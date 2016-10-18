@@ -59,9 +59,8 @@ public:
    * See vtkAbstractArray::GetProminentComponentValues for more information
    * about the \a uncertaintyAllowed and \a fraction arguments.
    */
-  virtual vtkPVProminentValuesInformation* GetProminentValuesInformation(
-    vtkStdString name, int fieldAssoc, int numComponents,
-    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+  virtual vtkPVProminentValuesInformation* GetProminentValuesInformation(vtkStdString name,
+    int fieldAssoc, int numComponents, double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
 
   /**
    * Calls Update() on all sources. It also creates output ports if
@@ -101,10 +100,10 @@ public:
    */
   virtual bool SetRepresentationType(const char* type);
   static bool SetRepresentationType(vtkSMProxy* repr, const char* type)
-    {
+  {
     vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
-    return self? self->SetRepresentationType(type) : false;
-    }
+    return self ? self->SetRepresentationType(type) : false;
+  }
   //@}
 
 protected:
@@ -138,7 +137,7 @@ protected:
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRepresentationProxy&) VTK_DELETE_FUNCTION;
-  
+
   /**
    * HACK: Returns true for lookuptable, piecewise function proxies which are
    * not expected to modify data pipeline.
@@ -166,7 +165,6 @@ private:
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
   bool VTKRepresentationUpdated;
-
 };
 
 #endif

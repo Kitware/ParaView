@@ -50,10 +50,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqListPropertyWidget : public pqPropertyWid
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
   Q_PROPERTY(QList<QVariant> value READ value WRITE setValue NOTIFY valueChanged);
+
 public:
-  explicit pqListPropertyWidget(vtkSMProxy* smproxy,
-                                vtkSMProperty* smproperty,
-                                QWidget* parent=0);
+  explicit pqListPropertyWidget(
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqListPropertyWidget();
 
   /**

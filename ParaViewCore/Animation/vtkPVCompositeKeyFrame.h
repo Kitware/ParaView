@@ -42,13 +42,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum
-    {
-    NONE =0,
-    BOOLEAN=1,
-    RAMP=2,
-    EXPONENTIAL=3,
-    SINUSOID=4
-    };
+  {
+    NONE = 0,
+    BOOLEAN = 1,
+    RAMP = 2,
+    EXPONENTIAL = 3,
+    SINUSOID = 4
+  };
 
   //@{
   /**
@@ -56,8 +56,7 @@ public:
    */
   virtual void RemoveAllKeyValues();
   virtual void SetKeyTime(double time);
-  virtual void SetKeyValue(double val)
-    { this->Superclass::SetKeyValue(val); }
+  virtual void SetKeyValue(double val) { this->Superclass::SetKeyValue(val); }
   virtual void SetKeyValue(unsigned int index, double val);
   virtual void SetNumberOfKeyValues(unsigned int num);
   //@}
@@ -97,8 +96,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue( double currenttime,
-                            vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
 protected:
   vtkPVCompositeKeyFrame();
@@ -110,6 +108,7 @@ protected:
   vtkPVRampKeyFrame* RampKeyFrame;
   vtkPVExponentialKeyFrame* ExponentialKeyFrame;
   vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
+
 private:
   vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;

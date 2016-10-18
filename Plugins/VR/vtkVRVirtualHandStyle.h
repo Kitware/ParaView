@@ -43,18 +43,18 @@ class vtkSMIntVectorProperty;
 struct vtkVREventData;
 
 class vtkVRVirtualHandStyle : public vtkVRTrackStyle
-{  
+{
 public:
-  static vtkVRVirtualHandStyle *New();
-  vtkTypeMacro(vtkVRVirtualHandStyle, vtkVRTrackStyle)
-  void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkVRVirtualHandStyle* New();
+  vtkTypeMacro(vtkVRVirtualHandStyle, vtkVRTrackStyle) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
 protected:
   vtkVRVirtualHandStyle();
   ~vtkVRVirtualHandStyle();
 
-  virtual void HandleButton( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
+  virtual void HandleButton(const vtkVREventData& data);
+  virtual void HandleTracker(const vtkVREventData& data);
 
   bool CurrentButton;
   bool PrevButton;
@@ -70,7 +70,6 @@ protected:
 private:
   vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
-
 };
 
-#endif //vtkVRVirtualHandStyle.h
+#endif // vtkVRVirtualHandStyle.h

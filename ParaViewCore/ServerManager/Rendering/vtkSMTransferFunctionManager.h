@@ -50,8 +50,8 @@ public:
    * with the given name. If none exists in the given
    * session, a new instance will be created and returned.
    */
-  virtual vtkSMProxy* GetColorTransferFunction(const char* arrayName,
-    vtkSMSessionProxyManager* pxm);
+  virtual vtkSMProxy* GetColorTransferFunction(
+    const char* arrayName, vtkSMSessionProxyManager* pxm);
 
   /**
    * Returns a opacity transfer function proxy (aka Piecewise Function) instance
@@ -59,8 +59,8 @@ public:
    * none exists in the given session, a new instance will be created and
    * returned.
    */
-  virtual vtkSMProxy* GetOpacityTransferFunction(const char* arrayName,
-    vtkSMSessionProxyManager* pxm);
+  virtual vtkSMProxy* GetOpacityTransferFunction(
+    const char* arrayName, vtkSMSessionProxyManager* pxm);
 
   /**
    * Returns the scalar-bar (color-legend) representation corresponding to the
@@ -78,13 +78,13 @@ public:
    * current data range rather then resetting it to the range.
    */
   void ResetAllTransferFunctionRangesUsingCurrentData(
-    vtkSMSessionProxyManager* pxm, bool extend=false);
+    vtkSMSessionProxyManager* pxm, bool extend = false);
 
   enum UpdateScalarBarsMode
-    {
+  {
     HIDE_UNUSED_SCALAR_BARS = 0x01,
     SHOW_USED_SCALAR_BARS = 0x02
-    };
+  };
 
   /**
    * Updates the scalar bar visibility in the view. Based on the specified mode,
@@ -106,7 +106,6 @@ protected:
 private:
   vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -29,8 +29,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVCylinder : public vtkCylinder
 {
 public:
   static vtkPVCylinder* New();
-  vtkTypeMacro(vtkPVCylinder, vtkCylinder)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkPVCylinder, vtkCylinder) void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -39,10 +38,10 @@ public:
   void SetAxis(double x, double y, double z);
   void SetAxis(const double axis[3]);
   vtkGetVector3Macro(Axis, double)
-  //@}
+    //@}
 
-  // Reimplemented to update transform on change:
-  virtual void SetCenter(double x, double y, double z);
+    // Reimplemented to update transform on change:
+    virtual void SetCenter(double x, double y, double z);
   virtual void SetCenter(double xyz[3]);
 
 protected:
@@ -60,7 +59,7 @@ private:
 
 inline void vtkPVCylinder::SetAxis(double x, double y, double z)
 {
-  double axis[3] = {x, y, z};
+  double axis[3] = { x, y, z };
   this->SetAxis(axis);
 }
 

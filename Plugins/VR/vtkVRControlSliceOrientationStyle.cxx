@@ -56,8 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRControlSliceOrientationStyle)
 
-// ----------------------------------------------------------------------------
-vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
+  // ----------------------------------------------------------------------------
+  vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
 {
   this->Enabled = false;
   this->InitialOrientationRecorded = false;
@@ -66,24 +66,21 @@ vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRControlSliceOrientationStyle::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRControlSliceOrientationStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Enabled: " << this->Enabled << endl;
-  os << indent << "InitialOrientationRecorded: "
-     << this->InitialOrientationRecorded << endl;
-  os << indent << "InitialQuat: " << this->InitialQuat[0] << " "
-     << this->InitialQuat[1] << " " << this->InitialQuat[2] << " "
-     << this->InitialQuat[3] << endl;
+  os << indent << "InitialOrientationRecorded: " << this->InitialOrientationRecorded << endl;
+  os << indent << "InitialQuat: " << this->InitialQuat[0] << " " << this->InitialQuat[1] << " "
+     << this->InitialQuat[2] << " " << this->InitialQuat[3] << endl;
   os << indent << "InitialTrackerQuat: " << this->InitialTrackerQuat[0] << " "
      << this->InitialTrackerQuat[1] << " " << this->InitialTrackerQuat[2] << " "
      << this->InitialTrackerQuat[3] << endl;
-  os << indent << "UpdatedQuat: " << this->UpdatedQuat[0] << " "
-     << this->UpdatedQuat[1] << " " << this->UpdatedQuat[2] << " "
-     << this->UpdatedQuat[3] << endl;
-  os << indent << "Normal: " << this->Normal[0] << " " << this->Normal[1] << " "
-     << this->Normal[2] << " " << this->Normal[3] << endl;
+  os << indent << "UpdatedQuat: " << this->UpdatedQuat[0] << " " << this->UpdatedQuat[1] << " "
+     << this->UpdatedQuat[2] << " " << this->UpdatedQuat[3] << endl;
+  os << indent << "Normal: " << this->Normal[0] << " " << this->Normal[1] << " " << this->Normal[2]
+     << " " << this->Normal[3] << endl;
 
   os << indent << "InitialInvertedPose:" << endl;
   this->InitialInvertedPose->PrintSelf(os, indent.GetNextIndent());
@@ -98,9 +95,9 @@ vtkVRControlSliceOrientationStyle::~vtkVRControlSliceOrientationStyle()
 bool vtkVRControlSliceOrientationStyle::Update()
 {
   if (!this->ControlledProxy)
-    {
+  {
     return false;
-    }
+  }
 
   return true;
 }
@@ -110,15 +107,15 @@ void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 {
   vtkStdString role = this->GetButtonRole(data.name);
   if (role == "Grab slice")
-    {
+  {
     if (this->Enabled && data.data.button.state == 0)
-      {
+    {
       this->ControlledProxy->UpdateVTKObjects();
       this->InitialOrientationRecorded = false;
-      }
+    }
 
     this->Enabled = data.data.button.state;
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -126,30 +123,29 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
 {
   vtkStdString role = this->GetTrackerRole(data.name);
   if (role != "Slice orientation")
-    {
+  {
     return;
-    }
+  }
 
   if (!this->Enabled)
-    {
+  {
     this->InitialOrientationRecorded = false;
     return;
-    }
+  }
 
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  pqView *view = pqActiveObjects::instance().activeView();
+  vtkSMRenderViewProxy* proxy = 0;
+  vtkSMDoubleVectorProperty* prop = 0;
+  pqView* view = pqActiveObjects::instance().activeView();
   if (view)
-    {
+  {
     proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
     if (proxy)
-      {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(
-            proxy->GetProperty("ModelTransformMatrix"));
+    {
+      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty("ModelTransformMatrix"));
       if (prop)
-        {
+      {
         if (!this->InitialOrientationRecorded)
-          {
+        {
           // Copy the data into matrix
           this->InitialInvertedPose->DeepCopy(data.data.tracker.matrix);
           this->InitialInvertedPose->SetElement(0, 3, 0.0);
@@ -159,14 +155,13 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
           // Invert the matrix
           this->InitialInvertedPose->Invert();
 
-          vtkSMPropertyHelper(this->ControlledProxy,
-                              this->ControlledPropertyName).Get(this->Normal,
-                                                                3);
+          vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
+            .Get(this->Normal, 3);
           this->Normal[3] = 1;
           this->InitialOrientationRecorded = true;
-          }
+        }
         else
-          {
+        {
           vtkNew<vtkMatrix4x4> transformMatrix;
           transformMatrix->DeepCopy(data.data.tracker.matrix);
           transformMatrix->SetElement(0, 3, 0.0);
@@ -175,18 +170,16 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
 
           double normal[4];
           vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
-                                    this->InitialInvertedPose.GetPointer(),
-                                    transformMatrix.GetPointer());
+            this->InitialInvertedPose.GetPointer(), transformMatrix.GetPointer());
           double* transformedPoint = transformMatrix->MultiplyDoublePoint(this->Normal);
           normal[0] = transformedPoint[0] / transformedPoint[3];
           normal[1] = transformedPoint[1] / transformedPoint[3];
           normal[2] = transformedPoint[2] / transformedPoint[3];
           normal[3] = 1.0;
 
-          vtkSMPropertyHelper(this->ControlledProxy,
-                              this->ControlledPropertyName).Set(normal, 3);
-          }
+          vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName).Set(normal, 3);
         }
       }
     }
+  }
 }

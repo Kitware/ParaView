@@ -52,15 +52,13 @@ public:
     NOT_EXPANDED_DISABLED
   };
 
-  pqCheckBoxDelegate(QObject *parent);
+  pqCheckBoxDelegate(QObject* parent);
   ~pqCheckBoxDelegate();
 
-  void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const;
-  bool editorEvent(QEvent *event,
-                   QAbstractItemModel *model,
-                   const QStyleOptionViewItem &option,
-                   const QModelIndex &index);
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
+    const QModelIndex& index);
+
 private:
   Q_DISABLE_COPY(pqCheckBoxDelegate)
   struct pqInternals;

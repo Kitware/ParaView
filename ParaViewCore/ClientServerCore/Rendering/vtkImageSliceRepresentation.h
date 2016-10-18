@@ -37,7 +37,8 @@ class vtkPVImageSliceMapper;
 class vtkPVLODActor;
 class vtkScalarsToColors;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageSliceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageSliceRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkImageSliceRepresentation* New();
@@ -49,25 +50,24 @@ public:
    * Set the input data arrays that this algorithm will process. Overridden to
    * pass the array selection to the mapper.
    */
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, const char *name);
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, int fieldAttributeType)
-    {
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, const char* name);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+  {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
-    }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
-    {
+  }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info)
+  {
     this->Superclass::SetInputArrayToProcess(idx, info);
-    }
+  }
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              const char* fieldAssociation,
-                              const char* attributeTypeorName)
-    {
-    this->Superclass::SetInputArrayToProcess(idx, port, connection,
-      fieldAssociation, attributeTypeorName);
-    }
+    const char* fieldAssociation, const char* attributeTypeorName)
+  {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, attributeTypeorName);
+  }
   //@}
 
   /**
@@ -76,8 +76,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * This needs to be called on all instances of vtkImageSliceRepresentation when
@@ -103,11 +103,11 @@ public:
   //@}
 
   enum
-    {
+  {
     XY_PLANE = VTK_XY_PLANE,
     YZ_PLANE = VTK_YZ_PLANE,
     XZ_PLANE = VTK_XZ_PLANE
-    };
+  };
 
   //@{
   /**
@@ -175,8 +175,7 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -209,10 +208,10 @@ protected:
   // when redistributing data.
   vtkNew<vtkPExtentTranslator> PExtentTranslator;
   int WholeExtent[6];
+
 private:
   vtkImageSliceRepresentation(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

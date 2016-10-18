@@ -33,15 +33,15 @@ class vtkMultiProcessController;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkCompleteArrays, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkCompleteArrays *New();
+  static vtkCompleteArrays* New();
 
   //@{
   /**
    * The user can set the controller used for inter-process communication.
    */
-  void SetController(vtkMultiProcessController *controller);
+  void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
@@ -49,10 +49,10 @@ protected:
   vtkCompleteArrays();
   ~vtkCompleteArrays();
 
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   vtkMultiProcessController* Controller;
+
 private:
   vtkCompleteArrays(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;

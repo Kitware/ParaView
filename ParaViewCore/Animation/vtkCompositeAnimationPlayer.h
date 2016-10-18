@@ -38,11 +38,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum Modes
-    {
-    SEQUENCE=0,
-    REAL_TIME=1,
-    SNAP_TO_TIMESTEPS=2
-    };
+  {
+    SEQUENCE = 0,
+    REAL_TIME = 1,
+    SNAP_TO_TIMESTEPS = 2
+  };
 
   //@{
   /**
@@ -101,7 +101,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif

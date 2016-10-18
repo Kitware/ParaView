@@ -48,11 +48,10 @@ protected:
   vtkPythonExtractSelection();
   ~vtkPythonExtractSelection();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int RequestDataObject(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-  virtual int RequestData(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Method used to initialize the output data object in request data.
@@ -64,7 +63,6 @@ protected:
 private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPythonExtractSelection&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

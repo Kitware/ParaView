@@ -114,6 +114,7 @@ public:
    * enumeration, if not it will be set to the first enumeration value.
    */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+
 protected:
   vtkSMEnumerationDomain();
   ~vtkSMEnumerationDomain();

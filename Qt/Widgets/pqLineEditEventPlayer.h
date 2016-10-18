@@ -44,8 +44,9 @@ class PQWIDGETS_EXPORT pqLineEditEventPlayer : public pqAbstractStringEventPlaye
 {
   Q_OBJECT
   typedef pqAbstractStringEventPlayer Superclass;
+
 public:
-  pqLineEditEventPlayer(QObject* parent=0);
+  pqLineEditEventPlayer(QObject* parent = 0);
   virtual ~pqLineEditEventPlayer();
 
   using Superclass::playEvent;

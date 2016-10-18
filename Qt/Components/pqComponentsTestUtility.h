@@ -43,6 +43,7 @@ class PQCOMPONENTS_EXPORT pqComponentsTestUtility : public pqCoreTestUtility
 {
   Q_OBJECT
   typedef pqCoreTestUtility Superclass;
+
 public:
   pqComponentsTestUtility(QObject* parentObj = 0);
 
@@ -58,5 +59,3 @@ private:
 };
 
 #endif
-
-

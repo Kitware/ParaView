@@ -55,8 +55,7 @@ public:
   * the given string as the title of the dialog when the widget is
   * popped out.
   */
-  pqPopOutWidget(QWidget *widgetToPopOut, const QString &dialogTitle,
-                 QWidget *p = 0);
+  pqPopOutWidget(QWidget* widgetToPopOut, const QString& dialogTitle, QWidget* p = 0);
   virtual ~pqPopOutWidget();
 
   /**
@@ -65,7 +64,7 @@ public:
   * appropriate slots and will cause its icon to be updated based on
   * whether the dialog is visible or not.
   */
-  void setPopOutButton(QPushButton *button);
+  void setPopOutButton(QPushButton* button);
 
 signals:
 
@@ -87,10 +86,10 @@ protected slots:
   * when the dialog is closed.
   */
   void moveWidgetBackToParent();
+
 private:
   class pqInternal;
-  pqInternal *Internals;
-
+  pqInternal* Internals;
 };
 
 #endif // PQPOPOUTWIDGET_H

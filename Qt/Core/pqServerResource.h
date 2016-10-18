@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,7 @@ class pqServerConfiguration;
 
 /**
 * pqServerResource encapsulates a resource in ParaView. A resource can be anything,
-* a data file, a list of data files, a state file, or a connection to a server. 
+* a data file, a list of data files, a state file, or a connection to a server.
 * The resource specification is based on URL-like syntax:
 * \verbatim
 * <scheme>://<scheme-specific-parameters>
@@ -119,13 +119,13 @@ public:
   * Returns a compact string representation of the resource in URI format
   */
   const QString toURI() const;
- 
+
   /**
   * Returns a compact string representation of the resource including extra
   * data
   */
   const QString serializeString() const;
-  
+
   /** Returns the resource scheme -
   builtin, cs, csrc, cdsrs, cdsrsrc, or session */
   const QString scheme() const;
@@ -133,7 +133,7 @@ public:
   * Sets the resource scheme
   */
   void setScheme(const QString&);
-  
+
   /** Returns the resource host, or empty string for builtin, session,
   cdsrs, and cdsrsrc schemes */
   const QString host() const;
@@ -141,25 +141,25 @@ public:
   * Sets the resource host
   */
   void setHost(const QString&);
-  
+
   int port() const;
   int port(int default_port) const;
   void setPort(int);
 
   const QString dataServerHost() const;
   void setDataServerHost(const QString&);
-  
+
   int dataServerPort() const;
   int dataServerPort(int default_port) const;
   void setDataServerPort(int);
-  
+
   const QString renderServerHost() const;
   void setRenderServerHost(const QString&);
-    
+
   int renderServerPort() const;
   int renderServerPort(int default_port) const;
   void setRenderServerPort(int);
-    
+
   const QString path() const;
   void setPath(const QString&);
 
@@ -172,7 +172,7 @@ public:
   const QString data(const QString& key) const;
   const QString data(const QString& key, const QString& default_value) const;
   bool hasData(const QString& key) const;
-  
+
   /** Returns a copy of this resource containing only server information -
   scheme, host, and port numbers */
   const pqServerResource schemeHostsPorts() const;

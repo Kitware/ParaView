@@ -28,7 +28,8 @@
 
 class vtkChartBox;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBoxChartRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBoxChartRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVBoxChartRepresentation* New();
@@ -107,14 +108,13 @@ protected:
   int LineStyle;
   double Color[3];
   bool Legend;
+
 private:
-  vtkPVBoxChartRepresentation(
-      const vtkPVBoxChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVBoxChartRepresentation(const vtkPVBoxChartRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVBoxChartRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

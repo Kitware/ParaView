@@ -59,16 +59,16 @@ public:
   virtual void Update();
 
   enum
-    {
+  {
     SAGITTAL_VIEW_RENDERER = vtkPVRenderView::NON_COMPOSITED_RENDERER + 1,
     AXIAL_VIEW_RENDERER,
     CORONAL_VIEW_RENDERER,
-    };
+  };
 
   /**
    * Overridden to add support for new types of renderers.
    */
-  virtual vtkRenderer* GetRenderer(int rendererType=vtkPVRenderView::DEFAULT_RENDERER);
+  virtual vtkRenderer* GetRenderer(int rendererType = vtkPVRenderView::DEFAULT_RENDERER);
 
   virtual void ResetCamera();
   virtual void ResetCamera(double bounds[6]);
@@ -98,11 +98,10 @@ public:
   vtkGetMacro(SliceAnnotationsVisibility, bool);
   //@}
 
-
   /**
    * To avoid confusion, we don't show the center axes at all in this view.
    */
-  virtual void SetCenterAxesVisibility(bool){}
+  virtual void SetCenterAxesVisibility(bool) {}
 
   //*****************************************************************
   virtual void SetBackground(double r, double g, double b);
@@ -129,7 +128,7 @@ protected:
   virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
 
   enum
-    {
+  {
     SIDE_VIEW = 0,
     TOP_VIEW = 1,
     FRONT_VIEW = 2,
@@ -143,7 +142,7 @@ protected:
     SAGITTAL_VIEW = SIDE_VIEW,
 
     RIGHT_SIDE_VIEW = SIDE_VIEW
-    };
+  };
 
   vtkNew<vtkRenderer> Renderers[3];
   vtkNew<vtkPVOrthographicSliceViewInteractorStyle> OrthographicInteractorStyle;
@@ -155,6 +154,7 @@ protected:
   double SliceIncrements[3];
   double SlicePosition[3];
   bool SliceAnnotationsVisibility;
+
 private:
   vtkPVOrthographicSliceView(const vtkPVOrthographicSliceView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVOrthographicSliceView&) VTK_DELETE_FUNCTION;
@@ -171,7 +171,6 @@ private:
   bool GridAxes3DActorsNeedShallowCopy;
   unsigned long GridAxes3DActorObserverId;
   void OnGridAxes3DActorModified();
-
 };
 
 #endif

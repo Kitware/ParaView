@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVCacheSizeInformation
- * @brief   information obeject to 
+ * @brief   information obeject to
  * collect cache size information from a vtkCacheSizeKeeper.
  *
  * Gather information about cache size from vtkCacheSizeKeeper.
@@ -53,15 +53,16 @@ public:
 
   vtkGetMacro(CacheSize, unsigned long);
   vtkSetMacro(CacheSize, unsigned long);
+
 protected:
   vtkPVCacheSizeInformation();
   ~vtkPVCacheSizeInformation();
 
   unsigned long CacheSize;
+
 private:
   vtkPVCacheSizeInformation(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

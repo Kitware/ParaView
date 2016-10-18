@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,24 +41,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------
-pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QTreeView* tree):
-  Superclass(tree)
+pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QTreeView* tree)
+  : Superclass(tree)
 {
   this->TreeView = tree;
   tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
   tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  QObject::connect(tree, SIGNAL(clicked(QModelIndex)),
-    this, SLOT(onClicked(QModelIndex)));
-  QObject::connect(tree, SIGNAL(pressed(QModelIndex)),
-    this, SLOT(onPressed(QModelIndex)));
+  QObject::connect(tree, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
+  QObject::connect(tree, SIGNAL(pressed(QModelIndex)), this, SLOT(onPressed(QModelIndex)));
 
-  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(showContextMenu(const QPoint&)));
+  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(showContextMenu(const QPoint&)));
 
-  QObject::connect(tree->selectionModel(), 
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-    this, SLOT(saveSelection()));
+  QObject::connect(tree->selectionModel(),
+    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+    SLOT(saveSelection()));
 }
 
 //-----------------------------------------------------------------------------
@@ -76,35 +74,35 @@ void pqTreeViewSelectionHelper::saveSelection()
 //-----------------------------------------------------------------------------
 void pqTreeViewSelectionHelper::onPressed(QModelIndex idx)
 {
-//  qDebug() << "onItemPressed" 
-//  << this->TreeWidget->selectionModel()->selectedIndexes().size();
+  //  qDebug() << "onItemPressed"
+  //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
 
   this->PressState = -1;
 
   Qt::ItemFlags flags = this->TreeView->model()->flags(idx);
 
   if ((flags & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-    {
+  {
     this->PressState = this->TreeView->model()->data(idx, Qt::CheckStateRole).toInt();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqTreeViewSelectionHelper::onClicked(QModelIndex idx)
 {
-  //  qDebug() << "onItemClicked" 
+  //  qDebug() << "onItemClicked"
   //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
   if (this->PrevSelection.contains(idx) && this->PressState != -1)
-    {
-    Qt::CheckState state = static_cast<Qt::CheckState>(
-      this->TreeView->model()->data(idx, Qt::CheckStateRole).toInt());
+  {
+    Qt::CheckState state =
+      static_cast<Qt::CheckState>(this->TreeView->model()->data(idx, Qt::CheckStateRole).toInt());
     if (state != this->PressState)
-      {
+    {
       // Change all checkable items in the this->Selection to match the new
       // check state.
       this->setSelectedItemsCheckState(state);
-      }
     }
+  }
   this->saveSelection();
 }
 
@@ -114,24 +112,24 @@ void pqTreeViewSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)
   // Change all checkable items in the this->Selection to match the new
   // check state.
   foreach (QModelIndex idx, this->PrevSelection.indexes())
-    {
+  {
     Qt::ItemFlags flags = this->TreeView->model()->flags(idx);
 
     if ((flags & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-      {
+    {
       this->TreeView->model()->setData(idx, state, Qt::CheckStateRole);
-      }
     }
+  }
 
-  this->TreeView->selectionModel()->select(this->PrevSelection, 
-    QItemSelectionModel::ClearAndSelect);
+  this->TreeView->selectionModel()->select(
+    this->PrevSelection, QItemSelectionModel::ClearAndSelect);
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::showContextMenu(const QPoint &pos)
+void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
 {
   if (this->TreeView->selectionModel()->selectedIndexes().size() > 0)
-    {
+  {
     QMenu menu;
     menu.setObjectName("TreeViewCheckMenu");
     QAction* check = new QAction("Check", &menu);
@@ -140,12 +138,12 @@ void pqTreeViewSelectionHelper::showContextMenu(const QPoint &pos)
     menu.addAction(uncheck);
     QAction* result = menu.exec(this->TreeView->mapToGlobal(pos));
     if (result == check)
-      {
+    {
       this->setSelectedItemsCheckState(Qt::Checked);
-      }
-    else if (result == uncheck)
-      {
-      this->setSelectedItemsCheckState(Qt::Unchecked);
-      }
     }
+    else if (result == uncheck)
+    {
+      this->setSelectedItemsCheckState(Qt::Unchecked);
+    }
+  }
 }

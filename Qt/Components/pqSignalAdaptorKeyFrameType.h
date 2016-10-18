@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,28 +41,27 @@ class QLabel;
 class pqKeyFrameTypeWidget;
 
 /**
-* pqSignalAdaptorKeyFrameType is adaptor for the "Type" property of the 
-* vtkSMCompositeKeyFrameProxy. For certain types of keyframes, 
+* pqSignalAdaptorKeyFrameType is adaptor for the "Type" property of the
+* vtkSMCompositeKeyFrameProxy. For certain types of keyframes,
 * we have additional properties that must be exposed in the GUI,
-* this class manages that. 
-* Use this to connect a QComboBox with type listing 
+* this class manages that.
+* Use this to connect a QComboBox with type listing
 * to the Type property on the proxy.
 */
-class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameType : 
-  public pqSignalAdaptorComboBox
+class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameType : public pqSignalAdaptorComboBox
 {
   Q_OBJECT
 public:
   /**
-  * Constructor. 
+  * Constructor.
   * \c combo is the combo-box that chooses the type, while frame is
   * the frame in which this adaptor can put additional widgets, if needed.
   * \c valueLabel is the label that is used for the keyframe value,
   * since based on the type  the value label may change.
   * Note that this class will toggle the visibility of this frame as needed.
   */
-  pqSignalAdaptorKeyFrameType(pqKeyFrameTypeWidget* widget,
-                              pqPropertyLinks* links, QLabel* valueLabel=NULL);
+  pqSignalAdaptorKeyFrameType(
+    pqKeyFrameTypeWidget* widget, pqPropertyLinks* links, QLabel* valueLabel = NULL);
   virtual ~pqSignalAdaptorKeyFrameType();
 
   /**
@@ -84,8 +83,6 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
-
 };
 
 #endif
-

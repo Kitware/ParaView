@@ -40,8 +40,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractVOI : public vtkDataSetAlgori
 {
 
 public:
-  static vtkPVExtractVOI *New();
-  vtkTypeMacro(vtkPVExtractVOI,vtkDataSetAlgorithm);
+  static vtkPVExtractVOI* New();
+  vtkTypeMacro(vtkPVExtractVOI, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -50,8 +50,8 @@ public:
    * dataset can be of any topological dimension (i.e., point, line, plane,
    * or 3D grid).
    */
-  vtkSetVector6Macro(VOI,int);
-  vtkGetVectorMacro(VOI,int,6);
+  vtkSetVector6Macro(VOI, int);
+  vtkGetVectorMacro(VOI, int, 6);
   //@}
 
   //@{
@@ -76,7 +76,7 @@ public:
   int GetSampleRateJ() { return this->SampleRate[1]; }
   int GetSampleRateK() { return this->SampleRate[2]; }
   //@}
-  
+
   //@{
   /**
    * Control whether to enforce that the "boundary" of the grid is output in
@@ -86,21 +86,18 @@ public:
    * though the sample rate is not an even multiple of the grid
    * dimensions. (By default IncludeBoundary is off.)
    */
-  vtkSetMacro(IncludeBoundary,int);
-  vtkGetMacro(IncludeBoundary,int);
-  vtkBooleanMacro(IncludeBoundary,int);
+  vtkSetMacro(IncludeBoundary, int);
+  vtkGetMacro(IncludeBoundary, int);
+  vtkBooleanMacro(IncludeBoundary, int);
   //@}
 
 protected:
   vtkPVExtractVOI();
   ~vtkPVExtractVOI();
 
-  virtual int RequestData(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestInformation(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestUpdateExtent(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   int VOI[6];
   int SampleRate[3];
@@ -111,12 +108,10 @@ protected:
   vtkExtractRectilinearGrid* ExtractRG;
 
   virtual void ReportReferences(vtkGarbageCollector*);
+
 private:
   vtkPVExtractVOI(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-
-
-

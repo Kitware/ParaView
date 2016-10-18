@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
   QItemSelectionModel* pipelineSelectionModel)
-: pqSelectionAdaptor(pipelineSelectionModel)
+  : pqSelectionAdaptor(pipelineSelectionModel)
 {
   if (!qobject_cast<const pqPipelineModel*>(this->getQModel()))
-    {
+  {
     qDebug() << "QItemSelectionModel must be a selection model for "
-      " pqPipelineModel.";
+                " pqPipelineModel.";
     return;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -57,19 +57,15 @@ pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqPipelineModelSelectionAdaptor::mapFromItem(
-  pqServerManagerModelItem* item) const
+QModelIndex pqPipelineModelSelectionAdaptor::mapFromItem(pqServerManagerModelItem* item) const
 {
-  const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
-    this->getQModel());
+  const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(this->getQModel());
   return pM->getIndexFor(item);
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelItem*
-pqPipelineModelSelectionAdaptor::mapToItem(const QModelIndex& index) const
+pqServerManagerModelItem* pqPipelineModelSelectionAdaptor::mapToItem(const QModelIndex& index) const
 {
-  const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
-    this->getQModel());
+  const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(this->getQModel());
   return pM->getItemFor(index);
 }

@@ -41,19 +41,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqHideAllReaction : public pqReaction
 {
   Q_OBJECT
-    typedef pqReaction Superclass;
+  typedef pqReaction Superclass;
+
 public:
   pqHideAllReaction(QAction* parent);
 
   static void HideAll();
+
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    {
-    pqHideAllReaction::HideAll();
-    }
+  virtual void onTriggered() { pqHideAllReaction::HideAll(); }
 private:
   Q_DISABLE_COPY(pqHideAllReaction)
 };

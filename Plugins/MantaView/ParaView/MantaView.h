@@ -71,25 +71,20 @@ class MantaView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
+
 public:
   static QString mantaViewType() { return "MantaView"; }
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView
-  MantaView(
-         const QString& group,
-         const QString& name,
-         vtkSMProxy* viewmodule,
-         pqServer* server,
-         QObject* p);
+  MantaView(const QString& group, const QString& name, vtkSMProxy* viewmodule, pqServer* server,
+    QObject* p);
   ~MantaView();
 
 protected:
-
 private:
   MantaView(const MantaView&) VTK_DELETE_FUNCTION;
   void operator=(const MantaView&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // _MantaView_h

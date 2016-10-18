@@ -56,8 +56,8 @@ public:
   //@}
 
   enum FileTypes
-    {
-    INVALID=0,
+  {
+    INVALID = 0,
     SINGLE_FILE,
     SINGLE_FILE_LINK,
     DIRECTORY,
@@ -68,7 +68,7 @@ public:
     NETWORK_DOMAIN,
     NETWORK_SERVER,
     NETWORK_SHARE
-    };
+  };
 
   /**
    * Helper that returns whether a FileType is a
@@ -109,7 +109,7 @@ public:
   /**
    * Get the state of the hidden flag for the file/directory.
    */
-  vtkGetMacro(Hidden,bool);
+  vtkGetMacro(Hidden, bool);
   //@}
 
   //@{
@@ -130,15 +130,15 @@ protected:
   ~vtkPVFileInformation();
 
   vtkCollection* Contents;
-  vtkFileSequenceParser * SequenceParser;
+  vtkFileSequenceParser* SequenceParser;
 
-  char* Name;     // Name of this file/directory.
-  char* FullPath; // Full path for this file/directory.
-  int Type;       // Type i.e. File/Directory/FileGroup.
-  bool Hidden;    // If file/directory is hidden
-  char* Extension; // File extension
-  long long Size;     // File size
-  time_t ModificationTime;  // File modification time
+  char* Name;              // Name of this file/directory.
+  char* FullPath;          // Full path for this file/directory.
+  int Type;                // Type i.e. File/Directory/FileGroup.
+  bool Hidden;             // If file/directory is hidden
+  char* Extension;         // File extension
+  long long Size;          // File size
+  time_t ModificationTime; // File modification time
 
   vtkSetStringMacro(Extension);
   vtkSetStringMacro(Name);
@@ -153,14 +153,14 @@ protected:
 
   bool DetectType();
   void GetSpecialDirectories();
-  void SetHiddenFlag( );
+  void SetHiddenFlag();
   int FastFileTypeDetection;
+
 private:
   vtkPVFileInformation(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
 
   struct vtkInfo;
-
 };
 
 #endif

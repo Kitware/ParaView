@@ -47,26 +47,27 @@ void vtkSMMultiServerSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   // Notify the VTK object as well
   vtkPVMultiServerDataSource* clientObj =
-      vtkPVMultiServerDataSource::SafeDownCast(this->GetClientSideObject());
+    vtkPVMultiServerDataSource::SafeDownCast(this->GetClientSideObject());
   clientObj->Modified();
 
   // Propagate the dirty flag as regular proxy
   this->Superclass::MarkDirty(modifiedProxy);
 }
 //---------------------------------------------------------------------------
-void vtkSMMultiServerSourceProxy::SetExternalProxy(vtkSMSourceProxy* proxyFromAnotherServer, int port)
+void vtkSMMultiServerSourceProxy::SetExternalProxy(
+  vtkSMSourceProxy* proxyFromAnotherServer, int port)
 {
   vtkPVMultiServerDataSource* clientObj =
-      vtkPVMultiServerDataSource::SafeDownCast(this->GetClientSideObject());
+    vtkPVMultiServerDataSource::SafeDownCast(this->GetClientSideObject());
 
   clientObj->SetExternalProxy(proxyFromAnotherServer, port);
 
   // Remove previous proxy dependency
   vtkSMSourceProxy* previousRemoteProxy = this->GetExternalProxy();
-  if(previousRemoteProxy != NULL)
-    {
+  if (previousRemoteProxy != NULL)
+  {
     previousRemoteProxy->RemoveConsumer(this->GetProperty("DependencyLink"), this);
-    }
+  }
 
   // Store data informations
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -87,16 +88,13 @@ void vtkSMMultiServerSourceProxy::SetExternalProxy(vtkSMSourceProxy* proxyFromAn
 vtkSMSourceProxy* vtkSMMultiServerSourceProxy::GetExternalProxy()
 {
   vtkSMSourceProxy* bindedProxy = NULL;
-  vtkSMSession* remoteSession =
-      vtkSMSession::SafeDownCast(
-        vtkProcessModule::GetProcessModule()->GetSession(
-          this->RemoteProxySessionID));
-  if(remoteSession)
-    {
-    bindedProxy =
-        vtkSMSourceProxy::SafeDownCast(
-          remoteSession->GetProxyLocator()->LocateProxy(this->RemoteProxyID));
-    }
+  vtkSMSession* remoteSession = vtkSMSession::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetSession(this->RemoteProxySessionID));
+  if (remoteSession)
+  {
+    bindedProxy = vtkSMSourceProxy::SafeDownCast(
+      remoteSession->GetProxyLocator()->LocateProxy(this->RemoteProxyID));
+  }
   return bindedProxy;
 }
 
@@ -110,8 +108,7 @@ void vtkSMMultiServerSourceProxy::UpdateState()
   // push current state.
   this->State->ClearExtension(ProxyState::user_data);
 
-  ProxyState_UserData* user_data =
-      this->State->AddExtension(ProxyState::user_data);
+  ProxyState_UserData* user_data = this->State->AddExtension(ProxyState::user_data);
   user_data->set_key("RemoteProxyInfo");
 
   Variant* variant = user_data->add_variant();
@@ -121,29 +118,28 @@ void vtkSMMultiServerSourceProxy::UpdateState()
   variant->add_integer(this->PortToExport);
 
   // Debug
-  //this->State->PrintDebugString();
+  // this->State->PrintDebugString();
 
   this->PushState(this->State);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMMultiServerSourceProxy::LoadState( const vtkSMMessage* message, vtkSMProxyLocator* locator)
+void vtkSMMultiServerSourceProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator)
 {
   this->Superclass::LoadState(message, locator);
 
   // Extract
   if (message->ExtensionSize(ProxyState::user_data) != 1)
-    {
+  {
     return;
-    }
+  }
 
-  const ProxyState_UserData& user_data =
-      message->GetExtension(ProxyState::user_data, 0);
+  const ProxyState_UserData& user_data = message->GetExtension(ProxyState::user_data, 0);
   if (user_data.key() != "RemoteProxyInfo")
-    {
-    //vtkWarningMacro("Unexpected user_data. Expecting RemoteProxyInfo.");
+  {
+    // vtkWarningMacro("Unexpected user_data. Expecting RemoteProxyInfo.");
     return;
-    }
+  }
 
   const Variant& data = user_data.variant(0);
   this->RemoteProxySessionID = data.idtype(0);

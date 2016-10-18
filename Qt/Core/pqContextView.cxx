@@ -68,17 +68,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqContextView::command : public vtkCommand
 {
 public:
-  static command* New(pqContextView &view)
+  static command* New(pqContextView& view) { return new command(view); }
+
+  command(pqContextView& view)
+    : Target(view)
   {
-    return new command(view);
   }
 
-  command(pqContextView &view) : Target(view) { }
-
-  virtual void Execute(vtkObject*, unsigned long, void*)
-  {
-    Target.selectionChanged();
-  }
+  virtual void Execute(vtkObject*, unsigned long, void*) { Target.selectionChanged(); }
 
   pqContextView& Target;
 
@@ -93,31 +90,25 @@ public:
   int SelectionAction;
 
   pqInternal()
-    {
-    this->InitializedAfterObjectsCreated=false;
+  {
+    this->InitializedAfterObjectsCreated = false;
     this->SelectionAction = vtkChart::SELECT_RECTANGLE;
-    }
-  ~pqInternal()
-    {
-    }
+  }
+  ~pqInternal() {}
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
 };
 
 //-----------------------------------------------------------------------------
-pqContextView::pqContextView(
-  const QString& type, const QString& group,
-  const QString& name,
-  vtkSMViewProxy* viewProxy,
-  pqServer* server,
-  QObject* parentObject)
-: Superclass(type, group, name, viewProxy, server, parentObject)
+pqContextView::pqContextView(const QString& type, const QString& group, const QString& name,
+  vtkSMViewProxy* viewProxy, pqServer* server, QObject* parentObject)
+  : Superclass(type, group, name, viewProxy, server, parentObject)
 {
   this->Internal = new pqContextView::pqInternal();
   viewProxy->UpdateVTKObjects(); // this results in calling CreateVTKObjects().
   this->Command = command::New(*this);
-  vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
-    vtkCommand::SelectionChangedEvent, this->Command);
+  vtkObject::SafeDownCast(viewProxy->GetClientSideObject())
+    ->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
 }
 
 //-----------------------------------------------------------------------------
@@ -170,12 +161,12 @@ bool pqContextView::supportsSelection() const
 /// Resets the zoom level to 100%.
 void pqContextView::resetDisplay()
 {
-  vtkSMContextViewProxy *proxy = this->getContextViewProxy();
+  vtkSMContextViewProxy* proxy = this->getContextViewProxy();
   if (proxy)
-    {
+  {
     proxy->ResetDisplay();
     this->render();
-    }
+  }
 }
 
 void pqContextView::selectionChanged()
@@ -183,9 +174,9 @@ void pqContextView::selectionChanged()
   // Fill the selection source with the selection from the view
   vtkSelection* sel = this->getContextViewProxy()->GetCurrentSelection();
   if (sel)
-    {
+  {
     this->setSelection(sel);
-    }
+  }
 }
 
 void pqContextView::setSelection(vtkSelection* sel)
@@ -194,49 +185,46 @@ void pqContextView::setSelection(vtkSelection* sel)
   pqDataRepresentation* pqRepr = 0;
 
   for (int i = 0; i < this->getNumberOfRepresentations(); ++i)
-    {
+  {
     if (this->getRepresentation(i)->isVisible())
-      {
+    {
       pqRepr = qobject_cast<pqDataRepresentation*>(this->getRepresentation(i));
-      }
     }
+  }
 
   if (!pqRepr)
-    {
+  {
     return;
-    }
+  }
 
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  
+  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
+
   repSource->CleanSelectionInputs(opPort->getPortNumber());
 
   vtkSMProxy* selectionSource =
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-      repSource->GetSession(), sel);
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(repSource->GetSession(), sel);
 
-  // If not selection has been made, 
+  // If not selection has been made,
   // the selection source can be null.
   if (selectionSource)
-    {
+  {
     // Set the selection on the representation's source
-    repSource->SetSelectionInput(opPort->getPortNumber(),
-      vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
+    repSource->SetSelectionInput(
+      opPort->getPortNumber(), vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
     selectionSource->Delete();
-    }
+  }
 
   emit this->selected(opPort);
 }
 
 void pqContextView::setSelectionAction(int selAction)
 {
-  if (this->Internal->SelectionAction == selAction ||
-    selAction < vtkChart::SELECT ||
+  if (this->Internal->SelectionAction == selAction || selAction < vtkChart::SELECT ||
     selAction > vtkChart::SELECT_POLYGON)
-    {
+  {
     return;
-    }
+  }
   this->Internal->SelectionAction = selAction;
 }
 

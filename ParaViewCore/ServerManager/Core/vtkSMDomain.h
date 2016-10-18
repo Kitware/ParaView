@@ -62,16 +62,12 @@ public:
    * properties. Subclasses must override this method to update the domain based
    * on the requestingProperty (and/or other required properties).
    */
-  virtual void Update(vtkSMProperty* requestingProperty)
-    {
-    (void)requestingProperty;
-    }
+  virtual void Update(vtkSMProperty* requestingProperty) { (void)requestingProperty; }
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(
-    vtkSMProperty*, int vtkNotUsed(index), double vtkNotUsed(value)) {}
+  virtual void SetAnimationValue(vtkSMProperty*, int vtkNotUsed(index), double vtkNotUsed(value)) {}
 
   /**
    * A vtkSMProperty is often defined with a default value in the
@@ -86,8 +82,7 @@ public:
    * Returns 1 if the domain updated the property.
    * Default implementation does nothing.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool vtkNotUsed(use_unchecked_values))
-    {return 0; };
+  virtual int SetDefaultValues(vtkSMProperty*, bool vtkNotUsed(use_unchecked_values)) { return 0; };
 
   //@{
   /**
@@ -141,8 +136,11 @@ protected:
    * vtkSMProxyListDomain needs to try to restore proxies (with proper ids) for
    * the domain.
    */
-  virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement),
-    vtkSMProxyLocator* vtkNotUsed(loader)) { return 1;  }
+  virtual int LoadState(
+    vtkPVXMLElement* vtkNotUsed(domainElement), vtkSMProxyLocator* vtkNotUsed(loader))
+  {
+    return 1;
+  }
 
   /**
    * Set the appropriate ivars from the xml element. Should
@@ -172,14 +170,13 @@ protected:
    * the vtkCommand::UpdateDataEvent is fired by the proxies contained in that
    * required property.
    */
-  void AddRequiredProperty(vtkSMProperty *prop, const char *function);
+  void AddRequiredProperty(vtkSMProperty* prop, const char* function);
 
   /**
    * Helper method to get vtkPVDataInformation from input proxy connected to the
    * required property with the given function.
    */
-  virtual vtkPVDataInformation* GetInputDataInformation(
-    const char* function, int index=0);
+  virtual vtkPVDataInformation* GetInputDataInformation(const char* function, int index = 0);
 
   //@{
   /**
@@ -221,6 +218,7 @@ protected:
   char* XMLName;
   bool IsOptional;
   vtkSMDomainInternals* Internals;
+
 private:
   vtkSMDomain(const vtkSMDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDomain&) VTK_DELETE_FUNCTION;

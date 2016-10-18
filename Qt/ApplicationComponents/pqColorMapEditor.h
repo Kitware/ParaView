@@ -50,8 +50,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorMapEditor : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqColorMapEditor(QWidget* parent=0);
+  pqColorMapEditor(QWidget* parent = 0);
   virtual ~pqColorMapEditor();
 
 protected slots:

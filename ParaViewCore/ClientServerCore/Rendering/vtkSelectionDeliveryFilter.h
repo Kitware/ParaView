@@ -30,7 +30,8 @@
 class vtkClientServerMoveData;
 class vtkReductionFilter;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionDeliveryFilter : public vtkSelectionAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionDeliveryFilter
+  : public vtkSelectionAlgorithm
 {
 public:
   static vtkSelectionDeliveryFilter* New();
@@ -42,8 +43,8 @@ protected:
   ~vtkSelectionDeliveryFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;
@@ -51,7 +52,6 @@ protected:
 private:
   vtkSelectionDeliveryFilter(const vtkSelectionDeliveryFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSelectionDeliveryFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

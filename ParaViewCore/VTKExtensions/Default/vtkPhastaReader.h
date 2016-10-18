@@ -38,8 +38,8 @@ struct vtkPhastaReaderInternal;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPhastaReader : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkPhastaReader *New();
-  vtkTypeMacro(vtkPhastaReader,vtkUnstructuredGridAlgorithm);
+  static vtkPhastaReader* New();
+  vtkTypeMacro(vtkPhastaReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -63,12 +63,8 @@ public:
    * Clear/Set info. in FieldInfoMap for object of vtkPhastaReaderInternal
    */
   void ClearFieldInfo();
-  void SetFieldInfo(const char *paraviewFieldTag,
-                    const char* phastaFieldTag,
-                    int index,
-                    int numOfComps,
-                    int dataDependency,
-                    const char* dataType);
+  void SetFieldInfo(const char* paraviewFieldTag, const char* phastaFieldTag, int index,
+    int numOfComps, int dataDependency, const char* dataType);
   //@}
 
   void SetCachedGrid(vtkUnstructuredGrid*);
@@ -78,71 +74,41 @@ protected:
   vtkPhastaReader();
   ~vtkPhastaReader();
 
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  void ReadGeomFile(char *GeomFileName, 
-                    int &firstVertexNo,
-                    vtkPoints *points, 
-                    int &noOfNodes,
-                    int &noOfCells);
-  void ReadFieldFile(char *fieldFileName , 
-                     int firstVertexNo, 
-                     vtkDataSetAttributes *field, 
-                     int &noOfNodes);
-  void ReadFieldFile(char *fieldFileName,
-                     int firstVertexNo,
-                     vtkUnstructuredGrid *output,
-                     int &noOfDatas);
+  void ReadGeomFile(
+    char* GeomFileName, int& firstVertexNo, vtkPoints* points, int& noOfNodes, int& noOfCells);
+  void ReadFieldFile(
+    char* fieldFileName, int firstVertexNo, vtkDataSetAttributes* field, int& noOfNodes);
+  void ReadFieldFile(
+    char* fieldFileName, int firstVertexNo, vtkUnstructuredGrid* output, int& noOfDatas);
 
 private:
-  char *GeometryFileName;
-  char *FieldFileName;
+  char* GeometryFileName;
+  char* FieldFileName;
   vtkUnstructuredGrid* CachedGrid;
 
-  int NumberOfVariables; //number of variable in the field file
+  int NumberOfVariables; // number of variable in the field file
 
-  static char* StringStripper( const char  istring[] );
-  static int cscompare( const char teststring[], 
-                        const char targetstring[] );
-  static void isBinary( const char iotype[] );
-  static size_t typeSize( const char typestring[] );
-  static int readHeader( FILE*       fileObject,
-                         const char  phrase[],
-                         int*        params,
-                         int         expect );
-  static void SwapArrayByteOrder( void* array, 
-                                  int   nbytes, 
-                                  int   nItems );
-  static void openfile( const char filename[],
-                        const char mode[],
-                        int*  fileDescriptor );
-  static void closefile( int* fileDescriptor, 
-                         const char mode[] );
-  static void readheader( int* fileDescriptor,
-                          const char keyphrase[],
-                          void* valueArray,
-                          int*  nItems,
-                          const char  datatype[],
-                          const char  iotype[] );
-  static void readdatablock( int*  fileDescriptor,
-                             const char keyphrase[],
-                             void* valueArray,
-                             int*  nItems,
-                             const char  datatype[],
-                             const char  iotype[] );
+  static char* StringStripper(const char istring[]);
+  static int cscompare(const char teststring[], const char targetstring[]);
+  static void isBinary(const char iotype[]);
+  static size_t typeSize(const char typestring[]);
+  static int readHeader(FILE* fileObject, const char phrase[], int* params, int expect);
+  static void SwapArrayByteOrder(void* array, int nbytes, int nItems);
+  static void openfile(const char filename[], const char mode[], int* fileDescriptor);
+  static void closefile(int* fileDescriptor, const char mode[]);
+  static void readheader(int* fileDescriptor, const char keyphrase[], void* valueArray, int* nItems,
+    const char datatype[], const char iotype[]);
+  static void readdatablock(int* fileDescriptor, const char keyphrase[], void* valueArray,
+    int* nItems, const char datatype[], const char iotype[]);
 
-
-  
-  
 private:
-  vtkPhastaReaderInternal *Internal;
+  vtkPhastaReaderInternal* Internal;
 
   vtkPhastaReader(const vtkPhastaReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPhastaReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-
-

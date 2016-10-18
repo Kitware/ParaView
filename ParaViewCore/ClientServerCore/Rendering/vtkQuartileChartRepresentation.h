@@ -26,7 +26,8 @@
 
 #include "vtkXYChartRepresentation.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkQuartileChartRepresentation : public vtkXYChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkQuartileChartRepresentation
+  : public vtkXYChartRepresentation
 {
 public:
   static vtkQuartileChartRepresentation* New();
@@ -87,7 +88,6 @@ private:
 
   class vtkQCRInternals;
   friend class vtkQCRInternals;
-
 };
 
 #endif

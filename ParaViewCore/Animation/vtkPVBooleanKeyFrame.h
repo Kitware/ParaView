@@ -23,7 +23,7 @@
 
 #include "vtkPVKeyFrame.h"
 
-class VTKPVANIMATION_EXPORT vtkPVBooleanKeyFrame: public vtkPVKeyFrame
+class VTKPVANIMATION_EXPORT vtkPVBooleanKeyFrame : public vtkPVKeyFrame
 {
 public:
   vtkTypeMacro(vtkPVBooleanKeyFrame, vtkPVKeyFrame);
@@ -35,8 +35,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue(double currenttime,
-    vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next);
 
 protected:
   vtkPVBooleanKeyFrame();
@@ -45,6 +44,5 @@ protected:
 private:
   vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
-
 };
 #endif

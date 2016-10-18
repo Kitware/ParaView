@@ -18,7 +18,7 @@
 // standard polydata mapper
 // Note that it's essential that the mapper can handle composite datasets. If
 // your mapper cannot, then simply use an append filter internally to
-// merge the blocks into a single polydata. 
+// merge the blocks into a single polydata.
 
 #ifndef vtkMySpecialPolyDataMapper_h
 #define vtkMySpecialPolyDataMapper_h
@@ -39,8 +39,6 @@ protected:
 private:
   vtkMySpecialPolyDataMapper(const vtkMySpecialPolyDataMapper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMySpecialPolyDataMapper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

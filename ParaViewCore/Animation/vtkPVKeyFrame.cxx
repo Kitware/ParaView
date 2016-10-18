@@ -26,7 +26,6 @@ public:
 };
 //----------------------------------------------------------------------------
 
-
 vtkStandardNewMacro(vtkPVKeyFrame);
 //----------------------------------------------------------------------------
 vtkPVKeyFrame::vtkPVKeyFrame()
@@ -42,8 +41,8 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVKeyFrame::UpdateValue(double vtkNotUsed(currenttime),
-  vtkPVAnimationCue* vtkNotUsed(cue), vtkPVKeyFrame* vtkNotUsed(next))
+void vtkPVKeyFrame::UpdateValue(double vtkNotUsed(currenttime), vtkPVAnimationCue* vtkNotUsed(cue),
+  vtkPVKeyFrame* vtkNotUsed(next))
 {
 }
 
@@ -58,9 +57,9 @@ void vtkPVKeyFrame::RemoveAllKeyValues()
 void vtkPVKeyFrame::SetKeyValue(unsigned int index, double value)
 {
   if (index >= this->GetNumberOfKeyValues())
-    {
-    this->SetNumberOfKeyValues(index+1);
-    }
+  {
+    this->SetNumberOfKeyValues(index + 1);
+  }
   this->Internals->KeyValues[index] = value;
   this->Modified();
 }
@@ -69,9 +68,9 @@ void vtkPVKeyFrame::SetKeyValue(unsigned int index, double value)
 double vtkPVKeyFrame::GetKeyValue(unsigned int index)
 {
   if (index >= this->GetNumberOfKeyValues())
-    {
+  {
     return 0.0;
-    }
+  }
   return this->Internals->KeyValues[index];
 }
 

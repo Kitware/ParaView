@@ -29,8 +29,7 @@
 #include "vtkTable.h"
 
 #include "vtkSmartPointer.h"
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 //=============================================================================
 //=============================================================================
@@ -38,8 +37,9 @@ class vtkPTemporalRanges::vtkRangeTableReduction : public vtkTableAlgorithm
 {
 public:
   vtkTypeMacro(vtkPTemporalRanges::vtkRangeTableReduction, vtkTableAlgorithm);
-  static vtkRangeTableReduction *New() {
-    vtkRangeTableReduction *ret = new vtkRangeTableReduction;
+  static vtkRangeTableReduction* New()
+  {
+    vtkRangeTableReduction* ret = new vtkRangeTableReduction;
     ret->InitializeObjectBase();
     return ret;
   }
@@ -48,46 +48,37 @@ public:
   vtkSetObjectMacro(Parent, vtkPTemporalRanges);
 
 protected:
-  vtkRangeTableReduction() {
-    this->Parent = NULL;
-  }
-  ~vtkRangeTableReduction() {
-    this->SetParent(NULL);
-  }
+  vtkRangeTableReduction() { this->Parent = NULL; }
+  ~vtkRangeTableReduction() { this->SetParent(NULL); }
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info) {
+  virtual int FillInputPortInformation(int port, vtkInformation* info)
+  {
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     return this->Superclass::FillInputPortInformation(port, info);
   }
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  vtkPTemporalRanges *Parent;
+  vtkPTemporalRanges* Parent;
 };
 
-
 //-----------------------------------------------------------------------------
-int vtkPTemporalRanges::vtkRangeTableReduction::RequestData(
-                                            vtkInformation *vtkNotUsed(request),
-                                            vtkInformationVector **inputVector,
-                                            vtkInformationVector *outputVector)
+int vtkPTemporalRanges::vtkRangeTableReduction::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   int numInputs = inputVector[0]->GetNumberOfInformationObjects();
-  vtkTable *output = vtkTable::GetData(outputVector);
+  vtkTable* output = vtkTable::GetData(outputVector);
 
   this->Parent->InitializeTable(output);
 
   for (int i = 0; i < numInputs; i++)
-    {
-    vtkTable *input = vtkTable::GetData(inputVector[0], i);
+  {
+    vtkTable* input = vtkTable::GetData(inputVector[0], i);
     this->Parent->AccumulateTable(input, output);
-    }
+  }
 
   return 1;
 }
-
 
 //=============================================================================
 //=============================================================================
@@ -107,7 +98,7 @@ vtkPTemporalRanges::~vtkPTemporalRanges()
   this->SetController(NULL);
 }
 
-void vtkPTemporalRanges::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPTemporalRanges::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -115,31 +106,30 @@ void vtkPTemporalRanges::PrintSelf(ostream &os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPTemporalRanges::RequestData(vtkInformation *request,
-                                    vtkInformationVector **inputVector,
-                                    vtkInformationVector *outputVector)
+int vtkPTemporalRanges::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::RequestData(request, inputVector, outputVector))
-    {
+  {
     return 0;
-    }
+  }
 
   if (!request->Has(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING()))
-    {
+  {
     // Finished last execution.  Reduce tables.
     this->Reduce(vtkTable::GetData(outputVector));
-    }
+  }
 
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPTemporalRanges::Reduce(vtkTable *table)
+void vtkPTemporalRanges::Reduce(vtkTable* table)
 {
   if (!this->Controller || (this->Controller->GetNumberOfProcesses() <= 1))
-    {
+  {
     return;
-    }
+  }
 
   VTK_CREATE(vtkReductionFilter, reduceFilter);
   reduceFilter->SetController(this->Controller);
@@ -154,11 +144,11 @@ void vtkPTemporalRanges::Reduce(vtkTable *table)
   reduceFilter->Update();
 
   if (this->Controller->GetLocalProcessId() == 0)
-    {
+  {
     table->ShallowCopy(reduceFilter->GetOutput());
-    }
+  }
   else
-    {
+  {
     table->Initialize();
-    }
+  }
 }

@@ -59,8 +59,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
-  Qt::WindowFlags f):Superclass(_parent, f)
+pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent, Qt::WindowFlags f)
+  : Superclass(_parent, f)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
@@ -71,7 +71,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   this->Internal->quality->setMaximum(100);
   this->Internal->quality->setValue(100);
 
-  QIntValidator *validator = new QIntValidator(this);
+  QIntValidator* validator = new QIntValidator(this);
   validator->setBottom(50);
   this->Internal->width->setValidator(validator);
 
@@ -81,49 +81,44 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
   if (settings && settings->contains(SETTINGS_KEY))
-    {
-    this->Internal->selectedViewOnly->setChecked(
-      settings->value(SETTINGS_KEY).toBool());
-    }
+  {
+    this->Internal->selectedViewOnly->setChecked(settings->value(SETTINGS_KEY).toBool());
+  }
 
-  QObject::connect(this->Internal->width, SIGNAL(editingFinished()),
-    this, SLOT(onWidthEdited()));
-  QObject::connect(this->Internal->height, SIGNAL(editingFinished()),
-    this, SLOT(onHeightEdited()));
-  QObject::connect(this->Internal->lockAspect, SIGNAL(toggled(bool)),
-    this, SLOT(onLockAspectRatio(bool)));
-  QObject::connect(this->Internal->selectedViewOnly, SIGNAL(toggled(bool)),
-    this, SLOT(updateSize()));
+  QObject::connect(this->Internal->width, SIGNAL(editingFinished()), this, SLOT(onWidthEdited()));
+  QObject::connect(this->Internal->height, SIGNAL(editingFinished()), this, SLOT(onHeightEdited()));
+  QObject::connect(
+    this->Internal->lockAspect, SIGNAL(toggled(bool)), this, SLOT(onLockAspectRatio(bool)));
+  QObject::connect(
+    this->Internal->selectedViewOnly, SIGNAL(toggled(bool)), this, SLOT(updateSize()));
 
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (pxm->GetProxyDefinitionManager())
-    {
+  {
     vtkPVProxyDefinitionIterator* iter =
       pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("palettes");
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-      vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
-        iter->GetProxyName());
+    {
+      vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetProxyName());
       if (prototype)
-        {
-        this->Internal->palette->addItem(prototype->GetXMLLabel(),
-          prototype->GetXMLName());
-        }
+      {
+        this->Internal->palette->addItem(prototype->GetXMLLabel(), prototype->GetXMLName());
       }
-    iter->Delete();
     }
+    iter->Delete();
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqSaveSnapshotDialog::~pqSaveSnapshotDialog()
 {
-  pqSettings* settings = pqApplicationCore::instance()?
-    pqApplicationCore::instance()->settings(): NULL;
+  pqSettings* settings =
+    pqApplicationCore::instance() ? pqApplicationCore::instance()->settings() : NULL;
   if (settings)
-    {
+  {
     settings->setValue(SETTINGS_KEY, !this->saveAllViews());
-    }
+  }
 
   delete this->Internal;
 }
@@ -140,7 +135,6 @@ void pqSaveSnapshotDialog::setViewSize(const QSize& view_size)
   this->Internal->ViewSize = view_size;
   this->updateSize();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::setAllViewsSize(const QSize& view_size)
@@ -159,34 +153,28 @@ bool pqSaveSnapshotDialog::saveAllViews() const
 void pqSaveSnapshotDialog::updateSize()
 {
   if (this->saveAllViews())
-    {
-    this->Internal->width->setText(QString::number(
-        this->Internal->AllViewsSize.width()));
-    this->Internal->height->setText(QString::number(
-        this->Internal->AllViewsSize.height()));
-    }
+  {
+    this->Internal->width->setText(QString::number(this->Internal->AllViewsSize.width()));
+    this->Internal->height->setText(QString::number(this->Internal->AllViewsSize.height()));
+  }
   else
-    {
-    this->Internal->width->setText(QString::number(
-        this->Internal->ViewSize.width()));
-    this->Internal->height->setText(QString::number(
-        this->Internal->ViewSize.height()));
-    }
+  {
+    this->Internal->width->setText(QString::number(this->Internal->ViewSize.width()));
+    this->Internal->height->setText(QString::number(this->Internal->ViewSize.height()));
+  }
 
   QSize curSize = this->viewSize();
-  this->Internal->AspectRatio =
-    curSize.width()/static_cast<double>(curSize.height());
+  this->Internal->AspectRatio = curSize.width() / static_cast<double>(curSize.height());
 }
 
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::onLockAspectRatio(bool lock)
 {
   if (lock)
-    {
+  {
     QSize curSize = this->viewSize();
-    this->Internal->AspectRatio =
-      curSize.width()/static_cast<double>(curSize.height());
-    }
+    this->Internal->AspectRatio = curSize.width() / static_cast<double>(curSize.height());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -198,44 +186,39 @@ int pqSaveSnapshotDialog::quality() const
 //-----------------------------------------------------------------------------
 QSize pqSaveSnapshotDialog::viewSize() const
 {
-  return QSize(
-    this->Internal->width->text().toInt(),
-    this->Internal->height->text().toInt());
+  return QSize(this->Internal->width->text().toInt(), this->Internal->height->text().toInt());
 }
 
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::onWidthEdited()
 {
   if (this->Internal->lockAspect->isChecked())
-    {
+  {
     this->Internal->height->setText(QString::number(
-        static_cast<int>(
-          this->Internal->width->text().toInt()/this->Internal->AspectRatio)));
-    }
+      static_cast<int>(this->Internal->width->text().toInt() / this->Internal->AspectRatio)));
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::onHeightEdited()
 {
   if (this->Internal->lockAspect->isChecked())
-    {
+  {
     this->Internal->width->setText(QString::number(
-        static_cast<int>(
-          this->Internal->height->text().toInt()*this->Internal->AspectRatio)));
-    }
+      static_cast<int>(this->Internal->height->text().toInt() * this->Internal->AspectRatio)));
+  }
 }
 
 //-----------------------------------------------------------------------------
 QString pqSaveSnapshotDialog::palette() const
 {
-  QString paletteData = this->Internal->palette->itemData(
-    this->Internal->palette->currentIndex()).toString();
+  QString paletteData =
+    this->Internal->palette->itemData(this->Internal->palette->currentIndex()).toString();
   return paletteData;
 }
 
 //-----------------------------------------------------------------------------
 int pqSaveSnapshotDialog::getStereoMode() const
 {
-  return pqStereoModeHelper::stereoMode(
-    this->Internal->stereoMode->currentText());
+  return pqStereoModeHelper::stereoMode(this->Internal->stereoMode->currentText());
 }

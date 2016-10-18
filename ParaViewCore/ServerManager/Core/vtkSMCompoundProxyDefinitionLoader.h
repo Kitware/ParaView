@@ -18,7 +18,7 @@
  * XML definition.
  *
  * vtkSMCompoundProxyDefinitionLoader can load a compound proxy definition
- * from a given vtkPVXMLElement. This element can be populated by a 
+ * from a given vtkPVXMLElement. This element can be populated by a
  * vtkPVXMLElement or obtained from the proxy manager.
  * @sa
  * vtkPVXMLElement vtkPVXMLParser vtkSMProxyManager
@@ -51,6 +51,7 @@ protected:
   virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
 
   vtkPVXMLElement* RootElement;
+
 private:
   vtkSMCompoundProxyDefinitionLoader(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;

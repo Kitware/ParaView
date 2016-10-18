@@ -31,16 +31,14 @@
 
 #include <QDoubleValidator>
 
-pqDoubleEdit::pqDoubleEdit(QWidget* parentObject) :
-  QLineEdit(parentObject)
+pqDoubleEdit::pqDoubleEdit(QWidget* parentObject)
+  : QLineEdit(parentObject)
 {
-  this->connect(this, SIGNAL(textChanged(const QString&)), this,
-      SLOT(valueEdited(const QString&)));
+  this->connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(valueEdited(const QString&)));
 }
 
 pqDoubleEdit::~pqDoubleEdit()
 {
-
 }
 
 double pqDoubleEdit::value()
@@ -50,9 +48,9 @@ double pqDoubleEdit::value()
   QDoubleValidator dvalidator(NULL);
   QValidator::State state = dvalidator.validate(currentText, currentPos);
   if (state == QValidator::Acceptable || state == QValidator::Intermediate)
-    {
+  {
     return currentText.toDouble();
-    }
+  }
   return 0.0;
 }
 
@@ -63,25 +61,25 @@ void pqDoubleEdit::setValue(double dvalue)
   // is impossible to enter decimals
   QString currentText = this->text();
   int currentPos = this->cursorPosition();
-  QDoubleValidator *dvalidator = new QDoubleValidator(NULL);
+  QDoubleValidator* dvalidator = new QDoubleValidator(NULL);
   QValidator::State state = dvalidator->validate(currentText, currentPos);
   delete dvalidator;
   if (state == QValidator::Acceptable)
-    {
+  {
     double v = this->text().toDouble();
     if (v != dvalue)
-      {
+    {
       this->setText(QString::number(dvalue));
-      }
     }
+  }
   else if (state == QValidator::Intermediate && currentPos > 0)
-    {
+  {
     return;
-    }
+  }
   else
-    {
+  {
     this->setText(QString::number(dvalue));
-    }
+  }
 }
 
 void pqDoubleEdit::valueEdited(const QString& /*text*/)
@@ -92,8 +90,8 @@ void pqDoubleEdit::valueEdited(const QString& /*text*/)
   QValidator::State state = dvalidator->validate(currentText, currentPos);
   delete dvalidator;
   if (state == QValidator::Acceptable)
-    {
+  {
     double dvalue = this->text().toDouble();
     emit valueChanged(dvalue);
-    }
+  }
 }

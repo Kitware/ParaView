@@ -41,15 +41,16 @@ class pqPointSpriteTextureComboBox : public pqTextureComboBox
 {
   Q_OBJECT
   typedef pqTextureComboBox Superclass;
+
 public:
-  pqPointSpriteTextureComboBox(QWidget* parent=0);
+  pqPointSpriteTextureComboBox(QWidget* parent = 0);
   virtual ~pqPointSpriteTextureComboBox();
 
-public slots :
+public slots:
   // Description:
   // Set the point sprite render mode (simple point, texture, exact sphere)
   // this in turns updates the enable state and active the texture
-  virtual void  setRenderMode(int);
+  virtual void setRenderMode(int);
 
 protected slots:
   /// Update the enable state of the widget.
@@ -58,7 +59,8 @@ protected slots:
   virtual void updateEnableState();
 
   virtual void updateTexture();
-protected :
+
+protected:
   int RenderMode;
   int CachedTextureIndex;
 
@@ -67,5 +69,3 @@ private:
 };
 
 #endif
-
-

@@ -46,10 +46,11 @@ class vtkTemporalRanges : public vtkTableAlgorithm
 {
 public:
   vtkTypeMacro(vtkTemporalRanges, vtkTableAlgorithm);
-  static vtkTemporalRanges *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkTemporalRanges* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  enum {
+  enum
+  {
     AVERAGE_ROW,
     MINIMUM_ROW,
     MAXIMUM_ROW,
@@ -63,37 +64,29 @@ protected:
 
   int CurrentTimeIndex;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestInformation(vtkInformation *,
-                                 vtkInformationVector **,
-                                 vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestUpdateExtent(vtkInformation *,
-                                  vtkInformationVector **,
-                                  vtkInformationVector *);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual void InitializeTable(vtkTable *output);
+  virtual void InitializeTable(vtkTable* output);
 
-  virtual void AccumulateCompositeData(vtkCompositeDataSet *input,
-                                       vtkTable *output);
-  virtual void AccumulateDataSet(vtkDataSet *input, vtkTable *output);
-  virtual void AccumulateFields(vtkFieldData *fields, vtkTable *output);
-  virtual void AccumulateArray(vtkDataArray *field, vtkTable *output);
+  virtual void AccumulateCompositeData(vtkCompositeDataSet* input, vtkTable* output);
+  virtual void AccumulateDataSet(vtkDataSet* input, vtkTable* output);
+  virtual void AccumulateFields(vtkFieldData* fields, vtkTable* output);
+  virtual void AccumulateArray(vtkDataArray* field, vtkTable* output);
 
-  virtual void AccumulateTable(vtkTable *source, vtkTable *target);
+  virtual void AccumulateTable(vtkTable* source, vtkTable* target);
 
-  virtual vtkDoubleArray *GetColumn(vtkTable *table, const char *name,
-                                    int component);
-  virtual vtkDoubleArray *GetColumn(vtkTable *table, const char *name);
+  virtual vtkDoubleArray* GetColumn(vtkTable* table, const char* name, int component);
+  virtual vtkDoubleArray* GetColumn(vtkTable* table, const char* name);
 
 private:
-  vtkTemporalRanges(const vtkTemporalRanges &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTemporalRanges &) VTK_DELETE_FUNCTION;
+  vtkTemporalRanges(const vtkTemporalRanges&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkTemporalRanges&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkTemporalRanges_h
+#endif // vtkTemporalRanges_h

@@ -46,16 +46,13 @@ protected:
   vtkPConvertSelection();
   ~vtkPConvertSelection();
 
-  virtual int RequestData(
-    vtkInformation *,
-    vtkInformationVector **,
-    vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   vtkMultiProcessController* Controller;
+
 private:
   vtkPConvertSelection(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // vtkPConvertSelection_h

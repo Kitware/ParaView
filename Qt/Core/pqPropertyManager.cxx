@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,8 +48,7 @@ pqPropertyManager::pqPropertyManager(QObject* p)
   this->Links = new pqPropertyLinks();
   this->Links->setUseUncheckedProperties(true);
   this->Links->setAutoUpdateVTKObjects(false);
-  QObject::connect(this->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(propertyChanged()));
+  QObject::connect(this->Links, SIGNAL(qtWidgetChanged()), this, SLOT(propertyChanged()));
   this->Modified = false;
 }
 
@@ -61,22 +60,17 @@ pqPropertyManager::~pqPropertyManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyManager::registerLink(
-  QObject* qObject, const char* qProperty, const char* signal,
+void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, const char* signal,
   vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  this->Links->addPropertyLink(
-    qObject, qProperty, signal, Proxy, Property, Index);
+  this->Links->addPropertyLink(qObject, qProperty, signal, Proxy, Property, Index);
 }
 
-
 //-----------------------------------------------------------------------------
-void pqPropertyManager::unregisterLink(
-  QObject* qObject, const char* qProperty, const char* signal,
+void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
   vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  this->Links->removePropertyLink(
-    qObject, qProperty, signal, Proxy, Property, Index);
+  this->Links->removePropertyLink(qObject, qProperty, signal, Proxy, Property, Index);
 }
 
 //-----------------------------------------------------------------------------

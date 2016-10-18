@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqViewStreamingBehavior;
 /**
-Concrete implementation of pqWidgetEventPlayer that handles playback of recorded pqViewStreamingBehavior.
+Concrete implementation of pqWidgetEventPlayer that handles playback of recorded
+pqViewStreamingBehavior.
 
 \sa pqEventPlayer
 */
@@ -49,16 +50,18 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStreamingTestingEventPlayer : public pqWi
   typedef pqWidgetEventPlayer Superclass;
 
 public:
-  pqStreamingTestingEventPlayer(QObject* p) : Superclass(p) { }
+  pqStreamingTestingEventPlayer(QObject* p)
+    : Superclass(p)
+  {
+  }
   using Superclass::playEvent;
-  virtual bool playEvent(QObject*,
-    const QString& command, const QString& arguments, bool& error);
+  virtual bool playEvent(QObject*, const QString& command, const QString& arguments, bool& error);
 
   void setViewStreamingBehavior(pqViewStreamingBehavior*);
   pqViewStreamingBehavior* viewStreamingBehavior();
+
 protected:
   QPointer<pqViewStreamingBehavior> StreamingBehavior;
-
 };
 
 #endif

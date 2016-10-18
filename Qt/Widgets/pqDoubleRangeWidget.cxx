@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 
 pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
-  : QWidget(p) 
+  : QWidget(p)
 {
   this->BlockUpdate = false;
   this->Value = 0;
@@ -62,13 +62,11 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
   this->LineEdit->setTextAndResetCursor(QString().setNum(this->Value));
 
-  QObject::connect(this->Slider, SIGNAL(valueChanged(int)),
-                   this, SLOT(sliderChanged(int)));
-  QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)),
-                   this, SLOT(textChanged(const QString&)));
-  QObject::connect(this->LineEdit, SIGNAL(textChangedAndEditingFinished()),
-                   this, SLOT(editingFinished()));
-  
+  QObject::connect(this->Slider, SIGNAL(valueChanged(int)), this, SLOT(sliderChanged(int)));
+  QObject::connect(
+    this->LineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
+  QObject::connect(
+    this->LineEdit, SIGNAL(textChangedAndEditingFinished()), this, SLOT(editingFinished()));
 }
 
 //-----------------------------------------------------------------------------
@@ -99,24 +97,24 @@ double pqDoubleRangeWidget::value() const
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::setValue(double val)
 {
-  if(this->Value == val)
-    {
+  if (this->Value == val)
+  {
     return;
-    }
-  
+  }
+
   this->Value = val;
 
-  if(!this->BlockUpdate)
-    {
-    // set the slider 
+  if (!this->BlockUpdate)
+  {
+    // set the slider
     this->updateSlider();
 
     // set the text
     this->BlockUpdate = true;
-    this->LineEdit->setTextAndResetCursor(QString().setNum(
-      val,'g',DEFAULT_DOUBLE_PRECISION_VALUE));
+    this->LineEdit->setTextAndResetCursor(
+      QString().setNum(val, 'g', DEFAULT_DOUBLE_PRECISION_VALUE));
     this->BlockUpdate = false;
-    }
+  }
 
   emit this->valueChanged(this->Value);
 }
@@ -152,22 +150,21 @@ void pqDoubleRangeWidget::setMinimum(double val)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::updateValidator()
 {
-  if(this->StrictRange)
-    {
-    this->LineEdit->setValidator(new QDoubleValidator(this->minimum(),
-        this->maximum(), 100, this->LineEdit));
-    }
+  if (this->StrictRange)
+  {
+    this->LineEdit->setValidator(
+      new QDoubleValidator(this->minimum(), this->maximum(), 100, this->LineEdit));
+  }
   else
-    {
+  {
     this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool pqDoubleRangeWidget::strictRange() const
 {
-  const QDoubleValidator* dv =
-    qobject_cast<const QDoubleValidator*>(this->LineEdit->validator());
+  const QDoubleValidator* dv = qobject_cast<const QDoubleValidator*>(this->LineEdit->validator());
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
 
@@ -180,8 +177,8 @@ void pqDoubleRangeWidget::setStrictRange(bool s)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::sliderChanged(int val)
 {
-  if(!this->BlockUpdate)
-    {
+  if (!this->BlockUpdate)
+  {
     double fraction = val / static_cast<double>(this->Resolution);
     double range = this->Maximum - this->Minimum;
     double v = (fraction * range) + this->Minimum;
@@ -190,14 +187,14 @@ void pqDoubleRangeWidget::sliderChanged(int val)
     this->setValue(v);
     emit this->valueEdited(v);
     this->BlockUpdate = false;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::textChanged(const QString& text)
 {
-  if(!this->BlockUpdate)
-    {
+  if (!this->BlockUpdate)
+  {
     double val = text.toDouble();
     this->BlockUpdate = true;
     double range = this->Maximum - this->Minimum;
@@ -206,9 +203,9 @@ void pqDoubleRangeWidget::textChanged(const QString& text)
     this->Slider->setValue(sliderVal);
     this->setValue(val);
     this->BlockUpdate = false;
-    }
+  }
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::editingFinished()
 {
@@ -225,5 +222,3 @@ void pqDoubleRangeWidget::updateSlider()
   this->Slider->setValue(v);
   this->Slider->blockSignals(false);
 }
-
-

@@ -20,7 +20,6 @@
 
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
-
 //----------------------------------------------------------------------------
 vtkUpdateSuppressorPipeline::vtkUpdateSuppressorPipeline()
 {
@@ -40,23 +39,19 @@ void vtkUpdateSuppressorPipeline::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
-                                                vtkInformationVector** inInfo,
-                                                vtkInformationVector* outInfo)
+int vtkUpdateSuppressorPipeline::ProcessRequest(
+  vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo)
 {
   if (this->Enabled)
+  {
+    if (this->Algorithm && request->Has(REQUEST_DATA()))
     {
-    if(this->Algorithm && request->Has(REQUEST_DATA()))
-      {
       return 1;
-      }
-    if(request->Has(REQUEST_UPDATE_EXTENT()))
-      {
-      return 1;
-      }
     }
+    if (request->Has(REQUEST_UPDATE_EXTENT()))
+    {
+      return 1;
+    }
+  }
   return this->Superclass::ProcessRequest(request, inInfo, outInfo);
 }
-
-
-

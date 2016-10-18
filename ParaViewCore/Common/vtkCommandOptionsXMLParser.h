@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkCommandOptionsXMLParser.h
 
@@ -36,7 +36,7 @@ class VTKPVCOMMON_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
 {
 public:
   static vtkCommandOptionsXMLParser* New();
-  vtkTypeMacro(vtkCommandOptionsXMLParser,vtkXMLParser);
+  vtkTypeMacro(vtkCommandOptionsXMLParser, vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -45,13 +45,10 @@ public:
    * long arguments from the vtkCommandOptions class of the form
    * --foo, and pass in the variable that needs to be set with the value.
    */
-  void AddBooleanArgument(const char* longarg, int* var, int type=0);
-  void AddArgument(const char* longarg, int* var, int type=0);
-  void AddArgument(const char* longarg, char** var, int type=0);
-  void SetPVOptions(vtkCommandOptions* o) 
-    {
-      this->PVOptions = o;
-    }
+  void AddBooleanArgument(const char* longarg, int* var, int type = 0);
+  void AddArgument(const char* longarg, int* var, int type = 0);
+  void AddArgument(const char* longarg, char** var, int type = 0);
+  void SetPVOptions(vtkCommandOptions* o) { this->PVOptions = o; }
 protected:
   //@}
   /**
@@ -73,7 +70,7 @@ protected:
 
   // Called at the end of an element in the XML source opened when
   // StartElement was called.
-  virtual void EndElement(const char* name);  
+  virtual void EndElement(const char* name);
   // Call to process the .. of  <Option>...</>
   void HandleOption(const char** atts);
   // Call to process the .. of  <Option>...</>
@@ -91,4 +88,3 @@ private:
 };
 
 #endif // #ifndef vtkCommandOptionsXMLParser_h
-

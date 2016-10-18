@@ -75,19 +75,18 @@ public:
    * Moreover, error can be throw if the definition was not found if the
    * flag throwError is true.
    */
-  vtkPVXMLElement* GetProxyDefinition( const char* group, const char* name,
-                                       bool throwError );
+  vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name, bool throwError);
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name)
-    {
+  {
     // We do throw an error by default
     return this->GetProxyDefinition(group, name, true);
-    }
+  }
   //@}
 
   /**
    * Return true if the XML Definition was found
    */
-  bool HasDefinition( const char* groupName, const char* proxyName );
+  bool HasDefinition(const char* groupName, const char* proxyName);
 
   //@{
   /**
@@ -95,16 +94,13 @@ public:
    * By flatten, we mean that the class hierarchy has been walked and merged
    * into a single vtkPVXMLElement definition.
    */
-  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group,
-                                               const char* name,
-                                               const char* subProxyName,
-                                               bool throwError);
-  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group,
-                                               const char* name,
-                                               const char* subProxyName)
-    {
+  vtkPVXMLElement* GetCollapsedProxyDefinition(
+    const char* group, const char* name, const char* subProxyName, bool throwError);
+  vtkPVXMLElement* GetCollapsedProxyDefinition(
+    const char* group, const char* name, const char* subProxyName)
+  {
     return this->GetCollapsedProxyDefinition(group, name, subProxyName, true);
-    }
+  }
   //@}
 
   //@{
@@ -118,8 +114,7 @@ public:
    * definition added using this method or by parsing a server manager
    * configuration file.
    */
-  void AddCustomProxyDefinition( const char* group, const char* name,
-                                 vtkPVXMLElement* top );
+  void AddCustomProxyDefinition(const char* group, const char* name, vtkPVXMLElement* top);
   void AddCustomProxyDefinition(
     const char* groupName, const char* proxyName, const char* xmlcontents);
   //@}
@@ -163,10 +158,10 @@ public:
   //@}
 
   enum Events
-    {
-    ProxyDefinitionsUpdated=2000,
-    CompoundProxyDefinitionsUpdated=2001
-    };
+  {
+    ProxyDefinitionsUpdated = 2000,
+    CompoundProxyDefinitionsUpdated = 2001
+  };
 
   /**
    * Return a new configured iterator for traversing a set of proxy definition
@@ -178,11 +173,11 @@ public:
    */
 
   enum
-    {
-    ALL_DEFINITIONS    = 0,
-    CORE_DEFINITIONS   = 1,
+  {
+    ALL_DEFINITIONS = 0,
+    CORE_DEFINITIONS = 1,
     CUSTOM_DEFINITIONS = 2
-    };
+  };
 
   /**
    * Return a NEW instance of vtkPVProxyDefinitionIterator configured to
@@ -193,7 +188,7 @@ public:
    * by setting a set of GroupName...
    */
   VTK_NEWINSTANCE
-  vtkPVProxyDefinitionIterator* NewIterator( int scope=ALL_DEFINITIONS );
+  vtkPVProxyDefinitionIterator* NewIterator(int scope = ALL_DEFINITIONS);
 
   /**
    * Return a new configured iterator for traversing a set of proxy definition
@@ -201,8 +196,8 @@ public:
    * Possible scope defined as enum inside vtkSIProxyDefinitionManager:
    * ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
    */
-  vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
-    int scope=ALL_DEFINITIONS);
+  vtkPVProxyDefinitionIterator* NewSingleGroupIterator(
+    const char* groupName, int scope = ALL_DEFINITIONS);
 
   /**
    * Desactivate the modification of the ProxyDefinitions for that given
@@ -230,19 +225,18 @@ public:
    * Information object used in Event notification
    */
   struct RegisteredDefinitionInformation
-    {
+  {
     const char* GroupName;
     const char* ProxyName;
     bool CustomDefinition;
-    RegisteredDefinitionInformation(const char* groupName,
-      const char* proxyName,
-      bool isCustom=false)
-      {
+    RegisteredDefinitionInformation(
+      const char* groupName, const char* proxyName, bool isCustom = false)
+    {
       this->GroupName = groupName;
       this->ProxyName = proxyName;
       this->CustomDefinition = isCustom;
-      }
-    };
+    }
+  };
   //@}
 
 protected:
@@ -288,14 +282,12 @@ protected:
    * Called by the XML parser to add an element from which a proxy
    * can be created. Called during parsing.
    */
-  void AddElement(const char* groupName,
-                  const char* proxyName, vtkPVXMLElement* element);
+  void AddElement(const char* groupName, const char* proxyName, vtkPVXMLElement* element);
 
   /**
    * Implementation for add custom proxy definition.
    */
-  bool AddCustomProxyDefinitionInternal(
-    const char* group, const char* name, vtkPVXMLElement* top );
+  bool AddCustomProxyDefinitionInternal(const char* group, const char* name, vtkPVXMLElement* top);
 
   /**
    * Integrate a ProxyDefinition into another ProxyDefinition by merging them.
@@ -316,16 +308,13 @@ protected:
    * Given the proxy name and group name, returns the XML element for
    * the proxy.
    */
-  vtkPVXMLElement* GetProxyElement(const char* groupName,
-                                   const char* proxyName);
+  vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName);
 
   /**
    * Convenient method used to extract sub-proxy definition inside a proxy
    * definition. If (subProxyName == NULL) return proxyDefinition;
    */
-  vtkPVXMLElement* ExtractSubProxy(vtkPVXMLElement* proxyDefinition,
-                                   const char* subProxyName);
-
+  vtkPVXMLElement* ExtractSubProxy(vtkPVXMLElement* proxyDefinition, const char* subProxyName);
 
   /**
    * Called when custom definitions are updated. Fires appropriate events.
@@ -339,7 +328,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   vtkInternals* InternalsFlatten;
-
 };
 
 #endif

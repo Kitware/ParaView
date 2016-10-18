@@ -49,4 +49,3 @@
 ///
 /// pqVariableVariablePlotter
 ///
-

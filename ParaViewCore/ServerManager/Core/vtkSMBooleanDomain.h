@@ -46,8 +46,7 @@ public:
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty *property, int idx,
-                                 double value);
+  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
 
 protected:
   vtkSMBooleanDomain();

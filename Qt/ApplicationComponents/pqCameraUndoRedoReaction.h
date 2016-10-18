@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -45,29 +45,27 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraUndoRedoReaction : public pqReactio
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor parent cannot be NULL. When undo is true, acts as
   * undo-reaction, else acts as redo reaction.
   * If \c view ==NULL then active view is used.
   */
-  pqCameraUndoRedoReaction(QAction* parent, bool undo, pqView* view=0);
+  pqCameraUndoRedoReaction(QAction* parent, bool undo, pqView* view = 0);
 
   /**
-  * undo. 
+  * undo.
   */
   static void undo(pqView* view);
 
   /**
-  * redo. 
+  * redo.
   */
   static void redo(pqView* view);
 
 protected slots:
-  void setEnabled(bool enable)
-    {
-    this->parentAction()->setEnabled(enable);
-    }
+  void setEnabled(bool enable) { this->parentAction()->setEnabled(enable); }
   void setActiveView(pqView*);
 
 protected:
@@ -83,5 +81,3 @@ private:
 };
 
 #endif
-
-

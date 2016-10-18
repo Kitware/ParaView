@@ -32,23 +32,23 @@ class vtkMultiProcessController;
 
 //*******************************************************************
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributePolyData : public vtkWeightedRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributePolyData
+  : public vtkWeightedRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkAllToNRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkAllToNRedistributePolyData *New();
+  static vtkAllToNRedistributePolyData* New();
 
   vtkSetMacro(NumberOfProcesses, int);
   vtkGetMacro(NumberOfProcesses, int);
-
 
 protected:
   vtkAllToNRedistributePolyData();
   ~vtkAllToNRedistributePolyData();
 
-  void MakeSchedule (vtkPolyData*, vtkCommSched*);
+  void MakeSchedule(vtkPolyData*, vtkCommSched*);
 
   int NumberOfProcesses;
 
@@ -60,5 +60,3 @@ private:
 //****************************************************************
 
 #endif
-
-

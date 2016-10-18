@@ -24,7 +24,7 @@
  * Note that vtkDataLabelRepresentation adds the label props to the
  * non-composited renderer.
  * @par Thanks:
- * The addition of a transformation matrix was supported by CEA/DIF 
+ * The addition of a transformation matrix was supported by CEA/DIF
  * Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 */
 
@@ -45,7 +45,8 @@ class vtkPVCacheKeeper;
 class vtkTextProperty;
 class vtkTransform;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkDataLabelRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkDataLabelRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkDataLabelRepresentation* New();
@@ -115,8 +116,7 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(
-    vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
 protected:
   vtkDataLabelRepresentation();
@@ -151,8 +151,7 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
@@ -179,16 +178,15 @@ protected:
   vtkSmartPointer<vtkDataObject> Dataset;
 
   // Mutes label mapper warnings
-  vtkCallbackCommand *WarningObserver;
-  static void OnWarningEvent(
-    vtkObject* source, unsigned long, void* clientdata, void *);
+  vtkCallbackCommand* WarningObserver;
+  static void OnWarningEvent(vtkObject* source, unsigned long, void* clientdata, void*);
 
   int PointLabelVisibility;
   int CellLabelVisibility;
+
 private:
   vtkDataLabelRepresentation(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

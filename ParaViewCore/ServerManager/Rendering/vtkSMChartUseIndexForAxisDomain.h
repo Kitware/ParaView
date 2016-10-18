@@ -65,7 +65,6 @@ protected:
 private:
   vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

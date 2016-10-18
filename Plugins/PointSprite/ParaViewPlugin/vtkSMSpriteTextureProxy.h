@@ -55,8 +55,6 @@ protected:
 private:
   vtkSMSpriteTextureProxy(const vtkSMSpriteTextureProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSpriteTextureProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

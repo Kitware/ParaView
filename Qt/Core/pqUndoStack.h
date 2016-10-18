@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,8 +40,8 @@ class vtkSMUndoElement;
 class vtkSMUndoStack;
 class vtkSMUndoStackBuilder;
 class vtkUndoElement;
-class vtkUndoSet; //vistrails
-class vtkPVXMLElement; //vistrails
+class vtkUndoSet;      // vistrails
+class vtkPVXMLElement; // vistrails
 
 /**
 * pqUndoStack represents a vtkSMUndoStack along with a
@@ -61,7 +61,7 @@ public:
   * If no \c builder is provided a default vtkSMUndoStackBuilder object
   * will be created.
   */
-  pqUndoStack(vtkSMUndoStackBuilder* builder=0, QObject* parent=NULL);
+  pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = NULL);
   virtual ~pqUndoStack();
 
   /**
@@ -84,7 +84,6 @@ public:
   */
   const QString redoLabel();
 
-
   /**
   * Get the status of the IgnoreAllChanges flag on the
   * stack builder.
@@ -103,11 +102,12 @@ public:
   bool getInRedo() const;
 
   /**
-  * vistrails - push an undo set directly onto the undo stack (don't apply the changes - we want to be able to undo them)
+  * vistrails - push an undo set directly onto the undo stack (don't apply the changes - we want to
+  * be able to undo them)
   */
-  void Push(const char *label, vtkUndoSet *set);
-  vtkUndoSet* getLastUndoSet(); //vistrails
-  vtkUndoSet* getUndoSetFromXML(vtkPVXMLElement *root); //vistrails
+  void Push(const char* label, vtkUndoSet* set);
+  vtkUndoSet* getLastUndoSet();                         // vistrails
+  vtkUndoSet* getUndoSetFromXML(vtkPVXMLElement* root); // vistrails
 
   /**
   * Get the UndoStackBuilder that is used with that UndoStack
@@ -122,7 +122,7 @@ public:
 public slots:
   void beginUndoSet(QString label);
   void endUndoSet();
- 
+
   /**
   * triggers Undo.
   */
@@ -149,7 +149,7 @@ public slots:
   void endNonUndoableChanges();
 
   /**
-  * One can add arbritary elements to the 
+  * One can add arbritary elements to the
   * undo set currently being built.
   */
   void addToActiveUndoSet(vtkUndoElement* element);
@@ -159,28 +159,25 @@ signals:
   * Fired to notify interested parites that the stack has changed.
   * Has information to know the status of the top of the stack.
   */
-  void stackChanged(bool canUndo, QString undoLabel, 
-    bool canRedo, QString redoLabel);
-    
+  void stackChanged(bool canUndo, QString undoLabel, bool canRedo, QString redoLabel);
+
   void canUndoChanged(bool);
   void canRedoChanged(bool);
   void undoLabelChanged(const QString&);
   void redoLabelChanged(const QString&);
-  
+
   // Fired after undo.
   void undone();
   // Fired after redo.
   void redone();
- 
+
 private slots:
   void onStackChanged();
 
 private:
-  class pqImplementation;  
+  class pqImplementation;
   pqImplementation* Implementation;
-  
 };
-
 
 #include "pqApplicationCore.h"
 
@@ -188,54 +185,53 @@ inline void BEGIN_UNDO_SET(const QString& name)
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->beginUndoSet(name);
-    }
+  }
 }
 
 inline void END_UNDO_SET()
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->endUndoSet();
-    }
+  }
 }
 
 inline void CLEAR_UNDO_STACK()
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->clear();
-    }
+  }
 }
 
 inline void ADD_UNDO_ELEM(vtkUndoElement* elem)
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->addToActiveUndoSet(elem);
-    }
+  }
 }
 
 inline void BEGIN_UNDO_EXCLUDE()
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->beginNonUndoableChanges();
-    }
+  }
 }
 
 inline void END_UNDO_EXCLUDE()
 {
   pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
   if (usStack)
-    {
+  {
     usStack->endNonUndoableChanges();
-    }
+  }
 }
 #endif
-

@@ -32,13 +32,13 @@
 #include "vtkPParticlePathFilter.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInSituPParticlePathFilter: public vtkPParticlePathFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInSituPParticlePathFilter : public vtkPParticlePathFilter
 {
 public:
-  vtkTypeMacro(vtkInSituPParticlePathFilter,vtkPParticlePathFilter)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
-  static vtkInSituPParticlePathFilter *New();
+  static vtkInSituPParticlePathFilter* New();
 
   /**
    * Set whether or not to clear out cache of previous time steps.
@@ -93,10 +93,10 @@ protected:
    * restarted simulation. These particles are only added at the first
    * time step.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector);
 
   /**
    * For restarts of particle paths, we add in the ability to add in
@@ -113,10 +113,8 @@ protected:
    * This takes into account that the "seeds" may just be restarted
    * particles.
    */
-  virtual void AssignSeedsToProcessors(
-    double time, vtkDataSet *source, int sourceID, int ptId,
-    vtkParticleTracerBaseNamespace::ParticleVector &localSeedPoints,
-    int &localAssignedCount);
+  virtual void AssignSeedsToProcessors(double time, vtkDataSet* source, int sourceID, int ptId,
+    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints, int& localAssignedCount);
 
 private:
   vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;
@@ -147,4 +145,4 @@ private:
   int FirstTimeStep;
 };
 #endif
-  //@}
+//@}

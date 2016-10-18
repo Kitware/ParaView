@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -46,6 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMa
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;
+
 public:
   pqManageCustomFiltersReaction(QAction* parentObject);
 
@@ -55,8 +56,7 @@ public:
   void manageCustomFilters();
 
 protected:
-  virtual void onTriggered()
-    { this->manageCustomFilters(); }
+  virtual void onTriggered() { this->manageCustomFilters(); }
 
 private:
   Q_DISABLE_COPY(pqManageCustomFiltersReaction)
@@ -64,5 +64,3 @@ private:
 };
 
 #endif
-
-

@@ -61,12 +61,10 @@ protected:
 
   vtkImageData* Buffer;
   int ReadImageFromFile(const char* filename);
-  int RequestData(vtkInformation *request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector);
-  int RequestInformation(vtkInformation *request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkNetworkImageSource(const vtkNetworkImageSource&) VTK_DELETE_FUNCTION;

@@ -37,8 +37,8 @@ public:
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
@@ -69,13 +69,12 @@ protected:
   // input for you. The related helper functions GetInternalAnnotationOutputPort,
   // GetInternalSelectionOutputPort should be used to obtain a selection or
   // annotation port whose selections are localized for a particular input data object.
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Description:
   // Overridden to request correct ghost-level to avoid internal surfaces.
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // Description:
   // Adds the representation to the view.  This is called from
@@ -98,7 +97,6 @@ private:
 
   char* DebugString;
   vtkSetStringMacro(DebugString);
-
 };
 
 #endif

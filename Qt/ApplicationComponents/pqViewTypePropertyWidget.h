@@ -43,15 +43,14 @@ class QComboBox;
 * values equal to the currently available types of views. This could have been
 * implemented as a domain, but I was being lazy :).
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT;
   typedef pqPropertyWidget Superclass;
   Q_PROPERTY(QString value READ value WRITE setValue);
+
 public:
-  pqViewTypePropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent=0);
+  pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqViewTypePropertyWidget();
 
   /**

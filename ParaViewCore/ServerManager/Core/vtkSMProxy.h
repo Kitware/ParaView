@@ -16,14 +16,14 @@
  * @class   vtkSMProxy
  * @brief   proxy for a VTK object(s) on a server
  *
- * vtkSMProxy manages VTK object(s) that are created on a server 
- * using the proxy pattern. The managed object is manipulated through 
- * properties. 
+ * vtkSMProxy manages VTK object(s) that are created on a server
+ * using the proxy pattern. The managed object is manipulated through
+ * properties.
  * The type of object created and managed by vtkSMProxy is determined
  * by the VTKClassName variable. The object is managed by getting the desired
  * property from the proxy, changing it's value and updating the server
  * with UpdateVTKObjects().
- * A proxy can be composite. Sub-proxies can be added by the proxy 
+ * A proxy can be composite. Sub-proxies can be added by the proxy
  * manager. This is transparent to the user who sees all properties
  * as if they belong to the root proxy.
  *
@@ -44,7 +44,7 @@
  *
  * When defining a proxy in the XML configuration file,
  * to derrive the property interface from another proxy definition,
- * we can use attributes "base_proxygroup" and "base_proxyname" which 
+ * we can use attributes "base_proxygroup" and "base_proxyname" which
  * identify the proxy group and proxy name of another proxy. Base interfaces
  * can be defined recursively, however care must be taken to avoid cycles.
  *
@@ -80,8 +80,8 @@
  *      </SubProxy>
  *    </Proxy>
  *    \endcode
- *    Thus, subproxies Mapper and Mapper2 share the properties that are 
- *    common to both; except those listed as exceptions using the "Exception" 
+ *    Thus, subproxies Mapper and Mapper2 share the properties that are
+ *    common to both; except those listed as exceptions using the "Exception"
  *    tag.
  *
  * \li 2) It is possible for a subproxy to use proxy definition defined elsewhere
@@ -95,7 +95,7 @@
  *
  * \li 3) It is possible to scope the properties exposed by a subproxy and expose
  *     only a fixed set of properties to be accessible from outside. Also,
- *     while exposing the property, it can be exposed with a different name. 
+ *     while exposing the property, it can be exposed with a different name.
  *     eg.
  *     \code
  *     <Proxy name="Alpha" ....>
@@ -108,20 +108,20 @@
  *       </SubProxy>
  *     </Proxy>
  *     \endcode
- *     Here, for the proxy Alpha, the property with the name LookupTable from its 
+ *     Here, for the proxy Alpha, the property with the name LookupTable from its
  *     subproxy "Mapper" can be obtained by calling GetProperty("MapperLookupTable")
- *     on an instance of the proxy Alpha. "exposed_name" attribute is optional, if 
+ *     on an instance of the proxy Alpha. "exposed_name" attribute is optional, if
  *     not specified, then the "name" is used as the exposed property name.
  *     Properties that are not exposed are treated as
  *     non-saveable and non-animateable (see vtkSMProperty for details).
- *     Exposed property restrictions only work when 
+ *     Exposed property restrictions only work when
  *     using the GetProperty on the container proxy (in this case Alpha) or
  *     using the PropertyIterator obtained from the container proxy. If one
- *     is to some how obtain a pointer to the subproxy and call GetProperty on 
- *     it (or get a PropertyIterator for the subproxy), the properties exposed 
+ *     is to some how obtain a pointer to the subproxy and call GetProperty on
+ *     it (or get a PropertyIterator for the subproxy), the properties exposed
  *     by the container class are no longer applicable.
  *     If two exposed properties are exposed with the same name, then a Warning is
- *     flagged -- only one of the two exposed properties will get exposed. 
+ *     flagged -- only one of the two exposed properties will get exposed.
  *
  * @sa
  * vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
@@ -203,7 +203,9 @@ public:
    * NULL is returned.
    */
   virtual vtkSMProperty* GetProperty(const char* name)
-    { return this->GetProperty(name, /*self-only*/ 0); }
+  {
+    return this->GetProperty(name, /*self-only*/ 0);
+  }
 
   /**
    * Return a property of the given name from self or one of
@@ -242,20 +244,14 @@ public:
    * first. If force is true, the property is pushed even if it not
    * modified. Return true if UpdateProperty pushes the property value.
    */
-  bool UpdateProperty(const char* name)
-    {
-      return this->UpdateProperty(name, 0);
-    }
+  bool UpdateProperty(const char* name) { return this->UpdateProperty(name, 0); }
   bool UpdateProperty(const char* name, int force);
   //@}
 
   /**
    * Convenience method equivalent to UpdateProperty(name, 1).
    */
-  void InvokeCommand(const char* name)
-    {
-      this->UpdateProperty(name, 1);
-    }
+  void InvokeCommand(const char* name) { this->UpdateProperty(name, 1); }
 
   //@{
   /**
@@ -383,11 +379,11 @@ public:
   virtual void ResetPropertiesToDomainDefaults();
 
   enum ResetPropertiesMode
-    {
+  {
     DEFAULT = 0,
     ONLY_XML = 1,
     ONLY_DOMAIN = 2
-    };
+  };
 
   /**
    * Use this method to set all properties on this proxy to their default domain
@@ -404,11 +400,11 @@ public:
    * Flags used for the proxyPropertyCopyFlag argument to the Copy method.
    */
   enum
-    {
-    COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE=0,
+  {
+    COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE = 0,
 
     COPY_PROXY_PROPERTY_VALUES_BY_CLONING // < No longer supported!!!
-    };
+  };
 
   //@{
   /**
@@ -426,10 +422,9 @@ public:
    */
   void Copy(vtkSMProxy* src);
   void Copy(vtkSMProxy* src, const char* exceptionClass);
-  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag);
+  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, int proxyPropertyCopyFlag);
   //@}
-  
+
   /**
    * Calls MarkDirty() and invokes ModifiedEvent.
    */
@@ -583,7 +578,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
   /**
    * Returns the property group at \p index for the proxy.
@@ -602,9 +597,8 @@ protected:
   /**
    * Invoke that takes a vtkClientServerStream as the argument.
    */
-  void ExecuteStream(const vtkClientServerStream& msg,
-                     bool ignore_errors = false,
-                     vtkTypeUInt32 location = 0);
+  void ExecuteStream(
+    const vtkClientServerStream& msg, bool ignore_errors = false, vtkTypeUInt32 location = 0);
 
   // Any method changing the annotations will trigger this method that will
   // update the local full state as well as sending the annotation state part
@@ -626,7 +620,6 @@ protected:
    * be replaced. This includes properties in sub-proxies.
    */
   virtual void AddProperty(const char* name, vtkSMProperty* prop);
-
 
   /**
    * Calls MarkDirty() on all consumers.
@@ -742,8 +735,7 @@ protected:
    * If the overrideOK flag is set, then no warning is printed when a new
    * subproxy replaces a preexisting one.
    */
-  void AddSubProxy(const char* name, vtkSMProxy* proxy,
-                   int overrideOK=0);
+  void AddSubProxy(const char* name, vtkSMProxy* proxy, int overrideOK = 0);
 
   /**
    * Remove a sub-proxy.
@@ -798,7 +790,7 @@ protected:
    * to the list of producers.
    */
   void AddProducer(vtkSMProperty* property, vtkSMProxy* proxy);
-  
+
   /**
    * Remove the property,proxy pair from the list of producers.
    */
@@ -822,12 +814,12 @@ protected:
    * (makes it public) and updates the pipeline information.
    */
   virtual void UpdatePipelineInformation();
-  
+
   // When an algorithm proxy is marked modified, NeedsUpdate is
   // set to true. In PostUpdateData(), NeedsUpdate is set to false.
   // This is used to keep track of data information validity.
   bool NeedsUpdate;
-  
+
   //@{
   /**
    * Creates a new property and initializes it by calling ReadXMLAttributes()
@@ -855,8 +847,8 @@ protected:
    * Read attributes from an XML element.
    */
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
-  void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
-  void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
+  void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement* element);
+  void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement* element);
   //@}
 
   /**
@@ -866,16 +858,15 @@ protected:
    * If the overrideOK flag is set, then no warning is printed when a new
    * exposed property replaces a preexisting one.
    */
-  void ExposeSubProxyProperty(const char* subproxy_name,
-    const char* property_name, const char* exposed_name, int overrideOK = 0);
+  void ExposeSubProxyProperty(const char* subproxy_name, const char* property_name,
+    const char* exposed_name, int overrideOK = 0);
 
   /**
    * Handle events fired by subproxies.
    */
   virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, void* data);
 
-  virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
-    vtkPVXMLElement *element);
+  virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
   /**
    * Called to update the property information on the property. It is assured
@@ -883,7 +874,7 @@ protected:
    * overloads of UpdatePropertyInformation() call this method, so subclass can
    * override this method to perform special tasks.
    */
-  virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop = NULL);
 
   //@{
   /**
@@ -909,7 +900,6 @@ protected:
    * properties are modified.
    */
   int InUpdateVTKObjects;
-
 
   /**
    * Flag used to help speed up UpdateVTKObjects and ArePropertiesModified
@@ -939,6 +929,7 @@ protected:
   int InMarkModified;
 
   vtkWeakPointer<vtkSMProxy> ParentProxy;
+
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
@@ -946,9 +937,7 @@ protected:
   void operator=(const vtkSMProxy&) VTK_DELETE_FUNCTION;
 
 private:
-  vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,
-                                      const char* subproxy_name);
-
+  vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement, const char* subproxy_name);
 };
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used
@@ -967,7 +956,10 @@ private:
 class VTKPVSERVERMANAGERCORE_EXPORT SIPROXY : public SIOBJECT
 {
 public:
-  SIPROXY(vtkSMProxy* proxy) : SIOBJECT (proxy) { }
+  SIPROXY(vtkSMProxy* proxy)
+    : SIOBJECT(proxy)
+  {
+  }
 };
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used
@@ -989,8 +981,12 @@ class VTKPVSERVERMANAGERCORE_EXPORT VTKOBJECT
   vtkSMProxy* Reference;
   friend VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const VTKOBJECT& manipulator);
+
 public:
-  VTKOBJECT(vtkSMProxy* proxy) : Reference(proxy) {}
+  VTKOBJECT(vtkSMProxy* proxy)
+    : Reference(proxy)
+  {
+  }
 };
 VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
   vtkClientServerStream& stream, const VTKOBJECT& manipulator);

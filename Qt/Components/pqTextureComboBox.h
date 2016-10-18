@@ -50,8 +50,9 @@ class PQCOMPONENTS_EXPORT pqTextureComboBox : public QComboBox
 {
   Q_OBJECT
   typedef QComboBox Superclass;
+
 public:
-  pqTextureComboBox(QWidget* parent=0);
+  pqTextureComboBox(QWidget* parent = 0);
   virtual ~pqTextureComboBox();
 
 public slots:
@@ -86,8 +87,8 @@ protected slots:
   void updateTextures();
 
   void proxyRegistered(const QString& groupname);
-  void proxyUnRegistered(const QString& group,
-    const QString&, vtkSMProxy* proxy);
+  void proxyUnRegistered(const QString& group, const QString&, vtkSMProxy* proxy);
+
 protected:
   /**
   * Get the texture proxy associated with the given data.
@@ -99,6 +100,7 @@ protected:
   */
   void loadTexture();
   bool loadTexture(const QString& filename);
+
 private:
   Q_DISABLE_COPY(pqTextureComboBox)
 
@@ -106,9 +108,6 @@ private:
   pqInternal* Internal;
 
   bool InOnActivate;
-
 };
 
 #endif
-
-

@@ -29,11 +29,12 @@
 class pqSierraPlotToolsActionGroup : public QActionGroup
 {
   Q_OBJECT;
+
 public:
-  pqSierraPlotToolsActionGroup(QObject *p);
+  pqSierraPlotToolsActionGroup(QObject* p);
 
 private:
   Q_DISABLE_COPY(pqSierraPlotToolsActionGroup)
 };
 
-#endif //pqSierraPlotToolsActionGroup_h
+#endif // pqSierraPlotToolsActionGroup_h

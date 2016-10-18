@@ -42,6 +42,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveStateReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
@@ -80,13 +81,10 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { pqSaveStateReaction::saveState(); }
+  virtual void onTriggered() { pqSaveStateReaction::saveState(); }
 
 private:
   Q_DISABLE_COPY(pqSaveStateReaction)
 };
 
 #endif
-
-

@@ -50,11 +50,8 @@ public:
   static QString XYChartViewType() { return "XYChartView"; }
 
 public:
-  pqXYChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYChartView();
 

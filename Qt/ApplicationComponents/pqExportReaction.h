@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-
 class pqProxyWidget;
 class pqView;
 
@@ -47,6 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExportReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
@@ -70,8 +70,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { this->exportActiveView(); }
+  virtual void onTriggered() { this->exportActiveView(); }
 
 private:
   /**
@@ -85,5 +84,3 @@ private:
 };
 
 #endif
-
-

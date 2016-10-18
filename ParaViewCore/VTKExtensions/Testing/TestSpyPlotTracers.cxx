@@ -3,22 +3,22 @@
 #include "vtkSpyPlotReader.h"
 #include "vtkTestUtilities.h"
 
-#define VTK_CREATE(type,name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New ()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-int TestSpyPlotTracers(int argc, char * argv[])
+int TestSpyPlotTracers(int argc, char* argv[])
 {
-  char *fname = vtkTestUtilities::ExpandDataFileName (argc, argv, "Data/SPCTH/ball_and_box.spcth");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/SPCTH/ball_and_box.spcth");
 
   VTK_CREATE(vtkDummyController, controller);
-  vtkMultiProcessController::SetGlobalController (controller);
+  vtkMultiProcessController::SetGlobalController(controller);
 
   VTK_CREATE(vtkSpyPlotReader, reader);
-  reader->SetGlobalController (controller);
-  reader->SetFileName (fname);
-  reader->GenerateTracerArrayOn ();
-  reader->Update ();
+  reader->SetGlobalController(controller);
+  reader->SetFileName(fname);
+  reader->GenerateTracerArrayOn();
+  reader->Update();
 
-  delete [] fname;
+  delete[] fname;
 
   return 0;
 }

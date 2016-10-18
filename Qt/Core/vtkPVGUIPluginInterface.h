@@ -24,7 +24,7 @@
 * simply provides access to the GUI-component interfaces defined in this
 * plugin.
 */
-class PQCORE_EXPORT vtkPVGUIPluginInterface 
+class PQCORE_EXPORT vtkPVGUIPluginInterface
 {
 public:
   virtual ~vtkPVGUIPluginInterface();
@@ -32,4 +32,3 @@ public:
 };
 
 #endif
-

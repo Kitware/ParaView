@@ -53,42 +53,44 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqResetScalarRangeReaction : public pqReact
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   enum Modes
-    {
+  {
     DATA,
     CUSTOM,
     TEMPORAL
-    };
+  };
 
   /**
   * if \c track_active_objects is false, then the reaction will not track
   * pqActiveObjects automatically.
   */
-  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects=true , Modes mode=DATA);
+  pqResetScalarRangeReaction(QAction* parent, bool track_active_objects = true, Modes mode = DATA);
   ~pqResetScalarRangeReaction();
-
 
   /**
   * @deprecated Use resetScalarRangeToData().
   */
-  static void resetScalarRange(pqPipelineRepresentation* repr=NULL)
-    { pqResetScalarRangeReaction::resetScalarRangeToData(repr); }
+  static void resetScalarRange(pqPipelineRepresentation* repr = NULL)
+  {
+    pqResetScalarRangeReaction::resetScalarRangeToData(repr);
+  }
 
   /**
   * Reset to current data range.
   */
-  static bool resetScalarRangeToData(pqPipelineRepresentation* repr=NULL);
+  static bool resetScalarRangeToData(pqPipelineRepresentation* repr = NULL);
 
   /**
   * Reset range to a custom range.
   */
-  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr=NULL);
+  static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr = NULL);
 
   /**
   * Reset range to data range over time.
   */
-  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr=NULL);
+  static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = NULL);
 
 public slots:
   /**
@@ -109,8 +111,8 @@ protected:
   virtual void onTriggered();
 
 protected slots:
-  virtual void onServerAdded(pqServer* server);  
-  virtual void onAboutToRemoveServer(pqServer* server);  
+  virtual void onServerAdded(pqServer* server);
+  virtual void onAboutToRemoveServer(pqServer* server);
 
 private:
   Q_DISABLE_COPY(pqResetScalarRangeReaction)

@@ -35,7 +35,12 @@ protected:
   vtkSIStringVectorProperty();
   ~vtkSIStringVectorProperty();
 
-  enum ElementTypes{ INT, DOUBLE, STRING };
+  enum ElementTypes
+  {
+    INT,
+    DOUBLE,
+    STRING
+  };
 
   /**
    * Push a new state to the underneath implementation
@@ -59,9 +64,8 @@ private:
   class vtkVectorOfStrings;
   class vtkVectorOfInts;
 
-  bool Push(const vtkVectorOfStrings &values);
+  bool Push(const vtkVectorOfStrings& values);
   vtkVectorOfInts* ElementTypes;
-
 };
 
 #endif

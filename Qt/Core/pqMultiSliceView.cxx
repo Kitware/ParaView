@@ -44,33 +44,28 @@
 #define MULTI_SLICE_AXIS_EDGE_MARGIN 10
 
 //-----------------------------------------------------------------------------
-pqMultiSliceView::pqMultiSliceView(
-    const QString& viewType, const QString& group, const QString& name,
-    vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
+pqMultiSliceView::pqMultiSliceView(const QString& viewType, const QString& group,
+  const QString& name, vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
   // Nothing is changing anything.
   this->UserIsInteracting = false;
 
   // When data change make sure the bounds are updated
-  QObject::connect(this, SIGNAL(updateDataEvent()),
-                   this, SLOT(updateAxisBounds()));
+  QObject::connect(this, SIGNAL(updateDataEvent()), this, SLOT(updateAxisBounds()));
 
   // Make sure if the proxy change by undo-redo, we properly update the Qt UI
-  viewProxy->GetProperty("XSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this,
-        &pqMultiSliceView::updateViewModelCallBack);
-  viewProxy->GetProperty("YSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this,
-        &pqMultiSliceView::updateViewModelCallBack);
-  viewProxy->GetProperty("ZSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this,
-        &pqMultiSliceView::updateViewModelCallBack);
+  viewProxy->GetProperty("XSlicesValues")
+    ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
+  viewProxy->GetProperty("YSlicesValues")
+    ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
+  viewProxy->GetProperty("ZSlicesValues")
+    ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
 
-  for(int i=0;i<9;++i)
-    {
+  for (int i = 0; i < 9; ++i)
+  {
     this->NormalValuesHolder[i] = this->OriginValuesHolder[i] = 0;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -80,7 +75,7 @@ pqMultiSliceView::~pqMultiSliceView()
 //-----------------------------------------------------------------------------
 QWidget* pqMultiSliceView::createWidget()
 {
-  pqPropertyLinks *links = new pqPropertyLinks(this);
+  pqPropertyLinks* links = new pqPropertyLinks(this);
   vtkSMProxy* smproxy = this->getProxy();
 
   // Get the internal widget that we want to decorate
@@ -97,7 +92,7 @@ QWidget* pqMultiSliceView::createWidget()
   // Init top axis
   this->AxisX = new pqMultiSliceAxisWidget(container);
   this->AxisX->setAxisType(vtkAxis::LEFT);
-  this->AxisX->setRange(-10,10);
+  this->AxisX->setRange(-10, 10);
   this->AxisX->setTitle("X");
   this->AxisX->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisX->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
@@ -106,7 +101,7 @@ QWidget* pqMultiSliceView::createWidget()
 
   this->AxisY = new pqMultiSliceAxisWidget(container);
   this->AxisY->setAxisType(vtkAxis::TOP);
-  this->AxisY->setRange(-10,10);
+  this->AxisY->setRange(-10, 10);
   this->AxisY->setTitle("Y");
   this->AxisY->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisY->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
@@ -115,7 +110,7 @@ QWidget* pqMultiSliceView::createWidget()
 
   this->AxisZ = new pqMultiSliceAxisWidget(container);
   this->AxisZ->setAxisType(vtkAxis::RIGHT);
-  this->AxisZ->setRange(-10,10);
+  this->AxisZ->setRange(-10, 10);
   this->AxisZ->setTitle("Z");
   this->AxisZ->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisZ->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
@@ -127,42 +122,42 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisXYZ[2] = this->AxisZ;
 
   // Setup links so the UI updates when the property changes.
-  links->addPropertyLink(this->AxisX, "title", SIGNAL(titleChanged(const QString&)),
-    smproxy, smproxy->GetProperty("XTitle"));
+  links->addPropertyLink(this->AxisX, "title", SIGNAL(titleChanged(const QString&)), smproxy,
+    smproxy->GetProperty("XTitle"));
   this->AxisX->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
 
-  links->addPropertyLink(this->AxisY, "title", SIGNAL(titleChanged(const QString&)),
-    smproxy, smproxy->GetProperty("YTitle"));
+  links->addPropertyLink(this->AxisY, "title", SIGNAL(titleChanged(const QString&)), smproxy,
+    smproxy->GetProperty("YTitle"));
   this->AxisY->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
 
-  links->addPropertyLink(this->AxisZ, "title", SIGNAL(titleChanged(const QString&)),
-    smproxy, smproxy->GetProperty("ZTitle"));
+  links->addPropertyLink(this->AxisZ, "title", SIGNAL(titleChanged(const QString&)), smproxy,
+    smproxy->GetProperty("ZTitle"));
   this->AxisZ->connect(links, SIGNAL(smPropertyChanged()), SLOT(renderView()));
 
-
-  gridLayout->addWidget(this->AxisY, 0, 1);  // TOP
+  gridLayout->addWidget(this->AxisY, 0, 1); // TOP
   gridLayout->addWidget(this->AxisX, 1, 0); // LEFT
   gridLayout->addWidget(this->AxisZ, 1, 2); // RIGHT
-  gridLayout->addWidget(this->InternalWidget,1,1);
-  gridLayout->setContentsMargins(0,0,0,0);
+  gridLayout->addWidget(this->InternalWidget, 1, 1);
+  gridLayout->setContentsMargins(0, 0, 0, 0);
   gridLayout->setSpacing(0);
 
   // Properly do the binding between the proxy and the 3D widget
   vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
   if (this->InternalWidget && renModule)
-    {
+  {
     this->InternalWidget->SetRenderWindow(renModule->GetRenderWindow());
-    }
+  }
 
-  for (int cc=0; cc < 3; cc++)
-    {
+  for (int cc = 0; cc < 3; cc++)
+  {
     // Make sure we are aware when the slice positions changes
     this->connect(this->AxisXYZ[cc], SIGNAL(sliceAdded(int)), SLOT(onSliceAdded(int)));
     this->connect(this->AxisXYZ[cc], SIGNAL(sliceRemoved(int)), SLOT(onSliceRemoved(int)));
     this->connect(this->AxisXYZ[cc], SIGNAL(sliceModified(int)), SLOT(onSliceModified(int)));
     // Attach click listener to slice marks
-    this->connect(this->AxisXYZ[cc], SIGNAL(markClicked(int,int,double)), SLOT(onSliceClicked(int,int,double)));
-    }
+    this->connect(this->AxisXYZ[cc], SIGNAL(markClicked(int, int, double)),
+      SLOT(onSliceClicked(int, int, double)));
+  }
 
   // Make sure the UI reflect the proxy state
   this->updateViewModelCallBack(NULL, 0, NULL);
@@ -174,23 +169,22 @@ QWidget* pqMultiSliceView::createWidget()
 void pqMultiSliceView::updateAxisBounds()
 {
   double bounds[6];
-  vtkSMMultiSliceViewProxy* viewPxy = vtkSMMultiSliceViewProxy::SafeDownCast(
-    this->getProxy());
+  vtkSMMultiSliceViewProxy* viewPxy = vtkSMMultiSliceViewProxy::SafeDownCast(this->getProxy());
   Q_ASSERT(viewPxy);
 
   viewPxy->GetDataBounds(bounds);
   if (vtkMath::AreBoundsInitialized(bounds))
-    {
+  {
     this->AxisX->setRange(bounds[0], bounds[1]);
     this->AxisY->setRange(bounds[2], bounds[3]);
     this->AxisZ->setRange(bounds[4], bounds[5]);
-    }
+  }
   else
-    {
+  {
     this->AxisX->setRange(-10, 10);
     this->AxisY->setRange(-10, 10);
     this->AxisZ->setRange(-10, 10);
-    }
+  }
 
   // Make sure we render the new range
   this->AxisX->renderView();
@@ -227,13 +221,13 @@ void pqMultiSliceView::updateSlices()
 //-----------------------------------------------------------------------------
 int pqMultiSliceView::getAxisIndex(QObject* axis)
 {
-  for (int cc=0; cc < 3; cc++)
-    {
+  for (int cc = 0; cc < 3; cc++)
+  {
     if (this->AxisXYZ[cc] == axis)
-      {
+    {
       return cc;
-      }
     }
+  }
   return -1;
 }
 
@@ -243,7 +237,7 @@ void pqMultiSliceView::onSliceAdded(int activeSliceIndex)
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
 
-  Q_ASSERT(axisIndex >= 0 && axisIndex <=2);
+  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed
@@ -255,7 +249,7 @@ void pqMultiSliceView::onSliceRemoved(int activeSliceIndex)
 {
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
-  Q_ASSERT(axisIndex >= 0 && axisIndex <=2);
+  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed
@@ -267,7 +261,7 @@ void pqMultiSliceView::onSliceModified(int activeSliceIndex)
 {
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
-  Q_ASSERT(axisIndex >= 0 && axisIndex <=2);
+  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed
@@ -275,72 +269,69 @@ void pqMultiSliceView::onSliceModified(int activeSliceIndex)
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiSliceView::updateViewModelCallBack(vtkObject*,unsigned long, void*)
+void pqMultiSliceView::updateViewModelCallBack(vtkObject*, unsigned long, void*)
 {
-  if(this->UserIsInteracting)
-    {
+  if (this->UserIsInteracting)
+  {
     return; // We don't want to update our data model
-    }
+  }
 
   std::vector<double> xSlices =
-      vtkSMPropertyHelper(this->getViewProxy(), "XSlicesValues").GetDoubleArray();
+    vtkSMPropertyHelper(this->getViewProxy(), "XSlicesValues").GetDoubleArray();
   std::vector<double> ySlices =
-      vtkSMPropertyHelper(this->getViewProxy(), "YSlicesValues").GetDoubleArray();
+    vtkSMPropertyHelper(this->getViewProxy(), "YSlicesValues").GetDoubleArray();
   std::vector<double> zSlices =
-      vtkSMPropertyHelper(this->getViewProxy(), "ZSlicesValues").GetDoubleArray();
+    vtkSMPropertyHelper(this->getViewProxy(), "ZSlicesValues").GetDoubleArray();
 
   assert("The maximum number of slice can not be bigger than 255" &&
-         ( 255 >
-           std::max(
-             std::max(
-               xSlices.size(), ySlices.size()), zSlices.size())));
+    (255 > std::max(std::max(xSlices.size(), ySlices.size()), zSlices.size())));
 
   // Build a tmp array of visibility set to true
   bool visibility[255];
   memset(visibility, true, 255);
 
   double emptyDouble = 0;
-  if( xSlices.size() > 0 )
-    {
+  if (xSlices.size() > 0)
+  {
     this->AxisX->updateSlices(&xSlices[0], visibility, static_cast<int>(xSlices.size()));
-    }
+  }
   else // Reset slices
-    {
+  {
     this->AxisX->updateSlices(&emptyDouble, visibility, 0);
-    }
+  }
 
-  if( ySlices.size() > 0 )
-    {
+  if (ySlices.size() > 0)
+  {
     this->AxisY->updateSlices(&ySlices[0], visibility, static_cast<int>(ySlices.size()));
-    }
+  }
   else // Reset slices
-    {
+  {
     this->AxisY->updateSlices(&emptyDouble, visibility, 0);
-    }
+  }
 
-  if( zSlices.size() > 0 )
-    {
+  if (zSlices.size() > 0)
+  {
     this->AxisZ->updateSlices(&zSlices[0], visibility, static_cast<int>(zSlices.size()));
-    }
+  }
   else // Reset slices
-    {
+  {
     this->AxisZ->updateSlices(&emptyDouble, visibility, 0);
-    }
+  }
 
   this->render();
 }
 //-----------------------------------------------------------------------------
-const double* pqMultiSliceView::GetVisibleSlices(int axisIndex, int &numberOfSlices)
+const double* pqMultiSliceView::GetVisibleSlices(int axisIndex, int& numberOfSlices)
 {
-  switch(axisIndex)
-    {
-  case 0:
-    return this->AxisX->getVisibleSlices(numberOfSlices);
-  case 1:
-    return this->AxisY->getVisibleSlices(numberOfSlices);
-  case 2:
-    return this->AxisZ->getVisibleSlices(numberOfSlices);
-    }
+  switch (axisIndex)
+  {
+    case 0:
+      return this->AxisX->getVisibleSlices(numberOfSlices);
+    case 1:
+      return this->AxisY->getVisibleSlices(numberOfSlices);
+    case 2:
+      return this->AxisZ->getVisibleSlices(numberOfSlices);
+  }
 
   // Invalid axis
   numberOfSlices = 0;
@@ -348,17 +339,17 @@ const double* pqMultiSliceView::GetVisibleSlices(int axisIndex, int &numberOfSli
 }
 
 //-----------------------------------------------------------------------------
-const double* pqMultiSliceView::GetAllSlices(int axisIndex, int &numberOfSlices)
+const double* pqMultiSliceView::GetAllSlices(int axisIndex, int& numberOfSlices)
 {
-  switch(axisIndex)
-    {
-  case 0:
-    return this->AxisX->getSlices(numberOfSlices);
-  case 1:
-    return this->AxisY->getSlices(numberOfSlices);
-  case 2:
-    return this->AxisZ->getSlices(numberOfSlices);
-    }
+  switch (axisIndex)
+  {
+    case 0:
+      return this->AxisX->getSlices(numberOfSlices);
+    case 1:
+      return this->AxisY->getSlices(numberOfSlices);
+    case 2:
+      return this->AxisZ->getSlices(numberOfSlices);
+  }
 
   // Invalid axis
   numberOfSlices = 0;
@@ -368,63 +359,63 @@ const double* pqMultiSliceView::GetAllSlices(int axisIndex, int &numberOfSlices)
 //-----------------------------------------------------------------------------
 const double* pqMultiSliceView::GetSliceNormal(int axisIndex)
 {
-  if(axisIndex < 0 || axisIndex > 2)
-    {
+  if (axisIndex < 0 || axisIndex > 2)
+  {
     return NULL;
-    }
+  }
 
-  const char* propertyNames[3] = {"XSlicesNormal", "YSlicesNormal", "ZSlicesNormal"};
+  const char* propertyNames[3] = { "XSlicesNormal", "YSlicesNormal", "ZSlicesNormal" };
   std::vector<double> values =
-      vtkSMPropertyHelper(this->getViewProxy(), propertyNames[axisIndex]).GetDoubleArray();
-  for(int i=0;i<3;++i)
-    {
-    this->NormalValuesHolder[i+ (3*axisIndex)] = values[i];
-    }
-  return &this->NormalValuesHolder[(3*axisIndex)];
+    vtkSMPropertyHelper(this->getViewProxy(), propertyNames[axisIndex]).GetDoubleArray();
+  for (int i = 0; i < 3; ++i)
+  {
+    this->NormalValuesHolder[i + (3 * axisIndex)] = values[i];
+  }
+  return &this->NormalValuesHolder[(3 * axisIndex)];
 }
 
 //-----------------------------------------------------------------------------
 const double* pqMultiSliceView::GetSliceOrigin(int axisIndex)
 {
-  if(axisIndex < 0 || axisIndex > 2)
-    {
+  if (axisIndex < 0 || axisIndex > 2)
+  {
     return NULL;
-    }
+  }
 
-  const char* propertyNames[3] = {"XSlicesOrigin", "YSlicesOrigin", "ZSlicesOrigin"};
+  const char* propertyNames[3] = { "XSlicesOrigin", "YSlicesOrigin", "ZSlicesOrigin" };
   std::vector<double> values =
-      vtkSMPropertyHelper(this->getViewProxy(), propertyNames[axisIndex]).GetDoubleArray();
-  for(int i=0;i<3;++i)
-    {
-    this->OriginValuesHolder[i+ (3*axisIndex)] = values[i];
-    }
-  return &this->OriginValuesHolder[(3*axisIndex)];
+    vtkSMPropertyHelper(this->getViewProxy(), propertyNames[axisIndex]).GetDoubleArray();
+  for (int i = 0; i < 3; ++i)
+  {
+    this->OriginValuesHolder[i + (3 * axisIndex)] = values[i];
+  }
+  return &this->OriginValuesHolder[(3 * axisIndex)];
 }
 
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::onSliceClicked(int button, int modifier, double value)
 {
   QObject* senderObject = QObject::sender();
-  if(senderObject == this->AxisX.data())
-    {
+  if (senderObject == this->AxisX.data())
+  {
     emit sliceClicked(0, value, button, modifier);
-    }
-  else if(senderObject == this->AxisY.data())
-    {
+  }
+  else if (senderObject == this->AxisY.data())
+  {
     emit sliceClicked(1, value, button, modifier);
-    }
-  else if(senderObject == this->AxisZ.data())
-    {
+  }
+  else if (senderObject == this->AxisZ.data())
+  {
     emit sliceClicked(2, value, button, modifier);
-    }
+  }
 }
 //-----------------------------------------------------------------------------
-void pqMultiSliceView::setCursor(const QCursor &c)
+void pqMultiSliceView::setCursor(const QCursor& c)
 {
-  if(this->InternalWidget)
-    {
+  if (this->InternalWidget)
+  {
     this->InternalWidget->setCursor(c);
-    }
+  }
 }
 //-----------------------------------------------------------------------------
 QVTKWidget* pqMultiSliceView::getInternalWidget()

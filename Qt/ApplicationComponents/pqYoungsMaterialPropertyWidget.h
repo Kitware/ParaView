@@ -44,20 +44,18 @@ class vtkSMPropertyGroup;
 * since this filter has unusual requirements when it comes to setting
 * OrderingArrays and NormalArrays properties.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget : public pqStringVectorPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
+  : public pqStringVectorPropertyWidget
 {
   Q_OBJECT
   typedef pqStringVectorPropertyWidget Superclass;
-  Q_PROPERTY(QList<QVariant> orderingArrays
-             READ orderingArrays
-             WRITE setOrderingArrays
-             NOTIFY orderingArraysChanged);
-  Q_PROPERTY(QList<QVariant> normalArrays
-             READ normalArrays
-             WRITE setNormalArrays
-             NOTIFY normalArraysChanged);
+  Q_PROPERTY(QList<QVariant> orderingArrays READ orderingArrays WRITE setOrderingArrays NOTIFY
+      orderingArraysChanged);
+  Q_PROPERTY(QList<QVariant> normalArrays READ normalArrays WRITE setNormalArrays NOTIFY
+      normalArraysChanged);
+
 public:
-  pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent=0);
+  pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
   virtual ~pqYoungsMaterialPropertyWidget();
 
   void setOrderingArrays(const QList<QVariant>&);

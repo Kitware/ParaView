@@ -58,9 +58,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractiveP
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqBoxPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqBoxPropertyWidget();
 
 protected slots:

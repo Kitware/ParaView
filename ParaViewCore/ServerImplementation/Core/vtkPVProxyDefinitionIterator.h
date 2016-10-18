@@ -51,8 +51,7 @@ public:
   /**
    * Reset the iterator and move it to the head.
    */
-  virtual void InitTraversal()
-    { this->GoToFirstItem(); }
+  virtual void InitTraversal() { this->GoToFirstItem(); }
 
   /**
    * Move the iterator to the next item. This will also move to next group
@@ -60,9 +59,9 @@ public:
    */
   virtual void GoToNextItem() = 0;
 
-    /**
-     * Move the iterator to the next group.
-     */
+  /**
+   * Move the iterator to the next group.
+   */
   virtual void GoToNextGroup() = 0;
 
   /**
@@ -70,7 +69,6 @@ public:
    * item.
    */
   virtual bool IsDoneWithTraversal() = 0;
-
 
   // ********* Configuration methods **********
 
@@ -84,7 +82,7 @@ public:
   /// Return the current proxy name or NULL if Next() was never called.
   virtual const char* GetProxyName() = 0;
   /// Return true if the current definition has been defined in the Custom scope
-  virtual bool  IsCustom() { return false; };
+  virtual bool IsCustom() { return false; };
   /// Return the current XML proxy definition
   virtual vtkPVXMLElement* GetProxyDefinition() = 0;
   /// Return the current XML proxy hints

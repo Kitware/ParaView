@@ -43,7 +43,6 @@ protected:
 private:
   vtkViewLayout(const vtkViewLayout&) VTK_DELETE_FUNCTION;
   void operator=(const vtkViewLayout&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

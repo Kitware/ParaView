@@ -53,10 +53,10 @@ class PQCORE_EXPORT pqDataRepresentation : public pqRepresentation
 {
   Q_OBJECT
   typedef pqRepresentation Superclass;
+
 public:
-  pqDataRepresentation(const QString& group, const QString& name,
-    vtkSMProxy* display, pqServer* server,
-    QObject* parent=0);
+  pqDataRepresentation(const QString& group, const QString& name, vtkSMProxy* display,
+    pqServer* server, QObject* parent = 0);
   virtual ~pqDataRepresentation();
 
   /**
@@ -72,7 +72,7 @@ public:
 
   /**
   * Returns the data information for the data coming into the representation
-  * as input. 
+  * as input.
   */
   vtkPVDataInformation* getInputDataInformation() const;
 
@@ -88,7 +88,7 @@ public:
   * shows an outline of the data, the this method will return the information
   * about the polydata forming the outline not the input dataset.
   */
-  vtkPVDataInformation* getRepresentedDataInformation(bool update=true) const;
+  vtkPVDataInformation* getRepresentedDataInformation(bool update = true) const;
 
   /**
   * Get the data bounds for the input of this display.
@@ -172,10 +172,11 @@ protected:
   * after the object has been created.
   */
   virtual void initialize()
-    {
+  {
     this->Superclass::initialize();
     this->onInputChanged();
-    }
+  }
+
 private:
   Q_DISABLE_COPY(pqDataRepresentation)
 
@@ -183,4 +184,3 @@ private:
 };
 
 #endif
-

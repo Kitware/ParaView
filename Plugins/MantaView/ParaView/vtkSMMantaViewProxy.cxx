@@ -87,7 +87,6 @@ public:
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMantaViewProxy);
 
-
 //-----------------------------------------------------------------------------
 vtkSMMantaViewProxy::vtkSMMantaViewProxy()
 {
@@ -99,9 +98,9 @@ vtkSMMantaViewProxy::vtkSMMantaViewProxy()
 vtkSMMantaViewProxy::~vtkSMMantaViewProxy()
 {
   for (size_t i = 0; i < this->Internals->Lights.size(); i++)
-    {
+  {
     this->Internals->Lights[i]->UnRegister(this);
-    }
+  }
   delete this->Internals;
 }
 
@@ -118,7 +117,7 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
 
   vtkSMPropertyHelper(this, "UseLight").Set(0);
 
-  //disable the light renderview gives us
+  // disable the light renderview gives us
   vtkSMPropertyHelper(this, "LightSwitch").Set(0);
 }
 
@@ -127,9 +126,9 @@ vtkSMRepresentationProxy* vtkSMMantaViewProxy::CreateDefaultRepresentation(
   vtkSMProxy* source, int opport)
 {
   if (!source)
-    {
+  {
     return 0;
-    }
+  }
 
   assert("Session should be set by now" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
@@ -137,49 +136,46 @@ vtkSMRepresentationProxy* vtkSMMantaViewProxy::CreateDefaultRepresentation(
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
   if (sproxy)
-    {
+  {
     double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
     sproxy->UpdatePipeline(view_time);
-    }
+  }
 
   // Choose which type of representation proxy to create.
   vtkSMProxy* prototype;
-  prototype = pxm->GetPrototypeProxy("representations",
-    "MantaGeometryRepresentation");
-  vtkSMInputProperty *pp = vtkSMInputProperty::SafeDownCast(
-    prototype->GetProperty("Input"));
+  prototype = pxm->GetPrototypeProxy("representations", "MantaGeometryRepresentation");
+  vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
   pp->AddUncheckedInputConnection(source, opport);
-  bool g = (pp->IsInDomains()>0);
+  bool g = (pp->IsInDomains() > 0);
   pp->RemoveAllUncheckedProxies();
   if (g)
-    {
+  {
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "MantaGeometryRepresentation"));
-    }
+  }
 
   return 0;
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkSMMantaViewProxy::MakeLight()
 {
   vtkSMProxy* pxy;
   if (this->Internals->CurrentLight == -1)
-    {
-    //we have a light at start by virtue of CurrentLight proxy property
-    //but have no record of it. So when we make the first new one,
-    //grab hold of the initial one
+  {
+    // we have a light at start by virtue of CurrentLight proxy property
+    // but have no record of it. So when we make the first new one,
+    // grab hold of the initial one
     pxy = vtkSMPropertyHelper(this, "CurrentLight").GetAsProxy();
     this->Internals->Lights.push_back(pxy);
     pxy->Register(this);
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   pxy = pxm->NewProxy("extra_lights", "MantaLight");
   this->Internals->Lights.push_back(pxy);
-  this->Internals->CurrentLight = this->Internals->Lights.size()-1;
+  this->Internals->CurrentLight = this->Internals->Lights.size() - 1;
   vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
   pxy->UpdateSelfAndAllInputs();
   this->UpdateSelfAndAllInputs();
@@ -189,23 +185,22 @@ void vtkSMMantaViewProxy::MakeLight()
 void vtkSMMantaViewProxy::PreviousLight()
 {
   if (this->Internals->CurrentLight < 1)
-    {
+  {
     return;
-    }
+  }
   this->Internals->CurrentLight = this->Internals->CurrentLight - 1;
-  vtkSMProxy *pxy = this->Internals->Lights[this->Internals->CurrentLight];
+  vtkSMProxy* pxy = this->Internals->Lights[this->Internals->CurrentLight];
   vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMMantaViewProxy::NextLight()
 {
-  if (static_cast<size_t>(this->Internals->CurrentLight) >=
-      this->Internals->Lights.size()-1)
-    {
+  if (static_cast<size_t>(this->Internals->CurrentLight) >= this->Internals->Lights.size() - 1)
+  {
     return;
-    }
+  }
   this->Internals->CurrentLight = this->Internals->CurrentLight + 1;
-  vtkSMProxy *pxy = this->Internals->Lights[this->Internals->CurrentLight];
+  vtkSMProxy* pxy = this->Internals->Lights[this->Internals->CurrentLight];
   vtkSMPropertyHelper(this, "CurrentLight").Set(pxy);
 }

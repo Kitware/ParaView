@@ -36,7 +36,6 @@ public:
     this->ExtractCells->SetExtractOnlyBoundaryCells(0);
     this->ExtractCells->SetExtractBoundaryCells(1);
   }
-
 };
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMetaClipDataSet);
@@ -57,13 +56,14 @@ vtkPVMetaClipDataSet::vtkPVMetaClipDataSet()
 //----------------------------------------------------------------------------
 vtkPVMetaClipDataSet::~vtkPVMetaClipDataSet()
 {
-  delete this->Internal; this->Internal = NULL;
+  delete this->Internal;
+  this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ void vtkPVMetaClipDataSet::SetImplicitFunction(vtkImplicitFunction* func)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMetaClipDataSet::SetValue( double value)
+void vtkPVMetaClipDataSet::SetValue(double value)
 {
   this->Internal->Clip->SetValue(value);
   this->Modified();
@@ -92,25 +92,24 @@ void vtkPVMetaClipDataSet::PreserveInputCells(int keepCellAsIs)
   this->SetActiveFilter(keepCellAsIs);
 }
 //----------------------------------------------------------------------------
-void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, int port, int connection,
-                            int fieldAssociation,
-                            const char *name)
+void vtkPVMetaClipDataSet::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char* name)
 {
   this->Internal->Clip->SetInputArrayToProcess(idx, port, connection, fieldAssociation, name);
   this->Modified();
 }
 //----------------------------------------------------------------------------
 
-void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, int port, int connection,
-                            int fieldAssociation,
-                            int fieldAttributeType)
+void vtkPVMetaClipDataSet::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
 {
-  this->Internal->Clip->SetInputArrayToProcess(idx, port, connection, fieldAssociation, fieldAttributeType);
+  this->Internal->Clip->SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, fieldAttributeType);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, vtkInformation *info)
+void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, vtkInformation* info)
 {
   this->Internal->Clip->SetInputArrayToProcess(idx, info);
   this->Modified();
@@ -118,7 +117,7 @@ void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, vtkInformation *info)
 
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::SetInputArrayToProcess(
-    int idx, int port, int connection, const char* fieldName, const char* fieldType)
+  int idx, int port, int connection, const char* fieldName, const char* fieldType)
 {
   this->Internal->Clip->SetInputArrayToProcess(idx, port, connection, fieldName, fieldType);
   this->Modified();
@@ -136,42 +135,38 @@ void vtkPVMetaClipDataSet::SetInsideOut(int insideOut)
 //----------------------------------------------------------------------------
 bool vtkPVMetaClipDataSet::SwitchFilterForCrinkle()
 {
-  if(!this->Internal->ExtractCells->GetImplicitFunction() &&
+  if (!this->Internal->ExtractCells->GetImplicitFunction() &&
     this->GetActiveFilter() == this->Internal->ExtractCells.GetPointer())
-    {
+  {
     // We can not use vtkExtractGeometry without the ImplicitFunction being set
     this->PreserveInputCells(0);
     return true;
-    }
+  }
   return false;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVMetaClipDataSet::ProcessRequest(
-    vtkInformation *request,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   bool needSwitch = this->SwitchFilterForCrinkle();
   int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
-  if(needSwitch)
-    {
+  if (needSwitch)
+  {
     this->PreserveInputCells(1);
-    }
+  }
   return res;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVMetaClipDataSet::ProcessRequest(
-    vtkInformation *request,
-    vtkCollection *inputVector,
-    vtkInformationVector *outputVector)
+  vtkInformation* request, vtkCollection* inputVector, vtkInformationVector* outputVector)
 {
   bool needSwitch = this->SwitchFilterForCrinkle();
   int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
-  if(needSwitch)
-    {
+  if (needSwitch)
+  {
     this->PreserveInputCells(1);
-    }
+  }
   return res;
 }

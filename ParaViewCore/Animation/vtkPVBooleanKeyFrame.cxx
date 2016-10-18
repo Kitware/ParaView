@@ -33,23 +33,22 @@ vtkPVBooleanKeyFrame::~vtkPVBooleanKeyFrame()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkPVBooleanKeyFrame::UpdateValue( double, vtkPVAnimationCue* cue,
-                                        vtkPVKeyFrame*)
+void vtkPVBooleanKeyFrame::UpdateValue(double, vtkPVAnimationCue* cue, vtkPVKeyFrame*)
 {
   cue->BeginUpdateAnimationValues();
   int animated_element = cue->GetAnimatedElement();
   if (animated_element != -1)
-    {
+  {
     cue->SetAnimationValue(animated_element, this->GetKeyValue());
-    }
+  }
   else
-    {
+  {
     unsigned int max = this->GetNumberOfKeyValues();
-    for (unsigned int i=0; i < max; i++)
-      {
+    for (unsigned int i = 0; i < max; i++)
+    {
       cue->SetAnimationValue(i, this->GetKeyValue(i));
-      }
     }
+  }
   cue->EndUpdateAnimationValues();
 }
 

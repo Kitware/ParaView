@@ -26,8 +26,8 @@ vtkStandardNewMacro(vtkTimeToTextConvertor);
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
   this->Format = 0;
-  this->Shift  = 0.0;
-  this->Scale  = 1.0;
+  this->Shift = 0.0;
+  this->Scale = 1.0;
   this->SetFormat("Time: %f");
 }
 
@@ -38,8 +38,7 @@ vtkTimeToTextConvertor::~vtkTimeToTextConvertor()
 }
 
 //----------------------------------------------------------------------------
-int vtkTimeToTextConvertor::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkTimeToTextConvertor::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
@@ -48,15 +47,12 @@ int vtkTimeToTextConvertor::FillInputPortInformation(
 
 //----------------------------------------------------------------------------
 int vtkTimeToTextConvertor::RequestInformation(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (!this->Superclass::RequestInformation(
-      request, inputVector, outputVector))
-    {
+  if (!this->Superclass::RequestInformation(request, inputVector, outputVector))
+  {
     return 0;
-    }
+  }
   double timeRange[2];
   timeRange[0] = VTK_DOUBLE_MIN;
   timeRange[1] = VTK_DOUBLE_MAX;
@@ -68,39 +64,34 @@ int vtkTimeToTextConvertor::RequestInformation(
 //----------------------------------------------------------------------------
 inline double vtkTimeToTextConvertor_ForwardConvert(double T0, double shift, double scale)
 {
-  return T0*scale + shift;
+  return T0 * scale + shift;
 }
 //----------------------------------------------------------------------------
-int vtkTimeToTextConvertor::RequestData(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkTimeToTextConvertor::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkTable* output = vtkTable::GetData(outputVector);
 
-  char *buffer = new char[strlen(this->Format)+1024];
+  char* buffer = new char[strlen(this->Format) + 1024];
   strcpy(buffer, "?");
 
-  vtkInformation* inputInfo = input? input->GetInformation() : 0;
+  vtkInformation* inputInfo = input ? input->GetInformation() : 0;
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
-  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP())
-    && this->Format)
-    {
+  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP()) && this->Format)
+  {
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
-    }
-  else if(outputInfo &&
-    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP())
-    && this->Format)
-    {
-    double time = outputInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  }
+  else if (outputInfo && outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
+    this->Format)
+  {
+    double time = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
-    }
+  }
 
   vtkStringArray* data = vtkStringArray::New();
   data->SetName("Text");
@@ -117,8 +108,5 @@ int vtkTimeToTextConvertor::RequestData(
 void vtkTimeToTextConvertor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Format: "
-    << (this->Format? this->Format : "(none)") << endl;
+  os << indent << "Format: " << (this->Format ? this->Format : "(none)") << endl;
 }
-
-

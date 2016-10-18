@@ -31,39 +31,37 @@ class vtkPlane;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipClosedSurface : public vtkClipClosedSurface
 {
 public:
-  vtkTypeMacro( vtkPVClipClosedSurface, vtkClipClosedSurface );
-  void PrintSelf( ostream & os, vtkIndent indent );
-  static vtkPVClipClosedSurface * New();
+  vtkTypeMacro(vtkPVClipClosedSurface, vtkClipClosedSurface);
+  void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkPVClipClosedSurface* New();
 
   //@{
   /**
    * Set/Get the InsideOut flag (off by default)
    */
-  vtkSetMacro( InsideOut, int );
-  vtkGetMacro( InsideOut, int );
-  vtkBooleanMacro( InsideOut, int );
+  vtkSetMacro(InsideOut, int);
+  vtkGetMacro(InsideOut, int);
+  vtkBooleanMacro(InsideOut, int);
   //@}
 
   /**
    * Set the clipping plane.
    */
-  void   SetClippingPlane( vtkPlane * plane );
+  void SetClippingPlane(vtkPlane* plane);
 
 protected:
   vtkPVClipClosedSurface();
   ~vtkPVClipClosedSurface();
 
-  virtual int RequestData( vtkInformation        * request,
-                           vtkInformationVector ** inputVector,
-                           vtkInformationVector  * outputVector );
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  int         InsideOut;
-  vtkPlane  * ClippingPlane;
+  int InsideOut;
+  vtkPlane* ClippingPlane;
 
 private:
-
-  vtkPVClipClosedSurface( const vtkPVClipClosedSurface & ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPVClipClosedSurface & ) VTK_DELETE_FUNCTION;
+  vtkPVClipClosedSurface(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
 };
 
 #endif

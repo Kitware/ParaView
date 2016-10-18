@@ -28,8 +28,8 @@ class vtkInformation;
 class vtkAdiosPixieReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAdiosPixieReader *New();
-  vtkTypeMacro(vtkAdiosPixieReader,vtkMultiBlockDataSetAlgorithm);
+  static vtkAdiosPixieReader* New();
+  vtkTypeMacro(vtkAdiosPixieReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -79,9 +79,8 @@ protected:
   ~vtkAdiosPixieReader();
 
   // Trigger the real data access
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
 
   // The input file's name.
   char* FileName;
@@ -95,7 +94,6 @@ private:
 
   class Internals;
   Internals* Internal;
-
 };
 
 #endif

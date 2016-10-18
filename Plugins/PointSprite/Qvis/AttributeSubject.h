@@ -40,7 +40,8 @@
 #include <AttributeGroup.h>
 #include <Subject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // ****************************************************************************
 // Class: AttributeSubject
@@ -75,16 +76,15 @@ namespace pointsprite {
 class AttributeSubject : public AttributeGroup, public Subject
 {
 public:
-    AttributeSubject(const char *);
-    virtual ~AttributeSubject();
-    virtual void SelectAll() = 0;
-    virtual const std::string TypeName() const;
-    virtual void Notify();
-    virtual AttributeSubject *CreateCompatible(const std::string &) const;
-    virtual AttributeSubject *NewInstance(bool /*copy*/) const { return 0; };
+  AttributeSubject(const char*);
+  virtual ~AttributeSubject();
+  virtual void SelectAll() = 0;
+  virtual const std::string TypeName() const;
+  virtual void Notify();
+  virtual AttributeSubject* CreateCompatible(const std::string&) const;
+  virtual AttributeSubject* NewInstance(bool /*copy*/) const { return 0; };
 
-    virtual bool VarChangeRequiresReset(void) { return false; };
+  virtual bool VarChangeRequiresReset(void) { return false; };
 };
-
 }
 #endif

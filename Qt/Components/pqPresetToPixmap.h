@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Json
 {
-  class Value;
+class Value;
 }
 
 class vtkPiecewiseFunction;
@@ -55,14 +55,15 @@ class PQCOMPONENTS_EXPORT pqPresetToPixmap : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqPresetToPixmap(QObject* parent=0);
+  pqPresetToPixmap(QObject* parent = 0);
   virtual ~pqPresetToPixmap();
 
   /**
   * Render a preset to a pixmap for the given resolution.
   */
-  QPixmap render(const Json::Value &preset, const QSize& resolution) const;
+  QPixmap render(const Json::Value& preset, const QSize& resolution) const;
 
 protected:
   /**
@@ -74,7 +75,8 @@ protected:
   /**
   * Renders a color transfer function preset.
   */
-  QPixmap renderIndexedColorTransferFunction(vtkScalarsToColors* stc, const QSize& resolution) const;
+  QPixmap renderIndexedColorTransferFunction(
+    vtkScalarsToColors* stc, const QSize& resolution) const;
 
 private:
   Q_DISABLE_COPY(pqPresetToPixmap)

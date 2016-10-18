@@ -43,13 +43,13 @@ public:
   void AddFocalPathPoint(double x, double y, double z);
   void ClearFocalPath();
 
-  enum Modes 
-    {
+  enum Modes
+  {
     PATH,
     FIXED_DIRECTION,
     LOOK_AHEAD,
     ORTHOGONAL
-    };
+  };
 
   //@{
   /**
@@ -72,10 +72,10 @@ public:
   //@}
 
   enum PathInterpolationModes
-    {
+  {
     LINEAR,
     SPLINE
-    };
+  };
 
   // Support for interpolation modes hasn't been implemented yet.
   vtkSetClampMacro(PositionPathInterpolationMode, int, LINEAR, SPLINE);
@@ -130,8 +130,6 @@ protected:
 private:
   vtkCameraInterpolator2(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

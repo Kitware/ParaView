@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(pqDisplayPanel *panel,
-                                                           QWidget *parentObject)
+pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(
+  pqDisplayPanel* panel, QWidget* parentObject)
   : pqPropertyWidget(panel->getRepresentation()->getProxy(), parentObject)
 {
   this->DisplayPanel = panel;
 
-  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  QVBoxLayout* layoutLocal = new QVBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->addWidget(panel);
   setLayout(layoutLocal);

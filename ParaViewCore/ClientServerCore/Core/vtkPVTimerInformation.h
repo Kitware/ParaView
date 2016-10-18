@@ -22,10 +22,8 @@
 #ifndef vtkPVTimerInformation_h
 #define vtkPVTimerInformation_h
 
-
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
-
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVTimerInformation : public vtkPVInformation
 {
@@ -48,7 +46,7 @@ public:
    * Access to the logs.
    */
   int GetNumberOfLogs();
-  char *GetLog(int proc);
+  char* GetLog(int proc);
   //@}
 
   //@{
@@ -64,7 +62,7 @@ public:
    * Merge another information object.
    */
   virtual void AddInformation(vtkPVInformation* info);
-  
+
   //@{
   /**
    * Serialize objects to/from a stream object.
@@ -81,6 +79,7 @@ public:
    */
   virtual void CopyParametersToStream(vtkMultiProcessStream&);
   virtual void CopyParametersFromStream(vtkMultiProcessStream&);
+
 protected:
   vtkPVTimerInformation();
   ~vtkPVTimerInformation();

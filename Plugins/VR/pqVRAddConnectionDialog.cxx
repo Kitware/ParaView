@@ -54,7 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVRAddConnectionDialog::pqInternals : public Ui::VRAddConnectionDialog
 {
 public:
-  enum InputType {
+  enum InputType
+  {
     Analog = 0,
     Button,
     Tracker
@@ -64,7 +65,8 @@ public:
   std::map<std::string, std::string> ButtonMapping;
   std::map<std::string, std::string> TrackerMapping;
 
-  enum ConnectionType {
+  enum ConnectionType
+  {
     None = -1,
     VRPN,
     VRUI
@@ -75,56 +77,56 @@ public:
   ConnectionType GetSelectedConnectionType()
   {
     if (this->connectionType->currentText() == "VRPN")
-      {
+    {
       return VRPN;
-      }
+    }
     else if (this->connectionType->currentText() == "VRUI")
-      {
+    {
       return VRUI;
-      }
+    }
     return None;
   }
 
   bool SetSelectedConnectionType(ConnectionType type)
   {
     switch (type)
-      {
+    {
 #ifdef PARAVIEW_USE_VRPN
       case pqInternals::VRPN:
-        {
+      {
         int ind = this->connectionType->findText("VRPN");
         if (ind == -1)
-          {
+        {
           return false;
-          }
+        }
         this->connectionType->setCurrentIndex(ind);
         return true;
-        }
+      }
 #endif
 #ifdef PARAVIEW_USE_VRUI
       case pqInternals::VRUI:
-        {
+      {
         int ind = this->connectionType->findText("VRUI");
         if (ind == -1)
-          {
+        {
           return false;
-          }
+        }
         this->connectionType->setCurrentIndex(ind);
         return true;
-        }
+      }
 #endif
       default:
       case pqInternals::None:
         return false;
-      }
+    }
   }
 
 #ifdef PARAVIEW_USE_VRPN
-  pqVRPNConnection *VRPNConn;
+  pqVRPNConnection* VRPNConn;
   void updateVRPNConnection();
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  pqVRUIConnection *VRUIConn;
+  pqVRUIConnection* VRUIConn;
   void updateVRUIConnection();
 #endif
 
@@ -138,9 +140,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject,
-  Qt::WindowFlags f)
-  : Superclass(parentObject, f), Internals(new pqInternals())
+pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject, Qt::WindowFlags f)
+  : Superclass(parentObject, f)
+  , Internals(new pqInternals())
 {
   this->Internals->setupUi(this);
   this->Internals->Type = pqInternals::None;
@@ -155,26 +157,20 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject,
   this->connectionTypeChanged();
 
   // Restrict input in some line edits
-  QRegExpValidator *connNameValidator =
-      new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
-  QRegExpValidator *addressValidator =
-      new QRegExpValidator(
-        QRegExp("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.]+"), this);
-  QRegExpValidator *inputIdValidator =
-      new QRegExpValidator(QRegExp("[0-9]+"), this);
-  QRegExpValidator *inputNameValidator =
-      new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
+  QRegExpValidator* connNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
+  QRegExpValidator* addressValidator =
+    new QRegExpValidator(QRegExp("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.]+"), this);
+  QRegExpValidator* inputIdValidator = new QRegExpValidator(QRegExp("[0-9]+"), this);
+  QRegExpValidator* inputNameValidator = new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
   this->Internals->connectionName->setValidator(connNameValidator);
   this->Internals->connectionAddress->setValidator(addressValidator);
   this->Internals->inputId->setValidator(inputIdValidator);
   this->Internals->inputName->setValidator(inputNameValidator);
 
-  connect(this->Internals->insertInput, SIGNAL(clicked()),
-          this, SLOT(addInput()));
-  connect(this->Internals->eraseInput, SIGNAL(clicked()),
-          this, SLOT(removeInput()));
-  connect(this->Internals->connectionType, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(connectionTypeChanged()));
+  connect(this->Internals->insertInput, SIGNAL(clicked()), this, SLOT(addInput()));
+  connect(this->Internals->eraseInput, SIGNAL(clicked()), this, SLOT(removeInput()));
+  connect(this->Internals->connectionType, SIGNAL(currentIndexChanged(int)), this,
+    SLOT(connectionTypeChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -185,14 +181,12 @@ pqVRAddConnectionDialog::~pqVRAddConnectionDialog()
 
 #ifdef PARAVIEW_USE_VRPN
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::setConnection(pqVRPNConnection *conn)
+void pqVRAddConnectionDialog::setConnection(pqVRPNConnection* conn)
 {
   this->Internals->VRPNConn = conn;
   this->Internals->Type = pqInternals::VRPN;
-  this->Internals->connectionName->setText(
-        QString::fromStdString(conn->name()));
-  this->Internals->connectionAddress->setText(
-        QString::fromStdString(conn->address()));
+  this->Internals->connectionName->setText(QString::fromStdString(conn->name()));
+  this->Internals->connectionAddress->setText(QString::fromStdString(conn->address()));
   this->Internals->SetSelectedConnectionType(pqInternals::VRPN);
   this->Internals->connectionType->setEnabled(false);
   this->Internals->AnalogMapping = conn->analogMap();
@@ -202,12 +196,12 @@ void pqVRAddConnectionDialog::setConnection(pqVRPNConnection *conn)
 }
 
 //-----------------------------------------------------------------------------
-pqVRPNConnection *pqVRAddConnectionDialog::getVRPNConnection()
+pqVRPNConnection* pqVRAddConnectionDialog::getVRPNConnection()
 {
   if (this->Internals->Type == pqInternals::VRPN)
-    {
+  {
     return this->Internals->VRPNConn;
-    }
+  }
   return NULL;
 }
 
@@ -220,16 +214,13 @@ bool pqVRAddConnectionDialog::isVRPN()
 
 #ifdef PARAVIEW_USE_VRUI
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::setConnection(pqVRUIConnection *conn)
+void pqVRAddConnectionDialog::setConnection(pqVRUIConnection* conn)
 {
   this->Internals->VRUIConn = conn;
   this->Internals->Type = pqInternals::VRUI;
-  this->Internals->connectionName->setText(
-        QString::fromStdString(conn->name()));
-  this->Internals->connectionAddress->setText(
-        QString::fromStdString(conn->address()));
-  this->Internals->connectionPort->setValue(
-        QString::fromStdString(conn->port()).toInt());
+  this->Internals->connectionName->setText(QString::fromStdString(conn->name()));
+  this->Internals->connectionAddress->setText(QString::fromStdString(conn->address()));
+  this->Internals->connectionPort->setValue(QString::fromStdString(conn->port()).toInt());
   this->Internals->SetSelectedConnectionType(pqInternals::VRUI);
   this->Internals->connectionType->setEnabled(false);
   this->Internals->AnalogMapping = conn->analogMap();
@@ -239,12 +230,12 @@ void pqVRAddConnectionDialog::setConnection(pqVRUIConnection *conn)
 }
 
 //-----------------------------------------------------------------------------
-pqVRUIConnection *pqVRAddConnectionDialog::getVRUIConnection()
+pqVRUIConnection* pqVRAddConnectionDialog::getVRUIConnection()
 {
   if (this->Internals->Type == pqInternals::VRUI)
-    {
+  {
     return this->Internals->VRUIConn;
-    }
+  }
   return NULL;
 }
 
@@ -259,7 +250,7 @@ bool pqVRAddConnectionDialog::isVRUI()
 void pqVRAddConnectionDialog::updateConnection()
 {
   switch (this->Internals->Type)
-    {
+  {
 #ifdef PARAVIEW_USE_VRPN
     case pqInternals::VRPN:
       this->Internals->updateVRPNConnection();
@@ -275,18 +266,18 @@ void pqVRAddConnectionDialog::updateConnection()
       switch (this->Internals->GetSelectedConnectionType())
       {
 #ifdef PARAVIEW_USE_VRPN
-      case pqInternals::VRPN:
-        this->Internals->updateVRPNConnection();
-        return;
+        case pqInternals::VRPN:
+          this->Internals->updateVRPNConnection();
+          return;
 #endif
 #ifdef PARAVIEW_USE_VRUI
-      case pqInternals::VRUI:
-        this->Internals->updateVRUIConnection();
-        return;
+        case pqInternals::VRUI:
+          this->Internals->updateVRUIConnection();
+          return;
 #endif
-      default:
-        qWarning() << "Cannot create connection...unsupported connection type.";
-        return;
+        default:
+          qWarning() << "Cannot create connection...unsupported connection type.";
+          return;
       }
   }
 }
@@ -295,43 +286,41 @@ void pqVRAddConnectionDialog::accept()
 {
   QString missingVar;
   if (this->Internals->connectionName->text().isEmpty())
-    {
+  {
     missingVar = "Connection name";
-    }
+  }
   if (this->Internals->connectionAddress->text().isEmpty())
-    {
+  {
     missingVar = "Connection address";
-    }
+  }
 
   if (!missingVar.isEmpty())
-    {
-    QMessageBox::critical(this, "Missing value", QString("%1 is not set!")
-                          .arg(missingVar));
+  {
+    QMessageBox::critical(this, "Missing value", QString("%1 is not set!").arg(missingVar));
     return;
-    }
+  }
   this->Superclass::accept();
 }
 
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent *e)
+void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent* e)
 {
   // Disable the default behavior of clicking "Ok" when enter is pressed
-  if (!e->modifiers() ||
-      (e->modifiers() & Qt::KeypadModifier && e->key() == Qt::Key_Enter))
-    {
+  if (!e->modifiers() || (e->modifiers() & Qt::KeypadModifier && e->key() == Qt::Key_Enter))
+  {
     switch (e->key())
-      {
+    {
       case Qt::Key_Enter:
       case Qt::Key_Return:
         if (this->Internals->insertInput->hasFocus())
-          {
+        {
           this->Internals->insertInput->click();
           e->accept();
           return;
-          }
+        }
         return;
-      }
     }
+  }
   QDialog::keyPressEvent(e);
 }
 
@@ -341,20 +330,19 @@ void pqVRAddConnectionDialog::addInput()
 
   QString missingVar;
   if (this->Internals->inputName->text().isEmpty())
-    {
+  {
     missingVar = "Input name";
-    }
+  }
   if (this->Internals->inputId->text().isEmpty())
-    {
+  {
     missingVar = "Input id";
-    }
+  }
 
   if (!missingVar.isEmpty())
-    {
-    QMessageBox::critical(this, "Missing value", QString("%1 is not set!")
-                          .arg(missingVar));
+  {
+    QMessageBox::critical(this, "Missing value", QString("%1 is not set!").arg(missingVar));
     return;
-    }
+  }
 
   this->Internals->addInput();
 }
@@ -369,7 +357,7 @@ void pqVRAddConnectionDialog::removeInput()
 void pqVRAddConnectionDialog::connectionTypeChanged()
 {
   switch (this->Internals->GetSelectedConnectionType())
-    {
+  {
     case pqInternals::VRPN:
       this->Internals->portLabel->hide();
       this->Internals->connectionPort->hide();
@@ -380,7 +368,7 @@ void pqVRAddConnectionDialog::connectionTypeChanged()
       break;
     default:
       break;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -392,10 +380,10 @@ void pqVRAddConnectionDialog::connectionTypeChanged()
 void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 {
   if (!this->VRPNConn)
-    {
+  {
     this->VRPNConn = new pqVRPNConnection(pqVRConnectionManager::instance());
     this->Type = VRPN;
-    }
+  }
 
   this->VRPNConn->setName(this->connectionName->text().toStdString());
   this->VRPNConn->setAddress(this->connectionAddress->text().toStdString());
@@ -410,15 +398,14 @@ void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 void pqVRAddConnectionDialog::pqInternals::updateVRUIConnection()
 {
   if (!this->VRUIConn)
-    {
+  {
     this->VRUIConn = new pqVRUIConnection(pqVRConnectionManager::instance());
     this->Type = VRUI;
-    }
+  }
 
   this->VRUIConn->setName(this->connectionName->text().toStdString());
   this->VRUIConn->setAddress(this->connectionAddress->text().toStdString());
-  this->VRUIConn->setPort(
-        QString::number(this->connectionPort->value()).toStdString());
+  this->VRUIConn->setPort(QString::number(this->connectionPort->value()).toStdString());
   this->VRUIConn->setAnalogMap(this->AnalogMapping);
   this->VRUIConn->setButtonMap(this->ButtonMapping);
   this->VRUIConn->setTrackerMap(this->TrackerMapping);
@@ -431,39 +418,35 @@ void pqVRAddConnectionDialog::pqInternals::updateUi()
   this->listWidget->clear();
   std::map<std::string, std::string>::const_iterator it;
   std::map<std::string, std::string>::const_iterator it_end;
-  for (it = this->AnalogMapping.begin(), it_end = this->AnalogMapping.end();
-       it != it_end; ++it)
-    {
+  for (it = this->AnalogMapping.begin(), it_end = this->AnalogMapping.end(); it != it_end; ++it)
+  {
     this->listWidget->addItem(QString("%1: %2")
-                              .arg(QString::fromStdString(it->first))
-                              .arg(QString::fromStdString(it->second)));
-    }
-  for (it = this->ButtonMapping.begin(), it_end = this->ButtonMapping.end();
-       it != it_end; ++it)
-    {
+                                .arg(QString::fromStdString(it->first))
+                                .arg(QString::fromStdString(it->second)));
+  }
+  for (it = this->ButtonMapping.begin(), it_end = this->ButtonMapping.end(); it != it_end; ++it)
+  {
     this->listWidget->addItem(QString("%1: %2")
-                              .arg(QString::fromStdString(it->first))
-                              .arg(QString::fromStdString(it->second)));
-    }
-  for (it = this->TrackerMapping.begin(), it_end = this->TrackerMapping.end();
-       it != it_end; ++it)
-    {
+                                .arg(QString::fromStdString(it->first))
+                                .arg(QString::fromStdString(it->second)));
+  }
+  for (it = this->TrackerMapping.begin(), it_end = this->TrackerMapping.end(); it != it_end; ++it)
+  {
     this->listWidget->addItem(QString("%1: %2")
-                              .arg(QString::fromStdString(it->first))
-                              .arg(QString::fromStdString(it->second)));
-    }
+                                .arg(QString::fromStdString(it->first))
+                                .arg(QString::fromStdString(it->second)));
+  }
 }
 
 //-----------------------------------------------------------------------------
-QPair<QString, QString>
-pqVRAddConnectionDialog::pqInternals::parseEntry(const QString &entry)
+QPair<QString, QString> pqVRAddConnectionDialog::pqInternals::parseEntry(const QString& entry)
 {
   QPair<QString, QString> result;
   QRegExp regexp("([^:]+): (.+)");
   if (regexp.indexIn(entry) < 0)
-    {
+  {
     return result;
-    }
+  }
 
   result.first = regexp.cap(1);
   result.second = regexp.cap(2);
@@ -473,24 +456,25 @@ pqVRAddConnectionDialog::pqInternals::parseEntry(const QString &entry)
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::pqInternals::addInput()
 {
-  std::map<std::string, std::string> *targetMap;
-  const char *idPrefix;
-  switch (this->inputType->currentIndex()) {
-  case Analog:
-    targetMap = &this->AnalogMapping;
-    idPrefix = "analog.";
-    break;
-  case Button:
-    targetMap = &this->ButtonMapping;
-    idPrefix = "button.";
-    break;
-  case Tracker:
-    targetMap = &this->TrackerMapping;
-    idPrefix = "tracker.";
-    break;
-  default:
-    qWarning() << "Invalid input type! This shouldn't happen...";
-    return;
+  std::map<std::string, std::string>* targetMap;
+  const char* idPrefix;
+  switch (this->inputType->currentIndex())
+  {
+    case Analog:
+      targetMap = &this->AnalogMapping;
+      idPrefix = "analog.";
+      break;
+    case Button:
+      targetMap = &this->ButtonMapping;
+      idPrefix = "button.";
+      break;
+    case Tracker:
+      targetMap = &this->TrackerMapping;
+      idPrefix = "tracker.";
+      break;
+    default:
+      qWarning() << "Invalid input type! This shouldn't happen...";
+      return;
   }
 
   std::string id = this->inputId->text().prepend(idPrefix).toStdString();
@@ -502,18 +486,18 @@ void pqVRAddConnectionDialog::pqInternals::addInput()
 void pqVRAddConnectionDialog::pqInternals::removeInput()
 {
   bool changed = false;
-  foreach(QListWidgetItem *item, this->listWidget->selectedItems())
-    {
+  foreach (QListWidgetItem* item, this->listWidget->selectedItems())
+  {
     QString id = this->parseEntry(item->text()).first;
     if (id.isEmpty())
-      {
+    {
       continue;
-      }
+    }
 
     if (id.startsWith("analog."))
-      {
+    {
       this->AnalogMapping.erase(id.toStdString());
-      }
+    }
     else if (id.startsWith("button."))
     {
       this->ButtonMapping.erase(id.toStdString());
@@ -524,10 +508,10 @@ void pqVRAddConnectionDialog::pqInternals::removeInput()
     }
 
     changed = true;
-    }
+  }
 
   if (changed)
-    {
+  {
     this->updateUi();
-    }
+  }
 }

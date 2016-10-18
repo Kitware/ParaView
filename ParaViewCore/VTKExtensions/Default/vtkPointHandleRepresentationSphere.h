@@ -38,19 +38,20 @@ class vtkPolyDataAlgorithm;
 class vtkPolyDataMapper;
 class vtkProperty;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPointHandleRepresentationSphere : public vtkHandleRepresentation
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPointHandleRepresentationSphere
+  : public vtkHandleRepresentation
 {
 public:
   /**
    * Instantiate this class.
    */
-  static vtkPointHandleRepresentationSphere *New();
+  static vtkPointHandleRepresentationSphere* New();
 
   //@{
   /**
    * Standard methods for instances of this class.
    */
-  vtkTypeMacro(vtkPointHandleRepresentationSphere,vtkHandleRepresentation);
+  vtkTypeMacro(vtkPointHandleRepresentationSphere, vtkHandleRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
   //@}
 
@@ -60,8 +61,8 @@ public:
    * shape is assumed to be defined in the display coordinate system. By
    * default a sphere (the output of vtkSphereSource) shape is used.
    */
-  void SetCursorShape(vtkPolyData *cursorShape);
-  vtkPolyData *GetCursorShape();
+  void SetCursorShape(vtkPolyData* cursorShape);
+  vtkPolyData* GetCursorShape();
   //@}
 
   /**
@@ -77,31 +78,31 @@ public:
    */
   void SetProperty(vtkProperty*);
   void SetSelectedProperty(vtkProperty*);
-  vtkGetObjectMacro(Property,vtkProperty);
-  vtkGetObjectMacro(SelectedProperty,vtkProperty);
+  vtkGetObjectMacro(Property, vtkProperty);
+  vtkGetObjectMacro(SelectedProperty, vtkProperty);
   //@}
-  
+
   //@{
   /**
    * Subclasses of vtkPointHandleRepresentationSphere must implement these
    * methods. These are the methods that the widget and its representation
    * use to communicate with each other.
    */
-  virtual double *GetBounds();
+  virtual double* GetBounds();
   virtual void BuildRepresentation();
   virtual void StartWidgetInteraction(double eventPos[2]);
   virtual void WidgetInteraction(double eventPos[2]);
-  virtual int ComputeInteractionState(int X, int Y, int modify=0);
+  virtual int ComputeInteractionState(int X, int Y, int modify = 0);
   //@}
 
   //@{
   /**
    * Methods to make this class behave as a vtkProp.
    */
-  virtual void ShallowCopy(vtkProp *prop);
-  virtual void GetActors(vtkPropCollection *);
-  virtual void ReleaseGraphicsResources(vtkWindow *);
-  virtual int RenderOpaqueGeometry(vtkViewport *viewport);
+  virtual void ShallowCopy(vtkProp* prop);
+  virtual void GetActors(vtkPropCollection*);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
+  virtual int RenderOpaqueGeometry(vtkViewport* viewport);
   //@}
 
   //@{
@@ -111,7 +112,7 @@ public:
   vtkSetMacro(Scalar, double);
   vtkGetMacro(Scalar, double);
   //@}
-  
+
   //@{
   /**
    * Set/get the flag whether to add a circle (disk) source around the sphere.
@@ -131,39 +132,39 @@ protected:
   ~vtkPointHandleRepresentationSphere();
 
   // Render the cursor
-  vtkActor             *Actor;
-  vtkPolyDataMapper    *Mapper;
-  vtkGlyph3D           *Glypher;
-  vtkPolyData          *CursorShape;
-  vtkPolyData          *FocalData;
-  vtkPoints            *FocalPoint;
+  vtkActor* Actor;
+  vtkPolyDataMapper* Mapper;
+  vtkGlyph3D* Glypher;
+  vtkPolyData* CursorShape;
+  vtkPolyData* FocalData;
+  vtkPoints* FocalPoint;
 
   // Support picking
   double LastPickPosition[3];
   double LastEventPosition[2];
-  
+
   // Methods to manipulate the cursor
-  int  ConstraintAxis;
+  int ConstraintAxis;
   void Translate(double eventPos[2]);
   void Scale(double eventPos[2]);
-  
+
   // A flag to use the disk source
-  int                   AddCircleAroundSphere;
-  vtkActor             *DiskActor;
-  vtkPolyDataMapper    *DiskMapper;
-  vtkGlyph3D           *DiskGlypher;
+  int AddCircleAroundSphere;
+  vtkActor* DiskActor;
+  vtkPolyDataMapper* DiskMapper;
+  vtkGlyph3D* DiskGlypher;
   void CreateDefaultDiskSource();
-  
+
   // Properties used to control the appearance of selected objects and
   // the manipulator in general.
-  vtkProperty *Property;
-  vtkProperty *SelectedProperty;
-  void        CreateDefaultProperties();
-  
+  vtkProperty* Property;
+  vtkProperty* SelectedProperty;
+  void CreateDefaultProperties();
+
   // The size of the hot spot.
-  int    DetermineConstraintAxis(int constraint, double eventPos[2]);
-  int    WaitingForMotion;
-  int    WaitCount;
+  int DetermineConstraintAxis(int constraint, double eventPos[2]);
+  int WaitingForMotion;
+  int WaitCount;
 
   double Scalar;
 

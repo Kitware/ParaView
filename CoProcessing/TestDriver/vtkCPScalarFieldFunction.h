@@ -16,7 +16,7 @@
  * @class   vtkCPScalarFieldFunction
  * @brief   Abstract class for specifying scalars at points.
  *
- * Abstract class for specifying scalars at specified points.  
+ * Abstract class for specifying scalars at specified points.
 */
 
 #ifndef vtkCPScalarFieldFunction_h
@@ -35,13 +35,13 @@ public:
    * Get the NumberOfComponents.  This is abstract to make sure
    * that the value for the NumberOfComponents cannot be changed.
    */
-  virtual unsigned int GetNumberOfComponents() {return 1;};
+  virtual unsigned int GetNumberOfComponents() { return 1; };
 
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time) = 0;
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
 
 protected:
   vtkCPScalarFieldFunction();

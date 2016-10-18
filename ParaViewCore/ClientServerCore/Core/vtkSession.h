@@ -63,7 +63,6 @@ protected:
 private:
   vtkSession(const vtkSession&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSession&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

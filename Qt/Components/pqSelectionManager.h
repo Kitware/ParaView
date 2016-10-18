@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,16 +52,16 @@ class vtkSMSession;
 class vtkSMSourceProxy;
 
 /**
-* pqSelectionManager is the nexus for introspective surface selection in 
+* pqSelectionManager is the nexus for introspective surface selection in
 */
-//  paraview. 
+//  paraview.
 /**
 * It responds to UI events to tell the servermanager to setup for making
 * selections. It watches the servermanager's state to see if the selection
-* parameters are changed (either from the UI or from playback) and tells 
+* parameters are changed (either from the UI or from playback) and tells
 * the servermanager to perform the requested selection.
-* It is also the link between the server manager level selection and the 
-* GUI, converting servermanager selection result datastructures into pq/Qt 
+* It is also the link between the server manager level selection and the
+* GUI, converting servermanager selection result datastructures into pq/Qt
 * level selection datastructures so that all views can be synchronized and
 * show the same selection in their own manner.
 */
@@ -70,7 +70,7 @@ class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
   Q_OBJECT
 
 public:
-  pqSelectionManager(QObject* parent=NULL);
+  pqSelectionManager(QObject* parent = NULL);
   virtual ~pqSelectionManager();
 
   /**
@@ -79,7 +79,7 @@ public:
   pqOutputPort* getSelectedPort() const;
 
   /**
-  * Return all currently selected pqOutputPort as a QSet, 
+  * Return all currently selected pqOutputPort as a QSet,
   * or an empty QSet if there aren't any
   */
   const QSet<pqOutputPort*>& getSelectedPorts() const;
@@ -99,7 +99,7 @@ signals:
 
 public slots:
   /**
-  * Clear selection on a pqOutputPort. 
+  * Clear selection on a pqOutputPort.
   * Calling the method without arguments or with null
   * will clear all selection
   */
@@ -117,13 +117,13 @@ public slots:
 
 private slots:
   /**
-  * Called when pqLinkModel create a link, 
+  * Called when pqLinkModel create a link,
   * to update the selection
   */
   void onLinkAdded(int linkType);
 
   /**
-  * Called when pqLinkModel remove a link, 
+  * Called when pqLinkModel remove a link,
   * to update the selection
   */
   void onLinkRemoved();
@@ -134,13 +134,12 @@ private slots:
   void onItemRemoved(pqServerManagerModelItem* item);
 
 protected:
-  void onSelect(pqOutputPort*,bool forceGlobalIds);
+  void onSelect(pqOutputPort*, bool forceGlobalIds);
 
 private:
   pqSelectionManagerImplementation* Implementation;
 
-  //helpers
+  // helpers
   void selectOnSurface(int screenRectange[4]);
 };
 #endif
-

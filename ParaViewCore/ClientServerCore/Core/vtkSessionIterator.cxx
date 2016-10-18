@@ -26,7 +26,6 @@ public:
   vtkProcessModuleInternals::MapOfSessions::iterator Iter;
 };
 
-
 vtkStandardNewMacro(vtkSessionIterator);
 //----------------------------------------------------------------------------
 vtkSessionIterator::vtkSessionIterator()
@@ -46,10 +45,10 @@ void vtkSessionIterator::InitTraversal()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("No ProcessModule found.");
     return;
-    }
+  }
 
   vtkProcessModuleInternals* internals = pm->Internals;
   this->Internals->Iter = internals->Sessions.begin();
@@ -60,10 +59,10 @@ bool vtkSessionIterator::IsDoneWithTraversal()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("No ProcessModule found.");
     return true;
-    }
+  }
   vtkProcessModuleInternals* internals = pm->Internals;
   return (this->Internals->Iter == internals->Sessions.end());
 }
@@ -73,10 +72,10 @@ void vtkSessionIterator::GoToNextItem()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("No ProcessModule found.");
     return;
-    }
+  }
   this->Internals->Iter++;
 }
 
@@ -85,10 +84,10 @@ vtkSession* vtkSessionIterator::GetCurrentSession()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("No ProcessModule found.");
     return NULL;
-    }
+  }
 
   assert(this->IsDoneWithTraversal() == false);
   return this->Internals->Iter->second.GetPointer();
@@ -99,10 +98,10 @@ vtkIdType vtkSessionIterator::GetCurrentSessionId()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("No ProcessModule found.");
     return 0;
-    }
+  }
 
   assert(this->IsDoneWithTraversal() == false);
   return this->Internals->Iter->first;

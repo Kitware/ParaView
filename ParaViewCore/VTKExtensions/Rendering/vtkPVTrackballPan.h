@@ -32,23 +32,20 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballPan : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballPan *New();
+  static vtkPVTrackballPan* New();
   vtkTypeMacro(vtkPVTrackballPan, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *iren);
-  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *iren);
-  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *iren);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
   //@}
-  
+
 protected:
   vtkPVTrackballPan();
   ~vtkPVTrackballPan();

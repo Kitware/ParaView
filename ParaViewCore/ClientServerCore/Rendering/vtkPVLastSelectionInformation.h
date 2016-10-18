@@ -25,7 +25,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVSelectionInformation.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLastSelectionInformation : public vtkPVSelectionInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLastSelectionInformation
+  : public vtkPVSelectionInformation
 {
 public:
   static vtkPVLastSelectionInformation* New();
@@ -41,7 +42,6 @@ protected:
 private:
   vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

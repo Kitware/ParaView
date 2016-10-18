@@ -159,12 +159,11 @@ public:
   void ClearCache();
 
   // INTERNAL METHOD. Don't call directly.
-  vtkTable* FetchBlockCallback(vtkIdType blockindex, 
-    bool filterColumnForExport = false);
+  vtkTable* FetchBlockCallback(vtkIdType blockindex, bool filterColumnForExport = false);
+
 protected:
   vtkSpreadSheetView();
   ~vtkSpreadSheetView();
-
 
   /**
    * On render streams all the data from the processes to the client.
@@ -188,9 +187,10 @@ protected:
   vtkIdType NumberOfRows;
 
   enum
-    {
+  {
     FETCH_BLOCK_TAG = 394732
-    };
+  };
+
 private:
   vtkSpreadSheetView(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
@@ -203,7 +203,6 @@ private:
   bool SomethingUpdated;
 
   unsigned long RMICallbackTag;
-
 };
 
 #endif

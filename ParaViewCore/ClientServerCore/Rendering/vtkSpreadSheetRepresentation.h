@@ -35,7 +35,8 @@
 
 class vtkBlockDeliveryPreprocessor;
 class vtkCleanArrays;
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkSpreadSheetRepresentation* New();
@@ -64,7 +65,6 @@ public:
   void SetFieldAssociation(int val);
   int GetFieldAssociation();
 
-
   //@{
   /**
    * Select the block indices to extract.
@@ -90,8 +90,7 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   vtkNew<vtkCleanArrays> CleanArrays;
   vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;
@@ -102,7 +101,6 @@ protected:
 private:
   vtkSpreadSheetRepresentation(const vtkSpreadSheetRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSpreadSheetRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

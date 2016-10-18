@@ -36,13 +36,13 @@
 class vtkDataObject;
 class vtkDataSet;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTooltipSelectionPipeline :
-  public vtkSMPreselectionPipeline
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTooltipSelectionPipeline
+  : public vtkSMPreselectionPipeline
 {
 public:
   static vtkSMTooltipSelectionPipeline* New();
-  vtkTypeMacro(vtkSMTooltipSelectionPipeline,vtkSMPreselectionPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkSMTooltipSelectionPipeline, vtkSMPreselectionPipeline);
+  void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMTooltipSelectionPipeline* GetInstance();
 
   //@{
@@ -50,8 +50,8 @@ public:
    * Re-implemented from vtkSMPreselectionPipeline
    */
   virtual void Hide(vtkSMRenderViewProxy* view);
-  virtual void Show(vtkSMSourceProxy* sourceRepresentation,
-    vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view);
+  virtual void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
+    vtkSMRenderViewProxy* view);
   //@}
 
   /**
@@ -92,8 +92,8 @@ protected:
    * Extract dataset from the dataObject, which can be either directly a dataset
    * or a composite dataset containing only one dataset.
    */
-  vtkDataSet* FindDataSet(vtkDataObject* dataObject, 
-    bool& compositeFound, std::string& compositeName);
+  vtkDataSet* FindDataSet(
+    vtkDataObject* dataObject, bool& compositeFound, std::string& compositeName);
 
   vtkSMSourceProxy* MoveSelectionToClient;
   vtkIdType PreviousSelectionId;
@@ -101,8 +101,7 @@ protected:
   bool TooltipEnabled;
 
 private:
-  vtkSMTooltipSelectionPipeline(
-    const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMTooltipSelectionPipeline(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
 };
 

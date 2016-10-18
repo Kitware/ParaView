@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,11 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(portChanged(pqOutputPort*)),
-    this, SLOT(updateEnableState()));
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(selectionChanged(const pqProxySelection&)),
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(portChanged(pqOutputPort*)), this,
+    SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(selectionChanged(const pqProxySelection&)),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
@@ -55,8 +53,7 @@ pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject
 //-----------------------------------------------------------------------------
 void pqCreateCustomFilterReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(
-    pqActiveObjects::instance().selection().size() > 0);
+  this->parentAction()->setEnabled(pqActiveObjects::instance().selection().size() > 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -64,16 +61,15 @@ void pqCreateCustomFilterReaction::createCustomFilter()
 {
   // Get the selected sources from the application core. Notify the user
   // if the selection is empty.
-  QWidget *mainWin = pqCoreUtilities::mainWidget();
+  QWidget* mainWin = pqCoreUtilities::mainWidget();
 
   if (pqActiveObjects::instance().selection().size() == 0)
-    {
-    qCritical() <<
-      "No pipeline objects are selected."
-      "To create a new custom filter, select the sources and "
-      "filters you want. Then, launch the creation wizard.";
+  {
+    qCritical() << "No pipeline objects are selected."
+                   "To create a new custom filter, select the sources and "
+                   "filters you want. Then, launch the creation wizard.";
     return;
-    }
+  }
 
   // Create a custom filter definition model with the pipeline
   // selection. The model only accepts pipeline sources. Notify the
@@ -81,18 +77,18 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   pqCustomFilterDefinitionModel custom;
   custom.setContents(pqActiveObjects::instance().selection());
   if (!custom.hasChildren(QModelIndex()))
-    {
+  {
     QMessageBox::warning(mainWin, "Create Custom Filter Error",
       "The selected objects cannot be used to make a custom filter.\n"
       "To create a new custom filter, select the sources and "
       "filters you want.\nThen, launch the creation wizard.",
       QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     return;
-    }
+  }
 
   pqCustomFilterDefinitionWizard wizard(&custom, mainWin);
   if (wizard.exec() == QDialog::Accepted)
-    {
+  {
     // Create a new compound proxy from the custom filter definition.
     wizard.createCustomFilter();
     // QString customName = wizard.getCustomFilterName();
@@ -102,6 +98,5 @@ void pqCreateCustomFilterReaction::createCustomFilter()
     // // the user.
     // this->onToolsManageCustomFilters();
     // this->Implementation->CustomFilterManager->selectCustomFilter(customName);
-    }
+  }
 }
-

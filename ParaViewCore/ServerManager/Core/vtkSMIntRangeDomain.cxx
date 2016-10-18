@@ -33,7 +33,7 @@ vtkSMIntRangeDomain::~vtkSMIntRangeDomain()
 }
 
 ////---------------------------------------------------------------------------
-//int vtkSMIntRangeDomain::SetDefaultValues(vtkSMProperty* prop)
+// int vtkSMIntRangeDomain::SetDefaultValues(vtkSMProperty* prop)
 //{
 //  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
 //  if (!ivp || this->GetNumberOfRequiredProperties() == 0)

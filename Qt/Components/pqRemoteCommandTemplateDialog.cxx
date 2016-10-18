@@ -12,39 +12,27 @@ using std::endl;
 #include <sstream>
 #include <string>
 
-#define pqErrorMacro(estr)\
-  qDebug()\
-      << "Error in:" << endl\
-      << __FILE__ << ", line " << __LINE__ << endl\
-      << "" estr << endl;
-
+#define pqErrorMacro(estr)                                                                         \
+  qDebug() << "Error in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr << endl;
 
 // User interface
 //=============================================================================
-class pqRemoteCommandTemplateDialogUI
-    :
-  public Ui::pqRemoteCommandTemplateDialogForm
-    {};
+class pqRemoteCommandTemplateDialogUI : public Ui::pqRemoteCommandTemplateDialogForm
+{
+};
 
 //------------------------------------------------------------------------------
-pqRemoteCommandTemplateDialog::pqRemoteCommandTemplateDialog(
-    QWidget *Parent,
-    Qt::WindowFlags flags)
-            :
-    QDialog(Parent,flags),
-    Modified(0),
-    Ui(0)
+pqRemoteCommandTemplateDialog::pqRemoteCommandTemplateDialog(QWidget* Parent, Qt::WindowFlags flags)
+  : QDialog(Parent, flags)
+  , Modified(0)
+  , Ui(0)
 {
   this->Ui = new pqRemoteCommandTemplateDialogUI;
   this->Ui->setupUi(this);
 
-  QObject::connect(
-    this->Ui->commandName, SIGNAL(textChanged(QString)),
-    this, SLOT(SetModified()));
+  QObject::connect(this->Ui->commandName, SIGNAL(textChanged(QString)), this, SLOT(SetModified()));
 
-  QObject::connect(
-    this->Ui->commandTemplate, SIGNAL(textChanged()),
-    this, SLOT(SetModified()));
+  QObject::connect(this->Ui->commandTemplate, SIGNAL(textChanged()), this, SLOT(SetModified()));
 }
 
 //------------------------------------------------------------------------------

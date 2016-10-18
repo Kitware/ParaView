@@ -93,9 +93,9 @@ protected:
   int ValueIndexMax;
 
 private:
-  vtkPVKeyFrameAnimationCueForProxies(const vtkPVKeyFrameAnimationCueForProxies&) VTK_DELETE_FUNCTION;
+  vtkPVKeyFrameAnimationCueForProxies(
+    const vtkPVKeyFrameAnimationCueForProxies&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVKeyFrameAnimationCueForProxies&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

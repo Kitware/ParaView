@@ -42,7 +42,8 @@ class vtkDataObject;
 class vtkStdString;
 class vtkStringArray;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVProminentValuesInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVProminentValuesInformation
+  : public vtkPVInformation
 {
 public:
   static vtkPVProminentValuesInformation* New();
@@ -89,8 +90,8 @@ public:
    * Setting this to one indicates that an array must have every value be
    * identical in order to have any considered prominent.
    */
-  vtkSetClampMacro(Fraction,double,0.,1.);
-  vtkGetMacro(Fraction,double);
+  vtkSetClampMacro(Fraction, double, 0., 1.);
+  vtkGetMacro(Fraction, double);
   //@}
 
   //@{
@@ -99,8 +100,8 @@ public:
    * The uncertainty is the probability of prominent values going undetected.
    * Setting this to zero forces the entire array to be inspected.
    */
-  vtkSetClampMacro(Uncertainty,double,0.,1.);
-  vtkGetMacro(Uncertainty,double);
+  vtkSetClampMacro(Uncertainty, double, 0., 1.);
+  vtkGetMacro(Uncertainty, double);
   //@}
 
   /**

@@ -14,7 +14,8 @@
 =========================================================================*/
 /**
  * @class   vtkPSciVizMultiCorrelativeStats
- * @brief   Fit a multivariate Gaussian to data and/or assess Mahalanobis distance of each datum from the mean.
+ * @brief   Fit a multivariate Gaussian to data and/or assess Mahalanobis distance of each datum
+ * from the mean.
  *
  * This filter either computes a statistical model of
  * a dataset or takes such a model as its second input.
@@ -75,19 +76,20 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizMultiCorrelativeStats : public 
 {
 public:
   static vtkPSciVizMultiCorrelativeStats* New();
-  vtkTypeMacro(vtkPSciVizMultiCorrelativeStats,vtkSciVizStatistics);
-  virtual void PrintSelf( ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkPSciVizMultiCorrelativeStats, vtkSciVizStatistics);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkPSciVizMultiCorrelativeStats();
   virtual ~vtkPSciVizMultiCorrelativeStats();
 
-  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
-  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
+  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData);
+  virtual int AssessData(
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model);
 
 private:
-  vtkPSciVizMultiCorrelativeStats( const vtkPSciVizMultiCorrelativeStats& ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPSciVizMultiCorrelativeStats& ) VTK_DELETE_FUNCTION;
+  vtkPSciVizMultiCorrelativeStats(const vtkPSciVizMultiCorrelativeStats&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPSciVizMultiCorrelativeStats&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizMultiCorrelativeStats_h

@@ -112,9 +112,9 @@ public:
 
   enum TraversalMode
   {
-    GROUPS_ONLY=0,
-    ONE_GROUP=1,
-    ALL=2
+    GROUPS_ONLY = 0,
+    ONE_GROUP = 1,
+    ALL = 2
   };
 
 protected:
@@ -124,6 +124,7 @@ protected:
   bool SkipPrototypes;
   int Mode;
   void NextInternal();
+
 private:
   vtkSMProxyIteratorInternals* Internals;
 

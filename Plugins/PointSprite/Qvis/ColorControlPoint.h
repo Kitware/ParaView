@@ -39,7 +39,8 @@
 #define COLORCONTROLPOINT_H
 #include <AttributeSubject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // ****************************************************************************
 // Class: ColorControlPoint
 //
@@ -58,50 +59,49 @@ namespace pointsprite {
 class ColorControlPoint : public AttributeSubject
 {
 public:
-    ColorControlPoint();
-    ColorControlPoint(const ColorControlPoint &obj);
-    virtual ~ColorControlPoint();
+  ColorControlPoint();
+  ColorControlPoint(const ColorControlPoint& obj);
+  virtual ~ColorControlPoint();
 
-    virtual void operator = (const ColorControlPoint &obj);
-    virtual bool operator == (const ColorControlPoint &obj) const;
-    virtual bool operator != (const ColorControlPoint &obj) const;
+  virtual void operator=(const ColorControlPoint& obj);
+  virtual bool operator==(const ColorControlPoint& obj) const;
+  virtual bool operator!=(const ColorControlPoint& obj) const;
 
-    virtual const std::string TypeName() const;
-    virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const std::string &) const;
-    virtual AttributeSubject *NewInstance(bool) const;
+  virtual const std::string TypeName() const;
+  virtual bool CopyAttributes(const AttributeGroup*);
+  virtual AttributeSubject* CreateCompatible(const std::string&) const;
+  virtual AttributeSubject* NewInstance(bool) const;
 
-    // Property selection methods
-    virtual void SelectAll();
-    void SelectColors();
+  // Property selection methods
+  virtual void SelectAll();
+  void SelectColors();
 
-    // Property setting methods
-    void SetColors(const unsigned char *colors_);
-    void SetPosition(float position_);
+  // Property setting methods
+  void SetColors(const unsigned char* colors_);
+  void SetPosition(float position_);
 
-    // Property getting methods
-    const unsigned char *GetColors() const;
-          unsigned char *GetColors();
-    float               GetPosition() const;
+  // Property getting methods
+  const unsigned char* GetColors() const;
+  unsigned char* GetColors();
+  float GetPosition() const;
 
-    // Persistence methods
-    virtual bool CreateNode(DataNode *node, bool completeSave, bool forceAdd);
-    virtual void SetFromNode(DataNode *node);
+  // Persistence methods
+  virtual bool CreateNode(DataNode* node, bool completeSave, bool forceAdd);
+  virtual void SetFromNode(DataNode* node);
 
+  // Keyframing methods
+  virtual std::string GetFieldName(int index) const;
+  virtual AttributeGroup::FieldType GetFieldType(int index) const;
+  virtual std::string GetFieldTypeName(int index) const;
+  virtual bool FieldsEqual(int index, const AttributeGroup* rhs) const;
 
-    // Keyframing methods
-    virtual std::string               GetFieldName(int index) const;
-    virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual std::string               GetFieldTypeName(int index) const;
-    virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
+  // User-defined methods
+  ColorControlPoint(float pos, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
-    // User-defined methods
-    ColorControlPoint(float pos, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 private:
-    unsigned char colors[4];
-    float         position;
+  unsigned char colors[4];
+  float position;
 };
-
 }
 
 #endif

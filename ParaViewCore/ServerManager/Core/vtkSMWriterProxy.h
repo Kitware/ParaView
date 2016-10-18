@@ -56,10 +56,7 @@ public:
    * Not set by default.
    */
   vtkSetMacro(SupportsParallel, int);
-  int GetSupportsParallel()
-  {
-    return this->SupportsParallel || this->ParallelOnly;
-  }
+  int GetSupportsParallel() { return this->SupportsParallel || this->ParallelOnly; }
   //@}
 
   //@{
@@ -89,6 +86,7 @@ protected:
   vtkGetStringMacro(FileNameMethod);
 
   char* FileNameMethod;
+
 private:
   vtkSMWriterProxy(const vtkSMWriterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMWriterProxy&) VTK_DELETE_FUNCTION;

@@ -26,16 +26,14 @@
 #ifndef vtkCinemaExporter_h
 #define vtkCinemaExporter_h
 
-
 #include "vtkExporter.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-
-class  VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCinemaExporter : public vtkExporter
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCinemaExporter : public vtkExporter
 {
 public:
   static vtkCinemaExporter* New();
-  vtkTypeMacro(vtkCinemaExporter,vtkExporter);
+  vtkTypeMacro(vtkCinemaExporter, vtkExporter);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 

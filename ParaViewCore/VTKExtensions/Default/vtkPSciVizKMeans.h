@@ -14,7 +14,8 @@
 =========================================================================*/
 /**
  * @class   vtkPSciVizKMeans
- * @brief   Find k cluster centers and/or assess the closest center and distance to it for each datum.
+ * @brief   Find k cluster centers and/or assess the closest center and distance to it for each
+ * datum.
  *
  * This filter either computes a statistical model of
  * a dataset or takes such a model as its second input.
@@ -40,8 +41,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizKMeans : public vtkSciVizStatis
 {
 public:
   static vtkPSciVizKMeans* New();
-  vtkTypeMacro(vtkPSciVizKMeans,vtkSciVizStatistics);
-  virtual void PrintSelf( ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkPSciVizKMeans, vtkSciVizStatistics);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -50,8 +51,8 @@ public:
    * In the future the filter will accept an input table of initial cluster positions.
    * The default value of \a K is 5.
    */
-  vtkSetMacro(K,int);
-  vtkGetMacro(K,int);
+  vtkSetMacro(K, int);
+  vtkGetMacro(K, int);
   //@}
 
   //@{
@@ -59,8 +60,8 @@ public:
    * The maximum number of iterations to perform when converging on cluster centers.
    * The default value is 50 iterations.
    */
-  vtkSetMacro(MaxNumIterations,int);
-  vtkGetMacro(MaxNumIterations,int);
+  vtkSetMacro(MaxNumIterations, int);
+  vtkGetMacro(MaxNumIterations, int);
   //@}
 
   //@{
@@ -68,24 +69,25 @@ public:
    * The relative tolerance on cluster centers that will cause early termination of the algorithm.
    * The default value is 0.01: a 1 percent change in cluster coordinates.
    */
-  vtkSetMacro(Tolerance,double);
-  vtkGetMacro(Tolerance,double);
+  vtkSetMacro(Tolerance, double);
+  vtkGetMacro(Tolerance, double);
   //@}
 
 protected:
   vtkPSciVizKMeans();
   virtual ~vtkPSciVizKMeans();
 
-  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
-  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
+  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData);
+  virtual int AssessData(
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model);
 
   int K;
   int MaxNumIterations;
   double Tolerance;
 
 private:
-  vtkPSciVizKMeans( const vtkPSciVizKMeans& ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPSciVizKMeans& ) VTK_DELETE_FUNCTION;
+  vtkPSciVizKMeans(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizKMeans_h

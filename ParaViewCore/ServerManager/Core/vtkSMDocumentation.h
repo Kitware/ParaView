@@ -51,24 +51,24 @@ public:
    * Returns the description text, if any.
    */
   const char* GetDescription();
- 
+
   //@{
   /**
    * Get/Set the documentation XML element.
    */
   void SetDocumentationElement(vtkPVXMLElement*);
   vtkGetObjectMacro(DocumentationElement, vtkPVXMLElement);
+
 protected:
   vtkSMDocumentation();
   ~vtkSMDocumentation();
   //@}
-  
+
   vtkPVXMLElement* DocumentationElement;
+
 private:
   vtkSMDocumentation(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

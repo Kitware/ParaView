@@ -23,8 +23,7 @@ vtkStandardNewMacro(vtkPVDataSetToPiston);
 //----------------------------------------------------------------------------
 vtkPVDataSetToPiston::vtkPVDataSetToPiston()
 {
-  vtkPVDataInformation::RegisterHelper("vtkPistonDataObject",
-                                       "vtkPistonInformationHelper");
+  vtkPVDataInformation::RegisterHelper("vtkPistonDataObject", "vtkPistonInformationHelper");
 }
 
 //----------------------------------------------------------------------------
@@ -35,5 +34,5 @@ vtkPVDataSetToPiston::~vtkPVDataSetToPiston()
 //----------------------------------------------------------------------------
 void vtkPVDataSetToPiston::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

@@ -48,31 +48,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqInputDataTypeDecorator::pqInputDataTypeDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject),
-  ObserverId(0)
+  : Superclass(config, parentObject)
+  , ObserverId(0)
 {
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy? proxy->GetProperty("Input") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : NULL;
   if (!prop)
-    {
+  {
     qDebug("Could not locate property named 'Input'. "
-      "pqInputDataTypeDecorator will have no effect.");
+           "pqInputDataTypeDecorator will have no effect.");
     return;
-    }
+  }
 
   this->ObservedObject = prop;
   this->ObserverId = pqCoreUtilities::connect(
-    prop, vtkCommand::UncheckedPropertyModifiedEvent,
-    this, SIGNAL(enableStateChanged()));
+    prop, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(enableStateChanged()));
 }
 
 //-----------------------------------------------------------------------------
 pqInputDataTypeDecorator::~pqInputDataTypeDecorator()
 {
   if (this->ObservedObject && this->ObserverId)
-    {
+  {
     this->ObservedObject->RemoveObserver(this->ObserverId);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -80,50 +79,48 @@ bool pqInputDataTypeDecorator::enableWidget() const
 {
   pqPropertyWidget* parentObject = this->parentWidget();
   vtkSMProxy* proxy = parentObject->proxy();
-  vtkSMProperty* prop = proxy? proxy->GetProperty("Input") : NULL;
+  vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : NULL;
   if (prop)
-    {
+  {
     pqPipelineSource* source =
-      pqApplicationCore::instance()->getServerManagerModel()->
-      findItem<pqPipelineSource*>(
-      vtkSMUncheckedPropertyHelper(prop).GetAsProxy());
+      pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(
+        vtkSMUncheckedPropertyHelper(prop).GetAsProxy());
 
     if (!source)
-      {
+    {
       return false;
-      }
+    }
     pqOutputPort* cur_input = NULL;
     QList<pqOutputPort*> ports = source->getOutputPorts();
-    cur_input = ports.size() > 0? ports[0] : NULL;
+    cur_input = ports.size() > 0 ? ports[0] : NULL;
     int exclude = 0;
-    if(!this->xml()->GetScalarAttribute("exclude", &exclude))
-      {
+    if (!this->xml()->GetScalarAttribute("exclude", &exclude))
+    {
       exclude = 0;
-      }
+    }
     const char* dataname = this->xml()->GetAttribute("name");
     if (cur_input && dataname)
-      {
+    {
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
-      bool match = (dataInfo->IsDataStructured() &&
-                   !strcmp(dataname, "Structured")) ||
-                   (dataInfo->DataSetTypeIsA(dataname));
-      if(exclude)
+      bool match = (dataInfo->IsDataStructured() && !strcmp(dataname, "Structured")) ||
+        (dataInfo->DataSetTypeIsA(dataname));
+      if (exclude)
+      {
+        if (match)
         {
-        if(match)
-          {
           return false;
-          }
-        }
-      else if(!match)
-        {
-        return false;
         }
       }
-    else
+      else if (!match)
       {
-      return false;
+        return false;
       }
     }
+    else
+    {
+      return false;
+    }
+  }
 
   return this->Superclass::enableWidget();
 }

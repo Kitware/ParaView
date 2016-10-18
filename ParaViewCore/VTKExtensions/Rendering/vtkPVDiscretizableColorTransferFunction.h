@@ -34,21 +34,22 @@ class vtkAbstractArray;
 class vtkDoubleArray;
 class vtkVariantArray;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVDiscretizableColorTransferFunction : public vtkDiscretizableColorTransferFunction
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVDiscretizableColorTransferFunction
+  : public vtkDiscretizableColorTransferFunction
 {
 public:
-  static vtkPVDiscretizableColorTransferFunction *New();
+  static vtkPVDiscretizableColorTransferFunction* New();
   vtkTypeMacro(vtkPVDiscretizableColorTransferFunction, vtkDiscretizableColorTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
- 
+
   //@{
   /**
    * Parallel API to API for annotated values to set/get the full list of annotations.
    * A subset of the full list will be used.
    */
   virtual void SetAnnotationsInFullSet(vtkAbstractArray* values, vtkStringArray* annotations);
-  vtkGetObjectMacro(AnnotatedValuesInFullSet,vtkAbstractArray);
-  vtkGetObjectMacro(AnnotationsInFullSet,vtkStringArray);
+  vtkGetObjectMacro(AnnotatedValuesInFullSet, vtkAbstractArray);
+  vtkGetObjectMacro(AnnotationsInFullSet, vtkStringArray);
   virtual vtkIdType SetAnnotationInFullSet(vtkVariant value, vtkStdString annotation);
   virtual vtkIdType SetAnnotationInFullSet(vtkStdString value, vtkStdString annotation);
   virtual void ResetAnnotationsInFullSet();
@@ -82,7 +83,8 @@ protected:
   ~vtkPVDiscretizableColorTransferFunction();
 
 private:
-  vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
+  vtkPVDiscretizableColorTransferFunction(
+    const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
 
   // All annotations.

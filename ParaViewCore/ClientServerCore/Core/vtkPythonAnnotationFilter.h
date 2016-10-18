@@ -87,9 +87,9 @@ public:
 
   vtkGetMacro(NumberOfTimeSteps, int);
   double GetTimeStep(int index)
-    {
-    return (index < this->NumberOfTimeSteps? this->TimeSteps[index] : 0.0);
-    }
+  {
+    return (index < this->NumberOfTimeSteps ? this->TimeSteps[index] : 0.0);
+  }
 
   vtkGetMacro(TimeRangeValid, bool);
   vtkGetVector2Macro(TimeRange, double);
@@ -101,9 +101,8 @@ protected:
   ~vtkPythonAnnotationFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual void EvaluateExpression();
 
@@ -122,7 +121,6 @@ private:
   bool TimeRangeValid;
   double TimeRange[2];
   vtkDataObject* CurrentInputDataObject;
-
 };
 
 #endif

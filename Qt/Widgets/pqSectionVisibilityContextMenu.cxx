@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,14 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSetName.h"
 
-
 //-----------------------------------------------------------------------------
 pqSectionVisibilityContextMenu::pqSectionVisibilityContextMenu(QWidget* _p)
   : QMenu(_p)
 {
   this->HeaderView = 0;
-  QObject::connect(this, SIGNAL(triggered(QAction*)),
-    this, SLOT(toggleSectionVisibility(QAction*)));
+  QObject::connect(
+    this, SIGNAL(triggered(QAction*)), this, SLOT(toggleSectionVisibility(QAction*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -56,16 +55,16 @@ void pqSectionVisibilityContextMenu::setHeaderView(QHeaderView* header)
   this->clear();
   this->HeaderView = header;
   if (header)
-    {
+  {
     QAbstractItemModel* model = header->model();
-    for (int cc=0; cc < header->count(); cc++)
-      {
+    for (int cc = 0; cc < header->count(); cc++)
+    {
       QString headertext = model->headerData(cc, header->orientation()).toString();
       QAction* action = this->addAction(headertext) << pqSetName(headertext);
       action->setCheckable(true);
       action->setChecked(!header->isSectionHidden(cc));
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -73,25 +72,24 @@ void pqSectionVisibilityContextMenu::toggleSectionVisibility(QAction* action)
 {
   QHeaderView* header = this->HeaderView;
   if (!header)
-    {
+  {
     return;
-    }
+  }
   QString headertext = action->text();
   QAbstractItemModel* model = header->model();
-  for (int cc=0; cc < header->count(); cc++)
-    {
+  for (int cc = 0; cc < header->count(); cc++)
+  {
     if (headertext == model->headerData(cc, Qt::Horizontal).toString())
-      {
+    {
       if (action->isChecked())
-        {
+      {
         header->showSection(cc);
-        }
-      else
-        {
-        header->hideSection(cc);
-        }
-      break;
       }
+      else
+      {
+        header->hideSection(cc);
+      }
+      break;
     }
+  }
 }
-

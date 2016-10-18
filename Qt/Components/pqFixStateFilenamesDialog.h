@@ -49,13 +49,13 @@ class PQCOMPONENTS_EXPORT pqFixStateFilenamesDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
   /**
   * \c xml is the state xml root-element. Note that the xml may get modified, if
   * the user picks different filesnames.
   */
-  pqFixStateFilenamesDialog(vtkPVXMLElement* xml,
-    QWidget* parent=0, Qt::WindowFlags f=0);
+  pqFixStateFilenamesDialog(vtkPVXMLElement* xml, QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFixStateFilenamesDialog();
 
   /**
@@ -74,7 +74,6 @@ public:
   virtual void accept();
 
 protected:
-
   /**
   * Detect File paterns, constructing the filename to be shown in the pipeline browser.
   */
@@ -88,7 +87,7 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
-  vtkFileSequenceParser * SequenceParser;
+  vtkFileSequenceParser* SequenceParser;
 };
 
 #endif

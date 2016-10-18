@@ -14,14 +14,14 @@
 =========================================================================*/
 /**
  * @class   vtkAttributeDataReductionFilter
- * @brief   Reduces cell/point attribute data 
+ * @brief   Reduces cell/point attribute data
  * with different modes to combine cell/point data.
  *
  * Filter that takes data with same structure on multiple input connections to
- * produce a reduced dataset with cell/point data summed/maxed/minned for 
+ * produce a reduced dataset with cell/point data summed/maxed/minned for
  * all cells/points. Data arrays not available in all inputs
  * are discarded. The attribute to reduce can be set to point or cell or field
- * or all. Only selected attributes will be reduced according to the 
+ * or all. Only selected attributes will be reduced according to the
  * type choosen, all other attributes are those at the first input.
 */
 
@@ -31,7 +31,8 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAttributeDataReductionFilter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAttributeDataReductionFilter
+  : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAttributeDataReductionFilter* New();
@@ -39,23 +40,23 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum ReductionTypes
-    {
+  {
     ADD = 1,
     MAX = 2,
     MIN = 3
-    };
+  };
 
   enum AttributeTypes // These can be 'or'-ed together.
-    {
+  {
     POINT_DATA = 0x01,
-    CELL_DATA  = 0x02,
+    CELL_DATA = 0x02,
     FIELD_DATA = 0x04, // FIXME: Field data not supported yet.
     ROW_DATA = 0x08
-    };
+  };
 
-  // Set the attributes to reduce. Only the choosen type of attributes will be 
+  // Set the attributes to reduce. Only the choosen type of attributes will be
   // reduced by this filter. The not-choosen attributes are passed through
-  // from the first input unchanged. Default is (POINT_DATA|CELL_DATA) 
+  // from the first input unchanged. Default is (POINT_DATA|CELL_DATA)
   // i.e. point data and cell data will be reduced.
   // FIXME: Field data not supported yet.
   vtkSetMacro(AttributeType, int);
@@ -66,43 +67,38 @@ public:
   vtkSetMacro(ReductionType, int);
   vtkGetMacro(ReductionType, int);
   const char* GetReductionTypeAsString()
-    {
+  {
     switch (this->ReductionType)
-      {
-    case ADD:
-      return "ADD";
-    case MAX:
-      return "MAX";
-    case MIN:
-      return "MIN";
-      }
-    return "";
+    {
+      case ADD:
+        return "ADD";
+      case MAX:
+        return "MAX";
+      case MIN:
+        return "MIN";
     }
-  void SetReductionTypeToAdd() 
-    { this->SetReductionType(vtkAttributeDataReductionFilter::ADD); }
-  void SetReductionTypeToMax() 
-    { this->SetReductionType(vtkAttributeDataReductionFilter::MAX); }
-  void SetReductionTypeToMin() 
-    { this->SetReductionType(vtkAttributeDataReductionFilter::MIN); }
+    return "";
+  }
+  void SetReductionTypeToAdd() { this->SetReductionType(vtkAttributeDataReductionFilter::ADD); }
+  void SetReductionTypeToMax() { this->SetReductionType(vtkAttributeDataReductionFilter::MAX); }
+  void SetReductionTypeToMin() { this->SetReductionType(vtkAttributeDataReductionFilter::MIN); }
 protected:
   vtkAttributeDataReductionFilter();
   ~vtkAttributeDataReductionFilter();
-  
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
-  
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
   int ReductionType;
   int AttributeType;
+
 private:
   vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;

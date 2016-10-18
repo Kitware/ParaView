@@ -51,18 +51,19 @@ class vtkDistributedDataFilter;
 class vtkMultiProcessController;
 class vtkPKdTree;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkOrderedCompositeDistributor : public vtkPointSetAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkOrderedCompositeDistributor
+  : public vtkPointSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);
-  static vtkOrderedCompositeDistributor *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkOrderedCompositeDistributor* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
    * Set the vtkPKdTree to distribute with.
    */
-  virtual void SetPKdTree(vtkPKdTree *);
+  virtual void SetPKdTree(vtkPKdTree*);
   vtkGetObjectMacro(PKdTree, vtkPKdTree);
   //@}
 
@@ -70,7 +71,7 @@ public:
   /**
    * Set/get the controller to distribute with.
    */
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
@@ -95,20 +96,18 @@ protected:
   vtkOrderedCompositeDistributor();
   ~vtkOrderedCompositeDistributor();
 
-  char *OutputType;
+  char* OutputType;
   bool PassThrough;
-  vtkPKdTree *PKdTree;
-  vtkMultiProcessController *Controller;
- 
-  int FillInputPortInformation(int port, vtkInformation *info);
-  int RequestDataObject(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  int RequestData(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  vtkPKdTree* PKdTree;
+  vtkMultiProcessController* Controller;
+
+  int FillInputPortInformation(int port, vtkInformation* info);
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
-  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkOrderedCompositeDistributor &) VTK_DELETE_FUNCTION;
+  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkOrderedCompositeDistributor&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkOrderedCompositeDistributor_h
+#endif // vtkOrderedCompositeDistributor_h

@@ -45,24 +45,21 @@ void IdentifyDownStreamRecipients(
   IdentifyDownStreamRecipients(child,nProcs,DSR);
 }
 #endif
-
 };
-
 
 //-----------------------------------------------------------------------------
 vtkMaterialInterfacePieceTransactionMatrix::vtkMaterialInterfacePieceTransactionMatrix()
 {
-  this->NFragments=0;
-  this->NProcs=0;
-  this->FlatMatrixSize=0;
-  this->Matrix=0;
-  this->NumberOfTransactions=0;
+  this->NFragments = 0;
+  this->NProcs = 0;
+  this->FlatMatrixSize = 0;
+  this->Matrix = 0;
+  this->NumberOfTransactions = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkMaterialInterfacePieceTransactionMatrix::vtkMaterialInterfacePieceTransactionMatrix(
-                int nFragments,
-                int nProcs)
+  int nFragments, int nProcs)
 {
   this->Initialize(nFragments, nProcs);
 }
@@ -76,125 +73,116 @@ vtkMaterialInterfacePieceTransactionMatrix::~vtkMaterialInterfacePieceTransactio
 //-----------------------------------------------------------------------------
 void vtkMaterialInterfacePieceTransactionMatrix::Clear()
 {
-  this->NFragments=0;
-  this->NProcs=0;
-  if ( this->Matrix )
-    {
-    delete [] this->Matrix;
-    this->Matrix=0;
-    }
-  this->NumberOfTransactions=0;
+  this->NFragments = 0;
+  this->NProcs = 0;
+  if (this->Matrix)
+  {
+    delete[] this->Matrix;
+    this->Matrix = 0;
+  }
+  this->NumberOfTransactions = 0;
 }
 
 //-----------------------------------------------------------------------------
-void vtkMaterialInterfacePieceTransactionMatrix::Initialize(
-                int nFragments,
-                int nProcs)
+void vtkMaterialInterfacePieceTransactionMatrix::Initialize(int nFragments, int nProcs)
 {
   this->Clear();
 
-  this->NFragments=nFragments;
-  this->NProcs=nProcs;
-  this->FlatMatrixSize=nFragments*nProcs;
-  this->Matrix
-    = new vector<vtkMaterialInterfacePieceTransaction>[this->FlatMatrixSize];
+  this->NFragments = nFragments;
+  this->NProcs = nProcs;
+  this->FlatMatrixSize = nFragments * nProcs;
+  this->Matrix = new vector<vtkMaterialInterfacePieceTransaction>[this->FlatMatrixSize];
 }
 
 //-----------------------------------------------------------------------------
 void vtkMaterialInterfacePieceTransactionMatrix::PushTransaction(
-                int fragmentId,
-                int procId,
-                vtkMaterialInterfacePieceTransaction &transaction)
+  int fragmentId, int procId, vtkMaterialInterfacePieceTransaction& transaction)
 {
-  int idx=fragmentId+procId*this->NFragments;
+  int idx = fragmentId + procId * this->NFragments;
   this->Matrix[idx].push_back(transaction);
   ++this->NumberOfTransactions;
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType vtkMaterialInterfacePieceTransactionMatrix::Pack(int *&buf)
+vtkIdType vtkMaterialInterfacePieceTransactionMatrix::Pack(int*& buf)
 {
-/*
-the buffer has this structure:
+  /*
+  the buffer has this structure:
 
-[nFragments,nProcs][nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]...[nT,T0,...,TN]
-                       /\           /\               /\               /\
-                       |            |                |                |
-                      f0,p0        f1,p0            fN,p0            fN,PN
-*/
+  [nFragments,nProcs][nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]...[nT,T0,...,TN]
+                         /\           /\               /\               /\
+                         |            |                |                |
+                        f0,p0        f1,p0            fN,p0            fN,PN
+  */
 
   // caller should not allocate memory.
-  assert( "Buffer appears to be pre-allocated."
-          && buf==0 );
+  assert("Buffer appears to be pre-allocated." && buf == 0);
 
-  const int transactionSize
-    = vtkMaterialInterfacePieceTransaction::SIZE;
+  const int transactionSize = vtkMaterialInterfacePieceTransaction::SIZE;
 
-  const vtkIdType bufSize = this->FlatMatrixSize     // transaction count for each i,j
-        + transactionSize*this->NumberOfTransactions // enough to store all transactions
-        + 2;                                         // nFragments, nProcs
+  const vtkIdType bufSize = this->FlatMatrixSize   // transaction count for each i,j
+    + transactionSize * this->NumberOfTransactions // enough to store all transactions
+    + 2;                                           // nFragments, nProcs
 
   buf = new int[bufSize];
   // header
-  buf[0]=this->NFragments;
-  buf[1]=this->NProcs;
-  vtkIdType bufIdx=2;
+  buf[0] = this->NFragments;
+  buf[1] = this->NProcs;
+  vtkIdType bufIdx = 2;
 
-  for (int j=0; j<this->NProcs; ++j)
+  for (int j = 0; j < this->NProcs; ++j)
+  {
+    for (int i = 0; i < this->NFragments; ++i)
     {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
+      int matIdx = i + j * this->NFragments;
       int nTransactions = static_cast<int>(this->Matrix[matIdx].size());
 
       // put the count for this i,j
-      buf[bufIdx]=nTransactions;
+      buf[bufIdx] = nTransactions;
       ++bufIdx;
 
       // put this i,j's transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
+      for (int q = 0; q < nTransactions; ++q)
+      {
         this->Matrix[matIdx][q].Pack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
+        bufIdx += transactionSize;
       }
     }
+  }
   // now bufIdx is number of ints we have stored
   return bufIdx;
 }
 
 //-----------------------------------------------------------------------------
-int vtkMaterialInterfacePieceTransactionMatrix::UnPack(int *buf)
+int vtkMaterialInterfacePieceTransactionMatrix::UnPack(int* buf)
 {
-  assert("Buffer has not been allocated."
-         && buf!=0 );
+  assert("Buffer has not been allocated." && buf != 0);
 
-  const int transactionSize
-    = vtkMaterialInterfacePieceTransaction::SIZE;
+  const int transactionSize = vtkMaterialInterfacePieceTransaction::SIZE;
 
-  this->Initialize(buf[0],buf[1]);
-  int bufIdx=2;
+  this->Initialize(buf[0], buf[1]);
+  int bufIdx = 2;
 
-  for (int j=0; j<this->NProcs; ++j)
+  for (int j = 0; j < this->NProcs; ++j)
+  {
+    for (int i = 0; i < this->NFragments; ++i)
     {
-    for (int i=0; i<this->NFragments; ++i)
-      {
       // get the number of transactions for this i,j
-      int nTransactions=buf[bufIdx];
+      int nTransactions = buf[bufIdx];
       ++bufIdx;
 
       // size the i,j th transaction list
-      int matIdx=i+j*this->NFragments;
+      int matIdx = i + j * this->NFragments;
       this->Matrix[matIdx].resize(nTransactions);
 
       // load the i,j th transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
+      for (int q = 0; q < nTransactions; ++q)
+      {
         this->Matrix[matIdx][q].UnPack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
+        bufIdx += transactionSize;
       }
     }
+  }
 
   return 1;
 }
@@ -204,11 +192,9 @@ int vtkMaterialInterfacePieceTransactionMatrix::UnPack(int *buf)
 // starting from process 0 (which is assumed to be the root) each
 // process will send only rows of the matrix that are needed by
 // its children. This will reduce the communication by quite a bit.
-void vtkMaterialInterfacePieceTransactionMatrix::Broadcast(
-                vtkCommunicator *comm,
-                int srcProc)
+void vtkMaterialInterfacePieceTransactionMatrix::Broadcast(vtkCommunicator* comm, int srcProc)
 {
-  int myProcId=comm->GetLocalProcessId();
+  int myProcId = comm->GetLocalProcessId();
 
   /*
   int nProcs=comm->GetNumberOfProcesses();
@@ -250,52 +236,52 @@ void vtkMaterialInterfacePieceTransactionMatrix::Broadcast(
   // NOTE: this will be replaced by tree structured
   // broadcast.
   // pack
-  int *buf=0;
-  int bufSize=0;
-  if ( myProcId==srcProc )
-    {
-    bufSize=this->Pack(buf);
-    }
+  int* buf = 0;
+  int bufSize = 0;
+  if (myProcId == srcProc)
+  {
+    bufSize = this->Pack(buf);
+  }
 
   // move
-  comm->Broadcast(&bufSize,1,srcProc);
-  if ( myProcId!=srcProc )
-    {
+  comm->Broadcast(&bufSize, 1, srcProc);
+  if (myProcId != srcProc)
+  {
     buf = new int[bufSize];
-    }
-  comm->Broadcast(buf,bufSize,srcProc);
+  }
+  comm->Broadcast(buf, bufSize, srcProc);
 
   // unpack
-  if ( myProcId!=srcProc )
-    {
+  if (myProcId != srcProc)
+  {
     this->UnPack(buf);
-    }
+  }
 
   // clean up
-  delete [] buf;
+  delete[] buf;
 }
 
 //-----------------------------------------------------------------------------
 void vtkMaterialInterfacePieceTransactionMatrix::Print()
 {
-  for (int j=0; j<this->NProcs; ++j)
+  for (int j = 0; j < this->NProcs; ++j)
+  {
+    for (int i = 0; i < this->NFragments; ++i)
     {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
+      int matIdx = i + j * this->NFragments;
       int nTransactions = static_cast<int>(this->Matrix[matIdx].size());
 
-      if (nTransactions>0)
-        {
+      if (nTransactions > 0)
+      {
         cerr << "TM[f=" << i << ",p=" << j << "]=";
 
         // put this i,j's transaction list
-        for (int q=0; q<nTransactions; ++q)
-          {
+        for (int q = 0; q < nTransactions; ++q)
+        {
           cerr << this->Matrix[matIdx][q] << ",";
-          }
-        cerr << endl;
         }
+        cerr << endl;
       }
     }
+  }
 }

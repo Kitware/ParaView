@@ -54,17 +54,16 @@ class PQWIDGETS_EXPORT pqLineEdit : public QLineEdit
 {
   Q_OBJECT
   Q_PROPERTY(QString text2 READ text WRITE setTextAndResetCursor)
-  Q_PROPERTY(bool resetCursorPositionOnEditingFinished
-    READ resetCursorPositionOnEditingFinished
-    WRITE setResetCursorPositionOnEditingFinished)
+  Q_PROPERTY(bool resetCursorPositionOnEditingFinished READ resetCursorPositionOnEditingFinished
+      WRITE setResetCursorPositionOnEditingFinished)
 
   typedef QLineEdit Superclass;
+
 public:
-  pqLineEdit(QWidget *parent=0);
-  pqLineEdit(const QString &contents, QWidget *parent=0);
+  pqLineEdit(QWidget* parent = 0);
+  pqLineEdit(const QString& contents, QWidget* parent = 0);
 
   virtual ~pqLineEdit();
-
 
   /**
   * To enable/disable whether the cursor position is reset to 0 after
@@ -72,7 +71,9 @@ public:
   * resetCursorPositionOnEditingFinished property (default: true).
   */
   bool resetCursorPositionOnEditingFinished() const
-    { return this->ResetCursorPositionOnEditingFinished; }
+  {
+    return this->ResetCursorPositionOnEditingFinished;
+  }
 
 signals:
   /**
@@ -97,7 +98,9 @@ public slots:
   * resetCursorPositionOnEditingFinished property (default: true).
   */
   void setResetCursorPositionOnEditingFinished(bool val)
-    { this->ResetCursorPositionOnEditingFinished = val; }
+  {
+    this->ResetCursorPositionOnEditingFinished = val;
+  }
 
 private slots:
   void onTextEdited();

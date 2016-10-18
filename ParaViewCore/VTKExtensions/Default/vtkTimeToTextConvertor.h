@@ -66,23 +66,19 @@ protected:
   ~vtkTimeToTextConvertor();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual int RequestInformation(vtkInformation *request,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  char  *Format;
+  char* Format;
   double Shift;
   double Scale;
 
 private:
   vtkTimeToTextConvertor(const vtkTimeToTextConvertor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTimeToTextConvertor&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

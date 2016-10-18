@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 
 //-----------------------------------------------------------------------------
-myMainWindow::myMainWindow(QWidget* parentObject,
-  Qt::WindowFlags wflags) : Superclass(parentObject, wflags)
+myMainWindow::myMainWindow(QWidget* parentObject, Qt::WindowFlags wflags)
+  : Superclass(parentObject, wflags)
 {
   Ui::myMainWindow ui;
   ui.setupUi(this);
@@ -50,16 +50,14 @@ myMainWindow::myMainWindow(QWidget* parentObject,
   core->getObjectBuilder()->createServer(pqServerResource("builtin:"));
 
   // Create render view
-  pqRenderView* view = qobject_cast<pqRenderView*>(
-    pqApplicationCore::instance()->getObjectBuilder()->createView(
-      pqRenderView::renderViewType(),
-      pqActiveObjects::instance().activeServer()));
+  pqRenderView* view =
+    qobject_cast<pqRenderView*>(pqApplicationCore::instance()->getObjectBuilder()->createView(
+      pqRenderView::renderViewType(), pqActiveObjects::instance().activeServer()));
   pqActiveObjects::instance().setActiveView(view);
 
   // Set it as the central widget
   this->setCentralWidget(view->widget());
 }
-
 
 //-----------------------------------------------------------------------------
 myMainWindow::~myMainWindow()

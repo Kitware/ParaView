@@ -49,24 +49,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  static QMap<int, QIcon> Icons;
-  void InitIcons()
-    {
-    if (Icons.size() == 0)
-      {
-      Icons[vtkDataObject::POINT] =
-        QIcon(":/pqWidgets/Icons/pqPointData16.png");
-      Icons[vtkDataObject::CELL] =
-        QIcon(":/pqWidgets/Icons/pqCellData16.png");
-      Icons[vtkDataObject::VERTEX] =
-        QIcon(":/pqWidgets/Icons/pqPointData16.png");
-      Icons[vtkDataObject::EDGE] =
-        QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
-      Icons[vtkDataObject::ROW] =
-        QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
-      }
-    }
-
+static QMap<int, QIcon> Icons;
+void InitIcons()
+{
+  if (Icons.size() == 0)
+  {
+    Icons[vtkDataObject::POINT] = QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    Icons[vtkDataObject::CELL] = QIcon(":/pqWidgets/Icons/pqCellData16.png");
+    Icons[vtkDataObject::VERTEX] = QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    Icons[vtkDataObject::EDGE] = QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+    Icons[vtkDataObject::ROW] = QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
+  }
+}
 }
 
 class pqFindDataCreateSelectionFrame::pqInternals
@@ -79,11 +73,11 @@ public:
   pqOutputPort* CurrentPort;
 
   //---------------------------------------------------------------------------
-  pqInternals(pqFindDataCreateSelectionFrame* self) :
-    CreatingSelection(false),
-    DataChangedSinceLastUpdate(true),
-    CurrentPort(NULL)
-    {
+  pqInternals(pqFindDataCreateSelectionFrame* self)
+    : CreatingSelection(false)
+    , DataChangedSinceLastUpdate(true)
+    , CurrentPort(NULL)
+  {
     this->SelectionManager = qobject_cast<pqSelectionManager*>(
       pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
 
@@ -98,45 +92,41 @@ public:
     // automatically.
     this->Ui.source->setAutoUpdateIndex(false);
 
-    self->connect(this->Ui.source, SIGNAL(currentIndexChanged(pqOutputPort*)),
-      SLOT(setPort(pqOutputPort*)));
-    self->connect(this->Ui.selectionType, SIGNAL(currentIndexChanged(int)),
-      SLOT(refreshQuery()));
-    self->connect(this->Ui.queryClauseWidget, SIGNAL(helpRequested()),
-      SIGNAL(helpRequested()));
+    self->connect(
+      this->Ui.source, SIGNAL(currentIndexChanged(pqOutputPort*)), SLOT(setPort(pqOutputPort*)));
+    self->connect(this->Ui.selectionType, SIGNAL(currentIndexChanged(int)), SLOT(refreshQuery()));
+    self->connect(this->Ui.queryClauseWidget, SIGNAL(helpRequested()), SIGNAL(helpRequested()));
     self->connect(this->Ui.runQuery, SIGNAL(clicked()), SLOT(runQuery()));
 
     // when the selection manager reports a new selection, we reset the query
     // created to avoid confusing the user.
     if (this->SelectionManager)
-      {
-      self->connect(this->SelectionManager,
-        SIGNAL(selectionChanged(pqOutputPort*)),
+    {
+      self->connect(this->SelectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
         SLOT(onSelectionChanged(pqOutputPort*)));
-      }
     }
+  }
 
   //---------------------------------------------------------------------------
   // based on the current "source", fill up selection type with available
   // options.
   void populateSelectionType()
-    {
+  {
     bool prev = this->Ui.selectionType->blockSignals(true);
     pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(
       this->Ui.selectionType, this->Ui.source->currentPort());
     this->Ui.selectionType->blockSignals(prev);
-    }
+  }
 
   //---------------------------------------------------------------------------
   int selectionType() const
-    {
-    return this->Ui.selectionType->itemData(
-      this->Ui.selectionType->currentIndex()).toInt();
-    }
+  {
+    return this->Ui.selectionType->itemData(this->Ui.selectionType->currentIndex()).toInt();
+  }
 
   //---------------------------------------------------------------------------
   void updateClause(bool force_reset = false)
-    {
+  {
     Ui::FindDataCreateSelectionFrame& ui = this->Ui;
 
     pqOutputPort* port = ui.source->currentPort();
@@ -145,37 +135,37 @@ public:
 
     bool reset_clause = force_reset;
     if (ui.queryClauseWidget->producer() != port)
-      {
+    {
       ui.queryClauseWidget->setProducer(port);
       reset_clause = true;
-      }
+    }
 
     // The data is marked as changed when the port pipeline source
     // signals it has changed.
     if (this->DataChangedSinceLastUpdate)
-      {
+    {
       reset_clause = true;
       this->DataChangedSinceLastUpdate = false;
-      }
+    }
 
     int attrType = this->selectionType();
     if (ui.queryClauseWidget->attributeType() != attrType)
-      {
+    {
       ui.queryClauseWidget->setAttributeType(attrType);
       reset_clause = true;
-      }
-    if (reset_clause && port)
-      {
-      ui.queryClauseWidget->initialize();
-      }
     }
+    if (reset_clause && port)
+    {
+      ui.queryClauseWidget->initialize();
+    }
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqFindDataCreateSelectionFrame::pqFindDataCreateSelectionFrame(
   QWidget* parentObject, Qt::WindowFlags wflags)
-  : Superclass(parentObject, wflags),
-  Internals(new pqInternals(this))
+  : Superclass(parentObject, wflags)
+  , Internals(new pqInternals(this))
 {
   // fill the source combo with existing sources, if any.
   this->Internals->Ui.source->fillExistingPorts();
@@ -191,27 +181,23 @@ pqFindDataCreateSelectionFrame::~pqFindDataCreateSelectionFrame()
 //-----------------------------------------------------------------------------
 void pqFindDataCreateSelectionFrame::setPort(pqOutputPort* port)
 {
-  Ui::FindDataCreateSelectionFrame &ui = this->Internals->Ui;
+  Ui::FindDataCreateSelectionFrame& ui = this->Internals->Ui;
   if (this->Internals->CurrentPort != port)
-    {
+  {
     ui.source->setCurrentPort(port);
-    if (this->Internals->CurrentPort &&
-        this->Internals->CurrentPort->getSource())
-      {
-      QObject::disconnect(this->Internals->CurrentPort->getSource(),
-                          SIGNAL(dataUpdated(pqPipelineSource*)),
-                          this, SLOT(dataChanged()));
-      }
-    this->Internals->CurrentPort = port;
-    }
-
-  if (this->Internals->CurrentPort &&
-      this->Internals->CurrentPort->getSource())
+    if (this->Internals->CurrentPort && this->Internals->CurrentPort->getSource())
     {
-    QObject::connect(this->Internals->CurrentPort->getSource(),
-                     SIGNAL(dataUpdated(pqPipelineSource*)),
-                     this, SLOT(dataChanged()));
+      QObject::disconnect(this->Internals->CurrentPort->getSource(),
+        SIGNAL(dataUpdated(pqPipelineSource*)), this, SLOT(dataChanged()));
     }
+    this->Internals->CurrentPort = port;
+  }
+
+  if (this->Internals->CurrentPort && this->Internals->CurrentPort->getSource())
+  {
+    QObject::connect(this->Internals->CurrentPort->getSource(),
+      SIGNAL(dataUpdated(pqPipelineSource*)), this, SLOT(dataChanged()));
+  }
 
   // Update available selection types.
   this->Internals->populateSelectionType();
@@ -234,7 +220,7 @@ void pqFindDataCreateSelectionFrame::refreshQuery()
 //-----------------------------------------------------------------------------
 void pqFindDataCreateSelectionFrame::runQuery()
 {
-  Ui::FindDataCreateSelectionFrame &ui = this->Internals->Ui;
+  Ui::FindDataCreateSelectionFrame& ui = this->Internals->Ui;
   Q_ASSERT(ui.source->currentPort() == ui.queryClauseWidget->producer() &&
     ui.source->currentPort() != NULL);
 
@@ -243,12 +229,12 @@ void pqFindDataCreateSelectionFrame::runQuery()
   vtkSmartPointer<vtkSMProxy> selectionSource;
   selectionSource.TakeReference(ui.queryClauseWidget->newSelectionSource());
   if (!selectionSource)
-    {
+  {
     qWarning("Failed to create a selection based on the given criteria.");
     return;
-    }
-  vtkSMPropertyHelper(selectionSource, "FieldType").Set(
-    vtkSelectionNode::ConvertAttributeTypeToSelectionField(
+  }
+  vtkSMPropertyHelper(selectionSource, "FieldType")
+    .Set(vtkSelectionNode::ConvertAttributeTypeToSelectionField(
       ui.queryClauseWidget->attributeType()));
   selectionSource->UpdateVTKObjects();
   port->setSelectionInput(vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
@@ -257,11 +243,11 @@ void pqFindDataCreateSelectionFrame::runQuery()
   // selection manager has logic to clear other selections and such as per the
   // application's requirements.
   if (this->Internals->SelectionManager)
-    {
+  {
     this->Internals->CreatingSelection = true;
     this->Internals->SelectionManager->select(port);
     this->Internals->CreatingSelection = false;
-    }
+  }
   port->renderAllViews();
 }
 
@@ -269,21 +255,20 @@ void pqFindDataCreateSelectionFrame::runQuery()
 void pqFindDataCreateSelectionFrame::onSelectionChanged(pqOutputPort* port)
 {
   if (!this->Internals->CreatingSelection)
-    {
+  {
     this->setPort(port);
     this->Internals->updateClause(true);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(
-  QComboBox* cbox, pqOutputPort* port)
+void pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(QComboBox* cbox, pqOutputPort* port)
 {
   if (port == NULL)
-    {
+  {
     cbox->clear();
     return;
-    }
+  }
 
   InitIcons();
 
@@ -294,23 +279,23 @@ void pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(
   vtkPVDataInformation* dataInfo = port->getDataInformation();
 
   if (dataInfo->DataSetTypeIsA("vtkGraph"))
-    {
+  {
     cbox->addItem(Icons[vtkDataObject::VERTEX], "Vertex", vtkDataObject::VERTEX);
-    cbox->addItem(Icons[vtkDataObject::EDGE], "Edge(s)",   vtkDataObject::EDGE);
-    }
+    cbox->addItem(Icons[vtkDataObject::EDGE], "Edge(s)", vtkDataObject::EDGE);
+  }
   else if (dataInfo->DataSetTypeIsA("vtkTable"))
-    {
+  {
     cbox->addItem(Icons[vtkDataObject::ROW], "Row(s)", vtkDataObject::ROW);
-    }
+  }
   else
-    {
-    cbox->addItem(Icons[vtkDataObject::CELL], "Cell(s)",  vtkDataObject::CELL);
+  {
+    cbox->addItem(Icons[vtkDataObject::CELL], "Cell(s)", vtkDataObject::CELL);
     cbox->addItem(Icons[vtkDataObject::POINT], "Point(s)", vtkDataObject::POINT);
-    }
+  }
 
   int index = cbox->findText(currentText);
   if (index != -1)
-    {
+  {
     cbox->setCurrentIndex(index);
-    }
+  }
 }

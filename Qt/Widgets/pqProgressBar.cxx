@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,32 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 //-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p), PreviousMessage("")
+pqProgressBar::pqProgressBar(QWidget* _p)
+  : QWidget(_p)
+  , PreviousMessage("")
 {
 
-  QGridLayout *gridlayout = new QGridLayout(this);
+  QGridLayout* gridlayout = new QGridLayout(this);
   gridlayout->setSpacing(0);
-  gridlayout->setContentsMargins(0,0,4,0);
+  gridlayout->setContentsMargins(0, 0, 4, 0);
 
   this->ProgressBar = new QProgressBar(this);
-  this->ProgressBar->setRange(0,100);
+  this->ProgressBar->setRange(0, 100);
   this->ProgressBar->setValue(0);
   this->ProgressBar->setTextVisible(false);
   this->ProgressBar->setMinimumWidth(200);
-  this->ProgressBar->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed);
+  this->ProgressBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
   this->ProgressLabel = new QLabel(this);
   this->ProgressLabel->setMinimumWidth(100);
-  this->ProgressLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
+  this->ProgressLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  gridlayout->addWidget(this->ProgressBar,0,0);
-  gridlayout->addWidget(this->ProgressLabel,0,1);
+  gridlayout->addWidget(this->ProgressBar, 0, 0);
+  gridlayout->addWidget(this->ProgressLabel, 0, 1);
   this->setLayout(gridlayout);
-
 
   this->reset();
 }
-
 
 //-----------------------------------------------------------------------------
 pqProgressBar::~pqProgressBar()
@@ -76,18 +76,18 @@ void pqProgressBar::setProgress(const QString& message, int value)
 {
   this->ProgressBar->setValue(value);
   QString msg = QString("%1: %2").arg(message, QString::number(value));
-  if ( msg.length() > this->PreviousMessage.length() )
-    {
-    //we need to get the label to be resized correctly so it fits
-    //this is trickier than it seems. By hiding it and than calling show
-    //we invalidate numerous flags which causes an ensurePolished and
+  if (msg.length() > this->PreviousMessage.length())
+  {
+    // we need to get the label to be resized correctly so it fits
+    // this is trickier than it seems. By hiding it and than calling show
+    // we invalidate numerous flags which causes an ensurePolished and
     // it also FORCES a updateGeometry. If you now a cleaner way, please
-    //change this
+    // change this
     this->ProgressLabel->hide();
-    }
+  }
   this->ProgressLabel->setText(msg);
   this->ProgressLabel->show();
-    
+
   this->PreviousMessage = msg;
 }
 

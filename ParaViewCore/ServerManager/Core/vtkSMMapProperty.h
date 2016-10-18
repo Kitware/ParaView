@@ -52,7 +52,7 @@ protected:
   ~vtkSMMapProperty();
 
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-  virtual int ReadXMLAttributes(vtkSMProxy *parent, vtkPVXMLElement *element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
 private:
   vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;

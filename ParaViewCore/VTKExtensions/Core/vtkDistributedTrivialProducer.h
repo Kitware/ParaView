@@ -61,7 +61,6 @@ private:
   void operator=(const vtkDistributedTrivialProducer&) VTK_DELETE_FUNCTION;
 
   static vtkPVTrivialProducerStaticInternal* InternalStatic;
-
 };
 
 #endif

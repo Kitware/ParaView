@@ -47,8 +47,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqLoadPaletteReaction(QAction* parent=0);
+  pqLoadPaletteReaction(QAction* parent = 0);
   virtual ~pqLoadPaletteReaction();
 
 protected:

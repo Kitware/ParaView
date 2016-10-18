@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkExtractHistogram
- * @brief   Extract histogram data (binned values) from any 
+ * @brief   Extract histogram data (binned values) from any
  * dataset
  *
  * vtkExtractHistogram accepts any vtkDataSet as input and produces a
@@ -41,7 +41,7 @@ public:
   static vtkExtractHistogram* New();
   vtkTypeMacro(vtkExtractHistogram, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Controls which input data component should be binned, for input arrays
@@ -50,7 +50,7 @@ public:
   vtkSetClampMacro(Component, int, 0, VTK_INT_MAX);
   vtkGetMacro(Component, int);
   //@}
-  
+
   //@{
   /**
    * Controls the number of bins N in the output histogram data
@@ -77,7 +77,7 @@ public:
   vtkGetMacro(UseCustomBinRanges, bool);
   vtkBooleanMacro(UseCustomBinRanges, bool);
   //@}
-  
+
   //@{
   /**
    * This option controls whether the algorithm calculates averages
@@ -88,8 +88,8 @@ public:
   vtkGetMacro(CalculateAverages, int);
   vtkBooleanMacro(CalculateAverages, int);
   //@}
-  
-protected: 
+
+protected:
   vtkExtractHistogram();
   ~vtkExtractHistogram();
 
@@ -102,24 +102,18 @@ protected:
    */
   virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
-  virtual int FillInputPortInformation (int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation *request, 
-                          vtkInformationVector **inputVector, 
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  // Initialize the bin_extents using the data range for the selected 
+  // Initialize the bin_extents using the data range for the selected
   // array.
   virtual bool InitializeBinExtents(
-    vtkInformationVector** inputVector, 
-    vtkDoubleArray* bin_extents, 
-    double& min, double& max);
+    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents, double& min, double& max);
 
   void BinAnArray(
-    vtkDataArray *src, 
-    vtkIntArray *vals, 
-    double min, double max,
-    vtkFieldData* field);
+    vtkDataArray* src, vtkIntArray* vals, double min, double max, vtkFieldData* field);
 
   void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
 
@@ -130,11 +124,11 @@ protected:
   int CalculateAverages;
 
   vtkEHInternals* Internal;
-  
+
 private:
   void operator=(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
   vtkExtractHistogram(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
-  
+
   int GetInputFieldAssociation();
   vtkFieldData* GetInputFieldData(vtkDataObject* input);
 };

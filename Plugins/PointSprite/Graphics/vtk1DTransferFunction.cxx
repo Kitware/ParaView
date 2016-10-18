@@ -32,7 +32,6 @@
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 
-
 vtk1DTransferFunction::vtk1DTransferFunction()
 {
   this->InputRange[0] = 0.0;
@@ -49,51 +48,49 @@ void vtk1DTransferFunction::MapArray(vtkDataArray* input, vtkDataArray* output)
 {
   double range[2];
   if (this->UseScalarRange)
-    {
+  {
     input->GetRange(range, this->VectorComponent);
-    }
+  }
   else
-    {
+  {
     range[0] = this->InputRange[0];
     range[1] = this->InputRange[1];
-    }
+  }
   output->SetNumberOfComponents(1);
   output->SetNumberOfTuples(input->GetNumberOfTuples());
 
   double mappedValue;
   vtkIdType index;
   for (index = 0; index < input->GetNumberOfTuples(); index++)
-    {
+  {
     double val;
     int comp = this->VectorComponent;
-    if(comp == -1 && input->GetNumberOfComponents() == 1)
-      {
+    if (comp == -1 && input->GetNumberOfComponents() == 1)
+    {
       comp = 0;
-      }
-    if (comp == -1 )
-      {
+    }
+    if (comp == -1)
+    {
       double norm2 = 0;
-      double *tuple = input->GetTuple(index);
+      double* tuple = input->GetTuple(index);
       for (int i = 0; i < input->GetNumberOfComponents(); i++)
-        {
-        norm2 += tuple[i] * tuple[i];
-        }
-      val = sqrt(norm2);
-      }
-    else
       {
-      val = input->GetTuple(index)[comp];
+        norm2 += tuple[i] * tuple[i];
       }
+      val = sqrt(norm2);
+    }
+    else
+    {
+      val = input->GetTuple(index)[comp];
+    }
     mappedValue = this->MapValue(val, range);
     output->SetTuple1(index, mappedValue);
-    }
+  }
 }
 
 void vtk1DTransferFunction::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "InputRange : " << InputRange[0] << " " << InputRange[1]
-      << endl;
+  os << indent << "InputRange : " << InputRange[0] << " " << InputRange[1] << endl;
 }
-

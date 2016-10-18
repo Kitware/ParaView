@@ -36,7 +36,8 @@
 
 class vtkPVDataInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentationTypeDomain : public vtkSMStringListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentationTypeDomain
+  : public vtkSMStringListDomain
 {
 public:
   static vtkSMRepresentationTypeDomain* New();
@@ -62,7 +63,6 @@ protected:
 private:
   vtkSMRepresentationTypeDomain(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

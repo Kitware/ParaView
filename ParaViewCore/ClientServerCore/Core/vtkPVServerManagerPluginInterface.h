@@ -45,9 +45,9 @@ public:
    * perfectly valid.
    */
   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-    GetInitializeInterpreterCallback() = 0;
+  GetInitializeInterpreterCallback() = 0;
 };
-  //@}
+//@}
 
 #endif
 

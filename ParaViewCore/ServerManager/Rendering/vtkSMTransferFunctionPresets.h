@@ -37,8 +37,8 @@
 // forward declare Json::Value
 namespace Json
 {
-  class Value;
-  class ValueConstIterator;
+class Value;
+class ValueConstIterator;
 }
 class vtkPVXMLElement;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
@@ -94,21 +94,27 @@ public:
    */
   bool GetPresetHasOpacities(const Json::Value& preset);
   bool GetPresetHasOpacities(unsigned int index)
-    { return this->GetPresetHasOpacities(this->GetPreset(index)); }
+  {
+    return this->GetPresetHasOpacities(this->GetPreset(index));
+  }
 
   /**
    * Returns true is the preset has indexed colors.
    */
   bool GetPresetHasIndexedColors(const Json::Value& preset);
   bool GetPresetHasIndexedColors(unsigned int index)
-    { return this->GetPresetHasIndexedColors(this->GetPreset(index)); }
+  {
+    return this->GetPresetHasIndexedColors(this->GetPreset(index));
+  }
 
   /**
    * Returns true is the preset has annotations.
    */
   bool GetPresetHasAnnotations(const Json::Value& preset);
   bool GetPresetHasAnnotations(unsigned int index)
-    { return this->GetPresetHasAnnotations(this->GetPreset(index)); }
+  {
+    return this->GetPresetHasAnnotations(this->GetPreset(index));
+  }
 
   /**
    * Add a preset give the Json::Value object.
@@ -119,7 +125,7 @@ public:
    * Same as AddPreset() expect it create a unique name using the prefix
    * provided. If no prefix is specified, "Preset" will be used as the prefix.
    */
-  vtkStdString AddUniquePreset(const Json::Value& preset, const char* prefix=NULL);
+  vtkStdString AddUniquePreset(const Json::Value& preset, const char* prefix = NULL);
 
   /**
    * Returns true if the preset is a builtin preset.
@@ -153,7 +159,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

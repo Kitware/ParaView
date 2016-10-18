@@ -51,7 +51,7 @@ class vtkSelectionNode;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVExtractSelection : public vtkExtractSelection
 {
 public:
-  vtkTypeMacro(vtkPVExtractSelection,vtkExtractSelection);
+  vtkTypeMacro(vtkPVExtractSelection, vtkExtractSelection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static const int OUTPUT_PORT_EXTRACTED_DATASET = 0;
@@ -61,32 +61,27 @@ public:
   /**
    * Constructor
    */
-  static vtkPVExtractSelection *New();
+  static vtkPVExtractSelection* New();
 
   /**
    * Removes all inputs from input port 1.
    */
-  void RemoveAllSelectionsInputs()
-    { this->SetInputConnection(1, 0); }
+  void RemoveAllSelectionsInputs() { this->SetInputConnection(1, 0); }
 
 protected:
   vtkPVExtractSelection();
   ~vtkPVExtractSelection();
 
-  //sets up empty output dataset
-  virtual int RequestDataObject(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector);
+  // sets up empty output dataset
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  //runs the algorithm and fills the output with results
-  virtual int RequestData(vtkInformation *,
-                  vtkInformationVector **,
-                  vtkInformationVector *);
+  // runs the algorithm and fills the output with results
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  vtkSelectionNode* LocateSelection(unsigned int level,
-    unsigned int index, vtkSelection* sel);
+  vtkSelectionNode* LocateSelection(unsigned int level, unsigned int index, vtkSelection* sel);
   vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);
 
 private:
@@ -94,13 +89,11 @@ private:
   void operator=(const vtkPVExtractSelection&) VTK_DELETE_FUNCTION;
 
   class vtkSelectionNodeVector;
-  void RequestDataInternal(vtkSelectionNodeVector& outputs,
-                           vtkDataObject* dataObjectOutput,
-                           vtkSelectionNode* sel);
+  void RequestDataInternal(
+    vtkSelectionNodeVector& outputs, vtkDataObject* dataObjectOutput, vtkSelectionNode* sel);
 
   // Returns the combined content type for the selection.
   int GetContentType(vtkSelection* sel);
-
 };
 
 #endif

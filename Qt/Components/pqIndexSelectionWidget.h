@@ -53,19 +53,18 @@ class PQCOMPONENTS_EXPORT pqIndexSelectionWidget : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqIndexSelectionWidget(vtkSMProxy *proxy, vtkSMProperty *property,
-                         QWidget* parent=0);
+  pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   virtual ~pqIndexSelectionWidget();
 
 public slots:
-  void setHeaderLabel(const QString &str);
-  void setPushPropertyName(const QByteArray &pName);
+  void setHeaderLabel(const QString& str);
+  void setPushPropertyName(const QByteArray& pName);
 
 signals:
   void widgetModified();
 
 protected slots:
-  void currentChanged(const QString &current);
+  void currentChanged(const QString& current);
   void currentChanged(int current);
   void currentChanged(); // pqLineEdit::textChangedAndEditingFinished() handler
 
@@ -80,7 +79,7 @@ protected slots:
   void updatePropertyImpl();
 
 protected:
-  bool eventFilter(QObject *obj, QEvent *e);
+  bool eventFilter(QObject* obj, QEvent* e);
   /**
   * Update the widget state from the PropertyLink Qt property.
   */
@@ -89,20 +88,20 @@ protected:
 private:
   Q_DISABLE_COPY(pqIndexSelectionWidget)
 
-  void buildWidget(vtkSMProperty *infoProp);
-  void addRow(const QString &key, int current, int size);
+  void buildWidget(vtkSMProperty* infoProp);
+  void addRow(const QString& key, int current, int size);
 
   /**
   * The names of the Qt properties used to sync with the vtkSMProperty.
   */
   QByteArray PushPropertyName;
 
-  bool PropertyUpdatePending; // Only update the property once per 250 ms.
+  bool PropertyUpdatePending;     // Only update the property once per 250 ms.
   bool IgnorePushPropertyUpdates; // don't react to our own updates.
 
-  QGroupBox *GroupBox;
-  QVBoxLayout *VBox;
-  QFormLayout *Form;
+  QGroupBox* GroupBox;
+  QVBoxLayout* VBox;
+  QFormLayout* Form;
 
   class pqInternals;
   pqInternals* Internals;

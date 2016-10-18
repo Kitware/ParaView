@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * given time. When the user changes the state of a selection property,
 * selections on other properties are cleared.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCTHArraySelectionDecorator :
-  public pqPropertyWidgetDecorator
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCTHArraySelectionDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
   pqCTHArraySelectionDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   virtual ~pqCTHArraySelectionDecorator();

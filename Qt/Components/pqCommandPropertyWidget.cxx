@@ -39,22 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqCommandPropertyWidget::pqCommandPropertyWidget(vtkSMProperty *smproperty,
-  vtkSMProxy *smproxy, QWidget *parentObject)
+pqCommandPropertyWidget::pqCommandPropertyWidget(
+  vtkSMProperty* smproperty, vtkSMProxy* smproxy, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
   if (!smproperty)
-    {
-    qCritical() <<
-      "pqCommandPropertyWidget cannot be instantiated without a vtkSMProperty";
+  {
+    qCritical() << "pqCommandPropertyWidget cannot be instantiated without a vtkSMProperty";
     return;
-    }
+  }
 
-  QPushButton *button = new QPushButton(smproperty->GetXMLLabel(), this);
+  QPushButton* button = new QPushButton(smproperty->GetXMLLabel(), this);
   button->setObjectName("PushButton");
   QObject::connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 
-  QHBoxLayout *layoutLocal = new QHBoxLayout(this);
+  QHBoxLayout* layoutLocal = new QHBoxLayout(this);
   layoutLocal->setMargin(0);
   layoutLocal->addWidget(button);
   layoutLocal->addStretch();
@@ -74,23 +73,23 @@ void pqCommandPropertyWidget::buttonClicked()
   vtkSMProxy* smproxy = this->proxy();
   vtkSMProperty* smproperty = this->property();
   if (smproperty != NULL && smproxy != NULL)
-    {
+  {
     const char* pname = smproxy->GetPropertyName(smproperty);
     if (pname)
-      {
+    {
       smproxy->InvokeCommand(pname);
 
       // Update pipeline information, if possible, otherwise, simple update
       // information properties.
       vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(smproxy);
       if (source)
-        {
+      {
         source->UpdatePipelineInformation();
-        }
+      }
       else
-        {
+      {
         smproxy->UpdatePropertyInformation();
-        }
       }
     }
+  }
 }

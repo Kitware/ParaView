@@ -43,12 +43,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum EventIds
-    {
-    RegisterRemoteObjectEvent   = 1234,
+  {
+    RegisterRemoteObjectEvent = 1234,
     UnRegisterRemoteObjectEvent = 4321,
-    ProcessingRemoteEnd         = 2143,
-    ConnectionLost              = 6789
-    };
+    ProcessingRemoteEnd = 2143,
+    ConnectionLost = 6789
+  };
 
   //---------------------------------------------------------------------------
   // Superclass Implementations
@@ -98,9 +98,8 @@ public:
    * last result after the command stream is evaluated. Once can set
    * \c ignore_errors to true, to ignore any interpreting errors.
    */
-  virtual void ExecuteStream( vtkTypeUInt32 location,
-                              const vtkClientServerStream& stream,
-                              bool ignore_errors = false );
+  virtual void ExecuteStream(
+    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false);
 
   /**
    * Returns the response of the ExecuteStream() call from the location. Note if
@@ -113,8 +112,8 @@ public:
    * Gather information about an object referred by the \c globalid.
    * \c location identifies the processes to gather the information from.
    */
-  virtual bool GatherInformation(vtkTypeUInt32 location,
-    vtkPVInformation* information, vtkTypeUInt32 globalid);
+  virtual bool GatherInformation(
+    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   //---------------------------------------------------------------------------
   // Remote communication API. This API is used for communication in the
@@ -128,18 +127,18 @@ public:
   /**
    * Sends the message to all clients.
    */
-  virtual void NotifyAllClients(const vtkSMMessage*)=0;
+  virtual void NotifyAllClients(const vtkSMMessage*) = 0;
 
   /**
    * Sends the message to all but the active client-session.
    */
-  virtual void NotifyOtherClients(const vtkSMMessage*)=0;
+  virtual void NotifyOtherClients(const vtkSMMessage*) = 0;
 
   //---------------------------------------------------------------------------
   // API dealing with/forwarded to vtkPVSessionCore dealing with SIObjects and
   // SMObjects.
   //---------------------------------------------------------------------------
-  
+
   //@{
   /**
    * Provides access to the session core.
@@ -253,8 +252,7 @@ protected:
   /**
    * Register a remote object
    */
-  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location,
-                            vtkObject* obj);
+  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location, vtkObject* obj);
 
   /**
    * Unregister a remote object
@@ -273,7 +271,6 @@ private:
   vtkPVServerInformation* LocalServerInformation;
   unsigned long ActivateObserverTag;
   unsigned long DesactivateObserverTag;
-
 };
 
 #endif

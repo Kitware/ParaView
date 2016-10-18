@@ -40,7 +40,7 @@ class vtkPVXMLElement;
 
 /**
 * pqInteractiveViewLink is uaed by pqLinksModel to create
-* interactive view links, wich are ViewLink allowing to see a view "trough" 
+* interactive view links, wich are ViewLink allowing to see a view "trough"
 * another view.
 */
 class PQCORE_EXPORT pqInteractiveViewLink : public QObject
@@ -49,8 +49,8 @@ class PQCORE_EXPORT pqInteractiveViewLink : public QObject
   typedef QObject Superclass;
 
 public:
-  pqInteractiveViewLink(pqRenderView* displayView, pqRenderView* linkedView, 
-                        double xPos = 0.375, double yPos = 0.375, double xSize = 0.25, double ySize = 0.25);
+  pqInteractiveViewLink(pqRenderView* displayView, pqRenderView* linkedView, double xPos = 0.375,
+    double yPos = 0.375, double xSize = 0.25, double ySize = 0.25);
   virtual ~pqInteractiveViewLink();
 
   // Save this interactive view link in xml node
@@ -64,7 +64,7 @@ public:
   virtual void setHideLinkedViewBackground(bool hide);
   virtual bool getHideLinkedViewBackground();
 
-protected:  
+protected:
   // Generate a correct draw method call from current situation
   // on the back buffer
   virtual void drawViewLink();
@@ -79,7 +79,7 @@ protected:
   virtual void linkedWindowRendered();
 
 protected slots:
-  
+
   // draw pixels on the front buffer
   virtual void finalRenderDisplayView();
 

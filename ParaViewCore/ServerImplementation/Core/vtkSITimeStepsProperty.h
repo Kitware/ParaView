@@ -45,7 +45,6 @@ protected:
 private:
   vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

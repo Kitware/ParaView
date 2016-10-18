@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
   typedef QWidget Superclass;
   Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 public:
-  pqTabbedMultiViewWidget(QWidget* parent=0);
+  pqTabbedMultiViewWidget(QWidget* parent = 0);
   virtual ~pqTabbedMultiViewWidget();
 
   /**
@@ -86,7 +86,7 @@ public:
   /**
   * Capture an image and saves it out to a file.
   */
-  virtual bool writeImage(const QString& filename, int width, int height, int quality=-1);
+  virtual bool writeImage(const QString& filename, int width, int height, int quality = -1);
 
   /**
   * When set to true (off by default), the widget will not allow
@@ -170,7 +170,7 @@ protected slots:
   void onLayoutNameChanged(pqServerManagerModelItem*);
 
 protected:
-  virtual bool eventFilter(QObject *obj, QEvent *event);
+  virtual bool eventFilter(QObject* obj, QEvent* event);
 
   /**
   * assigns a frame to the view.
@@ -183,6 +183,7 @@ protected:
   class pqTabWidget : public QTabWidget
   {
     typedef QTabWidget Superclass;
+
   public:
     pqTabWidget(QWidget* parentWdg = NULL);
     virtual ~pqTabWidget();
@@ -222,8 +223,7 @@ protected:
     * by user interaction.
     */
     void setReadOnly(bool val);
-    bool readOnly() const
-      { return this->ReadOnly;}
+    bool readOnly() const { return this->ReadOnly; }
 
   private:
     Q_DISABLE_COPY(pqTabWidget)

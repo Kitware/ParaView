@@ -54,7 +54,7 @@ public:
   static vtkTypeUInt32 GetReservedGlobalID();
 
   static vtkSMCollaborationManager* New();
-  vtkTypeMacro(vtkSMCollaborationManager,vtkSMRemoteObject);
+  vtkTypeMacro(vtkSMCollaborationManager, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -137,14 +137,14 @@ public:
   void UpdateUserInformations();
 
   enum EventType
-    {
+  {
     CollaborationNotification = 12345,
     UpdateUserName = 12346,
     UpdateUserList = 12347,
     UpdateMasterUser = 12348,
     FollowUserCamera = 12349,
     CameraChanged = 12350
-    };
+  };
 
   /**
    * Send message to other clients which will trigger Observer
@@ -160,7 +160,7 @@ public:
    * This method is used to either load its internal connected clients
    * informations or to forward messages across clients
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   /**
@@ -179,6 +179,5 @@ private:
 
   vtkSMCollaborationManager(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
-
 };
 #endif // #ifndef vtkSMCollaborationManager_h

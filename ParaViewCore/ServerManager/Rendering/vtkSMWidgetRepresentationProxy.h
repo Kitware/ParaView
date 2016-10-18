@@ -17,8 +17,8 @@
  * @brief   proxy for a widget representation
  *
  * vtkSMWidgetRepresentationProxy is a specialized proxy that represents
- * VTK widget representation. It adds the capability of syncing the 
- * appearance of server-side representation to the client-side 
+ * VTK widget representation. It adds the capability of syncing the
+ * appearance of server-side representation to the client-side
  * representation
 */
 

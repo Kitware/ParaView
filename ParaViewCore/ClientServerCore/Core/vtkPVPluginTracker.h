@@ -37,7 +37,7 @@ class vtkPVXMLElement;
 
 typedef bool (*vtkPluginSearchFunction)(const char*);
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT  vtkPVPluginTracker : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginTracker : public vtkObject
 {
 public:
   static vtkPVPluginTracker* New();
@@ -130,7 +130,6 @@ private:
   vtkPluginsList* PluginsList;
 
   static vtkPluginSearchFunction StaticPluginSearchFunction;
-
 };
 
 #endif

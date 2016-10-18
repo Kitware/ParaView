@@ -30,8 +30,8 @@ class vtkDataSet;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRayCastPickingHelper : public vtkObject
 {
 public:
-  static vtkPVRayCastPickingHelper *New();
-  vtkTypeMacro(vtkPVRayCastPickingHelper,vtkObject);
+  static vtkPVRayCastPickingHelper* New();
+  vtkTypeMacro(vtkPVRayCastPickingHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**

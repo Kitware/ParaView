@@ -17,8 +17,8 @@
  * @brief   filter used to generate text annotation
  * for the current project.
  *
- * vtkEnvironmentAnnotationFilter is designed to help annotate the scene with 
- * frequently needed information. 
+ * vtkEnvironmentAnnotationFilter is designed to help annotate the scene with
+ * frequently needed information.
  *
  * The variables available in the expression evaluation scope are as follows:
  * \li FileName: the name of the file that the user is working on.
@@ -34,7 +34,6 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 #include <string> //needed for iVars
-
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkEnvironmentAnnotationFilter : public vtkTableAlgorithm
 {
@@ -66,9 +65,8 @@ protected:
   ~vtkEnvironmentAnnotationFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   std::string AnnotationValue;
   std::string FileName;
@@ -84,7 +82,6 @@ private:
   bool DisplayFileName;
   bool DisplayFilePath;
   bool DisplayDate;
-
 };
 
 #endif

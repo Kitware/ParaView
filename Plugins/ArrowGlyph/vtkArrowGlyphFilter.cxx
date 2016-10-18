@@ -48,20 +48,20 @@ vtkArrowGlyphFilter::vtkArrowGlyphFilter()
   this->ScaleByOrientationVectorMagnitude = 1;
   this->OrientationVectorArray = NULL;
   //
-  this->ScaleFactor  = 1.0;
-  this->ScaleArray   = NULL;
+  this->ScaleFactor = 1.0;
+  this->ScaleArray = NULL;
   //
-  this->ShaftRadiusFactor  = 1.0;
-  this->ShaftRadiusArray   = NULL;
+  this->ShaftRadiusFactor = 1.0;
+  this->ShaftRadiusArray = NULL;
   //
-  this->TipRadiusFactor  = 1.0;
-  this->TipRadiusArray   = NULL;
+  this->TipRadiusFactor = 1.0;
+  this->TipRadiusArray = NULL;
   //
   this->MaskPoints = vtkMaskPoints::New();
   this->RandomMode = this->MaskPoints->GetRandomMode();
   this->MaximumNumberOfPoints = 5000;
-//  this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
-//    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() : 1;
+  //  this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
+  //    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() : 1;
   this->UseMaskPoints = 1;
   //
   this->SetNumberOfInputPorts(1);
@@ -72,19 +72,24 @@ vtkArrowGlyphFilter::vtkArrowGlyphFilter()
 //----------------------------------------------------------------------------
 vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
 {
-  if (this->OrientationVectorArray) {
-    delete []OrientationVectorArray;
+  if (this->OrientationVectorArray)
+  {
+    delete[] OrientationVectorArray;
   }
-  if (this->ScaleArray) {
-    delete []ScaleArray;
+  if (this->ScaleArray)
+  {
+    delete[] ScaleArray;
   }
-  if (this->ShaftRadiusArray) {
-    delete []ShaftRadiusArray;
+  if (this->ShaftRadiusArray)
+  {
+    delete[] ShaftRadiusArray;
   }
-  if (this->TipRadiusArray) {
-    delete []TipRadiusArray;
+  if (this->TipRadiusArray)
+  {
+    delete[] TipRadiusArray;
   }
-  if(this->MaskPoints) {
+  if (this->MaskPoints)
+  {
     this->MaskPoints->Delete();
   }
   this->SetArrowSourceObject(NULL);
@@ -93,24 +98,24 @@ vtkArrowGlyphFilter::~vtkArrowGlyphFilter()
 //----------------------------------------------------------------------------
 vtkMTimeType vtkArrowGlyphFilter::GetMTime()
 {
-  vtkMTimeType mTime=this->Superclass::GetMTime();
+  vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
-  if ( this->ArrowSourceObject != NULL )
-    {
-    time = this->ArrowSourceObject ->GetMTime();
-    mTime = ( time > mTime ? time : mTime );
-    }
+  if (this->ArrowSourceObject != NULL)
+  {
+    time = this->ArrowSourceObject->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
   return mTime;
 }
 
 //-----------------------------------------------------------------------------
 void vtkArrowGlyphFilter::SetRandomMode(int mode)
 {
-  if (mode==this->MaskPoints->GetRandomMode())
-    {
+  if (mode == this->MaskPoints->GetRandomMode())
+  {
     // no change
     return;
-    }
+  }
   // Store random mode to so that we don't have to call
   // MaskPoints->GetRandomMode() in tight loop.
   this->MaskPoints->SetRandomMode(mode);
@@ -127,11 +132,11 @@ int vtkArrowGlyphFilter::GetRandomMode()
 //-----------------------------------------------------------------------------
 void vtkArrowGlyphFilter::SetUseMaskPoints(int useMaskPoints)
 {
-  if (useMaskPoints==this->UseMaskPoints)
-    {
+  if (useMaskPoints == this->UseMaskPoints)
+  {
     return;
-    }
-  this->UseMaskPoints=useMaskPoints;
+  }
+  this->UseMaskPoints = useMaskPoints;
   this->Modified();
 }
 
@@ -141,52 +146,48 @@ vtkIdType vtkArrowGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
   // Although this is not perfectly process invariant, it is better
   // than we had before (divide by number of processes).
   vtkIdType totalNumPts = localNumPts;
-  vtkMultiProcessController *controller =
-    vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   if (controller)
-    {
+  {
     vtkIdType tmp;
     // This could be done much easier with MPI specific calls.
     if (controller->GetLocalProcessId() == 0)
-      {
+    {
       int i;
       // Sum points on all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
-        {
+      {
         controller->Receive(&tmp, 1, i, GlyphNPointsGather);
         totalNumPts += tmp;
-        }
+      }
       // Send results back to all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
-        {
-        controller->Send(&totalNumPts, 1,
-                         i, GlyphNPointsScatter);
-        }
-      }
-    else
       {
-      controller->Send(&localNumPts, 1,
-                       0, GlyphNPointsGather);
-      controller->Receive(&totalNumPts, 1,
-                          0, GlyphNPointsScatter);
+        controller->Send(&totalNumPts, 1, i, GlyphNPointsScatter);
       }
     }
+    else
+    {
+      controller->Send(&localNumPts, 1, 0, GlyphNPointsGather);
+      controller->Receive(&totalNumPts, 1, 0, GlyphNPointsScatter);
+    }
+  }
 
   return totalNumPts;
 }
 
 //----------------------------------------------------------------------------
 int vtkArrowGlyphFilter::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataObject   *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkDataSet    *dsInput = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet* dsInput = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  if (!dsInput) {
-    if (input) {
+  if (!dsInput)
+  {
+    if (input)
+    {
       vtkErrorMacro("This filter cannot process input of type: " << input->GetClassName());
     }
     return 0;
@@ -198,7 +199,7 @@ int vtkArrowGlyphFilter::RequestData(
   vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
 
   // What fraction of the points will this processes get allocated?
-  maxNumPts = (vtkIdType)((double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
+  maxNumPts = (vtkIdType)((double)(maxNumPts) * (double)(numPts) / (double)(totalNumPts));
 
   maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
 
@@ -213,19 +214,16 @@ int vtkArrowGlyphFilter::RequestData(
   newInInfo->Delete();
   inputVs[1] = inputVector[1];
 
-  int retVal = this->MaskAndExecute(numPts, maxNumPts, dsInput,
-    request, inputVs, outputVector);
+  int retVal = this->MaskAndExecute(numPts, maxNumPts, dsInput, request, inputVs, outputVector);
 
   inputVs[0]->Delete();
   return retVal;
 }
 
 //----------------------------------------------------------------------------
-int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
-                                     vtkDataSet* input,
-                                     vtkInformation* vtkNotUsed(request),
-                                     vtkInformationVector ** vtkNotUsed(inputVector),
-                                     vtkInformationVector *outputVector)
+int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, vtkDataSet* input,
+  vtkInformation* vtkNotUsed(request), vtkInformationVector** vtkNotUsed(inputVector),
+  vtkInformationVector* outputVector)
 
 {
   // ------
@@ -241,27 +239,22 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   this->MaskPoints->SetInputData(inputCopy);
   inputCopy->Delete();
 
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
   this->MaskPoints->SetOnRatio(numPts / maxNumPts);
 
-  vtkInformation *maskPointsInfo =
-    this->MaskPoints->GetExecutive()->GetOutputInformation(0);
-  maskPointsInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+  vtkInformation* maskPointsInfo = this->MaskPoints->GetExecutive()->GetOutputInformation(0);
+  maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-  maskPointsInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+  maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-  maskPointsInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-    outInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+  maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
   this->MaskPoints->Update();
 
   // How many points will we be glyphing (in this process)
-  vtkPoints *maskedpoints = this->MaskPoints->GetOutput()->GetPoints();
+  vtkPoints* maskedpoints = this->MaskPoints->GetOutput()->GetPoints();
   vtkIdType numMaskedPoints = maskedpoints->GetNumberOfPoints();
 
   // ------
@@ -271,17 +264,17 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   //
   // get the input and output
   //
-  vtkDataSet *minput = this->MaskPoints->GetOutput();
-  vtkPointData *inPd = minput->GetPointData();
+  vtkDataSet* minput = this->MaskPoints->GetOutput();
+  vtkPointData* inPd = minput->GetPointData();
 
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkPointData *outPd = output->GetPointData();
+  vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPointData* outPd = output->GetPointData();
 
   //
   // If no Arrow Source was supplied, instantiate a default one
   //
-  if (!this->ArrowSourceObject) {
+  if (!this->ArrowSourceObject)
+  {
     vtkSmartPointer<vtkArrowSource> arrow = this->ArrowSourceObject->NewInstance();
     this->SetArrowSourceObject(arrow);
   }
@@ -302,45 +295,54 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   internalArrow->Update();
 
   double Ashaftradius = this->ArrowSourceObject->GetShaftRadius();
-  double   Atipradius = this->ArrowSourceObject->GetTipRadius();
+  double Atipradius = this->ArrowSourceObject->GetTipRadius();
   // Not used: double   Atiplength = this->ArrowSourceObject->GetTipLength();
 
   // and get useful information from it
-  vtkPolyData *arrow = internalArrow->GetOutput();
-  vtkPoints *arrowpoints = arrow->GetPoints();
+  vtkPolyData* arrow = internalArrow->GetOutput();
+  vtkPoints* arrowpoints = arrow->GetPoints();
   vtkIdType numArrowPoints = arrowpoints->GetNumberOfPoints();
 
   //
   // Find the arrays to be used for Scale/ShaftRadius/etc
   // if not present, we will use default values based on particle size
   //
-  vtkDataArray *orientdata      = this->OrientationVectorArray ? minput->GetPointData()->GetArray(this->OrientationVectorArray) : NULL;
-  vtkDataArray *scaledata       = this->ScaleArray  ? minput->GetPointData()->GetArray(this->ScaleArray) : NULL;
-  vtkDataArray *shaftradiusdata = this->ShaftRadiusArray ? minput->GetPointData()->GetArray(this->ShaftRadiusArray) : NULL;
-  vtkDataArray *tipradiusdata   = this->TipRadiusArray ? minput->GetPointData()->GetArray(this->TipRadiusArray) : NULL;
-  bool orientMagnitude      = false;
+  vtkDataArray* orientdata = this->OrientationVectorArray
+    ? minput->GetPointData()->GetArray(this->OrientationVectorArray)
+    : NULL;
+  vtkDataArray* scaledata =
+    this->ScaleArray ? minput->GetPointData()->GetArray(this->ScaleArray) : NULL;
+  vtkDataArray* shaftradiusdata =
+    this->ShaftRadiusArray ? minput->GetPointData()->GetArray(this->ShaftRadiusArray) : NULL;
+  vtkDataArray* tipradiusdata =
+    this->TipRadiusArray ? minput->GetPointData()->GetArray(this->TipRadiusArray) : NULL;
+  bool orientMagnitude = false;
   bool shaftradiusMagnitude = false;
-  bool tipradiusMagnitude   = false;
-  bool scaleMagnitude       = false;
+  bool tipradiusMagnitude = false;
+  bool scaleMagnitude = false;
   //
-  if (orientdata && this->ScaleByOrientationVectorMagnitude) {
+  if (orientdata && this->ScaleByOrientationVectorMagnitude)
+  {
     orientMagnitude = true;
   }
-  if (shaftradiusdata && shaftradiusdata->GetNumberOfComponents()==3) {
+  if (shaftradiusdata && shaftradiusdata->GetNumberOfComponents() == 3)
+  {
     shaftradiusMagnitude = true;
   }
-  if (tipradiusdata && tipradiusdata->GetNumberOfComponents()==3) {
+  if (tipradiusdata && tipradiusdata->GetNumberOfComponents() == 3)
+  {
     tipradiusMagnitude = true;
   }
-  if (scaledata && scaledata->GetNumberOfComponents()==3) {
+  if (scaledata && scaledata->GetNumberOfComponents() == 3)
+  {
     scaleMagnitude = true;
   }
 
   // we know the output will require NumPoints in Arrow * NumPoints in MaskPoints
   // so we can pre-allocate the output space.
   vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
-  newPoints->Allocate(numArrowPoints*numMaskedPoints);
-  outPd->CopyAllocate(inPd, numArrowPoints*numMaskedPoints);
+  newPoints->Allocate(numArrowPoints * numMaskedPoints);
+  outPd->CopyAllocate(inPd, numArrowPoints * numMaskedPoints);
 
   // Setting up for calls to PolyData::InsertNextCell()
   output->Allocate(numArrowPoints * arrow->GetNumberOfCells() * 3, 5000);
@@ -349,83 +351,100 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
 
   // track pt, cell increments for copying old point data into new geometry
-  vtkIdType ptIncr=0;
+  vtkIdType ptIncr = 0;
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
   pts->Allocate(VTK_CELL_SIZE);
 
   //
   // Loop over all our points and do the actual glyphing
   //
-  for (vtkIdType i=0; i<numMaskedPoints; i++) {
+  for (vtkIdType i = 0; i < numMaskedPoints; i++)
+  {
 
     // The variables we use to control each individual glyph
-    double   sradius = 1.0;
-    double   tradius = 1.0;
-    double     scale = 1.0;
-    double      vMag = 0.0;
-    double *orientvector = NULL;
+    double sradius = 1.0;
+    double tradius = 1.0;
+    double scale = 1.0;
+    double vMag = 0.0;
+    double* orientvector = NULL;
 
     // update progress bar
-    if ( ! (i % 10000) ) {
-      this->UpdateProgress(static_cast<double>(i)/numArrowPoints);
-      if (this->GetAbortExecute()) {
+    if (!(i % 10000))
+    {
+      this->UpdateProgress(static_cast<double>(i) / numArrowPoints);
+      if (this->GetAbortExecute())
+      {
         break;
       }
     }
 
-/* // @TODO fix parallel ghost cell skipping of points
+    /* // @TODO fix parallel ghost cell skipping of points
 
-    // Check ghost points.
-    // If we are processing a piece, we do not want to duplicate
-    // glyphs on the borders.  The corrct check here is:
-    // ghostLevel > 0.  I am leaving this over glyphing here because
-    // it make a nice example (sphereGhost.tcl) to show the
-    // point ghost levels with the glyph filter.  I am not certain
-    // of the usefullness of point ghost levels over 1, but I will have
-    // to think about it.
-    if (inGhostLevels && inGhostLevels[inPtId] > requestedGhostLevel) {
-      continue;
-    }
+        // Check ghost points.
+        // If we are processing a piece, we do not want to duplicate
+        // glyphs on the borders.  The corrct check here is:
+        // ghostLevel > 0.  I am leaving this over glyphing here because
+        // it make a nice example (sphereGhost.tcl) to show the
+        // point ghost levels with the glyph filter.  I am not certain
+        // of the usefullness of point ghost levels over 1, but I will have
+        // to think about it.
+        if (inGhostLevels && inGhostLevels[inPtId] > requestedGhostLevel) {
+          continue;
+        }
 
-    if (!this->IsPointVisible(input, inPtId)) {
-      continue;
-      }
-*/
+        if (!this->IsPointVisible(input, inPtId)) {
+          continue;
+          }
+    */
 
     // Get Input point
-    double *x = maskedpoints->GetPoint(i);
+    double* x = maskedpoints->GetPoint(i);
 
     // translate to Input point
     trans->Identity();
     trans->Translate(x[0], x[1], x[2]);
 
-    if (orientdata) {
+    if (orientdata)
+    {
       orientvector = orientdata->GetTuple3(i);
       vMag = vtkMath::Norm(orientvector);
     }
-    if (tipradiusdata) {
-      if (!tipradiusMagnitude) tradius = tipradiusdata->GetTuple1(i);
-      else tradius = vtkMath::Norm(tipradiusdata->GetTuple3(i));
+    if (tipradiusdata)
+    {
+      if (!tipradiusMagnitude)
+        tradius = tipradiusdata->GetTuple1(i);
+      else
+        tradius = vtkMath::Norm(tipradiusdata->GetTuple3(i));
     }
-    if (shaftradiusdata) {
-      if (!shaftradiusMagnitude) sradius = shaftradiusdata->GetTuple1(i);
-      else sradius = vtkMath::Norm(shaftradiusdata->GetTuple3(i));
+    if (shaftradiusdata)
+    {
+      if (!shaftradiusMagnitude)
+        sradius = shaftradiusdata->GetTuple1(i);
+      else
+        sradius = vtkMath::Norm(shaftradiusdata->GetTuple3(i));
     }
-    if (scaledata) {
-      if (!scaleMagnitude) scale = scaledata->GetTuple1(i);
-      else scale = vtkMath::Norm(scaledata->GetTuple3(i));
+    if (scaledata)
+    {
+      if (!scaleMagnitude)
+        scale = scaledata->GetTuple1(i);
+      else
+        scale = vtkMath::Norm(scaledata->GetTuple3(i));
     }
 
     double vNew[3];
-    if (vMag > 0.0) {
+    if (vMag > 0.0)
+    {
       // if there is no y or z component
-      if ( orientvector[1] == 0.0 && orientvector[2] == 0.0 ) {
-        if (orientvector[0] < 0) { // just flip x if we need to
+      if (orientvector[1] == 0.0 && orientvector[2] == 0.0)
+      {
+        if (orientvector[0] < 0)
+        { // just flip x if we need to
           trans->RotateWXYZ(180.0, 0, 1, 0);
         }
       }
-      else {
-        vNew[0] = (orientvector[0]+vMag) / 2.0;
+      else
+      {
+        vNew[0] = (orientvector[0] + vMag) / 2.0;
         vNew[1] = orientvector[1] / 2.0;
         vNew[2] = orientvector[2] / 2.0;
         trans->RotateWXYZ(180.0, vNew[0], vNew[1], vNew[2]);
@@ -433,16 +452,18 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
     }
 
     // Overall glyph scaling is combined from ...
-    if (orientMagnitude) {
+    if (orientMagnitude)
+    {
       scale = this->ScaleFactor * vMag * scale;
     }
-    else {
+    else
+    {
       scale = this->ScaleFactor * scale;
     }
-    trans->Scale(scale,scale,scale);
+    trans->Scale(scale, scale, scale);
     //
-    internalArrow->SetShaftRadius(Ashaftradius*sradius*this->ShaftRadiusFactor);
-    internalArrow->SetTipRadius(Atipradius*tradius*this->TipRadiusFactor);
+    internalArrow->SetShaftRadius(Ashaftradius * sradius * this->ShaftRadiusFactor);
+    internalArrow->SetTipRadius(Atipradius * tradius * this->TipRadiusFactor);
     internalArrow->Update();
 
     // pointers may have changed, so refresh them here before copying
@@ -451,24 +472,27 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
     numArrowPoints = arrowpoints->GetNumberOfPoints();
 
     // transform the arrow point to correct glyph position/orientation
-    trans->TransformPoints(arrowpoints,newPoints);
+    trans->TransformPoints(arrowpoints, newPoints);
 
     // for each arrow point, copy original input point
-    for (int a=0; a<numArrowPoints; a++) {
-      outPd->CopyData(inPd, i, ptIncr+a);
+    for (int a = 0; a < numArrowPoints; a++)
+    {
+      outPd->CopyData(inPd, i, ptIncr + a);
     }
 
     // Copy all topology (transformation independent)
     int numArrowCells = arrow->GetNumberOfCells();
-    for (vtkIdType cellId=0; cellId<numArrowCells; cellId++) {
-      vtkCell      *cell = arrow->GetCell(cellId);
-      vtkIdList *cellPts = cell->GetPointIds();
+    for (vtkIdType cellId = 0; cellId < numArrowCells; cellId++)
+    {
+      vtkCell* cell = arrow->GetCell(cellId);
+      vtkIdList* cellPts = cell->GetPointIds();
       pts->Reset();
       int npts = cellPts->GetNumberOfIds();
-      for (int p=0; p<npts; p++) {
+      for (int p = 0; p < npts; p++)
+      {
         pts->InsertId(p, cellPts->GetId(p) + ptIncr);
       }
-      output->InsertNextCell(cell->GetCellType(),pts);
+      output->InsertNextCell(cell->GetCellType(), pts);
     }
 
     ptIncr += numArrowPoints;
@@ -477,35 +501,31 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   return 1;
 }
 
-
-int vtkArrowGlyphFilter::RequestUpdateExtent(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+int vtkArrowGlyphFilter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
   inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
 
   return 1;
 }
 
-
 //----------------------------------------------------------------------------
-int vtkArrowGlyphFilter::FillInputPortInformation(int port, vtkInformation *info)
+int vtkArrowGlyphFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (port == 0)
-    {
+  {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
     return 1;
-    }
+  }
   return 0;
 }

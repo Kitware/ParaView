@@ -27,9 +27,9 @@
 #ifndef vtkPartitionOrderingInterface_h
 #define vtkPartitionOrderingInterface_h
 
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkObject.h"
-#include "vtkSmartPointer.h" // For automatic reference counting
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkSmartPointer.h"                   // For automatic reference counting
 
 class vtkDataSet;
 class vtkIntArray;
@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkPartitionOrderingInterface, vtkObject);
 
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPartitionOrderingInterface *New();
+  static vtkPartitionOrderingInterface* New();
 
   // the number of processes
   int GetNumberOfRegions();
@@ -53,8 +53,8 @@ public:
    * of processes. The return value is the number of processes.
    * \pre orderedList_exists: orderedList!=0
    */
-  int ViewOrderAllProcessesInDirection(const double directionOfProjection[3],
-                                       vtkIntArray *orderedList);
+  int ViewOrderAllProcessesInDirection(
+    const double directionOfProjection[3], vtkIntArray* orderedList);
 
   /**
    * Return a list of all processes in order from front to back given a
@@ -63,8 +63,7 @@ public:
    * of processes. The return value is the number of processes.
    * \pre orderedList_exists: orderedList!=0
    */
-  int ViewOrderAllProcessesFromPosition(const double cameraPosition[3],
-                                        vtkIntArray *orderedList);
+  int ViewOrderAllProcessesFromPosition(const double cameraPosition[3], vtkIntArray* orderedList);
 
   //@{
   /**
@@ -72,10 +71,7 @@ public:
    * are vtkPKdTree and vtkPartitionOrdering.
    */
   void SetImplementation(vtkObject* implementation);
-  vtkObject* GetImplementation()
-  {
-    return this->Implementation;
-  }
+  vtkObject* GetImplementation() { return this->Implementation; }
   //@}
 
   virtual vtkMTimeType GetMTime();

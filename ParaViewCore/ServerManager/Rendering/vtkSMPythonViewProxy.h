@@ -63,7 +63,6 @@ protected:
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // vtkSMPythonViewProxy_h

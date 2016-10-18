@@ -29,24 +29,24 @@ class VTK_EXPORT vtkUncertaintySurfaceRepresentation : public vtkGeometryReprese
 {
 public:
   static vtkUncertaintySurfaceRepresentation* New();
-  vtkTypeMacro(vtkUncertaintySurfaceRepresentation, vtkGeometryRepresentation)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkUncertaintySurfaceRepresentation, vtkGeometryRepresentation) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
   // Description:
   // Select the uncertainty array.
-  void SelectUncertaintyArray(int, int, int, int, const char *name)
+  void SelectUncertaintyArray(int, int, int, int, const char* name)
   {
     this->SetUncertaintyArray(name);
   }
 
   // Description:
   // Set/get the uncertainty array name.
-  void SetUncertaintyArray(const char *name);
+  void SetUncertaintyArray(const char* name);
   const char* GetUncertaintyArray() const;
 
   // Description:
   // Set/get the uncertainty transfer function.
-  void SetUncertaintyTransferFunction(vtkPiecewiseFunction *function);
+  void SetUncertaintyTransferFunction(vtkPiecewiseFunction* function);
   vtkPiecewiseFunction* GetUncertaintyTransferFunction() const;
 
   // Description:
@@ -65,7 +65,7 @@ protected:
   void UpdateColoringParameters();
 
 private:
-  vtkUncertaintySurfacePainter *Painter;
+  vtkUncertaintySurfacePainter* Painter;
 };
 
 #endif // vtkUncertaintySurfaceRepresentation_h

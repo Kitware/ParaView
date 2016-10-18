@@ -34,14 +34,13 @@ vtkPExtractTemporalFieldData::~vtkPExtractTemporalFieldData()
 }
 
 //----------------------------------------------------------------------------
-int vtkPExtractTemporalFieldData::RequestData(vtkInformation *request,
-    vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkPExtractTemporalFieldData::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (this->Controller == NULL
-    || this->Controller->GetLocalProcessId() == 0)
-    {
+  if (this->Controller == NULL || this->Controller->GetLocalProcessId() == 0)
+  {
     return this->Superclass::RequestData(request, inputVector, outputVector);
-    }
+  }
 
   // On all other ranks, we do nothing, except it both input & output are
   // composite datasets. In that case, we copy structure to avoid composite data
@@ -49,9 +48,9 @@ int vtkPExtractTemporalFieldData::RequestData(vtkInformation *request,
   vtkCompositeDataSet* input = vtkCompositeDataSet::GetData(inputVector[0], 0);
   vtkCompositeDataSet* output = vtkCompositeDataSet::GetData(outputVector, 0);
   if (input && output)
-    {
+  {
     output->CopyStructure(input);
-    }
+  }
   return 1;
 }
 

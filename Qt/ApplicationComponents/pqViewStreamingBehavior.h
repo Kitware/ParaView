@@ -55,8 +55,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewStreamingBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqViewStreamingBehavior(QObject* parent=0);
+  pqViewStreamingBehavior(QObject* parent = 0);
   virtual ~pqViewStreamingBehavior();
 
   /**

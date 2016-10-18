@@ -68,14 +68,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
   Q_PROPERTY(QList<QVariant> sceneTimeSteps READ sceneTimeSteps WRITE setSceneTimeSteps)
   Q_PROPERTY(int sceneNumberOfFrames READ sceneNumberOfFrames WRITE setSceneNumberOfFrames)
   Q_PROPERTY(QList<QVariant> timeSources READ timeSources WRITE setTimeSources)
-  Q_PROPERTY(QList<QVariant> suppressedTimeSources READ suppressedTimeSources
-    WRITE setSuppressedTimeSources)
-  Q_PROPERTY(double sceneCurrentTime READ sceneCurrentTime WRITE setSceneCurrentTime
-    NOTIFY sceneCurrentTimeChanged)
+  Q_PROPERTY(
+    QList<QVariant> suppressedTimeSources READ suppressedTimeSources WRITE setSuppressedTimeSources)
+  Q_PROPERTY(double sceneCurrentTime READ sceneCurrentTime WRITE setSceneCurrentTime NOTIFY
+      sceneCurrentTimeChanged)
 
   typedef QWidget Superclass;
+
 public:
-  pqTimeInspectorWidget(QWidget* parent=0);
+  pqTimeInspectorWidget(QWidget* parent = 0);
   virtual ~pqTimeInspectorWidget();
 
   /**
@@ -140,7 +141,7 @@ public slots:
   /**
   * set the active server.
   */
-  void setServer(pqServer*server);
+  void setServer(pqServer* server);
 
   /**
   * set the current time for the scene.

@@ -61,8 +61,9 @@ class PQCOMPONENTS_EXPORT pqProxiesWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqProxiesWidget(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqProxiesWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqProxiesWidget();
 
 public slots:
@@ -74,10 +75,8 @@ public slots:
   /**
   * Add the widgets for a proxy.
   */
-  void addProxy(vtkSMProxy*,
-    const QString& componentName=QString(),
-    const QStringList& properties=QStringList(),
-    bool applyChangesImmediately=false);
+  void addProxy(vtkSMProxy*, const QString& componentName = QString(),
+    const QStringList& properties = QStringList(), bool applyChangesImmediately = false);
 
   /**
   * Call this method once after all proxies have been added (or after clear)
@@ -91,8 +90,7 @@ public slots:
   * result in the panel showing all the non-advanced properties.
   * Returns true, if any widgets were shown.
   */
-  bool filterWidgets(
-    bool show_advanced=false, const QString& filterText=QString());
+  bool filterWidgets(bool show_advanced = false, const QString& filterText = QString());
 
   /**
   * Accepts the property widget changes changes.

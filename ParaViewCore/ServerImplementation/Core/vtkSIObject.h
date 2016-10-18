@@ -34,7 +34,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIObject : public vtkObject
 {
 public:
   static vtkSIObject* New();
-  vtkTypeMacro(vtkSIObject,vtkObject);
+  vtkTypeMacro(vtkSIObject, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -43,7 +43,7 @@ public:
    * a first pass on all SIObject with a AboutToDelete() we can simply delete the
    * remaining SIObjects.
    */
-  virtual void AboutToDelete() {};
+  virtual void AboutToDelete(){};
 
   /**
    * Initializes the instance. Session is the session to which this instance
@@ -100,10 +100,10 @@ protected:
   vtkSMMessage* LastPushedMessage;
 
   vtkTypeUInt32 GlobalID;
+
 private:
   vtkSIObject(const vtkSIObject&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIObject&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // #ifndef vtkSIObject_h

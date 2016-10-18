@@ -27,7 +27,8 @@
 #include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy
+  : public vtkSIProxy
 {
 public:
   static vtkSIUnstructuredGridVolumeRepresentationProxy* New();
@@ -43,11 +44,10 @@ protected:
    */
   bool CreateVTKObjects() VTK_OVERRIDE;
 
-
 private:
-  vtkSIUnstructuredGridVolumeRepresentationProxy(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSIUnstructuredGridVolumeRepresentationProxy(
+    const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

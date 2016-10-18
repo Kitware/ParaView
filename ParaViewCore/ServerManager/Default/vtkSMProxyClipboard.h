@@ -71,8 +71,7 @@ public:
   /**
    * Clears the clipboard. Same as calling Copy(NULL).
    */
-  void Clear()
-    { this->Copy(NULL); }
+  void Clear() { this->Copy(NULL); }
 
 protected:
   vtkSMProxyClipboard();
@@ -85,7 +84,6 @@ private:
   void operator=(const vtkSMProxyClipboard&) VTK_DELETE_FUNCTION;
 
   vtkSMProxyClipboardInternals* Internals;
-
 };
 
 #endif

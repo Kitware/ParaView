@@ -51,114 +51,111 @@ public:
   bool Visible;
 
   enum
-    {
+  {
     VISIBILITY,
     ENABLED_STATE
-    } Mode;
+  } Mode;
 
   pqInternals()
-    : Inverse(false),
-    Enabled(true),
-    Visible(true),
-    Mode(ENABLED_STATE)
+    : Inverse(false)
+    , Enabled(true)
+    , Visible(true)
+    , Mode(ENABLED_STATE)
   {
   }
 
   bool valueMatch()
-    {
+  {
     vtkSMUncheckedPropertyHelper helper(this->Property);
     if (helper.GetNumberOfElements() == 0)
-      {
+    {
       // if there is no proxy, 'its value' does not match this->Value.
       bool status = false;
-      return this->Inverse ? ! status : status;
-      }
+      return this->Inverse ? !status : status;
+    }
     if (helper.GetNumberOfElements() != 1)
-      {
+    {
       qCritical() << "pqGenericPropertyWidgetDecorator may not work as expected.";
       // currently, we only support 1 element properties.
       return false;
-      }
+    }
 
     if (vtkSMProxyProperty::SafeDownCast(this->Property))
-      {
-      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-        this->Property->FindDomain("vtkSMProxyListDomain"));
+    {
+      vtkSMProxyListDomain* pld =
+        vtkSMProxyListDomain::SafeDownCast(this->Property->FindDomain("vtkSMProxyListDomain"));
       if (!pld)
-        {
+      {
         qCritical() << "ProxyProperty without vtkSMProxyListDomain is not supported. "
-          << "pqGenericPropertyWidgetDecorator may not work as expected.";
+                    << "pqGenericPropertyWidgetDecorator may not work as expected.";
         return false;
-        }
-
-      bool status = (helper.GetAsProxy(0) &&
-        (helper.GetAsProxy(0)->GetXMLName() == this->Value));
-      return this->Inverse? !status :  status;
       }
+
+      bool status = (helper.GetAsProxy(0) && (helper.GetAsProxy(0)->GetXMLName() == this->Value));
+      return this->Inverse ? !status : status;
+    }
 
     vtkVariant val = helper.GetAsVariant(0);
     bool status = (val.ToString() == this->Value);
-    return this->Inverse? !status : status;
-    }
+    return this->Inverse ? !status : status;
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject),
-  Internals(new pqGenericPropertyWidgetDecorator::pqInternals())
+  : Superclass(config, parentObject)
+  , Internals(new pqGenericPropertyWidgetDecorator::pqInternals())
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
   Q_ASSERT(proxy != NULL);
 
   const char* propertyName = config->GetAttribute("property");
   if (propertyName == NULL || proxy->GetProperty(propertyName) == NULL)
-    {
+  {
     // this can happen with compound proxies. In which case, silently ignore.
     // qCritical() << "Invalid property='" << (propertyName? propertyName : "(null)")
     //  << "' specified in the configuration.";
     return;
-    }
+  }
 
   this->Internals->Property = proxy->GetProperty(propertyName);
   if (vtkSMUncheckedPropertyHelper(this->Internals->Property).GetNumberOfElements() > 1)
-    {
+  {
     qCritical() << "pqGenericPropertyWidgetDecorator currently only supports "
-      "single valued properties";
+                   "single valued properties";
     return;
-    }
+  }
 
   const char* value = config->GetAttribute("value");
   if (value == NULL)
-    {
+  {
     qCritical() << "Missing 'value' in the specified configuration.";
     return;
-    }
+  }
   this->Internals->Value = value;
 
   const char* mode = config->GetAttribute("mode");
   if (mode && strcmp(mode, "visibility") == 0)
-    {
+  {
     this->Internals->Mode = pqInternals::VISIBILITY;
-    }
+  }
   else if (mode && strcmp(mode, "enabled_state") == 0)
-    {
+  {
     this->Internals->Mode = pqInternals::ENABLED_STATE;
-    }
+  }
   else
-    {
-    qCritical() << "Invalid mode: " << (mode? mode : "(null)");
+  {
+    qCritical() << "Invalid mode: " << (mode ? mode : "(null)");
     return;
-    }
+  }
 
-  if (config->GetAttribute("inverse") &&
-    strcmp(config->GetAttribute("inverse"), "1") == 0)
-    {
+  if (config->GetAttribute("inverse") && strcmp(config->GetAttribute("inverse"), "1") == 0)
+  {
     this->Internals->Inverse = true;
-    }
+  }
 
-  pqCoreUtilities::connect(
-    this->Internals->Property, vtkCommand::UncheckedPropertyModifiedEvent,
+  pqCoreUtilities::connect(this->Internals->Property, vtkCommand::UncheckedPropertyModifiedEvent,
     this, SLOT(updateState()));
   this->updateState();
 }
@@ -172,24 +169,24 @@ pqGenericPropertyWidgetDecorator::~pqGenericPropertyWidgetDecorator()
 void pqGenericPropertyWidgetDecorator::updateState()
 {
   if (this->Internals->Property == NULL || this->parentWidget() == NULL)
-    {
+  {
     return;
-    }
+  }
 
   bool valueMatch = this->Internals->valueMatch();
 
   switch (this->Internals->Mode)
-    {
-  case pqInternals::ENABLED_STATE:
-    this->Internals->Enabled = valueMatch;
-    emit this->enableStateChanged();
-    break;
+  {
+    case pqInternals::ENABLED_STATE:
+      this->Internals->Enabled = valueMatch;
+      emit this->enableStateChanged();
+      break;
 
-  case pqInternals::VISIBILITY:
-    this->Internals->Visible = valueMatch;
-    emit this->visibilityChanged();
-    break;
-    }
+    case pqInternals::VISIBILITY:
+      this->Internals->Visible = valueMatch;
+      emit this->visibilityChanged();
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------

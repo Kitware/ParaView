@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -48,8 +48,9 @@ class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 {
   Q_OBJECT
   typedef QAbstractItemModel Superclass;
+
 public:
-  pqSILModel(QObject* parent=0);
+  pqSILModel(QObject* parent = 0);
   virtual ~pqSILModel();
 
   /**
@@ -63,7 +64,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -72,7 +73,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -81,7 +82,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex &parent=QModelIndex()) const;
+  virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -92,8 +93,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column,
-      const QModelIndex &parent=QModelIndex()) const;
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -102,7 +102,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex &index) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -112,8 +112,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex &index,
-      int role=Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   /**
   * \brief
@@ -125,17 +124,16 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
 
   /**
   * \brief
-  *  Sets the role data for the item at index to value. Returns 
+  *  Sets the role data for the item at index to value. Returns
   *  true if successful; otherwise returns false.
   */
-  bool setData(const QModelIndex &index, const QVariant& value, 
-    int role = Qt::EditRole);
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   //@}
-  
+
   /**
   * Returns the QModelIndex for the hierarchy with the given name, if present.
   * If the hierarchy is not present an index referring to an empty tree will
@@ -143,14 +141,14 @@ public:
   */
   QModelIndex hierarchyIndex(const QString& hierarchyName) const;
 
-  virtual QVariant headerData (int, Qt::Orientation, int role = Qt::DisplayRole ) const
-    {
+  virtual QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const
+  {
     if (role == Qt::DisplayRole)
-      {
+    {
       return "Selections";
-      }
-    return QVariant();
     }
+    return QVariant();
+  }
 
   /**
   * API to get/set status of a given hierarchy.
@@ -183,8 +181,7 @@ protected:
   * Called every time vtkSMSILModel tells us that the check state has changed.
   * We fire the dataChanged() event so that the view updates.
   */
-  void checkStateUpdated(vtkObject* caller,
-    unsigned long eventid, void* calldata);
+  void checkStateUpdated(vtkObject* caller, unsigned long eventid, void* calldata);
 
   /**
   * Returns if the given vertex id refers to a leaf node.
@@ -213,7 +210,7 @@ protected:
   /**
   * Cache used by makeIndex() to avoid iterating over the edges each time.
   */
-  QMap<vtkIdType, QModelIndex> *ModelIndexCache;
+  QMap<vtkIdType, QModelIndex>* ModelIndexCache;
 
   QMap<QString, QModelIndex> Hierarchies;
 
@@ -229,5 +226,3 @@ private:
 };
 
 #endif
-
-

@@ -20,7 +20,7 @@
  * inputs to a filter (through vtkSMProxy). It is a special property that
  * always calls AddInput on a vtkSMSourceProxy.
  * The xml configuration for input proxy supports the following attributes:
- * multiple_input: For an input port that connects multiple connections 
+ * multiple_input: For an input port that connects multiple connections
  * such as the input of an append filter. port_index: The input port to
  * be used.
  * @sa
@@ -61,20 +61,18 @@ public:
    * can be removed with RemoveXXX() methods as usual.
    */
   void AddInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
-  void SetInputConnection(
-    unsigned int idx, vtkSMProxy* proxy, unsigned int outputPort);
+  void SetInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int outputPort);
   //@}
 
   void AddUncheckedInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
-  void SetUncheckedInputConnection(
-    unsigned int idx, vtkSMProxy* proxy, unsigned int inputPort);
+  void SetUncheckedInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int inputPort);
 
   //@{
   /**
    * Sets the value of the property to the list of proxies specified.
    */
-  virtual void SetProxies(unsigned int numElements,
-    vtkSMProxy* proxies[], unsigned int outputports[]);
+  virtual void SetProxies(
+    unsigned int numElements, vtkSMProxy* proxies[], unsigned int outputports[]);
   using Superclass::SetProxies;
   //@}
 
@@ -109,11 +107,11 @@ protected:
   /**
    * Fill state property/proxy XML element with output port attribute
    */
-  virtual vtkPVXMLElement* AddProxyElementState(
-    vtkPVXMLElement *propertyElement, unsigned int idx);
+  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement* propertyElement, unsigned int idx);
 
   int MultipleInput;
   int PortIndex;
+
 private:
   vtkSMInputProperty(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;

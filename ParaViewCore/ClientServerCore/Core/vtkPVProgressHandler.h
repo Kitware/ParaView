@@ -107,11 +107,11 @@ protected:
   ~vtkPVProgressHandler();
 
   enum eTAGS
-    {
+  {
     CLEANUP_TAG = 188969,
     PROGRESS_EVENT_TAG = 188970,
     MESSAGE_EVENT_TAG = 188971
-    };
+  };
 
   //@{
   void RefreshProgress(const char* progress_text, double progress);
@@ -120,6 +120,7 @@ protected:
 
   vtkPVSession* Session;
   double ProgressFrequency;
+
 private:
   vtkPVProgressHandler(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
@@ -149,7 +150,6 @@ private:
 
   vtkSetStringMacro(LastMessage);
   char* LastMessage;
-
 };
 
 #endif

@@ -76,8 +76,7 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->ArrayToRadiusFilter->SetOutputArrayName("ArrayMappedToRadius");
   this->ArrayToRadiusFilter->SetForceSameTypeAsInputArray(0);
   this->ArrayToRadiusFilter->SetOutputArrayType(VTK_FLOAT);
-  this->ArrayToRadiusFilter->SetTransferFunction(
-    this->RadiusTransferFunctionChooser);
+  this->ArrayToRadiusFilter->SetTransferFunction(this->RadiusTransferFunctionChooser);
   this->RadiusTransferFunctionChooser->SetGaussianTransferFunction(
     this->RadiusGaussianTransferFunction);
   this->RadiusTransferFunctionChooser->SetLookupTableTransferFunction(
@@ -88,8 +87,7 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->ArrayToOpacityFilter->SetOutputArrayName("ArrayMappedToOpacity");
   this->ArrayToOpacityFilter->SetForceSameTypeAsInputArray(0);
   this->ArrayToOpacityFilter->SetOutputArrayType(VTK_FLOAT);
-  this->ArrayToOpacityFilter->SetTransferFunction(
-    this->OpacityTransferFunctionChooser);
+  this->ArrayToOpacityFilter->SetTransferFunction(this->OpacityTransferFunctionChooser);
   this->OpacityTransferFunctionChooser->SetGaussianTransferFunction(
     this->OpacityGaussianTransferFunction);
   this->OpacityTransferFunctionChooser->SetLookupTableTransferFunction(
@@ -102,15 +100,11 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->ScalarsToColorsPainter->SetEnableOpacity(0);
   this->LODScalarsToColorsPainter->SetEnableOpacity(0);
 
-  this->PointSpriteDefaultPainter->SetScalarsToColorsPainter(
-    this->ScalarsToColorsPainter);
-  this->PointSpriteDefaultPainter->SetDepthSortPainter(
-    this->DepthSortPainter);
+  this->PointSpriteDefaultPainter->SetScalarsToColorsPainter(this->ScalarsToColorsPainter);
+  this->PointSpriteDefaultPainter->SetDepthSortPainter(this->DepthSortPainter);
 
-  this->LODPointSpriteDefaultPainter->SetScalarsToColorsPainter(
-    this->LODScalarsToColorsPainter);
-  this->LODPointSpriteDefaultPainter->SetDepthSortPainter(
-    this->LODDepthSortPainter);
+  this->LODPointSpriteDefaultPainter->SetScalarsToColorsPainter(this->LODScalarsToColorsPainter);
+  this->LODPointSpriteDefaultPainter->SetDepthSortPainter(this->LODDepthSortPainter);
 
   vtkCompositePolyDataMapper2* compositeMapper =
     vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
@@ -118,17 +112,14 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
     compositeMapper->GetPainter()->GetDelegatePainter());
   compositeMapper->SetPainter(this->PointSpriteDefaultPainter);
 
-  compositeMapper = vtkCompositePolyDataMapper2::SafeDownCast
-    (this->LODMapper);
+  compositeMapper = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper);
   this->LODPointSpriteDefaultPainter->SetDelegatePainter(
     compositeMapper->GetPainter()->GetDelegatePainter());
   compositeMapper->SetPainter(this->LODPointSpriteDefaultPainter);
 
   // change the pipeline setup by the superclass to insert our filters in it.
-  this->ArrayToRadiusFilter->SetInputConnection(
-    this->CacheKeeper->GetInputConnection(0, 0));
-  this->ArrayToOpacityFilter->SetInputConnection(
-    this->ArrayToRadiusFilter->GetOutputPort());
+  this->ArrayToRadiusFilter->SetInputConnection(this->CacheKeeper->GetInputConnection(0, 0));
+  this->ArrayToOpacityFilter->SetInputConnection(this->ArrayToRadiusFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->ArrayToOpacityFilter->GetOutputPort());
 
   // Setup default textures.
@@ -190,9 +181,9 @@ void vtkPointSpriteRepresentation::SetTexture(vtkTexture* texture)
 {
   this->SetTextureInternal(texture);
   if (this->RenderMode == vtkPointSpriteProperty::TexturedSprite)
-    {
+  {
     this->Superclass::SetTexture(texture);
-    }
+  }
   // Don't override the this->Actor->Texture unless the user wants to use a
   // custom texture.
 }
@@ -232,26 +223,25 @@ void vtkPointSpriteRepresentation::SetOpacityArrayToProcess(
 void vtkPointSpriteRepresentation::SetRenderMode(int val)
 {
   this->RenderMode = val;
-  if (val == vtkPointSpriteProperty::Quadrics ||
-    val == vtkPointSpriteProperty::TexturedSprite ||
+  if (val == vtkPointSpriteProperty::Quadrics || val == vtkPointSpriteProperty::TexturedSprite ||
     val == vtkPointSpriteProperty::SimplePoint)
-    {
+  {
     this->PSProperty->SetRenderMode(val);
     if (val == vtkPointSpriteProperty::TexturedSprite)
-      {
-      this->Actor->SetTexture(this->TextureInternal);
-      }
-    }
-  if (val == 3) // SphereTexture
     {
+      this->Actor->SetTexture(this->TextureInternal);
+    }
+  }
+  if (val == 3) // SphereTexture
+  {
     this->PSProperty->SetRenderMode(1);
     this->Actor->SetTexture(this->SphereTexture);
-    }
+  }
   else if (val == 4) // BlurTexture
-    {
+  {
     this->PSProperty->SetRenderMode(1);
     this->Actor->SetTexture(this->BlurTexture);
-    }
+  }
 }
 
 void vtkPointSpriteRepresentation::SetRadiusMode(int val)
@@ -381,11 +371,11 @@ void vtkPointSpriteRepresentation::RemoveAllRadiusGaussianControlPoints()
 
 //***************************************************************************
 // Forwarded to OpacityGaussianTransferFunction
-void vtkPointSpriteRepresentation::SetOpacityGaussianControlPoints(int index,
-  double val0, double val1, double val2, double val3, double val4)
+void vtkPointSpriteRepresentation::SetOpacityGaussianControlPoints(
+  int index, double val0, double val1, double val2, double val3, double val4)
 {
-  this->OpacityGaussianTransferFunction->SetGaussianControlPoint(index,
-    val0, val1, val2, val3, val4);
+  this->OpacityGaussianTransferFunction->SetGaussianControlPoint(
+    index, val0, val1, val2, val3, val4);
 }
 
 void vtkPointSpriteRepresentation::SetNumberOfOpacityGaussianControlPoints(int val)

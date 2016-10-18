@@ -39,21 +39,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-
-namespace Ui { class pqLinksManager; }
+namespace Ui
+{
+class pqLinksManager;
+}
 /**
 * dialog for viewing, creating, editing, removing proxy/property/camera links
 */
-class PQCOMPONENTS_EXPORT pqLinksManager :
-  public QDialog
+class PQCOMPONENTS_EXPORT pqLinksManager : public QDialog
 {
   Q_OBJECT
   typedef QDialog base;
+
 public:
   /**
   * create this dialog with a parent
   */
-  pqLinksManager(QWidget* p=0);
+  pqLinksManager(QWidget* p = 0);
   /**
   * destroy this dialog
   */
@@ -75,10 +77,9 @@ public slots:
 
 private slots:
   void selectionChanged(const QModelIndex& idx);
+
 private:
   QScopedPointer<Ui::pqLinksManager> Ui;
-
 };
 
 #endif
-

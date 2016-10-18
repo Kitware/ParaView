@@ -45,7 +45,6 @@ protected:
 private:
   vtkSIIdTypeVectorProperty(const vtkSIIdTypeVectorProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIIdTypeVectorProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

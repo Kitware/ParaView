@@ -44,15 +44,15 @@ class vtkSMPropertyGroup;
 * "Bold", "Italics" and "Shadow". If any property is missing, the
 * corresponding widget will be hidden.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget :
-  public pqPropertyGroupWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGroupWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString justification READ justification WRITE setJustification)
 
   typedef pqPropertyGroupWidget Superclass;
+
 public:
-  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqFontPropertyWidget();
 
   QString justification() const;

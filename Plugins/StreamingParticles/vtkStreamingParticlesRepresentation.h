@@ -43,30 +43,29 @@ public:
   // Description:
   // Set the input data arrays that this algorithm will process. Overridden to
   // pass the array selection to the mapper.
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, const char *name);
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, int fieldAttributeType)
-    {
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, const char* name);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+  {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
-    }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
-    {
+  }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info)
+  {
     this->Superclass::SetInputArrayToProcess(idx, info);
-    }
+  }
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              const char* fieldAssociation,
-                              const char* attributeTypeorName)
-    {
-    this->Superclass::SetInputArrayToProcess(idx, port, connection,
-      fieldAssociation, attributeTypeorName);
-    }
+    const char* fieldAssociation, const char* attributeTypeorName)
+  {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, attributeTypeorName);
+  }
 
   // Description:
   // Overridden to handle various view passes.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
@@ -94,20 +93,20 @@ public:
   // Defaults to false.
   void SetUseBlockDetailInformation(bool newVal);
   bool GetUseBlockDetailInformation() const;
-  vtkBooleanMacro(UseBlockDetailInformation,bool)
+  vtkBooleanMacro(UseBlockDetailInformation, bool)
 
-  // Description:
-  // Should be true if any server process can load any block.  This is not true
-  // for all data formats.  Defaults to true.
-  void SetProcessesCanLoadAnyBlock(bool newVal);
+    // Description:
+    // Should be true if any server process can load any block.  This is not true
+    // for all data formats.  Defaults to true.
+    void SetProcessesCanLoadAnyBlock(bool newVal);
   bool GetProcessesCanLoadAnyBlock() const;
-  vtkBooleanMacro(ProcessesCanLoadAnyBlock,bool)
+  vtkBooleanMacro(ProcessesCanLoadAnyBlock, bool)
 
-  // Description:
-  // Used in conjunction with SetUseBlockDetailInformation.  This determines how
-  // far from the camera highly detailed blocks are loaded.  Units: 1 = block diagonal.
-  // Defaults to 2
-  void SetDetailLevelToLoad(double level);
+    // Description:
+    // Used in conjunction with SetUseBlockDetailInformation.  This determines how
+    // far from the camera highly detailed blocks are loaded.  Units: 1 = block diagonal.
+    // Defaults to 2
+    void SetDetailLevelToLoad(double level);
   double GetDetailLevelToLoad();
 
   //---------------------------------------------------------------------------
@@ -116,12 +115,10 @@ public:
   //---------------------------------------------------------------------------
   void SetLookupTable(vtkScalarsToColors*);
   void SetPointSize(double val);
-    
 
 protected:
   vtkStreamingParticlesRepresentation();
   ~vtkStreamingParticlesRepresentation();
-
 
   // Description:
   // Adds the representation to the view.  This is called from
@@ -143,9 +140,8 @@ protected:
   // Overridden to check if the input pipeline is streaming capable. This method
   // should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
   // and the input pipeline provides necessary AMR meta-data.
-  virtual int RequestInformation(vtkInformation *rqst,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  virtual int RequestInformation(
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   // Description:
   // Setup the block request. During StreamingUpdate, this will request the
@@ -153,17 +149,15 @@ protected:
   // otherwise it doesn't make any specific request. AMR sources can treat the
   // absence of specific block request to mean various things. It's expected
   // that read only the root block (or a few more) in that case.
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   // Description:
   // Generate the outline for the current input.
   // When not in StreamingUpdate, this also initializes the priority queue since
   // the input AMR may have totally changed, including its structure.
-  virtual int RequestData(vtkInformation *rqst,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  virtual int RequestData(
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   // Description:
   // Returns true when the input pipeline supports streaming. It is set in
@@ -180,7 +174,7 @@ protected:
   // and then call Update() on the representation, making it reexecute and
   // regenerate the outline for the next "piece" of data.
   bool StreamingUpdate(const double view_planes[24]);
-  
+
   // Description:
   // Called in StreamingUpdate() to determine the blocks to stream in the
   // current pass. Returns false if no blocks need to be streaming currently.
@@ -188,13 +182,13 @@ protected:
 
   // Description:
   // This is the data object generated processed by the most recent call to
-  // RequestData() while not streaming. 
+  // RequestData() while not streaming.
   // This is non-empty only on the data-server nodes.
   vtkSmartPointer<vtkMultiBlockDataSet> ProcessedData;
 
   // Description:
   // This is the data object generated processed by the most recent call to
-  // RequestData() while streaming. 
+  // RequestData() while streaming.
   // This is non-empty only on the data-server nodes.
   vtkSmartPointer<vtkDataObject> ProcessedPiece;
 
@@ -223,7 +217,8 @@ protected:
   bool UseOutline;
 
 private:
-  vtkStreamingParticlesRepresentation(const vtkStreamingParticlesRepresentation&) VTK_DELETE_FUNCTION;
+  vtkStreamingParticlesRepresentation(
+    const vtkStreamingParticlesRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkStreamingParticlesRepresentation&) VTK_DELETE_FUNCTION;
 
   // Description:
@@ -240,7 +235,6 @@ private:
   // and we need to clear our streaming buffers since the streamed data is no
   // longer valid.
   bool InStreamingUpdate;
-
 };
 
 #endif

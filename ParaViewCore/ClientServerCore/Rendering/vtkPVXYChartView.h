@@ -32,63 +32,37 @@ class vtkChart;
 class vtkPVPlotTime;
 class vtkChartWarning;
 
+#define GENERATE_AXIS_FUNCTIONS(name, type)                                                        \
+  void SetLeft##name(type value) { Set##name(vtkAxis::LEFT, value); }                              \
+  void SetBottom##name(type value) { Set##name(vtkAxis::BOTTOM, value); }                          \
+  void SetRight##name(type value) { Set##name(vtkAxis::RIGHT, value); }                            \
+  void SetTop##name(type value) { Set##name(vtkAxis::TOP, value); }
 
-#define GENERATE_AXIS_FUNCTIONS(name, type) \
-void SetLeft ## name (type value)           \
-{\
-  Set ## name(vtkAxis::LEFT, value);        \
-}\
-void SetBottom ## name(type value)          \
-{\
-  Set ## name(vtkAxis::BOTTOM, value);      \
-}\
-void SetRight ## name(type value)           \
-{\
-  Set ## name(vtkAxis::RIGHT, value);       \
-}\
-void SetTop ## name(type value)             \
-{\
-  Set ## name(vtkAxis::TOP, value);         \
-}
+#define GENERATE_AXIS_FUNCTIONS2(name, type1, type2)                                               \
+  void SetLeft##name(type1 value1, type2 value2) { Set##name(vtkAxis::LEFT, value1, value2); }     \
+  void SetBottom##name(type1 value1, type2 value2) { Set##name(vtkAxis::BOTTOM, value1, value2); } \
+  void SetRight##name(type1 value1, type2 value2) { Set##name(vtkAxis::RIGHT, value1, value2); }   \
+  void SetTop##name(type1 value1, type2 value2) { Set##name(vtkAxis::TOP, value1, value2); }
 
-#define GENERATE_AXIS_FUNCTIONS2(name, type1, type2) \
-void SetLeft ## name (type1 value1, type2 value2)    \
-{\
-  Set ## name(vtkAxis::LEFT, value1, value2);        \
-}\
-void SetBottom ## name(type1 value1, type2 value2)   \
-{\
-  Set ## name(vtkAxis::BOTTOM, value1, value2);      \
-}\
-void SetRight ## name(type1 value1, type2 value2)    \
-{\
-  Set ## name(vtkAxis::RIGHT, value1, value2);       \
-}\
-void SetTop ## name(type1 value1, type2 value2)      \
-{\
-  Set ## name(vtkAxis::TOP, value1, value2);         \
-}
+#define GENERATE_AXIS_FUNCTIONS3(name, type1, type2, type3)                                        \
+  void SetLeft##name(type1 value1, type2 value2, type3 value3)                                     \
+  {                                                                                                \
+    Set##name(vtkAxis::LEFT, value1, value2, value3);                                              \
+  }                                                                                                \
+  void SetBottom##name(type1 value1, type2 value2, type3 value3)                                   \
+  {                                                                                                \
+    Set##name(vtkAxis::BOTTOM, value1, value2, value3);                                            \
+  }                                                                                                \
+  void SetRight##name(type1 value1, type2 value2, type3 value3)                                    \
+  {                                                                                                \
+    Set##name(vtkAxis::RIGHT, value1, value2, value3);                                             \
+  }                                                                                                \
+  void SetTop##name(type1 value1, type2 value2, type3 value3)                                      \
+  {                                                                                                \
+    Set##name(vtkAxis::TOP, value1, value2, value3);                                               \
+  }
 
-#define GENERATE_AXIS_FUNCTIONS3(name, type1, type2, type3)      \
-void SetLeft ## name (type1 value1, type2 value2, type3 value3)  \
-{\
-  Set ## name(vtkAxis::LEFT, value1, value2, value3);            \
-}\
-void SetBottom ## name(type1 value1, type2 value2, type3 value3) \
-{\
-  Set ## name(vtkAxis::BOTTOM, value1, value2, value3);          \
-}\
-void SetRight ## name(type1 value1, type2 value2, type3 value3)  \
-{\
-  Set ## name(vtkAxis::RIGHT, value1, value2, value3);           \
-}\
-void SetTop ## name(type1 value1, type2 value2, type3 value3)    \
-{\
-  Set ## name(vtkAxis::TOP, value1, value2, value3);             \
-}
-
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVXYChartView :
-  public vtkPVContextView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVXYChartView : public vtkPVContextView
 {
 public:
   static vtkPVXYChartView* New();
@@ -98,15 +72,14 @@ public:
   /**
    * Set the chart type, defaults to line chart
    */
-  void SetChartType(const char *type);
+  void SetChartType(const char* type);
   void SetChartTypeToLine() { this->SetChartType("Line"); }
   void SetChartTypeToBar() { this->SetChartType("Bar"); }
   void SetChartTypeToBag() { this->SetChartType("Bag"); }
   void SetChartTypeToBox() { this->SetChartType("Box"); }
   void SetChartTypeToArea() { this->SetChartType("Area"); }
   void SetChartTypeToFunctionalBag() { this->SetChartType("FunctionalBag"); }
-  void SetChartTypeToParallelCoordinates()
-    { this->SetChartType("ParallelCoordinates"); }
+  void SetChartTypeToParallelCoordinates() { this->SetChartType("ParallelCoordinates"); }
 
   /**
    * Set the title of the chart.
@@ -195,7 +168,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetGridVisibility(int index, bool visible);
-  GENERATE_AXIS_FUNCTIONS(GridVisibility,bool);
+  GENERATE_AXIS_FUNCTIONS(GridVisibility, bool);
   //@}
 
   //@{
@@ -206,7 +179,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisColor(int index, double red, double green, double blue);
-  GENERATE_AXIS_FUNCTIONS3(AxisColor,double,double,double);
+  GENERATE_AXIS_FUNCTIONS3(AxisColor, double, double, double);
   //@}
 
   //@{
@@ -217,7 +190,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetGridColor(int index, double red, double green, double blue);
-  GENERATE_AXIS_FUNCTIONS3(GridColor,double,double,double);
+  GENERATE_AXIS_FUNCTIONS3(GridColor, double, double, double);
   //@}
 
   //@{
@@ -228,7 +201,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisLabelVisibility(int index, bool visible);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelVisibility,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelVisibility, bool);
   //@}
 
   /**
@@ -237,15 +210,14 @@ public:
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
    */
-  void SetAxisLabelFont(int index, const char* family, int pointSize, bool bold,
-                        bool italic);
+  void SetAxisLabelFont(int index, const char* family, int pointSize, bool bold, bool italic);
 
   //@{
   /**
    * Set the axis label font family for the given axis.
    */
   void SetAxisLabelFontFamily(int index, const char* family);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelFontFamily,const char*);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelFontFamily, const char*);
   //@}
 
   //@{
@@ -253,7 +225,7 @@ public:
    * Set the axis label font size for the given axis.
    */
   void SetAxisLabelFontSize(int index, int pointSize);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelFontSize,int);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelFontSize, int);
   //@}
 
   //@{
@@ -261,7 +233,7 @@ public:
    * Set the axis label font bold for the given axis.
    */
   void SetAxisLabelBold(int index, bool bold);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelBold,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelBold, bool);
   //@}
 
   //@{
@@ -269,7 +241,7 @@ public:
    * Set the axis label font italic for the given axis.
    */
   void SetAxisLabelItalic(int index, bool italic);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelItalic,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelItalic, bool);
   //@}
 
   //@{
@@ -280,7 +252,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisLabelColor(int index, double red, double green, double blue);
-  GENERATE_AXIS_FUNCTIONS3(AxisLabelColor,double,double,double);
+  GENERATE_AXIS_FUNCTIONS3(AxisLabelColor, double, double, double);
   //@}
 
   //@{
@@ -291,7 +263,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisLabelNotation(int index, int notation);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelNotation,int);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelNotation, int);
   //@}
 
   //@{
@@ -302,7 +274,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisLabelPrecision(int index, int precision);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelPrecision,int);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelPrecision, int);
   //@}
 
   //@{
@@ -314,8 +286,8 @@ public:
    * these methods to set the ranges. Note these ranges are only respected when
    * the corresponding AxisUseCustomRange flag it set.
    */
-  GENERATE_AXIS_FUNCTIONS(AxisRangeMinimum,double);
-  GENERATE_AXIS_FUNCTIONS(AxisRangeMaximum,double);
+  GENERATE_AXIS_FUNCTIONS(AxisRangeMinimum, double);
+  GENERATE_AXIS_FUNCTIONS(AxisRangeMaximum, double);
   //@}
 
   //@{
@@ -325,7 +297,7 @@ public:
    * shown.
    */
   void SetAxisUseCustomRange(int index, bool useCustomRange);
-  GENERATE_AXIS_FUNCTIONS(AxisUseCustomRange,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisUseCustomRange, bool);
   //@}
 
   //@{
@@ -336,9 +308,8 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisLogScale(int index, bool logScale);
-  GENERATE_AXIS_FUNCTIONS(AxisLogScale,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisLogScale, bool);
   //@}
-
 
   //@{
   /**
@@ -348,7 +319,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitle(int index, const char* title);
-  GENERATE_AXIS_FUNCTIONS(AxisTitle,const char*);
+  GENERATE_AXIS_FUNCTIONS(AxisTitle, const char*);
   //@}
 
   /**
@@ -357,8 +328,7 @@ public:
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
    */
-  void SetAxisTitleFont(int index, const char* family, int pointSize,
-                        bool bold, bool italic);
+  void SetAxisTitleFont(int index, const char* family, int pointSize, bool bold, bool italic);
 
   //@{
   /**
@@ -368,7 +338,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitleFontFamily(int index, const char* family);
-  GENERATE_AXIS_FUNCTIONS(AxisTitleFontFamily,const char*);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleFontFamily, const char*);
   //@}
 
   //@{
@@ -379,7 +349,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitleFontSize(int index, int pointSize);
-  GENERATE_AXIS_FUNCTIONS(AxisTitleFontSize,int);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleFontSize, int);
   //@}
 
   //@{
@@ -390,7 +360,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitleBold(int index, bool bold);
-  GENERATE_AXIS_FUNCTIONS(AxisTitleBold,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleBold, bool);
   //@}
 
   //@{
@@ -401,7 +371,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitleItalic(int index, bool italic);
-  GENERATE_AXIS_FUNCTIONS(AxisTitleItalic,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleItalic, bool);
   //@}
 
   //@{
@@ -412,7 +382,7 @@ public:
    * corresponding properties to change these values.
    */
   void SetAxisTitleColor(int index, double red, double green, double blue);
-  GENERATE_AXIS_FUNCTIONS3(AxisTitleColor,double,double,double);
+  GENERATE_AXIS_FUNCTIONS3(AxisTitleColor, double, double, double);
   //@}
 
   //@{
@@ -421,16 +391,15 @@ public:
    * automatically.
    */
   void SetAxisUseCustomLabels(int index, bool useCustomLabels);
-  GENERATE_AXIS_FUNCTIONS(AxisUseCustomLabels,bool);
+  GENERATE_AXIS_FUNCTIONS(AxisUseCustomLabels, bool);
   //@}
-
 
   //@{
   /**
    * Set the number of labels for the supplied axis.
    */
   void SetAxisLabelsNumber(int axis, int number);
-  GENERATE_AXIS_FUNCTIONS(AxisLabelsNumber,int);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelsNumber, int);
   //@}
 
   //@{
@@ -438,7 +407,7 @@ public:
    * Set the axis label positions for the supplied axis at the given index.
    */
   void SetAxisLabels(int axis, int index, double value);
-  GENERATE_AXIS_FUNCTIONS2(AxisLabels,int,double);
+  GENERATE_AXIS_FUNCTIONS2(AxisLabels, int, double);
   //@}
 
   void SetTooltipNotation(int notation);
@@ -471,8 +440,7 @@ public:
    * the local process alone. The view does not manage data movement for the
    * selection.
    */
-  virtual void SetSelection(
-    vtkChartRepresentation* repr, vtkSelection* selection);
+  virtual void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection);
 
   /**
    * Overridden to rescale axes range on every update.
@@ -522,7 +490,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

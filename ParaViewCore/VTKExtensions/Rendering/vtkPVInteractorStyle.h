@@ -33,10 +33,11 @@
 class vtkCameraManipulator;
 class vtkCollection;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle : public vtkInteractorStyleTrackballCamera
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle
+  : public vtkInteractorStyleTrackballCamera
 {
 public:
-  static vtkPVInteractorStyle *New();
+  static vtkPVInteractorStyle* New();
   vtkTypeMacro(vtkPVInteractorStyle, vtkInteractorStyleTrackballCamera);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -73,7 +74,7 @@ public:
   /**
    * Access to adding or removing manipulators.
    */
-  void AddManipulator(vtkCameraManipulator *m);
+  void AddManipulator(vtkCameraManipulator* m);
 
   /**
    * Removes all manipulators.
@@ -115,7 +116,6 @@ public:
   vtkGetMacro(RotationFactor, double);
   //@}
 
-
   /**
    * Returns the chosen manipulator based on the modifiers.
    */
@@ -139,12 +139,12 @@ protected:
 
   virtual void Dolly(double factor);
 
-  vtkCameraManipulator *CurrentManipulator;
+  vtkCameraManipulator* CurrentManipulator;
   double CenterOfRotation[3];
   double RotationFactor;
 
   // The CameraInteractors also store there button and modifier.
-  vtkCollection *CameraManipulators;
+  vtkCollection* CameraManipulators;
 
   void OnButtonDown(int button, int shift, int control);
   void OnButtonUp(int button);

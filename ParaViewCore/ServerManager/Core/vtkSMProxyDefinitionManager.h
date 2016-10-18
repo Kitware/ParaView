@@ -46,7 +46,7 @@ public:
    * changing of the XML definitions on the server e.g. loading of plugins.
    */
   void SynchronizeDefinitions();
-  
+
   /**
    * Overridden call SynchronizeDefinitions() when the session changes. Also
    * ensures that the internal references to vtkSIProxyDefinitionManager are
@@ -57,19 +57,17 @@ public:
   //***************************************************************************
   // enums re-defined from vtkSIProxyDefinitionManager for convenience.
   enum Events
-    {
-    ProxyDefinitionsUpdated = 
-      vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
-    CompoundProxyDefinitionsUpdated =
-      vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated
-    };
+  {
+    ProxyDefinitionsUpdated = vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
+    CompoundProxyDefinitionsUpdated = vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated
+  };
 
   enum
-    {
-    ALL_DEFINITIONS    = vtkSIProxyDefinitionManager::ALL_DEFINITIONS,
-    CORE_DEFINITIONS   = vtkSIProxyDefinitionManager::CORE_DEFINITIONS,
+  {
+    ALL_DEFINITIONS = vtkSIProxyDefinitionManager::ALL_DEFINITIONS,
+    CORE_DEFINITIONS = vtkSIProxyDefinitionManager::CORE_DEFINITIONS,
     CUSTOM_DEFINITIONS = vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS
-    };
+  };
 
   //***************************************************************************
   // Methods simply forwarded to the client-side vtkSIProxyDefinitionManager
@@ -81,18 +79,18 @@ public:
    * Moreover, error can be throw if the definition was not found if the
    * flag throwError is true.
    */
-  vtkPVXMLElement* GetProxyDefinition(
-    const char* group, const char* name, bool throwError)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->GetProxyDefinition(
-        group, name, throwError) : NULL;
-    }
+  vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name, bool throwError)
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->GetProxyDefinition(group, name, throwError)
+      : NULL;
+  }
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->GetProxyDefinition(group, name) : NULL;
-    }
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->GetProxyDefinition(group, name)
+      : NULL;
+  }
   //@}
 
   /**
@@ -100,36 +98,36 @@ public:
    * By flatten, we mean that the class hierarchy has been walked and merged
    * into a single vtkPVXMLElement definition.
    */
-  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group,
-                                               const char* name,
-                                               const char* subProxyName,
-                                               bool throwError)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
-        group, name, subProxyName, throwError) : NULL;
-    }
+  vtkPVXMLElement* GetCollapsedProxyDefinition(
+    const char* group, const char* name, const char* subProxyName, bool throwError)
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
+          group, name, subProxyName, throwError)
+      : NULL;
+  }
 
   /**
    * Return true if the XML Definition was found
    */
-  bool HasDefinition( const char* groupName, const char* proxyName )
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->HasDefinition(groupName, proxyName): false;
-    }
+  bool HasDefinition(const char* groupName, const char* proxyName)
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->HasDefinition(groupName, proxyName)
+      : false;
+  }
 
   /**
    * Save registered custom proxy definitions. The caller must release the
    * reference to the returned vtkPVXMLElement.
    */
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root)
-    {
+  {
     if (this->ProxyDefinitionManager)
-      {
+    {
       this->ProxyDefinitionManager->SaveCustomProxyDefinitions(root);
-      }
     }
+  }
 
   //@{
   /**
@@ -142,16 +140,14 @@ public:
    */
   VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator()
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->NewIterator() : NULL;
-    }
+  {
+    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator() : NULL;
+  }
   VTK_NEWINSTANCE
   vtkPVProxyDefinitionIterator* NewIterator(int scope)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->NewIterator(scope) : NULL;
-    }
+  {
+    return this->ProxyDefinitionManager ? this->ProxyDefinitionManager->NewIterator(scope) : NULL;
+  }
   //@}
 
   //@{
@@ -162,16 +158,17 @@ public:
    * ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
    */
   vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->NewSingleGroupIterator(groupName): NULL;
-    }
-  vtkPVProxyDefinitionIterator* NewSingleGroupIterator(
-    const char* groupName, int scope)
-    {
-    return this->ProxyDefinitionManager?
-      this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, scope) : NULL;
-    }
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->NewSingleGroupIterator(groupName)
+      : NULL;
+  }
+  vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName, int scope)
+  {
+    return this->ProxyDefinitionManager
+      ? this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, scope)
+      : NULL;
+  }
   //@}
 
   //***************************************************************************
@@ -182,8 +179,7 @@ public:
   /**
    * Add/Remove/Clear custom proxy definitions.
    */
-  void AddCustomProxyDefinition(
-    const char* group, const char* name, vtkPVXMLElement* top);
+  void AddCustomProxyDefinition(const char* group, const char* name, vtkPVXMLElement* top);
   void RemoveCustomProxyDefinition(const char* group, const char* name);
   void ClearCustomProxyDefinitions();
   //@}
@@ -211,7 +207,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxyDefinitionManager();
@@ -223,7 +219,6 @@ protected:
 private:
   vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

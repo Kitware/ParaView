@@ -38,9 +38,9 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLCollectionReader : public vtkXMLRea
 {
 public:
   static vtkXMLCollectionReader* New();
-  vtkTypeMacro(vtkXMLCollectionReader,vtkXMLReader);
+  vtkTypeMacro(vtkXMLCollectionReader, vtkXMLReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Get/Set the required value for a particular named attribute.
@@ -51,7 +51,7 @@ public:
   virtual void SetRestriction(const char* name, const char* value);
   virtual const char* GetRestriction(const char* name);
   //@}
-  
+
   //@{
   /**
    * Get/set the required value for a particular named attribute.  The
@@ -63,31 +63,31 @@ public:
   virtual void SetRestrictionAsIndex(const char* name, int index);
   virtual int GetRestrictionAsIndex(const char* name);
   //@}
-  
+
   /**
    * Get the number of distinct attribute values present in the file.
    * Valid after UpdateInformation.
    */
   int GetNumberOfAttributes();
-  
+
   /**
    * Get the name of an attribute.  The order of attributes with
    * respect to the index is not specified, but will be the same every
    * time the same instance of the reader reads the same input file.
    */
   const char* GetAttributeName(int attribute);
-  
+
   /**
    * Get the index of the attribute with the given name.  Returns -1
    * if no such attribute exists.
    */
   int GetAttributeIndex(const char* name);
-  
+
   /**
    * Get the number of distinct values for the given attribute.
    */
   int GetNumberOfAttributeValues(int attribute);
-  
+
   //@{
   /**
    * Get one of the possible values for a given attribute.  The order
@@ -98,7 +98,7 @@ public:
   const char* GetAttributeValue(int attribute, int index);
   const char* GetAttributeValue(const char* name, int index);
   //@}
-  
+
   //@{
   /**
    * Get the index of the attribute value with the given name.  Returns -1
@@ -128,8 +128,8 @@ public:
 
 protected:
   vtkXMLCollectionReader();
-  ~vtkXMLCollectionReader();  
-  
+  ~vtkXMLCollectionReader();
+
   void BuildRestrictedDataSets();
 
   bool InternalForceMultiBlock;
@@ -137,55 +137,48 @@ protected:
 
   // Get the name of the data set being read.
   virtual const char* GetDataSetName();
-  
+
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual int FillOutputPortInformation(int, vtkInformation* info);
 
   vtkDataObject* SetupOutput(const char* filePath, int index);
 
-  virtual int RequestDataObject(vtkInformation* request, 
-                                vtkInformationVector** inputVector, 
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // Overload of vtkXMLReader function, so we can handle updating the
   // information on multiple outputs
-  virtual int RequestInformation(vtkInformation *request,
-    vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // Setup the output with no data available.  Used in error cases.
   virtual void SetupEmptyOutput();
 
   void ReadXMLData();
   void ReadXMLDataImpl();
-  
+
   // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void*,
-                                           void*);
+  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void*, void*);
   // Progress callback from XMLParser.
   virtual void InternalProgressCallback();
-  
+
   // The observer to report progress from the internal readers.
   vtkCallbackCommand* InternalProgressObserver;
-  
+
   // Internal implementation details.
   vtkXMLCollectionReaderInternals* Internal;
-  
+
   void AddAttributeNameValue(const char* name, const char* value);
 
-  virtual void SetRestrictionImpl(const char* name, 
-                                  const char* value,
-                                  bool doModify);
+  virtual void SetRestrictionImpl(const char* name, const char* value, bool doModify);
 
-  void ReadAFile(int index,
-                 int updatePiece,
-                 int updateNumPieces,
-                 int updateGhostLevels,
-                 vtkDataObject* actualOutput);
-  
+  void ReadAFile(int index, int updatePiece, int updateNumPieces, int updateGhostLevels,
+    vtkDataObject* actualOutput);
+
 private:
   vtkXMLCollectionReader(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
-  
+
   int CurrentOutput;
 };
 

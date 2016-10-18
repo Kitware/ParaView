@@ -50,6 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropert
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
   pqInputDataTypeDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   virtual ~pqInputDataTypeDecorator();

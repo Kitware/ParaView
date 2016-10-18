@@ -28,175 +28,167 @@
 #ifndef vtkPointAccumulator_hxx
 #define vtkPointAccumulator_hxx
 
-
-#include <exception>
 #include "vtkPoints.h"
+#include <exception>
 
-template<typename T_CPP, class T_VTK>
+template <typename T_CPP, class T_VTK>
 class vtkPointAccumulator
 {
-  public:
-    vtkPointAccumulator()
+public:
+  vtkPointAccumulator()
+  {
+    this->PtStore = 0;
+    this->NPts = 0;
+  }
+  ~vtkPointAccumulator() { this->Clear(); }
+  //@{
+  /**
+   * Free resources and mark as empty.
+   */
+  void Clear()
+  {
+    if (this->PtStore != 0)
     {
-      this->PtStore=0;
-      this->NPts=0;
+      free(this->PtStore);
     }
-    ~vtkPointAccumulator()
+    this->PtStore = 0;
+    this->NPts = 0;
+  }
+  //@}
+  /**
+   * Test if there is anything in the store.
+   */
+  bool Empty() { return this->NPts == 0; }
+  //@{
+  /**
+   * Extend the internal store and get a pointer to
+   * the newly added memory.
+   */
+  T_CPP* Expand(vtkIdType n)
+  {
+    const int bytesPerPoint = 3 * sizeof(T_CPP);
+    // extend
+    vtkIdType newNPts = this->NPts + n;
+    T_CPP* newPointStore = static_cast<T_CPP*>(realloc(this->PtStore, newNPts * bytesPerPoint));
+    if (newPointStore == 0)
     {
-      this->Clear();
+#ifndef NDEBUG
+      abort();
+#else
+      throw std::bad_alloc();
+#endif
     }
-    //@{
-    /**
-     * Free resources and mark as empty.
-     */
-    void Clear()
-    {
-      if (this->PtStore!=0)
-        {
-        free(this->PtStore);
-        }
-      this->PtStore=0;
-      this->NPts=0;
-    }
-    //@}
-    /**
-     * Test if there is anything in the store.
-     */
-    bool Empty()
-    {
-      return this->NPts==0;
-    }
-    //@{
-    /**
-     * Extend the internal store and get a pointer to
-     * the newly added memory.
-     */
-    T_CPP *Expand(vtkIdType n)
-    {
-      const int bytesPerPoint=3*sizeof(T_CPP);
-      // extend
-      vtkIdType newNPts=this->NPts+n;
-      T_CPP *newPointStore
-        = static_cast<T_CPP *>(realloc(this->PtStore,newNPts*bytesPerPoint));
-      if (newPointStore==0)
-        {
-        #ifndef NDEBUG
-        abort();
-        #else
-        throw std::bad_alloc();
-        #endif
-        }
-      // mark begin of new
-      T_CPP *writePointer=newPointStore+3*this->NPts;
-      // update
-      this->PtStore=newPointStore;
-      this->NPts=newNPts;
+    // mark begin of new
+    T_CPP* writePointer = newPointStore + 3 * this->NPts;
+    // update
+    this->PtStore = newPointStore;
+    this->NPts = newNPts;
     //@}
 
-      return writePointer;
-    }
-    //@{
-    /**
-     * Adds an array of points to the end of
-     * the internal store.
-     */
-    void Accumulate(T_CPP *pts, vtkIdType n)
-    {
-      // extend
-      T_CPP *writePointer=this->Expand(n);
-      // copy at end
-      const int bytesPerPoint=3*sizeof(T_CPP);
-      memcpy(writePointer,pts,n*bytesPerPoint);
-    }
-    //@}
-    /**
-     * Adds an array of points at the end of
-     * the internal store.
-     */
-    void Accumulate(T_VTK *pts)
-    {
-      this->Accumulate(pts->GetPointer(0),pts->GetNumberOfTuples());
-    }
-    //@{
-    /**
-     * Creates a vtkPoints data structure from
-     * the internal store. Caller to delete the points.
-     */
-    vtkPoints *BuildVtkPoints()
-    {
-      T_VTK *da=T_VTK::New();
-      da->SetNumberOfComponents(3);
-      da->SetArray(this->PtStore,3*this->NPts,1);
-      vtkPoints *pts=vtkPoints::New();
-      pts->SetData(da);
-      da->Delete();
+    return writePointer;
+  }
+  //@{
+  /**
+   * Adds an array of points to the end of
+   * the internal store.
+   */
+  void Accumulate(T_CPP* pts, vtkIdType n)
+  {
+    // extend
+    T_CPP* writePointer = this->Expand(n);
+    // copy at end
+    const int bytesPerPoint = 3 * sizeof(T_CPP);
+    memcpy(writePointer, pts, n * bytesPerPoint);
+  }
+  //@}
+  /**
+   * Adds an array of points at the end of
+   * the internal store.
+   */
+  void Accumulate(T_VTK* pts) { this->Accumulate(pts->GetPointer(0), pts->GetNumberOfTuples()); }
+  //@{
+  /**
+   * Creates a vtkPoints data structure from
+   * the internal store. Caller to delete the points.
+   */
+  vtkPoints* BuildVtkPoints()
+  {
+    T_VTK* da = T_VTK::New();
+    da->SetNumberOfComponents(3);
+    da->SetArray(this->PtStore, 3 * this->NPts, 1);
+    vtkPoints* pts = vtkPoints::New();
+    pts->SetData(da);
+    da->Delete();
     //@}
 
-      return pts;
-    }
-    //@{
-    /**
-     * Compute axis-aligned bounding box. An exhaustive search is made
-     * through points every time. It's calllers responsibility to use
-     * sparingly.
-     */
-    void GetBounds(double bounds[6])
+    return pts;
+  }
+  //@{
+  /**
+   * Compute axis-aligned bounding box. An exhaustive search is made
+   * through points every time. It's calllers responsibility to use
+   * sparingly.
+   */
+  void GetBounds(double bounds[6])
+  {
+    // Prepare
+    for (int q = 0; q < 3; ++q)
     {
-      // Prepare
-      for (int q=0; q<3; ++q)
-        {
-        bounds[q]=static_cast<double>(this->PtStore[q]);
-        bounds[q+1]=static_cast<double>(this->PtStore[q+1]);
-        }
-      // Search
-      for (vtkIdType i=1; i<this->NPts; ++i)
-        {
-        double pt[3];
-        vtkIdType ptIdx=3*i;
-        pt[0]=static_cast<double>(this->PtStore[ptIdx]);
-        pt[1]=static_cast<double>(this->PtStore[ptIdx+1]);
-        pt[2]=static_cast<double>(this->PtStore[ptIdx+2]);
-        if (pt[0]<bounds[0]) bounds[0]=pt[0];
-        if (pt[0]>bounds[1]) bounds[1]=pt[0];
-        if (pt[1]<bounds[2]) bounds[2]=pt[1];
-        if (pt[1]>bounds[3]) bounds[3]=pt[1];
-        if (pt[2]<bounds[4]) bounds[4]=pt[2];
-        if (pt[2]>bounds[5]) bounds[5]=pt[2];
-        }
+      bounds[q] = static_cast<double>(this->PtStore[q]);
+      bounds[q + 1] = static_cast<double>(this->PtStore[q + 1]);
     }
-    //@}
-    /**
-     * Return the number of points currently in the point store.
-     */
-    vtkIdType GetNumberOfPoints()
+    // Search
+    for (vtkIdType i = 1; i < this->NPts; ++i)
     {
-      return this->NPts;
+      double pt[3];
+      vtkIdType ptIdx = 3 * i;
+      pt[0] = static_cast<double>(this->PtStore[ptIdx]);
+      pt[1] = static_cast<double>(this->PtStore[ptIdx + 1]);
+      pt[2] = static_cast<double>(this->PtStore[ptIdx + 2]);
+      if (pt[0] < bounds[0])
+        bounds[0] = pt[0];
+      if (pt[0] > bounds[1])
+        bounds[1] = pt[0];
+      if (pt[1] < bounds[2])
+        bounds[2] = pt[1];
+      if (pt[1] > bounds[3])
+        bounds[3] = pt[1];
+      if (pt[2] < bounds[4])
+        bounds[4] = pt[2];
+      if (pt[2] > bounds[5])
+        bounds[5] = pt[2];
     }
-    //@{
-    /**
-     * Print the contents of the internal store.
-     */
-    void Print()
+  }
+  //@}
+  /**
+   * Return the number of points currently in the point store.
+   */
+  vtkIdType GetNumberOfPoints() { return this->NPts; }
+  //@{
+  /**
+   * Print the contents of the internal store.
+   */
+  void Print()
+  {
+    T_CPP* pBuf = this->PtStore;
+    for (int i = 0; i < this->NPts; ++i)
     {
-      T_CPP *pBuf=this->PtStore;
-      for (int i=0; i<this->NPts; ++i)
-        {
-        cerr << i << " (" << pBuf[0];
-        for (int q=1; q<3; ++q)
-          {
-          cerr << ", " << pBuf[q];
-          }
-        cerr << ")" << endl;
-        pBuf+=3;
-        }
+      cerr << i << " (" << pBuf[0];
+      for (int q = 1; q < 3; ++q)
+      {
+        cerr << ", " << pBuf[q];
+      }
+      cerr << ")" << endl;
+      pBuf += 3;
     }
-    //@}
+  }
+  //@}
 
-  private:
-    vtkPointAccumulator(const vtkPointAccumulator &) VTK_DELETE_FUNCTION;
-    vtkPointAccumulator &operator=(const vtkPointAccumulator &) VTK_DELETE_FUNCTION;
+private:
+  vtkPointAccumulator(const vtkPointAccumulator&) VTK_DELETE_FUNCTION;
+  vtkPointAccumulator& operator=(const vtkPointAccumulator&) VTK_DELETE_FUNCTION;
 
-    T_CPP *PtStore;
-    vtkIdType NPts;
+  T_CPP* PtStore;
+  vtkIdType NPts;
 };
 #endif

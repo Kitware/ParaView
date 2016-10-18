@@ -28,7 +28,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkSmartPointer.h"                 // needed for vtkSmartPointer.
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVGeneralSettings : public vtkObject
 {
@@ -118,12 +118,12 @@ public:
    * Enum for TransferFunctionResetMode
    */
   enum
-    {
-    GROW_ON_APPLY=0,
-    GROW_ON_APPLY_AND_TIMESTEP=1,
-    RESET_ON_APPLY=2,
-    RESET_ON_APPLY_AND_TIMESTEP=3
-    };
+  {
+    GROW_ON_APPLY = 0,
+    GROW_ON_APPLY_AND_TIMESTEP = 1,
+    RESET_ON_APPLY = 2,
+    RESET_ON_APPLY_AND_TIMESTEP = 3
+  };
 
   //@{
   /**
@@ -138,11 +138,11 @@ public:
    * Enum for ScalarBarMode.
    */
   enum
-    {
-    AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS=0,
-    AUTOMATICALLY_HIDE_SCALAR_BARS=1,
-    MANUAL_SCALAR_BARS=2
-    };
+  {
+    AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS = 0,
+    AUTOMATICALLY_HIDE_SCALAR_BARS = 1,
+    MANUAL_SCALAR_BARS = 2
+  };
   vtkGetMacro(ScalarBarMode, int);
   void SetScalarBarMode(int);
   //@}
@@ -177,12 +177,12 @@ public:
   void SetInheritRepresentationProperties(bool val);
 
   enum
-    {
-    ALL_IN_ONE=0,
-    SEPARATE_DISPLAY_PROPERTIES=1,
-    SEPARATE_VIEW_PROPERTIES=2,
-    ALL_SEPARATE=3
-    };
+  {
+    ALL_IN_ONE = 0,
+    SEPARATE_DISPLAY_PROPERTIES = 1,
+    SEPARATE_VIEW_PROPERTIES = 2,
+    ALL_SEPARATE = 3
+  };
   //@{
   /**
    * Properties panel configuration.
@@ -231,7 +231,7 @@ public:
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();
-  
+
   int BlockColorsDistinctValues;
   bool AutoApply;
   bool AutoApplyActiveOnly;
@@ -249,7 +249,6 @@ private:
   void operator=(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
 
   static vtkSmartPointer<vtkPVGeneralSettings> Instance;
-
 };
 
 #endif

@@ -59,28 +59,30 @@ namespace
 class pqHelpWindowNetworkReply : public QNetworkReply
 {
   typedef QNetworkReply Superclass;
+
 public:
   pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
 
   virtual void abort() {}
   virtual qint64 bytesAvailable() const
-    {
-    return (this->RawData.size() - this->Offset) +
-      this->Superclass::bytesAvailable();
-    }
-  virtual bool isSequential() const {return true;}
+  {
+    return (this->RawData.size() - this->Offset) + this->Superclass::bytesAvailable();
+  }
+  virtual bool isSequential() const { return true; }
 protected:
-  virtual qint64 readData(char *data, qint64 maxSize);
+  virtual qint64 readData(char* data, qint64 maxSize);
 
   QByteArray RawData;
   qint64 Offset;
+
 private:
   Q_DISABLE_COPY(pqHelpWindowNetworkReply)
 };
 
 //-----------------------------------------------------------------------------
-pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
-  const QUrl& my_url, QHelpEngineCore* engine) : Superclass(engine), Offset(0)
+pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(const QUrl& my_url, QHelpEngineCore* engine)
+  : Superclass(engine)
+  , Offset(0)
 {
   Q_ASSERT(engine);
 
@@ -89,42 +91,40 @@ pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
   QString content_type = "text/plain";
   QString extension = QFileInfo(my_url.path()).suffix().toLower();
   QMap<QString, QString> extension_type_map;
-  extension_type_map["jpg"]   = "image/jpeg";
-  extension_type_map["jpeg"]  = "image/jpeg";
-  extension_type_map["png"]   = "image/png";
-  extension_type_map["gif"]   = "image/gif";
-  extension_type_map["tiff"]  = "image/tiff";
-  extension_type_map["htm"]   = "text/html";
-  extension_type_map["html"]  = "text/html";
-  extension_type_map["css"]   = "text/css";
-  extension_type_map["xml"]   = "text/xml";
+  extension_type_map["jpg"] = "image/jpeg";
+  extension_type_map["jpeg"] = "image/jpeg";
+  extension_type_map["png"] = "image/png";
+  extension_type_map["gif"] = "image/gif";
+  extension_type_map["tiff"] = "image/tiff";
+  extension_type_map["htm"] = "text/html";
+  extension_type_map["html"] = "text/html";
+  extension_type_map["css"] = "text/css";
+  extension_type_map["xml"] = "text/xml";
 
   if (extension_type_map.contains(extension))
-    {
+  {
     content_type = extension_type_map[extension];
-    }
+  }
 
-  this->setHeader(QNetworkRequest::ContentLengthHeader,
-    QVariant(this->RawData.size()));
+  this->setHeader(QNetworkRequest::ContentLengthHeader, QVariant(this->RawData.size()));
   this->setHeader(QNetworkRequest::ContentTypeHeader, content_type);
-  this->open(QIODevice::ReadOnly|QIODevice::Unbuffered);
+  this->open(QIODevice::ReadOnly | QIODevice::Unbuffered);
   this->setUrl(my_url);
   QTimer::singleShot(0, this, SIGNAL(readyRead()));
   QTimer::singleShot(0, this, SLOT(finished()));
 }
 
 //-----------------------------------------------------------------------------
-qint64 pqHelpWindowNetworkReply::readData(char *data, qint64 maxSize)
+qint64 pqHelpWindowNetworkReply::readData(char* data, qint64 maxSize)
 {
   if (this->Offset <= this->RawData.size())
-    {
-    qint64 end = qMin(this->Offset + maxSize,
-      static_cast<qint64>(this->RawData.size()));
+  {
+    qint64 end = qMin(this->Offset + maxSize, static_cast<qint64>(this->RawData.size()));
     qint64 delta = end - this->Offset;
     memcpy(data, this->RawData.constData() + this->Offset, delta);
     this->Offset += delta;
     return delta;
-    }
+  }
   return -1;
 }
 
@@ -136,34 +136,34 @@ class pqNetworkAccessManager : public QNetworkAccessManager
 {
   typedef QNetworkAccessManager Superclass;
   QPointer<QHelpEngineCore> Engine;
+
 public:
   pqNetworkAccessManager(
-    QHelpEngineCore* helpEngine, QNetworkAccessManager *manager,
-    QObject *parentObject) :
-    Superclass(parentObject),
-    Engine(helpEngine)
+    QHelpEngineCore* helpEngine, QNetworkAccessManager* manager, QObject* parentObject)
+    : Superclass(parentObject)
+    , Engine(helpEngine)
   {
-  Q_ASSERT(manager != NULL && helpEngine != NULL);
+    Q_ASSERT(manager != NULL && helpEngine != NULL);
 
-  this->setCache(manager->cache());
-  this->setCookieJar(manager->cookieJar());
-  this->setProxy(manager->proxy());
-  this->setProxyFactory(manager->proxyFactory());
+    this->setCache(manager->cache());
+    this->setCookieJar(manager->cookieJar());
+    this->setProxy(manager->proxy());
+    this->setProxyFactory(manager->proxyFactory());
   }
 
 protected:
-  virtual QNetworkReply *createRequest(
-    Operation operation, const QNetworkRequest &request, QIODevice *device)
-    {
+  virtual QNetworkReply* createRequest(
+    Operation operation, const QNetworkRequest& request, QIODevice* device)
+  {
     if (request.url().scheme() == "qthelp" && operation == GetOperation)
-      {
+    {
       return new pqHelpWindowNetworkReply(request.url(), this->Engine);
-      }
-    else
-      {
-      return this->Superclass::createRequest(operation, request, device);
-      }
     }
+    else
+    {
+      return this->Superclass::createRequest(operation, request, device);
+    }
+  }
 
 private:
   Q_DISABLE_COPY(pqNetworkAccessManager)
@@ -176,24 +176,24 @@ private:
 class pqWebView : public QWebView
 {
   typedef QWebView Superclass;
+
 public:
   pqWebView(QWidget* parentObject)
     : Superclass(parentObject)
-    {
-    }
-  ~pqWebView()
-    {
-    }
+  {
+  }
+  ~pqWebView() {}
 
   static pqWebView* newInstance(QHelpEngine* engine, QWidget* parentObject)
-    {
+  {
     pqWebView* instance = new pqWebView(parentObject);
-    QNetworkAccessManager *oldManager = instance->page()->networkAccessManager();
-    pqNetworkAccessManager* newManager = new pqNetworkAccessManager(engine, oldManager, parentObject);
+    QNetworkAccessManager* oldManager = instance->page()->networkAccessManager();
+    pqNetworkAccessManager* newManager =
+      new pqNetworkAccessManager(engine, oldManager, parentObject);
     instance->page()->setNetworkAccessManager(newManager);
     instance->page()->setForwardUnsupportedContent(false);
     return instance;
-    }
+  }
 
 private:
   Q_DISABLE_COPY(pqWebView)

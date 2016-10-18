@@ -83,7 +83,7 @@ public:
 
   // methods to control block selection.
   // When changed, this will call MarkModified().
-  void SetCompositeDataSetIndex(unsigned int); //only used for single block selection
+  void SetCompositeDataSetIndex(unsigned int); // only used for single block selection
   void AddCompositeDataSetIndex(unsigned int);
   void ResetCompositeDataSetIndices();
 
@@ -100,8 +100,8 @@ public:
    * PrepareForRendering.
    * Overridden to handle REQUEST_RENDER() to call PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * Method to provide the default name given the name of a table and a column
@@ -154,8 +154,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter))
-    { return false; }
+  virtual bool Export(vtkCSVExporter* vtkNotUsed(exporter)) { return false; }
 
 protected:
   vtkChartRepresentation();
@@ -188,8 +187,7 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -219,8 +217,8 @@ protected:
    * Method to be overrided to transform input data to a vtkTable.
    * The default implementation just returns the data object provided in parameter.
    */
-  virtual vtkDataObject* TransformInputData(vtkInformationVector** inputVector,
-                                            vtkDataObject* data);
+  virtual vtkDataObject* TransformInputData(
+    vtkInformationVector** inputVector, vtkDataObject* data);
 
   typedef std::map<std::string, vtkSmartPointer<vtkTable> > MapOfTables;
   /**
@@ -236,16 +234,16 @@ protected:
   int FlattenTable;
 
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
-  std::set<unsigned int> CompositeIndices; //the selected blocks
+  std::set<unsigned int> CompositeIndices; // the selected blocks
 
   vtkWeakPointer<vtkChartSelectionRepresentation> SelectionRepresentation;
+
 private:
   vtkChartRepresentation(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
 
   vtkTimeStamp PrepareForRenderingTime;
   vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;
-
 };
 
 #endif

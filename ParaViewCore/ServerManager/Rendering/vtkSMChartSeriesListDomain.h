@@ -43,8 +43,7 @@
 class vtkPVArrayInformation;
 class vtkPVDataInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesListDomain :
-  public vtkSMStringListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesListDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMChartSeriesListDomain* New();
@@ -80,14 +79,13 @@ protected:
 
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
-  virtual void PopulateArrayComponents(
-    vtkPVArrayInformation*, std::vector<vtkStdString>&);
+  virtual void PopulateArrayComponents(vtkPVArrayInformation*, std::vector<vtkStdString>&);
 
   bool HidePartialArrays;
+
 private:
   vtkSMChartSeriesListDomain(const vtkSMChartSeriesListDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMChartSeriesListDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

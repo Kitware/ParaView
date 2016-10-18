@@ -36,26 +36,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoolPropertyWidgetDecorator.h"
 #include "vtkWeakPointer.h"
 
-
 /**
 * pqEnableWidgetDecorator can be used to enable/disable a widget based on the
 * status of another property not directly controlled by the widget.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqEnableWidgetDecorator :
-  public pqBoolPropertyWidgetDecorator
+class PQAPPLICATIONCOMPONENTS_EXPORT pqEnableWidgetDecorator : public pqBoolPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqBoolPropertyWidgetDecorator Superclass;
+
 public:
   pqEnableWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
- 
+
   /**
   * overridden from pqPropertyWidget.
   */
-  virtual bool enableWidget() const
-  {
-    return this->isBoolProperty();
-  }
+  virtual bool enableWidget() const { return this->isBoolProperty(); }
 
 private:
   Q_DISABLE_COPY(pqEnableWidgetDecorator)

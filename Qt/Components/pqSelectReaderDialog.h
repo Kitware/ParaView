@@ -50,15 +50,10 @@ public:
   /**
   * constructor
   */
-  pqSelectReaderDialog(const QString& file,
-                       pqServer* s,
-                       vtkSMReaderFactory* factory,
-                       QWidget* p = 0);
+  pqSelectReaderDialog(
+    const QString& file, pqServer* s, vtkSMReaderFactory* factory, QWidget* p = 0);
 
-  pqSelectReaderDialog(const QString& file,
-                       pqServer* s,
-                       vtkStringList* list,
-                       QWidget* p = 0);
+  pqSelectReaderDialog(const QString& file, pqServer* s, vtkStringList* list, QWidget* p = 0);
   /**
   * destructor
   */
@@ -77,8 +72,6 @@ public:
 protected:
   class pqInternal;
   pqInternal* Internal;
-
 };
 
 #endif
-

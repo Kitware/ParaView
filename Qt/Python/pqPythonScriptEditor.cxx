@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,9 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPythonInterpreter.h>
 
-
 //-----------------------------------------------------------------------------
-pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p) : Superclass(p)
+pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
+  : Superclass(p)
 {
   this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
@@ -67,41 +67,40 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p) : Superclass(p)
   this->createStatusBar();
   this->DefaultSaveDirectory = QDir::homePath();
   this->setCurrentFile("");
-  this->connect(this->TextEdit->document(),
-    SIGNAL(contentsChanged()),
-    this, SLOT(documentWasModified()));
-  this->resize(300,450);
+  this->connect(
+    this->TextEdit->document(), SIGNAL(contentsChanged()), this, SLOT(documentWasModified()));
+  this->resize(300, 450);
   pqApplicationCore::instance()->settings()->restoreState("PythonScriptEditor", *this);
   vtkPythonInterpreter::Initialize();
-  this->SyntaxHighlighter = new pqPythonSyntaxHighlighter(this->TextEdit,this);
+  this->SyntaxHighlighter = new pqPythonSyntaxHighlighter(this->TextEdit, this);
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::closeEvent(QCloseEvent *e)
+void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
 {
   if (this->maybeSave())
-    {
+  {
     this->TextEdit->clear();
     this->TextEdit->document()->setModified(false);
     this->setWindowModified(false);
     e->accept();
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
-    }
+  }
   else
-    {
+  {
     e->ignore();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::newFile()
 {
   if (this->maybeSave())
-    {
+  {
     this->TextEdit->clear();
     this->setCurrentFile("");
     return true;
-    }
+  }
   return false;
 }
 
@@ -109,25 +108,25 @@ bool pqPythonScriptEditor::newFile()
 void pqPythonScriptEditor::open()
 {
   if (this->maybeSave())
-    {
+  {
     QString fileName = QFileDialog::getOpenFileName(this);
     if (!fileName.isEmpty())
-      {
+    {
       this->loadFile(fileName);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::open(const QString & fileName)
+void pqPythonScriptEditor::open(const QString& fileName)
 {
   if (this->maybeSave())
-    {
+  {
     if (!fileName.isEmpty())
-      {
+    {
       this->loadFile(fileName);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -147,13 +146,13 @@ void pqPythonScriptEditor::setPythonManager(pqPythonManager* manager)
 bool pqPythonScriptEditor::save()
 {
   if (this->CurrentFile.isEmpty())
-    {
+  {
     return this->saveAs();
-    }
+  }
   else
-    {
+  {
     return this->saveFile(this->CurrentFile);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -162,37 +161,37 @@ bool pqPythonScriptEditor::saveAsMacro()
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
   QDir existCheck(userMacroDir);
   if (!existCheck.exists() && !existCheck.mkpath(userMacroDir))
-    {
+  {
     qWarning() << "Could not create user Macro directory:" << userMacroDir;
     return false;
-    }
+  }
 
-  QString fileName = pqFileDialog::getSaveFileName(NULL, this, 
-    tr("Save Macro"), userMacroDir, tr("Python script (*.py)"));
+  QString fileName = pqFileDialog::getSaveFileName(
+    NULL, this, tr("Save Macro"), userMacroDir, tr("Python script (*.py)"));
   if (!fileName.isEmpty() && this->saveFile(fileName))
+  {
+    if (pythonManager)
     {
-    if(pythonManager)
-      {
       pythonManager->updateMacroList();
-      }
-    return true;
     }
+    return true;
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::saveAs()
 {
-  QString fileName = pqFileDialog::getSaveFileName(NULL, this, tr("Save File"),
-    this->DefaultSaveDirectory, tr("Python script (*.py)"));
+  QString fileName = pqFileDialog::getSaveFileName(
+    NULL, this, tr("Save File"), this->DefaultSaveDirectory, tr("Python script (*.py)"));
   if (fileName.isEmpty())
-    {
+  {
     return false;
-    }
+  }
   if (!fileName.endsWith(".py"))
-    {
+  {
     fileName.append(".py");
-    }
+  }
   return this->saveFile(fileName);
 }
 
@@ -236,28 +235,26 @@ void pqPythonScriptEditor::createActions()
   this->cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
   this->cutAct->setShortcut(tr("Ctrl+X"));
   this->cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                          "clipboard"));
+                                "clipboard"));
   this->connect(this->cutAct, SIGNAL(triggered()), this->TextEdit, SLOT(cut()));
 
   this->copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
   this->copyAct->setShortcut(tr("Ctrl+C"));
   this->copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                            "clipboard"));
+                                 "clipboard"));
   this->connect(this->copyAct, SIGNAL(triggered()), this->TextEdit, SLOT(copy()));
 
   this->pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
   this->pasteAct->setShortcut(tr("Ctrl+V"));
   this->pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                            "selection"));
+                                  "selection"));
   this->connect(this->pasteAct, SIGNAL(triggered()), this->TextEdit, SLOT(paste()));
 
   this->saveAsMacroAct->setEnabled(false);
   this->cutAct->setEnabled(false);
   this->copyAct->setEnabled(false);
-  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)),
-    this->cutAct, SLOT(setEnabled(bool)));
-  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)),
-    this->copyAct, SLOT(setEnabled(bool)));
+  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)), this->cutAct, SLOT(setEnabled(bool)));
+  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)), this->copyAct, SLOT(setEnabled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -293,21 +290,20 @@ void pqPythonScriptEditor::createStatusBar()
 bool pqPythonScriptEditor::maybeSave()
 {
   if (this->TextEdit->document()->isModified())
-    {
+  {
     QMessageBox::StandardButton ret;
-    ret = QMessageBox::warning(this, tr("Script Editor"),
-          tr("The document has been modified.\n"
-             "Do you want to save your changes?"),
-          QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    ret = QMessageBox::warning(this, tr("Script Editor"), tr("The document has been modified.\n"
+                                                             "Do you want to save your changes?"),
+      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     if (ret == QMessageBox::Save)
-      {
+    {
       return this->save();
-      }
-    else if (ret == QMessageBox::Cancel)
-      {
-      return false;
-      }
     }
+    else if (ret == QMessageBox::Cancel)
+    {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -318,17 +314,15 @@ void pqPythonScriptEditor::setText(const QString& text)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::loadFile(const QString &fileName)
+void pqPythonScriptEditor::loadFile(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
+  {
     QMessageBox::warning(this, tr("Script Editor"),
-                        tr("Cannot read file %1:\n%2.")
-                        .arg(fileName)
-                        .arg(file.errorString()));
+      tr("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString()));
     return;
-    }
+  }
 
   QTextStream in(&file);
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -340,17 +334,15 @@ void pqPythonScriptEditor::loadFile(const QString &fileName)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPythonScriptEditor::saveFile(const QString &fileName)
+bool pqPythonScriptEditor::saveFile(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QFile::WriteOnly | QFile::Text))
-    {
-    QMessageBox::warning(this, tr("Sorry!"),
-                        tr("Cannot write file %1:\n%2.")
-                        .arg(fileName)
-                        .arg(file.errorString()));
+  {
+    QMessageBox::warning(
+      this, tr("Sorry!"), tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
     return false;
-    }
+  }
 
   QTextStream out(&file);
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -364,7 +356,7 @@ bool pqPythonScriptEditor::saveFile(const QString &fileName)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::setCurrentFile(const QString &fileName)
+void pqPythonScriptEditor::setCurrentFile(const QString& fileName)
 {
   this->CurrentFile = fileName;
   this->TextEdit->document()->setModified(false);
@@ -372,20 +364,19 @@ void pqPythonScriptEditor::setCurrentFile(const QString &fileName)
 
   QString shownName;
   if (this->CurrentFile.isEmpty())
-    {
+  {
     shownName = "untitled.py";
-    }
+  }
   else
-    {
+  {
     shownName = strippedName(this->CurrentFile);
-    }
+  }
 
   this->setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Script Editor")));
 }
 
 //-----------------------------------------------------------------------------
-QString pqPythonScriptEditor::strippedName(const QString &fullFileName)
+QString pqPythonScriptEditor::strippedName(const QString& fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
 }
-

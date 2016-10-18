@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,25 +54,25 @@ public:
   // treeWidget :- the tree widget managed by this helper.
   // checkableColumn :- column index for the checkable item.
   // parent :- QObject parent.
-  pqTreeWidgetCheckHelper(QTreeWidget* treeWidget,
-    int checkableColumn, QObject* parent);
+  pqTreeWidgetCheckHelper(QTreeWidget* treeWidget, int checkableColumn, QObject* parent);
 
   enum CheckMode
-    {
+  {
     CLICK_IN_COLUMN, // toggle check state when clicked in the column
                      // with the checkable item.
     CLICK_IN_ROW,    // toggle check state when clicked in the row
                      // with the checkable item (default).
-    };
+  };
 
   // Check Mode controls whether the user must click in the column
   // with the checkable item or any column in the same row.
-  void setCheckMode(CheckMode mode) {this->Mode = mode;}
+  void setCheckMode(CheckMode mode) { this->Mode = mode; }
   CheckMode checkMode() const { return this->Mode; }
 
 protected slots:
-  void onItemClicked (QTreeWidgetItem *item, int column);
-  void onItemPressed (QTreeWidgetItem *item, int column);
+  void onItemClicked(QTreeWidgetItem* item, int column);
+  void onItemPressed(QTreeWidgetItem* item, int column);
+
 private:
   Q_DISABLE_COPY(pqTreeWidgetCheckHelper)
 
@@ -83,4 +83,3 @@ private:
 };
 
 #endif
-

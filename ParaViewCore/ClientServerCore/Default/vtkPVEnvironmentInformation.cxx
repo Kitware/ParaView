@@ -37,22 +37,20 @@ vtkPVEnvironmentInformation::~vtkPVEnvironmentInformation()
 //-----------------------------------------------------------------------------
 void vtkPVEnvironmentInformation::CopyFromObject(vtkObject* object)
 {
-  vtkPVEnvironmentInformationHelper* helper = 
+  vtkPVEnvironmentInformationHelper* helper =
     vtkPVEnvironmentInformationHelper::SafeDownCast(object);
   if (!helper)
-    {
-    vtkErrorMacro(
-      "Can collect information only from a vtkPVEnvironmentInformationHelper.");
+  {
+    vtkErrorMacro("Can collect information only from a vtkPVEnvironmentInformationHelper.");
     return;
-    }
+  }
   this->SetVariable(vtksys::SystemTools::GetEnv(helper->GetVariable()));
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVEnvironmentInformation::CopyToStream(vtkClientServerStream* stream)
 {
-  *stream << vtkClientServerStream::Reply
-    << this->Variable;
+  *stream << vtkClientServerStream::Reply << this->Variable;
   *stream << vtkClientServerStream::End;
 }
 
@@ -61,10 +59,10 @@ void vtkPVEnvironmentInformation::CopyFromStream(const vtkClientServerStream* cs
 {
   const char* temp = 0;
   if (!css->GetArgument(0, 0, &temp))
-    {
+  {
     vtkErrorMacro("Error parsing Variable.");
     return;
-    }
+  }
   this->SetVariable(temp);
 }
 
@@ -72,7 +70,5 @@ void vtkPVEnvironmentInformation::CopyFromStream(const vtkClientServerStream* cs
 void vtkPVEnvironmentInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Variable: " 
-    << (this->Variable? this->Variable : "(none)") << endl;
+  os << indent << "Variable: " << (this->Variable ? this->Variable : "(none)") << endl;
 }
-

@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerOptions : public vtkPVOptions
 {
 public:
   static vtkPVServerOptions* New();
-  vtkTypeMacro(vtkPVServerOptions,vtkPVOptions);
+  vtkTypeMacro(vtkPVServerOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -107,6 +107,7 @@ protected:
   char* ClientHostName;
 
   int ServerPort;
+
 private:
   vtkPVServerOptions(const vtkPVServerOptions&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVServerOptions&) VTK_DELETE_FUNCTION;

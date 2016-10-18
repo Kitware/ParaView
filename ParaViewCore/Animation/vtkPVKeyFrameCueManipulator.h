@@ -43,8 +43,7 @@ class vtkPVKeyFrameCueManipulatorInternals;
 class vtkPVKeyFrameCueManipulatorObserver;
 class vtkPVKeyFrame;
 
-class VTKPVANIMATION_EXPORT vtkPVKeyFrameCueManipulator :
-  public vtkPVCueManipulator
+class VTKPVANIMATION_EXPORT vtkPVKeyFrameCueManipulator : public vtkPVCueManipulator
 {
 public:
   vtkTypeMacro(vtkPVKeyFrameCueManipulator, vtkPVCueManipulator);
@@ -57,7 +56,7 @@ public:
    * key time, only one of then will be considered. It returns the index
    * of the added frame in the collection.
    */
-  int AddKeyFrame (vtkPVKeyFrame* keyframe);
+  int AddKeyFrame(vtkPVKeyFrame* keyframe);
 
   //@{
   /**
@@ -156,15 +155,14 @@ protected:
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime,
-    vtkPVAnimationCue* cueproxy);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy);
 
   int AddKeyFrameInternal(vtkPVKeyFrame* keyframe);
   int RemoveKeyFrameInternal(vtkPVKeyFrame* keyframe);
 
   friend class vtkPVKeyFrameCueManipulatorObserver;
   vtkPVKeyFrameCueManipulatorObserver* Observer;
-  void ExecuteEvent(vtkObject* obj, unsigned long event, void* );
+  void ExecuteEvent(vtkObject* obj, unsigned long event, void*);
 
   int SendEndEvent;
   int LastAddedKeyFrameIndex;

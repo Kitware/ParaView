@@ -19,11 +19,8 @@
 #include <vtkUnstructuredGrid.h>
 
 #include <vtkSmartPointer.h>
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-#define VTK_NEW(type, name) \
-  name = vtkSmartPointer<type>::New()
-
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_NEW(type, name) name = vtkSmartPointer<type>::New()
 
 vtkStandardNewMacro(vtkPMergeConnected);
 
@@ -42,11 +39,12 @@ vtkPMergeConnected::~vtkPMergeConnected()
 
 void vtkPMergeConnected::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "vtkPMergeConnected filter" << "\n";
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "vtkPMergeConnected filter"
+     << "\n";
 }
 
-void vtkPMergeConnected::SetController(vtkMultiProcessController *c)
+void vtkPMergeConnected::SetController(vtkMultiProcessController* c)
 {
   if ((c == NULL) || (c->GetNumberOfProcesses() == 0))
   {
@@ -79,28 +77,25 @@ void vtkPMergeConnected::SetController(vtkMultiProcessController *c)
   this->MyId = c->GetLocalProcessId();
 }
 
-int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
-    vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector)
+int vtkPMergeConnected::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Get the input and ouptut
-  vtkMultiBlockDataSet *input = vtkMultiBlockDataSet::SafeDownCast(
-      inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkMultiBlockDataSet* input =
+    vtkMultiBlockDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkMultiBlockDataSet* output =
+    vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   int piece, numPieces;
-  piece = outInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-  numPieces = outInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+  piece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+  numPieces = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
   // Read file
-  vtkMultiProcessController *contr = this->Controller;
+  vtkMultiProcessController* contr = this->Controller;
 
   int sum = 0;
   int oops = ((piece != this->MyId) || (numPieces != this->NumProcesses));
@@ -118,29 +113,25 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
 
   int i, j, tb;
   tb = input->GetNumberOfBlocks();
-  for (i=piece; i<tb; i+=numPieces)
+  for (i = piece; i < tb; i += numPieces)
   {
-    vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::SafeDownCast(
-        input->GetBlock(i));
+    vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(input->GetBlock(i));
 
     VTK_CREATE(vtkUnstructuredGrid, ugrid_out);
     ugrid_out->SetPoints(ugrid->GetPoints());
 
-    vtkCellData   *cd = ugrid->GetCellData();
-    vtkPointData  *pd = ugrid->GetPointData();
-    vtkCellData  *ocd = ugrid_out->GetCellData();
-    vtkPointData *opd = ugrid_out->GetPointData();
+    vtkCellData* cd = ugrid->GetCellData();
+    vtkPointData* pd = ugrid->GetPointData();
+    vtkCellData* ocd = ugrid_out->GetCellData();
+    vtkPointData* opd = ugrid_out->GetPointData();
 
-    vtkIdTypeArray *prid_array = vtkIdTypeArray::SafeDownCast(
-        pd->GetArray("RegionId"));
-    vtkIdTypeArray *crid_array = vtkIdTypeArray::SafeDownCast(
-        cd->GetArray("RegionId"));
-    vtkFloatArray *vol_array = vtkFloatArray::SafeDownCast(
-        cd->GetArray("Volumes"));
+    vtkIdTypeArray* prid_array = vtkIdTypeArray::SafeDownCast(pd->GetArray("RegionId"));
+    vtkIdTypeArray* crid_array = vtkIdTypeArray::SafeDownCast(cd->GetArray("RegionId"));
+    vtkFloatArray* vol_array = vtkFloatArray::SafeDownCast(cd->GetArray("Volumes"));
 
     VTK_CREATE(vtkIdTypeArray, oprid_array);
     VTK_CREATE(vtkIdTypeArray, ocrid_array);
-    VTK_CREATE(vtkFloatArray,  ovol_array);
+    VTK_CREATE(vtkFloatArray, ovol_array);
 
     // point data "RegionId" keep their old id for now
     oprid_array->DeepCopy(prid_array);
@@ -158,7 +149,7 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
     ovol_array->SetNumberOfComponents(1);
 
     // Compute cell/point data
-    for (j=rid_range[0]; j<=rid_range[1]; j++)
+    for (j = rid_range[0]; j <= rid_range[1]; j++)
     {
       // Compute face stream of merged polyhedron cell
       VTK_CREATE(vtkIdList, mcell);
@@ -189,7 +180,7 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
 
 // Convert local region id to global ones
 void vtkPMergeConnected::LocalToGlobalRegionId(
-    vtkMultiProcessController *contr, vtkMultiBlockDataSet *data)
+  vtkMultiProcessController* contr, vtkMultiBlockDataSet* data)
 {
   int i, j;
   int rank, num_p, tb;
@@ -200,12 +191,11 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
   // Gather information about number of regions in each block
   int all_num_regions_local[tb];
   memset(all_num_regions_local, 0, sizeof(int) * tb);
-  for (i=rank; i<tb; i+=num_p)
+  for (i = rank; i < tb; i += num_p)
   {
-    vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::SafeDownCast(
-          data->GetBlock(i));
-    vtkIdTypeArray *crid_array = vtkIdTypeArray::SafeDownCast(
-          ugrid->GetCellData()->GetArray("RegionId"));
+    vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(data->GetBlock(i));
+    vtkIdTypeArray* crid_array =
+      vtkIdTypeArray::SafeDownCast(ugrid->GetCellData()->GetArray("RegionId"));
 
     double rid_range[2];
     crid_array->GetRange(rid_range, 0);
@@ -216,14 +206,13 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
   contr->AllReduce(all_num_regions_local, all_num_regions, tb, vtkCommunicator::SUM_OP);
 
   // Compute and adding offset and make local id global
-  for (i=rank; i<tb; i+=num_p)
+  for (i = rank; i < tb; i += num_p)
   {
-    vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::SafeDownCast(
-          data->GetBlock(i));
-    vtkIdTypeArray *crid_array = vtkIdTypeArray::SafeDownCast(
-          ugrid->GetCellData()->GetArray("RegionId"));
-    vtkIdTypeArray *prid_array = vtkIdTypeArray::SafeDownCast(
-          ugrid->GetPointData()->GetArray("RegionId"));
+    vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(data->GetBlock(i));
+    vtkIdTypeArray* crid_array =
+      vtkIdTypeArray::SafeDownCast(ugrid->GetCellData()->GetArray("RegionId"));
+    vtkIdTypeArray* prid_array =
+      vtkIdTypeArray::SafeDownCast(ugrid->GetPointData()->GetArray("RegionId"));
 
     int num_cells = crid_array->GetNumberOfTuples();
     int num_points = prid_array->GetNumberOfTuples();
@@ -239,13 +228,13 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
     oprid_array->SetName("RegionId");
 
     int offset = 0;
-    for (j=0; j<i; j++)
+    for (j = 0; j < i; j++)
       offset += all_num_regions[j];
 
     // vtkIdTypeArray doesn't update range when replace elements, hack around
-    for (j=0; j<num_cells; j++)
+    for (j = 0; j < num_cells; j++)
       ocrid_array->InsertValue(j, offset + crid_array->GetValue(j));
-    for (j=0; j<num_points; j++)
+    for (j = 0; j < num_points; j++)
       oprid_array->InsertValue(j, offset + prid_array->GetValue(j));
 
     ugrid->GetCellData()->RemoveArray("RegionId");
@@ -257,24 +246,24 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
 }
 
 // Comparision function to sort point id list
-int compare_ids(const void *a, const void *b)
+int compare_ids(const void* a, const void* b)
 {
-  vtkIdType A = *( static_cast<const vtkIdType*>( a ) );
-  vtkIdType B = *( static_cast<const vtkIdType*>( b ) );
-  return ( static_cast<int>( A-B ) );
+  vtkIdType A = *(static_cast<const vtkIdType*>(a));
+  vtkIdType B = *(static_cast<const vtkIdType*>(b));
+  return (static_cast<int>(A - B));
 }
 
 // Generate FaceWithKey struct from vtkIdList to use for indexing
 vtkPMergeConnected::FaceWithKey* vtkPMergeConnected::IdsToKey(vtkIdList* ids)
 {
-  FaceWithKey *facekey = new FaceWithKey[1];
+  FaceWithKey* facekey = new FaceWithKey[1];
 
   int num_pts = ids->GetNumberOfIds();
-  vtkIdType *key  = new vtkIdType[num_pts];
-  vtkIdType *orig = new vtkIdType[num_pts];
+  vtkIdType* key = new vtkIdType[num_pts];
+  vtkIdType* orig = new vtkIdType[num_pts];
 
   int i;
-  for (i=0; i<num_pts; i++)
+  for (i = 0; i < num_pts; i++)
     orig[i] = ids->GetId(i);
   memcpy(key, orig, sizeof(vtkIdType) * num_pts);
   qsort(key, num_pts, sizeof(vtkIdType), compare_ids);
@@ -289,13 +278,13 @@ vtkPMergeConnected::FaceWithKey* vtkPMergeConnected::IdsToKey(vtkIdList* ids)
 // Compare function in face_map
 struct vtkPMergeConnected::cmp_ids
 {
-  bool operator()(FaceWithKey const *a, FaceWithKey const *b) const
+  bool operator()(FaceWithKey const* a, FaceWithKey const* b) const
   {
     int i, ret = 0;
 
     if (a->num_pts == b->num_pts)
     {
-      for (i=0; i<a->num_pts; i++)
+      for (i = 0; i < a->num_pts; i++)
       {
         if (a->key[i] != b->key[i])
         {
@@ -312,7 +301,7 @@ struct vtkPMergeConnected::cmp_ids
 };
 
 // Delete a FaceWithKey struct
-void vtkPMergeConnected::delete_key(FaceWithKey *key)
+void vtkPMergeConnected::delete_key(FaceWithKey* key)
 {
   delete[] key->key;
   delete[] key->orig;
@@ -321,54 +310,55 @@ void vtkPMergeConnected::delete_key(FaceWithKey *key)
 
 // Face stream of a polyhedron cell in the following format:
 // numCellFaces, numFace0Pts, id1, id2, id3, numFace1Pts,id1, id2, id3, ...
-void vtkPMergeConnected::MergeCellsOnRegionId(vtkUnstructuredGrid *ugrid, int target, vtkIdList *facestream)
+void vtkPMergeConnected::MergeCellsOnRegionId(
+  vtkUnstructuredGrid* ugrid, int target, vtkIdList* facestream)
 {
   int i, j;
 
-  vtkIdTypeArray *rids = vtkIdTypeArray::SafeDownCast(ugrid->GetCellData()->GetArray("RegionId"));
+  vtkIdTypeArray* rids = vtkIdTypeArray::SafeDownCast(ugrid->GetCellData()->GetArray("RegionId"));
 
   // Initially set -1 for number of faces in facestream
   facestream->InsertNextId(-1);
 
-  std::map<FaceWithKey *, int, cmp_ids> face_map;
-  std::map<FaceWithKey *, int, cmp_ids>::iterator it;
+  std::map<FaceWithKey*, int, cmp_ids> face_map;
+  std::map<FaceWithKey*, int, cmp_ids>::iterator it;
 
   // Create face map and count how many times a face is shared.
-  for (i=0; i<rids->GetNumberOfTuples(); i++)
+  for (i = 0; i < rids->GetNumberOfTuples(); i++)
   {
     if (rids->GetTuple1(i) == target)
     {
-      vtkPolyhedron *cell = vtkPolyhedron::SafeDownCast(ugrid->GetCell(i));
-      for (j=0; j<cell->GetNumberOfFaces(); j++)
+      vtkPolyhedron* cell = vtkPolyhedron::SafeDownCast(ugrid->GetCell(i));
+      for (j = 0; j < cell->GetNumberOfFaces(); j++)
       {
-        vtkCell *face = cell->GetFace(j);
-        vtkIdList *pts = face->GetPointIds();
-        FaceWithKey *key = IdsToKey(pts);
+        vtkCell* face = cell->GetFace(j);
+        vtkIdList* pts = face->GetPointIds();
+        FaceWithKey* key = IdsToKey(pts);
 
         it = face_map.find(key);
         if (it == face_map.end())
           face_map[key] = 1;
         else
-          it->second ++;
+          it->second++;
       }
     }
   }
 
   // Keep those unshared faces and build up a new cell
   int face_count = 0;
-  for(it=face_map.begin(); it!=face_map.end(); ++it)
+  for (it = face_map.begin(); it != face_map.end(); ++it)
   {
-    FaceWithKey *key = (* it).first;
-    int count = (* it).second;
+    FaceWithKey* key = (*it).first;
+    int count = (*it).second;
 
     if (count > 2)
       std::cerr << "error in building up face map" << std::endl;
     else if (count == 1)
     {
       facestream->InsertNextId(key->num_pts);
-      for (i=0; i<key->num_pts; i++)
+      for (i = 0; i < key->num_pts; i++)
         facestream->InsertNextId(key->orig[i]);
-      face_count ++;
+      face_count++;
     }
     delete_key(key);
   }
@@ -376,23 +366,24 @@ void vtkPMergeConnected::MergeCellsOnRegionId(vtkUnstructuredGrid *ugrid, int ta
 }
 
 // For original cell data, sum them up if possible in merging the connected cells
-float vtkPMergeConnected::MergeCellDataOnRegionId(vtkFloatArray *data_array, vtkIdTypeArray *rid_array, vtkIdType target)
+float vtkPMergeConnected::MergeCellDataOnRegionId(
+  vtkFloatArray* data_array, vtkIdTypeArray* rid_array, vtkIdType target)
 {
   int i;
   float val = 0;
 
-  for (i=0; i<rid_array->GetNumberOfTuples(); i++)
+  for (i = 0; i < rid_array->GetNumberOfTuples(); i++)
     if (rid_array->GetTuple1(i) == target)
       val += data_array->GetTuple1(i);
 
   return val;
 }
 
-int vtkPMergeConnected::FillOutputPortInformation(int port, vtkInformation* info )
+int vtkPMergeConnected::FillOutputPortInformation(int port, vtkInformation* info)
 {
-  if ( port == 0 )
+  if (port == 0)
   {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet" );
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
 
     return 1;
   }

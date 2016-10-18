@@ -20,23 +20,23 @@
 extern "C" void createcpimagedata_(int* dimensions, int* extent)
 {
   if (!vtkCPPythonAdaptorAPI::GetCoProcessorData())
-    {
+  {
     vtkGenericWarningMacro("Unable to access CoProcessorData.");
     return;
-    }
+  }
 
   // The simulation grid is a 3-dimensional topologically and geometrically
   // regular grid. In VTK/ParaView, this is considered an image data set.
   vtkSmartPointer<vtkImageData> grid = vtkSmartPointer<vtkImageData>::New();
 
-  grid->SetExtent(extent[0]-1, extent[1]-1, extent[2]-1,
-                  extent[3]-1, extent[4]-1, extent[5]-1);
-  grid->SetSpacing(1./(dimensions[0]-1), 1./(dimensions[1]-1), 1./(dimensions[2]-1));
+  grid->SetExtent(
+    extent[0] - 1, extent[1] - 1, extent[2] - 1, extent[3] - 1, extent[4] - 1, extent[5] - 1);
+  grid->SetSpacing(1. / (dimensions[0] - 1), 1. / (dimensions[1] - 1), 1. / (dimensions[2] - 1));
 
   // Name should be consistent between here, Fortran and Python client script.
   vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(grid);
   vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input")->SetWholeExtent(
-    0, dimensions[0]-1, 0, dimensions[1]-1, 0, dimensions[2]-1);
+    0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1);
 }
 
 // Add field(s) to the data container.
@@ -50,17 +50,17 @@ extern "C" void addfield_(double* scalars, char* name)
   vtkImageData* image = vtkImageData::SafeDownCast(idd->GetGrid());
 
   if (!image)
-    {
+  {
     vtkGenericWarningMacro("No adaptor grid to attach field data to.");
     return;
-    }
+  }
 
   // field name must match that in the fortran code.
   if (idd->IsFieldNeeded(name))
-    {
+  {
     vtkSmartPointer<vtkDoubleArray> field = vtkSmartPointer<vtkDoubleArray>::New();
     field->SetName(name);
     field->SetArray(scalars, image->GetNumberOfPoints(), 1);
     image->GetPointData()->AddArray(field);
-    }
+  }
 }

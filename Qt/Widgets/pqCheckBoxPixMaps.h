@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -58,30 +58,27 @@ public:
   */
   QPixmap getPixmap(Qt::CheckState state, bool active) const;
   QPixmap getPixmap(int state, bool active) const
-    {
+  {
     return this->getPixmap(static_cast<Qt::CheckState>(state), active);
-    }
-
+  }
 
 private:
   Q_DISABLE_COPY(pqCheckBoxPixMaps)
 
   enum PixmapStateIndex
-    {
-    Checked                 = 0,
-    PartiallyChecked        = 1,
-    UnChecked               = 2,
-    
+  {
+    Checked = 0,
+    PartiallyChecked = 1,
+    UnChecked = 2,
+
     // All active states in lower half
-    Checked_Active          = 3,
+    Checked_Active = 3,
     PartiallyChecked_Active = 4,
-    UnChecked_Active        = 5,
-   
-    PixmapCount             = 6
-    };
+    UnChecked_Active = 5,
+
+    PixmapCount = 6
+  };
   QPixmap Pixmaps[6];
 };
 
 #endif
-
-

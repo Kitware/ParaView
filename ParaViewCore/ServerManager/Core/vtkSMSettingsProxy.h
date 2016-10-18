@@ -43,7 +43,7 @@ public:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
- protected:
+protected:
   vtkSMSettingsProxy();
   ~vtkSMSettingsProxy();
 
@@ -64,7 +64,6 @@ public:
 private:
   vtkSMSettingsProxy(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

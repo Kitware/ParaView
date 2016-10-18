@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,6 +43,7 @@ class PQCORE_EXPORT pqComparativeRenderView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
+
 public:
   static QString comparativeRenderViewType() { return "ComparativeRenderView"; }
 
@@ -52,11 +53,8 @@ public:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqComparativeRenderView( const QString& group,
-                const QString& name, 
-                vtkSMViewProxy* renModule, 
-                pqServer* server, 
-                QObject* parent=NULL);
+  pqComparativeRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
+    pqServer* server, QObject* parent = NULL);
   virtual ~pqComparativeRenderView();
 
   /**
@@ -73,7 +71,7 @@ protected slots:
   /**
   * Called when the layout on the comparative vis changes.
   */
-  void updateViewWidgets(QWidget* container=NULL);
+  void updateViewWidgets(QWidget* container = NULL);
 
 protected:
   /**

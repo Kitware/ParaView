@@ -20,14 +20,12 @@
 
 vtkStandardNewMacro(vtkPVArrowSource);
 
-
 void vtkPVArrowSource::ExecuteInformation()
 {
   this->GetOutputInformation(0)->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 }
 
-
 void vtkPVArrowSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

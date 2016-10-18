@@ -46,6 +46,7 @@ class vtkSMProxySelectionModel;
 class PQCORE_EXPORT pqProxySelection : public QSet<pqServerManagerModelItem*>
 {
   typedef QList<pqServerManagerModelItem> Superclass;
+
 public:
   /**
   * copy values from vtkSMProxySelectionModel. All proxies in the

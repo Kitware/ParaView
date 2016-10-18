@@ -32,7 +32,8 @@ class vtk3DWidgetRepresentation;
 class vtkPolyData;
 class vtkPVCacheKeeper;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkProgressBarSourceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkProgressBarSourceRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkProgressBarSourceRepresentation* New();
@@ -66,10 +67,9 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(
-    vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
-//BTX
+  // BTX
 protected:
   vtkProgressBarSourceRepresentation();
   ~vtkProgressBarSourceRepresentation();
@@ -82,8 +82,7 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -111,7 +110,7 @@ protected:
 private:
   vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
-//ETX
+  // ETX
 };
 
 #endif

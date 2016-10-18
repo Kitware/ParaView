@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVArrayCalculator
- * @brief   perform mathematical operations on data 
+ * @brief   perform mathematical operations on data
  *  in field data arrays
  *
  *
@@ -40,18 +40,17 @@ class vtkDataSetAttributes;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVArrayCalculator : public vtkArrayCalculator
 {
 public:
-  vtkTypeMacro( vtkPVArrayCalculator,vtkArrayCalculator );
-  void   PrintSelf( ostream & os, vtkIndent indent );
+  vtkTypeMacro(vtkPVArrayCalculator, vtkArrayCalculator);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVArrayCalculator * New();
+  static vtkPVArrayCalculator* New();
 
 protected:
   vtkPVArrayCalculator();
   ~vtkPVArrayCalculator();
 
-  virtual int RequestData( vtkInformation *, vtkInformationVector **, 
-                           vtkInformationVector *);
-  
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
   //@{
   /**
    * This function updates the (scalar and vector arrays / variables) names
@@ -62,12 +61,12 @@ protected:
    * to the attributes of the input dataset. This function should be called by
    * RequestData() only.
    */
-  void    UpdateArrayAndVariableNames( vtkDataObject        * theInputObj, 
-                                       vtkDataSetAttributes * inDataAttrs );
+  void UpdateArrayAndVariableNames(vtkDataObject* theInputObj, vtkDataSetAttributes* inDataAttrs);
+
 private:
-  vtkPVArrayCalculator( const vtkPVArrayCalculator & ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPVArrayCalculator & ) VTK_DELETE_FUNCTION;
+  vtkPVArrayCalculator(const vtkPVArrayCalculator&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVArrayCalculator&) VTK_DELETE_FUNCTION;
 };
-  //@}
+//@}
 
 #endif

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,8 +43,7 @@ class QPoint;
 /**
 * Provides tooltip-like behavior, but displays an image instead of text
 */
-class PQCOMPONENTS_EXPORT pqImageTip :
-  public QLabel
+class PQCOMPONENTS_EXPORT pqImageTip : public QLabel
 {
   Q_OBJECT
 
@@ -52,7 +51,7 @@ public:
   /**
   * Displays a pixmap at the given screen coordinates
   */
-  static void showTip(const QPixmap& image, const QPoint& pos);    
+  static void showTip(const QPixmap& image, const QPoint& pos);
 
 private:
   pqImageTip(const QPixmap& image, QWidget* parent);
@@ -62,8 +61,8 @@ private:
 
   bool eventFilter(QObject*, QEvent*);
   void enterEvent(QEvent*);
-  void timerEvent(QTimerEvent *e);
-  void paintEvent(QPaintEvent *e);
+  void timerEvent(QTimerEvent* e);
+  void paintEvent(QPaintEvent* e);
 };
 
 #endif

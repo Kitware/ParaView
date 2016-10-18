@@ -25,7 +25,8 @@
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVExtractSelection.h"
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVSingleOutputExtractSelection : public vtkPVExtractSelection
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVSingleOutputExtractSelection
+  : public vtkPVExtractSelection
 {
 public:
   static vtkPVSingleOutputExtractSelection* New();
@@ -39,7 +40,6 @@ protected:
 private:
   vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

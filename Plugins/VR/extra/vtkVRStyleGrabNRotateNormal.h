@@ -47,14 +47,15 @@ class vtkVRStyleGrabNRotateSliceNormal : public vtkVRStyleGrabNUpdateMatrix
 {
   Q_OBJECT
   typedef vtkVRStyleGrabNUpdateMatrix Superclass;
+
 public:
-  vtkVRStyleGrabNRotateSliceNormal(QObject* parent=0);
+  vtkVRStyleGrabNRotateSliceNormal(QObject* parent = 0);
   virtual ~vtkVRStyleGrabNRotateSliceNormal();
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleButton( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
-   virtual void GetPropertyData();
+  virtual void HandleButton(const vtkVREventData& data);
+  virtual void HandleTracker(const vtkVREventData& data);
+  virtual void GetPropertyData();
   virtual void SetProperty();
   virtual bool update();
   bool GetNormalProxyNProperty();
@@ -67,6 +68,7 @@ protected:
   vtkSMProxy* NormalProxy;
   vtkSMDoubleVectorProperty* NormalProperty;
   double Normal[4];
+
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateSliceNormal)
 };

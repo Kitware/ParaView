@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -47,17 +47,16 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAlwaysConnectedBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqAlwaysConnectedBehavior(QObject* parent=0);
+  pqAlwaysConnectedBehavior(QObject* parent = 0);
   ~pqAlwaysConnectedBehavior();
 
   /**
-  * Get/Set the default server resource to connect to. 
+  * Get/Set the default server resource to connect to.
   */
-  void setDefaultServer(const pqServerResource& resource)
-    { this->DefaultServer = resource; }
-  const pqServerResource& defaultServer() const
-    { return this->DefaultServer; }
+  void setDefaultServer(const pqServerResource& resource) { this->DefaultServer = resource; }
+  const pqServerResource& defaultServer() const { return this->DefaultServer; }
 
 protected slots:
   void delayedServerCheck();
@@ -66,10 +65,9 @@ protected slots:
 protected:
   pqServerResource DefaultServer;
   pqTimer Timer;
+
 private:
   Q_DISABLE_COPY(pqAlwaysConnectedBehavior)
 };
 
 #endif
-
-

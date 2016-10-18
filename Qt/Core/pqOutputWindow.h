@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,10 +45,9 @@ to the corresponding pqOutputWindow slots.
 
 \sa pqOutputWindowAdapter
 */
-class PQCORE_EXPORT pqOutputWindow :
-  public QDialog
+class PQCORE_EXPORT pqOutputWindow : public QDialog
 {
-  typedef QDialog Superclass;  
+  typedef QDialog Superclass;
   Q_OBJECT
 
 public:
@@ -128,12 +127,11 @@ private:
   void addMessage(int messageType, const QString& text);
   void addPythonMessages(int messageType, const QString& text);
 
-  void addMessage(int messageType, const QString& location, 
-                  const QString& message);
-  
+  void addMessage(int messageType, const QString& location, const QString& message);
+
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
-  
+
   bool Show[MESSAGE_TYPE_COUNT];
 
   /**

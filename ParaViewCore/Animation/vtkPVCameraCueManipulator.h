@@ -42,11 +42,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum Modes
-    {
+  {
     CAMERA,
     PATH,
     FOLLOW_DATA
-    };
+  };
 
   //@{
   /**
@@ -69,7 +69,7 @@ public:
    * Set the data soruce proxy. This is used when in the FOLLOW_DATA mode. The
    * camera will track the data refered to by the data source proxy.
    */
-  void SetDataSourceProxy(vtkSMProxy *dataSourceProxy);
+  void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);
 
 protected:
   vtkPVCameraCueManipulator();
@@ -83,15 +83,14 @@ protected:
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime,
-                           vtkPVAnimationCue* cueproxy);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy);
 
   vtkCameraInterpolator* CameraInterpolator;
   vtkSMProxy* DataSourceProxy;
+
 private:
   vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

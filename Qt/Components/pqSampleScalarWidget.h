@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,8 +50,7 @@ scalar samples.  Current uses include: specifying the set of "slices" for
 the Cut filter, and specifying the set of contour values for the Contour filter.
 */
 
-class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
-  public QWidget
+class PQCOMPONENTS_EXPORT pqSampleScalarWidget : public QWidget
 {
   typedef QWidget Superclass;
 
@@ -67,9 +66,7 @@ public:
   /**
   * Sets the server manager objects that will be controlled by the widget
   */
-  void setDataSources(
-    pqSMProxy controlled_proxy,
-    vtkSMDoubleVectorProperty* sample_property,
+  void setDataSources(pqSMProxy controlled_proxy, vtkSMDoubleVectorProperty* sample_property,
     vtkSMProperty* range_property = 0);
 
   /**
@@ -96,27 +93,27 @@ signals:
 private slots:
   void onSamplesChanged();
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
-  
+
   void onDelete();
   void onDeleteAll();
   void onNewValue();
   void onNewRange();
   void onSelectAll();
   void onScientificNotation(bool);
-  
+
   void onControlledPropertyChanged();
   void onControlledPropertyDomainChanged();
-  
+
 private:
   pqSampleScalarWidget(const pqSampleScalarWidget&);
   pqSampleScalarWidget& operator=(const pqSampleScalarWidget&);
-  
+
   bool getRange(double& range_min, double& range_max);
-  
+
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  bool eventFilter(QObject *object, QEvent *e);
+  bool eventFilter(QObject* object, QEvent* e);
 };
 
 #endif // !_pqSampleScalarWidget_h

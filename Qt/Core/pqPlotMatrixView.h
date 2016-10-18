@@ -40,13 +40,10 @@ class PQCORE_EXPORT pqPlotMatrixView : public pqContextView
   typedef pqContextView Superclass;
 
 public:
-  pqPlotMatrixView(const QString &group, 
-                   const QString &name,
-                   vtkSMContextViewProxy *viewModule,
-                   pqServer *server,
-                   QObject *parent = NULL);
+  pqPlotMatrixView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
   virtual ~pqPlotMatrixView();
-  
+
   static QString viewType() { return "PlotMatrixView"; }
 
 protected:

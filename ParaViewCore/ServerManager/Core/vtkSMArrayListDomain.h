@@ -138,7 +138,7 @@ public:
    */
   vtkGetMacro(AttributeType, int);
   //@}
-  
+
   //@{
   /**
    * Return the string that is used as "none_string" in XML configuration.
@@ -177,8 +177,8 @@ public:
    * If no InformationKey is specified in the xml, the default
    * behavior is to create a rejected key vtkAbstractArray::GUI_HIDE
    */
-  virtual unsigned int AddInformationKey(const char* location, const char *name, int strategy);
-  virtual unsigned int AddInformationKey(const char* location, const char *name)
+  virtual unsigned int AddInformationKey(const char* location, const char* name, int strategy);
+  virtual unsigned int AddInformationKey(const char* location, const char* name)
   {
     return this->AddInformationKey(location, name, vtkSMArrayListDomain::NEED_KEY);
   }
@@ -187,7 +187,7 @@ public:
   /**
    * Removes an InformationKey from this domain.
    */
-  unsigned int RemoveInformationKey(const char* location, const char *name);
+  unsigned int RemoveInformationKey(const char* location, const char* name);
 
   /**
    * Returns the number of InformationKeys in this domain.
@@ -212,7 +212,7 @@ public:
    * returns the mangled name for the component index that is passed in.
 
    */
-  static vtkStdString CreateMangledName(vtkPVArrayInformation *arrayInfo, int component);
+  static vtkStdString CreateMangledName(vtkPVArrayInformation* arrayInfo, int component);
 
   //@{
   /**
@@ -220,7 +220,7 @@ public:
 
    */
   static vtkStdString ArrayNameFromMangledName(const char* name);
-  static int ComponentIndexFromMangledName(vtkPVArrayInformation *info, const char* name);
+  static int ComponentIndexFromMangledName(vtkPVArrayInformation* info, const char* name);
   //@}
 
 protected:
@@ -245,8 +245,7 @@ protected:
    * filter out arrays based on their names by subclasses.
    * This implementation always returns false, but subclasses may override.
    */
-  virtual bool IsFilteredArray(
-    vtkPVDataInformation* info, int association, const char* arrayName);
+  virtual bool IsFilteredArray(vtkPVDataInformation* info, int association, const char* arrayName);
 
   //@{
   /**
@@ -274,6 +273,7 @@ protected:
   // arbitrary array for scalar coloring. Need to rethink how this should be
   // done cleanly.
   bool PickFirstAvailableArrayByDefault;
+
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;

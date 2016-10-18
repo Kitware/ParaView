@@ -28,7 +28,8 @@
 
 class vtkChartParallelCoordinates;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVParallelCoordinatesRepresentation* New();
@@ -113,14 +114,14 @@ protected:
   int LineStyle;
   double Color[3];
   double Opacity;
+
 private:
   vtkPVParallelCoordinatesRepresentation(
-      const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
+    const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

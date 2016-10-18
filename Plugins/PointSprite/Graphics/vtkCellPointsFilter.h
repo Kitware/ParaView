@@ -47,47 +47,44 @@ class vtkCompositeDataSet;
 
 class VTKPOINTSPRITEGRAPHICS_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgorithm
 {
-  public:
-    // Description:
-    // Standard Type-Macro
-    vtkTypeMacro(vtkCellPointsFilter,vtkPolyDataAlgorithm);
+public:
+  // Description:
+  // Standard Type-Macro
+  vtkTypeMacro(vtkCellPointsFilter, vtkPolyDataAlgorithm);
 
-    // Description:
-    // Create an instance of vtkCellPointsFilter
-    static vtkCellPointsFilter *New();
+  // Description:
+  // Create an instance of vtkCellPointsFilter
+  static vtkCellPointsFilter* New();
 
-    // Description:
-    // if VertexCells is true (default) then each point is represented by a
-    // vertex cell in the output dataset. If false then the points are generated,
-    // but no cells are generated.
-    vtkGetMacro(VertexCells,int);
-    vtkSetMacro(VertexCells,int);
-    vtkBooleanMacro(VertexCells,int);
-    //
-  protected:
-     vtkCellPointsFilter();
-    ~vtkCellPointsFilter();
-    //
-    virtual int FillInputPortInformation(int port, vtkInformation* info);
-    virtual int RequestCompositeData(vtkInformation* request,
-                                     vtkInformationVector** inputVector,
-                                     vtkInformationVector* outputVector);
-    virtual int RequestData(vtkInformation* request,
-                            vtkInformationVector** inputVector,
-                            vtkInformationVector* outputVector);
+  // Description:
+  // if VertexCells is true (default) then each point is represented by a
+  // vertex cell in the output dataset. If false then the points are generated,
+  // but no cells are generated.
+  vtkGetMacro(VertexCells, int);
+  vtkSetMacro(VertexCells, int);
+  vtkBooleanMacro(VertexCells, int);
+  //
+protected:
+  vtkCellPointsFilter();
+  ~vtkCellPointsFilter();
+  //
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-    // Create a default executive.
-    virtual vtkExecutive* CreateDefaultExecutive();
-    int CheckAttributes(vtkDataObject* input);
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
+  int CheckAttributes(vtkDataObject* input);
 
-    void ExecuteSimple(vtkDataSet *input, vtkPolyData *output);
-    int  ExecuteCompositeDataSet(vtkCompositeDataSet* input,
-          vtkAppendPolyData* append);
+  void ExecuteSimple(vtkDataSet* input, vtkPolyData* output);
+  int ExecuteCompositeDataSet(vtkCompositeDataSet* input, vtkAppendPolyData* append);
 
-    //
-    int VertexCells;
-    int GenerateGroupScalars;
-    int CurrentGroup;
+  //
+  int VertexCells;
+  int GenerateGroupScalars;
+  int CurrentGroup;
 
 private:
   vtkCellPointsFilter(const vtkCellPointsFilter&) VTK_DELETE_FUNCTION;

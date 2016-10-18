@@ -34,19 +34,17 @@ class vtkDataSet;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMergeArrays : public vtkDataSetAlgorithm
 {
 public:
-  static vtkMergeArrays *New();
+  static vtkMergeArrays* New();
 
-  vtkTypeMacro(vtkMergeArrays,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkMergeArrays, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkMergeArrays();
   ~vtkMergeArrays();
 
-  virtual int RequestData(vtkInformation*, 
-                          vtkInformationVector**, 
-                          vtkInformationVector*);
-  
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
   // see algorithm for more info
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
@@ -55,7 +53,4 @@ private:
   void operator=(const vtkMergeArrays&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-
-

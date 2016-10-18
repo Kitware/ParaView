@@ -37,7 +37,7 @@ public:
   /**
    * Forwarded to the internal vtkPVKeyFrameCueManipulator.
    */
-  int AddKeyFrame (vtkPVKeyFrame* keyframe);
+  int AddKeyFrame(vtkPVKeyFrame* keyframe);
   int GetLastAddedKeyFrameIndex();
   void RemoveKeyFrame(vtkPVKeyFrame*);
   void RemoveAllKeyFrames();
@@ -52,7 +52,6 @@ protected:
 private:
   vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

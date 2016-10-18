@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqLoadRestoreWindowLayoutReaction::pqLoadRestoreWindowLayoutReaction(
   bool load, QAction* parentObject)
-  : Superclass(parentObject),
-  Load(load)
+  : Superclass(parentObject)
+  , Load(load)
 {
 }
 
@@ -55,29 +55,25 @@ void pqLoadRestoreWindowLayoutReaction::onTriggered()
 {
   QMainWindow* window = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
 
-  pqFileDialog fileDialog(NULL,
-    window,
-    this->parentAction()->text(),
-    QString(),
+  pqFileDialog fileDialog(NULL, window, this->parentAction()->text(), QString(),
     "ParaView Window Layout (*.pwin);;All files (*)");
-  fileDialog.setFileMode(this->Load?
-    pqFileDialog::ExistingFile : pqFileDialog::AnyFile);
+  fileDialog.setFileMode(this->Load ? pqFileDialog::ExistingFile : pqFileDialog::AnyFile);
   fileDialog.setObjectName("LoadRestoreWindowLayout");
 
   if (fileDialog.exec() == QDialog::Accepted)
-    {
+  {
     QString filename = fileDialog.getSelectedFiles()[0];
     // we use pqSettings instead of QSettings since pqSettings is better and
     // saving window position/geometry than QSettings + QWindow.
     pqSettings settings(filename, QSettings::IniFormat);
     if (this->Load)
-      {
+    {
       settings.restoreState("pqLoadRestoreWindowLayoutReaction", *window);
-      }
+    }
     else
-      {
+    {
       settings.clear();
       settings.saveState(*window, "pqLoadRestoreWindowLayoutReaction");
-      }
     }
+  }
 }

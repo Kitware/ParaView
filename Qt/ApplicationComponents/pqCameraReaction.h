@@ -43,9 +43,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   enum Mode
-    {
+  {
     RESET_CAMERA,
     RESET_POSITIVE_X,
     RESET_POSITIVE_Y,
@@ -56,7 +57,7 @@ public:
     ZOOM_TO_DATA,
     ROTATE_CAMERA_CW,
     ROTATE_CAMERA_CCW
-    };
+  };
 
   pqCameraReaction(QAction* parent, Mode mode);
 
@@ -68,8 +69,7 @@ public:
   static void resetNegativeY();
   static void resetNegativeZ();
   static void resetDirection(
-    double look_x, double look_y, double look_z,
-    double up_x, double up_y, double up_z);
+    double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
   static void zoomToData();
   static void rotateCamera(double angle);
 
@@ -92,5 +92,3 @@ private:
 };
 
 #endif
-
-

@@ -106,7 +106,6 @@ protected:
 private:
   vtkSMViewProxyInteractorHelper(const vtkSMViewProxyInteractorHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMViewProxyInteractorHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

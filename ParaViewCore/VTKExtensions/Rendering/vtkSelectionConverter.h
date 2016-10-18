@@ -45,7 +45,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSelectionConverter : public vtkObjec
 {
 public:
   static vtkSelectionConverter* New();
-  vtkTypeMacro(vtkSelectionConverter,vtkObject);
+  vtkTypeMacro(vtkSelectionConverter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -70,7 +70,6 @@ private:
   void operator=(const vtkSelectionConverter&) VTK_DELETE_FUNCTION;
 
   class vtkKeyType;
-
 };
 
 #endif

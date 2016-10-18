@@ -51,21 +51,21 @@
 #include <string>
 
 vtkStandardNewMacro(vtkPVBagChartRepresentation);
-vtkCxxSetObjectMacro(vtkPVBagChartRepresentation,LookupTable,vtkScalarsToColors)
+vtkCxxSetObjectMacro(vtkPVBagChartRepresentation, LookupTable, vtkScalarsToColors)
 
-//----------------------------------------------------------------------------
-vtkPVBagChartRepresentation::vtkPVBagChartRepresentation() :
-  LineThickness(1),
-  LineStyle(0),
-  LookupTable(NULL),
-  Opacity(1.),
-  PointSize(5),
-  GridLineThickness(1),
-  GridLineStyle(0),
-  XAxisSeriesName(NULL),
-  YAxisSeriesName(NULL),
-  DensitySeriesName(NULL),
-  UseIndexForXAxis(true)
+  //----------------------------------------------------------------------------
+  vtkPVBagChartRepresentation::vtkPVBagChartRepresentation()
+  : LineThickness(1)
+  , LineStyle(0)
+  , LookupTable(NULL)
+  , Opacity(1.)
+  , PointSize(5)
+  , GridLineThickness(1)
+  , GridLineStyle(0)
+  , XAxisSeriesName(NULL)
+  , YAxisSeriesName(NULL)
+  , DensitySeriesName(NULL)
+  , UseIndexForXAxis(true)
 {
   this->BagColor[0] = 1.0;
   this->BagColor[1] = this->BagColor[2] = 0.0;
@@ -102,14 +102,14 @@ void vtkPVBagChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPVBagChartRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
-    {
+  {
     return false;
-    }
+  }
 
   if (this->GetChart())
-    {
+  {
     this->GetChart()->SetVisible(this->GetVisibility());
-    }
+  }
 
   return true;
 }
@@ -118,10 +118,10 @@ bool vtkPVBagChartRepresentation::AddToView(vtkView* view)
 bool vtkPVBagChartRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
-    {
+  {
     this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
-    }
+  }
 
   return this->Superclass::RemoveFromView(view);
 }
@@ -133,11 +133,11 @@ void vtkPVBagChartRepresentation::SetVisibility(bool visible)
 
   vtkChartXY* chart = this->GetChart();
   if (chart && !visible)
-    {
+  {
     // Refer to vtkChartRepresentation::PrepareForRendering() documentation to
     // know why this is cannot be done in PrepareForRendering();
     chart->SetVisible(false);
-    }
+  }
 
   this->Modified();
 }
@@ -146,10 +146,9 @@ void vtkPVBagChartRepresentation::SetVisibility(bool visible)
 vtkChartXY* vtkPVBagChartRepresentation::GetChart()
 {
   if (this->ContextView)
-    {
-    return vtkChartXY::SafeDownCast(
-      this->ContextView->GetContextItem());
-    }
+  {
+    return vtkChartXY::SafeDownCast(this->ContextView->GetContextItem());
+  }
 
   return 0;
 }
@@ -164,53 +163,55 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   vtkPlotHistogram2D* gridPlot = 0;
   vtkPlotLine* p50LinePlot = 0;
   vtkPlotLine* pUserLinePlot = 0;
-  for (int i = 0; i < chart->GetNumberOfPlots() &&
-      (!bagPlot || !gridPlot || !p50LinePlot || !pUserLinePlot); i++)
-    {
+  for (int i = 0;
+       i < chart->GetNumberOfPlots() && (!bagPlot || !gridPlot || !p50LinePlot || !pUserLinePlot);
+       i++)
+  {
     // Search for the first bag plot of the chart. For now
     // the chart only manage one bag plot
     if (vtkPlotBag::SafeDownCast(chart->GetPlot(i)))
-      {
+    {
       bagPlot = vtkPlotBag::SafeDownCast(chart->GetPlot(i));
-      }
+    }
     if (vtkPlotHistogram2D::SafeDownCast(chart->GetPlot(i)))
-      {
+    {
       gridPlot = vtkPlotHistogram2D::SafeDownCast(chart->GetPlot(i));
-      }
+    }
     if (vtkPlotLine::SafeDownCast(chart->GetPlot(i)))
-      {
+    {
       if (p50LinePlot == NULL)
-        {
+      {
         p50LinePlot = vtkPlotLine::SafeDownCast(chart->GetPlot(i));
-        }
+      }
       else
-        {
+      {
         pUserLinePlot = vtkPlotLine::SafeDownCast(chart->GetPlot(i));
-        }
       }
     }
+  }
   if (!gridPlot)
-    {
+  {
     gridPlot = vtkPlotHistogram2D::New();
     chart->AddPlot(gridPlot);
     gridPlot->Delete();
-    }
+  }
 
-   if (!p50LinePlot)
-    {
+  if (!p50LinePlot)
+  {
     p50LinePlot = vtkPlotLine::SafeDownCast(chart->AddPlot(vtkChart::LINE));
     p50LinePlot->PolyLineOff();
     p50LinePlot->SelectableOff();
-    }
+  }
   if (!pUserLinePlot)
-    {
+  {
     pUserLinePlot = vtkPlotLine::SafeDownCast(chart->AddPlot(vtkChart::LINE));
     pUserLinePlot->PolyLineOff();
     pUserLinePlot->SelectableOff();
-    }
+  }
 
-  vtkDoubleArray* thresholdArray = this->LocalThreshold ?
-    vtkDoubleArray::SafeDownCast(this->LocalThreshold->GetColumnByName("TValues")) : NULL;
+  vtkDoubleArray* thresholdArray = this->LocalThreshold
+    ? vtkDoubleArray::SafeDownCast(this->LocalThreshold->GetColumnByName("TValues"))
+    : NULL;
 
   std::ostringstream labelp50;
   labelp50 << "P" << (thresholdArray ? thresholdArray->GetValue(0) : 50);
@@ -219,15 +220,14 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   labelpUser << "P" << (thresholdArray ? thresholdArray->GetValue(2) : 99);
   pUserLinePlot->SetLabel(labelpUser.str().c_str());
   if (!bagPlot)
-    {
+  {
     // Create and add a bag plot to the chart
     bagPlot = vtkPlotBag::SafeDownCast(chart->AddPlot(vtkChart::BAG));
-    }
+  }
 
   vtkTable* plotInput = this->GetLocalOutput();
   bool hasBagPlot = plotInput && plotInput->GetNumberOfRows() > 0;
-  chart->SetVisible(
-    (hasBagPlot  || this->LocalGrid != NULL) && this->GetVisibility());
+  chart->SetVisible((hasBagPlot || this->LocalGrid != NULL) && this->GetVisibility());
   bagPlot->SetVisible(hasBagPlot);
   bagPlot->SetBagVisible(false);
 
@@ -245,23 +245,22 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   bagPlot->GetSelectionPen()->SetColorF(this->SelectionColor);
 
   if (hasBagPlot)
-    {
+  {
     // We only consider the first vtkTable.
     if (this->YAxisSeriesName && this->DensitySeriesName)
-      {
+    {
       bagPlot->SetUseIndexForXSeries(this->UseIndexForXAxis);
       if (this->UseIndexForXAxis)
-        {
-        bagPlot->SetInputData(plotInput,
-          this->YAxisSeriesName, this->DensitySeriesName);
-        }
+      {
+        bagPlot->SetInputData(plotInput, this->YAxisSeriesName, this->DensitySeriesName);
+      }
       else
-        {
-        bagPlot->SetInputData(plotInput, this->XAxisSeriesName,
-          this->YAxisSeriesName, this->DensitySeriesName);
-        }
+      {
+        bagPlot->SetInputData(
+          plotInput, this->XAxisSeriesName, this->YAxisSeriesName, this->DensitySeriesName);
       }
     }
+  }
 
   gridPlot->SetInputData(this->LocalGrid);
   gridPlot->SetVisible(this->LocalGrid != NULL);
@@ -269,45 +268,44 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   pUserLinePlot->SetVisible(this->LocalGrid != NULL);
 
   if (this->LocalGrid)
-    {
+  {
     double range[2];
     this->LocalGrid->GetScalarRange(range);
 
     gridPlot->SetTransferFunction(GetLookupTable());
     if (gridPlot->GetTransferFunction())
-      {
-      vtkLookupTable* lut = vtkLookupTable::SafeDownCast(
-        gridPlot->GetTransferFunction());
+    {
+      vtkLookupTable* lut = vtkLookupTable::SafeDownCast(gridPlot->GetTransferFunction());
       vtkColorTransferFunction* tf =
         vtkColorTransferFunction::SafeDownCast(gridPlot->GetTransferFunction());
       if (lut)
-        {
+      {
         lut->SetTableRange(range);
         lut->Build();
-        }
+      }
       else if (tf)
-        {
+      {
         double oldRange[2];
         tf->GetRange(oldRange);
         int numberOfNodes = tf->GetSize();
-        double* newNodes = new double[6*numberOfNodes];
+        double* newNodes = new double[6 * numberOfNodes];
         for (int i = 0; i < numberOfNodes; ++i)
-          {
-          double* newNode = &newNodes[6*i];
+        {
+          double* newNode = &newNodes[6 * i];
           tf->GetNodeValue(i, newNode);
-          newNode[0] = (range[1] - range[0]) * (newNode[0] - oldRange[0])
-            / (oldRange[1] - oldRange[0]) + range[0];
-          }
+          newNode[0] =
+            (range[1] - range[0]) * (newNode[0] - oldRange[0]) / (oldRange[1] - oldRange[0]) +
+            range[0];
+        }
         tf->RemoveAllPoints();
         for (int i = 0; i < numberOfNodes; ++i)
-          {
-          double* newNode = &newNodes[6*i];
-          tf->AddRGBPoint(newNode[0], newNode[1], newNode[2], newNode[3],
-                          newNode[4], newNode[5]);
-          }
-        delete [] newNodes;
+        {
+          double* newNode = &newNodes[6 * i];
+          tf->AddRGBPoint(newNode[0], newNode[1], newNode[2], newNode[3], newNode[4], newNode[5]);
         }
+        delete[] newNodes;
       }
+    }
 
     double p50 = thresholdArray ? thresholdArray->GetValue(1) : 0.;
     double pUser = thresholdArray ? thresholdArray->GetValue(3) : 0.;
@@ -319,8 +317,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
     medianContour->Update();
 
     vtkNew<vtkTable> medianTable;
-    SetPolyLineToTable(vtkPolyData::SafeDownCast(
-      medianContour->GetOutput()), medianTable.Get());
+    SetPolyLineToTable(vtkPolyData::SafeDownCast(medianContour->GetOutput()), medianTable.Get());
     p50LinePlot->SetInputData(medianTable.Get(), "X", "Y");
 
     p50LinePlot->GetPen()->SetWidth(this->GridLineThickness);
@@ -335,8 +332,7 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
     pUserContour->Update();
 
     vtkNew<vtkTable> pUserTable;
-    SetPolyLineToTable(vtkPolyData::SafeDownCast(pUserContour->GetOutput()),
-                       pUserTable.Get());
+    SetPolyLineToTable(vtkPolyData::SafeDownCast(pUserContour->GetOutput()), pUserTable.Get());
     pUserLinePlot->SetInputData(pUserTable.Get(), "X", "Y");
 
     pUserLinePlot->GetPen()->SetWidth(this->GridLineThickness);
@@ -346,22 +342,20 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
 
     p50LinePlot->SetVisible(medianTable->GetNumberOfRows() >= 2);
     pUserLinePlot->SetVisible(pUserTable->GetNumberOfRows() >= 2);
-    }
+  }
 
-   // Initialize the view title with the explained variance
-   vtkPVXYChartView* view = vtkPVXYChartView::SafeDownCast(this->GetView());
-   if (view && thresholdArray)
-     {
-     std::stringstream title;
-     title << "Explained variance: " <<
-       static_cast<int>(thresholdArray->GetValue(4)) << "%";
-     view->SetTitle(title.str().c_str());
-     }
+  // Initialize the view title with the explained variance
+  vtkPVXYChartView* view = vtkPVXYChartView::SafeDownCast(this->GetView());
+  if (view && thresholdArray)
+  {
+    std::stringstream title;
+    title << "Explained variance: " << static_cast<int>(thresholdArray->GetValue(4)) << "%";
+    view->SetTitle(title.str().c_str());
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBagChartRepresentation::SetPolyLineToTable(vtkPolyData* polyline,
-  vtkTable* table)
+void vtkPVBagChartRepresentation::SetPolyLineToTable(vtkPolyData* polyline, vtkTable* table)
 {
   vtkNew<vtkDoubleArray> x;
   x->SetName("X");
@@ -371,26 +365,26 @@ void vtkPVBagChartRepresentation::SetPolyLineToTable(vtkPolyData* polyline,
   vtkCellArray* lines = polyline->GetLines();
   lines->InitTraversal();
   for (vtkIdType nbpts, *pts; lines->GetNextCell(nbpts, pts);)
-    {
+  {
     for (vtkIdType i = 0; i < nbpts; ++i)
-      {
+    {
       double* point = polyline->GetPoint(pts[i]);
       x->InsertNextValue(point[0]);
       y->InsertNextValue(point[1]);
-      }
     }
+  }
   table->AddColumn(x.Get());
   table->AddColumn(y.Get());
 }
 
 //----------------------------------------------------------------------------
-int vtkPVBagChartRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVBagChartRepresentation::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-    {
+  {
     return this->Superclass::RequestData(request, inputVector, outputVector);
-    }
+  }
 
   // remove the "cached" delivered data.
   this->LocalOutput = NULL;
@@ -403,45 +397,45 @@ int vtkPVBagChartRepresentation::RequestData(vtkInformation* request,
   int myId = pm->GetPartitionId();
   int numProcs = pm->GetNumberOfLocalPartitions();
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+  {
     vtkSmartPointer<vtkDataObject> data;
 
     // don't process data is the cachekeeper has already cached the result.
     if (!this->CacheKeeper->IsCached())
-      {
+    {
       data = vtkDataObject::GetData(inputVector[0], 0);
       data = this->TransformInputData(inputVector, data);
       if (!data)
-        {
+      {
         return 0;
-        }
+      }
 
       // Prune input dataset to only process blocks on interest.
       // If input is not a multiblock dataset, we make it one so the rest of the
       // pipeline is simple.
       if (data->IsA("vtkMultiBlockDataSet"))
-        {
+      {
         vtkNew<vtkExtractBlock> extractBlock;
         extractBlock->SetInputData(data);
         extractBlock->PruneOutputOff();
-        int i =0;
+        int i = 0;
         for (std::set<unsigned int>::const_iterator iter = this->CompositeIndices.begin();
-          iter != this->CompositeIndices.end(); ++iter, ++i)
-          {
+             iter != this->CompositeIndices.end(); ++iter, ++i)
+        {
           extractBlock->AddIndex(*iter);
-          }
+        }
 
         extractBlock->Update();
         data = extractBlock->GetOutputDataObject(0);
-        }
+      }
       else
-        {
+      {
         vtkNew<vtkMultiBlockDataSet> mbdata;
         mbdata->SetNumberOfBlocks(1);
         mbdata->SetBlock(0, data);
         data = mbdata.GetPointer();
-        }
+      }
 
       // data must be a multiblock dataset, no matter what.
       assert(data->IsA("vtkMultiBlockDataSet"));
@@ -450,8 +444,8 @@ int vtkPVBagChartRepresentation::RequestData(vtkInformation* request,
       // first, reduce it to root node.
       vtkNew<vtkReductionFilter> reductionFilter;
       // For now we do not support parallel servers
-      //vtkNew<vtkPVMergeTablesMultiBlock> algo;
-      //reductionFilter->SetPostGatherHelper(algo.GetPointer());
+      // vtkNew<vtkPVMergeTablesMultiBlock> algo;
+      // reductionFilter->SetPostGatherHelper(algo.GetPointer());
       reductionFilter->SetController(pm->GetGlobalController());
       reductionFilter->SetInputData(data);
       reductionFilter->Update();
@@ -459,43 +453,43 @@ int vtkPVBagChartRepresentation::RequestData(vtkInformation* request,
       data = reductionFilter->GetOutputDataObject(0);
 
       if (this->EnableServerSideRendering && numProcs > 1)
-        {
+      {
         // share the reduction result will all satellites.
         pm->GetGlobalController()->Broadcast(data.GetPointer(), 0);
-        }
-      this->CacheKeeper->SetInputData(data);
       }
+      this->CacheKeeper->SetInputData(data);
+    }
     // here the cachekeeper will either give us the cached result of the result
     // we just processed.
     this->CacheKeeper->Update();
     data = this->CacheKeeper->GetOutputDataObject(0);
 
     if (myId == 0)
-      {
+    {
       // send data to client.
       vtkNew<vtkClientServerMoveData> deliver;
       deliver->SetInputData(data);
       deliver->Update();
-      }
+    }
 
     this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(data);
-    }
+  }
   else
-    {
+  {
     // receive data on client.
     vtkNew<vtkClientServerMoveData> deliver;
     deliver->Update();
     this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(deliver->GetOutputDataObject(0));
-    }
+  }
 
   this->LocalGrid = NULL;
   this->LocalThreshold = NULL;
 
   if (this->LocalOutput)
-    {
+  {
     this->LocalGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetBlock(2));
     this->LocalThreshold = vtkTable::SafeDownCast(this->LocalOutput->GetBlock(3));
-    }
+  }
 
   return vtkPVDataRepresentation::RequestData(request, inputVector, outputVector);
 }

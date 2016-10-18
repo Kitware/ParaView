@@ -83,11 +83,10 @@ class vtkInformationVector;
 class vtkMultiBlockDataSet;
 class vtkUnstructuredGrid;
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkACosmoReader :
-  public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkACosmoReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkACosmoReader *New();
+  static vtkACosmoReader* New();
   vtkTypeMacro(vtkACosmoReader, vtkMultiBlockDataSetAlgorithm);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -126,8 +125,8 @@ public:
   /**
    * Sets the level of resolution
    */
-  vtkSetMacro(Level,int);
-  vtkGetMacro(Level,int);
+  vtkSetMacro(Level, int);
+  vtkGetMacro(Level, int);
   //@}
 
 protected:
@@ -135,10 +134,8 @@ protected:
   ~vtkACosmoReader();
 
   // Standard pipeline methods
-  virtual int RequestInformation(vtkInformation *,
-    vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestData(vtkInformation *,
-    vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Loads the metadata
@@ -166,12 +163,12 @@ protected:
    * Given an output information object, this method will populate
    * the vector of block Ids to read in.
    */
-  void SetupBlockRequest(vtkInformation *outInfo);
+  void SetupBlockRequest(vtkInformation* outInfo);
 
   /**
    * Read in the block corresponding to the given index
    */
-  void ReadBlock(const int blockIdx, vtkMultiBlockDataSet *mbds);
+  void ReadBlock(const int blockIdx, vtkMultiBlockDataSet* mbds);
 
   /**
    * Given the block level and index within the level, this method returns
@@ -184,27 +181,25 @@ protected:
    * the particles for a contiguous block.
    */
   void ReadBlockFromFile(
-      std::string file,
-      const int start, const int end,
-      vtkUnstructuredGrid* particles);
+    std::string file, const int start, const int end, vtkUnstructuredGrid* particles);
 
   std::string BaseFileName; // Base path and file name
   char* FileName;           // Name of binary particle file
-  bool MetadataIsLoaded; // Indicates if the meta data has been loaded
+  bool MetadataIsLoaded;    // Indicates if the meta data has been loaded
 
-  double BoxSize; // Maximum of x,y,z locations from simulation
-  int ByteSwap;   // indicates whether to swap data or not
-  int TagSize;    // Size of the tag, 0 = 32-bit or 1 = 64-bit
-  int Level;      // level of resolution to load (staring from 1)
+  double BoxSize;          // Maximum of x,y,z locations from simulation
+  int ByteSwap;            // indicates whether to swap data or not
+  int TagSize;             // Size of the tag, 0 = 32-bit or 1 = 64-bit
+  int Level;               // level of resolution to load (staring from 1)
   int TotalNumberOfLevels; // The total number of levels
 
-  vtkMultiBlockDataSet *MetaData;
+  vtkMultiBlockDataSet* MetaData;
 
   struct block_t; // defined in the implementation
 
-  std::vector< int > NBlocks; // Number of blocks at level "i"
-  std::vector< block_t > ParticleBlocks; // stores block info for each block
-  std::vector< int > RequestedBlocks; // list of blocks to load
+  std::vector<int> NBlocks;            // Number of blocks at level "i"
+  std::vector<block_t> ParticleBlocks; // stores block info for each block
+  std::vector<int> RequestedBlocks;    // list of blocks to load
   std::set<std::string> FileNames;
 
 private:

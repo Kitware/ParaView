@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqMyPropertyWidgetForProperty::pqMyPropertyWidgetForProperty(
-  vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget *parentObject)
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
   this->setShowLabel(false);

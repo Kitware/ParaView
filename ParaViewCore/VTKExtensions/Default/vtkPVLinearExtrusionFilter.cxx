@@ -23,7 +23,7 @@ vtkPVLinearExtrusionFilter::vtkPVLinearExtrusionFilter()
   this->ExtrusionType = VTK_VECTOR_EXTRUSION;
 }
 
-void vtkPVLinearExtrusionFilter::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVLinearExtrusionFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

@@ -42,27 +42,28 @@ vtkCompositeAnimationPlayer::~vtkCompositeAnimationPlayer()
 vtkAnimationPlayer* vtkCompositeAnimationPlayer::GetActivePlayer()
 {
   switch (this->PlayMode)
-    {
-  case SEQUENCE:
-    return this->SequenceAnimationPlayer;
+  {
+    case SEQUENCE:
+      return this->SequenceAnimationPlayer;
 
-  case REAL_TIME:
-    return this->RealtimeAnimationPlayer;
+    case REAL_TIME:
+      return this->RealtimeAnimationPlayer;
 
-  case SNAP_TO_TIMESTEPS:
-    return this->TimestepsAnimationPlayer;
-    }
+    case SNAP_TO_TIMESTEPS:
+      return this->TimestepsAnimationPlayer;
+  }
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkCompositeAnimationPlayer::StartLoop(double starttime, double endtime, double* playbackWindow)
+void vtkCompositeAnimationPlayer::StartLoop(
+  double starttime, double endtime, double* playbackWindow)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
-    {
+  {
     player->StartLoop(starttime, endtime, playbackWindow);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -70,9 +71,9 @@ void vtkCompositeAnimationPlayer::EndLoop()
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
-    {
+  {
     player->EndLoop();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -80,35 +81,33 @@ double vtkCompositeAnimationPlayer::GetNextTime(double currentime)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
-    {
+  {
     return player->GetNextTime(currentime);
-    }
+  }
 
   return VTK_DOUBLE_MAX;
 }
 
 //----------------------------------------------------------------------------
-double vtkCompositeAnimationPlayer::GoToNext(double start, double end, 
-  double currenttime)
+double vtkCompositeAnimationPlayer::GoToNext(double start, double end, double currenttime)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
-    {
+  {
     return player->GoToNext(start, end, currenttime);
-    }
+  }
 
   return VTK_DOUBLE_MAX;
 }
 
 //----------------------------------------------------------------------------
-double vtkCompositeAnimationPlayer::GoToPrevious(double start, double end, 
-  double currenttime)
+double vtkCompositeAnimationPlayer::GoToPrevious(double start, double end, double currenttime)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
-    {
+  {
     return player->GoToPrevious(start, end, currenttime);
-    }
+  }
 
   return VTK_DOUBLE_MIN;
 }

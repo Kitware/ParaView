@@ -19,12 +19,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 
-int TestSMStringVectorProperty(int argc, char *argv[])
+int TestSMStringVectorProperty(int argc, char* argv[])
 {
   vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
 
   vtkSMStringVectorPropertyTest test;
   int ret = QTest::qExec(&test, argc, argv);

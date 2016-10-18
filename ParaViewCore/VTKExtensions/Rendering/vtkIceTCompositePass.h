@@ -70,14 +70,14 @@ public:
    * Perform rendering according to a render state \p s.
    * \pre s_exists: s!=0
    */
-  virtual void Render(const vtkRenderState *s);
+  virtual void Render(const vtkRenderState* s);
 
   /**
    * Release graphics resources and ask components to release their own
    * resources.
    * \pre w_exists: w!=0
    */
-  void ReleaseGraphicsResources(vtkWindow *w);
+  void ReleaseGraphicsResources(vtkWindow* w);
 
   //@{
   /**
@@ -85,8 +85,8 @@ public:
    * If it is NULL, nothing will be rendered and a warning will be emitted.
    * Initial value is a NULL pointer.
    */
-  vtkGetObjectMacro(Controller,vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *controller);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  virtual void SetController(vtkMultiProcessController* controller);
   //@}
 
   //@{
@@ -148,7 +148,7 @@ public:
    * partition ordering that gives processes ordering. Initial value is a NULL pointer.
    * This is used only when UseOrderedCompositing is true.
    */
-  vtkGetObjectMacro(PartitionOrdering,vtkPartitionOrderingInterface);
+  vtkGetObjectMacro(PartitionOrdering, vtkPartitionOrderingInterface);
   virtual void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering);
   //@}
 
@@ -182,8 +182,8 @@ public:
    * If true, UseOrderedCompositing is ignored.
    * Initial value is false.
    */
-  vtkGetMacro(DepthOnly,bool);
-  vtkSetMacro(DepthOnly,bool);
+  vtkGetMacro(DepthOnly, bool);
+  vtkSetMacro(DepthOnly, bool);
   //@}
 
   //@{
@@ -193,8 +193,8 @@ public:
    * price of some copy operations.
    * Initial value is false.
    */
-  vtkGetMacro(FixBackground,bool);
-  vtkSetMacro(FixBackground,bool);
+  vtkGetMacro(FixBackground, bool);
+  vtkSetMacro(FixBackground, bool);
   //@}
 
   /**
@@ -249,9 +249,8 @@ public:
    * Internal callback. Don't use.
    */
   virtual void GLDraw(const vtkRenderState*);
-  virtual void Draw(const vtkRenderState*,
-    const IceTDouble *proj_matrix, const IceTDouble *mv_matrix,
-    const IceTFloat *background_color, const IceTInt *viewport,
+  virtual void Draw(const vtkRenderState*, const IceTDouble* proj_matrix,
+    const IceTDouble* mv_matrix, const IceTFloat* background_color, const IceTInt* viewport,
     IceTImage result);
   //@}
 
@@ -273,14 +272,14 @@ protected:
    * \pre Program_void: this->Program==0
    * \post Program_exists: this->Program!=0
    */
-  void CreateProgram(vtkOpenGLRenderWindow *context);
+  void CreateProgram(vtkOpenGLRenderWindow* context);
 
   /**
    * Updates the IceT tile information during each render.
    */
   void UpdateTileInformation(const vtkRenderState*);
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
   vtkPartitionOrderingInterface* PartitionOrdering;
   vtkRenderPass* RenderPass;
   vtkIceTContext* IceTContext;
@@ -304,32 +303,31 @@ protected:
 
   vtkNew<vtkFloatArray> LastRenderedRGBA32F;
 
-  vtkPixelBufferObject *PBO;
-  vtkTextureObject *ZTexture;
+  vtkPixelBufferObject* PBO;
+  vtkTextureObject* ZTexture;
 #ifdef VTKGL2
-  vtkOpenGLHelper *Program;
+  vtkOpenGLHelper* Program;
 #else
-  vtkShaderProgram2 *Program;
+  vtkShaderProgram2* Program;
 #endif
 
   bool FixBackground;
-  vtkTextureObject *BackgroundTexture;
-  vtkTextureObject *IceTTexture;
+  vtkTextureObject* BackgroundTexture;
+  vtkTextureObject* IceTTexture;
 
-  //Stereo Render support requires us
-  //to have to raw image one for each eye so that we
-  //don't overwrite the left eye with the right eyes image
-  //will point at the last rendered eye
+  // Stereo Render support requires us
+  // to have to raw image one for each eye so that we
+  // don't overwrite the left eye with the right eyes image
+  // will point at the last rendered eye
   vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
 
-  //actual rendered raw images for stereo. Left Eye is index 0
-  //and Right Eye is index 1
+  // actual rendered raw images for stereo. Left Eye is index 0
+  // and Right Eye is index 1
   vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];
 
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
   void operator=(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

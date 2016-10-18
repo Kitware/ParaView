@@ -29,7 +29,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkSmartPointer.h"                   // needed for vtkSmartPointer
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkPVRepresentedArrayListSettings : public vtkObject
 {
@@ -72,7 +72,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

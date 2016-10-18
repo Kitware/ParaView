@@ -55,17 +55,13 @@ class vtkSMCameraConfigurationReader;
 
 class pqCustomViewButtonDialog : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
   // Description:
   // Create and initialize the dialog.
-  pqCustomViewButtonDialog(
-      QWidget *parent,
-      Qt::WindowFlags f,
-      QStringList &toolTips,
-      QStringList &configurations,
-      QString &currentConfig);
+  pqCustomViewButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
+    QStringList& configurations, QString& currentConfig);
 
   ~pqCustomViewButtonDialog();
 
@@ -75,17 +71,17 @@ public:
 
   // Description:
   // Set/get a list of tool tips, one for each button.
-  void setToolTips(QStringList &toolTips);
+  void setToolTips(QStringList& toolTips);
   QStringList getToolTips();
 
   // Description:
   // Set/get a list of camera configurations, one for each buttton.
-  void setConfigurations(QStringList &configs);
+  void setConfigurations(QStringList& configs);
   QStringList getConfigurations();
 
   // Descrition:
   // Set/get the current camera configuration.
-  void setCurrentConfiguration(QString &config);
+  void setCurrentConfiguration(QString& config);
   QString getCurrentConfiguration();
 
 private slots:
@@ -94,21 +90,20 @@ private slots:
   void clearAll();
 
   void assignCurrentView(int id);
-  void assignCurrentView0(){ this->assignCurrentView(0); }
-  void assignCurrentView1(){ this->assignCurrentView(1); }
-  void assignCurrentView2(){ this->assignCurrentView(2); }
-  void assignCurrentView3(){ this->assignCurrentView(3); }
+  void assignCurrentView0() { this->assignCurrentView(0); }
+  void assignCurrentView1() { this->assignCurrentView(1); }
+  void assignCurrentView2() { this->assignCurrentView(2); }
+  void assignCurrentView3() { this->assignCurrentView(3); }
 
 private:
-  pqCustomViewButtonDialog(){}
+  pqCustomViewButtonDialog() {}
 
   int NButtons;
 
-  QList<QLineEdit *> ToolTips;
+  QList<QLineEdit*> ToolTips;
   QStringList Configurations;
   QString CurrentConfiguration;
 
-  pqCustomViewButtonDialogUI *ui;
+  pqCustomViewButtonDialogUI* ui;
 };
 #endif
-

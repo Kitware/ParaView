@@ -74,7 +74,7 @@ public:
    * handling in order to do correctly - see the notes in the detailed
    * description of vtkRenderViewBase.
    */
-  virtual void SetRenderWindow(vtkRenderWindow *win);
+  virtual void SetRenderWindow(vtkRenderWindow* win);
 
   //@{
   /**
@@ -135,9 +135,7 @@ public:
    * From the visible object at the given index, get the name of
    * attribute array at index for the given attribute type.
    */
-  const char* GetAttributeArrayName(int visibleObjectIndex,
-                                    int attributeType,
-                                    int arrayIndex);
+  const char* GetAttributeArrayName(int visibleObjectIndex, int attributeType, int arrayIndex);
 
   /**
    * Set the array status for the visible object at the given index. A
@@ -146,19 +144,15 @@ public:
    * the array will not be copied to the client. The status is 0 by
    * default.
    */
-  void SetAttributeArrayStatus(int visibleObjectIndex,
-                               int attributeType,
-                               const char* name,
-                               int status);
+  void SetAttributeArrayStatus(
+    int visibleObjectIndex, int attributeType, const char* name, int status);
 
   /**
    * Get the status indicating whether the array with the given name
    * and attribute type in the visible object will be copied to the
    * client. Status is 0 by default.
    */
-  int GetAttributeArrayStatus(int visibleObjectIndex,
-                              int attributeType,
-                              const char* name);
+  int GetAttributeArrayStatus(int visibleObjectIndex, int attributeType, const char* name);
 
   /**
    * Enable all attribute arrays.
@@ -187,8 +181,8 @@ protected:
   vtkPythonView();
   virtual ~vtkPythonView();
 
-  vtkSmartPointer<vtkTexture>      RenderTexture;
-  vtkSmartPointer<vtkRenderer>     Renderer;
+  vtkSmartPointer<vtkTexture> RenderTexture;
+  vtkSmartPointer<vtkRenderer> Renderer;
   vtkSmartPointer<vtkRenderWindow> RenderWindow;
 
   // Needed to handle rendering at different magnifications

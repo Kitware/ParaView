@@ -32,13 +32,13 @@ public:
   static vtkPVPlotTime* New();
   vtkTypeMacro(vtkPVPlotTime, vtkPlot);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   enum
-    {
-    NONE=0,
-    X_AXIS=1,
-    Y_AXIS=2
-    };
+  {
+    NONE = 0,
+    X_AXIS = 1,
+    Y_AXIS = 2
+  };
 
   //@{
   /**
@@ -59,13 +59,16 @@ public:
   /**
    * Paint event for the axis, called whenever the axis needs to be drawn
    */
-  virtual bool Paint(vtkContext2D *painter);
+  virtual bool Paint(vtkContext2D* painter);
 
   /**
    * Get the bounds for this plot as (Xmin, Xmax, Ymin, Ymax).
    */
   virtual void GetBounds(double bounds[4])
-  { bounds[0] = bounds[2] = 1.0; bounds[1] = bounds[3] = -1.0;}
+  {
+    bounds[0] = bounds[2] = 1.0;
+    bounds[1] = bounds[3] = -1.0;
+  }
 
 protected:
   vtkPVPlotTime();
@@ -73,10 +76,10 @@ protected:
 
   double Time;
   int TimeAxisMode;
+
 private:
   vtkPVPlotTime(const vtkPVPlotTime&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPlotTime&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

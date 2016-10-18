@@ -29,7 +29,8 @@ class vtkChartXY;
 class vtkImageData;
 class vtkScalarsToColors;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBagChartRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBagChartRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVBagChartRepresentation* New();
@@ -204,7 +205,8 @@ protected:
   virtual bool RemoveFromView(vtkView* view);
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector);
+
 private:
   vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
@@ -229,7 +231,6 @@ private:
   bool UseIndexForXAxis;
   vtkSmartPointer<vtkImageData> LocalGrid;
   vtkSmartPointer<vtkTable> LocalThreshold;
-
 };
 
 #endif

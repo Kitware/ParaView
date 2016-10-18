@@ -40,17 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QVBoxLayout>
 
-pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *smProxy,
-                                                             vtkSMProperty *proxyProperty,
-                                                             QWidget *pWidget)
-  : pqPropertyWidget(smProxy, pWidget),
-    Property(proxyProperty)
+pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
+  vtkSMProxy* smProxy, vtkSMProperty* proxyProperty, QWidget* pWidget)
+  : pqPropertyWidget(smProxy, pWidget)
+  , Property(proxyProperty)
 {
-  QVBoxLayout *l = new QVBoxLayout;
+  QVBoxLayout* l = new QVBoxLayout;
   l->setSpacing(0);
   l->setMargin(0);
 
-  QPushButton *button = new QPushButton(proxyProperty->GetXMLLabel());
+  QPushButton* button = new QPushButton(proxyProperty->GetXMLLabel());
   connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
   l->addWidget(button);
 
@@ -58,7 +57,7 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *smProxy
   this->setLayout(l);
 
   PV_DEBUG_PANELS() << "pqCommandButtonPropertyWidget for a property with "
-                << "the panel_widget=\"command_button\" attribute";
+                    << "the panel_widget=\"command_button\" attribute";
 }
 
 pqCommandButtonPropertyWidget::~pqCommandButtonPropertyWidget()

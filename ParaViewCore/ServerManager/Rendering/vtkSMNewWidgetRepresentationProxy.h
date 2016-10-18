@@ -98,11 +98,10 @@ protected:
    * Called everytime a controlled property's unchecked values change.
    */
   void ProcessLinkedPropertyEvent(vtkSMProperty* controlledProperty, unsigned long event);
-private:
 
+private:
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

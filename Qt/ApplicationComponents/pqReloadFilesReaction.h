@@ -46,8 +46,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReloadFilesReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqReloadFilesReaction(QAction* parent=0);
+  pqReloadFilesReaction(QAction* parent = 0);
   virtual ~pqReloadFilesReaction();
 
   /**
@@ -61,10 +62,7 @@ public:
   static bool reload(vtkSMSourceProxy* proxy);
 
 protected:
-  virtual void onTriggered()
-    {
-    this->reload();
-    }
+  virtual void onTriggered() { this->reload(); }
   virtual void updateEnableState();
 
 private:

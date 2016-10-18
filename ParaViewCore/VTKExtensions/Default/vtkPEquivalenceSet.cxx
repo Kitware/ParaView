@@ -17,69 +17,70 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
-vtkStandardNewMacro (vtkPEquivalenceSet);
+vtkStandardNewMacro(vtkPEquivalenceSet);
 
-vtkPEquivalenceSet::vtkPEquivalenceSet ()
+vtkPEquivalenceSet::vtkPEquivalenceSet()
 {
 }
 
-vtkPEquivalenceSet::~vtkPEquivalenceSet ()
+vtkPEquivalenceSet::~vtkPEquivalenceSet()
 {
 }
 
-void vtkPEquivalenceSet::PrintSelf (ostream& os, vtkIndent indent)
+void vtkPEquivalenceSet::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf (os, indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
-int vtkPEquivalenceSet::ResolveEquivalences ()
+int vtkPEquivalenceSet::ResolveEquivalences()
 {
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
-  int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  int myProc = controller->GetLocalProcessId();
+  int numProcs = controller->GetNumberOfProcesses();
 
-  vtkIntArray* workingSet = vtkIntArray::New ();
-  workingSet->SetNumberOfComponents (1); 
+  vtkIntArray* workingSet = vtkIntArray::New();
+  workingSet->SetNumberOfComponents(1);
 
   int tag = 475893745;
   int pivot = (numProcs + 1) / 2;
   while (pivot > 0 && myProc < (pivot * 2))
-    {
+  {
     int tuples;
     if (myProc >= pivot)
-      {
-      tuples = this->EquivalenceArray->GetNumberOfTuples ();
-      controller->Send (&tuples, 1, myProc - pivot, tag + pivot + 0);
-      controller->Send (this->EquivalenceArray, myProc - pivot, tag + pivot + 1);
-      }
+    {
+      tuples = this->EquivalenceArray->GetNumberOfTuples();
+      controller->Send(&tuples, 1, myProc - pivot, tag + pivot + 0);
+      controller->Send(this->EquivalenceArray, myProc - pivot, tag + pivot + 1);
+    }
     else if ((myProc + pivot) < numProcs)
-      {
-      controller->Receive (&tuples, 1, myProc + pivot, tag + pivot + 0);
-      workingSet->SetNumberOfTuples (tuples);
+    {
+      controller->Receive(&tuples, 1, myProc + pivot, tag + pivot + 0);
+      workingSet->SetNumberOfTuples(tuples);
 
-      controller->Receive (workingSet, myProc + pivot, tag + pivot + 1);
-      while (workingSet->GetNumberOfTuples () > this->EquivalenceArray->GetNumberOfTuples ())
+      controller->Receive(workingSet, myProc + pivot, tag + pivot + 1);
+      while (workingSet->GetNumberOfTuples() > this->EquivalenceArray->GetNumberOfTuples())
+      {
+        this->EquivalenceArray->InsertNextTuple1(0);
+      }
+      for (int i = 0; i < workingSet->GetNumberOfTuples(); i++)
+      {
+        int workingVal = workingSet->GetValue(i);
+        if (workingVal == 0)
         {
-        this->EquivalenceArray->InsertNextTuple1 (0);
-        }
-      for (int i = 0; i < workingSet->GetNumberOfTuples (); i ++)
-        {
-        int workingVal = workingSet->GetValue (i);
-        if (workingVal == 0) {
           continue;
         }
-        int existingVal = this->EquivalenceArray->GetValue (i); 
-        this->EquivalenceArray->SetValue (i, workingVal);
+        int existingVal = this->EquivalenceArray->GetValue(i);
+        this->EquivalenceArray->SetValue(i, workingVal);
         if (existingVal != 0 && existingVal < workingVal)
-          {
-          this->EquateInternal (existingVal, workingVal);
-          }
+        {
+          this->EquateInternal(existingVal, workingVal);
         }
       }
-    pivot /= 2;
     }
-  controller->Broadcast (this->EquivalenceArray, 0);
+    pivot /= 2;
+  }
+  controller->Broadcast(this->EquivalenceArray, 0);
 
-  this->Superclass::ResolveEquivalences ();
+  this->Superclass::ResolveEquivalences();
   return 1;
 }

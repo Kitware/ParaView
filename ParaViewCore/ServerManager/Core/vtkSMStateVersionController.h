@@ -49,7 +49,6 @@ protected:
 private:
   vtkSMStateVersionController(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

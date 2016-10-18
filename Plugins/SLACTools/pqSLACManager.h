@@ -38,58 +38,59 @@ class pqView;
 class pqSLACManager : public QObject
 {
   Q_OBJECT;
+
 public:
-  static pqSLACManager *instance();
+  static pqSLACManager* instance();
 
   ~pqSLACManager();
 
   /// Get the action for the respective operation.
-  QAction *actionDataLoadManager();
-  QAction *actionShowEField();
-  QAction *actionShowBField();
-  QAction *actionShowParticles();
-  QAction *actionSolidMesh();
-  QAction *actionWireframeSolidMesh();
-  QAction *actionWireframeAndBackMesh();
-  QAction *actionPlotOverZ();
-  QAction *actionToggleBackgroundBW();
-  QAction *actionShowStandardViewpoint();
-  QAction *actionTemporalResetRange();
-  QAction *actionCurrentTimeResetRange();
+  QAction* actionDataLoadManager();
+  QAction* actionShowEField();
+  QAction* actionShowBField();
+  QAction* actionShowParticles();
+  QAction* actionSolidMesh();
+  QAction* actionWireframeSolidMesh();
+  QAction* actionWireframeAndBackMesh();
+  QAction* actionPlotOverZ();
+  QAction* actionToggleBackgroundBW();
+  QAction* actionShowStandardViewpoint();
+  QAction* actionTemporalResetRange();
+  QAction* actionCurrentTimeResetRange();
 
   /// Convenience function for getting the current server.
-  pqServer *getActiveServer();
+  pqServer* getActiveServer();
 
   /// Convenience function for getting the main window.
-  QWidget *getMainWindow();
+  QWidget* getMainWindow();
 
   /// Get the window used for viewing the mesh.
-  pqView *getMeshView();
-  pqRenderView *getMeshRenderView();
+  pqView* getMeshView();
+  pqRenderView* getMeshRenderView();
 
   /// Get the window used for viewing plots.
-  pqView *getPlotView();
+  pqView* getPlotView();
 
   /// Get the reader objects.  Returns NULL if that reader was never created.
-  pqPipelineSource *getMeshReader();
-  pqPipelineSource *getParticlesReader();
+  pqPipelineSource* getMeshReader();
+  pqPipelineSource* getParticlesReader();
 
   /// Get plotting object.  Returns NULL if that object was never created.
-  pqPipelineSource *getPlotFilter();
+  pqPipelineSource* getPlotFilter();
 
   /// Get object that computes ranges over time.  Returns NULL if that object
   /// was never created.
-  pqPipelineSource *getTemporalRanges();
+  pqPipelineSource* getTemporalRanges();
 
   /// Convenience function for destroying a pipeline object and all of its
   /// consumers.
-  static void destroyPipelineSourceAndConsumers(pqPipelineSource *source);
+  static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
 public slots:
   void showDataLoadManager();
   void checkActionEnabled();
   void showField(QString name);
-  void showField(const char *name);
+  void showField(const char* name);
   void showEField();
   void showBField();
   void showParticles(bool show);
@@ -105,12 +106,11 @@ public slots:
 protected:
   /// Finds a pipeline source with the given SM XML name.  If there is more than
   /// one, the first is returned.
-  virtual pqPipelineSource *findPipelineSource(const char *SMName);
+  virtual pqPipelineSource* findPipelineSource(const char* SMName);
 
   /// Finds a view appropriate for the data of the source and port given,
   /// constrained to those views with the given type.
-  virtual pqView *findView(pqPipelineSource *source, int port,
-                           const QString &viewType);
+  virtual pqView* findView(pqPipelineSource* source, int port, const QString& viewType);
 
   /// Updates the plot view (if it is created) with the field shown in the
   /// mesh view.
@@ -129,12 +129,12 @@ protected:
   bool ScaleFieldsByCurrentTimeStep;
 
 private:
-  pqSLACManager(QObject *p);
+  pqSLACManager(QObject* p);
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 
   Q_DISABLE_COPY(pqSLACManager)
 };
 
-#endif //pqSLACManager_h
+#endif // pqSLACManager_h

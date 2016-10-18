@@ -26,7 +26,8 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkUpdateSuppressorPipeline
+  : public vtkCompositeDataPipeline
 {
 public:
   static vtkUpdateSuppressorPipeline* New();
@@ -37,23 +38,24 @@ public:
    * Generalized interface for asking the executive to fullfill update
    * requests.
    */
-  virtual int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inInfo,
-                             vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
 
   //@{
   /**
    * Get/Set if the update suppressions are enabled.
    * Enabled by default.
    */
-  void SetEnabled(bool e) {this->Enabled = e;}
+  void SetEnabled(bool e) { this->Enabled = e; }
   vtkGetMacro(Enabled, bool);
+
 protected:
   vtkUpdateSuppressorPipeline();
   ~vtkUpdateSuppressorPipeline();
   //@}
 
   bool Enabled;
+
 private:
   vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;

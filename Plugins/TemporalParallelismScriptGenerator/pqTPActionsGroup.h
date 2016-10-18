@@ -39,8 +39,9 @@ class pqTPActionsGroup : public QActionGroup
 {
   Q_OBJECT
   typedef QActionGroup Superclass;
+
 public:
-  pqTPActionsGroup(QObject* parent=0);
+  pqTPActionsGroup(QObject* parent = 0);
   virtual ~pqTPActionsGroup();
 
 protected slots:

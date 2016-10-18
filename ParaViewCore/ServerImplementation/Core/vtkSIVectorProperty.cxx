@@ -36,45 +36,43 @@ vtkSIVectorProperty::~vtkSIVectorProperty()
 }
 
 //---------------------------------------------------------------------------
-bool vtkSIVectorProperty::ReadXMLAttributes(
-  vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
+bool vtkSIVectorProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(proxyhelper, element))
-    {
-    return false;;
-
-    }
+  {
+    return false;
+    ;
+  }
 
   const char* numCommand = element->GetAttribute("set_number_command");
   if (numCommand)
-    {
+  {
     this->SetSetNumberCommand(numCommand);
-    }
+  }
 
   int use_index;
   if (element->GetScalarAttribute("use_index", &use_index))
-    {
+  {
     this->UseIndex = (use_index != 0);
-    }
+  }
 
   int numElsPerCommand;
-  if (element->GetScalarAttribute(
-      "number_of_elements_per_command", &numElsPerCommand))
-    {
+  if (element->GetScalarAttribute("number_of_elements_per_command", &numElsPerCommand))
+  {
     this->NumberOfElementsPerCommand = numElsPerCommand;
-    }
+  }
 
   const char* clean_command = element->GetAttribute("clean_command");
   if (clean_command)
-    {
+  {
     this->SetCleanCommand(clean_command);
-    }
+  }
 
   const char* initial_string = element->GetAttribute("initial_string");
   if (initial_string)
-    {
+  {
     this->SetInitialString(initial_string);
-    }
+  }
 
   return 1;
 }

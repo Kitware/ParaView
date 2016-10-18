@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,10 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMStringVectorProperty.h"
 
-pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
-                                 vtkSMProperty* prop)
-  : QObject(p), Property(prop),
-    MarkedForUpdate(false), IsGettingAllDomains(false)
+pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* prop)
+  : QObject(p)
+  , Property(prop)
+  , MarkedForUpdate(false)
+  , IsGettingAllDomains(false)
 {
   this->Connection = vtkEventQtSlotConnect::New();
 
@@ -59,39 +60,27 @@ pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
   this->Selection.append("");
   this->Selection.append("");
 
-  if(p && pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
-    {
+  if (p && pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
+  {
     this->AttributeModeDomain = prop->GetDomain("field_list");
     this->ScalarDomain = prop->GetDomain("array_list");
-    
+
     this->internalDomainChanged();
 
-    this->Connection->Connect(this->AttributeModeDomain,
-                              vtkCommand::DomainModifiedEvent,
-                              this,
-                              SLOT(domainChanged()));
-    
-    this->Connection->Connect(this->ScalarDomain,
-                              vtkCommand::DomainModifiedEvent,
-                              this,
-                              SLOT(domainChanged()));
-    
-    this->Connection->Connect(this->AttributeModeDomain,
-                              vtkCommand::DomainModifiedEvent,
-                              this,
-                              SLOT(blockDomainModified(vtkObject*, unsigned long,void*, void*, vtkCommand*)),
-                              NULL, 1.0);
-    
-    this->Connection->Connect(this->ScalarDomain,
-                              vtkCommand::DomainModifiedEvent,
-                              this,
-                              SLOT(blockDomainModified(vtkObject*, unsigned long,void*, void*, vtkCommand*)),
-                              NULL, 1.0);
-    
-    QObject::connect(p, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(indexChanged(int)));
+    this->Connection->Connect(
+      this->AttributeModeDomain, vtkCommand::DomainModifiedEvent, this, SLOT(domainChanged()));
 
-    }
+    this->Connection->Connect(
+      this->ScalarDomain, vtkCommand::DomainModifiedEvent, this, SLOT(domainChanged()));
+
+    this->Connection->Connect(this->AttributeModeDomain, vtkCommand::DomainModifiedEvent, this,
+      SLOT(blockDomainModified(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+
+    this->Connection->Connect(this->ScalarDomain, vtkCommand::DomainModifiedEvent, this,
+      SLOT(blockDomainModified(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+
+    QObject::connect(p, SIGNAL(currentIndexChanged(int)), this, SLOT(indexChanged(int)));
+  }
 }
 
 pqFieldSelectionAdaptor::~pqFieldSelectionAdaptor()
@@ -99,19 +88,19 @@ pqFieldSelectionAdaptor::~pqFieldSelectionAdaptor()
   this->Connection->Delete();
 }
 
-void pqFieldSelectionAdaptor::setSelection(const QStringList &sel)
+void pqFieldSelectionAdaptor::setSelection(const QStringList& sel)
 {
-  if(sel.size() != 2)
-    {
+  if (sel.size() != 2)
+  {
     return;
-    }
+  }
 
-  if(sel != this->Selection)
-    {
+  if (sel != this->Selection)
+  {
     this->Selection = sel;
     this->updateGUI();
     emit this->selectionChanged();
-    }
+  }
 }
 
 QStringList pqFieldSelectionAdaptor::selection() const
@@ -139,8 +128,7 @@ void pqFieldSelectionAdaptor::setScalar(const QString& sc)
   this->setAttributeModeAndScalar(this->attributeMode(), sc);
 }
 
-void pqFieldSelectionAdaptor::setAttributeModeAndScalar(
-         const QString& m, const QString& s)
+void pqFieldSelectionAdaptor::setAttributeModeAndScalar(const QString& m, const QString& s)
 {
   this->setSelection(QStringList() << m << s);
 }
@@ -148,74 +136,74 @@ void pqFieldSelectionAdaptor::setAttributeModeAndScalar(
 void pqFieldSelectionAdaptor::updateGUI()
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  if(combo)
-    {
+  if (combo)
+  {
     int num = combo->count();
-    for (int i=0; i<num; i++)
-      {
+    for (int i = 0; i < num; i++)
+    {
       QStringList array = combo->itemData(i).toStringList();
       if (array == this->Selection)
+      {
+        if (combo->currentIndex() != i)
         {
-        if(combo->currentIndex() != i)
-          {
           combo->setCurrentIndex(i);
-          }
-        break;
         }
+        break;
       }
     }
+  }
 }
-  
+
 void pqFieldSelectionAdaptor::indexChanged(int index)
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  if(combo)
-    {
+  if (combo)
+  {
     this->setSelection(combo->itemData(index).toStringList());
-    }
+  }
 }
 
 void pqFieldSelectionAdaptor::domainChanged()
 {
-  if(this->MarkedForUpdate)
-    {
+  if (this->MarkedForUpdate)
+  {
     return;
-    }
+  }
 
   this->MarkedForUpdate = true;
   pqTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
-  
-void pqFieldSelectionAdaptor::blockDomainModified(vtkObject*, unsigned long, 
-                           void*, void*, vtkCommand* cmd)
+
+void pqFieldSelectionAdaptor::blockDomainModified(
+  vtkObject*, unsigned long, void*, void*, vtkCommand* cmd)
 {
-  if(this->IsGettingAllDomains)
-    {
+  if (this->IsGettingAllDomains)
+  {
     // don't let anyone else know this domain is changing (because it really isn't)
     // and we're going to put it back when we're done
     cmd->SetAbortFlag(1);
-    }
+  }
 }
 
 void pqFieldSelectionAdaptor::internalDomainChanged()
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
   Q_ASSERT(combo != NULL);
-  if(!combo)
-    {
+  if (!combo)
+  {
     return;
-    }
+  }
 
   QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
   QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
 
-  vtkSMArrayListDomain* ald = vtkSMArrayListDomain::SafeDownCast(
-    this->Property->GetDomain("array_list"));
-  vtkSMEnumerationDomain* fld = vtkSMEnumerationDomain::SafeDownCast(
-    this->Property->GetDomain("field_list"));
+  vtkSMArrayListDomain* ald =
+    vtkSMArrayListDomain::SafeDownCast(this->Property->GetDomain("array_list"));
+  vtkSMEnumerationDomain* fld =
+    vtkSMEnumerationDomain::SafeDownCast(this->Property->GetDomain("field_list"));
 
   this->IsGettingAllDomains = true;
-  QList<QPair<QString, bool> > arrays = 
+  QList<QPair<QString, bool> > arrays =
     pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
   this->IsGettingAllDomains = false;
 
@@ -225,7 +213,7 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
   int array_idx = 0;
   QPair<QString, bool> array;
   foreach (array, arrays)
-    {
+  {
     QPixmap* pix = 0;
     // Refer to vtkSMArrayListDomain. FieldAssociation is the value to use on
     // the property, while DomainAssociation is the value to use for showing
@@ -233,50 +221,48 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     int field_association = ald->GetFieldAssociation(array_idx);
     int icon_association = ald->GetDomainAssociation(array_idx);
     switch (icon_association)
-      {
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      pix = &cellPixmap;
-      break;
+    {
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        pix = &cellPixmap;
+        break;
 
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      pix = &pointPixmap;
-      break;
-      }
+      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+        pix = &pointPixmap;
+        break;
+    }
 
     QString arrayName = array.first;
     QStringList data;
-    data << fld->GetEntryTextForValue(field_association)
-         << arrayName;
+    data << fld->GetEntryTextForValue(field_association) << arrayName;
     if (array.second)
-      {
+    {
       arrayName += " (partial)";
-      }
+    }
 
     if (pix)
-      {
+    {
       combo->addItem(QIcon(*pix), arrayName, QVariant(data));
-      }
-    else
-      {
-      combo->addItem(arrayName, QVariant(data));
-      }
-    if (data == this->selection())
-      {
-      newIndex = array_idx;
-      }
-    array_idx++;
     }
+    else
+    {
+      combo->addItem(arrayName, QVariant(data));
+    }
+    if (data == this->selection())
+    {
+      newIndex = array_idx;
+    }
+    array_idx++;
+  }
   combo->setCurrentIndex(-1);
   combo->blockSignals(false);
-  if(newIndex != -1)
-    {
+  if (newIndex != -1)
+  {
     combo->setCurrentIndex(newIndex);
-    }
+  }
   else
-    {
+  {
     combo->setCurrentIndex(0);
-    }
+  }
 
   this->MarkedForUpdate = false;
 }
-

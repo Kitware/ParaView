@@ -43,17 +43,17 @@ class vtkSMPropertyGroup;
 * "PVLookupTable" proxy. The property group can comprise of two properties,
 * \c Annotations and \c IndexedColors.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT;
   Q_PROPERTY(QList<QVariant> annotations READ annotations WRITE setAnnotations);
   Q_PROPERTY(QList<QVariant> indexedColors READ indexedColors WRITE setIndexedColors);
 
   typedef pqPropertyWidget Superclass;
+
 public:
   pqColorAnnotationsPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqColorAnnotationsPropertyWidget();
 
   /**
@@ -109,7 +109,7 @@ private slots:
   /**
   * pick a preset.
   */
-  void choosePreset(const char* presetName=NULL);
+  void choosePreset(const char* presetName = NULL);
 
   /**
   * save current transfer function as preset.
@@ -126,6 +126,7 @@ private slots:
   * called when the user edits past the last row.
   */
   void editPastLastRow();
+
 private:
   Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget)
 

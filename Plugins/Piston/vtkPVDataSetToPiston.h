@@ -30,8 +30,8 @@
 class VTK_EXPORT vtkPVDataSetToPiston : public vtkDataSetToPiston
 {
 public:
-  static vtkPVDataSetToPiston *New();
-  vtkTypeMacro(vtkPVDataSetToPiston,vtkDataSetToPiston);
+  static vtkPVDataSetToPiston* New();
+  vtkTypeMacro(vtkPVDataSetToPiston, vtkDataSetToPiston);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

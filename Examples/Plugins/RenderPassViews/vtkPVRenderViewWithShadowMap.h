@@ -42,7 +42,6 @@ protected:
 private:
   vtkPVRenderViewWithShadowMap(const vtkPVRenderViewWithShadowMap&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRenderViewWithShadowMap&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

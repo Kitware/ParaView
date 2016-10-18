@@ -67,19 +67,19 @@ class pqColorMapModel;
 * "EnableOpacityMapping" is property is ON. However, in cases of Volume
 * rendering, the EnableOpacityMapping has no effect.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPropertyWidget
 {
   Q_OBJECT
   Q_PROPERTY(QList<QVariant> xrgbPoints READ xrgbPoints WRITE setXrgbPoints)
   Q_PROPERTY(QList<QVariant> xvmsPoints READ xvmsPoints WRITE setXvmsPoints)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
   Q_PROPERTY(bool lockScalarRange READ lockScalarRange WRITE setLockScalarRange)
-  Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy
-                                                  WRITE setScalarOpacityFunctionProxy)
+  Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
+      setScalarOpacityFunctionProxy)
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqColorOpacityEditorWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqColorOpacityEditorWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqColorOpacityEditorWidget();
 
   /**
@@ -167,7 +167,7 @@ public slots:
   /**
   * pick a preset.
   */
-  void choosePreset(const char* presetName=NULL);
+  void choosePreset(const char* presetName = NULL);
 
   /**
   * save current transfer function as preset.

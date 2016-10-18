@@ -60,15 +60,14 @@ protected:
    * of the lookmark state loader until we get the chance to clean it up.
    * DONT override this method.
    */
-  virtual int LoadProxyState(vtkPVXMLElement* element, vtkSMProxy*,
-                             vtkSMProxyLocator* locator);
+  virtual int LoadProxyState(vtkPVXMLElement* element, vtkSMProxy*, vtkSMProxyLocator* locator);
 
   /**
    * Create a new proxy of the given group and name. Default implementation
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
-  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
-                                  const char* subProxyName = NULL);
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL);
 
   /**
    * Called after a new proxy has been created. Gives the subclasses an
@@ -80,7 +79,6 @@ protected:
 private:
   vtkSMDeserializerXML(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

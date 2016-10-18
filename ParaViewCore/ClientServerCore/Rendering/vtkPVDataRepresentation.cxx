@@ -57,15 +57,14 @@ vtkPVDataRepresentation::~vtkPVDataRepresentation()
 //----------------------------------------------------------------------------
 void vtkPVDataRepresentation::SetUpdateTime(double time)
 {
-  if (!this->UpdateTimeValid ||
-    (this->UpdateTimeValid && (this->UpdateTime != time)))
-    {
+  if (!this->UpdateTimeValid || (this->UpdateTimeValid && (this->UpdateTime != time)))
+  {
     this->UpdateTime = time;
     this->UpdateTimeValid = true;
 
     // Call MarkModified() only when the timestep has indeed changed.
     this->MarkModified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -81,14 +80,14 @@ int vtkPVDataRepresentation::ProcessViewRequest(
   assert("We must have an ID at that time" && this->UniqueIdentifier);
   assert(this->GetExecutive()->IsA("vtkPVDataRepresentationPipeline"));
   if (this->GetVisibility() == false)
-    {
+  {
     return 0;
-    }
+  }
 
   if (request == vtkPVView::REQUEST_UPDATE())
-    {
+  {
     this->Update();
-    }
+  }
 
   return 1;
 }
@@ -101,24 +100,26 @@ void vtkPVDataRepresentation::MarkModified()
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVDataRepresentation::Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable)
+unsigned int vtkPVDataRepresentation::Initialize(
+  unsigned int minIdAvailable, unsigned int maxIdAvailable)
 {
   // Already initialized ?
-  if(this->UniqueIdentifier)
-    {
+  if (this->UniqueIdentifier)
+  {
     return minIdAvailable;
-    }
+  }
 
-  assert("Invalid Representation Id. Not enough reserved ids." && (maxIdAvailable >= minIdAvailable));
-  (void) maxIdAvailable; // Prevent warning in Release build
+  assert(
+    "Invalid Representation Id. Not enough reserved ids." && (maxIdAvailable >= minIdAvailable));
+  (void)maxIdAvailable; // Prevent warning in Release build
 
   this->UniqueIdentifier = minIdAvailable;
   return (1 + this->UniqueIdentifier);
 }
 
 //----------------------------------------------------------------------------
-int vtkPVDataRepresentation::RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*)
+int vtkPVDataRepresentation::RequestData(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector*)
 {
   // We fire UpdateDataEvent to notify the representation proxy that the
   // representation was updated. The representation proxty will then call
@@ -129,56 +130,49 @@ int vtkPVDataRepresentation::RequestData(vtkInformation*,
   return 1;
 }
 
-int vtkPVDataRepresentation::RequestUpdateTime(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* vtkNotUsed(outputVector))
+int vtkPVDataRepresentation::RequestUpdateTime(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
-  for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
+  for (int cc = 0; cc < this->GetNumberOfInputPorts(); cc++)
+  {
+    for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
     {
-    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
-      {
       if (this->UpdateTimeValid)
-        {
+      {
         inputVector[cc]->GetInformationObject(kk)->Set(
-          vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
-          this->UpdateTime);
-        }
+          vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), this->UpdateTime);
       }
     }
+  }
 
   return 1;
 }
 //----------------------------------------------------------------------------
-int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkPVDataRepresentation::RequestUpdateExtent(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
 
   // ideally, extent and time information will come from the view in
   // REQUEST_UPDATE(), include view-time.
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
-  for (int cc=0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  for (int cc = 0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
+  {
+    for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
     {
-    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
-      {
       vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
-      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
-        controller->GetLocalProcessId());
+      info->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), controller->GetLocalProcessId());
       info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
         controller->GetNumberOfProcesses());
-      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-        0);
+      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 0);
       info->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
       if (this->UpdateTimeValid)
-        {
-        info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
-          this->UpdateTime);
-        }
+      {
+        info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), this->UpdateTime);
       }
     }
+  }
 
   return 1;
 }
@@ -187,30 +181,27 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
 bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
 {
   if (this->GetUseCache())
-    {
+  {
     return this->IsCached(this->GetCacheKey());
-    }
+  }
 
   return false;
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
-                                                                   int conn)
+vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port, int conn)
 {
-  vtkAlgorithmOutput* prevOutput =
-    this->Superclass::GetInternalOutputPort(port, conn);
+  vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(port, conn);
   if (!prevOutput)
-    {
+  {
     return 0;
-    }
+  }
 
-  vtkTrivialProducer* prevProducer = static_cast<vtkTrivialProducer*>(
-    prevOutput->GetProducer());
+  vtkTrivialProducer* prevProducer = static_cast<vtkTrivialProducer*>(prevOutput->GetProducer());
   if (prevProducer->IsA("vtkPVTrivialProducer"))
-    {
+  {
     return prevOutput;
-    }
+  }
 
   vtkDataObject* dobj = prevProducer->GetOutputDataObject(0);
 
@@ -232,10 +223,10 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
 bool vtkPVDataRepresentation::AddToView(vtkView* view)
 {
   if (this->View != NULL)
-    {
+  {
     vtkWarningMacro("Added representation has a non-null 'View'. "
-      "A representation cannot be added to two views at the same time!");
-    }
+                    "A representation cannot be added to two views at the same time!");
+  }
   this->View = view;
   return this->Superclass::AddToView(view);
 }
@@ -244,9 +235,9 @@ bool vtkPVDataRepresentation::AddToView(vtkView* view)
 bool vtkPVDataRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->View == view)
-    {
+  {
     this->View = NULL;
-    }
+  }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -260,13 +251,13 @@ vtkView* vtkPVDataRepresentation::GetView() const
 double vtkPVDataRepresentation::GetCacheKey()
 {
   if (this->ForceUseCache)
-    {
+  {
     return this->ForcedCacheKey;
-    }
+  }
   if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
-    {
+  {
     return pvview->GetCacheKey();
-    }
+  }
   return 0.0;
 }
 
@@ -274,14 +265,14 @@ double vtkPVDataRepresentation::GetCacheKey()
 bool vtkPVDataRepresentation::GetUseCache()
 {
   if (this->ForceUseCache)
-    {
+  {
     return true;
-    }
+  }
 
   if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
-    {
+  {
     return pvview->GetUseCache();
-    }
+  }
   return false;
 }
 

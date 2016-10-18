@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,23 +40,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqToggleInteractionViewMode::pqToggleInteractionViewMode(QAction* parentObject, pqView* view)
-  : Superclass(parentObject), View(view)
+  : Superclass(parentObject)
+  , View(view)
 {
   pqRenderView* renderView = qobject_cast<pqRenderView*>(this->View);
-  if(renderView)
-    {
-    QObject::connect(view, SIGNAL(updateInteractionMode(int)), this, SLOT(updateInteractionLabel(int)));
+  if (renderView)
+  {
+    QObject::connect(
+      view, SIGNAL(updateInteractionMode(int)), this, SLOT(updateInteractionLabel(int)));
 
     // Update label based on the current state (Needed when we load a state)
     int mode = -1;
     vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Get(&mode);
     this->updateInteractionLabel(mode);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqToggleInteractionViewMode::onTriggered()
-{ 
+{
   pqRenderView* view = qobject_cast<pqRenderView*>(this->View);
   SM_SCOPED_TRACE(PropertiesModified)
     .arg(view->getProxy())
@@ -65,31 +67,29 @@ void pqToggleInteractionViewMode::onTriggered()
   int currentMode = -1;
   int interactionMode = -1;
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Get(&currentMode);
-  if(currentMode == vtkPVRenderView::INTERACTION_MODE_3D)
-    {
+  if (currentMode == vtkPVRenderView::INTERACTION_MODE_3D)
+  {
     interactionMode = vtkPVRenderView::INTERACTION_MODE_2D;
-    }
+  }
   else
-    {
+  {
     interactionMode = vtkPVRenderView::INTERACTION_MODE_3D;
-    }
+  }
 
   // Update the interaction
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Set(interactionMode);
-  view->getProxy()->UpdateProperty("InteractionMode",1);
+  view->getProxy()->UpdateProperty("InteractionMode", 1);
 }
 //-----------------------------------------------------------------------------
 void pqToggleInteractionViewMode::updateInteractionLabel(int mode)
 {
-  switch(mode)
-    {
-  case vtkPVRenderView::INTERACTION_MODE_2D:
-    this->parentAction()->setIcon(
-      QIcon(":/pqWidgets/Icons/pqInteractionMode2D16.png"));
-    break;
-  case vtkPVRenderView::INTERACTION_MODE_3D:
-    this->parentAction()->setIcon(
-      QIcon(":/pqWidgets/Icons/pqInteractionMode3D16.png"));
-    break;
-    }
+  switch (mode)
+  {
+    case vtkPVRenderView::INTERACTION_MODE_2D:
+      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode2D16.png"));
+      break;
+    case vtkPVRenderView::INTERACTION_MODE_3D:
+      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode3D16.png"));
+      break;
+  }
 }

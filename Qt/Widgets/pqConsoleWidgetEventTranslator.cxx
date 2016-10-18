@@ -44,7 +44,7 @@ pqConsoleWidgetEventTranslator::pqConsoleWidgetEventTranslator(QObject* parentOb
 pqConsoleWidgetEventTranslator::~pqConsoleWidgetEventTranslator()
 {
 }
-  
+
 //-----------------------------------------------------------------------------
 bool pqConsoleWidgetEventTranslator::translateEvent(
   QObject* target, QEvent* qtevent, bool& errorFlag)
@@ -53,29 +53,28 @@ bool pqConsoleWidgetEventTranslator::translateEvent(
   // Capture inputs for pqConsoleWidget and all its children
   pqConsoleWidget* object = NULL;
   for (QObject* current = target; current != NULL; current = current->parent())
-    {
+  {
     object = qobject_cast<pqConsoleWidget*>(current);
     if (object)
-      {
-      break;
-      }
-    }
-  if (!object)
     {
-    return false;
+      break;
     }
+  }
+  if (!object)
+  {
+    return false;
+  }
 
   if (qtevent->type() == QEvent::FocusIn)
-    {
+  {
     if (this->CurrentObject)
-      {
+    {
       QObject::disconnect(this->CurrentObject, NULL, this, NULL);
-      }
-    this->CurrentObject = object;
-    QObject::connect(
-      this->CurrentObject, SIGNAL(executeCommand(const QString&)),
-      this, SLOT(recordCommand(const QString&)));
     }
+    this->CurrentObject = object;
+    QObject::connect(this->CurrentObject, SIGNAL(executeCommand(const QString&)), this,
+      SLOT(recordCommand(const QString&)));
+  }
 
   return true;
 }

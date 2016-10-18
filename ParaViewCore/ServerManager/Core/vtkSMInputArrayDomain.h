@@ -35,12 +35,12 @@
  *                         'vertex', 'edge', 'row', 'none', 'any-except-field', 'any'.
  *                         If not specified, 'any-except-field' is assumed. This
  *                         indicates the attribute type for acceptable arrays.
- * \li \c number_of_components : (optional) Indicates the number of components 
- *                         required in arrays that are considered acceptable. 
- *                         0 (default) indicates any number of components is acceptable. 
- *                         A comma-separated list (e.g., "1" or "1,3,4") of component counts 
- *                         limits acceptable arrays to those with a number of components that 
- *                         appear in the list. 
+ * \li \c number_of_components : (optional) Indicates the number of components
+ *                         required in arrays that are considered acceptable.
+ *                         0 (default) indicates any number of components is acceptable.
+ *                         A comma-separated list (e.g., "1" or "1,3,4") of component counts
+ *                         limits acceptable arrays to those with a number of components that
+ *                         appear in the list.
  *
  * This domain doesn't support any required properties (to help clean old
  * code, we print a warning if any required properties are specified).
@@ -64,7 +64,7 @@
 
 // Needed to get around some header defining ANY as a macro
 #ifdef ANY
-# undef ANY
+#undef ANY
 #endif
 
 class vtkPVArrayInformation;
@@ -90,7 +90,7 @@ public:
    * Returns true if input has one or more arrays that match the
    * requirements on  the given output port.
    */
-  int IsInDomain(vtkSMSourceProxy* proxy, unsigned int outputport=0);
+  int IsInDomain(vtkSMSourceProxy* proxy, unsigned int outputport = 0);
 
   //@{
   /**
@@ -120,7 +120,7 @@ public:
   static bool GetAutomaticPropertyConversion();
 
   enum AttributeTypes
-    {
+  {
     POINT = vtkDataObject::POINT,
     CELL = vtkDataObject::CELL,
     FIELD = vtkDataObject::FIELD,
@@ -129,8 +129,8 @@ public:
     EDGE = vtkDataObject::EDGE,
     ROW = vtkDataObject::ROW,
     ANY = vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES,
-    NUMBER_OF_ATTRIBUTE_TYPES = ANY+1,
-    };
+    NUMBER_OF_ATTRIBUTE_TYPES = ANY + 1,
+  };
 
   /**
    * Method to check if a particular attribute-type (\c attribute_type) will
@@ -144,8 +144,8 @@ public:
    * acceptable_as_type will be set to POINT. In other cases, acceptable_as_type
    * is simply set to attribute_type.
    */
-  static bool IsAttributeTypeAcceptable(int required_type, int attribute_type,
-    int *acceptable_as_type=NULL);
+  static bool IsAttributeTypeAcceptable(
+    int required_type, int attribute_type, int* acceptable_as_type = NULL);
 
   /**
    * Method to check if a particular array is acceptable to a domain with the
@@ -169,7 +169,7 @@ public:
    * This method return the accepted number of components to use.
    */
   int IsArrayAcceptable(vtkPVArrayInformation* arrayInfo);
-  
+
 protected:
   vtkSMInputArrayDomain();
   ~vtkSMInputArrayDomain();
@@ -203,6 +203,7 @@ protected:
 
   int AttributeType;
   std::vector<int> AcceptableNumbersOfComponents;
+
 private:
   static bool AutomaticPropertyConversion;
   vtkSMInputArrayDomain(const vtkSMInputArrayDomain&) VTK_DELETE_FUNCTION;

@@ -34,14 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcessEnvironment>
 
 //-----------------------------------------------------------------------------
-pqDebugType::pqDebugType(const QString& envVariable/*=QString()*/)
+pqDebugType::pqDebugType(const QString& envVariable /*=QString()*/)
 {
   // since call to systemEnvironment is expensive, we only do it once.
-  static QProcessEnvironment systemEnvironment =
-    QProcessEnvironment::systemEnvironment();
+  static QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
 
-  this->Enabled = envVariable.isEmpty()? true:
-    systemEnvironment.contains(envVariable);
+  this->Enabled = envVariable.isEmpty() ? true : systemEnvironment.contains(envVariable);
 }
 
 //-----------------------------------------------------------------------------
@@ -50,9 +48,9 @@ pqDebugType::~pqDebugType()
 }
 
 //-----------------------------------------------------------------------------
-QDebug pqDebug(const pqDebugType& type/*=pqDebugType()*/)
+QDebug pqDebug(const pqDebugType& type /*=pqDebugType()*/)
 {
   static QString messageEater;
   messageEater.clear();
-  return type? QDebug(QtDebugMsg) : QDebug(&messageEater);
+  return type ? QDebug(QtDebugMsg) : QDebug(&messageEater);
 }

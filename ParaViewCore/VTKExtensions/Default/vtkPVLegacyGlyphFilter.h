@@ -31,10 +31,10 @@ class vtkMaskPoints;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLegacyGlyphFilter : public vtkGlyph3D
 {
 public:
-  vtkTypeMacro(vtkPVLegacyGlyphFilter,vtkGlyph3D);
+  vtkTypeMacro(vtkPVLegacyGlyphFilter, vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVLegacyGlyphFilter *New();
+  static vtkPVLegacyGlyphFilter* New();
 
   //@{
   /**
@@ -75,18 +75,15 @@ public:
   virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
 
   void SetKeepRandomPoints(int keepRandomPoints);
-  vtkGetMacro(KeepRandomPoints,int);
+  vtkGetMacro(KeepRandomPoints, int);
 
 protected:
   vtkPVLegacyGlyphFilter();
   ~vtkPVLegacyGlyphFilter();
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
-  virtual int RequestCompositeData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual int FillInputPortInformation(int, vtkInformation*);
 
@@ -100,9 +97,9 @@ protected:
    * block of the dataset to calculate indices of points
    * to be glyphed in the block
    */
- void CalculatePtsToGlyph(double PtsNotBlanked);
+  void CalculatePtsToGlyph(double PtsNotBlanked);
 
-  vtkMaskPoints *MaskPoints;
+  vtkMaskPoints* MaskPoints;
   int MaximumNumberOfPoints;
   int NumberOfProcesses;
   int UseMaskPoints;
@@ -115,7 +112,7 @@ protected:
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
 
-  std::vector< vtkIdType > RandomPtsInDataset;
+  std::vector<vtkIdType> RandomPtsInDataset;
 
   int RandomMode;
 
@@ -129,13 +126,11 @@ private:
   void operator=(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
 
 public:
-
   enum CommunicationIds
-   {
-     GlyphNPointsGather=1000,
-     GlyphNPointsScatter
-   };
-
+  {
+    GlyphNPointsGather = 1000,
+    GlyphNPointsScatter
+  };
 };
 
 #endif

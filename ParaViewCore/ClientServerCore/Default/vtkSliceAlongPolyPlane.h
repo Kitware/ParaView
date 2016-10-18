@@ -38,22 +38,20 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkSliceAlongPolyPlane : public vtkDat
 {
 public:
   static vtkSliceAlongPolyPlane* New();
-  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
   //@{
-  vtkSetMacro(Tolerance, double)
-  vtkGetMacro(Tolerance, double)
-  //@}
+  vtkSetMacro(Tolerance, double) vtkGetMacro(Tolerance, double)
+    //@}
 
-protected:
-  vtkSliceAlongPolyPlane();
+    protected : vtkSliceAlongPolyPlane();
   virtual ~vtkSliceAlongPolyPlane();
 
   virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector** inputVector , vtkInformationVector* outputVector);
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation( int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   /**
    * The actual algorithm for slice a dataset along a polyline.
@@ -70,7 +68,6 @@ private:
   void operator=(const vtkSliceAlongPolyPlane&) VTK_DELETE_FUNCTION;
 
   double Tolerance;
-
 };
 
 #endif

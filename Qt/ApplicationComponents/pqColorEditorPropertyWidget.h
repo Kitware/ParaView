@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqProp
 public:
   typedef pqPropertyWidget Superclass;
 
-  pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqColorEditorPropertyWidget();
 
 private slots:

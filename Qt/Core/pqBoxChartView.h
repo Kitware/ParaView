@@ -48,11 +48,8 @@ class PQCORE_EXPORT pqBoxChartView : public pqContextView
 public:
   static QString chartViewType() { return "BoxChartView"; }
 
-  pqBoxChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqBoxChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
 
   virtual ~pqBoxChartView();
 

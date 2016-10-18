@@ -51,8 +51,8 @@ class vtkMultiProcessController;
 class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkCGNSReader *New();
-  vtkTypeMacro(vtkCGNSReader,vtkMultiBlockDataSetAlgorithm);
+  static vtkCGNSReader* New();
+  vtkTypeMacro(vtkCGNSReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -67,7 +67,6 @@ public:
    * Is the given file name a CGNS file?
    */
   int CanReadFile(const char* filename);
-
 
   // The following methods allow selective reading of solutions fields.
   int GetBaseArrayStatus(const char* name);
@@ -95,17 +94,17 @@ public:
   void DisableAllCellArrays();
   void EnableAllCellArrays();
 
-  vtkSetMacro(DoublePrecisionMesh,int);
-  vtkGetMacro(DoublePrecisionMesh,int);
-  vtkBooleanMacro(DoublePrecisionMesh,int);
+  vtkSetMacro(DoublePrecisionMesh, int);
+  vtkGetMacro(DoublePrecisionMesh, int);
+  vtkBooleanMacro(DoublePrecisionMesh, int);
 
-  vtkSetMacro(LoadBndPatch,int);
-  vtkGetMacro(LoadBndPatch,int);
-  vtkBooleanMacro(LoadBndPatch,int);
+  vtkSetMacro(LoadBndPatch, int);
+  vtkGetMacro(LoadBndPatch, int);
+  vtkBooleanMacro(LoadBndPatch, int);
 
-  vtkSetMacro(CreateEachSolutionAsBlock,int);
-  vtkGetMacro(CreateEachSolutionAsBlock,int);
-  vtkBooleanMacro(CreateEachSolutionAsBlock,int);
+  vtkSetMacro(CreateEachSolutionAsBlock, int);
+  vtkGetMacro(CreateEachSolutionAsBlock, int);
+  vtkBooleanMacro(CreateEachSolutionAsBlock, int);
 
   //@{
   /**
@@ -121,7 +120,7 @@ public:
    * Sends metadata (that read from the input file, not settings modified
    * through this API) from the rank 0 node to all other processes in a job.
    */
-  void Broadcast( vtkMultiProcessController* ctrl );
+  void Broadcast(vtkMultiProcessController* ctrl);
 
 protected:
   vtkCGNSReader();
@@ -129,13 +128,8 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
-  virtual int RequestInformation(vtkInformation*,
-                                 vtkInformationVector**,
-                                 vtkInformationVector*);
-
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   vtkDataArraySelection* BaseSelection;
   vtkDataArraySelection* PointDataArraySelection;
@@ -146,16 +140,14 @@ protected:
   vtkCallbackCommand* SelectionObserver;
 
   // Callback registered with the SelectionObserver.
-  static void SelectionModifiedCallback(vtkObject* caller, unsigned long eid,
-                                        void* clientdata, void* calldata);
+  static void SelectionModifiedCallback(
+    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
-  int GetCurvilinearZone(int  base, int zone,
-                         int cell_dim, int phys_dim, void *zsize,
-                         vtkMultiBlockDataSet *mbase);
+  int GetCurvilinearZone(
+    int base, int zone, int cell_dim, int phys_dim, void* zsize, vtkMultiBlockDataSet* mbase);
 
-  int GetUnstructuredZone(int  base, int zone,
-                          int cell_dim, int phys_dim, void *zsize,
-                          vtkMultiBlockDataSet *mbase);
+  int GetUnstructuredZone(
+    int base, int zone, int cell_dim, int phys_dim, void* zsize, vtkMultiBlockDataSet* mbase);
   vtkMultiProcessController* Controller;
   vtkIdType ProcRank;
   vtkIdType ProcSize;
@@ -164,16 +156,16 @@ private:
   vtkCGNSReader(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
 
-  CGNSRead::vtkCGNSMetaData *Internal;  // Metadata
+  CGNSRead::vtkCGNSMetaData* Internal; // Metadata
 
-  char *FileName; // cgns file name
-  int LoadBndPatch; // option to set section loading for unstructured grid
-  int DoublePrecisionMesh; // option to set mesh loading to double precision
+  char* FileName;                // cgns file name
+  int LoadBndPatch;              // option to set section loading for unstructured grid
+  int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
 
   // For internal cgio calls (low level IO)
-  int cgioNum; // cgio file reference
-  double rootId; // id of root node
+  int cgioNum;      // cgio file reference
+  double rootId;    // id of root node
   double currentId; // id of node currently being read (zone)
   //
   unsigned int NumberOfBases;

@@ -39,50 +39,45 @@ vtkPVExtractComponent::~vtkPVExtractComponent()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVExtractComponent::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkPVExtractComponent::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 
-
 //----------------------------------------------------------------------------
-int vtkPVExtractComponent::RequestData(vtkInformation *vtkNotUsed(request),
-                                       vtkInformationVector **inputVector,
-                                       vtkInformationVector *outputVector)
+int vtkPVExtractComponent::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // get the output info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet *output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet* output = vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   output->ShallowCopy(input);
 
-  vtkDataArray *inVectors = this->GetInputArrayToProcess(0, inputVector);
+  vtkDataArray* inVectors = this->GetInputArrayToProcess(0, inputVector);
 
   if (!inVectors)
-    {
+  {
     vtkErrorMacro(<< "No data to extract");
     return 0;
-    }
+  }
 
-  if (this->InputArrayComponent >= inVectors->GetNumberOfComponents()
-   || this->InputArrayComponent < 0)
-    {
+  if (this->InputArrayComponent >= inVectors->GetNumberOfComponents() ||
+    this->InputArrayComponent < 0)
+  {
     vtkErrorMacro(<< "Invalid component");
     return 0;
-    }
+  }
 
   if (!this->OutputArrayName)
-    {
+  {
     vtkErrorMacro(<< "No output array name");
     return 0;
-    }
+  }
 
   vtkDataArray* outScalars = inVectors->NewInstance();
   outScalars->SetName(this->OutputArrayName);
@@ -91,17 +86,17 @@ int vtkPVExtractComponent::RequestData(vtkInformation *vtkNotUsed(request),
   outScalars->CopyComponent(0, inVectors, this->InputArrayComponent);
 
   if (inVectors->GetNumberOfTuples() == input->GetNumberOfPoints())
-    {
+  {
     output->GetPointData()->AddArray(outScalars);
-    }
+  }
   else if (inVectors->GetNumberOfTuples() == input->GetNumberOfCells())
-    {
+  {
     output->GetCellData()->AddArray(outScalars);
-    }
+  }
   else
-    {
+  {
     output->GetFieldData()->AddArray(outScalars);
-    }
+  }
 
   outScalars->Delete();
 
@@ -111,7 +106,7 @@ int vtkPVExtractComponent::RequestData(vtkInformation *vtkNotUsed(request),
 //----------------------------------------------------------------------------
 void vtkPVExtractComponent::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "InputArrayComponent: " << this->InputArrayComponent << endl;
   os << indent << "OutputArrayName: " << this->OutputArrayName << endl;
 }

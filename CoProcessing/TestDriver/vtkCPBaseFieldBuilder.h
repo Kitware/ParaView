@@ -16,8 +16,8 @@
  * @class   vtkCPBaseFieldBuilder
  * @brief   Abstract class for specifying fields over grids.
  *
- * Abstract class for specifying fields over grids for a test driver.  
- * May want to remove GetHighestFieldOrder as it is just a place holder 
+ * Abstract class for specifying fields over grids for a test driver.
+ * May want to remove GetHighestFieldOrder as it is just a place holder
  * for now.
 */
 
@@ -40,8 +40,7 @@ public:
    * that were returned were already built before.
    * vtkCPBaseFieldBuilder will also delete the grid.
    */
-  virtual void BuildField(unsigned long TimeStep, double Time,
-                          vtkDataSet* Grid) = 0;
+  virtual void BuildField(unsigned long TimeStep, double Time, vtkDataSet* Grid) = 0;
 
   /**
    * Return the highest order of discretization of the field.

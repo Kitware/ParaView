@@ -45,10 +45,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(
   QAction* parentObject, bool track_active_objects)
-  : Superclass(parentObject),
-  BlockSignals(false),
-  TrackActiveObjects(track_active_objects),
-  Timer(new pqTimer(this))
+  : Superclass(parentObject)
+  , BlockSignals(false)
+  , TrackActiveObjects(track_active_objects)
+  , Timer(new pqTimer(this))
 {
   parentObject->setCheckable(true);
 
@@ -57,8 +57,8 @@ pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(
   this->connect(this->Timer, SIGNAL(timeout()), SLOT(updateEnableState()));
 
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
+    Qt::QueuedConnection);
 
   this->updateEnableState();
 }
@@ -73,8 +73,8 @@ pqScalarBarVisibilityReaction::~pqScalarBarVisibilityReaction()
 void pqScalarBarVisibilityReaction::updateEnableState()
 {
   pqDataRepresentation* cachedRepr = this->CachedRepresentation;
-  this->setRepresentation(this->TrackActiveObjects?
-    pqActiveObjects::instance().activeRepresentation() : cachedRepr);
+  this->setRepresentation(
+    this->TrackActiveObjects ? pqActiveObjects::instance().activeRepresentation() : cachedRepr);
 }
 
 //-----------------------------------------------------------------------------
@@ -87,43 +87,43 @@ pqDataRepresentation* pqScalarBarVisibilityReaction::representation() const
 void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr)
 {
   if (this->CachedRepresentation)
-    {
+  {
     this->CachedRepresentation->disconnect(this->Timer);
     this->Timer->disconnect(this->CachedRepresentation);
     this->CachedRepresentation = 0;
-    }
+  }
   if (this->CachedView)
-    {
+  {
     this->CachedView->disconnect(this->Timer);
     this->Timer->disconnect(this->CachedView);
     this->CachedView = 0;
-    }
+  }
 
-  vtkSMProxy* reprProxy = repr? repr->getProxy() : NULL;
-  pqView *view = repr? repr->getView() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
+  pqView* view = repr ? repr->getView() : NULL;
 
   bool can_show_sb = repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
   bool is_shown = false;
   if (repr)
-    {
+  {
     this->CachedRepresentation = repr;
     this->CachedView = view;
 
     this->Timer->connect(repr, SIGNAL(colorTransferFunctionModified()), SLOT(start()));
     this->Timer->connect(repr, SIGNAL(colorArrayNameModified()), SLOT(start()));
-    this->Timer->connect(view, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
-      SLOT(start()));
-    }
+    this->Timer->connect(
+      view, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), SLOT(start()));
+  }
 
   if (can_show_sb)
-    {
+  {
     Q_ASSERT(repr);
     Q_ASSERT(view);
 
     // get whether the scalar bar is currently shown.
     vtkSMProxy* sb = this->scalarBarProxy();
-    is_shown = sb?  (vtkSMPropertyHelper(sb, "Visibility").GetAsInt()!=0) : false;
-    }
+    is_shown = sb ? (vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0) : false;
+  }
 
   QAction* parent_action = this->parentAction();
   this->BlockSignals = true;
@@ -136,13 +136,13 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
 vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
 {
   pqDataRepresentation* repr = this->CachedRepresentation;
-  vtkSMProxy* reprProxy = repr? repr->getProxy() : NULL;
-  pqView *view = repr? repr->getView() : NULL;
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
+  pqView* view = repr ? repr->getView() : NULL;
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
-    {
+  {
     return vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
       repr->getLookupTableProxy(), view->getProxy());
-    }
+  }
   return NULL;
 }
 
@@ -150,18 +150,18 @@ vtkSMProxy* pqScalarBarVisibilityReaction::scalarBarProxy() const
 void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
 {
   if (this->BlockSignals)
-    {
+  {
     return;
-    }
+  }
 
   pqDataRepresentation* repr = this->CachedRepresentation;
   if (!repr)
-    {
+  {
     qCritical() << "Required active objects are not available.";
     return;
-    }
+  }
 
-  BEGIN_UNDO_SET( "Toggle Color Legend Visibility");
+  BEGIN_UNDO_SET("Toggle Color Legend Visibility");
   vtkSMPVRepresentationProxy::SetScalarBarVisibility(
     repr->getProxy(), repr->getView()->getProxy(), visible);
   END_UNDO_SET();

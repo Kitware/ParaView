@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QtDebug>
 
-
 class pqArrayListDomain::pqInternals
 {
 public:
@@ -49,24 +48,25 @@ public:
   vtkWeakPointer<vtkSMProperty> SMProperty;
   vtkWeakPointer<vtkSMDomain> SMDomain;
   unsigned long ObserverId;
-  pqInternals() : ObserverId(0)
-    {
-    }
+  pqInternals()
+    : ObserverId(0)
+  {
+  }
   ~pqInternals()
-    {
+  {
     if (this->SMDomain && this->ObserverId)
-      {
+    {
       this->SMDomain->RemoveObserver(this->ObserverId);
-      }
-    this->ObserverId = 0;
     }
+    this->ObserverId = 0;
+  }
 };
 
 //-----------------------------------------------------------------------------
-pqArrayListDomain::pqArrayListDomain(
-    QWidget* selectorWidget, const QString& qproperty,
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMDomain* domain)
-  : Superclass(selectorWidget), Internals(new pqInternals())
+pqArrayListDomain::pqArrayListDomain(QWidget* selectorWidget, const QString& qproperty,
+  vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMDomain* domain)
+  : Superclass(selectorWidget)
+  , Internals(new pqInternals())
 {
   Q_ASSERT(selectorWidget && proxy && smproperty && domain);
 
@@ -75,9 +75,8 @@ pqArrayListDomain::pqArrayListDomain(
   this->Internals->SMProperty = smproperty;
   this->Internals->SMDomain = domain;
 
-  this->Internals->ObserverId = domain->AddObserver(
-    vtkCommand::DomainModifiedEvent,
-    this,  &pqArrayListDomain::domainChanged);
+  this->Internals->ObserverId =
+    domain->AddObserver(vtkCommand::DomainModifiedEvent, this, &pqArrayListDomain::domainChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -90,11 +89,10 @@ pqArrayListDomain::~pqArrayListDomain()
 void pqArrayListDomain::domainChanged()
 {
   // reset the widget's value using the domain.
-  QList<QList<QVariant> > newVal = pqSMAdaptor::getSelectionProperty(
-    this->Internals->SMProperty, pqSMAdaptor::UNCHECKED);
+  QList<QList<QVariant> > newVal =
+    pqSMAdaptor::getSelectionProperty(this->Internals->SMProperty, pqSMAdaptor::UNCHECKED);
   QVariant variantVal;
   variantVal.setValue(newVal);
 
-  this->parent()->setProperty(
-    this->Internals->QProperty.toLatin1().data(), variantVal);
+  this->parent()->setProperty(this->Internals->QProperty.toLatin1().data(), variantVal);
 }

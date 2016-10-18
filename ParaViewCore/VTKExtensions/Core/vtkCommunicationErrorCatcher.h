@@ -49,14 +49,12 @@ public:
   /**
    * Get the status of errors.
    */
-  bool GetErrorsRaised() const
-    { return this->ErrorsRaised; }
+  bool GetErrorsRaised() const { return this->ErrorsRaised; }
 
   /**
    * Get the combined error messages.
    */
-  const std::string& GetErrorMessages() const
-    { return this->ErrorMessages; }
+  const std::string& GetErrorMessages() const { return this->ErrorMessages; }
 
 private:
   vtkCommunicationErrorCatcher(const vtkCommunicationErrorCatcher&) VTK_DELETE_FUNCTION;

@@ -41,7 +41,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPipelineState : public vtkSMRemoteObjec
 
 public:
   static vtkSMPipelineState* New();
-  vtkTypeMacro(vtkSMPipelineState,vtkSMRemoteObject);
+  vtkTypeMacro(vtkSMPipelineState, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -55,7 +55,7 @@ public:
   /**
    * This method is used to initialise the object to the given state
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
   void ValidateState();
 
@@ -73,7 +73,6 @@ protected:
 private:
   vtkSMPipelineState(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // #ifndef vtkSMPipelineState_h

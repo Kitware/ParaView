@@ -50,9 +50,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqHandlePropertyWidget : public pqInteracti
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqHandlePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqHandlePropertyWidget();
 
 public slots:

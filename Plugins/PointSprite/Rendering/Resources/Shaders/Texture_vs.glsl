@@ -28,7 +28,7 @@
 // </verbatim>
 
 uniform float MaxPixelSize;
-uniform vec2  viewport;
+uniform vec2 viewport;
 
 float GetRadius();
 
@@ -37,7 +37,7 @@ void propFuncVS()
   float radius = GetRadius();
 
   gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
-  gl_Position   = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
   //
   // Convert position to window coordinates
   //
@@ -46,12 +46,12 @@ void propFuncVS()
   // Convert Radius to window coordinates
   // radius/w is homogenous clip coord
   //
-  float pixelSize  = (radius/gl_Position.w)*(4.0*viewport.y);
+  float pixelSize = (radius / gl_Position.w) * (4.0 * viewport.y);
 
   // Clamp radius to prevent overloading if bad scalars were passed in
-  if (pixelSize>MaxPixelSize)
+  if (pixelSize > MaxPixelSize)
     pixelSize = MaxPixelSize;
 
-  gl_PointSize  = pixelSize;
+  gl_PointSize = pixelSize;
   gl_FrontColor = gl_Color;
 }

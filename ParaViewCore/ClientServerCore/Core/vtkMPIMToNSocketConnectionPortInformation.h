@@ -15,7 +15,7 @@
 /**
  * @class   vtkMPIMToNSocketConnectionPortInformation
  * @brief   holds port and host name
- * information.  
+ * information.
  *
  * and host information from a render server.  This information is used by
  * the data server to make the connections to the render server processes.
@@ -29,25 +29,24 @@
 
 class vtkMPIMToNSocketConnectionPortInformationInternals;
 
-
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnectionPortInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnectionPortInformation
+  : public vtkPVInformation
 {
 public:
   static vtkMPIMToNSocketConnectionPortInformation* New();
   vtkTypeMacro(vtkMPIMToNSocketConnectionPortInformation, vtkPVInformation);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Set the port and host information for a specific process number.
    */
-  void SetConnectionInformation(
-    unsigned int processNumber, int portNumber, const char* hostname);
+  void SetConnectionInformation(unsigned int processNumber, int portNumber, const char* hostname);
 
   /**
    * Set/Get the number of connections.
    */
   int GetNumberOfConnections();
- 
+
   //@{
   /**
    * Access information about a particular process.
@@ -55,7 +54,7 @@ public:
   int GetProcessPort(unsigned int processNumber);
   const char* GetProcessHostName(unsigned int processNumber);
   //@}
-  
+
   /**
    * Transfer information about a single object into this object.
    */
@@ -80,8 +79,10 @@ protected:
 
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionPortInformationInternals* Internals;
+
 private:
-  vtkMPIMToNSocketConnectionPortInformation(const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
+  vtkMPIMToNSocketConnectionPortInformation(
+    const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
 };
 

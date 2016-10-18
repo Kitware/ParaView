@@ -48,10 +48,10 @@ vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
 vtkSMUndoStackBuilder::~vtkSMUndoStackBuilder()
 {
   if (this->UndoSet)
-    {
+  {
     this->UndoSet->Delete();
     this->UndoSet = NULL;
-    }
+  }
   this->SetLabel(NULL);
   this->SetUndoStack(0);
 }
@@ -59,9 +59,9 @@ vtkSMUndoStackBuilder::~vtkSMUndoStackBuilder()
 void vtkSMUndoStackBuilder::Begin(const char* label)
 {
   if (!this->Label)
-    {
+  {
     this->SetLabel(label);
-    }
+  }
 
   ++this->EnableMonitoring;
 }
@@ -70,27 +70,25 @@ void vtkSMUndoStackBuilder::Begin(const char* label)
 void vtkSMUndoStackBuilder::End()
 {
   if (this->EnableMonitoring == 0)
-    {
+  {
     vtkWarningMacro("Unmatched End().");
     return;
-    }
+  }
   this->EnableMonitoring--;
-
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::PushToStack()
 {
-  if(this->EnableMonitoring > 0)
-    {
+  if (this->EnableMonitoring > 0)
+  {
     return; // Only push the whole set when the first begin/end has been reached
-    }
+  }
 
   if (this->UndoSet->GetNumberOfElements() > 0 && this->UndoStack)
-    {
-    this->UndoStack->Push( (this->Label? this->Label : "Changes"),
-                           this->UndoSet);
-    }
+  {
+    this->UndoStack->Push((this->Label ? this->Label : "Changes"), this->UndoSet);
+  }
   this->InitializeUndoSet();
 }
 
@@ -111,48 +109,44 @@ void vtkSMUndoStackBuilder::InitializeUndoSet()
 bool vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 {
   if (!element)
-    {
+  {
     return false;
-    }
+  }
 
   if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
-    {
+  {
     return false;
-    }
+  }
 
   this->UndoSet->AddElement(element);
   return true;
 }
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
-                                           vtkTypeUInt32 vtkNotUsed(globalId),
-                                           const vtkSMMessage *previousState,
-                                           const vtkSMMessage *newState)
+void vtkSMUndoStackBuilder::OnStateChange(vtkSMSession* session, vtkTypeUInt32 vtkNotUsed(globalId),
+  const vtkSMMessage* previousState, const vtkSMMessage* newState)
 {
-  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack
-      || session->IsMultiClients()) // No undo for collaboration
-    {
+  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack ||
+    session->IsMultiClients()) // No undo for collaboration
+  {
     return;
-    }
+  }
 
   vtkSMRemoteObjectUpdateUndoElement* undoElement;
   undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
   undoElement->SetSession(session);
-  undoElement->SetUndoRedoState( previousState, newState );
+  undoElement->SetUndoRedoState(previousState, newState);
   this->Add(undoElement);
   undoElement->FastDelete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnCreateObject(
-  vtkSMSession* session, vtkSMMessage* newState)
+void vtkSMUndoStackBuilder::OnCreateObject(vtkSMSession* session, vtkSMMessage* newState)
 {
   // Valid undo stack but No collaborative session
   if (this->UndoStack && !session->IsMultiClients())
-    {
-    this->UndoStack->InvokeEvent(
-      vtkSMUndoStack::ObjectCreationEvent, newState);
-    }
+  {
+    this->UndoStack->InvokeEvent(vtkSMUndoStack::ObjectCreationEvent, newState);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #ifndef _pqFileChooserWidget_h
 #define _pqFileChooserWidget_h
 
@@ -50,15 +49,11 @@ class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true)
-  Q_PROPERTY(QString singleFilename READ singleFilename WRITE
-    setSingleFilename)
+  Q_PROPERTY(QString singleFilename READ singleFilename WRITE setSingleFilename)
   Q_PROPERTY(QString extension READ extension WRITE setExtension)
-  Q_PROPERTY(bool useDirectoryMode
-             READ useDirectoryMode WRITE setUseDirectoryMode)
-  Q_PROPERTY(bool forceSingleFile
-             READ forceSingleFile WRITE setForceSingleFile)
-  Q_PROPERTY(bool acceptAnyFile
-             READ acceptAnyFile WRITE setAcceptAnyFile)
+  Q_PROPERTY(bool useDirectoryMode READ useDirectoryMode WRITE setUseDirectoryMode)
+  Q_PROPERTY(bool forceSingleFile READ forceSingleFile WRITE setForceSingleFile)
+  Q_PROPERTY(bool acceptAnyFile READ acceptAnyFile WRITE setAcceptAnyFile)
 
 public:
   /**
@@ -87,7 +82,7 @@ public:
   * forceSingleFile property).
   */
   QString singleFilename() const;
-  void setSingleFilename(const QString &);
+  void setSingleFilename(const QString&);
 
   /**
   * get the file extension for the file dialog
@@ -102,7 +97,8 @@ public:
   * flag specifying whether this widget should accept multiple files
   */
   bool forceSingleFile() { return this->ForceSingleFile; }
-  void setForceSingleFile(bool flag) {
+  void setForceSingleFile(bool flag)
+  {
     this->ForceSingleFile = flag;
     this->setFilenames(this->filenames());
   }
@@ -111,7 +107,8 @@ public:
   * flag specifying whether this widget should use directory mode
   */
   bool useDirectoryMode() { return this->UseDirectoryMode; }
-  void setUseDirectoryMode(bool flag) {
+  void setUseDirectoryMode(bool flag)
+  {
     this->UseDirectoryMode = flag;
     this->setFilenames(this->filenames());
   }
@@ -120,7 +117,8 @@ public:
   * flag specifying whether this widget should accept any file
   */
   bool acceptAnyFile() { return this->AcceptAnyFile; }
-  void setAcceptAnyFile(bool flag) {
+  void setAcceptAnyFile(bool flag)
+  {
     this->AcceptAnyFile = flag;
     this->setFilenames(this->filenames());
   }
@@ -136,12 +134,11 @@ public:
   * Converts between a list of file names and delimited string of filenames
   * (which is shown in the line edit box).
   */
-  static QStringList splitFilenames(const QString &filesString) {
+  static QStringList splitFilenames(const QString& filesString)
+  {
     return filesString.split(";", QString::SkipEmptyParts);
   }
-  static QString joinFilenames(const QStringList &filesList) {
-    return filesList.join(";");
-  }
+  static QString joinFilenames(const QStringList& filesList) { return filesList.join(";"); }
 
 signals:
   /**
@@ -159,7 +156,7 @@ protected slots:
   /**
   * Respond to changes with the filename in the line edit box.
   */
-  void handleFileLineEditChanged(const QString &fileString);
+  void handleFileLineEditChanged(const QString& fileString);
 
 protected:
   QString Extension;
@@ -175,8 +172,7 @@ protected:
   * Takes a string with delimited files and emits the filenamesChanged
   *  and filenameChanged signals.
   */
-  void emitFilenamesChanged(const QStringList &fileList);
+  void emitFilenamesChanged(const QStringList& fileList);
 };
 
 #endif // _pqFileChooserWidget_h
-

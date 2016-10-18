@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -69,17 +69,17 @@ public:
   * get the proxy for which properties are displayed
   */
   vtkSMProxy* proxy() const;
-  
+
   /**
   * get the view that this object panel works with.
   */
   pqView* view() const;
-  
+
   /**
   * size hint for this widget
   */
   QSize sizeHint() const;
-  
+
   /**
   * property manager belongs to this panel
   */
@@ -121,12 +121,12 @@ public slots:
   * Set the view that this panel works with
   */
   virtual void setView(pqView*);
-  
+
   /**
   * Fires modified
   */
   virtual void setModified();
-  
+
 private slots:
   /**
   * Called when the vtkSMProxy fires ModifiedEvent.
@@ -134,7 +134,6 @@ private slots:
   * depending on those) may now be obsolete.
   */
   void proxyModifiedEvent();
-
 
 signals:
   void modified();
@@ -146,12 +145,12 @@ signals:
 
 protected slots:
   /**
-  * This method gets called to referesh all domains 
+  * This method gets called to referesh all domains
   * and information properties. Subclassess can override
   * this to update any domain related entities.
-  * Since this is not a particularly fast operation, we update 
-  * the information and domains only when the panel is selected 
-  * or an already active panel is accepted. 
+  * Since this is not a particularly fast operation, we update
+  * the information and domains only when the panel is selected
+  * or an already active panel is accepted.
   */
   virtual void updateInformationAndDomains();
 
@@ -159,14 +158,13 @@ protected slots:
   * Called after the algorithm executes.
   */
   void dataUpdated();
-  
+
 protected:
   bool event(QEvent* e);
 
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
-
 };
 
 #endif

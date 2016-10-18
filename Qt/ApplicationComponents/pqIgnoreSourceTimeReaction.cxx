@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,9 +44,8 @@ pqIgnoreSourceTimeReaction::pqIgnoreSourceTimeReaction(QAction* parentObject)
 {
   parentObject->setCheckable(true);
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -54,10 +53,10 @@ pqIgnoreSourceTimeReaction::pqIgnoreSourceTimeReaction(QAction* parentObject)
 void pqIgnoreSourceTimeReaction::updateEnableState()
 {
   if (!pqActiveObjects::instance().activeSource())
-    {
+  {
     this->parentAction()->setEnabled(false);
     return;
-    }
+  }
 
   // Decide enable state as well as check state for the action.
   QAction* action = this->parentAction();
@@ -68,16 +67,16 @@ void pqIgnoreSourceTimeReaction::updateEnableState()
   // Now determine the check state for the action.
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   if (!source)
-    {
+  {
     enabled = false;
-    }
+  }
   else
-    {
+  {
     pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
     checked = checked ||
       // "checked" when the source proxy is not being tracked.
       !vtkSMTimeKeeperProxy::IsTimeSourceTracked(timeKeeper->getProxy(), source->getProxy());
-    }
+  }
   action->setChecked(checked);
   action->blockSignals(prev);
   action->setEnabled(enabled);
@@ -89,22 +88,20 @@ void pqIgnoreSourceTimeReaction::ignoreSourceTime(bool ignore)
   BEGIN_UNDO_SET("Toggle Ignore Time");
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   if (source)
-    {
+  {
     pqIgnoreSourceTimeReaction::ignoreSourceTime(source, ignore);
-    }
+  }
   END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
-void pqIgnoreSourceTimeReaction::ignoreSourceTime(
-  pqPipelineSource* source, bool ignore)
+void pqIgnoreSourceTimeReaction::ignoreSourceTime(pqPipelineSource* source, bool ignore)
 {
   if (!source)
-    {
+  {
     return;
-    }
+  }
 
   pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
-  vtkSMTimeKeeperProxy::SetSuppressTimeSource(
-    timeKeeper->getProxy(), source->getProxy(), ignore);
+  vtkSMTimeKeeperProxy::SetSuppressTimeSource(timeKeeper->getProxy(), source->getProxy(), ignore);
 }

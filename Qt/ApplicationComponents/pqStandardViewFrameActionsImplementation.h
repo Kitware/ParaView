@@ -85,14 +85,15 @@ class QWidget;
 * \endverbatim
 *
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation :
-  public QObject,
-  public pqViewFrameActionsInterface
+class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionsImplementation
+  : public QObject,
+    public pqViewFrameActionsInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqViewFrameActionsInterface);
+
 public:
-  pqStandardViewFrameActionsImplementation(QObject* parent=0);
+  pqStandardViewFrameActionsImplementation(QObject* parent = 0);
   virtual ~pqStandardViewFrameActionsImplementation();
 
   /**
@@ -171,7 +172,7 @@ protected:
   /**
   * called to add render view actions.
   */
-  virtual void addRenderViewActions(pqViewFrame *frame, pqRenderView* view);
+  virtual void addRenderViewActions(pqViewFrame* frame, pqRenderView* view);
 
   /**
   * called to add actions/decorator for pqSpreadSheetView.
@@ -182,18 +183,19 @@ protected:
   * check the XML hints to see if a button with the given name
   * should be added to the view frame
   */
-  virtual bool isButtonVisible(const std::string & buttonName, pqView* view);
+  virtual bool isButtonVisible(const std::string& buttonName, pqView* view);
 
   struct ViewType
-    {
+  {
     QString Label;
     QString Name;
-    ViewType(){}
-    ViewType(const QString& label, const QString& name):
-      Label(label), Name(name)
+    ViewType() {}
+    ViewType(const QString& label, const QString& name)
+      : Label(label)
+      , Name(name)
     {
     }
-    };
+  };
 
   /**
   * Returns available view types in the application. Used when setting up the

@@ -28,7 +28,8 @@
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPythonAnnotationFilter.h"
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateAttributeDataFilter : public vtkPythonAnnotationFilter
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateAttributeDataFilter
+  : public vtkPythonAnnotationFilter
 {
 public:
   static vtkAnnotateAttributeDataFilter* New();
@@ -82,7 +83,6 @@ protected:
 private:
   vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

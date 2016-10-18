@@ -14,22 +14,21 @@
 //=========================================================================
 // Id: Id
 
-
 uniform sampler2D texDepth;
 uniform vec2 uViewSize;
 varying vec4 vColor;
 
 const vec2 threshold = vec2(0.00001, 0.005);
-void main (void)
+void main(void)
 {
-  float surfaceDepth = texture2D(texDepth, gl_FragCoord.xy/uViewSize).x;
-  
+  float surfaceDepth = texture2D(texDepth, gl_FragCoord.xy / uViewSize).x;
+
   // tolerance increases as depth increases, this ensures that the lines appear
   // smooth and continuous.
   float tolerance = threshold.x + (1.0 - gl_FragCoord.z) * (threshold.y - threshold.x);
-  if (surfaceDepth+tolerance < gl_FragCoord.z)
-    {
+  if (surfaceDepth + tolerance < gl_FragCoord.z)
+  {
     discard;
-    }
+  }
   gl_FragColor = vColor;
 }

@@ -44,6 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqRescaleVisibleScalarRangeReaction : publi
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqRescaleVisibleScalarRangeReaction(QAction* parent);
 
@@ -60,10 +61,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    {
-    pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange();
-    }
+  virtual void onTriggered() { pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange(); }
 
 private:
   Q_DISABLE_COPY(pqRescaleVisibleScalarRangeReaction)

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   Qt dialog that embeds an instance of pqPythonShell, providing the user
   with an interactive Python console where they can enter Python commands
   manually and see the corresponding output.
-  
+
   \sa pqPythonShell, pqConsoleWidget
 */
 class pqPythonShell;
@@ -82,19 +82,18 @@ protected:
   /**
   * Overloaded to save window geometry on close events.
   */
-  void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent* event);
 
 private slots:
   void runScript();
   void clearConsole();
- 
+
 private:
   pqPythonDialog(const pqPythonDialog&);
   pqPythonDialog& operator=(const pqPythonDialog&);
-  
+
   struct pqImplementation;
   pqImplementation* const Implementation;
 };
 
 #endif // !_pqPythonDialog_h
-

@@ -48,7 +48,7 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
   Q_PROPERTY(QString text READ text WRITE setText)
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
 public:
-  pqExpanderButton(QWidget* parent=0);
+  pqExpanderButton(QWidget* parent = 0);
   virtual ~pqExpanderButton();
 
 public slots:
@@ -62,9 +62,8 @@ public slots:
   * is unchecked.
   */
   void setChecked(bool);
-  bool checked() const
-    { return this->Checked; }
- 
+  bool checked() const { return this->Checked; }
+
   /**
   * This property holds the text shown on the button.
   */
@@ -80,7 +79,7 @@ signals:
   void toggled(bool checked);
 
 protected:
-  void mousePressEvent(QMouseEvent *evt);
+  void mousePressEvent(QMouseEvent* evt);
   void mouseReleaseEvent(QMouseEvent* evt);
 
 private:

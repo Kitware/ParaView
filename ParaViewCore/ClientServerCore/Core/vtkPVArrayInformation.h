@@ -69,14 +69,14 @@ public:
   /**
    * Set the name for a component. Must be >= 1.
    */
-  void SetComponentName( vtkIdType component, const char* name );
+  void SetComponentName(vtkIdType component, const char* name);
 
   /**
    * Get the component name for a given component.
    * Note: the const char* that is returned is only valid
    * intill the next call to this method!
    */
-  const char* GetComponentName( vtkIdType component );
+  const char* GetComponentName(vtkIdType component);
 
   //@{
   /**
@@ -94,7 +94,9 @@ public:
    */
   void SetComponentRange(int comp, double min, double max);
   void SetComponentRange(int comp, double* range)
-    { this->SetComponentRange(comp, range[0], range[1]);}
+  {
+    this->SetComponentRange(comp, range[0], range[1]);
+  }
   double* GetComponentRange(int component);
   void GetComponentRange(int comp, double* range);
   //@}
@@ -123,12 +125,12 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject( vtkObject* );
+  virtual void CopyFromObject(vtkObject*);
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation( vtkPVInformation* );
+  virtual void AddInformation(vtkPVInformation*);
 
   //@{
   /**
@@ -188,12 +190,12 @@ protected:
   class vtkInternalInformationKeys;
   vtkInternalInformationKeys* InformationKeys;
 
-  //this is used by GetComponentName, so that it always return a valid component name
+  // this is used by GetComponentName, so that it always return a valid component name
 
   vtkStdString* DefaultComponentName;
 
   /// assigns to a string to DefaultComponentName for this component
-  void DetermineDefaultComponentName( const int &component_no, const int &numComps);
+  void DetermineDefaultComponentName(const int& component_no, const int& numComps);
 
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;

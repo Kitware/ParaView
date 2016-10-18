@@ -86,12 +86,12 @@ public:
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
-  virtual void SaveConfiguration(vtkMultiProcessStream *stream);
-  virtual bool RestoreConfiguration(vtkMultiProcessStream *stream);
+  virtual void SaveConfiguration(vtkMultiProcessStream* stream);
+  virtual bool RestoreConfiguration(vtkMultiProcessStream* stream);
   //@}
 
-  virtual const char *SaveConfiguration();
-  virtual const char *RestoreConfiguration(const char *stream);
+  virtual const char* SaveConfiguration();
+  virtual const char* RestoreConfiguration(const char* stream);
 
 protected:
   vtkSquirtCompressor();
@@ -105,6 +105,5 @@ private:
   vtkSquirtCompressor(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
 };
-
 
 #endif

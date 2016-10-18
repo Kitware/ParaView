@@ -58,15 +58,13 @@ public:
   * The variable color is used to specify the highlight color
   * \default QColor(Qt::white)
   */
-  pqHighlightItemDelegate(QColor color = QColor(Qt::white),
-    QObject *parentObject = 0) :
-    QStyledItemDelegate(parentObject),
-    HighlightColor(color)
-    {
-    }
+  pqHighlightItemDelegate(QColor color = QColor(Qt::white), QObject* parentObject = 0)
+    : QStyledItemDelegate(parentObject)
+    , HighlightColor(color)
+  {
+  }
 
-  void paint(QPainter *painter, const QStyleOptionViewItem &option,
-    const QModelIndex &index) const;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
   QColor HighlightColor;

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,44 +53,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  class pqDataInformationModelSelectionAdaptor : public pqSelectionAdaptor
-  {
+class pqDataInformationModelSelectionAdaptor : public pqSelectionAdaptor
+{
 public:
-  pqDataInformationModelSelectionAdaptor(
-    QItemSelectionModel* diModel)
+  pqDataInformationModelSelectionAdaptor(QItemSelectionModel* diModel)
     : pqSelectionAdaptor(diModel)
-    {
-    }
+  {
+  }
 
 protected:
-  /// subclasses can override this method to provide model specific selection 
+  /// subclasses can override this method to provide model specific selection
   /// overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
   virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const
-    { return QItemSelectionModel::Rows; }
+  {
+    return QItemSelectionModel::Rows;
+  }
 
   /// Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
   virtual QModelIndex mapFromItem(pqServerManagerModelItem* item) const
-    {
-    const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
-      this->getQModel());
+  {
+    const pqDataInformationModel* pM =
+      qobject_cast<const pqDataInformationModel*>(this->getQModel());
 
     pqOutputPort* outputPort = qobject_cast<pqOutputPort*>(item);
     if (outputPort)
-      {
+    {
       return pM->getIndexFor(outputPort);
-      }
-    pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
-    return pM->getIndexFor(src? src->getOutputPort(0) : 0);
     }
+    pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
+    return pM->getIndexFor(src ? src->getOutputPort(0) : 0);
+  }
 
   /// Maps a QModelIndex to a pqServerManagerModelItem.
   virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const
-    {
-    const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
-      this->getQModel());
+  {
+    const pqDataInformationModel* pM =
+      qobject_cast<const pqDataInformationModel*>(this->getQModel());
     return pM->getItemFor(index);
-    }
-  };
+  }
+};
 }
 //-----------------------------------------------------------------------------
 pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
@@ -101,7 +102,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->View->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   // We provide the sorting proxy model
-  QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+  QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(this->Model);
   this->View->setModel(proxyModel);
 
@@ -114,42 +115,40 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
 #endif
   this->View->horizontalHeader()->setHighlightSections(false);
   this->View->horizontalHeader()->setStretchLastSection(true);
-  //this->View->horizontalHeader()->setSortIndicatorShown(true);
+  // this->View->horizontalHeader()->setSortIndicatorShown(true);
   this->View->setSelectionBehavior(QAbstractItemView::SelectRows);
-  //this->View->sortByColumn(0);
+  // this->View->sortByColumn(0);
 
-  QVBoxLayout * _layout = new QVBoxLayout(this);
+  QVBoxLayout* _layout = new QVBoxLayout(this);
   if (_layout)
-    {
+  {
     _layout->setMargin(0);
     _layout->addWidget(this->View);
-    }
+  }
 
-  pqServerManagerModel* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this->Model, SLOT(addSource(pqPipelineSource*)));
-  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
-    this->Model, SLOT(removeSource(pqPipelineSource*)));
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this->Model, SLOT(setActiveView(pqView*)));
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)), this->Model,
+    SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)), this->Model,
+    SLOT(removeSource(pqPipelineSource*)));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this->Model,
+    SLOT(setActiveView(pqView*)));
   this->Model->setActiveView(pqActiveObjects::instance().activeView());
 
   // Clicking on the header should sort the column.
-  QObject::connect(this->View->horizontalHeader(), SIGNAL(sectionClicked(int)),
-    this->View, SLOT(sortByColumn(int)));
+  QObject::connect(this->View->horizontalHeader(), SIGNAL(sectionClicked(int)), this->View,
+    SLOT(sortByColumn(int)));
 
   // Set the context menu policy for the header.
   this->View->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
 
   QObject::connect(this->View->horizontalHeader(),
-    SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(showHeaderContextMenu(const QPoint&)));
+    SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(showHeaderContextMenu(const QPoint&)));
 
   this->View->setContextMenuPolicy(Qt::CustomContextMenu);
-  QObject::connect(this->View, 
-    SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(showBodyContextMenu(const QPoint&)));
+  QObject::connect(this->View, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(showBodyContextMenu(const QPoint&)));
 
   new pqDataInformationModelSelectionAdaptor(this->View->selectionModel());
 }
@@ -162,7 +161,7 @@ pqDataInformationWidget::~pqDataInformationWidget()
 }
 
 //-----------------------------------------------------------------------------
-bool pqDataInformationWidget::eventFilter(QObject* object, QEvent *evt)
+bool pqDataInformationWidget::eventFilter(QObject* object, QEvent* evt)
 {
   return QWidget::eventFilter(object, evt);
 }
@@ -183,12 +182,11 @@ void pqDataInformationWidget::showBodyContextMenu(const QPoint& _pos)
 {
   QMenu menu;
   menu.setObjectName("DataInformationBodyContextMenu");
-  QAction* action = menu.addAction("Column Titles") 
-    << pqSetName("ColumnTitles");
+  QAction* action = menu.addAction("Column Titles") << pqSetName("ColumnTitles");
   action->setCheckable(true);
   action->setChecked(this->View->horizontalHeader()->isVisible());
   if (menu.exec(this->View->mapToGlobal(_pos)) == action)
-    {
+  {
     this->View->horizontalHeader()->setVisible(action->isChecked());
-    }
+  }
 }

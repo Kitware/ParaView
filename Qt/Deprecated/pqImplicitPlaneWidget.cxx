@@ -64,17 +64,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqImplicitPlaneWidget::pqImplementation
 {
 public:
-  pqImplementation() :
-    UI(new Ui::pqImplicitPlaneWidget()),
-    OriginProperty(0),
-    NormalProperty(0)
+  pqImplementation()
+    : UI(new Ui::pqImplicitPlaneWidget())
+    , OriginProperty(0)
+    , NormalProperty(0)
   {
   }
 
-  ~pqImplementation()
-  {
-    delete this->UI;
-  }
+  ~pqImplementation() { delete this->UI; }
 
   /// Stores the Qt widgets
   Ui::pqImplicitPlaneWidget* const UI;
@@ -86,34 +83,34 @@ public:
 
 namespace
 {
-  // implicit plane widget does not like it when any of the dimensions is 0. So
-  // we ensure that each dimension has some thickness.
-  static void pqFixBounds(vtkBoundingBox& bbox)
+// implicit plane widget does not like it when any of the dimensions is 0. So
+// we ensure that each dimension has some thickness.
+static void pqFixBounds(vtkBoundingBox& bbox)
+{
+  double max_length = bbox.GetMaxLength();
+  max_length = max_length > 0 ? max_length * 0.05 : 1;
+  double min_point[3], max_point[3];
+  bbox.GetMinPoint(min_point[0], min_point[1], min_point[2]);
+  bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
+  for (int cc = 0; cc < 3; cc++)
+  {
+    if (bbox.GetLength(cc) == 0)
     {
-    double max_length = bbox.GetMaxLength();
-    max_length = max_length > 0? max_length * 0.05 : 1;
-    double min_point[3], max_point[3];
-    bbox.GetMinPoint(min_point[0], min_point[1], min_point[2]);
-    bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
-    for (int cc=0; cc < 3; cc++)
-      {
-      if (bbox.GetLength(cc) == 0)
-        {
-        min_point[cc] -= max_length;
-        max_point[cc] += max_length;
-        }
-      }
-    bbox.SetMinPoint(min_point);
-    bbox.SetMaxPoint(max_point);
+      min_point[cc] -= max_length;
+      max_point[cc] += max_length;
     }
+  }
+  bbox.SetMinPoint(min_point);
+  bbox.SetMaxPoint(max_point);
+}
 }
 
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget
 
-pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p),
-  Implementation(new pqImplementation())
+pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
+  : Superclass(o, pxy, p)
+  , Implementation(new pqImplementation())
 {
   // enable picking.
   this->pickingSupported(QKeySequence(tr("P")));
@@ -131,57 +128,45 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
   this->Implementation->UI->normalY->setValidator(validator);
   this->Implementation->UI->normalZ->setValidator(validator);
 
-  connect(this->Implementation->UI->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this, SLOT(onWidgetVisibilityChanged(bool)));
-  QObject::connect(this->Implementation->UI->pickMeshPoint,
-    SIGNAL(toggled(bool)), this, SLOT(setPickOnMeshPoint(bool)));
- 
-  connect(this->Implementation->UI->useXNormal,
-    SIGNAL(clicked()), this, SLOT(onUseXNormal()));
-  connect(this->Implementation->UI->useYNormal,
-    SIGNAL(clicked()), this, SLOT(onUseYNormal()));
-  connect(this->Implementation->UI->useZNormal,
-    SIGNAL(clicked()), this, SLOT(onUseZNormal()));
-  connect(this->Implementation->UI->useCameraNormal,
-    SIGNAL(clicked()), this, SLOT(onUseCameraNormal()));
-  connect(this->Implementation->UI->resetBounds,
-    SIGNAL(clicked()), this, SLOT(resetBounds()));
-  connect(this->Implementation->UI->useCenterBounds,
-    SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
-  connect(this->Implementation->UI->resetCameraToNormal,
-    SIGNAL(clicked()), this, SLOT(resetCameraToNormal()));
+  connect(this->Implementation->UI->show3DWidget, SIGNAL(toggled(bool)), this,
+    SLOT(onShow3DWidget(bool)));
+  QObject::connect(
+    this, SIGNAL(widgetVisibilityChanged(bool)), this, SLOT(onWidgetVisibilityChanged(bool)));
+  QObject::connect(this->Implementation->UI->pickMeshPoint, SIGNAL(toggled(bool)), this,
+    SLOT(setPickOnMeshPoint(bool)));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  connect(this->Implementation->UI->useXNormal, SIGNAL(clicked()), this, SLOT(onUseXNormal()));
+  connect(this->Implementation->UI->useYNormal, SIGNAL(clicked()), this, SLOT(onUseYNormal()));
+  connect(this->Implementation->UI->useZNormal, SIGNAL(clicked()), this, SLOT(onUseZNormal()));
+  connect(
+    this->Implementation->UI->useCameraNormal, SIGNAL(clicked()), this, SLOT(onUseCameraNormal()));
+  connect(this->Implementation->UI->resetBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
+  connect(
+    this->Implementation->UI->useCenterBounds, SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
+  connect(this->Implementation->UI->resetCameraToNormal, SIGNAL(clicked()), this,
+    SLOT(resetCameraToNormal()));
+
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 
   // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI->originX,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->originY,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->originZ,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalX,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalY,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalZ,
-    SIGNAL(editingFinished()),
-    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->originX, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->originY, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->originZ, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->normalX, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->normalY, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->normalZ, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
 
   // We need to mark the plane when inteaction starts.
-  QObject::connect(this, SIGNAL(widgetStartInteraction()),
-    this, SLOT(onStartInteraction()));
+  QObject::connect(this, SIGNAL(widgetStartInteraction()), this, SLOT(onStartInteraction()));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(o->GetSession()));
 }
 
@@ -194,8 +179,8 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 void pqImplicitPlaneWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ImplicitPlaneWidgetRepresentation", server, this->getReferenceProxy());
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      "ImplicitPlaneWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
@@ -204,74 +189,58 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
 
   // The adaptor is used to format the text value.
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->originX,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Origin"), 0);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->originX, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Origin"), 0);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->originY,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Origin"), 1);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->originY, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Origin"), 1);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->originZ,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Origin"), 2);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->originZ, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Origin"), 2);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->normalX,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Normal"), 0);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->normalX, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Normal"), 0);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->normalY,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Normal"), 1);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->normalY, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Normal"), 1);
 
-  this->Implementation->Links.addPropertyLink(
-  this->Implementation->UI->normalZ,
-    "text2", SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("Normal"), 2);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->normalZ, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("Normal"), 2);
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setControlledProperty(const char* function,
-  vtkSMProperty* controlled_property)
+void pqImplicitPlaneWidget::setControlledProperty(
+  const char* function, vtkSMProperty* controlled_property)
 {
-  if (strcmp(function, "Origin") ==0)
-    {
+  if (strcmp(function, "Origin") == 0)
+  {
     this->setOriginProperty(controlled_property);
-    }
+  }
   else if (strcmp(function, "Normal") == 0)
-    {
+  {
     this->setNormalProperty(controlled_property);
-    }
+  }
   this->Superclass::setControlledProperty(function, controlled_property);
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 {
-  this->Implementation->OriginProperty =
-    vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
+  this->Implementation->OriginProperty = vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
   if (origin_property->GetXMLLabel())
-    {
-    this->Implementation->UI->labelOrigin->setText(
-      origin_property->GetXMLLabel());
-    }
+  {
+    this->Implementation->UI->labelOrigin->setText(origin_property->GetXMLLabel());
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 {
-  this->Implementation->NormalProperty =
-    vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
+  this->Implementation->NormalProperty = vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
   if (normal_property->GetXMLLabel())
-    {
-    this->Implementation->UI->labelNormal->setText(
-      normal_property->GetXMLLabel());
-    }
+  {
+    this->Implementation->UI->labelNormal->setText(normal_property->GetXMLLabel());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -280,8 +249,7 @@ void pqImplicitPlaneWidget::pick(double dx, double dy, double dz)
   vtkSMProxy* widget = this->getWidgetProxy();
   QList<QVariant> value;
   value << dx << dy << dz;
-  pqSMAdaptor::setMultipleElementProperty(
-      widget->GetProperty("Origin"), value);
+  pqSMAdaptor::setMultipleElementProperty(widget->GetProperty("Origin"), value);
   widget->UpdateVTKObjects();
 
   this->setModified();
@@ -299,43 +267,41 @@ void pqImplicitPlaneWidget::onWidgetVisibilityChanged(bool visible)
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::showPlane()
 {
-  if(this->getWidgetProxy())
+  if (this->getWidgetProxy())
+  {
+    if (vtkSMIntVectorProperty* const show_plane =
+          vtkSMIntVectorProperty::SafeDownCast(this->getWidgetProxy()->GetProperty("DrawPlane")))
     {
-    if(vtkSMIntVectorProperty* const show_plane =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->getWidgetProxy()->GetProperty("DrawPlane")))
-      {
       show_plane->SetElement(0, true);
       this->getWidgetProxy()->UpdateVTKObjects();
-      }
     }
+  }
 }
 
 void pqImplicitPlaneWidget::hidePlane()
 {
-  if(this->getWidgetProxy())
+  if (this->getWidgetProxy())
+  {
+    if (vtkSMIntVectorProperty* const show_plane =
+          vtkSMIntVectorProperty::SafeDownCast(this->getWidgetProxy()->GetProperty("DrawPlane")))
     {
-    if(vtkSMIntVectorProperty* const show_plane =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->getWidgetProxy()->GetProperty("DrawPlane")))
-      {
       show_plane->SetElement(0, false);
       this->getWidgetProxy()->UpdateVTKObjects();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
 {
   if (show_widget)
-    {
+  {
     this->showWidget();
-    }
+  }
   else
-    {
+  {
     this->hideWidget();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -345,9 +311,9 @@ void pqImplicitPlaneWidget::select()
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
   if (!widget || !this->getReferenceInputBounds(input_bounds))
-    {
+  {
     return;
-    }
+  }
 
   double center[3];
   vtkSMPropertyHelper(widget, "Origin").Get(center, 3);
@@ -406,10 +372,10 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
-  if(!widget || !this->getReferenceInputBounds(input_bounds))
-    {
+  if (!widget || !this->getReferenceInputBounds(input_bounds))
+  {
     return;
-    }
+  }
 
   vtkBoundingBox box(input_bounds);
   pqFixBounds(box);
@@ -425,54 +391,51 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
 void pqImplicitPlaneWidget::onUseXNormal()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
+  if (widget)
+  {
+    if (vtkSMDoubleVectorProperty* const normal =
+          vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Normal")))
     {
-    if(vtkSMDoubleVectorProperty* const normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Normal")))
-      {
       normal->SetElements3(1, 0, 0);
       widget->UpdateVTKObjects();
       this->render();
       this->setModified();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onUseYNormal()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
+  if (widget)
+  {
+    if (vtkSMDoubleVectorProperty* const normal =
+          vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Normal")))
     {
-    if(vtkSMDoubleVectorProperty* const normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Normal")))
-      {
       normal->SetElements3(0, 1, 0);
       widget->UpdateVTKObjects();
       this->render();
       this->setModified();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onUseZNormal()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
+  if (widget)
+  {
+    if (vtkSMDoubleVectorProperty* const normal =
+          vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Normal")))
     {
-    if(vtkSMDoubleVectorProperty* const normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Normal")))
-      {
       normal->SetElements3(0, 0, 1);
       widget->UpdateVTKObjects();
       this->render();
       this->setModified();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -480,11 +443,10 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqRenderView* renView = qobject_cast<pqRenderView*>(this->renderView());
-    if (vtkCamera* const camera = renView ?
-      renView->getRenderViewProxy()->GetActiveCamera() : 0)
-      {
+    if (vtkCamera* const camera = renView ? renView->getRenderViewProxy()->GetActiveCamera() : 0)
+    {
       double camera_normal[3];
       camera->GetViewPlaneNormal(camera_normal);
       camera_normal[0] = -camera_normal[0];
@@ -494,8 +456,8 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
       widget->UpdateVTKObjects();
       this->render();
       this->setModified();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -503,22 +465,20 @@ void pqImplicitPlaneWidget::resetCameraToNormal()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqRenderView* renView = qobject_cast<pqRenderView*>(this->renderView());
-    if (vtkCamera* const camera = renView ?
-        renView->getRenderViewProxy()->GetActiveCamera() : 0)
-      {
+    if (vtkCamera* const camera = renView ? renView->getRenderViewProxy()->GetActiveCamera() : 0)
+    {
       double up[3], forward[3];
       camera->GetViewUp(up);
       vtkSMPropertyHelper(widget, "Normal").Get(forward, 3);
       vtkMath::Cross(up, forward, up);
       vtkMath::Cross(forward, up, up);
-      renView->resetViewDirection(
-        forward[0], forward[1], forward[2], up[0], up[1], up[2]);
+      renView->resetViewDirection(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
 
       this->render();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -532,7 +492,7 @@ void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     vtkSMPropertyHelper originHelper(widget, "Origin");
     origin[0] = originHelper.GetAsDouble(0);
     origin[1] = originHelper.GetAsDouble(1);
@@ -542,5 +502,5 @@ void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
     normal[0] = normalHelper.GetAsDouble(0);
     normal[1] = normalHelper.GetAsDouble(1);
     normal[2] = normalHelper.GetAsDouble(2);
-    }
+  }
 }

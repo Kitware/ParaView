@@ -23,12 +23,11 @@
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
 
-class vtkSMIdTypeVectorProperty::vtkInternals :
-  public vtkSMVectorPropertyTemplate<vtkIdType>
+class vtkSMIdTypeVectorProperty::vtkInternals : public vtkSMVectorPropertyTemplate<vtkIdType>
 {
 public:
-  vtkInternals(vtkSMIdTypeVectorProperty* ivp) :
-    vtkSMVectorPropertyTemplate<vtkIdType>(ivp)
+  vtkInternals(vtkSMIdTypeVectorProperty* ivp)
+    : vtkSMVectorPropertyTemplate<vtkIdType>(ivp)
   {
   }
 };
@@ -49,36 +48,33 @@ vtkSMIdTypeVectorProperty::~vtkSMIdTypeVectorProperty()
 //---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::WriteTo(vtkSMMessage* msg)
 {
-  ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+  ProxyState_Property* prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *variant = prop->mutable_value();
+  Variant* variant = prop->mutable_value();
   variant->set_type(Variant::IDTYPE);
   std::vector<vtkIdType>::iterator iter;
-  for (iter = this->Internals->Values.begin(); iter!=
-    this->Internals->Values.end(); ++iter)
-    {
+  for (iter = this->Internals->Values.begin(); iter != this->Internals->Values.end(); ++iter)
+  {
     variant->add_idtype(*iter);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
-                                         vtkSMProxyLocator*)
+void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset, vtkSMProxyLocator*)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
-  const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,
-    offset);
+  const ProxyState_Property* prop = &msg->GetExtension(ProxyState::property, offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value();
+  const Variant* variant = &prop->value();
 
   int num_elems = variant->idtype_size();
-  vtkIdType *values = new vtkIdType[num_elems+1];
-  for (int cc=0; cc < num_elems; cc++)
-    {
+  vtkIdType* values = new vtkIdType[num_elems + 1];
+  for (int cc = 0; cc < num_elems; cc++)
+  {
     values[cc] = variant->idtype(cc);
-    }
+  }
   this->SetElements(values, num_elems);
   delete[] values;
 }
@@ -120,8 +116,7 @@ vtkIdType vtkSMIdTypeVectorProperty::GetUncheckedElement(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::SetUncheckedElement(
-  unsigned int idx, vtkIdType value)
+void vtkSMIdTypeVectorProperty::SetUncheckedElement(unsigned int idx, vtkIdType value)
 {
   this->Internals->SetUncheckedElement(idx, value);
 }
@@ -147,9 +142,7 @@ int vtkSMIdTypeVectorProperty::SetElements2(vtkIdType value0, vtkIdType value1)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIdTypeVectorProperty::SetElements3(vtkIdType value0, 
-                                            vtkIdType value1, 
-                                            vtkIdType value2)
+int vtkSMIdTypeVectorProperty::SetElements3(vtkIdType value0, vtkIdType value1, vtkIdType value2)
 {
   int retVal1 = this->SetElement(0, value0);
   int retVal2 = this->SetElement(1, value1);
@@ -164,8 +157,7 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values,
-  unsigned int num)
+int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values, unsigned int num)
 {
   return this->Internals->SetElements(values, num);
 }
@@ -183,63 +175,59 @@ int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values, uns
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
-                                                 vtkPVXMLElement* element)
+int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)
 {
   int retVal;
 
   retVal = this->Superclass::ReadXMLAttributes(parent, element);
   if (!retVal)
-    {
+  {
     return retVal;
-    }
+  }
 
   int arg_is_array;
   retVal = element->GetScalarAttribute("argument_is_array", &arg_is_array);
-  if(retVal) 
-    { 
-    this->SetArgumentIsArray(arg_is_array); 
-    }
+  if (retVal)
+  {
+    this->SetArgumentIsArray(arg_is_array);
+  }
 
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
-    {
+  {
     if (element->GetAttribute("default_values") &&
-        strcmp("none", element->GetAttribute("default_values")) == 0 )
-      {
+      strcmp("none", element->GetAttribute("default_values")) == 0)
+    {
       this->Internals->Initialized = false;
-      }
+    }
     else
-      {
+    {
       int* initVal = new int[numElems];
-      int numRead = element->GetVectorAttribute("default_values",
-                                                numElems,
-                                                initVal);
-      
+      int numRead = element->GetVectorAttribute("default_values", numElems, initVal);
+
       if (numRead > 0)
-        {
+      {
         if (numRead != numElems)
-          {
+        {
           vtkErrorMacro("The number of default values does not match the "
                         "number of elements. Initialization failed.");
           delete[] initVal;
           return 0;
-          }
-        vtkIdType *idtype_values = new vtkIdType[numElems];
-        std::copy(initVal, initVal+numElems, idtype_values);
+        }
+        vtkIdType* idtype_values = new vtkIdType[numElems];
+        std::copy(initVal, initVal + numElems, idtype_values);
         this->SetElements(idtype_values);
         delete[] idtype_values;
         this->Internals->UpdateDefaultValues();
-        }
-      else if (!this->Internals->Initialized)
-        {
-        vtkErrorMacro("No default value is specified for property: "
-                      << this->GetXMLName()
-                      << ". This might lead to stability problems");
-        }
-      delete[] initVal;
       }
+      else if (!this->Internals->Initialized)
+      {
+        vtkErrorMacro("No default value is specified for property: "
+          << this->GetXMLName() << ". This might lead to stability problems");
+      }
+      delete[] initVal;
     }
+  }
 
   return 1;
 }
@@ -249,12 +237,11 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
 
-  vtkSMIdTypeVectorProperty* dsrc = vtkSMIdTypeVectorProperty::SafeDownCast(
-    src);
+  vtkSMIdTypeVectorProperty* dsrc = vtkSMIdTypeVectorProperty::SafeDownCast(src);
   if (dsrc)
-    {
+  {
     this->Internals->Copy(dsrc->Internals);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -276,16 +263,15 @@ void vtkSMIdTypeVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
   os << indent << "Values: ";
-  for (unsigned int i=0; i<this->GetNumberOfElements(); i++)
-    {
+  for (unsigned int i = 0; i < this->GetNumberOfElements(); i++)
+  {
     os << this->GetElement(i) << " ";
-    }
+  }
   os << endl;
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIdTypeVectorProperty::LoadState(
-  vtkPVXMLElement* element, vtkSMProxyLocator* loader)
+int vtkSMIdTypeVectorProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader)
 {
   int prevImUpdate = this->ImmediateUpdate;
 
@@ -293,9 +279,9 @@ int vtkSMIdTypeVectorProperty::LoadState(
   this->ImmediateUpdate = 0;
   int retVal = this->Superclass::LoadState(element, loader);
   if (retVal != 0)
-    {
+  {
     retVal = this->Internals->LoadStateValues(element) ? 1 : 0;
-    }
+  }
   this->ImmediateUpdate = prevImUpdate;
   return retVal;
 }

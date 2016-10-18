@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,8 +49,8 @@ pqLoadStateReaction::pqLoadStateReaction(QAction* parentObject)
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(
+    activeObjects, SIGNAL(serverChanged(pqServer*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -65,17 +65,17 @@ void pqLoadStateReaction::updateEnableState()
 void pqLoadStateReaction::loadState(const QString& filename)
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  pqServer *server = activeObjects->activeServer();
+  pqServer* server = activeObjects->activeServer();
 
   // Read in the xml file to restore.
-  vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+  vtkPVXMLParser* xmlParser = vtkPVXMLParser::New();
   xmlParser->SetFileName(filename.toLatin1().data());
   xmlParser->Parse();
 
   // Get the root element from the parser.
-  vtkPVXMLElement *root = xmlParser->GetRootElement();
+  vtkPVXMLElement* root = xmlParser->GetRootElement();
   if (root)
-    {
+  {
     pqApplicationCore::instance()->loadState(root, server);
 
     // Add this to the list of recent server resources ...
@@ -86,27 +86,25 @@ void pqLoadStateReaction::loadState(const QString& filename)
     pqApplicationCore::instance()->recentlyUsedResources().add(resource);
     pqApplicationCore::instance()->recentlyUsedResources().save(
       *pqApplicationCore::instance()->settings());
-    }
+  }
   else
-    {
+  {
     qCritical("Root does not exist. Either state file could not be opened "
-      "or it does not contain valid xml");
-    }
+              "or it does not contain valid xml");
+  }
   xmlParser->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void pqLoadStateReaction::loadState()
 {
-  pqFileDialog fileDialog(NULL,
-    pqCoreUtilities::mainWidget(),
-    tr("Load State File"), QString(),
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
     "ParaView state file (*.pvsm);;All files (*)");
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
-    {
+  {
     QString selectedFile = fileDialog.getSelectedFiles()[0];
     pqLoadStateReaction::loadState(selectedFile);
-    }
+  }
 }

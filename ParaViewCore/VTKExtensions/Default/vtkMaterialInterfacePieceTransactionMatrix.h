@@ -70,23 +70,19 @@ public:
    * Given a proc and a fragment, return a ref to
    * the associated list of tranactions.
    */
-  std::vector<vtkMaterialInterfacePieceTransaction> &GetTransactions(
-                  int fragmentId,
-                  int procId);
+  std::vector<vtkMaterialInterfacePieceTransaction>& GetTransactions(int fragmentId, int procId);
   /**
    * Add a transaction to the end of the given a proc,fragment pair's
    * transaction list.
    */
   void PushTransaction(
-                  int fragmentId,
-                  int procId,
-                  vtkMaterialInterfacePieceTransaction &transaction);
+    int fragmentId, int procId, vtkMaterialInterfacePieceTransaction& transaction);
   //@{
   /**
    * Send the transaction matrix on srcProc to all
    * other procs.
    */
-  void Broadcast(vtkCommunicator *comm, int srcProc);
+  void Broadcast(vtkCommunicator* comm, int srcProc);
   //
   void Print();
   //@}
@@ -95,9 +91,10 @@ public:
    */
   vtkIdType Capacity()
   {
-    return this->FlatMatrixSize
-      + this->NumberOfTransactions*sizeof(vtkMaterialInterfacePieceTransaction);
+    return this->FlatMatrixSize +
+      this->NumberOfTransactions * sizeof(vtkMaterialInterfacePieceTransaction);
   }
+
 private:
   /**
    * Put the matrix into a buffer for communication.
@@ -105,49 +102,43 @@ private:
    * will be allocated, and is expected to be null
    * on entry.
    */
-  vtkIdType Pack(int *&buffer);
+  vtkIdType Pack(int*& buffer);
   /**
    * Put a set of rows into a buffer for communication.
    * This is used to send a subset of the TM.
    */
-  vtkIdType PackPartial(int *&buffer, int *rows, int nRows);
+  vtkIdType PackPartial(int*& buffer, int* rows, int nRows);
   //@{
   /**
    * Load state from a buffer containing a Pack'ed
    * transaction matrix. 0 is returned on error.
    */
-  int UnPack(int *buffer);
-  int UnPackPartial(int *buffer);
+  int UnPack(int* buffer);
+  int UnPackPartial(int* buffer);
   ///
   int NProcs;
   int NFragments;
-  std::vector<vtkMaterialInterfacePieceTransaction> *Matrix;
+  std::vector<vtkMaterialInterfacePieceTransaction>* Matrix;
   vtkIdType FlatMatrixSize;
   vtkIdType NumberOfTransactions;
 };
 //
-inline
-std::vector<vtkMaterialInterfacePieceTransaction> &
-vtkMaterialInterfacePieceTransactionMatrix::GetTransactions(
-                int fragmentId,
-                int procId)
+inline std::vector<vtkMaterialInterfacePieceTransaction>&
+vtkMaterialInterfacePieceTransactionMatrix::GetTransactions(int fragmentId, int procId)
 {
-  int idx=fragmentId+procId*this->NFragments;
+  int idx = fragmentId + procId * this->NFragments;
   return this->Matrix[idx];
 }
 //
-inline
-vtkIdType
-vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransactions(
-                int procId)
+inline vtkIdType vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransactions(int procId)
 {
   size_t nTransactions = 0;
   //@}
 
-  for (int fragmentId=0; fragmentId<this->NFragments; ++fragmentId)
-    {
-    nTransactions+=this->GetTransactions(fragmentId,procId).size();
-    }
+  for (int fragmentId = 0; fragmentId < this->NFragments; ++fragmentId)
+  {
+    nTransactions += this->GetTransactions(fragmentId, procId).size();
+  }
 
   return static_cast<vtkIdType>(nTransactions);
 }

@@ -48,8 +48,9 @@ class PQCOMPONENTS_EXPORT pqFindDataCurrentSelectionFrame : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqFindDataCurrentSelectionFrame(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqFindDataCurrentSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFindDataCurrentSelectionFrame();
 
   /**
@@ -87,6 +88,7 @@ private slots:
   * update the data shown in the spreadsheet aka render the spreadsheet.
   */
   void updateSpreadSheet();
+
 private:
   Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame)
 

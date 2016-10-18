@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProxy;
 
 /**
-* pqAnimatablePropertiesComboBox is a combo box that can list the animatable 
+* pqAnimatablePropertiesComboBox is a combo box that can list the animatable
 * properties of any proxy.
 */
 class PQCOMPONENTS_EXPORT pqAnimatablePropertiesComboBox : public QComboBox
@@ -47,7 +47,7 @@ class PQCOMPONENTS_EXPORT pqAnimatablePropertiesComboBox : public QComboBox
   typedef QComboBox Superclass;
 
 public:
-  pqAnimatablePropertiesComboBox(QWidget* parent=0);
+  pqAnimatablePropertiesComboBox(QWidget* parent = 0);
   ~pqAnimatablePropertiesComboBox();
 
   /**
@@ -76,8 +76,7 @@ public:
   * Sometimes, we want the combo to show a empty field that does not represent
   * any property. Set this to true to use such a field.
   */
-  void setUseBlankEntry(bool b)
-    { this->UseBlankEntry = b;}
+  void setUseBlankEntry(bool b) { this->UseBlankEntry = b; }
 
 public slots:
   /**
@@ -120,21 +119,20 @@ private:
   Q_DISABLE_COPY(pqAnimatablePropertiesComboBox)
 
   void buildPropertyListInternal(vtkSMProxy* proxy, const QString& labelPrefix);
-  void addSMPropertyInternal(const QString& label, 
-    vtkSMProxy* proxy, const QString& propertyname, int index,
-    bool is_display_property=false, unsigned int display_port=0);
+  void addSMPropertyInternal(const QString& label, vtkSMProxy* proxy, const QString& propertyname,
+    int index, bool is_display_property = false, unsigned int display_port = 0);
 
   /**
   * Add properties that control the display parameters.
   */
   void addDisplayProperties(vtkSMProxy* proxy);
   bool UseBlankEntry;
+
 public:
   class pqInternal;
+
 private:
   pqInternal* Internal;
 };
 
 #endif
-
-

@@ -65,12 +65,13 @@ public:
    */
   virtual bool PostInitializeProxy(vtkSMProxy* proxy);
 
-
   /**
    * Convenience method to call PreInitializeProxy and PostInitializeProxy.
    */
   bool InitializeProxy(vtkSMProxy* proxy)
-    { return this->PreInitializeProxy(proxy) && this->PostInitializeProxy(proxy); }
+  {
+    return this->PreInitializeProxy(proxy) && this->PostInitializeProxy(proxy);
+  }
 
   /**
    * Cleans up any helper proxies registered for the proxy in
@@ -98,7 +99,9 @@ public:
    */
   virtual bool RegisterPipelineProxy(vtkSMProxy* proxy, const char* proxyname);
   virtual bool RegisterPipelineProxy(vtkSMProxy* proxy)
-    { return this->RegisterPipelineProxy(proxy, NULL); }
+  {
+    return this->RegisterPipelineProxy(proxy, NULL);
+  }
 
   /**
    * Unregisters a pipeline proxy. This is the inverse of RegisterPipelineProxy()
@@ -119,8 +122,7 @@ public:
    * additional setups as needed e.g. registering the view with the
    * animation scene and the timer keeper.
    */
-  virtual bool RegisterViewProxy(vtkSMProxy* proxy)
-    { return this->RegisterViewProxy(proxy, NULL); }
+  virtual bool RegisterViewProxy(vtkSMProxy* proxy) { return this->RegisterViewProxy(proxy, NULL); }
   virtual bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname);
 
   /**
@@ -132,7 +134,7 @@ public:
    * is true), then this method will skip the unregistering of representations.
    * Default behaviour is to unregister all representations too.
    */
-  virtual bool UnRegisterViewProxy(vtkSMProxy* proxy, bool unregister_representations=true);
+  virtual bool UnRegisterViewProxy(vtkSMProxy* proxy, bool unregister_representations = true);
 
   /**
    * Registration method for representations to be used after
@@ -158,14 +160,18 @@ public:
    */
   virtual bool RegisterColorTransferFunctionProxy(vtkSMProxy* proxy, const char* proxyname);
   virtual bool RegisterColorTransferFunctionProxy(vtkSMProxy* proxy)
-    { return this->RegisterColorTransferFunctionProxy(proxy, NULL); }
+  {
+    return this->RegisterColorTransferFunctionProxy(proxy, NULL);
+  }
 
   /**
    * Registration method for opacity transfer function proxies.
    */
   virtual bool RegisterOpacityTransferFunction(vtkSMProxy* proxy, const char* proxyname);
   virtual bool RegisterOpacityTransferFunction(vtkSMProxy* proxy)
-    { return this->RegisterOpacityTransferFunction(proxy, NULL); }
+  {
+    return this->RegisterOpacityTransferFunction(proxy, NULL);
+  }
 
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
@@ -243,8 +249,8 @@ protected:
    * Find proxy of the group type (xmlgroup, xmltype) registered under a
    * particular group (reggroup). Returns the first proxy found, if any.
    */
-  vtkSMProxy* FindProxy(vtkSMSessionProxyManager* pxm,
-    const char* reggroup, const char* xmlgroup, const char* xmltype);
+  vtkSMProxy* FindProxy(
+    vtkSMSessionProxyManager* pxm, const char* reggroup, const char* xmlgroup, const char* xmltype);
 
   //@{
   /**
@@ -285,6 +291,7 @@ protected:
    * calls those initialization helpers, if any.
    */
   void ProcessInitializationHelper(vtkSMProxy*, unsigned long initializationTimeStamp);
+
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
@@ -302,7 +309,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

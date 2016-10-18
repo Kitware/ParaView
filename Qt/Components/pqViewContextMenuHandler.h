@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,12 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqViewContextMenuHandler_h
 #define _pqViewContextMenuHandler_h
 
-
 #include "pqComponentsModule.h"
 #include <QObject>
 
 class pqView;
-
 
 /**
 * \class pqViewContextMenuHandler
@@ -61,7 +59,7 @@ public:
   *   Constructs a view context menu handler.
   * \param parent The parent object.
   */
-  pqViewContextMenuHandler(QObject *parent=0);
+  pqViewContextMenuHandler(QObject* parent = 0);
   virtual ~pqViewContextMenuHandler() {}
 
   /**
@@ -73,14 +71,14 @@ public:
   *
   * \param view The view to set up.
   */
-  virtual void setupContextMenu(pqView *view)=0;
+  virtual void setupContextMenu(pqView* view) = 0;
 
   /**
   * \brief
   *   Cleans up the context menu for the given view.
   * \param view The view to clean up.
   */
-  virtual void cleanupContextMenu(pqView *view)=0;
+  virtual void cleanupContextMenu(pqView* view) = 0;
 };
 
 #endif

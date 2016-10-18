@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -49,9 +49,9 @@ class PQCOMPONENTS_EXPORT pqProxySILModel : public QAbstractProxyModel
   Q_OBJECT
   typedef QAbstractProxyModel Superclass;
   Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
- 
+
 public:
-  pqProxySILModel(const QString& hierarchyName, QObject* parent=0);
+  pqProxySILModel(const QString& hierarchyName, QObject* parent = 0);
   ~pqProxySILModel();
 
   /**
@@ -65,10 +65,10 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex &theParent=QModelIndex()) const
-    { 
+  virtual int rowCount(const QModelIndex& theParent = QModelIndex()) const
+  {
     return this->sourceModel()->rowCount(this->mapToSource(theParent));
-    }
+  }
 
   /**
   * \brief
@@ -77,10 +77,10 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex &theParent=QModelIndex()) const
-    {
+  virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const
+  {
     return this->sourceModel()->columnCount(this->mapToSource(theParent));
-    }
+  }
 
   /**
   * \brief
@@ -89,10 +89,10 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex &theParent=QModelIndex()) const
-    {
+  virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const
+  {
     return this->sourceModel()->hasChildren(this->mapToSource(theParent));
-    }
+  }
 
   /**
   * \brief
@@ -103,13 +103,11 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column,
-      const QModelIndex &theParent=QModelIndex()) const
-    {
-    QModelIndex sourceIndex = 
-      this->sourceModel()->index(row, column, this->mapToSource(theParent));
+  virtual QModelIndex index(int row, int column, const QModelIndex& theParent = QModelIndex()) const
+  {
+    QModelIndex sourceIndex = this->sourceModel()->index(row, column, this->mapToSource(theParent));
     return this->mapFromSource(sourceIndex);
-    }
+  }
 
   /**
   * \brief
@@ -118,22 +116,21 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex &theIndex) const
-    {
+  virtual QModelIndex parent(const QModelIndex& theIndex) const
+  {
     QModelIndex sourceIndex = this->sourceModel()->parent(this->mapToSource(theIndex));
     return this->mapFromSource(sourceIndex);
-    }
+  }
 
   /**
   * \brief
-  *  Sets the role data for the item at index to value. Returns 
+  *  Sets the role data for the item at index to value. Returns
   *  true if successful; otherwise returns false.
   */
-  bool setData(const QModelIndex &theIndex, const QVariant& value, 
-    int role = Qt::EditRole)
-    {
+  bool setData(const QModelIndex& theIndex, const QVariant& value, int role = Qt::EditRole)
+  {
     return this->sourceModel()->setData(this->mapToSource(theIndex), value, role);
-    }
+  }
   //@}
 
   /**
@@ -141,7 +138,7 @@ public:
   */
   virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const;
   virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const;
-  virtual void setSourceModel(QAbstractItemModel *sourceModel);
+  virtual void setSourceModel(QAbstractItemModel* sourceModel);
 
   /**
   * Overridden to return the same name as the hierarchy.
@@ -150,18 +147,18 @@ public:
   * toggleRootCheckState() to support affecting the check state using the
   * header.
   */
-  virtual QVariant headerData (int, Qt::Orientation, int role = Qt::DisplayRole ) const;
+  virtual QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const;
 
   /**
   * Overridden to provide a means of turning off checkboxes
   */
-  virtual QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const;
 
   /**
-  * overridden to allow us to turn off checkboxes in the flags returned 
+  * overridden to allow us to turn off checkboxes in the flags returned
   * from the model
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
 
   /**
   * Get the status values for the hierarchy.
@@ -176,7 +173,7 @@ public:
   /**
   * Override the display of the title in the header with this string
   */
-  void setHeaderTitle(QString &title);
+  void setHeaderTitle(QString& title);
 
 public slots:
   /**
@@ -195,16 +192,16 @@ signals:
 
 protected slots:
   void sourceDataChanged(const QModelIndex& idx1, const QModelIndex& idx2)
-    {
+  {
     QModelIndex pidx1 = this->mapFromSource(idx1);
     QModelIndex pidx2 = this->mapFromSource(idx2);
     if (!pidx1.isValid() || !pidx2.isValid())
-      {
+    {
       // index is root, that mean header data may have changed as well.
       emit this->headerDataChanged(Qt::Horizontal, 0, 0);
-      }
-    emit this->dataChanged(pidx1, pidx2);
     }
+    emit this->dataChanged(pidx1, pidx2);
+  }
 
   void onCheckStatusChanged();
 
@@ -214,10 +211,8 @@ private:
   pqTimer DelayedValuesChangedSignalTimer;
   QPixmap CheckboxPixmaps[3];
   QString HierarchyName;
-  bool    noCheckBoxes;
+  bool noCheckBoxes;
   QString HeaderTitle;
 };
 
 #endif
-
-

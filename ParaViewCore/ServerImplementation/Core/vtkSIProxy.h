@@ -109,8 +109,7 @@ public:
    * vtkSIInputProperty. This indirection makes it possible for subclasses to
    * insert VTK-algorithms in the input pipeline.
    */
-  virtual void AddInput(int input_port,
-    vtkAlgorithmOutput* connection, const char* method);
+  virtual void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method);
   virtual void CleanInputs(const char* method);
   //@}
 
@@ -118,7 +117,7 @@ public:
    * Triggers UpdateInformation() on vtkObject if possible.
    * Default implementation does pretty much nothing.
    */
-  virtual void UpdatePipelineInformation() { }
+  virtual void UpdatePipelineInformation() {}
 
   /**
    * Called by vtkSMProxy::RecreateVTKObjects() to re-create the VTK objects.
@@ -213,7 +212,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

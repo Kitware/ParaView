@@ -36,9 +36,10 @@
 #include "vtkProcessModule.h"
 
 //=============================================================================
-pqBlotShell::pqBlotShell(QWidget *p) : QWidget(p)
+pqBlotShell::pqBlotShell(QWidget* p)
+  : QWidget(p)
 {
-  QVBoxLayout *boxLayout = new QVBoxLayout(this);
+  QVBoxLayout* boxLayout = new QVBoxLayout(this);
   boxLayout->setMargin(0);
 
   this->Console = new pqConsoleWidget(this);
@@ -46,8 +47,8 @@ pqBlotShell::pqBlotShell(QWidget *p) : QWidget(p)
 
   this->setObjectName("pvblotShell");
 
-  QObject::connect(this->Console, SIGNAL(executeCommand(const QString &)),
-                   this, SLOT(executeBlotCommand(const QString &)));
+  QObject::connect(this->Console, SIGNAL(executeCommand(const QString&)), this,
+    SLOT(executeBlotCommand(const QString&)));
 
   this->ActiveServer = NULL;
   this->VTKConnect = vtkEventQtSlotConnect::New();
@@ -62,7 +63,7 @@ pqBlotShell::~pqBlotShell()
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::initialize(const QString &filename)
+void pqBlotShell::initialize(const QString& filename)
 {
   this->FileName = QDir::fromNativeSeparators(filename);
   this->initialize();
@@ -71,36 +72,37 @@ void pqBlotShell::initialize(const QString &filename)
 void pqBlotShell::initialize()
 {
   if (this->FileName.isEmpty())
-    {
+  {
     qWarning("Need to initialize PV Blot with a filename.");
     return;
-    }
+  }
 
   this->destroyInterpretor();
 
   this->Interpretor = vtkPVPythonInterpretor::New();
   this->Interpretor->SetCaptureStreams(true);
-  this->VTKConnect->Connect(this->Interpretor, vtkCommand::ErrorEvent,
-                            this, SLOT(printStderr(vtkObject *, unsigned long,
-                                                   void *, void *)));
-  this->VTKConnect->Connect(this->Interpretor, vtkCommand::WarningEvent,
-                            this, SLOT(printStdout(vtkObject *, unsigned long,
-                                                   void *, void *)));
+  this->VTKConnect->Connect(this->Interpretor, vtkCommand::ErrorEvent, this,
+    SLOT(printStderr(vtkObject*, unsigned long, void*, void*)));
+  this->VTKConnect->Connect(this->Interpretor, vtkCommand::WarningEvent, this,
+    SLOT(printStdout(vtkObject*, unsigned long, void*, void*)));
 
-  char *argv0 = const_cast<char *>(
-                vtkProcessModule::GetProcessModule()->GetOptions()->GetArgv0());
+  char* argv0 = const_cast<char*>(vtkProcessModule::GetProcessModule()->GetOptions()->GetArgv0());
   this->Interpretor->InitializeSubInterpretor(1, &argv0);
 
   this->executePythonCommand("import paraview\n");
   this->executePythonCommand("paraview.compatibility.major = 3\n");
   this->executePythonCommand("paraview.compatibility.minor = 5\n");
   this->executePythonCommand("from paraview import servermanager\n");
-  this->executePythonCommand(QString("servermanager.ActiveConnection = servermanager.Connection(%1)\n").arg(this->ActiveServer->GetConnectionID()));
-  this->executePythonCommand(QString("servermanager.ActiveConnection.SetHost(\"%1\",0)\n").arg(this->ActiveServer->getResource().toURI()));
+  this->executePythonCommand(
+    QString("servermanager.ActiveConnection = servermanager.Connection(%1)\n")
+      .arg(this->ActiveServer->GetConnectionID()));
+  this->executePythonCommand(QString("servermanager.ActiveConnection.SetHost(\"%1\",0)\n")
+                               .arg(this->ActiveServer->getResource().toURI()));
   this->executePythonCommand("servermanager.ToggleProgressPrinting()\n");
   this->executePythonCommand("servermanager.fromGUI = True\n");
   this->executePythonCommand("import paraview.simple\n");
-  this->executePythonCommand("paraview.simple.active_objects.view = servermanager.GetRenderView()\n");
+  this->executePythonCommand(
+    "paraview.simple.active_objects.view = servermanager.GetRenderView()\n");
   this->executePythonCommand("import pvblot\n");
 
   QString initcommand = "pvblot.initialize('" + this->FileName + "')\n";
@@ -112,7 +114,8 @@ void pqBlotShell::initialize()
 //-----------------------------------------------------------------------------
 void pqBlotShell::destroyInterpretor()
 {
-  if (!this->Interpretor) return;
+  if (!this->Interpretor)
+    return;
 
   this->executePythonCommand("pvblot.finalize()\n");
 
@@ -128,7 +131,7 @@ void pqBlotShell::destroyInterpretor()
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::executePythonCommand(const QString &command)
+void pqBlotShell::executePythonCommand(const QString& command)
 {
   emit this->executing(true);
   // this->printMessage(command);
@@ -137,7 +140,7 @@ void pqBlotShell::executePythonCommand(const QString &command)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::executeBlotCommand(const QString &command)
+void pqBlotShell::executeBlotCommand(const QString& command)
 {
   QString blotCommand = command;
   blotCommand.replace("'", "\\'");
@@ -148,7 +151,7 @@ void pqBlotShell::executeBlotCommand(const QString &command)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::echoExecuteBlotCommand(const QString &command)
+void pqBlotShell::echoExecuteBlotCommand(const QString& command)
 {
   QTextCharFormat format = this->Console->getFormat();
   format.setForeground(QColor(0, 0, 0));
@@ -159,7 +162,7 @@ void pqBlotShell::echoExecuteBlotCommand(const QString &command)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::executeBlotScript(const QString &filename)
+void pqBlotShell::executeBlotScript(const QString& filename)
 {
   QString pythonCommand = QString("pvblot.execute_file('%1')\n").arg(filename);
   this->executePythonCommand(pythonCommand);
@@ -168,24 +171,22 @@ void pqBlotShell::executeBlotScript(const QString &filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::printStderr(vtkObject *, unsigned long, void *,
-                              void *calldata)
+void pqBlotShell::printStderr(vtkObject*, unsigned long, void*, void* calldata)
 {
-  const char *text = reinterpret_cast<const char *>(calldata);
+  const char* text = reinterpret_cast<const char*>(calldata);
   this->printStderr(text);
   this->Interpretor->ClearMessages();
 }
 
-void pqBlotShell::printStdout(vtkObject *, unsigned long, void *,
-                              void *calldata)
+void pqBlotShell::printStdout(vtkObject*, unsigned long, void*, void* calldata)
 {
-  const char *text = reinterpret_cast<const char *>(calldata);
+  const char* text = reinterpret_cast<const char*>(calldata);
   this->printStdout(text);
   this->Interpretor->ClearMessages();
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::printStderr(const QString &text)
+void pqBlotShell::printStderr(const QString& text)
 {
   QTextCharFormat format = this->Console->getFormat();
   format.setForeground(QColor(255, 0, 0));
@@ -195,7 +196,7 @@ void pqBlotShell::printStderr(const QString &text)
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-void pqBlotShell::printStdout(const QString &text)
+void pqBlotShell::printStdout(const QString& text)
 {
   QTextCharFormat format = this->Console->getFormat();
   format.setForeground(QColor(0, 150, 0));
@@ -205,7 +206,7 @@ void pqBlotShell::printStdout(const QString &text)
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-void pqBlotShell::printMessage(const QString &text)
+void pqBlotShell::printMessage(const QString& text)
 {
   QTextCharFormat format = this->Console->getFormat();
   format.setForeground(QColor(0, 0, 150));
@@ -224,23 +225,22 @@ void pqBlotShell::promptForInput()
 
   // Is there an easier way to get the value of pvblot.interpreter.prompt?
   this->Interpretor->MakeCurrent();
-  PyObject *modules = PySys_GetObject(const_cast<char*>("modules"));
-  PyObject *pvblotmodule = PyDict_GetItemString(modules, "pvblot");
+  PyObject* modules = PySys_GetObject(const_cast<char*>("modules"));
+  PyObject* pvblotmodule = PyDict_GetItemString(modules, "pvblot");
   QString newPrompt = ">>> ";
   if (pvblotmodule)
-    {
-    PyObject *pvblotdict = PyModule_GetDict(pvblotmodule);
+  {
+    PyObject* pvblotdict = PyModule_GetDict(pvblotmodule);
     if (pvblotdict)
-      {
-      PyObject *pvblotinterp = PyDict_GetItemString(pvblotdict, "interpreter");
+    {
+      PyObject* pvblotinterp = PyDict_GetItemString(pvblotdict, "interpreter");
       if (pvblotinterp)
-        {
-        PyObject *promptObj = PyObject_GetAttrString(pvblotinterp,
-                                                   const_cast<char*>("prompt"));
+      {
+        PyObject* promptObj = PyObject_GetAttrString(pvblotinterp, const_cast<char*>("prompt"));
         newPrompt = PyString_AsString(PyObject_Str(promptObj));
-        }
       }
     }
+  }
 
   this->Console->prompt(newPrompt);
   this->Interpretor->ReleaseControl();

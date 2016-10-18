@@ -24,7 +24,7 @@
  *
  * This filter tries to make it easy for the user to write expressions
  * by defining certain variables. The filter tries to assign each array
- * to a variable of the same name. If the name of the array is not a 
+ * to a variable of the same name. If the name of the array is not a
  * valid Python variable, it has to be accessed through a dictionary called
  * arrays (i.e. arrays['array_name']). The points can be accessed using the
  * points variable.
@@ -39,9 +39,9 @@
 class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPythonCalculator : public vtkProgrammableFilter
 {
 public:
-  vtkTypeMacro(vtkPythonCalculator,vtkProgrammableFilter);
+  vtkTypeMacro(vtkPythonCalculator, vtkProgrammableFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPythonCalculator *New();
+  static vtkPythonCalculator* New();
 
   //@{
   /**
@@ -69,22 +69,20 @@ public:
    * must return a scalar value (which is converted to an array) or a
    * numpy array.
    */
-  vtkSetStringMacro(Expression)
-  vtkGetStringMacro(Expression)
-  //@}
+  vtkSetStringMacro(Expression) vtkGetStringMacro(Expression)
+    //@}
 
-  //@{
-  /**
-   * Set the name of the output array.
-   */
-  vtkSetStringMacro(ArrayName)
-  vtkGetStringMacro(ArrayName)
-  //@}
+    //@{
+    /**
+     * Set the name of the output array.
+     */
+    vtkSetStringMacro(ArrayName) vtkGetStringMacro(ArrayName)
+    //@}
 
-  /**
-   * For internal use only.
-   */
-  static void ExecuteScript(void *);
+    /**
+     * For internal use only.
+     */
+    static void ExecuteScript(void*);
 
 protected:
   vtkPythonCalculator();
@@ -97,17 +95,16 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  //overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  // overridden to allow multiple inputs to port 0
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   // DeExpressionion:
   // Creates whatever output data set type is selected.
-  virtual int RequestDataObject(vtkInformation* request, 
-                                vtkInformationVector** inputVector, 
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  char *Expression;
-  char *ArrayName;
+  char* Expression;
+  char* ArrayName;
   int ArrayAssociation;
   bool CopyArrays;
 

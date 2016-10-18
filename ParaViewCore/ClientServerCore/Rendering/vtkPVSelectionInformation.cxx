@@ -37,15 +37,15 @@ vtkPVSelectionInformation::vtkPVSelectionInformation()
 vtkPVSelectionInformation::~vtkPVSelectionInformation()
 {
   if (this->Selection)
-    {
+  {
     this->Selection->Delete();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSelectionInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Selection: ";
   this->Selection->PrintSelf(os, indent.GetNextIndent());
@@ -63,46 +63,43 @@ void vtkPVSelectionInformation::CopyFromObject(vtkObject* obj)
   this->Initialize();
   vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(obj);
   if (alg)
-    {
-    vtkSelection* output = vtkSelection::SafeDownCast(
-      alg->GetOutputDataObject(0));
+  {
+    vtkSelection* output = vtkSelection::SafeDownCast(alg->GetOutputDataObject(0));
     if (output)
-      {
+    {
       this->Selection->DeepCopy(output);
-      }
     }
-  
+  }
+
   vtkSelection* sel = vtkSelection::SafeDownCast(obj);
   if (sel)
-    {
+  {
     this->Selection->DeepCopy(sel);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSelectionInformation::AddInformation(vtkPVInformation* info)
 {
   if (!info)
-    {
+  {
     return;
-    }
+  }
 
-  vtkPVSelectionInformation* sInfo = 
-    vtkPVSelectionInformation::SafeDownCast(info);
+  vtkPVSelectionInformation* sInfo = vtkPVSelectionInformation::SafeDownCast(info);
   if (!sInfo)
-    {
+  {
     vtkErrorMacro("Could not downcast info to array info.");
     return;
-    }
+  }
 
   for (unsigned int i = 0; i < sInfo->Selection->GetNumberOfNodes(); ++i)
-    {
+  {
     vtkSelectionNode* node = sInfo->Selection->GetNode(i);
-    vtkSmartPointer<vtkSelectionNode> newNode =
-      vtkSmartPointer<vtkSelectionNode>::New();
+    vtkSmartPointer<vtkSelectionNode> newNode = vtkSmartPointer<vtkSelectionNode>::New();
     newNode->ShallowCopy(node);
     this->Selection->AddNode(node);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -125,11 +122,10 @@ void vtkPVSelectionInformation::CopyFromStream(const vtkClientServerStream* css)
   this->Initialize();
 
   const char* xml = 0;
-  if(!css->GetArgument(0, 0, &xml))
-    {
+  if (!css->GetArgument(0, 0, &xml))
+  {
     vtkErrorMacro("Error parsing selection xml from message.");
     return;
-    }
+  }
   vtkSelectionSerializer::Parse(xml, this->Selection);
 }
-

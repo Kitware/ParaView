@@ -44,6 +44,7 @@ class vtkVRWandTrackingStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
   vtkVRWandTrackingStyle(QObject* parent);
   ~vtkVRWandTrackingStyle();
@@ -61,16 +62,16 @@ public:
   virtual bool update();
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
+  void HandleButton(const vtkVREventData& data);
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleTracker(const vtkVREventData& data);
   bool GetWandPoseProxyNProperty();
-  bool SetWandPoseProperty(const vtkVREventData &data );
+  bool SetWandPoseProperty(const vtkVREventData& data);
 
 protected:
-  vtkSMRenderViewProxy *Proxy;
-  vtkSMDoubleVectorProperty *Property;
+  vtkSMRenderViewProxy* Proxy;
+  vtkSMDoubleVectorProperty* Property;
   bool IsFoundProxyProperty;
 };
 
-#endif //vtkVRWandTrackingStyle.h_
+#endif // vtkVRWandTrackingStyle.h_

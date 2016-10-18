@@ -78,16 +78,19 @@ public:
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
 
   /**
    * Returns the render-window used by the root view, if any.
    */
   virtual vtkRenderWindow* GetRenderWindow()
-    { return this->GetRootView()? this->GetRootView()->GetRenderWindow() : NULL; }
+  {
+    return this->GetRootView() ? this->GetRootView()->GetRenderWindow() : NULL;
+  }
   virtual vtkRenderWindowInteractor* GetInteractor()
-    { return this->GetRootView()? this->GetRootView()->GetInteractor() : NULL; }
+  {
+    return this->GetRootView() ? this->GetRootView()->GetInteractor() : NULL;
+  }
 
   /**
    * To avoid misuse of this method for comparative views, this method will
@@ -100,7 +103,7 @@ public:
    * Overridden to call MakeRenderWindowInteractor() on each of the internal
    * views.
    */
-  virtual bool MakeRenderWindowInteractor(bool quiet=false);
+  virtual bool MakeRenderWindowInteractor(bool quiet = false);
 
 protected:
   vtkSMComparativeViewProxy();

@@ -53,13 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)
-  : Superclass(parentObject), ConnectedView(NULL)
+  : Superclass(parentObject)
+  , ConnectedView(NULL)
 {
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(viewChanged(pqView*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(activeObjects, SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -70,43 +70,43 @@ void pqExportReaction::updateEnableState()
   // QAction's state.
   pqView* view = pqActiveObjects::instance().activeView();
   if (this->ConnectedView != view)
-    {
+  {
     if (this->ConnectedView)
-      {
-      QObject::disconnect(this->ConnectedView, 
-        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
-        this, SLOT(updateEnableState()));
-      }
+    {
+      QObject::disconnect(this->ConnectedView,
+        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), this,
+        SLOT(updateEnableState()));
+    }
     this->ConnectedView = view;
     if (view)
-      {
-      QObject::connect(this->ConnectedView, 
-        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
-        this, SLOT(updateEnableState()));
-      }
+    {
+      QObject::connect(this->ConnectedView,
+        SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), this,
+        SLOT(updateEnableState()));
     }
-  
+  }
+
   bool enabled = false;
   if (view)
-    {
+  {
     bool visibleRepresentation = false;
     QList<pqRepresentation*> representations = view->getRepresentations();
-    foreach(pqRepresentation* repr, representations)
-      {
+    foreach (pqRepresentation* repr, representations)
+    {
       if (repr->isVisible())
-        {
-          visibleRepresentation = true;
-          break;
-        }
+      {
+        visibleRepresentation = true;
+        break;
       }
+    }
 
     if (visibleRepresentation)
-      {
+    {
       vtkSMViewProxy* viewProxy = view->getViewProxy();
       vtkNew<vtkSMViewExportHelper> helper;
       enabled = (helper->GetSupportedFileTypes(viewProxy).size() > 0);
-      }
     }
+  }
   this->parentAction()->setEnabled(enabled);
 }
 
@@ -114,32 +114,34 @@ void pqExportReaction::updateEnableState()
 QString pqExportReaction::exportActiveView()
 {
   pqView* view = pqActiveObjects::instance().activeView();
-  if (!view) { return QString(); }
+  if (!view)
+  {
+    return QString();
+  }
   vtkSMViewProxy* viewProxy = view->getViewProxy();
 
   vtkNew<vtkSMViewExportHelper> helper;
   QString filters(helper->GetSupportedFileTypes(viewProxy).c_str());
   if (filters.isEmpty())
-    {
+  {
     qCritical("Cannot export current view.");
     return QString();
-    }
+  }
 
-  pqFileDialog file_dialog(NULL, pqCoreUtilities::mainWidget(),
-    tr("Export View:"), QString(), filters);
+  pqFileDialog file_dialog(
+    NULL, pqCoreUtilities::mainWidget(), tr("Export View:"), QString(), filters);
   file_dialog.setObjectName("FileExportDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog.exec() == QDialog::Accepted &&
-    file_dialog.getSelectedFiles().size() > 0)
-    {
+  if (file_dialog.exec() == QDialog::Accepted && file_dialog.getSelectedFiles().size() > 0)
+  {
     QString filename = file_dialog.getSelectedFiles().first();
     vtkSmartPointer<vtkSMExporterProxy> proxy;
     proxy.TakeReference(helper->CreateExporter(filename.toLatin1().data(), viewProxy));
     if (!proxy)
-      {
+    {
       qCritical("Couldn't handle export filename");
       return QString();
-      }
+    }
 
     QPointer<pqProxyWidget> proxyWidget = new pqProxyWidget(proxy);
     proxyWidget->setApplyChangesImmediately(true);
@@ -147,7 +149,7 @@ QString pqExportReaction::exportActiveView()
     // Show a configuration dialog if options are available:
     bool export_cancelled = false;
     if (proxyWidget->filterWidgets(true))
-      {
+    {
       QDialog* dialog = this->createConfigurationDialog(proxyWidget);
 
       // While all widgets are shown, fix the size of the dialog. Add a bit to
@@ -163,19 +165,19 @@ QString pqExportReaction::exportActiveView()
       int dialogCode = dialog->exec();
       export_cancelled = (static_cast<QDialog::DialogCode>(dialogCode) != QDialog::Accepted);
       delete dialog;
-      }
+    }
 
     delete proxyWidget;
     if (!export_cancelled)
-      {
+    {
       SM_SCOPED_TRACE(ExportView)
         .arg("view", viewProxy)
         .arg("exporter", proxy)
         .arg("filename", filename.toLatin1().data());
       proxy->Write();
       return filename;
-      }
     }
+  }
   return QString();
 }
 
@@ -185,25 +187,23 @@ QDialog* pqExportReaction::createConfigurationDialog(pqProxyWidget* proxyWidget)
   QDialog* dialog = new QDialog(pqCoreUtilities::mainWidget());
   dialog->setWindowTitle(tr("Export Options"));
 
-  QLabel *label = new QLabel(dialog);
+  QLabel* label = new QLabel(dialog);
   label->setText(tr("Show advanced options:"));
 
-  QToolButton *advancedButton = new QToolButton(dialog);
+  QToolButton* advancedButton = new QToolButton(dialog);
   advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
   advancedButton->setCheckable(true);
-  connect(advancedButton, SIGNAL(toggled(bool)), proxyWidget,
-    SLOT(filterWidgets(bool)));
+  connect(advancedButton, SIGNAL(toggled(bool)), proxyWidget, SLOT(filterWidgets(bool)));
 
-  QDialogButtonBox *bbox = new QDialogButtonBox(QDialogButtonBox::Save |
-    QDialogButtonBox::Cancel);
+  QDialogButtonBox* bbox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
   connect(bbox, SIGNAL(accepted()), dialog, SLOT(accept()));
   connect(bbox, SIGNAL(rejected()), dialog, SLOT(reject()));
 
-  QHBoxLayout *hbox = new QHBoxLayout();
+  QHBoxLayout* hbox = new QHBoxLayout();
   hbox->addWidget(label);
   hbox->addWidget(advancedButton);
 
-  QVBoxLayout *vbox = new QVBoxLayout(dialog);
+  QVBoxLayout* vbox = new QVBoxLayout(dialog);
   vbox->addLayout(hbox);
   vbox->addWidget(proxyWidget);
   vbox->addStretch();

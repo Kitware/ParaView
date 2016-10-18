@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,24 +42,21 @@ Translates low-level Qt events into high-level ParaView events that can be recor
 \sa pqEventTranslator
 */
 
-class PQCORE_EXPORT pqQVTKWidgetEventTranslator :
-  public pqWidgetEventTranslator
+class PQCORE_EXPORT pqQVTKWidgetEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
   typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqQVTKWidgetEventTranslator(QObject* p=0);
+  pqQVTKWidgetEventTranslator(QObject* p = 0);
   ~pqQVTKWidgetEventTranslator();
-  
+
   using Superclass::translateEvent;
   virtual bool translateEvent(QObject* Object, QEvent* Event, int eventType, bool& Error);
 
 private:
   pqQVTKWidgetEventTranslator(const pqQVTKWidgetEventTranslator&);
   pqQVTKWidgetEventTranslator& operator=(const pqQVTKWidgetEventTranslator&);
-  
 };
 
 #endif // !_pqQVTKWidgetEventTranslator_h
-

@@ -53,62 +53,52 @@ public:
    * The name must be unique to each proxy added, otherwise the previously
    * added proxy will be replaced.
    */
-   void AddProxy(const char* name, vtkSMProxy* proxy);
+  void AddProxy(const char* name, vtkSMProxy* proxy);
 
-   /**
-    * Expose a property from the sub proxy (added using AddProxy).
-    * Only exposed properties are accessible externally. Note that the sub proxy
-    * whose property is being exposed must have been already added using
-    * AddProxy().
-    */
-   void ExposeProperty(const char* proxyName,
-                       const char* propertyName,
-                       const char* exposedName);
+  /**
+   * Expose a property from the sub proxy (added using AddProxy).
+   * Only exposed properties are accessible externally. Note that the sub proxy
+   * whose property is being exposed must have been already added using
+   * AddProxy().
+   */
+  void ExposeProperty(const char* proxyName, const char* propertyName, const char* exposedName);
 
-   /**
-    * Expose an output port from a subproxy. Exposed output ports are treated as
-    * output ports of the vtkSMCompoundSourceProxy itself.
-    * This method does not may the output port available. One must call
-    * CreateOutputPorts().
-    */
-   void ExposeOutputPort(const char* proxyName,
-                         const char* portName,
-                         const char* exposedName);
+  /**
+   * Expose an output port from a subproxy. Exposed output ports are treated as
+   * output ports of the vtkSMCompoundSourceProxy itself.
+   * This method does not may the output port available. One must call
+   * CreateOutputPorts().
+   */
+  void ExposeOutputPort(const char* proxyName, const char* portName, const char* exposedName);
 
-   /**
-    * Expose an output port from a subproxy. Exposed output ports are treated as
-    * output ports of the vtkSMCompoundSourceProxy itself.
-    * This method does not may the output port available. One must call
-    * CreateOutputPorts().
-    */
-   void ExposeOutputPort(const char* proxyName,
-                         unsigned int portIndex,
-                         const char* exposedName);
+  /**
+   * Expose an output port from a subproxy. Exposed output ports are treated as
+   * output ports of the vtkSMCompoundSourceProxy itself.
+   * This method does not may the output port available. One must call
+   * CreateOutputPorts().
+   */
+  void ExposeOutputPort(const char* proxyName, unsigned int portIndex, const char* exposedName);
 
-   /**
-    * Returns the number of sub-proxies.
-    */
-   unsigned int GetNumberOfProxies()
-     { return this->GetNumberOfSubProxies(); }
+  /**
+   * Returns the number of sub-proxies.
+   */
+  unsigned int GetNumberOfProxies() { return this->GetNumberOfSubProxies(); }
 
-   /**
-    * Returns the sub proxy at a given index.
-    */
-   vtkSMProxy* GetProxy(unsigned int cc)
-     { return this->GetSubProxy(cc); }
+  /**
+   * Returns the sub proxy at a given index.
+   */
+  vtkSMProxy* GetProxy(unsigned int cc) { return this->GetSubProxy(cc); }
 
-   /**
-    * Returns the subproxy with the given name.
-    */
-   vtkSMProxy* GetProxy(const char* name)
-     { return this->GetSubProxy(name); }
+  /**
+   * Returns the subproxy with the given name.
+   */
+  vtkSMProxy* GetProxy(const char* name) { return this->GetSubProxy(name); }
 
-   /**
-    * Returns the name used to store sub-proxy. Returns 0 if sub-proxy does
-    * not exist.
-    */
-   const char* GetProxyName(unsigned int index)
-     { return this->GetSubProxyName(index); }
+  /**
+   * Returns the name used to store sub-proxy. Returns 0 if sub-proxy does
+   * not exist.
+   */
+  const char* GetProxyName(unsigned int index) { return this->GetSubProxyName(index); }
 
   /**
    * Creates the output port proxiess for this filter.
@@ -168,8 +158,6 @@ private:
 
   class vtkInternals;
   vtkInternals* CSInternals;
-
 };
 
 #endif
-

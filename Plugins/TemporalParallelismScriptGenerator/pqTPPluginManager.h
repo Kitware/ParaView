@@ -36,12 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// pqTPPluginManager is the central class that orchestrates the behaviour of
 /// this spatio-temporal script creator plugin.
-class pqTPPluginManager :  public pqSGPluginManager
+class pqTPPluginManager : public pqSGPluginManager
 {
   Q_OBJECT
   typedef pqSGPluginManager Superclass;
+
 public:
-  pqTPPluginManager(QObject* parent=0);
+  pqTPPluginManager(QObject* parent = 0);
   ~pqTPPluginManager();
 
   /// Get the name of the writers menu from the concrete subclass.

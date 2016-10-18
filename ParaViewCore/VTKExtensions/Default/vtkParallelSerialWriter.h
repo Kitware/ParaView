@@ -132,22 +132,18 @@ public:
   /**
    * Get/Set the interpreter to use to call methods on the writer.
    */
-  void SetInterpreter(vtkClientServerInterpreter* interp)
-    { this->Interpreter = interp; }
+  void SetInterpreter(vtkClientServerInterpreter* interp) { this->Interpreter = interp; }
 
 protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter();
 
-  int RequestInformation(vtkInformation* request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
-  int RequestUpdateExtent(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  int RequestData(vtkInformation* request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
@@ -176,7 +172,6 @@ private:
   char* FileName;
 
   vtkClientServerInterpreter* Interpreter;
-
 };
 
 #endif

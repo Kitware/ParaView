@@ -29,7 +29,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCompositeMultiProcessController : public vtkMultiProcessController
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCompositeMultiProcessController
+  : public vtkMultiProcessController
 {
 public:
   static vtkCompositeMultiProcessController* New();
@@ -97,20 +98,18 @@ public:
    * Allow server to broadcast data to all connected client with our without
    * sending to the active client
    */
-  virtual void TriggerRMI2All(int remote, void* data, int length, int tag,
-                              bool sendToActiveToo);
+  virtual void TriggerRMI2All(int remote, void* data, int length, int tag, bool sendToActiveToo);
 
   //  --------------- vtkMultiProcessController API ----------------------
   // Make sure inner vtkSocketController are initialized
   virtual void Initialize();
-  virtual void Initialize(int*,char***)     {this->Initialize();};
-  virtual void Initialize(int*,char***,int) {this->Initialize();};
-  virtual void Finalize() {};             // Empty: Same as vtkSocketController
-  virtual void Finalize(int) {};          // Empty: Same as vtkSocketController
-  virtual void SingleMethodExecute() {};  // Empty: Same as vtkSocketController
-  virtual void MultipleMethodExecute() {};// Empty: Same as vtkSocketController
-  virtual void CreateOutputWindow() {};   // Empty: Same as vtkSocketController
-
+  virtual void Initialize(int*, char***) { this->Initialize(); };
+  virtual void Initialize(int*, char***, int) { this->Initialize(); };
+  virtual void Finalize(){};              // Empty: Same as vtkSocketController
+  virtual void Finalize(int){};           // Empty: Same as vtkSocketController
+  virtual void SingleMethodExecute(){};   // Empty: Same as vtkSocketController
+  virtual void MultipleMethodExecute(){}; // Empty: Same as vtkSocketController
+  virtual void CreateOutputWindow(){};    // Empty: Same as vtkSocketController
 
   virtual vtkCommunicator* GetCommunicator();
 
@@ -131,18 +130,18 @@ public:
    */
   virtual void RemoveAllRMICallbacks(int tag);
   virtual int RemoveFirstRMI(int tag)
-    {
+  {
     vtkWarningMacro("RemoveRMICallbacks will remove all...");
     this->RemoveAllRMICallbacks(tag);
     return 1;
-    }
+  }
   virtual bool RemoveRMICallback(unsigned long observerTagId);
   //@}
 
   enum EventId
-    {
+  {
     CompositeMultiProcessControllerChanged = 2345
-    };
+  };
 
 protected:
   vtkCompositeMultiProcessController();
@@ -155,7 +154,6 @@ private:
   class vtkCompositeInternals;
   vtkCompositeInternals* Internal;
   friend class vtkCompositeInternals;
-
 };
 
 #endif

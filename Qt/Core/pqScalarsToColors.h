@@ -48,8 +48,8 @@ class PQCORE_EXPORT pqScalarsToColors : public pqProxy
 {
   Q_OBJECT
 public:
-  pqScalarsToColors(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  pqScalarsToColors(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
+    QObject* parent = NULL);
   virtual ~pqScalarsToColors();
 
   /**
@@ -83,10 +83,10 @@ public:
   bool getUseLogScale() const;
 
   enum Mode
-    {
+  {
     MAGNITUDE = 0,
     COMPONENT = 1
-    };
+  };
 
   // Set the color mode (component/magnitude) and
   // component to color by. When mode is magnitude, component is ignored.
@@ -105,10 +105,10 @@ public:
   void updateScalarBarTitles(const QString& component);
 
   enum RangeScalingModes
-    {
+  {
     GROW_ON_MODIFIED, /* only when a pipeline object is explicitly modified */
     GROW_ON_UPDATED   /* any time the pipeline updates */
-    };
+  };
 
   /**
   * This merely update the application settings with correct values for the
@@ -123,7 +123,7 @@ public:
   * done.
   */
   static void setColorRangeScalingMode(int);
-  static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
+  static int colorRangeScalingMode(int default_value = GROW_ON_MODIFIED);
 
 signals:
   /**

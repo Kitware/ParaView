@@ -31,25 +31,24 @@ vtkPVDataInformationHelper::~vtkPVDataInformationHelper()
 //----------------------------------------------------------------------------
 void vtkPVDataInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformationHelper::CopyFromDataObject
-  (vtkPVDataInformation *pvdi, vtkDataObject* data)
+void vtkPVDataInformationHelper::CopyFromDataObject(vtkPVDataInformation* pvdi, vtkDataObject* data)
 {
   if (!this->ValidateType(data))
-    {
+  {
     return;
-    }
+  }
   this->Data = data;
 
   pvdi->SetDataClassName(data->GetClassName());
   pvdi->DataSetType = data->GetDataObjectType();
   pvdi->NumberOfDataSets = this->GetNumberOfDataSets();
 
-  double *dataBounds = this->GetBounds();
-  memcpy(pvdi->Bounds, dataBounds, 6*sizeof(double));
+  double* dataBounds = this->GetBounds();
+  memcpy(pvdi->Bounds, dataBounds, 6 * sizeof(double));
 
   pvdi->MemorySize = data->GetActualMemorySize();
   pvdi->NumberOfCells = this->GetNumberOfCells();

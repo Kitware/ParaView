@@ -76,9 +76,8 @@ public:
    * last result after the command stream is evaluated. Once can set
    * \c ignore_errors to true, to ignore any interpreting errors.
    */
-  virtual void ExecuteStream( vtkTypeUInt32 location,
-                              const vtkClientServerStream& stream,
-                              bool ignore_errors = false );
+  virtual void ExecuteStream(
+    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false);
 
   /**
    * Returns the response of the ExecuteStream() call from the location. Note if
@@ -125,9 +124,8 @@ public:
    * Gather information about an object referred by the \c globalid.
    * \c location identifies the processes to gather the information from.
    */
-  virtual bool GatherInformation( vtkTypeUInt32 location,
-                                  vtkPVInformation* information,
-                                  vtkTypeUInt32 globalid );
+  virtual bool GatherInformation(
+    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   /**
    * Returns the number of processes. This simply calls the
@@ -162,14 +160,14 @@ public:
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
   enum MessageTypes
-    {
-    PUSH_STATE         = 12,
-    PULL_STATE         = 13,
-    EXECUTE_STREAM     = 14,
+  {
+    PUSH_STATE = 12,
+    PULL_STATE = 13,
+    EXECUTE_STREAM = 14,
     GATHER_INFORMATION = 15,
-    REGISTER_SI        = 16,
-    UNREGISTER_SI      = 17,
-    };
+    REGISTER_SI = 16,
+    UNREGISTER_SI = 17,
+  };
   // Methods used to managed MPI satellite
   void PushStateSatelliteCallback();
   void ExecuteStreamSatelliteCallback();
@@ -204,15 +202,13 @@ protected:
    * This will execute localy the given vtkClientServerStream either by
    * calling method on the vtkSIObject or its internal vtkObject.
    */
-  virtual void ExecuteStreamInternal( const vtkClientServerStream& stream,
-                                      bool ignore_errors );
+  virtual void ExecuteStreamInternal(const vtkClientServerStream& stream, bool ignore_errors);
 
   /**
    * This will gather informations on the local vtkObjects
    * through the local vtkSIObjects.
    */
-  bool GatherInformationInternal( vtkPVInformation* information,
-                                  vtkTypeUInt32 globalid );
+  bool GatherInformationInternal(vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   /**
    * Gather informations across MPI satellites.
@@ -237,10 +233,10 @@ protected:
   void OnInterpreterError(vtkObject*, unsigned long, void* calldata);
 
   enum
-    {
-    ROOT_SATELLITE_RMI_TAG =  887822,
+  {
+    ROOT_SATELLITE_RMI_TAG = 887822,
     ROOT_SATELLITE_INFO_TAG = 887823
-    };
+  };
 
   vtkSIProxyDefinitionManager* ProxyDefinitionManager;
   vtkWeakPointer<vtkMultiProcessController> ParallelController;
@@ -258,8 +254,7 @@ private:
   // Local counter for global Ids
   vtkTypeUInt32 LocalGlobalID;
 
-  ostream *LogStream;
-
+  ostream* LogStream;
 };
 
 #endif

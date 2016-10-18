@@ -37,58 +37,56 @@ vtkPVExponentialKeyFrame::~vtkPVExponentialKeyFrame()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkPVExponentialKeyFrame::UpdateValue( double currenttime,
-                                            vtkPVAnimationCue* cue,
-                                            vtkPVKeyFrame* next)
+void vtkPVExponentialKeyFrame::UpdateValue(
+  double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next)
 {
   if (!next)
-    {
+  {
     return;
-    }
+  }
 
   if (this->Base == 1)
-    {
+  {
     vtkErrorMacro("Exponential with base 1");
-    }
+  }
 
   // Do some computation
   int animated_element = cue->GetAnimatedElement();
-  double tcur = pow(this->Base, this->StartPower + currenttime *
-                    (this->EndPower- this->StartPower));
+  double tcur =
+    pow(this->Base, this->StartPower + currenttime * (this->EndPower - this->StartPower));
   double tmin = pow(this->Base, this->StartPower);
   double tmax = pow(this->Base, this->EndPower);
-  double t = (this->Base!= 1) ? (tcur - tmin) / (tmax - tmin): 0;
+  double t = (this->Base != 1) ? (tcur - tmin) / (tmax - tmin) : 0;
 
   // Apply changes
   cue->BeginUpdateAnimationValues();
   if (animated_element != -1)
-    {
+  {
     double vmax = next->GetKeyValue();
     double vmin = this->GetKeyValue();
     double value = vmin + t * (vmax - vmin);
     cue->SetAnimationValue(animated_element, value);
-    }
+  }
   else
-    {
+  {
     unsigned int start_novalues = this->GetNumberOfKeyValues();
     unsigned int end_novalues = next->GetNumberOfKeyValues();
-    unsigned int min = (start_novalues < end_novalues)
-                       ? start_novalues : end_novalues;
+    unsigned int min = (start_novalues < end_novalues) ? start_novalues : end_novalues;
     unsigned int i;
     // interpolate common indices.
-    for (i=0; i < min; i++)
-      {
+    for (i = 0; i < min; i++)
+    {
       double vmax = next->GetKeyValue(i);
       double vmin = this->GetKeyValue(i);
       double value = vmin + t * (vmax - vmin);
       cue->SetAnimationValue(i, value);
-      }
+    }
     // add any additional indices in start key frame.
     for (i = min; i < start_novalues; i++)
-      {
-      cue->SetAnimationValue( i, this->GetKeyValue(i) );
-      }
+    {
+      cue->SetAnimationValue(i, this->GetKeyValue(i));
     }
+  }
   cue->EndUpdateAnimationValues();
 }
 

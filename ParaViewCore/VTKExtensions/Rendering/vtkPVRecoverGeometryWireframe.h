@@ -49,8 +49,8 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVRecoverGeometryWireframe : public 
 {
 public:
   vtkTypeMacro(vtkPVRecoverGeometryWireframe, vtkPolyDataAlgorithm);
-  static vtkPVRecoverGeometryWireframe *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkPVRecoverGeometryWireframe* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * In order to determine which edges existed in the original data, we need an
@@ -59,20 +59,18 @@ public:
    * existance of this field is also a signal that this wireframe extraction is
    * necessary.
    */
-  static const char *ORIGINAL_FACE_IDS()
-    { return "vtkPVRecoverWireframeOriginalFaceIds"; }
+  static const char* ORIGINAL_FACE_IDS() { return "vtkPVRecoverWireframeOriginalFaceIds"; }
 
 protected:
   vtkPVRecoverGeometryWireframe();
   ~vtkPVRecoverGeometryWireframe();
 
-  virtual int RequestData(vtkInformation *request,
-                          vtkInformationVector **inputVector,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
-  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRecoverGeometryWireframe &) VTK_DELETE_FUNCTION;
+  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVRecoverGeometryWireframe&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkPVRecoverGeometryWireframe_h
+#endif // vtkPVRecoverGeometryWireframe_h

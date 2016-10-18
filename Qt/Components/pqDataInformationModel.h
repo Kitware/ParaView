@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,36 +45,35 @@ class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  pqDataInformationModel(QObject* _parent=NULL);
+  pqDataInformationModel(QObject* _parent = NULL);
   virtual ~pqDataInformationModel();
 
   /**
-  * QAbstractTableModel API. 
+  * QAbstractTableModel API.
   * Returns the number of rows under the given parent.
   */
-  virtual int rowCount(const QModelIndex& parent =QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * QAbstractTableModel API.
   * Returns the number of columns for the given parent.
   */
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * QAbstractTableModel API.
-  * Returns the data stored under the given role for the item referred 
+  * Returns the data stored under the given role for the item referred
   * to by the index.
   */
   virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-  
+
   /**
   * QAbstractTableModel API.
-  * Returns the data for the given role and section in the header with the 
+  * Returns the data for the given role and section in the header with the
   * specified orientation.
   */
-  virtual QVariant headerData(int section, Qt::Orientation orientation, 
-    int role = Qt::DisplayRole) const;
+  virtual QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
   /**
   * Given a pqOutputPort, get the index for it, if present in this model,
@@ -91,8 +90,8 @@ public:
   /**
   * Method needed for copy/past cell editor
   */
-  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
-  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
 public slots:
   /**
@@ -126,8 +125,8 @@ private:
   pqDataInformationModelInternal* Internal;
 
   enum ColumnType
-    {
-    Name=0,
+  {
+    Name = 0,
     DataType,
     CellCount,
     PointCount,
@@ -136,9 +135,7 @@ private:
     Bounds,
     TimeSpan,
     Max_Columns
-    };
+  };
 };
 
-
 #endif
-

@@ -24,7 +24,7 @@
  *
  *
  * This filter throws away all of the cells in the input and replaces them with
- * a vertex on each point. This filter may take a graph, a point set or a 
+ * a vertex on each point. This filter may take a graph, a point set or a
  * CompositeDataSet as input.
  *
 */
@@ -39,20 +39,19 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMergeCompositeDataSet : public vtkVert
 {
 public:
   vtkTypeMacro(vtkMergeCompositeDataSet, vtkVertexGlyphFilter);
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
-  static vtkMergeCompositeDataSet *New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkMergeCompositeDataSet* New();
 
 protected:
   vtkMergeCompositeDataSet();
   virtual ~vtkMergeCompositeDataSet();
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **, vtkInformationVector *);
-  virtual int FillInputPortInformation(int, vtkInformation *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int, vtkInformation*);
 
 private:
-  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMergeCompositeDataSet &) VTK_DELETE_FUNCTION;
+  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMergeCompositeDataSet&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkMergeCompositeDataSet_h
+#endif // vtkMergeCompositeDataSet_h

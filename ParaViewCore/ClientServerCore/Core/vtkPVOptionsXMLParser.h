@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkPVOptionsXMLParser.h
 
@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptionsXMLParser : public vtkCommand
 {
 public:
   static vtkPVOptionsXMLParser* New();
-  vtkTypeMacro(vtkPVOptionsXMLParser,vtkCommandOptionsXMLParser);
+  vtkTypeMacro(vtkPVOptionsXMLParser, vtkCommandOptionsXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
@@ -48,4 +48,3 @@ private:
 };
 
 #endif // #ifndef vtkPVOptionsXMLParser_h
-

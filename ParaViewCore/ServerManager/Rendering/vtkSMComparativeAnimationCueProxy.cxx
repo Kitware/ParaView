@@ -30,36 +30,31 @@
 class vtkSMComparativeAnimationCueProxy::vtkInternal
 {
 public:
-  vtkInternal(vtkSMComparativeAnimationCueProxy* parent)
-    {
-    this->Parent = parent;
-    }
+  vtkInternal(vtkSMComparativeAnimationCueProxy* parent) { this->Parent = parent; }
 
   ~vtkInternal()
-    {
+  {
     this->Parent = NULL;
-    if(this->Observable)
-      {
+    if (this->Observable)
+    {
       this->Observable->RemoveObserver(this->CallbackID);
-      }
+    }
+  }
+
+  void CreateUndoElement(
+    vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData))
+  {
+    // Make sure an UndoStackBuilder is available
+    vtkSMUndoStackBuilder* usb = vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+    if (usb == NULL)
+    {
+      return;
     }
 
-  void CreateUndoElement(vtkObject *vtkNotUsed(caller),
-                         unsigned long vtkNotUsed(eventId),
-                         void *vtkNotUsed(callData))
+    if (!this->Parent || !this->Parent->GetComparativeAnimationCue())
     {
-    // Make sure an UndoStackBuilder is available
-    vtkSMUndoStackBuilder* usb =
-      vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
-    if (usb == NULL)
-      {
-      return;
-      }
-
-    if(!this->Parent || !this->Parent->GetComparativeAnimationCue())
-      {
       return; // This shouldn't be called with that state
-      }
+    }
 
     // Create custom undoElement
     vtkSMComparativeAnimationCueUndoElement* elem = vtkSMComparativeAnimationCueUndoElement::New();
@@ -68,21 +63,20 @@ public:
     elem->SetXMLStates(this->Parent->GetGlobalID(), this->LastKnownState, newState);
     elem->SetSession(this->Parent->GetSession());
     if (usb->Add(elem))
-      {
+    {
       this->LastKnownState = vtkSmartPointer<vtkPVXMLElement>::New();
       newState->CopyTo(this->LastKnownState);
       usb->PushToStack();
-      }
-    elem->Delete();
     }
+    elem->Delete();
+  }
 
   void AttachObserver(vtkObject* obj)
-    {
+  {
     this->Observable = obj;
-    this->CallbackID = obj->AddObserver(
-      vtkCommand::StateChangedEvent, this,
+    this->CallbackID = obj->AddObserver(vtkCommand::StateChangedEvent, this,
       &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
-    }
+  }
 
   vtkSMComparativeAnimationCueProxy* Parent;
   vtkWeakPointer<vtkObject> Observable;
@@ -110,11 +104,10 @@ void vtkSMComparativeAnimationCueProxy::CreateVTKObjects()
 {
   bool needToAttachObserver = !this->ObjectsCreated;
   this->Superclass::CreateVTKObjects();
-  if(needToAttachObserver && this->GetClientSideObject())
-    {
-    this->Internals->AttachObserver(
-        vtkObject::SafeDownCast(this->GetClientSideObject()));
-    }
+  if (needToAttachObserver && this->GetClientSideObject())
+  {
+    this->Internals->AttachObserver(vtkObject::SafeDownCast(this->GetClientSideObject()));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -125,10 +118,10 @@ vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetComparativeA
 
 //----------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMComparativeAnimationCueProxy::SaveXMLState(
-  vtkPVXMLElement* root, vtkSMPropertyIterator *piter)
+  vtkPVXMLElement* root, vtkSMPropertyIterator* piter)
 {
   return this->GetComparativeAnimationCue()->AppendCommandInfo(
-      this->Superclass::SaveXMLState(root, piter));
+    this->Superclass::SaveXMLState(root, piter));
 }
 
 //----------------------------------------------------------------------------
@@ -136,24 +129,30 @@ int vtkSMComparativeAnimationCueProxy::LoadXMLState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
 {
   if (!this->Superclass::LoadXMLState(proxyElement, locator))
-    {
+  {
     return 0;
-    }
+  }
   this->GetComparativeAnimationCue()->LoadCommandInfo(proxyElement);
   this->Modified();
   return 1;
 }
 
-#define SAFE_FORWARD(method)\
-  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();\
-  if (cue == NULL) \
-    { vtkWarningMacro("Please call CreateVTKObjects() first."); return; }\
+#define SAFE_FORWARD(method)                                                                       \
+  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();                          \
+  if (cue == NULL)                                                                                 \
+  {                                                                                                \
+    vtkWarningMacro("Please call CreateVTKObjects() first.");                                      \
+    return;                                                                                        \
+  }                                                                                                \
   cue->method
 
-#define SAFE_FORWARD_AND_RETURN(method, retval)\
-  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();\
-  if (cue == NULL) \
-    { vtkWarningMacro("Please call CreateVTKObjects() first."); return retval; }\
+#define SAFE_FORWARD_AND_RETURN(method, retval)                                                    \
+  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();                          \
+  if (cue == NULL)                                                                                 \
+  {                                                                                                \
+    vtkWarningMacro("Please call CreateVTKObjects() first.");                                      \
+    return retval;                                                                                 \
+  }                                                                                                \
   return cue->method
 
 //----------------------------------------------------------------------------
@@ -186,7 +185,7 @@ void vtkSMComparativeAnimationCueProxy::UpdateValue(int x, int y, double value)
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateXRange(
-  int y, double *minx, double* maxx, unsigned int numvalues)
+  int y, double* minx, double* maxx, unsigned int numvalues)
 {
   SAFE_FORWARD(UpdateXRange)(y, minx, maxx, numvalues);
   this->MarkModified(this);
@@ -194,7 +193,7 @@ void vtkSMComparativeAnimationCueProxy::UpdateXRange(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateYRange(
-  int x, double *minx, double* maxx, unsigned int numvalues)
+  int x, double* minx, double* maxx, unsigned int numvalues)
 {
   SAFE_FORWARD(UpdateYRange)(x, minx, maxx, numvalues);
   this->MarkModified(this);
@@ -202,7 +201,7 @@ void vtkSMComparativeAnimationCueProxy::UpdateYRange(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
-  double *mint, double *maxt, unsigned int numValues)
+  double* mint, double* maxt, unsigned int numValues)
 {
   SAFE_FORWARD(UpdateWholeRange)(mint, maxt, numValues);
   this->MarkModified(this);
@@ -210,7 +209,7 @@ void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
-  double *mint, double *maxt, unsigned int numValues, bool vertical_first)
+  double* mint, double* maxt, unsigned int numValues, bool vertical_first)
 {
   SAFE_FORWARD(UpdateWholeRange)(mint, maxt, numValues, vertical_first);
   this->MarkModified(this);
@@ -218,15 +217,14 @@ void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateValue(
-  int x, int y, double *value, unsigned int numValues)
+  int x, int y, double* value, unsigned int numValues)
 {
   SAFE_FORWARD(UpdateValue)(x, y, value, numValues);
   this->MarkModified(this);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeAnimationCueProxy::UpdateAnimatedValue(
-  int x, int y, int dx, int dy)
+void vtkSMComparativeAnimationCueProxy::UpdateAnimatedValue(int x, int y, int dx, int dy)
 {
   SAFE_FORWARD(UpdateAnimatedValue)(x, y, dx, dy);
   // NOTE: this should not call MarkModified().
@@ -234,14 +232,13 @@ void vtkSMComparativeAnimationCueProxy::UpdateAnimatedValue(
 
 //----------------------------------------------------------------------------
 double* vtkSMComparativeAnimationCueProxy::GetValues(
-  int x, int y, int dx, int dy, unsigned int &numValues)
+  int x, int y, int dx, int dy, unsigned int& numValues)
 {
   SAFE_FORWARD_AND_RETURN(GetValues, NULL)(x, y, dx, dy, numValues);
 }
 
 //----------------------------------------------------------------------------
-double vtkSMComparativeAnimationCueProxy::GetValue(
-  int x, int y, int dx, int dy)
+double vtkSMComparativeAnimationCueProxy::GetValue(int x, int y, int dx, int dy)
 {
   SAFE_FORWARD_AND_RETURN(GetValue, 0)(x, y, dx, dy);
 }

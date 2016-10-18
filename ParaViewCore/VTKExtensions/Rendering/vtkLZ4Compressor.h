@@ -61,10 +61,10 @@ public:
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
-  virtual void SaveConfiguration(vtkMultiProcessStream *stream);
-  virtual bool RestoreConfiguration(vtkMultiProcessStream *stream);
-  virtual const char *SaveConfiguration();
-  virtual const char *RestoreConfiguration(const char *stream);
+  virtual void SaveConfiguration(vtkMultiProcessStream* stream);
+  virtual bool RestoreConfiguration(vtkMultiProcessStream* stream);
+  virtual const char* SaveConfiguration();
+  virtual const char* RestoreConfiguration(const char* stream);
   //@}
 
 protected:
@@ -72,13 +72,13 @@ protected:
   ~vtkLZ4Compressor();
 
   int Quality;
+
 private:
   vtkLZ4Compressor(const vtkLZ4Compressor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkLZ4Compressor&) VTK_DELETE_FUNCTION;
 
   // Used when Quality > 1.
   vtkNew<vtkUnsignedCharArray> TemporaryBuffer;
-
 };
 
 #endif

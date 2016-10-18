@@ -41,50 +41,51 @@ class vtkSMProxy;
 class pqSierraPlotToolsManager : public QObject
 {
   Q_OBJECT;
+
 public:
-  static pqSierraPlotToolsManager *instance();
+  static pqSierraPlotToolsManager* instance();
 
   ~pqSierraPlotToolsManager();
 
   /// Get the action for the respective operation.
-  QAction *actionDataLoadManager();
-  QAction *actionPlotVars();
-  QAction *actionSolidMesh();
-  QAction *actionWireframeSolidMesh();
-  QAction *actionWireframeAndBackMesh();
-  QAction *actionPlotOverTime();
-  QAction *actionToggleBackgroundBW();
-  QAction *actionPlotDEBUG();
-  QAction *actionHoverGlobalVarVsTimeLabel();
+  QAction* actionDataLoadManager();
+  QAction* actionPlotVars();
+  QAction* actionSolidMesh();
+  QAction* actionWireframeSolidMesh();
+  QAction* actionWireframeAndBackMesh();
+  QAction* actionPlotOverTime();
+  QAction* actionToggleBackgroundBW();
+  QAction* actionPlotDEBUG();
+  QAction* actionHoverGlobalVarVsTimeLabel();
 
   /// Convenience function for getting the current server.
-  pqServer *getActiveServer();
+  pqServer* getActiveServer();
 
   /// Convenience function for getting the main window.
-  QWidget *getMainWindow();
+  QWidget* getMainWindow();
 
   /// Get the window used for viewing the mesh.
-  pqView *getMeshView();
+  pqView* getMeshView();
 
   /// Get the window used for viewing plots.
-  pqView *getPlotView();
+  pqView* getPlotView();
 
   /// Get the reader objects.  Returns NULL if that reader was never created.
-  pqPipelineSource *getMeshReader();
-  pqPipelineSource *getParticlesReader();
+  pqPipelineSource* getMeshReader();
+  pqPipelineSource* getParticlesReader();
 
   /// Get plotting object.  Returns NULL if that object was never created.
-  pqPipelineSource *getPlotFilter();
+  pqPipelineSource* getPlotFilter();
 
   /// Get plotting object.  Returns NULL if that object was never created.
-  pqPipelineSource *getGlobalVariablesPlotOverTimeFilter();
+  pqPipelineSource* getGlobalVariablesPlotOverTimeFilter();
 
   /// Get plotting object.  Returns NULL if that object was never created.
-  pqPipelineSource *getSelectionPlotOverTimeFilter();
+  pqPipelineSource* getSelectionPlotOverTimeFilter();
 
   /// Convenience function for destroying a pipeline object and all of its
   /// consumers.
-  static void destroyPipelineSourceAndConsumers(pqPipelineSource *source);
+  static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
 signals:
   void createdPlotGUI();
@@ -110,25 +111,24 @@ protected:
 
   /// Finds a pipeline source with the given SM XML name.  If there is more than
   /// one, the first is returned.
-  virtual pqPipelineSource *findPipelineSource(const char *SMName);
+  virtual pqPipelineSource* findPipelineSource(const char* SMName);
 
   /// Finds a view appropriate for the data of the source and port given,
   /// constrained to those views with the given type.
-  virtual pqView *findView(pqPipelineSource *source, int port,
-                           const QString &viewType);
+  virtual pqView* findView(pqPipelineSource* source, int port, const QString& viewType);
 
   virtual bool setupGUIForVars();
 
   virtual void setupPlotMenu();
-  virtual void showPlotGUI(pqPlotVariablesDialog *);
+  virtual void showPlotGUI(pqPlotVariablesDialog*);
 
 private:
-  pqSierraPlotToolsManager(QObject *p);
+  pqSierraPlotToolsManager(QObject* p);
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 
   Q_DISABLE_COPY(pqSierraPlotToolsManager)
 };
 
-#endif //pqSierraPlotToolsManager_h
+#endif // pqSierraPlotToolsManager_h

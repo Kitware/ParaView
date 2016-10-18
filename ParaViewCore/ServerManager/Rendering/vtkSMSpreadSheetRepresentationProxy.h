@@ -26,12 +26,12 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSpreadSheetRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSpreadSheetRepresentationProxy
+  : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMSpreadSheetRepresentationProxy* New();
-  vtkTypeMacro(vtkSMSpreadSheetRepresentationProxy,
-    vtkSMRepresentationProxy);
+  vtkTypeMacro(vtkSMSpreadSheetRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
@@ -46,10 +46,9 @@ protected:
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
 private:
-  vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSpreadSheetRepresentationProxy(
+    const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

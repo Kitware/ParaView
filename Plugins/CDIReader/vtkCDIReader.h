@@ -41,9 +41,9 @@
 #define MAX_VAR_NAME 100
 
 #ifdef __linux__
-    //linux code goes here
+// linux code goes here
 #elif _WIN32
-    #define  VTKIONETCDF_EXPORT __declspec(dllexport)
+#define VTKIONETCDF_EXPORT __declspec(dllexport)
 #endif
 
 #include "vtkIONetCDFModule.h"
@@ -104,8 +104,8 @@ struct point_with_index
 class VTKIONETCDF_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkCDIReader *New();
-  vtkTypeMacro(vtkCDIReader,vtkUnstructuredGridAlgorithm);
+  static vtkCDIReader* New();
+  vtkTypeMacro(vtkCDIReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetStringMacro(FileName);
@@ -115,22 +115,22 @@ public:
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
 
-  vtkUnstructuredGrid *GetOutput();
-  vtkUnstructuredGrid *GetOutput(int index);
+  vtkUnstructuredGrid* GetOutput();
+  vtkUnstructuredGrid* GetOutput(int index);
 
-  vtkStringArray *VariableDimensions;
-  vtkStringArray *AllDimensions;
+  vtkStringArray* VariableDimensions;
+  vtkStringArray* AllDimensions;
   vtkSmartPointer<vtkIntArray> LoadingDimensions;
-  void SetDimensions(const char *dimensions);
-  vtkStringArray *GetAllVariableArrayNames();
+  void SetDimensions(const char* dimensions);
+  vtkStringArray* GetAllVariableArrayNames();
   vtkSmartPointer<vtkStringArray> AllVariableArrayNames;
   vtkGetObjectMacro(AllDimensions, vtkStringArray);
   vtkGetObjectMacro(VariableDimensions, vtkStringArray);
 
-  int GetNumberOfVariableArrays() {return GetNumberOfCellArrays();};
-  const char *GetVariableArrayName(int idx) {return GetCellArrayName(idx);};
-  int GetVariableArrayStatus(const char *name) {return GetCellArrayStatus(name);};
-  void SetVariableArrayStatus(const char *name, int status) {SetCellArrayStatus(name, status);};
+  int GetNumberOfVariableArrays() { return GetNumberOfCellArrays(); };
+  const char* GetVariableArrayName(int idx) { return GetCellArrayName(idx); };
+  int GetVariableArrayStatus(const char* name) { return GetCellArrayStatus(name); };
+  void SetVariableArrayStatus(const char* name, int status) { SetCellArrayStatus(name, status); };
 
   int GetNumberOfPointArrays();
   const char* GetPointArrayName(int index);
@@ -153,9 +153,9 @@ public:
   void DisableAllDomainArrays();
   void EnableAllDomainArrays();
 
-  int getNumberOfDomains() {return NumberOfDomains;};
-  int getNumberOfDomainsVars() {return NumberOfDomainVars;};
-  bool SupportDomainData() {return (haveDomainData && haveDomainVariable);};
+  int getNumberOfDomains() { return NumberOfDomains; };
+  int getNumberOfDomainsVars() { return NumberOfDomainVars; };
+  bool SupportDomainData() { return (haveDomainData && haveDomainVariable); };
 
   void SetVerticalLevel(int level);
   vtkGetVector2Macro(VerticalLevelRange, int);
@@ -213,10 +213,11 @@ protected:
   int ConstructGridGeometry();
   int MirrorMesh();
   bool BuildDomainCellVars();
-  void Remove_Duplicates(double * PointLon, double * PointLat, int temp_nbr_vertices, int * vertexID, int * nbr_cells);
+  void Remove_Duplicates(
+    double* PointLon, double* PointLat, int temp_nbr_vertices, int* vertexID, int* nbr_cells);
   void cellMask(const char* arg1);
 
-  char *FileName;
+  char* FileName;
   vtkStdString* VariableName;
   int* VariableType;
   int NumberOfTimeSteps;
@@ -224,9 +225,10 @@ protected:
   double DTime;
 
   vtkCallbackCommand* SelectionObserver;
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  static void SelectionCallback(vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  static void SelectionCallback(
+    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
   bool InfoRequested;
   bool DataRequested;
@@ -235,9 +237,9 @@ protected:
   vtkDataArraySelection* CellDataArraySelection;
   vtkDataArraySelection* DomainDataArraySelection;
 
-  vtkDoubleArray** CellVarDataArray;    // Actual data arrays
-  vtkDoubleArray** PointVarDataArray;   // Actual data arrays
-  vtkDoubleArray** DomainVarDataArray;   // Actual data arrays
+  vtkDoubleArray** CellVarDataArray;   // Actual data arrays
+  vtkDoubleArray** PointVarDataArray;  // Actual data arrays
+  vtkDoubleArray** DomainVarDataArray; // Actual data arrays
 
   int VerticalLevelSelected;
   int VerticalLevelRange[2];
@@ -270,28 +272,28 @@ protected:
   int NumberOfTriangles;
   int NumberOfDomains;
   int PointsPerCell;
-  int CurrentExtraPoint;  	// current extra point
-  int CurrentExtraCell;   	// current extra  cell
+  int CurrentExtraPoint; // current extra point
+  int CurrentExtraCell;  // current extra  cell
   bool reconstruct_new;
 
   double* clon_vertices;
   double* clat_vertices;
   double* depth_var;
-  double* PointX;      		// x coord of point
-  double* PointY;      		// y coord of point
-  double* PointZ;      		// z coord of point
+  double* PointX; // x coord of point
+  double* PointY; // y coord of point
+  double* PointZ; // z coord of point
   int ModNumPoints;
   int ModNumCells;
-  int* OrigConnections;   	// original connections
-  int* ModConnections;    	// modified connections
-  int* CellMap;           	// maps from added cell to original cell #
+  int* OrigConnections; // original connections
+  int* ModConnections;  // modified connections
+  int* CellMap;         // maps from added cell to original cell #
   int* CellMask;
-  int* DomainMask;		// in which line is which domain variable
-  double* DomainCellVar;		// in which line is which domain variable
-  int* PointMap;          	// maps from added point to original point #
-  int* MaximumLevelPoint;       //
-  int MaximumCells;           	// max cells
-  int MaximumPoints;          	// max points
+  int* DomainMask;        // in which line is which domain variable
+  double* DomainCellVar;  // in which line is which domain variable
+  int* PointMap;          // maps from added point to original point #
+  int* MaximumLevelPoint; //
+  int MaximumCells;       // max cells
+  int MaximumPoints;      // max points
 
   // vars
   int NumberOfCellVars;
@@ -311,8 +313,7 @@ private:
   vtkCDIReader(const vtkCDIReader&);
   void operator=(const vtkCDIReader&);
   class Internal;
-  Internal *Internals;
-
+  Internal* Internals;
 };
 
 #endif

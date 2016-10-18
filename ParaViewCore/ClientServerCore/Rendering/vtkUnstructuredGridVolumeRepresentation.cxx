@@ -44,12 +44,10 @@
 class vtkUnstructuredGridVolumeRepresentation::vtkInternals
 {
 public:
-  typedef std::map<std::string,
-          vtkSmartPointer<vtkUnstructuredGridVolumeMapper> > MapOfMappers;
+  typedef std::map<std::string, vtkSmartPointer<vtkUnstructuredGridVolumeMapper> > MapOfMappers;
   MapOfMappers Mappers;
   std::string ActiveVolumeMapper;
 };
-
 
 vtkStandardNewMacro(vtkUnstructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
@@ -105,26 +103,24 @@ void vtkUnstructuredGridVolumeRepresentation::AddVolumeMapper(
 }
 
 //----------------------------------------------------------------------------
-void vtkUnstructuredGridVolumeRepresentation::SetActiveVolumeMapper(
-  const char* mapper)
+void vtkUnstructuredGridVolumeRepresentation::SetActiveVolumeMapper(const char* mapper)
 {
-  this->Internals->ActiveVolumeMapper = mapper? mapper : "";
+  this->Internals->ActiveVolumeMapper = mapper ? mapper : "";
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
-vtkUnstructuredGridVolumeMapper*
-vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
+vtkUnstructuredGridVolumeMapper* vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
 {
   if (this->Internals->ActiveVolumeMapper != "")
-    {
+  {
     vtkInternals::MapOfMappers::iterator iter =
       this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
     if (iter != this->Internals->Mappers.end() && iter->second.GetPointer())
-      {
+    {
       return iter->second.GetPointer();
-      }
     }
+  }
 
   return this->DefaultMapper;
 }
@@ -133,16 +129,15 @@ vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
 void vtkUnstructuredGridVolumeRepresentation::MarkModified()
 {
   if (!this->GetUseCache())
-    {
+  {
     // Cleanup caches when not using cache.
     this->CacheKeeper->RemoveAllCaches();
-    }
+  }
   this->Superclass::MarkModified();
 }
 
 //----------------------------------------------------------------------------
-int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(
-  int, vtkInformation* info)
+int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGridBase");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
@@ -151,8 +146,8 @@ int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkUnstructuredGridVolumeRepresentation::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
 
@@ -160,28 +155,26 @@ int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
-    this->Preprocessor->SetInputConnection(
-      this->GetInternalOutputPort());
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+  {
+    this->Preprocessor->SetInputConnection(this->GetInternalOutputPort());
 
     this->Preprocessor->Update();
     this->CacheKeeper->Update();
 
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(
-      this->CacheKeeper->GetOutputDataObject(0));
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
     if (ds)
-      {
-      ds->GetBounds(this->DataBounds);
-      }
-    }
-  else
     {
+      ds->GetBounds(this->DataBounds);
+    }
+  }
+  else
+  {
     this->Preprocessor->RemoveAllInputs();
     vtkNew<vtkUnstructuredGrid> placeholder;
     this->Preprocessor->SetInputData(0, placeholder.GetPointer());
     this->CacheKeeper->Update();
-    }
+  }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -194,69 +187,62 @@ bool vtkUnstructuredGridVolumeRepresentation::IsCached(double cache_key)
 
 //----------------------------------------------------------------------------
 int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type,
-  vtkInformation* inInfo, vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
+  {
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
-    vtkPVRenderView::SetPiece(inInfo, this,
-      this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
 
-    if(this->UseDataPartitions == true)
-      {
+    if (this->UseDataPartitions == true)
+    {
       // Pass partitioning information to the render view.
-      vtkPVRenderView::SetOrderedCompositingInformation(
-        inInfo, this->DataBounds);
-      }
+      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this->DataBounds);
+    }
     else
-      {
+    {
       vtkPVRenderView::MarkAsRedistributable(inInfo, this);
-      }
+    }
 
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
 
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds,
-      matrix.GetPointer());
-    }
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds, matrix.GetPointer());
+  }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
-    {
+  {
     this->LODGeometryFilter->SetUseOutline(
-      inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD())? 1 : 0);
+      inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()) ? 1 : 0);
     this->LODGeometryFilter->Update();
-    vtkPVRenderView::SetPieceLOD(inInfo, this,
-      this->LODGeometryFilter->GetOutputDataObject(0));
-    }
+    vtkPVRenderView::SetPieceLOD(inInfo, this, this->LODGeometryFilter->GetOutputDataObject(0));
+  }
   else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     if (inInfo->Has(vtkPVRenderView::USE_LOD()))
-      {
+    {
       this->Actor->SetEnableLOD(1);
-      }
+    }
     else
-      {
+    {
       this->Actor->SetEnableLOD(0);
-      }
+    }
 
-    vtkAlgorithmOutput* producerPort =
-      vtkPVRenderView::GetPieceProducer(inInfo, this);
-    vtkAlgorithmOutput* producerPortLOD =
-      vtkPVRenderView::GetPieceProducerLOD(inInfo, this);
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    vtkAlgorithmOutput* producerPortLOD = vtkPVRenderView::GetPieceProducerLOD(inInfo, this);
 
     vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
     activeMapper->SetInputConnection(producerPort);
     this->LODMapper->SetInputConnection(producerPortLOD);
 
     this->UpdateMapperParameters();
-    }
+  }
 
   return 1;
 }
@@ -266,10 +252,10 @@ bool vtkUnstructuredGridVolumeRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->AddActor(this->Actor);
     return this->Superclass::AddToView(view);
-    }
+  }
   return false;
 }
 
@@ -278,10 +264,10 @@ bool vtkUnstructuredGridVolumeRepresentation::RemoveFromView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->RemoveActor(this->Actor);
     return this->Superclass::RemoveFromView(view);
-    }
+  }
   return false;
 }
 
@@ -292,45 +278,44 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
   const char* colorArrayName = NULL;
   int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
-  vtkInformation *info = this->GetInputArrayInformation(0);
-  if (info &&
-    info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+  vtkInformation* info = this->GetInputArrayInformation(0);
+  if (info && info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
     info->Has(vtkDataObject::FIELD_NAME()))
-    {
+  {
     colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
     fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
-    }
+  }
 
   activeMapper->SelectScalarArray(colorArrayName);
   if (colorArrayName && colorArrayName[0])
-    {
+  {
     this->LODMapper->SetScalarVisibility(1);
     this->LODMapper->SelectColorArray(colorArrayName);
-    }
+  }
   else
-    {
+  {
     this->LODMapper->SetScalarVisibility(0);
     this->LODMapper->SelectColorArray(static_cast<const char*>(NULL));
-    }
+  }
 
   switch (fieldAssociation)
-    {
-  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-    activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    break;
+  {
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+      this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+      break;
 
-  case vtkDataObject::FIELD_ASSOCIATION_NONE:
-    activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
-    this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
-    break;
+    case vtkDataObject::FIELD_ASSOCIATION_NONE:
+      activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
+      this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
+      break;
 
-  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-  default:
-    activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
-    }
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    default:
+      activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+      this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+      break;
+  }
 
   this->Actor->SetMapper(activeMapper);
 }
@@ -371,7 +356,7 @@ void vtkUnstructuredGridVolumeRepresentation::SetPickable(int val)
   this->Actor->SetPickable(val);
 }
 //----------------------------------------------------------------------------
-void vtkUnstructuredGridVolumeRepresentation::SetPosition(double x , double y, double z)
+void vtkUnstructuredGridVolumeRepresentation::SetPosition(double x, double y, double z)
 {
   this->Actor->SetPosition(x, y, z);
 }
@@ -384,7 +369,7 @@ void vtkUnstructuredGridVolumeRepresentation::SetScale(double x, double y, doubl
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridVolumeRepresentation::SetVisibility(bool val)
 {
-  this->Actor->SetVisibility(val? 1 : 0);
+  this->Actor->SetVisibility(val ? 1 : 0);
   this->Superclass::SetVisibility(val);
 }
 

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -53,28 +53,26 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReaction : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
   */
-  pqReaction(QAction* parent,Qt::ConnectionType type = Qt::AutoConnection );
+  pqReaction(QAction* parent, Qt::ConnectionType type = Qt::AutoConnection);
   virtual ~pqReaction();
 
   /**
   * Provides access to the parent action.
   */
-  QAction* parentAction() const
-    {
-    return qobject_cast<QAction*>(this->parent());
-    }
+  QAction* parentAction() const { return qobject_cast<QAction*>(this->parent()); }
 
 protected slots:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered(){ }
+  virtual void onTriggered() {}
 
-  virtual void updateEnableState(){ }
+  virtual void updateEnableState() {}
   virtual void updateMasterEnableState(bool);
 
 protected:
@@ -85,5 +83,3 @@ private:
 };
 
 #endif
-
-

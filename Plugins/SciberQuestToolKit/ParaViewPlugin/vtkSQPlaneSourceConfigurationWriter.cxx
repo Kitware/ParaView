@@ -39,7 +39,7 @@ vtkStandardNewMacro(vtkSQPlaneSourceConfigurationWriter);
 //-----------------------------------------------------------------------------
 vtkSQPlaneSourceConfigurationWriter::vtkSQPlaneSourceConfigurationWriter()
 {
-  vtkStringList *propNames=vtkStringList::New();
+  vtkStringList* propNames = vtkStringList::New();
   propNames->AddString("Name");
   propNames->AddString("Origin");
   propNames->AddString("Point1");
@@ -47,7 +47,7 @@ vtkSQPlaneSourceConfigurationWriter::vtkSQPlaneSourceConfigurationWriter()
   propNames->AddString("XResolution");
   propNames->AddString("YResolution");
 
-  vtkSMNamedPropertyIterator *propIt=vtkSMNamedPropertyIterator::New();
+  vtkSMNamedPropertyIterator* propIt = vtkSMNamedPropertyIterator::New();
   propIt->SetPropertyNames(propNames);
   propNames->Delete();
   this->SetPropertyIterator(propIt);
@@ -61,11 +61,11 @@ vtkSQPlaneSourceConfigurationWriter::vtkSQPlaneSourceConfigurationWriter()
 
 //-----------------------------------------------------------------------------
 vtkSQPlaneSourceConfigurationWriter::~vtkSQPlaneSourceConfigurationWriter()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-void vtkSQPlaneSourceConfigurationWriter::SetProxy(
-      vtkSMProxy *proxy)
+void vtkSQPlaneSourceConfigurationWriter::SetProxy(vtkSMProxy* proxy)
 {
   this->vtkSMProxyConfigurationWriter::SetProxy(proxy);
   this->GetPropertyIterator()->SetProxy(proxy);
@@ -74,5 +74,5 @@ void vtkSQPlaneSourceConfigurationWriter::SetProxy(
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSourceConfigurationWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

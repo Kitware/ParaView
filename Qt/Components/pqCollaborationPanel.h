@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,8 +50,9 @@ class PQCOMPONENTS_EXPORT pqCollaborationPanel : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqCollaborationPanel(QWidget* parent=0);
+  pqCollaborationPanel(QWidget* parent = 0);
   ~pqCollaborationPanel();
 
 signals:
@@ -60,7 +61,7 @@ signals:
   * if the user is the local one, the message will be broadcasted to the
   * other clients.
   */
-  void triggerChatMessage(pqServer* server,int userId, QString& msgContent);
+  void triggerChatMessage(pqServer* server, int userId, QString& msgContent);
 
   /**
   * Emmitting this signal when user has allowed its mouse position to be
@@ -121,7 +122,6 @@ protected slots:
   void onServerChanged();
 
 protected:
-
   /**
   * Promote a new master
   */

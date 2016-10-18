@@ -33,8 +33,7 @@ public:
   virtual ~vtkPVPythonPluginInterface();
 
   virtual void GetPythonSourceList(std::vector<std::string>& modules,
-    std::vector<std::string>& sources,
-    std::vector<int> &package_flags) = 0;
+    std::vector<std::string>& sources, std::vector<int>& package_flags) = 0;
 };
 
 #endif

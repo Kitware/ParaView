@@ -22,13 +22,13 @@
 #include "vtkCoincidentTopologyResolutionPainter.h"
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 
-class VTKPOINTSPRITERENDERING_EXPORT vtkPointSpriteCoincidentTopologyResolutionPainter :
-  public vtkCoincidentTopologyResolutionPainter
+class VTKPOINTSPRITERENDERING_EXPORT vtkPointSpriteCoincidentTopologyResolutionPainter
+  : public vtkCoincidentTopologyResolutionPainter
 {
 public:
   static vtkPointSpriteCoincidentTopologyResolutionPainter* New();
-  vtkTypeMacro(vtkPointSpriteCoincidentTopologyResolutionPainter,
-    vtkCoincidentTopologyResolutionPainter);
+  vtkTypeMacro(
+    vtkPointSpriteCoincidentTopologyResolutionPainter, vtkCoincidentTopologyResolutionPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
@@ -38,14 +38,13 @@ protected:
   // Description:
   // Performs the actual rendering. Override the behavior to force
   // the PolygonOffset mode. ZShift is buggy with the point sprite raycasting.
-  virtual void RenderInternal(vtkRenderer* renderer, vtkActor* actor, 
-                              unsigned long typeflags, bool forceCompileOnly);
+  virtual void RenderInternal(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
 private:
   vtkPointSpriteCoincidentTopologyResolutionPainter(
     const vtkPointSpriteCoincidentTopologyResolutionPainter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPointSpriteCoincidentTopologyResolutionPainter&) VTK_DELETE_FUNCTION;
 };
-
 
 #endif

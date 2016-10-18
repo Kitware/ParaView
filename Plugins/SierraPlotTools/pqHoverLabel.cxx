@@ -29,8 +29,8 @@
 #include <QToolTip>
 
 ///////////////////////////////////////////////////////////////////////////////
-pqHoverLabel::pqHoverLabel(QWidget *_parent) :
-  QLabel(_parent)
+pqHoverLabel::pqHoverLabel(QWidget* _parent)
+  : QLabel(_parent)
 {
   this->setMouseTracking(true);
 }
@@ -38,44 +38,46 @@ pqHoverLabel::pqHoverLabel(QWidget *_parent) :
 // We overload the MouseMoveEvent
 //
 //
-void pqHoverLabel::mouseMoveEvent ( QMouseEvent * theEvent  )
+void pqHoverLabel::mouseMoveEvent(QMouseEvent* theEvent)
 {
   QLabel::mouseMoveEvent(theEvent);
 
-# if 0
+#if 0
   int globalX = theEvent->globalX();
   int globalY = theEvent->globalY();
   const QPoint pos = theEvent->pos();
   QPointF posF = theEvent->posF();
   int x = theEvent->x();
   int y = theEvent->y();
-# endif
+#endif
 
   QString currentToolTip;
   if (this->plotter != NULL)
-    {
+  {
     currentToolTip = plotter->getPlotterHeadingHoverText();
-    }
+  }
   else
-    {
-    currentToolTip = QString("pqHoverLabel::mouseMoveEvent: current tool tip REALLY SHOULD NOT BE HERE");;
-    }
+  {
+    currentToolTip =
+      QString("pqHoverLabel::mouseMoveEvent: current tool tip REALLY SHOULD NOT BE HERE");
+    ;
+  }
 
   QToolTip::showText(theEvent->globalPos(), currentToolTip);
 }
 
-void pqHoverLabel::setPlotter(pqPlotter * thePlotter)
+void pqHoverLabel::setPlotter(pqPlotter* thePlotter)
 {
   plotter = thePlotter;
 }
 
-bool pqHoverLabel::event ( QEvent * theEvent )
+bool pqHoverLabel::event(QEvent* theEvent)
 {
   QEvent::Type type = theEvent->type();
   if (type == QEvent::ToolTip)
-    {
+  {
     // possibly do something...
-    }
+  }
 
   return this->QLabel::event(theEvent);
 }

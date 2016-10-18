@@ -50,12 +50,12 @@ bool pqLineEditEventPlayer::playEvent(
 {
   bool retval = this->Superclass::playEvent(Object, Command, Arguments, Error);
   if (retval && !Error)
-    {
+  {
     if (pqLineEdit* object = qobject_cast<pqLineEdit*>(Object))
-      {
+    {
       object->triggerTextChangedAndEditingFinished();
-      }
     }
+  }
 
   return retval;
 }

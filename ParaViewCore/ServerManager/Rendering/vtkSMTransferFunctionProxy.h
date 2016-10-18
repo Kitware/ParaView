@@ -29,7 +29,7 @@
 
 namespace Json
 {
-  class Value;
+class Value;
 }
 
 class vtkPVArrayInformation;
@@ -46,23 +46,23 @@ public:
    * If \c extend is true (false by default), the transfer function range will
    * only be extended as needed to fit the data range.
    */
-  virtual bool RescaleTransferFunction(const double range[2], bool extend=false)
-    { return this->RescaleTransferFunction(range[0], range[1], extend); }
-  virtual bool RescaleTransferFunction(double rangeMin, double rangeMax, bool extend=false);
+  virtual bool RescaleTransferFunction(const double range[2], bool extend = false)
+  {
+    return this->RescaleTransferFunction(range[0], range[1], extend);
+  }
+  virtual bool RescaleTransferFunction(double rangeMin, double rangeMax, bool extend = false);
 
   //@{
   /**
    * Safely call RescaleTransferFunction() after casting the proxy to
    * appropriate type.
    */
-  static bool RescaleTransferFunction(vtkSMProxy* proxy,
-    double rangeMin, double rangeMax, bool extend=false);
-  static bool RescaleTransferFunction(vtkSMProxy* proxy,
-    const double range[2], bool extend=false)
-    {
-    return vtkSMTransferFunctionProxy::RescaleTransferFunction(
-      proxy, range[0], range[1], extend);
-    }
+  static bool RescaleTransferFunction(
+    vtkSMProxy* proxy, double rangeMin, double rangeMax, bool extend = false);
+  static bool RescaleTransferFunction(vtkSMProxy* proxy, const double range[2], bool extend = false)
+  {
+    return vtkSMTransferFunctionProxy::RescaleTransferFunction(proxy, range[0], range[1], extend);
+  }
   //@}
 
   //@{
@@ -71,13 +71,12 @@ public:
    * and then rescales the transfer function scalar range to exactly match the
    * combined valid scalar ranges obtained from them all.
    */
-  virtual bool RescaleTransferFunctionToDataRange(bool extend=false);
-  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, bool extend=false)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToDataRange(extend) : false;
-    }
+  virtual bool RescaleTransferFunctionToDataRange(bool extend = false);
+  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, bool extend = false)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToDataRange(extend) : false;
+  }
   //@}
 
   /**
@@ -98,21 +97,19 @@ public:
    * the control points are normalized in log-space and interpolated in
    * linear-space, useful when converting from log- to linear-mode.
    */
-  virtual bool MapControlPointsToLogSpace(bool inverse=false);
-  virtual bool MapControlPointsToLinearSpace()
-    { return this->MapControlPointsToLogSpace(true); }
+  virtual bool MapControlPointsToLogSpace(bool inverse = false);
+  virtual bool MapControlPointsToLinearSpace() { return this->MapControlPointsToLogSpace(true); }
 
   //@{
   /**
    * Safely call MapControlPointsToLogSpace() after casting the proxy to the
    * appropriate type.
    */
-  static bool MapControlPointsToLogSpace(vtkSMProxy* proxy, bool inverse=false)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->MapControlPointsToLogSpace(inverse) : false;
-    }
+  static bool MapControlPointsToLogSpace(vtkSMProxy* proxy, bool inverse = false)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->MapControlPointsToLogSpace(inverse) : false;
+  }
   //@}
 
   /**
@@ -120,9 +117,9 @@ public:
    * appropriate type.
    */
   static bool MapControlPointsToLinearSpace(vtkSMProxy* proxy)
-    {
+  {
     return vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(proxy, true);
-    }
+  }
 
   //@{
   /**
@@ -133,22 +130,20 @@ public:
    * loading of annotations since the "range" for indexed color maps is
    * described by the annotations.
    */
-  virtual bool ApplyPreset(const Json::Value& value, bool rescale=true);
-  static bool ApplyPreset(vtkSMProxy* proxy, const Json::Value& value, bool rescale=true)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->ApplyPreset(value, rescale) : false;
-    }
+  virtual bool ApplyPreset(const Json::Value& value, bool rescale = true);
+  static bool ApplyPreset(vtkSMProxy* proxy, const Json::Value& value, bool rescale = true)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ApplyPreset(value, rescale) : false;
+  }
   //@}
 
-  virtual bool ApplyPreset(const char* presetname, bool rescale=true);
-  static bool ApplyPreset(vtkSMProxy* proxy, const char* presetname, bool rescale=true)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->ApplyPreset(presetname, rescale) : false;
-    }
+  virtual bool ApplyPreset(const char* presetname, bool rescale = true);
+  static bool ApplyPreset(vtkSMProxy* proxy, const char* presetname, bool rescale = true)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ApplyPreset(presetname, rescale) : false;
+  }
 
   //@{
   /**
@@ -175,11 +170,10 @@ public:
    * type.
    */
   static bool ApplyColorMap(vtkSMProxy* proxy, const char* text)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->ApplyColorMap(text) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ApplyColorMap(text) : false;
+  }
   //@}
 
   //@{
@@ -188,11 +182,10 @@ public:
    * type.
    */
   static bool ApplyColorMap(vtkSMProxy* proxy, vtkPVXMLElement* xml)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->ApplyColorMap(xml) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ApplyColorMap(xml) : false;
+  }
   //@}
 
   /**
@@ -207,11 +200,10 @@ public:
    * type.
    */
   static bool SaveColorMap(vtkSMProxy* proxy, vtkPVXMLElement* xml)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->SaveColorMap(xml) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->SaveColorMap(xml) : false;
+  }
   //@}
 
   /**
@@ -227,11 +219,10 @@ public:
    * appropriate type.
    */
   static bool IsScalarBarVisible(vtkSMProxy* proxy, vtkSMProxy* view)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->IsScalarBarVisible(view) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->IsScalarBarVisible(view) : false;
+  }
   //@}
 
   /**
@@ -246,13 +237,11 @@ public:
    * Safely call FindScalarBarRepresentation(..) after casting the proxy to the
    * appropriate type.
    */
-  static vtkSMProxy* FindScalarBarRepresentation(
-    vtkSMProxy* proxy, vtkSMProxy* view)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->FindScalarBarRepresentation(view) : NULL;
-    }
+  static vtkSMProxy* FindScalarBarRepresentation(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->FindScalarBarRepresentation(view) : NULL;
+  }
   //@}
 
   //@{
@@ -262,13 +251,11 @@ public:
    * possible.
    */
   virtual bool UpdateScalarBarsComponentTitle(vtkPVArrayInformation* arrayInfo);
-  static bool UpdateScalarBarsComponentTitle(vtkSMProxy* proxy,
-    vtkPVArrayInformation* arrayInfo)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->UpdateScalarBarsComponentTitle(arrayInfo) : false;
-    }
+  static bool UpdateScalarBarsComponentTitle(vtkSMProxy* proxy, vtkPVArrayInformation* arrayInfo)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->UpdateScalarBarsComponentTitle(arrayInfo) : false;
+  }
   //@}
 
   //@{
@@ -279,21 +266,18 @@ public:
    */
   virtual bool ComputeDataRange(double range[2]);
   static bool ComputeDataRange(vtkSMProxy* proxy, double range[2])
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->ComputeDataRange(range) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ComputeDataRange(range) : false;
+  }
   //@}
-
 
   // Helper method to compute the active annotated values in visible
   // representations that use the transfer function.
-  virtual bool ComputeAvailableAnnotations(bool extend=false);
-  static bool ComputeAvailableAnnotations(vtkSMProxy* proxy, bool extend=false)
+  virtual bool ComputeAvailableAnnotations(bool extend = false);
+  static bool ComputeAvailableAnnotations(vtkSMProxy* proxy, bool extend = false)
   {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     return self ? self->ComputeAvailableAnnotations(extend) : false;
   }
 
@@ -304,16 +288,15 @@ public:
    * transfer function range.
    */
   virtual void ResetPropertiesToDefaults(const char* arrayName, bool preserve_range);
-  static void ResetPropertiesToDefaults(vtkSMProxy* proxy, const char* arrayName,
-                                        bool preserve_range=false)
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+  static void ResetPropertiesToDefaults(
+    vtkSMProxy* proxy, const char* arrayName, bool preserve_range = false)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     if (self)
-      {
+    {
       self->ResetPropertiesToDefaults(arrayName, preserve_range);
-      }
     }
+  }
   using Superclass::ResetPropertiesToXMLDefaults;
   //@}
 
@@ -348,11 +331,10 @@ public:
    */
   virtual bool GetRange(double range[2]);
   static bool GetRange(vtkSMProxy* proxy, double range[2])
-    {
-    vtkSMTransferFunctionProxy* self =
-      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
-    return self? self->GetRange(range) : false;
-    }
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->GetRange(range) : false;
+  }
   //@}
 
 protected:
@@ -362,7 +344,6 @@ protected:
 private:
   vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

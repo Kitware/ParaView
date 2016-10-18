@@ -16,7 +16,7 @@
  * @class   vtkCustomUnstructuredGridBuilder
  * @brief   Class for creating unstructured grids.
  *
- * Class for creating vtkUnstructuredGrids for a test driver.  The 
+ * Class for creating vtkUnstructuredGrids for a test driver.  The
  * UnstructuredGrid is built directly from a vtkUniformGrid to demonstrate
  * how to input a grid into the coprocessor.
 */
@@ -44,8 +44,7 @@ public:
    * that were returned were already built before.
    * vtkCustomUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
-                                 int & builtNewGrid);
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid);
 
   /**
    * Customized function to build UnstructuredGrid.

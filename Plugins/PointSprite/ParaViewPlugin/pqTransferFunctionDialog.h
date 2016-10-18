@@ -39,6 +39,7 @@ class pqTransferFunctionDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
   pqTransferFunctionDialog(QWidget* parent);
   ~pqTransferFunctionDialog();
@@ -46,9 +47,9 @@ public:
   pqTransferFunctionEditor* opacityEditor();
   pqTransferFunctionEditor* radiusEditor();
 
-  void  setRepresentation(pqPipelineRepresentation* repr);
+  void setRepresentation(pqPipelineRepresentation* repr);
 
-  void  show(pqTransferFunctionEditor* editor);
+  void show(pqTransferFunctionEditor* editor);
 
 private:
   class pqInternals;
@@ -58,5 +59,3 @@ private:
 };
 
 #endif
-
-

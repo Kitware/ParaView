@@ -40,14 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * pqPropertyWidget used by ParaView application. It adds logic to create some
 * of the custom widgets and decorators used by ParaView's Properties Panel.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface :
-  public QObject,
-  public pqPropertyWidgetInterface
+class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface
+  : public QObject,
+    public pqPropertyWidgetInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqPropertyWidgetInterface)
 public:
-  pqStandardPropertyWidgetInterface(QObject *p = 0);
+  pqStandardPropertyWidgetInterface(QObject* p = 0);
   virtual ~pqStandardPropertyWidgetInterface();
 
   /**
@@ -74,8 +74,7 @@ public:
   * \li \c int_mask: pqIntMaskPropertyWidget
   * \li \c filename_widget: pqFileNamePropertyWidget
   */
-  virtual pqPropertyWidget* createWidgetForProperty(
-    vtkSMProxy *proxy, vtkSMProperty *property);
+  virtual pqPropertyWidget* createWidgetForProperty(vtkSMProxy* proxy, vtkSMProperty* property);
 
   /**
   * Given a proxy and its property group, create a widget for the same, of possible.
@@ -102,7 +101,7 @@ public:
   * \li \c cinema_export_selector : pqCinemaConfiguration
   */
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
-    vtkSMProxy *proxy, vtkSMPropertyGroup *group);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* group);
 
   /**
   * Given the type of the decorator and the pqPropertyWidget that needs to be

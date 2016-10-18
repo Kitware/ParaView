@@ -38,7 +38,7 @@ class vtkIndent;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMPIMoveData : public vtkPassInputTypeAlgorithm
 {
 public:
-  static vtkMPIMoveData *New();
+  static vtkMPIMoveData* New();
   vtkTypeMacro(vtkMPIMoveData, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -68,15 +68,15 @@ public:
   void SetClientDataServerSocketController(vtkMultiProcessController*);
   vtkGetObjectMacro(ClientDataServerSocketController, vtkMultiProcessController);
   //@}
-  
+
   //@{
   /**
    * Tell the object on which client/server it resides.
    * Whether the sockets are set helps determine which servers are running.
    */
-  void SetServerToClient(){this->Server=vtkMPIMoveData::CLIENT;}
-  void SetServerToDataServer(){this->Server=vtkMPIMoveData::DATA_SERVER;}
-  void SetServerToRenderServer(){this->Server=vtkMPIMoveData::RENDER_SERVER;}
+  void SetServerToClient() { this->Server = vtkMPIMoveData::CLIENT; }
+  void SetServerToDataServer() { this->Server = vtkMPIMoveData::DATA_SERVER; }
+  void SetServerToRenderServer() { this->Server = vtkMPIMoveData::RENDER_SERVER; }
   vtkSetClampMacro(Server, int, vtkMPIMoveData::CLIENT, vtkMPIMoveData::RENDER_SERVER);
   vtkGetMacro(Server, int);
   //@}
@@ -84,11 +84,11 @@ public:
   /**
    * Specify how the data is to be redistributed.
    */
-  void SetMoveModeToPassThrough(){this->MoveMode=vtkMPIMoveData::PASS_THROUGH;}
-  void SetMoveModeToCollect(){this->MoveMode=vtkMPIMoveData::COLLECT;}
-  void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
-  vtkSetClampMacro(MoveMode, int, vtkMPIMoveData::PASS_THROUGH,
-    vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
+  void SetMoveModeToPassThrough() { this->MoveMode = vtkMPIMoveData::PASS_THROUGH; }
+  void SetMoveModeToCollect() { this->MoveMode = vtkMPIMoveData::COLLECT; }
+  void SetMoveModeToClone() { this->MoveMode = vtkMPIMoveData::CLONE; }
+  vtkSetClampMacro(
+    MoveMode, int, vtkMPIMoveData::PASS_THROUGH, vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
 
   //@{
   /**
@@ -131,24 +131,23 @@ public:
   vtkGetMacro(SkipDataServerGatherToZero, bool);
   //@}
 
-  enum MoveModes {
-    PASS_THROUGH=0,
-    COLLECT=1,
-    CLONE=2,
-    COLLECT_AND_PASS_THROUGH=3
+  enum MoveModes
+  {
+    PASS_THROUGH = 0,
+    COLLECT = 1,
+    CLONE = 2,
+    COLLECT_AND_PASS_THROUGH = 3
   };
 
 protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
 
-  virtual int RequestDataObject(vtkInformation* request, 
-                           vtkInformationVector** inputVector, 
-                           vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   vtkMultiProcessController* Controller;
   vtkMultiProcessController* ClientDataServerSocketController;
@@ -165,11 +164,11 @@ protected:
   void DataServerSendToClient(vtkDataObject* output);
   void ClientReceiveFromDataServer(vtkDataObject* output);
 
-  int        NumberOfBuffers;
+  int NumberOfBuffers;
   vtkIdType* BufferLengths;
   vtkIdType* BufferOffsets;
-  char*      Buffers;
-  vtkIdType  BufferTotalLength;
+  char* Buffers;
+  vtkIdType BufferTotalLength;
 
   void ClearBuffer();
   void MarshalDataToBuffer(vtkDataObject* data);
@@ -180,10 +179,11 @@ protected:
 
   bool SkipDataServerGatherToZero;
 
-  enum Servers {
-    CLIENT=0,
-    DATA_SERVER=1,
-    RENDER_SERVER=2
+  enum Servers
+  {
+    CLIENT = 0,
+    DATA_SERVER = 1,
+    RENDER_SERVER = 2
   };
 
   int OutputDataType;
@@ -199,4 +199,3 @@ private:
 };
 
 #endif
-

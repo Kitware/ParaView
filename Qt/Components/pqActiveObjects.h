@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -61,6 +61,7 @@ class PQCOMPONENTS_EXPORT pqActiveObjects : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * Provides access to the singleton.
@@ -90,20 +91,17 @@ public:
   /**
   * Returns the active representation.
   */
-  pqDataRepresentation* activeRepresentation() const
-    { return this->ActiveRepresentation; }
+  pqDataRepresentation* activeRepresentation() const { return this->ActiveRepresentation; }
 
   vtkSMProxySelectionModel* activeSourcesSelectionModel() const
-    {
-    return this->activeServer()?
-      this->activeServer()->activeSourcesSelectionModel() : NULL;
-    }
+  {
+    return this->activeServer() ? this->activeServer()->activeSourcesSelectionModel() : NULL;
+  }
 
   /**
   * Returns the current source selection.
   */
-  const pqProxySelection& selection() const
-    { return this->Selection; }
+  const pqProxySelection& selection() const { return this->Selection; }
 
   /**
   * Returns the proxyManager() from the active server, if any.
@@ -112,9 +110,9 @@ public:
   vtkSMSessionProxyManager* proxyManager() const;
 
 public slots:
-  void setActiveView(pqView * view);
-  void setActiveSource(pqPipelineSource * source);
-  void setActivePort(pqOutputPort * port);
+  void setActiveView(pqView* view);
+  void setActiveSource(pqPipelineSource* source);
+  void setActivePort(pqOutputPort* port);
   void setActiveServer(pqServer*);
   void onActiveServerChanged();
 
@@ -124,8 +122,7 @@ public slots:
   * etc. unless the server is different from the active server. In which case,
   * the active server is changed before the selection is updated.
   */
-  void setSelection(const pqProxySelection& selection,
-    pqServerManagerModelItem* current);
+  void setSelection(const pqProxySelection& selection, pqServerManagerModelItem* current);
 
 signals:
   /**
@@ -210,5 +207,3 @@ private:
 };
 
 #endif
-
-

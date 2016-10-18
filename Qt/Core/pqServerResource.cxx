@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,26 +46,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerResource::pqImplementation
 {
 public:
-  pqImplementation() :
-    Port(-1),
-    DataServerPort(-1),
-    RenderServerPort(-1)
+  pqImplementation()
+    : Port(-1)
+    , DataServerPort(-1)
+    , RenderServerPort(-1)
   {
   }
-  
-  pqImplementation(const QString& rhs, const pqServerConfiguration& config=pqServerConfiguration()) :
-    Port(-1),
-    DataServerPort(-1),
-    RenderServerPort(-1),
-    Configuration(config)
+
+  pqImplementation(
+    const QString& rhs, const pqServerConfiguration& config = pqServerConfiguration())
+    : Port(-1)
+    , DataServerPort(-1)
+    , RenderServerPort(-1)
+    , Configuration(config)
   {
     QStringList strings = rhs.split(";");
 
     QUrl temp(strings[0]);
     this->Scheme = temp.scheme();
-    
-    if(this->Scheme == "cdsrs" || this->Scheme == "cdsrsrc")
-      {
+
+    if (this->Scheme == "cdsrs" || this->Scheme == "cdsrsrc")
+    {
       this->DataServerHost = temp.host();
       this->DataServerPort = temp.port();
 
@@ -73,93 +74,86 @@ public:
       // is separated by a "/" while the code looks for "//". Updating the
       // regular expressions so that both cases are handled.
       QRegExp render_server_host("//?([^:/]*)");
-      if(0 == render_server_host.indexIn(temp.path()))
-        {
+      if (0 == render_server_host.indexIn(temp.path()))
+      {
         this->RenderServerHost = render_server_host.cap(1);
-        }
+      }
 
       QRegExp render_server_port("//?[^:]*:([^/]*)");
-      if(0 == render_server_port.indexIn(temp.path()))
-        {
+      if (0 == render_server_port.indexIn(temp.path()))
+      {
         bool ok = false;
         const int port = render_server_port.cap(1).toInt(&ok);
-        if(ok)
+        if (ok)
           this->RenderServerPort = port;
-        }
+      }
 
       QRegExp path("(//[^/]*)(.*)");
-      if(0 == path.indexIn(temp.path()))
-        {
-        this->Path = path.cap(2);
-        }
-      }
-    else if(this->Scheme == "session")
+      if (0 == path.indexIn(temp.path()))
       {
+        this->Path = path.cap(2);
+      }
+    }
+    else if (this->Scheme == "session")
+    {
       this->Path = temp.path();
       this->SessionServer = temp.fragment();
-      }
+    }
     else
-      {
+    {
       this->Host = temp.host();
       this->Port = temp.port();
       this->Path = temp.path();
-      }
-
-  if(this->Path.size() > 2 && this->Path[0] == '/' && this->Path[2] == ':')
-    {
-    this->Path = this->Path.mid(1);
-    }
-    
-  if(this->Path.size() > 1 && this->Path[1] == ':')
-    {
-    this->Path = QDir::toNativeSeparators(this->Path);
     }
 
-  strings.removeFirst();
-  foreach(QString str, strings)
+    if (this->Path.size() > 2 && this->Path[0] == '/' && this->Path[2] == ':')
     {
-    QStringList data = str.split(":");
-    this->ExtraData[data[0]] = data[1];
+      this->Path = this->Path.mid(1);
+    }
+
+    if (this->Path.size() > 1 && this->Path[1] == ':')
+    {
+      this->Path = QDir::toNativeSeparators(this->Path);
+    }
+
+    strings.removeFirst();
+    foreach (QString str, strings)
+    {
+      QStringList data = str.split(":");
+      this->ExtraData[data[0]] = data[1];
     }
   }
 
   bool operator==(const pqImplementation& rhs)
   {
-    return this->Scheme == rhs.Scheme
-      && this->Host == rhs.Host
-      && this->Port == rhs.Port
-      && this->DataServerHost == rhs.DataServerHost
-      && this->DataServerPort == rhs.DataServerPort
-      && this->RenderServerHost == rhs.RenderServerHost
-      && this->RenderServerPort == rhs.RenderServerPort
-      && this->Path == rhs.Path
-      && this->SessionServer == rhs.SessionServer;
+    return this->Scheme == rhs.Scheme && this->Host == rhs.Host && this->Port == rhs.Port &&
+      this->DataServerHost == rhs.DataServerHost && this->DataServerPort == rhs.DataServerPort &&
+      this->RenderServerHost == rhs.RenderServerHost &&
+      this->RenderServerPort == rhs.RenderServerPort && this->Path == rhs.Path &&
+      this->SessionServer == rhs.SessionServer;
   }
-  
-  bool operator!=(const pqImplementation& rhs)
-  {
-    return !(*this == rhs);
-  }
-  
+
+  bool operator!=(const pqImplementation& rhs) { return !(*this == rhs); }
+
   bool operator<(const pqImplementation& rhs)
   {
-    if(this->Scheme != rhs.Scheme)
+    if (this->Scheme != rhs.Scheme)
       return this->Scheme < rhs.Scheme;
-    if(this->Host != rhs.Host)
+    if (this->Host != rhs.Host)
       return this->Host < rhs.Host;
-    if(this->Port != rhs.Port)
+    if (this->Port != rhs.Port)
       return this->Port < rhs.Port;
-    if(this->DataServerHost != rhs.DataServerHost)
+    if (this->DataServerHost != rhs.DataServerHost)
       return this->DataServerHost < rhs.DataServerHost;
-    if(this->DataServerPort != rhs.DataServerPort)
+    if (this->DataServerPort != rhs.DataServerPort)
       return this->DataServerPort < rhs.DataServerPort;
-    if(this->RenderServerHost != rhs.RenderServerHost)
+    if (this->RenderServerHost != rhs.RenderServerHost)
       return this->RenderServerHost < rhs.RenderServerHost;
-    if(this->RenderServerPort != rhs.RenderServerPort)
+    if (this->RenderServerPort != rhs.RenderServerPort)
       return this->RenderServerPort < rhs.RenderServerPort;
-    if(this->Path != rhs.Path)
+    if (this->Path != rhs.Path)
       return this->Path < rhs.Path;
-      
+
     return this->SessionServer < rhs.SessionServer;
   }
 
@@ -176,34 +170,33 @@ public:
   pqServerConfiguration Configuration;
 };
 
-pqServerResource::pqServerResource() :
-  Implementation(new pqImplementation())
+pqServerResource::pqServerResource()
+  : Implementation(new pqImplementation())
 {
 }
 
-pqServerResource::pqServerResource(const QString& rhs) :
-  Implementation(new pqImplementation(rhs))
+pqServerResource::pqServerResource(const QString& rhs)
+  : Implementation(new pqImplementation(rhs))
 {
 }
 
-pqServerResource::pqServerResource(
-  const QString& rhs, const pqServerConfiguration& config) :
-  Implementation(new pqImplementation(rhs, config))
+pqServerResource::pqServerResource(const QString& rhs, const pqServerConfiguration& config)
+  : Implementation(new pqImplementation(rhs, config))
 {
 }
 
-pqServerResource::pqServerResource(const pqServerResource& rhs) :
-  Implementation(new pqImplementation(*rhs.Implementation))
+pqServerResource::pqServerResource(const pqServerResource& rhs)
+  : Implementation(new pqImplementation(*rhs.Implementation))
 {
 }
 
 pqServerResource& pqServerResource::operator=(const pqServerResource& rhs)
 {
-  if(this != &rhs)
-    {
+  if (this != &rhs)
+  {
     *this->Implementation = *rhs.Implementation;
-    }
-    
+  }
+
   return *this;
 }
 
@@ -216,51 +209,49 @@ const QString pqServerResource::toURI() const
 {
   QString result;
   result += this->Implementation->Scheme + ":";
-  
-  if(this->Implementation->Scheme == "builtin")
-    {
-    }
-  else if(this->Implementation->Scheme == "cs" ||
-    this->Implementation->Scheme == "csrc")
-    {
+
+  if (this->Implementation->Scheme == "builtin")
+  {
+  }
+  else if (this->Implementation->Scheme == "cs" || this->Implementation->Scheme == "csrc")
+  {
     result += "//" + this->Implementation->Host;
-    if(-1 != this->Implementation->Port)
-      {
+    if (-1 != this->Implementation->Port)
+    {
       result += ":" + QString::number(this->Implementation->Port);
-      }
     }
-  else if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  }
+  else if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     result += "//" + this->Implementation->DataServerHost;
-    if(-1 != this->Implementation->DataServerPort)
-      {
+    if (-1 != this->Implementation->DataServerPort)
+    {
       result += ":" + QString::number(this->Implementation->DataServerPort);
-      }
+    }
     result += "//" + this->Implementation->RenderServerHost;
-    if(-1 != this->Implementation->RenderServerPort)
-      {
+    if (-1 != this->Implementation->RenderServerPort)
+    {
       result += ":" + QString::number(this->Implementation->RenderServerPort);
-      }
     }
-  else if(this->Implementation->Scheme == "session")
+  }
+  else if (this->Implementation->Scheme == "session")
+  {
+  }
+
+  if (!this->Implementation->Path.isEmpty())
+  {
+    if (this->Implementation->Path[0] != '/')
     {
-    }
-    
-  if(!this->Implementation->Path.isEmpty())
-    {
-    if(this->Implementation->Path[0] != '/')
-      {
       result += "/";
-      }
-      result += this->Implementation->Path;
     }
-    
-  if(!this->Implementation->SessionServer.isEmpty())
-    {
+    result += this->Implementation->Path;
+  }
+
+  if (!this->Implementation->SessionServer.isEmpty())
+  {
     result += "#" + this->Implementation->SessionServer;
-    }
-    
+  }
+
   return result;
 }
 
@@ -276,181 +267,166 @@ void pqServerResource::setScheme(const QString& rhs)
 
 const QString pqServerResource::host() const
 {
-  if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     return "";
-    }
-    
+  }
+
   return this->Implementation->Host;
 }
 
 void pqServerResource::setHost(const QString& rhs)
 {
-  if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     return;
-    }
-    
+  }
+
   this->Implementation->Host = rhs;
 }
 
 int pqServerResource::port() const
 {
-  if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     return -1;
-    }
-    
+  }
+
   return this->Implementation->Port;
 }
 
 int pqServerResource::port(int default_port) const
 {
-  if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     return -1;
-    }
-  
-  if(-1 == this->Implementation->Port)
-    {
+  }
+
+  if (-1 == this->Implementation->Port)
+  {
     return default_port;
-    }
-    
+  }
+
   return this->Implementation->Port;
 }
 
 void pqServerResource::setPort(int rhs)
 {
-  if(this->Implementation->Scheme == "cdsrs" ||
-    this->Implementation->Scheme == "cdsrsrc")
-    {
+  if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")
+  {
     return;
-    }
+  }
 
   this->Implementation->Port = rhs;
 }
 
 const QString pqServerResource::dataServerHost() const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return "";
-    }
-    
+  }
+
   return this->Implementation->DataServerHost;
 }
 
 void pqServerResource::setDataServerHost(const QString& rhs)
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return;
-    }
-    
+  }
+
   this->Implementation->DataServerHost = rhs;
 }
 
 int pqServerResource::dataServerPort() const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return -1;
-    }
-  
+  }
+
   return this->Implementation->DataServerPort;
 }
 
 int pqServerResource::dataServerPort(int default_port) const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return -1;
-    }
-  
-  if(-1 == this->Implementation->DataServerPort)
-    {
+  }
+
+  if (-1 == this->Implementation->DataServerPort)
+  {
     return default_port;
-    }
-  
+  }
+
   return this->Implementation->DataServerPort;
 }
 
 void pqServerResource::setDataServerPort(int rhs)
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return;
-    }
-  
+  }
+
   this->Implementation->DataServerPort = rhs;
 }
 
 const QString pqServerResource::renderServerHost() const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return "";
-    }
+  }
 
   return this->Implementation->RenderServerHost;
 }
 
 void pqServerResource::setRenderServerHost(const QString& rhs)
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return;
-    }
-    
+  }
+
   this->Implementation->RenderServerHost = rhs;
 }
 
 int pqServerResource::renderServerPort() const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return -1;
-    }
+  }
 
   return this->Implementation->RenderServerPort;
 }
 
 int pqServerResource::renderServerPort(int default_port) const
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return -1;
-    }
+  }
 
-  if(-1 == this->Implementation->RenderServerPort)
-    {
+  if (-1 == this->Implementation->RenderServerPort)
+  {
     return default_port;
-    }
-    
+  }
+
   return this->Implementation->RenderServerPort;
 }
 
 void pqServerResource::setRenderServerPort(int rhs)
 {
-  if(this->Implementation->Scheme != "cdsrs" &&
-    this->Implementation->Scheme != "cdsrsrc")
-    {
+  if (this->Implementation->Scheme != "cdsrs" && this->Implementation->Scheme != "cdsrsrc")
+  {
     return;
-    }
-  
+  }
+
   this->Implementation->RenderServerPort = rhs;
 }
 
@@ -466,28 +442,28 @@ void pqServerResource::setPath(const QString& rhs)
 
 const pqServerResource pqServerResource::sessionServer() const
 {
-  if(this->Implementation->Scheme != "session")
-    {
+  if (this->Implementation->Scheme != "session")
+  {
     return QString("");
-    }
-    
+  }
+
   return this->Implementation->SessionServer;
 }
 
 void pqServerResource::setSessionServer(const pqServerResource& rhs)
 {
-  if(this->Implementation->Scheme != "session")
-    {
+  if (this->Implementation->Scheme != "session")
+  {
     return;
-    }
-    
+  }
+
   this->Implementation->SessionServer = rhs.toURI();
 }
 
 const pqServerResource pqServerResource::schemeHostsPorts() const
 {
   pqServerResource result;
-  
+
   result.setScheme(this->Implementation->Scheme);
   result.setHost(this->Implementation->Host);
   result.setPort(this->Implementation->Port);
@@ -495,31 +471,31 @@ const pqServerResource pqServerResource::schemeHostsPorts() const
   result.setDataServerPort(this->Implementation->DataServerPort);
   result.setRenderServerHost(this->Implementation->RenderServerHost);
   result.setRenderServerPort(this->Implementation->RenderServerPort);
-  
+
   return result;
 }
 
 const pqServerResource pqServerResource::schemeHosts() const
 {
   pqServerResource result;
-  
+
   result.setScheme(this->Implementation->Scheme);
   result.setHost(this->Implementation->Host);
   result.setDataServerHost(this->Implementation->DataServerHost);
   result.setRenderServerHost(this->Implementation->RenderServerHost);
-  
+
   return result;
 }
 
 const pqServerResource pqServerResource::hostPath() const
 {
   pqServerResource result;
-  
+
   result.setHost(this->Implementation->Host);
   result.setDataServerHost(this->Implementation->DataServerHost);
   result.setRenderServerHost(this->Implementation->RenderServerHost);
   result.setPath(this->Implementation->Path);
-  
+
   return result;
 }
 
@@ -537,7 +513,7 @@ bool pqServerResource::operator<(const pqServerResource& rhs) const
 {
   return *this->Implementation < *rhs.Implementation;
 }
-  
+
 void pqServerResource::addData(const QString& key, const QString& value)
 {
   this->Implementation->ExtraData[key] = value;
@@ -550,8 +526,8 @@ const QString pqServerResource::data(const QString& key) const
 
 const QString pqServerResource::data(const QString& key, const QString& default_value) const
 {
-  return this->Implementation->ExtraData.contains(key)?
-    this->Implementation->ExtraData[key] : default_value;
+  return this->Implementation->ExtraData.contains(key) ? this->Implementation->ExtraData[key]
+                                                       : default_value;
 }
 
 bool pqServerResource::hasData(const QString& key) const
@@ -563,12 +539,11 @@ const QString pqServerResource::serializeString() const
 {
   QString uri = this->toURI();
   QMap<QString, QString>::iterator iter;
-  for(iter = this->Implementation->ExtraData.begin();
-      iter != this->Implementation->ExtraData.end();
-      ++iter)
-    {
+  for (iter = this->Implementation->ExtraData.begin();
+       iter != this->Implementation->ExtraData.end(); ++iter)
+  {
     uri += QString(";%1:%2").arg(iter.key()).arg(iter.value());
-    }
+  }
   return uri;
 }
 

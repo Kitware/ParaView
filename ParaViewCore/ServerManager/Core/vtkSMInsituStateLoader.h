@@ -43,7 +43,6 @@ protected:
 private:
   vtkSMInsituStateLoader(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

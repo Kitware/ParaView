@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPVector3FieldFunction.h"
 
-
 //----------------------------------------------------------------------------
 vtkCPVector3FieldFunction::vtkCPVector3FieldFunction()
 {

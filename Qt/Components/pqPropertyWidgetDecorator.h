@@ -48,6 +48,7 @@ class PQCOMPONENTS_EXPORT pqPropertyWidgetDecorator : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * Constructor. \c parent cannot be NULL.
@@ -72,10 +73,10 @@ public:
   * invisible given the current state.
   */
   virtual bool canShowWidget(bool show_advanced) const
-    {
+  {
     Q_UNUSED(show_advanced);
     return true;
-    }
+  }
 
   /**
   * Override this method to override the enable state of the widget in the
@@ -85,10 +86,7 @@ public:
   * Thus subclasses typically override this method only to force the widget
   * disabled given the current state.
   */
-  virtual bool enableWidget() const
-    {
-    return true;
-    }
+  virtual bool enableWidget() const { return true; }
 
 signals:
   /**
@@ -104,7 +102,7 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqPropertyWidgetDecorator)
- 
+
   vtkSmartPointer<vtkPVXMLElement> XML;
 };
 

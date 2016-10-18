@@ -42,15 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineFilter;
 class pqScalarValueListPropertyWidget;
 
-namespace Ui { class CinemaTrack; }
+namespace Ui
+{
+class CinemaTrack;
+}
 
 class PQCOMPONENTS_EXPORT pqCinemaTrack : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqCinemaTrack(
-    QWidget *parentObject, Qt::WindowFlags parentFlags, pqPipelineFilter *filter);
+  pqCinemaTrack(QWidget* parentObject, Qt::WindowFlags parentFlags, pqPipelineFilter* filter);
   ~pqCinemaTrack();
 
   bool explore() const;
@@ -59,11 +62,11 @@ public:
 
 public slots:
 
-  void setFilterName(QString const & name);
+  void setFilterName(QString const& name);
 
 private:
   Q_DISABLE_COPY(pqCinemaTrack)
   QScopedPointer<Ui::CinemaTrack> Track;
-  pqScalarValueListPropertyWidget *valsWidget;
+  pqScalarValueListPropertyWidget* valsWidget;
 };
 #endif

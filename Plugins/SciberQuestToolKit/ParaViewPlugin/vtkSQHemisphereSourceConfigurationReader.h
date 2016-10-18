@@ -50,29 +50,26 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkSQHemisphereSourceConfigurationReader : public vtkSMProxyConfigurationReader
 {
 public:
-  vtkTypeMacro(vtkSQHemisphereSourceConfigurationReader,vtkSMProxyConfigurationReader);
+  vtkTypeMacro(vtkSQHemisphereSourceConfigurationReader, vtkSMProxyConfigurationReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSQHemisphereSourceConfigurationReader *New();
-
+  static vtkSQHemisphereSourceConfigurationReader* New();
 
   // Description:
   // Read the named file, and push the properties into the underying
   // managed render view proxy. This will make sure the renderview is
   // updated after the read.
-  virtual int ReadConfiguration(const char *filename);
-  virtual int ReadConfiguration(vtkPVXMLElement *x);
+  virtual int ReadConfiguration(const char* filename);
+  virtual int ReadConfiguration(vtkPVXMLElement* x);
   // unhide
-  virtual int ReadConfiguration()
-    {
-    return this->Superclass::ReadConfiguration();
-    }
+  virtual int ReadConfiguration() { return this->Superclass::ReadConfiguration(); }
 
 protected:
   vtkSQHemisphereSourceConfigurationReader();
   virtual ~vtkSQHemisphereSourceConfigurationReader();
 
 private:
-  vtkSQHemisphereSourceConfigurationReader(const vtkSQHemisphereSourceConfigurationReader&) VTK_DELETE_FUNCTION;
+  vtkSQHemisphereSourceConfigurationReader(
+    const vtkSQHemisphereSourceConfigurationReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSQHemisphereSourceConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 

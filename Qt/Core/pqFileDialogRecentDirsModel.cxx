@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,15 +50,14 @@ Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
 //-----------------------------------------------------------------------------
 pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
-  pqFileDialogModel* fileDialogModel,
-  pqServer* server, QObject* _parent):Superclass(_parent)
+  pqFileDialogModel* fileDialogModel, pqServer* server, QObject* _parent)
+  : Superclass(_parent)
 {
   this->FileDialogModel = fileDialogModel;
 
   // We need to determine the URI for this server to get the list of recent dirs
   // from the pqSettings. If server==NULL, we use the "builtin:" resource.
-  pqServerResource resource = server? server->getResource():
-    pqServerResource("builtin:");
+  pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
   QString uri = resource.toURI();
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -66,18 +65,18 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
 
   QString key = QString("RecentDirs/%1").arg(uri);
   if (settings->contains(key))
-    {
+  {
     QStringList dirs = settings->value(key).toStringList();
     // ensure that the directories exist.
     foreach (QString dir, dirs)
-      {
+    {
       QString temp;
       if (!this->FileDialogModel || this->FileDialogModel->dirExists(dir, temp))
-        {
+      {
         this->Directories.push_back(dir);
-        }
       }
     }
+  }
   this->SettingsKey = key;
 }
 
@@ -87,9 +86,9 @@ pqFileDialogRecentDirsModel::~pqFileDialogRecentDirsModel()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
   if (settings)
-    {
+  {
     settings->setValue(this->SettingsKey, QVariant(this->Directories));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -97,9 +96,9 @@ pqFileDialogRecentDirsModel::~pqFileDialogRecentDirsModel()
 QString pqFileDialogRecentDirsModel::filePath(const QModelIndex& idx) const
 {
   if (idx.row() < this->Directories.size())
-    {
+  {
     return this->Directories[idx.row()];
-    }
+  }
   return QString();
 }
 
@@ -109,11 +108,11 @@ QVariant pqFileDialogRecentDirsModel::data(const QModelIndex& idx, int role) con
 
 {
   if (idx.isValid() && idx.row() < this->Directories.size())
-    {
+  {
     switch (role)
+    {
+      case Qt::DisplayRole:
       {
-    case Qt::DisplayRole:
-        {
         // We only return the directory name, not the full path.
         QString path = this->Directories[idx.row()];
         // We don't use QFileInfo here since it messes the paths up if the client and
@@ -123,30 +122,30 @@ QVariant pqFileDialogRecentDirsModel::data(const QModelIndex& idx, int role) con
         std::string filename;
         std::string::size_type slashPos = unix_path.rfind("/");
         if (slashPos != std::string::npos)
-          {
-          filename = unix_path.substr(slashPos+1);
-          }
-        else
-          {
-          filename = unix_path;
-          }
-        return filename.c_str();
+        {
+          filename = unix_path.substr(slashPos + 1);
         }
-
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
-      return this->Directories[idx.row()];
-
-    case Qt::DecorationRole:
-      return Icons()->icon(pqFileDialogModelIconProvider::Folder);
+        else
+        {
+          filename = unix_path;
+        }
+        return filename.c_str();
       }
+
+      case Qt::ToolTipRole:
+      case Qt::StatusTipRole:
+        return this->Directories[idx.row()];
+
+      case Qt::DecorationRole:
+        return Icons()->icon(pqFileDialogModelIconProvider::Folder);
     }
+  }
 
   return QVariant();
 }
- 
+
 //-----------------------------------------------------------------------------
-/// return the number of rows in the model 
+/// return the number of rows in the model
 int pqFileDialogRecentDirsModel::rowCount(const QModelIndex&) const
 {
   return this->Directories.size();
@@ -154,13 +153,12 @@ int pqFileDialogRecentDirsModel::rowCount(const QModelIndex&) const
 
 //-----------------------------------------------------------------------------
 /// return header data
-QVariant pqFileDialogRecentDirsModel::headerData(
-  int section, Qt::Orientation, int role) const
+QVariant pqFileDialogRecentDirsModel::headerData(int section, Qt::Orientation, int role) const
 {
   if (role == Qt::DisplayRole && section == 0)
-    {
+  {
     return tr("Recent Directories");
-    }
+  }
 
   return QVariant();
 }
@@ -169,23 +167,22 @@ QVariant pqFileDialogRecentDirsModel::headerData(
 void pqFileDialogRecentDirsModel::setChosenDir(const QString& dir)
 {
   QString temp;
-  if (!dir.isEmpty() && 
-    (!this->FileDialogModel || this->FileDialogModel->dirExists(dir, temp)))
-    {
+  if (!dir.isEmpty() && (!this->FileDialogModel || this->FileDialogModel->dirExists(dir, temp)))
+  {
     this->Directories.removeAll(dir);
     this->Directories.push_front(dir);
     // For now only 5 paths are saved in the most recent list.
     this->Directories = this->Directories.mid(0, 5);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList> &files)
+void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList>& files)
 {
   if (files.size() <= 0)
-    {
+  {
     return;
-    }
+  }
   QString filename = files[0][0];
 
   // We don't use QFileInfo here since it messes the paths up if the client and
@@ -196,9 +193,9 @@ void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList> &files
   std::string dirname;
   std::string::size_type slashPos = unix_path.rfind("/");
   if (slashPos == std::string::npos)
-    {
+  {
     return;
-    }
+  }
   dirname = unix_path.substr(0, slashPos);
   this->setChosenDir(dirname.c_str());
 }

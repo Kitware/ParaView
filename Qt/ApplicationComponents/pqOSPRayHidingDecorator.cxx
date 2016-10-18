@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
-    vtkPVXMLElement* config, pqPropertyWidget* parentObject)
+  vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
 }
@@ -51,7 +51,7 @@ bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
 #ifdef PARAVIEW_USE_OSPRAY
   return this->Superclass::canShowWidget(show_advanced);
 #else
-  (void) show_advanced;
+  (void)show_advanced;
   return false;
 #endif
 }

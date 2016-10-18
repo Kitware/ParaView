@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMDoubleVectorPropertyTest::SetNumberOfElements()
 {
-  vtkSMDoubleVectorProperty *smproperty = vtkSMDoubleVectorProperty::New();
+  vtkSMDoubleVectorProperty* smproperty = vtkSMDoubleVectorProperty::New();
   QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
   smproperty->SetNumberOfElements(4);
@@ -40,7 +40,7 @@ void vtkSMDoubleVectorPropertyTest::SetNumberOfElements()
 
 void vtkSMDoubleVectorPropertyTest::SetElement()
 {
-  vtkSMDoubleVectorProperty *smproperty = vtkSMDoubleVectorProperty::New();
+  vtkSMDoubleVectorProperty* smproperty = vtkSMDoubleVectorProperty::New();
   smproperty->SetNumberOfElements(2);
   QCOMPARE(smproperty->GetNumberOfElements(), 2U);
   QCOMPARE(smproperty->GetElement(0), 0.0);
@@ -62,9 +62,9 @@ void vtkSMDoubleVectorPropertyTest::SetElement()
 
 void vtkSMDoubleVectorPropertyTest::SetElements()
 {
-  vtkSMDoubleVectorProperty *smproperty = vtkSMDoubleVectorProperty::New();
+  vtkSMDoubleVectorProperty* smproperty = vtkSMDoubleVectorProperty::New();
 
-  double values[] = {9.5, 18.7, 27.9};
+  double values[] = { 9.5, 18.7, 27.9 };
   smproperty->SetElements(values, 3);
   QCOMPARE(smproperty->GetNumberOfElements(), 3U);
   QCOMPARE(smproperty->GetElement(0), 9.5);
@@ -76,8 +76,8 @@ void vtkSMDoubleVectorPropertyTest::SetElements()
 
 void vtkSMDoubleVectorPropertyTest::Copy()
 {
-  vtkSMDoubleVectorProperty *property1 = vtkSMDoubleVectorProperty::New();
-  vtkSMDoubleVectorProperty *property2 = vtkSMDoubleVectorProperty::New();
+  vtkSMDoubleVectorProperty* property1 = vtkSMDoubleVectorProperty::New();
+  vtkSMDoubleVectorProperty* property2 = vtkSMDoubleVectorProperty::New();
 
   property1->SetElement(0, 5.0);
   property1->SetElement(1, 10.1);

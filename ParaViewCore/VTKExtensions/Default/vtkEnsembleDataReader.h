@@ -31,9 +31,9 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkEnsembleDataReader *New();
+  static vtkEnsembleDataReader* New();
   vtkTypeMacro(vtkEnsembleDataReader, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -67,7 +67,7 @@ public:
   /**
    * Set the file reader for the specified row of data
    */
-  void SetReader(unsigned int rowIndex, vtkAlgorithm *reader);
+  void SetReader(unsigned int rowIndex, vtkAlgorithm* reader);
 
   /**
    * Removes all readers set using SetReader().
@@ -84,17 +84,16 @@ protected:
   vtkEnsembleDataReader();
   ~vtkEnsembleDataReader();
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  vtkAlgorithm *GetCurrentReader();
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  vtkAlgorithm* GetCurrentReader();
 
 private:
-  char *FileName;
+  char* FileName;
   unsigned int CurrentMember;
   unsigned int CurrentMemberRange[2];
 
   class vtkInternal;
-  vtkInternal *Internal;
+  vtkInternal* Internal;
 
   vtkEnsembleDataReader(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;

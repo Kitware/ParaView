@@ -29,7 +29,8 @@
  * Normal, and Origin is used.
  * li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
  * where maxbounds is the length of the longest axis for the bounding box.
- * li \c ARRAY_SCALED_EXTENT: the range is set to (0, (arrayMagnitude / maxbounds) * this->ScaleFactor)
+ * li \c ARRAY_SCALED_EXTENT: the range is set to (0, (arrayMagnitude / maxbounds) *
+ * this->ScaleFactor)
  * where maxbounds is the length of the longest axis for the bounding box.
  * and arrayMagnitude the maximum magnitude of the array.
  * li \c APPROXIMATE_CELL_LENGTH: approximation for cell length computed using the
@@ -46,8 +47,10 @@
  *
  * Supported XML attributes:
  * \li \c mode : used to specify the Mode. Value can be "normal", "magnitude",
- * "oriented_magnitude", "scaled_extent", "array_scaled_extent", or "approximate_cell_length", "data_bounds".
- * \li \c scale_factor : used in SCALED_EXTENT, ARRAY_SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
+ * "oriented_magnitude", "scaled_extent", "array_scaled_extent", or "approximate_cell_length",
+ * "data_bounds".
+ * \li \c scale_factor : used in SCALED_EXTENT, ARRAY_SCALED_EXTENT and APPROXIMATE_CELL_LENGTH
+ * mode.
  * Value is a floating point number that is used as the scale factor.
 */
 
@@ -124,7 +127,7 @@ protected:
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
-  
+
   vtkSMArrayRangeDomain* ArrayRangeDomain;
 };
 

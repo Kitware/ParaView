@@ -45,22 +45,23 @@ class pqVRUIConnection;
 class pqVRPNConnection;
 #endif
 
-class pqVRConnectionManager: public QObject
+class pqVRConnectionManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqVRConnectionManager(vtkVRQueue* queue, QObject* parent=0);
+  pqVRConnectionManager(vtkVRQueue* queue, QObject* parent = 0);
   virtual ~pqVRConnectionManager();
 #ifdef PARAVIEW_USE_VRPN
-  void add( pqVRPNConnection* conn );
-  void remove ( pqVRPNConnection *conn );
-  pqVRPNConnection *GetVRPNConnection(const QString &name);
+  void add(pqVRPNConnection* conn);
+  void remove(pqVRPNConnection* conn);
+  pqVRPNConnection* GetVRPNConnection(const QString& name);
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  void add( pqVRUIConnection* conn );
-  void remove ( pqVRUIConnection *conn );
-  pqVRUIConnection *GetVRUIConnection(const QString &name);
+  void add(pqVRUIConnection* conn);
+  void remove(pqVRUIConnection* conn);
+  pqVRUIConnection* GetVRUIConnection(const QString& name);
 #endif
   void clear();
 
@@ -77,10 +78,10 @@ public slots:
 
   /// Clears current connections and loads a new set of connections from the XML
   /// Configuration
-  void configureConnections( vtkPVXMLElement* xml, vtkSMProxyLocator* locator );
+  void configureConnections(vtkPVXMLElement* xml, vtkSMProxyLocator* locator);
 
   // save the connection configuration
-  void saveConnectionsConfiguration( vtkPVXMLElement* root );
+  void saveConnectionsConfiguration(vtkPVXMLElement* root);
 
 signals:
   void connectionsChanged();

@@ -43,19 +43,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMLiveInsituLinkProxy.h"
 
-
-
 //-----------------------------------------------------------------------------
-pqSetBreakpointDialog::pqSetBreakpointDialog(QWidget* Parent) :
-  QDialog(Parent),
-  Ui(new Ui::pqSetBreakpointDialog())
+pqSetBreakpointDialog::pqSetBreakpointDialog(QWidget* Parent)
+  : QDialog(Parent)
+  , Ui(new Ui::pqSetBreakpointDialog())
 {
   this->Ui->setupUi(this);
   this->setObjectName("pqSetBreakpointDialog");
-  QObject::connect(this->Ui->ButtonBox, SIGNAL(accepted()),
-                   this, SLOT(onAccepted()));
-  QObject::connect(pqLiveInsituManager::instance(), SIGNAL(timeUpdated()),
-                   this, SLOT(onTimeUpdated()));
+  QObject::connect(this->Ui->ButtonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
+  QObject::connect(
+    pqLiveInsituManager::instance(), SIGNAL(timeUpdated()), this, SLOT(onTimeUpdated()));
 }
 
 //-----------------------------------------------------------------------------
@@ -71,26 +68,26 @@ void pqSetBreakpointDialog::onAccepted()
   QString timeString = this->Ui->BreakpointTime->text();
   bool ok = false;
   if (this->Ui->buttonGroup->checkedButton() == this->Ui->radioButtonTime)
-    {
+  {
     double time = timeString.toDouble(&ok);
     if (ok && time > server->time())
-      {
+    {
       server->setBreakpoint(time);
       this->accept();
       return;
-      }
     }
+  }
   else
-    {
+  {
     // maybe vtkIdType is smaller
     vtkIdType timeStep = static_cast<vtkIdType>(timeString.toLongLong(&ok));
     if (ok && timeStep > server->timeStep())
-      {
+    {
       server->setBreakpoint(timeStep);
       this->accept();
       return;
-      }
     }
+  }
   QMessageBox message(this);
   message.setText("Breakpoint time is invalid or "
                   "it is smaller than current time");
@@ -100,11 +97,9 @@ void pqSetBreakpointDialog::onAccepted()
 //-----------------------------------------------------------------------------
 void pqSetBreakpointDialog::onTimeUpdated()
 {
-  QString timeString =
-    QString("%1").arg(pqLiveInsituManager::instance()->time());
-  this->Ui->Time->setText (timeString);
+  QString timeString = QString("%1").arg(pqLiveInsituManager::instance()->time());
+  this->Ui->Time->setText(timeString);
 
-  QString timeStepString =
-    QString("%1").arg(pqLiveInsituManager::instance()->timeStep());
-  this->Ui->TimeStep->setText (timeStepString);
+  QString timeStepString = QString("%1").arg(pqLiveInsituManager::instance()->timeStep());
+  this->Ui->TimeStep->setText(timeStepString);
 }

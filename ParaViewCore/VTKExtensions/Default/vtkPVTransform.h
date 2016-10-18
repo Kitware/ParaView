@@ -71,12 +71,11 @@ protected:
   double AbsolutePosition[3];
   double AbsoluteRotation[3];
   double AbsoluteScale[3];
-  vtkTransform *AbsoluteTransform;
+  vtkTransform* AbsoluteTransform;
 
 private:
   vtkPVTransform(const vtkPVTransform&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTransform&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

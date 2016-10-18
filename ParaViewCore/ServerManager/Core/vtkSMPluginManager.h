@@ -91,12 +91,12 @@ public:
    * remote server process(es). \c session is only used when
    * remote==true and session itself is a remote session.
    */
-  void LoadPluginConfigurationXMLFromString(const char* xmlcontents,
-    vtkSMSession* session, bool remote);
+  void LoadPluginConfigurationXMLFromString(
+    const char* xmlcontents, vtkSMSession* session, bool remote);
 
   enum
   {
-    PluginLoadedEvent       = 100000,
+    PluginLoadedEvent = 100000,
     LocalPluginLoadedEvent,
     RemotePluginLoadedEvent
   };
@@ -116,7 +116,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

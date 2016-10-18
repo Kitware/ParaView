@@ -16,7 +16,7 @@
  * @class   vtkKWAssignment
  * @brief   Manages allocation and freeing for a string list.
  *
- * A vtkStringList holds a list of strings.  
+ * A vtkStringList holds a list of strings.
  * We might be able to replace it in the future.
 */
 
@@ -26,14 +26,13 @@
 #include "vtkObject.h"
 #include "vtkPVCommonModule.h" // needed for export macro
 
-
 class VTKPVCOMMON_EXPORT vtkStringList : public vtkObject
 {
 public:
   static vtkStringList* New();
-  vtkTypeMacro(vtkStringList,vtkObject);
+  vtkTypeMacro(vtkStringList, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Add a simple string.
@@ -41,14 +40,12 @@ public:
   void AddString(const char* str);
   void AddUniqueString(const char* str);
   //@}
-  
 
   /**
    * Add a command and format it any way you like.
    */
   void AddFormattedString(const char* EventString, ...);
 
-  
   /**
    * Initialize to empty.
    */
@@ -57,32 +54,32 @@ public:
   /**
    * Random access.
    */
-  void SetString(int idx, const char *str);
+  void SetString(int idx, const char* str);
 
   /**
    * Get the length of the list.
    */
-  int GetLength() { return this->NumberOfStrings;}
+  int GetLength() { return this->NumberOfStrings; }
 
   /**
    * Get the index of a string.
    */
   int GetIndex(const char* str);
-  
+
   /**
    * Get a command from its index.
    */
-  const char *GetString(int idx);
-  
+  const char* GetString(int idx);
+
   vtkGetMacro(NumberOfStrings, int);
-  
+
 protected:
   vtkStringList();
   ~vtkStringList();
-  
+
   int NumberOfStrings;
   int StringArrayLength;
-  char **Strings;
+  char** Strings;
   void Reallocate(int num);
   void DeleteStrings();
 

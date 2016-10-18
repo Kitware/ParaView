@@ -17,7 +17,7 @@
  * @brief   list of strings
  *
  * vtkSMStringListDomain represents a domain consisting of a list of
- * strings. It only works with vtkSMStringVectorProperty. 
+ * strings. It only works with vtkSMStringVectorProperty.
  * Valid XML elements are:
  * @verbatim
  * * <String value="">
@@ -90,6 +90,7 @@ public:
    * Returns 1 if the domain updated the property.
    */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+
 protected:
   vtkSMStringListDomain();
   ~vtkSMStringListDomain();
@@ -115,7 +116,7 @@ protected:
 private:
   vtkSMStringListDomain(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
-  
+
   vtkSMStringListDomainInternals* SLInternals;
 };
 

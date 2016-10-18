@@ -48,15 +48,16 @@ class PQCORE_EXPORT pqSettings : public QSettings
 {
   Q_OBJECT
   typedef QSettings Superclass;
+
 public:
-  pqSettings(const QString& organization, const QString& application, QObject* p=NULL);
-  pqSettings(const QString& fileName, Format format, QObject* parent=NULL);
+  pqSettings(const QString& organization, const QString& application, QObject* p = NULL);
+  pqSettings(const QString& fileName, Format format, QObject* parent = NULL);
 
   /**
   * use this constructor to use a file. If temporary is true, then the file
   * will be deleted when the pqSettings object is destroyed.
   */
-  pqSettings(const QString& filename, bool temporary, QObject* parent=NULL);
+  pqSettings(const QString& filename, bool temporary, QObject* parent = NULL);
 
   void saveState(const QMainWindow& window, const QString& key);
   void saveState(const QDialog& dialog, const QString& key);
@@ -82,7 +83,6 @@ private:
   void sanityCheckDock(QDockWidget* dock_widget);
 signals:
   void modified();
-
 };
 
 #endif

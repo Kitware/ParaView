@@ -39,19 +39,19 @@ class vtkResampledAMRImageSource;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingVolumeRepresentation :
-  public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingVolumeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkAMRStreamingVolumeRepresentation* New();
   vtkTypeMacro(vtkAMRStreamingVolumeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   enum ResamplingModes
-    {
-    RESAMPLE_OVER_DATA_BOUNDS=0,
-    RESAMPLE_USING_VIEW_FRUSTUM=1
-    };
+  {
+    RESAMPLE_OVER_DATA_BOUNDS = 0,
+    RESAMPLE_USING_VIEW_FRUSTUM = 1
+  };
 
   //@{
   /**
@@ -73,8 +73,8 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -97,30 +97,28 @@ public:
   vtkGetMacro(StreamingRequestSize, int);
   //@}
 
-
   //@{
   /**
    * Set the input data arrays that this algorithm will process.
    */
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, const char *name);
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, int fieldAttributeType)
-    {
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, const char* name);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+  {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
-    }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
-    {
+  }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info)
+  {
     this->Superclass::SetInputArrayToProcess(idx, info);
-    }
+  }
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              const char* fieldAssociation,
-                              const char* attributeTypeorName)
-    {
-    this->Superclass::SetInputArrayToProcess(idx, port, connection,
-      fieldAssociation, attributeTypeorName);
-    }
+    const char* fieldAssociation, const char* attributeTypeorName)
+  {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, attributeTypeorName);
+  }
   //@}
 
   //***************************************************************************
@@ -146,7 +144,7 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
   void SetIndependantComponents(bool);
-  
+
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
@@ -179,8 +177,7 @@ protected:
    * should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
    * and the input pipeline provides necessary AMR meta-data.
    */
-  virtual int RequestInformation(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   /**
@@ -190,8 +187,7 @@ protected:
    * absence of specific block request to mean various things. It's expected
    * that read only the root block (or a few more) in that case.
    */
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   /**
@@ -199,8 +195,7 @@ protected:
    * When not in StreamingUpdate, this also initializes the priority queue since
    * the input AMR may have totally changed, including its structure.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   //@{
   /**
@@ -271,7 +266,8 @@ protected:
   int StreamingRequestSize;
 
 private:
-  vtkAMRStreamingVolumeRepresentation(const vtkAMRStreamingVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkAMRStreamingVolumeRepresentation(
+    const vtkAMRStreamingVolumeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRStreamingVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
   /**
@@ -290,7 +286,6 @@ private:
    * longer valid.
    */
   bool InStreamingUpdate;
-
 };
 
 #endif

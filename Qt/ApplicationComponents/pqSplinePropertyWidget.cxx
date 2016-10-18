@@ -50,38 +50,38 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqSplinePropertyWidget::pqSplinePropertyWidget(
-    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
-    pqSplinePropertyWidget::ModeTypes mode, QWidget* parentObject)
-  : Superclass(
-    "representations",
-    (mode == pqSplinePropertyWidget::POLYLINE?  "PolyLineWidgetRepresentation" : "SplineWidgetRepresentation"),
-    smproxy, smgroup, parentObject),
-  Internals (new pqSplinePropertyWidget::pqInternals())
+pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
+  pqSplinePropertyWidget::ModeTypes mode, QWidget* parentObject)
+  : Superclass("representations",
+      (mode == pqSplinePropertyWidget::POLYLINE ? "PolyLineWidgetRepresentation"
+                                                : "SplineWidgetRepresentation"),
+      smproxy, smgroup, parentObject)
+  , Internals(new pqSplinePropertyWidget::pqInternals())
 {
   pqInternals& internals = (*this->Internals);
-  Ui::SplinePropertyWidget &ui = internals.Ui;
+  Ui::SplinePropertyWidget& ui = internals.Ui;
   ui.setupUi(this);
 
   if (vtkSMProperty* handlePositions = smgroup->GetProperty("HandlePositions"))
-    {
+  {
     internals.PointsAdaptor = new pqSignalAdaptorTreeWidget(ui.handlePositions, true);
-    this->addPropertyLink(internals.PointsAdaptor, "values", SIGNAL(valuesChanged()), handlePositions);
-    }
+    this->addPropertyLink(
+      internals.PointsAdaptor, "values", SIGNAL(valuesChanged()), handlePositions);
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'HandlePositions'.");
-    }
+  }
 
   if (vtkSMProperty* closed = smgroup->GetProperty("Closed"))
-    {
+  {
     this->addPropertyLink(ui.closed, "checked", SIGNAL(toggled(bool)), closed);
     ui.closed->setText(closed->GetXMLLabel());
-    }
+  }
   else
-    {
+  {
     ui.closed->hide();
-    }
+  }
 
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
@@ -95,13 +95,15 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
-  this->connect(pickHelper, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
+  this->connect(
+    pickHelper, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
 
-  pqPointPickingHelper* pickHelper2 = new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
+  pqPointPickingHelper* pickHelper2 =
+    new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
-  this->connect(pickHelper2, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
-
+  this->connect(
+    pickHelper2, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +134,7 @@ void pqSplinePropertyWidget::placeWidget()
 void pqSplinePropertyWidget::addPoint()
 {
   pqInternals& internals = (*this->Internals);
-  Ui::SplinePropertyWidget &ui = internals.Ui;
+  Ui::SplinePropertyWidget& ui = internals.Ui;
 
   QTreeWidgetItem* newItem = internals.PointsAdaptor->growTable();
   QTreeWidget* tree = ui.handlePositions;
@@ -148,19 +150,19 @@ void pqSplinePropertyWidget::addPoint()
 void pqSplinePropertyWidget::removePoints()
 {
   pqInternals& internals = (*this->Internals);
-  Ui::SplinePropertyWidget &ui = internals.Ui;
+  Ui::SplinePropertyWidget& ui = internals.Ui;
 
   QList<QTreeWidgetItem*> items = ui.handlePositions->selectedItems();
   foreach (QTreeWidgetItem* item, items)
-    {
+  {
     if (ui.handlePositions->topLevelItemCount() <= 2)
-      {
+    {
       qWarning("At least two point locations are required. Deletion request ignored.");
       // don't allow deletion of the last two points.
       return;
-      }
-    delete item;
     }
+    delete item;
+  }
 
   emit this->changeAvailable();
   this->render();
@@ -171,16 +173,16 @@ void pqSplinePropertyWidget::pick(double argx, double argy, double argz)
 {
   vtkSMProxy* widget = this->widgetProxy();
   pqInternals& internals = (*this->Internals);
-  Ui::SplinePropertyWidget &ui = internals.Ui;
+  Ui::SplinePropertyWidget& ui = internals.Ui;
 
   QList<QTreeWidgetItem*> items = ui.handlePositions->selectedItems();
   if (items.size() > 0)
-    {
+  {
     QTreeWidgetItem* item = items.front();
     item->setText(0, QString("%1").arg(argx));
     item->setText(1, QString("%1").arg(argy));
     item->setText(2, QString("%1").arg(argz));
-    }
+  }
   widget->UpdateVTKObjects();
   emit this->changeAvailable();
   this->render();

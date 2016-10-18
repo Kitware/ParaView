@@ -33,7 +33,8 @@
 class vtkCamera;
 class vtkMatrix4x4;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCaveSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCaveSynchronizedRenderers
+  : public vtkSynchronizedRenderers
 {
 public:
   static vtkCaveSynchronizedRenderers* New();
@@ -69,15 +70,14 @@ protected:
 
   void DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
 
-
   /**
    * Method to update the camera.
    */
   void ComputeCamera(vtkCamera* cam);
 
   double EyeSeparation;
-  int    NumberOfDisplays;
-  double **Displays;
+  int NumberOfDisplays;
+  double** Displays;
   double DisplayOrigin[3];
   double DisplayX[3];
   double DisplayY[3];
@@ -86,7 +86,6 @@ protected:
 private:
   vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

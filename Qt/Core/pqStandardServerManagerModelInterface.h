@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,11 +53,8 @@ public:
   * Creates a pqProxy subclass for the vtkSMProxy given the details for its
   * registration with the proxy manager.
   */
-  virtual pqProxy* createPQProxy(const QString& group,
-    const QString& name, vtkSMProxy* proxy, pqServer* server) const;
-
+  virtual pqProxy* createPQProxy(
+    const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server) const;
 };
 
 #endif
-
-

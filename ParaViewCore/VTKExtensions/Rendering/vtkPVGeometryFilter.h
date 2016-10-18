@@ -50,8 +50,8 @@ class vtkOverlappingAMR;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkPVGeometryFilter *New();
-  vtkTypeMacro(vtkPVGeometryFilter,vtkDataObjectAlgorithm);
+  static vtkPVGeometryFilter* New();
+  vtkTypeMacro(vtkPVGeometryFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -145,8 +145,8 @@ public:
    * cell. This is useful for picking but it takes memory. The default is on.
    */
   void SetPassThroughCellIds(int);
-  vtkGetMacro(PassThroughCellIds,int);
-  vtkBooleanMacro(PassThroughCellIds,int);
+  vtkGetMacro(PassThroughCellIds, int);
+  vtkBooleanMacro(PassThroughCellIds, int);
   //@}
 
   //@{
@@ -156,8 +156,8 @@ public:
    * vertex. This is useful for picking but it takes memory. The default is on.
    */
   void SetPassThroughPointIds(int);
-  vtkGetMacro(PassThroughPointIds,int);
-  vtkBooleanMacro(PassThroughPointIds,int);
+  vtkGetMacro(PassThroughPointIds, int);
+  vtkBooleanMacro(PassThroughPointIds, int);
   //@}
 
   //@{
@@ -214,18 +214,13 @@ protected:
    * Overridden to create vtkMultiBlockDataSet when input is a
    * composite-dataset and vtkPolyData when input is a vtkDataSet.
    */
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
-  virtual int RequestAMRData(vtkInformation*  request,
-                             vtkInformationVector** inputVector,
-                             vtkInformationVector* outputVector );
-  virtual int RequestCompositeData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestAMRData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   //@}
 
   // Create a default executive.
@@ -236,64 +231,37 @@ protected:
    * This does not handle producing outlines. Call only when this->UseOutline ==
    * 0; \c extractface mask it is used to determine external faces.
    */
-  void ExecuteAMRBlock(vtkUniformGrid* input,
-                       vtkPolyData* output,
-                       const bool extractface[6]);
-
+  void ExecuteAMRBlock(vtkUniformGrid* input, vtkPolyData* output, const bool extractface[6]);
 
   /**
    * Used instead of ExecuteAMRBlock() when this->UseOutline is true.
    */
-  void ExecuteAMRBlockOutline(const double bounds[6],
-                              vtkPolyData* output,
-                              const bool extractface[6]);
+  void ExecuteAMRBlockOutline(
+    const double bounds[6], vtkPolyData* output, const bool extractface[6]);
 
-  void ExecuteBlock(vtkDataObject* input,
-                    vtkPolyData* output,
-                    int doCommunicate,
-                    int updatePiece,
-                    int updateNumPieces,
-                    int updateGhosts,
-                    const int* wholeExtent);
+  void ExecuteBlock(vtkDataObject* input, vtkPolyData* output, int doCommunicate, int updatePiece,
+    int updateNumPieces, int updateGhosts, const int* wholeExtent);
 
-  void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
-                      int doCommunicate);
-  void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
-                             int doCommunicate);
+  void DataSetExecute(vtkDataSet* input, vtkPolyData* output, int doCommunicate);
+  void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output, int doCommunicate);
 
-  void ImageDataExecute(vtkImageData* input,
-                        vtkPolyData* output,
-                        int doCommunicate,
-                        int updatePiece,
-                        const int* ext);
+  void ImageDataExecute(
+    vtkImageData* input, vtkPolyData* output, int doCommunicate, int updatePiece, const int* ext);
 
-  void StructuredGridExecute(
-    vtkStructuredGrid* input,
-    vtkPolyData* output,
-    int updatePiece,
-    int updateNumPieces,
-    int updateGhosts,
-    const int* wholeExtent);
+  void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output, int updatePiece,
+    int updateNumPieces, int updateGhosts, const int* wholeExtent);
 
-  void RectilinearGridExecute(
-    vtkRectilinearGrid* input,
-    vtkPolyData* output,
-    int updatePiece,
-    int updateNumPieces,
-    int updateGhosts,
-    const int* wholeExtent);
+  void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output, int updatePiece,
+    int updateNumPieces, int updateGhosts, const int* wholeExtent);
 
   void UnstructuredGridExecute(
     vtkUnstructuredGridBase* input, vtkPolyData* output, int doCommunicate);
 
-  void PolyDataExecute(
-    vtkPolyData* input, vtkPolyData* output, int doCommunicate);
+  void PolyDataExecute(vtkPolyData* input, vtkPolyData* output, int doCommunicate);
 
-  void OctreeExecute(
-    vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
+  void OctreeExecute(vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
 
-  void HyperTreeGridExecute(
-    vtkHyperTreeGrid* input, vtkPolyData* output, int doCommunicate);
+  void HyperTreeGridExecute(vtkHyperTreeGrid* input, vtkPolyData* output, int doCommunicate);
 
   /**
    * Cleans up the output polydata. If doCommunicate is true the method is free
@@ -314,11 +282,11 @@ protected:
   int NonlinearSubdivisionLevel;
 
   vtkMultiProcessController* Controller;
-  vtkOutlineSource *OutlineSource;
+  vtkOutlineSource* OutlineSource;
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
-  vtkGenericGeometryFilter *GenericGeometryFilter;
-  vtkUnstructuredGridGeometryFilter *UnstructuredGridGeometryFilter;
-  vtkPVRecoverGeometryWireframe *RecoverWireframeFilter;
+  vtkGenericGeometryFilter* GenericGeometryFilter;
+  vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
+  vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
 
   /**
    * Call CheckAttributes on the \c input which ensures that all attribute
@@ -327,9 +295,8 @@ protected:
   int CheckAttributes(vtkDataObject* input);
 
   // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
-                                               void* clientdata, void*);
-  void InternalProgressCallback(vtkAlgorithm *algorithm);
+  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void* clientdata, void*);
+  void InternalProgressCallback(vtkAlgorithm* algorithm);
   // The observer to report progress from the internal readers.
   vtkCallbackCommand* InternalProgressObserver;
 
@@ -341,10 +308,7 @@ protected:
    * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
    * don't generate internal surfaces.
    */
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
-
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Convenience method to purge ghost cells.
   void RemoveGhostCells(vtkPolyData*);
@@ -353,7 +317,7 @@ protected:
   int PassThroughCellIds;
   int PassThroughPointIds;
   int ForceUseStrips;
-  vtkTimeStamp     StripSettingMTime;
+  vtkTimeStamp StripSettingMTime;
   int StripModFirstPass;
 
   bool HideInternalAMRFaces;
@@ -375,7 +339,6 @@ private:
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
   class BoundsReductionOperation;
   //@}
-
 };
 
 #endif

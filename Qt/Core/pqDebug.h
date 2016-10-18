@@ -53,7 +53,7 @@ protected:
   bool Enabled;
 
 public:
-  pqDebugType(const QString& envVariable=QString());
+  pqDebugType(const QString& envVariable = QString());
 
   virtual ~pqDebugType();
 
@@ -62,11 +62,17 @@ public:
   virtual operator bool() const { return this->Enabled; }
 };
 
-PQCORE_EXPORT QDebug pqDebug(const pqDebugType& type=pqDebugType());
-inline QDebug pqDebug(const QString& type) { return pqDebug(pqDebugType(type)); }
+PQCORE_EXPORT QDebug pqDebug(const pqDebugType& type = pqDebugType());
+inline QDebug pqDebug(const QString& type)
+{
+  return pqDebug(pqDebugType(type));
+}
 
 #include <string>
-inline QDebug &operator<<(QDebug debug, const std::string& stdstring)
-{ debug << stdstring.c_str(); return debug.maybeSpace(); }
+inline QDebug& operator<<(QDebug debug, const std::string& stdstring)
+{
+  debug << stdstring.c_str();
+  return debug.maybeSpace();
+}
 
 #endif

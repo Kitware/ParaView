@@ -70,11 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <string>
 
-#define pqErrorMacro(estr)\
-  qDebug()\
-      << "Error in:" << endl\
-      << __FILE__ << ", line " << __LINE__ << endl\
-      << "" estr << endl;
+#define pqErrorMacro(estr)                                                                         \
+  qDebug() << "Error in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr << endl;
 
 namespace
 {
@@ -84,29 +81,28 @@ void RotateElevation(vtkCamera* camera, double angle)
 
   double scale = vtkMath::Norm(camera->GetPosition());
   if (scale <= 0.0)
-    {
+  {
     scale = vtkMath::Norm(camera->GetFocalPoint());
     if (scale <= 0.0)
-      {
+    {
       scale = 1.0;
-      }
     }
+  }
   double* temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0]/scale, temp[1]/scale, temp[2]/scale);
+  camera->SetFocalPoint(temp[0] / scale, temp[1] / scale, temp[2] / scale);
   temp = camera->GetPosition();
-  camera->SetPosition(temp[0]/scale, temp[1]/scale, temp[2]/scale);
+  camera->SetPosition(temp[0] / scale, temp[1] / scale, temp[2] / scale);
 
   double v2[3];
   // translate to center
   // we rotate around 0,0,0 rather than the center of rotation
   transform->Identity();
 
-
   // elevation
   camera->OrthogonalizeViewUp();
-  double *viewUp = camera->GetViewUp();
+  double* viewUp = camera->GetViewUp();
   vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(- angle, v2[0], v2[1], v2[2]);
+  transform->RotateWXYZ(-angle, v2[0], v2[1], v2[2]);
 
   // translate back
   // we are already at 0,0,0
@@ -116,13 +112,11 @@ void RotateElevation(vtkCamera* camera, double angle)
 
   // For rescale back.
   temp = camera->GetFocalPoint();
-  camera->SetFocalPoint(temp[0]*scale, temp[1]*scale, temp[2]*scale);
+  camera->SetFocalPoint(temp[0] * scale, temp[1] * scale, temp[2] * scale);
   temp = camera->GetPosition();
-  camera->SetPosition(temp[0]*scale, temp[1]*scale, temp[2]*scale);
+  camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
 }
 };
-
-
 
 //=============================================================================
 class pqCameraDialogInternal : public Ui::pqCameraDialog
@@ -131,17 +125,13 @@ public:
   QPointer<pqRenderView> RenderModule;
   pqPropertyLinks CameraLinks;
 
-  pqCameraDialogInternal()
-    {
-    }
-  ~pqCameraDialogInternal()
-    {
-    }
+  pqCameraDialogInternal() {}
+  ~pqCameraDialogInternal() {}
 };
 
 //-----------------------------------------------------------------------------
-pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
-  Qt::WindowFlags f/*=0*/): pqDialog(_p, f)
+pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
+  : pqDialog(_p, f)
 {
   this->Internal = new pqCameraDialogInternal;
   this->Internal->setupUi(this);
@@ -149,93 +139,70 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
   this->setUndoLabel("Camera");
 
   QObject::connect(
-    this->Internal->viewXPlus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionPosX()));
+    this->Internal->viewXPlus, SIGNAL(clicked()), this, SLOT(resetViewDirectionPosX()));
   QObject::connect(
-    this->Internal->viewXMinus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionNegX()));
+    this->Internal->viewXMinus, SIGNAL(clicked()), this, SLOT(resetViewDirectionNegX()));
   QObject::connect(
-    this->Internal->viewYPlus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionPosY()));
+    this->Internal->viewYPlus, SIGNAL(clicked()), this, SLOT(resetViewDirectionPosY()));
   QObject::connect(
-    this->Internal->viewYMinus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionNegY()));
+    this->Internal->viewYMinus, SIGNAL(clicked()), this, SLOT(resetViewDirectionNegY()));
   QObject::connect(
-    this->Internal->viewZPlus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionPosZ()));
+    this->Internal->viewZPlus, SIGNAL(clicked()), this, SLOT(resetViewDirectionPosZ()));
   QObject::connect(
-    this->Internal->viewZMinus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionNegZ()));
+    this->Internal->viewZMinus, SIGNAL(clicked()), this, SLOT(resetViewDirectionNegZ()));
+
+  QObject::connect(this->Internal->AutoResetCenterOfRotation, SIGNAL(toggled(bool)), this,
+    SLOT(resetRotationCenterWithCamera()));
+
+  QObject::connect(this->Internal->rollButton, SIGNAL(clicked()), this, SLOT(applyCameraRoll()));
+  QObject::connect(
+    this->Internal->elevationButton, SIGNAL(clicked()), this, SLOT(applyCameraElevation()));
+  QObject::connect(
+    this->Internal->azimuthButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuth()));
+
+  QObject::connect(this->Internal->saveCameraConfiguration, SIGNAL(clicked()), this,
+    SLOT(saveCameraConfiguration()));
+
+  QObject::connect(this->Internal->loadCameraConfiguration, SIGNAL(clicked()), this,
+    SLOT(loadCameraConfiguration()));
+
+  QObject::connect(this->Internal->customView0, SIGNAL(clicked()), this, SLOT(applyCustomView0()));
+
+  QObject::connect(this->Internal->customView1, SIGNAL(clicked()), this, SLOT(applyCustomView1()));
+
+  QObject::connect(this->Internal->customView2, SIGNAL(clicked()), this, SLOT(applyCustomView2()));
+
+  QObject::connect(this->Internal->customView3, SIGNAL(clicked()), this, SLOT(applyCustomView3()));
 
   QObject::connect(
-    this->Internal->AutoResetCenterOfRotation,
-    SIGNAL(toggled(bool)),
-    this, SLOT(resetRotationCenterWithCamera()));
+    this->Internal->configureCustomViews, SIGNAL(clicked()), this, SLOT(configureCustomViews()));
 
-  QObject::connect(
-    this->Internal->rollButton, SIGNAL(clicked()),
-    this, SLOT(applyCameraRoll()));
-  QObject::connect(
-    this->Internal->elevationButton, SIGNAL(clicked()),
-    this, SLOT(applyCameraElevation()));
-  QObject::connect(
-    this->Internal->azimuthButton, SIGNAL(clicked()),
-    this, SLOT(applyCameraAzimuth()));
-
-  QObject::connect(
-    this->Internal->saveCameraConfiguration, SIGNAL(clicked()),
-    this, SLOT(saveCameraConfiguration()));
-
-  QObject::connect(
-    this->Internal->loadCameraConfiguration, SIGNAL(clicked()),
-    this, SLOT(loadCameraConfiguration()));
-
-  QObject::connect(
-    this->Internal->customView0, SIGNAL(clicked()),
-    this, SLOT(applyCustomView0()));
-
-  QObject::connect(
-    this->Internal->customView1, SIGNAL(clicked()),
-    this, SLOT(applyCustomView1()));
-
-  QObject::connect(
-    this->Internal->customView2, SIGNAL(clicked()),
-    this, SLOT(applyCustomView2()));
-
-  QObject::connect(
-    this->Internal->customView3, SIGNAL(clicked()),
-    this, SLOT(applyCustomView3()));
-
-  QObject::connect(
-    this->Internal->configureCustomViews, SIGNAL(clicked()),
-    this, SLOT(configureCustomViews()));
-
-  QObject::connect(
-    this->Internal->interactiveViewLinkComboBox, SIGNAL(currentIndexChanged(int)),
+  QObject::connect(this->Internal->interactiveViewLinkComboBox, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateInteractiveViewLinkWidgets()));
 
-  QObject::connect(
-    this->Internal->interactiveViewLinkBackground, SIGNAL(toggled(bool)),
-    this, SLOT(setInteractiveViewLinkBackground(bool)));
+  QObject::connect(this->Internal->interactiveViewLinkBackground, SIGNAL(toggled(bool)), this,
+    SLOT(setInteractiveViewLinkBackground(bool)));
 
-  QObject::connect(
-    this->Internal->interactiveViewLinkOpacity, SIGNAL(valueChanged(double)),
-    this, SLOT(setInteractiveViewLinkOpacity(double)));
+  QObject::connect(this->Internal->interactiveViewLinkOpacity, SIGNAL(valueChanged(double)), this,
+    SLOT(setInteractiveViewLinkOpacity(double)));
 
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(setRenderModule(pqView*)));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
+    SLOT(setRenderModule(pqView*)));
 
   // load custom view buttons with any tool tips set by the user in a previous
   // session.
-  pqCameraDialogInternal *w=this->Internal;
-  pqSettings *settings=pqApplicationCore::instance()->settings();
+  pqCameraDialogInternal* w = this->Internal;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("ToolTips");
-  w->customView0->setToolTip(settings->value("0",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView1->setToolTip(settings->value("1",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView2->setToolTip(settings->value("2",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView3->setToolTip(settings->value("3",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView0->setToolTip(
+    settings->value("0", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView1->setToolTip(
+    settings->value("1", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView2->setToolTip(
+    settings->value("2", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView3->setToolTip(
+    settings->value("3", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
   settings->endGroup();
   settings->endGroup();
 }
@@ -251,164 +218,140 @@ void pqCameraDialog::setRenderModule(pqView* view)
 {
   pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
   if (renderView)
-    {
+  {
     this->Internal->RenderModule = renderView;
     this->setupGUI();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::setupGUI()
 {
   if (this->Internal->RenderModule)
-    {
-    vtkSMRenderViewProxy* proxy =
-      this->Internal->RenderModule->getRenderViewProxy();
+  {
+    vtkSMRenderViewProxy* proxy = this->Internal->RenderModule->getRenderViewProxy();
     proxy->SynchronizeCameraProperties();
 
-    this->Internal->position0->setValidator(
-                               new QDoubleValidator(this->Internal->position0));
-    this->Internal->position1->setValidator(
-                               new QDoubleValidator(this->Internal->position1));
-    this->Internal->position2->setValidator(
-                               new QDoubleValidator(this->Internal->position2));
+    this->Internal->position0->setValidator(new QDoubleValidator(this->Internal->position0));
+    this->Internal->position1->setValidator(new QDoubleValidator(this->Internal->position1));
+    this->Internal->position2->setValidator(new QDoubleValidator(this->Internal->position2));
 
-    this->Internal->focalPoint0->setValidator(
-                             new QDoubleValidator(this->Internal->focalPoint0));
-    this->Internal->focalPoint1->setValidator(
-                             new QDoubleValidator(this->Internal->focalPoint1));
-    this->Internal->focalPoint2->setValidator(
-                             new QDoubleValidator(this->Internal->focalPoint2));
+    this->Internal->focalPoint0->setValidator(new QDoubleValidator(this->Internal->focalPoint0));
+    this->Internal->focalPoint1->setValidator(new QDoubleValidator(this->Internal->focalPoint1));
+    this->Internal->focalPoint2->setValidator(new QDoubleValidator(this->Internal->focalPoint2));
 
-    this->Internal->viewUp0->setValidator(
-                                 new QDoubleValidator(this->Internal->viewUp0));
-    this->Internal->viewUp1->setValidator(
-                                 new QDoubleValidator(this->Internal->viewUp1));
-    this->Internal->viewUp2->setValidator(
-                                 new QDoubleValidator(this->Internal->viewUp2));
+    this->Internal->viewUp0->setValidator(new QDoubleValidator(this->Internal->viewUp0));
+    this->Internal->viewUp1->setValidator(new QDoubleValidator(this->Internal->viewUp1));
+    this->Internal->viewUp2->setValidator(new QDoubleValidator(this->Internal->viewUp2));
 
-    this->Internal->CenterX->setValidator(
-                                 new QDoubleValidator(this->Internal->CenterX));
-    this->Internal->CenterY->setValidator(
-                                 new QDoubleValidator(this->Internal->CenterY));
-    this->Internal->CenterZ->setValidator(
-                                 new QDoubleValidator(this->Internal->CenterZ));
+    this->Internal->CenterX->setValidator(new QDoubleValidator(this->Internal->CenterX));
+    this->Internal->CenterY->setValidator(new QDoubleValidator(this->Internal->CenterY));
+    this->Internal->CenterZ->setValidator(new QDoubleValidator(this->Internal->CenterZ));
 
     this->Internal->CameraLinks.removeAllPropertyLinks();
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->position0, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraPosition"), 0);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->position1, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraPosition"), 1);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->position2, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraPosition"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position0, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraPosition"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position1, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraPosition"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position2, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraPosition"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->focalPoint0, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraFocalPoint"), 0);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->focalPoint1, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraFocalPoint"), 1);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->focalPoint2, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraFocalPoint"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint0, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint1, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint2, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->viewUp0, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraViewUp"), 0);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->viewUp1, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraViewUp"), 1);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->viewUp2, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraViewUp"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp0, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp1, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp2, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->CenterX, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CenterOfRotation"), 0);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->CenterY, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CenterOfRotation"), 1);
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->CenterZ, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CenterOfRotation"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterX, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterY, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterZ, "text",
+      SIGNAL(editingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->rotationFactor, "value", SIGNAL(valueChanged(double)),
-      proxy, proxy->GetProperty("RotationFactor"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->rotationFactor, "value",
+      SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("RotationFactor"), 0);
 
-    this->Internal->CameraLinks.addPropertyLink(
-      this->Internal->viewAngle, "value", SIGNAL(valueChanged(double)),
-      proxy, proxy->GetProperty("CameraViewAngle"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewAngle, "value",
+      SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("CameraViewAngle"), 0);
 
     QObject::connect(&this->Internal->CameraLinks, SIGNAL(qtWidgetChanged()),
       this->Internal->RenderModule, SLOT(render()));
 
     this->Internal->AutoResetCenterOfRotation->setCheckState(
-      this->Internal->RenderModule->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
+      this->Internal->RenderModule->getResetCenterWithCamera() ? Qt::Checked : Qt::Unchecked);
 
     // Interactive View Link Options
     pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
     vtkNew<vtkCollection> cameraLinks;
     model->FindLinksFromProxy(proxy, vtkSMLink::INPUT, cameraLinks.Get());
-    
+
     // For each found link
     vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
     this->Internal->interactiveViewLinkComboBox->clear();
     for (int i = 0; i < cameraLinks->GetNumberOfItems(); i++)
-      {
+    {
       // check if it is a camera link
-      vtkSMCameraLink* cameraLink = vtkSMCameraLink::SafeDownCast(
-        cameraLinks->GetItemAsObject(i));
+      vtkSMCameraLink* cameraLink = vtkSMCameraLink::SafeDownCast(cameraLinks->GetItemAsObject(i));
       if (cameraLink != NULL)
-        {
+      {
         const char* linkName = pxm->GetRegisteredLinkName(cameraLink);
         if (model->hasInteractiveViewLink(linkName))
-          {
-          this->Internal->interactiveViewLinkComboBox->addItem(linkName, QVariant::fromValue(static_cast<void*>(model->getInteractiveViewLink(linkName))));
-          }
+        {
+          this->Internal->interactiveViewLinkComboBox->addItem(linkName,
+            QVariant::fromValue(static_cast<void*>(model->getInteractiveViewLink(linkName))));
         }
       }
-    if (cameraLinks->GetNumberOfItems() == 0)
-      {
-      this->updateInteractiveViewLinkWidgets();
-      }
     }
+    if (cameraLinks->GetNumberOfItems() == 0)
+    {
+      this->updateInteractiveViewLinkWidgets();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::updateInteractiveViewLinkWidgets()
 {
   if (this->Internal->interactiveViewLinkComboBox->count() == 0)
-    {
+  {
     this->Internal->interactiveViewLinkGroup->setEnabled(false);
-    }
+  }
   else
-    {
+  {
     this->Internal->interactiveViewLinkGroup->setEnabled(true);
 
     pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
-      this->Internal->interactiveViewLinkComboBox->itemData(
-        this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+      this->Internal->interactiveViewLinkComboBox
+        ->itemData(this->Internal->interactiveViewLinkComboBox->currentIndex())
+        .value<void*>());
 
     bool block = this->Internal->interactiveViewLinkOpacity->blockSignals(true);
     this->Internal->interactiveViewLinkOpacity->setValue(ivLink->getOpacity());
     this->Internal->interactiveViewLinkOpacity->blockSignals(block);
 
     block = this->Internal->interactiveViewLinkBackground->blockSignals(true);
-    this->Internal->interactiveViewLinkBackground->setChecked(ivLink->getHideLinkedViewBackground());
+    this->Internal->interactiveViewLinkBackground->setChecked(
+      ivLink->getHideLinkedViewBackground());
     this->Internal->interactiveViewLinkBackground->blockSignals(block);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::setInteractiveViewLinkOpacity(double value)
 {
   pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
-    this->Internal->interactiveViewLinkComboBox->itemData(
-      this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+    this->Internal->interactiveViewLinkComboBox
+      ->itemData(this->Internal->interactiveViewLinkComboBox->currentIndex())
+      .value<void*>());
   ivLink->setOpacity(value);
 }
 
@@ -416,8 +359,9 @@ void pqCameraDialog::setInteractiveViewLinkOpacity(double value)
 void pqCameraDialog::setInteractiveViewLinkBackground(bool hideBackground)
 {
   pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
-    this->Internal->interactiveViewLinkComboBox->itemData(
-      this->Internal->interactiveViewLinkComboBox->currentIndex()).value<void*>());
+    this->Internal->interactiveViewLinkComboBox
+      ->itemData(this->Internal->interactiveViewLinkComboBox->currentIndex())
+      .value<void*>());
   ivLink->setHideLinkedViewBackground(hideBackground);
 }
 
@@ -431,14 +375,12 @@ void pqCameraDialog::SetCameraGroupsEnabled(bool enabled)
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetViewDirection(
-    double look_x, double look_y, double look_z,
-    double up_x, double up_y, double up_z)
+  double look_x, double look_y, double look_z, double up_x, double up_y, double up_z)
 {
   if (this->Internal->RenderModule)
-    {
-    this->Internal->RenderModule->resetViewDirection(
-      look_x, look_y, look_z, up_x, up_y, up_z);
-    }
+  {
+    this->Internal->RenderModule->resetViewDirection(look_x, look_y, look_z, up_x, up_y, up_z);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -450,7 +392,6 @@ void pqCameraDialog::resetViewDirectionPosX()
 void pqCameraDialog::resetViewDirectionNegX()
 {
   this->resetViewDirection(-1, 0, 0, 0, 0, 1);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -478,124 +419,119 @@ void pqCameraDialog::resetViewDirectionNegZ()
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::adjustCamera(
-  CameraAdjustmentType enType, double angle)
+void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double angle)
 {
   if (this->Internal->RenderModule)
-    {
-    vtkSMRenderViewProxy* proxy =
-      this->Internal->RenderModule->getRenderViewProxy();
+  {
+    vtkSMRenderViewProxy* proxy = this->Internal->RenderModule->getRenderViewProxy();
     proxy->SynchronizeCameraProperties();
     vtkCamera* camera = proxy->GetActiveCamera();
     if (!camera)
-      {
+    {
       return;
-      }
-    if(enType == pqCameraDialog::Roll)
-      {
+    }
+    if (enType == pqCameraDialog::Roll)
+    {
       camera->Roll(angle);
-      }
-    else if(enType == pqCameraDialog::Elevation)
-      {
+    }
+    else if (enType == pqCameraDialog::Elevation)
+    {
       RotateElevation(camera, angle);
-      }
-    else if(enType == pqCameraDialog::Azimuth)
-      {
+    }
+    else if (enType == pqCameraDialog::Azimuth)
+    {
       camera->Azimuth(angle);
-      }
+    }
     proxy->SynchronizeCameraProperties();
     this->Internal->RenderModule->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraRoll()
 {
-  this->adjustCamera(pqCameraDialog::Roll,
-    this->Internal->rollAngle->value());
+  this->adjustCamera(pqCameraDialog::Roll, this->Internal->rollAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraElevation()
 {
-  this->adjustCamera(pqCameraDialog::Elevation,
-    this->Internal->elevationAngle->value());
+  this->adjustCamera(pqCameraDialog::Elevation, this->Internal->elevationAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraAzimuth()
 {
-  this->adjustCamera(pqCameraDialog::Azimuth,
-    this->Internal->azimuthAngle->value());
+  this->adjustCamera(pqCameraDialog::Azimuth, this->Internal->azimuthAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::resetRotationCenterWithCamera()
 {
-  if(this->Internal->RenderModule)
-    {
+  if (this->Internal->RenderModule)
+  {
     this->Internal->RenderModule->setResetCenterWithCamera(
-      this->Internal->AutoResetCenterOfRotation->checkState()==Qt::Checked);
-    }
+      this->Internal->AutoResetCenterOfRotation->checkState() == Qt::Checked);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::configureCustomViews()
 {
-  pqCameraDialogInternal *ui=this->Internal;
+  pqCameraDialogInternal* ui = this->Internal;
 
   // load the existing button configurations from the app wide settings.
   QStringList toolTips;
   QStringList configs;
 
-  pqSettings *settings;
-  settings=pqApplicationCore::instance()->settings();
+  pqSettings* settings;
+  settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
 
   settings->beginGroup("Configurations");
-  configs << settings->value("0","").toString();
-  configs << settings->value("1","").toString();
-  configs << settings->value("2","").toString();
-  configs << settings->value("3","").toString();
+  configs << settings->value("0", "").toString();
+  configs << settings->value("1", "").toString();
+  configs << settings->value("2", "").toString();
+  configs << settings->value("3", "").toString();
   settings->endGroup();
 
   settings->beginGroup("ToolTips");
-  toolTips << settings->value("0",ui->customView0->toolTip()).toString();
-  toolTips << settings->value("1",ui->customView1->toolTip()).toString();
-  toolTips << settings->value("2",ui->customView2->toolTip()).toString();
-  toolTips << settings->value("3",ui->customView3->toolTip()).toString();
+  toolTips << settings->value("0", ui->customView0->toolTip()).toString();
+  toolTips << settings->value("1", ui->customView1->toolTip()).toString();
+  toolTips << settings->value("2", ui->customView2->toolTip()).toString();
+  toolTips << settings->value("3", ui->customView3->toolTip()).toString();
   settings->endGroup();
   settings->endGroup();
 
   // grab the current camera configuration.
   std::ostringstream os;
 
-  vtkSMCameraConfigurationWriter *writer=vtkSMCameraConfigurationWriter::New();
+  vtkSMCameraConfigurationWriter* writer = vtkSMCameraConfigurationWriter::New();
   writer->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
   writer->WriteConfiguration(os);
 
   QString currentConfig(os.str().c_str());
 
   // user modifies the configuration
-  pqCustomViewButtonDialog dialog(this,0,toolTips,configs,currentConfig);
-  if (dialog.exec()==QDialog::Accepted)
-    {
+  pqCustomViewButtonDialog dialog(this, 0, toolTips, configs, currentConfig);
+  if (dialog.exec() == QDialog::Accepted)
+  {
     // save the new configuration into the app wide settings.
-    configs=dialog.getConfigurations();
+    configs = dialog.getConfigurations();
     settings->beginGroup("CustomViewButtons");
     settings->beginGroup("Configurations");
-    settings->setValue("0",configs[0]);
-    settings->setValue("1",configs[1]);
-    settings->setValue("2",configs[2]);
-    settings->setValue("3",configs[3]);
+    settings->setValue("0", configs[0]);
+    settings->setValue("1", configs[1]);
+    settings->setValue("2", configs[2]);
+    settings->setValue("3", configs[3]);
     settings->endGroup();
 
-    toolTips=dialog.getToolTips();
+    toolTips = dialog.getToolTips();
     settings->beginGroup("ToolTips");
-    settings->setValue("0",toolTips[0]);
-    settings->setValue("1",toolTips[1]);
-    settings->setValue("2",toolTips[2]);
-    settings->setValue("3",toolTips[3]);
+    settings->setValue("0", toolTips[0]);
+    settings->setValue("1", toolTips[1]);
+    settings->setValue("2", toolTips[2]);
+    settings->setValue("3", toolTips[3]);
     settings->endGroup();
     settings->endGroup();
 
@@ -603,7 +539,7 @@ void pqCameraDialog::configureCustomViews()
     ui->customView1->setToolTip(toolTips[1]);
     ui->customView2->setToolTip(toolTips[2]);
     ui->customView3->setToolTip(toolTips[3]);
-    }
+  }
 
   writer->Delete();
 }
@@ -611,70 +547,68 @@ void pqCameraDialog::configureCustomViews()
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCustomView(int buttonId)
 {
-  pqCameraDialogInternal *ui=this->Internal;
+  pqCameraDialogInternal* ui = this->Internal;
 
-  pqSettings *settings=pqApplicationCore::instance()->settings();
+  pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("Configurations");
-  QString config=settings->value(QString::number(buttonId),"").toString();
+  QString config = settings->value(QString::number(buttonId), "").toString();
   settings->endGroup();
   settings->endGroup();
 
   if (!config.isEmpty() && ui->RenderModule)
-    {
-    vtkSmartPointer<vtkPVXMLParser> parser=vtkSmartPointer<vtkPVXMLParser>::New();
+  {
+    vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
     parser->InitializeParser();
-    parser->ParseChunk(config.toLatin1().data(),static_cast<unsigned int>(config.size()));
+    parser->ParseChunk(config.toLatin1().data(), static_cast<unsigned int>(config.size()));
     parser->CleanupParser();
 
-    vtkPVXMLElement *xmlStream=parser->GetRootElement();
+    vtkPVXMLElement* xmlStream = parser->GetRootElement();
     if (!xmlStream)
-      {
+    {
       pqErrorMacro("Invalid XML in custom view button configuration.");
       return;
-      }
+    }
 
-    vtkSmartPointer<vtkSMCameraConfigurationReader> reader
-      = vtkSmartPointer<vtkSMCameraConfigurationReader>::New();
+    vtkSmartPointer<vtkSMCameraConfigurationReader> reader =
+      vtkSmartPointer<vtkSMCameraConfigurationReader>::New();
 
     reader->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
-    int ok=reader->ReadConfiguration(xmlStream);
+    int ok = reader->ReadConfiguration(xmlStream);
     if (!ok)
-      {
-      pqErrorMacro(
-          << "Invalid XML in custom view button "
-          << buttonId << " configuration.");
+    {
+      pqErrorMacro(<< "Invalid XML in custom view button " << buttonId << " configuration.");
       return;
-      }
+    }
 
     // camera configuration has been modified update the scene.
     ui->RenderModule->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::saveCameraConfiguration()
 {
-  vtkSMCameraConfigurationWriter *writer=vtkSMCameraConfigurationWriter::New();
+  vtkSMCameraConfigurationWriter* writer = vtkSMCameraConfigurationWriter::New();
   writer->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
 
-  QString filters
-    = QString("%1 (*%2);;All Files (*.*)")
-        .arg(writer->GetFileDescription()).arg(writer->GetFileExtension());
+  QString filters = QString("%1 (*%2);;All Files (*.*)")
+                      .arg(writer->GetFileDescription())
+                      .arg(writer->GetFileExtension());
 
-  pqFileDialog dialog(0,this,"Save Camera Configuration","",filters);
+  pqFileDialog dialog(0, this, "Save Camera Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
-  if (dialog.exec()==QDialog::Accepted)
-    {
+  if (dialog.exec() == QDialog::Accepted)
+  {
     QString filename(dialog.getSelectedFiles()[0]);
 
-    int ok=writer->WriteConfiguration(filename.toStdString().c_str());
+    int ok = writer->WriteConfiguration(filename.toStdString().c_str());
     if (!ok)
-      {
+    {
       pqErrorMacro("Failed to save the camera configuration.");
-      }
     }
+  }
 
   writer->Delete();
 }
@@ -682,30 +616,30 @@ void pqCameraDialog::saveCameraConfiguration()
 //-----------------------------------------------------------------------------
 void pqCameraDialog::loadCameraConfiguration()
 {
-  vtkSMCameraConfigurationReader *reader=vtkSMCameraConfigurationReader::New();
+  vtkSMCameraConfigurationReader* reader = vtkSMCameraConfigurationReader::New();
   reader->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
 
-  QString filters
-    = QString("%1 (*%2);;All Files (*.*)")
-        .arg(reader->GetFileDescription()).arg(reader->GetFileExtension());
+  QString filters = QString("%1 (*%2);;All Files (*.*)")
+                      .arg(reader->GetFileDescription())
+                      .arg(reader->GetFileExtension());
 
-  pqFileDialog dialog(0,this,"Load Camera Configuration","",filters);
+  pqFileDialog dialog(0, this, "Load Camera Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
-  if (dialog.exec()==QDialog::Accepted)
-    {
+  if (dialog.exec() == QDialog::Accepted)
+  {
     QString filename;
-    filename=dialog.getSelectedFiles()[0];
+    filename = dialog.getSelectedFiles()[0];
 
-    int ok=reader->ReadConfiguration(filename.toStdString().c_str());
+    int ok = reader->ReadConfiguration(filename.toStdString().c_str());
     if (!ok)
-      {
+    {
       pqErrorMacro("Failed to load the camera configuration.");
-      }
+    }
 
     // Update the scene with the new camera settings.
     this->Internal->RenderModule->render();
-    }
+  }
 
   reader->Delete();
 }

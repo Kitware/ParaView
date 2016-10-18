@@ -77,7 +77,6 @@ protected:
 private:
   vtkPythonAnimationCue(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

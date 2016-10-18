@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -44,17 +44,18 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqRepresentationToolbar : public QToolBar
 {
   Q_OBJECT
   typedef QToolBar Superclass;
+
 public:
-  pqRepresentationToolbar(const QString& title, QWidget* parentObject=0)
+  pqRepresentationToolbar(const QString& title, QWidget* parentObject = 0)
     : Superclass(title, parentObject)
-    {
+  {
     this->constructor();
-    }
-  pqRepresentationToolbar(QWidget* parentObject=0)
+  }
+  pqRepresentationToolbar(QWidget* parentObject = 0)
     : Superclass(parentObject)
-    {
+  {
     this->constructor();
-    }
+  }
 
 private:
   Q_DISABLE_COPY(pqRepresentationToolbar)
@@ -62,5 +63,3 @@ private:
 };
 
 #endif
-
-

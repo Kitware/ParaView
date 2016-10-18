@@ -33,14 +33,14 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 {
 public:
   static vtkXMLPVDWriter* New();
-  vtkTypeMacro(vtkXMLPVDWriter,vtkXMLWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);  
-  
+  vtkTypeMacro(vtkXMLPVDWriter, vtkXMLWriter);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
   /**
    * Get the default file extension for files written by this writer.
    */
   virtual const char* GetDefaultFileExtension();
-  
+
   //@{
   /**
    * Get/Set the piece number to write.  The same piece number is used
@@ -49,7 +49,7 @@ public:
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
   //@}
-  
+
   //@{
   /**
    * Get/Set the number of pieces into which the inputs are split.
@@ -57,7 +57,7 @@ public:
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
   //@}
-  
+
   //@{
   /**
    * Get/Set the number of ghost levels to be written for unstructured
@@ -66,11 +66,11 @@ public:
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
   //@}
-  
+
   /**
    * Add an input of this algorithm.
    */
-  void AddInputData(vtkDataObject *);
+  void AddInputData(vtkDataObject*);
 
   //@{
   /**
@@ -82,26 +82,24 @@ public:
   //@}
 
   // See the vtkAlgorithm for a desciption of what these do
-  int ProcessRequest(vtkInformation*,
-                     vtkInformationVector**,
-                     vtkInformationVector*);
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 protected:
   vtkXMLPVDWriter();
   ~vtkXMLPVDWriter();
-  
+
   // see algorithm for more info
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   // Replace vtkXMLWriter's writing driver method.
-  int RequestData(vtkInformation*  , vtkInformationVector** , vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   virtual int WriteData();
   virtual const char* GetDataSetName();
-  
+
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
   vtkXMLWriter* GetWriter(int index);
-  
+
   // Methods to help construct internal file names.
   void SplitFileName();
   const char* GetFilePrefix();
@@ -110,43 +108,43 @@ protected:
   // Methods to construct the list of entries for the collection file.
   void AppendEntry(const char* entry);
   void DeleteAllEntries();
-  
+
   // Write the collection file if it is requested.
   int WriteCollectionFileIfRequested();
-  
+
   // Make a directory.
   void MakeDirectory(const char* name);
-  
+
   // Remove a directory.
   void RemoveADirectory(const char* name);
-  
+
   // Internal implementation details.
-  vtkXMLPVDWriterInternals* Internal;  
-  
+  vtkXMLPVDWriterInternals* Internal;
+
   // The piece number to write.
   int Piece;
-  
+
   // The number of pieces into which the inputs are split.
   int NumberOfPieces;
-  
+
   // The number of ghost levels to write for unstructured data.
   int GhostLevel;
-  
+
   // Whether to write the collection file on this node.
   int WriteCollectionFile;
   int WriteCollectionFileInitialized;
-  
+
   // Callback registered with the ProgressObserver.
-  static void ProgressCallbackFunction(vtkObject*, unsigned long, void*,
-                                       void*);
+  static void ProgressCallbackFunction(vtkObject*, unsigned long, void*, void*);
   // Progress callback from internal writer.
   virtual void ProgressCallback(vtkAlgorithm* w);
-  
+
   // The observer to report progress from the internal writer.
-  vtkCallbackCommand* ProgressObserver;  
-  
+  vtkCallbackCommand* ProgressObserver;
+
   // Garbage collection support.
   virtual void ReportReferences(vtkGarbageCollector*);
+
 private:
   vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;

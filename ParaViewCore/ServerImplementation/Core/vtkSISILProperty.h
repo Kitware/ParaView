@@ -54,9 +54,8 @@ protected:
   vtkSetStringMacro(SubTree);
 
   class vtkIdTypeSet;
-  static void GetLeaves( vtkGraph *sil, vtkIdType vertexid,
-                         vtkIdTypeSet& list,
-                         bool traverse_cross_edges);
+  static void GetLeaves(
+    vtkGraph* sil, vtkIdType vertexid, vtkIdTypeSet& list, bool traverse_cross_edges);
 
 private:
   vtkSISILProperty(const vtkSISILProperty&) VTK_DELETE_FUNCTION;
@@ -64,7 +63,6 @@ private:
 
   char* SubTree;
   int OutputPort;
-
 };
 
 #endif

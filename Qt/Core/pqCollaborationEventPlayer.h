@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -45,14 +45,14 @@ class PQCORE_EXPORT pqCollaborationEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqCollaborationEventPlayer(QObject *parent=NULL);
+  pqCollaborationEventPlayer(QObject* parent = NULL);
   virtual ~pqCollaborationEventPlayer();
 
   using Superclass::playEvent;
-  virtual bool playEvent(QObject* object,
-    const QString& command,
-    const QString& arguments, bool& error);
+  virtual bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error);
 
   /**
   * used to wait till the process becomes a master.
@@ -65,6 +65,7 @@ public:
   static void waitForConnections(int num_connections);
 
   static void wait(int milli_seconds);
+
 private:
   Q_DISABLE_COPY(pqCollaborationEventPlayer)
 };

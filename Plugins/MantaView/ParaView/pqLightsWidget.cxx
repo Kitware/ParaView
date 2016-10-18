@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLightsWidget::pqLightsWidget(
-  vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget *parentObject)
+  vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
   this->NumberOfLights = 1;
@@ -62,7 +62,7 @@ pqLightsWidget::pqLightsWidget(
 
   QPushButton* add = new QPushButton("Add Light", this);
   QObject::connect(add, SIGNAL(released()), this, SLOT(onAdd()));
-  gridLayout->addWidget(add,       0, 0);
+  gridLayout->addWidget(add, 0, 0);
 
   QHBoxLayout* boxLayout = new QHBoxLayout();
   gridLayout->addLayout(boxLayout, 1, 0);
@@ -71,8 +71,8 @@ pqLightsWidget::pqLightsWidget(
   QObject::connect(previous, SIGNAL(released()), this, SLOT(onPrevious()));
   boxLayout->addWidget(previous);
 
-  vtkSMProperty *clight = smgroup->GetProperty("CurrentLight");
-  pqProxyEditorPropertyWidget *editor = new pqProxyEditorPropertyWidget(smproxy, clight, this);
+  vtkSMProperty* clight = smgroup->GetProperty("CurrentLight");
+  pqProxyEditorPropertyWidget* editor = new pqProxyEditorPropertyWidget(smproxy, clight, this);
   editor->setProperty(clight);
   editor->setObjectName("light_id");
   boxLayout->addWidget(editor);
@@ -82,7 +82,6 @@ pqLightsWidget::pqLightsWidget(
   QPushButton* next = new QPushButton(">", this);
   QObject::connect(next, SIGNAL(released()), this, SLOT(onNext()));
   boxLayout->addWidget(next);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -93,12 +92,12 @@ pqLightsWidget::~pqLightsWidget()
 //-----------------------------------------------------------------------------
 void pqLightsWidget::forceRender()
 {
-  vtkSMMantaViewProxy* rvproxy = vtkSMMantaViewProxy::SafeDownCast
-    (pqActiveObjects::instance().activeView()->getViewProxy());
+  vtkSMMantaViewProxy* rvproxy =
+    vtkSMMantaViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy());
   if (!rvproxy)
-    {
+  {
     return;
-    }
+  }
   rvproxy->StillRender();
   pqActiveObjects::instance().activeView()->render();
 }
@@ -106,12 +105,12 @@ void pqLightsWidget::forceRender()
 //-----------------------------------------------------------------------------
 void pqLightsWidget::onAdd()
 {
-  vtkSMMantaViewProxy* rvproxy = vtkSMMantaViewProxy::SafeDownCast
-    (pqActiveObjects::instance().activeView()->getViewProxy());
+  vtkSMMantaViewProxy* rvproxy =
+    vtkSMMantaViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy());
   if (!rvproxy)
-    {
+  {
     return;
-    }
+  }
   this->NumberOfLights++;
   rvproxy->MakeLight();
   this->forceRender();
@@ -120,17 +119,17 @@ void pqLightsWidget::onAdd()
 //-----------------------------------------------------------------------------
 void pqLightsWidget::onPrevious()
 {
-  vtkSMMantaViewProxy* rvproxy = vtkSMMantaViewProxy::SafeDownCast
-    (pqActiveObjects::instance().activeView()->getViewProxy());
+  vtkSMMantaViewProxy* rvproxy =
+    vtkSMMantaViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy());
   if (!rvproxy)
-    {
+  {
     return;
-    }
+  }
   this->CurrentLight--;
-  if (this->CurrentLight<0)
-    {
-    this->CurrentLight=0;
-    }
+  if (this->CurrentLight < 0)
+  {
+    this->CurrentLight = 0;
+  }
   this->UpdateLabel();
   rvproxy->PreviousLight();
 }
@@ -138,17 +137,17 @@ void pqLightsWidget::onPrevious()
 //-----------------------------------------------------------------------------
 void pqLightsWidget::onNext()
 {
-  vtkSMMantaViewProxy* rvproxy = vtkSMMantaViewProxy::SafeDownCast
-    (pqActiveObjects::instance().activeView()->getViewProxy());
+  vtkSMMantaViewProxy* rvproxy =
+    vtkSMMantaViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy());
   if (!rvproxy)
-    {
+  {
     return;
-    }
+  }
   this->CurrentLight++;
-  if (this->CurrentLight==this->NumberOfLights)
-    {
-    this->CurrentLight=this->NumberOfLights-1;
-    }
+  if (this->CurrentLight == this->NumberOfLights)
+  {
+    this->CurrentLight = this->NumberOfLights - 1;
+  }
   this->UpdateLabel();
   rvproxy->NextLight();
 }
@@ -156,7 +155,7 @@ void pqLightsWidget::onNext()
 //-----------------------------------------------------------------------------
 void pqLightsWidget::UpdateLabel()
 {
-  pqProxyEditorPropertyWidget * editor = this->findChild<pqProxyEditorPropertyWidget*>("light_id");
-  QPushButton *button = editor->findChild<QPushButton*>("PushButton");
+  pqProxyEditorPropertyWidget* editor = this->findChild<pqProxyEditorPropertyWidget*>("light_id");
+  QPushButton* button = editor->findChild<QPushButton*>("PushButton");
   button->setText("Edit Light " + QString::number(this->CurrentLight));
 }

@@ -45,53 +45,48 @@ vtkVolumeRepresentationPreprocessor::~vtkVolumeRepresentationPreprocessor()
 }
 
 //----------------------------------------------------------------------------
-int vtkVolumeRepresentationPreprocessor::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut
-  vtkDataObject *input = vtkDataObject::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid* output =
+    vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // input to the triangle filter is a vtkDataSet
-  vtkDataSet *triangleFilterInput = 0;
+  vtkDataSet* triangleFilterInput = 0;
 
   if (input->IsA("vtkMultiBlockDataSet"))
-    {
+  {
     // extract a dataset from the multiblock data.
-    triangleFilterInput =
-      this->MultiBlockToDataSet(vtkMultiBlockDataSet::SafeDownCast(input));
+    triangleFilterInput = this->MultiBlockToDataSet(vtkMultiBlockDataSet::SafeDownCast(input));
 
     // check for error
     if (!triangleFilterInput)
-      {
+    {
       vtkErrorMacro("Could not extract a dataset from multiblock input.");
       return 0;
-      }
     }
+  }
   else
-    {
+  {
     // try to down cast input DataOject to DataSet
     triangleFilterInput = vtkDataSet::SafeDownCast(input);
 
     // check for error
     if (!triangleFilterInput)
-      {
+    {
       vtkErrorMacro("Could not downcast data object input to dataset.");
       return 0;
-      }
     }
+  }
 
   // push dataset through the triangle filter
-  vtkUnstructuredGrid * triangleFilterOutput =
-    this->TriangulateDataSet(triangleFilterInput);
+  vtkUnstructuredGrid* triangleFilterOutput = this->TriangulateDataSet(triangleFilterInput);
 
   // copy to output
   output->ShallowCopy(triangleFilterOutput);
@@ -102,11 +97,10 @@ int vtkVolumeRepresentationPreprocessor::RequestData(
 //----------------------------------------------------------------------------
 /// Pushes input dataset through a vtkDataSetTriangleFilter and returns
 /// the output.
-vtkUnstructuredGrid *vtkVolumeRepresentationPreprocessor::TriangulateDataSet(
-  vtkDataSet *input)
+vtkUnstructuredGrid* vtkVolumeRepresentationPreprocessor::TriangulateDataSet(vtkDataSet* input)
 {
   // shallow copy the input and connect to triangle filter
-  vtkDataSet *clone = input->NewInstance();
+  vtkDataSet* clone = input->NewInstance();
   clone->ShallowCopy(input);
   this->DataSetTriangleFilter->SetInputData(clone);
   clone->Delete();
@@ -122,11 +116,10 @@ vtkUnstructuredGrid *vtkVolumeRepresentationPreprocessor::TriangulateDataSet(
 //----------------------------------------------------------------------------
 /// Extracts a single block from a multiblock dataset and attempts to downcast
 /// the extracted block to dataset before returning.
-vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
-  vtkMultiBlockDataSet *input)
+vtkDataSet* vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(vtkMultiBlockDataSet* input)
 {
   // shallow copy the input and connect to extract block filter
-  vtkMultiBlockDataSet *clone = input->NewInstance();
+  vtkMultiBlockDataSet* clone = input->NewInstance();
   clone->ShallowCopy(input);
   this->ExtractBlockFilter->SetInputData(clone);
   clone->Delete();
@@ -136,11 +129,11 @@ vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
   this->ExtractBlockFilter->SetInputData(0);
 
   // output is a vtkMultiBlockDataSet with a single leaf node.
-  vtkMultiBlockDataSet *output = this->ExtractBlockFilter->GetOutput();
+  vtkMultiBlockDataSet* output = this->ExtractBlockFilter->GetOutput();
 
   // use an iterator to get the dataset at the leaf node.
-  vtkDataSet * dataset = 0;
-  vtkCompositeDataIterator *iter = output->NewIterator();
+  vtkDataSet* dataset = 0;
+  vtkCompositeDataIterator* iter = output->NewIterator();
   iter->GoToFirstItem();
   dataset = vtkDataSet::SafeDownCast(output->GetDataSet(iter));
   iter->Delete();
@@ -154,12 +147,12 @@ vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
 void vtkVolumeRepresentationPreprocessor::SetExtractedBlockIndex(int index)
 {
   if (this->ExtractedBlockIndex != index)
-    {
+  {
     this->ExtractedBlockIndex = index;
     this->ExtractBlockFilter->RemoveAllIndices();
     this->ExtractBlockFilter->AddIndex(this->ExtractedBlockIndex);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -171,21 +164,18 @@ void vtkVolumeRepresentationPreprocessor::SetTetrahedraOnly(int value)
 }
 
 //----------------------------------------------------------------------------
-int vtkVolumeRepresentationPreprocessor::FillInputPortInformation(
-  int, vtkInformation *info)
+int vtkVolumeRepresentationPreprocessor::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkVolumeRepresentationPreprocessor::PrintSelf(
-  ostream& os, vtkIndent indent)
+void vtkVolumeRepresentationPreprocessor::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "ExtractedBlockIndex: " << this->ExtractedBlockIndex << "\n";
-  os << indent << "TetrahedraOnly: " << (this->TetrahedraOnly ? "On":"Off") << "\n";
+  os << indent << "TetrahedraOnly: " << (this->TetrahedraOnly ? "On" : "Off") << "\n";
 }
 
 //----------------------------------------------------------------------------
-

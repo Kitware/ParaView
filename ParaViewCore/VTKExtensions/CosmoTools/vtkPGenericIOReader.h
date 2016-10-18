@@ -42,28 +42,28 @@ class vtkStringArray;
 class vtkUnstructuredGrid;
 
 // GenericIO Forward Declarations
-namespace gio {
-  class GenericIOReader;
+namespace gio
+{
+class GenericIOReader;
 }
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOReader :
-  public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOReader : public vtkUnstructuredGridAlgorithm
 {
 public:
+  enum IOType
+  {
+    IOTYPEMPI,
+    IOTYPEPOSIX
+  };
 
-enum IOType {
-  IOTYPEMPI,
-  IOTYPEPOSIX
-};
+  enum BlockAssignment
+  {
+    ROUND_ROBIN,
+    RCB
+  };
 
-enum BlockAssignment {
-  ROUND_ROBIN,
-  RCB
-};
-
-
-  static vtkPGenericIOReader *New();
-  vtkTypeMacro(vtkPGenericIOReader,vtkUnstructuredGridAlgorithm);
+  static vtkPGenericIOReader* New();
+  vtkTypeMacro(vtkPGenericIOReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -102,8 +102,8 @@ enum BlockAssignment {
   /**
    * Set/Get the underlying IO method the reader will employ, i.e., MPI or POSIX.
    */
-  vtkSetMacro(GenericIOType,int);
-  vtkGetMacro(GenericIOType,int);
+  vtkSetMacro(GenericIOType, int);
+  vtkGetMacro(GenericIOType, int);
   //@}
 
   //@{
@@ -111,8 +111,8 @@ enum BlockAssignment {
    * Set/Get the underlying block-assignment strategy to use, i.e., ROUND_ROBIN,
    * or RCB.
    */
-  vtkSetMacro(BlockAssignment,int);
-  vtkGetMacro(BlockAssignment,int);
+  vtkSetMacro(BlockAssignment, int);
+  vtkGetMacro(BlockAssignment, int);
   //@}
 
   //@{
@@ -121,8 +121,8 @@ enum BlockAssignment {
    * tells the reader to render only the data of the RankInQuery and its
    * neighbors.
    */
-  vtkSetMacro(RankInQuery,int);
-  vtkGetMacro(RankInQuery,int);
+  vtkSetMacro(RankInQuery, int);
+  vtkGetMacro(RankInQuery, int);
   //@}
 
   //@{
@@ -130,8 +130,8 @@ enum BlockAssignment {
    * Set/Get whether the reader should read/render only the data of the
    * user-supplied rank, via SetRankInQuery(),
    */
-  vtkSetMacro(QueryRankNeighbors,int);
-  vtkGetMacro(QueryRankNeighbors,int);
+  vtkSetMacro(QueryRankNeighbors, int);
+  vtkGetMacro(QueryRankNeighbors, int);
   //@}
 
   //@{
@@ -139,9 +139,9 @@ enum BlockAssignment {
    * Set/Get whether the reader should append the coordinates of the block each
    * point was read from as a point data array.  Defaults to false (Off).
    */
-  vtkSetMacro(AppendBlockCoordinates,bool);
-  vtkBooleanMacro(AppendBlockCoordinates,bool);
-  vtkGetMacro(AppendBlockCoordinates,bool);
+  vtkSetMacro(AppendBlockCoordinates, bool);
+  vtkBooleanMacro(AppendBlockCoordinates, bool);
+  vtkGetMacro(AppendBlockCoordinates, bool);
   //@}
 
   //@{
@@ -149,7 +149,7 @@ enum BlockAssignment {
    * Returns the list of arrays used to select the variables to be used
    * for the x,y and z axis.
    */
-  vtkGetObjectMacro(ArrayList,vtkStringArray);
+  vtkGetObjectMacro(ArrayList, vtkStringArray);
   //@}
 
   //@{
@@ -157,7 +157,7 @@ enum BlockAssignment {
    * Get the data array selection tables used to configure which data
    * arrays are loaded by the reader.
    */
-  vtkGetObjectMacro(PointDataArraySelection,vtkDataArraySelection);
+  vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
   //@}
 
   //@{
@@ -165,8 +165,8 @@ enum BlockAssignment {
    * Set/Get a multiprocess-controller for reading in parallel.
    * By default this parameter is set to NULL by the constructor.
    */
-  vtkSetMacro(Controller,vtkMultiProcessController*);
-  vtkGetMacro(Controller,vtkMultiProcessController*);
+  vtkSetMacro(Controller, vtkMultiProcessController*);
+  vtkGetMacro(Controller, vtkMultiProcessController*);
   //@}
 
   /**
@@ -254,10 +254,8 @@ protected:
   virtual ~vtkPGenericIOReader();
 
   // Pipeline methods
-  virtual int RequestInformation(
-      vtkInformation*,vtkInformationVector**,vtkInformationVector*);
-  virtual int RequestData(
-      vtkInformation*,vtkInformationVector**,vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Loads the GenericIO metadata from the file.
@@ -276,16 +274,11 @@ protected:
    */
   gio::GenericIOReader* GetInternalReader();
 
-
   /**
    * Return the point from the raw data.
    */
-  void GetPointFromRawData(
-          int xType, void* xBuffer,
-          int yType, void* yBuffer,
-          int zType, void* zBuffer,
-          vtkIdType idx,
-          double pnt[3]);
+  void GetPointFromRawData(int xType, void* xBuffer, int yType, void* yBuffer, int zType,
+    void* zBuffer, vtkIdType idx, double pnt[3]);
 
   /**
    * Loads the variable with the given name
@@ -300,14 +293,12 @@ protected:
   /**
    * Loads the particle coordinates
    */
-  void LoadCoordinates(vtkUnstructuredGrid *grid,
-                       std::set< vtkIdType >& pointsInSelectedHalos);
+  void LoadCoordinates(vtkUnstructuredGrid* grid, std::set<vtkIdType>& pointsInSelectedHalos);
 
   /**
    * Loads the particle data arrays
    */
-  void LoadData(vtkUnstructuredGrid *grid,
-                const std::set< vtkIdType >& pointsInSelectedHalos);
+  void LoadData(vtkUnstructuredGrid* grid, const std::set<vtkIdType>& pointsInSelectedHalos);
 
   /**
    * Finds the neighbors of the user-supplied rank
@@ -318,15 +309,14 @@ protected:
    * Call-back registered with the SelectionObserver.
    */
   static void SelectionModifiedCallback(
-    vtkObject *caller,unsigned long eid,
-    void *clientdata,void *calldata );
+    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
-  char *XAxisVariableName;
-  char *YAxisVariableName;
-  char *ZAxisVariableName;
-  char *HaloIdVariableName;
+  char* XAxisVariableName;
+  char* YAxisVariableName;
+  char* ZAxisVariableName;
+  char* HaloIdVariableName;
 
-  char *FileName;
+  char* FileName;
   int GenericIOType;
   int BlockAssignment;
 
@@ -335,7 +325,6 @@ protected:
 
   bool BuildMetaData;
   bool AppendBlockCoordinates;
-
 
   vtkMultiProcessController* Controller;
 
@@ -349,6 +338,7 @@ protected:
 
   int RequestInfoCounter;
   int RequestDataCounter;
+
 private:
   vtkPGenericIOReader(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;

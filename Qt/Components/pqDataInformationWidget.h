@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,14 +46,14 @@ class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
 {
   Q_OBJECT
 public:
-  pqDataInformationWidget(QWidget* parent=NULL);
+  pqDataInformationWidget(QWidget* parent = NULL);
   virtual ~pqDataInformationWidget();
 
 protected:
   /**
   * Filters events received by the View.
   */
-  virtual bool eventFilter(QObject* object, QEvent *event);
+  virtual bool eventFilter(QObject* object, QEvent* event);
 
 private slots:
   void showHeaderContextMenu(const QPoint&);
@@ -62,8 +62,6 @@ private slots:
 private:
   pqDataInformationModel* Model;
   QTableView* View;
-
 };
 
 #endif
-

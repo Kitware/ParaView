@@ -50,8 +50,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent=0);
+  pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent = 0);
   virtual ~pqPointPickingHelper();
 
   /**
@@ -60,8 +61,7 @@ public:
   * picked point will always be a point specified in the points that form the
   * mesh.
   */
-  bool pickOnMesh() const
-    { return this->PickOnMesh; }
+  bool pickOnMesh() const { return this->PickOnMesh; }
 
 public slots:
   /**

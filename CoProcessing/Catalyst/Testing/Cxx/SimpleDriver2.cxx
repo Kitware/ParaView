@@ -24,45 +24,41 @@
 class VTK_EXPORT vtkCPImplementedTestDriver : public vtkCPTestDriver
 {
 public:
-  static vtkCPImplementedTestDriver * New();
+  static vtkCPImplementedTestDriver* New();
   vtkTypeMacro(vtkCPImplementedTestDriver, vtkCPTestDriver);
-  void PrintSelf(ostream& os, vtkIndent indent)
-    {
-      this->Superclass::PrintSelf(os, indent);
-    }
+  void PrintSelf(ostream& os, vtkIndent indent) { this->Superclass::PrintSelf(os, indent); }
 
 protected:
   vtkCPImplementedTestDriver()
-    {
-      // Specify how the field varies over space and time.
-      vtkCPLinearScalarFieldFunction* fieldFunction = 
-        vtkCPLinearScalarFieldFunction::New();
-      fieldFunction->SetConstant(2.);
-      fieldFunction->SetTimeMultiplier(.1);
-      fieldFunction->SetYMultiplier(23.);
-      
-      // Specify how to construct the field over the grid.
-      vtkCPNodalFieldBuilder* fieldBuilder = vtkCPNodalFieldBuilder::New();
-      fieldBuilder->SetArrayName("Velocity");
-      fieldBuilder->SetTensorFieldFunction(fieldFunction);
-      fieldFunction->Delete();
-      
-      // Set the type of grid we are building.
-      vtkCPUniformGridBuilder* gridBuilder = vtkCPUniformGridBuilder::New();
-      int dimensions[3] = {50, 50, 50};
-      gridBuilder->SetDimensions(dimensions);
-      double spacing[3] = {.2, .2, .3};
-      gridBuilder->SetSpacing(spacing);
-      double origin[3] = {10,20,300};
-      gridBuilder->SetOrigin(origin);
-      gridBuilder->SetFieldBuilder(fieldBuilder);
-      fieldBuilder->Delete();
-      
-      this->SetNumberOfTimeSteps(100);
-      this->SetGridBuilder(gridBuilder);
-      gridBuilder->Delete();
-    }
-  ~vtkCPImplementedTestDriver() {};
+  {
+    // Specify how the field varies over space and time.
+    vtkCPLinearScalarFieldFunction* fieldFunction = vtkCPLinearScalarFieldFunction::New();
+    fieldFunction->SetConstant(2.);
+    fieldFunction->SetTimeMultiplier(.1);
+    fieldFunction->SetYMultiplier(23.);
+
+    // Specify how to construct the field over the grid.
+    vtkCPNodalFieldBuilder* fieldBuilder = vtkCPNodalFieldBuilder::New();
+    fieldBuilder->SetArrayName("Velocity");
+    fieldBuilder->SetTensorFieldFunction(fieldFunction);
+    fieldFunction->Delete();
+
+    // Set the type of grid we are building.
+    vtkCPUniformGridBuilder* gridBuilder = vtkCPUniformGridBuilder::New();
+    int dimensions[3] = { 50, 50, 50 };
+    gridBuilder->SetDimensions(dimensions);
+    double spacing[3] = { .2, .2, .3 };
+    gridBuilder->SetSpacing(spacing);
+    double origin[3] = { 10, 20, 300 };
+    gridBuilder->SetOrigin(origin);
+    gridBuilder->SetFieldBuilder(fieldBuilder);
+    fieldBuilder->Delete();
+
+    this->SetNumberOfTimeSteps(100);
+    this->SetGridBuilder(gridBuilder);
+    gridBuilder->Delete();
+  }
+  ~vtkCPImplementedTestDriver(){};
 
 private:
   vtkCPImplementedTestDriver(const vtkCPImplementedTestDriver&) VTK_DELETE_FUNCTION;
@@ -71,8 +67,7 @@ private:
 
 vtkStandardNewMacro(vtkCPImplementedTestDriver);
 
-
-int SimpleDriver2(int, char*[])
+int SimpleDriver2(int, char* [])
 {
   vtkCPImplementedTestDriver* testDriver = vtkCPImplementedTestDriver::New();
   testDriver->SetNumberOfTimeSteps(100);

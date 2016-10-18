@@ -27,13 +27,14 @@ class vtkMultiProcessController;
 class vtkPVEnSightMasterServerReaderInternal;
 class vtkPVEnSightMasterServerTranslator;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerReader : public vtkGenericEnSightReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerReader
+  : public vtkGenericEnSightReader
 {
 public:
   static vtkPVEnSightMasterServerReader* New();
   vtkTypeMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * This class uses MPI communication mechanisms to verify the
@@ -52,7 +53,7 @@ public:
    * Return whether we can read the file given.
    */
   virtual int CanReadFile(const char*);
-  
+
   //@{
   /**
    * Get the number of pieces in the file.  Valid after
@@ -64,35 +65,31 @@ public:
 protected:
   vtkPVEnSightMasterServerReader();
   ~vtkPVEnSightMasterServerReader();
-  
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
-                                 vtkInformationVector *);
-  virtual int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *);
+
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   int ParseMasterServerFile();
-  
-  void SuperclassExecuteInformation(vtkInformation *, vtkInformationVector **,
-                                    vtkInformationVector *);
-  void SuperclassExecuteData(vtkInformation *, vtkInformationVector **,
-                             vtkInformationVector *);
-  
+
+  void SuperclassExecuteInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  void SuperclassExecuteData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
   // The MPI controller used to communicate with the instances in
   // other processes.
   vtkMultiProcessController* Controller;
-  
+
   // The number of pieces available in the file.
   int NumberOfPieces;
-  
+
   // Internal implementation details.
   vtkPVEnSightMasterServerReaderInternal* Internal;
-  
+
   // The extent translator used to provide the correct breakdown of
   // pieces across processes.
   vtkPVEnSightMasterServerTranslator* ExtentTranslator;
-  
+
   // Whether an error occurred during ExecuteInformation.
   int InformationError;
-  
+
 private:
   vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;

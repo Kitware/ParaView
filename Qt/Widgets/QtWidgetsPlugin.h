@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,8 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <qplugin.h>
 
-class pqCollapsedGroupPlugin :
-  public QDesignerCustomWidgetInterface
+class pqCollapsedGroupPlugin : public QDesignerCustomWidgetInterface
 {
   Q_INTERFACES(QDesignerCustomWidgetInterface)
 
@@ -55,8 +54,7 @@ public:
   bool isContainer() const;
 };
 
-class pqDoubleRangeWidgetPlugin :
-  public QDesignerCustomWidgetInterface
+class pqDoubleRangeWidgetPlugin : public QDesignerCustomWidgetInterface
 {
   Q_INTERFACES(QDesignerCustomWidgetInterface)
 
@@ -72,18 +70,16 @@ public:
   bool isContainer() const;
 };
 
-class QtWidgetsPlugin :
-  public QObject,
-  public QDesignerCustomWidgetCollectionInterface
+class QtWidgetsPlugin : public QObject, public QDesignerCustomWidgetCollectionInterface
 {
   Q_OBJECT
   Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
-  
+
 public:
   QtWidgetsPlugin(QObject* parent = 0);
 
   QList<QDesignerCustomWidgetInterface*> customWidgets() const;
-  
+
 private:
   QList<QDesignerCustomWidgetInterface*> List;
 };

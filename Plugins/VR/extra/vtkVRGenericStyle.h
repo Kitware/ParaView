@@ -44,6 +44,7 @@ class vtkVRGenericStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
   vtkVRGenericStyle(QObject* parent);
   ~vtkVRGenericStyle();
@@ -61,11 +62,11 @@ public:
   virtual bool update();
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
+  void HandleButton(const vtkVREventData& data);
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleTracker(const vtkVREventData& data);
 
 protected:
 };
 
-#endif //vtkVRGenericStyle.h_
+#endif // vtkVRGenericStyle.h_

@@ -41,17 +41,17 @@ public:
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*){}
+  virtual void AddInformation(vtkPVInformation*) {}
 
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*){}
-  virtual void CopyFromStream(const vtkClientServerStream*){}
+  virtual void CopyToStream(vtkClientServerStream*) {}
+  virtual void CopyFromStream(const vtkClientServerStream*) {}
 
 protected:
-  vtkPVEnableStackTraceSignalHandler(){}
-  ~vtkPVEnableStackTraceSignalHandler(){}
+  vtkPVEnableStackTraceSignalHandler() {}
+  ~vtkPVEnableStackTraceSignalHandler() {}
 
 private:
   vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;

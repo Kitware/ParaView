@@ -48,9 +48,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandButtonPropertyWidget : public pqPr
   Q_OBJECT
 
 public:
-  explicit pqCommandButtonPropertyWidget(vtkSMProxy *proxy,
-                                         vtkSMProperty *property,
-                                         QWidget *parent = 0);
+  explicit pqCommandButtonPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqCommandButtonPropertyWidget();
 
 private slots:

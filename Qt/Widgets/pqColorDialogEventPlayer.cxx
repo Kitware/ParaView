@@ -47,34 +47,31 @@ pqColorDialogEventPlayer::~pqColorDialogEventPlayer()
 
 //-----------------------------------------------------------------------------
 bool pqColorDialogEventPlayer::playEvent(
-  QObject* object, const QString& command,
-  const QString& arguments, bool& /*error*/)
+  QObject* object, const QString& command, const QString& arguments, bool& /*error*/)
 {
   QColorDialog* dialog = qobject_cast<QColorDialog*>(object);
   if (!dialog)
-    {
+  {
     return false;
-    }
+  }
 
   QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
-  if (   (command == pqColorDialogEventPlayer::EVENT_NAME())
-      && (regExp.indexIn(arguments) != -1) )
-    {
-    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(),
-      regExp.cap(3).toInt());
+  if ((command == pqColorDialogEventPlayer::EVENT_NAME()) && (regExp.indexIn(arguments) != -1))
+  {
+    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(), regExp.cap(3).toInt());
     dialog->setCurrentColor(rgb);
     return true;
-    }
+  }
   else if (command == "done")
-    {
+  {
     static_cast<QDialog*>(dialog)->done(arguments.toInt());
     return true;
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-const QString &pqColorDialogEventPlayer::EVENT_NAME()
+const QString& pqColorDialogEventPlayer::EVENT_NAME()
 {
   static const QString eventName("setChosenColor");
   return eventName;

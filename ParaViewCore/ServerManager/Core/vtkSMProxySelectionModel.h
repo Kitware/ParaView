@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkSMProxySelectionModel
- * @brief   selects proxies. 
+ * @brief   selects proxies.
  *
  * vtkSMProxySelectionModel is used to select proxies. vtkSMProxyManager uses
  * two instances of vtkSMProxySelectionModel for keeping track of the
@@ -40,9 +40,9 @@ class vtkSMProxy;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
 public:
-  static vtkSMProxySelectionModel*  New();
-  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMRemoteObject);
-  void PrintSelf(ostream&  os,  vtkIndent  indent);
+  static vtkSMProxySelectionModel* New();
+  vtkTypeMacro(vtkSMProxySelectionModel, vtkSMRemoteObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Override the set session, so we can attach an observer to the Collaboration
@@ -58,7 +58,6 @@ public:
   void SetFollowingMaster(bool following);
   bool IsFollowingMaster();
   //@}
- 
 
   /**
    * Type for selection.
@@ -66,11 +65,12 @@ public:
   typedef std::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
 
   // vtkSMProxy selection flags
-  enum ProxySelectionFlag {
-    NO_UPDATE        = 0,
-    CLEAR            = 1,
-    SELECT           = 2,
-    DESELECT         = 4,
+  enum ProxySelectionFlag
+  {
+    NO_UPDATE = 0,
+    CLEAR = 1,
+    SELECT = 2,
+    DESELECT = 4,
     CLEAR_AND_SELECT = CLEAR | SELECT
   };
 
@@ -88,20 +88,20 @@ public:
    * \li SELECT: also select the proxy being set as current
    * \li DESELECT: deselect the proxy being set as current.
    */
-  void SetCurrentProxy(vtkSMProxy*  proxy,  int  command);
+  void SetCurrentProxy(vtkSMProxy* proxy, int command);
 
   /**
    * Returns true if the proxy is selected.
    */
-  bool IsSelected(vtkSMProxy*  proxy);
+  bool IsSelected(vtkSMProxy* proxy);
 
   // Returns the number of selected proxies.
   unsigned int GetNumberOfSelectedProxies();
-  
+
   /**
    * Returns the selected proxy at the given index.
    */
-  vtkSMProxy* GetSelectedProxy(unsigned int  index);
+  vtkSMProxy* GetSelectedProxy(unsigned int index);
 
   /**
    * Returns the selection set.
@@ -119,21 +119,17 @@ public:
    * the selection.
    */
 
-  void Select(const SelectionType &proxies,  int command);
+  void Select(const SelectionType& proxies, int command);
 
-  void Select(vtkSMProxy* proxy,  int command);
- 
+  void Select(vtkSMProxy* proxy, int command);
+
   /**
    * Wrapper friendly methods to doing what Select() can do.
    */
-  void Clear()
-    { this->Select(NULL, CLEAR); }
-  void Select(vtkSMProxy*  proxy)
-    { this->Select(proxy, SELECT); }
-  void Deselect(vtkSMProxy*  proxy)
-    { this->Select(proxy, DESELECT); }
-  void ClearAndSelect(vtkSMProxy*  proxy)
-    { this->Select(proxy, CLEAR_AND_SELECT); }
+  void Clear() { this->Select(NULL, CLEAR); }
+  void Select(vtkSMProxy* proxy) { this->Select(proxy, SELECT); }
+  void Deselect(vtkSMProxy* proxy) { this->Select(proxy, DESELECT); }
+  void ClearAndSelect(vtkSMProxy* proxy) { this->Select(proxy, CLEAR_AND_SELECT); }
 
   /**
    * Utility method to get the data bounds for the currently selected items.
@@ -158,13 +154,13 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxySelectionModel();
   ~vtkSMProxySelectionModel();
 
-  void InvokeCurrentChanged(vtkSMProxy*  proxy);
+  void InvokeCurrentChanged(vtkSMProxy* proxy);
   void InvokeSelectionChanged();
 
   vtkSmartPointer<vtkSMProxy> Current;
@@ -175,18 +171,17 @@ protected:
    * is any collaboration is involved
    */
   void PushStateToSession();
-  
+
   // Cached version of State
   vtkSMMessage* State;
 
 private:
-  vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
-  void operator = (const  vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
+  vtkSMProxySelectionModel(const vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   friend class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif

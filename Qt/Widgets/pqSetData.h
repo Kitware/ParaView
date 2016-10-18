@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,15 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 /**
-  Using pqSetData, you can create and initialize Qt objects without having to create a bunch of temporaries:
-  
+  Using pqSetData, you can create and initialize Qt objects without having to create a bunch of
+  temporaries:
+
   \code
   menu->addAction("Open") << pqSetData("My Private Data");
   \endcode
- 
+
   \sa pqSetName, pqConnect
 */
-  
+
 struct PQWIDGETS_EXPORT pqSetData
 {
   pqSetData(const QVariant& Data);
@@ -58,7 +59,7 @@ private:
 /**
 * Sets custom data for a Qt object
 */
-template<typename T>
+template <typename T>
 T* operator<<(T* LHS, const pqSetData& RHS)
 {
   LHS->setData(RHS.Data);
@@ -66,4 +67,3 @@ T* operator<<(T* LHS, const pqSetData& RHS)
 }
 
 #endif // !_pqSetData_h
-

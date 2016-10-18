@@ -58,7 +58,7 @@ void vtkPVRenderViewWithEDL::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
 
-  vtkEDLShading* EDLpass =vtkEDLShading::New();
+  vtkEDLShading* EDLpass = vtkEDLShading::New();
   this->SynchronizedRenderers->SetImageProcessingPass(EDLpass);
   this->SynchronizedRenderers->SetUseDepthBuffer(true);
   EDLpass->Delete();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,17 +47,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDockWidget>
 
 //-----------------------------------------------------------------------------
-pqEditColorMapReaction::pqEditColorMapReaction(
-  QAction* parentObject, bool track_active_objects)
+pqEditColorMapReaction::pqEditColorMapReaction(QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
   if (track_active_objects)
-    {
+  {
     QObject::connect(&pqActiveObjects::instance(),
-      SIGNAL(representationChanged(pqDataRepresentation*)),
-      this, SLOT(setRepresentation(pqDataRepresentation*)));
+      SIGNAL(representationChanged(pqDataRepresentation*)), this,
+      SLOT(setRepresentation(pqDataRepresentation*)));
     this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -83,78 +82,68 @@ void pqEditColorMapReaction::onTriggered()
 void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
 {
   if (repr == NULL)
-    {
-    repr = qobject_cast<pqPipelineRepresentation*>(
-      pqActiveObjects::instance().activeRepresentation());
+  {
+    repr =
+      qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
     if (!repr)
-      {
+    {
       qCritical() << "No representation provided.";
       return;
-      }
     }
+  }
 
   if (!vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
-    {
+  {
     // Get the color property.
-    vtkSMProxy *proxy = repr->getProxy();
-    SM_SCOPED_TRACE(PropertiesModified)
-      .arg(proxy)
-      .arg("comment", " change solid color");
+    vtkSMProxy* proxy = repr->getProxy();
+    SM_SCOPED_TRACE(PropertiesModified).arg(proxy).arg("comment", " change solid color");
 
-    vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
+    vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
-    QString reprType = vtkSMPropertyHelper(
-      proxy, "Representation", /*quiet=*/true).GetAsString();
-    bool use_ambient = (reprType == "Wireframe" ||
-      reprType == "Points"||
-      reprType == "Outline");
+    QString reprType = vtkSMPropertyHelper(proxy, "Representation", /*quiet=*/true).GetAsString();
+    bool use_ambient = (reprType == "Wireframe" || reprType == "Points" || reprType == "Outline");
     if (diffuse && ambient)
-      {
+    {
       // Get the current color from the property.
-      QList<QVariant> rgb =
-        pqSMAdaptor::getMultipleElementProperty(diffuse);
+      QList<QVariant> rgb = pqSMAdaptor::getMultipleElementProperty(diffuse);
       QColor color(Qt::white);
-      if(rgb.size() >= 3)
-        {
-        color = QColor::fromRgbF(rgb[0].toDouble(), rgb[1].toDouble(),
-          rgb[2].toDouble());
-        }
+      if (rgb.size() >= 3)
+      {
+        color = QColor::fromRgbF(rgb[0].toDouble(), rgb[1].toDouble(), rgb[2].toDouble());
+      }
 
       // Let the user pick a new color.
-      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget(),
-        "Pick Solid Color", QColorDialog::DontUseNativeDialog);
-      if(color.isValid())
-        {
+      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget(), "Pick Solid Color",
+        QColorDialog::DontUseNativeDialog);
+      if (color.isValid())
+      {
         // Set the properties to the new color.
         rgb.clear();
         rgb.append(color.redF());
         rgb.append(color.greenF());
         rgb.append(color.blueF());
         BEGIN_UNDO_SET("Changed Solid Color");
-        pqSMAdaptor::setMultipleElementProperty(
-          use_ambient? ambient : diffuse, rgb);
+        pqSMAdaptor::setMultipleElementProperty(use_ambient ? ambient : diffuse, rgb);
         proxy->UpdateVTKObjects();
         repr->renderViewEventually();
         END_UNDO_SET();
-        }
       }
     }
+  }
   else
-    {
+  {
     // Raise the color editor is present in the application.
-    QDockWidget* widget = qobject_cast<QDockWidget*>(
-      pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
+    QDockWidget* widget =
+      qobject_cast<QDockWidget*>(pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
     if (widget)
-      {
+    {
       widget->setVisible(true);
       // widget->setFloating(true);
       widget->raise();
-      }
-    else
-      {
-      qDebug("Failed to find 'COLOR_EDITOR_PANEL'.");
-      }
     }
-
+    else
+    {
+      qDebug("Failed to find 'COLOR_EDITOR_PANEL'.");
+    }
+  }
 }
-

@@ -40,10 +40,10 @@ public:
    */
   virtual bool UpdateAnimationUsingDataTimeSteps();
   static bool UpdateAnimationUsingDataTimeSteps(vtkSMProxy* scene)
-    {
+  {
     vtkSMAnimationSceneProxy* self = vtkSMAnimationSceneProxy::SafeDownCast(scene);
-    return self? self->UpdateAnimationUsingDataTimeSteps() : false;
-    }
+    return self ? self->UpdateAnimationUsingDataTimeSteps() : false;
+  }
   //@}
 
   //@{
@@ -51,14 +51,13 @@ public:
    * Returns the first animation cue (enabled or otherwise) that animates the
    * given property on the proxy. This will return NULL if none such cue exists.
    */
-  virtual vtkSMProxy* FindAnimationCue(
-    vtkSMProxy* animatedProxy, const char* animatedPropertyName);
-  static vtkSMProxy* FindAnimationCue(vtkSMProxy* scene,
-    vtkSMProxy* animatedProxy, const char* animatedPropertyName)
-    {
+  virtual vtkSMProxy* FindAnimationCue(vtkSMProxy* animatedProxy, const char* animatedPropertyName);
+  static vtkSMProxy* FindAnimationCue(
+    vtkSMProxy* scene, vtkSMProxy* animatedProxy, const char* animatedPropertyName)
+  {
     vtkSMAnimationSceneProxy* self = vtkSMAnimationSceneProxy::SafeDownCast(scene);
-    return self? self->FindAnimationCue(animatedProxy, animatedPropertyName) : NULL;
-    }
+    return self ? self->FindAnimationCue(animatedProxy, animatedPropertyName) : NULL;
+  }
   //@}
 
 protected:
@@ -84,7 +83,6 @@ private:
 
   // Called when vtkSMAnimationScene::UpdateStartEndTimesEvent is fired.
   void OnUpdateStartEndTimesEvent(vtkObject*, unsigned long, void*);
-
 };
 
 #endif

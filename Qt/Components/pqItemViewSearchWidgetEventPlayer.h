@@ -43,15 +43,16 @@ class PQCOMPONENTS_EXPORT pqItemViewSearchWidgetEventPlayer : public pqWidgetEve
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqItemViewSearchWidgetEventPlayer(QObject* parent=0);
+  pqItemViewSearchWidgetEventPlayer(QObject* parent = 0);
   ~pqItemViewSearchWidgetEventPlayer();
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString&
-    arguments, bool& error);
+  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
 
-  static const QString &EVENT_NAME();
+  static const QString& EVENT_NAME();
+
 private:
   Q_DISABLE_COPY(pqItemViewSearchWidgetEventPlayer)
 };

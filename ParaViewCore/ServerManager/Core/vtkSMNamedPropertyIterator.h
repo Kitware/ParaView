@@ -17,7 +17,7 @@
  * @brief   iterates over a subset of a proxy's properties
  *
  *
- * vtkSMNamedPropertyIterator can be used to iterate over a subset of a proxy's 
+ * vtkSMNamedPropertyIterator can be used to iterate over a subset of a proxy's
  * properties. The subset is defined through a list of strings naming properties.
  * The properties of the root proxies as well as sub-proxies are  included in the
  * iteration. For sub-proxies, only exposed properties are iterated over.
@@ -49,7 +49,7 @@ public:
   /**
    * Set the names of properties to iterate over.
    */
-  void SetPropertyNames(vtkStringList *names);
+  void SetPropertyNames(vtkStringList* names);
 
   /**
    * Go to the first property.
@@ -86,7 +86,7 @@ protected:
   vtkSMNamedPropertyIterator();
   ~vtkSMNamedPropertyIterator();
 
-  vtkStringList *PropertyNames;
+  vtkStringList* PropertyNames;
   int PropertyNameIndex;
 
 private:
@@ -95,4 +95,3 @@ private:
 };
 
 #endif
-

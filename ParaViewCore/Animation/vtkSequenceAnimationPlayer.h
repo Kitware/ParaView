@@ -39,7 +39,7 @@ protected:
   ~vtkSequenceAnimationPlayer();
 
   virtual void StartLoop(double, double, double*);
-  virtual void EndLoop() {};
+  virtual void EndLoop(){};
 
   /**
    * Return the next time given the current time.
@@ -54,10 +54,10 @@ protected:
   double StartTime;
   double EndTime;
   int FrameNo;
+
 private:
   vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

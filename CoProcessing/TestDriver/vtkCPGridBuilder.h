@@ -16,7 +16,7 @@
  * @class   vtkCPGridBuilder
  * @brief   Abstract class for creating grids.
  *
- * Abstract class for creating grids for a test driver.  
+ * Abstract class for creating grids for a test driver.
 */
 
 #ifndef vtkCPGridBuilder_h
@@ -39,8 +39,7 @@ public:
    * that were returned were already built before.
    * vtkCPGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
-                                 int & builtNewGrid) = 0;
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) = 0;
 
   //@{
   /**
@@ -65,6 +64,6 @@ private:
    */
   vtkCPBaseFieldBuilder* FieldBuilder;
 };
-  //@}
+//@}
 
 #endif

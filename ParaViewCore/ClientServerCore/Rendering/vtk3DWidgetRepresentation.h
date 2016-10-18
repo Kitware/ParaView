@@ -121,7 +121,6 @@ private:
   void operator=(const vtk3DWidgetRepresentation&) VTK_DELETE_FUNCTION;
   unsigned long RepresentationObserverTag;
   unsigned long ViewObserverTag;
-
 };
 
 #endif

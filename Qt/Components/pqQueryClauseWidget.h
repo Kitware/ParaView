@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -48,25 +48,26 @@ class PQCOMPONENTS_EXPORT pqQueryClauseWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
   enum CriteriaType
-    {
-    INVALID=0x0,
+  {
+    INVALID = 0x0,
     INDEX = 0x1,
-    GLOBALID =0x2,
+    GLOBALID = 0x2,
     THRESHOLD = 0x4,
-    BLOCK =0x10,
-    AMR_LEVEL=0x20,
-    AMR_BLOCK=0x40,
-    PROCESSID=0x80,
+    BLOCK = 0x10,
+    AMR_LEVEL = 0x20,
+    AMR_BLOCK = 0x40,
+    PROCESSID = 0x80,
     QUERY = 0x8,
-    ANY=0xffff
-    };
+    ANY = 0xffff
+  };
 
   Q_DECLARE_FLAGS(CriteriaTypes, CriteriaType);
 
   enum ConditionMode
-    {
+  {
     SINGLE_VALUE,
     SINGLE_VALUE_GE,
     SINGLE_VALUE_LE,
@@ -83,29 +84,25 @@ public:
     SINGLE_VALUE_LE_MEAN,
     SINGLE_VALUE_GE_MEAN,
     SINGLE_VALUE_MEAN_WITH_TOLERANCE
-    };
+  };
+
 public:
-  pqQueryClauseWidget(
-    QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqQueryClauseWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqQueryClauseWidget();
 
   /**
   * Set/Get the data producer.
   */
-  void setProducer(pqOutputPort* p)
-    { this->Producer = p; }
-  pqOutputPort* producer() const
-    { return this->Producer; }
+  void setProducer(pqOutputPort* p) { this->Producer = p; }
+  pqOutputPort* producer() const { return this->Producer; }
 
   /**
   * Set the attribute type. This determine what arrays are listed in the
   * selection criteria.
   * Valid values are from the enum vtkDataObject::AttributeTypes.
   */
-  void setAttributeType(int attrType)
-    { this->AttributeType = attrType; }
-  int attributeType() const
-    { return this->AttributeType; }
+  void setAttributeType(int attrType) { this->AttributeType = attrType; }
+  int attributeType() const { return this->AttributeType; }
 
   /**
   * Creates a new selection source proxy based on the query.
@@ -123,7 +120,9 @@ public slots:
   * (possibly 3.10/4.0)
   */
   void initialize()
-    { this->initialize(CriteriaTypes(ANY) ^ PROCESSID ^ AMR_LEVEL ^ AMR_BLOCK ^ BLOCK); }
+  {
+    this->initialize(CriteriaTypes(ANY) ^ PROCESSID ^ AMR_LEVEL ^ AMR_BLOCK ^ BLOCK);
+  }
 
   /**
   * initialize the widget only with the subset of criteria mentioned.
@@ -132,7 +131,7 @@ public slots:
   * available operators may change in such case. Hence, we specify if it's
   * being used as a qualifier or not.
   */
-  void initialize(CriteriaTypes type_flags, bool qualifier_mode=false);
+  void initialize(CriteriaTypes type_flags, bool qualifier_mode = false);
 
 signals:
   /**
@@ -177,7 +176,7 @@ protected:
   * Based on the selection type and data information from the producer,
   * populate the "criteria" combo box.
   */
-  void populateSelectionCriteria(CriteriaTypes type=ANY);
+  void populateSelectionCriteria(CriteriaTypes type = ANY);
 
   /**
   * Returns the current criteria type.
@@ -195,14 +194,11 @@ protected:
   int AttributeType;
   bool AsQualifier;
   QString LastQuery;
+
 private:
   Q_DISABLE_COPY(pqQueryClauseWidget)
   class pqInternals;
   pqInternals* Internals;
-
-
 };
 
 #endif
-
-

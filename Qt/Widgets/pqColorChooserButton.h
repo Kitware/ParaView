@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,13 +47,10 @@ class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
 {
   Q_OBJECT
   Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor);
-  Q_PROPERTY(QVariantList chosenColorRgbF
-             READ chosenColorRgbF
-             WRITE setChosenColorRgbF);
-  Q_PROPERTY(QVariantList chosenColorRgbaF
-             READ chosenColorRgbaF
-             WRITE setChosenColorRgbaF);
+  Q_PROPERTY(QVariantList chosenColorRgbF READ chosenColorRgbF WRITE setChosenColorRgbF);
+  Q_PROPERTY(QVariantList chosenColorRgbaF READ chosenColorRgbaF WRITE setChosenColorRgbaF);
   Q_PROPERTY(bool showAlphaChannel READ showAlphaChannel WRITE setShowAlphaChannel);
+
 public:
   /**
   * constructor requires a QComboBox
@@ -80,17 +77,14 @@ public:
   /**
   * Set/Get the ratio of icon radius to button height
   */
-  void setIconRadiusHeightRatio(double val)
-    { this->IconRadiusHeightRatio = val; }
-  double iconRadiusHeightRatio() const
-    { return this->IconRadiusHeightRatio; }
+  void setIconRadiusHeightRatio(double val) { this->IconRadiusHeightRatio = val; }
+  double iconRadiusHeightRatio() const { return this->IconRadiusHeightRatio; }
 
   /**
   * When true, the widget will allow users to choose the alpha channel.
   */
   bool showAlphaChannel() const { return this->ShowAlphaChannel; }
-  void setShowAlphaChannel(bool val)
-    { this->ShowAlphaChannel = val; }
+  void setShowAlphaChannel(bool val) { this->ShowAlphaChannel = val; }
 
 signals:
   /**
@@ -132,7 +126,7 @@ protected:
   /**
   * overridden to resize the color icon.
   */
-  virtual void resizeEvent(QResizeEvent *rEvent);
+  virtual void resizeEvent(QResizeEvent* rEvent);
 
   /**
   * renders an icon for the color.

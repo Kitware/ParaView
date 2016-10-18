@@ -9,10 +9,10 @@ vec4 singleColor(gl_MaterialParameters m, vec3 surfacePosEyeCoords, vec3 n);
 
 vec4 colorFrontFace()
 {
-  vec4 heyeCoords = gl_ModelViewMatrix*gl_Vertex;
-  vec3 eyeCoords = heyeCoords.xyz/heyeCoords.w;
-  vec3 n = normalize(gl_NormalMatrix*gl_Normal);
-  return singleColor(gl_FrontMaterial,eyeCoords,n);
+  vec4 heyeCoords = gl_ModelViewMatrix * gl_Vertex;
+  vec3 eyeCoords = heyeCoords.xyz / heyeCoords.w;
+  vec3 n = normalize(gl_NormalMatrix * gl_Normal);
+  return singleColor(gl_FrontMaterial, eyeCoords, n);
 }
 
 void main()

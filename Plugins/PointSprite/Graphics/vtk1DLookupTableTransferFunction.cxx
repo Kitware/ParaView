@@ -36,7 +36,7 @@
 
 vtkStandardNewMacro(vtk1DLookupTableTransferFunction)
 
-vtk1DLookupTableTransferFunction::vtk1DLookupTableTransferFunction()
+  vtk1DLookupTableTransferFunction::vtk1DLookupTableTransferFunction()
 {
   this->Table = vtkDoubleArray::New();
   this->Interpolation = 0;
@@ -53,48 +53,48 @@ double vtk1DLookupTableTransferFunction::MapValue(double value, double* range)
 
   double output = 0;
   if (diff == 0)
-    {
+  {
     vtkDebugMacro("input range min and max do match!");
     if (value < range[0])
       output = this->Table->GetTuple1(0);
     else
       output = this->Table->GetTuple1(this->Table->GetNumberOfTuples() - 1);
-    }
+  }
   else
-    {
+  {
     double ratio = (value - range[0]) / diff * this->Table->GetNumberOfTuples();
     if (ratio <= 0)
-      {
+    {
       output = this->Table->GetTuple1(0);
-      }
+    }
     else if (ratio >= this->Table->GetNumberOfTuples())
-      {
+    {
       output = this->Table->GetTuple1(this->Table->GetNumberOfTuples() - 1);
-      }
+    }
     else
-      {
-      vtkIdType index = static_cast<vtkIdType> (floor(ratio));
+    {
+      vtkIdType index = static_cast<vtkIdType>(floor(ratio));
       double first = this->Table->GetTuple1(index);
       if (Interpolation)
-        {
+      {
         double delta = ratio - index;
         double second;
         if (index < this->Table->GetNumberOfTuples() - 1)
-          {
-          second = this->Table->GetTuple1(index + 1);
-          }
-        else
-          {
-          second = this->Table->GetTuple1(index);
-          }
-        output = first * (1.0 - delta) + delta * second;
-        }
-      else // no interpolation
         {
-        output = first;
+          second = this->Table->GetTuple1(index + 1);
         }
+        else
+        {
+          second = this->Table->GetTuple1(index);
+        }
+        output = first * (1.0 - delta) + delta * second;
+      }
+      else // no interpolation
+      {
+        output = first;
       }
     }
+  }
   return output;
 }
 
@@ -105,57 +105,56 @@ void vtk1DLookupTableTransferFunction::BuildDefaultTable()
   this->Table->SetNumberOfTuples(ntuples);
   this->Table->Allocate(ntuples);
   for (vtkIdType i = 0; i < ntuples; i++)
-    {
+  {
     this->Table->SetTuple1(i, i / double(ntuples - 1));
-    }
+  }
 }
 
-void  vtk1DLookupTableTransferFunction::SetNumberOfTableValues(vtkIdType size)
+void vtk1DLookupTableTransferFunction::SetNumberOfTableValues(vtkIdType size)
 {
-  if(this->Table->GetNumberOfTuples() != size)
-    {
+  if (this->Table->GetNumberOfTuples() != size)
+  {
     this->Table->SetNumberOfTuples(size);
     this->Modified();
-    }
+  }
 }
 
-vtkIdType  vtk1DLookupTableTransferFunction::GetNumberOfTableValues()
+vtkIdType vtk1DLookupTableTransferFunction::GetNumberOfTableValues()
 {
   return this->Table->GetNumberOfTuples();
 }
 
-void  vtk1DLookupTableTransferFunction::SetTableValue(vtkIdType index, double value)
+void vtk1DLookupTableTransferFunction::SetTableValue(vtkIdType index, double value)
 {
-  if(index < 0)
+  if (index < 0)
     return;
   bool modif = false;
-  if(index >= this->Table->GetNumberOfTuples())
-    {
-    this->Table->SetNumberOfTuples(index+1);
+  if (index >= this->Table->GetNumberOfTuples())
+  {
+    this->Table->SetNumberOfTuples(index + 1);
     modif = true;
-    }
-  if(this->Table->GetTuple1(index) != value)
-    {
+  }
+  if (this->Table->GetTuple1(index) != value)
+  {
     this->Table->SetValue(index, value);
     modif = true;
-    }
-  if(modif)
+  }
+  if (modif)
     this->Modified();
 }
 
-void  vtk1DLookupTableTransferFunction::RemoveAllTableValues()
+void vtk1DLookupTableTransferFunction::RemoveAllTableValues()
 {
   this->SetNumberOfTableValues(0);
 }
 
-
-double  vtk1DLookupTableTransferFunction::GetTableValue(vtkIdType index)
+double vtk1DLookupTableTransferFunction::GetTableValue(vtkIdType index)
 {
-  if(index < 0 || index >= this->Table->GetNumberOfTuples())
-    {
+  if (index < 0 || index >= this->Table->GetNumberOfTuples())
+  {
     vtkWarningMacro("Trying to get out of range table value, returning 0.");
     return 0;
-    }
+  }
   return this->Table->GetTuple1(index);
 }
 
@@ -163,8 +162,6 @@ void vtk1DLookupTableTransferFunction::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "InputRange : " << InputRange[0] << " " << InputRange[1]
-      << endl;
+  os << indent << "InputRange : " << InputRange[0] << " " << InputRange[1] << endl;
   this->Table->PrintSelf(os, indent.GetNextIndent());
 }
-

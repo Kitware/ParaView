@@ -60,8 +60,7 @@ public:
    * Does not cause any updates.
    */
   bool IsCached(double cacheTime);
-  bool IsCached()
-    { return this->IsCached(this->CacheTime); }
+  bool IsCached() { return this->IsCached(this->CacheTime); }
 
   //@{
   /**
@@ -97,10 +96,10 @@ protected:
   vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
   //@}
 
-  int RequestDataObject(vtkInformation* request, vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
-  int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   virtual vtkExecutive* CreateDefaultExecutive();
 
   /**
@@ -123,7 +122,6 @@ private:
   static int CacheHit;
   static int CacheMiss;
   static int CacheSkips;
-
 };
 
 #endif

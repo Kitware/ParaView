@@ -77,6 +77,7 @@ class PQCORE_EXPORT pqApplicationCore : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   // Get the global instace for the pqApplicationCore.
   static pqApplicationCore* instance();
@@ -88,29 +89,26 @@ public:
   * otherwise a new instance of pqOptions with standard ParaView command line
   * options will be created.
   */
-  pqApplicationCore(int& argc, char** argv, pqOptions* options=0, QObject* parent=0);
+  pqApplicationCore(int& argc, char** argv, pqOptions* options = 0, QObject* parent = 0);
 
   /**
   * Provides access to the command line options object.
   */
-  pqOptions* getOptions() const
-    { return this->Options; }
+  pqOptions* getOptions() const { return this->Options; }
 
   /**
   * Get the Object Builder. Object Buider must be used
   * to create complex objects such as sources, filters,
   * readers, views, displays etc.
   */
-  pqObjectBuilder* getObjectBuilder() const
-    { return this->ObjectBuilder; }
+  pqObjectBuilder* getObjectBuilder() const { return this->ObjectBuilder; }
 
   /**
   * Set/Get the application's central undo stack. By default no undo stack is
   * provided. Applications must set on up as required.
   */
   void setUndoStack(pqUndoStack* stack);
-  pqUndoStack* getUndoStack() const
-    { return this->UndoStack; }
+  pqUndoStack* getUndoStack() const { return this->UndoStack; }
 
   /**
   * Custom Applications may need use various "managers"
@@ -154,8 +152,7 @@ public:
   * certain actions such as registeration/unregistration of proxies
   * etc. Returns the ServerManagerObserver used by the application.
   */
-  pqServerManagerObserver* getServerManagerObserver()
-    { return this->ServerManagerObserver; }
+  pqServerManagerObserver* getServerManagerObserver() { return this->ServerManagerObserver; }
 
   /**
   * ServerManagerModel is the representation of the ServerManager
@@ -163,19 +160,16 @@ public:
   * explore the ServerManager with ease by separating proxies based
   * on their functionality/type.
   */
-  pqServerManagerModel* getServerManagerModel() const
-    { return this->ServerManagerModel; }
+  pqServerManagerModel* getServerManagerModel() const { return this->ServerManagerModel; }
 
-  pq3DWidgetFactory* get3DWidgetFactory() const
-    { return this->WidgetFactory; }
+  pq3DWidgetFactory* get3DWidgetFactory() const { return this->WidgetFactory; }
 
   /**
   * Locates the interface tracker for the application. pqInterfaceTracker is
   * used to locate all interface implementations typically loaded from
   * plugins.
   */
-  pqInterfaceTracker* interfaceTracker() const
-    { return this->InterfaceTracker; }
+  pqInterfaceTracker* interfaceTracker() const { return this->InterfaceTracker; }
 
   /**
   * pqLinksModel is the model used to keep track of proxy/property links
@@ -184,37 +178,31 @@ public:
   * pqLinksModel. All the information is already available in
   * vtkSMProxyManager.
   */
-  pqLinksModel* getLinksModel() const
-    { return this->LinksModel; }
+  pqLinksModel* getLinksModel() const { return this->LinksModel; }
 
   /**
   * pqPluginManager manages all functionality associated with loading plugins.
   */
-  pqPluginManager* getPluginManager() const
-    { return this->PluginManager; }
+  pqPluginManager* getPluginManager() const { return this->PluginManager; }
 
   /**
   * ProgressManager is the manager that streamlines progress.
   */
-  pqProgressManager* getProgressManager() const
-    { return this->ProgressManager; }
+  pqProgressManager* getProgressManager() const { return this->ProgressManager; }
 
   /**
   * Returns the display policy instance used by the application.
   * pqDisplayPolicy defines the policy for creating representations
   * for sources.
   */
-  pqDisplayPolicy* getDisplayPolicy() const
-    { return this->DisplayPolicy; }
+  pqDisplayPolicy* getDisplayPolicy() const { return this->DisplayPolicy; }
 
   /**
   * Returns the output window.
   */
-  pqOutputWindowAdapter* outputWindowAdapter()
-    { return this->OutputWindowAdapter; }
+  pqOutputWindowAdapter* outputWindowAdapter() { return this->OutputWindowAdapter; }
 
-  pqOutputWindow* outputWindow()
-  { return this->OutputWindow; }
+  pqOutputWindow* outputWindow() { return this->OutputWindow; }
 
   /**
   * It is possible to change the display policy used by
@@ -255,33 +243,36 @@ public:
   * Loads the ServerManager state. Emits the signal
   * stateLoaded() on loading state successfully.
   */
-  void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadState(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = NULL);
 
   /**
   * Load state xml from a file. The filename can be a Qt resource file,
   * besides regular filesystem files (refer to QFile documentation for more
   * information on Qt resource system).
   */
-  void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader = NULL);
 
   /**
   * Loads state from an in-memory buffer.
   */
-  void loadStateFromString(const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadStateFromString(
+    const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader = NULL);
 
   /**
   * Same as loadState() except that it doesn't clear the current visualization
   * state.
   */
-  void loadStateIncremental(vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader=NULL);
-  void loadStateIncremental(const QString& filename, pqServer* server, vtkSMStateLoader* loader=NULL);
+  void loadStateIncremental(
+    vtkPVXMLElement* root, pqServer* server, vtkSMStateLoader* loader = NULL);
+  void loadStateIncremental(
+    const QString& filename, pqServer* server, vtkSMStateLoader* loader = NULL);
 
   /**
   * Check to see if its in the process of loading a state
   * Reliance on this flag is chimerical since we cannot set this ivar when
   * state file is  being loaded from python shell.
   */
-  bool isLoadingState(){return this->LoadingState;};
+  bool isLoadingState() { return this->LoadingState; };
 
   /**
   * returns the active server is any.
@@ -293,7 +284,7 @@ public:
   * lists the plugins that the application is aware by default. If no filename
   * is specified, {executable-path}/.plugins is loaded.
   */
-  void loadDistributedPlugins(const char* filename=0);
+  void loadDistributedPlugins(const char* filename = 0);
 
   /**
   * Destructor.
@@ -395,7 +386,7 @@ protected:
   pqServerManagerModel* ServerManagerModel;
   pqServerManagerObserver* ServerManagerObserver;
   pqUndoStack* UndoStack;
-  pqRecentlyUsedResourcesList *RecentlyUsedResourcesList;
+  pqRecentlyUsedResourcesList* RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
   QHelpEngine* HelpEngine;
@@ -412,4 +403,3 @@ private:
 };
 
 #endif
-

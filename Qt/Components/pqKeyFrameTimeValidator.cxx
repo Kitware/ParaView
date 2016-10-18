@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,10 +47,7 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<pqAnimationScene> AnimationScene;
 
-  pqInternals()
-    {
-    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    }
+  pqInternals() { this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -74,11 +71,10 @@ void pqKeyFrameTimeValidator::setDomain(vtkSMDomain* domain)
 
   this->Internals->Domain = drd;
   if (drd)
-    {
-    this->Internals->VTKConnect->Connect(drd,
-      vtkCommand::DomainModifiedEvent,
-      this, SLOT(onDomainModified()));
-    }
+  {
+    this->Internals->VTKConnect->Connect(
+      drd, vtkCommand::DomainModifiedEvent, this, SLOT(onDomainModified()));
+  }
   this->onDomainModified();
 }
 
@@ -86,15 +82,15 @@ void pqKeyFrameTimeValidator::setDomain(vtkSMDomain* domain)
 void pqKeyFrameTimeValidator::setAnimationScene(pqAnimationScene* scene)
 {
   if (this->Internals->AnimationScene)
-    {
+  {
     QObject::disconnect(this->Internals->AnimationScene, 0, this, 0);
-    }
+  }
   this->Internals->AnimationScene = scene;
   if (scene)
-    {
-    QObject::connect(scene, SIGNAL(clockTimeRangesChanged()), 
-      this, SLOT(onDomainModified()), Qt::QueuedConnection);
-    }
+  {
+    QObject::connect(scene, SIGNAL(clockTimeRangesChanged()), this, SLOT(onDomainModified()),
+      Qt::QueuedConnection);
+  }
   this->onDomainModified();
 }
 
@@ -102,20 +98,18 @@ void pqKeyFrameTimeValidator::setAnimationScene(pqAnimationScene* scene)
 void pqKeyFrameTimeValidator::onDomainModified()
 {
   if (!this->Internals->Domain)
-    {
+  {
     return;
-    }
+  }
 
   double min = this->Internals->Domain->GetMinimum(0);
   double max = this->Internals->Domain->GetMaximum(0);
 
   if (this->Internals->AnimationScene)
-    {
-    QPair<double, double> range = 
-      this->Internals->AnimationScene->getClockTimeRange();
-    min = range.first + (range.second - range.first)*min;
-    max = range.first + (range.second - range.first)*max;
-    }
+  {
+    QPair<double, double> range = this->Internals->AnimationScene->getClockTimeRange();
+    min = range.first + (range.second - range.first) * min;
+    max = range.first + (range.second - range.first) * max;
+  }
   this->setRange(min, max);
 }
-

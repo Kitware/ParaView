@@ -47,34 +47,31 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballMultiRotate : public vtkC
 {
 public:
   vtkTypeMacro(vtkPVTrackballMultiRotate, vtkCameraManipulator);
-  static vtkPVTrackballMultiRotate *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkPVTrackballMultiRotate* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *rwi);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
   //@}
 
 protected:
   vtkPVTrackballMultiRotate();
   ~vtkPVTrackballMultiRotate();
 
-  vtkPVTrackballRotate *RotateManipulator;
-  vtkPVTrackballRoll   *RollManipulator;
+  vtkPVTrackballRotate* RotateManipulator;
+  vtkPVTrackballRoll* RollManipulator;
 
-  vtkCameraManipulator *CurrentManipulator;
+  vtkCameraManipulator* CurrentManipulator;
 
 private:
-  vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballMultiRotate &) VTK_DELETE_FUNCTION;
+  vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTrackballMultiRotate&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkPVTrackballMultiRotate_h
+#endif // vtkPVTrackballMultiRotate_h

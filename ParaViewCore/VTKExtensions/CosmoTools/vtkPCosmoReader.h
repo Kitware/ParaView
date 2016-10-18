@@ -92,11 +92,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkMultiProcessController;
 class vtkStdString;
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPCosmoReader :
-  public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPCosmoReader : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkPCosmoReader *New();
+  static vtkPCosmoReader* New();
   vtkTypeMacro(vtkPCosmoReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -163,18 +162,16 @@ protected:
   vtkPCosmoReader();
   ~vtkPCosmoReader();
 
-  virtual int RequestInformation
-    (vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestData
-    (vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   vtkMultiProcessController* Controller;
 
-  char* FileName; // Name of binary particle file
-  float RL; // The physical box dimensions (rL)
-  float Overlap; // The ghost cell boundary space
-  int ReadMode; // The reading mode
-//  int ByteSwap; // Indicates whether to byte-swap data on read
+  char* FileName;  // Name of binary particle file
+  float RL;        // The physical box dimensions (rL)
+  float Overlap;   // The ghost cell boundary space
+  int ReadMode;    // The reading mode
+                   //  int ByteSwap; // Indicates whether to byte-swap data on read
   int CosmoFormat; // Enable cosmo format or gadget format
 
 private:

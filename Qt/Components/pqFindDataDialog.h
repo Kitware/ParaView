@@ -41,14 +41,15 @@ class pqOutputPort;
 * pqFindDataDialog encapsulates the logic for the "Find Data" dialog in
 * ParaView. This class puts together components provided by other
 * classes e.g. pqFindDataCreateSelectionFrame and
-* pqFindDataCurrentSelectionFrame. 
+* pqFindDataCurrentSelectionFrame.
 */
 class PQCOMPONENTS_EXPORT pqFindDataDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqFindDataDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqFindDataDialog();
 
 signals:

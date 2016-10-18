@@ -113,7 +113,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif

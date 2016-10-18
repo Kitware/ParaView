@@ -8,7 +8,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,9 +42,9 @@ static int AddTestScript(const char*, const char* value, void* call_data)
 {
   pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
   if (self)
-    {
+  {
     return self->AddTestScript(value);
-    }
+  }
   return 0;
 }
 
@@ -52,9 +52,9 @@ static int AddTestBaseline(const char*, const char* value, void* call_data)
 {
   pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
   if (self)
-    {
+  {
     return self->SetLastTestBaseline(value);
-    }
+  }
   return 0;
 }
 
@@ -62,9 +62,9 @@ static int AddTestImageThreshold(const char*, const char* value, void* call_data
 {
   pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
   if (self)
-    {
+  {
     return self->SetLastTestImageThreshold(QString(value).toInt());
-    }
+  }
   return 0;
 }
 
@@ -98,69 +98,59 @@ pqOptions::~pqOptions()
 void pqOptions::Initialize()
 {
   this->Superclass::Initialize();
- 
-  this->AddArgument("--baseline-directory", NULL,
-    &this->TestDirectory,
+
+  this->AddArgument("--baseline-directory", NULL, &this->TestDirectory,
     "Set the baseline directory where test recorder will store baseline images.");
- 
-  this->AddArgument("--test-directory", NULL,
-    &this->TestDirectory,
+
+  this->AddArgument("--test-directory", NULL, &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
 
-  this->AddArgument("--tile-image-prefix", NULL,
-    &this->TileImagePath,
+  this->AddArgument("--tile-image-prefix", NULL, &this->TileImagePath,
     "Set the temporary directory with file name prefix for tile display image dump.");
-  
-  this->AddArgument("--data-directory", NULL,
-    &this->DataDirectory,
+
+  this->AddArgument("--data-directory", NULL, &this->DataDirectory,
     "Set the data directory where test-case data are.");
- 
+
   this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
     "Exit application when testing is done. Use for testing.");
 
-  this->AddArgument("--server", "-s",
-    &this->ServerResourceName,
+  this->AddArgument("--server", "-s", &this->ServerResourceName,
     "Set the name of the server resource to connect with when the client starts.");
 
-  this->AddCallback("--test-script", NULL,
-    &::AddTestScript, this, "Add test script. Can be used multiple times to "
+  this->AddCallback("--test-script", NULL, &::AddTestScript, this,
+    "Add test script. Can be used multiple times to "
     "specify multiple tests.");
-  this->AddCallback("--test-baseline", NULL,
-    &::AddTestBaseline, this,
+  this->AddCallback("--test-baseline", NULL, &::AddTestBaseline, this,
     "Add test baseline. Can be used multiple times to specify "
     "multiple baselines for multiple tests, in order.");
-  this->AddCallback("--test-threshold", NULL,
-    &::AddTestImageThreshold, this,
+  this->AddCallback("--test-threshold", NULL, &::AddTestImageThreshold, this,
     "Add test image threshold. "
     "Can be used multiple times to specify multiple image thresholds for "
     "multiple tests in order. When recording test can be a directory to record image in");
 
-  this->AddArgument("--script", NULL,
-    &this->PythonScript,
-    "Set a python script to be evaluated on startup.");
+  this->AddArgument(
+    "--script", NULL, &this->PythonScript, "Set a python script to be evaluated on startup.");
 
-  this->AddBooleanArgument("--test-master", 0,
-    &this->TestMaster,
+  this->AddBooleanArgument("--test-master", 0, &this->TestMaster,
     "(For testing) When present, tests master configuration.");
 
-  this->AddBooleanArgument("--test-slave", 0,
-    &this->TestSlave,
-    "(For testing) When present, tests slave configuration.");
+  this->AddBooleanArgument(
+    "--test-slave", 0, &this->TestSlave, "(For testing) When present, tests slave configuration.");
 }
 
 //-----------------------------------------------------------------------------
 QStringList pqOptions::GetTestScripts()
 {
   QStringList list;
-  for (int cc=0; cc < this->GetNumberOfTestScripts(); cc++)
-    {
+  for (int cc = 0; cc < this->GetNumberOfTestScripts(); cc++)
+  {
     list << this->GetTestScript(cc);
-    }
+  }
   return list;
 }
 
 //-----------------------------------------------------------------------------
-int pqOptions::PostProcess(int argc, const char * const *argv)
+int pqOptions::PostProcess(int argc, const char* const* argv)
 {
   return this->Superclass::PostProcess(argc, argv);
 }
@@ -183,9 +173,9 @@ int pqOptions::AddTestScript(const char* script)
 int pqOptions::SetLastTestBaseline(const char* image)
 {
   if (this->TestScripts.size() == 0)
-    {
+  {
     this->AddTestScript("-not-specified");
-    }
+  }
   this->TestScripts.last().TestBaseline = image;
   return 1;
 }
@@ -194,9 +184,9 @@ int pqOptions::SetLastTestBaseline(const char* image)
 int pqOptions::SetLastTestImageThreshold(int threshold)
 {
   if (this->TestScripts.size() == 0)
-    {
+  {
     this->AddTestScript("-not-specified");
-    }
+  }
   this->TestScripts.last().ImageThreshold = threshold;
   return 1;
 }
@@ -206,14 +196,14 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "TestDirectory: " << (this->TestDirectory?
-    this->TestDirectory : "(none)") << endl;
-  os << indent << "DataDirectory: " << (this->DataDirectory?
-    this->DataDirectory : "(none)") << endl;
+  os << indent << "TestDirectory: " << (this->TestDirectory ? this->TestDirectory : "(none)")
+     << endl;
+  os << indent << "DataDirectory: " << (this->DataDirectory ? this->DataDirectory : "(none)")
+     << endl;
 
-  os << indent << "ServerResourceName: " 
-    << (this->ServerResourceName? this->ServerResourceName : "(none)") << endl;
+  os << indent
+     << "ServerResourceName: " << (this->ServerResourceName ? this->ServerResourceName : "(none)")
+     << endl;
 
-  os << indent << "PythonScript: " << 
-    (this->PythonScript? this->PythonScript : "(none)") << endl;
+  os << indent << "PythonScript: " << (this->PythonScript ? this->PythonScript : "(none)") << endl;
 }

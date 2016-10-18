@@ -32,7 +32,8 @@
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPExtractTemporalFieldData : public vtkExtractTemporalFieldData
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPExtractTemporalFieldData
+  : public vtkExtractTemporalFieldData
 {
 public:
   static vtkPExtractTemporalFieldData* New();
@@ -53,8 +54,8 @@ protected:
   vtkPExtractTemporalFieldData();
   ~vtkPExtractTemporalFieldData();
 
-  int RequestData(vtkInformation *request,
-    vtkInformationVector **inputVector, vtkInformationVector *outputVector) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
 

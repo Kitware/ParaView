@@ -33,41 +33,40 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSystemConfigInformation : public vtk
 {
 public:
   class ConfigInfo
+  {
+  public:
+    ConfigInfo()
+      : OSDescriptor("")
+      , CPUDescriptor("")
+      , MemDescriptor("")
+      , HostName("")
+      , ProcessType(-1)
+      , SystemType(-1)
+      , Rank(-1)
+      , Pid(0)
+      , HostMemoryTotal(0)
+      , HostMemoryAvailable(0)
+      , ProcMemoryAvailable(0)
     {
-    public:
-      ConfigInfo()
-            :
-        OSDescriptor(""),
-        CPUDescriptor(""),
-        MemDescriptor(""),
-        HostName(""),
-        ProcessType(-1),
-        SystemType(-1),
-        Rank(-1),
-        Pid(0),
-        HostMemoryTotal(0),
-        HostMemoryAvailable(0),
-        ProcMemoryAvailable(0)
-      {}
+    }
 
-      void Print();
+    void Print();
 
-      bool operator<(const ConfigInfo &other) const
-      { return this->Rank<other.Rank; }
+    bool operator<(const ConfigInfo& other) const { return this->Rank < other.Rank; }
 
-    public:
-      string OSDescriptor;
-      string CPUDescriptor;
-      string MemDescriptor;
-      string HostName;
-      int ProcessType;
-      int SystemType;
-      int Rank;
-      long long Pid;
-      long long HostMemoryTotal;
-      long long HostMemoryAvailable;
-      long long ProcMemoryAvailable;
-    };
+  public:
+    string OSDescriptor;
+    string CPUDescriptor;
+    string MemDescriptor;
+    string HostName;
+    int ProcessType;
+    int SystemType;
+    int Rank;
+    long long Pid;
+    long long HostMemoryTotal;
+    long long HostMemoryAvailable;
+    long long ProcMemoryAvailable;
+  };
 
 public:
   static vtkPVSystemConfigInformation* New();
@@ -88,26 +87,26 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream *css);
-  virtual void CopyFromStream(const vtkClientServerStream *css);
+  virtual void CopyToStream(vtkClientServerStream* css);
+  virtual void CopyFromStream(const vtkClientServerStream* css);
   //@}
 
   /**
    * Access managed information
    */
-  size_t GetSize(){ return this->Configs.size(); }
+  size_t GetSize() { return this->Configs.size(); }
 
-  const char *GetOSDescriptor(size_t i){ return this->Configs[i].OSDescriptor.c_str(); }
-  const char *GetCPUDescriptor(size_t i){ return this->Configs[i].CPUDescriptor.c_str(); }
-  const char *GetMemoryDescriptor(size_t i){ return this->Configs[i].MemDescriptor.c_str(); }
-  const char *GetHostName(size_t i){ return this->Configs[i].HostName.c_str(); }
-  int GetProcessType(size_t i){ return this->Configs[i].ProcessType; }
-  int GetSystemType(size_t i){ return this->Configs[i].SystemType; }
-  int GetRank(size_t i){ return this->Configs[i].Rank; }
-  long long GetPid(size_t i){ return this->Configs[i].Pid; }
-  long long GetHostMemoryTotal(size_t i){ return this->Configs[i].HostMemoryTotal; }
-  long long GetHostMemoryAvailable(size_t i){ return this->Configs[i].HostMemoryAvailable; }
-  long long GetProcMemoryAvailable(size_t i){ return this->Configs[i].ProcMemoryAvailable; }
+  const char* GetOSDescriptor(size_t i) { return this->Configs[i].OSDescriptor.c_str(); }
+  const char* GetCPUDescriptor(size_t i) { return this->Configs[i].CPUDescriptor.c_str(); }
+  const char* GetMemoryDescriptor(size_t i) { return this->Configs[i].MemDescriptor.c_str(); }
+  const char* GetHostName(size_t i) { return this->Configs[i].HostName.c_str(); }
+  int GetProcessType(size_t i) { return this->Configs[i].ProcessType; }
+  int GetSystemType(size_t i) { return this->Configs[i].SystemType; }
+  int GetRank(size_t i) { return this->Configs[i].Rank; }
+  long long GetPid(size_t i) { return this->Configs[i].Pid; }
+  long long GetHostMemoryTotal(size_t i) { return this->Configs[i].HostMemoryTotal; }
+  long long GetHostMemoryAvailable(size_t i) { return this->Configs[i].HostMemoryAvailable; }
+  long long GetProcMemoryAvailable(size_t i) { return this->Configs[i].ProcMemoryAvailable; }
 
   /**
    * Sort elements by mpi rank.
@@ -119,7 +118,6 @@ protected:
   ~vtkPVSystemConfigInformation();
 
 private:
-
   vector<ConfigInfo> Configs;
 
 private:

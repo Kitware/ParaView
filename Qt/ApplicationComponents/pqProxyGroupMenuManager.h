@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -47,6 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqProxyGroupMenuManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * Constructor.
@@ -60,18 +61,15 @@ public:
   /**
   * Access the menu.
   */
-  QMenu* menu() const
-    { return static_cast<QMenu*>(this->parent()); }
+  QMenu* menu() const { return static_cast<QMenu*>(this->parent()); }
 
   /**
   * When size>0 a recently used category will be added to the menu.
   * One must call update() or initialize() after changing this value.
   */
-  void setRecentlyUsedMenuSize(unsigned int val)
-    { this->RecentlyUsedMenuSize = val; }
+  void setRecentlyUsedMenuSize(unsigned int val) { this->RecentlyUsedMenuSize = val; }
 
-  unsigned int recentlyUsedMenuSize() const
-    { return this->RecentlyUsedMenuSize; }
+  unsigned int recentlyUsedMenuSize() const { return this->RecentlyUsedMenuSize; }
 
   /**
   * returns the widget that hold actions created by this menu manager.
@@ -167,7 +165,7 @@ public slots:
 
 signals:
   void triggered(const QString& group, const QString& name);
-  
+
   /**
   * fired when the menu gets repopulated,typically means that the actions have
   * been updated.
@@ -196,11 +194,9 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqProxyGroupMenuManager)
-  
+
   class pqInternal;
   pqInternal* Internal;
 };
 
 #endif
-
-

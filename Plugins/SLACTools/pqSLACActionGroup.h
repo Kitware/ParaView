@@ -29,11 +29,12 @@
 class pqSLACActionGroup : public QActionGroup
 {
   Q_OBJECT;
+
 public:
-  pqSLACActionGroup(QObject *p);
+  pqSLACActionGroup(QObject* p);
 
 private:
   Q_DISABLE_COPY(pqSLACActionGroup)
 };
 
-#endif //pqSLACActionGroup_h
+#endif // pqSLACActionGroup_h

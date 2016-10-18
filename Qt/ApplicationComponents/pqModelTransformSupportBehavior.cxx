@@ -48,57 +48,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
+static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
+{
+  foreach (pqRepresentation* repr, view->getRepresentations())
+  {
+    pqDataRepresentation* drepr = qobject_cast<pqDataRepresentation*>(repr);
+    if (!drepr || !drepr->isVisible())
     {
-    foreach (pqRepresentation* repr, view->getRepresentations())
-      {
-      pqDataRepresentation* drepr = qobject_cast<pqDataRepresentation*>(repr);
-      if (!drepr || !drepr->isVisible())
-        {
-        continue;
-        }
-
-      vtkPVDataInformation* info = drepr->getInputDataInformation();
-      vtkPVArrayInformation* cobm = info->GetArrayInformation(
-        "ChangeOfBasisMatrix", vtkDataObject::FIELD);
-      vtkPVArrayInformation* bbimc = cobm ? info->GetArrayInformation(
-        "BoundingBoxInModelCoordinates", vtkDataObject::FIELD) : NULL;
-      if (cobm && bbimc)
-        {
-        return vtkSMSourceProxy::SafeDownCast(drepr->getInput()->getProxy());
-        }
-      }
-    return NULL;
+      continue;
     }
 
-  /// Changes the title property iff its value wasn't explicitly changed by the user.
-  /// If value is NULL, we restore the property default else the property is set to
-  /// the specified value.
-  void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value)
+    vtkPVDataInformation* info = drepr->getInputDataInformation();
+    vtkPVArrayInformation* cobm =
+      info->GetArrayInformation("ChangeOfBasisMatrix", vtkDataObject::FIELD);
+    vtkPVArrayInformation* bbimc = cobm
+      ? info->GetArrayInformation("BoundingBoxInModelCoordinates", vtkDataObject::FIELD)
+      : NULL;
+    if (cobm && bbimc)
     {
-    vtkSMProperty* prop = gridAxis->GetProperty(pname);
-    Q_ASSERT(prop);
-
-    vtkSMPropertyHelper helper(prop);
-
-    QString key = QString("MTSBAutoTitle.%1").arg(pname);
-    if (prop->IsValueDefault() ||
-      (gridAxis->HasAnnotation(key.toLatin1().data()) &&
-       strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0))
-      {
-      if (value)
-        {
-        helper.Set(value);
-        gridAxis->SetAnnotation(key.toLatin1().data(), value);
-        }
-      else
-        {
-        prop->ResetToDefault();
-        gridAxis->RemoveAnnotation(key.toLatin1().data());
-        }
-      }
+      return vtkSMSourceProxy::SafeDownCast(drepr->getInput()->getProxy());
     }
+  }
+  return NULL;
+}
 
+/// Changes the title property iff its value wasn't explicitly changed by the user.
+/// If value is NULL, we restore the property default else the property is set to
+/// the specified value.
+void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value)
+{
+  vtkSMProperty* prop = gridAxis->GetProperty(pname);
+  Q_ASSERT(prop);
+
+  vtkSMPropertyHelper helper(prop);
+
+  QString key = QString("MTSBAutoTitle.%1").arg(pname);
+  if (prop->IsValueDefault() ||
+    (gridAxis->HasAnnotation(key.toLatin1().data()) &&
+        strcmp(gridAxis->GetAnnotation(key.toLatin1().data()), helper.GetAsString()) == 0))
+  {
+    if (value)
+    {
+      helper.Set(value);
+      gridAxis->SetAnnotation(key.toLatin1().data(), value);
+    }
+    else
+    {
+      prop->ResetToDefault();
+      gridAxis->RemoveAnnotation(key.toLatin1().data());
+    }
+  }
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -108,9 +108,9 @@ pqModelTransformSupportBehavior::pqModelTransformSupportBehavior(QObject* parent
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->connect(smmodel, SIGNAL(viewAdded(pqView*)), SLOT(viewAdded(pqView*)));
   foreach (pqView* view, smmodel->findItems<pqView*>())
-    {
+  {
     this->viewAdded(view);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -122,9 +122,9 @@ pqModelTransformSupportBehavior::~pqModelTransformSupportBehavior()
 void pqModelTransformSupportBehavior::viewAdded(pqView* view)
 {
   if (view)
-    {
+  {
     this->connect(view, SIGNAL(updateDataEvent()), SLOT(viewUpdated()));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -136,25 +136,24 @@ void pqModelTransformSupportBehavior::viewUpdated()
   // Check if there is any data source visible in the view that has a
   // ChangeOfBasisMatrix and BoundingBoxInModelCoordinates specified.
   if (vtkSMSourceProxy* producer = FindVisibleProducerWithChangeOfBasisMatrix(view))
-    {
+  {
     this->enableModelTransform(view, producer);
-    }
+  }
   else
-    {
+  {
     this->disableModelTransform(view);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqModelTransformSupportBehavior::enableModelTransform(
-  pqView* view, vtkSMSourceProxy* producer)
+void pqModelTransformSupportBehavior::enableModelTransform(pqView* view, vtkSMSourceProxy* producer)
 {
   bool are_titles_valid;
   vtkTuple<vtkStdString, 3> titles = this->getAxisTitles(producer, 0, &are_titles_valid);
 
-  if (vtkSMProxy* gridAxes3DActor = vtkSMPropertyHelper(
-    view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
-    {
+  if (vtkSMProxy* gridAxes3DActor =
+        vtkSMPropertyHelper(view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
+  {
     vtkSMPropertyHelper(gridAxes3DActor, "UseModelTransform").Set(1);
     vtkTuple<double, 16> cobm = this->getChangeOfBasisMatrix(producer);
     vtkTuple<double, 6> bounds = this->getBoundingBoxInModelCoordinates(producer);
@@ -162,72 +161,71 @@ void pqModelTransformSupportBehavior::enableModelTransform(
     vtkSMPropertyHelper(gridAxes3DActor, "ModelBounds").Set(bounds.GetData(), 6);
 
     if (are_titles_valid)
-      {
+    {
       SafeSetAxisTitle(gridAxes3DActor, "XTitle", titles[0].c_str());
       SafeSetAxisTitle(gridAxes3DActor, "YTitle", titles[1].c_str());
       SafeSetAxisTitle(gridAxes3DActor, "ZTitle", titles[2].c_str());
-      }
+    }
     else
-      {
+    {
       // clear data-dependent axis titles.
       SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
       SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
       SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
-      }
-    gridAxes3DActor->UpdateVTKObjects();
     }
+    gridAxes3DActor->UpdateVTKObjects();
+  }
 
   if (are_titles_valid)
-    {
+  {
     vtkSMProxy* viewProxy = view->getProxy();
-    vtkSMPropertyHelper(viewProxy, "XTitle", /*quiet*/true).Set(titles[0].c_str());
-    vtkSMPropertyHelper(viewProxy, "YTitle", /*quiet*/true).Set(titles[1].c_str());
-    vtkSMPropertyHelper(viewProxy, "ZTitle", /*quiet*/true).Set(titles[2].c_str());
+    vtkSMPropertyHelper(viewProxy, "XTitle", /*quiet*/ true).Set(titles[0].c_str());
+    vtkSMPropertyHelper(viewProxy, "YTitle", /*quiet*/ true).Set(titles[1].c_str());
+    vtkSMPropertyHelper(viewProxy, "ZTitle", /*quiet*/ true).Set(titles[2].c_str());
     viewProxy->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqModelTransformSupportBehavior::disableModelTransform(pqView* view)
 {
-  if (vtkSMProxy* gridAxes3DActor = vtkSMPropertyHelper(
-    view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
-    {
+  if (vtkSMProxy* gridAxes3DActor =
+        vtkSMPropertyHelper(view->getProxy(), "AxesGrid", /*quiet*/ true).GetAsProxy())
+  {
     vtkSMPropertyHelper helper(gridAxes3DActor, "UseModelTransform");
     if (helper.GetAsInt() != 0)
-      {
+    {
       helper.Set(0);
-      }
+    }
     SafeSetAxisTitle(gridAxes3DActor, "XTitle", NULL);
     SafeSetAxisTitle(gridAxes3DActor, "YTitle", NULL);
     SafeSetAxisTitle(gridAxes3DActor, "ZTitle", NULL);
     gridAxes3DActor->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-template<class T, int size>
-vtkTuple<T, size> GetValues(
-  const char* aname, vtkSMSourceProxy* producer, int port, bool *pisvalid)
+template <class T, int size>
+vtkTuple<T, size> GetValues(const char* aname, vtkSMSourceProxy* producer, int port, bool* pisvalid)
 {
   bool dummy;
-  pisvalid = pisvalid? pisvalid : &dummy;
+  pisvalid = pisvalid ? pisvalid : &dummy;
   *pisvalid = false;
 
   vtkTuple<T, size> value;
   vtkPVDataInformation* dinfo = producer->GetDataInformation(port);
   if (vtkPVArrayInformation* ainfo =
-    (dinfo? dinfo->GetArrayInformation(aname, vtkDataObject::FIELD) : NULL))
-    {
+        (dinfo ? dinfo->GetArrayInformation(aname, vtkDataObject::FIELD) : NULL))
+  {
     if (ainfo->GetNumberOfComponents() == size)
-      {
+    {
       *pisvalid = true;
-      for (int cc=0; cc < size; cc++)
-        {
+      for (int cc = 0; cc < size; cc++)
+      {
         value[cc] = ainfo->GetComponentRange(cc)[0];
-        }
       }
     }
+  }
   return value;
 }
 
@@ -250,12 +248,15 @@ vtkTuple<vtkStdString, 3> pqModelTransformSupportBehavior::getAxisTitles(
   vtkSMSourceProxy* producer, int port, bool* pisvalid)
 {
   bool dummy;
-  pisvalid = pisvalid? pisvalid : &dummy;
+  pisvalid = pisvalid ? pisvalid : &dummy;
   *pisvalid = false;
 
   vtkTuple<vtkStdString, 3> value;
   vtkPVDataInformation* dinfo = producer->GetDataInformation(port);
-  if (!dinfo) { return value; }
+  if (!dinfo)
+  {
+    return value;
+  }
 
   vtkPVArrayInformation* xtitle = dinfo->GetArrayInformation("AxisTitleForX", vtkDataObject::FIELD);
   vtkPVArrayInformation* ytitle = dinfo->GetArrayInformation("AxisTitleForY", vtkDataObject::FIELD);
@@ -263,24 +264,24 @@ vtkTuple<vtkStdString, 3> pqModelTransformSupportBehavior::getAxisTitles(
   if ((xtitle && xtitle->GetComponentName(0) == NULL) ||
     (ytitle && ytitle->GetComponentName(0) == NULL) ||
     (ztitle && ztitle->GetComponentName(0) == NULL))
-    {
+  {
     qCritical() << "Mechanisms for specifying axis titles have changed. "
-      "Please contact the ParaView developers for more info.";
+                   "Please contact the ParaView developers for more info.";
     return value;
-    }
+  }
 
   *pisvalid = xtitle || ytitle || ztitle;
   if (xtitle && xtitle->GetComponentName(0))
-    {
+  {
     value[0] = xtitle->GetComponentName(0);
-    }
+  }
   if (ytitle && ytitle->GetComponentName(0))
-    {
+  {
     value[1] = ytitle->GetComponentName(0);
-    }
+  }
   if (ztitle && ztitle->GetComponentName(0))
-    {
+  {
     value[2] = ztitle->GetComponentName(0);
-    }
+  }
   return value;
 }

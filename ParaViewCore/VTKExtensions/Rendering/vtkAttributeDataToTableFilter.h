@@ -88,18 +88,16 @@ public:
 protected:
   vtkAttributeDataToTableFilter();
   ~vtkAttributeDataToTableFilter();
- 
+
   // Overridden to indicate to the executive that we accept non-composite
   // datasets. We let the executive manage the looping over the composite
-  // dataset leaves. 
+  // dataset leaves.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   /**
    * Perform the data processing
    */
-  virtual int RequestData(vtkInformation*, 
-                          vtkInformationVector**, 
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Create a default executive.
@@ -124,11 +122,10 @@ protected:
   bool AddMetaData;
   bool GenerateOriginalIds;
   bool GenerateCellConnectivity;
+
 private:
   vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

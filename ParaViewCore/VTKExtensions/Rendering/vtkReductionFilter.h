@@ -17,13 +17,13 @@
  * @brief   A generic filter that can reduce any type of
  * dataset using any reduction algorithm.
  *
- * A generic filter that can reduce any type of dataset using any reduction 
+ * A generic filter that can reduce any type of dataset using any reduction
  * algorithm. Actual reduction is performed by running the PreGatherHelper
  * and PostGatherHelper algorithms. The PreGatherHelper runs on each node
  * in parallel. Next the intermediate results are gathered to the root node.
  * Then the root node then runs the PostGatherHelper algorithm to produce a
- * single result. The PostGatherHelper must be an algorithm that takes 
- * multiple input connections and produces a single reduced output. 
+ * single result. The PostGatherHelper must be an algorithm that takes
+ * multiple input connections and produces a single reduced output.
  *
  * In addition to doing reduction the PassThrough variable lets you choose
  * to pass through the results of any one node instead of aggregating all of
@@ -96,7 +96,8 @@ public:
   vtkGetMacro(GenerateProcessIds, int);
   //@}
 
-  enum Tags {
+  enum Tags
+  {
     TRANSMIT_DATA_OBJECT = 23484
   };
 
@@ -106,30 +107,25 @@ protected:
 
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestDataObject(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   void Reduce(vtkDataObject* input, vtkDataObject* output);
   vtkDataObject* PreProcess(vtkDataObject* input);
-  void PostProcess(vtkDataObject* output,
-    vtkSmartPointer<vtkDataObject> inputs[],
-    unsigned int num_inputs);
+  void PostProcess(
+    vtkDataObject* output, vtkSmartPointer<vtkDataObject> inputs[], unsigned int num_inputs);
 
   /**
    * Gather for vtkSelection
    * sendData is a vtkSelection while receiveData is a vector of NumberOfProcesses
    * vtkSelections. Selections are gathered on destProcessId
    */
-  int GatherSelection(
-    vtkSelection* sendData,
-    std::vector<vtkSmartPointer<vtkDataObject> >& receiveData,
-    int destProcessId);
+  int GatherSelection(vtkSelection* sendData,
+    std::vector<vtkSmartPointer<vtkDataObject> >& receiveData, int destProcessId);
 
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;
@@ -140,8 +136,6 @@ protected:
 private:
   vtkReductionFilter(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

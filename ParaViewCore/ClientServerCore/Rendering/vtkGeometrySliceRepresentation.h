@@ -27,7 +27,8 @@
 
 #include "vtkGeometryRepresentation.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometrySliceRepresentation : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometrySliceRepresentation
+  : public vtkGeometryRepresentation
 {
 public:
   static vtkGeometrySliceRepresentation* New();
@@ -35,16 +36,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   enum
-    {
+  {
     X_SLICE_ONLY,
     Y_SLICE_ONLY,
     Z_SLICE_ONLY,
     ALL_SLICES
-    };
+  };
   vtkSetClampMacro(Mode, int, X_SLICE_ONLY, ALL_SLICES);
   vtkGetMacro(Mode, int);
 
@@ -61,11 +61,12 @@ protected:
   ~vtkGeometrySliceRepresentation();
 
   virtual void SetupDefaults();
-  virtual int RequestData(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual bool AddToView(vtkView* view);
   virtual bool RemoveFromView(vtkView* view);
+
 private:
   vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
@@ -74,7 +75,6 @@ private:
   vtkInternals* Internals;
   int Mode;
   bool ShowOutline;
-
 };
 
 #endif

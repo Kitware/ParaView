@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -57,26 +57,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLineWidget::pqImplementation
 {
 public:
-  pqImplementation() :
-    WidgetPoint1(0),
-    WidgetPoint2(0)
+  pqImplementation()
+    : WidgetPoint1(0)
+    , WidgetPoint2(0)
   {
     this->Links.setUseUncheckedProperties(false);
     this->Links.setAutoUpdateVTKObjects(true);
     this->PickPoint1 = true;
   }
-  
-  ~pqImplementation()
-  {
-  }
-  
+
+  ~pqImplementation() {}
+
   /// Stores the Qt widgets
   Ui::pqLineWidget UI;
-  
+
   /// Stores the 3D widget properties
   vtkSMDoubleVectorProperty* WidgetPoint1;
   vtkSMDoubleVectorProperty* WidgetPoint2;
-  
+
   /// Maps Qt widgets to the 3D widget
   pqPropertyLinks Links;
 
@@ -86,10 +84,10 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineWidget
 
-pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
-  const char* xmlname/*="LineWidgetRepresentation"*/) :
-  Superclass(o, pxy, p),
-  Implementation(new pqImplementation())
+pqLineWidget::pqLineWidget(
+  vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p, const char* xmlname /*="LineWidgetRepresentation"*/)
+  : Superclass(o, pxy, p)
+  , Implementation(new pqImplementation())
 {
   // enable picking.
   this->pickingSupported(QKeySequence(tr("P")));
@@ -107,62 +105,51 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
   this->Implementation->UI.point2Y->setValidator(validator);
   this->Implementation->UI.point2Z->setValidator(validator);
 
-  QObject::connect(this->Implementation->UI.visible,
-    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+  QObject::connect(
+    this->Implementation->UI.visible, SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
-  QObject::connect(this->Implementation->UI.pickMeshPoint,
-    SIGNAL(toggled(bool)), this, SLOT(setPickOnMeshPoint(bool)));
+  QObject::connect(this->Implementation->UI.pickMeshPoint, SIGNAL(toggled(bool)), this,
+    SLOT(setPickOnMeshPoint(bool)));
 
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this, SLOT(onWidgetVisibilityChanged(bool)));
+  QObject::connect(
+    this, SIGNAL(widgetVisibilityChanged(bool)), this, SLOT(onWidgetVisibilityChanged(bool)));
 
-  QObject::connect(this->Implementation->UI.xAxis,
-    SIGNAL(clicked()), this, SLOT(onXAxis()));
-  QObject::connect(this->Implementation->UI.yAxis,
-    SIGNAL(clicked()), this, SLOT(onYAxis()));
-  QObject::connect(this->Implementation->UI.zAxis,
-    SIGNAL(clicked()), this, SLOT(onZAxis()));
+  QObject::connect(this->Implementation->UI.xAxis, SIGNAL(clicked()), this, SLOT(onXAxis()));
+  QObject::connect(this->Implementation->UI.yAxis, SIGNAL(clicked()), this, SLOT(onYAxis()));
+  QObject::connect(this->Implementation->UI.zAxis, SIGNAL(clicked()), this, SLOT(onZAxis()));
 
   // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI.point1X, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI.point1Y, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI.point1Z,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI.point2X, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI.point2Y, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI.point2Z,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  
+  QObject::connect(this->Implementation->UI.point1X, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Y, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Z, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2X, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Y, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Z, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+
   this->createWidget(smmodel->findServer(o->GetSession()), xmlname);
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 }
 
 //-----------------------------------------------------------------------------
 pqLineWidget::~pqLineWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
-  
-  if(vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy())
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-      
+
+  if (vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy())
+  {
+    pqApplicationCore::instance()->get3DWidgetFactory()->free3DWidget(widget);
+
     this->setWidgetProxy(0);
-    }
+  }
 
   delete this->Implementation;
 }
@@ -179,26 +166,23 @@ void pqLineWidget::setControlledProperties(vtkSMProperty* point1, vtkSMProperty*
 }
 
 //-----------------------------------------------------------------------------
-void pqLineWidget::setControlledProperty(const char* function,
-  vtkSMProperty* prop)
+void pqLineWidget::setControlledProperty(const char* function, vtkSMProperty* prop)
 {
   this->Superclass::setControlledProperty(function, prop);
   if (QString("Point1WorldPosition") == function)
-    {
+  {
     if (prop->GetXMLLabel())
-      {
-      this->Implementation->UI.labelPoint1->setText(
-        prop->GetXMLLabel());
-      }
+    {
+      this->Implementation->UI.labelPoint1->setText(prop->GetXMLLabel());
     }
+  }
   else if (QString("Point2WorldPosition") == function)
-    {
+  {
     if (prop->GetXMLLabel())
-      {
-      this->Implementation->UI.labelPoint2->setText(
-        prop->GetXMLLabel());
-      }
+    {
+      this->Implementation->UI.labelPoint2->setText(prop->GetXMLLabel());
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -211,30 +195,27 @@ void pqLineWidget::pick(double dx, double dy, double dz)
   bool point1;
   int pickPointIndex = this->Implementation->UI.pickPoint->currentIndex();
   if (pickPointIndex == 1)
-    {
+  {
     point1 = true;
-    }
+  }
   else if (pickPointIndex == 2)
-    {
+  {
     point1 = false;
-    }
+  }
   else
-    {
+  {
     point1 = this->Implementation->PickPoint1;
-    this->Implementation->PickPoint1 = 
-      !this->Implementation->PickPoint1;
-    }
+    this->Implementation->PickPoint1 = !this->Implementation->PickPoint1;
+  }
 
   if (point1)
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      widget->GetProperty("Point1WorldPosition"), value);
-    }
+  {
+    pqSMAdaptor::setMultipleElementProperty(widget->GetProperty("Point1WorldPosition"), value);
+  }
   else
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      widget->GetProperty("Point2WorldPosition"), value);
-    }
+  {
+    pqSMAdaptor::setMultipleElementProperty(widget->GetProperty("Point2WorldPosition"), value);
+  }
   widget->UpdateVTKObjects();
 
   this->setModified();
@@ -247,9 +228,9 @@ void pqLineWidget::onXAxis()
   double object_center[3];
   double object_size[3];
   this->getReferenceBoundingBox(object_center, object_size);
-       
-  if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
-    {
+
+  if (this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
+  {
     this->Implementation->WidgetPoint1->SetElement(0, object_center[0] - object_size[0] * 0.5);
     this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
@@ -257,11 +238,11 @@ void pqLineWidget::onXAxis()
     this->Implementation->WidgetPoint2->SetElement(0, object_center[0] + object_size[0] * 0.5);
     this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
-  
+
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
     this->setModified();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -270,9 +251,9 @@ void pqLineWidget::onYAxis()
   double object_center[3];
   double object_size[3];
   this->getReferenceBoundingBox(object_center, object_size);
-       
-  if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
-    {
+
+  if (this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
+  {
     this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint1->SetElement(1, object_center[1] - object_size[1] * 0.5);
     this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
@@ -280,11 +261,11 @@ void pqLineWidget::onYAxis()
     this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint2->SetElement(1, object_center[1] + object_size[1] * 0.5);
     this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
-  
+
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
     this->setModified();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -293,9 +274,9 @@ void pqLineWidget::onZAxis()
   double object_center[3];
   double object_size[3];
   this->getReferenceBoundingBox(object_center, object_size);
-       
-  if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
-    {
+
+  if (this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
+  {
     this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint1->SetElement(2, object_center[2] - object_size[2] * 0.5);
@@ -303,11 +284,11 @@ void pqLineWidget::onZAxis()
     this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint2->SetElement(2, object_center[2] + object_size[2] * 0.5);
-  
+
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
     this->setModified();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -321,54 +302,40 @@ void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
 
-  this->Implementation->WidgetPoint1 = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget->GetProperty("Point1WorldPosition"));
-  this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget->GetProperty("Point2WorldPosition"));
+  this->Implementation->WidgetPoint1 =
+    vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Point1WorldPosition"));
+  this->Implementation->WidgetPoint2 =
+    vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Point2WorldPosition"));
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1X, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint1, 0);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point1X, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint1, 0);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1Y, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint1, 1);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point1Y, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint1, 1);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1Z, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint1, 2);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point1Z, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint1, 2);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2X, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint2, 0);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point2X, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint2, 0);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2Y, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint2, 1);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point2Y, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint2, 1);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2Z, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, this->Implementation->WidgetPoint2, 2);
-
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI.point2Z, "text2",
+    SIGNAL(textChanged(const QString&)), widget, this->Implementation->WidgetPoint2, 2);
 }
 
 //-----------------------------------------------------------------------------
 void pqLineWidget::resetBounds(double bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(vtkSMDoubleVectorProperty* const place_widget =
-    vtkSMDoubleVectorProperty::SafeDownCast(
-      widget->GetProperty("PlaceWidget")))
-    {
+  if (vtkSMDoubleVectorProperty* const place_widget =
+        vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("PlaceWidget")))
+  {
     place_widget->SetElements(bounds);
     widget->UpdateProperty("PlaceWidget", 1);
-    }
+  }
   widget->UpdatePropertyInformation();
 }
 
@@ -378,9 +345,9 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
   double input_bounds[6];
   vtkMath::UninitializeBounds(input_bounds);
   this->getReferenceInputBounds(input_bounds);
-  
-  if(vtkMath::AreBoundsInitialized(input_bounds))
-    {
+
+  if (vtkMath::AreBoundsInitialized(input_bounds))
+  {
     center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
     center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
     center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
@@ -389,16 +356,15 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
     sz[0] = fabs(input_bounds[1] - input_bounds[0]);
     sz[1] = fabs(input_bounds[3] - input_bounds[2]);
     sz[2] = fabs(input_bounds[5] - input_bounds[4]);
-    }
-  else if(this->Implementation->WidgetPoint1 &&
-          this->Implementation->WidgetPoint2)
-    {
+  }
+  else if (this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
+  {
     // get spherical bounds from what we had before
     double* tmp1 = this->Implementation->WidgetPoint1->GetElements();
     double* tmp2 = this->Implementation->WidgetPoint2->GetElements();
-    center[0] = (tmp1[0] + tmp2[0])/2.0;
-    center[1] = (tmp1[1] + tmp2[1])/2.0;
-    center[2] = (tmp1[2] + tmp2[2])/2.0;
+    center[0] = (tmp1[0] + tmp2[0]) / 2.0;
+    center[1] = (tmp1[1] + tmp2[1]) / 2.0;
+    center[2] = (tmp1[2] + tmp2[2]) / 2.0;
     sz[0] = fabs(tmp1[0] - tmp2[0]);
     sz[1] = fabs(tmp1[1] - tmp2[1]);
     sz[2] = fabs(tmp1[2] - tmp2[2]);
@@ -406,7 +372,7 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
     sz[0] = s;
     sz[1] = s;
     sz[2] = s;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -421,11 +387,8 @@ void pqLineWidget::onWidgetVisibilityChanged(bool visible)
 void pqLineWidget::setLineColor(const QColor& color)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
-  vtkSMPropertyHelper(widget,
-    "LineColor").Set(0, color.redF());
- vtkSMPropertyHelper(widget,
-    "LineColor").Set(1,color.greenF());
- vtkSMPropertyHelper(widget,
-    "LineColor").Set(2 , color.blueF());
-  widget->UpdateVTKObjects(); 
+  vtkSMPropertyHelper(widget, "LineColor").Set(0, color.redF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(1, color.greenF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(2, color.blueF());
+  widget->UpdateVTKObjects();
 }

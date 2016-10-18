@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,25 +52,23 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   QHBoxLayout* hbox = new QHBoxLayout(widget);
   hbox->setMargin(0);
   hbox->setSpacing(0);
-  pqProgressManager* progress_manager =
-    pqApplicationCore::instance()->getProgressManager();
+  pqProgressManager* progress_manager = pqApplicationCore::instance()->getProgressManager();
 
   // Progress bar/button management
   pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
   progress_manager->addNonBlockableObject(progress_bar);
   progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
 
-  QObject::connect( progress_manager, SIGNAL(enableProgress(bool)),
-                    progress_bar,     SLOT(enableProgress(bool)));
+  QObject::connect(
+    progress_manager, SIGNAL(enableProgress(bool)), progress_bar, SLOT(enableProgress(bool)));
 
-  QObject::connect( progress_manager, SIGNAL(progress(const QString&, int)),
-                    progress_bar,     SLOT(setProgress(const QString&, int)));
+  QObject::connect(progress_manager, SIGNAL(progress(const QString&, int)), progress_bar,
+    SLOT(setProgress(const QString&, int)));
 
-  QObject::connect( progress_manager, SIGNAL(enableAbort(bool)),
-                    progress_bar,     SLOT(enableAbort(bool)));
+  QObject::connect(
+    progress_manager, SIGNAL(enableAbort(bool)), progress_bar, SLOT(enableAbort(bool)));
 
-  QObject::connect( progress_bar,     SIGNAL(abortPressed()),
-                    progress_manager, SLOT(triggerAbort()));
+  QObject::connect(progress_bar, SIGNAL(abortPressed()), progress_manager, SLOT(triggerAbort()));
 
   // Final ui setup
   hbox->addWidget(progress_bar);

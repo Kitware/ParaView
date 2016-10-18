@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkSMAnimationSceneImageWriter
- * @brief   helper class to write animation 
+ * @brief   helper class to write animation
  * images/movies.
  *
  * vtkSMAnimationSceneImageWriter is a concrete implementation of
@@ -23,8 +23,8 @@
  * WindowPosition properties of the view modules. One can optionally specify
  * Magnification to scale the output.
  * @attention
- * This class does not support changing the dimensions of the view, one has to 
- * do that before calling Save(). It only provides Magnification which can scale 
+ * This class does not support changing the dimensions of the view, one has to
+ * do that before calling Save(). It only provides Magnification which can scale
  * the size using integral scale factor.
 */
 
@@ -96,7 +96,6 @@ public:
   vtkGetMacro(ErrorCode, int);
   //@}
 
-
   //@{
   /**
    * Get/Set the RGB background color to use to fill empty spaces in the image.
@@ -107,14 +106,13 @@ public:
   //@}
 
   // Get/Set the frame rate to use for saving the animation.
-  // This frame rate is the frame rate that gets saved in the movie 
+  // This frame rate is the frame rate that gets saved in the movie
   // file generated, if applicable. If does not affect the FrameRate
-  // set on the animation scene at all. In other words, this is the 
+  // set on the animation scene at all. In other words, this is the
   // playback frame rate and not the animation generation frame rate.
   // Default value is 1.
   vtkSetMacro(FrameRate, double);
   vtkGetMacro(FrameRate, double);
-
 
   //@{
   /**
@@ -123,6 +121,7 @@ public:
    * are determined by their extents.
    */
   static void Merge(vtkImageData* dest, vtkImageData* src);
+
 protected:
   vtkSMAnimationSceneImageWriter();
   ~vtkSMAnimationSceneImageWriter();
@@ -146,7 +145,7 @@ protected:
   // Creates the writer based on file type.
   bool CreateWriter();
 
-  // Updates the ActualSize which is the 
+  // Updates the ActualSize which is the
   // resolution of the generated animation frame.
   void UpdateImageSize();
 
@@ -156,8 +155,7 @@ protected:
    * Default implementation can only handle vtkSMViewProxy subclasses.
    * Subclassess must override to handle other types of view modules.
    */
-  virtual vtkImageData* CaptureViewImage(
-    vtkSMViewProxy*, int magnification);
+  virtual vtkImageData* CaptureViewImage(vtkSMViewProxy*, int magnification);
 
   vtkImageData* NewFrame();
 
@@ -183,10 +181,10 @@ protected:
 
   void SetImageWriter(vtkImageWriter*);
   void SetMovieWriter(vtkGenericMovieWriter*);
+
 private:
   vtkSMAnimationSceneImageWriter(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
 };
-
 
 #endif

@@ -45,14 +45,14 @@ class vtkPolyData;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkThreeSliceFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkThreeSliceFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkThreeSliceFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Construct with user-specified implicit function; initial value of 0.0; and
    * generating cut scalars turned off.
    */
-  static vtkThreeSliceFilter *New();
+  static vtkThreeSliceFilter* New();
 
   /**
    * Override GetMTime because we rely on internal filters that have their own MTime
@@ -92,7 +92,10 @@ public:
    */
   void SetCutOrigins(double origin[3]);
   void SetCutOrigins(double x, double y, double z)
-    { double xyz[] = {x,y,z}; this->SetCutOrigins(xyz); }
+  {
+    double xyz[] = { x, y, z };
+    this->SetCutOrigins(xyz);
+  }
 
   /**
    * Enable to probe the dataset at the given cut origin.
@@ -102,14 +105,14 @@ public:
   /**
    * Return true if any data is available and provide the value as argument
    */
-  bool GetProbedPointData(const char* arrayName, double &value);
+  bool GetProbedPointData(const char* arrayName, double& value);
 
 protected:
   vtkThreeSliceFilter();
   ~vtkThreeSliceFilter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   vtkCutter* Slices[3];
   vtkPlane* Planes[3];

@@ -71,7 +71,7 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
   typedef QObject Superclass;
 
 public:
-  pqObjectBuilder(QObject* parent=0);
+  pqObjectBuilder(QObject* parent = 0);
   virtual ~pqObjectBuilder();
 
   /**
@@ -91,7 +91,7 @@ public:
   /**
   * Destroy a server connection
   */
-  void removeServer(pqServer *server);
+  void removeServer(pqServer* server);
 
   /**
   * Resets the server by destroying the old pqServer instance and creating
@@ -104,8 +104,8 @@ public:
   * name (\c sm_name) on the given \c server. On success, returns the
   * pqPipelineSource for the created proxy.
   */
-  virtual pqPipelineSource* createSource(const QString& sm_group,
-    const QString& sm_name, pqServer* server);
+  virtual pqPipelineSource* createSource(
+    const QString& sm_group, const QString& sm_name, pqServer* server);
 
   /**
   * Creates a filter with the given Server Manager group (\c sm_group) and
@@ -113,30 +113,28 @@ public:
   * provided in the list are set as input, instead only the first one
   * is set as the input. All inputs must be on the same server.
   */
-  virtual pqPipelineSource* createFilter(
-    const QString& group, const QString& name,
+  virtual pqPipelineSource* createFilter(const QString& group, const QString& name,
     QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server);
 
   /**
   * Convenience method that takes a single input source.
   */
   virtual pqPipelineSource* createFilter(
-    const QString& group, const QString& name,
-    pqPipelineSource* input, int output_port = 0);
+    const QString& group, const QString& name, pqPipelineSource* input, int output_port = 0);
 
   /**
   * Creates a reader of the given server manager group (\c sm_group) and
   * name (\c sm_name) on the given \c server. On success, returns the
   * pqPipelineSource for the created proxy.
   */
-  virtual pqPipelineSource* createReader(const QString& sm_group,
-    const QString& sm_name, const QStringList& files, pqServer* server);
+  virtual pqPipelineSource* createReader(
+    const QString& sm_group, const QString& sm_name, const QStringList& files, pqServer* server);
 
   /**
   * Creates a new view module of the given type on the given server.
   */
-  virtual pqView* createView(const QString& type,
-    pqServer* server, bool detachedFromLayout = false);
+  virtual pqView* createView(
+    const QString& type, pqServer* server, bool detachedFromLayout = false);
 
   /**
   * Destroys the view module. This destroys the view module
@@ -149,7 +147,7 @@ public:
   * source in the given \c view.
   */
   virtual pqDataRepresentation* createDataRepresentation(
-    pqOutputPort* source, pqView* view, const QString &representationType="");
+    pqOutputPort* source, pqView* view, const QString& representationType = "");
 
   /**
   * Convenience method to create a proxy of any type on the given server.
@@ -157,12 +155,11 @@ public:
   * directly. This method additionally set the connection ID on
   * the new proxy. If reg_name is empty, then a new name is assigned.
   */
-  virtual vtkSMProxy* createProxy(const QString& sm_group, 
-    const QString& sm_name, pqServer* server, 
-    const QString& reg_group);
+  virtual vtkSMProxy* createProxy(
+    const QString& sm_group, const QString& sm_name, pqServer* server, const QString& reg_group);
 
   /**
-  * Destroys the data display. It will remove the display from any 
+  * Destroys the data display. It will remove the display from any
   * view modules it is added to and then unregister it.
   */
   virtual void destroy(pqRepresentation* repr);
@@ -191,18 +188,18 @@ public:
   /**
   * Destroy all sources/filters on a server.
   */
-  virtual void destroySources(pqServer* server=0);
+  virtual void destroySources(pqServer* server = 0);
 
   /**
   * Destroy all lookup tables and scalar bars associated with them.
   */
-  virtual void destroyLookupTables(pqServer* server=0);
+  virtual void destroyLookupTables(pqServer* server = 0);
 
   /**
   * Destroys all proxies that are involved in pipelines i.e. simply calls
   * destroySources(), destroyLookupTables().
   */
-  virtual void destroyPipelineProxies(pqServer* server=0);
+  virtual void destroyPipelineProxies(pqServer* server = 0);
 
   /**
   * This method unregisters all proxies on the given server.
@@ -225,8 +222,7 @@ public:
   /**
   * Returns true while pqObjectBuilder is in createServer() call.
   */
-  bool waitingForConnection() const
-    { return this->WaitingForConnection; }
+  bool waitingForConnection() const { return this->WaitingForConnection; }
 
 public slots:
   /**
@@ -239,7 +235,7 @@ signals:
   /**
   * Emitted after a new server connection is created
   */
-  void finishedAddingServer(pqServer *server);
+  void finishedAddingServer(pqServer* server);
 
   /**
   * Fired on successful completion of createSource().
@@ -349,7 +345,6 @@ private:
   Q_DISABLE_COPY(pqObjectBuilder)
 
   bool WaitingForConnection;
-
 };
 
 #endif

@@ -15,7 +15,7 @@
 /**
  * @class   vtkCSVWriter
  * @brief   CSV writer for vtkTable
- * Writes a vtkTable as a delimited text file (such as CSV). 
+ * Writes a vtkTable as a delimited text file (such as CSV).
 */
 
 #ifndef vtkCSVWriter_h
@@ -92,6 +92,7 @@ public:
    * UseStringDelimiter is true.
    */
   vtkStdString GetString(vtkStdString string);
+
 protected:
   vtkCSVWriter();
   ~vtkCSVWriter();
@@ -114,13 +115,10 @@ protected:
   bool UseScientificNotation;
 
   ofstream* Stream;
+
 private:
   vtkCSVWriter(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
-
 };
 
-
-
 #endif
-

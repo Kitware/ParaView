@@ -46,7 +46,6 @@ protected:
 private:
   vtkPVDefaultPass(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

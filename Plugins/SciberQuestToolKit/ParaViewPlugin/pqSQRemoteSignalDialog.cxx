@@ -51,52 +51,38 @@
 
 #include "pqFileDialog.h"
 
-#define pqErrorMacro(estr)\
-  qDebug()\
-      << "Error in:" << std::endl\
-      << __FILE__ << ", line " << __LINE__ << std::endl\
-      << "" estr << std::endl;
-
+#define pqErrorMacro(estr)                                                                         \
+  qDebug() << "Error in:" << std::endl                                                             \
+           << __FILE__ << ", line " << __LINE__ << std::endl                                       \
+           << "" estr << std::endl;
 
 // User interface
 //=============================================================================
-class pqSQRemoteSignalDialogUI
-    :
-  public Ui::pqSQRemoteSignalDialogForm
-    {};
+class pqSQRemoteSignalDialogUI : public Ui::pqSQRemoteSignalDialogForm
+{
+};
 
 //------------------------------------------------------------------------------
-pqSQRemoteSignalDialog::pqSQRemoteSignalDialog(
-    QWidget *Parent,
-    Qt::WindowFlags flags)
-            :
-    QDialog(Parent,flags),
-    Modified(0),
-    Ui(0)
+pqSQRemoteSignalDialog::pqSQRemoteSignalDialog(QWidget* Parent, Qt::WindowFlags flags)
+  : QDialog(Parent, flags)
+  , Modified(0)
+  , Ui(0)
 {
   this->Ui = new pqSQRemoteSignalDialogUI;
   this->Ui->setupUi(this);
 
   // plumbing to increment mtime as state changes
   QObject::connect(
-    this->Ui->fpeTrapUnderflow, SIGNAL(stateChanged(int)),
-    this, SLOT(SetModified()));
+    this->Ui->fpeTrapUnderflow, SIGNAL(stateChanged(int)), this, SLOT(SetModified()));
+
+  QObject::connect(this->Ui->fpeTrapOverflow, SIGNAL(stateChanged(int)), this, SLOT(SetModified()));
 
   QObject::connect(
-    this->Ui->fpeTrapOverflow, SIGNAL(stateChanged(int)),
-    this, SLOT(SetModified()));
+    this->Ui->fpeTrapDivByZero, SIGNAL(stateChanged(int)), this, SLOT(SetModified()));
 
-  QObject::connect(
-    this->Ui->fpeTrapDivByZero, SIGNAL(stateChanged(int)),
-    this, SLOT(SetModified()));
+  QObject::connect(this->Ui->fpeTrapInvalid, SIGNAL(stateChanged(int)), this, SLOT(SetModified()));
 
-  QObject::connect(
-    this->Ui->fpeTrapInvalid, SIGNAL(stateChanged(int)),
-    this, SLOT(SetModified()));
-
-  QObject::connect(
-    this->Ui->fpeTrapInexact, SIGNAL(stateChanged(int)),
-    this, SLOT(SetModified()));
+  QObject::connect(this->Ui->fpeTrapInexact, SIGNAL(stateChanged(int)), this, SLOT(SetModified()));
 }
 
 //------------------------------------------------------------------------------

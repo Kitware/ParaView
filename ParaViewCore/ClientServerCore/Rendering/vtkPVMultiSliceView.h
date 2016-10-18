@@ -89,7 +89,6 @@ private:
 
   class vtkSliceInternal;
   vtkSliceInternal* Internal;
-
 };
 
 #endif

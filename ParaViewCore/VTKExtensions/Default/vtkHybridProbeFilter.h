@@ -44,10 +44,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum ModeType
-    {
+  {
     INTERPOLATE_AT_LOCATION,
     EXTRACT_CELL_CONTAINING_LOCATION
-    };
+  };
 
   vtkSetClampMacro(Mode, int, INTERPOLATE_AT_LOCATION, EXTRACT_CELL_CONTAINING_LOCATION);
   vtkGetMacro(Mode, int);
@@ -66,8 +66,7 @@ protected:
   vtkHybridProbeFilter();
   ~vtkHybridProbeFilter();
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
@@ -80,7 +79,6 @@ protected:
 private:
   vtkHybridProbeFilter(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

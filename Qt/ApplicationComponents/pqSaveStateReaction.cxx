@@ -61,8 +61,8 @@ pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
   // save state enable state depends on whether we are connected to an active
   // server or not and whether
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(
+    activeObjects, SIGNAL(serverChanged(pqServer*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -81,32 +81,31 @@ void pqSaveStateReaction::saveState()
 #else
   QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
 #endif
-  pqFileDialog fileDialog(NULL,
-                          pqCoreUtilities::mainWidget(),
-                          tr("Save State File"), QString(), fileExt);
+  pqFileDialog fileDialog(
+    NULL, pqCoreUtilities::mainWidget(), tr("Save State File"), QString(), fileExt);
 
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
   if (fileDialog.exec() == QDialog::Accepted)
-    {
+  {
     QString selectedFile = fileDialog.getSelectedFiles()[0];
-    if(selectedFile.endsWith(".py"))
-      {
+    if (selectedFile.endsWith(".py"))
+    {
       pqSaveStateReaction::savePythonState(selectedFile);
-      }
-    else
-      {
-      pqSaveStateReaction::saveState(selectedFile);
-      }
     }
+    else
+    {
+      pqSaveStateReaction::saveState(selectedFile);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::saveState(const QString& filename)
 {
   pqApplicationCore::instance()->saveState(filename);
-  pqServer *server = pqActiveObjects::instance().activeServer();
+  pqServer* server = pqActiveObjects::instance().activeServer();
   // Add this to the list of recent server resources ...
   pqServerResource resource;
   resource.setScheme("session");
@@ -126,9 +125,9 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
   vtkSmartPointer<vtkSMProxy> options;
   options.TakeReference(pxm->NewProxy("pythontracing", "PythonStateOptions"));
   if (options.GetPointer() == NULL)
-    {
+  {
     return;
-    }
+  }
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->InitializeProxy(options);
@@ -138,28 +137,28 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
   dialog.setObjectName("StateOptionsDialog");
   dialog.setApplyChangesImmediately(true);
   if (dialog.exec() != QDialog::Accepted)
-    {
+  {
     return;
-    }
+  }
 
-  vtkStdString state = vtkSMTrace::GetState(
-    vtkSMPropertyHelper(options, "PropertiesToTraceOnCreate").GetAsInt(),
-    vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1);
+  vtkStdString state =
+    vtkSMTrace::GetState(vtkSMPropertyHelper(options, "PropertiesToTraceOnCreate").GetAsInt(),
+      vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1);
   if (state.empty())
-    {
+  {
     qWarning("Empty state generated.");
     return;
-    }
+  }
   QFile file(filename);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+  {
     qWarning() << "Could not open file:" << filename;
     return;
-    }
+  }
   QTextStream out(&file);
   out << state;
 #else
   qCritical() << "Failed to save '" << filename
-    << "' since Python support in not enabled in this build.";
+              << "' since Python support in not enabled in this build.";
 #endif
 }

@@ -37,7 +37,7 @@
 
 class vtkDoubleArray;
 
-class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DLookupTableTransferFunction: public vtk1DTransferFunction
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DLookupTableTransferFunction : public vtk1DTransferFunction
 {
 public:
   static vtk1DLookupTableTransferFunction* New();
@@ -53,25 +53,25 @@ public:
 
   // Description:
   // Set/Get the size of the lookup table.
-  virtual void  SetNumberOfTableValues(vtkIdType);
-  virtual vtkIdType  GetNumberOfTableValues();
+  virtual void SetNumberOfTableValues(vtkIdType);
+  virtual vtkIdType GetNumberOfTableValues();
 
   // Description:
   // Set/Get a single table value.
-  virtual void  SetTableValue(vtkIdType, double);
-  virtual double  GetTableValue(vtkIdType);
+  virtual void SetTableValue(vtkIdType, double);
+  virtual double GetTableValue(vtkIdType);
 
   // Description:
   // clean the lookup table.
-  virtual void  RemoveAllTableValues();
+  virtual void RemoveAllTableValues();
 
   // Description:
   // This will build a lookup table
-  virtual void  BuildDefaultTable();
+  virtual void BuildDefaultTable();
 
   // map a value and store it in the output at the given index
   // using the Lookup Table
-  virtual double  MapValue(double value, double* range);
+  virtual double MapValue(double value, double* range);
 
 protected:
   vtk1DLookupTableTransferFunction();
@@ -86,4 +86,3 @@ private:
 };
 
 #endif
-

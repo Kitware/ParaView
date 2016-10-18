@@ -63,8 +63,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
   Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
 
   typedef QWidget Superclass;
+
 public:
-  pqAnimationTimeWidget(QWidget* parent=0);
+  pqAnimationTimeWidget(QWidget* parent = 0);
   virtual ~pqAnimationTimeWidget();
 
   /**

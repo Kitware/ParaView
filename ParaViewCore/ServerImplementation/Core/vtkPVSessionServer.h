@@ -74,21 +74,22 @@ public:
   /**
    * Client-Server Communication tags.
    */
-  enum {
-    PUSH                            = 12,
-    PULL                            = 13,
-    EXECUTE_STREAM                  = 14,
-    GATHER_INFORMATION              = 15,
-    REGISTER_SI                     = 16,
-    UNREGISTER_SI                   = 17,
-    LAST_RESULT                     = 18,
+  enum
+  {
+    PUSH = 12,
+    PULL = 13,
+    EXECUTE_STREAM = 14,
+    GATHER_INFORMATION = 15,
+    REGISTER_SI = 16,
+    UNREGISTER_SI = 17,
+    LAST_RESULT = 18,
     SERVER_NOTIFICATION_MESSAGE_RMI = 55624,
-    CLIENT_SERVER_MESSAGE_RMI       = 55625,
-    CLOSE_SESSION                   = 55626,
-    REPLY_GATHER_INFORMATION_TAG    = 55627,
-    REPLY_PULL                      = 55628,
-    REPLY_LAST_RESULT               = 55629,
-    EXECUTE_STREAM_TAG              = 55630
+    CLIENT_SERVER_MESSAGE_RMI = 55625,
+    CLOSE_SESSION = 55626,
+    REPLY_GATHER_INFORMATION_TAG = 55627,
+    REPLY_PULL = 55628,
+    REPLY_LAST_RESULT = 55629,
+    EXECUTE_STREAM_TAG = 55630
   };
 
   //@{
@@ -124,8 +125,7 @@ protected:
    * Called when client triggers GatherInformation().
    */
   void GatherInformationInternal(
-    vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid,
-    vtkMultiProcessStream&);
+    vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid, vtkMultiProcessStream&);
 
   /**
    * Sends the last result to client.
@@ -143,7 +143,6 @@ protected:
 private:
   vtkPVSessionServer(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

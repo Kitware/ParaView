@@ -44,15 +44,18 @@ class pqPropertyLinks::pqInternals
 public:
   QList<QPointer<pqPropertyLinksConnection> > Connections;
   bool IgnoreSMChanges;
-  pqInternals(): IgnoreSMChanges(false) { }
+  pqInternals()
+    : IgnoreSMChanges(false)
+  {
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqPropertyLinks::pqPropertyLinks(QObject* parentObject)
-  : Superclass(parentObject),
-  Internals(new pqPropertyLinks::pqInternals()),
-  UseUncheckedProperties(false),
-  AutoUpdateVTKObjects(true)
+  : Superclass(parentObject)
+  , Internals(new pqPropertyLinks::pqInternals())
+  , UseUncheckedProperties(false)
+  , AutoUpdateVTKObjects(true)
 {
 }
 
@@ -69,16 +72,16 @@ pqPropertyLinks::~pqPropertyLinks()
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::setUseUncheckedProperties(bool val)
 {
-  if(val == this->UseUncheckedProperties)
-    {
+  if (val == this->UseUncheckedProperties)
+  {
     // nothing to change
     return;
-    }
+  }
 
-  foreach(pqPropertyLinksConnection *connection, this->Internals->Connections)
-    {
+  foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
+  {
     connection->setUseUncheckedProperties(val);
-    }
+  }
 
   this->UseUncheckedProperties = val;
 }
@@ -90,54 +93,49 @@ bool pqPropertyLinks::addNewConnection(pqPropertyLinksConnection* connection)
 
   // Avoid adding duplicates.
   foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)
-    {
+  {
     if (*existing == *connection)
-      {
+    {
       vtkSMProperty* smproperty = connection->propertySM();
       qDebug() << "Skipping duplicate connection: "
-        << "(" << connection->objectQt() << ", " << connection->propertyQt()
-        << ") <==> ("
-        << connection->proxySM() << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
-        << connection->indexSM();
+               << "(" << connection->objectQt() << ", " << connection->propertyQt() << ") <==> ("
+               << connection->proxySM() << ","
+               << (smproperty ? smproperty->GetXMLLabel() : "(none)") << connection->indexSM();
       delete connection;
       return true;
-      }
     }
+  }
 
   this->Internals->Connections.push_back(connection);
 
   // initialize the Qt widget using the SMProperty values.
   connection->copyValuesFromServerManagerToQt(this->useUncheckedProperties());
 
-  QObject::connect(connection, SIGNAL(qtpropertyModified()),
-    this, SLOT(onQtPropertyModified()));
-  QObject::connect(connection, SIGNAL(smpropertyModified()),
-    this, SLOT(onSMPropertyModified()));
+  QObject::connect(connection, SIGNAL(qtpropertyModified()), this, SLOT(onQtPropertyModified()));
+  QObject::connect(connection, SIGNAL(smpropertyModified()), this, SLOT(onSMPropertyModified()));
   return true;
 }
 
 //-----------------------------------------------------------------------------
-bool pqPropertyLinks::removePropertyLink(
-  QObject* qobject, const char* qproperty, const char* qsignal,
-  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
+bool pqPropertyLinks::removePropertyLink(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
 {
   // remove has to be a little flexible about input arguments. It accepts null
   // qobject and smproperty.
 
-  pqPropertyLinksConnection connection(
-    qobject, qproperty, qsignal, smproxy, smproperty, smindex,
+  pqPropertyLinksConnection connection(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
     this->useUncheckedProperties(), this);
 
   // Avoid adding duplicates.
   foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)
-    {
+  {
     if (*existing == connection)
-      {
+    {
       this->Internals->Connections.removeOne(existing);
       delete existing;
       return true;
-      }
     }
+  }
   return false;
 }
 
@@ -145,25 +143,23 @@ bool pqPropertyLinks::removePropertyLink(
 void pqPropertyLinks::clear()
 {
   foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
-    {
+  {
     delete connection;
-    }
+  }
   this->Internals->Connections.clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::onQtPropertyModified()
 {
-  pqPropertyLinksConnection* connection =
-    qobject_cast<pqPropertyLinksConnection*>(this->sender());
+  pqPropertyLinksConnection* connection = qobject_cast<pqPropertyLinksConnection*>(this->sender());
   if (connection)
-    {
-    connection->copyValuesFromQtToServerManager(
-      this->useUncheckedProperties());
+  {
+    connection->copyValuesFromQtToServerManager(this->useUncheckedProperties());
     if (this->autoUpdateVTKObjects() && connection->proxy())
-      {
+    {
       connection->proxy()->UpdateVTKObjects();
-      }
+    }
     emit this->qtWidgetChanged();
 
     // although unintuitive, several panels e.g. pqDisplayProxyEditor expect
@@ -175,26 +171,25 @@ void pqPropertyLinks::onQtPropertyModified()
     // explicitly. I'd like not provide some deprecation mechanism for this
     // behavior.
     if (this->autoUpdateVTKObjects() && connection->proxy())
-      {
+    {
       emit this->smPropertyChanged();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::onSMPropertyModified()
 {
   if (!this->Internals->IgnoreSMChanges)
-    {
+  {
     pqPropertyLinksConnection* connection =
       qobject_cast<pqPropertyLinksConnection*>(this->sender());
     if (connection)
-      {
-      connection->copyValuesFromServerManagerToQt(
-        this->useUncheckedProperties());
+    {
+      connection->copyValuesFromServerManagerToQt(this->useUncheckedProperties());
       emit this->smPropertyChanged();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -211,35 +206,35 @@ void pqPropertyLinks::accept()
   this->Internals->IgnoreSMChanges = true;
 
   foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
-    {
+  {
     if (connection && connection->proxy())
-      {
+    {
       connection->copyValuesFromQtToServerManager(false);
       proxies_to_update.insert(connection->proxy());
-      }
     }
+  }
   this->Internals->IgnoreSMChanges = false;
 
   for (std::set<vtkSMProxy*>::iterator iter = proxies_to_update.begin();
-    iter != proxies_to_update.end(); ++iter)
-    {
+       iter != proxies_to_update.end(); ++iter)
+  {
     (*iter)->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::reset()
 {
   foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
-    {
+  {
     if (connection && connection->proxy())
-      {
+    {
       connection->copyValuesFromServerManagerToQt(false);
       // Ensures that on "reset" we clear out unchecked values for the property.
       if (vtkSMProperty* prop = connection->propertySM())
-        {
+      {
         prop->ClearUncheckedElements();
-        }
       }
     }
+  }
 }

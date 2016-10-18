@@ -25,7 +25,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkPVCacheKeeper;
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeperPipeline : public vtkCompositeDataPipeline
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeperPipeline
+  : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCacheKeeperPipeline* New();
@@ -38,11 +39,10 @@ protected:
 
   virtual int ForwardUpstream(int i, int j, vtkInformation* request);
   virtual int ForwardUpstream(vtkInformation* request);
+
 private:
   vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

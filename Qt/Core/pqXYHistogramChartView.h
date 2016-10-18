@@ -53,13 +53,10 @@ public:
   /**
   * Currently the bar chart view is not supporting selection.
   */
-  virtual bool supportsSelection() const {return true;}
+  virtual bool supportsSelection() const { return true; }
 
-  pqXYHistogramChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYHistogramChartView(const QString& group, const QString& name,
+    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYHistogramChartView();
 

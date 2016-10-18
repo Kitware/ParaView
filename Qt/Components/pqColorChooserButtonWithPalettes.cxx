@@ -47,17 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 
 //-----------------------------------------------------------------------------
-pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(
-  QWidget* parentObject)
+pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(QWidget* parentObject)
   : Superclass(parentObject)
 {
   // Setup a popup menu.
-  QMenu *popupMenu = new QMenu(this);
+  QMenu* popupMenu = new QMenu(this);
   popupMenu << pqSetName("ColorPaletteMenu");
   this->setMenu(popupMenu);
   this->connect(popupMenu, SIGNAL(aboutToShow()), SLOT(updateMenu()));
-  this->connect(popupMenu, SIGNAL(triggered(QAction*)),
-    SLOT(actionTriggered(QAction*)));
+  this->connect(popupMenu, SIGNAL(triggered(QAction*)), SLOT(actionTriggered(QAction*)));
 
   this->setPopupMode(QToolButton::MenuButtonPopup);
 
@@ -75,10 +73,10 @@ pqColorChooserButtonWithPalettes::~pqColorChooserButtonWithPalettes()
 vtkSMGlobalPropertiesProxy* pqColorChooserButtonWithPalettes::colorPalette() const
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMSessionProxyManager* pxm = server? server->proxyManager() : NULL;
-  return (pxm?
-    vtkSMGlobalPropertiesProxy::SafeDownCast(
-      pxm->GetProxy("global_properties", "ColorPalette")) : NULL);
+  vtkSMSessionProxyManager* pxm = server ? server->proxyManager() : NULL;
+  return (pxm
+      ? vtkSMGlobalPropertiesProxy::SafeDownCast(pxm->GetProxy("global_properties", "ColorPalette"))
+      : NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -95,50 +93,46 @@ void pqColorChooserButtonWithPalettes::updateMenu()
   // Add palettes colors
   vtkSMProxy* cp = this->colorPalette();
   if (!cp)
-    {
+  {
     return;
-    }
+  }
 
   QString paletteColorName;
 
   pqColorPaletteLinkHelper* helper = this->findChild<pqColorPaletteLinkHelper*>();
   if (helper)
-    {
+  {
     paletteColorName = helper->selectedPaletteColor();
-    }
+  }
 
   vtkSMPropertyIterator* iter = cp->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMDoubleVectorProperty* dvp =
-      vtkSMDoubleVectorProperty::SafeDownCast(iter->GetProperty());
+  {
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(iter->GetProperty());
 
     if (dvp && dvp->GetNumberOfElements() == 3)
-      {
+    {
       QColor qcolor;
       qcolor.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
 
-      QAction* action = popupMenu->addAction(
-        this->renderColorSwatch(qcolor), dvp->GetXMLLabel());
+      QAction* action = popupMenu->addAction(this->renderColorSwatch(qcolor), dvp->GetXMLLabel());
       action << pqSetName(iter->GetKey());
       action->setData(QVariant(iter->GetKey()));
       action->setCheckable(true);
       if (paletteColorName == iter->GetKey())
-        {
+      {
         action->setChecked(true);
-        }
-      this->ActionGroup->addAction(action);
       }
+      this->ActionGroup->addAction(action);
     }
+  }
 
   // Add B&W stock colors
   popupMenu->addSeparator();
   QColor black(Qt::black);
-  popupMenu->addAction(this->renderColorSwatch(black),
-    tr("Black"))->setData(black);
+  popupMenu->addAction(this->renderColorSwatch(black), tr("Black"))->setData(black);
   QColor white(Qt::white);
-  popupMenu->addAction(this->renderColorSwatch(white),
-    tr("White"))->setData(white);
+  popupMenu->addAction(this->renderColorSwatch(white), tr("White"))->setData(white);
 
   iter->Delete();
 }
@@ -148,7 +142,7 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
 {
   QColor color;
   if (action->data().type() == QVariant::String)
-    {
+  {
     QString prop_name = action->data().toString();
     vtkSMProxy* globalProps = this->colorPalette();
     Q_ASSERT(globalProps);
@@ -158,14 +152,14 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
     color.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
     pqColorPaletteLinkHelper* helper = this->findChild<pqColorPaletteLinkHelper*>();
     if (helper)
-      {
-      helper->setSelectedPaletteColor(prop_name);
-      }
-    }
-  else if (action->data().type() == QVariant::Color)
     {
-    color = action->data().value<QColor>();
+      helper->setSelectedPaletteColor(prop_name);
     }
+  }
+  else if (action->data().type() == QVariant::Color)
+  {
+    color = action->data().value<QColor>();
+  }
 
   this->setChosenColor(color);
 }
@@ -176,11 +170,10 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
 
 //-----------------------------------------------------------------------------
 pqColorPaletteLinkHelper::pqColorPaletteLinkHelper(
-  pqColorChooserButtonWithPalettes* button,
-  vtkSMProxy* smproxy, const char* smproperty)
-  :Superclass(button),
-  SMProxy(smproxy),
-  SMPropertyName(smproperty)
+  pqColorChooserButtonWithPalettes* button, vtkSMProxy* smproxy, const char* smproperty)
+  : Superclass(button)
+  , SMProxy(smproxy)
+  , SMPropertyName(smproperty)
 {
   Q_ASSERT(button && smproperty && smproxy);
 }
@@ -199,10 +192,10 @@ void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)
 
   vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
-    {
-    palette->Link(colorName.toLatin1().data(),
-      this->SMProxy, this->SMPropertyName.toLatin1().data());
-    }
+  {
+    palette->Link(
+      colorName.toLatin1().data(), this->SMProxy, this->SMPropertyName.toLatin1().data());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -214,10 +207,9 @@ QString pqColorPaletteLinkHelper::selectedPaletteColor() const
 
   vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
-    {
-    return palette->GetLinkedPropertyName(
-        this->SMProxy, this->SMPropertyName.toLatin1().data());
-    }
+  {
+    return palette->GetLinkedPropertyName(this->SMProxy, this->SMPropertyName.toLatin1().data());
+  }
 
   return QString();
 }

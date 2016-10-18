@@ -41,8 +41,6 @@ protected:
 private:
   vtkPVNullSource(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

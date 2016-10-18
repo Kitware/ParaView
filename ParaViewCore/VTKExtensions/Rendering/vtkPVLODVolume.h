@@ -36,18 +36,18 @@ class vtkMapper;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODVolume : public vtkVolume
 {
 public:
-  vtkTypeMacro(vtkPVLODVolume,vtkVolume);
+  vtkTypeMacro(vtkPVLODVolume, vtkVolume);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVLODVolume *New();
+  static vtkPVLODVolume* New();
 
   //@{
   /**
    * This method is used internally by the rendering process.
    */
-  virtual int RenderOpaqueGeometry(vtkViewport *viewport);
-  virtual int RenderVolumetricGeometry(vtkViewport *viewport);
-  virtual int RenderTranslucentPolygonalGeometry( vtkViewport *);
+  virtual int RenderOpaqueGeometry(vtkViewport* viewport);
+  virtual int RenderVolumetricGeometry(vtkViewport* viewport);
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport*);
   //@}
 
   /**
@@ -60,43 +60,43 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
   //@{
   /**
    * Set the high res input.  Overloads the virtual vtkVolume method.
    */
-  virtual void SetMapper(vtkAbstractVolumeMapper *);
-  virtual vtkAbstractVolumeMapper *GetMapper();
+  virtual void SetMapper(vtkAbstractVolumeMapper*);
+  virtual vtkAbstractVolumeMapper* GetMapper();
   //@}
 
   //@{
   /**
    * This sets the low res input.
    */
-  virtual void SetLODMapper(vtkAbstractVolumeMapper *);
-  virtual void SetLODMapper(vtkMapper *);
+  virtual void SetLODMapper(vtkAbstractVolumeMapper*);
+  virtual void SetLODMapper(vtkMapper*);
   //@}
 
   /**
    * Sets the volume propery.  Overloads the virtual vtkVolume method.
    */
-  virtual void SetProperty(vtkVolumeProperty *property);
+  virtual void SetProperty(vtkVolumeProperty* property);
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  virtual void ShallowCopy(vtkProp *prop);
+  virtual void ShallowCopy(vtkProp* prop);
 
   /**
    * Get the bounds of the current mapper.
    */
-  virtual double *GetBounds();
+  virtual double* GetBounds();
 
   /**
    * Overloads the virtual vtkProp method.
    */
-  virtual void SetAllocatedRenderTime(double t, vtkViewport *v);
+  virtual void SetAllocatedRenderTime(double t, vtkViewport* v);
 
   //@{
   /**
@@ -105,6 +105,7 @@ public:
    */
   vtkSetMacro(EnableLOD, int);
   vtkGetMacro(EnableLOD, int);
+
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume();
@@ -117,7 +118,7 @@ protected:
    */
   bool CanRender();
 
-  vtkLODProp3D *LODProp;
+  vtkLODProp3D* LODProp;
   int HighLODId;
   int LowLODId;
   int EnableLOD;
@@ -125,6 +126,7 @@ protected:
   double MapperBounds[6];
   vtkTimeStamp BoundsMTime;
   virtual void UpdateLODProperty();
+
 private:
   vtkPVLODVolume(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;

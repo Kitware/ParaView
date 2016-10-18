@@ -24,16 +24,15 @@ class VTK_EXPORT vtkUncertaintySurfaceDefaultPainter : public vtkDefaultPainter
 {
 public:
   static vtkUncertaintySurfaceDefaultPainter* New();
-  vtkTypeMacro(vtkUncertaintySurfaceDefaultPainter, vtkDefaultPainter)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkUncertaintySurfaceDefaultPainter, vtkDefaultPainter) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
   // Description:
   // Get/Set the uncertainty surface painter.
   void SetUncertaintySurfacePainter(vtkUncertaintySurfacePainter*);
   vtkGetObjectMacro(UncertaintySurfacePainter, vtkUncertaintySurfacePainter)
 
-protected:
-  vtkUncertaintySurfaceDefaultPainter();
+    protected : vtkUncertaintySurfaceDefaultPainter();
   ~vtkUncertaintySurfaceDefaultPainter();
 
   // Description:

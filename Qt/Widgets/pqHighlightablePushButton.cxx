@@ -41,26 +41,25 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqHighlightablePushButton::pqHighlightablePushButton(QWidget *parentA)
-  : Superclass(parentA),
-  Internals(new pqHighlightablePushButton::pqInternals())
+pqHighlightablePushButton::pqHighlightablePushButton(QWidget* parentA)
+  : Superclass(parentA)
+  , Internals(new pqHighlightablePushButton::pqInternals())
 {
 }
 
 //-----------------------------------------------------------------------------
-pqHighlightablePushButton::pqHighlightablePushButton(
-  const QString &textA, QWidget *parentA)
-  : Superclass(textA, parentA),
-  Internals(new pqHighlightablePushButton::pqInternals())
+pqHighlightablePushButton::pqHighlightablePushButton(const QString& textA, QWidget* parentA)
+  : Superclass(textA, parentA)
+  , Internals(new pqHighlightablePushButton::pqInternals())
 {
   this->Internals->ResetPalette = this->palette();
 }
 
 //-----------------------------------------------------------------------------
 pqHighlightablePushButton::pqHighlightablePushButton(
-  const QIcon &iconA, const QString &textA, QWidget *parentA)
-  : Superclass(iconA, textA, parentA),
-  Internals(new pqHighlightablePushButton::pqInternals())
+  const QIcon& iconA, const QString& textA, QWidget* parentA)
+  : Superclass(iconA, textA, parentA)
+  , Internals(new pqHighlightablePushButton::pqInternals())
 {
 }
 
@@ -74,9 +73,9 @@ void pqHighlightablePushButton::highlight(bool clearHighlight)
 {
   QPalette buttonPalette = this->Internals->ResetPalette;
   if (clearHighlight == false)
-    {
+  {
     buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
     buttonPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
-    }
+  }
   this->setPalette(buttonPalette);
 }

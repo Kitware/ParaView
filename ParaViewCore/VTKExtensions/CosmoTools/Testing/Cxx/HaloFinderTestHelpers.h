@@ -30,30 +30,33 @@
 
 #include <set>
 
-namespace HaloFinderTestHelpers {
+namespace HaloFinderTestHelpers
+{
 
-struct HaloFinderTestVTKObjects {
-  HaloFinderTestVTKObjects() {
-    renWin = vtkSmartPointer< vtkRenderWindow >::New();
-    iren = vtkSmartPointer< vtkRenderWindowInteractor >::New();
-    reader = vtkSmartPointer< vtkPGenericIOReader >::New();
-    haloFinder = vtkSmartPointer< vtkPANLHaloFinder >::New();
-    onlyPointsInHalos = vtkSmartPointer< vtkThreshold >::New();
-    maskPoints = vtkSmartPointer< vtkMaskPoints >::New();
-    mapper = vtkSmartPointer< vtkCompositePolyDataMapper2 >::New();
+struct HaloFinderTestVTKObjects
+{
+  HaloFinderTestVTKObjects()
+  {
+    renWin = vtkSmartPointer<vtkRenderWindow>::New();
+    iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    reader = vtkSmartPointer<vtkPGenericIOReader>::New();
+    haloFinder = vtkSmartPointer<vtkPANLHaloFinder>::New();
+    onlyPointsInHalos = vtkSmartPointer<vtkThreshold>::New();
+    maskPoints = vtkSmartPointer<vtkMaskPoints>::New();
+    mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
   }
-  vtkSmartPointer< vtkRenderWindow > renWin;
-  vtkSmartPointer< vtkRenderWindowInteractor > iren;
-  vtkSmartPointer< vtkPGenericIOReader > reader;
-  vtkSmartPointer< vtkPANLHaloFinder > haloFinder;
-  vtkSmartPointer< vtkThreshold > onlyPointsInHalos;
-  vtkSmartPointer< vtkMaskPoints > maskPoints;
-  vtkSmartPointer< vtkCompositePolyDataMapper2 > mapper;
+  vtkSmartPointer<vtkRenderWindow> renWin;
+  vtkSmartPointer<vtkRenderWindowInteractor> iren;
+  vtkSmartPointer<vtkPGenericIOReader> reader;
+  vtkSmartPointer<vtkPANLHaloFinder> haloFinder;
+  vtkSmartPointer<vtkThreshold> onlyPointsInHalos;
+  vtkSmartPointer<vtkMaskPoints> maskPoints;
+  vtkSmartPointer<vtkCompositePolyDataMapper2> mapper;
 };
 
-inline std::set< std::string > getFirstOutputArrays()
+inline std::set<std::string> getFirstOutputArrays()
 {
-  std::set< std::string > arrayNames;
+  std::set<std::string> arrayNames;
   arrayNames.insert("vx");
   arrayNames.insert("vy");
   arrayNames.insert("vz");
@@ -62,9 +65,9 @@ inline std::set< std::string > getFirstOutputArrays()
   return arrayNames;
 }
 
-inline std::set< std::string > getHaloSummaryArrays()
+inline std::set<std::string> getHaloSummaryArrays()
 {
-  std::set< std::string > arrayNames;
+  std::set<std::string> arrayNames;
   arrayNames.insert("fof_halo_tag");
   arrayNames.insert("fof_halo_com");
   arrayNames.insert("fof_halo_count");
@@ -74,51 +77,48 @@ inline std::set< std::string > getHaloSummaryArrays()
   return arrayNames;
 }
 
-inline std::set< std::string > getHaloSummaryWithCenterInfoArrays()
+inline std::set<std::string> getHaloSummaryWithCenterInfoArrays()
 {
-  std::set< std::string > arrayNames = getHaloSummaryArrays();
+  std::set<std::string> arrayNames = getHaloSummaryArrays();
   arrayNames.insert("fof_center");
   return arrayNames;
 }
 
-inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set< std::string >& arrays)
+inline bool pointDataHasTheseArrays(vtkPointData* pd, const std::set<std::string>& arrays)
 {
   if (static_cast<size_t>(pd->GetNumberOfArrays()) != arrays.size())
-    {
-    std::cerr << "Wrong number of arrays.  There should be " << arrays.size()
-              << " and there are " << pd->GetNumberOfArrays() << std::endl;
+  {
+    std::cerr << "Wrong number of arrays.  There should be " << arrays.size() << " and there are "
+              << pd->GetNumberOfArrays() << std::endl;
     return false;
-    }
-  for (std::set< std::string >::iterator itr = arrays.begin();
-       itr != arrays.end(); ++itr)
-    {
+  }
+  for (std::set<std::string>::iterator itr = arrays.begin(); itr != arrays.end(); ++itr)
+  {
     if (!pd->HasArray((*itr).c_str()))
-      {
+    {
       std::cerr << "Point data does not have array: " << *itr << std::endl;
       return false;
-      }
     }
+  }
   return true;
 }
 
-inline HaloFinderTestVTKObjects SetupHaloFinderTest(
-    int argc, char* argv[],
-    vtkPANLHaloFinder::CenterFindingType centerFinding = vtkPANLHaloFinder::NONE,
-    bool findSubhalos = false)
+inline HaloFinderTestVTKObjects SetupHaloFinderTest(int argc, char* argv[],
+  vtkPANLHaloFinder::CenterFindingType centerFinding = vtkPANLHaloFinder::NONE,
+  bool findSubhalos = false)
 {
   HaloFinderTestVTKObjects testObjects;
-  char* fname =
-  vtkTestUtilities::ExpandDataFileName(argc,argv,"genericio/m000.499.allparticles");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "genericio/m000.499.allparticles");
 
   testObjects.reader->SetFileName(fname);
   testObjects.reader->UpdateInformation();
   testObjects.reader->SetXAxisVariableName("x");
   testObjects.reader->SetYAxisVariableName("y");
   testObjects.reader->SetZAxisVariableName("z");
-  testObjects.reader->SetPointArrayStatus("vx",1);
-  testObjects.reader->SetPointArrayStatus("vy",1);
-  testObjects.reader->SetPointArrayStatus("vz",1);
-  testObjects.reader->SetPointArrayStatus("id",1);
+  testObjects.reader->SetPointArrayStatus("vx", 1);
+  testObjects.reader->SetPointArrayStatus("vy", 1);
+  testObjects.reader->SetPointArrayStatus("vz", 1);
+  testObjects.reader->SetPointArrayStatus("id", 1);
   testObjects.reader->Update();
 
   delete[] fname;
@@ -133,27 +133,25 @@ inline HaloFinderTestVTKObjects SetupHaloFinderTest(
   testObjects.haloFinder->SetDeut(0.0224);
   testObjects.haloFinder->SetHubble(0.72);
   if (findSubhalos)
-    {
+  {
     testObjects.haloFinder->SetRunSubHaloFinder(1);
     testObjects.haloFinder->SetMinFOFSubhaloSize(7000);
     testObjects.haloFinder->SetMinCandidateSize(20);
     // Expand the linking length a bit for the subhalo finding test, we need big
     // halos to have interesting subhalos
     testObjects.haloFinder->SetBB(0.2);
-    }
+  }
   testObjects.haloFinder->Update();
 
-  testObjects.onlyPointsInHalos->SetInputConnection(
-        testObjects.haloFinder->GetOutputPort(0));
+  testObjects.onlyPointsInHalos->SetInputConnection(testObjects.haloFinder->GetOutputPort(0));
   testObjects.onlyPointsInHalos->SetInputArrayToProcess(
-        0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS, "fof_halo_tag");
+    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "fof_halo_tag");
   testObjects.onlyPointsInHalos->ThresholdByUpper(0.0);
   testObjects.onlyPointsInHalos->Update();
 
-  testObjects.maskPoints->SetInputConnection(
-        testObjects.onlyPointsInHalos->GetOutputPort());
+  testObjects.maskPoints->SetInputConnection(testObjects.onlyPointsInHalos->GetOutputPort());
   testObjects.maskPoints->SetMaximumNumberOfPoints(
-        testObjects.haloFinder->GetOutput(0)->GetNumberOfPoints());
+    testObjects.haloFinder->GetOutput(0)->GetNumberOfPoints());
   testObjects.maskPoints->SetOnRatio(1);
   testObjects.maskPoints->GenerateVerticesOn();
   testObjects.maskPoints->SingleVertexPerCellOn();
@@ -163,18 +161,17 @@ inline HaloFinderTestVTKObjects SetupHaloFinderTest(
   testObjects.mapper->SetInputConnection(testObjects.maskPoints->GetOutputPort());
   testObjects.mapper->Update();
 
-  vtkNew< vtkActor > actor;
+  vtkNew<vtkActor> actor;
   actor->SetMapper(testObjects.mapper);
 
-  vtkNew< vtkRenderer > renderer;
+  vtkNew<vtkRenderer> renderer;
   renderer->AddActor(actor.GetPointer());
 
   testObjects.renWin->AddRenderer(renderer.GetPointer());
-  testObjects.renWin->SetSize(300,300);
+  testObjects.renWin->SetSize(300, 300);
 
   testObjects.iren->SetRenderWindow(testObjects.renWin);
 
   return testObjects;
 }
-
 }

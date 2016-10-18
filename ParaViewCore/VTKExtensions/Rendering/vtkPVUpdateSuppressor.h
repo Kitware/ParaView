@@ -32,13 +32,13 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
 public:
-  vtkTypeMacro(vtkPVUpdateSuppressor,vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkPVUpdateSuppressor, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Construct with user-specified implicit function.
    */
-  static vtkPVUpdateSuppressor *New();
+  static vtkPVUpdateSuppressor* New();
 
   /**
    * Force update on the input.
@@ -66,10 +66,10 @@ protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
 
-  int RequestDataObject(vtkInformation* request, vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
-  int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   vtkTimeStamp ForcedUpdateTimeStamp;
 
@@ -77,10 +77,10 @@ protected:
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
+
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

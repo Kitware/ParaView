@@ -48,34 +48,34 @@ class PQCORE_EXPORT pqInterfaceTracker : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqInterfaceTracker(QObject* parent=0);
+  pqInterfaceTracker(QObject* parent = 0);
   virtual ~pqInterfaceTracker();
 
   /**
   * Return all interfaces that have been loaded/registered.
   */
-  QObjectList interfaces() const
-    { return this->Interfaces + this->RegisteredInterfaces; }
+  QObjectList interfaces() const { return this->Interfaces + this->RegisteredInterfaces; }
 
   /**
   * Returns all interfaces that have been loaded/registered that are of the
   * requested type.
   */
   template <class T>
-    QList<T> interfaces() const
+  QList<T> interfaces() const
+  {
+    QList<T> list;
+    QObjectList objList = this->interfaces();
+    foreach (QObject* object, objList)
+    {
+      if (object && qobject_cast<T>(object))
       {
-      QList<T> list;
-      QObjectList objList = this->interfaces();
-      foreach (QObject* object, objList)
-        {
-        if (object && qobject_cast<T>(object))
-          {
-          list.push_back(qobject_cast<T>(object));
-          }
-        }
-      return list;
+        list.push_back(qobject_cast<T>(object));
       }
+    }
+    return list;
+  }
 
   /**
   * add an extra interface.
@@ -113,7 +113,6 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqInterfaceTracker)
-
 };
 
 #endif

@@ -16,7 +16,7 @@
  * @class   vtkCPCellFieldBuilder
  * @brief   Class for specifying cell fields over grids.
  *
- * Class for specifying cell data fields over grids for a test driver.  
+ * Class for specifying cell data fields over grids for a test driver.
 */
 
 #ifndef vtkCPCellFieldBuilder_h
@@ -35,8 +35,7 @@ public:
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long TimeStep, double Time,
-                          vtkDataSet* Grid);
+  virtual void BuildField(unsigned long TimeStep, double Time, vtkDataSet* Grid);
 
   /**
    * Return the highest order of discretization of the field.

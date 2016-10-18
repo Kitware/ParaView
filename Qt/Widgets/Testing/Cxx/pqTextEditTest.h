@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,17 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QSignalSpy;
 class pqTextEdit;
 
-class pqTextEditTester: public QObject
+class pqTextEditTester : public QObject
 {
   Q_OBJECT
 
 public:
   enum SpyType
-    {
+  {
     TextChanged = 0,
     EditingFinished,
     TextChangedAndEditingFinished,
-    };
+  };
 
 private slots:
   void init();

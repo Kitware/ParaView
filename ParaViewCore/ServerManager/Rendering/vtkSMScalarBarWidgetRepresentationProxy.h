@@ -28,8 +28,8 @@
 class vtkSMViewProxy;
 class vtkPVArrayInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMScalarBarWidgetRepresentationProxy :
-  public vtkSMNewWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMScalarBarWidgetRepresentationProxy
+  : public vtkSMNewWidgetRepresentationProxy
 {
 public:
   static vtkSMScalarBarWidgetRepresentationProxy* New();
@@ -43,11 +43,11 @@ public:
    */
   virtual bool UpdateComponentTitle(vtkPVArrayInformation* dataInfo);
   static bool UpdateComponentTitle(vtkSMProxy* proxy, vtkPVArrayInformation* dataInfo)
-    {
+  {
     vtkSMScalarBarWidgetRepresentationProxy* self =
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
-    return self? self->UpdateComponentTitle(dataInfo) : false;
-    }
+    return self ? self->UpdateComponentTitle(dataInfo) : false;
+  }
   //@}
 
   //@{
@@ -57,11 +57,11 @@ public:
    */
   virtual bool PlaceInView(vtkSMProxy* view);
   static bool PlaceInView(vtkSMProxy* proxy, vtkSMProxy* view)
-    {
+  {
     vtkSMScalarBarWidgetRepresentationProxy* self =
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
-    return self? self->PlaceInView(view) : false;
-    }
+    return self ? self->PlaceInView(view) : false;
+  }
   //@}
 
 protected:
@@ -80,11 +80,11 @@ protected:
   virtual void ExecuteEvent(unsigned long event);
 
   vtkSMProxy* ActorProxy;
-private:
-  vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkSMScalarBarWidgetRepresentationProxy(
+    const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

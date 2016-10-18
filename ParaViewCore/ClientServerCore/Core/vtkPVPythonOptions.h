@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkPVPythonOptions.h
 
@@ -31,7 +31,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonOptions : public vtkPVOptions
 {
 public:
   static vtkPVPythonOptions* New();
-  vtkTypeMacro(vtkPVPythonOptions,vtkPVOptions);
+  vtkTypeMacro(vtkPVPythonOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{

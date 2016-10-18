@@ -72,10 +72,11 @@ public:
    * given timestep, you should call updatePipeline( time ) before the
    * CreateWriter call.
    */
-  vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy*,
-    unsigned int outputport);
+  vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy*, unsigned int outputport);
   vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy* pxy)
-    { return this->CreateWriter(filename, pxy, 0); }
+  {
+    return this->CreateWriter(filename, pxy, 0);
+  }
 
   /**
    * Returns a formatted string with all supported file types.
@@ -84,10 +85,11 @@ public:
    * "PVD Files (*.pvd);;VTK Files (*.vtk)"
    * \endverbatim
    */
-  const char* GetSupportedFileTypes(vtkSMSourceProxy* source,
-    unsigned int outputport);
+  const char* GetSupportedFileTypes(vtkSMSourceProxy* source, unsigned int outputport);
   const char* GetSupportedFileTypes(vtkSMSourceProxy* source)
-    { return this->GetSupportedFileTypes(source, 0); }
+  {
+    return this->GetSupportedFileTypes(source, 0);
+  }
 
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
@@ -130,8 +132,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif
-

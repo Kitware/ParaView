@@ -48,11 +48,11 @@ public:
   Ui::FontPropertyWidget Ui;
 
   pqInternals(pqFontPropertyWidget* self)
-    {
+  {
     this->Ui.setupUi(self);
     this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.mainLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    }
+  }
 
   QString justification;
 };
@@ -60,104 +60,99 @@ public:
 //-----------------------------------------------------------------------------
 pqFontPropertyWidget::pqFontPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
-  : Superclass(smproxy, smgroup, parentObject),
-  Internals(new pqInternals(this))
+  : Superclass(smproxy, smgroup, parentObject)
+  , Internals(new pqInternals(this))
 {
-  Ui::FontPropertyWidget &ui = this->Internals->Ui;
+  Ui::FontPropertyWidget& ui = this->Internals->Ui;
 
   vtkSMProperty* smproperty = smgroup->GetProperty("Family");
   if (smproperty)
-    {
+  {
     new pqComboBoxDomain(ui.FontFamily, smproperty);
-    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(ui.FontFamily);
-    this->addPropertyLink(
-      adaptor, "currentText", SIGNAL(currentTextChanged(QString)),
-      smproperty);
-    }
+    pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(ui.FontFamily);
+    this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), smproperty);
+  }
   else
-    {
+  {
     ui.FontFamily->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Size");
   if (smproperty)
-    {
-    this->addPropertyLink(ui.FontSize, "value", SIGNAL(valueChanged(int)),
-      smproperty);
-    }
+  {
+    this->addPropertyLink(ui.FontSize, "value", SIGNAL(valueChanged(int)), smproperty);
+  }
   else
-    {
+  {
     ui.FontSize->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Color");
   if (smproperty)
-    {
+  {
     this->addPropertyLink(
-      ui.FontColor, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)),
-      smproperty);
+      ui.FontColor, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)), smproperty);
 
     // pqColorPaletteLinkHelper makes it possible to set this color to one of
     // the color palette colors.
     new pqColorPaletteLinkHelper(ui.FontColor, smproxy, smproxy->GetPropertyName(smproperty));
-    }
+  }
   else
-    {
+  {
     ui.FontColor->hide();
-    }
-  
+  }
+
   smproperty = smgroup->GetProperty("Opacity");
   if (smproperty)
-    {
-    this->addPropertyLink(ui.Opacity, "value", SIGNAL(valueChanged(double)),
-      smproperty);
-    }
+  {
+    this->addPropertyLink(ui.Opacity, "value", SIGNAL(valueChanged(double)), smproperty);
+  }
   else
-    {
+  {
     ui.Opacity->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Bold");
   if (smproperty)
-    {
+  {
     this->addPropertyLink(ui.Bold, "checked", SIGNAL(toggled(bool)), smproperty);
-    }
+  }
   else
-    {
+  {
     ui.Bold->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Italics");
   if (smproperty)
-    {
+  {
     this->addPropertyLink(ui.Italics, "checked", SIGNAL(toggled(bool)), smproperty);
-    }
+  }
   else
-    {
+  {
     ui.Italics->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Shadow");
   if (smproperty)
-    {
+  {
     this->addPropertyLink(ui.Shadow, "checked", SIGNAL(toggled(bool)), smproperty);
-    }
+  }
   else
-    {
+  {
     ui.Shadow->hide();
-    }
+  }
 
   smproperty = smgroup->GetProperty("Justification");
-  if(smproperty)
-    {
+  if (smproperty)
+  {
     this->setupJustificationButton();
-    this->addPropertyLink(this, "justification",
-      SIGNAL(justificationChanged(QString&)), smproperty);
-    }
+    this->addPropertyLink(
+      this, "justification", SIGNAL(justificationChanged(QString&)), smproperty);
+  }
   else
-    {
+  {
     ui.Justification->hide();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -170,21 +165,21 @@ pqFontPropertyWidget::~pqFontPropertyWidget()
 //-----------------------------------------------------------------------------
 void pqFontPropertyWidget::setJustification(QString& str)
 {
-  if(this->Internals->justification == str)
-    {
+  if (this->Internals->justification == str)
+  {
     return;
-    }
+  }
   this->Internals->justification = str;
   // Change toolbutton icon
   QList<QAction*> acts = this->Internals->Ui.Justification->menu()->actions();
-  for(QList<QAction*>::iterator i = acts.begin(); i != acts.end(); ++i)
+  for (QList<QAction*>::iterator i = acts.begin(); i != acts.end(); ++i)
+  {
+    if ((*i)->text() == str)
     {
-    if((*i)->text() == str)
-      {
       this->Internals->Ui.Justification->setIcon((*i)->icon());
       break;
-      }
     }
+  }
 
   emit this->justificationChanged(str);
 }
@@ -198,25 +193,25 @@ QString pqFontPropertyWidget::justification() const
 //-----------------------------------------------------------------------------
 void pqFontPropertyWidget::setupJustificationButton()
 {
-  Ui::FontPropertyWidget &ui = this->Internals->Ui;
+  Ui::FontPropertyWidget& ui = this->Internals->Ui;
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->setExclusive(true);
-  QAction* leftAlign = new QAction(QIcon(
-      ":/pqWidgets/Icons/pqTextAlignLeft16.png"), tr("Left"), actionGroup);
+  QAction* leftAlign =
+    new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignLeft16.png"), tr("Left"), actionGroup);
   leftAlign->setIconVisibleInMenu(true);
-  QAction* rightAlign = new QAction(QIcon(
-      ":/pqWidgets/Icons/pqTextAlignRight16.png"), tr("Right"), actionGroup);
+  QAction* rightAlign =
+    new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignRight16.png"), tr("Right"), actionGroup);
   rightAlign->setIconVisibleInMenu(true);
-  QAction* centerAlign = new QAction(QIcon(
-      ":/pqWidgets/Icons/pqTextAlignCenter16.png"), tr("Center"), actionGroup);
+  QAction* centerAlign =
+    new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignCenter16.png"), tr("Center"), actionGroup);
   centerAlign->setIconVisibleInMenu(true);
   QMenu* popup = new QMenu(this);
   popup->addAction(leftAlign);
   popup->addAction(rightAlign);
   popup->addAction(centerAlign);
   ui.Justification->setMenu(popup);
-  QObject::connect(actionGroup, SIGNAL(triggered(QAction*)),
-    this, SLOT(changeJustificationIcon(QAction*)));
+  QObject::connect(
+    actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeJustificationIcon(QAction*)));
 }
 
 //-----------------------------------------------------------------------------

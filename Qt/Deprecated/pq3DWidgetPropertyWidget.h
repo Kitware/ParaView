@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,7 +41,7 @@ class pq3DWidgetPropertyWidget : public pqPropertyWidget
   Q_OBJECT
 
 public:
-  explicit pq3DWidgetPropertyWidget(pq3DWidget *widget, QWidget *parent = 0);
+  explicit pq3DWidgetPropertyWidget(pq3DWidget* widget, QWidget* parent = 0);
   ~pq3DWidgetPropertyWidget();
 
   void apply();
@@ -60,7 +60,7 @@ public:
   pq3DWidget* get3DWidget() const { return this->Widget; }
 
 private:
-  pq3DWidget *Widget;
+  pq3DWidget* Widget;
 };
 
 #endif // pq3DWidgetPropertyWidget_h

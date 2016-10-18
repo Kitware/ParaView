@@ -50,14 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * Example usages:
 * \li Stride, Seed, MaximumNumberOfSamplePoints properties on the Glyph proxy.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericPropertyWidgetDecorator :
-  public pqPropertyWidgetDecorator
+class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericPropertyWidgetDecorator
+  : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
-  pqGenericPropertyWidgetDecorator(
-    vtkPVXMLElement* config, pqPropertyWidget* parent);
+  pqGenericPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   virtual ~pqGenericPropertyWidgetDecorator();
 
   /**

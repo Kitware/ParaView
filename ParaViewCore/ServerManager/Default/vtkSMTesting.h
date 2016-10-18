@@ -18,7 +18,7 @@
  * .DESCRIPTION
  * This provides helper methods to use view proxy for testing.
  * This is also required for python testing, since when SM is python wrapped,
- * VTK need not by python wrapped, hence we cannot use vtkTesting in python 
+ * VTK need not by python wrapped, hence we cannot use vtkTesting in python
  * testing.
 */
 
@@ -46,8 +46,7 @@ public:
   /**
    * API for backwards compatibility. Simply calls SetViewProxy(..).
    */
-  void SetRenderViewProxy(vtkSMViewProxy* proxy)
-    { this->SetViewProxy(proxy); }
+  void SetRenderViewProxy(vtkSMViewProxy* proxy) { this->SetViewProxy(proxy); }
 
   /**
    * Add argument

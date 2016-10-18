@@ -89,8 +89,7 @@ public:
    * ensures that CreateDefaultRepresentation() and CanDisplayData() both
    * work as expected.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
-    vtkSMProxy*, int);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
 
   /**
    * Returns the xml name of the representation proxy to create to show the data
@@ -101,8 +100,7 @@ public:
    * can accept the data produced, returns this->DefaultRepresentationName.
    * Subclasses should override this method.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
 
   /**
    * Finds the representation proxy showing the data produced by the provided
@@ -126,7 +124,7 @@ public:
    * Saves a screenshot of the view to disk. The writerName argument specifies
    * the vtkImageWriter subclass to use.
    */
-  int WriteImage(const char* filename, const char* writerName, int magnification=1);
+  int WriteImage(const char* filename, const char* writerName, int magnification = 1);
 
   /**
    * Return true any internal representation is dirty. This can be usefull to
@@ -170,7 +168,7 @@ public:
    * vtkRenderWindowInteractor should override this method to set the interactor
    * up.
    */
-  virtual void SetupInteractor(vtkRenderWindowInteractor* iren) {(void) iren;}
+  virtual void SetupInteractor(vtkRenderWindowInteractor* iren) { (void)iren; }
 
   /**
    * Creates a default render window interactor for the vtkRenderWindow and sets
@@ -179,7 +177,7 @@ public:
    * may cause issues. One should let the QVTKWidget create the interactor and
    * then call SetupInteractor().
    */
-  virtual bool MakeRenderWindowInteractor(bool quiet=false);
+  virtual bool MakeRenderWindowInteractor(bool quiet = false);
 
   //@{
   /**
@@ -200,9 +198,9 @@ public:
    */
   virtual bool HideOtherRepresentationsIfNeeded(vtkSMProxy* repr);
   static bool HideOtherRepresentationsIfNeeded(vtkSMViewProxy* self, vtkSMProxy* repr)
-    {
-    return self? self->HideOtherRepresentationsIfNeeded(repr) : false;
-    }
+  {
+    return self ? self->HideOtherRepresentationsIfNeeded(repr) : false;
+  }
   //@}
 
 protected:
@@ -213,11 +211,9 @@ protected:
   /**
    * Subclasses should override this method to do the actual image capture.
    */
-  virtual vtkImageData* CaptureWindowInternal(int vtkNotUsed(magnification))
-    { return NULL; }
+  virtual vtkImageData* CaptureWindowInternal(int vtkNotUsed(magnification)) { return NULL; }
 
-  virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive))
-    { return this->GetLocation(); }
+  virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive)) { return this->GetLocation(); }
   virtual void PostRender(bool vtkNotUsed(interactive)) {}
 
   /**
@@ -268,7 +264,6 @@ private:
   class vtkRendererSaveInfo;
   vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
   void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);
-
 };
 
 #endif

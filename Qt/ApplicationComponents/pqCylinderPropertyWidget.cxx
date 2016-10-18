@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-
-namespace {
+namespace
+{
 
 // Scale the bounds by the given factor
 static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
@@ -53,23 +53,21 @@ static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
   bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
 
   for (int i = 0; i < 3; ++i)
-    {
-    double mid = (min_point[i] + max_point[i])/2.0;
+  {
+    double mid = (min_point[i] + max_point[i]) / 2.0;
     min_point[i] = mid + scaleFactor * (min_point[i] - mid);
     max_point[i] = mid + scaleFactor * (max_point[i] - mid);
-    }
+  }
   bbox.SetMinPoint(min_point);
   bbox.SetMaxPoint(max_point);
 }
-
 }
 
 //-----------------------------------------------------------------------------
 pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(
-    "representations", "ImplicitCylinderWidgetRepresentation",
-    smproxy, smgroup, parentObject)
+      "representations", "ImplicitCylinderWidgetRepresentation", smproxy, smgroup, parentObject)
 {
   Ui::CylinderPropertyWidget ui;
   ui.setupUi(this);
@@ -83,54 +81,47 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   new QDoubleValidator(ui.radius);
 
   if (vtkSMProperty* center = smgroup->GetProperty("Center"))
-    {
-    this->addPropertyLink(
-      ui.centerX, "text2", SIGNAL(textChangedAndEditingFinished()), center, 0);
-    this->addPropertyLink(
-      ui.centerY, "text2", SIGNAL(textChangedAndEditingFinished()), center, 1);
-    this->addPropertyLink(
-      ui.centerZ, "text2", SIGNAL(textChangedAndEditingFinished()), center, 2);
+  {
+    this->addPropertyLink(ui.centerX, "text2", SIGNAL(textChangedAndEditingFinished()), center, 0);
+    this->addPropertyLink(ui.centerY, "text2", SIGNAL(textChangedAndEditingFinished()), center, 1);
+    this->addPropertyLink(ui.centerZ, "text2", SIGNAL(textChangedAndEditingFinished()), center, 2);
     ui.centerLabel->setText(center->GetXMLLabel());
-    }
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'Center'.");
-    }
+  }
 
   if (vtkSMProperty* axis = smgroup->GetProperty("Axis"))
-    {
-    this->addPropertyLink(
-      ui.axisX, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 0);
-    this->addPropertyLink(
-      ui.axisY, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 1);
-    this->addPropertyLink(
-      ui.axisZ, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 2);
+  {
+    this->addPropertyLink(ui.axisX, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 0);
+    this->addPropertyLink(ui.axisY, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 1);
+    this->addPropertyLink(ui.axisZ, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 2);
     ui.axisLabel->setText(axis->GetXMLLabel());
-    }
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'Axis'.");
-    }
+  }
 
   if (vtkSMProperty* radius = smgroup->GetProperty("Radius"))
-    {
-    this->addPropertyLink(
-      ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
+  {
+    this->addPropertyLink(ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
     ui.radiusLabel->setText(radius->GetXMLLabel());
-    }
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'Radius'.");
-    }
+  }
 
   if (smgroup->GetProperty("Input"))
-    {
+  {
     this->connect(ui.resetBounds, SIGNAL(clicked()), SLOT(resetBounds()));
-    }
+  }
   else
-    {
+  {
     ui.resetBounds->hide();
-    }
+  }
 
   // link a few buttons
   this->connect(ui.useXAxis, SIGNAL(clicked()), SLOT(useXAxis()));
@@ -142,8 +133,8 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   // Let's link some of the UI elements that only affect the interactive widget
   // properties without affecting properties on the main proxy.
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  this->WidgetLinks.addPropertyLink(ui.scaling, "checked", SIGNAL(toggled(bool)),
-    wdgProxy, wdgProxy->GetProperty("ScaleEnabled"));
+  this->WidgetLinks.addPropertyLink(
+    ui.scaling, "checked", SIGNAL(toggled(bool)), wdgProxy, wdgProxy->GetProperty("ScaleEnabled"));
   this->WidgetLinks.addPropertyLink(ui.outlineTranslation, "checked", SIGNAL(toggled(bool)),
     wdgProxy, wdgProxy->GetProperty("OutlineTranslation"));
   this->connect(&this->WidgetLinks, SIGNAL(qtWidgetChanged()), SLOT(render()));
@@ -170,9 +161,9 @@ void pqCylinderPropertyWidget::placeWidget()
 {
   vtkBoundingBox bbox = this->dataBounds();
   if (!bbox.IsValid())
-    {
+  {
     return;
-    }
+  }
 
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   Q_ASSERT(wdgProxy);
@@ -193,12 +184,12 @@ void pqCylinderPropertyWidget::resetBounds()
 
   vtkBoundingBox bbox = this->dataBounds();
   if (!bbox.IsValid())
-    {
+  {
     return;
-    }
+  }
 
   if (wdgProxy)
-    {
+  {
     double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
     pqAdjustBounds(bbox, scaleFactor);
 
@@ -213,14 +204,14 @@ void pqCylinderPropertyWidget::resetBounds()
 
     emit this->changeAvailable();
     this->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCylinderPropertyWidget::resetCameraToAxis()
 {
   if (pqRenderView* renView = qobject_cast<pqRenderView*>(this->view()))
-    {
+  {
     vtkCamera* camera = renView->getRenderViewProxy()->GetActiveCamera();
     vtkSMProxy* wdgProxy = this->widgetProxy();
     double up[3], forward[3];
@@ -228,19 +219,18 @@ void pqCylinderPropertyWidget::resetCameraToAxis()
     vtkSMPropertyHelper(wdgProxy, "Axis").Get(forward, 3);
     vtkMath::Cross(up, forward, up);
     vtkMath::Cross(forward, up, up);
-    renView->resetViewDirection(
-      forward[0], forward[1], forward[2], up[0], up[1], up[2]);
+    renView->resetViewDirection(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
     renView->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCylinderPropertyWidget::useCameraAxis()
 {
-  vtkSMRenderViewProxy* viewProxy = this->view()?
-    vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
+  vtkSMRenderViewProxy* viewProxy =
+    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
   if (viewProxy)
-    {
+  {
     vtkCamera* camera = viewProxy->GetActiveCamera();
 
     double camera_normal[3];
@@ -249,14 +239,14 @@ void pqCylinderPropertyWidget::useCameraAxis()
     camera_normal[1] = -camera_normal[1];
     camera_normal[2] = -camera_normal[2];
     this->setAxis(camera_normal[0], camera_normal[1], camera_normal[2]);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCylinderPropertyWidget::setAxis(double wx, double wy, double wz)
 {
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  double axis[3] = {wx, wy, wz};
+  double axis[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Axis").Set(axis, 3);
   wdgProxy->UpdateVTKObjects();
   emit this->changeAvailable();
@@ -267,7 +257,7 @@ void pqCylinderPropertyWidget::setAxis(double wx, double wy, double wz)
 void pqCylinderPropertyWidget::updateWidget(bool showing_advanced_properties)
 {
   for (int i = 0; i < 2; ++i)
-    {
+  {
     this->AdvancedPropertyWidgets[i]->setVisible(showing_advanced_properties);
-    }
+  }
 }

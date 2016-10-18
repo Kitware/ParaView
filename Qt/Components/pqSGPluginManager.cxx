@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSGWritersMenuManager.h"
 
 //-----------------------------------------------------------------------------
-pqSGPluginManager::pqSGPluginManager(QObject* parentObject):
-  Superclass(parentObject)
+pqSGPluginManager::pqSGPluginManager(QObject* parentObject)
+  : Superclass(parentObject)
 {
 }
 
@@ -50,8 +50,8 @@ void pqSGPluginManager::startup()
   // don't delete menuMgr, it will be cleaned up by Qt.
   const char* writersMenuName = this->getWritersMenuName();
   const char* objectMenuName = this->getObjectMenuName();
-  pqSGWritersMenuManager *menuMgr = new pqSGWritersMenuManager(
-    writersMenuName, objectMenuName, this);
+  pqSGWritersMenuManager* menuMgr =
+    new pqSGWritersMenuManager(writersMenuName, objectMenuName, this);
   menuMgr->createMenu();
 }
 

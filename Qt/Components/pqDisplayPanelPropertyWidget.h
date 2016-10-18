@@ -42,14 +42,13 @@ class pqDisplayPanelPropertyWidget : public pqPropertyWidget
   Q_OBJECT
 
 public:
-  explicit pqDisplayPanelPropertyWidget(pqDisplayPanel *displayPanel,
-                                        QWidget *parent = 0);
+  explicit pqDisplayPanelPropertyWidget(pqDisplayPanel* displayPanel, QWidget* parent = 0);
   ~pqDisplayPanelPropertyWidget();
 
   pqDisplayPanel* getDisplayPanel() const;
 
 private:
-  pqDisplayPanel *DisplayPanel;
+  pqDisplayPanel* DisplayPanel;
 };
 
 #endif // _pqDisplayPanelPropertyWidget_h

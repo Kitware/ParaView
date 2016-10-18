@@ -43,6 +43,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqServerDisconnectReaction : public pqReact
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
@@ -72,6 +73,7 @@ protected:
   virtual void onTriggered();
 
   pqTimer UpdateTimer;
+
 private:
   Q_DISABLE_COPY(pqServerDisconnectReaction)
 };

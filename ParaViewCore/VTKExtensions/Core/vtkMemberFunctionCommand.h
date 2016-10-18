@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 
-template<class ClassT>
+template <class ClassT>
 class vtkMemberFunctionCommand : public vtkCommand
 {
   typedef vtkMemberFunctionCommand<ClassT> ThisT;
@@ -80,20 +80,11 @@ public:
 
   virtual const char* GetClassNameInternal() const { return "vtkMemberFunctionCommand"; }
 
-  static ThisT* SafeDownCast(vtkObjectBase* o)
-    {
-    return dynamic_cast<ThisT*>(o);
-    }
+  static ThisT* SafeDownCast(vtkObjectBase* o) { return dynamic_cast<ThisT*>(o); }
 
-  static ThisT* New()
-    {
-    return new ThisT();
-    }
+  static ThisT* New() { return new ThisT(); }
 
-  void PrintSelf(ostream& os, vtkIndent indent)
-    {
-    vtkCommand::PrintSelf(os, indent);
-    }
+  void PrintSelf(ostream& os, vtkIndent indent) { vtkCommand::PrintSelf(os, indent); }
 
   //@{
   /**
@@ -101,53 +92,49 @@ public:
    * event is received.
    */
   void SetCallback(ClassT& object, void (ClassT::*method)())
-    {
+  {
     this->Object = &object;
     this->Method = method;
-    }
+  }
   //@}
 
-  void SetCallback(ClassT& object,
-    void (ClassT::*method2)(vtkObject*, unsigned long, void*))
-    {
+  void SetCallback(ClassT& object, void (ClassT::*method2)(vtkObject*, unsigned long, void*))
+  {
     this->Object = &object;
     this->Method2 = method2;
-    }
+  }
 
   virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
-    {
+  {
     if (this->Object && this->Method)
-      {
-      (this->Object->*this->Method)();
-      }
-    if (this->Object && this->Method2)
-      {
-      (this->Object->*this->Method2)(caller, event, calldata);
-      }
-    }
-  void Reset()
     {
+      (this->Object->*this->Method)();
+    }
+    if (this->Object && this->Method2)
+    {
+      (this->Object->*this->Method2)(caller, event, calldata);
+    }
+  }
+  void Reset()
+  {
     this->Object = 0;
     this->Method2 = 0;
     this->Method = 0;
-    }
+  }
 
 private:
   vtkMemberFunctionCommand()
-    {
+  {
     this->Object = 0;
     this->Method = 0;
     this->Method2 = 0;
-    }
+  }
 
-  ~vtkMemberFunctionCommand()
-    {
-    }
+  ~vtkMemberFunctionCommand() {}
 
   ClassT* Object;
   void (ClassT::*Method)();
-  void (ClassT::*Method2)(
-    vtkObject* caller, unsigned long event, void* calldata);
+  void (ClassT::*Method2)(vtkObject* caller, unsigned long event, void* calldata);
 
   vtkMemberFunctionCommand(const vtkMemberFunctionCommand&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMemberFunctionCommand&) VTK_DELETE_FUNCTION;
@@ -168,7 +155,7 @@ private:
  * vtkMemberFunctionCommand, vtkCallbackCommand
  */
 
-template<class ClassT>
+template <class ClassT>
 vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
   ClassT& object, void (ClassT::*method)())
 {
@@ -177,7 +164,7 @@ vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
   return result;
 }
 
-template<class ClassT>
+template <class ClassT>
 vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
   ClassT& object, void (ClassT::*method)(vtkObject*, unsigned long, void*))
 {

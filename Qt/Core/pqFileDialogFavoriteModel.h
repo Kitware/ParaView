@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,7 +50,7 @@ filesystem, as well as browsing of the local file system.
 class PQCORE_EXPORT pqFileDialogFavoriteModel : public QAbstractListModel
 {
   typedef QAbstractListModel base;
-  
+
   Q_OBJECT
 
 public:
@@ -74,12 +74,12 @@ public:
   * returns the data for an item
   */
   QVariant data(const QModelIndex& idx, int role) const;
- 
+
   /**
-  * return the number of rows in the model 
+  * return the number of rows in the model
   */
   int rowCount(const QModelIndex& idx) const;
-  
+
   /**
   * return header data
   */
@@ -91,4 +91,3 @@ private:
 };
 
 #endif // !_pqFileDialogFavoriteModel_h
-

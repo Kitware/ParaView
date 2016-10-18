@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVExtractArraysOverTime : public vtkPE
 {
 public:
   static vtkPVExtractArraysOverTime* New();
-  vtkTypeMacro(vtkPVExtractArraysOverTime,vtkPExtractArraysOverTime);
+  vtkTypeMacro(vtkPVExtractArraysOverTime, vtkPExtractArraysOverTime);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

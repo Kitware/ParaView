@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,10 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqTreeView_h
 #define _pqTreeView_h
 
-
 #include "pqWidgetsModule.h"
 #include <QTreeView>
-
 
 class PQWIDGETS_EXPORT pqTreeView : public QTreeView
 {
@@ -52,27 +50,25 @@ class PQWIDGETS_EXPORT pqTreeView : public QTreeView
   * vertical scroll bar. The pqTreeView will keep on resizing until
   * maximumRowCountBeforeScrolling row to avoid vertical scrolling.
   */
-  Q_PROPERTY(int maximumRowCountBeforeScrolling
-             READ maximumRowCountBeforeScrolling
-             WRITE setMaximumRowCountBeforeScrolling)
+  Q_PROPERTY(int maximumRowCountBeforeScrolling READ maximumRowCountBeforeScrolling WRITE
+      setMaximumRowCountBeforeScrolling)
 
   typedef QTreeView Superclass;
+
 public:
-  pqTreeView(QWidget *parent=0);
+  pqTreeView(QWidget* parent = 0);
   virtual ~pqTreeView() {}
 
-  virtual bool eventFilter(QObject *object, QEvent *e);
+  virtual bool eventFilter(QObject* object, QEvent* e);
 
-  virtual void setModel(QAbstractItemModel *model);
-  virtual void setRootIndex(const QModelIndex &index);
+  virtual void setModel(QAbstractItemModel* model);
+  virtual void setRootIndex(const QModelIndex& index);
 
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
-  void setMaximumRowCountBeforeScrolling(int val)  
-    { this->MaximumRowCountBeforeScrolling = val; }
-  int maximumRowCountBeforeScrolling() const
-    { return this->MaximumRowCountBeforeScrolling; }
+  void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
+  int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }
 
 private slots:
   void invalidateLayout();

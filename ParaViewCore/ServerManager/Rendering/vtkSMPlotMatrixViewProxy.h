@@ -54,7 +54,6 @@ protected:
 private:
   vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -54,12 +54,12 @@ public:
    * to INPUT | OUTPUT
    */
   void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
-  
+
   /**
    * Remove a linked proxy.
    */
   virtual void RemoveLinkedProxy(vtkSMProxy* proxy);
-  
+
   /**
    * Update all the views linked with an OUTPUT direction.
    * \c interactive indicates if the render is interactive or not.
@@ -73,7 +73,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMCameraLink();
@@ -97,7 +97,7 @@ protected:
    * caller :- the input proxy.
    * pname :- name of property that was pushed.
    */
-  virtual void UpdateProperty(vtkSMProxy* , const char* ) {}
+  virtual void UpdateProperty(vtkSMProxy*, const char*) {}
 
   /**
    * Save the state of the link.
@@ -122,14 +122,12 @@ protected:
   virtual void UpdateState();
 
 private:
-
   class vtkInternals;
   vtkInternals* Internals;
   friend class vtkInternals;
 
   vtkSMCameraLink(const vtkSMCameraLink&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCameraLink&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

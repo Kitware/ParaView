@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVClassNameInformation : public vtkPVI
 public:
   static vtkPVClassNameInformation* New();
   vtkTypeMacro(vtkPVClassNameInformation, vtkPVInformation);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -89,6 +89,7 @@ protected:
   int PortNumber;
   char* VTKClassName;
   vtkSetStringMacro(VTKClassName);
+
 private:
   vtkPVClassNameInformation(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;

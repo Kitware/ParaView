@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,19 +45,17 @@ pqManageCustomFiltersReaction::pqManageCustomFiltersReaction(QAction* parentObje
   this->Model = new pqCustomFilterManagerModel(this);
 
   // Listen for compound proxy register events.
-  pqServerManagerObserver *observer =
-      pqApplicationCore::instance()->getServerManagerObserver();
-  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
-      this->Model, SLOT(addCustomFilter(QString)));
-  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-      this->Model, SLOT(removeCustomFilter(QString)));
+  pqServerManagerObserver* observer = pqApplicationCore::instance()->getServerManagerObserver();
+  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)), this->Model,
+    SLOT(addCustomFilter(QString)));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)), this->Model,
+    SLOT(removeCustomFilter(QString)));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
-    this->Model, SLOT(importCustomFiltersFromSettings()));
-  QObject::connect(smmodel, SIGNAL(aboutToRemoveServer(pqServer*)),
-    this->Model, SLOT(exportCustomFiltersToSettings()));
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(
+    smmodel, SIGNAL(serverAdded(pqServer*)), this->Model, SLOT(importCustomFiltersFromSettings()));
+  QObject::connect(smmodel, SIGNAL(aboutToRemoveServer(pqServer*)), this->Model,
+    SLOT(exportCustomFiltersToSettings()));
 }
 
 //-----------------------------------------------------------------------------

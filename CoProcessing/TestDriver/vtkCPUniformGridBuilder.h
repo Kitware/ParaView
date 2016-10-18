@@ -16,7 +16,7 @@
  * @class   vtkCPUniformGridBuilder
  * @brief   Class for creating uniform grids.
  *
- * Class for creating vtkUniformGrids for a test driver.  
+ * Class for creating vtkUniformGrids for a test driver.
 */
 
 #ifndef vtkCPUniformGridBuilder_h
@@ -40,8 +40,7 @@ public:
    * that were returned were already built before.
    * vtkCPUniformGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
-                                 int & builtNewGrid);
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid);
 
   //@{
   /**
@@ -113,4 +112,4 @@ private:
   void SetUniformGrid(vtkUniformGrid* UG);
 };
 #endif
-  //@}
+//@}

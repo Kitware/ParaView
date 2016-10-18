@@ -148,7 +148,6 @@ private:
 
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
-
 };
 
 #endif

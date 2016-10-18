@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -51,21 +51,19 @@ pqServerManagerModelItem::pqServerManagerModelItem(QObject* _parent /*=null*/)
 pqServerManagerModelItem::~pqServerManagerModelItem()
 {
   if (this->Connector)
-    {
+  {
     this->Connector->Delete();
     this->Connector = 0;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 vtkEventQtSlotConnect* pqServerManagerModelItem::getConnector()
 {
   if (!this->Connector)
-    {
+  {
     this->Connector = vtkEventQtSlotConnect::New();
-    }
+  }
 
   return this->Connector;
 }
-
-

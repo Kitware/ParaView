@@ -49,9 +49,10 @@ public:
    */
   void GatherZBufferValueRMI(int x, int y);
 
-  enum Tags {
-    GATHER_Z_RMI_TAG=987987,
-    Z_TAG=88771
+  enum Tags
+  {
+    GATHER_Z_RMI_TAG = 987987,
+    Z_TAG = 88771
   };
 
   /**
@@ -66,15 +67,15 @@ public:
    * buffers haven;t been swapped yet.
    */
   virtual int ChooseBuffer();
+
 protected:
   vtkMPICompositeManager();
   ~vtkMPICompositeManager();
   //@}
-  
+
 private:
   vtkMPICompositeManager(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
-  
 };
 
 #endif

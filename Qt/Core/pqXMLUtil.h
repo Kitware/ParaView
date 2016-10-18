@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,22 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqXMLUtil_h
 #define _pqXMLUtil_h
 
-
 #include "pqCoreModule.h"
 #include <QList>
 #include <QString>
 
 class vtkPVXMLElement;
 
-
 class PQCORE_EXPORT pqXMLUtil
 {
 public:
-  static vtkPVXMLElement *FindNestedElementByName(vtkPVXMLElement *element,
-      const char *name);
+  static vtkPVXMLElement* FindNestedElementByName(vtkPVXMLElement* element, const char* name);
 
-  static QString GetStringFromIntList(const QList<int> &list);
-  static QList<int> GetIntListFromString(const char *value);
+  static QString GetStringFromIntList(const QList<int>& list);
+  static QList<int> GetIntListFromString(const char* value);
 };
 
 #endif

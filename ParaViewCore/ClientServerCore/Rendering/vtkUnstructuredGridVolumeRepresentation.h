@@ -42,7 +42,8 @@ class vtkUnstructuredGridVolumeMapper;
 class vtkVolumeProperty;
 class vtkVolumeRepresentationPreprocessor;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkUnstructuredGridVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkUnstructuredGridVolumeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkUnstructuredGridVolumeRepresentation* New();
@@ -68,8 +69,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -130,8 +131,7 @@ protected:
    */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -170,12 +170,12 @@ protected:
   bool UseDataPartitions;
 
 private:
-  vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkUnstructuredGridVolumeRepresentation(
+    const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

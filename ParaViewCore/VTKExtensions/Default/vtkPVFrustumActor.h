@@ -58,7 +58,6 @@ protected:
 private:
   vtkPVFrustumActor(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

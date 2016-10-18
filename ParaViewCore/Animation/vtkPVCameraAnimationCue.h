@@ -56,10 +56,10 @@ public:
   void SetMode(int mode);
 
   virtual void BeginUpdateAnimationValues() {}
-  virtual void SetAnimationValue(int, double){}
+  virtual void SetAnimationValue(int, double) {}
   virtual void EndUpdateAnimationValues();
 
-  void SetDataSourceProxy(vtkSMProxy *dataSourceProxy);
+  void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);
 
 protected:
   vtkPVCameraAnimationCue();
@@ -67,10 +67,10 @@ protected:
 
   vtkPVRenderView* View;
   vtkSMProxy* DataSourceProxy;
+
 private:
   vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCameraAnimationCue&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -48,12 +48,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLockPanelsBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * Note: parent is assumed to be a subclass of QMainWindow, e.g.,
   * ParaViewMainWindow.
   */
-  pqLockPanelsBehavior(QObject* parent=0);
+  pqLockPanelsBehavior(QObject* parent = 0);
   virtual ~pqLockPanelsBehavior();
 
   /**

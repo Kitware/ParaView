@@ -15,9 +15,9 @@ public:
   static int exec();
 
 #if QT_VERSION >= 0x050000
-  static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+  static void messageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 #else
-  static void messageHandler(QtMsgType type, const char *msg);
+  static void messageHandler(QtMsgType type, const char* msg);
 #endif
 
   static void delay(int ms);
@@ -33,28 +33,28 @@ public:
   // Simulate a key clicked (Down then Up) to the given widget. If any delay is
   // given (delay > 0), the function will wait before sending the keyes to the
   // widget.
-  static void keyClick(QWidget* w, Qt::Key key,
-    Qt::KeyboardModifiers mod = Qt::NoModifier, int ms = -1);
+  static void keyClick(
+    QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod = Qt::NoModifier, int ms = -1);
 
   // Simulate each letter of the given text clicked to the widget. If any delay
   // is given (delay > 0), the function will delay before each key of the text.
-  static void keyClicks(QWidget* w, const QString& text,
-    Qt::KeyboardModifiers mod = Qt::NoModifier, int ms = -1);
+  static void keyClicks(
+    QWidget* w, const QString& text, Qt::KeyboardModifiers mod = Qt::NoModifier, int ms = -1);
 
-  static void mouseDown(QWidget* w, QPoint pos, Qt::MouseButton btn, 
-                        Qt::KeyboardModifiers mod, int ms);
-  
-  static void mouseUp(QWidget* w, QPoint pos, Qt::MouseButton btn, 
-                      Qt::KeyboardModifiers mod, int ms);
-  
-  static void mouseMove(QWidget* w, QPoint pos, Qt::MouseButton btn, 
-                        Qt::KeyboardModifiers mod, int ms);
+  static void mouseDown(
+    QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms);
 
-  static void mouseClick(QWidget* w, QPoint pos, Qt::MouseButton btn, 
-                         Qt::KeyboardModifiers mod, int ms);
-  
-  static void mouseDClick(QWidget* w, QPoint pos, Qt::MouseButton btn, 
-                         Qt::KeyboardModifiers mod, int ms);
+  static void mouseUp(
+    QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms);
+
+  static void mouseMove(
+    QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms);
+
+  static void mouseClick(
+    QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms);
+
+  static void mouseDClick(
+    QWidget* w, QPoint pos, Qt::MouseButton btn, Qt::KeyboardModifiers mod, int ms);
 
 private:
   QApplication* App;
@@ -65,4 +65,3 @@ private:
 };
 
 #endif
-

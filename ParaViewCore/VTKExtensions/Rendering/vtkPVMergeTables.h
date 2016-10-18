@@ -17,8 +17,8 @@
  * @brief   used to merge rows in tables.
  *
  * Simplified version of vtkMergeTables which simply combines tables merging
- * columns. This assumes that each of the inputs either has exactly identical 
- * columns or no columns at all. 
+ * columns. This assumes that each of the inputs either has exactly identical
+ * columns or no columns at all.
  * This filter can handle composite datasets as well. The output is produced by
  * merging corresponding leaf nodes. This assumes that all inputs have the same
  * composite structure.
@@ -46,10 +46,7 @@ protected:
   vtkPVMergeTables();
   ~vtkPVMergeTables();
 
-  int RequestData(
-    vtkInformation*, 
-    vtkInformationVector**, 
-    vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual vtkExecutive* CreateDefaultExecutive();
@@ -57,8 +54,6 @@ protected:
 private:
   vtkPVMergeTables(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

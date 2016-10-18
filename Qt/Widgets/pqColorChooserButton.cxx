@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
-  : QToolButton(p),
-  ShowAlphaChannel(false)
+  : QToolButton(p)
+  , ShowAlphaChannel(false)
 {
   this->Color[0] = 0.0;
   this->Color[1] = 0.0;
@@ -81,11 +81,11 @@ QVariantList pqColorChooserButton::chosenColorRgbaF() const
 void pqColorChooserButton::setChosenColor(const QColor& color)
 {
   if (color.isValid())
-    {
+  {
     QVariantList val;
     val << color.redF() << color.greenF() << color.blueF() << color.alphaF();
     this->setChosenColorRgbaF(val);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -96,21 +96,20 @@ void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
   color.setRgbF(val[0].toDouble(), val[1].toDouble(), val[2].toDouble());
 
   if (color.isValid())
+  {
+    if (val[0].toDouble() != this->Color[0] || val[1].toDouble() != this->Color[1] ||
+      val[2].toDouble() != this->Color[2])
     {
-    if (val[0].toDouble() != this->Color[0] ||
-        val[1].toDouble() != this->Color[1] ||
-        val[2].toDouble() != this->Color[2])
-      {
       this->Color[0] = val[0].toDouble();
       this->Color[1] = val[1].toDouble();
       this->Color[2] = val[2].toDouble();
-      
+
       this->setIcon(this->renderColorSwatch(color));
       emit this->chosenColorChanged(color);
-      }
+    }
 
     emit this->validColorChosen(color);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -118,16 +117,13 @@ void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
 {
   Q_ASSERT(val.size() == 4);
   QColor color;
-  color.setRgbF(val[0].toDouble(), val[1].toDouble(),
-                val[2].toDouble(), val[3].toDouble());
+  color.setRgbF(val[0].toDouble(), val[1].toDouble(), val[2].toDouble(), val[3].toDouble());
 
   if (color.isValid())
+  {
+    if (val[0].toDouble() != this->Color[0] || val[1].toDouble() != this->Color[1] ||
+      val[2].toDouble() != this->Color[2] || val[3].toDouble() != this->Color[3])
     {
-    if (val[0].toDouble() != this->Color[0] ||
-        val[1].toDouble() != this->Color[1] ||
-        val[2].toDouble() != this->Color[2] ||
-        val[3].toDouble() != this->Color[3])
-      {
       this->Color[0] = val[0].toDouble();
       this->Color[1] = val[1].toDouble();
       this->Color[2] = val[2].toDouble();
@@ -135,9 +131,9 @@ void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
 
       this->setIcon(this->renderColorSwatch(color));
       emit this->chosenColorChanged(color);
-      }
-    emit this->validColorChosen(color);
     }
+    emit this->validColorChosen(color);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -145,17 +141,17 @@ QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
 {
   int radius = qRound(this->height() * this->IconRadiusHeightRatio);
   if (radius <= 10)
-    {
+  {
     radius = 10;
-    }
+  }
 
   QPixmap pix(radius, radius);
-  pix.fill(QColor(0,0,0,0));
+  pix.fill(QColor(0, 0, 0, 0));
 
   QPainter painter(&pix);
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setBrush(QBrush(color));
-  painter.drawEllipse(1, 1, radius-2, radius-2);
+  painter.drawEllipse(1, 1, radius - 2, radius - 2);
   painter.end();
   return QIcon(pix);
 }
@@ -165,17 +161,17 @@ void pqColorChooserButton::chooseColor()
 {
   QColorDialog::ColorDialogOptions opts;
   if (this->ShowAlphaChannel)
-    {
+  {
     opts |= QColorDialog::ShowAlphaChannel;
-    }
+  }
 
   this->setChosenColor(QColorDialog::getColor(this->chosenColor(), this, "Select Color", opts));
 }
 
 //-----------------------------------------------------------------------------
-void pqColorChooserButton::resizeEvent(QResizeEvent *rEvent)
+void pqColorChooserButton::resizeEvent(QResizeEvent* rEvent)
 {
-  (void) rEvent;
+  (void)rEvent;
 
   QColor color = this->chosenColor();
   this->setIcon(this->renderColorSwatch(color));

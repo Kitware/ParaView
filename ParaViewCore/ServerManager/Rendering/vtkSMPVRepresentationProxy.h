@@ -38,7 +38,8 @@
 
 class vtkPVArrayInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy
+  : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMPVRepresentationProxy* New();
@@ -51,18 +52,17 @@ public:
    * check for the validity of the array.
    */
   virtual bool GetUsingScalarColoring();
-  
+
   //@{
   /**
    * Safely call GetUsingScalarColoring() after casting the proxy to appropriate
    * type.
    */
   static bool GetUsingScalarColoring(vtkSMProxy* proxy)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->GetUsingScalarColoring() : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetUsingScalarColoring() : false;
+  }
   //@}
 
   /**
@@ -72,7 +72,7 @@ public:
    * \c attribute_type must be one of vtkDataObject::AttributeTypes.
    */
   virtual bool SetScalarColoring(const char* arrayname, int attribute_type);
- 
+
   /**
    * Enable/disable scalar coloring using the specified array. This will set up a
    * color and opacity transfer functions using vtkSMTransferFunctionProxy
@@ -89,11 +89,10 @@ public:
    * type.
    */
   static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->SetScalarColoring(arrayname, attribute_type) : false;
-    }
+  }
   //@}
 
   //@{
@@ -101,12 +100,12 @@ public:
    * Safely call SetScalarColoring() after casting the proxy to the appropriate
    * type, component version
    */
-  static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type, int component)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+  static bool SetScalarColoring(
+    vtkSMProxy* proxy, const char* arrayname, int attribute_type, int component)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self ? self->SetScalarColoring(arrayname, attribute_type, component) : false;
-    }
+  }
   //@}
 
   /**
@@ -121,7 +120,7 @@ public:
    * @param[in] force Update transfer function even if the range is locked
    * (default: true).
    */
-  virtual bool RescaleTransferFunctionToDataRange(bool extend=false, bool force=true);
+  virtual bool RescaleTransferFunctionToDataRange(bool extend = false, bool force = true);
 
   /**
    * Rescales the color transfer function and opacity transfer function using the
@@ -138,7 +137,7 @@ public:
    * (default: true).
    */
   virtual bool RescaleTransferFunctionToDataRange(
-    const char* arrayname, int attribute_type, bool extend=false, bool force=true);
+    const char* arrayname, int attribute_type, bool extend = false, bool force = true);
 
   //@{
   /**
@@ -146,12 +145,11 @@ public:
    * appropriate type.
    */
   static bool RescaleTransferFunctionToDataRange(
-    vtkSMProxy* proxy, bool extend=false, bool force=true)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToDataRange(extend, force) : false;
-    }
+    vtkSMProxy* proxy, bool extend = false, bool force = true)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToDataRange(extend, force) : false;
+  }
   //@}
 
   //@{
@@ -159,14 +157,13 @@ public:
    * Safely call RescaleTransferFunctionToDataRange() after casting the proxy to
    * appropriate type.
    */
-  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy,
-    const char* arrayname, int attribute_type, bool extend=false, bool force=true)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self?
-      self->RescaleTransferFunctionToDataRange(arrayname, attribute_type, extend, force) : false;
-    }
+  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, const char* arrayname,
+    int attribute_type, bool extend = false, bool force = true)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToDataRange(arrayname, attribute_type, extend, force)
+                : false;
+  }
   //@}
 
   /**
@@ -190,11 +187,10 @@ public:
    * appropriate type.
    */
   static bool RescaleTransferFunctionToDataRangeOverTime(vtkSMProxy* proxy)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToDataRangeOverTime() : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToDataRangeOverTime() : false;
+  }
   //@}
 
   //@{
@@ -202,16 +198,14 @@ public:
    * Safely call RescaleTransferFunctionToDataRangeOverTime() after casting the proxy to
    * appropriate type.
    */
-  static bool RescaleTransferFunctionToDataRangeOverTime(vtkSMProxy* proxy,
-    const char* arrayname, int attribute_type)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self?
-      self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type) : false;
-    }
+  static bool RescaleTransferFunctionToDataRangeOverTime(
+    vtkSMProxy* proxy, const char* arrayname, int attribute_type)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type)
+                : false;
+  }
   //@}
-
 
   //@{
   /**
@@ -219,8 +213,8 @@ public:
    * using the current data range, limited to the currernt visible elements.
    */
   virtual bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* view);
-  virtual bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* view,
-    const char* arrayname, int attribute_type);
+  virtual bool RescaleTransferFunctionToVisibleRange(
+    vtkSMProxy* view, const char* arrayname, int attribute_type);
   //@}
 
   //@{
@@ -229,19 +223,17 @@ public:
    * to the appropriate type.
    */
   static bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* proxy, vtkSMProxy* view)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToVisibleRange(view) : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToVisibleRange(view) : false;
+  }
   static bool RescaleTransferFunctionToVisibleRange(
     vtkSMProxy* proxy, vtkSMProxy* view, const char* arrayname, int attribute_type)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self?
-      self->RescaleTransferFunctionToVisibleRange(view, arrayname, attribute_type) : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->RescaleTransferFunctionToVisibleRange(view, arrayname, attribute_type)
+                : false;
+  }
   //@}
 
   //@{
@@ -251,11 +243,10 @@ public:
    */
   virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visibile);
   static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visibile)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->SetScalarBarVisibility(view, visibile) : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->SetScalarBarVisibility(view, visibile) : false;
+  }
   //@}
 
   //@{
@@ -268,11 +259,10 @@ public:
    */
   virtual bool HideScalarBarIfNotNeeded(vtkSMProxy* view);
   static bool HideScalarBarIfNotNeeded(vtkSMProxy* repr, vtkSMProxy* view)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(repr);
-    return self? self->HideScalarBarIfNotNeeded(view) : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    return self ? self->HideScalarBarIfNotNeeded(view) : false;
+  }
   //@}
 
   //@{
@@ -282,11 +272,10 @@ public:
    */
   virtual bool IsScalarBarVisible(vtkSMProxy* view);
   static bool IsScalarBarVisible(vtkSMProxy* repr, vtkSMProxy* view)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(repr);
-    return self? self->IsScalarBarVisible(view) : false;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    return self ? self->IsScalarBarVisible(view) : false;
+  }
   //@}
 
   //@{
@@ -296,11 +285,10 @@ public:
    */
   virtual vtkPVArrayInformation* GetArrayInformationForColorArray();
   static vtkPVArrayInformation* GetArrayInformationForColorArray(vtkSMProxy* proxy)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->GetArrayInformationForColorArray() : NULL;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetArrayInformationForColorArray() : NULL;
+  }
   //@}
 
   //@{
@@ -312,12 +300,11 @@ public:
     double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
   static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
     vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3)
-    {
-    vtkSMPVRepresentationProxy* self =
-      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->GetProminentValuesInformationForColorArray(
-      uncertaintyAllowed, fraction) : NULL;
-    }
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction)
+                : NULL;
+  }
   //@}
 
   /**
@@ -335,7 +322,7 @@ protected:
    * Rescales transfer function ranges using the array information provided.
    */
   virtual bool RescaleTransferFunctionToDataRange(
-    vtkPVArrayInformation* info, bool extend=false, bool force=true);
+    vtkPVArrayInformation* info, bool extend = false, bool force = true);
 
   /**
    * Overridden to ensure that the RepresentationTypesInfo and
@@ -358,12 +345,12 @@ protected:
    * Overridden to process "RepresentationType" elements.
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
- 
+
   /**
    * Internal method to set scalar coloring, do not use directly.
    */
-  virtual bool SetScalarColoringInternal(const char* arrayname, int attribute_type, 
-    bool useComponent, int component);
+  virtual bool SetScalarColoringInternal(
+    const char* arrayname, int attribute_type, bool useComponent, int component);
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;
@@ -372,8 +359,6 @@ private:
   bool InReadXMLAttributes;
   class vtkStringSet;
   vtkStringSet* RepresentationSubProxies;
-
 };
 
 #endif
-

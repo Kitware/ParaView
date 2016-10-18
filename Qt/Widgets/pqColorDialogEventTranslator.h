@@ -41,13 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * that they can be recorded in tests in a platform independent
 * way.
 */
-class PQWIDGETS_EXPORT pqColorDialogEventTranslator :
-  public pqWidgetEventTranslator
+class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
   typedef pqWidgetEventTranslator Superclass;
+
 public:
-  pqColorDialogEventTranslator(QObject* parent=0);
+  pqColorDialogEventTranslator(QObject* parent = 0);
   ~pqColorDialogEventTranslator();
 
   /**

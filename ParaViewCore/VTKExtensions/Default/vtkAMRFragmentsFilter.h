@@ -14,14 +14,14 @@
 =========================================================================*/
 /**
  * @class   vtkAMRFragmentsFilter
- * @brief   A meta filter that combines 
- * vtkAMRConnectivity, vtkAMRFragmentIntegration, vtkAMRDualContour, 
+ * @brief   A meta filter that combines
+ * vtkAMRConnectivity, vtkAMRFragmentIntegration, vtkAMRDualContour,
  * vtkExtractCTHPart to allow all the fragment analysis in one easy UI
  *
  *
  *   Input 0: The AMR Volume
  *
- *   Output 0: A multiblock containing tables of fragments, one block 
+ *   Output 0: A multiblock containing tables of fragments, one block
  *             for each requested material
 */
 
@@ -40,7 +40,7 @@ class vtkPVAMRFragmentIntegration;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRFragmentsFilter : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAMRFragmentsFilter *New();
+  static vtkAMRFragmentsFilter* New();
   vtkTypeMacro(vtkAMRFragmentsFilter, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -112,8 +112,8 @@ public:
   //@}
 
 protected:
-  vtkAMRFragmentsFilter ();
-  virtual ~vtkAMRFragmentsFilter ();
+  vtkAMRFragmentsFilter();
+  virtual ~vtkAMRFragmentsFilter();
 
   bool ExtractSurface;
   bool UseWatertightSurface;
@@ -126,9 +126,9 @@ protected:
   vtkAMRConnectivity* Connectivity;
   vtkPVAMRFragmentIntegration* Integration;
 
-  virtual int FillInputPortInformation (int, vtkInformation *);
-  virtual int FillOutputPortInformation (int, vtkInformation *);
-  virtual int RequestData (vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int, vtkInformation*);
+  virtual int FillOutputPortInformation(int, vtkInformation*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;

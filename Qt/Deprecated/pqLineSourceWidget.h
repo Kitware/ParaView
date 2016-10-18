@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -40,27 +40,27 @@ class pqServer;
 /**
 * Provides a complete Qt UI for working with a 3D line widget
 */
-class pqLineSourceWidget :
-  public pqLineWidget
+class pqLineSourceWidget : public pqLineWidget
 {
   typedef pqLineWidget Superclass;
-  
+
   Q_OBJECT
-  
+
 public:
   pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqLineSourceWidget();
 
-  void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution);
+  void setControlledProperties(
+    vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution);
 
   /**
   * Subclasses can override this method to map properties to
   * GUI. Default implementation updates the internal datastructures
-  * so that default implementations can be provided for 
+  * so that default implementations can be provided for
   * accept/reset.
   */
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
+  virtual void setControlledProperty(const char* function, vtkSMProperty* controlled_property);
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

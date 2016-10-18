@@ -58,21 +58,16 @@ vtkPVRayCastPickingHelper::~vtkPVRayCastPickingHelper()
 void vtkPVRayCastPickingHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os, indent);
-  os << indent << "PointA: "
-     << this->PointA[0] << ", " << this->PointA[1] << ", " << this->PointA[2]
+  os << indent << "PointA: " << this->PointA[0] << ", " << this->PointA[1] << ", "
+     << this->PointA[2] << endl;
+  os << indent << "PointB: " << this->PointB[0] << ", " << this->PointB[1] << ", "
+     << this->PointB[2] << endl;
+  os << indent << "SnapOnMeshPoint: " << this->SnapOnMeshPoint << endl;
+  os << indent << "Last Intersection: " << this->Intersection[0] << ", " << this->Intersection[1]
+     << ", " << this->Intersection[2] << endl;
+  os << indent << "Input: " << (this->Input ? this->Input->GetClassName() : "NULL") << endl;
+  os << indent << "Selection: " << (this->Selection ? this->Selection->GetClassName() : "NULL")
      << endl;
-  os << indent << "PointB: "
-     << this->PointB[0] << ", " << this->PointB[1] << ", " << this->PointB[2]
-     << endl;
-  os << indent << "SnapOnMeshPoint: "
-     << this->SnapOnMeshPoint << endl;
-  os << indent << "Last Intersection: "
-     << this->Intersection[0] << ", " << this->Intersection[1] << ", "
-     << this->Intersection[2] << endl;
-  os << indent << "Input: "
-     << (this->Input ? this->Input->GetClassName() : "NULL") << endl;
-  os << indent << "Selection: "
-     << (this->Selection ? this->Selection->GetClassName() : "NULL") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -90,37 +85,36 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
   int numberOfProcesses = controller->GetNumberOfProcesses();
 
   vtkNew<vtkPVExtractSelection> extractSelectionFilter;
-  extractSelectionFilter->SetInputConnection(0,this->Input->GetOutputPort(0));
-  extractSelectionFilter->SetInputConnection(1,this->Selection->GetOutputPort(0));
+  extractSelectionFilter->SetInputConnection(0, this->Input->GetOutputPort(0));
+  extractSelectionFilter->SetInputConnection(1, this->Selection->GetOutputPort(0));
   extractSelectionFilter->UpdatePiece(pid, numberOfProcesses, 0);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
-  vtkCompositeDataSet* cds =
-      vtkCompositeDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
-  if(ds && ds->GetNumberOfCells() > 0)
-    {
-     this->ComputeIntersectionFromDataSet(ds);
-    }
-  else if(cds)
-    {
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
+  if (ds && ds->GetNumberOfCells() > 0)
+  {
+    this->ComputeIntersectionFromDataSet(ds);
+  }
+  else if (cds)
+  {
     vtkSmartPointer<vtkCompositeDataIterator> dsIter;
     dsIter.TakeReference(cds->NewIterator());
-    for(dsIter->GoToFirstItem();!dsIter->IsDoneWithTraversal();dsIter->GoToNextItem())
-      {
+    for (dsIter->GoToFirstItem(); !dsIter->IsDoneWithTraversal(); dsIter->GoToNextItem())
+    {
       this->ComputeIntersectionFromDataSet(
         vtkDataSet::SafeDownCast(dsIter->GetCurrentDataObject()));
-      }
     }
+  }
 
   // If distributed do a global reduction and make sure the root node get the
   // right value. We don't care about the other nodes...
-  if(numberOfProcesses > 1)
-    {
+  if (numberOfProcesses > 1)
+  {
     double result[3];
     controller->Reduce(this->Intersection, result, 3, vtkCommunicator::SUM_OP, 0);
     this->Intersection[0] = result[0];
     this->Intersection[1] = result[1];
     this->Intersection[2] = result[2];
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -131,17 +125,17 @@ void vtkPVRayCastPickingHelper::ComputeIntersectionFromDataSet(vtkDataSet* ds)
   int subId;
   double pcoord[3];
 
-  if(ds && ds->GetNumberOfCells() > 0)
-    {
+  if (ds && ds->GetNumberOfCells() > 0)
+  {
     if (this->SnapOnMeshPoint)
-      {
+    {
       ds->GetPoint(0, this->Intersection);
-      }
-    else if(ds->GetCell(0)->IntersectWithLine(
-      this->PointA, this->PointB, tolerance, t, this->Intersection,
-      pcoord, subId) == 0 && t == VTK_DOUBLE_MAX)
-      {
-      vtkErrorMacro("The intersection was not properly found");
-      }
     }
+    else if (ds->GetCell(0)->IntersectWithLine(
+               this->PointA, this->PointB, tolerance, t, this->Intersection, pcoord, subId) == 0 &&
+      t == VTK_DOUBLE_MAX)
+    {
+      vtkErrorMacro("The intersection was not properly found");
+    }
+  }
 }

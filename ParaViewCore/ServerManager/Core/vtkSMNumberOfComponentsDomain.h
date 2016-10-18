@@ -56,15 +56,12 @@ protected:
   /**
    * Internal update method doing the actual work.
    */
-  void Update(const char* arrayname, 
-    vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad,
-    int outputport);
+  void Update(
+    const char* arrayname, vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
 
 private:
   vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

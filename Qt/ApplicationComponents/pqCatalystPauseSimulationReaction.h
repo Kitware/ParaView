@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -44,19 +44,16 @@ class vtkSMLiveInsituLinkProxy;
 * @ingroup Reactions
 * @ingroup LiveInsitu
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction :
-  public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqCatalystPauseSimulationReaction(QAction* parent=0);
+  pqCatalystPauseSimulationReaction(QAction* parent = 0);
 
 public slots:
-  virtual void updateEnableState()
-  {
-    updateEnableState(PAUSE);
-  }
+  virtual void updateEnableState() { updateEnableState(PAUSE); }
 
 protected:
   enum Type
@@ -68,11 +65,10 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-  { this->setPauseSimulation(true); }
+  virtual void onTriggered() { this->setPauseSimulation(true); }
 
-  void setPauseSimulation (bool pause);
-  void updateEnableState (Type type);
+  void setPauseSimulation(bool pause);
+  void updateEnableState(Type type);
 
 private:
   Q_DISABLE_COPY(pqCatalystPauseSimulationReaction)

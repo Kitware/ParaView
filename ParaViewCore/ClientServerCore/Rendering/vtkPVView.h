@@ -45,9 +45,9 @@ public:
   static bool GetEnableStreaming();
 
   enum
-    {
-    ViewTimeChangedEvent=9000
-    };
+  {
+    ViewTimeChangedEvent = 9000
+  };
 
   /**
    * Initialize the view with an identifier. Unless noted otherwise, this method
@@ -65,7 +65,7 @@ public:
   virtual void SetPosition(int, int);
   vtkGetVector2Macro(Position, int);
   //@}
-  
+
   //@{
   /**
    * Set the size of this view in the multiview configuration.
@@ -80,14 +80,14 @@ public:
    * Triggers a high-resolution render.
    * @CallOnAllProcessess
    */
-  virtual void StillRender()=0;
+  virtual void StillRender() = 0;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * @CallOnAllProcessess
    */
-  virtual void InteractiveRender()=0;
+  virtual void InteractiveRender() = 0;
 
   //@{
   /**
@@ -101,8 +101,8 @@ public:
    * We may make this API generic in future, for now this works.
    */
   bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(double &size);
-  bool SynchronizeSize(unsigned int &size);
+  bool SynchronizeSize(double& size);
+  bool SynchronizeSize(unsigned int& size);
   //@}
 
   //@{
@@ -251,8 +251,7 @@ protected:
    * Subclasses can use this method to trigger a pass on all representations.
    */
   void CallProcessViewRequest(
-    vtkInformationRequestKey* passType,
-    vtkInformation* request, vtkInformationVector* reply);
+    vtkInformationRequestKey* passType, vtkInformation* request, vtkInformationVector* reply);
   double ViewTime;
   //@}
 
@@ -272,8 +271,6 @@ private:
   bool LastRenderOneViewAtATime;
 
   static bool EnableStreaming;
-
 };
 
 #endif
-

@@ -18,14 +18,14 @@ PURPOSE.  See the above copyright notice for more information.
  *
  * vtkSpyPlotUniReader is a reader that reads SPCTH Spy Plot file binary format
  * that describes part of a dataset (in the case that the simulation consists of
- * more than 1 file) or the entire simulation. 
+ * more than 1 file) or the entire simulation.
  * The reader supports both Spy dataset types: flat mesh and AMR
  * (Adaptive Mesh Refinement).
  *
  * @par Implementation Details:
- * Class was extracted from vtkSpyPlotReader.cxx and is a helper to that 
+ * Class was extracted from vtkSpyPlotReader.cxx and is a helper to that
  * class.  Note the grids in the reader may have bad ghost cells that will
- * need to be taken into consideration in terms of both geometry and 
+ * need to be taken into consideration in terms of both geometry and
  * cell data
  *-----------------------------------------------------------------------------
  *=============================================================================
@@ -44,7 +44,6 @@ class vtkIntArray;
 class vtkUnsignedCharArray;
 class vtkSpyPlotIStream;
 
-
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotUniReader : public vtkObject
 {
 public:
@@ -60,13 +59,13 @@ public:
   vtkGetStringMacro(FileName);
   virtual void SetCellArraySelection(vtkDataArraySelection* da);
   //@}
-  
+
   /**
    * Reads the basic information from the file such as the header, number
    * of fields, etc..
    */
   virtual int ReadInformation();
-  
+
   /**
    * Make sure that actual data (including grid blocks) is current
    * else it will read in the required data from file
@@ -137,16 +136,13 @@ public:
    * Return the mass data array for the material index passed in
    * for the passed in block
    */
-  vtkDataArray* GetMaterialMassField(const int& block,
-    const int& materialIndex);
-  
+  vtkDataArray* GetMaterialMassField(const int& block, const int& materialIndex);
+
   /**
    * Return the volume fraction data array for the material index passed in
    * for the passed in block
    */
-  vtkDataArray* GetMaterialVolumeFractionField(const int& block,
-    const int& materialIndex);  
-    
+  vtkDataArray* GetMaterialVolumeFractionField(const int& block, const int& materialIndex);
 
   /**
    * Mark the block's field to have been fixed w/r bad ghost cells
@@ -156,19 +152,19 @@ public:
   /**
    * Return the data array for the tracer positions.
    */
-  vtkFloatArray* GetTracers ();
+  vtkFloatArray* GetTracers();
 
   // Return the ith block (i.e. grid) in the reader
-  vtkSpyPlotBlock *GetBlock(int i);
+  vtkSpyPlotBlock* GetBlock(int i);
 
   // Returns the number of materials
-  int GetNumberOfMaterials( ) const { return NumberOfMaterials; }
+  int GetNumberOfMaterials() const { return NumberOfMaterials; }
 
   // Returns the number of dimensions
   int GetNumberOfDimensions() const { return NumberOfDimensions; }
 
   // Returns the coordinate system of the file
-  int GetCoordinateSystem( ) const { return IGM; }
+  int GetCoordinateSystem() const { return IGM; }
 
   struct CellMaterialField
   {
@@ -183,7 +179,7 @@ public:
     int Index;
     CellMaterialField* MaterialField;
     vtkDataArray** DataBlocks;
-    int *GhostCellsFixed;
+    int* GhostCellsFixed;
   };
   struct DataDump
   {
@@ -193,12 +189,12 @@ public:
     vtkTypeInt64 SavedBlocksGeometryOffset;
     unsigned char* SavedBlockAllocatedStates;
     vtkTypeInt64 BlocksOffset;
-    Variable *Variables;
+    Variable* Variables;
     int NumberOfBlocks;
     int ActualNumberOfBlocks;
     int NumberOfTracers;
-    vtkFloatArray *TracerCoord;
-    vtkIntArray *TracerBlock;
+    vtkFloatArray* TracerCoord;
+    vtkIntArray* TracerBlock;
   };
   struct MarkerMaterialField
   {
@@ -210,18 +206,18 @@ public:
     int NumMarks;
     int NumRealMarks;
     int NumVars;
-    MarkerMaterialField *Variables;
+    MarkerMaterialField* Variables;
   };
   struct MarkerDump
   {
-    vtkFloatArray *XLoc;
-    vtkFloatArray *YLoc;
-    vtkFloatArray *ZLoc;
-    vtkIntArray *ILoc;
-    vtkIntArray *JLoc;
-    vtkIntArray *KLoc;
-    vtkIntArray *Block;
-    vtkFloatArray **Variables;
+    vtkFloatArray* XLoc;
+    vtkFloatArray* YLoc;
+    vtkFloatArray* ZLoc;
+    vtkIntArray* ILoc;
+    vtkIntArray* JLoc;
+    vtkIntArray* KLoc;
+    vtkIntArray* Block;
+    vtkFloatArray** Variables;
   };
   MaterialMarker* Markers;
   MarkerDump* MarkersDumps;
@@ -241,20 +237,17 @@ protected:
   vtkSpyPlotBlock* Blocks;
 
 private:
-  int RunLengthDataDecode(const unsigned char* in, int inSize, float* out, 
-                          int outSize);
-  int RunLengthDataDecode(const unsigned char* in, int inSize, int* out, 
-                          int outSize);
-  int RunLengthDataDecode(const unsigned char* in, int inSize, 
-                          unsigned char* out, int outSize);
+  int RunLengthDataDecode(const unsigned char* in, int inSize, float* out, int outSize);
+  int RunLengthDataDecode(const unsigned char* in, int inSize, int* out, int outSize);
+  int RunLengthDataDecode(const unsigned char* in, int inSize, unsigned char* out, int outSize);
 
-  int ReadHeader(vtkSpyPlotIStream *spis);
-  int ReadMarkerHeader(vtkSpyPlotIStream *spis);
-  int ReadCellVariableInfo(vtkSpyPlotIStream *spis);
-  int ReadMaterialInfo(vtkSpyPlotIStream *spis);
-  int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
-  int ReadDataDumps(vtkSpyPlotIStream *spis);
-  int ReadMarkerDumps(vtkSpyPlotIStream *spis);
+  int ReadHeader(vtkSpyPlotIStream* spis);
+  int ReadMarkerHeader(vtkSpyPlotIStream* spis);
+  int ReadCellVariableInfo(vtkSpyPlotIStream* spis);
+  int ReadMaterialInfo(vtkSpyPlotIStream* spis);
+  int ReadGroupHeaderInformation(vtkSpyPlotIStream* spis);
+  int ReadDataDumps(vtkSpyPlotIStream* spis);
+  int ReadMarkerDumps(vtkSpyPlotIStream* spis);
 
   vtkDataArray* GetMaterialField(const int& block, const int& materialIndex, const char* Id);
 
@@ -284,13 +277,12 @@ private:
 
   // Individual dump information
   int NumberOfDataDumps;
-  int *DumpCycle;
-  double *DumpTime;
-  double *DumpDT; // SPCTH 102 (What is this anyway?)
-  vtkTypeInt64 *DumpOffset;
+  int* DumpCycle;
+  double* DumpTime;
+  double* DumpDT; // SPCTH 102 (What is this anyway?)
+  vtkTypeInt64* DumpOffset;
 
   DataDump* DataDumps;
-
 
   // File name
   char* FileName;
@@ -306,9 +298,9 @@ private:
   int TimeStepRange[2];
   double TimeRange[2];
 
-  // Indicates that the reader needs to check its data 
+  // Indicates that the reader needs to check its data
   // (Not its geometry) - the reason is that ReadData
-  // wil be called alot and there needs to be a way to 
+  // wil be called alot and there needs to be a way to
   // optimize this
   int NeedToCheck;
 
@@ -316,7 +308,7 @@ private:
   int DownConvertVolumeFraction;
 
   int NumberOfCellFields;
-  
+
   vtkDataArraySelection* CellArraySelection;
 
   Variable* GetCellField(int field);
@@ -327,16 +319,15 @@ private:
   void operator=(const vtkSpyPlotUniReader&) VTK_DELETE_FUNCTION;
 };
 
-inline  double* vtkSpyPlotUniReader::GetTimeArray() 
-{ 
+inline double* vtkSpyPlotUniReader::GetTimeArray()
+{
   return this->DumpTime;
 }
 
-inline int vtkSpyPlotUniReader::IsAMR() 
-{ 
-  return (this->NumberOfBlocks > 1); 
+inline int vtkSpyPlotUniReader::IsAMR()
+{
+  return (this->NumberOfBlocks > 1);
 }
-
 
 #endif
 

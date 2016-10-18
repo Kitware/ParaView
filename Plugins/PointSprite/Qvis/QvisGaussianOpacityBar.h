@@ -58,63 +58,78 @@ class QPixmap;
 
 class VTKQVIS_EXPORT QvisGaussianOpacityBar : public QvisAbstractOpacityBar
 {
-    Q_OBJECT
+  Q_OBJECT
+public:
+  QvisGaussianOpacityBar(QWidget* parent = NULL, const char* name = NULL);
+  ~QvisGaussianOpacityBar();
+  void getRawOpacities(int, float*);
+  int getNumberOfGaussians();
+  void getGaussian(int, float*, float*, float*, float*, float*);
+  void setGaussian(int, float*, float*, float*, float*, float*);
+  void setAllGaussians(int, float*);
+  void setMaximumNumberOfGaussians(int);
+  void setMinimumNumberOfGaussians(int);
+
+protected:
+  void mouseMoveEvent(QMouseEvent*);
+  void mousePressEvent(QMouseEvent*);
+  void mouseReleaseEvent(QMouseEvent*);
+  void paintToPixmap(int, int);
+  void drawControlPoints(QPainter& painter);
+
+private:
+  enum Mode
+  {
+    modeNone,
+    modeX,
+    modeH,
+    modeW,
+    modeWR,
+    modeWL,
+    modeB
+  };
+  // encapsulation of gaussian parameters
+  class Gaussian
+  {
   public:
-                  QvisGaussianOpacityBar(QWidget *parent=NULL, const char *name=NULL);
-                 ~QvisGaussianOpacityBar();
-    void          getRawOpacities(int, float*);
-    int           getNumberOfGaussians();
-    void          getGaussian(int, float*,float*,float*,float*,float*);
-    void          setGaussian(int, float*,float*,float*,float*,float*);
-    void          setAllGaussians(int, float*);
-    void          setMaximumNumberOfGaussians(int);
-    void          setMinimumNumberOfGaussians(int);
+    float x;
+    float h;
+    float w;
+    float bx;
+    float by;
 
-  protected:
-    void          mouseMoveEvent(QMouseEvent*);
-    void          mousePressEvent(QMouseEvent*);
-    void          mouseReleaseEvent(QMouseEvent*);
-    void          paintToPixmap(int,int);
-    void          drawControlPoints(QPainter &painter);
+  public:
+    Gaussian(float x_, float h_, float w_, float bx_, float by_)
+      : x(x_)
+      , h(h_)
+      , w(w_)
+      , bx(bx_)
+      , by(by_){};
+    Gaussian(){};
+    ~Gaussian(){};
+  };
 
-  private:
-    enum Mode     {modeNone, modeX, modeH, modeW, modeWR, modeWL, modeB};
-    // encapsulation of gaussian parameters
-    class Gaussian
-    {
-      public:
-        float x;
-        float h;
-        float w;
-        float bx;
-        float by;
-      public:
-        Gaussian(float x_,float h_,float w_,float bx_,float by_) : x(x_),h(h_),w(w_),bx(bx_),by(by_) {};
-        Gaussian() {};
-        ~Gaussian() {};
-    };
+  // the list of gaussians
+  int ngaussian;
+  Gaussian gaussian[200];
 
-    // the list of gaussians
-    int         ngaussian;
-    Gaussian    gaussian[200];
+  // the current interaction mode and the current gaussian
+  Mode currentMode;
+  int currentGaussian;
 
-    // the current interaction mode and the current gaussian
-    Mode        currentMode;
-    int         currentGaussian;
+  // GUI interaction variables
+  bool mousedown;
+  int lastx;
+  int lasty;
 
-    // GUI interaction variables
-    bool        mousedown;
-    int         lastx;
-    int         lasty;
+  // User specified constraints
+  int maximumNumberOfGaussians;
+  int minimumNumberOfGaussians;
 
-    // User specified constraints
-    int         maximumNumberOfGaussians;
-    int         minimumNumberOfGaussians;
-
-    // helper functions
-    bool findGaussianControlPoint(int,int, int*,Mode*);
-    void removeGaussian(int);
-    void addGaussian(float,float,float,float,float);
+  // helper functions
+  bool findGaussianControlPoint(int, int, int*, Mode*);
+  void removeGaussian(int);
+  void addGaussian(float, float, float, float, float);
 };
 
 #endif

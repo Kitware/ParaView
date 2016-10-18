@@ -191,12 +191,14 @@
 #endif
 #endif
 
-#define PRINT_SELF(classname)\
-  c = classname::New(); c->Print(cout); c->Delete();
+#define PRINT_SELF(classname)                                                                      \
+  c = classname::New();                                                                            \
+  c->Print(cout);                                                                                  \
+  c->Delete();
 
-int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
+int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
 {
-  vtkObject *c;
+  vtkObject* c;
 
   PRINT_SELF(vtkAMRDualClip);
   PRINT_SELF(vtkAMRDualContour);
@@ -217,7 +219,7 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
   PRINT_SELF(vtkDataSetToRectilinearGrid);
-  //PRINT_SELF(vtkEnzoReader);
+  // PRINT_SELF(vtkEnzoReader);
   PRINT_SELF(vtkEquivalenceSet);
   PRINT_SELF(vtkExodusFileSeriesReader);
   PRINT_SELF(vtkExtractHistogram);
@@ -226,7 +228,7 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkFileSeriesReader);
   PRINT_SELF(vtkFileSeriesWriter);
   PRINT_SELF(vtkFlashContour);
-  //PRINT_SELF(vtkFlashReader);
+  // PRINT_SELF(vtkFlashReader);
   PRINT_SELF(vtkGridConnectivity);
   PRINT_SELF(vtkHierarchicalFractal);
   PRINT_SELF(vtkImageCompressor);
@@ -238,15 +240,15 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkKdTreeGenerator);
   PRINT_SELF(vtkKdTreeManager);
   PRINT_SELF(vtkMarkSelectedRows);
-  //PRINT_SELF(vtkMaterialInterfaceCommBuffer);
+  // PRINT_SELF(vtkMaterialInterfaceCommBuffer);
   PRINT_SELF(vtkMaterialInterfaceFilter);
-  //PRINT_SELF(vtkMaterialInterfaceIdList);
-  //PRINT_SELF(vtkMaterialInterfacePieceLoading);
-  //PRINT_SELF(vtkMaterialInterfacePieceTransaction);
-  //PRINT_SELF(vtkMaterialInterfacePieceTransactionMatrix);
-  //PRINT_SELF(vtkMaterialInterfaceProcessLoading);
-  //PRINT_SELF(vtkMaterialInterfaceProcessRing);
-  //PRINT_SELF(vtkMaterialInterfaceToProcMap);
+  // PRINT_SELF(vtkMaterialInterfaceIdList);
+  // PRINT_SELF(vtkMaterialInterfacePieceLoading);
+  // PRINT_SELF(vtkMaterialInterfacePieceTransaction);
+  // PRINT_SELF(vtkMaterialInterfacePieceTransactionMatrix);
+  // PRINT_SELF(vtkMaterialInterfaceProcessLoading);
+  // PRINT_SELF(vtkMaterialInterfaceProcessRing);
+  // PRINT_SELF(vtkMaterialInterfaceToProcMap);
   PRINT_SELF(vtkMergeArrays);
   PRINT_SELF(vtkMergeCompositeDataSet);
   PRINT_SELF(vtkMinMax);
@@ -326,18 +328,18 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);
   PRINT_SELF(vtkSortedTableStreamer);
-  //PRINT_SELF(vtkSpyPlotBlock);
-  //PRINT_SELF(vtkSpyPlotBlockIterator);
+  // PRINT_SELF(vtkSpyPlotBlock);
+  // PRINT_SELF(vtkSpyPlotBlockIterator);
   PRINT_SELF(vtkSpyPlotHistoryReader);
-  //PRINT_SELF(vtkSpyPlotIStream);
+  // PRINT_SELF(vtkSpyPlotIStream);
   PRINT_SELF(vtkSpyPlotReader);
-  //PRINT_SELF(vtkSpyPlotReaderMap);
+  // PRINT_SELF(vtkSpyPlotReaderMap);
   PRINT_SELF(vtkSpyPlotUniReader);
   PRINT_SELF(vtkSquirtCompressor);
   PRINT_SELF(vtkSurfaceVectors);
   PRINT_SELF(vtkTexturePainter);
-  //PRINT_SELF(vtkTilesHelper);
-  //PRINT_SELF(vtkTileDisplayHelper);
+  // PRINT_SELF(vtkTilesHelper);
+  // PRINT_SELF(vtkTileDisplayHelper);
   PRINT_SELF(vtkTimeToTextConvertor);
   PRINT_SELF(vtkTrackballPan);
   PRINT_SELF(vtkTransferFunctionEditorRepresentation);
@@ -367,10 +369,10 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkRedistributePolyData);
   PRINT_SELF(vtkWeightedRedistributePolyData);
   PRINT_SELF(vtkMPICompositeManager);
-# ifdef PARAVIEW_USE_ICE_T
+#ifdef PARAVIEW_USE_ICE_T
   PRINT_SELF(vtkIceTCompositePass);
   PRINT_SELF(vtkIceTContext);
-# endif
+#endif
 #endif
 
   return 0;

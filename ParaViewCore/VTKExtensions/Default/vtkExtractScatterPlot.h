@@ -32,22 +32,22 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractScatterPlot :
-  public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractScatterPlot : public vtkPolyDataAlgorithm
 {
 public:
   static vtkExtractScatterPlot* New();
   vtkTypeMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
-   * Controls which input data component should be binned, for input arrays with more-than-one component
+   * Controls which input data component should be binned, for input arrays with more-than-one
+   * component
    */
   vtkSetClampMacro(XComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(XComponent, int);
   //@}
-  
+
   //@{
   /**
    * Controls which input data component should be binned, for input arrays
@@ -56,7 +56,7 @@ public:
   vtkSetClampMacro(YComponent, int, 0, VTK_INT_MAX);
   vtkGetMacro(YComponent, int);
   //@}
-  
+
   //@{
   /**
    * Controls the number of bins along the X axis in the output histogram data
@@ -64,7 +64,7 @@ public:
   vtkSetClampMacro(XBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(XBinCount, int);
   //@}
-  
+
   //@{
   /**
    * Controls the number of bins along the Y axis in the output histogram data
@@ -72,17 +72,16 @@ public:
   vtkSetClampMacro(YBinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(YBinCount, int);
   //@}
-  
+
 private:
   vtkExtractScatterPlot();
   vtkExtractScatterPlot(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
   void operator=(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
   ~vtkExtractScatterPlot();
 
-  virtual int FillInputPortInformation (int port, vtkInformation *info);
-  virtual int RequestData(vtkInformation *request, 
-                          vtkInformationVector **inputVector, 
-                          vtkInformationVector *outputVector);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   int XComponent;
   int YComponent;

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,26 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqListWidgetItemObject.h"
 
-
 pqListWidgetItemObject::pqListWidgetItemObject(const QString& t, QListWidget* p)
-  : QListWidgetItem(t, p) 
+  : QListWidgetItem(t, p)
 {
 }
 
 void pqListWidgetItemObject::setData(int role, const QVariant& v)
 {
-  if(Qt::CheckStateRole == role)
+  if (Qt::CheckStateRole == role)
+  {
+    if (v != this->data(Qt::CheckStateRole))
     {
-    if(v != this->data(Qt::CheckStateRole))
-      {
       QListWidgetItem::setData(role, v);
       emit this->checkedStateChanged(Qt::Checked == v ? true : false);
-      }
     }
+  }
   else
-    {
+  {
     QListWidgetItem::setData(role, v);
-    }
+  }
 }
 
 bool pqListWidgetItemObject::isChecked() const
@@ -61,14 +60,12 @@ bool pqListWidgetItemObject::isChecked() const
 
 void pqListWidgetItemObject::setChecked(bool v)
 {
-  if(v)
-    {
+  if (v)
+  {
     this->setCheckState(Qt::Checked);
-    }
+  }
   else
-    {
+  {
     this->setCheckState(Qt::Unchecked);
-    }
+  }
 }
-
-

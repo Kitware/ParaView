@@ -91,10 +91,10 @@ protected:
 
   vtkWeakPointer<vtkPVSessionCore> Core;
   int LogLevel;
+
 private:
   vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

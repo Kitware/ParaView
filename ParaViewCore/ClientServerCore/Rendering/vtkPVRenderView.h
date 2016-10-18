@@ -33,7 +33,6 @@
 #include "vtkPVView.h"
 #include "vtkSmartPointer.h" // needed for iVar
 
-
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCuller;
@@ -77,14 +76,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum InteractionModes
-    {
-    INTERACTION_MODE_UNINTIALIZED=-1,
-    INTERACTION_MODE_3D=0,
+  {
+    INTERACTION_MODE_UNINTIALIZED = -1,
+    INTERACTION_MODE_3D = 0,
     INTERACTION_MODE_2D, // not implemented yet.
     INTERACTION_MODE_SELECTION,
     INTERACTION_MODE_ZOOM,
     INTERACTION_MODE_POLYGON
-    };
+  };
 
   //@{
   /**
@@ -108,7 +107,6 @@ public:
    */
   virtual void Initialize(unsigned int id);
 
-
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
@@ -131,17 +129,17 @@ public:
    * Defines various renderer types.
    */
   enum
-    {
+  {
     DEFAULT_RENDERER = 0,
     NON_COMPOSITED_RENDERER = 1,
-    };
+  };
 
   /**
    * Returns the renderer given an int identifying its type.
    * \li DEFAULT_RENDERER: returns the 3D renderer.
    * \li NON_COMPOSITED_RENDERER: returns the NonCompositedRenderer.
    */
-  virtual vtkRenderer* GetRenderer(int rendererType=DEFAULT_RENDERER);
+  virtual vtkRenderer* GetRenderer(int rendererType = DEFAULT_RENDERER);
 
   //@{
   /**
@@ -292,7 +290,7 @@ public:
 
   //@{
   void StreamingUpdate(const double view_planes[24]);
-  void DeliverStreamedPieces(unsigned int size, unsigned int *representation_ids);
+  void DeliverStreamedPieces(unsigned int size, unsigned int* representation_ids);
   //@}
 
   /**
@@ -349,16 +347,16 @@ public:
    */
   void SelectCells(int region[4]);
   void SelectCells(int region0, int region1, int region2, int region3)
-    {
-    int r[4] = {region0, region1, region2, region3};
+  {
+    int r[4] = { region0, region1, region2, region3 };
     this->SelectCells(r);
-    }
+  }
   void SelectPoints(int region[4]);
   void SelectPoints(int region0, int region1, int region2, int region3)
-    {
-    int r[4] = {region0, region1, region2, region3};
+  {
+    int r[4] = { region0, region1, region2, region3 };
     this->SelectPoints(r);
-    }
+  }
   void Select(int field_association, int region[4]);
   //@}
 
@@ -432,8 +430,7 @@ public:
    * Returns if remote-rendering is possible on the current group of processes.
    */
   vtkGetMacro(RemoteRenderingAvailable, bool);
-  void RemoteRenderingAvailableOff()
-    { this->RemoteRenderingAvailable = false; }
+  void RemoteRenderingAvailableOff() { this->RemoteRenderingAvailable = false; }
   //@}
 
   //@{
@@ -462,20 +459,17 @@ public:
    * If trueSize is non-zero, then that's the size used in making decisions
    * about LOD/remote rendering etc and not the actual size of the dataset.
    */
-  static void SetPiece(vtkInformation* info,
-    vtkPVDataRepresentation* repr, vtkDataObject* data, unsigned long trueSize=0);
-  static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info,
-    vtkPVDataRepresentation* repr);
-  static void SetPieceLOD(vtkInformation* info,
-    vtkPVDataRepresentation* repr, vtkDataObject* data);
-  static vtkAlgorithmOutput* GetPieceProducerLOD(vtkInformation* info,
-    vtkPVDataRepresentation* repr);
+  static void SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
+    unsigned long trueSize = 0);
+  static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info, vtkPVDataRepresentation* repr);
+  static void SetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data);
+  static vtkAlgorithmOutput* GetPieceProducerLOD(
+    vtkInformation* info, vtkPVDataRepresentation* repr);
   static void MarkAsRedistributable(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool value=true);
-  static void SetGeometryBounds(vtkInformation* info,
-    double bounds[6], vtkMatrix4x4* transform = NULL);
-  static void SetStreamable(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true);
+  static void SetGeometryBounds(
+    vtkInformation* info, double bounds[6], vtkMatrix4x4* transform = NULL);
+  static void SetStreamable(vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
   static void SetNextStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
   static vtkDataObject* GetCurrentStreamedPiece(
@@ -514,21 +508,18 @@ public:
    * the client. If \c gather_before_delivery is false, only the data from the
    * root node will be sent to the client without any parallel communication.
    */
-  static void SetDeliverToClientAndRenderingProcesses(
-    vtkInformation* info, vtkPVDataRepresentation* repr,
-    bool deliver_to_client, bool gather_before_delivery);
+  static void SetDeliverToClientAndRenderingProcesses(vtkInformation* info,
+    vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery);
 
   //@{
   /**
    * Pass the structured-meta-data for determining rendering order for ordered
    * compositing.
    */
-  static void SetOrderedCompositingInformation(
-    vtkInformation* info, vtkPVDataRepresentation* repr,
-    vtkExtentTranslator* translator,
-    const int whole_extents[6], const double origin[3], const double spacing[3]);
-  static void SetOrderedCompositingInformation(
-    vtkInformation* info, const double bounds[6]);
+  static void SetOrderedCompositingInformation(vtkInformation* info, vtkPVDataRepresentation* repr,
+    vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
+    const double spacing[3]);
+  static void SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6]);
   void ClearOrderedCompositingInformation();
   //@}
 
@@ -542,12 +533,12 @@ public:
    * only render property on the client or root node.
    */
   static void SetRequiresDistributedRendering(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool value, bool for_lod=false);
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value, bool for_lod = false);
   static void SetRequiresDistributedRenderingLOD(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool value)
-    {
+  {
     vtkPVRenderView::SetRequiresDistributedRendering(info, repr, value, true);
-    }
+  }
   //@}
 
   /**
@@ -558,7 +549,8 @@ public:
    * Set \c flag to -1 to clear. The flag is cleared in every
    * vtkPVRenderView::Update() call, hence a representation must set it in
    * vtkPVView::REQUEST_UPDATE() pass if needed each time.
-   * Also note, if the value it set to non-negative and is not equal to vtkMPIMoveData::PASS_THROUGH,
+   * Also note, if the value it set to non-negative and is not equal to
+   * vtkMPIMoveData::PASS_THROUGH,
    * ordered compositing will also be disabled.
    */
   static void SetForceDataDistributionMode(vtkInformation* info, int flag);
@@ -569,10 +561,8 @@ public:
    * should register the prop that they use for selection rendering. They can do
    * that in the vtkPVDataRepresentation::AddToView() implementation.
    */
-  void RegisterPropForHardwareSelection(
-    vtkPVDataRepresentation* repr, vtkProp* prop);
-  void UnRegisterPropForHardwareSelection(
-    vtkPVDataRepresentation* repr, vtkProp* prop);
+  void RegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop);
+  void UnRegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop);
   //@}
 
   //@{
@@ -633,8 +623,7 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
-  vtkSetMacro(UseHiddenLineRemoval, bool)
-  virtual void SetUseDepthPeeling(int val);
+  vtkSetMacro(UseHiddenLineRemoval, bool) virtual void SetUseDepthPeeling(int val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackground(double r, double g, double b);
   virtual void SetBackground2(double r, double g, double b);
@@ -744,8 +733,7 @@ public:
    * representations. Note this method has to be called on all processes or it
    * may lead to deadlock.
    */
-  void Deliver(int use_lod,
-    unsigned int size, unsigned int *representation_ids);
+  void Deliver(int use_lod, unsigned int size, unsigned int* representation_ids);
 
   /**
    * Returns true when ordered compositing is needed on the current group of
@@ -767,15 +755,14 @@ public:
   /**
    * Enable/disable FXAA antialiasing.
    */
-  vtkSetMacro(UseFXAA, bool)
-  vtkGetMacro(UseFXAA, bool)
-  //@}
+  vtkSetMacro(UseFXAA, bool) vtkGetMacro(UseFXAA, bool)
+    //@}
 
-  //@{
-  /**
-   * FXAA tunable parameters. See vtkFXAAOptions for details.
-   */
-  void SetFXAARelativeContrastThreshold(double val);
+    //@{
+    /**
+     * FXAA tunable parameters. See vtkFXAAOptions for details.
+     */
+    void SetFXAARelativeContrastThreshold(double val);
   void SetFXAAHardContrastThreshold(double val);
   void SetFXAASubpixelBlendLimit(double val);
   void SetFXAASubpixelContrastThreshold(double val);
@@ -786,8 +773,7 @@ public:
   /**
    * Provides access to the time when Update() was last called.
    */
-  unsigned long GetUpdateTimeStamp()
-    { return this->UpdateTimeStamp; }
+  unsigned long GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
 
   /**
    * Copy internal fields that are used for rendering decision such as
@@ -812,7 +798,7 @@ public:
    * decoded to obtain the values.
    */
   void SetDrawCells(bool choice);
-  void SetArrayNameToDraw(const char *name);
+  void SetArrayNameToDraw(const char* name);
   void SetArrayNumberToDraw(int fieldAttributeType);
   void SetArrayComponentToDraw(int comp);
   void SetScalarRange(double min, double max);
@@ -855,7 +841,7 @@ public:
    * Access to the Z buffer.
    */
   void CaptureZBuffer();
-  vtkFloatArray * GetCapturedZBuffer();
+  vtkFloatArray* GetCapturedZBuffer();
   //@}
 
   //@{
@@ -900,7 +886,6 @@ public:
   void SetLightScale(double);
   double GetLightScale();
   //@}
-    
 
 protected:
   vtkPVRenderView();
@@ -928,8 +913,7 @@ protected:
    * Called  just before the local process renders. This is only called on the
    * nodes where the rendering is going to happen.
    */
-  virtual void AboutToRenderOnLocalProcess(bool interactive)
-    {(void) interactive;}
+  virtual void AboutToRenderOnLocalProcess(bool interactive) { (void)interactive; }
 
   /**
    * Returns true if distributed rendering should be used based on the geometry
@@ -1088,6 +1072,7 @@ protected:
   vtkTimeStamp PriorityQueueBuildTimeStamp;
 
   bool LockBounds;
+
 private:
   vtkPVRenderView(const vtkPVRenderView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRenderView&) VTK_DELETE_FUNCTION;

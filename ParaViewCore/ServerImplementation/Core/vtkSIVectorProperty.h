@@ -93,18 +93,16 @@ protected:
   char* CleanCommand;
   bool UseIndex;
   int NumberOfElementsPerCommand;
-  char *InitialString;
+  char* InitialString;
 
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper,
-    vtkPVXMLElement* element);
+  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
 private:
   vtkSIVectorProperty(const vtkSIVectorProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIVectorProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

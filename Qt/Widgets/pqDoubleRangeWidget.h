@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,7 +47,7 @@ class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
   Q_PROPERTY(double value READ value WRITE setValue USER true)
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
-  Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)
+  Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
 public:
   /**
@@ -60,18 +60,18 @@ public:
   * get the value
   */
   double value() const;
-  
+
   // get the min range value
   double minimum() const;
   // get the max range value
   double maximum() const;
- 
-  // returns whether the line edit is also limited 
+
+  // returns whether the line edit is also limited
   bool strictRange() const;
 
   // returns the resolution.
   int resolution() const;
-  
+
 signals:
   /**
   * signal the value changed
@@ -122,4 +122,3 @@ private:
 };
 
 #endif
-

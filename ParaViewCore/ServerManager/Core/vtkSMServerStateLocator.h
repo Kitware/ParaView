@@ -52,18 +52,17 @@ public:
    * successfully filled.
    * In that case useParent is not used and is set to false.
    */
-  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill,
-                         bool useParent);
+  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent);
 
 protected:
   vtkSMServerStateLocator();
   ~vtkSMServerStateLocator();
 
   vtkWeakPointer<vtkSMSession> Session;
+
 private:
   vtkSMServerStateLocator(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

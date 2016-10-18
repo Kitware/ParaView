@@ -58,8 +58,7 @@ public:
   /**
    * Register a tile.
    */
-  void SetTile(unsigned int key,
-    double viewport[4], vtkRenderer* renderer,
+  void SetTile(unsigned int key, double viewport[4], vtkRenderer* renderer,
     vtkSynchronizedRenderers::vtkRawImage& tile);
 
   /**
@@ -104,7 +103,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

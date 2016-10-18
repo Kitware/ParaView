@@ -44,6 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialogReaction : pub
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqExampleVisualizationsDialogReaction(QAction* parent);
   virtual ~pqExampleVisualizationsDialogReaction();
@@ -58,7 +59,9 @@ protected:
   * Called when the action is triggered.
   */
   virtual void onTriggered()
-    { pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog(); }
+  {
+    pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog();
+  }
 
 private:
   Q_DISABLE_COPY(pqExampleVisualizationsDialogReaction)

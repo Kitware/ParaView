@@ -41,93 +41,53 @@
 using namespace std;
 
 // XPM data for pixmaps.
-static const char * black_xpm[] = { "40 20 1 1", "+    c #000000",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++" };
+static const char* black_xpm[] = { "40 20 1 1", "+    c #000000",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++" };
 
-static const char * ramp_xpm[] = { "40 20 2 1", ".    c #000000",
-    "+    c #FFFFFF", "......................................++",
-    "....................................++++",
-    "..................................++++++",
-    "................................++++++++",
-    "..............................++++++++++",
-    "............................++++++++++++",
-    "..........................++++++++++++++",
-    "........................++++++++++++++++",
-    "......................++++++++++++++++++",
-    "....................++++++++++++++++++++",
-    "..................++++++++++++++++++++++",
-    "................++++++++++++++++++++++++",
-    "..............++++++++++++++++++++++++++",
-    "............++++++++++++++++++++++++++++",
-    "..........++++++++++++++++++++++++++++++",
-    "........++++++++++++++++++++++++++++++++",
-    "......++++++++++++++++++++++++++++++++++",
-    "....++++++++++++++++++++++++++++++++++++",
-    "..++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++" };
+static const char* ramp_xpm[] = { "40 20 2 1", ".    c #000000", "+    c #FFFFFF",
+  "......................................++", "....................................++++",
+  "..................................++++++", "................................++++++++",
+  "..............................++++++++++", "............................++++++++++++",
+  "..........................++++++++++++++", "........................++++++++++++++++",
+  "......................++++++++++++++++++", "....................++++++++++++++++++++",
+  "..................++++++++++++++++++++++", "................++++++++++++++++++++++++",
+  "..............++++++++++++++++++++++++++", "............++++++++++++++++++++++++++++",
+  "..........++++++++++++++++++++++++++++++", "........++++++++++++++++++++++++++++++++",
+  "......++++++++++++++++++++++++++++++++++", "....++++++++++++++++++++++++++++++++++++",
+  "..++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++" };
 
-static const char * inverse_ramp_xpm[] = { "40 20 2 1", ".    c #000000",
-    "+    c #FFFFFF", "........................................",
-    "++......................................",
-    "++++....................................",
-    "++++++..................................",
-    "++++++++................................",
-    "++++++++++..............................",
-    "++++++++++++............................",
-    "++++++++++++++..........................",
-    "++++++++++++++++........................",
-    "++++++++++++++++++......................",
-    "++++++++++++++++++++....................",
-    "++++++++++++++++++++++..................",
-    "++++++++++++++++++++++++................",
-    "++++++++++++++++++++++++++..............",
-    "++++++++++++++++++++++++++++............",
-    "++++++++++++++++++++++++++++++..........",
-    "++++++++++++++++++++++++++++++++........",
-    "++++++++++++++++++++++++++++++++++......",
-    "++++++++++++++++++++++++++++++++++++....",
-    "++++++++++++++++++++++++++++++++++++++.." };
+static const char* inverse_ramp_xpm[] = { "40 20 2 1", ".    c #000000", "+    c #FFFFFF",
+  "........................................", "++......................................",
+  "++++....................................", "++++++..................................",
+  "++++++++................................", "++++++++++..............................",
+  "++++++++++++............................", "++++++++++++++..........................",
+  "++++++++++++++++........................", "++++++++++++++++++......................",
+  "++++++++++++++++++++....................", "++++++++++++++++++++++..................",
+  "++++++++++++++++++++++++................", "++++++++++++++++++++++++++..............",
+  "++++++++++++++++++++++++++++............", "++++++++++++++++++++++++++++++..........",
+  "++++++++++++++++++++++++++++++++........", "++++++++++++++++++++++++++++++++++......",
+  "++++++++++++++++++++++++++++++++++++....", "++++++++++++++++++++++++++++++++++++++.." };
 
-static const char * white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++",
-    "++++++++++++++++++++++++++++++++++++++++" };
+static const char* white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++",
+  "++++++++++++++++++++++++++++++++++++++++", "++++++++++++++++++++++++++++++++++++++++" };
 
 // Qvis includes
 #include <QvisGaussianOpacityBar.h>
@@ -150,7 +110,7 @@ static const char * white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
 
 #include "pqUndoStack.h"
 
-class pqTransferFunctionEditor::pqInternals: public Ui::pqTransferFunctionEditor
+class pqTransferFunctionEditor::pqInternals : public Ui::pqTransferFunctionEditor
 {
 public:
   pqPipelineRepresentation* Representation;
@@ -178,7 +138,6 @@ public:
     BlockSignals = 0;
     Updating = 0;
   }
-
 };
 
 pqTransferFunctionEditor::pqTransferFunctionEditor()
@@ -186,7 +145,7 @@ pqTransferFunctionEditor::pqTransferFunctionEditor()
   this->Internals = new pqTransferFunctionEditor::pqInternals();
   this->Internals->setupUi(this);
 
-  //this->initialize();
+  // this->initialize();
 
   // We are usinging Queued slot execution where ever possible,
   // This ensures that the updateAllViews() slot is called
@@ -204,18 +163,14 @@ pqTransferFunctionEditor::pqTransferFunctionEditor()
   this->Internals->iRampButton->setIcon(iRampPixmap);
   this->Internals->oneButton->setIcon(whitePixmap);
 
-  connect(this->Internals->zeroButton, SIGNAL(clicked()),
-      this->Internals->scribbleEditor, SLOT(makeTotallyZero()),
-      Qt::QueuedConnection);
-  connect(this->Internals->rampButton, SIGNAL(clicked()),
-      this->Internals->scribbleEditor, SLOT(makeLinearRamp()),
-      Qt::QueuedConnection);
-  connect(this->Internals->iRampButton, SIGNAL(clicked()),
-      this->Internals->scribbleEditor, SLOT(makeInverseLinearRamp()),
-      Qt::QueuedConnection);
-  connect(this->Internals->oneButton, SIGNAL(clicked()),
-      this->Internals->scribbleEditor, SLOT(makeTotallyOne()),
-      Qt::QueuedConnection);
+  connect(this->Internals->zeroButton, SIGNAL(clicked()), this->Internals->scribbleEditor,
+    SLOT(makeTotallyZero()), Qt::QueuedConnection);
+  connect(this->Internals->rampButton, SIGNAL(clicked()), this->Internals->scribbleEditor,
+    SLOT(makeLinearRamp()), Qt::QueuedConnection);
+  connect(this->Internals->iRampButton, SIGNAL(clicked()), this->Internals->scribbleEditor,
+    SLOT(makeInverseLinearRamp()), Qt::QueuedConnection);
+  connect(this->Internals->oneButton, SIGNAL(clicked()), this->Internals->scribbleEditor,
+    SLOT(makeTotallyOne()), Qt::QueuedConnection);
 
   QButtonGroup* radiusGroup = new QButtonGroup(this);
   radiusGroup->addButton(this->Internals->freeform);
@@ -224,21 +179,19 @@ pqTransferFunctionEditor::pqTransferFunctionEditor()
   //
   // Interaction mode
   //
-  connect(this->Internals->freeform, SIGNAL(toggled(bool)), this,
-      SLOT(onFreeFormToggled(bool)));
+  connect(this->Internals->freeform, SIGNAL(toggled(bool)), this, SLOT(onFreeFormToggled(bool)));
 
   //
   // Connect the opacity editor widgets
   //
-  this->Internals->editorStack->setCurrentWidget(
-      this->Internals->scribbleEditor);
+  this->Internals->editorStack->setCurrentWidget(this->Internals->scribbleEditor);
 
   connect(this->Internals->gaussianEditor, SIGNAL(mouseReleased()), this,
-      SLOT(onGaussianValuesModified()), Qt::QueuedConnection);
+    SLOT(onGaussianValuesModified()), Qt::QueuedConnection);
   connect(this->Internals->scribbleEditor, SIGNAL(opacitiesChanged()), this,
-      SLOT(onTableValuesModified()), Qt::QueuedConnection);
+    SLOT(onTableValuesModified()), Qt::QueuedConnection);
   connect(this->Internals->scribbleEditor, SIGNAL(mouseReleased()), this,
-      SLOT(onTableValuesModified()), Qt::QueuedConnection);
+    SLOT(onTableValuesModified()), Qt::QueuedConnection);
 
   QDoubleValidator* validator;
   validator = new QDoubleValidator(this->Internals->scaleMin);
@@ -259,27 +212,26 @@ pqTransferFunctionEditor::pqTransferFunctionEditor()
   validator->setBottom(0.0);
   this->Internals->propEdit->setValidator(validator);
 
-  this->connect(this->Internals->useScalarRange, SIGNAL(toggled(bool)), this,
-      SLOT(onAutoScalarRange(bool)));
+  this->connect(
+    this->Internals->useScalarRange, SIGNAL(toggled(bool)), this, SLOT(onAutoScalarRange(bool)));
 
   this->connect(this->Internals->scaleMin, SIGNAL(valueChanged(double)), this,
-      SLOT(onScaleRangeModified()), Qt::QueuedConnection);
+    SLOT(onScaleRangeModified()), Qt::QueuedConnection);
 
   this->connect(this->Internals->scaleMax, SIGNAL(valueChanged(double)), this,
-      SLOT(onScaleRangeModified()), Qt::QueuedConnection);
+    SLOT(onScaleRangeModified()), Qt::QueuedConnection);
 
   this->connect(this->Internals->scalarMin, SIGNAL(valueChanged(double)), this,
-      SLOT(onScalarRangeModified()), Qt::QueuedConnection);
+    SLOT(onScalarRangeModified()), Qt::QueuedConnection);
 
   this->connect(this->Internals->scalarMax, SIGNAL(valueChanged(double)), this,
-      SLOT(onScalarRangeModified()), Qt::QueuedConnection);
+    SLOT(onScalarRangeModified()), Qt::QueuedConnection);
 
   this->connect(this->Internals->propBox, SIGNAL(toggled(bool)), this,
-      SLOT(onProportionnalToggled(bool)), Qt::QueuedConnection);
+    SLOT(onProportionnalToggled(bool)), Qt::QueuedConnection);
 
   this->connect(this->Internals->propEdit, SIGNAL(valueChanged(double)), this,
-      SLOT(onProportionnalEdited()), Qt::QueuedConnection);
-
+    SLOT(onProportionnalEdited()), Qt::QueuedConnection);
 }
 
 pqTransferFunctionEditor::~pqTransferFunctionEditor()
@@ -291,9 +243,9 @@ pqTransferFunctionEditor::~pqTransferFunctionEditor()
 void pqTransferFunctionEditor::needReloadGUI()
 {
   if (this->Internals->Updating)
-    {
+  {
     return;
-    }
+  }
   this->Internals->Updating = true;
   QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
@@ -301,10 +253,8 @@ void pqTransferFunctionEditor::needReloadGUI()
 void pqTransferFunctionEditor::reloadGUI()
 {
   this->Internals->Updating = false;
-  vtkSMProxy
-      * reprProxy =
-          (this->Internals->Representation) ? this->Internals->Representation->getProxy()
-              : NULL;
+  vtkSMProxy* reprProxy =
+    (this->Internals->Representation) ? this->Internals->Representation->getProxy() : NULL;
   if (!reprProxy)
     return;
 
@@ -312,39 +262,41 @@ void pqTransferFunctionEditor::reloadGUI()
 
   // get all the values from the SM
 
-  int useScalarRange = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-      this->Internals->UseScalarRangeProperty)).toInt();
+  int useScalarRange =
+    pqSMAdaptor::getElementProperty(reprProxy->GetProperty(this->Internals->UseScalarRangeProperty))
+      .toInt();
   QString transfertFunctionMode =
-      pqSMAdaptor::getEnumerationProperty(reprProxy->GetProperty(
-          this->Internals->TransferFunctionModeProperty)).toString();
+    pqSMAdaptor::getEnumerationProperty(
+      reprProxy->GetProperty(this->Internals->TransferFunctionModeProperty))
+      .toString();
   QList<QVariant> tableValues = pqSMAdaptor::getMultipleElementProperty(
-      reprProxy->GetProperty(this->Internals->TableValuesProperty));
+    reprProxy->GetProperty(this->Internals->TableValuesProperty));
   QList<QVariant> gaussianValues = pqSMAdaptor::getMultipleElementProperty(
-      reprProxy->GetProperty(this->Internals->GaussianControlPointsProperty));
-  QList<QVariant> scaleRange = pqSMAdaptor::getMultipleElementProperty(
-      reprProxy->GetProperty(this->Internals->RangeProperty));
+    reprProxy->GetProperty(this->Internals->GaussianControlPointsProperty));
+  QList<QVariant> scaleRange =
+    pqSMAdaptor::getMultipleElementProperty(reprProxy->GetProperty(this->Internals->RangeProperty));
   QList<QVariant> scalarRange = pqSMAdaptor::getMultipleElementProperty(
-      reprProxy->GetProperty(this->Internals->ScalarRangeProperty));
+    reprProxy->GetProperty(this->Internals->ScalarRangeProperty));
 
   this->Internals->freeform->setChecked(transfertFunctionMode == "Table");
 
-  //bool setAutoScalarRange = false;
+  // bool setAutoScalarRange = false;
   if (useScalarRange == 0)
-    {
+  {
     this->Internals->scalarMin->setValue(scalarRange[0].toDouble());
     this->Internals->scalarMax->setValue(scalarRange[1].toDouble());
-    }
+  }
   else
-    {
+  {
     onAutoScalarRange(true);
-    }
+  }
 
   // the opacity editor has no scale range property, so the returned list is empty
   if (scaleRange.size() == 2)
-    {
+  {
     this->Internals->scaleMin->setValue(scaleRange[0].toDouble());
     this->Internals->scaleMax->setValue(scaleRange[1].toDouble());
-    }
+  }
 
   this->setGaussianControlPoints(gaussianValues);
   this->setFreeformValues(tableValues);
@@ -355,9 +307,9 @@ void pqTransferFunctionEditor::reloadGUI()
 void pqTransferFunctionEditor::setRepresentation(pqPipelineRepresentation* repr)
 {
   if (this->Internals->Representation == repr)
-    {
+  {
     return;
-    }
+  }
 
   this->Internals->Representation = repr;
 
@@ -367,37 +319,37 @@ void pqTransferFunctionEditor::setRepresentation(pqPipelineRepresentation* repr)
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
 
   if (reprProxy)
-    {
+  {
     vtkSMProperty* prop;
 
     prop = reprProxy->GetProperty(this->Internals->UseScalarRangeProperty);
     if (prop)
-      {
-      this->Internals->Links.addPropertyLink(this->Internals->useScalarRange,
-          "checked", SIGNAL(toggled(bool)), reprProxy, prop);
-      }
+    {
+      this->Internals->Links.addPropertyLink(
+        this->Internals->useScalarRange, "checked", SIGNAL(toggled(bool)), reprProxy, prop);
+    }
 
     prop = reprProxy->GetProperty(this->Internals->ProportionalFactor);
     if (prop)
-      {
-      this->Internals->Links.addPropertyLink(this->Internals->propEdit,
-          "value", SIGNAL(valueChanged(double)), reprProxy, prop);
-      }
+    {
+      this->Internals->Links.addPropertyLink(
+        this->Internals->propEdit, "value", SIGNAL(valueChanged(double)), reprProxy, prop);
+    }
 
     prop = reprProxy->GetProperty(this->Internals->IsProportional);
     if (prop)
-      {
-      this->Internals->Links.addPropertyLink(this->Internals->propBox,
-          "checked", SIGNAL(toggled(bool)), reprProxy, prop);
-      }
+    {
+      this->Internals->Links.addPropertyLink(
+        this->Internals->propBox, "checked", SIGNAL(toggled(bool)), reprProxy, prop);
+    }
 
     prop = reprProxy->GetProperty("Representation");
     if (prop)
-      {
-      this->Internals->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
-          this, SLOT(needReloadGUI()), NULL, 0.0, Qt::QueuedConnection);
-      }
+    {
+      this->Internals->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent, this,
+        SLOT(needReloadGUI()), NULL, 0.0, Qt::QueuedConnection);
     }
+  }
 
   needReloadGUI();
 }
@@ -405,45 +357,39 @@ void pqTransferFunctionEditor::setRepresentation(pqPipelineRepresentation* repr)
 void pqTransferFunctionEditor::configure(EditorConfiguration conf)
 {
   if (conf == Opacity)
-    {
+  {
     this->Internals->titleStack->setCurrentWidget(this->Internals->noTitlePage);
-    this->Internals->legendStack->setCurrentWidget(
-        this->Internals->opacityLegend);
+    this->Internals->legendStack->setCurrentWidget(this->Internals->opacityLegend);
 
     this->Internals->ConstantNameProperty = "Constant Opacity";
     this->Internals->UseScalarRangeProperty = "OpacityUseScalarRange";
     this->Internals->ArrayNameProperty = "OpacityArray";
     this->Internals->ArrayComponentProperty = "OpacityVectorComponent";
-    this->Internals->TransferFunctionModeProperty
-        = "OpacityTransferFunctionMode";
+    this->Internals->TransferFunctionModeProperty = "OpacityTransferFunctionMode";
     this->Internals->TableValuesProperty = "OpacityTableValues";
     this->Internals->RangeProperty = NULL;
     this->Internals->ScalarRangeProperty = "OpacityScalarRange";
-    this->Internals->GaussianControlPointsProperty
-        = "OpacityGaussianControlPoints";
+    this->Internals->GaussianControlPointsProperty = "OpacityGaussianControlPoints";
     this->Internals->ProportionalFactor = "OpacityProportionalFactor";
     this->Internals->IsProportional = "OpacityIsProportional";
-    }
+  }
   else if (conf == Radius)
-    {
+  {
     this->Internals->titleStack->setCurrentWidget(this->Internals->scalePage);
-    this->Internals->legendStack->setCurrentWidget(
-        this->Internals->radiusLegend);
+    this->Internals->legendStack->setCurrentWidget(this->Internals->radiusLegend);
 
     this->Internals->ConstantNameProperty = "Constant Radius";
     this->Internals->UseScalarRangeProperty = "RadiusUseScalarRange";
     this->Internals->ArrayNameProperty = "RadiusArray";
     this->Internals->ArrayComponentProperty = "RadiusVectorComponent";
-    this->Internals->TransferFunctionModeProperty
-        = "RadiusTransferFunctionMode";
+    this->Internals->TransferFunctionModeProperty = "RadiusTransferFunctionMode";
     this->Internals->TableValuesProperty = "RadiusTableValues";
     this->Internals->RangeProperty = "RadiusRange";
     this->Internals->ScalarRangeProperty = "RadiusScalarRange";
-    this->Internals->GaussianControlPointsProperty
-        = "RadiusGaussianControlPoints";
+    this->Internals->GaussianControlPointsProperty = "RadiusGaussianControlPoints";
     this->Internals->ProportionalFactor = "RadiusProportionalFactor";
     this->Internals->IsProportional = "RadiusIsProportional";
-    }
+  }
 }
 
 void pqTransferFunctionEditor::onFreeFormToggled(bool freeFormOn)
@@ -454,24 +400,22 @@ void pqTransferFunctionEditor::onFreeFormToggled(bool freeFormOn)
   const char* mode = NULL;
 
   if (freeFormOn)
-    {
-    this->Internals->editorStack->setCurrentWidget(
-        this->Internals->scribbleEditor);
+  {
+    this->Internals->editorStack->setCurrentWidget(this->Internals->scribbleEditor);
     mode = "Table";
-    }
+  }
   else
-    {
-    this->Internals->editorStack->setCurrentWidget(
-        this->Internals->gaussianEditor);
+  {
+    this->Internals->editorStack->setCurrentWidget(this->Internals->gaussianEditor);
 
     mode = "Gaussian";
-    }
+  }
 
   if (!reprProxy)
     return;
 
-  pqSMAdaptor::setEnumerationProperty(reprProxy->GetProperty(
-      this->Internals->TransferFunctionModeProperty), mode);
+  pqSMAdaptor::setEnumerationProperty(
+    reprProxy->GetProperty(this->Internals->TransferFunctionModeProperty), mode);
 
   if (this->Internals->BlockSignals)
     return;
@@ -487,10 +431,10 @@ QList<QVariant> pqTransferFunctionEditor::freeformValues()
   this->Internals->scribbleEditor->getRawOpacities(resolution, opacities);
   QList<QVariant> list;
   for (int i = 0; i < resolution; ++i)
-    {
-    list.append(QVariant(static_cast<double> (opacities[i])));
-    }
-  delete [] opacities;
+  {
+    list.append(QVariant(static_cast<double>(opacities[i])));
+  }
+  delete[] opacities;
   return list;
 }
 
@@ -498,16 +442,15 @@ QList<QVariant> pqTransferFunctionEditor::gaussianControlPoints()
 {
   QList<QVariant> list;
   for (int i = 0; i < this->Internals->gaussianEditor->getNumberOfGaussians(); ++i)
-    {
+  {
     float g[5];
-    this->Internals->gaussianEditor->getGaussian(i, &g[0], &g[1], &g[2], &g[3],
-        &g[4]);
+    this->Internals->gaussianEditor->getGaussian(i, &g[0], &g[1], &g[2], &g[3], &g[4]);
 
     for (int j = 0; j < 5; j++)
-      {
-      list.append(QVariant(static_cast<double> (g[j])));
-      }
+    {
+      list.append(QVariant(static_cast<double>(g[j])));
     }
+  }
   return list;
 }
 
@@ -521,11 +464,11 @@ void pqTransferFunctionEditor::setFreeformValues(const QList<QVariant>& values)
   float* vals = new float[n];
 
   for (int i = 0; i < n; ++i)
-    vals[i] = static_cast<float> (values[i].toDouble());
+    vals[i] = static_cast<float>(values[i].toDouble());
 
   this->Internals->scribbleEditor->setRawOpacities(n, vals);
   this->Internals->scribbleEditor->blockSignals(false);
-  delete [] vals;
+  delete[] vals;
 }
 
 void pqTransferFunctionEditor::setGaussianControlPoints(const QList<QVariant>& values)
@@ -535,24 +478,24 @@ void pqTransferFunctionEditor::setGaussianControlPoints(const QList<QVariant>& v
   this->Internals->gaussianEditor->setAllGaussians(0, NULL);
   int n = values.size();
   if (n > 0)
-    {
+  {
     float gcpts[1024];
     for (int i = 0; i < n; ++i)
-      gcpts[i] = static_cast<float> (values[i].toDouble());
+      gcpts[i] = static_cast<float>(values[i].toDouble());
     // Set all of the gaussians into the widget.
     this->Internals->gaussianEditor->setAllGaussians(n / 5, gcpts);
-    }
+  }
   this->Internals->gaussianEditor->blockSignals(false);
 }
 
 void pqTransferFunctionEditor::onProportionnalToggled(bool propOn)
 {
   if (propOn)
-    {
+  {
     this->Internals->scribbleEditor->makeLinearRamp();
     onFreeFormToggled(true);
     onProportionnalEdited();
-    }
+  }
 }
 
 void pqTransferFunctionEditor::onProportionnalEdited()
@@ -562,19 +505,17 @@ void pqTransferFunctionEditor::onProportionnalEdited()
   if (!reprProxy)
     return;
 
-  int isProportional = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-      this->Internals->IsProportional)).toInt();
+  int isProportional =
+    pqSMAdaptor::getElementProperty(reprProxy->GetProperty(this->Internals->IsProportional))
+      .toInt();
 
-  if(!isProportional)
+  if (!isProportional)
     return;
 
   double ff = this->Internals->propEdit->value();
 
-  this->Internals->scaleMin->setValue(this->Internals->scalarMin->value()
-      * ff);
-  this->Internals->scaleMax->setValue(this->Internals->scalarMax->value()
-      * ff);
-
+  this->Internals->scaleMin->setValue(this->Internals->scalarMin->value() * ff);
+  this->Internals->scaleMax->setValue(this->Internals->scalarMax->value() * ff);
 }
 
 void pqTransferFunctionEditor::onGaussianValuesModified()
@@ -584,8 +525,8 @@ void pqTransferFunctionEditor::onGaussianValuesModified()
   if (!reprProxy)
     return;
 
-  this->SetProxyValue(this->Internals->GaussianControlPointsProperty,
-      this->gaussianControlPoints(), false);
+  this->SetProxyValue(
+    this->Internals->GaussianControlPointsProperty, this->gaussianControlPoints(), false);
 
   if (this->Internals->BlockSignals)
     return;
@@ -601,8 +542,7 @@ void pqTransferFunctionEditor::onTableValuesModified()
   if (!reprProxy)
     return;
 
-  this->SetProxyValue(this->Internals->TableValuesProperty,
-      this->freeformValues(), false);
+  this->SetProxyValue(this->Internals->TableValuesProperty, this->freeformValues(), false);
 
   if (this->Internals->BlockSignals)
     return;
@@ -620,17 +560,17 @@ void pqTransferFunctionEditor::onScalarRangeModified()
   this->SetProxyValue(this->Internals->ScalarRangeProperty, range);
 
   pqPipelineRepresentation* repr = this->Internals->Representation;
-  vtkSMProxy * reprProxy = (repr ? repr->getProxy() : NULL);
+  vtkSMProxy* reprProxy = (repr ? repr->getProxy() : NULL);
   if (!reprProxy)
-    {
+  {
     return;
-    }
+  }
 
-  if (pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-      this->Internals->IsProportional)).toInt() == 1)
-    {
+  if (pqSMAdaptor::getElementProperty(reprProxy->GetProperty(this->Internals->IsProportional))
+        .toInt() == 1)
+  {
     onProportionnalEdited();
-    }
+  }
 }
 
 void pqTransferFunctionEditor::onScaleRangeModified()
@@ -645,91 +585,86 @@ void pqTransferFunctionEditor::onScaleRangeModified()
 void pqTransferFunctionEditor::onAutoScalarRange(bool autoRange)
 {
   if (autoRange)
-    {
+  {
     pqPipelineRepresentation* repr = this->Internals->Representation;
-    vtkSMProxy * reprProxy = (repr ? repr->getProxy() : NULL);
+    vtkSMProxy* reprProxy = (repr ? repr->getProxy() : NULL);
     if (!reprProxy)
-      {
+    {
       return;
-      }
+    }
 
-    const char* array =
-      vtkSMStringVectorProperty::SafeDownCast(reprProxy->GetProperty(
-      this->Internals->ArrayNameProperty))->GetElement(4);
-    int comp = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-      this->Internals->ArrayComponentProperty)).toInt();
+    const char* array = vtkSMStringVectorProperty::SafeDownCast(
+                          reprProxy->GetProperty(this->Internals->ArrayNameProperty))
+                          ->GetElement(4);
+    int comp = pqSMAdaptor::getElementProperty(
+                 reprProxy->GetProperty(this->Internals->ArrayComponentProperty))
+                 .toInt();
 
-    if (strcmp(array, this->Internals->ConstantNameProperty) == 0
-      || strcmp(array, "") == 0)
-      {
+    if (strcmp(array, this->Internals->ConstantNameProperty) == 0 || strcmp(array, "") == 0)
+    {
       return;
-      }
+    }
 
     double drange[2] = { 0.0, 1.0 };
     vtkSMPropertyHelper inputHelper(reprProxy, "Input");
     vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
     if (input)
-      {
-      vtkPVArrayInformation* arrayInfo = input->GetDataInformation(
-        inputHelper.GetOutputPort())->GetArrayInformation(array, vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    {
+      vtkPVArrayInformation* arrayInfo =
+        input->GetDataInformation(inputHelper.GetOutputPort())
+          ->GetArrayInformation(array, vtkDataObject::FIELD_ASSOCIATION_POINTS);
       if (arrayInfo)
-        {
+      {
         arrayInfo->GetComponentRange(comp, drange);
         if (drange[1] < drange[0])
-          {
+        {
           drange[0] = 0.0;
           drange[1] = 1.0;
-          }
         }
       }
+    }
     this->Internals->scalarMin->setValue(drange[0]);
     this->Internals->scalarMax->setValue(drange[1]);
 
-    if (pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-        this->Internals->IsProportional)).toInt() == 1)
-      {
+    if (pqSMAdaptor::getElementProperty(reprProxy->GetProperty(this->Internals->IsProportional))
+          .toInt() == 1)
+    {
       onProportionnalEdited();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 // The routines below here should be in some generic proxy set/get class
 //----------------------------------------------------------------------------
-void pqTransferFunctionEditor::SetProxyValue(const char *name,
-    QList<QVariant> val,
-    bool updateFlag)
+void pqTransferFunctionEditor::SetProxyValue(const char* name, QList<QVariant> val, bool updateFlag)
 {
-  vtkSMProxy
-      *reprProxy =
-          (this->Internals->Representation ? this->Internals->Representation->getProxy()
-              : NULL);
+  vtkSMProxy* reprProxy =
+    (this->Internals->Representation ? this->Internals->Representation->getProxy() : NULL);
   if (!reprProxy)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProperty* Property = reprProxy->GetProperty(name);
   pqSMAdaptor::setMultipleElementProperty(Property, val);
   if (updateFlag && !this->Internals->BlockSignals)
-    {
+  {
     BEGIN_UNDO_EXCLUDE();
     reprProxy->UpdateVTKObjects();
     this->updateAllViews();
     END_UNDO_EXCLUDE();
-    }
+  }
 }
 //----------------------------------------------------------------------------
-QList<QVariant> pqTransferFunctionEditor::GetProxyValueList(const char *name)
+QList<QVariant> pqTransferFunctionEditor::GetProxyValueList(const char* name)
 {
-  vtkSMProxy
-      *proxy =
-          (this->Internals->Representation ? this->Internals->Representation->getProxy()
-              : NULL);
+  vtkSMProxy* proxy =
+    (this->Internals->Representation ? this->Internals->Representation->getProxy() : NULL);
   if (!this->Internals->Representation || !proxy)
-    {
-    return QList<QVariant> ();
-    }
+  {
+    return QList<QVariant>();
+  }
 
   vtkSMProperty* Property = proxy->GetProperty(name);
   return pqSMAdaptor::getMultipleElementProperty(Property);
@@ -738,8 +673,7 @@ QList<QVariant> pqTransferFunctionEditor::GetProxyValueList(const char *name)
 void pqTransferFunctionEditor::updateAllViews()
 {
   if (this->Internals->Representation)
-    {
+  {
     this->Internals->Representation->renderViewEventually();
-    }
+  }
 }
-

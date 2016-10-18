@@ -62,26 +62,26 @@ public:
    * When set the implementation must use loss-less compression, otherwise
    * implemnetation should user provided settings.
    */
-  vtkSetMacro(LossLessMode,int);
-  vtkGetMacro(LossLessMode,int);
+  vtkSetMacro(LossLessMode, int);
+  vtkGetMacro(LossLessMode, int);
   //@}
 
   /**
    * Call this method to compress the input and generate the compressed
    * data.
    */
-  virtual int Compress()=0;
+  virtual int Compress() = 0;
 
   /**
    * Decompresses and geenartes the decompressed data as output.
    * Input must be compressed data.
    */
-  virtual int Decompress()=0;
+  virtual int Decompress() = 0;
 
   /**
    * Serialize compressor configuration (but not the data) into the stream.
    */
-  virtual void SaveConfiguration(vtkMultiProcessStream *stream);
+  virtual void SaveConfiguration(vtkMultiProcessStream* stream);
 
   /**
    * Restore state from the stream. The stream format for all image compressor
@@ -93,7 +93,7 @@ public:
    * Serialize compressor configuration (but not the data) into the stream.
    * A pointer to the internally managed stream is returned (ie do not free it!).
    */
-  virtual const char *SaveConfiguration();
+  virtual const char* SaveConfiguration();
 
   /**
    * Restore state from the stream, The stream format for all image compressor
@@ -101,7 +101,7 @@ public:
    * Upon success the stream is returned otherwise 0 is returned indicating
    * an error.
    */
-  virtual const char *RestoreConfiguration(const char *stream);
+  virtual const char* RestoreConfiguration(const char* stream);
 
 protected:
   //@{
@@ -119,7 +119,7 @@ protected:
   int LossLessMode;
 
   vtkSetStringMacro(Configuration);
-  char *Configuration;
+  char* Configuration;
 
 private:
   vtkImageCompressor(const vtkImageCompressor&) VTK_DELETE_FUNCTION;

@@ -26,8 +26,8 @@
 
 vtkStandardNewMacro(vtkPVCylinder)
 
-//----------------------------------------------------------------------------
-vtkPVCylinder::vtkPVCylinder()
+  //----------------------------------------------------------------------------
+  vtkPVCylinder::vtkPVCylinder()
 {
   this->Axis[0] = 0.;
   this->Axis[1] = 1.;
@@ -43,21 +43,19 @@ vtkPVCylinder::~vtkPVCylinder()
 void vtkPVCylinder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Axis: [ "
-     << this->Axis[0] << ","
-     << this->Axis[1] << ","
-     << this->Axis[2] << " ]\n";
+  os << indent << "Axis: [ " << this->Axis[0] << "," << this->Axis[1] << "," << this->Axis[2]
+     << " ]\n";
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCylinder::SetAxis(const double axis[3])
 {
   if (!std::equal(axis, axis + 3, this->Axis))
-    {
+  {
     std::copy(axis, axis + 3, this->Axis);
     this->UpdateTransform();
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -85,7 +83,7 @@ void vtkPVCylinder::UpdateTransform()
 
   // Calculate the rotation if needed:
   if (!std::equal(axis.GetData(), axis.GetData() + 3, yAxis.GetData()))
-    {
+  {
     vtkVector3d cross = yAxis.Cross(axis);
     double crossNorm = cross.Normalize();
     double dot = yAxis.Dot(axis);
@@ -99,9 +97,9 @@ void vtkPVCylinder::UpdateTransform()
 
     xform->Inverse();
     this->SetTransform(xform.GetPointer());
-    }
+  }
   else
-    {
+  {
     this->SetTransform(static_cast<vtkAbstractTransform*>(NULL));
-    }
+  }
 }

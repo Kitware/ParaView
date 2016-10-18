@@ -40,7 +40,7 @@ class vtkScalarsToColors;
 class vtkScalarsToColorsPainter;
 class vtkUnsignedCharArray;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkScatterPlotPainter: public vtkPainter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkScatterPlotPainter : public vtkPainter
 {
 public:
   static vtkScatterPlotPainter* New();
@@ -77,9 +77,9 @@ protected:
    * Note:
    * To work, the Z_Coords index array must be given.
    */
-  vtkSetMacro(ThreeDMode,int);
-  vtkGetMacro(ThreeDMode,int);
-  vtkBooleanMacro(ThreeDMode,int);
+  vtkSetMacro(ThreeDMode, int);
+  vtkGetMacro(ThreeDMode, int);
+  vtkBooleanMacro(ThreeDMode, int);
   //@}
 
   //@{
@@ -100,9 +100,9 @@ protected:
    * To work, at least 1 Glyph polydata input must be set and the Glyph index
    * array must be given.
    */
-  vtkSetMacro(GlyphMode,int);
-  vtkGetMacro(GlyphMode,int);
-  //vtkBooleanMacro(GlyphMode,int);
+  vtkSetMacro(GlyphMode, int);
+  vtkGetMacro(GlyphMode, int);
+  // vtkBooleanMacro(GlyphMode,int);
   //@}
 
   //@{
@@ -110,8 +110,8 @@ protected:
    * If the GlyphMode has ScaledGlyph turned on, ScalingArrayMode describes
    * how to data in the different GLYPH_[X,Y,Z]_SCALE arrays
    */
-  vtkSetMacro(ScalingArrayMode,int);
-  vtkGetMacro(ScalingArrayMode,int);
+  vtkSetMacro(ScalingArrayMode, int);
+  vtkGetMacro(ScalingArrayMode, int);
   //@}
 
   //@{
@@ -119,8 +119,8 @@ protected:
    * If the GlyphMode has ScaledGlyph turned on, decide how to scale the
    * glyph. By Magnitude or components.
    */
-  vtkSetMacro(ScaleMode,int);
-  vtkGetMacro(ScaleMode,int);
+  vtkSetMacro(ScaleMode, int);
+  vtkGetMacro(ScaleMode, int);
   //@}
 
   //@{
@@ -128,13 +128,12 @@ protected:
    * Specify scale factor to scale object by. This is used only when Scaling is
    * On.
    */
-  vtkSetMacro(ScaleFactor,double);
-  vtkGetMacro(ScaleFactor,double);
+  vtkSetMacro(ScaleFactor, double);
+  vtkGetMacro(ScaleFactor, double);
   //@}
 
   vtkSetMacro(OrientationMode, int);
   vtkGetMacro(OrientationMode, int);
-
 
   //@{
   /**
@@ -168,10 +167,11 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow *window);
+  virtual void ReleaseGraphicsResources(vtkWindow* window);
 
   virtual void UpdateBounds(double bounds[6]);
-  vtkInformation *GetInputArrayInformation(int idx);
+  vtkInformation* GetInputArrayInformation(int idx);
+
 protected:
   /**
    * Method initiates the mapping process. Generally sent by the actor
@@ -179,8 +179,8 @@ protected:
    * Its behavior depends on the value of SelectMode.
    * virtual void Render(vtkRenderer *ren, vtkActor *a);
    */
-  virtual void RenderInternal(vtkRenderer *renderer, vtkActor *actor,
-                       unsigned long typeflags, bool forceCompileOnly);
+  virtual void RenderInternal(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
 protected:
   vtkScatterPlotPainter();
@@ -190,7 +190,7 @@ protected:
   /**
    * Take part in garbage collection.
    */
-  virtual void ReportReferences(vtkGarbageCollector *collector);
+  virtual void ReportReferences(vtkGarbageCollector* collector);
   virtual void ProcessInformation(vtkInformation* info);
   //@}
   /**
@@ -205,43 +205,43 @@ protected:
   vtkUnsignedCharArray* GetColors();
 
   virtual void PrepareForRendering(vtkRenderer* renderer, vtkActor* actor);
-  void RenderPoints(vtkRenderer* renderer, vtkActor* actor,
-                    unsigned long typeflags, bool forceCompileOnly);
-  void RenderGlyphs(vtkRenderer* renderer, vtkActor* actor,
-                    unsigned long typeflags, bool forceCompileOnly);
+  void RenderPoints(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
+  void RenderGlyphs(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
   /**
    * Release display list used for matrices and color.
    */
   void ReleaseDisplayList();
 
-  int            ThreeDMode;
-  int            Colorize;
-  int            GlyphMode;
+  int ThreeDMode;
+  int Colorize;
+  int GlyphMode;
 
-  double         ScaleFactor; // Scale factor to use to scale geometry
-  int            ScaleMode; // Scale by scalar value or vector magnitude
-  int            ScalingArrayMode;
-  int            OrientationMode;
-  int            NestedDisplayLists; // boolean
-  unsigned int   DisplayListId; // GLuint
-  int            ParallelToCamera;
+  double ScaleFactor; // Scale factor to use to scale geometry
+  int ScaleMode;      // Scale by scalar value or vector magnitude
+  int ScalingArrayMode;
+  int OrientationMode;
+  int NestedDisplayLists;     // boolean
+  unsigned int DisplayListId; // GLuint
+  int ParallelToCamera;
 
-  //vtkScatterPlotPainterArray* SourceGlyphMappers; // array of mappers
+  // vtkScatterPlotPainterArray* SourceGlyphMappers; // array of mappers
   vtkCollection* SourceGlyphMappers; // array of mappers
 
   vtkScalarsToColorsPainter* ScalarsToColorsPainter;
-  vtkTimeStamp   ColorPainterUpdateTime;
-  vtkTimeStamp   BuildTime;
+  vtkTimeStamp ColorPainterUpdateTime;
+  vtkTimeStamp BuildTime;
 
-  unsigned int   SelectionColorId;
-  int            SelectMode;
+  unsigned int SelectionColorId;
+  int SelectMode;
 
   vtkScalarsToColors* LookupTable;
+
 private:
   vtkScatterPlotPainter(const vtkScatterPlotPainter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkScatterPlotPainter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

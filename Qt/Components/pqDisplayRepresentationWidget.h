@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,13 +48,12 @@ class vtkSMProxy;
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 {
   Q_OBJECT;
-  Q_PROPERTY(QString representationText
-             READ representationText
-             WRITE setRepresentationText
-             NOTIFY representationTextChanged);
+  Q_PROPERTY(QString representationText READ representationText WRITE setRepresentationText NOTIFY
+      representationTextChanged);
   typedef QWidget Superclass;
+
 public:
-  pqDisplayRepresentationWidget(QWidget* parent=0);
+  pqDisplayRepresentationWidget(QWidget* parent = 0);
   virtual ~pqDisplayRepresentationWidget();
 
   /**
@@ -102,12 +101,11 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPrope
   Q_OBJECT
 
 public:
-  pqDisplayRepresentationPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqDisplayRepresentationPropertyWidget();
 
 private:
-  pqDisplayRepresentationWidget *Widget;
+  pqDisplayRepresentationWidget* Widget;
 };
 
 #endif
-

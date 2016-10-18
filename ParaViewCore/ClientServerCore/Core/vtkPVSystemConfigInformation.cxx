@@ -27,28 +27,27 @@ using std::sort;
 
 // #define vtkPVSystemConfigInformationDEBUG
 
-#define vtkVerifyParseMacro(_call,_field) \
-  if (!(_call)) \
-    { \
-    vtkErrorMacro("Error parsing " _field "."); \
-    return; \
-    }
+#define vtkVerifyParseMacro(_call, _field)                                                         \
+  if (!(_call))                                                                                    \
+  {                                                                                                \
+    vtkErrorMacro("Error parsing " _field ".");                                                    \
+    return;                                                                                        \
+  }
 
 void vtkPVSystemConfigInformation::ConfigInfo::Print()
 {
-  cerr
-    << "OSDescriptor=" << this->OSDescriptor << endl
-    << "CPUDescriptor=" << this->CPUDescriptor << endl
-    << "MemDescriptor=" << this->MemDescriptor << endl
-    << "HostName=" << this->HostName << endl
-    << "ProcessType=" << this->ProcessType << endl
-    << "SystemType=" << this->SystemType << endl
-    << "Rank=" << this->Rank << endl
-    << "Pid=" << this->Pid << endl
-    << "HostMemoryTotal=" << this->HostMemoryTotal << endl
-    << "HostMemoryAvailable=" << this->HostMemoryAvailable << endl
-    << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl
-    << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl;
+  cerr << "OSDescriptor=" << this->OSDescriptor << endl
+       << "CPUDescriptor=" << this->CPUDescriptor << endl
+       << "MemDescriptor=" << this->MemDescriptor << endl
+       << "HostName=" << this->HostName << endl
+       << "ProcessType=" << this->ProcessType << endl
+       << "SystemType=" << this->SystemType << endl
+       << "Rank=" << this->Rank << endl
+       << "Pid=" << this->Pid << endl
+       << "HostMemoryTotal=" << this->HostMemoryTotal << endl
+       << "HostMemoryAvailable=" << this->HostMemoryAvailable << endl
+       << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl
+       << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -57,25 +56,25 @@ vtkStandardNewMacro(vtkPVSystemConfigInformation);
 //----------------------------------------------------------------------------
 vtkPVSystemConfigInformation::vtkPVSystemConfigInformation()
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::vtkPVSystemConfigInformation" << endl;
-  #endif
+#endif
 }
 
 //----------------------------------------------------------------------------
 vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation()
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::~vtkPVSystemConfigInformation" << endl;
-  #endif
+#endif
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSystemConfigInformation::CopyFromObject(vtkObject *obj)
+void vtkPVSystemConfigInformation::CopyFromObject(vtkObject* obj)
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::CopyFromObject" << endl;
-  #endif
+#endif
 
   (void)obj;
 
@@ -88,57 +87,51 @@ void vtkPVSystemConfigInformation::CopyFromObject(vtkObject *obj)
   sysInfo.RunOSCheck();
   sysInfo.RunMemoryCheck();
 
-  info.OSDescriptor=sysInfo.GetOSDescription();
-  info.CPUDescriptor=sysInfo.GetCPUDescription();
-  info.MemDescriptor=sysInfo.GetMemoryDescription();
-  info.HostName=sysInfo.GetHostname();
-  info.ProcessType=vtkProcessModule::GetProcessType();
-  info.SystemType=sysInfo.GetOSIsWindows();
-  info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
-  info.Pid=sysInfo.GetProcessId();
-  info.HostMemoryTotal=sysInfo.GetHostMemoryTotal();
+  info.OSDescriptor = sysInfo.GetOSDescription();
+  info.CPUDescriptor = sysInfo.GetCPUDescription();
+  info.MemDescriptor = sysInfo.GetMemoryDescription();
+  info.HostName = sysInfo.GetHostname();
+  info.ProcessType = vtkProcessModule::GetProcessType();
+  info.SystemType = sysInfo.GetOSIsWindows();
+  info.Rank = vtkProcessModule::GetProcessModule()->GetPartitionId();
+  info.Pid = sysInfo.GetProcessId();
+  info.HostMemoryTotal = sysInfo.GetHostMemoryTotal();
   // the folloowing envornment variables are querried, if set they
   // are the means of reporting limits that are applied in a non-
   // standard way.
-  info.HostMemoryAvailable=sysInfo.GetHostMemoryAvailable(
-        "PV_HOST_MEMORY_LIMIT");
-  info.ProcMemoryAvailable=sysInfo.GetProcMemoryAvailable(
-        "PV_HOST_MEMORY_LIMIT",
-        "PV_PROC_MEMORY_LIMIT");
+  info.HostMemoryAvailable = sysInfo.GetHostMemoryAvailable("PV_HOST_MEMORY_LIMIT");
+  info.ProcMemoryAvailable =
+    sysInfo.GetProcMemoryAvailable("PV_HOST_MEMORY_LIMIT", "PV_PROC_MEMORY_LIMIT");
 
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   info.Print();
-  #endif
+#endif
 
   this->Configs.push_back(info);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSystemConfigInformation::AddInformation(vtkPVInformation *pvinfo)
+void vtkPVSystemConfigInformation::AddInformation(vtkPVInformation* pvinfo)
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::AddInformation" << endl;
-  #endif
-  vtkPVSystemConfigInformation *info
-    = dynamic_cast<vtkPVSystemConfigInformation*>(pvinfo);
+#endif
+  vtkPVSystemConfigInformation* info = dynamic_cast<vtkPVSystemConfigInformation*>(pvinfo);
 
   if (!info)
-    {
+  {
     return;
-    }
+  }
 
-  this->Configs.insert(
-      this->Configs.end(),
-      info->Configs.begin(),
-      info->Configs.end());
+  this->Configs.insert(this->Configs.end(), info->Configs.begin(), info->Configs.end());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream *css)
+void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream* css)
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::CopyToStream" << endl;
-  #endif
+#endif
 
   css->Reset();
 
@@ -146,118 +139,89 @@ void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream *css)
 
   *css << vtkClientServerStream::Reply << numberOfConfigs;
 
-  for (size_t i=0; i<numberOfConfigs; ++i)
-    {
-    *css
-      << this->Configs[i].OSDescriptor.c_str()
-      << this->Configs[i].CPUDescriptor.c_str()
-      << this->Configs[i].MemDescriptor.c_str()
-      << this->Configs[i].HostName.c_str()
-      << this->Configs[i].ProcessType
-      << this->Configs[i].SystemType
-      << this->Configs[i].Rank
-      << this->Configs[i].Pid
-      << this->Configs[i].HostMemoryTotal
-      << this->Configs[i].HostMemoryAvailable
-      << this->Configs[i].ProcMemoryAvailable;
-    }
+  for (size_t i = 0; i < numberOfConfigs; ++i)
+  {
+    *css << this->Configs[i].OSDescriptor.c_str() << this->Configs[i].CPUDescriptor.c_str()
+         << this->Configs[i].MemDescriptor.c_str() << this->Configs[i].HostName.c_str()
+         << this->Configs[i].ProcessType << this->Configs[i].SystemType << this->Configs[i].Rank
+         << this->Configs[i].Pid << this->Configs[i].HostMemoryTotal
+         << this->Configs[i].HostMemoryAvailable << this->Configs[i].ProcMemoryAvailable;
+  }
 
   *css << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSystemConfigInformation::CopyFromStream(
-        const vtkClientServerStream* css)
+void vtkPVSystemConfigInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::CopyFromStream" << endl;
-  #endif
+#endif
 
-  int offset=0;
-  size_t numberOfConfigs=0;
+  int offset = 0;
+  size_t numberOfConfigs = 0;
 
-  vtkVerifyParseMacro(
-      css->GetArgument(0,offset,&numberOfConfigs),
-      "numberOfConfigs");
+  vtkVerifyParseMacro(css->GetArgument(0, offset, &numberOfConfigs), "numberOfConfigs");
   ++offset;
 
   this->Configs.resize(numberOfConfigs);
 
-  for (size_t i=0; i<numberOfConfigs; ++i)
-    {
-    char *osDescr;
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&osDescr),
-        "OSDescriptor");
+  for (size_t i = 0; i < numberOfConfigs; ++i)
+  {
+    char* osDescr;
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &osDescr), "OSDescriptor");
     ++offset;
-    this->Configs[i].OSDescriptor=osDescr;
+    this->Configs[i].OSDescriptor = osDescr;
 
-    char *cpuDescr;
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&cpuDescr),
-        "CPUDescriptor");
+    char* cpuDescr;
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &cpuDescr), "CPUDescriptor");
     ++offset;
-    this->Configs[i].CPUDescriptor=cpuDescr;
+    this->Configs[i].CPUDescriptor = cpuDescr;
 
-    char *memDescr;
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&memDescr),
-        "MemDescriptor");
+    char* memDescr;
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &memDescr), "MemDescriptor");
     ++offset;
-    this->Configs[i].MemDescriptor=memDescr;
+    this->Configs[i].MemDescriptor = memDescr;
 
-    char *hostName;
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&hostName),
-        "HostName");
+    char* hostName;
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &hostName), "HostName");
     ++offset;
-    this->Configs[i].HostName=hostName;
+    this->Configs[i].HostName = hostName;
 
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].ProcessType),
-        "ProcessType");
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &this->Configs[i].ProcessType), "ProcessType");
     ++offset;
 
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].SystemType),
-        "SystemType");
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &this->Configs[i].SystemType), "SystemType");
+    ++offset;
+
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &this->Configs[i].Rank), "Rank");
+    ++offset;
+
+    vtkVerifyParseMacro(css->GetArgument(0, offset, &this->Configs[i].Pid), "Pid");
     ++offset;
 
     vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].Rank),
-        "Rank");
+      css->GetArgument(0, offset, &this->Configs[i].HostMemoryTotal), "HostMemoryTotal");
     ++offset;
 
     vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].Pid),
-        "Pid");
+      css->GetArgument(0, offset, &this->Configs[i].HostMemoryAvailable), "HostMemoryAvailable");
     ++offset;
 
     vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].HostMemoryTotal),
-        "HostMemoryTotal");
+      css->GetArgument(0, offset, &this->Configs[i].ProcMemoryAvailable), "ProcMemoryAvailable");
     ++offset;
-
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].HostMemoryAvailable),
-        "HostMemoryAvailable");
-    ++offset;
-
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].ProcMemoryAvailable),
-        "ProcMemoryAvailable");
-    ++offset;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSystemConfigInformation::Sort()
 {
-  #ifdef vtkPVSystemConfigInformationDEBUG
+#ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::Sort" << endl;
-  #endif
+#endif
 
-  sort(this->Configs.begin(),this->Configs.end());
+  sort(this->Configs.begin(), this->Configs.end());
 }
 
 //----------------------------------------------------------------------------

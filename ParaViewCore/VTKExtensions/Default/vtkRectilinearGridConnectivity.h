@@ -14,8 +14,8 @@
 =========================================================================*/
 /**
  * @class   vtkRectilinearGridConnectivity
- * @brief   Extracts material fragments from 
- *  multi-block vtkRectilinearGrid datasets based on the selected volume 
+ * @brief   Extracts material fragments from
+ *  multi-block vtkRectilinearGrid datasets based on the selected volume
  *  fraction array(s) and a fraction isovalue and integrates the associated
  *  attributes.
  *
@@ -26,22 +26,22 @@
  *  filter extracts fragments from the dual grids (with the aforementioned
  *  values as the point data) based on the (at least one) selected fraction
  *  array(s) in combination with a specified fraction value and integrates
- *  the attributes (e.g., volume, pressure, density) across the surface of 
+ *  the attributes (e.g., volume, pressure, density) across the surface of
  *  each fragment. Each material, made up of one or multiple disconnected
  *  fragments, is exported to the output vtkMultiBlockDataSet as a single
  *  block that is a vtkPolyData storing the exterior polygons of the fragment
  *  (s) and the associated cell data attributes as the integrated result (of
- *  the fragment) in terms of the volume, pressure, density, and et al. 
+ *  the fragment) in terms of the volume, pressure, density, and et al.
  *
  *  This filter differs from a closely related filter vtkGridConnectivity in
  *  that the former extracts fragments at a sub-cell resolution to create
  *  relatively smooth surfaces while the latter works at the cell granularity
  *  (a whole cell is taken as either inside or outside a fragment) to cause
- *  staircasing artifacts. In fact, an extended 256-entry marching cubes 
+ *  staircasing artifacts. In fact, an extended 256-entry marching cubes
  *  LUT is designed for generating cube faces (either truncated by iso-lines
- *  or not) in addition to iso-triangles. These two kinds of polygons in 
+ *  or not) in addition to iso-triangles. These two kinds of polygons in
  *  combination represent the surface(s) of the greater-than-isovalue sub-
- *  volume(s) extracted in a cube. 
+ *  volume(s) extracted in a cube.
  *
  *  vtkRectilinearGridConnectivity performs fragments extraction using a
  *  three-level mechanism, i.e., intra-process intra-block, intra-process
@@ -53,24 +53,24 @@
  *  / polygons, extracting fragments turns into the task of detecting and
  *  removing internal faces (an internal face is the one shared by two sub-
  *  volumes or fragments) in a way of combining the associated sub-volumes or
- *  fragments. For the fragemnts extraction conducted at any level, the 
- *  polygons of the input (e.g., greater-than-isovalue sub-volumes resulting 
+ *  fragments. For the fragemnts extraction conducted at any level, the
+ *  polygons of the input (e.g., greater-than-isovalue sub-volumes resulting
  *  from marching cubes for the lowest level extraction) are pushed to a face
- *  hash (that accepts the three smallest point Ids of a polygon: triangle, 
- *  quad, or pentagon) on a per sub-volume or fragment basis. Once the face 
- *  hash detects an internal face, an entry is added to an equivalence set 
- *  (by means of class vtkEquivalenceSet) to correlate the two fragment Ids 
- *  that are attached to the two associated sub-volumes or fragments' polygons. 
- *  After resolving the equivalence set, each face that remains in the face 
- *  hash (internal faces are masked as invalid) is updated with a resolved 
- *  fragment Id. In this way the original complete polygons (triangles, quads, 
+ *  hash (that accepts the three smallest point Ids of a polygon: triangle,
+ *  quad, or pentagon) on a per sub-volume or fragment basis. Once the face
+ *  hash detects an internal face, an entry is added to an equivalence set
+ *  (by means of class vtkEquivalenceSet) to correlate the two fragment Ids
+ *  that are attached to the two associated sub-volumes or fragments' polygons.
+ *  After resolving the equivalence set, each face that remains in the face
+ *  hash (internal faces are masked as invalid) is updated with a resolved
+ *  fragment Id. In this way the original complete polygons (triangles, quads,
  *  pentagons) pointed to by the remaining hashed faces with the same resolved
  *  fragment Id are retrieved from the input vtkPolyData and hence combined by
  *  means of the same fragemnt Id.
  *
  * @sa
  *  vtkGridConnectivity vtkExtractCTHPart vtkPolyData vtkRectilinearGrid
- *  vtkMultiBlockDataSetAlgorithm 
+ *  vtkMultiBlockDataSetAlgorithm
 */
 
 #ifndef vtkRectilinearGridConnectivity_h
@@ -90,124 +90,116 @@ class vtkIncrementalOctreePointLocator;
 class vtkRectilinearGridConnectivityFaceHash;
 class vtkRectilinearGridConnectivityInternal;
 
-
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRectilinearGridConnectivity : 
-          public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRectilinearGridConnectivity
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
+  vtkTypeMacro(vtkRectilinearGridConnectivity, vtkMultiBlockDataSetAlgorithm);
+  static vtkRectilinearGridConnectivity* New();
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkTypeMacro( vtkRectilinearGridConnectivity,
-                        vtkMultiBlockDataSetAlgorithm );
-  static vtkRectilinearGridConnectivity * New();
-  void   PrintSelf( ostream & os, vtkIndent indent );
-  
   //@{
   /**
    * Set / get the volume fraction value [0, 1] used for extracting fragments.
    */
-  vtkSetClampMacro( VolumeFractionSurfaceValue, double, 0.0, 1.0 );
-  vtkGetMacro( VolumeFractionSurfaceValue, double );
+  vtkSetClampMacro(VolumeFractionSurfaceValue, double, 0.0, 1.0);
+  vtkGetMacro(VolumeFractionSurfaceValue, double);
   //@}
-  
+
   /**
    * Remove all volume array names.
    */
-  void  RemoveAllVolumeArrayNames();
-  
+  void RemoveAllVolumeArrayNames();
+
   /**
    * Remove double-type volume array names.
    */
-  void  RemoveDoubleVolumeArrayNames();
-    
+  void RemoveDoubleVolumeArrayNames();
+
   /**
    * Remove float-type volume array names.
    */
-  void  RemoveFloatVolumeArrayNames();
-  
+  void RemoveFloatVolumeArrayNames();
+
   /**
    * Remove unsigned char-type volume array names.
    */
-  void  RemoveUnsignedCharVolumeArrayNames();
-  
+  void RemoveUnsignedCharVolumeArrayNames();
+
   /**
    * Add a double-type volume array name to the selection list.
    */
-  void  AddDoubleVolumeArrayName( char * arayName );
-  
+  void AddDoubleVolumeArrayName(char* arayName);
+
   /**
    * Add a float-type volume array name to the selection list.
    */
-  void  AddFloatVolumeArrayName( char * arayName );
-  
+  void AddFloatVolumeArrayName(char* arayName);
+
   /**
    * Add an unsigned char-type volume array name to the selection list.
    */
-  void  AddUnsignedCharVolumeArrayName( char * arayName );
-  
+  void AddUnsignedCharVolumeArrayName(char* arayName);
+
   /**
    * Add a volume array (of any type) name to the selection list.
    */
-  void  AddVolumeArrayName( char * arayName ); 
-  
-protected:
+  void AddVolumeArrayName(char* arayName);
 
+protected:
   vtkRectilinearGridConnectivity();
   ~vtkRectilinearGridConnectivity();
-  
-  int                         DualGridsReady;
-  int                         NumberOfBlocks;
-  double                      DataBlocksTime;
-  double                      DualGridBounds[6];
-  double                      VolumeFractionSurfaceValue;
-  vtkDoubleArray            * FragmentValues;
-  vtkEquivalenceSet         * EquivalenceSet;
-  vtkRectilinearGrid       ** DualGridBlocks;
-  vtkMultiProcessController * Controller;
-  vtkRectilinearGridConnectivityFaceHash * FaceHash;
-  vtkRectilinearGridConnectivityInternal * Internal;
-  
-  
-  virtual vtkExecutive   * CreateDefaultExecutive();
-  virtual int FillInputPortInformation( int, vtkInformation * );
-  virtual int RequestData( vtkInformation        * request,
-                           vtkInformationVector ** inputVector,
-                           vtkInformationVector  * outputVector );
-  
-  
+
+  int DualGridsReady;
+  int NumberOfBlocks;
+  double DataBlocksTime;
+  double DualGridBounds[6];
+  double VolumeFractionSurfaceValue;
+  vtkDoubleArray* FragmentValues;
+  vtkEquivalenceSet* EquivalenceSet;
+  vtkRectilinearGrid** DualGridBlocks;
+  vtkMultiProcessController* Controller;
+  vtkRectilinearGridConnectivityFaceHash* FaceHash;
+  vtkRectilinearGridConnectivityInternal* Internal;
+
+  virtual vtkExecutive* CreateDefaultExecutive();
+  virtual int FillInputPortInformation(int, vtkInformation*);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+
   // ---------------------------------------------------------------------- //
   // --------------------------- Volume  arrays --------------------------- //
   // ---------------------------------------------------------------------- //
-  
-  
+
   /**
    * Get the number of selected volume fraction arrays.
    */
-  int   GetNumberOfVolumeFractionArrays();
-  
+  int GetNumberOfVolumeFractionArrays();
+
   /**
    * Get the number of all volume arrays (not necessarily selected as the
    * ones for extracting fragemnts).
    */
-  int   GetNumberOfVolumeArrays();
-  
+  int GetNumberOfVolumeArrays();
+
   /**
    * Get the name of a selected volume fraction array specified by arrayIdx.
    */
-  const char* GetVolumeFractionArrayName( int arrayIdx );
-  
+  const char* GetVolumeFractionArrayName(int arrayIdx);
+
   /**
    * This function determines whether the specified name (arayName) refers to
    * a selected volume fraction array (1) or not (0).
    */
-  bool  IsVolumeFractionArray( const char * arayName );
-  
+  bool IsVolumeFractionArray(const char* arayName);
+
   /**
    * This function determines whether the specified name (arayName) refers to
    * a volume array (1) or not (0). Note the array is not necessarily a
    * selected one used for extracting fragments.
    */
-  bool  IsVolumeArray( const char * arayName );
-  
+  bool IsVolumeArray(const char* arayName);
+
   /**
    * This function checks the consistency between a number (numGrids) of
    * vtkRectilinearGrid blocks (recGrids, the original ones still with cell
@@ -216,22 +208,19 @@ protected:
    * (unless one) volume fraction arrays in the data type. This function
    * returns 1 for consistency and 0 for inconsistency.
    */
-  int   CheckVolumeDataArrays( vtkRectilinearGrid ** recGrids, int numGrids );
-       
-                           
+  int CheckVolumeDataArrays(vtkRectilinearGrid** recGrids, int numGrids);
+
   // ---------------------------------------------------------------------- //
   // ----------- Dual grids generation and fragments extraction ----------- //
   // ---------------------------------------------------------------------- //
-  
-  
+
   /**
    * Given an input vtkRectilinearGrid dataset (rectGrid) with cell data
    * attributes, this function creates a dual vtkRectilinearGrid dataset with
    * point data attributes.
    */
-  void CreateDualRectilinearGrid
-       ( vtkRectilinearGrid * rectGrid, vtkRectilinearGrid * dualGrid );
-          
+  void CreateDualRectilinearGrid(vtkRectilinearGrid* rectGrid, vtkRectilinearGrid* dualGrid);
+
   /**
    * Given numBlcks vtkRectilinearGrid blocks with point data attributes
    * (i.e.,the dual grid version of the original blocks with cell data
@@ -240,15 +229,13 @@ protected:
    * (partIndx), this function extracts fragments based on this volume
    * fraction array and exports the result to a vtkPolyData (polyData).
    */
-  void ExtractFragments( vtkRectilinearGrid ** dualGrds, int numBlcks, 
-       double boundBox[6], unsigned char partIndx, vtkPolyData * polyData );
-       
-       
+  void ExtractFragments(vtkRectilinearGrid** dualGrds, int numBlcks, double boundBox[6],
+    unsigned char partIndx, vtkPolyData* polyData);
+
   // ---------------------------------------------------------------------- //
   // ------------- Common functions  for fragments extraction ------------- //
   // ---------------------------------------------------------------------- //
-       
-       
+
   /**
    * Given the raw fragment index (fragIndx) of either an original sub-volume
    * extracted from marching cubes of a block or a macro-volume (combination
@@ -261,16 +248,15 @@ protected:
    * different sub-volumes or macro-volumes belonging to the same fragment
    * have their integrated results summed together.
    */
-  void IntegrateFragmentAttributes
-       ( int fragIndx, int numComps, double * attrVals );
-  
+  void IntegrateFragmentAttributes(int fragIndx, int numComps, double* attrVals);
+
   /**
    * This function resolves the equivalence set (intra-process intra-block,
    * intra-process inter-block, or inter-process), followed by the face
    * fragment Ids and integrated fragment attributes.
    */
   void ResolveEquivalentFragments();
-  
+
   /**
    * With the equivalence set (intra-process intra-block, intra-process inter-
    * block, or inter-process) resolved in advance, this function updates each
@@ -281,7 +267,7 @@ protected:
    * same (new) fragment Id.
    */
   void ResolveFaceFragmentIds();
-  
+
   /**
    * With the equivalence set (intra-process intra-block, intra-process inter-
    * block, or inter-process) resolved in advance, this function integrates
@@ -291,37 +277,35 @@ protected:
    * into a single entry (of the new shortened array of integrated attributes).
    */
   void ResolveIntegratedFragmentAttributes();
-       
-  
+
   // ---------------------------------------------------------------------- //
   // ----------- Intra-process intra-block fragments extraction ----------- //
   // ---------------------------------------------------------------------- //
-  
-  
+
   // Descrption:
-  // Give a vtkRectilinearGrid data block (rectGrid, the dual version of an 
-  // original input block) with point data attributes (including some volume 
-  // fraction arrays and others like pressure, density, or velocity vector), 
-  // the name of a selected volume fraction array (fracName, through which to 
-  // extract fragments), and a specified volume fraction iso-value (isoValue), 
-  // this function performs the marching-cubes algorithm based on the volume 
+  // Give a vtkRectilinearGrid data block (rectGrid, the dual version of an
+  // original input block) with point data attributes (including some volume
+  // fraction arrays and others like pressure, density, or velocity vector),
+  // the name of a selected volume fraction array (fracName, through which to
+  // extract fragments), and a specified volume fraction iso-value (isoValue),
+  // this function performs the marching-cubes algorithm based on the volume
   // fraction array and the iso-value to produce greater-than-isovalue sub-
-  // volumes (or polyhedra) by employing an extended 256-entry lookup table. 
+  // volumes (or polyhedra) by employing an extended 256-entry lookup table.
   // These resulting polyhedra are stored in the output vtkPolyData (plyHedra).
-  // All point data attribues except for non-selected volume fraction arrays 
-  // are integrated when marching cubes. The integrated attribute arrays are 
+  // All point data attribues except for non-selected volume fraction arrays
+  // are integrated when marching cubes. The integrated attribute arrays are
   // attached to the polyhedra's faces as the cell data.
-  void ExtractFragmentPolyhedra( vtkRectilinearGrid * rectGrid, 
-       const char * fracName, double isoValue, vtkPolyData * plyHedra );
-       
+  void ExtractFragmentPolyhedra(
+    vtkRectilinearGrid* rectGrid, const char* fracName, double isoValue, vtkPolyData* plyHedra);
+
   /**
    * Given a vtkPolyData (plyHedra) storing the polygons of the greater-than-
    * isovalue sub-volumes (or polyhedra) extracted from a data block, this
    * function initializes the size of the face hash (with the number of points
    * of the polyhedra) used to maintain the polygons of the polyhedra.
    */
-  void InitializeFaceHash( vtkPolyData * plyHedra );
-  
+  void InitializeFaceHash(vtkPolyData* plyHedra);
+
   /**
    * Given a data block index (blockIdx) and a vtkPolyData (plyHedra) storing
    * the polygons of the greater-than-isovalue sub-volumes (or polyhedra) that
@@ -332,8 +316,8 @@ protected:
    * equivalence set to associate the fragment Ids assigned to the two sub-
    * volumes' polygons.
    */
-  void AddPolygonsToFaceHash( int blockIdx, vtkPolyData * plyHedra );
-  
+  void AddPolygonsToFaceHash(int blockIdx, vtkPolyData* plyHedra);
+
   /**
    * Given the index of the data block (blockIdx), the vtkPolyData (plyHedra)
    * storing the polygons / faces of the greater-than-isovalue sub-volumes
@@ -356,16 +340,13 @@ protected:
    * Argument maxFSize returns the maximum number of faces a macro-volume
    * (combination of sub-volumes) may contain in a block.
    */
-  void ExtractFragmentPolygons( int blockIdx, int & maxFsize, 
-       vtkPolyData * plyHedra, vtkPolyData * polygons, 
-       vtkIncrementalOctreePointLocator * gPtIdGen );
-  
-  
+  void ExtractFragmentPolygons(int blockIdx, int& maxFsize, vtkPolyData* plyHedra,
+    vtkPolyData* polygons, vtkIncrementalOctreePointLocator* gPtIdGen);
+
   // ---------------------------------------------------------------------- //
   // ----------- Intra-process inter-block fragments extraction ----------- //
   // ---------------------------------------------------------------------- //
-  
- 
+
   /**
    * Given a number (numPolys) of vtkPolyData objects (plyDatas) storing the
    * fragments extracted from the multiple data blocks, this function inits
@@ -373,8 +354,8 @@ protected:
    * attribute attached to each point of these vtkPolyData objects) that is
    * used to combine these intermediate fragments.
    */
-  void InitializeFaceHash( vtkPolyData ** plyDatas, int numPolys );
-  
+  void InitializeFaceHash(vtkPolyData** plyDatas, int numPolys);
+
   /**
    * Given a number (numPolys) of vtkPolyData objects (plyDatas) storing the
    * initial fragments (macro-volumes --- combination of greater-than-isovalue
@@ -389,9 +370,8 @@ protected:
    * two macro-volumes, an entry is added to the equivalence set to associate
    * the fragment Ids assigned to the two macro-volumes' polygons.
    */
-  void AddPolygonsToFaceHash
-       ( vtkPolyData ** plyDatas, int * maxFsize, int numPolys );
-       
+  void AddPolygonsToFaceHash(vtkPolyData** plyDatas, int* maxFsize, int numPolys);
+
   /**
    * With the intra-process inter-block equivalence set resolved, intra-process
    * inter-block fragment Ids resolved, and cell data attributes integrated by
@@ -405,15 +385,13 @@ protected:
    * data attribute. In a word, this function exports a combined version of the
    * fragements extracted from multiple blocks assigned to a single process.
    */
-  void GenerateOutputFromSingleProcess( vtkPolyData ** surfaces, int numSurfs, 
-       unsigned char partIndx, vtkPolyData * polyData );
-  
-  
+  void GenerateOutputFromSingleProcess(
+    vtkPolyData** surfaces, int numSurfs, unsigned char partIndx, vtkPolyData* polyData);
+
   // ---------------------------------------------------------------------- //
   // ----------------- Inter-process fragments extraction ----------------- //
   // ---------------------------------------------------------------------- //
-  
-  
+
   /**
    * Given the vtkPolyData (fragPoly) storing the fragments extracted from a
    * single process (assigned with either one block or multiple blocks), this
@@ -426,10 +404,9 @@ protected:
    * global point locator 'gPtIdGen') as the point data attribute used later
    * for combining the fragments across multiple processes.
    */
-  void CreateInterProcessPolygons
-       ( vtkPolyData * fragPoly, vtkPolyData * procPoly, 
-         vtkIncrementalOctreePointLocator * gPtIdGen, int & maxFsize );
-       
+  void CreateInterProcessPolygons(vtkPolyData* fragPoly, vtkPolyData* procPoly,
+    vtkIncrementalOctreePointLocator* gPtIdGen, int& maxFsize);
+
   /**
    * Given a number (numProcs) of vtkPolyData objects (procPlys) storing the
    * (initial) fragments extracted from multiple processes and an array of
@@ -446,9 +423,8 @@ protected:
    * later to retrieve the source vtkPolyData for the target complete polygon
    * if the face remains in the face hash after removing internal faces.
    */
-  void AddInterProcessPolygonsToFaceHash
-       ( vtkPolyData ** procPlys, int * maxFsize, int numProcs );
-       
+  void AddInterProcessPolygonsToFaceHash(vtkPolyData** procPlys, int* maxFsize, int numProcs);
+
   /**
    * With the inter-process equivalence set resolved, inter-process fragment
    * Ids resolved, and cell data attributes integrated by the fragment Id, this
@@ -463,14 +439,12 @@ protected:
    * a combined version of the fragements extracted from multiple processes (of
    * which each is assigned with either one block or multiple blocks).
    */
-  void GenerateOutputFromMultiProcesses( vtkPolyData ** procPlys, 
-       int numProcs, unsigned char partIndx, vtkPolyData * polyData );
-  
-  
+  void GenerateOutputFromMultiProcesses(
+    vtkPolyData** procPlys, int numProcs, unsigned char partIndx, vtkPolyData* polyData);
+
 private:
-  vtkRectilinearGridConnectivity
-                  ( const vtkRectilinearGridConnectivity & ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkRectilinearGridConnectivity & ) VTK_DELETE_FUNCTION;
+  vtkRectilinearGridConnectivity(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
 };
 
 #endif

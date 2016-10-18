@@ -60,12 +60,9 @@ protected:
   int GetDirection(vtkSMIntVectorProperty* ivp);
   void GetExtent(vtkSMProxyProperty* pp, int extent[6]);
 
-
 private:
   vtkSMDimensionsDomain(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

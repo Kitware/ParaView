@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkNIfTIWriter - Writes NIfTI files.
 // .SECTION Description
-// vtkNIfTIWriter writes NIfTI files. 
+// vtkNIfTIWriter writes NIfTI files.
 //
 // .SECTION See Also
 // vtkNIfTIReader vtkAnalayzeReader vtkAnalyzeWriter
@@ -35,21 +35,21 @@ class vtkUnsignedCharArray;
 class vtkNIfTIWriter : public vtkImageWriter
 {
 public:
-  static vtkNIfTIWriter *New();
-  vtkTypeMacro(vtkNIfTIWriter,vtkImageWriter);
+  static vtkNIfTIWriter* New();
+  vtkTypeMacro(vtkNIfTIWriter, vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetFileType(int inValue);
   int getFileType();
 
-  unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
+  unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
 
 protected:
   vtkNIfTIWriter();
   ~vtkNIfTIWriter();
-  
-  virtual void WriteFile(ofstream *file, vtkImageData *data, int ext[6], int wholeExtent[6]);
-  virtual void WriteFileHeader(ofstream *file, vtkImageData *cache, int wholeExtent[6]);
+
+  virtual void WriteFile(ofstream* file, vtkImageData* data, int ext[6], int wholeExtent[6]);
+  virtual void WriteFileHeader(ofstream* file, vtkImageData* cache, int wholeExtent[6]);
 
 private:
   int FileType;
@@ -58,8 +58,8 @@ private:
   int iname_offset;
   bool foundNiftiHeader;
   bool foundAnalayzeHeader;
-  double **q;
-  double **s;
+  double** q;
+  double** s;
   int sform_code;
   int qform_code;
 

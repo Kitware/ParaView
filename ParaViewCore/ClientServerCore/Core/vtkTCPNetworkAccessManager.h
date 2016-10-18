@@ -106,26 +106,26 @@ protected:
   /**
    * Connects to remote processes.
    */
-  vtkMultiProcessController* ConnectToRemote(const char* hostname, int port,
-    const char* handshake, int timeout_in_seconds);
+  vtkMultiProcessController* ConnectToRemote(
+    const char* hostname, int port, const char* handshake, int timeout_in_seconds);
 
   /**
    * Waits for connection from remote process.
    */
-  vtkMultiProcessController* WaitForConnection(int port, bool once,
-    const char* handshake, bool nonblocking);
+  vtkMultiProcessController* WaitForConnection(
+    int port, bool once, const char* handshake, bool nonblocking);
 
-  bool ParaViewHandshake(vtkMultiProcessController* controller,
-    bool server_side, const char* handshake);
+  bool ParaViewHandshake(
+    vtkMultiProcessController* controller, bool server_side, const char* handshake);
 
   bool AbortPendingConnectionFlag;
+
 private:
   vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

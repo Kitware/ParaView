@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QModelIndex;
 namespace Json
 {
-  class Value;
+class Value;
 }
 
 /**
@@ -57,19 +57,20 @@ class PQCOMPONENTS_EXPORT pqPresetDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
   /**
   * Used to control what kinds of presets are shown in the dialog.
   * This merely affects the presets that are hidden from the view.
   */
   enum Modes
-    {
+  {
     SHOW_ALL,
     SHOW_INDEXED_COLORS_ONLY,
     SHOW_NON_INDEXED_COLORS_ONLY
-    };
+  };
 
-  pqPresetDialog(QWidget* parent=0, Modes mode=SHOW_ALL);
+  pqPresetDialog(QWidget* parent = 0, Modes mode = SHOW_ALL);
   virtual ~pqPresetDialog();
 
   /**
@@ -110,22 +111,22 @@ public:
   /**
   * Set when user can choose to load colors along with the default state.
   */
-  void setCustomizableLoadColors(bool state, bool defaultValue=true);
+  void setCustomizableLoadColors(bool state, bool defaultValue = true);
 
   /**
   * Set when user can choose to load annotations along with the default state.
   */
-  void setCustomizableLoadAnnotations(bool state, bool defaultValue=true);
+  void setCustomizableLoadAnnotations(bool state, bool defaultValue = true);
 
   /**
   * Set when user can choose to load opacities along with the default state.
   */
-  void setCustomizableLoadOpacities(bool state, bool defaultValue=true);
+  void setCustomizableLoadOpacities(bool state, bool defaultValue = true);
 
   /**
   * Set when user can choose to load usePresetRange along with the default state.
   */
-  void setCustomizableUsePresetRange(bool state, bool defaultValue=false);
+  void setCustomizableUsePresetRange(bool state, bool defaultValue = false);
 
 signals:
   void applyPreset(const Json::Value& preset);
@@ -133,8 +134,8 @@ signals:
 protected slots:
   void updateEnabledStateForSelection();
   void updateForSelectedIndex(const QModelIndex& proxyIndex);
-  void triggerApply(const QModelIndex& proxyIndex=QModelIndex());
-  void removePreset(const QModelIndex& idx=QModelIndex());
+  void triggerApply(const QModelIndex& proxyIndex = QModelIndex());
+  void removePreset(const QModelIndex& idx = QModelIndex());
   void importPresets();
   void exportPresets();
 

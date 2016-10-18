@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,12 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineAnnotationFilterModel_h
 #define _pqPipelineAnnotationFilterModel_h
 
-
 #include "pqComponentsModule.h"
 #include <QSortFilterProxyModel>
 
 class vtkSession;
-
 
 /**
 * \class pqPipelineAnnotationFilterModel
@@ -59,18 +57,18 @@ class PQCOMPONENTS_EXPORT pqPipelineAnnotationFilterModel : public QSortFilterPr
   Q_OBJECT;
 
 public:
-  pqPipelineAnnotationFilterModel(QObject *parent=0);
-  virtual ~pqPipelineAnnotationFilterModel() {};
+  pqPipelineAnnotationFilterModel(QObject* parent = 0);
+  virtual ~pqPipelineAnnotationFilterModel(){};
 
-  void enableAnnotationFilter(const QString &annotationKey);
+  void enableAnnotationFilter(const QString& annotationKey);
   void disableAnnotationFilter();
 
   void enableSessionFilter(vtkSession* session);
   void disableSessionFilter();
 
 protected:
-  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
-  bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const;
+  bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 
 private:
   bool FilterAnnotation;

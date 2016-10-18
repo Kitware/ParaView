@@ -33,10 +33,10 @@ class vtkSIPVRepresentationProxy::vtkInternals
 {
 public:
   struct vtkValue
-    {
+  {
     vtkSmartPointer<vtkSIProxy> SubProxy;
     std::string SubText;
-    };
+  };
 
   typedef std::map<std::string, vtkValue> RepresentationProxiesType;
   RepresentationProxiesType RepresentationProxies;
@@ -63,9 +63,8 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
     vtkPVCompositeRepresentation::SafeDownCast(this->GetVTKObject());
 
   // Pass on the cube-axes and selection-represenations
-  vtkSelectionRepresentation* selection =
-    vtkSelectionRepresentation::SafeDownCast(
-      this->GetSubSIProxy("SelectionRepresentation")->GetVTKObject());
+  vtkSelectionRepresentation* selection = vtkSelectionRepresentation::SafeDownCast(
+    this->GetSubSIProxy("SelectionRepresentation")->GetVTKObject());
   pvrepresentation->SetSelectionRepresentation(selection);
 
   // Update internal data-structures for the types of representations provided
@@ -74,49 +73,46 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
   // <RepresentationType subproxy="OutlineRepresentation" text="Outline"
   //    subtype="0"/>
   unsigned int numElements = element->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < numElements; cc++)
-    {
+  for (unsigned int cc = 0; cc < numElements; cc++)
+  {
     vtkPVXMLElement* child = element->GetNestedElement(cc);
-    if (child && child->GetName() &&
-      strcmp(child->GetName(), "RepresentationType") == 0)
-      {
+    if (child && child->GetName() && strcmp(child->GetName(), "RepresentationType") == 0)
+    {
       const char* name = child->GetAttribute("subproxy");
       vtkSIProxy* subproxy = this->GetSubSIProxy(name);
       if (!subproxy)
-        {
+      {
         vtkErrorMacro("Missing data representation subproxy '"
-          << (name? name : "<null>")
-          << "' when processing RepresentationType element.");
+          << (name ? name : "<null>") << "' when processing RepresentationType element.");
         return false;
-        }
+      }
 
       const char* text = child->GetAttribute("text");
       if (!text)
-        {
-        vtkErrorMacro(
-          "Missing required 'text' attribute on RepresentationType element");
+      {
+        vtkErrorMacro("Missing required 'text' attribute on RepresentationType element");
         return false;
-        }
+      }
 
       // Add each of the sub-representations to the composite representation.
-      pvrepresentation->AddRepresentation(text,
-        vtkPVDataRepresentation::SafeDownCast(subproxy->GetVTKObject()));
+      pvrepresentation->AddRepresentation(
+        text, vtkPVDataRepresentation::SafeDownCast(subproxy->GetVTKObject()));
 
       //// read optional subtype.
       const char* sub_text = child->GetAttribute("subtype");
       this->Internals->RepresentationProxies[text].SubProxy = subproxy;
       if (sub_text)
-        {
+      {
         this->Internals->RepresentationProxies[text].SubText = sub_text;
-        }
       }
     }
+  }
 
   // We add observer to the vtkCompositeRepresentation so that every time it's
   // modified, we ensure that the representation type is up-to-date.
-  vtkObject::SafeDownCast(this->GetVTKObject())->AddObserver(
-    vtkCommand::ModifiedEvent,
-    this, &vtkSIPVRepresentationProxy::OnVTKObjectModified);
+  vtkObject::SafeDownCast(this->GetVTKObject())
+    ->AddObserver(
+      vtkCommand::ModifiedEvent, this, &vtkSIPVRepresentationProxy::OnVTKObjectModified);
 
   return this->Superclass::ReadXMLAttributes(element);
 }
@@ -124,23 +120,18 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 //----------------------------------------------------------------------------
 void vtkSIPVRepresentationProxy::OnVTKObjectModified()
 {
-  vtkCompositeRepresentation* repr = vtkCompositeRepresentation::SafeDownCast(
-    this->GetVTKObject());
+  vtkCompositeRepresentation* repr = vtkCompositeRepresentation::SafeDownCast(this->GetVTKObject());
   const char* key = repr->GetActiveRepresentationKey();
-  vtkInternals::RepresentationProxiesType::iterator iter = key?
-    this->Internals->RepresentationProxies.find(key) :
-    this->Internals->RepresentationProxies.end();
-  if (iter != this->Internals->RepresentationProxies.end() &&
-    iter->second.SubText != "")
-    {
+  vtkInternals::RepresentationProxiesType::iterator iter = key
+    ? this->Internals->RepresentationProxies.find(key)
+    : this->Internals->RepresentationProxies.end();
+  if (iter != this->Internals->RepresentationProxies.end() && iter->second.SubText != "")
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << iter->second.SubProxy->GetVTKObject()
-      << "SetRepresentation"
-      << iter->second.SubText.c_str()
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << iter->second.SubProxy->GetVTKObject()
+           << "SetRepresentation" << iter->second.SubText.c_str() << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

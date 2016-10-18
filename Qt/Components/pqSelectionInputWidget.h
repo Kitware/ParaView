@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,11 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqSelectionInputWidget_h
 #define pqSelectionInputWidget_h
 
-
 #include "pqComponentsModule.h"
 #include <QWidget>
 
-#include "pqSMProxy.h"  // For property.
+#include "pqSMProxy.h" // For property.
 
 /**
 * pqSelectionInputWidget is a custom widget used for specifying
@@ -45,13 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(pqSMProxy selection
-             READ selection
-             WRITE setSelection
-             USER true)
+  Q_PROPERTY(pqSMProxy selection READ selection WRITE setSelection USER true)
   typedef QWidget Superclass;
+
 public:
-  pqSelectionInputWidget(QWidget* parent=0);
+  pqSelectionInputWidget(QWidget* parent = 0);
   ~pqSelectionInputWidget();
 
   virtual pqSMProxy selection() { return this->SelectionSource; }
@@ -94,8 +91,7 @@ private:
   Q_DISABLE_COPY(pqSelectionInputWidget)
 
   class UI;
-  UI *ui;
+  UI* ui;
 };
 
 #endif
-

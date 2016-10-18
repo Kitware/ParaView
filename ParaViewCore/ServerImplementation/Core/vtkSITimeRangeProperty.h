@@ -45,7 +45,6 @@ protected:
 private:
   vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

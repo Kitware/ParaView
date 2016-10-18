@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqRenderViewModule_h
 #define pqRenderViewModule_h
 
-
 #include "pqRenderViewBase.h"
 #include <QColor> // needed for return type.
 
@@ -58,19 +57,12 @@ public:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqRenderView( const QString& group,
-                const QString& name,
-                vtkSMViewProxy* renModule,
-                pqServer* server,
-                QObject* parent=NULL);
+  pqRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
+    pqServer* server, QObject* parent = NULL);
 
   // This version allows subclasses to substitute their own renderViewType.
-  pqRenderView( const QString& tname,
-                const QString& group,
-                const QString& name,
-                vtkSMViewProxy* renModule,
-                pqServer* server,
-                QObject* parent=NULL);
+  pqRenderView(const QString& tname, const QString& group, const QString& name,
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
   // Destructor.
   virtual ~pqRenderView();
@@ -116,14 +108,15 @@ public:
   * Get whether resetCamera() resets the
   * center of rotation as well.
   */
-  bool getResetCenterWithCamera() const
-    { return this->ResetCenterWithCamera; }
+  bool getResetCenterWithCamera() const { return this->ResetCenterWithCamera; }
 
   /**
   * Get whether selection will be done on multiple representations.
   */
   bool getUseMultipleRepresentationSelection() const
-    { return this->UseMultipleRepresentationSelection; }
+  {
+    return this->UseMultipleRepresentationSelection;
+  }
 
   /**
   * Get center axes visibility.
@@ -167,8 +160,7 @@ public:
   * Reset camera view direction
   */
   void resetViewDirection(
-    double look_x, double look_y, double look_z,
-    double up_x, double up_y, double up_z);
+    double look_x, double look_y, double look_z, double up_x, double up_y, double up_z);
 
   /**
   * Let internal class handle which internal widget should change its cursor
@@ -176,7 +168,7 @@ public:
   * which contains an aggregation of QWidget, we don't necessary want all of
   * them to share the same cursor.
   */
-  virtual void setCursor(const QCursor &);
+  virtual void setCursor(const QCursor&);
 
 public:
   /**
@@ -184,7 +176,8 @@ public:
   * coordinates.
   */
   void selectOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
-  void selectPointsOnSurface(int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  void selectPointsOnSurface(
+    int rectangle[4], int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /**
   * Picks the representation at the given position.
@@ -198,7 +191,7 @@ public:
   * picked representation is a multi-block data set the picked block will
   * be returned in the flatIndex variable.
   */
-  pqDataRepresentation* pickBlock(int pos[2], unsigned int &flatIndex);
+  pqDataRepresentation* pickBlock(int pos[2], unsigned int& flatIndex);
 
   /**
   * Creates a new frustum selection given the rectangle in display
@@ -217,13 +210,15 @@ public:
   * Creates a new surface points selection given the polygon in display
   * coordinates.
   */
-  void selectPolygonPoints(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  void selectPolygonPoints(
+    vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
   /**
   * Creates a new surface cells selection given the polygon in display
   * coordinates.
   */
-  void selectPolygonCells(vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
+  void selectPolygonCells(
+    vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
 signals:
   // Triggered when interaction mode change underneath
@@ -247,10 +242,7 @@ public slots:
   // and camera manipulators that use the center of rotation.
   // They are setup correctly by default.
   void setCenterOfRotation(double x, double y, double z);
-  void setCenterOfRotation(double xyz[3])
-    {
-    this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);
-    }
+  void setCenterOfRotation(double xyz[3]) { this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]); }
 
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);
@@ -259,14 +251,15 @@ public slots:
   * Get/Set whether resetCamera() resets the
   * center of rotation as well.
   */
-  void setResetCenterWithCamera(bool b)
-    { this->ResetCenterWithCamera = b;}
+  void setResetCenterWithCamera(bool b) { this->ResetCenterWithCamera = b; }
 
   /**
   * Set whether selection will be done on multiple representations.
   */
   void setUseMultipleRepresentationSelection(bool b)
-    { this->UseMultipleRepresentationSelection = b;}
+  {
+    this->UseMultipleRepresentationSelection = b;
+  }
 
   /**
   * start the link to other view process
@@ -288,8 +281,7 @@ public slots:
   /**
   * Resets center of rotation if this->ResetCenterWithCamera is true.
   */
-  void resetCenterOfRotationIfNeeded()
-    { this->onResetCameraEvent(); }
+  void resetCenterOfRotationIfNeeded() { this->onResetCameraEvent(); }
 
   /**
   * Try to provide the best view orientation and interaction mode
@@ -342,21 +334,21 @@ protected:
   * Overridden to initialize the interaction undo/redo stack.
   */
   virtual void initialize();
+
 private:
   class pqInternal;
   pqInternal* Internal;
-  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&,
-    bool select_points, int selectionModifier, bool select_blocks);
-  void selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPort*>&,
-    bool select_points, int selectionModifier, bool select_blocks);
+  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&, bool select_points,
+    int selectionModifier, bool select_blocks);
+  void selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPort*>&, bool select_points,
+    int selectionModifier, bool select_blocks);
 
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,
-    int selectionModifier, bool select_blocks);
+    vtkCollection* selectionSources, QList<pqOutputPort*>& pqPorts, int selectionModifier,
+    bool select_blocks);
 
-  void InternalConstructor(vtkSMViewProxy *renModule);
+  void InternalConstructor(vtkSMViewProxy* renModule);
 };
 
 #endif
-

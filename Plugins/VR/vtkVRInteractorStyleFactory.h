@@ -42,13 +42,13 @@ class vtkVRInteractorStyle;
 class vtkVRInteractorStyleFactory : public vtkObject
 {
 public:
-  static vtkVRInteractorStyleFactory *New();
-  vtkTypeMacro(vtkVRInteractorStyleFactory, vtkObject)
-  void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkVRInteractorStyleFactory* New();
+  vtkTypeMacro(vtkVRInteractorStyleFactory, vtkObject) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
   // Description:
   // Get the singleton instance of this class
-  static vtkVRInteractorStyleFactory *GetInstance();
+  static vtkVRInteractorStyleFactory* GetInstance();
 
   // Description:
   // Get the list of interactor style classes
@@ -61,17 +61,17 @@ public:
 
   // Description:
   // Get the action description for a style classname
-  std::string GetDescriptionFromClassName(const std::string &className);
+  std::string GetDescriptionFromClassName(const std::string& className);
 
   // Description:
   // Create a new interactor style instance. The input string
   // must be in the vector returned by GetInteractorStyleClassNames().
-  vtkVRInteractorStyle *NewInteractorStyleFromClassName(const std::string &);
+  vtkVRInteractorStyle* NewInteractorStyleFromClassName(const std::string&);
 
   // Description:
   // Create a new interactor style instance. The input string
   // must be in the vector returned by GetInteractorStyleDescriptions().
-  vtkVRInteractorStyle *NewInteractorStyleFromDescription(const std::string &);
+  vtkVRInteractorStyle* NewInteractorStyleFromDescription(const std::string&);
 
   friend class pqVRStarter;
 
@@ -79,12 +79,11 @@ protected:
   vtkVRInteractorStyleFactory();
   ~vtkVRInteractorStyleFactory();
 
-  static void SetInstance(vtkVRInteractorStyleFactory *);
-  static vtkVRInteractorStyleFactory *Instance;
+  static void SetInstance(vtkVRInteractorStyleFactory*);
+  static vtkVRInteractorStyleFactory* Instance;
 
   std::vector<std::string> InteractorStyleClassNames;
   std::vector<std::string> InteractorStyleDescriptions;
-
 };
 
 #endif // vtkVRInteractorStyleFactory_h

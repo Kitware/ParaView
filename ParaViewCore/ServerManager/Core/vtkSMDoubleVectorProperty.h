@@ -65,7 +65,7 @@ public:
    */
   int SetElements(const double* values);
   int SetElements(const double* values, unsigned int numValues);
-  double *GetElements();
+  double* GetElements();
   //@}
 
   //@{
@@ -151,7 +151,6 @@ public:
   vtkGetMacro(ArgumentIsArray, int);
   vtkSetMacro(ArgumentIsArray, int);
   //@}
-
 
   //@{
   /**

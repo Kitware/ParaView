@@ -41,67 +41,61 @@ void vtkCPPVSMPipeline::Initialize(int outputFrequency, std::string& fileName)
 }
 
 //----------------------------------------------------------------------------
-int vtkCPPVSMPipeline::RequestDataDescription(
-  vtkCPDataDescription* dataDescription)
+int vtkCPPVSMPipeline::RequestDataDescription(vtkCPDataDescription* dataDescription)
 {
-  if(!dataDescription)
-    {
+  if (!dataDescription)
+  {
     vtkWarningMacro("dataDescription is NULL.");
     return 0;
-    }
+  }
 
-  if(this->FileName.empty())
-    {
+  if (this->FileName.empty())
+  {
     vtkWarningMacro("No output file name given to output results to.");
     return 0;
-    }
+  }
 
-  if(dataDescription->GetForceOutput() == true ||
-     (this->OutputFrequency != 0 &&
-      dataDescription->GetTimeStep() % this->OutputFrequency == 0) )
-    {
+  if (dataDescription->GetForceOutput() == true ||
+    (this->OutputFrequency != 0 && dataDescription->GetTimeStep() % this->OutputFrequency == 0))
+  {
     dataDescription->GetInputDescriptionByName("input")->AllFieldsOn();
     dataDescription->GetInputDescriptionByName("input")->GenerateMeshOn();
     return 1;
-    }
+  }
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkCPPVSMPipeline::CoProcess(
-  vtkCPDataDescription* dataDescription)
+int vtkCPPVSMPipeline::CoProcess(vtkCPDataDescription* dataDescription)
 {
-  if(!dataDescription)
-    {
+  if (!dataDescription)
+  {
     vtkWarningMacro("DataDescription is NULL");
     return 0;
-    }
+  }
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast(
     dataDescription->GetInputDescriptionByName("input")->GetGrid());
-  if(grid == NULL)
-    {
+  if (grid == NULL)
+  {
     vtkWarningMacro("DataDescription is missing input unstructured grid.");
     return 0;
-    }
-  if(this->RequestDataDescription(dataDescription) == 0)
-    {
+  }
+  if (this->RequestDataDescription(dataDescription) == 0)
+  {
     return 1;
-    }
+  }
 
   vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
-  vtkSMSessionProxyManager* sessionProxyManager =
-    proxyManager->GetActiveSessionProxyManager();
+  vtkSMSessionProxyManager* sessionProxyManager = proxyManager->GetActiveSessionProxyManager();
 
   // Create a vtkPVTrivialProducer and set its output
   // to be the input grid.
   vtkSmartPointer<vtkSMSourceProxy> producer;
   producer.TakeReference(
-    vtkSMSourceProxy::SafeDownCast(
-      sessionProxyManager->NewProxy("sources", "PVTrivialProducer")));
+    vtkSMSourceProxy::SafeDownCast(sessionProxyManager->NewProxy("sources", "PVTrivialProducer")));
   producer->UpdateVTKObjects();
   vtkObjectBase* clientSideObject = producer->GetClientSideObject();
-  vtkPVTrivialProducer* realProducer =
-    vtkPVTrivialProducer::SafeDownCast(clientSideObject);
+  vtkPVTrivialProducer* realProducer = vtkPVTrivialProducer::SafeDownCast(clientSideObject);
   realProducer->SetOutput(grid);
 
   // Create a slice filter and set the cut type to plane
@@ -111,11 +105,9 @@ int vtkCPPVSMPipeline::CoProcess(
   vtkSMInputProperty* sliceInputConnection =
     vtkSMInputProperty::SafeDownCast(slice->GetProperty("Input"));
 
-  vtkSMProxyProperty* cutType =
-    vtkSMProxyProperty::SafeDownCast(slice->GetProperty("CutFunction"));
+  vtkSMProxyProperty* cutType = vtkSMProxyProperty::SafeDownCast(slice->GetProperty("CutFunction"));
   vtkSmartPointer<vtkSMProxy> cutPlane;
-  cutPlane.TakeReference(
-    sessionProxyManager->NewProxy("implicit_functions", "Plane"));
+  cutPlane.TakeReference(sessionProxyManager->NewProxy("implicit_functions", "Plane"));
   cutPlane->UpdatePropertyInformation();
   cutPlane->UpdateVTKObjects();
   cutType->SetProxy(0, cutPlane);

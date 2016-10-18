@@ -21,14 +21,14 @@
  * <?xml version="1.0" ?>
  *
  * <PhastaMetaFile number_of_pieces="2">
- *   <GeometryFileNamePattern pattern="geombc.dat.%d" 
+ *   <GeometryFileNamePattern pattern="geombc.dat.%d"
  *                            has_piece_entry="1"
  *                            has_time_entry="0"/>
  *   <FieldFileNamePattern pattern="restart.%d.%d"
  *                         has_piece_entry="1"
  *                         has_time_entry="1"/>
  *
- *   <TimeSteps number_of_steps="2" 
+ *   <TimeSteps number_of_steps="2"
  *              auto_generate_indices="1"
  *              start_index="0"
  *              increment_index_by="20"
@@ -54,11 +54,11 @@
  * The GeometryFileNamePattern and FieldFileNamePattern elements have
  * three attributes:
  * \li pattern: This is the pattern used to get the Phasta filenames.
- *   The %d placeholders will be replaced by appropriate 
+ *   The %d placeholders will be replaced by appropriate
  *   indices. The first index is time (if specified), the
  *   second one is piece.
  * \li has_piece_entry (0 or 1): Specifies whether the pattern has a
- *   piece placeholder. The piece placeholder is replaced by the 
+ *   piece placeholder. The piece placeholder is replaced by the
  *   update piece number.
  * \li has_time_entry (0 or 1): Specified whether the pattern has a
  *   time placeholder. The time placeholder is replaced by an index
@@ -87,17 +87,17 @@
  * compute all indices for field files and overwrite the geometry indices
  * with TimeStep elements.
  *
- * The Fields element contain number_of_fields Field sub-element. 
+ * The Fields element contain number_of_fields Field sub-element.
  * Each Field element specifies tag attribute to be used in paraview,
- * tag under which the field is stored in phasta files, start index of 
- * the array in phasta files, number of components of the field, data 
- * dependency, i.e., either 0 for nodal or 1 for elemental and 
- * data type, i.e., "double" (as of now supports only 1, 3 & 9 for number 
- * of components, i.e., scalars, vectors & tensors, and "double" for 
+ * tag under which the field is stored in phasta files, start index of
+ * the array in phasta files, number of components of the field, data
+ * dependency, i.e., either 0 for nodal or 1 for elemental and
+ * data type, i.e., "double" (as of now supports only 1, 3 & 9 for number
+ * of components, i.e., scalars, vectors & tensors, and "double" for
  * type of data).
  * In the example above, there are two fields to be visualized
  * one is velocity field stored under tag solution from index 1 to 3
- * in phasta files which is a vector field defined on nodes with 
+ * in phasta files which is a vector field defined on nodes with
  * double values, and the other field is average speed scalar field
  * stored under tag ybar at index 4 in phasta files
  * If any Field element is specified then default attribute values are :
@@ -110,7 +110,7 @@
  * If no Field(s) is/are specfied then the default is following 3 fields :
  * pressure (index 0 under solution),
  * velocity (index 1-3 under solution)
- * temperature (index 4 under soltuion)     
+ * temperature (index 4 under soltuion)
  *
  * @sa
  * vtkPhastaReader
@@ -141,7 +141,7 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   //@}
-  
+
   //@{
   /**
    * Set the step number for the geometry.
@@ -157,18 +157,16 @@ public:
   vtkGetVector2Macro(TimeStepRange, int);
   //@}
 
-  static int CanReadFile(const char *filename);
+  static int CanReadFile(const char* filename);
 
 protected:
   vtkPPhastaReader();
   ~vtkPPhastaReader();
-  
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   char* FileName;
 
@@ -186,10 +184,9 @@ protected:
 
 private:
   vtkPPhastaReaderInternal* Internal;
-  
+
   vtkPPhastaReader(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

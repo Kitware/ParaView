@@ -47,10 +47,9 @@
 
 vtkStandardNewMacro(vtkSMTooltipSelectionPipeline);
 
-
 //----------------------------------------------------------------------------
-vtkSMTooltipSelectionPipeline::vtkSMTooltipSelectionPipeline() :
-  MoveSelectionToClient(NULL)
+vtkSMTooltipSelectionPipeline::vtkSMTooltipSelectionPipeline()
+  : MoveSelectionToClient(NULL)
 {
   this->PreviousSelectionId = 0;
   this->SelectionFound = false;
@@ -67,10 +66,10 @@ vtkSMTooltipSelectionPipeline::~vtkSMTooltipSelectionPipeline()
 void vtkSMTooltipSelectionPipeline::ClearCache()
 {
   if (this->MoveSelectionToClient)
-    {
+  {
     this->MoveSelectionToClient->Delete();
     this->MoveSelectionToClient = NULL;
-    }
+  }
   this->Superclass::ClearCache();
 }
 
@@ -84,52 +83,49 @@ void vtkSMTooltipSelectionPipeline::Hide(vtkSMRenderViewProxy* view)
 
 //----------------------------------------------------------------------------
 void vtkSMTooltipSelectionPipeline::Show(
-  vtkSMSourceProxy* representation,
-  vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view)
+  vtkSMSourceProxy* representation, vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view)
 {
   this->Superclass::Show(representation, selection, view);
 
   vtkIdType currSelectionId;
   if (this->GetCurrentSelectionId(view, currSelectionId))
-    {
+  {
     this->SelectionFound = true;
     if (currSelectionId != this->PreviousSelectionId)
-      {
+    {
       this->PreviousSelectionId = currSelectionId;
       this->TooltipEnabled = true;
-      }
     }
+  }
   else
-    {
+  {
     this->PreviousSelectionId = 0;
     this->TooltipEnabled = true;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool vtkSMTooltipSelectionPipeline::GetCurrentSelectionId(
   vtkSMRenderViewProxy* view, vtkIdType& selId)
 {
-  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
-    view->GetClientSideObject());
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(view->GetClientSideObject());
   vtkSelection* selection = rv->GetLastSelection();
   if (!selection || selection->GetNumberOfNodes() != 1)
-    {
+  {
     return false;
-    }
+  }
 
   vtkSelectionNode* selectionNode = selection->GetNode(0);
   if (!selectionNode)
-    {
+  {
     return false;
-    }
+  }
 
-  vtkIdTypeArray* selectionArray =
-    vtkIdTypeArray::SafeDownCast(selectionNode->GetSelectionList());
+  vtkIdTypeArray* selectionArray = vtkIdTypeArray::SafeDownCast(selectionNode->GetSelectionList());
   if (!selectionArray || selectionArray->GetNumberOfTuples() != 1)
-    {
+  {
     return false;
-    }
+  }
 
   selId = selectionArray->GetValue(0);
   return true;
@@ -143,41 +139,46 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   // Reduce data
-  vtkSMSourceProxy* reduceSelectionToClient = vtkSMSourceProxy::SafeDownCast(
-    proxyManager->NewProxy("filters", "ReductionFilter"));
+  vtkSMSourceProxy* reduceSelectionToClient =
+    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "ReductionFilter"));
   // set input
-  vtkSMInputProperty* inputProperty = vtkSMInputProperty::SafeDownCast(
-    reduceSelectionToClient->GetProperty("Input"));
+  vtkSMInputProperty* inputProperty =
+    vtkSMInputProperty::SafeDownCast(reduceSelectionToClient->GetProperty("Input"));
   inputProperty->RemoveAllProxies();
   inputProperty->AddInputConnection(source, sourceOutputPort);
   // set postGatherHelperName
   std::string postGatherHelperName;
-  if (source->GetDataInformation(sourceOutputPort)->GetCompositeDataInformation()->GetDataIsComposite())
-    {
+  if (source->GetDataInformation(sourceOutputPort)
+        ->GetCompositeDataInformation()
+        ->GetDataIsComposite())
+  {
     postGatherHelperName = "vtkMultiBlockDataGroupFilter";
-    }
-  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) == std::string("vtkPolyData"))
-    {
+  }
+  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) ==
+    std::string("vtkPolyData"))
+  {
     postGatherHelperName = "vtkAppendPolyData";
-    }
-  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) == std::string("vtkRectilinearGrid"))
-    {
+  }
+  else if (std::string(source->GetDataInformation(sourceOutputPort)->GetDataClassName()) ==
+    std::string("vtkRectilinearGrid"))
+  {
     postGatherHelperName = "vtkAppendRectilinearGrid";
-    }
+  }
   else
-    {
+  {
     postGatherHelperName = "vtkAppendFilter";
-    }
-  vtkSMPropertyHelper(reduceSelectionToClient, "PostGatherHelperName").Set(postGatherHelperName.c_str());
+  }
+  vtkSMPropertyHelper(reduceSelectionToClient, "PostGatherHelperName")
+    .Set(postGatherHelperName.c_str());
   reduceSelectionToClient->UpdateVTKObjects();
   reduceSelectionToClient->UpdatePipeline();
 
   // Move data to client
-  if(!this->MoveSelectionToClient)
-    {
-    this->MoveSelectionToClient = vtkSMSourceProxy::SafeDownCast(
-      proxyManager->NewProxy("filters", "ClientServerMoveData"));
-    }
+  if (!this->MoveSelectionToClient)
+  {
+    this->MoveSelectionToClient =
+      vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "ClientServerMoveData"));
+  }
 
   // set input, manually modifying VTK object so it is updated
   vtkSMPropertyHelper(this->MoveSelectionToClient, "Input").Set(reduceSelectionToClient, 0);
@@ -188,94 +189,92 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
   vtkPVDataInformation* info = reduceSelectionToClient->GetDataInformation(0);
   int dataType = info->GetDataSetType();
   if (info->GetCompositeDataSetType() > 0)
-    {
+  {
     dataType = info->GetCompositeDataSetType();
-    }
+  }
   vtkSMPropertyHelper(this->MoveSelectionToClient, "OutputDataType").Set(dataType);
 
   this->MoveSelectionToClient->UpdateVTKObjects();
   this->MoveSelectionToClient->UpdatePipeline();
-  return vtkAlgorithm::SafeDownCast(
-    this->MoveSelectionToClient->GetClientSideObject())->GetOutputDataObject(0);
+  return vtkAlgorithm::SafeDownCast(this->MoveSelectionToClient->GetClientSideObject())
+    ->GetOutputDataObject(0);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2],
-                                                   std::string& tooltipText)
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::string& tooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
-  unsigned int extractOutputPort =
-    extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
-  vtkDataObject* dataObject = this->ConnectPVMoveSelectionToClient(extractSource, extractOutputPort);
+  unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
+  vtkDataObject* dataObject =
+    this->ConnectPVMoveSelectionToClient(extractSource, extractOutputPort);
 
   bool compositeFound;
   std::string compositeName;
   vtkDataSet* ds = this->FindDataSet(dataObject, compositeFound, compositeName);
   if (!ds || ds->GetNumberOfPoints() != 1)
-    {
+  {
     return false;
-    }
+  }
 
   std::ostringstream tooltipTextStream;
 
   // name of the filter which generated the selected dataset
   if (this->PreviousRepresentation)
-    {
+  {
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
-    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
-      representationHelper.GetAsProxy());
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(representationHelper.GetAsProxy());
     vtkSMSessionProxyManager* proxyManager = source->GetSessionProxyManager();
     tooltipTextStream << proxyManager->GetProxyName("sources", source);
-    }
+  }
 
   // composite name
   if (compositeFound)
-    {
+  {
     tooltipTextStream << std::endl << "Block: " << compositeName;
-    }
+  }
 
   // point index
   vtkPointData* pointData = ds->GetPointData();
   vtkDataArray* originalPointIds = pointData->GetArray("vtkOriginalPointIds");
   if (originalPointIds)
-    {
+  {
     tooltipTextStream << std::endl << "Id: " << originalPointIds->GetTuple1(0);
-    }
+  }
 
   // point coords
   double point[3];
   ds->GetPoint(0, point);
   tooltipTextStream << std::endl
-    << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
+                    << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
 
   // point attributes
   vtkIdType nbArrays = pointData->GetNumberOfArrays();
   for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
-    {
+  {
     vtkDataArray* array = pointData->GetArray(i_arr);
     if (!array || originalPointIds == array)
-      {
+    {
       continue;
-      }
+    }
     tooltipTextStream << std::endl << array->GetName() << ": ";
     if (array->GetNumberOfComponents() > 1)
-      {
+    {
       tooltipTextStream << "(";
-      }
+    }
     vtkIdType nbComps = array->GetNumberOfComponents();
     for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
-      {
+    {
       tooltipTextStream << array->GetTuple(0)[i_comp];
       if (i_comp + 1 < nbComps)
-        {
-        tooltipTextStream << ", ";
-        }
-      }
-    if (array->GetNumberOfComponents() > 1)
       {
-      tooltipTextStream << ")";
+        tooltipTextStream << ", ";
       }
     }
+    if (array->GetNumberOfComponents() > 1)
+    {
+      tooltipTextStream << ")";
+    }
+  }
 
   // tooltip position
   double pos[3] = { point[0], point[1], point[2] };
@@ -299,23 +298,21 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2],
 bool vtkSMTooltipSelectionPipeline::CanDisplayTooltip(bool& showTooltip)
 {
   showTooltip = false;
-  if (!this->PreviousRepresentation
-   || !this->ExtractInteractiveSelection
-   || !this->PreviousView)
-    {
+  if (!this->PreviousRepresentation || !this->ExtractInteractiveSelection || !this->PreviousView)
+  {
     return false;
-    }
+  }
 
   if (!this->SelectionFound)
-    {
+  {
     showTooltip = false;
     return true;
-    }
+  }
 
   if (!this->TooltipEnabled)
-    {
+  {
     return false;
-    }
+  }
 
   showTooltip = true;
   return true;
@@ -326,26 +323,25 @@ vtkSMTooltipSelectionPipeline* vtkSMTooltipSelectionPipeline::GetInstance()
 {
   static vtkSmartPointer<vtkSMTooltipSelectionPipeline> Instance;
   if (Instance.GetPointer() == NULL)
-    {
-    vtkSMTooltipSelectionPipeline* pipeline =
-      vtkSMTooltipSelectionPipeline::New();
+  {
+    vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::New();
     Instance = pipeline;
     pipeline->FastDelete();
-    }
+  }
 
   return Instance;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTooltipSelectionPipeline::PrintSelf(ostream& os, vtkIndent indent )
+void vtkSMTooltipSelectionPipeline::PrintSelf(ostream& os, vtkIndent indent)
 {
   (void)os;
   (void)indent;
 }
 
 //----------------------------------------------------------------------------
-vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(vtkDataObject* dataObject,
-  bool& compositeFound, std::string& compositeName)
+vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(
+  vtkDataObject* dataObject, bool& compositeFound, std::string& compositeName)
 {
   vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObject);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dataObject);
@@ -353,33 +349,33 @@ vtkDataSet* vtkSMTooltipSelectionPipeline::FindDataSet(vtkDataObject* dataObject
   // handle composite case
   compositeFound = false;
   if (cd)
-    {
+  {
     vtkCompositeDataIterator* it = cd->NewIterator();
     it->SkipEmptyNodesOn();
     it->InitTraversal();
     while (!it->IsDoneWithTraversal())
-      {
+    {
       ds = vtkDataSet::SafeDownCast(it->GetCurrentDataObject());
       if (ds)
-        {
+      {
         compositeFound = true;
         std::stringstream ssname;
         ssname << it->GetCurrentFlatIndex() - 1;
         const char* name = it->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
         if (name)
-          {
+        {
           ssname << ": " << name;
-          }
+        }
         compositeName = ssname.str();
         break;
-        }
-      it->GoToNextItem();
       }
+      it->GoToNextItem();
+    }
     it->Delete();
     if (!compositeFound)
-      {
+    {
       return NULL;
-      }
     }
+  }
   return ds;
 }

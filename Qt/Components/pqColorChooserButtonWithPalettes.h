@@ -64,8 +64,9 @@ class PQCOMPONENTS_EXPORT pqColorChooserButtonWithPalettes : public pqColorChoos
 {
   Q_OBJECT
   typedef pqColorChooserButton Superclass;
+
 public:
-  pqColorChooserButtonWithPalettes(QWidget* parent=0);
+  pqColorChooserButtonWithPalettes(QWidget* parent = 0);
   virtual ~pqColorChooserButtonWithPalettes();
 
 private slots:
@@ -101,9 +102,10 @@ class PQCOMPONENTS_EXPORT pqColorPaletteLinkHelper : public QObject
 {
   Q_OBJECT;
   typedef QObject Superclass;
+
 public:
-  pqColorPaletteLinkHelper(pqColorChooserButtonWithPalettes* button,
-    vtkSMProxy* smproxy, const char* smproperty);
+  pqColorPaletteLinkHelper(
+    pqColorChooserButtonWithPalettes* button, vtkSMProxy* smproxy, const char* smproperty);
   virtual ~pqColorPaletteLinkHelper();
 
 private:

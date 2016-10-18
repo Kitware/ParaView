@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QtDebug>
 
-
 //-----------------------------------------------------------------------------
 pqColorButtonEventTranslator::pqColorButtonEventTranslator(QObject* parentObject)
   : Superclass(parentObject)
@@ -57,42 +56,39 @@ bool pqColorButtonEventTranslator::translateEvent(
 {
   // Capture events from pqColorChooserButton and all its children.
   if (qobject_cast<QMenu*>(object))
-    {
+  {
     // we don't want to capture events from the menu on the color chooser button.
     return false;
-    }
+  }
 
   pqColorChooserButton* color_button = 0;
   while (object && !color_button)
-    {
+  {
     color_button = qobject_cast<pqColorChooserButton*>(object);
     object = object->parent();
-    }
+  }
 
   if (!color_button)
-    {
+  {
     return false;
-    }
+  }
 
   if (tr_event->type() == QEvent::FocusIn)
-    {
+  {
     QObject::disconnect(color_button, 0, this, 0);
-    QObject::connect(color_button, SIGNAL(validColorChosen(const QColor&)),
-      this, SLOT(onColorChosen(const QColor&)));
-    }
+    QObject::connect(color_button, SIGNAL(validColorChosen(const QColor&)), this,
+      SLOT(onColorChosen(const QColor&)));
+  }
 
   return true;
 }
-
 
 //-----------------------------------------------------------------------------
 void pqColorButtonEventTranslator::onColorChosen(const QColor& color)
 {
   pqColorChooserButton* color_button = qobject_cast<pqColorChooserButton*>(this->sender());
 
-  QString colorvalue = QString("%1,%2,%3").arg(
-    color.red()).arg(color.green()).arg(color.blue());
+  QString colorvalue = QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue());
 
-  emit this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(),
-                         colorvalue);
+  emit this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(), colorvalue);
 }

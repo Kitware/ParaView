@@ -69,25 +69,21 @@ class PQCOMPONENTS_EXPORT pqSearchBox : public QWidget
   */
   Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
 
- /**
- * The advancedSearchActive allows the user to access/control the advanced
- * search button state depending on the current advancedSearchEnabled
- * property.
- * \sa advancedSearchEnabled property
- */
-  Q_PROPERTY(bool advancedSearchActive
-    READ isAdvancedSearchActive
-    WRITE setAdvancedSearchActive
-    NOTIFY advancedSearchActivated)
+  /**
+  * The advancedSearchActive allows the user to access/control the advanced
+  * search button state depending on the current advancedSearchEnabled
+  * property.
+  * \sa advancedSearchEnabled property
+  */
+  Q_PROPERTY(bool advancedSearchActive READ isAdvancedSearchActive WRITE setAdvancedSearchActive
+      NOTIFY advancedSearchActivated)
 
   /**
-  * This property governs whether the advanced search button is enabled 
+  * This property governs whether the advanced search button is enabled
   * and visible (enabled == visible).
   * By default the advanced search button is disabled/hidden.
   */
-  Q_PROPERTY(bool advancedSearchEnabled
-    READ isAdvancedSearchEnabled
-    WRITE setAdvancedSearchEnabled)
+  Q_PROPERTY(bool advancedSearchEnabled READ isAdvancedSearchEnabled WRITE setAdvancedSearchEnabled)
 
   /**
   * When the advanced search is enabled, the button can save/restore its
@@ -101,19 +97,13 @@ class PQCOMPONENTS_EXPORT pqSearchBox : public QWidget
   * By default the setting key is empty, meaning that the advanced button
   * state isn't saved in the settings;
   */
-  Q_PROPERTY(QString settingKey
-    READ settingKey
-    WRITE setSettingKey
-    NOTIFY settingKeyChanged)
+  Q_PROPERTY(QString settingKey READ settingKey WRITE setSettingKey NOTIFY settingKeyChanged)
 
 public:
   typedef QWidget Superclass;
 
-  pqSearchBox(QWidget *parent=0);
-  pqSearchBox(
-    bool advancedSearchEnabled,
-    const QString &settingKey = "",
-    QWidget *parent=0);
+  pqSearchBox(QWidget* parent = 0);
+  pqSearchBox(bool advancedSearchEnabled, const QString& settingKey = "", QWidget* parent = 0);
 
   virtual ~pqSearchBox();
 
@@ -166,13 +156,13 @@ signals:
   * Sent whenever the search text is changed.
   * \sa text property, QLineEdit
   */
-  void textChanged(const QString &);
+  void textChanged(const QString&);
 
   /**
   * Sent whenever the setting key was changed.
   * \sa settingKey property
   */
-  void settingKeyChanged(const QString &);
+  void settingKeyChanged(const QString&);
 
 public slots:
   /**
@@ -205,7 +195,7 @@ public slots:
   void setAdvancedSearchEnabled(bool enable);
 
 protected:
-  virtual void keyPressEvent(QKeyEvent *e);
+  virtual void keyPressEvent(QKeyEvent* e);
 
 protected slots:
   void onAdvancedButtonClicked(bool);

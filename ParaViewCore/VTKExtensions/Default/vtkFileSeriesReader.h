@@ -70,9 +70,7 @@ public:
    * updated the file name of the internal in RequestUpdateExtent based
    * on the time step request.
    */
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * CanReadFile is forwarded to the internal reader if it supports it.
@@ -125,22 +123,21 @@ protected:
   vtkFileSeriesReader();
   ~vtkFileSeriesReader();
 
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestUpdateTime (vtkInformation*,
-                                  vtkInformationVector**,
-                                 vtkInformationVector*) {return 1;};
-  virtual int RequestUpdateTimeDependentInformation (vtkInformation*,
-                                                     vtkInformationVector**,
-                                                     vtkInformationVector*) {return 1;};
-  virtual int RequestData(vtkInformation *request,
-                          vtkInformationVector **inputVector,
-                          vtkInformationVector *outputVector);
+  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  {
+    return 1;
+  };
+  virtual int RequestUpdateTimeDependentInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  {
+    return 1;
+  };
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
@@ -149,17 +146,14 @@ protected:
    * run RequestInformation on the reader.
    */
   virtual int RequestInformationForInput(
-                                     int index,
-                                     vtkInformation *request = NULL,
-                                     vtkInformationVector *outputVector = NULL);
+    int index, vtkInformation* request = NULL, vtkInformationVector* outputVector = NULL);
 
   /**
    * Reads a metadata file and returns a list of filenames (in filesToRead).  If
    * the file could not be read correctly, 0 is returned.
    */
-  virtual int ReadMetaDataFile(const char *metafilename,
-                               vtkStringArray *filesToRead,
-                               int maxFilesToRead = VTK_INT_MAX);
+  virtual int ReadMetaDataFile(
+    const char* metafilename, vtkStringArray* filesToRead, int maxFilesToRead = VTK_INT_MAX);
 
   /**
    * True if use a meta-file, false otherwise
@@ -183,6 +177,7 @@ protected:
   int IgnoreReaderTime;
 
   int ChooseInput(vtkInformation*);
+
 private:
   vtkFileSeriesReader(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;

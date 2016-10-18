@@ -54,10 +54,10 @@ protected:
   void UpdateFileNames();
 
   bool ReadAsImageStack;
+
 private:
   vtkImageFileSeriesReader(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

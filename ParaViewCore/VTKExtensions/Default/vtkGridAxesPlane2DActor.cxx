@@ -41,28 +41,28 @@ vtkGridAxesPlane2DActor* vtkGridAxesPlane2DActor::New(vtkGridAxesHelper* helper)
 }
 
 //----------------------------------------------------------------------------
-vtkGridAxesPlane2DActor::vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper) :
-  Face(vtkGridAxesPlane2DActor::MIN_YZ),
-  GenerateGrid(true),
-  GenerateEdges(true),
-  GenerateTicks(true),
-  TickDirection(vtkGridAxesPlane2DActor::TICK_DIRECTION_BOTH),
-  EnableLayerSupport(false),
-  Layer(0),
-  Helper(helper),
-  HelperManagedExternally(helper != NULL)
+vtkGridAxesPlane2DActor::vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper)
+  : Face(vtkGridAxesPlane2DActor::MIN_YZ)
+  , GenerateGrid(true)
+  , GenerateEdges(true)
+  , GenerateTicks(true)
+  , TickDirection(vtkGridAxesPlane2DActor::TICK_DIRECTION_BOTH)
+  , EnableLayerSupport(false)
+  , Layer(0)
+  , Helper(helper)
+  , HelperManagedExternally(helper != NULL)
 {
   if (helper == NULL)
-    {
+  {
     this->Helper = vtkSmartPointer<vtkGridAxesHelper>::New();
     this->GridBounds[0] = this->GridBounds[2] = this->GridBounds[4] = -1.0;
     this->GridBounds[1] = this->GridBounds[3] = this->GridBounds[5] = 1.0;
-    }
+  }
   else
-    {
+  {
     vtkMath::UninitializeBounds(this->GridBounds);
     // So we can warn if user changes the bounds when they are not being used.
-    }
+  }
 
   this->Mapper->SetInputDataObject(this->PolyData.GetPointer());
   this->Actor->SetMapper(this->Mapper.GetPointer());
@@ -78,10 +78,10 @@ vtkGridAxesPlane2DActor::~vtkGridAxesPlane2DActor()
 void vtkGridAxesPlane2DActor::SetProperty(vtkProperty* property)
 {
   if (this->GetProperty() != property)
-    {
+  {
     this->Actor->SetProperty(property);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -93,45 +93,44 @@ vtkProperty* vtkGridAxesPlane2DActor::GetProperty()
 //----------------------------------------------------------------------------
 void vtkGridAxesPlane2DActor::SetTickPositions(int index, vtkDoubleArray* data)
 {
-  assert(index >=0 && index < 3 && (data == NULL || data->GetNumberOfComponents() <= 1));
+  assert(index >= 0 && index < 3 && (data == NULL || data->GetNumberOfComponents() <= 1));
   if (data == NULL)
-    {
+  {
     if (this->TickPositions[index].size() != 0)
-      {
+    {
       this->TickPositions[index].clear();
       this->Modified();
-      }
     }
-  else if (
-    static_cast<vtkIdType>(this->TickPositions[index].size()) != data->GetNumberOfTuples() ||
+  }
+  else if (static_cast<vtkIdType>(this->TickPositions[index].size()) != data->GetNumberOfTuples() ||
     std::equal(data->GetPointer(0), data->GetPointer(0) + data->GetNumberOfTuples(),
       this->TickPositions[index].begin()) == false)
-    {
+  {
     this->TickPositions[index].resize(data->GetNumberOfTuples());
     std::copy(data->GetPointer(0), data->GetPointer(0) + data->GetNumberOfTuples(),
       this->TickPositions[index].begin());
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 bool vtkGridAxesPlane2DActor::IsLayerActive(vtkViewport* viewport)
 {
   if (this->EnableLayerSupport)
-    {
+  {
     vtkRenderer* ren = vtkRenderer::SafeDownCast(viewport);
     return (ren && ren->GetLayer() == this->Layer);
-    }
+  }
   return true;
 }
 
 //----------------------------------------------------------------------------
-int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport *viewport)
+int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
   if (!this->IsLayerActive(viewport))
-    {
+  {
     return 0;
-    }
+  }
 
   // Do tasks that need to be done when this->MTime changes.
   this->Update(viewport);
@@ -142,9 +141,9 @@ int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport *viewport)
 int vtkGridAxesPlane2DActor::RenderTranslucentPolygonalGeometry(vtkViewport* viewport)
 {
   if (!this->IsLayerActive(viewport))
-    {
+  {
     return 0;
-    }
+  }
   return this->Actor->RenderTranslucentPolygonalGeometry(viewport);
 }
 
@@ -152,9 +151,9 @@ int vtkGridAxesPlane2DActor::RenderTranslucentPolygonalGeometry(vtkViewport* vie
 int vtkGridAxesPlane2DActor::RenderOverlay(vtkViewport* viewport)
 {
   if (!this->IsLayerActive(viewport))
-    {
+  {
     return 0;
-    }
+  }
   return this->Actor->RenderOverlay(viewport);
 }
 
@@ -165,7 +164,7 @@ int vtkGridAxesPlane2DActor::HasTranslucentPolygonalGeometry()
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxesPlane2DActor::ReleaseGraphicsResources(vtkWindow *win)
+void vtkGridAxesPlane2DActor::ReleaseGraphicsResources(vtkWindow* win)
 {
   this->Actor->ReleaseGraphicsResources(win);
   this->Superclass::ReleaseGraphicsResources(win);
@@ -175,16 +174,16 @@ void vtkGridAxesPlane2DActor::ReleaseGraphicsResources(vtkWindow *win)
 void vtkGridAxesPlane2DActor::Update(vtkViewport* viewport)
 {
   if (this->HelperManagedExternally == false)
-    {
+  {
     this->Helper->SetGridBounds(this->GridBounds);
     this->Helper->SetFace(this->Face);
     this->Helper->SetMatrix(this->GetMatrix());
     this->Helper->UpdateForViewport(viewport);
-    }
+  }
   else
-    {
+  {
     assert(vtkMath::AreBoundsInitialized(this->GridBounds) == 0);
-    }
+  }
 
   this->PolyData->Initialize();
   this->LineSegments.clear();
@@ -194,22 +193,23 @@ void vtkGridAxesPlane2DActor::Update(vtkViewport* viewport)
   success = success && (this->GenerateGrid == false || this->UpdateGrid(viewport));
   success = success && (this->GenerateTicks == false || this->UpdateTicks(viewport));
   if (!success)
-    {
+  {
     return;
-    }
+  }
 
   this->PolyDataPoints->Allocate(this->LineSegments.size() * 2);
   this->PolyDataPoints->SetDataType(VTK_FLOAT);
-  this->PolyDataLines->Allocate(this->PolyDataLines->EstimateSize(
-      static_cast<vtkIdType>(this->LineSegments.size()), 2));
+  this->PolyDataLines->Allocate(
+    this->PolyDataLines->EstimateSize(static_cast<vtkIdType>(this->LineSegments.size()), 2));
   for (std::deque<LineSegmentType>::iterator iter = this->LineSegments.begin(),
-    max = this->LineSegments.end(); iter != max; ++iter)
-    {
+                                             max = this->LineSegments.end();
+       iter != max; ++iter)
+  {
     vtkIdType pids[2];
     pids[0] = this->PolyDataPoints->InsertNextPoint(iter->first.GetData());
     pids[1] = this->PolyDataPoints->InsertNextPoint(iter->second.GetData());
     this->PolyDataLines->InsertNextCell(2, pids);
-    }
+  }
   this->PolyData->SetPoints(this->PolyDataPoints.GetPointer());
   this->PolyData->SetLines(this->PolyDataLines.GetPointer());
   this->PolyDataPoints->Modified();
@@ -226,10 +226,9 @@ bool vtkGridAxesPlane2DActor::UpdateEdges(vtkViewport*)
   assert(this->GenerateEdges);
   const vtkTuple<vtkVector3d, 4>& gridPoints = this->Helper->GetPoints();
   for (int cc = 0; cc < 4; cc++)
-    {
-    this->LineSegments.push_back(
-      LineSegmentType(gridPoints[cc], gridPoints[(cc+1)%4]));
-    }
+  {
+    this->LineSegments.push_back(LineSegmentType(gridPoints[cc], gridPoints[(cc + 1) % 4]));
+  }
   return true;
 }
 
@@ -240,21 +239,21 @@ bool vtkGridAxesPlane2DActor::UpdateGrid(vtkViewport*)
   const vtkVector2i& activeAxes = this->Helper->GetActiveAxes();
   const vtkTuple<vtkVector3d, 4>& gridPoints = this->Helper->GetPoints();
 
-  for (int cc=0; cc < 2; cc++)
-    {
+  for (int cc = 0; cc < 2; cc++)
+  {
     vtkVector3d points[2];
     points[0] = gridPoints[0];
-    points[1] = gridPoints[cc==0? 3 : 1];
+    points[1] = gridPoints[cc == 0 ? 3 : 1];
 
     const std::deque<double>& tick_positions = this->TickPositions[activeAxes[cc]];
     for (std::deque<double>::const_iterator iter = tick_positions.begin();
-      iter != tick_positions.end(); ++iter)
-      {
+         iter != tick_positions.end(); ++iter)
+    {
       points[0][activeAxes[cc]] = *iter;
       points[1][activeAxes[cc]] = *iter;
       this->LineSegments.push_back(LineSegmentType(points[0], points[1]));
-      }
     }
+  }
   return true;
 }
 
@@ -273,8 +272,8 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
   double offsets[4];
   vtkNew<vtkCoordinate> coordinate;
 
-  for (int cc=0; cc < 4; cc++)
-    {
+  for (int cc = 0; cc < 4; cc++)
+  {
     vtkVector2d normal = viewportNormals[cc];
 
     coordinate->SetCoordinateSystemToViewport();
@@ -282,49 +281,53 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
     const double* value = coordinate->GetComputedWorldValue(viewport);
     vtkVector3d pw1(value);
 
-    vtkVector2d pt2 = viewportPoints[cc] + normal*10;
+    vtkVector2d pt2 = viewportPoints[cc] + normal * 10;
     coordinate->SetValue(pt2.GetX(), pt2.GetY());
     value = coordinate->GetComputedWorldValue(viewport);
     vtkVector3d pw2(value);
     offsets[cc] = (pw2 - pw1).Norm();
     // FIXME: make this better -- maybe use average?
-    }
+  }
 
-  for (int cc=0; cc < 4; cc++)
-    {
+  for (int cc = 0; cc < 4; cc++)
+  {
     if (this->Helper->GetLabelVisibilities()[cc] == false)
-      {
+    {
       continue;
-      }
+    }
 
     vtkVector3d points[2];
     points[0] = gridPoints[cc];
 
     // FIXME: this can be precomputed.
-    vtkVector3d direction = gridPoints[(cc+1)%4] - gridPoints[cc];
-    vtkVector3d next = gridPoints[(cc+2)%4] - gridPoints[(cc+1)%4];
+    vtkVector3d direction = gridPoints[(cc + 1) % 4] - gridPoints[cc];
+    vtkVector3d next = gridPoints[(cc + 2) % 4] - gridPoints[(cc + 1) % 4];
     vtkVector3d normal = direction.Cross(direction.Cross(next)).Normalized();
 
     double n[] = { normal[0], normal[1], normal[2], 0.0 };
     inverted->MultiplyPoint(n, n);
-    normal[0] = n[0];  normal[1] = n[1];  normal[2] = n[2];
+    normal[0] = n[0];
+    normal[1] = n[1];
+    normal[2] = n[2];
 
     // We need to compute the length of the tick.
-    points[1] = ((this->TickDirection & TICK_DIRECTION_OUTWARDS) != 0)?
-      points[0] + normal*offsets[cc]  : points[0];
+    points[1] = ((this->TickDirection & TICK_DIRECTION_OUTWARDS) != 0)
+      ? points[0] + normal * offsets[cc]
+      : points[0];
 
-    points[0] = ((this->TickDirection & TICK_DIRECTION_INWARDS) != 0)?
-      points[0] - normal*offsets[cc] : points[0];
+    points[0] = ((this->TickDirection & TICK_DIRECTION_INWARDS) != 0)
+      ? points[0] - normal * offsets[cc]
+      : points[0];
 
-    const std::deque<double>& tick_positions = this->TickPositions[activeAxes[cc%2]];
+    const std::deque<double>& tick_positions = this->TickPositions[activeAxes[cc % 2]];
     for (std::deque<double>::const_iterator iter = tick_positions.begin();
-      iter != tick_positions.end(); ++iter)
-      {
-      points[0][activeAxes[cc%2]] = *iter;
-      points[1][activeAxes[cc%2]] = *iter;
+         iter != tick_positions.end(); ++iter)
+    {
+      points[0][activeAxes[cc % 2]] = *iter;
+      points[1][activeAxes[cc % 2]] = *iter;
       this->LineSegments.push_back(LineSegmentType(points[0], points[1]));
-      }
     }
+  }
 
   return true;
 }

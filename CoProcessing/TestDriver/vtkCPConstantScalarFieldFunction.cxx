@@ -30,14 +30,13 @@ vtkCPConstantScalarFieldFunction::~vtkCPConstantScalarFieldFunction()
 }
 
 //----------------------------------------------------------------------------
-double vtkCPConstantScalarFieldFunction::ComputeComponenentAtPoint(
-  unsigned int component, double* vtkNotUsed(point),
-  unsigned long vtkNotUsed(timeStep), double vtkNotUsed(time))
+double vtkCPConstantScalarFieldFunction::ComputeComponenentAtPoint(unsigned int component,
+  double* vtkNotUsed(point), unsigned long vtkNotUsed(timeStep), double vtkNotUsed(time))
 {
-  if(component != 0)
-    {
+  if (component != 0)
+  {
     vtkWarningMacro("Bad component value");
-    }
+  }
   return this->Constant;
 }
 

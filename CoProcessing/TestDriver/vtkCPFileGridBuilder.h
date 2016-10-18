@@ -16,7 +16,7 @@
  * @class   vtkCPFileGridBuilder
  * @brief   Class for creating grids from a VTK file.
  *
- * Class for creating grids from a VTK file.  
+ * Class for creating grids from a VTK file.
 */
 
 #ifndef vtkCPFileGridBuilder_h
@@ -39,8 +39,7 @@ public:
    * that were returned were already built before.
    * vtkCPFileGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
-                                 int & builtNewGrid);
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid);
 
   //@{
   /**
@@ -88,7 +87,7 @@ private:
   /**
    * The name of the VTK file to be read.
    */
-  char * FileName;
+  char* FileName;
 
   /**
    * Flag to indicate that any vtkPointData arrays that are set by the
@@ -108,6 +107,6 @@ private:
    */
   vtkDataObject* Grid;
 };
-  //@}
+//@}
 
 #endif

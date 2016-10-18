@@ -55,7 +55,7 @@ public:
   /**
    * Returns if the animation is currently playing.
    */
-  int IsInPlay() { return this->InPlay? 1 : 0; }
+  int IsInPlay() { return this->InPlay ? 1 : 0; }
   vtkGetMacro(InPlay, bool);
 
   //@{
@@ -92,16 +92,17 @@ protected:
 
   friend class vtkCompositeAnimationPlayer;
 
-  virtual void StartLoop(double starttime, double endtime, double* playbackWindow)=0;
-  virtual void EndLoop()=0;
+  virtual void StartLoop(double starttime, double endtime, double* playbackWindow) = 0;
+  virtual void EndLoop() = 0;
 
   /**
    * Return the next time given the current time.
    */
   virtual double GetNextTime(double currentime) = 0;
 
-  virtual double GoToNext(double start, double end, double currenttime)=0;
-  virtual double GoToPrevious(double start, double end, double currenttime)=0;
+  virtual double GoToNext(double start, double end, double currenttime) = 0;
+  virtual double GoToPrevious(double start, double end, double currenttime) = 0;
+
 private:
   vtkAnimationPlayer(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
@@ -111,7 +112,6 @@ private:
   bool StopPlay;
   bool Loop;
   double CurrentTime;
-
 };
 
 #endif

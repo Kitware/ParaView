@@ -44,16 +44,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum ProcessTypes
-    {
-    PROCESS_CLIENT, /* Capable of connecting to remote server or self.
-               Cannot run in Parallel */
-    PROCESS_SERVER, /* data-server+render-server */
-    PROCESS_DATA_SERVER, /* data-server */
+  {
+    PROCESS_CLIENT,        /* Capable of connecting to remote server or self.
+                      Cannot run in Parallel */
+    PROCESS_SERVER,        /* data-server+render-server */
+    PROCESS_DATA_SERVER,   /* data-server */
     PROCESS_RENDER_SERVER, /* render-server */
-    PROCESS_BATCH, /* Capable of running in parallel with root node acting as client.
-              Cannot connect to remote server */
-    PROCESS_INVALID=-1,
-    };
+    PROCESS_BATCH,         /* Capable of running in parallel with root node acting as client.
+                      Cannot connect to remote server */
+    PROCESS_INVALID = -1,
+  };
 
   /**
    * These flags are used to specify destination servers for the
@@ -63,7 +63,7 @@ public:
    * case.
    */
   enum ServerFlags
-    {
+  {
     DATA_SERVER = 0x01,
     DATA_SERVER_ROOT = 0x02,
     RENDER_SERVER = 0x04,
@@ -71,11 +71,13 @@ public:
     SERVERS = DATA_SERVER | RENDER_SERVER,
     CLIENT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
-    };
+  };
 
   static ProcessTypes GetProcessType();
   static unsigned int GetProcessTypeAsInt()
-    { return static_cast<int>(vtkProcessModule::GetProcessType()); }
+  {
+    return static_cast<int>(vtkProcessModule::GetProcessType());
+  }
 
   /**
    * This method has been added to support migration from one type to another
@@ -95,7 +97,7 @@ public:
    * Initializes the ProcessModule.
    * for the process and setup some environment e.g. DISPLAY.
    */
-  static bool Initialize(ProcessTypes type, int& argc, char** &argv);
+  static bool Initialize(ProcessTypes type, int& argc, char**& argv);
 
   /**
    * Finalizes and cleans up the process.
@@ -198,7 +200,6 @@ public:
   void SetOptions(vtkPVOptions* op);
   //@}
 
-
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
 
   //@{
@@ -256,17 +257,11 @@ public:
   /**
    * The full path to the current executable that is running (or empty if unknown).
    */
-  std::string GetProgramPath() const
-  {
-    return this->ProgramPath;
-  }
+  std::string GetProgramPath() const { return this->ProgramPath; }
   /**
    * The directory containing the current executable (or empty if unknown).
    */
-  std::string GetSelfDir() const
-  {
-    return this->SelfDir;
-  }
+  std::string GetSelfDir() const { return this->SelfDir; }
 
 protected:
   vtkProcessModule();
@@ -311,6 +306,7 @@ protected:
   friend class vtkSessionIterator;
 
   bool ReportInterpreterErrors;
+
 private:
   vtkProcessModule(const vtkProcessModule&) VTK_DELETE_FUNCTION;
   void operator=(const vtkProcessModule&) VTK_DELETE_FUNCTION;
@@ -342,7 +338,6 @@ private:
 
   std::string ProgramPath;
   std::string SelfDir;
-
 };
 
-#endif //vtkProcessModule_h
+#endif // vtkProcessModule_h

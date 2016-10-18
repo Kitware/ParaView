@@ -30,11 +30,9 @@ void coprocessorfinalize()
 
 // this is the function that determines whether or not there
 // is anything to coprocess this time step
-void requestdatadescription(int* timeStep, double* time,
-  int* coprocessThisTimeStep)
+void requestdatadescription(int* timeStep, double* time, int* coprocessThisTimeStep)
 {
-  vtkCPAdaptorAPI::RequestDataDescription(
-    timeStep, time, coprocessThisTimeStep);
+  vtkCPAdaptorAPI::RequestDataDescription(timeStep, time, coprocessThisTimeStep);
 }
 
 // this function sets needgrid to 1 if it does not have a copy of the grid

@@ -39,12 +39,11 @@ class vtkMultiBlockDataSet;
 class vtkDataSetTriangleFilter;
 class vtkExtractBlock;
 
-
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkVolumeRepresentationPreprocessor :
-  public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkVolumeRepresentationPreprocessor
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkVolumeRepresentationPreprocessor *New();
+  static vtkVolumeRepresentationPreprocessor* New();
   vtkTypeMacro(vtkVolumeRepresentationPreprocessor, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -67,30 +66,25 @@ public:
   //@}
 
 protected:
-
   vtkVolumeRepresentationPreprocessor();
   ~vtkVolumeRepresentationPreprocessor();
 
-  vtkUnstructuredGrid *TriangulateDataSet(vtkDataSet *);
-  vtkDataSet *MultiBlockToDataSet(vtkMultiBlockDataSet *);
+  vtkUnstructuredGrid* TriangulateDataSet(vtkDataSet*);
+  vtkDataSet* MultiBlockToDataSet(vtkMultiBlockDataSet*);
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   int TetrahedraOnly;
   int ExtractedBlockIndex;
 
-  vtkDataSetTriangleFilter *DataSetTriangleFilter;
-  vtkExtractBlock *ExtractBlockFilter;
+  vtkDataSetTriangleFilter* DataSetTriangleFilter;
+  vtkExtractBlock* ExtractBlockFilter;
 
 private:
-
-  vtkVolumeRepresentationPreprocessor(const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
+  vtkVolumeRepresentationPreprocessor(
+    const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
 };
 
-
-
 #endif
-
-

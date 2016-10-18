@@ -61,8 +61,9 @@ class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
   Q_OBJECT
   Q_PROPERTY(int panelMode READ panelMode WRITE setPanelMode);
   typedef QWidget Superclass;
+
 public:
-  pqPropertiesPanel(QWidget *parent = 0);
+  pqPropertiesPanel(QWidget* parent = 0);
   virtual ~pqPropertiesPanel();
 
   /**
@@ -99,12 +100,12 @@ public:
   static int suggestedVerticalSpacing() { return 4; }
 
   enum
-    {
-    SOURCE_PROPERTIES=0x01,
-    DISPLAY_PROPERTIES=0x02,
-    VIEW_PROPERTIES=0x04,
-    ALL_PROPERTIES=SOURCE_PROPERTIES|DISPLAY_PROPERTIES|VIEW_PROPERTIES
-    };
+  {
+    SOURCE_PROPERTIES = 0x01,
+    DISPLAY_PROPERTIES = 0x02,
+    VIEW_PROPERTIES = 0x04,
+    ALL_PROPERTIES = SOURCE_PROPERTIES | DISPLAY_PROPERTIES | VIEW_PROPERTIES
+  };
 
   /**
   * Get/Set the panel mode.
@@ -192,21 +193,21 @@ public slots:
 
   /**
   * Set the view currently managed by the
-  * panel, should be called automatically 
+  * panel, should be called automatically
   * when the active view changes.
   */
   void setView(pqView*);
 
   /**
   * Set the output port currently managed by the
-  * panel, should be called automatically 
+  * panel, should be called automatically
   * when the active output port changes.
   */
   void setOutputPort(pqOutputPort*);
 
   /**
   * Set the representation currently managed by the
-  * panel, should be called automatically 
+  * panel, should be called automatically
   * when the active representation changes.
   */
   void setRepresentation(pqDataRepresentation*);
@@ -229,7 +230,7 @@ signals:
   /**
   * This signal is emitted when the user clicks the help button.
   */
-  void helpRequested(const QString &groupname, const QString &proxyType);
+  void helpRequested(const QString& groupname, const QString& proxyType);
 
   /**
   * This signal is emitted when the user clicks the delete button.
@@ -268,9 +269,8 @@ private slots:
   /**
   * Called when a property on the current proxy changes.
   */
-  void sourcePropertyChanged(bool change_finished=true);
-  void sourcePropertyChangeAvailable()
-    { this->sourcePropertyChanged(false); }
+  void sourcePropertyChanged(bool change_finished = true);
+  void sourcePropertyChangeAvailable() { this->sourcePropertyChanged(false); }
 
   /**
   * Updates the state of all the buttons, apply/reset/delete.
@@ -299,7 +299,7 @@ private slots:
 protected:
   void updatePropertiesPanel(pqPipelineSource* source);
   void updateDisplayPanel(pqDataRepresentation* repr);
-  void updateViewPanel (pqView* view);
+  void updateViewPanel(pqView* view);
 
 private:
   static bool AutoApply;

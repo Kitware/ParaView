@@ -63,13 +63,13 @@ vtkSMOutputPort::~vtkSMOutputPort()
 vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 {
   if (!this->DataInformationValid)
-    {
+  {
     std::ostringstream mystr;
     mystr << this->GetSourceProxy()->GetXMLName() << "::GatherInformation";
     vtkTimerLog::MarkStartEvent(mystr.str().c_str());
     this->GatherDataInformation();
     vtkTimerLog::MarkEndEvent(mystr.str().c_str());
-    }
+  }
   return this->DataInformation;
 }
 
@@ -77,19 +77,19 @@ vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalDataInformation()
 {
   if (!this->TemporalDataInformationValid)
-    {
+  {
     this->GatherTemporalDataInformation();
-    }
+  }
   return this->TemporalDataInformation;
 }
 
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 {
-  if(this->ClassNameInformationValid == 0)
-    {
+  if (this->ClassNameInformationValid == 0)
+  {
     this->GatherClassNameInformation();
-    }
+  }
   return this->ClassNameInformation;
 }
 
@@ -111,10 +111,10 @@ void vtkSMOutputPort::InvalidateDataInformation()
 void vtkSMOutputPort::GatherDataInformation()
 {
   if (!this->SourceProxy)
-    {
+  {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;
-    }
+  }
 
   this->SourceProxy->GetSession()->PrepareProgress();
   this->DataInformation->Initialize();
@@ -128,10 +128,10 @@ void vtkSMOutputPort::GatherDataInformation()
 void vtkSMOutputPort::GatherTemporalDataInformation()
 {
   if (!this->SourceProxy)
-    {
+  {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;
-    }
+  }
 
   this->SourceProxy->GetSession()->PrepareProgress();
   this->TemporalDataInformation->Initialize();
@@ -146,24 +146,22 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
 void vtkSMOutputPort::GatherClassNameInformation()
 {
   if (!this->SourceProxy)
-    {
+  {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;
-    }
-
+  }
 
   this->ClassNameInformation->SetPortNumber(this->PortIndex);
   vtkObjectBase* cso = this->SourceProxy->GetClientSideObject();
   if (cso)
-    {
+  {
     this->ClassNameInformation->CopyFromObject(
-      vtkAlgorithm::SafeDownCast(cso)->GetOutputDataObject(
-        this->PortIndex));
-    }
+      vtkAlgorithm::SafeDownCast(cso)->GetOutputDataObject(this->PortIndex));
+  }
   else
-    {
+  {
     this->SourceProxy->GatherInformation(this->ClassNameInformation);
-    }
+  }
   this->ClassNameInformationValid = 1;
 }
 
@@ -180,16 +178,12 @@ void vtkSMOutputPort::UpdatePipeline(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMOutputPort::UpdatePipelineInternal(double time,
-                                             bool doTime)
+void vtkSMOutputPort::UpdatePipelineInternal(double time, bool doTime)
 {
   this->SourceProxy->GetSession()->PrepareProgress();
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << SIPROXY(this->SourceProxy)
-         << "UpdatePipeline"
-         << this->PortIndex << time << (doTime? 1 : 0)
-         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << SIPROXY(this->SourceProxy) << "UpdatePipeline"
+         << this->PortIndex << time << (doTime ? 1 : 0) << vtkClientServerStream::End;
   this->SourceProxy->ExecuteStream(stream);
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
@@ -197,7 +191,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "PortIndex: " << this->PortIndex << endl;
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }
@@ -205,8 +199,8 @@ void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkSMSourceProxy* vtkSMOutputPort::GetSourceProxy()
 {
-  return this->CompoundSourceProxy?
-    this->CompoundSourceProxy.GetPointer() : this->SourceProxy.GetPointer();
+  return this->CompoundSourceProxy ? this->CompoundSourceProxy.GetPointer()
+                                   : this->SourceProxy.GetPointer();
 }
 
 //----------------------------------------------------------------------------

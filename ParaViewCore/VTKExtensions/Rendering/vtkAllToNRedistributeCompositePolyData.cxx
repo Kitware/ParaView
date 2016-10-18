@@ -25,8 +25,7 @@
 #include "vtkPolyData.h"
 
 vtkStandardNewMacro(vtkAllToNRedistributeCompositePolyData);
-vtkCxxSetObjectMacro(vtkAllToNRedistributeCompositePolyData, Controller,
-  vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkAllToNRedistributeCompositePolyData, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkAllToNRedistributeCompositePolyData::vtkAllToNRedistributeCompositePolyData()
 {
@@ -56,42 +55,41 @@ vtkExecutive* vtkAllToNRedistributeCompositePolyData::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-int vtkAllToNRedistributeCompositePolyData::RequestDataObject(vtkInformation*,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkAllToNRedistributeCompositePolyData::RequestDataObject(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkDataObject *input = vtkDataObject::GetData(inputVector[0], 0);
-  vtkDataObject *output = vtkDataSet::GetData(outputVector, 0);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* output = vtkDataSet::GetData(outputVector, 0);
 
   if (input)
-    {
+  {
     // If input is composite-data, then output is multi-block of polydata,
     // otherwise it's a poly data.
     if (vtkCompositeDataSet::SafeDownCast(input))
-      {
+    {
       // Some developers have sub-classed vtkMultiBlockDataSet, in which
       // case, we try to preserve the type.
       output = input->NewInstance();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
       output->FastDelete();
       return 1;
-      }
+    }
 
     if (vtkPolyData::SafeDownCast(output) == NULL)
-      {
+    {
       output = vtkPolyData::New();
       outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
       output->FastDelete();
-      }
-    return 1;
     }
+    return 1;
+  }
 
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkAllToNRedistributeCompositePolyData::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
@@ -99,7 +97,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
   vtkCompositeDataSet* cdInput = vtkCompositeDataSet::SafeDownCast(input);
   vtkCompositeDataSet* cdOutput = vtkCompositeDataSet::SafeDownCast(output);
   if (!cdInput)
-    {
+  {
     vtkPolyData* inputCopy = vtkPolyData::New();
     inputCopy->ShallowCopy(input);
     vtkAllToNRedistributePolyData* allToN = vtkAllToNRedistributePolyData::New();
@@ -111,7 +109,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
     inputCopy->Delete();
     allToN->Delete();
     return 1;
-    }
+  }
 
   cdOutput->CopyStructure(cdInput);
 
@@ -122,24 +120,22 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
   // This assumes that the vtkPVGeometryFilter has ensured that all processes
   // have the same non-null leaf nodes.
   vtkCompositeDataIterator* iter = cdInput->NewIterator();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-    iter->GoToNextItem())
-    {
-    vtkPolyData* pdInput =
-      vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  {
+    vtkPolyData* pdInput = vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());
     if (pdInput)
-      {
+    {
       vtkPolyData* pdOutput = vtkPolyData::New();
       cdOutput->SetDataSet(iter, pdOutput);
       pdOutput->FastDelete();
 
       allToN->SetInputData(pdInput);
-      allToN->Modified(); //essential to force modification just in case the two
-          // blocks are the same polydata instance on any one of the processes.
+      allToN->Modified(); // essential to force modification just in case the two
+      // blocks are the same polydata instance on any one of the processes.
       allToN->Update();
       pdOutput->ShallowCopy(allToN->GetOutput());
-      }
     }
+  }
 
   allToN->Delete();
   iter->Delete();

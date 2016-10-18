@@ -58,7 +58,7 @@ public:
   void AddCue(vtkAnimationCue* cue);
   void RemoveCue(vtkAnimationCue* cue);
   void RemoveAllCues();
-  int  GetNumberOfCues();
+  int GetNumberOfCues();
   //@}
 
   //@{
@@ -114,15 +114,15 @@ public:
    * Sets the current animation time.
    */
   void SetSceneTime(double time)
-    {
+  {
     if (this->InTick)
-      {
+    {
       // Since this method can be called during a Tick() event handler.
       return;
-      }
+    }
     this->Initialize();
     this->Tick(time, 0, time);
-    }
+  }
   //@}
 
   // Get the time of the most recent tick.
@@ -166,12 +166,12 @@ public:
   //@}
 
   enum
-    {
+  {
     // Fired whenever the vtkAnimationScene wants to request the
     // vtkSMAnimationSceneProxy to update the start/end times.
     // The calldata is a vtkVector2d with the suggested time-range.
     UpdateStartEndTimesEvent = vtkCommand::UserEvent
-    };
+  };
 
   //@{
   /**
@@ -193,8 +193,7 @@ protected:
    * correctly.
    */
   virtual void StartCueInternal();
-  virtual void TickInternal(
-    double currenttime, double deltatime, double clocktime);
+  virtual void TickInternal(double currenttime, double deltatime, double clocktime);
   virtual void EndCueInternal();
   //@}
 
@@ -219,6 +218,7 @@ protected:
   friend class vtkSMAnimationSceneImageWriter;
   bool OverrideStillRender;
   vtkSetMacro(OverrideStillRender, bool);
+
 private:
   vtkSMAnimationScene(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
@@ -227,7 +227,6 @@ private:
   vtkInternals* Internals;
   unsigned long TimeRangeObserverID;
   unsigned long TimestepValuesObserverID;
-
 };
 
 #endif

@@ -52,13 +52,11 @@ protected:
   ~vtkSMArrayRangeDomain();
 
   void Update(
-    const char* arrayName, int fieldAssociation,
-    vtkSMSourceProxy* producer, int producerPort);
+    const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer, int producerPort);
 
   friend class vtkSMBoundsDomain;
 
 private:
-
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
 };

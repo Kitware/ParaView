@@ -92,12 +92,8 @@ protected:
   * \c server:- server on which the proxy is created.
   * \c parent:- QObject parent.
   */
-  pqComparativeContextView(const QString& type,
-    const QString& group,
-    const QString& name,
-    vtkSMComparativeViewProxy* view,
-    pqServer* server,
-    QObject* parent=NULL);
+  pqComparativeContextView(const QString& type, const QString& group, const QString& name,
+    vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent = NULL);
 
   QPointer<QWidget> Widget;
 

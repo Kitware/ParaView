@@ -23,9 +23,9 @@
  * if MIN is requested, it finds the minimum values in all of its input data
  * arrays. If this filter has multiple input data sets attached to its
  * first input port, it will run the operation on each input data set in
- * turn, producing a global minimum value over all the inputs. In parallel 
- * runs this filter REQUIRES ghost arrays to skip redundant 
- * information. The output of this filter will always be a single vtkPolyData 
+ * turn, producing a global minimum value over all the inputs. In parallel
+ * runs this filter REQUIRES ghost arrays to skip redundant
+ * information. The output of this filter will always be a single vtkPolyData
  * that contains exactly one point and one cell (a VTK_VERTEX).
 */
 
@@ -52,15 +52,15 @@ public:
    */
 
   enum Operations
-    {
-      MIN = 0,
-      MAX = 1,
-      SUM = 2
-    };
+  {
+    MIN = 0,
+    MAX = 1,
+    SUM = 2
+  };
 
   vtkSetClampMacro(Operation, int, MIN, SUM);
   vtkGetMacro(Operation, int);
-  void SetOperation(const char *op);
+  void SetOperation(const char* op);
 
   //@{
   /**
@@ -80,45 +80,43 @@ public:
   void FlagsForCells();
   //@}
 
-  //temp for debugging
-  const char *Name;
+  // temp for debugging
+  const char* Name;
   vtkIdType Idx;
 
 protected:
   vtkMinMax();
   ~vtkMinMax();
 
-  //overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  // overridden to allow multiple inputs to port 0
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  //run the algorithm
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  // run the algorithm
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  //helper methods to break up the work
-  void OperateOnField(vtkFieldData *id, vtkFieldData *od);
-  void OperateOnArray(vtkAbstractArray *ia, vtkAbstractArray *oa);
+  // helper methods to break up the work
+  void OperateOnField(vtkFieldData* id, vtkFieldData* od);
+  void OperateOnArray(vtkAbstractArray* ia, vtkAbstractArray* oa);
 
-  //choice of operation to perform
+  // choice of operation to perform
   int Operation;
 
-  //for keeping track of data initialization on the first value
+  // for keeping track of data initialization on the first value
   int ComponentIdx;
-  char *CFirstPass;
-  char *PFirstPass;
-  char *FirstPasses;
+  char* CFirstPass;
+  char* PFirstPass;
+  char* FirstPasses;
 
-  //for deciding what cells and points to ignore
-  vtkUnsignedCharArray *GhostArray;
+  // for deciding what cells and points to ignore
+  vtkUnsignedCharArray* GhostArray;
 
-  //a flag that indicates if values computed could be inaccurate
+  // a flag that indicates if values computed could be inaccurate
   int MismatchOccurred;
 
 private:
   vtkMinMax(const vtkMinMax&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMinMax&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

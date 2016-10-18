@@ -42,9 +42,9 @@
 
 vtkStandardNewMacro(vtkPointSpriteDefaultPainter)
 
-vtkCxxSetObjectMacro(vtkPointSpriteDefaultPainter, DepthSortPainter, vtkDepthSortPainter)
+  vtkCxxSetObjectMacro(vtkPointSpriteDefaultPainter, DepthSortPainter, vtkDepthSortPainter)
 
-vtkPointSpriteDefaultPainter::vtkPointSpriteDefaultPainter()
+    vtkPointSpriteDefaultPainter::vtkPointSpriteDefaultPainter()
 {
   this->DepthSortPainter = vtkDepthSortPainter::New();
 
@@ -54,8 +54,10 @@ vtkPointSpriteDefaultPainter::vtkPointSpriteDefaultPainter()
   this->SetScalarsToColorsPainter(twoScalarsToColorsPainter);
   twoScalarsToColorsPainter->Delete();
 
-  // create a vtkPointSpriteCoincidentTopologyResolutionPainter instead of the usual vtkOpenGLCoincidentTopologyResolutionPainter
-  vtkPointSpriteCoincidentTopologyResolutionPainter* topologyPainter = vtkPointSpriteCoincidentTopologyResolutionPainter::New();
+  // create a vtkPointSpriteCoincidentTopologyResolutionPainter instead of the usual
+  // vtkOpenGLCoincidentTopologyResolutionPainter
+  vtkPointSpriteCoincidentTopologyResolutionPainter* topologyPainter =
+    vtkPointSpriteCoincidentTopologyResolutionPainter::New();
   this->SetCoincidentTopologyResolutionPainter(topologyPainter);
   topologyPainter->Delete();
 }
@@ -72,21 +74,19 @@ void vtkPointSpriteDefaultPainter::BuildPainterChain()
 
   // insert the point sprite painter chain :
   // ScalarsToColorsPainter -> DepthSortPainter -> ...
-  this->DepthSortPainter->SetDelegatePainter( this->ScalarsToColorsPainter->GetDelegatePainter());
-  this->ScalarsToColorsPainter->SetDelegatePainter( this->DepthSortPainter);
+  this->DepthSortPainter->SetDelegatePainter(this->ScalarsToColorsPainter->GetDelegatePainter());
+  this->ScalarsToColorsPainter->SetDelegatePainter(this->DepthSortPainter);
 }
 
-void vtkPointSpriteDefaultPainter::ReportReferences(vtkGarbageCollector *collector)
+void vtkPointSpriteDefaultPainter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
 
-  vtkGarbageCollectorReport(collector, this->DepthSortPainter,
-      "DepthSortPainter");
+  vtkGarbageCollectorReport(collector, this->DepthSortPainter, "DepthSortPainter");
 }
 
 void vtkPointSpriteDefaultPainter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DepthSortPainter: "
-      << this->DepthSortPainter << endl;
+  os << indent << "DepthSortPainter: " << this->DepthSortPainter << endl;
 }

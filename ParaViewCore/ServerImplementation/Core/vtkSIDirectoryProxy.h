@@ -52,7 +52,6 @@ protected:
 private:
   vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

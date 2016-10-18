@@ -23,7 +23,6 @@
 
 #include <map>
 
-
 #include "vtkProcessModule.h"
 //#define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
@@ -62,65 +61,61 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVHardwareSelector::SetSynchronizedWindows(
-  vtkPVSynchronizedRenderWindows* sw)
+void vtkPVHardwareSelector::SetSynchronizedWindows(vtkPVSynchronizedRenderWindows* sw)
 {
   if (this->SynchronizedWindows != sw)
-    {
+  {
     this->SynchronizedWindows = sw;
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
   if (pass == MIN_KNOWN_PASS + 1)
-    {
+  {
     // synchronize the MaxAttributeId among all active processes (BUG #141112).
     if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
-      {
-      this->SynchronizedWindows->Reduce(this->MaxAttributeId,
-        vtkPVSynchronizedRenderWindows::MAX_OP);
-      }
+    {
+      this->SynchronizedWindows->Reduce(
+        this->MaxAttributeId, vtkPVSynchronizedRenderWindows::MAX_OP);
     }
-  return (pass == PROCESS_PASS?  true : this->Superclass::PassRequired(pass));
+  }
+  return (pass == PROCESS_PASS ? true : this->Superclass::PassRequired(pass));
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PrepareSelect()
 {
   if (this->NeedToRenderForSelection())
-    {
+  {
     int* size = this->Renderer->GetSize();
     int* origin = this->Renderer->GetOrigin();
-    this->SetArea(origin[0], origin[1], origin[0]+size[0]-1,
-      origin[1]+size[1]-1);
+    this->SetArea(origin[0], origin[1], origin[0] + size[0] - 1, origin[1] + size[1] - 1);
     if (this->CaptureBuffers() == false)
-      {
+    {
       this->CaptureTime.Modified();
       return false;
-      }
-    this->CaptureTime.Modified();
     }
+    this->CaptureTime.Modified();
+  }
   return true;
 }
 
 //----------------------------------------------------------------------------
 vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 {
-  if(!this->PrepareSelect())
-    {
+  if (!this->PrepareSelect())
+  {
     return NULL;
-    }
+  }
 
   vtkSelection* sel = this->GenerateSelection(region[0], region[1], region[2], region[3]);
   if (sel->GetNumberOfNodes() == 0 &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
-    region[0] == region[2] &&
-    region[1] == region[3] &&
-    vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius() > 0)
-    {
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS && region[0] == region[2] &&
+    region[1] == region[3] && vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius() > 0)
+  {
     unsigned int pos[2];
     pos[0] = static_cast<unsigned int>(region[0]);
     pos[1] = static_cast<unsigned int>(region[1]);
@@ -129,22 +124,21 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
     vtkHardwareSelector::PixelInformation info = this->GetPixelInformation(
       pos, vtkPVRenderViewSettings::GetInstance()->GetPointPickingRadius(), out_pos);
     if (info.Valid)
-      {
+    {
       sel->Delete();
       return this->GenerateSelection(out_pos[0], out_pos[1], out_pos[0], out_pos[1]);
-      }
     }
+  }
   return sel;
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVHardwareSelector::PolygonSelect(
-  int* polygonPoints, vtkIdType count)
+vtkSelection* vtkPVHardwareSelector::PolygonSelect(int* polygonPoints, vtkIdType count)
 {
-  if(!this->PrepareSelect())
-    {
+  if (!this->PrepareSelect())
+  {
     return NULL;
-    }
+  }
   return this->GeneratePolygonSelection(polygonPoints, count);
 }
 
@@ -170,8 +164,7 @@ int vtkPVHardwareSelector::AssignUniqueId(vtkProp* prop)
 int vtkPVHardwareSelector::GetPropID(int vtkNotUsed(idx), vtkProp* prop)
 {
   vtkInternals::PropMapType::iterator iter = this->Internals->PropMap.find(prop);
-  return (iter != this->Internals->PropMap.end() ?
-    iter->second : -1);
+  return (iter != this->Internals->PropMap.end() ? iter->second : -1);
 }
 
 //----------------------------------------------------------------------------
@@ -181,7 +174,7 @@ void vtkPVHardwareSelector::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVHardwareSelector::BeginRenderProp(vtkRenderWindow *rw)
+void vtkPVHardwareSelector::BeginRenderProp(vtkRenderWindow* rw)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->SetProcessID(pm->GetGlobalController()->GetLocalProcessId());
@@ -198,7 +191,7 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
 #ifdef vtkPVHardwareSelectorDEBUG
 
   vtkNew<vtkImageImport> ii;
-  ii->SetImportVoidPointer(this->PixBuffer[passNo],1);
+  ii->SetImportVoidPointer(this->PixBuffer[passNo], 1);
   ii->SetDataScalarTypeToUnsignedChar();
   ii->SetNumberOfScalarComponents(3);
   ii->SetDataExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
@@ -210,16 +203,16 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
   std::ostringstream toString;
   toString.str("");
   toString.clear();
-  // is there a platform generic way of doing this?
-  //  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //  toString << pm->GetPartitionId();
-  //  toString << pm->GetGlobalController()->GetLocalProcessId();
+// is there a platform generic way of doing this?
+//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+//  toString << pm->GetPartitionId();
+//  toString << pm->GetGlobalController()->GetLocalProcessId();
 #if defined(_WIN32)
   toString << GetCurrentProcessId();
 #endif
   fname += toString.str();
   fname += "_";
-  fname += ('0'+passNo);
+  fname += ('0' + passNo);
   fname += ".pnm";
   vtkNew<vtkPNMWriter> pw;
   pw->SetInputConnection(ii->GetOutputPort());

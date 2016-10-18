@@ -4,7 +4,8 @@
 #include "pqApplicationComponentsModule.h"
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class pqWelcomeDialog;
 }
 
@@ -15,8 +16,8 @@ class pqWelcomeDialog;
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
 {
- Q_OBJECT
- typedef QDialog Superclass;
+  Q_OBJECT
+  typedef QDialog Superclass;
 
 public:
   explicit pqWelcomeDialog(QWidget* parent = 0);
@@ -34,7 +35,7 @@ protected slots:
   void onDoNotShowAgainStateChanged(int);
 
 private:
-    Ui::pqWelcomeDialog* ui;
+  Ui::pqWelcomeDialog* ui;
 };
 
 #endif // PQWELCOMEDIALOG_H

@@ -43,19 +43,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
-  vtkSMProxy *smproxy, vtkSMProperty *vtkNotUsed(smproperty), QWidget *parentObject)
-: Superclass(smproxy, parentObject)
+  vtkSMProxy* smproxy, vtkSMProperty* vtkNotUsed(smproperty), QWidget* parentObject)
+  : Superclass(smproxy, parentObject)
 {
   PV_DEBUG_PANELS() << "pqColorPaletteSelectorWidget for a property with "
-    "the panel_widget=\"color_palette_selector\" attribute.";
-  //this->setShowLabel(false);
+                       "the panel_widget=\"color_palette_selector\" attribute.";
+  // this->setShowLabel(false);
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setSpacing(0);
   vbox->setMargin(0);
 
   vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
-  vtkSMProxyDefinitionManager *pdmgr = pxm->GetProxyDefinitionManager();
+  vtkSMProxyDefinitionManager* pdmgr = pxm->GetProxyDefinitionManager();
 
   Q_ASSERT(pdmgr);
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
@@ -64,20 +64,20 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   QComboBox* cbbox = new QComboBox(this);
   cbbox->setObjectName("ComboBox");
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
+  {
     vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetProxyName());
     cbbox->addItem(prototype->GetXMLLabel(), prototype->GetXMLName());
-    }
+  }
 
   if (cbbox->count() > 0)
-    {
+  {
     cbbox->insertItem(0, "Select palette to load ...", -1);
-    }
+  }
   else
-    {
+  {
     cbbox->insertItem(0, "No palettes available.");
     cbbox->setEnabled(false);
-    }
+  }
   cbbox->setCurrentIndex(0);
   vbox->addWidget(cbbox);
 
@@ -97,7 +97,10 @@ void pqColorPaletteSelectorWidget::setCurrentIndex(int index)
   Q_ASSERT(this->ComboBox);
   Q_ASSERT(smproxy);
 
-  if (index <= 0) { return; }
+  if (index <= 0)
+  {
+    return;
+  }
   QString name = this->ComboBox->itemData(index).toString();
 
   vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();

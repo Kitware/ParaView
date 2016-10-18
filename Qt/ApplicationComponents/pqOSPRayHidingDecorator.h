@@ -43,9 +43,9 @@ class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
-  pqOSPRayHidingDecorator(
-    vtkPVXMLElement* config, pqPropertyWidget* parentObject);
+  pqOSPRayHidingDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
   virtual ~pqOSPRayHidingDecorator();
 
   /**

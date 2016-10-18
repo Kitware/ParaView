@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -57,10 +57,9 @@ class PQCOMPONENTS_EXPORT pqServerLauncher : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqServerLauncher(
-    const pqServerConfiguration& configuration,
-    QObject* parent=0);
+  pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = 0);
   virtual ~pqServerLauncher();
 
   /**
@@ -78,7 +77,7 @@ public:
   * is specified, pqServerLauncher is created.
   */
   static pqServerLauncher* newInstance(
-    const pqServerConfiguration& configuration, QObject* parent=NULL);
+    const pqServerConfiguration& configuration, QObject* parent = NULL);
 
   /**
   * This method will launch the server process based on the configuration and
@@ -116,7 +115,8 @@ protected:
   /**
   * An utility method to execute a command using a QProcess
   */
-  bool processCommand(QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
+  bool processCommand(
+    QString command, double timeout, double delay, const QProcessEnvironment* options = NULL);
 
   virtual bool connectToPrelaunchedServer();
 

@@ -48,32 +48,32 @@ void vtkPVCameraCueManipulator::Initialize(vtkPVAnimationCue* cue)
   this->CameraInterpolator->Initialize();
   this->CameraInterpolator->SetInterpolationTypeToSpline();
   if (nos < 2)
-    {
+  {
     vtkErrorMacro("Too few keyframes to animate.");
     return;
-    }
+  }
 
   if (this->Mode == PATH || this->Mode == FOLLOW_DATA)
-    {
+  {
     // No need to initialize this->CameraInterpolator in PATH or
     // FOLLOW_DATA mode
     return;
-    }
+  }
 
   // Set up this->CameraInterpolator.
-  for(int i=0; i < nos; i++)
-    {
+  for (int i = 0; i < nos; i++)
+  {
     vtkPVCameraKeyFrame* kf;
     kf = vtkPVCameraKeyFrame::SafeDownCast(this->GetKeyFrameAtIndex(i));
 
     if (!kf)
-      {
+    {
       vtkErrorMacro("All keyframes in a vtkPVCameraKeyFrame must be "
                     "vtkPVCameraKeyFrame");
       continue;
-      }
-    this->CameraInterpolator->AddCamera(kf->GetKeyTime(), kf->GetCamera());
     }
+    this->CameraInterpolator->AddCamera(kf->GetKeyTime(), kf->GetCamera());
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -83,26 +83,24 @@ void vtkPVCameraCueManipulator::Finalize(vtkPVAnimationCue* cue)
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
-                                         vtkPVAnimationCue* cue)
+void vtkPVCameraCueManipulator::UpdateValue(double currenttime, vtkPVAnimationCue* cue)
 {
-  vtkPVCameraAnimationCue* cameraCue =
-    vtkPVCameraAnimationCue::SafeDownCast(cue);
+  vtkPVCameraAnimationCue* cameraCue = vtkPVCameraAnimationCue::SafeDownCast(cue);
   if (!cameraCue)
-    {
+  {
     vtkErrorMacro("This manipulator only works with vtkPVCameraAnimationCue.");
     return;
-    }
+  }
 
   vtkCamera* animatedCamera = cameraCue->GetCamera();
   if (!animatedCamera)
-    {
+  {
     vtkErrorMacro("No camera to animate.");
     return;
-    }
+  }
 
   if (this->Mode == CAMERA)
-    {
+  {
     vtkCamera* camera = vtkCamera::New();
     this->CameraInterpolator->InterpolateCamera(currenttime, camera);
 
@@ -114,25 +112,24 @@ void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
     camera->Delete();
 
     cameraCue->GetView()->ResetCameraClippingRange();
-    }
-  else if(this->Mode == FOLLOW_DATA)
-    {
-    vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(this->DataSourceProxy);
+  }
+  else if (this->Mode == FOLLOW_DATA)
+  {
+    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(this->DataSourceProxy);
     if (proxy)
-      {
+    {
       // With changes in vtkSMAnimationScene when this cue "tick" is called,
       // we no longer need to call UpdatePipeline(), the pipeline will already be updated.
       // proxy->UpdatePipeline();
 
       // get the data bounds
-      vtkPVDataInformation *info = proxy->GetDataInformation();
+      vtkPVDataInformation* info = proxy->GetDataInformation();
       double bounds[6];
       info->GetBounds(bounds);
 
       // calculate the center of the data
-      vtkVector3d center((bounds[0] + bounds[1]) * 0.5,
-                         (bounds[2] + bounds[3]) * 0.5,
-                         (bounds[4] + bounds[5]) * 0.5);
+      vtkVector3d center((bounds[0] + bounds[1]) * 0.5, (bounds[2] + bounds[3]) * 0.5,
+        (bounds[4] + bounds[5]) * 0.5);
 
       // move the camera's position and focal point based on
       // the data's position at the current time
@@ -146,25 +143,25 @@ void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
 
       position = center + (position - focalPoint);
       cameraCue->GetCamera()->SetPosition(&position[0]);
-      }
+    }
     else
-      {
-      vtkWarningMacro("No Data Source for Follow-Data Animation");
-      }
-    }
-  else
     {
-    this->Superclass::UpdateValue(currenttime, cue);
+      vtkWarningMacro("No Data Source for Follow-Data Animation");
     }
+  }
+  else
+  {
+    this->Superclass::UpdateValue(currenttime, cue);
+  }
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraCueManipulator::SetDataSourceProxy(vtkSMProxy *dataSourceProxy)
+void vtkPVCameraCueManipulator::SetDataSourceProxy(vtkSMProxy* dataSourceProxy)
 {
-  if(dataSourceProxy != this->DataSourceProxy)
-    {
+  if (dataSourceProxy != this->DataSourceProxy)
+  {
     this->DataSourceProxy = dataSourceProxy;
-    }
+  }
 }
 
 //------------------------------------------------------------------------------

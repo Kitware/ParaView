@@ -47,7 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 
 //-----------------------------------------------------------------------------
-pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
+pqDisplayPolicy::pqDisplayPolicy(QObject* _parent)
+  : QObject(_parent)
 {
 }
 
@@ -61,39 +62,35 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   pqOutputPort* opPort, pqView* view, bool visible) const
 {
   if (!opPort)
-    {
+  {
     // Cannot really repr a NULL source.
     return 0;
-    }
+  }
 
-  if (opPort->getServer() &&
-    opPort->getServer()->getResource().scheme() == "catalyst")
-    {
+  if (opPort->getServer() && opPort->getServer()->getResource().scheme() == "catalyst")
+  {
     return 0;
-    }
+  }
 
-  vtkSMSourceProxy* source =
-    vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
   vtkSMProxy* reprProxy = controller->SetVisibility(
-    source, opPort->getPortNumber(),
-    (view? view->getViewProxy() : NULL), visible);
+    source, opPort->getPortNumber(), (view ? view->getViewProxy() : NULL), visible);
 
-  return pqApplicationCore::instance()->getServerManagerModel()->findItem
-    <pqDataRepresentation*>(reprProxy);
+  return pqApplicationCore::instance()->getServerManagerModel()->findItem<pqDataRepresentation*>(
+    reprProxy);
 }
 
 //-----------------------------------------------------------------------------
 QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* port, bool update_pipeline) const
 {
-  (void) update_pipeline;
+  (void)update_pipeline;
   if (port)
-    {
-    vtkSMSourceProxy* source =
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+  {
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     return QString(controller->GetPreferredViewType(source, port->getPortNumber()));
-    }
+  }
   return QString();
 }
 
@@ -102,37 +99,36 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
   pqView* view, pqOutputPort* port) const
 {
   if (view && port)
-    {
-    vtkSMSourceProxy* source =
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+  {
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
 
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     if (controller->GetVisibility(source, port->getPortNumber(), view->getViewProxy()))
-      {
+    {
       return Visible;
-      }
+    }
 
     if (view->getViewProxy()->CanDisplayData(source, port->getPortNumber()))
-      {
+    {
       // If repr exists, or a new repr can be created for the port (since port
       // is show-able in the view)
       return Hidden;
-      }
+    }
     else
-      {
+    {
       // No repr exists, not can one be created.
       return NotApplicable;
-      }
     }
+  }
 
   //// If the port is on a CatalystSession or it hasn't been initialized yet,
   //// it has "no visiblily", so to speak.
-  //if (port && port->getServer() &&
+  // if (port && port->getServer() &&
   //  port->getServer()->getResource().scheme() == "catalyst")
   //  {
   //  return NotApplicable;
   //  }
-  //if (port && port->getSource() &&
+  // if (port && port->getSource() &&
   //  port->getSource()->modifiedState() == pqProxy::UNINITIALIZED)
   //  {
   //  return NotApplicable;

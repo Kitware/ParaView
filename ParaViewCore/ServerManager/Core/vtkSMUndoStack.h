@@ -15,7 +15,7 @@
 /**
  * @class   vtkSMUndoStack
  *
- * This is the undo/redo stack for the Server Manager. This provides a 
+ * This is the undo/redo stack for the Server Manager. This provides a
  * unified face for undo/redo irrespective of number of connections, their
  * type etc etc.
  *
@@ -25,7 +25,7 @@
  * XML elements. The loader instance must be set before performing the undo,
  * otherwise vtkSMUndoRedoStateLoader is used.
  *
- * This class also provides API to push any vtkUndoSet instance on to a 
+ * This class also provides API to push any vtkUndoSet instance on to a
  * server. GUI can use this to push its own changes that is undoable across
  * connections.
  *
@@ -76,11 +76,11 @@ public:
   virtual int Redo();
 
   enum EventIds
-    {
+  {
     PushUndoSetEvent = 1987,
     ObjectCreationEvent = 1988
 
-    };
+  };
 
 protected:
   vtkSMUndoStack();
@@ -93,7 +93,7 @@ protected:
   // This is usefull when we execute the undoset to prevent automatic
   // object deletion between 2 undo element calls when a proxy registration
   // is supposed to happen.
-  void FillWithRemoteObjects( vtkUndoSet *undoSet, vtkCollection *collection);
+  void FillWithRemoteObjects(vtkUndoSet* undoSet, vtkCollection* collection);
 
 private:
   vtkSMUndoStack(const vtkSMUndoStack&) VTK_DELETE_FUNCTION;
@@ -101,10 +101,8 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-  
+
   vtkSMUndoStackObserver* Observer;
-
 };
-
 
 #endif

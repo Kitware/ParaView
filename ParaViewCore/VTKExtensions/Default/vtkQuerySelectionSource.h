@@ -86,12 +86,10 @@ protected:
   vtkQuerySelectionSource();
   ~vtkQuerySelectionSource();
 
-  virtual int RequestInformation(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int RequestData(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   int FieldType;
@@ -111,8 +109,6 @@ private:
   vtkInternals* Internals;
 
   int Inverse;
-
 };
 
 #endif
-

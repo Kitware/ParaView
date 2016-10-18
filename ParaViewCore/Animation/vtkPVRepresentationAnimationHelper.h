@@ -51,10 +51,10 @@ protected:
   ~vtkPVRepresentationAnimationHelper();
 
   vtkWeakPointer<vtkSMProxy> SourceProxy;
+
 private:
   vtkPVRepresentationAnimationHelper(const vtkPVRepresentationAnimationHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRepresentationAnimationHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

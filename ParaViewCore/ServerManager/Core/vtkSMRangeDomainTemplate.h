@@ -21,7 +21,7 @@
  * precision based on the data-type) specified using a min and a max value.
  * Valid XML attributes are:
  * @verbatim
- * * min 
+ * * min
  * * max
  * @endverbatim
  * Both min and max attributes can have one or more space space
@@ -59,8 +59,7 @@
 #include <vector>     // needed for std::vector
 
 template <class T>
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate :
-  public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate : public vtkSMDomain
 {
 public:
   typedef vtkSMDomain Superclass;
@@ -108,9 +107,15 @@ public:
    * the bound is set.
    */
   T GetMinimum(unsigned int idx)
-    { int not_used; return this->GetMinimum(idx, not_used); }
+  {
+    int not_used;
+    return this->GetMinimum(idx, not_used);
+  }
   T GetMaximum(unsigned int idx)
-    { int not_used; return this->GetMaximum(idx, not_used); }
+  {
+    int not_used;
+    return this->GetMaximum(idx, not_used);
+  }
 
   /**
    * Returns the number of entries in the internal
@@ -125,24 +130,23 @@ public:
    * properties.
    */
   virtual void Update(vtkSMProperty*);
-  
+
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(
-    vtkSMProperty *property, int idx, double value);
+  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
 
   enum DefaultModes
-    {
+  {
     MIN,
     MAX,
     MID
-    };
+  };
 
   /**
    * Get the default-mode that controls how SetDefaultValues() behaves.
    */
-  DefaultModes GetDefaultMode(unsigned int index=0);
+  DefaultModes GetDefaultMode(unsigned int index = 0);
 
   /**
    * Set the property's default value based on the domain. How the value is
@@ -161,49 +165,51 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   struct vtkEntry
-    {
+  {
     vtkTuple<T, 2> Value;
     vtkTuple<bool, 2> Valid;
     vtkEntry()
-      {
+    {
       this->Value[0] = this->Value[1] = 0;
       this->Valid[0] = this->Valid[1] = false;
-      }
+    }
     vtkEntry(T min, bool minValid, T max, bool maxValid)
-      {
-      this->Value[0] = min; this->Value[1] = max;
-      this->Valid[0] = minValid; this->Valid[1] = maxValid;
-      }
+    {
+      this->Value[0] = min;
+      this->Value[1] = max;
+      this->Valid[0] = minValid;
+      this->Valid[1] = maxValid;
+    }
     vtkEntry(T min, T max)
-      {
-      this->Value[0] = min; this->Value[1] = max;
+    {
+      this->Value[0] = min;
+      this->Value[1] = max;
       this->Valid[0] = this->Valid[1] = true;
-      }
+    }
 
     bool operator==(const vtkEntry& other) const
-      {
+    {
       return this->Valid == other.Valid && this->Value == other.Value;
-      }
-    };
+    }
+  };
 
   // We keep Entries private so we can carefully manage firing the modified
   // events since subclasses can often forget the minutia.
-  const std::vector<vtkEntry>& GetEntries() const
-    { return this->Entries; }
+  const std::vector<vtkEntry>& GetEntries() const { return this->Entries; }
   void SetEntries(const std::vector<vtkEntry>& new_value)
-    {
+  {
     typedef typename std::vector<vtkEntry>::const_iterator cit;
     cit b = this->Entries.begin();
     cit e = this->Entries.end();
-    if (this->Entries.size() != new_value.size() ||
-      !std::equal(b,e, new_value.begin()))
-      {
+    if (this->Entries.size() != new_value.size() || !std::equal(b, e, new_value.begin()))
+    {
       this->Entries = new_value;
       this->DomainModified();
-      }
     }
+  }
   std::vector<DefaultModes> DefaultModeVector;
   DefaultModes DefaultDefaultMode;
+
 private:
   vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
@@ -211,15 +217,14 @@ private:
   bool GetComputedDefaultValue(unsigned int index, T& value);
 
   std::vector<vtkEntry> Entries;
-
 };
 
 #if !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)
-# define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T) \
-   template class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate< T >
+#define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T)                                                \
+  template class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate<T>
 #else
-# include "vtkSMRangeDomainTemplate.txx" // needed for templates.
-# define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T)
+#include "vtkSMRangeDomainTemplate.txx" // needed for templates.
+#define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T)
 #endif // !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)
 
 #endif // !defined(vtkSMRangeDomainTemplate_h)
@@ -228,17 +233,17 @@ private:
 // vtkSMRangeDomainTemplate subclass uses this to give its instantiation
 // of this template a DLL interface.
 #if defined(VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE)
-# if defined(VTK_BUILD_SHARED_LIBS) && defined(_MSC_VER)
-#  pragma warning (push)
-#  pragma warning (disable: 4091) // warning C4091: 'extern ' :
-   // ignored on left of 'int' when no variable is declared
-#  pragma warning (disable: 4231) // Compiler-specific extension warning.
-   // Use an "extern explicit instantiation" to give the class a DLL
-   // interface.  This is a compiler-specific extension.
-   extern VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE);
-#  pragma warning (pop)
-# endif
-# undef VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE
+#if defined(VTK_BUILD_SHARED_LIBS) && defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4091) // warning C4091: 'extern ' :
+                                // ignored on left of 'int' when no variable is declared
+#pragma warning(disable : 4231) // Compiler-specific extension warning.
+// Use an "extern explicit instantiation" to give the class a DLL
+// interface.  This is a compiler-specific extension.
+extern VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE);
+#pragma warning(pop)
+#endif
+#undef VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE
 #endif
 
 // VTK-HeaderTest-Exclude: vtkSMRangeDomainTemplate.h

@@ -31,29 +31,20 @@ vtkStandardNewMacro(vtkSMPropertyLink);
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
 public:
-  static vtkSMPropertyLinkObserver* New() 
-    {
-    return new vtkSMPropertyLinkObserver;
-    }
+  static vtkSMPropertyLinkObserver* New() { return new vtkSMPropertyLinkObserver; }
 
-  void SetTarget(vtkSMPropertyLink* t) 
-    { 
-    this->Target = t;
-    }
-  virtual void Execute(vtkObject *c, unsigned long , void* )
-    {
+  void SetTarget(vtkSMPropertyLink* t) { this->Target = t; }
+  virtual void Execute(vtkObject* c, unsigned long, void*)
+  {
     vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
     if (this->Target && caller && this->Target->GetEnabled())
-      {
+    {
       this->Target->PropertyModified(caller);
-      }
     }
+  }
 
 protected:
-  vtkSMPropertyLinkObserver() 
-    {
-    this->Target = 0;
-    }
+  vtkSMPropertyLinkObserver() { this->Target = 0; }
 
   vtkSMPropertyLink* Target;
 };
@@ -63,34 +54,36 @@ class vtkSMPropertyLinkInternals
 {
 public:
   struct LinkedProperty
-    {
+  {
   public:
-    LinkedProperty(vtkSMProxy* proxy, const char* pname, int updateDir) :
-      Proxy(proxy), PropertyName(pname), UpdateDirection(updateDir), 
-      Observer(0) 
+    LinkedProperty(vtkSMProxy* proxy, const char* pname, int updateDir)
+      : Proxy(proxy)
+      , PropertyName(pname)
+      , UpdateDirection(updateDir)
+      , Observer(0)
     {
     }
 
-    LinkedProperty(vtkSMProperty* property, int updateDir) :
-      Property(property), UpdateDirection(updateDir), 
-      Observer(0)
+    LinkedProperty(vtkSMProperty* property, int updateDir)
+      : Property(property)
+      , UpdateDirection(updateDir)
+      , Observer(0)
     {
     }
 
     ~LinkedProperty()
-      {
+    {
       if (this->Observer && this->Proxy && this->Proxy.GetPointer())
-        {
+      {
         this->Proxy.GetPointer()->RemoveObserver(this->Observer);
-        }
+      }
 
       if (this->Observer && this->Property && this->Property.GetPointer())
-        {
+      {
         this->Property->RemoveObserver(this->Observer);
-        }
-      this->Observer = 0;
-
       }
+      this->Observer = 0;
+    }
 
     // Either (Proxy, PropertyName) pair is valid or (Property) is valid,
     // depending on the API used to add the link.
@@ -100,7 +93,7 @@ public:
 
     int UpdateDirection;
     vtkWeakPointer<vtkCommand> Observer;
-    };
+  };
 
   typedef std::list<LinkedProperty> LinkedPropertyType;
   LinkedPropertyType LinkedProperties;
@@ -125,8 +118,7 @@ vtkSMPropertyLink::~vtkSMPropertyLink()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
-  int updateDir)
+void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname, int updateDir)
 {
   int addToList = 1;
   int addObserver = updateDir & INPUT;
@@ -135,42 +127,41 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
   for (; iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
-    if (iter->Proxy.GetPointer() == proxy && 
-      iter->PropertyName == pname && 
+  {
+    if (iter->Proxy.GetPointer() == proxy && iter->PropertyName == pname &&
       iter->UpdateDirection == updateDir)
-      {
+    {
       addObserver = 0;
       addToList = 0;
-      }
-    if (iter->UpdateDirection & INPUT)
-      {
-      input_exists = true;
-      }
     }
-
-  if (addToList && input_exists && (updateDir & INPUT) )
+    if (iter->UpdateDirection & INPUT)
     {
+      input_exists = true;
+    }
+  }
+
+  if (addToList && input_exists && (updateDir & INPUT))
+  {
     /* For now, allow multiple inputs. This strategy needs some evaluation.
     vtkErrorMacro("Only one input can be added at a time.");
     return;
     */
-    }
+  }
 
   if (addToList)
-    {
+  {
     vtkSMPropertyLinkInternals::LinkedProperty link(proxy, pname, updateDir);
     this->Internals->LinkedProperties.push_back(link);
     if (addObserver)
-      {
+    {
       this->Internals->LinkedProperties.back().Observer = this->Observer;
-      }
     }
+  }
 
   if (addObserver)
-    {
+  {
     this->ObserveProxyUpdates(proxy);
-    }
+  }
 
   this->Synchronize();
 
@@ -188,21 +179,21 @@ void vtkSMPropertyLink::Synchronize()
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); iter++)
-    { 
+  for (; iter != this->Internals->LinkedProperties.end(); iter++)
+  {
     if (iter->UpdateDirection & INPUT)
-      {
+    {
       if (iter->Property)
-        {
+      {
         this->PropertyModified(iter->Property);
-        }
-      else if (iter->Proxy)
-        {
-        this->PropertyModified(iter->Proxy, iter->PropertyName);
-        }
-      break;
       }
+      else if (iter->Proxy)
+      {
+        this->PropertyModified(iter->Proxy, iter->PropertyName);
+      }
+      break;
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -218,15 +209,14 @@ void vtkSMPropertyLink::RemoveAllLinks()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
-  const char* pname)
+void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy, const char* pname)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
   for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
+    if (iter->Proxy == proxy && iter->PropertyName == pname)
     {
-    if (iter->Proxy == proxy  && iter->PropertyName == pname)
-      {
       this->Internals->LinkedProperties.erase(iter);
       this->Modified();
 
@@ -235,8 +225,8 @@ void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
       this->PushStateToSession();
 
       break;
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -258,16 +248,14 @@ vtkSMProperty* vtkSMPropertyLink::GetLinkedProperty(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(int i=0;
-      i<index && iter != this->Internals->LinkedProperties.end();
-      i++)
-    { 
+  for (int i = 0; i < index && iter != this->Internals->LinkedProperties.end(); i++)
+  {
     iter++;
-    }
-  if(iter == this->Internals->LinkedProperties.end())
-    {
+  }
+  if (iter == this->Internals->LinkedProperties.end())
+  {
     return NULL;
-    }
+  }
   return iter->Property;
 }
 
@@ -276,16 +264,14 @@ const char* vtkSMPropertyLink::GetLinkedPropertyName(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(int i=0;
-      i<index && iter != this->Internals->LinkedProperties.end();
-      i++)
-    { 
+  for (int i = 0; i < index && iter != this->Internals->LinkedProperties.end(); i++)
+  {
     iter++;
-    }
-  if(iter == this->Internals->LinkedProperties.end())
-    {
+  }
+  if (iter == this->Internals->LinkedProperties.end())
+  {
     return NULL;
-    }
+  }
   return iter->PropertyName;
 }
 
@@ -294,16 +280,14 @@ vtkSMProxy* vtkSMPropertyLink::GetLinkedProxy(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(int i=0;
-      i<index && iter != this->Internals->LinkedProperties.end();
-      i++)
-    { 
+  for (int i = 0; i < index && iter != this->Internals->LinkedProperties.end(); i++)
+  {
     iter++;
-    }
-  if(iter == this->Internals->LinkedProperties.end())
-    {
+  }
+  if (iter == this->Internals->LinkedProperties.end())
+  {
     return NULL;
-    }
+  }
   return iter->Proxy;
 }
 
@@ -312,16 +296,14 @@ int vtkSMPropertyLink::GetLinkedObjectDirection(int index)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(int i=0;
-      i<index && iter != this->Internals->LinkedProperties.end();
-      i++)
-    { 
+  for (int i = 0; i < index && iter != this->Internals->LinkedProperties.end(); i++)
+  {
     iter++;
-    }
-  if(iter == this->Internals->LinkedProperties.end())
-    {
+  }
+  if (iter == this->Internals->LinkedProperties.end())
+  {
     return NONE;
-    }
+  }
   return iter->UpdateDirection;
 }
 
@@ -337,64 +319,64 @@ int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
 void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 {
   if (this->ModifyingProperty)
-    {
+  {
     return;
-    }
+  }
 
   if (!fromProxy)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProperty* fromProp = fromProxy->GetProperty(pname);
   if (!fromProp)
-    {
+  {
     return;
-    }
+  }
 
   this->ModifyingProperty = true;
   // First verify that the property that triggerred this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
   int propagate = 0;
-  for (iter = this->Internals->LinkedProperties.begin(); 
-    iter != this->Internals->LinkedProperties.end(); ++iter)
+  for (iter = this->Internals->LinkedProperties.begin();
+       iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
+    if (iter->UpdateDirection & INPUT && iter->Proxy.GetPointer() == fromProxy &&
+      iter->PropertyName == pname)
     {
-    if (iter->UpdateDirection & INPUT && iter->Proxy.GetPointer() == fromProxy
-      && iter->PropertyName == pname)
-      {
       propagate = 1;
       break;
-      }
     }
+  }
 
   if (!propagate)
-    {
+  {
     this->ModifyingProperty = false;
     return;
-    }
+  }
 
   // Propagate the changes.
-  for (iter = this->Internals->LinkedProperties.begin(); 
-    iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
+  for (iter = this->Internals->LinkedProperties.begin();
+       iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
     if (iter->UpdateDirection & OUTPUT)
-      {
+    {
       vtkSMProperty* toProp = 0;
       if (iter->Proxy.GetPointer())
-        {
+      {
         toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
-        }
+      }
       else if (iter->Property.GetPointer())
-        {
+      {
         toProp = iter->Property;
-        }
+      }
       if (toProp && (toProp != fromProp))
-        {
+      {
         toProp->Copy(fromProp);
-        }
       }
     }
+  }
   this->ModifyingProperty = false;
 }
 
@@ -402,51 +384,51 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
 void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
 {
   if (this->ModifyingProperty)
-    {
+  {
     return;
-    }
-  
+  }
+
   // First verify that the property that triggerred this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
   int propagate = 0;
-  for (iter = this->Internals->LinkedProperties.begin(); 
-    iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
+  for (iter = this->Internals->LinkedProperties.begin();
+       iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
     if (iter->UpdateDirection & INPUT && iter->Property.GetPointer() == fromProp)
-      {
+    {
       propagate = 1;
       break;
-      }
     }
+  }
 
   if (!propagate)
-    {
+  {
     return;
-    }
- 
+  }
+
   this->ModifyingProperty = true;
   // Propagate the changes.
-  for (iter = this->Internals->LinkedProperties.begin(); 
-    iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
+  for (iter = this->Internals->LinkedProperties.begin();
+       iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
     if (iter->UpdateDirection & OUTPUT)
-      {
+    {
       vtkSMProperty* toProp = 0;
       if (iter->Proxy.GetPointer())
-        {
+      {
         toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
-        }
+      }
       else if (iter->Property.GetPointer())
-        {
+      {
         toProp = iter->Property;
-        }
+      }
       if (toProp && (toProp != fromProp))
-        {
+      {
         toProp->Copy(fromProp);
-        }
       }
     }
+  }
   this->ModifyingProperty = false;
 }
 
@@ -454,34 +436,32 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
 void vtkSMPropertyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
-  
+
   // First check if pname is indeed an input property.
   bool is_input = false;
   iter = this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
+    if ((iter->Proxy.GetPointer() == caller) && (iter->PropertyName == pname) &&
+      (iter->UpdateDirection & INPUT))
     {
-    if ((iter->Proxy.GetPointer() == caller) && 
-      (iter->PropertyName == pname) && (iter->UpdateDirection & INPUT))
-      {
       is_input = true;
       break;
-      }
     }
+  }
 
   // Update all output properties.
   if (is_input)
-    {
+  {
     iter = this->Internals->LinkedProperties.begin();
-    for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+    for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+      if ((iter->Proxy.GetPointer() != caller) && (iter->UpdateDirection & OUTPUT))
       {
-      if ((iter->Proxy.GetPointer() != caller) && 
-        (iter->UpdateDirection & OUTPUT))
-        {
-        iter->Proxy.GetPointer()->UpdateProperty(
-          iter->PropertyName.c_str());
-        }
+        iter->Proxy.GetPointer()->UpdateProperty(iter->PropertyName.c_str());
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -489,14 +469,13 @@ void vtkSMPropertyLink::UpdateVTKObjects(vtkSMProxy* caller)
 {
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
+    if ((iter->Proxy.GetPointer() != caller) && (iter->UpdateDirection & OUTPUT))
     {
-    if ((iter->Proxy.GetPointer() != caller) && 
-        (iter->UpdateDirection & OUTPUT))
-      {
       iter->Proxy.GetPointer()->UpdateVTKObjects();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -507,76 +486,73 @@ void vtkSMPropertyLink::SaveXMLState(const char* linkname, vtkPVXMLElement* pare
   root->AddAttribute("name", linkname);
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
     vtkPVXMLElement* child = vtkPVXMLElement::New();
     child->SetName("Property");
-    child->AddAttribute("id",
-                        static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
+    child->AddAttribute("id", static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
     child->AddAttribute("name", iter->PropertyName);
-    child->AddAttribute("direction", ( (iter->UpdateDirection & INPUT)? 
-        "input" : "output"));
+    child->AddAttribute("direction", ((iter->UpdateDirection & INPUT) ? "input" : "output"));
     root->AddNestedElement(child);
     child->Delete();
-    }
+  }
   parent->AddNestedElement(root);
   root->Delete();
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMPropertyLink::LoadXMLState(vtkPVXMLElement* linkElement,
-  vtkSMProxyLocator* locator)
+int vtkSMPropertyLink::LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = linkElement->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < numElems; cc++)
-    {
+  for (unsigned int cc = 0; cc < numElems; cc++)
+  {
     vtkPVXMLElement* child = linkElement->GetNestedElement(cc);
     if (!child->GetName() || strcmp(child->GetName(), "Property") != 0)
-      {
+    {
       vtkWarningMacro("Invalid element in link state. Ignoring.");
       continue;
-      }
+    }
     const char* direction = child->GetAttribute("direction");
     if (!direction)
-      {
+    {
       vtkErrorMacro("State missing required attribute direction.");
       return 0;
-      }
+    }
     int idirection;
     if (strcmp(direction, "input") == 0)
-      {
+    {
       idirection = INPUT;
-      }
+    }
     else if (strcmp(direction, "output") == 0)
-      {
+    {
       idirection = OUTPUT;
-      }
+    }
     else
-      {
+    {
       vtkErrorMacro("Invalid value for direction: " << direction);
       return 0;
-      }
+    }
     int id;
     if (!child->GetScalarAttribute("id", &id))
-      {
+    {
       vtkErrorMacro("State missing required attribute id.");
       return 0;
-      }
-    vtkSMProxy* proxy = locator->LocateProxy(id); 
+    }
+    vtkSMProxy* proxy = locator->LocateProxy(id);
     if (!proxy)
-      {
+    {
       vtkErrorMacro("Failed to locate proxy with ID: " << id);
       return 0;
-      }
+    }
 
     const char* pname = child->GetAttribute("name");
     if (!pname)
-      {
+    {
       vtkErrorMacro("State missing required attribute name.");
       return 0;
-      }
-    this->AddLinkedProperty(proxy, pname, idirection);
     }
+    this->AddLinkedProperty(proxy, pname, idirection);
+  }
   return 1;
 }
 
@@ -586,7 +562,7 @@ void vtkSMPropertyLink::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //-----------------------------------------------------------------------------
-void vtkSMPropertyLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *locator)
+void vtkSMPropertyLink::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   this->Superclass::LoadState(msg, locator);
 
@@ -595,17 +571,17 @@ void vtkSMPropertyLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *lo
 
   // Load Property Links
   int numberOfLinks = msg->ExtensionSize(LinkState::link);
-  for(int i=0; i < numberOfLinks; i++)
-    {
+  for (int i = 0; i < numberOfLinks; i++)
+  {
     const LinkState_LinkDescription* link = &msg->GetExtension(LinkState::link, i);
     vtkSMProxy* proxy = locator->LocateProxy(link->proxy());
 
     assert("property name must be set for PropertyLink" && link->has_property_name());
 
-    if(proxy)
+    if (proxy)
+    {
+      switch (link->direction())
       {
-      switch(link->direction())
-        {
         case LinkState_LinkDescription::NONE:
           this->AddLinkedProperty(proxy, link->property_name().c_str(), vtkSMLink::NONE);
           break;
@@ -615,37 +591,37 @@ void vtkSMPropertyLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *lo
         case LinkState_LinkDescription::OUTPUT:
           this->AddLinkedProperty(proxy, link->property_name().c_str(), vtkSMLink::OUTPUT);
           break;
-        }
-      }
-    else
-      {
-      vtkDebugMacro("Proxy not found with ID: " << link->proxy());
       }
     }
+    else
+    {
+      vtkDebugMacro("Proxy not found with ID: " << link->proxy());
+    }
+  }
 }
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::UpdateState()
 {
-  if(this->Session == NULL)
-    {
+  if (this->Session == NULL)
+  {
     return;
-    }
+  }
 
   this->State->ClearExtension(LinkState::link);
   this->State->ClearExtension(LinkState::exception_property);
 
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
-  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
-    {
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+  {
     if (!iter->Proxy.GetPointer())
-      {
+    {
       continue;
-      }
+    }
     LinkState_LinkDescription* link = this->State->AddExtension(LinkState::link);
     link->set_proxy(iter->Proxy.GetPointer()->GetGlobalID());
-    switch(iter->UpdateDirection)
-      {
+    switch (iter->UpdateDirection)
+    {
       case vtkSMLink::NONE:
         link->set_direction(LinkState_LinkDescription::NONE);
         break;
@@ -658,7 +634,7 @@ void vtkSMPropertyLink::UpdateState()
       default:
         vtkErrorMacro("Invalid Link direction");
         break;
-      }
-    link->set_property_name(iter->PropertyName.c_str());
     }
+    link->set_property_name(iter->PropertyName.c_str());
+  }
 }

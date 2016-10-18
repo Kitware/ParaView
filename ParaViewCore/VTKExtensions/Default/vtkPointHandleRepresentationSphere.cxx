@@ -34,27 +34,26 @@
 
 vtkStandardNewMacro(vtkPointHandleRepresentationSphere);
 
-vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,Property,vtkProperty);
-vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,SelectedProperty,vtkProperty);
-
+vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere, Property, vtkProperty);
+vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere, SelectedProperty, vtkProperty);
 
 //----------------------------------------------------------------------
 vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
 {
   // Initialize state
   this->InteractionState = vtkHandleRepresentation::Outside;
-  
+
   // Represent the position of the cursor
   this->FocalPoint = vtkPoints::New();
   this->FocalPoint->SetNumberOfPoints(1);
-  this->FocalPoint->SetPoint(0, 0.0,0.0,0.0);
-  
+  this->FocalPoint->SetPoint(0, 0.0, 0.0, 0.0);
+
   this->FocalData = vtkPolyData::New();
   this->FocalData->SetPoints(this->FocalPoint);
 
   // The transformation of the cursor will be done via vtkGlyph3D
   // By default a vtkSphereSource will be used to define the cursor shape
-  vtkSphereSource *sphere = vtkSphereSource::New();
+  vtkSphereSource* sphere = vtkSphereSource::New();
   sphere->SetThetaResolution(12);
   sphere->Update();
   this->CursorShape = sphere->GetOutput();
@@ -84,12 +83,11 @@ vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
   this->ConstraintAxis = -1;
 
   this->Scalar = VTK_DOUBLE_MAX;
-  
+
   this->AddCircleAroundSphere = 0;
   this->DiskActor = NULL;
   this->DiskMapper = NULL;
   this->DiskGlypher = NULL;
-  
 }
 
 //----------------------------------------------------------------------
@@ -97,7 +95,7 @@ vtkPointHandleRepresentationSphere::~vtkPointHandleRepresentationSphere()
 {
   this->FocalPoint->Delete();
   this->FocalData->Delete();
-  
+
   this->CursorShape->Delete();
   this->Glypher->Delete();
   this->Mapper->Delete();
@@ -105,42 +103,42 @@ vtkPointHandleRepresentationSphere::~vtkPointHandleRepresentationSphere()
 
   this->Property->Delete();
   this->SelectedProperty->Delete();
-  
+
   if (this->DiskGlypher)
-    {
+  {
     this->DiskGlypher->Delete();
-    }
+  }
   if (this->DiskMapper)
-    {
+  {
     this->DiskMapper->Delete();
-    }
+  }
   if (this->DiskActor)
-    {
+  {
     this->DiskActor->Delete();
-    }
+  }
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::SetCursorShape(vtkPolyData *shape)
+void vtkPointHandleRepresentationSphere::SetCursorShape(vtkPolyData* shape)
 {
-  if ( shape != this->CursorShape )
+  if (shape != this->CursorShape)
+  {
+    if (this->CursorShape)
     {
-    if ( this->CursorShape )
-      {
       this->CursorShape->Delete();
-      }
+    }
     this->CursorShape = shape;
-    if ( this->CursorShape )
-      {
+    if (this->CursorShape)
+    {
       this->CursorShape->Register(this);
-      }
+    }
     this->Glypher->SetSourceData(this->CursorShape);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------
-vtkPolyData *vtkPointHandleRepresentationSphere::GetCursorShape()
+vtkPolyData* vtkPointHandleRepresentationSphere::GetCursorShape()
 {
   return this->CursorShape;
 }
@@ -160,52 +158,52 @@ void vtkPointHandleRepresentationSphere::SetDisplayPosition(double p[3])
 }
 
 //-------------------------------------------------------------------------
-int vtkPointHandleRepresentationSphere::ComputeInteractionState(int X, int Y, int vtkNotUsed(modify))
+int vtkPointHandleRepresentationSphere::ComputeInteractionState(
+  int X, int Y, int vtkNotUsed(modify))
 {
   double pos[3], xyz[3];
-  this->FocalPoint->GetPoint(0,pos);
+  this->FocalPoint->GetPoint(0, pos);
   xyz[0] = static_cast<double>(X);
   xyz[1] = static_cast<double>(Y);
   xyz[2] = pos[2];
 
   this->VisibilityOn();
   double tol2 = this->Tolerance * this->Tolerance;
-  if ( vtkMath::Distance2BetweenPoints(xyz,pos) <= tol2 )
-    {
+  if (vtkMath::Distance2BetweenPoints(xyz, pos) <= tol2)
+  {
     this->InteractionState = vtkHandleRepresentation::Nearby;
-    }
+  }
   else
-    {
+  {
     this->InteractionState = vtkHandleRepresentation::Outside;
-    if ( this->ActiveRepresentation )
-      {
+    if (this->ActiveRepresentation)
+    {
       this->VisibilityOff();
-      }
     }
+  }
 
   return this->InteractionState;
 }
 
 //-------------------------------------------------------------------------
-int vtkPointHandleRepresentationSphere::DetermineConstraintAxis(int constraint, 
-                                                            double eventPos[2])
+int vtkPointHandleRepresentationSphere::DetermineConstraintAxis(int constraint, double eventPos[2])
 {
   // Look for trivial cases: either not constrained or already constrained
-  if ( ! this->Constrained )
-    {
+  if (!this->Constrained)
+  {
     return -1;
-    }
-  else if ( constraint >= 0 && constraint < 3 )
-    {
+  }
+  else if (constraint >= 0 && constraint < 3)
+  {
     return constraint;
-    }
-  
+  }
+
   // Okay, figure out constraint based on mouse motion
   double dpos[2];
   dpos[0] = fabs(eventPos[0] - this->StartEventPosition[0]);
   dpos[1] = fabs(eventPos[1] - this->StartEventPosition[1]);
 
-  return (dpos[0]>dpos[1] ? 0 : 1);
+  return (dpos[0] > dpos[1] ? 0 : 1);
 }
 
 //----------------------------------------------------------------------
@@ -218,19 +216,18 @@ void vtkPointHandleRepresentationSphere::StartWidgetInteraction(double startEven
 
   this->LastEventPosition[0] = startEventPos[0];
   this->LastEventPosition[1] = startEventPos[1];
-  
+
   this->ConstraintAxis = -1;
   this->WaitCount = 0;
-  if ( this->Constrained )
-    {
+  if (this->Constrained)
+  {
     this->WaitingForMotion = 1;
-    }
+  }
   else
-    {
+  {
     this->WaitingForMotion = 0;
-    }
+  }
 }
-
 
 //----------------------------------------------------------------------
 // Based on the displacement vector (computed in display coordinates) and
@@ -241,27 +238,26 @@ void vtkPointHandleRepresentationSphere::StartWidgetInteraction(double startEven
 void vtkPointHandleRepresentationSphere::WidgetInteraction(double eventPos[2])
 {
   // Process the motion
-  if ( this->InteractionState == vtkHandleRepresentation::Selecting ||
-       this->InteractionState == vtkHandleRepresentation::Translating )
+  if (this->InteractionState == vtkHandleRepresentation::Selecting ||
+    this->InteractionState == vtkHandleRepresentation::Translating)
+  {
+    if (!this->WaitingForMotion || this->WaitCount++ > 1)
     {
-    if ( !this->WaitingForMotion || this->WaitCount++ > 1 )
-      {
-      
-      this->ConstraintAxis = 
-        this->DetermineConstraintAxis(this->ConstraintAxis,eventPos);
-      this->Translate(eventPos);
-      }
-    }
 
-  else if ( this->InteractionState == vtkHandleRepresentation::Scaling )
-    {
-    this->Scale(eventPos);
+      this->ConstraintAxis = this->DetermineConstraintAxis(this->ConstraintAxis, eventPos);
+      this->Translate(eventPos);
     }
+  }
+
+  else if (this->InteractionState == vtkHandleRepresentation::Scaling)
+  {
+    this->Scale(eventPos);
+  }
 
   // Book keeping
   this->LastEventPosition[0] = eventPos[0];
   this->LastEventPosition[1] = eventPos[1];
-  
+
   this->Modified();
 }
 
@@ -270,19 +266,19 @@ void vtkPointHandleRepresentationSphere::WidgetInteraction(double eventPos[2])
 void vtkPointHandleRepresentationSphere::Translate(double eventPos[2])
 {
   double pos[3], dpos[2];
-  this->FocalPoint->GetPoint(0,pos);
+  this->FocalPoint->GetPoint(0, pos);
   dpos[0] = eventPos[0] - pos[0];
   dpos[1] = eventPos[1] - pos[1];
-  
-  if ( this->ConstraintAxis >= 0 )
-    {
+
+  if (this->ConstraintAxis >= 0)
+  {
     pos[this->ConstraintAxis] += dpos[this->ConstraintAxis];
-    }
+  }
   else
-    {
+  {
     pos[0] += dpos[0];
     pos[1] += dpos[1];
-    }
+  }
   this->SetDisplayPosition(pos);
 }
 
@@ -293,158 +289,155 @@ void vtkPointHandleRepresentationSphere::Scale(double eventPos[2])
   double sf = this->Glypher->GetScaleFactor();
 
   // Compute the scale factor
-  int *size = this->Renderer->GetSize();
-  double dPos = static_cast<double>(eventPos[1]-this->LastEventPosition[1]);
-  sf *= (1.0 + 2.0*(dPos / size[1])); //scale factor of 2.0 is arbitrary
-  
+  int* size = this->Renderer->GetSize();
+  double dPos = static_cast<double>(eventPos[1] - this->LastEventPosition[1]);
+  sf *= (1.0 + 2.0 * (dPos / size[1])); // scale factor of 2.0 is arbitrary
+
   // Scale the handle
   this->Glypher->SetScaleFactor(sf);
-  if(this->AddCircleAroundSphere && this->DiskGlypher)
-    {
+  if (this->AddCircleAroundSphere && this->DiskGlypher)
+  {
     this->DiskGlypher->SetScaleFactor(sf);
-    }
+  }
 }
 
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::Highlight(int highlight)
 {
-  if ( highlight )
-    {
+  if (highlight)
+  {
     this->Actor->SetProperty(this->SelectedProperty);
-    if(this->AddCircleAroundSphere && this->DiskActor)
-      {
-      this->DiskActor->GetProperty()->SetColor(1.0, 0.0, 1.0);
-      }
-    }
-  else
+    if (this->AddCircleAroundSphere && this->DiskActor)
     {
-    this->Actor->SetProperty(this->Property);
-    if(this->AddCircleAroundSphere && this->DiskActor)
-      {
-      this->DiskActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      }
+      this->DiskActor->GetProperty()->SetColor(1.0, 0.0, 1.0);
     }
+  }
+  else
+  {
+    this->Actor->SetProperty(this->Property);
+    if (this->AddCircleAroundSphere && this->DiskActor)
+    {
+      this->DiskActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+    }
+  }
 }
 
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::CreateDefaultProperties()
 {
   this->Property = vtkProperty::New();
-  this->Property->SetColor(1.0,1.0,1.0);
+  this->Property->SetColor(1.0, 1.0, 1.0);
   this->Property->SetLineWidth(0.5);
 
   this->SelectedProperty = vtkProperty::New();
-  this->SelectedProperty->SetColor(0.0,1.0,0.0);
+  this->SelectedProperty->SetColor(0.0, 1.0, 0.0);
   this->SelectedProperty->SetLineWidth(2.0);
 }
 
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::BuildRepresentation()
 {
-  if ( this->GetMTime() > this->BuildTime || 
-       (this->Renderer && this->Renderer->GetActiveCamera() &&
+  if (this->GetMTime() > this->BuildTime ||
+    (this->Renderer && this->Renderer->GetActiveCamera() &&
         this->Renderer->GetActiveCamera()->GetMTime() > this->BuildTime) ||
-       (this->Renderer && this->Renderer->GetVTKWindow() &&
-        this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime) )
-    {
+    (this->Renderer && this->Renderer->GetVTKWindow() &&
+        this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime))
+  {
     double p[3];
     this->GetDisplayPosition(p);
     this->FocalPoint->SetPoint(0, p);
     this->FocalPoint->Modified();
     this->BuildTime.Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::ShallowCopy(vtkProp *prop)
+void vtkPointHandleRepresentationSphere::ShallowCopy(vtkProp* prop)
 {
-  vtkPointHandleRepresentationSphere *rep = 
-    vtkPointHandleRepresentationSphere::SafeDownCast(prop);
-  if ( rep )
-    {
+  vtkPointHandleRepresentationSphere* rep = vtkPointHandleRepresentationSphere::SafeDownCast(prop);
+  if (rep)
+  {
     this->SetCursorShape(rep->GetCursorShape());
     this->SetProperty(rep->GetProperty());
     this->SetSelectedProperty(rep->GetSelectedProperty());
     this->Actor->SetProperty(this->Property);
-    }
+  }
   this->Superclass::ShallowCopy(prop);
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::GetActors(vtkPropCollection *pc)
+void vtkPointHandleRepresentationSphere::GetActors(vtkPropCollection* pc)
 {
   this->Actor->GetActors(pc);
-  if(this->AddCircleAroundSphere && this->DiskActor)
-    {
+  if (this->AddCircleAroundSphere && this->DiskActor)
+  {
     this->DiskActor->GetActors(pc);
-    }
+  }
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::ReleaseGraphicsResources(vtkWindow *win)
+void vtkPointHandleRepresentationSphere::ReleaseGraphicsResources(vtkWindow* win)
 {
   this->Actor->ReleaseGraphicsResources(win);
-  if(this->DiskActor)
-    {
+  if (this->DiskActor)
+  {
     this->DiskActor->ReleaseGraphicsResources(win);
-    }
+  }
 }
 
 //----------------------------------------------------------------------
-int vtkPointHandleRepresentationSphere::RenderOpaqueGeometry(
-  vtkViewport *viewport)
+int vtkPointHandleRepresentationSphere::RenderOpaqueGeometry(vtkViewport* viewport)
 {
   this->BuildRepresentation();
   int res = this->Actor->RenderOpaqueGeometry(viewport);
-  if(res == 1 && this->AddCircleAroundSphere && this->DiskActor)
-    {
+  if (res == 1 && this->AddCircleAroundSphere && this->DiskActor)
+  {
     return this->DiskActor->RenderOpaqueGeometry(viewport);
-    }
-  return res; 
+  }
+  return res;
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::SetAddCircleAroundSphere(
-  int flag )
+void vtkPointHandleRepresentationSphere::SetAddCircleAroundSphere(int flag)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this
-                << "): setting AddCircleAroundSphere to " << flag);
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting AddCircleAroundSphere to "
+                << flag);
   if (this->AddCircleAroundSphere != flag)
-    {
+  {
     this->AddCircleAroundSphere = flag;
     this->Modified();
-    
-    if(this->AddCircleAroundSphere)
+
+    if (this->AddCircleAroundSphere)
+    {
+      if (!this->DiskActor)
       {
-      if(!this->DiskActor)
-        {
         this->CreateDefaultDiskSource();
-        }
+      }
       else
-        {
-        this->DiskActor->SetVisibility(1);
-        }
-      }
-    else
       {
-      if(this->DiskActor)
-        {
-        this->DiskActor->SetVisibility(0);
-        }
+        this->DiskActor->SetVisibility(1);
       }
-    }  
+    }
+    else
+    {
+      if (this->DiskActor)
+      {
+        this->DiskActor->SetVisibility(0);
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::CreateDefaultDiskSource()
 {
-  vtkDiskSource *disk = vtkDiskSource::New();
+  vtkDiskSource* disk = vtkDiskSource::New();
   disk->SetCircumferentialResolution(36);
   disk->SetRadialResolution(5);
   disk->SetInnerRadius(0.5);
   disk->SetOuterRadius(0.65);
   vtkProperty* diskProperty = vtkProperty::New();
-  diskProperty->SetColor(1.0,1.0,1.0);
+  diskProperty->SetColor(1.0, 1.0, 1.0);
   diskProperty->SetLineWidth(0.5);
 
   this->DiskGlypher = vtkGlyph3D::New();
@@ -461,7 +454,7 @@ void vtkPointHandleRepresentationSphere::CreateDefaultDiskSource()
   this->DiskActor = vtkActor::New();
   this->DiskActor->SetMapper(this->DiskMapper);
   this->DiskActor->SetProperty(diskProperty);
-  
+
   diskProperty->Delete();
   disk->Delete();
 }
@@ -469,35 +462,35 @@ void vtkPointHandleRepresentationSphere::CreateDefaultDiskSource()
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::PrintSelf(ostream& os, vtkIndent indent)
 {
-  //Superclass typedef defined in vtkTypeMacro() found in vtkSetGet.h
-  this->Superclass::PrintSelf(os,indent);
-  
-  if ( this->Property )
-    {
+  // Superclass typedef defined in vtkTypeMacro() found in vtkSetGet.h
+  this->Superclass::PrintSelf(os, indent);
+
+  if (this->Property)
+  {
     os << indent << "Property: " << this->Property << "\n";
-    }
+  }
   else
-    {
+  {
     os << indent << "Property: (none)\n";
-    }
+  }
 
-  if ( this->SelectedProperty )
-    {
+  if (this->SelectedProperty)
+  {
     os << indent << "Selected Property: " << this->SelectedProperty << "\n";
-    }
+  }
   else
-    {
+  {
     os << indent << "Selected Property: (none)\n";
-    }
+  }
 
-  if ( this->CursorShape )
-    {
+  if (this->CursorShape)
+  {
     os << indent << "Cursor Shape: " << this->CursorShape << "\n";
-    }
+  }
   else
-    {
+  {
     os << indent << "Cursor Shape: (none)\n";
-    }
+  }
 
   os << indent << "Scalar: " << this->Scalar << endl;
   os << indent << "AddCircleAroundSphere: " << this->AddCircleAroundSphere << endl;

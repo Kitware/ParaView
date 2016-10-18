@@ -38,16 +38,15 @@ void vtkPVCacheSizeInformation::CopyFromObject(vtkObject* obj)
 #ifdef FIXME
   vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
   if (pm)
-    {
+  {
     csk = pm->GetCacheSizeKeeper();
-    }
+  }
 #endif
   if (!csk)
-    {
-    vtkErrorMacro(
-      "vtkPVCacheSizeInformation requires vtkCacheSizeKeeper to gather info.");
+  {
+    vtkErrorMacro("vtkPVCacheSizeInformation requires vtkCacheSizeKeeper to gather info.");
     return;
-    }
+  }
   this->CacheSize = csk->GetCacheSize();
 }
 
@@ -55,34 +54,30 @@ void vtkPVCacheSizeInformation::CopyFromObject(vtkObject* obj)
 void vtkPVCacheSizeInformation::CopyToStream(vtkClientServerStream* stream)
 {
   stream->Reset();
-  *stream << vtkClientServerStream::Reply
-    << this->CacheSize
-    << vtkClientServerStream::End;
+  *stream << vtkClientServerStream::Reply << this->CacheSize << vtkClientServerStream::End;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVCacheSizeInformation::CopyFromStream(const vtkClientServerStream* stream)
 {
   this->CacheSize = 0;
-  if (!stream->GetArgument(0,0, &this->CacheSize))
-    {
+  if (!stream->GetArgument(0, 0, &this->CacheSize))
+  {
     vtkErrorMacro("Error parsing CacheSize.");
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVCacheSizeInformation::AddInformation(vtkPVInformation* info)
 {
-  vtkPVCacheSizeInformation* cinfo  = vtkPVCacheSizeInformation::SafeDownCast(info);
+  vtkPVCacheSizeInformation* cinfo = vtkPVCacheSizeInformation::SafeDownCast(info);
   if (!cinfo)
-    {
+  {
     vtkErrorMacro("AddInformation needs vtkPVCacheSizeInformation.");
     return;
-    }
-  this->CacheSize = (cinfo->CacheSize > this->CacheSize)?
-    cinfo->CacheSize : this->CacheSize;
+  }
+  this->CacheSize = (cinfo->CacheSize > this->CacheSize) ? cinfo->CacheSize : this->CacheSize;
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkPVCacheSizeInformation::PrintSelf(ostream& os, vtkIndent indent)

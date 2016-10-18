@@ -36,12 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// pqCPPluginManager is the central class that orchestrates the behaviour of
 /// this co-processing plugin.
-class pqCPPluginManager :  public pqSGPluginManager
+class pqCPPluginManager : public pqSGPluginManager
 {
   Q_OBJECT
   typedef pqSGPluginManager Superclass;
+
 public:
-  pqCPPluginManager(QObject* parent=0);
+  pqCPPluginManager(QObject* parent = 0);
   ~pqCPPluginManager();
 
   /// Get the name of the writers menu from the concrete subclass.

@@ -37,26 +37,29 @@ vtkSMOrderedPropertyIterator::~vtkSMOrderedPropertyIterator()
 void vtkSMOrderedPropertyIterator::SetProxy(vtkSMProxy* proxy)
 {
   if (this->Proxy != proxy)
+  {
+    if (this->Proxy != NULL)
     {
-    if (this->Proxy != NULL) { this->Proxy->UnRegister(this); }
-    this->Proxy = proxy;
-    if (this->Proxy != NULL) 
-      { 
-      this->Proxy->Register(this); 
-      this->Begin();
-      }
-    this->Modified();
+      this->Proxy->UnRegister(this);
     }
+    this->Proxy = proxy;
+    if (this->Proxy != NULL)
+    {
+      this->Proxy->Register(this);
+      this->Begin();
+    }
+    this->Modified();
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMOrderedPropertyIterator::Begin()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: Begin()");
     return;
-    }
+  }
 
   this->Index = 0;
 }
@@ -65,16 +68,15 @@ void vtkSMOrderedPropertyIterator::Begin()
 int vtkSMOrderedPropertyIterator::IsAtEnd()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: IsAtEnd()");
     return 1;
-    }
+  }
 
-  if (this->Index >=
-      this->Proxy->Internals->PropertyNamesInOrder.size())
-    {
+  if (this->Index >= this->Proxy->Internals->PropertyNamesInOrder.size())
+  {
     return 1;
-    }
+  }
   return 0;
 }
 
@@ -82,10 +84,10 @@ int vtkSMOrderedPropertyIterator::IsAtEnd()
 void vtkSMOrderedPropertyIterator::Next()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: Next()");
     return;
-    }
+  }
 
   this->Index++;
 }
@@ -94,15 +96,15 @@ void vtkSMOrderedPropertyIterator::Next()
 const char* vtkSMOrderedPropertyIterator::GetKey()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetKey()");
     return 0;
-    }
+  }
 
   if (!this->IsAtEnd())
-    {
+  {
     return this->Proxy->Internals->PropertyNamesInOrder[this->Index];
-    }
+  }
 
   return 0;
 }
@@ -111,45 +113,43 @@ const char* vtkSMOrderedPropertyIterator::GetKey()
 const char* vtkSMOrderedPropertyIterator::GetPropertyLabel()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetPropertyLabel()");
     return 0;
-    }
+  }
 
   if (!this->IsAtEnd())
-    {
+  {
     const char* pname = this->Proxy->Internals->PropertyNamesInOrder[this->Index];
 
-    if (vtkSMProperty* prop = this->Proxy->GetProperty(pname, /*selfOnly*/1))
-      {
+    if (vtkSMProperty* prop = this->Proxy->GetProperty(pname, /*selfOnly*/ 1))
+    {
       // Self property
       return prop->GetXMLLabel();
-      }
+    }
     else
-      {
+    {
       // Property of a sub-proxy
       return this->GetKey();
-      }
     }
+  }
 
   return 0;
 }
-
 
 //---------------------------------------------------------------------------
 vtkSMProperty* vtkSMOrderedPropertyIterator::GetProperty()
 {
   if (!this->Proxy)
-    {
+  {
     vtkErrorMacro("Proxy is not set. Can not perform operation: GetProperty()");
     return 0;
-    }
+  }
 
   if (!this->IsAtEnd())
-    {
-    return this->Proxy->GetProperty(
-      this->Proxy->Internals->PropertyNamesInOrder[this->Index]);
-    }
+  {
+    return this->Proxy->GetProperty(this->Proxy->Internals->PropertyNamesInOrder[this->Index]);
+  }
   return 0;
 }
 

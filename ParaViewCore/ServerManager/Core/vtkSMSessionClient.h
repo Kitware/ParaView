@@ -42,7 +42,7 @@ public:
   /**
    * Return the url used to connect the current session to a server
    */
-  virtual const char* GetURI() {return this->URI;};
+  virtual const char* GetURI() { return this->URI; };
 
   /**
    * Connects a remote server. URL can be of the following format:
@@ -86,8 +86,7 @@ public:
    * Overridden to provide return the information gathered from data-server and
    * render-server.
    */
-  virtual vtkPVServerInformation* GetServerInformation()
-    { return this->ServerInformation; }
+  virtual vtkPVServerInformation* GetServerInformation() { return this->ServerInformation; }
 
   /**
    * Called to do any initializations after a successful session has been
@@ -103,8 +102,7 @@ public:
   virtual void PushState(vtkSMMessage* msg);
   virtual void PullState(vtkSMMessage* message);
   virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignore_errors=false);
+    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false);
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
   //@}
 
@@ -129,8 +127,8 @@ public:
    * Overridden to fetch the information from server if needed, otherwise it's
    * handled locally.
    */
-  virtual bool GatherInformation(vtkTypeUInt32 location,
-    vtkPVInformation* information, vtkTypeUInt32 globalid);
+  virtual bool GatherInformation(
+    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   /**
    * Returns the number of processes on the given server/s. If more than 1
@@ -252,14 +250,12 @@ protected:
    * Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
    * Return true if the event was handle locally.
    */
-  virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
-                                void* calldata);
+  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   /**
    * Callback when any vtkMultiProcessController subclass fires a ErrorEvent.
    */
-  virtual void OnConnectionLost( vtkObject* caller, unsigned long eventid,
-                                 void* calldata);
+  virtual void OnConnectionLost(vtkObject* caller, unsigned long eventid, void* calldata);
 
 private:
   vtkSMSessionClient(const vtkSMSessionClient&) VTK_DELETE_FUNCTION;
@@ -268,7 +264,6 @@ private:
   int NotBusy;
   vtkTypeUInt32 LastGlobalID;
   vtkTypeUInt32 LastGlobalIDAvailable;
-
 };
 
 #endif

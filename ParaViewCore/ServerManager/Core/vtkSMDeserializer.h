@@ -78,15 +78,14 @@ protected:
    * Create a new proxy of the given group and name. Default implementation
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
-  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
-                                  const char* subProxyName = NULL);
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL);
 
   vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
 
 private:
   vtkSMDeserializer(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

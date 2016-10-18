@@ -48,7 +48,7 @@ protected:
   vtkSMTimeStepIndexDomain();
   ~vtkSMTimeStepIndexDomain();
 
-  void Update(vtkSMProxyProperty *pp);
+  void Update(vtkSMProxyProperty* pp);
 
 private:
   vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;

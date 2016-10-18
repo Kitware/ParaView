@@ -38,19 +38,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMTransferFunctionProxy;
 
 /**
-* A property widget for editing a transfer function. 
+* A property widget for editing a transfer function.
 *
-* To use this widget for a property add the 
+* To use this widget for a property add the
 * 'panel_widget="transfer_function_editor"' to the property's XML.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
+  : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  explicit pqTransferFunctionWidgetPropertyWidget(vtkSMProxy *proxy,
-                                                  vtkSMProperty *property,
-                                                  QWidget *parent = 0);
+  explicit pqTransferFunctionWidgetPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqTransferFunctionWidgetPropertyWidget();
 
 private slots:

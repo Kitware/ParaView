@@ -45,14 +45,12 @@ public:
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
-    vtkSMProxy* proxy, int outputPort);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort);
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
 
   /**
    * Fetchs data bounds from the client-side object. We simply fetch the
@@ -80,8 +78,7 @@ protected:
    * Use the center of the source to initialize the view with three orthogonal
    * slices in x, y, z.
    */
-  void InitDefaultSlices(vtkSMSourceProxy* source, int opport,
-    vtkSMRepresentationProxy* repr);
+  void InitDefaultSlices(vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy* repr);
 
 private:
   vtkSMMultiSliceViewProxy(const vtkSMMultiSliceViewProxy&) VTK_DELETE_FUNCTION;
@@ -89,7 +86,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

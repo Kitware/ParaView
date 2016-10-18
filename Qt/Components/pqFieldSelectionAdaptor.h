@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -59,11 +59,11 @@ class PQCOMPONENTS_EXPORT pqFieldSelectionAdaptor : public QObject
 
 public:
   /**
-  * constructor requires a QComboBox, 
+  * constructor requires a QComboBox,
   */
   pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* prop);
   ~pqFieldSelectionAdaptor();
-  
+
   /**
   * get the attribute mode
   */
@@ -73,7 +73,7 @@ public:
   */
   QString scalar() const;
 
-  void setSelection(const QStringList &selection);
+  void setSelection(const QStringList& selection);
   QStringList selection() const;
 
 signals:
@@ -98,12 +98,11 @@ public slots:
 protected slots:
   void updateGUI();
   void indexChanged(int index);
-  
+
   void domainChanged();
 private slots:
   void internalDomainChanged();
-  void blockDomainModified(vtkObject* caller, unsigned long, 
-                           void*, void*, vtkCommand*);
+  void blockDomainModified(vtkObject* caller, unsigned long, void*, void*, vtkCommand*);
 
 protected:
   QStringList Selection;
@@ -116,4 +115,3 @@ protected:
 };
 
 #endif // pq_FieldSelectionAdaptor_h
-

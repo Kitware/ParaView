@@ -9,7 +9,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -63,10 +63,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * Abstract interface for "auto-start" plugins. An auto-start plugin is a
-* plugin that is notified by ParaView when ParaView starts and exits. 
+* plugin that is notified by ParaView when ParaView starts and exits.
 * In practice, no plugin can be loaded until ParaView is up and running, hence
 * the \c startup() is called immediately after the plugin is loaded. When the
-* applicaiton is about to exit or if the plugin is about to be unloaded, 
+* applicaiton is about to exit or if the plugin is about to be unloaded,
 * \c shutdown() is called on all the registered /// interfaces.
 */
 class PQCORE_EXPORT pqAutoStartInterface
@@ -89,10 +89,9 @@ protected:
   pqAutoStartInterface();
 
 private:
-Q_DISABLE_COPY(pqAutoStartInterface)
+  Q_DISABLE_COPY(pqAutoStartInterface)
 };
 
 Q_DECLARE_INTERFACE(pqAutoStartInterface, "com.kitware/paraview/autostart")
 
 #endif // !_pqAutoStartInterface_h
-

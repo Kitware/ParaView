@@ -43,6 +43,7 @@ class PQDEPRECATED_EXPORT pqBoxWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
+
 public:
   pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   virtual ~pqBoxWidget();
@@ -56,8 +57,7 @@ public:
   * and hints have been set.
   */
   virtual void resetBounds(double bounds[6]);
-  virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
+  virtual void resetBounds() { this->Superclass::resetBounds(); }
 
   /**
   * accept the changes. Overridden to hide handles.
@@ -93,6 +93,7 @@ private slots:
 
   void showHandles();
   void hideHandles();
+
 private:
   Q_DISABLE_COPY(pqBoxWidget)
 

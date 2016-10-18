@@ -32,8 +32,7 @@
 class vtkCPDataDescription::vtkInternals
 {
 public:
-  typedef std::map<std::string, vtkSmartPointer<vtkCPInputDataDescription> >
-    GridDescriptionMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkCPInputDataDescription> > GridDescriptionMapType;
   GridDescriptionMapType GridDescriptionMap;
 };
 
@@ -73,10 +72,10 @@ void vtkCPDataDescription::AddInput(const char* gridName)
 {
   if (this->Internals->GridDescriptionMap.find(gridName) ==
     this->Internals->GridDescriptionMap.end())
-    {
+  {
     this->Internals->GridDescriptionMap[gridName] =
       vtkSmartPointer<vtkCPInputDataDescription>::New();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -90,10 +89,10 @@ void vtkCPDataDescription::ResetInputDescriptions()
 {
   vtkInternals::GridDescriptionMapType::iterator iter;
   for (iter = this->Internals->GridDescriptionMap.begin();
-    iter != this->Internals->GridDescriptionMap.end(); ++iter)
-    {
+       iter != this->Internals->GridDescriptionMap.end(); ++iter)
+  {
     iter->second->Reset();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -105,90 +104,84 @@ void vtkCPDataDescription::ResetAll()
 }
 
 //----------------------------------------------------------------------------
-vtkCPInputDataDescription *vtkCPDataDescription::GetInputDescription(
-  unsigned int index)
+vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescription(unsigned int index)
 {
-  unsigned int cur_index=0;
+  unsigned int cur_index = 0;
   vtkInternals::GridDescriptionMapType::iterator iter;
   for (iter = this->Internals->GridDescriptionMap.begin();
-    iter != this->Internals->GridDescriptionMap.end(); ++iter, ++cur_index)
-    {
+       iter != this->Internals->GridDescriptionMap.end(); ++iter, ++cur_index)
+  {
     if (cur_index == index)
-      {
+    {
       return iter->second;
-      }
     }
+  }
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkCPDataDescription::GetInputDescriptionName(
-  unsigned int index)
+const char* vtkCPDataDescription::GetInputDescriptionName(unsigned int index)
 {
-  unsigned int cur_index=0;
+  unsigned int cur_index = 0;
   vtkInternals::GridDescriptionMapType::iterator iter;
   for (iter = this->Internals->GridDescriptionMap.begin();
-    iter != this->Internals->GridDescriptionMap.end(); ++iter, ++cur_index)
-    {
+       iter != this->Internals->GridDescriptionMap.end(); ++iter, ++cur_index)
+  {
     if (cur_index == index)
-      {
+    {
       return iter->first.c_str();
-      }
     }
+  }
 
   return NULL;
 }
 
-
 //----------------------------------------------------------------------------
-vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescriptionByName(
-  const char* name)
+vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescriptionByName(const char* name)
 {
   vtkInternals::GridDescriptionMapType::iterator iter =
     this->Internals->GridDescriptionMap.find(name);
   if (iter != this->Internals->GridDescriptionMap.end())
-    {
+  {
     return iter->second;
-    }
+  }
   return NULL;
 }
 
 //----------------------------------------------------------------------------
 bool vtkCPDataDescription::GetIfAnyGridNecessary()
 {
-  if(this->ForceOutput)
-    {
+  if (this->ForceOutput)
+  {
     return true;
-    }
+  }
   vtkInternals::GridDescriptionMapType::iterator iter;
   for (iter = this->Internals->GridDescriptionMap.begin();
-    iter != this->Internals->GridDescriptionMap.end(); ++iter)
-    {
+       iter != this->Internals->GridDescriptionMap.end(); ++iter)
+  {
     if (iter->second->GetIfGridIsNecessary())
-      {
+    {
       return true;
-      }
     }
+  }
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkCPDataDescription::GetIfGridIsNecessary(
-  const char* name)
+bool vtkCPDataDescription::GetIfGridIsNecessary(const char* name)
 {
-  if(this->ForceOutput)
-    {
+  if (this->ForceOutput)
+  {
     return true;
-    }
+  }
   vtkInternals::GridDescriptionMapType::iterator iter =
     this->Internals->GridDescriptionMap.find(name);
   if (iter != this->Internals->GridDescriptionMap.end())
-    {
+  {
     return iter->second->GetIfGridIsNecessary();
-    }
+  }
   return false;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkCPDataDescription::PrintSelf(ostream& os, vtkIndent indent)
@@ -198,12 +191,12 @@ void vtkCPDataDescription::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeStep: " << this->TimeStep << "\n";
   os << indent << "IsTimeDataSet: " << this->IsTimeDataSet << "\n";
   os << indent << "ForceOutput: " << this->ForceOutput << "\n";
-  if(this->UserData)
-    {
+  if (this->UserData)
+  {
     os << indent << "UserData: " << this->UserData << "\n";
-    }
+  }
   else
-    {
+  {
     os << indent << "UserData: (NULL)\n";
-    }
+  }
 }

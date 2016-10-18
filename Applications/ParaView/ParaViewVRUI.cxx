@@ -44,46 +44,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vector>
 
-
 class ParaViewVRUI::pqInternals
 {
 public:
   pqInternals()
-    {
-      this->Pipe=0;
-      this->State=0;
-      this->Active=false;
-      this->Streaming=false;
-      this->Thread=0;
-      this->StateMutex=0;
-      this->PacketSignalCond=0;
-      this->PacketSignalCondMutex=0;
-    }
+  {
+    this->Pipe = 0;
+    this->State = 0;
+    this->Active = false;
+    this->Streaming = false;
+    this->Thread = 0;
+    this->StateMutex = 0;
+    this->PacketSignalCond = 0;
+    this->PacketSignalCondMutex = 0;
+  }
   ~pqInternals()
+  {
+    if (this->Pipe != 0)
     {
-      if(this->Pipe!=0)
-        {
-        delete this->Pipe;
-        }
-      if(this->State!=0)
-        {
-        delete this->State;
-        }
-      if(this->Thread!=0)
-        {
-        delete this->Thread;
-        }
+      delete this->Pipe;
     }
-  vruiPipe *Pipe;
-  vruiServerState *State;
+    if (this->State != 0)
+    {
+      delete this->State;
+    }
+    if (this->Thread != 0)
+    {
+      delete this->Thread;
+    }
+  }
+  vruiPipe* Pipe;
+  vruiServerState* State;
   bool Active;
   bool Streaming;
-  vruiThread *Thread;
+  vruiThread* Thread;
 
-  QMutex *StateMutex;
+  QMutex* StateMutex;
 
-  QWaitCondition *PacketSignalCond;
-  QMutex *PacketSignalCondMutex;
+  QWaitCondition* PacketSignalCond;
+  QMutex* PacketSignalCondMutex;
 };
 
 #if 0
@@ -117,32 +116,32 @@ void VRUI_CALLBACK handleTrackerPosQuat(void *userdata,
 // ----------------------------------------------------------------------------
 ParaViewVRUI::ParaViewVRUI()
 {
-  this->Internals=new pqInternals();
-  this->Name=0;
-  this->Port=8555;
-  this->Initialized=false;
+  this->Internals = new pqInternals();
+  this->Name = 0;
+  this->Port = 8555;
+  this->Initialized = false;
 }
 
 // ----------------------------------------------------------------------------
-void ParaViewVRUI::SetName(const char *name)
+void ParaViewVRUI::SetName(const char* name)
 {
-  if(this->Name!=name)
+  if (this->Name != name)
+  {
+    int size = strlen(name) + 1;
+    if (name && size > 1)
     {
-    int size=strlen(name)+1;
-    if(name && size > 1)
+      if (this->Name != 0)
       {
-      if(this->Name!=0)
-        {
         delete[] this->Name;
-        }
-      this->Name=new char[size];
       }
-    strncpy(this->Name,name,size);
+      this->Name = new char[size];
     }
+    strncpy(this->Name, name, size);
+  }
 }
 
 // ----------------------------------------------------------------------------
-const char *ParaViewVRUI::GetName() const
+const char* ParaViewVRUI::GetName() const
 {
   return this->Name;
 }
@@ -156,9 +155,8 @@ int ParaViewVRUI::GetPort() const
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::SetPort(int port)
 {
-  this->Port=port;
+  this->Port = port;
 }
-
 
 // ----------------------------------------------------------------------------
 bool ParaViewVRUI::GetInitialized() const
@@ -169,70 +167,70 @@ bool ParaViewVRUI::GetInitialized() const
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::Init()
 {
-  QTcpSocket *socket=new QTcpSocket;
-  socket->connectToHost(QString(this->Name),this->Port); // ReadWrite?
-  this->Internals->Pipe=new vruiPipe(socket);
+  QTcpSocket* socket = new QTcpSocket;
+  socket->connectToHost(QString(this->Name), this->Port); // ReadWrite?
+  this->Internals->Pipe = new vruiPipe(socket);
   this->Internals->Pipe->Send(vruiPipe::CONNECT_REQUEST);
-  if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
-    {
+  if (!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
+  {
     cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
     delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
+    this->Internals->Pipe = 0;
     return;
-    }
-  if(this->Internals->Pipe->Receive()!=vruiPipe::CONNECT_REPLY)
-    {
+  }
+  if (this->Internals->Pipe->Receive() != vruiPipe::CONNECT_REPLY)
+  {
     cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
     delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
+    this->Internals->Pipe = 0;
     return;
-    }
+  }
 
-  this->Internals->State=new vruiServerState;
-  this->Internals->StateMutex=new QMutex;
+  this->Internals->State = new vruiServerState;
+  this->Internals->StateMutex = new QMutex;
 
   this->Internals->Pipe->ReadLayout(this->Internals->State);
 
   this->Activate();
 
-//  this->StartStream();
+  //  this->StartStream();
 
-  this->Initialized=true;
+  this->Initialized = true;
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::Activate()
 {
-  if(!this->Internals->Active)
-    {
+  if (!this->Internals->Active)
+  {
     this->Internals->Pipe->Send(vruiPipe::ACTIVATE_REQUEST);
-    this->Internals->Active=true;
-    }
+    this->Internals->Active = true;
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::Deactivate()
 {
-  if(this->Internals->Active)
-    {
-    this->Internals->Active=false;
+  if (this->Internals->Active)
+  {
+    this->Internals->Active = false;
     this->Internals->Pipe->Send(vruiPipe::DEACTIVATE_REQUEST);
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::StartStream()
 {
-  if(this->Internals->Active)
-    {
-    this->Internals->Thread=new vruiThread;
-    this->Internals->Streaming=true;
+  if (this->Internals->Active)
+  {
+    this->Internals->Thread = new vruiThread;
+    this->Internals->Streaming = true;
     this->Internals->Thread->SetPipe(this->Internals->Pipe);
     this->Internals->Thread->SetServerState(this->Internals->State);
     this->Internals->Thread->SetStateMutex(this->Internals->StateMutex);
     this->Internals->Thread->start();
 
-    this->Internals->PacketSignalCond=new QWaitCondition;
+    this->Internals->PacketSignalCond = new QWaitCondition;
     QMutex m;
     m.lock();
 
@@ -240,19 +238,19 @@ void ParaViewVRUI::StartStream()
     this->Internals->PacketSignalCond->wait(&m);
     m.unlock();
 
-    this->Internals->Streaming=true;
-    }
+    this->Internals->Streaming = true;
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::StopStream()
 {
-  if(this->Internals->Streaming)
-    {
-    this->Internals->Streaming=false;
+  if (this->Internals->Streaming)
+  {
+    this->Internals->Streaming = false;
     this->Internals->Pipe->Send(vruiPipe::STOPSTREAM_REQUEST);
     this->Internals->Thread->wait();
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -263,17 +261,17 @@ ParaViewVRUI::~ParaViewVRUI()
   this->Deactivate();
 
   delete this->Internals;
-  if(this->Name!=0)
-    {
+  if (this->Name != 0)
+  {
     delete[] this->Name;
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::callback()
 {
-  if(this->Initialized)
-    {
+  if (this->Initialized)
+  {
     // std::cout << "callback()" << std::endl;
 
     this->Internals->StateMutex->lock();
@@ -283,53 +281,53 @@ void ParaViewVRUI::callback()
 
     this->Internals->StateMutex->unlock();
     this->GetNextPacket(); // for the next step
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::GetNextPacket()
 {
-  if(this->Internals->Active)
+  if (this->Internals->Active)
+  {
+    if (this->Internals->Streaming)
     {
-    if(this->Internals->Streaming)
-      {
       // With a thread
       this->Internals->PacketSignalCondMutex->lock();
       this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
       this->Internals->PacketSignalCondMutex->unlock();
-      }
+    }
     else
-      {
+    {
       // With a loop
       this->Internals->Pipe->Send(vruiPipe::PACKET_REQUEST);
-      if(this->Internals->Pipe->WaitForServerReply(10000))
+      if (this->Internals->Pipe->WaitForServerReply(10000))
+      {
+        if (this->Internals->Pipe->Receive() != vruiPipe::PACKET_REPLY)
         {
-        if(this->Internals->Pipe->Receive()!=vruiPipe::PACKET_REPLY)
-          {
           cout << "PVRUI Mismatching message while waiting for PACKET_REPLY" << endl;
-          }
+        }
         else
-          {
+        {
           this->Internals->StateMutex->lock();
           this->Internals->Pipe->ReadState(this->Internals->State);
           this->Internals->StateMutex->unlock();
 
-//          this->PacketNotificationMutex->lock();
-//          this->PacketNotificationMutex->unlock();
-          }
-        }
-      else
-        {
-        cout << "timeout for PACKET_REPLY" << endl;
+          //          this->PacketNotificationMutex->lock();
+          //          this->PacketNotificationMutex->unlock();
         }
       }
+      else
+      {
+        cout << "timeout for PACKET_REPLY" << endl;
+      }
     }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::PrintPositionOrientation()
 {
-  std::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
+  std::vector<vtkSmartPointer<vruiTrackerState> >* trackers =
     this->Internals->State->GetTrackerStates();
 
   float pos[3];
@@ -341,22 +339,21 @@ void ParaViewVRUI::PrintPositionOrientation()
   // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
   //      << endl;
 
-  std::vector<bool> *buttons=this->Internals->State->GetButtonStates();
+  std::vector<bool>* buttons = this->Internals->State->GetButtonStates();
   // cout << "button0=" << (*buttons)[0] << endl;
-  pqView *view = 0;
+  pqView* view = 0;
   view = pqActiveObjects::instance().activeView();
-  if ( view )
+  if (view)
+  {
+    vtkSMCaveRenderViewProxy* proxy = 0;
+    proxy = vtkSMCaveRenderViewProxy::SafeDownCast(view->getViewProxy());
+    if (proxy)
     {
-    vtkSMCaveRenderViewProxy *proxy = 0;
-    proxy = vtkSMCaveRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
-      {
       double rotMat[3][3];
-      vtkMath::QuaternionToMatrix3x3((double*)q,rotMat);
-      proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], pos[0]*1,
-                          rotMat[1][0], rotMat[1][1],rotMat[1][2], pos[1]*1,
-                          rotMat[2][0], rotMat[2][1],rotMat[2][2], pos[2]*1,
-                          0.0, 0.0, 0.0, 1.0 );
-      }
+      vtkMath::QuaternionToMatrix3x3((double*)q, rotMat);
+      proxy->SetHeadPose(rotMat[0][0], rotMat[0][1], rotMat[0][2], pos[0] * 1, rotMat[1][0],
+        rotMat[1][1], rotMat[1][2], pos[1] * 1, rotMat[2][0], rotMat[2][1], rotMat[2][2],
+        pos[2] * 1, 0.0, 0.0, 0.0, 1.0);
     }
+  }
 }

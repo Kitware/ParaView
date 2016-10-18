@@ -65,7 +65,7 @@ public:
    */
   int SetElements(const int* values);
   int SetElements(const int* values, unsigned int numElems);
-  int *GetElements();
+  int* GetElements();
   //@}
 
   //@{
@@ -180,7 +180,6 @@ protected:
    */
   virtual void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*);
 
-
   // Handle XML with int type for default values.
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
@@ -207,7 +206,6 @@ protected:
 private:
   vtkSMIntVectorProperty(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

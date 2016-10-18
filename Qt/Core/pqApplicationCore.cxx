@@ -107,27 +107,26 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
-  QObject* parentObject)
+pqApplicationCore::pqApplicationCore(
+  int& argc, char** argv, pqOptions* options, QObject* parentObject)
   : QObject(parentObject)
 {
   vtkSmartPointer<pqOptions> defaultOptions;
   if (!options)
-    {
+  {
     defaultOptions = vtkSmartPointer<pqOptions>::New();
     options = defaultOptions;
-    }
+  }
   this->Options = options;
 
   // Create output window before initializing server manager.
   this->createOutputWindow();
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule::PROCESS_CLIENT, options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();
-  QObject::connect(this->ProgressManager, SIGNAL(progressStartEvent()),
-                   this->OutputWindow, SLOT(onProgressStartEvent()));
+  QObject::connect(this->ProgressManager, SIGNAL(progressStartEvent()), this->OutputWindow,
+    SLOT(onProgressStartEvent()));
 }
 
 //-----------------------------------------------------------------------------
@@ -152,8 +151,7 @@ void pqApplicationCore::constructor()
   this->ServerManagerObserver = new pqServerManagerObserver(this);
 
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
-  this->ServerManagerModel = new pqServerManagerModel(
-    this->ServerManagerObserver, this);
+  this->ServerManagerModel = new pqServerManagerModel(this->ServerManagerObserver, this);
 
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
   this->ObjectBuilder = new pqObjectBuilder(this);
@@ -177,15 +175,14 @@ void pqApplicationCore::constructor()
 
   this->LoadingState = false;
   QObject::connect(this->ServerManagerObserver,
-    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
-    this, SLOT(onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)));
-  QObject::connect(this->ServerManagerObserver,
-    SIGNAL(stateSaved(vtkPVXMLElement*)),
-    this, SLOT(onStateSaved(vtkPVXMLElement*)));
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)), this,
+    SLOT(onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(this->ServerManagerObserver, SIGNAL(stateSaved(vtkPVXMLElement*)), this,
+    SLOT(onStateSaved(vtkPVXMLElement*)));
   // CAUTION: We do not want to connect this slot to aboutToQuit()
   //  => See prepareForQuit() for more details.
-  QObject::connect(QCoreApplication::instance(),SIGNAL(lastWindowClosed()),
-    this, SLOT(prepareForQuit()));
+  QObject::connect(
+    QCoreApplication::instance(), SIGNAL(lastWindowClosed()), this, SLOT(prepareForQuit()));
 
   // this has to happen after the construction of pqInterfaceTracker since if
   // the plugin initialization code itself may request access to  the interface
@@ -228,17 +225,17 @@ pqApplicationCore::~pqApplicationCore()
   this->ServerManagerObserver = 0;
 
   delete this->RecentlyUsedResourcesList;
-  this->RecentlyUsedResourcesList= 0;
+  this->RecentlyUsedResourcesList = 0;
 
   delete this->Settings;
   this->Settings = 0;
 
   if (this->HelpEngine)
-    {
+  {
     QString collectionFile = this->HelpEngine->collectionFile();
     delete this->HelpEngine;
     QFile::remove(collectionFile);
-    }
+  }
   this->HelpEngine = NULL;
 
   // We don't call delete on these since we have already setup parent on these
@@ -254,16 +251,16 @@ pqApplicationCore::~pqApplicationCore()
   delete this->TestUtility;
 
   if (pqApplicationCore::Instance == this)
-    {
+  {
     pqApplicationCore::Instance = 0;
-    }
+  }
 
   vtkInitializationHelper::Finalize();
   vtkOutputWindow::SetInstance(NULL);
   delete this->OutputWindow;
   this->OutputWindow = NULL;
   this->OutputWindowAdapter->Delete();
-  this->OutputWindowAdapter= 0;
+  this->OutputWindowAdapter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -273,20 +270,17 @@ void pqApplicationCore::createOutputWindow()
   pqOutputWindowAdapter* owAdapter = pqOutputWindowAdapter::New();
   this->OutputWindow = new pqOutputWindow(0);
   this->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayGenericWarningText(const QString&)),
+  this->OutputWindow->connect(
+    owAdapter, SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
+  this->OutputWindow->connect(
+    owAdapter, SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
+  this->OutputWindow->connect(owAdapter, SIGNAL(displayWarningText(const QString&)),
+    SLOT(onDisplayWarningText(const QString&)));
+  this->OutputWindow->connect(owAdapter, SIGNAL(displayGenericWarningText(const QString&)),
     SLOT(onDisplayGenericWarningText(const QString&)));
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayTextInWindow(const QString&)),
+  this->OutputWindow->connect(owAdapter, SIGNAL(displayTextInWindow(const QString&)),
     SLOT(onDisplayTextInWindow(const QString&)));
-  this->OutputWindow->connect(owAdapter,
-    SIGNAL(displayErrorTextInWindow(const QString&)),
+  this->OutputWindow->connect(owAdapter, SIGNAL(displayErrorTextInWindow(const QString&)),
     SLOT(onDisplayErrorTextInWindow(const QString&)));
   vtkOutputWindow::SetInstance(owAdapter);
   this->OutputWindowAdapter = owAdapter;
@@ -296,14 +290,14 @@ void pqApplicationCore::createOutputWindow()
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
 {
   if (stack != this->UndoStack)
-    {
+  {
     this->UndoStack = stack;
     if (stack)
-      {
+    {
       stack->setParent(this);
-      }
-    emit this->undoStackChanged(stack);
     }
+    emit this->undoStackChanged(stack);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -312,21 +306,19 @@ void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
   delete this->DisplayPolicy;
   this->DisplayPolicy = policy;
   if (policy)
-    {
+  {
     policy->setParent(this);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::registerManager(const QString& function,
-  QObject* _manager)
+void pqApplicationCore::registerManager(const QString& function, QObject* _manager)
 {
   if (this->Internal->RegisteredManagers.contains(function) &&
     this->Internal->RegisteredManagers[function] != 0)
-    {
-    qDebug() << "Replacing existing manager for function : "
-      << function;
-    }
+  {
+    qDebug() << "Replacing existing manager for function : " << function;
+  }
   this->Internal->RegisteredManagers[function] = _manager;
 }
 
@@ -342,9 +334,9 @@ QObject* pqApplicationCore::manager(const QString& function)
   QMap<QString, QPointer<QObject> >::iterator iter =
     this->Internal->RegisteredManagers.find(function);
   if (iter != this->Internal->RegisteredManagers.end())
-    {
+  {
     return iter.value();
-    }
+  }
   return 0;
 }
 
@@ -353,7 +345,7 @@ void pqApplicationCore::saveState(const QString& filename)
 {
   // * Save the Proxy Manager state.
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   pxm->SaveXMLState(filename.toLatin1().data());
 }
@@ -363,7 +355,7 @@ vtkPVXMLElement* pqApplicationCore::saveState()
 {
   // * Save the Proxy Manager state.
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   // Eventually proxy manager will save state for each connection separately.
   // For now, we only have one connection, so simply save it.
@@ -371,19 +363,18 @@ vtkPVXMLElement* pqApplicationCore::saveState()
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadState(
-  const char* filename, pqServer* server, vtkSMStateLoader* loader)
+void pqApplicationCore::loadState(const char* filename, pqServer* server, vtkSMStateLoader* loader)
 {
   if (!server || !filename)
-    {
+  {
     return;
-    }
+  }
 
   QFile qfile(filename);
-  if (qfile.open(QIODevice::ReadOnly|QIODevice::Text))
-    {
+  if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
     this->loadStateFromString(qfile.readAll().data(), server, loader);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -392,54 +383,52 @@ void pqApplicationCore::loadStateFromString(
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   if (xmlcontents && parser->Parse(xmlcontents))
-    {
+  {
     this->loadState(parser->GetRootElement(), server, loader);
-    }
+  }
   parser->Delete();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadState(
   vtkPVXMLElement* rootElement, pqServer* server, vtkSMStateLoader* loader)
 {
   if (!server || !rootElement)
-    {
-    return ;
-    }
+  {
+    return;
+  }
 
   // BUG #12398:
   // This change was added to prevent VisTrails from recording unwanted events.
   // We disable recording view deletion in Undo/Stack
   // In anycase, the stack will be cleared, why bother recording something...
   BEGIN_UNDO_EXCLUDE();
-  QList<pqProxy*> proxies =
-    this->ServerManagerModel->findItems<pqProxy*>(server);
+  QList<pqProxy*> proxies = this->ServerManagerModel->findItems<pqProxy*>(server);
   QList<QPointer<pqProxy> > to_destroy;
   foreach (pqProxy* proxy, proxies)
-    {
+  {
     pqView* view = qobject_cast<pqView*>(proxy);
     if (view)
-      {
-      to_destroy.push_back(view);
-      }
-    else if (proxy->getSMGroup()=="layouts")
-      {
-      to_destroy.push_back(proxy);
-      }
-    }
-  foreach (pqProxy* cur, to_destroy)
     {
+      to_destroy.push_back(view);
+    }
+    else if (proxy->getSMGroup() == "layouts")
+    {
+      to_destroy.push_back(proxy);
+    }
+  }
+  foreach (pqProxy* cur, to_destroy)
+  {
     pqView* view = qobject_cast<pqView*>(cur);
     if (view)
-      {
+    {
       this->ObjectBuilder->destroy(view);
-      }
-    else if (cur)
-      {
-      this->ObjectBuilder->destroy(cur);
-      }
     }
+    else if (cur)
+    {
+      this->ObjectBuilder->destroy(cur);
+    }
+  }
   END_UNDO_EXCLUDE();
   this->loadStateIncremental(rootElement, server, loader);
 }
@@ -449,9 +438,9 @@ void pqApplicationCore::loadStateIncremental(
   const QString& filename, pqServer* server, vtkSMStateLoader* loader)
 {
   if (!server || filename.isEmpty())
-    {
-    return ;
-    }
+  {
+    return;
+  }
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename.toLatin1().data());
   parser->Parse();
@@ -473,8 +462,7 @@ void pqApplicationCore::loadStateIncremental(
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::onStateLoaded(
-  vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+void pqApplicationCore::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
 {
   emit this->stateLoaded(root, locator);
 
@@ -483,12 +471,11 @@ void pqApplicationCore::onStateLoaded(
   // This is essential since it's possible that the AnimationTime property on
   // the scenes gets pushed before StartTime and EndTime and as a consequence
   // the scene may not even result in the animation time being set as expected.
-  QList<pqAnimationScene*> scenes =
-    this->getServerManagerModel()->findItems<pqAnimationScene*>();
+  QList<pqAnimationScene*> scenes = this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
-    {
+  {
     scene->getProxy()->UpdateProperty("AnimationTime", 1);
-    }
+  }
   this->render();
 }
 
@@ -496,12 +483,11 @@ void pqApplicationCore::onStateLoaded(
 void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
 {
   if (!QApplication::applicationName().isEmpty())
-    {
+  {
     // Change root element to match the application name.
-    QString valid_name =
-      QApplication::applicationName().replace(QRegExp("\\W"), "_");
+    QString valid_name = QApplication::applicationName().replace(QRegExp("\\W"), "_");
     root->SetName(valid_name.toLatin1().data());
-    }
+  }
   emit this->stateSaved(root);
 }
 
@@ -509,10 +495,10 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
 pqRecentlyUsedResourcesList& pqApplicationCore::recentlyUsedResources()
 {
   if (!this->RecentlyUsedResourcesList)
-    {
+  {
     this->RecentlyUsedResourcesList = new pqRecentlyUsedResourcesList(this);
     this->RecentlyUsedResourcesList->load(*this->settings());
-    }
+  }
 
   return *this->RecentlyUsedResourcesList;
 }
@@ -521,51 +507,48 @@ pqRecentlyUsedResourcesList& pqApplicationCore::recentlyUsedResources()
 pqServerConfigurationCollection& pqApplicationCore::serverConfigurations()
 {
   if (!this->ServerConfigurations)
-    {
+  {
     this->ServerConfigurations = new pqServerConfigurationCollection(this);
-    }
+  }
   return *this->ServerConfigurations;
 }
 
 //-----------------------------------------------------------------------------
 pqSettings* pqApplicationCore::settings()
 {
-  if ( !this->Settings )
-    {
-    pqOptions* options = pqOptions::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetOptions());
+  if (!this->Settings)
+  {
+    pqOptions* options =
+      pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
     if (options && options->GetDisableRegistry())
-      {
+    {
       QTemporaryFile tFile;
       tFile.open();
       this->Settings = new pqSettings(tFile.fileName() + ".ini", true, this);
       this->Settings->clear();
-      }
+    }
     else
-      {
-      this->Settings = new pqSettings(
-        QApplication::organizationName(),
-        QApplication::applicationName() + QApplication::applicationVersion(),
-        this);
-      }
+    {
+      this->Settings = new pqSettings(QApplication::organizationName(),
+        QApplication::applicationName() + QApplication::applicationVersion(), this);
+    }
 
     vtkProcessModuleAutoMPI::SetEnableAutoMPI(
       this->Settings->value("GeneralSettings.EnableAutoMPI").toBool());
     vtkProcessModuleAutoMPI::SetNumberOfCores(
       this->Settings->value("GeneralSettings.AutoMPILimit").toInt());
-    }
+  }
   return this->Settings;
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
-  QList<pqView*> list =
-    this->ServerManagerModel->findItems<pqView*>();
-  foreach(pqView* view, list)
-    {
+  QList<pqView*> list = this->ServerManagerModel->findItems<pqView*>();
+  foreach (pqView* view, list)
+  {
     view->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -578,21 +561,20 @@ pqServer* pqApplicationCore::getActiveServer() const
 //-----------------------------------------------------------------------------
 void pqApplicationCore::prepareForQuit()
 {
-  foreach(pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
-    {
+  foreach (pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
+  {
     server->session()->PreDisconnection();
-    }
+  }
 
   // As tempting as it is to connect this slot to
   // aboutToQuit() signal, it doesn't work since that signal is not
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
-  QList<pqAnimationScene*> scenes =
-    this->getServerManagerModel()->findItems<pqAnimationScene*>();
+  QList<pqAnimationScene*> scenes = this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
-    {
+  {
     scene->pause();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -615,10 +597,10 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
 {
   QFile xml(filename);
   if (!xml.open(QIODevice::ReadOnly))
-    {
+  {
     qCritical() << "Failed to load " << filename;
     return;
-    }
+  }
 
   QByteArray dat = xml.readAll();
   this->loadConfigurationXML(dat.data());
@@ -628,13 +610,12 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 {
-  vtkSmartPointer<vtkPVXMLParser> parser =
-    vtkSmartPointer<vtkPVXMLParser>::New();
+  vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
 
   if (!parser->Parse(xmldata))
-    {
+  {
     return;
-    }
+  }
 
   // Now, the reader/writer factories cannot be initialized until after a
   // session has been created. So what do we do? Do we save the xml for
@@ -648,16 +629,16 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 
   // Give a warning that if there is ParaViewReaders or ParaViewWriters in root
   // that it has been changed and people should change their code accordingly.
-  if(strcmp(root->GetName(), "ParaViewReaders") == 0)
-    {
+  if (strcmp(root->GetName(), "ParaViewReaders") == 0)
+  {
     vtkGenericWarningMacro("Readers have been changed such that the GUI definition is not needed."
-                           << " This should now be specified in the Hints section of the XML definition.");
-    }
-  else if(strcmp(root->GetName(), "ParaViewWriters") == 0)
-    {
+      << " This should now be specified in the Hints section of the XML definition.");
+  }
+  else if (strcmp(root->GetName(), "ParaViewWriters") == 0)
+  {
     vtkGenericWarningMacro("Writers have been changed such that the GUI definition is not needed."
-                           << " This should now be specified in the Hints section of the XML definition.");
-    }
+      << " This should now be specified in the Hints section of the XML definition.");
+  }
 
   emit this->loadXML(root);
 }
@@ -666,9 +647,9 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 pqTestUtility* pqApplicationCore::testUtility()
 {
   if (!this->TestUtility)
-    {
+  {
     this->TestUtility = new pqCoreTestUtility(this);
-    }
+  }
   return this->TestUtility;
 }
 
@@ -676,12 +657,11 @@ pqTestUtility* pqApplicationCore::testUtility()
 QHelpEngine* pqApplicationCore::helpEngine()
 {
   if (!this->HelpEngine)
-    {
+  {
     QTemporaryFile tFile;
     tFile.open();
     this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
-    QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
-      this->OutputWindow,
+    QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)), this->OutputWindow,
       SLOT(onDisplayGenericWarningText(const QString&)));
     this->HelpEngine->setupData();
     // register the application's qch file. An application specific qch file can
@@ -693,19 +673,19 @@ QHelpEngine* pqApplicationCore::helpEngine()
     QDir dir(QString(":/%1/Documentation").arg(QApplication::applicationName()));
     QStringList help_files;
     if (dir.exists())
-      {
+    {
       QStringList filters;
       filters << "*.qch";
       help_files = dir.entryList(filters, QDir::Files);
-      }
-    foreach (const QString& filename, help_files)
-      {
-      QString qch_file = QString(":/%1/Documentation/%2").arg(
-        QApplication::applicationName()).arg(filename);
-      this->registerDocumentation(qch_file);
-      }
-    this->HelpEngine->setupData();
     }
+    foreach (const QString& filename, help_files)
+    {
+      QString qch_file =
+        QString(":/%1/Documentation/%2").arg(QApplication::applicationName()).arg(filename);
+      this->registerDocumentation(qch_file);
+    }
+    this->HelpEngine->setupData();
+  }
 
   return this->HelpEngine;
 }
@@ -719,16 +699,16 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
   // file and use that.
   QTemporaryFile* localFile = QTemporaryFile::createLocalFile(filename);
   if (localFile)
-    {
+  {
     // localFile has autoRemove ON by default, so the file will be deleted with
     // the application quits.
     localFile->setParent(engine);
     engine->registerDocumentation(localFile->fileName());
-    }
+  }
   else
-    {
+  {
     engine->registerDocumentation(filename);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

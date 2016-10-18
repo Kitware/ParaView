@@ -34,7 +34,7 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileSeriesReader : public vtkFileSeriesReader
 {
 public:
-  static vtkSpyPlotFileSeriesReader* New ();
+  static vtkSpyPlotFileSeriesReader* New();
   vtkTypeMacro(vtkSpyPlotFileSeriesReader, vtkFileSeriesReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 

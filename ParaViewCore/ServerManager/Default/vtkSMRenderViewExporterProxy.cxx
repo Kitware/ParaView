@@ -43,25 +43,25 @@ void vtkSMRenderViewExporterProxy::Write()
   vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(this->View);
   if (exporter && rv)
-    {
+  {
     int old_threshold = -1;
     if (rv->GetProperty("RemoteRenderThreshold"))
-      {
+    {
       vtkSMPropertyHelper helper(rv, "RemoteRenderThreshold");
       old_threshold = helper.GetAsInt();
       helper.Set(VTK_INT_MAX);
       rv->StillRender();
-      }
+    }
 
     vtkRenderWindow* renWin = rv->GetRenderWindow();
     exporter->SetRenderWindow(renWin);
     exporter->Write();
     exporter->SetRenderWindow(0);
     if (rv->GetProperty("RemoteRenderThreshold"))
-      {
+    {
       vtkSMPropertyHelper(rv, "RemoteRenderThreshold").Set(old_threshold);
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -69,5 +69,3 @@ void vtkSMRenderViewExporterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

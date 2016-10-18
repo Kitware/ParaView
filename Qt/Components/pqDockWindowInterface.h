@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,6 +54,7 @@ public:
   * Creates a dock window with the given parent
   */
   virtual QDockWidget* dockWindow(QWidget* p) = 0;
+
 private:
   Q_DISABLE_COPY(pqDockWindowInterface)
 };

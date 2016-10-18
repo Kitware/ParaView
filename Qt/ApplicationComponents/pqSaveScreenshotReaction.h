@@ -42,6 +42,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveScreenshotReaction : public pqReactio
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
@@ -54,10 +55,8 @@ public:
   * having to create a reaction instance.
   */
   static void saveScreenshot();
-  static void saveScreenshot(const QString& filename,
-    const QSize& size,
-    int quality,
-    bool all_views=false);
+  static void saveScreenshot(
+    const QString& filename, const QSize& size, int quality, bool all_views = false);
 
 public slots:
   /**
@@ -70,13 +69,10 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { pqSaveScreenshotReaction::saveScreenshot(); }
+  virtual void onTriggered() { pqSaveScreenshotReaction::saveScreenshot(); }
 
 private:
   Q_DISABLE_COPY(pqSaveScreenshotReaction)
 };
 
 #endif
-
-

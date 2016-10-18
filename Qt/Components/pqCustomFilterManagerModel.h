@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,13 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCustomFilterManagerModel_h
 #define _pqCustomFilterManagerModel_h
 
-
 #include "pqComponentsModule.h"
 #include <QAbstractListModel>
 
 class pqCustomFilterManagerModelInternal;
 class QString;
-
 
 /**
 * \class pqCustomFilterManagerModel
@@ -62,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
   Q_OBJECT
 
 public:
-  pqCustomFilterManagerModel(QObject *parent=0);
+  pqCustomFilterManagerModel(QObject* parent = 0);
   virtual ~pqCustomFilterManagerModel();
 
   /**
@@ -76,7 +74,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -87,8 +85,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column,
-      const QModelIndex &parent=QModelIndex()) const;
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -98,8 +95,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex &index,
-      int role=Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   /**
   * \brief
@@ -111,7 +107,7 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
   //@}
 
   /**
@@ -125,7 +121,7 @@ public:
   * \return
   *   The custom filter definition name or an empty string.
   */
-  QString getCustomFilterName(const QModelIndex &index) const;
+  QString getCustomFilterName(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -134,7 +130,7 @@ public:
   * \return
   *   The model index for the given name.
   */
-  QModelIndex getIndexFor(const QString &filter) const;
+  QModelIndex getIndexFor(const QString& filter) const;
   //@}
 
 public slots:
@@ -165,13 +161,13 @@ signals:
   *   model.
   * \param name The name of the new custom filter definition.
   */
-  void customFilterAdded(const QString &name);
+  void customFilterAdded(const QString& name);
 
 private:
   /**
   * Stores the custom filter list.
   */
-  pqCustomFilterManagerModelInternal *Internal;
+  pqCustomFilterManagerModelInternal* Internal;
 };
 
 #endif

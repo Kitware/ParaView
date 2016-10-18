@@ -45,8 +45,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadRestoreWindowLayoutReaction : public 
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqLoadRestoreWindowLayoutReaction(bool load, QAction* parent=0);
+  pqLoadRestoreWindowLayoutReaction(bool load, QAction* parent = 0);
   virtual ~pqLoadRestoreWindowLayoutReaction();
 
 protected:

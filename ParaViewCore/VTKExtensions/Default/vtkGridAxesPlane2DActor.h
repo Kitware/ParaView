@@ -28,9 +28,9 @@
 #include "vtkProp3D.h"
 
 #include "vtkGridAxesHelper.h" // For face enumeration
-#include "vtkNew.h" // For member variables
-#include "vtkSmartPointer.h" // For member variables
-#include <deque> // For keeping track of tick marks
+#include "vtkNew.h"            // For member variables
+#include "vtkSmartPointer.h"   // For member variables
+#include <deque>               // For keeping track of tick marks
 
 class vtkActor;
 class vtkCellArray;
@@ -62,14 +62,14 @@ public:
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
-    {
+  {
     MIN_YZ = vtkGridAxesHelper::MIN_YZ,
     MIN_ZX = vtkGridAxesHelper::MIN_ZX,
     MIN_XY = vtkGridAxesHelper::MIN_XY,
     MAX_YZ = vtkGridAxesHelper::MAX_YZ,
     MAX_ZX = vtkGridAxesHelper::MAX_ZX,
     MAX_XY = vtkGridAxesHelper::MAX_XY
-    };
+  };
 
   //@{
   /**
@@ -112,18 +112,17 @@ public:
   //@}
 
   enum
-    {
-    TICK_DIRECTION_INWARDS=0x1,
-    TICK_DIRECTION_OUTWARDS=0x2,
-    TICK_DIRECTION_BOTH=TICK_DIRECTION_INWARDS|TICK_DIRECTION_OUTWARDS,
-    };
+  {
+    TICK_DIRECTION_INWARDS = 0x1,
+    TICK_DIRECTION_OUTWARDS = 0x2,
+    TICK_DIRECTION_BOTH = TICK_DIRECTION_INWARDS | TICK_DIRECTION_OUTWARDS,
+  };
 
   //@{
   /**
    * Get/Set the tick direction.
    */
-  vtkSetClampMacro(TickDirection, unsigned int,
-    static_cast<unsigned int>(TICK_DIRECTION_INWARDS),
+  vtkSetClampMacro(TickDirection, unsigned int, static_cast<unsigned int>(TICK_DIRECTION_INWARDS),
     static_cast<unsigned int>(TICK_DIRECTION_BOTH));
   vtkGetMacro(TickDirection, unsigned int);
   //@}
@@ -138,7 +137,9 @@ public:
    */
   void SetTickPositions(int axis, vtkDoubleArray* data);
   const std::deque<double>& GetTickPositions(int axis)
-    { return (axis>=0 && axis<3)? this->TickPositions[axis] : this->EmptyVector; }
+  {
+    return (axis >= 0 && axis < 3) ? this->TickPositions[axis] : this->EmptyVector;
+  }
 
   //@{
   /**
@@ -175,21 +176,21 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double *GetBounds()
-    {
+  virtual double* GetBounds()
+  {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
-    }
+  }
   //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport *);
+  virtual int RenderOpaqueGeometry(vtkViewport*);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
   virtual int RenderOverlay(vtkViewport* viewport);
   virtual int HasTranslucentPolygonalGeometry();
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
 protected:
-  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper=NULL);
+  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = NULL);
   ~vtkGridAxesPlane2DActor();
 
   //@{
@@ -246,7 +247,6 @@ private:
 
   typedef std::pair<vtkVector3d, vtkVector3d> LineSegmentType;
   std::deque<LineSegmentType> LineSegments;
-
 };
 
 #endif

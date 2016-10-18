@@ -30,7 +30,7 @@
  * View proxies that are to laid out in an layout should be "assigned" to a
  * particular cell in a vtkSMViewLayoutProxy instance. vtkSMViewLayoutProxy
  * takes over the responsibility of updating the view's \c Position property
- * correctly. 
+ * correctly.
  *
  * Although, currently, there are no safe guards against assigning a view to
  * more than one layout, this is strictly prohibited and can cause unexpected
@@ -54,11 +54,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum Direction
-    {
+  {
     NONE,
     VERTICAL,
     HORIZONTAL
-    };
+  };
 
   /**
    * Split a frame at the given \c location. Location must point to an existing cell
@@ -71,9 +71,13 @@ public:
    */
   int Split(int location, int direction, double fraction);
   int SplitVertical(int location, double fraction)
-    { return this->Split(location, VERTICAL, fraction); }
+  {
+    return this->Split(location, VERTICAL, fraction);
+  }
   int SplitHorizontal(int location, double fraction)
-    { return this->Split(location, HORIZONTAL, fraction); }
+  {
+    return this->Split(location, HORIZONTAL, fraction);
+  }
 
   /**
    * Assign a view at a particular location. Note that the view's position may
@@ -161,21 +165,18 @@ public:
    * Returns the index for the first child of the given location. This does not
    * do any validity checks for the location, nor that of the child.
    */
-  static int GetFirstChild(int location)
-    { return 2*location + 1; }
+  static int GetFirstChild(int location) { return 2 * location + 1; }
 
   /**
    * Returns the index for the second child of the given location. This does not
    * do any validity checks for the location, nor that of the child.
    */
-  static int GetSecondChild(int location)
-    { return 2*location + 2; }
+  static int GetSecondChild(int location) { return 2 * location + 2; }
 
   /**
    * Returns the parent index.
    */
-  static int GetParent(int location)
-    { return (location > 0?  ( (location - 1) / 2 ) : -1); }
+  static int GetParent(int location) { return (location > 0 ? ((location - 1) / 2) : -1); }
 
   /**
    * Returns the view, if any, assigned to the given cell location.
@@ -211,9 +212,10 @@ public:
    * Overridden to save custom XML state.
    */
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
-    { return this->Superclass::SaveXMLState(root); }
-  virtual vtkPVXMLElement* SaveXMLState(
-    vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
+  {
+    return this->Superclass::SaveXMLState(root);
+  }
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
 
   /**
    * Overridden to load custom XML state.
@@ -229,7 +231,7 @@ public:
    * Helper method to locate a layout, if any that contains the specified view
    * proxy.
    */
-  static vtkSMViewLayoutProxy* FindLayout(vtkSMViewProxy*, const char* reggroup="layouts");
+  static vtkSMViewLayoutProxy* FindLayout(vtkSMViewProxy*, const char* reggroup = "layouts");
 
   //@{
   /**
@@ -250,8 +252,7 @@ protected:
   /**
    * Called to load state from protobuf message.
    */
-  virtual void LoadState(
-    const vtkSMMessage* message, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator);
 
   /**
    * Although this class is a proxy, it's not really a proxy in the traditional
@@ -273,6 +274,7 @@ protected:
   int GetSplittableCell(int root, Direction& suggested_direction);
 
   int MaximizedCell;
+
 private:
   vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
@@ -281,17 +283,16 @@ private:
   vtkInternals* Internals;
 
   bool SetBlockUpdate(bool new_value)
-    {
+  {
     bool temp = this->BlockUpdate;
     this->BlockUpdate = new_value;
     return temp;
-    }
+  }
 
   bool BlockUpdate;
 
   static double MultiViewImageBorderColor[3];
   static int MultiViewImageBorderWidth;
-
 };
 
 #endif

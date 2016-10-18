@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,19 +44,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqDistanceWidget::pqDistanceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
-  :Superclass(o, pxy, p, "DistanceWidgetRepresentation")
+  : Superclass(o, pxy, p, "DistanceWidgetRepresentation")
 {
   QVBoxLayout* l = qobject_cast<QVBoxLayout*>(this->layout());
   if (l)
-    {
-    QLabel* label =new QLabel("<b>Distance:</b> <i>na</i> ", this);
+  {
+    QLabel* label = new QLabel("<b>Distance:</b> <i>na</i> ", this);
     l->insertWidget(0, label);
     this->Label = label;
-    QLabel* notelabel =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
+    QLabel* notelabel =
+      new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
     notelabel->setObjectName("ShortCutNoteLabel");
     notelabel->setWordWrap(1);
     l->addWidget(notelabel);
-    }
+  }
 
   QObject::connect(this, SIGNAL(widgetInteraction()), this, SLOT(updateDistance()));
   QObject::connect(this, SIGNAL(modified()), this, SLOT(updateDistance()));
@@ -68,21 +69,19 @@ pqDistanceWidget::~pqDistanceWidget()
 {
 }
 
-
 //-----------------------------------------------------------------------------
 void pqDistanceWidget::updateDistance()
 {
   vtkSMProxy* wproxy = this->getWidgetProxy();
 
-  vtkSMDoubleVectorProperty* dvp1 = vtkSMDoubleVectorProperty::SafeDownCast(
-    wproxy->GetProperty("Point1WorldPosition"));
-  vtkSMDoubleVectorProperty* dvp2 = vtkSMDoubleVectorProperty::SafeDownCast(
-    wproxy->GetProperty("Point2WorldPosition"));
+  vtkSMDoubleVectorProperty* dvp1 =
+    vtkSMDoubleVectorProperty::SafeDownCast(wproxy->GetProperty("Point1WorldPosition"));
+  vtkSMDoubleVectorProperty* dvp2 =
+    vtkSMDoubleVectorProperty::SafeDownCast(wproxy->GetProperty("Point2WorldPosition"));
   double distance = 0.0;
   if (dvp1 && dvp1->GetElements() && dvp2 && dvp2->GetElements())
-    {
-    distance = sqrt(vtkMath::Distance2BetweenPoints(
-                      dvp1->GetElements(), dvp2->GetElements()));
-    }
+  {
+    distance = sqrt(vtkMath::Distance2BetweenPoints(dvp1->GetElements(), dvp2->GetElements()));
+  }
   this->Label->setText(QString("<b>Distance:</b> <i>%1</i> ").arg(distance));
 }

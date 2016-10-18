@@ -57,14 +57,14 @@ bool vtkPVSession::GetPendingProgress()
 void vtkPVSession::PrepareProgress()
 {
   if (this->InCleanupPendingProgress)
-    {
+  {
     return;
-    }
+  }
 
   if (this->ProgressCount == 0)
-    {
+  {
     this->PrepareProgressInternal();
-    }
+  }
   this->ProgressCount++;
 }
 
@@ -72,21 +72,21 @@ void vtkPVSession::PrepareProgress()
 void vtkPVSession::CleanupPendingProgress()
 {
   if (this->InCleanupPendingProgress)
-    {
+  {
     return;
-    }
+  }
 
   this->InCleanupPendingProgress = true;
   this->ProgressCount--;
   if (this->ProgressCount == 0)
-    {
+  {
     this->CleanupPendingProgressInternal();
-    }
+  }
   if (this->ProgressCount < 0)
-    {
+  {
     vtkErrorMacro("PrepareProgress and CleanupPendingProgress mismatch!");
     this->ProgressCount = 0;
-    }
+  }
   this->InCleanupPendingProgress = false;
 }
 
@@ -112,21 +112,21 @@ bool vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
   memcpy(&tag, ptr, sizeof(tag));
 
   if (tag == vtkPVSession::EXCEPTION_EVENT_TAG)
-    {
+  {
     ptr += sizeof(tag);
     memcpy(&len, ptr, sizeof(len));
     ptr += sizeof(len);
     vtkErrorMacro("Encountered Exception: " << ptr);
     // this->OnSocketError();
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("Internal ParaView Error: "
-      "Socket Communicator received wrong tag: "
+                  "Socket Communicator received wrong tag: "
       << tag);
     // Treat as a socket error.
     // this->OnSocketError();
-    }
+  }
   return false;
 }
 

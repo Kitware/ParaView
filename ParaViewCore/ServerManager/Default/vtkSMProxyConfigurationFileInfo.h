@@ -36,23 +36,22 @@ class vtkSMProxyConfigurationFileInfo
 {
 public:
   vtkSMProxyConfigurationFileInfo()
-        :
-    FileIdentifier("SMProxyConfiguration"),
-    FileDescription("ParaView server manager proxy configuration"),
-    FileExtension(".pvpc")
-      { }
+    : FileIdentifier("SMProxyConfiguration")
+    , FileDescription("ParaView server manager proxy configuration")
+    , FileExtension(".pvpc")
+  {
+  }
 
-  void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << endl
-      << indent << "FileDescription: " << this->FileDescription << endl
-      << indent << "FileExtension: " << this->FileExtension << endl;
-    }
+  void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << endl
+       << indent << "FileDescription: " << this->FileDescription << endl
+       << indent << "FileExtension: " << this->FileExtension << endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

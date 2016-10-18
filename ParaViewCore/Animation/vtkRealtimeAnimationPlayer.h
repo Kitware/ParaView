@@ -32,7 +32,6 @@ public:
   vtkTypeMacro(vtkRealtimeAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
   //@{
   /**
    * Get/Set the duration for playing the animation in seconds.
@@ -62,10 +61,10 @@ protected:
   double ShiftTime;
   double Factor;
   vtkTimerLog* Timer;
+
 private:
   vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

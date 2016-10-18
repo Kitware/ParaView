@@ -25,31 +25,29 @@ int main(int argc, char* argv[])
 {
   // Initialization
   vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_BATCH,
-                                      options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_BATCH, options);
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   //---------------------------------------------------------------------------
 
   if (!pxm)
-    {
+  {
     cout << "Null proxy manager" << endl;
     session->Delete();
     return EXIT_FAILURE;
-    }
+  }
 
   // Create proxy and change main radius value
   vtkSMProxy* proxy = pxm->NewProxy("testcase", "None");
 
   if (!proxy)
-    {
+  {
     cout << "Null proxy" << endl;
     session->Delete();
     return EXIT_FAILURE;
-    }
+  }
   proxy->UpdateVTKObjects();
 
   // *******************************************************************

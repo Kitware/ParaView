@@ -37,7 +37,8 @@
 class vtkChartRepresentation;
 class vtkPVContextView;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartSelectionRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartSelectionRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkChartSelectionRepresentation* New();
@@ -48,8 +49,7 @@ public:
    * This needs to be called on all instances of vtkChartSelectionRepresentation when
    * the input is modified.
    */
-  virtual void MarkModified()
-    { this->Superclass::MarkModified(); }
+  virtual void MarkModified() { this->Superclass::MarkModified(); }
 
   /**
    * Set visibility of the representation.
@@ -67,8 +67,8 @@ protected:
   ~vtkChartSelectionRepresentation();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector** inputVector, vtkInformationVector*);
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -94,7 +94,6 @@ protected:
 private:
   vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -40,9 +40,10 @@ class pqMyPropertyWidgetForGroup : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
   pqMyPropertyWidgetForGroup(
-    vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget *parentObject=0);
+    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
   virtual ~pqMyPropertyWidgetForGroup();
 
 private:

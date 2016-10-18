@@ -43,9 +43,15 @@ vtkShearedWaveletSource::vtkShearedWaveletSource()
   this->ModelBoundingBox[0] = this->ModelBoundingBox[2] = this->ModelBoundingBox[4] = 0.0;
   this->ModelBoundingBox[1] = this->ModelBoundingBox[3] = this->ModelBoundingBox[5] = 1.0;
 
-  this->BasisU[0] = 1; this->BasisU[1] = 0; this->BasisU[2] = 0;
-  this->BasisV[0] = 0; this->BasisV[1] = 1; this->BasisV[2] = 0;
-  this->BasisW[0] = 0; this->BasisW[1] = 0; this->BasisW[2] = 1;
+  this->BasisU[0] = 1;
+  this->BasisU[1] = 0;
+  this->BasisU[2] = 0;
+  this->BasisV[0] = 0;
+  this->BasisV[1] = 1;
+  this->BasisV[2] = 0;
+  this->BasisW[0] = 0;
+  this->BasisW[1] = 0;
+  this->BasisW[2] = 1;
 
   this->SetNumberOfInputPorts(0);
 }
@@ -61,7 +67,7 @@ vtkShearedWaveletSource::~vtkShearedWaveletSource()
 
 //----------------------------------------------------------------------------
 int vtkShearedWaveletSource::RequestData(
-  vtkInformation *, vtkInformationVector **, vtkInformationVector *outputVector)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector, 0);
 
@@ -83,15 +89,15 @@ int vtkShearedWaveletSource::RequestData(
   transform->Scale(this->ModelBoundingBox[1] - this->ModelBoundingBox[0],
     this->ModelBoundingBox[3] - this->ModelBoundingBox[2],
     this->ModelBoundingBox[5] - this->ModelBoundingBox[4]);
-  transform->Translate(this->ModelBoundingBox[0], this->ModelBoundingBox[2], this->ModelBoundingBox[4]);
+  transform->Translate(
+    this->ModelBoundingBox[0], this->ModelBoundingBox[2], this->ModelBoundingBox[4]);
 
   transformFilter->SetTransform(transform.GetPointer());
   transformFilter->SetInputConnection(tetrahedralize->GetOutputPort());
   transformFilter->Update();
   output->ShallowCopy(transformFilter->GetOutputDataObject(0));
 
-  vtkSmartPointer<vtkMatrix4x4> cobMatrix =
-    vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(
+  vtkSmartPointer<vtkMatrix4x4> cobMatrix = vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(
     vtkVector3d(this->BasisU), vtkVector3d(this->BasisV), vtkVector3d(this->BasisW));
   transform->SetMatrix(cobMatrix.GetPointer());
   transformFilter->SetInputDataObject(output);
@@ -103,10 +109,10 @@ int vtkShearedWaveletSource::RequestData(
   vtkPVChangeOfBasisHelper::AddBoundingBoxInBasis(output, this->ModelBoundingBox);
 
   if (this->EnableAxisTitles)
-    {
-    vtkPVChangeOfBasisHelper::AddBasisNames(output,
-      this->AxisUTitle, this->AxisVTitle, this->AxisWTitle);
-    }
+  {
+    vtkPVChangeOfBasisHelper::AddBasisNames(
+      output, this->AxisUTitle, this->AxisVTitle, this->AxisWTitle);
+  }
   return 1;
 }
 

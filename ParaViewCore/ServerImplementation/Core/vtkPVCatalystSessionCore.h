@@ -27,7 +27,7 @@
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkPVSessionCore.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
-#include "vtkWeakPointer.h" // needed for vtkMultiProcessController
+#include "vtkWeakPointer.h"      // needed for vtkMultiProcessController
 
 class vtkPVInformation;
 
@@ -42,17 +42,16 @@ public:
    * Gather information about an object referred by the \c globalid.
    * \c location identifies the processes to gather the information from.
    */
-  virtual bool GatherInformation( vtkTypeUInt32 location,
-                                  vtkPVInformation* information,
-                                  vtkTypeUInt32 globalid );
+  virtual bool GatherInformation(
+    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   /**
    * Update the data information for a given proxy with the given globalid.
    * This will allow the GatherInformation to work with "fake" VTK pipeline.
    * Return the real corresponding proxy id
    */
-  vtkTypeUInt32 RegisterDataInformation(vtkTypeUInt32 globalid, unsigned int port,
-                                        vtkPVInformation* information);
+  vtkTypeUInt32 RegisterDataInformation(
+    vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation* information);
 
   void UpdateIdMap(vtkTypeUInt32* idMapArray, int size);
   void ResetIdMap();
@@ -67,7 +66,6 @@ private:
 
   class vtkInternal;
   vtkInternal* CatalystInternal;
-
 };
 
 #endif

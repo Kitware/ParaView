@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 
 pqTreeWidgetItemObject::pqTreeWidgetItemObject(const QStringList& t, int item_type)
-  : QTreeWidgetItem(t, item_type) 
+  : QTreeWidgetItem(t, item_type)
 {
 }
 
@@ -42,26 +42,26 @@ pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList
 {
 }
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t, int item_type)
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(
+  QTreeWidgetItem* p, const QStringList& t, int item_type)
   : QTreeWidgetItem(p, t, item_type)
 {
 }
 
-
 void pqTreeWidgetItemObject::setData(int column, int role, const QVariant& v)
 {
-  if(Qt::CheckStateRole == role)
+  if (Qt::CheckStateRole == role)
+  {
+    if (v != this->data(column, Qt::CheckStateRole))
     {
-    if(v != this->data(column, Qt::CheckStateRole))
-      {
       QTreeWidgetItem::setData(column, role, v);
       emit this->checkedStateChanged(Qt::Checked == v ? true : false);
-      }
     }
+  }
   else
-    {
+  {
     QTreeWidgetItem::setData(column, role, v);
-    }
+  }
   emit this->modified();
 }
 
@@ -72,14 +72,12 @@ bool pqTreeWidgetItemObject::isChecked() const
 
 void pqTreeWidgetItemObject::setChecked(bool v)
 {
-  if(v)
-    {
+  if (v)
+  {
     this->setCheckState(0, Qt::Checked);
-    }
+  }
   else
-    {
+  {
     this->setCheckState(0, Qt::Unchecked);
-    }
+  }
 }
-
-

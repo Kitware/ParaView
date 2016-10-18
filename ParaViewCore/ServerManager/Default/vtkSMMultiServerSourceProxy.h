@@ -58,7 +58,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* message, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMMultiServerSourceProxy();
@@ -73,7 +73,6 @@ protected:
 private:
   vtkSMMultiServerSourceProxy(const vtkSMMultiServerSourceProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMMultiServerSourceProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

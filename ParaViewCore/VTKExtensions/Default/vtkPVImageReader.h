@@ -32,9 +32,9 @@
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVImageReader : public
 #ifdef PARAVIEW_USE_MPI
-vtkMPIImageReader
+                                                          vtkMPIImageReader
 #else
-vtkImageReader
+                                                          vtkImageReader
 #endif
 {
 public:
@@ -46,10 +46,7 @@ public:
   vtkTypeMacro(vtkPVImageReader, vtkImageReader);
 #endif
 
-  virtual int CanReadFile(const char*)
-  {
-    return 1;
-  }
+  virtual int CanReadFile(const char*) { return 1; }
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -60,7 +57,6 @@ protected:
 private:
   vtkPVImageReader(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

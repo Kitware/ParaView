@@ -26,21 +26,22 @@
 #include "pqSierraPlotToolsManager.h"
 
 //=============================================================================
-pqSierraPlotToolsActionGroup::pqSierraPlotToolsActionGroup(QObject *p) : QActionGroup(p)
+pqSierraPlotToolsActionGroup::pqSierraPlotToolsActionGroup(QObject* p)
+  : QActionGroup(p)
 {
-  pqSierraPlotToolsManager *manager = pqSierraPlotToolsManager::instance();
+  pqSierraPlotToolsManager* manager = pqSierraPlotToolsManager::instance();
   if (!manager)
-    {
+  {
     qFatal("Cannot get SierraPlotTools Tools manager.");
     return;
-    }
+  }
 
   /*
-  The section of code below, the this->addAction() calls, are what tells Qt 
-  to add an action for each of the toolbar buttons, 
-  
+  The section of code below, the this->addAction() calls, are what tells Qt
+  to add an action for each of the toolbar buttons,
+
   * * * _AND_ * * *
-  
+
   TELLS the ParaView plugin architecture to add a button on to the toolbar for
   this toolbar plugin.
 

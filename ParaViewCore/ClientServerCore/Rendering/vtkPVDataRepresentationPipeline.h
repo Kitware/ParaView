@@ -29,7 +29,8 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentationPipeline : public vtkCompositeDataPipeline
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentationPipeline
+  : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVDataRepresentationPipeline* New();
@@ -43,22 +44,19 @@ protected:
   virtual int ForwardUpstream(int i, int j, vtkInformation* request);
   virtual int ForwardUpstream(vtkInformation* request);
 
-  virtual void ExecuteDataEnd(vtkInformation* request,
-    vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec);
+  virtual void ExecuteDataEnd(
+    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
   // Override this check to account for update extent.
-  virtual int NeedToExecuteData(int outputPort,
-    vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
+  virtual int NeedToExecuteData(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
-  virtual int ProcessRequest(vtkInformation* request,
-    vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
 private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

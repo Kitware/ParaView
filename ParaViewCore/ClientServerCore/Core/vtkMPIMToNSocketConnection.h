@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkMPIMToNSocketConnection
- * @brief   class to create socket connections between two servers 
+ * @brief   class to create socket connections between two servers
  *
  *
  * class used to create socket connections between the render and data
@@ -45,7 +45,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnection : public vtkOb
 {
 public:
   static vtkMPIMToNSocketConnection* New();
-  vtkTypeMacro(vtkMPIMToNSocketConnection,vtkObject);
+  vtkTypeMacro(vtkMPIMToNSocketConnection, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Initialize(int waiting_process_type);
@@ -67,28 +67,28 @@ public:
    * Set up information about the remote connection.
    */
   void SetPortInformation(unsigned int processNumber, int portNumber, const char* hostName);
-  
+
   //@{
   /**
    * Return the socket communicator for this process.
    */
   vtkGetObjectMacro(SocketCommunicator, vtkSocketCommunicator);
   //@}
-  
+
   /**
    * Fill the port information values into the port information object.
    */
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
-  
+
   //@{
   /**
    * Set port to use, if the value is 0, then the system will pick the port.
    */
-  vtkGetMacro(PortNumber,int);
+  vtkGetMacro(PortNumber, int);
   //@}
 
 protected:
-  vtkSetMacro(PortNumber,int);
+  vtkSetMacro(PortNumber, int);
 
   /**
    * Setup the wait for connection, but do not wait yet.
@@ -107,18 +107,18 @@ protected:
    */
   void Connect();
 
-
   virtual void SetController(vtkMultiProcessController*);
   virtual void SetSocketCommunicator(vtkSocketCommunicator*);
   vtkMPIMToNSocketConnection();
   ~vtkMPIMToNSocketConnection();
+
 private:
   int PortNumber;
   int Socket;
   vtkServerSocket* ServerSocket;
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionInternals* Internals;
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
   vtkSocketCommunicator* SocketCommunicator;
   vtkMPIMToNSocketConnection(const vtkMPIMToNSocketConnection&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMPIMToNSocketConnection&) VTK_DELETE_FUNCTION;

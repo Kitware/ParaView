@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,34 +41,34 @@ class vtkCommand;
 /**
 * pqUndoStackBuilder extends the vtkSMUndoStackBuilder as follows:
 * \li If properties on registered proxies are changed when the builder is not
-* with a BeginOrContinueUndoSet - EndUndoSet block, unless 
-* IgnoreIsolatedChanges is true, it will create a UndoSet with that change 
-* alone and push it on the stack. IgnoreIsolatedChanges does not have any 
+* with a BeginOrContinueUndoSet - EndUndoSet block, unless
+* IgnoreIsolatedChanges is true, it will create a UndoSet with that change
+* alone and push it on the stack. IgnoreIsolatedChanges does not have any
 * effect in a BeginOrContinueUndoSet-EndUndoSet block.
 * \li pqProxy objects can be added to be ignored for all changes. Thus,
 * any change event triggered from any of the proxies in the ignore list
 * don't result in updating of the undo stack even when those changes happen
-* with a BeginOrContinueUndoSet - EndUndoSet block (this feature isn't 
+* with a BeginOrContinueUndoSet - EndUndoSet block (this feature isn't
 * implemented currently).
 * With these extensions, following are the points we must remember to ensure
 * that Undo/Redo works.
-* \li For any multi-change operations or proxy creation/registration 
-*     operations such as creating of a source/reader/filter etc. we must 
+* \li For any multi-change operations or proxy creation/registration
+*     operations such as creating of a source/reader/filter etc. we must
 *     explicitly use Begin() and End() blocks.
-* \li For modal dialogs which change a bunch of properties when the user 
-*     hits Ok, such as Application Settings dialog, change input dialogs, 
+* \li For modal dialogs which change a bunch of properties when the user
+*     hits Ok, such as Application Settings dialog, change input dialogs,
 *     we must use Begin() and End().
-* \li Any GUI wiget that is a single widget but changes multiple server 
-*     manager properties or can lead to mutiple undo steps should use 
-*     Begin and End block eg. Accept button, widget to select scalar to color 
+* \li Any GUI wiget that is a single widget but changes multiple server
+*     manager properties or can lead to mutiple undo steps should use
+*     Begin and End block eg. Accept button, widget to select scalar to color
 *     by etc.
-* \li GUI Widgets that are directly linked to a Server Manager property and 
+* \li GUI Widgets that are directly linked to a Server Manager property and
 *     don't need to be accepted, don't need to worry about Undo/Redo at all.
-*     The pqUndoStackBuilder will automatically create elements for such 
-*     changes and even try to given them friendly labels eg. most Animation 
+*     The pqUndoStackBuilder will automatically create elements for such
+*     changes and even try to given them friendly labels eg. most Animation
 *     panel properties, display panel widgets etc.
-* Currently, this class automatically adds property modifications alone to 
-* the stack. We may want to explore the possibility of automatically adding 
+* Currently, this class automatically adds property modifications alone to
+* the stack. We may want to explore the possibility of automatically adding
 * all types of server manager modifications to the stack.
 */
 class PQCOMPONENTS_EXPORT pqUndoStackBuilder : public vtkSMUndoStackBuilder
@@ -96,9 +96,8 @@ public:
   /**
   * Overridden to filter unwanted event and manage auto undoset creation
   */
-  virtual void OnStateChange(vtkSMSession *session, vtkTypeUInt32 globalId,
-                             const vtkSMMessage *previousState,
-                             const vtkSMMessage *newState);
+  virtual void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
+    const vtkSMMessage* previousState, const vtkSMMessage* newState);
 
 protected:
   pqUndoStackBuilder();
@@ -118,4 +117,3 @@ private:
 };
 
 #endif
-

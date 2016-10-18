@@ -50,11 +50,8 @@ class PQCORE_EXPORT pqParallelCoordinatesChartView : public pqContextView
 public:
   static QString chartViewType() { return "ParallelCoordinatesChartView"; }
 
-  pqParallelCoordinatesChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqParallelCoordinatesChartView(const QString& group, const QString& name,
+    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
   virtual ~pqParallelCoordinatesChartView();
 
 private:

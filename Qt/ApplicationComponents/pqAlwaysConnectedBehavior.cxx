@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,18 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqAlwaysConnectedBehavior::pqAlwaysConnectedBehavior(QObject* parentObject)
-: Superclass(parentObject),
-  DefaultServer("builtin:")
+  : Superclass(parentObject)
+  , DefaultServer("builtin:")
 {
   this->Timer.setSingleShot(true);
   this->Timer.setInterval(0);
-  QObject::connect(&this->Timer, SIGNAL(timeout()),
-    this, SLOT(serverCheck()));
+  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(serverCheck()));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smmodel, SIGNAL(finishedRemovingServer()),
-    this, SLOT(delayedServerCheck()));
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(finishedRemovingServer()), this, SLOT(delayedServerCheck()));
   this->serverCheck();
 }
 
@@ -71,15 +68,15 @@ void pqAlwaysConnectedBehavior::serverCheck()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
-    {
+  {
     return;
-    }
+  }
   if (core->getObjectBuilder()->waitingForConnection())
-    {
+  {
     // Try again later, we are waiting for server to connect.
     this->delayedServerCheck();
     return;
-    }
+  }
 
   core->getObjectBuilder()->createServer(this->DefaultServer);
 }

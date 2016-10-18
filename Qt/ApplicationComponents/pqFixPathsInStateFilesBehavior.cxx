@@ -42,9 +42,8 @@ bool pqFixPathsInStateFilesBehavior::BlockDialog = false;
 pqFixPathsInStateFilesBehavior::pqFixPathsInStateFilesBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(pqApplicationCore::instance(),
-    SIGNAL(aboutToLoadState(vtkPVXMLElement*)),
-    this, SLOT(onLoadState(vtkPVXMLElement*)));
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(aboutToLoadState(vtkPVXMLElement*)), this,
+    SLOT(onLoadState(vtkPVXMLElement*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -66,9 +65,9 @@ void pqFixPathsInStateFilesBehavior::fixFileNames(vtkPVXMLElement* xml)
   Q_ASSERT(xml != NULL);
   pqFixStateFilenamesDialog dialog(xml, pqCoreUtilities::mainWidget());
   if (dialog.hasFileNames())
-    {
+  {
     dialog.exec();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -76,7 +75,7 @@ void pqFixPathsInStateFilesBehavior::onLoadState(vtkPVXMLElement* xml)
 {
   Q_ASSERT(xml != NULL);
   if (pqFixPathsInStateFilesBehavior::BlockDialog == false)
-    {
+  {
     pqFixPathsInStateFilesBehavior::fixFileNames(xml);
-    }
+  }
 }

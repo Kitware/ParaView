@@ -48,6 +48,7 @@ class PQCORE_EXPORT pqContextView : public pqView
 {
   Q_OBJECT
   typedef pqView Superclass;
+
 public:
   virtual ~pqContextView();
 
@@ -90,12 +91,8 @@ protected:
   * \c server:- server on which the proxy is created.
   * \c parent:- QObject parent.
   */
-  pqContextView(const QString& type,
-    const QString& group,
-    const QString& name,
-    vtkSMViewProxy* view,
-    pqServer* server,
-    QObject* parent=NULL);
+  pqContextView(const QString& type, const QString& group, const QString& name,
+    vtkSMViewProxy* view, pqServer* server, QObject* parent = NULL);
 
   /**
   * Creates a new instance of the QWidget subclass to be used to show this

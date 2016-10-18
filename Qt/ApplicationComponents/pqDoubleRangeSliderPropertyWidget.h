@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * two double sliders, one for min and one for max and has logic to ensure that
 * the min <= max.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
   pqDoubleRangeSliderPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent=0);
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   virtual ~pqDoubleRangeSliderPropertyWidget();
 
   virtual void apply();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqEditCameraReaction::pqEditCameraReaction(QAction* parentObject, pqView* view)
-  : Superclass(parentObject), View(view)
+  : Superclass(parentObject)
+  , View(view)
 {
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
+    SLOT(updateEnableState()), Qt::QueuedConnection);
 
   this->updateEnableState();
 }
@@ -51,13 +52,13 @@ void pqEditCameraReaction::updateEnableState()
 {
   this->View = pqActiveObjects::instance().activeView();
   if (qobject_cast<pqRenderView*>(this->View))
-    {
+  {
     this->parentAction()->setEnabled(true);
-    }
+  }
   else
-    {
+  {
     this->parentAction()->setEnabled(false);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -67,35 +68,33 @@ void pqEditCameraReaction::editCamera(pqView* view)
 
   pqRenderView* renModule = qobject_cast<pqRenderView*>(view);
   if (!renModule)
-    {
+  {
     if (dialog)
-      {
+    {
       dialog->SetCameraGroupsEnabled(false);
-      }
-    return;
     }
+    return;
+  }
 
   if (!dialog)
-    {
+  {
     dialog = new pqCameraDialog(pqCoreUtilities::mainWidget());
     dialog->setWindowTitle("Adjust Camera");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setRenderModule(renModule);
     dialog->show();
-    }
+  }
   else
-    {
+  {
     dialog->SetCameraGroupsEnabled(true);
     dialog->setRenderModule(renModule);
     dialog->raise();
     dialog->activateWindow();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqEditCameraReaction::onTriggered()
-{ 
+{
   pqEditCameraReaction::editCamera(this->View);
 }
-
-

@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
 public:
-  pqAnimationManager(QObject* parent=0);
+  pqAnimationManager(QObject* parent = 0);
   virtual ~pqAnimationManager();
 
   /**
@@ -72,8 +72,8 @@ public:
   * \c index of the given \c property on the \c proxy.
   * This method simply calls getCue() on the pqAnimationScene instance.
   */
-  pqAnimationCue* getCue(pqAnimationScene* scene,
-    vtkSMProxy* proxy, const char* propertyname, int index) const;
+  pqAnimationCue* getCue(
+    pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, int index) const;
 
   /**
   * Saves the animation from the active scene. The active scene
@@ -185,6 +185,7 @@ protected slots:
   void onWidthEdited();
   void onHeightEdited();
   void onLockAspectRatio(bool lock);
+
 private:
   Q_DISABLE_COPY(pqAnimationManager)
 
@@ -194,6 +195,5 @@ private:
   // the most recently used file extension
   QString AnimationExtension;
 };
-
 
 #endif

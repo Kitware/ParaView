@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -57,19 +57,18 @@ class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
 {
   Q_OBJECT
   typedef QItemSelectionModel Superclass;
+
 public:
-  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent=0);
+  pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
   ~pqSpreadSheetViewSelectionModel();
 
 public slots:
-  virtual void select(const QModelIndex& index, 
-    QItemSelectionModel::SelectionFlags command)
-    {
+  virtual void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command)
+  {
     this->Superclass::select(index, command);
-    }
+  }
 
-  virtual void select(const QItemSelection& selection, 
-    QItemSelectionModel::SelectionFlags command);
+  virtual void select(const QItemSelection& selection, QItemSelectionModel::SelectionFlags command);
 
 signals:
   void selection(vtkSMSourceProxy*);
@@ -95,5 +94,3 @@ private:
 };
 
 #endif
-
-

@@ -40,13 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * the Glyph filter. It customizes the resetButtonClicked() logic since the
 * Glyph filter's scale factor setup is custom.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget : public pqDoubleVectorPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget
+  : public pqDoubleVectorPropertyWidget
 {
   Q_OBJECT
   typedef pqDoubleVectorPropertyWidget Superclass;
+
 public:
-  pqGlyphScaleFactorPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent=0);
+  pqGlyphScaleFactorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   virtual ~pqGlyphScaleFactorPropertyWidget();
 
 protected slots:

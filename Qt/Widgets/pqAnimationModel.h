@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -57,7 +57,6 @@ class PQWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
   Q_PROPERTY(bool interactive READ interactive WRITE setInteractive)
 public:
-
   /**
   * Real, Sequence or Custom mode
   * Real mode shows no tick marks for timesteps
@@ -66,15 +65,15 @@ public:
   * Custom shows tick marks at the location indicated by the setTickMarks().
   */
   enum ModeType
-    {
+  {
     Real,
     Sequence,
     Custom
-    };
+  };
 
   pqAnimationModel(QGraphicsView* p = 0);
   ~pqAnimationModel();
-  
+
   /**
   * the number of tracks
   */
@@ -88,7 +87,7 @@ public:
   * add a track.
   * If \c trackToAdd is NULL, we create a new pqAnimationTrack instance.
   */
-  pqAnimationTrack* addTrack(pqAnimationTrack* trackToAdd=NULL);
+  pqAnimationTrack* addTrack(pqAnimationTrack* trackToAdd = NULL);
   /**
   * remove a track
   */
@@ -129,16 +128,14 @@ public:
   * provides access to the custom ticks set using
   * setTickMarks() method.
   */
-  const QList<double>& customTicks() const
-    { return this->CustomTicks; }
+  const QList<double>& customTicks() const { return this->CustomTicks; }
 
   /**
   * set the tooltip to use for the checkbox in the EnabledHeader.
   * default is "Enable/Disable Track".
   */
   void setEnabledHeaderToolTip(const QString& val);
-  const QString& enabledHeaderToolTip() const
-    { return this->EnabledHeaderToolTip; }
+  const QString& enabledHeaderToolTip() const { return this->EnabledHeaderToolTip; }
 
 public slots:
 
@@ -212,24 +209,24 @@ protected:
   * or return this->ticks().
   */
   int currentTicks() const;
-private:
 
+private:
   ModeType Mode;
-  int    Ticks;
+  int Ticks;
   double CurrentTime;
   double StartTime;
   double EndTime;
-  int    RowHeight;
-  bool   Interactive;
+  int RowHeight;
+  bool Interactive;
 
   QList<double> CustomTicks;
-  
+
   // vars to support interaction
-  bool   CurrentTimeGrabbed;
+  bool CurrentTimeGrabbed;
   double NewCurrentTime;
-  pqAnimationTrack*   CurrentTrackGrabbed;
-  pqAnimationKeyFrame*   CurrentKeyFrameGrabbed;
-  int   CurrentKeyFrameEdge;
+  pqAnimationTrack* CurrentTrackGrabbed;
+  pqAnimationKeyFrame* CurrentKeyFrameGrabbed;
+  int CurrentKeyFrameEdge;
   QPair<double, double> InteractiveRange;
   QList<double> SnapHints;
 
@@ -247,4 +244,3 @@ private:
 };
 
 #endif // pqAnimationModel_h
-

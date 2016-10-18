@@ -49,8 +49,9 @@ class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqTransferFunctionWidget(QWidget* parent=0);
+  pqTransferFunctionWidget(QWidget* parent = 0);
   virtual ~pqTransferFunctionWidget();
 
   /**
@@ -59,8 +60,8 @@ public:
   * null). The editable flags are used to control if the users should be
   * allowed to edit/change the particular transfer function.
   */
-  void initialize(vtkScalarsToColors* stc, bool stc_editable,
-    vtkPiecewiseFunction* pwf, bool pwf_editable);
+  void initialize(
+    vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable);
 
   /**
   * Returns the current point index. -1 is none is selected.

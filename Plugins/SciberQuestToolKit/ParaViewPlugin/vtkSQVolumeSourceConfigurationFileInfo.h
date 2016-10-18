@@ -47,24 +47,23 @@ class VTK_EXPORT vtkSQVolumeSourceConfigurationFileInfo
 {
 public:
   vtkSQVolumeSourceConfigurationFileInfo()
-        :
-    FileIdentifier("SQVolumeSourceConfiguration"),
-    FileDescription("SciberQuest volume source configuration"),
-    FileExtension(".sqvsc")
-       {}
-  virtual ~vtkSQVolumeSourceConfigurationFileInfo(){}
+    : FileIdentifier("SQVolumeSourceConfiguration")
+    , FileDescription("SciberQuest volume source configuration")
+    , FileExtension(".sqvsc")
+  {
+  }
+  virtual ~vtkSQVolumeSourceConfigurationFileInfo() {}
 
-  virtual void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << std::endl
-      << indent << "FileDescription: " << this->FileDescription << std::endl
-      << indent << "FileExtension: " << this->FileExtension << std::endl;
-    }
+  virtual void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << std::endl
+       << indent << "FileDescription: " << this->FileDescription << std::endl
+       << indent << "FileExtension: " << this->FileExtension << std::endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

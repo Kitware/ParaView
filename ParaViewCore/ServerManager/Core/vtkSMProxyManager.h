@@ -124,8 +124,8 @@ public:
    * errors if no active session manager can be determined (using
    * GetActiveSessionProxyManager()).
    */
-  vtkSMProxy* NewProxy(const char* groupName,
-    const char* proxyName, const char* subProxyName = NULL);
+  vtkSMProxy* NewProxy(
+    const char* groupName, const char* proxyName, const char* subProxyName = NULL);
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
@@ -166,11 +166,10 @@ public:
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
   //@}
 
-
   enum eventId
-    {
+  {
     ActiveSessionChanged = 9753
-    };
+  };
 
   struct RegisteredProxyInformation
   {
@@ -182,30 +181,30 @@ public:
     unsigned int Type;
 
     enum
-      {
-      PROXY =0x1,
+    {
+      PROXY = 0x1,
       COMPOUND_PROXY_DEFINITION = 0x2,
       LINK = 0x3,
-      };
+    };
   };
 
   struct ModifiedPropertyInformation
-    {
+  {
     vtkSMProxy* Proxy;
     const char* PropertyName;
-    };
+  };
 
   struct LoadStateInformation
-    {
+  {
     vtkPVXMLElement* RootElement;
     vtkSMProxyLocator* ProxyLocator;
-    };
+  };
 
   struct StateChangedInformation
-    {
+  {
     vtkSMProxy* Proxy;
     vtkPVXMLElement* StateChangeElement;
-    };
+  };
 
 protected:
   vtkSMProxyManager();
@@ -234,7 +233,6 @@ private:
 
   vtkSMProxyManager(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

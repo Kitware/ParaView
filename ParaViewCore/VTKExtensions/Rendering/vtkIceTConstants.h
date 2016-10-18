@@ -46,21 +46,23 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTConstants
 {
 public:
-  enum StrategyType {
-    DEFAULT    = 0,
-    REDUCE     = 1,
-    VTREE      = 2,
-    SPLIT      = 3,
+  enum StrategyType
+  {
+    DEFAULT = 0,
+    REDUCE = 1,
+    VTREE = 2,
+    SPLIT = 3,
     SEQUENTIAL = 4,
-    DIRECT     = 5
+    DIRECT = 5
   };
 
-  enum ComposeOperationType {
+  enum ComposeOperationType
+  {
     ComposeOperationClosest = 0,
-    ComposeOperationOver    = 1
+    ComposeOperationOver = 1
   };
 };
 
-#endif //vtkIceTConstants_h
+#endif // vtkIceTConstants_h
 
 // VTK-HeaderTest-Exclude: vtkIceTConstants.h

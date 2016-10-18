@@ -44,33 +44,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QWidget>
 
-pqComponentsTestUtility::pqComponentsTestUtility(QObject* parentObj) :
-  Superclass(parentObj)
+pqComponentsTestUtility::pqComponentsTestUtility(QObject* parentObj)
+  : Superclass(parentObj)
 {
-  this->eventTranslator()->addWidgetEventTranslator(
-    new pqPluginTreeWidgetEventTranslator(this));
+  this->eventTranslator()->addWidgetEventTranslator(new pqPluginTreeWidgetEventTranslator(this));
 
-  this->eventPlayer()->addWidgetEventPlayer(
-    new pqPluginTreeWidgetEventPlayer(this));
-  this->eventPlayer()->addWidgetEventPlayer(
-    new pqItemViewSearchWidgetEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(new pqPluginTreeWidgetEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(new pqItemViewSearchWidgetEventPlayer(this));
 }
 
 //-----------------------------------------------------------------------------
 bool pqComponentsTestUtility::CompareView(
-  const QString& referenceImage,
-  double threshold,
-  const QString& tempDirectory)
+  const QString& referenceImage, double threshold, const QString& tempDirectory)
 {
   pqView* curView = pqActiveObjects::instance().activeView();
   if (!curView)
-    {
-    qCritical() << "ERROR: Could not locate the active view." ;
+  {
+    qCritical() << "ERROR: Could not locate the active view.";
     return false;
-    }
+  }
 
   // All tests need a 300x300 render window size.
   return pqCoreTestUtility::CompareView(
-    curView, referenceImage, threshold, tempDirectory,
-    QSize(300, 300));
+    curView, referenceImage, threshold, tempDirectory, QSize(300, 300));
 }

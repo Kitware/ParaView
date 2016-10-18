@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,8 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqServerConfiguration::pqServerConfiguration()
 {
   vtkNew<vtkPVXMLParser> parser;
-  parser->Parse(
-    "<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME "' configuration=''><ManualStartup/></Server>");
+  parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
+                "' configuration=''><ManualStartup/></Server>");
   this->constructor(parser->GetRootElement());
 }
 
@@ -110,13 +110,13 @@ void pqServerConfiguration::setResource(const QString& str)
 pqServerConfiguration::StartupType pqServerConfiguration::startupType() const
 {
   if (this->XML->FindNestedElementByName("ManualStartup"))
-    {
+  {
     return MANUAL;
-    }
+  }
   else if (this->XML->FindNestedElementByName("CommandStartup"))
-    {
+  {
     return COMMAND;
-    }
+  }
 
   return INVALID;
 }
@@ -126,9 +126,9 @@ vtkPVXMLElement* pqServerConfiguration::optionsXML() const
 {
   vtkPVXMLElement* startup = this->startupXML();
   if (startup != NULL)
-    {
-    return startup->FindNestedElementByName("Options"); 
-    }
+  {
+    return startup->FindNestedElementByName("Options");
+  }
   return NULL;
 }
 
@@ -142,23 +142,23 @@ vtkPVXMLElement* pqServerConfiguration::hintsXML() const
 vtkPVXMLElement* pqServerConfiguration::startupXML() const
 {
   switch (this->startupType())
-    {
+  {
     case (MANUAL):
-      {
+    {
       return this->XML->FindNestedElementByName("ManualStartup");
       break;
-      }
+    }
     case (COMMAND):
-      {
+    {
       return this->XML->FindNestedElementByName("CommandStartup");
       break;
-      } 
+    }
     default:
-      {
+    {
       return NULL;
       break;
-      }
     }
+  }
 }
 //-----------------------------------------------------------------------------
 /// If startupType() == COMMAND, then this method can be used to obtain
@@ -166,22 +166,22 @@ vtkPVXMLElement* pqServerConfiguration::startupXML() const
 /// information options etc. that may be specified in the startup.
 QString pqServerConfiguration::command(double& timeout, double& delay) const
 {
-  timeout = 0; delay = 0;
+  timeout = 0;
+  delay = 0;
   if (this->startupType() != COMMAND)
-    {
+  {
     return QString();
-    }
+  }
 
-  vtkPVXMLElement* commandStartup =
-    this->XML->FindNestedElementByName("CommandStartup");
+  vtkPVXMLElement* commandStartup = this->XML->FindNestedElementByName("CommandStartup");
   vtkPVXMLElement* commandXML = commandStartup->FindNestedElementByName("Command");
 
   if (commandXML == NULL)
-    {
+  {
     // CommandStartup is missing the  <Command/> element. That's peculiar, but
     // not a critical error. So we return empty string.
     return QString();
-    }
+  }
 
   commandXML->GetScalarAttribute("timeout", &timeout);
   commandXML->GetScalarAttribute("delay", &delay);
@@ -189,28 +189,27 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
   QString reply;
   QTextStream stream(&reply);
   stream << commandXML->GetAttributeOrDefault("exec", "");
-  vtkPVXMLElement* arguments = commandXML->GetNumberOfNestedElements()==1?
-    commandXML->GetNestedElement(0) : NULL;
+  vtkPVXMLElement* arguments =
+    commandXML->GetNumberOfNestedElements() == 1 ? commandXML->GetNestedElement(0) : NULL;
   if (arguments)
+  {
+    for (unsigned int cc = 0; cc < arguments->GetNumberOfNestedElements(); cc++)
     {
-    for (unsigned int cc=0; cc < arguments->GetNumberOfNestedElements(); cc++)
-      {
-      const char* value =
-        arguments->GetNestedElement(cc)->GetAttribute("value");
+      const char* value = arguments->GetNestedElement(cc)->GetAttribute("value");
       if (value)
-        {
+      {
         // if value contains space, quote it.
         if (QRegExp("\\s").indexIn(value) == -1)
-          {
+        {
           stream << " " << value;
-          }
+        }
         else
-          {
+        {
           stream << " \"" << value << "\"";
-          }
         }
       }
     }
+  }
   return reply;
 }
 
@@ -219,15 +218,15 @@ void pqServerConfiguration::setStartupToManual()
 {
   vtkPVXMLElement* startupElement = this->startupXML();
   if (startupElement)
-    {
+  {
     startupElement->SetName("ManualStartup");
-    }
+  }
   else
-    {
+  {
     vtkNew<vtkPVXMLElement> child;
     child->SetName("ManualStartup");
     this->XML->AddNestedElement(child.GetPointer());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -237,24 +236,24 @@ void pqServerConfiguration::setStartupToCommand(
   // we try to preserve any existing options.
   vtkPVXMLElement* startupElement = this->startupXML();
   if (startupElement)
-    {
+  {
     startupElement->SetName("CommandStartup");
-    }
+  }
   else
-    {
+  {
     vtkNew<vtkPVXMLElement> child;
     child->SetName("CommandStartup");
     this->XML->AddNestedElement(child.GetPointer());
     startupElement = child.GetPointer();
-    }
+  }
 
   // remove any existing command.
   vtkPVXMLElement* old_command = startupElement->FindNestedElementByName("Command");
   if (old_command)
-    {
+  {
     startupElement->RemoveNestedElement(old_command);
     old_command = NULL;
-    }
+  }
 
   vtkNew<vtkPVXMLElement> xml_command;
   xml_command->SetName("Command");
@@ -272,12 +271,12 @@ void pqServerConfiguration::setStartupToCommand(
   xml_command->AddNestedElement(xml_arguments.GetPointer());
 
   for (int i = 1; i < commandList.size(); ++i)
-    {
+  {
     vtkNew<vtkPVXMLElement> xml_argument;
     xml_argument->SetName("Argument");
     xml_arguments->AddNestedElement(xml_argument.GetPointer());
     xml_argument->AddAttribute("value", commandList[i].toLatin1().data());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

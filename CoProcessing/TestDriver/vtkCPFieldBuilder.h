@@ -16,7 +16,7 @@
  * @class   vtkCPFieldBuilder
  * @brief   Abstract class for specifying fields over grids.
  *
- * Abstract class for specifying fields over grids for a test driver.  
+ * Abstract class for specifying fields over grids for a test driver.
 */
 
 #ifndef vtkCPFieldBuilder_h
@@ -36,8 +36,7 @@ public:
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long TimeStep, double Time,
-                          vtkDataSet* Grid) = 0;
+  virtual void BuildField(unsigned long TimeStep, double Time, vtkDataSet* Grid) = 0;
 
   /**
    * Return the highest order of discretization of the field.
@@ -80,6 +79,6 @@ private:
    */
   vtkCPTensorFieldFunction* TensorFieldFunction;
 };
-  //@}
+//@}
 
 #endif

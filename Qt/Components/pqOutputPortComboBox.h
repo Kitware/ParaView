@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,18 +47,17 @@ class PQCOMPONENTS_EXPORT pqOutputPortComboBox : public QComboBox
 {
   Q_OBJECT
   typedef QComboBox Superclass;
+
 public:
-  pqOutputPortComboBox(QWidget* parent=0);
+  pqOutputPortComboBox(QWidget* parent = 0);
   ~pqOutputPortComboBox();
 
   /**
   * Enable/Disable changing of the combo-box selected index based on the
   * active source/port. Default is true i.e. enabled.
   */
-  void setAutoUpdateIndex(bool val)
-    { this->AutoUpdateIndex = val; }
-  bool autoUpdateIndex() const
-    { return this->AutoUpdateIndex; }
+  void setAutoUpdateIndex(bool val) { this->AutoUpdateIndex = val; }
+  bool autoUpdateIndex() const { return this->AutoUpdateIndex; }
 
   /**
   * Makes is possible to add custom items to the combo-box.
@@ -104,7 +103,7 @@ private slots:
   * Called when currentIndexChanged(int) is fired.
   * We fire currentIndexChanged(pqPipelineSource*) and
   */
-  //currentIndexChanged(vtkSMProxy*);
+  // currentIndexChanged(vtkSMProxy*);
   void onCurrentIndexChanged(int index);
 
   /**
@@ -125,5 +124,3 @@ private:
 };
 
 #endif
-
-

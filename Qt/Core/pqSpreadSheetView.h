@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,13 +47,13 @@ class PQCORE_EXPORT pqSpreadSheetView : public pqView
 {
   Q_OBJECT
   typedef pqView Superclass;
+
 public:
   static QString spreadsheetViewType() { return "SpreadSheetView"; }
 
 public:
-  pqSpreadSheetView(const QString& group, const QString& name, 
-    vtkSMViewProxy* viewModule, pqServer* server, 
-    QObject* parent=NULL);
+  pqSpreadSheetView(const QString& group, const QString& name, vtkSMViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
   virtual ~pqSpreadSheetView();
 
   /**
@@ -82,7 +82,7 @@ protected slots:
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
   /**
-  * Called at start of every render. 
+  * Called at start of every render.
   * If in "selection-only" mode, and showing composite dataset, we want to make
   * sure that we are shown a block with non-empty cells/points (if possible).
   */
@@ -112,6 +112,7 @@ protected slots:
   * Create a QWidget for the view's viewport.
   */
   virtual QWidget* createWidget();
+
 private:
   Q_DISABLE_COPY(pqSpreadSheetView)
 
@@ -120,5 +121,3 @@ private:
 };
 
 #endif
-
-

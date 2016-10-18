@@ -34,11 +34,10 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnim
 {
 public:
   static vtkSMAnimationSceneGeometryWriter* New();
-  vtkTypeMacro(vtkSMAnimationSceneGeometryWriter,
-    vtkSMAnimationSceneWriter);
+  vtkTypeMacro(vtkSMAnimationSceneGeometryWriter, vtkSMAnimationSceneWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Get/Set the View Module from which we are writing the 
+  // Get/Set the View Module from which we are writing the
   // geometry.
   vtkGetObjectMacro(ViewModule, vtkSMProxy);
   void SetViewModule(vtkSMProxy*);
@@ -64,6 +63,7 @@ protected:
 
   vtkSMProxy* GeometryWriter;
   vtkSMProxy* ViewModule;
+
 private:
   vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QtDebug>
 
-pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p) 
+pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
 {
 }
@@ -48,24 +48,25 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
 {
   // Capture input for pqFileDialog and all its children ...
   pqFileDialog* object = 0;
-  for(QObject* o = Object; o; o = o->parent())
-    {
+  for (QObject* o = Object; o; o = o->parent())
+  {
     object = qobject_cast<pqFileDialog*>(o);
-    if(object)
+    if (object)
       break;
-    }
-  
-  if(!object)
+  }
+
+  if (!object)
     return false;
 
-  if(Event->type() == QEvent::FocusIn && !this->CurrentObject)
-    {
+  if (Event->type() == QEvent::FocusIn && !this->CurrentObject)
+  {
     this->CurrentObject = object;
-    connect(object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
+    connect(
+      object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
     connect(object, SIGNAL(rejected()), this, SLOT(onCancelled()));
     return true;
-    }
-      
+  }
+
   return this->Superclass::translateEvent(Object, Event, Error);
 }
 
@@ -73,22 +74,24 @@ void pqFileDialogEventTranslator::onFilesSelected(const QString& file)
 {
   QString data_directory = pqCoreTestUtility::DataRoot();
   data_directory = QDir::cleanPath(QDir::fromNativeSeparators(data_directory));
-  if(data_directory.isEmpty())
-    {
-    qWarning() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
-    }
+  if (data_directory.isEmpty())
+  {
+    qWarning()
+      << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
+  }
 
   QString cleanedFile = QDir::cleanPath(QDir::fromNativeSeparators(file));
-  
-  if(cleanedFile.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
-    {
+
+  if (cleanedFile.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
+  {
     cleanedFile.replace(data_directory, "$PARAVIEW_DATA_ROOT", Qt::CaseInsensitive);
-    }
+  }
   else
-    {
-    qWarning() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
-    }
-  
+  {
+    qWarning()
+      << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
+  }
+
   emit recordEvent(this->CurrentObject, "filesSelected", cleanedFile);
 }
 

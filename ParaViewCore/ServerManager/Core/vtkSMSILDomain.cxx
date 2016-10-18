@@ -21,7 +21,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
-
 vtkStandardNewMacro(vtkSMSILDomain);
 //----------------------------------------------------------------------------
 vtkSMSILDomain::vtkSMSILDomain()
@@ -41,10 +40,10 @@ vtkSMSILDomain::~vtkSMSILDomain()
 //----------------------------------------------------------------------------
 int vtkSMSILDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem)
 {
-  if (!this->Superclass::ReadXMLAttributes(prop,elem))
-    {
+  if (!this->Superclass::ReadXMLAttributes(prop, elem))
+  {
     return 0;
-    }
+  }
 
   // Keep subtree attribute
   this->SetSubTree(elem->GetAttribute("subtree"));
@@ -54,30 +53,29 @@ int vtkSMSILDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem
 vtkGraph* vtkSMSILDomain::GetSIL()
 {
   vtkSMIdTypeVectorProperty* timestamp =
-      vtkSMIdTypeVectorProperty::SafeDownCast(
-          this->GetRequiredProperty("TimeStamp"));
+    vtkSMIdTypeVectorProperty::SafeDownCast(this->GetRequiredProperty("TimeStamp"));
   vtkSMProperty* silProp = this->GetRequiredProperty("ArrayList");
 
   if (timestamp != NULL)
-    {
+  {
     // Check timestamp to know if the SIL fecth is needed
     timestamp->GetParent()->UpdatePropertyInformation(timestamp);
 
-    if(timestamp->GetNumberOfElements() == 0)
-      {
+    if (timestamp->GetNumberOfElements() == 0)
+    {
       timestamp->GetParent()->GatherInformation(this->SIL);
-      }
-    else if( this->SILTimeStamp < timestamp->GetElement(0) )
-      {
+    }
+    else if (this->SILTimeStamp < timestamp->GetElement(0))
+    {
       this->SILTimeStamp = timestamp->GetElement(0);
       timestamp->GetParent()->GatherInformation(this->SIL);
-      }
     }
-  else if(silProp != NULL)
-    {
+  }
+  else if (silProp != NULL)
+  {
     // With no timestamp, we simply fecth each time the request is made
     silProp->GetParent()->GatherInformation(this->SIL);
-    }
+  }
 
   return this->SIL->GetSIL();
 }
@@ -87,5 +85,3 @@ void vtkSMSILDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

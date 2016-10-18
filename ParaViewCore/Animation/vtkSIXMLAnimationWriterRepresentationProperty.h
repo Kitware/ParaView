@@ -26,7 +26,8 @@
 #include "vtkPVAnimationModule.h" //needed for exports
 #include "vtkSIInputProperty.h"
 
-class VTKPVANIMATION_EXPORT vtkSIXMLAnimationWriterRepresentationProperty : public vtkSIInputProperty
+class VTKPVANIMATION_EXPORT vtkSIXMLAnimationWriterRepresentationProperty
+  : public vtkSIInputProperty
 {
 public:
   static vtkSIXMLAnimationWriterRepresentationProperty* New();
@@ -44,9 +45,9 @@ protected:
   virtual bool Push(vtkSMMessage*, int);
 
 private:
-  vtkSIXMLAnimationWriterRepresentationProperty(const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
+  vtkSIXMLAnimationWriterRepresentationProperty(
+    const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

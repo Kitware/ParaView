@@ -42,34 +42,33 @@ void vtkSMPLYWriterProxyInitializationHelper::PostInitializeProxy(
   assert(proxy != NULL);
   if (proxy->GetProperty("ColorArrayName")->GetMTime() > ts ||
     proxy->GetProperty("LookupTable")->GetMTime() > ts)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMPropertyHelper input(proxy, "Input");
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   vtkSMViewProxy* activeView = NULL;
   if (vtkSMProxySelectionModel* viewSM = pxm->GetSelectionModel("ActiveView"))
-    {
+  {
     activeView = vtkSMViewProxy::SafeDownCast(viewSM->GetCurrentProxy());
-    }
+  }
 
   if (activeView && input.GetAsProxy())
-    {
+  {
     if (vtkSMRepresentationProxy* repr = activeView->FindRepresentation(
-        vtkSMSourceProxy::SafeDownCast(input.GetAsProxy()),
-        input.GetOutputPort()))
-      {
+          vtkSMSourceProxy::SafeDownCast(input.GetAsProxy()), input.GetOutputPort()))
+    {
       if (repr->GetProperty("ColorArrayName") && repr->GetProperty("LookupTable"))
-        {
+      {
         vtkSMPropertyHelper rca(repr, "ColorArrayName");
-        vtkSMPropertyHelper(proxy, "ColorArrayName").SetInputArrayToProcess(
-          rca.GetInputArrayAssociation(), rca.GetInputArrayNameToProcess());
-        vtkSMPropertyHelper(proxy, "LookupTable").Set(
-          vtkSMPropertyHelper(repr, "LookupTable").GetAsProxy());
-        }
+        vtkSMPropertyHelper(proxy, "ColorArrayName")
+          .SetInputArrayToProcess(rca.GetInputArrayAssociation(), rca.GetInputArrayNameToProcess());
+        vtkSMPropertyHelper(proxy, "LookupTable")
+          .Set(vtkSMPropertyHelper(repr, "LookupTable").GetAsProxy());
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------

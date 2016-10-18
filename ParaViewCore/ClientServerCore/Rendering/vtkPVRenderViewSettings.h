@@ -28,7 +28,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkSmartPointer.h"                      // needed for vtkSmartPointer
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderViewSettings : public vtkObject
 {
@@ -48,12 +48,12 @@ public:
   void SetUseDisplayLists(bool val);
 
   enum
-    {
-    DO_NOTHING =0,
-    OFFSET_FACES=1,
-    OFFSET_LINES_AND_VERTS=2,
-    ZSHIFT=3
-    };
+  {
+    DO_NOTHING = 0,
+    OFFSET_FACES = 1,
+    OFFSET_LINES_AND_VERTS = 2,
+    ZSHIFT = 3
+  };
 
   //@{
   /**
@@ -98,12 +98,12 @@ protected:
   vtkIdType OutlineThreshold;
   int PointPickingRadius;
   bool DisableIceT;
+
 private:
   vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
 
   static vtkSmartPointer<vtkPVRenderViewSettings> Instance;
-
 };
 
 #endif

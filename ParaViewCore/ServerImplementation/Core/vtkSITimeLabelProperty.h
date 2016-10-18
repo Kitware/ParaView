@@ -45,7 +45,6 @@ protected:
 private:
   vtkSITimeLabelProperty(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

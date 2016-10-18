@@ -33,38 +33,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewStreamingBehavior.h"
 
 //-----------------------------------------------------------------------------
-bool pqStreamingTestingEventPlayer::playEvent(QObject*,
-  const QString& command, const QString& arguments, bool& error)
+bool pqStreamingTestingEventPlayer::playEvent(
+  QObject*, const QString& command, const QString& arguments, bool& error)
 {
-if (command == "pqViewStreamingBehavior" && this->StreamingBehavior)
+  if (command == "pqViewStreamingBehavior" && this->StreamingBehavior)
   {
-  if (arguments == "stop_streaming")
+    if (arguments == "stop_streaming")
     {
-    this->StreamingBehavior->stopAutoUpdates();
+      this->StreamingBehavior->stopAutoUpdates();
     }
-  else if (arguments == "resume_streaming")
+    else if (arguments == "resume_streaming")
     {
-    this->StreamingBehavior->resumeAutoUpdates();
+      this->StreamingBehavior->resumeAutoUpdates();
     }
-  else if (arguments == "next")
+    else if (arguments == "next")
     {
-    this->StreamingBehavior->triggerSingleUpdate();
+      this->StreamingBehavior->triggerSingleUpdate();
     }
-  else
+    else
     {
-    error = true;
+      error = true;
     }
-  return true;
+    return true;
   }
-else
+  else
   {
-  return false;
+    return false;
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqStreamingTestingEventPlayer::setViewStreamingBehavior(
-    pqViewStreamingBehavior* vsBehavior)
+void pqStreamingTestingEventPlayer::setViewStreamingBehavior(pqViewStreamingBehavior* vsBehavior)
 {
   this->StreamingBehavior = vsBehavior;
 }

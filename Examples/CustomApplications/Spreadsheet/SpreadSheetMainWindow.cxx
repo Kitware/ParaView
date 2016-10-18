@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewDecorator.h"
 
 //-----------------------------------------------------------------------------
-SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,
-  Qt::WindowFlags wflags) : Superclass(parentObject, wflags)
+SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject, Qt::WindowFlags wflags)
+  : Superclass(parentObject, wflags)
 {
   Ui::SpreadSheetMainWindow ui;
   ui.setupUi(this);
@@ -62,27 +62,24 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,
   new pqRecentFilesMenu(*ui.menuRecent_Datasets, ui.menuRecent_Datasets);
 
   // Create spread-sheet view and set it as the central Widget.
-  pqSpreadSheetView* view = qobject_cast<pqSpreadSheetView*>(
-    pqApplicationCore::instance()->getObjectBuilder()->createView(
-      pqSpreadSheetView::spreadsheetViewType(),
-      pqActiveObjects::instance().activeServer()));
+  pqSpreadSheetView* view =
+    qobject_cast<pqSpreadSheetView*>(pqApplicationCore::instance()->getObjectBuilder()->createView(
+      pqSpreadSheetView::spreadsheetViewType(), pqActiveObjects::instance().activeServer()));
   this->setCentralWidget(view->widget());
   new pqSpreadSheetViewDecorator(view);
-  
+
   pqActiveObjects::instance().setActiveView(view);
 
   // Reactions
   new pqLoadDataReaction(ui.action_Open_Dataset);
-  QObject::connect(ui.action_Exit, SIGNAL(triggered()),
-    pqApplicationCore::instance(), SLOT(quit()));
+  QObject::connect(
+    ui.action_Exit, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(quit()));
 
   // We need to destroy the previously opened source and show the new one
   // every time a new source is created.
   QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
-    SIGNAL(sourceCreated(pqPipelineSource*)),
-    this, SLOT(showData(pqPipelineSource*)));
+    SIGNAL(sourceCreated(pqPipelineSource*)), this, SLOT(showData(pqPipelineSource*)));
 }
-
 
 //-----------------------------------------------------------------------------
 SpreadSheetMainWindow::~SpreadSheetMainWindow()
@@ -95,10 +92,9 @@ void SpreadSheetMainWindow::showData(pqPipelineSource* source)
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
 
   if (activeObjects.activeSource())
-    {
-    pqApplicationCore::instance()->getObjectBuilder()->destroy(
-      activeObjects.activeSource());
-    }
+  {
+    pqApplicationCore::instance()->getObjectBuilder()->destroy(activeObjects.activeSource());
+  }
   activeObjects.setActiveSource(source);
   pqApplicationCore::instance()->getDisplayPolicy()->setRepresentationVisibility(
     source->getOutputPort(0), activeObjects.activeView(), true);

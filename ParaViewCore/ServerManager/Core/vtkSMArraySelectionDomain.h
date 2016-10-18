@@ -22,7 +22,7 @@
  * items). This is similar to vtkSMArrayListDomain, the only different is that
  * vtkSMArrayListDomain is designed to work with data-information obtained
  * from the required Input property, while vtkSMArraySelectionDomain depends on
- * a required information-only property ("ArrayList") that provides the 
+ * a required information-only property ("ArrayList") that provides the
  * arrays available.
  *
  * Supported Required-Property functions:
@@ -55,9 +55,10 @@ public:
    * values according to infoProperty and (b) setting all default values to on.
    */
   static void SetLoadAllVariables(bool choice)
-  { vtkSMArraySelectionDomain::LoadAllVariables = choice; }
-  static bool GetLoadAllVariables()
-  { return vtkSMArraySelectionDomain::LoadAllVariables; }
+  {
+    vtkSMArraySelectionDomain::LoadAllVariables = choice;
+  }
+  static bool GetLoadAllVariables() { return vtkSMArraySelectionDomain::LoadAllVariables; }
 
 protected:
   vtkSMArraySelectionDomain();

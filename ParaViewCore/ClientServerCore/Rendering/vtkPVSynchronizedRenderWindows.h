@@ -52,7 +52,7 @@ public:
    * if session==NULL, then active session is used. If no active session is
    * present, then it's a critical error and this method will return NULL.
    */
-  static vtkPVSynchronizedRenderWindows* New(vtkPVSession* session=NULL);
+  static vtkPVSynchronizedRenderWindows* New(vtkPVSession* session = NULL);
 
   vtkTypeMacro(vtkPVSynchronizedRenderWindows, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -139,18 +139,18 @@ public:
    * We may make this API generic in future, for now this works.
    */
   bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(double &size);
-  bool SynchronizeSize(unsigned int &size);
+  bool SynchronizeSize(double& size);
+  bool SynchronizeSize(unsigned int& size);
   bool BroadcastToDataServer(vtkSelection* selection);
   bool BroadcastToRenderServer(vtkDataObject*);
   //@}
 
   enum StandardOperations
-    {
+  {
     MAX_OP = vtkCommunicator::MAX_OP,
     MIN_OP = vtkCommunicator::MIN_OP,
     SUM_OP = vtkCommunicator::SUM_OP
-    };
+  };
   bool Reduce(vtkIdType& value, StandardOperations operation);
 
   //@{
@@ -163,11 +163,11 @@ public:
   //@}
 
   enum
-    {
+  {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
     GET_ZBUFFER_VALUE_TAG = 15003,
     SYNC_TILE_DISPLAY_PARAMATERS = 15004
-    };
+  };
 
   // Internal-callback-method
   void Render(unsigned int);
@@ -219,14 +219,14 @@ public:
   double GetZbufferDataAtPoint(int x, int y, unsigned int id);
 
   enum ModeEnum
-    {
+  {
     INVALID,
     BUILTIN,
     CLIENT,
     RENDER_SERVER,
     DATA_SERVER,
     BATCH
-    };
+  };
 
   /**
    * Streaming uses this class as a conduit for messaging.
@@ -300,7 +300,6 @@ protected:
    */
   void ShinkGaps();
 
-
   ModeEnum Mode;
   vtkMultiProcessController* ParallelController;
   vtkMultiProcessController* ClientServerController;
@@ -324,10 +323,8 @@ private:
   class vtkObserver;
   vtkObserver* Observer;
 
-
   template <class T>
-  bool ReduceTemplate(T &size, StandardOperations operation);
-
+  bool ReduceTemplate(T& size, StandardOperations operation);
 };
 
 #endif

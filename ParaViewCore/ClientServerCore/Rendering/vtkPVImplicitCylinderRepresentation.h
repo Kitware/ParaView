@@ -26,7 +26,6 @@
 #include "vtkImplicitCylinderRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitCylinderRepresentation
   : public vtkImplicitCylinderRepresentation
 {
@@ -40,7 +39,8 @@ protected:
   ~vtkPVImplicitCylinderRepresentation();
 
 private:
-  vtkPVImplicitCylinderRepresentation(const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVImplicitCylinderRepresentation(
+    const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
 };
 

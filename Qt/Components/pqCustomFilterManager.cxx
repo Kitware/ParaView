@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,13 +49,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 
-
-class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager {};
-
+class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager
+{
+};
 
 //-----------------------------------------------------------------------------
-pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
-    QWidget *widgetParent)
+pqCustomFilterManager::pqCustomFilterManager(
+  pqCustomFilterManagerModel* model, QWidget* widgetParent)
   : QDialog(widgetParent)
 {
   this->Model = model;
@@ -68,24 +68,19 @@ pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
   this->Form->CustomFilterList->setModel(this->Model);
 
   // Listen for button clicks.
-  QObject::connect(this->Form->ImportButton, SIGNAL(clicked()),
-      this, SLOT(importFiles()));
-  QObject::connect(this->Form->ExportButton, SIGNAL(clicked()),
-      this, SLOT(exportSelected()));
-  QObject::connect(this->Form->RemoveButton, SIGNAL(clicked()),
-      this, SLOT(removeSelected()));
-  QObject::connect(this->Form->CloseButton, SIGNAL(clicked()),
-      this, SLOT(accept()));
+  QObject::connect(this->Form->ImportButton, SIGNAL(clicked()), this, SLOT(importFiles()));
+  QObject::connect(this->Form->ExportButton, SIGNAL(clicked()), this, SLOT(exportSelected()));
+  QObject::connect(this->Form->RemoveButton, SIGNAL(clicked()), this, SLOT(removeSelected()));
+  QObject::connect(this->Form->CloseButton, SIGNAL(clicked()), this, SLOT(accept()));
 
   // Listen for selection changes.
   QObject::connect(this->Form->CustomFilterList->selectionModel(),
-      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-      this,
-      SLOT(updateButtons(const QItemSelection &, const QItemSelection &)));
+    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+    SLOT(updateButtons(const QItemSelection&, const QItemSelection&)));
 
   // Listen for new custom filter additions.
-  QObject::connect(this->Model, SIGNAL(customFilterAdded(const QString &)),
-      this, SLOT(selectCustomFilter(const QString &)));
+  QObject::connect(this->Model, SIGNAL(customFilterAdded(const QString&)), this,
+    SLOT(selectCustomFilter(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -95,54 +90,54 @@ pqCustomFilterManager::~pqCustomFilterManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqCustomFilterManager::selectCustomFilter(const QString &name)
+void pqCustomFilterManager::selectCustomFilter(const QString& name)
 {
   QModelIndex index = this->Model->getIndexFor(name);
-  if(index.isValid())
-    {
-    this->Form->CustomFilterList->selectionModel()->select(index,
-        QItemSelectionModel::SelectCurrent);
-    }
+  if (index.isValid())
+  {
+    this->Form->CustomFilterList->selectionModel()->select(
+      index, QItemSelectionModel::SelectCurrent);
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCustomFilterManager::importFiles(const QStringList &files)
+void pqCustomFilterManager::importFiles(const QStringList& files)
 {
   // Clear the current selection. The new custom filter definitions
   // will be selected as they're added.
   this->Form->CustomFilterList->selectionModel()->clear();
 
-  vtkSMSessionProxyManager *proxyManager =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSMSessionProxyManager* proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QStringList::ConstIterator iter = files.begin();
-  for( ; iter != files.end(); ++iter)
-    {
+  for (; iter != files.end(); ++iter)
+  {
     // Make sure name is unique among filters
     // Should this be done in vtkSMProxyManager???
     vtkPVXMLParser* parser = vtkPVXMLParser::New();
     parser->SetFileName((*iter).toLatin1().data());
     parser->Parse();
-    vtkPVXMLElement *root = parser->GetRootElement();
+    vtkPVXMLElement* root = parser->GetRootElement();
     if (!root)
-      {
+    {
       continue;
-      }
+    }
     unsigned int numElems = root->GetNumberOfNestedElements();
-    for (unsigned int i=0; i<numElems; i++)
-      {
+    for (unsigned int i = 0; i < numElems; i++)
+    {
       vtkPVXMLElement* currentElement = root->GetNestedElement(i);
       if (currentElement->GetName() &&
-          strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0)
-        {
+        strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0)
+      {
         const char* name = currentElement->GetAttribute("name");
         const char* group = currentElement->GetAttribute("group");
         if (name && group)
-          {
+        {
           QString newname = this->getUnusedFilterName(group, name);
-          currentElement->SetAttribute("name",newname.toLatin1().data());
-          }
+          currentElement->SetAttribute("name", newname.toLatin1().data());
         }
       }
+    }
 
     // Load the custom proxy definitions using the server manager.
     // This should trigger some register events, which will update the
@@ -150,54 +145,48 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
     proxyManager->LoadCustomProxyDefinitions(root);
 
     parser->Delete();
-    }
+  }
 }
 
-
-
 //----------------------------------------------------------------------------
-QString pqCustomFilterManager::getUnusedFilterName(
-  const QString& group, const QString &name)
+QString pqCustomFilterManager::getUnusedFilterName(const QString& group, const QString& name)
 {
-  vtkSMSessionProxyManager *proxyManager =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  
+  vtkSMSessionProxyManager* proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
   QString tempName = name;
   int counter = 1;
-  while(proxyManager->GetProxyDefinition(
-      group.toLatin1().data(), tempName.toLatin1().data()))
-    {
+  while (proxyManager->GetProxyDefinition(group.toLatin1().data(), tempName.toLatin1().data()))
+  {
     tempName = QString(name + " (" + QString::number(counter) + ")");
     counter++;
-    }
+  }
 
   return tempName;
 }
 
-
 //----------------------------------------------------------------------------
-void pqCustomFilterManager::exportSelected(const QStringList &files)
+void pqCustomFilterManager::exportSelected(const QStringList& files)
 {
   // Get the selected custom filters from the list.
-  QModelIndexList selection =
-      this->Form->CustomFilterList->selectionModel()->selectedIndexes();
-  if(selection.size() == 0 || files.size() == 0)
-    {
+  QModelIndexList selection = this->Form->CustomFilterList->selectionModel()->selectedIndexes();
+  if (selection.size() == 0 || files.size() == 0)
+  {
     return;
-    }
+  }
 
   // Create the root xml element for the file.
-  vtkPVXMLElement *root = vtkPVXMLElement::New();
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
   root->SetName("CustomFilterDefinitions");
 
   QString filter;
-  vtkPVXMLElement *element = 0;
-  vtkPVXMLElement *definition = 0;
-  vtkSMSessionProxyManager *proxyManager =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkPVXMLElement* element = 0;
+  vtkPVXMLElement* definition = 0;
+  vtkSMSessionProxyManager* proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QModelIndexList::Iterator iter = selection.begin();
-  for( ; iter != selection.end(); ++iter)
-    {
+  for (; iter != selection.end(); ++iter)
+  {
     // Get the xml for the custom filter. The xml from the server
     // manager needs to be added to a "CustomProxyDefinition"
     // element. That element needs a name attribute set.
@@ -207,26 +196,26 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
     definition->AddAttribute("name", filter.toLatin1().data());
     element = proxyManager->GetProxyDefinition("filters", filter.toLatin1().data());
     if (element)
-      {
+    {
       definition->AddAttribute("group", "filters");
-      }
+    }
     else
-      {
+    {
       element = proxyManager->GetProxyDefinition("sources", filter.toLatin1().data());
       definition->AddAttribute("group", "sources");
-      }
+    }
     definition->AddNestedElement(element);
     root->AddNestedElement(definition);
     definition->Delete();
-    }
+  }
 
   // Save the custom filters in the selected files.
   QStringList::ConstIterator jter = files.begin();
-  for( ; jter != files.end(); ++jter)
-    {
+  for (; jter != files.end(); ++jter)
+  {
     ofstream os((*jter).toLatin1().data(), ios::out);
     root->PrintXML(os, vtkIndent());
-    }
+  }
 
   root->Delete();
 }
@@ -235,19 +224,15 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
 void pqCustomFilterManager::importFiles()
 {
   // Let the user select a file.
-  pqFileDialog* fileDialog = new pqFileDialog(
-      NULL,
-      this,
-      tr("Open Custom Filter File"),
-      QString(),
-      "Custom Filter Files (*.cpd *.xml);;All Files (*)");
+  pqFileDialog* fileDialog = new pqFileDialog(NULL, this, tr("Open Custom Filter File"), QString(),
+    "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFile);
 
   // Listen for the user's selection.
-  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),
-      this, SLOT(importFiles(const QStringList &)));
+  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), this,
+    SLOT(importFiles(const QStringList&)));
 
   fileDialog->show();
 }
@@ -256,19 +241,15 @@ void pqCustomFilterManager::importFiles()
 void pqCustomFilterManager::exportSelected()
 {
   // Let the user select a file to save.
-  pqFileDialog* fileDialog = new pqFileDialog(
-      NULL,
-      this,
-      tr("Save Custom Filter File"),
-      QString(),
-      "Custom Filter Files (*.cpd *.xml);;All Files (*)");
+  pqFileDialog* fileDialog = new pqFileDialog(NULL, this, tr("Save Custom Filter File"), QString(),
+    "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
 
   // Listen for the user's selection.
-  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),
-      this, SLOT(exportSelected(const QStringList &)));
+  this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)), this,
+    SLOT(exportSelected(const QStringList&)));
 
   fileDialog->show();
 }
@@ -277,43 +258,36 @@ void pqCustomFilterManager::exportSelected()
 void pqCustomFilterManager::removeSelected()
 {
   // Get the selected custom filters from the list.
-  vtkSMSessionProxyManager *proxyManager =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  QModelIndexList selection =
-      this->Form->CustomFilterList->selectionModel()->selectedIndexes();
+  vtkSMSessionProxyManager* proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  QModelIndexList selection = this->Form->CustomFilterList->selectionModel()->selectedIndexes();
   QModelIndexList::Iterator iter = selection.begin();
   QStringList filters;
-  for( ; iter != selection.end(); ++iter)
-    {
+  for (; iter != selection.end(); ++iter)
+  {
     filters.append(this->Model->getCustomFilterName(*iter));
-    }
+  }
 
-  foreach(QString filter, filters)
-    {
+  foreach (QString filter, filters)
+  {
     // Unregister the custom filter from the server manager.
     if (proxyManager->GetProxyDefinition("filters", filter.toLatin1().data()))
-      {
-      proxyManager->UnRegisterCustomProxyDefinition(
-        "filters", filter.toLatin1().data());
-      }
-    else if (proxyManager->GetProxyDefinition(
-        "sources", filter.toLatin1().data()))
-      {
-      proxyManager->UnRegisterCustomProxyDefinition(
-        "sources", filter.toLatin1().data());
-      }
+    {
+      proxyManager->UnRegisterCustomProxyDefinition("filters", filter.toLatin1().data());
     }
+    else if (proxyManager->GetProxyDefinition("sources", filter.toLatin1().data()))
+    {
+      proxyManager->UnRegisterCustomProxyDefinition("sources", filter.toLatin1().data());
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCustomFilterManager::updateButtons(const QItemSelection &,
-    const QItemSelection &)
+void pqCustomFilterManager::updateButtons(const QItemSelection&, const QItemSelection&)
 {
   // Enable or disable the buttons based on the selection.
-  QItemSelectionModel *selection = this->Form->CustomFilterList->selectionModel();
+  QItemSelectionModel* selection = this->Form->CustomFilterList->selectionModel();
   bool hasSelected = selection->selection().size() > 0;
   this->Form->ExportButton->setEnabled(hasSelected);
   this->Form->RemoveButton->setEnabled(hasSelected);
 }
-
-

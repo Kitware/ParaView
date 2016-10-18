@@ -57,63 +57,62 @@ class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 {
   Q_OBJECT
   typedef QAbstractTableModel Superclass;
+
 public:
-  pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent=NULL);
+  pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent = NULL);
   ~pqSpreadSheetViewModel();
 
   class vtkIndex
-    {
+  {
   public:
     vtkIdType Tuple[3];
     vtkIndex()
-      {
+    {
       this->Tuple[0] = 0;
       this->Tuple[1] = 0;
       this->Tuple[2] = 0;
-      }
+    }
 
-  vtkIndex(vtkIdType a, vtkIdType b, vtkIdType c)
-      {
+    vtkIndex(vtkIdType a, vtkIdType b, vtkIdType c)
+    {
       this->Tuple[0] = a;
       this->Tuple[1] = b;
       this->Tuple[2] = c;
-      }
+    }
 
     bool operator==(const vtkIndex& other) const
-      {
-      return (this->Tuple[0] == other.Tuple[0] &&
-        this->Tuple[1] == other.Tuple[1] &&
+    {
+      return (this->Tuple[0] == other.Tuple[0] && this->Tuple[1] == other.Tuple[1] &&
         this->Tuple[2] == other.Tuple[2]);
-      }
-    };
+    }
+  };
 
   /**
   * Returns the number of rows.
   */
-  int rowCount(const QModelIndex& parent=QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * Returns the number of columns.
   */
-  int columnCount(const QModelIndex& parent=QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * Returns the data storeed under the given role for the item referred by the
   * index.
   */
-  QVariant data(const QModelIndex& index, int role=Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   /**
   * Returns the data for the given role and section in the header with the
   * specified orientation.
   */
-  QVariant headerData (int section, Qt::Orientation orientation,
-    int role=Qt::DisplayRole) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
   /**
   * Make a server request to sort based on a given column with a given order
   */
-  void sortSection (int section, Qt::SortOrder order);
+  void sortSection(int section, Qt::SortOrder order);
 
   /**
   * Return true only if the given column is sortable.
@@ -173,8 +172,8 @@ public:
   /**
   * Method needed for copy/past cell editor
   */
-  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
-  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 public slots:
   /**
   * resets the model.
@@ -219,9 +218,10 @@ protected:
   * Given an index into the model, check to see that its row number is
   * less than the length of the data array associated with its column
   */
-  bool isDataValid(const QModelIndex &idx) const;
+  bool isDataValid(const QModelIndex& idx) const;
 
   vtkSpreadSheetView* GetView() const;
+
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewModel)
 
@@ -232,5 +232,3 @@ private:
 };
 
 #endif
-
-

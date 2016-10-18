@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,14 +46,12 @@ vtkOutputWindow::setInstance() static method.
 
 \sa pqOutputWindow
 */
-class PQCORE_EXPORT pqOutputWindowAdapter :
-  public QObject,
-  public vtkOutputWindow
+class PQCORE_EXPORT pqOutputWindowAdapter : public QObject, public vtkOutputWindow
 {
   Q_OBJECT
-  
+
 public:
-  static pqOutputWindowAdapter *New();
+  static pqOutputWindowAdapter* New();
   vtkTypeMacro(pqOutputWindowAdapter, vtkOutputWindow);
 
   /**
@@ -110,7 +108,7 @@ private:
   virtual void DisplayErrorText(const char*);
   virtual void DisplayWarningText(const char*);
   virtual void DisplayGenericWarningText(const char*);
-  
+
   bool Active;
 };
 

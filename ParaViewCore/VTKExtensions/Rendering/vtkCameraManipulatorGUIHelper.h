@@ -14,14 +14,14 @@
 =========================================================================*/
 /**
  * @class   vtkCameraManipulatorGUIHelper
- * @brief   Helper class for Camera 
- * Manipulators. 
+ * @brief   Helper class for Camera
+ * Manipulators.
  *
  * This class is the interaface that defines API for a helper class
  * used by some specialized camera manipulators that needed
- * access to GUI. GUI implementations subclass this. 
+ * access to GUI. GUI implementations subclass this.
  * vtkPVInteractorStyle sets the helper on every manipulator,
- * if available so that the manipulator can use it. 
+ * if available so that the manipulator can use it.
  * @sa
  * vtkPVInteractorStyle
 */
@@ -51,7 +51,7 @@ public:
    * not supported by GUI, otherwise returns 1 and the bounds
    * are filled into the passed argument array.
    */
-  virtual int GetActiveSourceBounds(double bounds[6])= 0;
+  virtual int GetActiveSourceBounds(double bounds[6]) = 0;
 
   //@{
   /**
@@ -59,8 +59,8 @@ public:
    * source in the active view. If applicable returns 1, otherwise
    * returns 0.
    */
-  virtual int GetActiveActorTranslate(double translate[3])=0;
-  virtual int SetActiveActorTranslate(double translate[3])=0;
+  virtual int GetActiveActorTranslate(double translate[3]) = 0;
+  virtual int SetActiveActorTranslate(double translate[3]) = 0;
   //@}
 
   //@{
@@ -68,6 +68,7 @@ public:
    * Get the center of rotation. Returns 0 if not applicable.
    */
   virtual int GetCenterOfRotation(double center[3]) = 0;
+
 protected:
   vtkCameraManipulatorGUIHelper();
   ~vtkCameraManipulatorGUIHelper();
@@ -79,5 +80,3 @@ private:
 };
 
 #endif
-
-

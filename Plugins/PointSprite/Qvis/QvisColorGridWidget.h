@@ -72,74 +72,73 @@ class QPainter;
 
 class VTKQVIS_EXPORT QvisColorGridWidget : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    QvisColorGridWidget(QWidget *parent = 0, const char *name = 0);
-    virtual ~QvisColorGridWidget();
-    virtual QSize sizeHint () const;
-    virtual QSize minimumSize() const;
+  QvisColorGridWidget(QWidget* parent = 0, const char* name = 0);
+  virtual ~QvisColorGridWidget();
+  virtual QSize sizeHint() const;
+  virtual QSize minimumSize() const;
 
-    void setPaletteColors(const QColor *c, int nColors, int suggestedColumns=6);
-    void setPaletteColor(const QColor &c, int index);
-    void setSelectedColor(const QColor &c);
+  void setPaletteColors(const QColor* c, int nColors, int suggestedColumns = 6);
+  void setPaletteColor(const QColor& c, int index);
+  void setSelectedColor(const QColor& c);
 
-    void setActiveColorIndex(int index);
-    void setSelectedColorIndex(int index);
+  void setActiveColorIndex(int index);
+  void setSelectedColorIndex(int index);
 
+  void setFrame(bool val);
+  void setBoxSize(int val);
+  void setBoxPadding(int val);
 
-    void setFrame(bool val);
-    void setBoxSize(int val);
-    void setBoxPadding(int val);
-
-    int    rows() const;
-    int    columns() const;
-    QColor selectedColor() const;
-    int    selectedColorIndex() const;
-    QColor paletteColor(int index) const;
-    bool   containsColor(const QColor &color) const;
-    int    boxSize() const;
-    int    boxPadding() const;
-    int    activeColorIndex() const;
+  int rows() const;
+  int columns() const;
+  QColor selectedColor() const;
+  int selectedColorIndex() const;
+  QColor paletteColor(int index) const;
+  bool containsColor(const QColor& color) const;
+  int boxSize() const;
+  int boxPadding() const;
+  int activeColorIndex() const;
 
 signals:
-    void selectedColor(const QColor &c);
-    void selectedColor(const QColor &c, int colorIndex);
-    void selectedColor(const QColor &c, int row, int column);
-    void activateMenu(const QColor &c, int row, int column, const QPoint &);
-protected:
-    virtual void enterEvent(QEvent *);
-    virtual void keyPressEvent(QKeyEvent *e);
-    virtual void leaveEvent(QEvent *);
-    virtual void mousePressEvent(QMouseEvent *e);
-    virtual void mouseMoveEvent(QMouseEvent *e);
-    virtual void mouseReleaseEvent(QMouseEvent *e);
-    virtual void paintEvent(QPaintEvent *);
-    virtual void resizeEvent(QResizeEvent *);
+  void selectedColor(const QColor& c);
+  void selectedColor(const QColor& c, int colorIndex);
+  void selectedColor(const QColor& c, int row, int column);
+  void activateMenu(const QColor& c, int row, int column, const QPoint&);
 
-    void drawColorArray();
-    void drawColor(QPainter &paint, int index);
-    QRegion drawHighlightedColor(QPainter *paint, int index);
-    QRegion drawUnHighlightedColor(QPainter *paint, int index);
-    QRegion drawSelectedColor(QPainter *paint, int index);
+protected:
+  virtual void enterEvent(QEvent*);
+  virtual void keyPressEvent(QKeyEvent* e);
+  virtual void leaveEvent(QEvent*);
+  virtual void mousePressEvent(QMouseEvent* e);
+  virtual void mouseMoveEvent(QMouseEvent* e);
+  virtual void mouseReleaseEvent(QMouseEvent* e);
+  virtual void paintEvent(QPaintEvent*);
+  virtual void resizeEvent(QResizeEvent*);
+
+  void drawColorArray();
+  void drawColor(QPainter& paint, int index);
+  QRegion drawHighlightedColor(QPainter* paint, int index);
+  QRegion drawUnHighlightedColor(QPainter* paint, int index);
+  QRegion drawSelectedColor(QPainter* paint, int index);
 
 private:
-    void getColorRect(int index, int &x, int &y, int &w, int &h);
-    int  getColorIndex(int x, int y) const;
-    int  getIndex(int row, int col) const;
-    void getRowColumnFromIndex(int index, int &row, int &column) const;
-    void drawBox(QPainter &p, const QRect &r,
-                 const QColor &light, const QColor &dark, int lw = 2);
+  void getColorRect(int index, int& x, int& y, int& w, int& h);
+  int getColorIndex(int x, int y) const;
+  int getIndex(int row, int col) const;
+  void getRowColumnFromIndex(int index, int& row, int& column) const;
+  void drawBox(QPainter& p, const QRect& r, const QColor& light, const QColor& dark, int lw = 2);
 
-    QColor  *paletteColors;
-    int     numPaletteColors;
-    int     numRows;
-    int     numColumns;
-    int     currentActiveColor;
-    int     currentSelectedColor;
-    bool    drawFrame;
-    int     boxSizeValue;
-    int     boxPaddingValue;
-    QPixmap *drawPixmap;
+  QColor* paletteColors;
+  int numPaletteColors;
+  int numRows;
+  int numColumns;
+  int currentActiveColor;
+  int currentSelectedColor;
+  bool drawFrame;
+  int boxSizeValue;
+  int boxPaddingValue;
+  QPixmap* drawPixmap;
 };
 
 #endif

@@ -63,8 +63,7 @@ public:
    * Allow to shut down pipeline execution. This is particulary useful for
    * a Catalyst session that does not contains any real data.
    */
-  virtual void SetDisablePipelineExecution(bool value)
-  { this->DisablePipelineExecution = value; }
+  virtual void SetDisablePipelineExecution(bool value) { this->DisablePipelineExecution = value; }
 
   /**
    * Overridden to update the output ports.
@@ -100,11 +99,12 @@ protected:
   void MarkEndEvent();
   //@}
 
-  char *ExecutiveName;
+  char* ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
   bool DisablePipelineExecution;
 
   friend class vtkSICompoundSourceProxy;
+
 private:
   vtkSISourceProxy(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
@@ -112,7 +112,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool PortsCreated;
-
 };
 
 #endif

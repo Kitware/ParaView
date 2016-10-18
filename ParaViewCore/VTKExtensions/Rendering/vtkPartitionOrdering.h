@@ -32,9 +32,9 @@
 #ifndef vtkPartitionOrdering_h
 #define vtkPartitionOrdering_h
 
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkObject.h"
-#include <vector> // For dynamic data storage
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include <vector>                              // For dynamic data storage
 
 class vtkDataSet;
 class vtkIntArray;
@@ -46,13 +46,13 @@ public:
   vtkTypeMacro(vtkPartitionOrdering, vtkObject);
 
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPartitionOrdering *New();
+  static vtkPartitionOrdering* New();
 
   //@{
   /**
    * Set/Get the communicator object
    */
-  void SetController(vtkMultiProcessController *c);
+  void SetController(vtkMultiProcessController* c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
@@ -68,8 +68,8 @@ public:
    * of processes. The return value is the number of processes.
    * \pre orderedList_exists: orderedList!=0
    */
-  virtual int ViewOrderAllProcessesInDirection(const double directionOfProjection[3],
-                                               vtkIntArray *orderedList);
+  virtual int ViewOrderAllProcessesInDirection(
+    const double directionOfProjection[3], vtkIntArray* orderedList);
 
   /**
    * Return a list of all processes in order from front to back given a
@@ -78,8 +78,8 @@ public:
    * of processes. The return value is the number of processes.
    * \pre orderedList_exists: orderedList!=0
    */
-  virtual int ViewOrderAllProcessesFromPosition(const double cameraPosition[3],
-                                                vtkIntArray *orderedList);
+  virtual int ViewOrderAllProcessesFromPosition(
+    const double cameraPosition[3], vtkIntArray* orderedList);
 
   //@{
   /**
@@ -94,7 +94,7 @@ protected:
   ~vtkPartitionOrdering();
 
 private:
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
   std::vector<double> ProcessBounds;
   double GlobalBounds[6];

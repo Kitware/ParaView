@@ -37,64 +37,58 @@ vtkPVClassNameInformation::~vtkPVClassNameInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClassNameInformation::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVClassNameInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PortNumber: " << this->PortNumber << endl;
-  os << indent << "VTKClassName: "
-     << (this->VTKClassName?this->VTKClassName:"(none)") << "\n";
+  os << indent << "VTKClassName: " << (this->VTKClassName ? this->VTKClassName : "(none)") << "\n";
 }
 
 //----------------------------------------------------------------------------
 void vtkPVClassNameInformation::CopyFromObject(vtkObject* obj)
 {
-  if(!obj)
-    {
+  if (!obj)
+  {
     vtkErrorMacro("Cannot get class name from NULL object.");
     return;
-    }
+  }
   vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(obj);
   if (algo == NULL || this->PortNumber == -1)
-    {
+  {
     this->SetVTKClassName(obj->GetClassName());
-    }
+  }
   else
-    {
+  {
     vtkDataObject* dobj = algo->GetOutputDataObject(this->PortNumber);
     if (dobj)
-      {
+    {
       this->SetVTKClassName(dobj->GetClassName());
-      }
-    else
-      {
-      vtkErrorMacro("Cannot get data-object class name from NULL object.");
-      }
     }
-
+    else
+    {
+      vtkErrorMacro("Cannot get data-object class name from NULL object.");
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVClassNameInformation::AddInformation(vtkPVInformation* info)
 {
   if (vtkPVClassNameInformation::SafeDownCast(info))
-    {
-    this->SetVTKClassName(
-      vtkPVClassNameInformation::SafeDownCast(info)->GetVTKClassName());
-    }
+  {
+    this->SetVTKClassName(vtkPVClassNameInformation::SafeDownCast(info)->GetVTKClassName());
+  }
 }
 
 //----------------------------------------------------------------------------
-void
-vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css)
+void vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply << this->VTKClassName
-       << vtkClientServerStream::End;
+  *css << vtkClientServerStream::Reply << this->VTKClassName << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-void
-vtkPVClassNameInformation::CopyFromStream(const vtkClientServerStream* css)
+void vtkPVClassNameInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   const char* cname = 0;
   css->GetArgument(0, 0, &cname);
@@ -113,7 +107,7 @@ void vtkPVClassNameInformation::CopyParametersFromStream(vtkMultiProcessStream& 
   int magic_number;
   str >> magic_number >> this->PortNumber;
   if (magic_number != 829992)
-    {
+  {
     vtkErrorMacro("Magic number mismatch.");
-    }
+  }
 }

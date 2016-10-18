@@ -48,12 +48,11 @@ class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperFace;
 class vtkAMRDualClipLocator;
 
-
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualClip : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAMRDualClip *New();
-  vtkTypeMacro(vtkAMRDualClip,vtkMultiBlockDataSetAlgorithm);
+  static vtkAMRDualClip* New();
+  vtkTypeMacro(vtkAMRDualClip, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);
@@ -65,14 +64,14 @@ public:
    * and multiprocess comunication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
-  vtkSetMacro(EnableInternalDecimation,int);
-  vtkGetMacro(EnableInternalDecimation,int);
-  vtkSetMacro(EnableDegenerateCells,int);
-  vtkGetMacro(EnableDegenerateCells,int);
-  vtkBooleanMacro(EnableDegenerateCells,int);
-  vtkSetMacro(EnableMultiProcessCommunication,int);
-  vtkGetMacro(EnableMultiProcessCommunication,int);
-  vtkBooleanMacro(EnableMultiProcessCommunication,int);
+  vtkSetMacro(EnableInternalDecimation, int);
+  vtkGetMacro(EnableInternalDecimation, int);
+  vtkSetMacro(EnableDegenerateCells, int);
+  vtkGetMacro(EnableDegenerateCells, int);
+  vtkBooleanMacro(EnableDegenerateCells, int);
+  vtkSetMacro(EnableMultiProcessCommunication, int);
+  vtkGetMacro(EnableMultiProcessCommunication, int);
+  vtkBooleanMacro(EnableMultiProcessCommunication, int);
   //@}
 
   //@{
@@ -81,14 +80,13 @@ public:
    * boundary edges between blocks. It does not eliminate
    * boundary edges between processes.
    */
-  vtkSetMacro(EnableMergePoints,int);
-  vtkGetMacro(EnableMergePoints,int);
-  vtkBooleanMacro(EnableMergePoints,int);
+  vtkSetMacro(EnableMergePoints, int);
+  vtkGetMacro(EnableMergePoints, int);
+  vtkBooleanMacro(EnableMergePoints, int);
   //@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
-
+  virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkAMRDualClip();
@@ -105,40 +103,34 @@ protected:
   // Needed for copying cell data to point data.
   vtkUnstructuredGrid* Mesh;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  void InitializeCopyAttributes(vtkNonOverlappingAMR *hbdsInput, vtkDataSet* mesh);
+  void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
 
   /**
    * Not a pipeline function. This is a helper function that
    * allows creating a new data set given a input and a cell array name.
    */
-  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
-                                          const char* arrayNameToProcess);
+  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  void ShareBlockLocatorWithNeighbors(
-    vtkAMRDualGridHelperBlock* block);
+  void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 
-  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId,
-                    const char* arrayName);
+  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId, const char* arrayName);
 
-  void ProcessDualCell(
-    vtkAMRDualGridHelperBlock* block, int blockId,
-    int x, int y, int z,
-    vtkIdType cornerOffsets[8],
-    vtkDataArray *volumeFractionArray);
+  void ProcessDualCell(vtkAMRDualGridHelperBlock* block, int blockId, int x, int y, int z,
+    vtkIdType cornerOffsets[8], vtkDataArray* volumeFractionArray);
 
   void InitializeLevelMask(vtkAMRDualGridHelperBlock* block);
   void ShareLevelMask(vtkAMRDualGridHelperBlock* block);
   void DistributeLevelMasks();
 
-  //void DebugCases();
-  //void PermuteCases();
-  //void MirrorCases();
-  //void AddGlyph(double x, double y, double z);
+  // void DebugCases();
+  // void PermuteCases();
+  // void MirrorCases();
+  // void AddGlyph(double x, double y, double z);
 
   // Stuff exclusively for debugging.
   vtkIntArray* BlockIdCellArray;
@@ -149,7 +141,7 @@ protected:
   vtkPoints* Points;
   vtkCellArray* Cells;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
   // I made these ivars to avoid allocating multiple times.
   // The buffer is not used too many times, but .....
@@ -161,7 +153,6 @@ protected:
 private:
   vtkAMRDualClip(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

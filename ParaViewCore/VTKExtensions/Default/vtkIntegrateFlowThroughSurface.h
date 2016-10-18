@@ -31,25 +31,22 @@
 class vtkIdList;
 class vtkDataSetAttributes;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkIntegrateFlowThroughSurface, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkIntegrateFlowThroughSurface *New();
-  
+  static vtkIntegrateFlowThroughSurface* New();
+
 protected:
   vtkIntegrateFlowThroughSurface();
   ~vtkIntegrateFlowThroughSurface();
 
   // Usual data generation method
   // Usual data generation method
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, 
-                          vtkInformationVector *);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 

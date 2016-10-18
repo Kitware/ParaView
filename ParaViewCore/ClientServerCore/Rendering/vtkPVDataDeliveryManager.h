@@ -61,7 +61,7 @@ public:
    * directly using a self pointer, while enables views on different processes
    * to communicate information about representations using their unique ids.
    */
-  void RegisterRepresentation(vtkPVDataRepresentation *repr);
+  void RegisterRepresentation(vtkPVDataRepresentation* repr);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
   vtkPVDataRepresentation* GetRepresentation(unsigned int);
   //@}
@@ -73,8 +73,8 @@ public:
    * representation that requires delivering of any geometry must register with
    * the vtkPVDataDeliveryManager and never manage the delivery on its own.
    */
-  void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data,
-    bool low_res, unsigned long trueSize=0);
+  void SetPiece(
+    vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res, unsigned long trueSize = 0);
   void SetPiece(unsigned int repr_id, vtkDataObject* data, bool low_res);
   //@}
 
@@ -109,8 +109,7 @@ public:
    * deliver to the client and never scatter.
    */
   void SetDeliverToClientAndRenderingProcesses(
-    vtkPVDataRepresentation*, bool deliver_to_client,
-    bool gather_before_delivery, bool low_res);
+    vtkPVDataRepresentation*, bool deliver_to_client, bool gather_before_delivery, bool low_res);
 
   /**
    * Under certain cases, e.g. when remote rendering in parallel with
@@ -120,7 +119,7 @@ public:
    * redistribute the geometry as needed. Only vtkPolyData, vtkUnstructuredGrid
    * or a multi-block comprising of vtkPolyData is currently supported.
    */
-  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value=true);
+  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value = true);
 
   /**
    * Returns the size for all visible geometry. If low_res is true, and low-res
@@ -161,9 +160,9 @@ public:
    * Pass the structured-meta-data for determining rendering order for ordered
    * compositing.
    */
-  void SetOrderedCompositingInformation(
-    vtkPVDataRepresentation* repr, vtkExtentTranslator* translator,
-    const int whole_extents[6], const double origin[3], const double spacing[3]);
+  void SetOrderedCompositingInformation(vtkPVDataRepresentation* repr,
+    vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
+    const double spacing[3]);
 
   /**
    * Internal method used to determine the list of representations that need
@@ -171,13 +170,13 @@ public:
    * client decide what geometries it needs and then requests those from the
    * server-sides using Deliver().
    */
-  bool NeedsDelivery(unsigned long timestamp,
-    std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
+  bool NeedsDelivery(
+    unsigned long timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
 
   /**
    * Triggers delivery for the geometries of indicated representations.
    */
-  void Deliver(int use_low_res, unsigned int size, unsigned int *keys);
+  void Deliver(int use_low_res, unsigned int size, unsigned int* keys);
 
   // *******************************************************************
   // UNDER CONSTRUCTION STREAMING API
@@ -205,7 +204,7 @@ public:
    * and released. Representations are expected to manage the pieces once they
    * are delivered to them.
    */
-  void DeliverStreamedPieces(unsigned int size, unsigned int *keys);
+  void DeliverStreamedPieces(unsigned int size, unsigned int* keys);
 
   /**
    * Fills up the vector with the keys for representations that have non-null
@@ -223,13 +222,13 @@ protected:
   vtkSmartPointer<vtkPKdTree> KdTree;
 
   vtkTimeStamp RedistributionTimeStamp;
+
 private:
   vtkPVDataDeliveryManager(const vtkPVDataDeliveryManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataDeliveryManager&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

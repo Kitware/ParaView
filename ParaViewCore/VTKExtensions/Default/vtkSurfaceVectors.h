@@ -33,11 +33,12 @@ class vtkIdList;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSurfaceVectors : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkSurfaceVectors,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkSurfaceVectors, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSurfaceVectors *New();
+  static vtkSurfaceVectors* New();
 
-  enum ConstraintMode {
+  enum ConstraintMode
+  {
     Parallel = 0,
     Perpendicular,
     PerpendicularScale
@@ -49,29 +50,28 @@ public:
    * perpendicular to surface or parallel to surface.
    * It defaults to parallel.
    */
-  vtkSetMacro(ConstraintMode,int);
-  vtkGetMacro(ConstraintMode,int);
-  void SetConstraintModeToParallel() 
-    {this->SetConstraintMode(vtkSurfaceVectors::Parallel);}
-  void SetConstraintModeToPerpendicular() 
-    {this->SetConstraintMode(vtkSurfaceVectors::Perpendicular);}
-  void SetConstraintModeToPerpendicularScale() 
-    {this->SetConstraintMode(vtkSurfaceVectors::PerpendicularScale);}
+  vtkSetMacro(ConstraintMode, int);
+  vtkGetMacro(ConstraintMode, int);
+  void SetConstraintModeToParallel() { this->SetConstraintMode(vtkSurfaceVectors::Parallel); }
+  void SetConstraintModeToPerpendicular()
+  {
+    this->SetConstraintMode(vtkSurfaceVectors::Perpendicular);
+  }
+  void SetConstraintModeToPerpendicularScale()
+  {
+    this->SetConstraintMode(vtkSurfaceVectors::PerpendicularScale);
+  }
   //@}
-    
+
 protected:
   vtkSurfaceVectors();
   ~vtkSurfaceVectors();
 
   // Usual data generation method
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, 
-                          vtkInformationVector *);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  int   ConstraintMode;
+  int ConstraintMode;
 
 private:
   vtkSurfaceVectors(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;

@@ -17,7 +17,7 @@
  * @brief   source that generates a 1x1 vtkTable with a single
  * string data.
  *
- * vtkPVTextSource is used to generate a table with a single string. 
+ * vtkPVTextSource is used to generate a table with a single string.
 */
 
 #ifndef vtkPVTextSource_h
@@ -40,25 +40,21 @@ public:
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
   //@}
-  
 
 protected:
   vtkPVTextSource();
   ~vtkPVTextSource();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   char* Text;
+
 private:
   vtkPVTextSource(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

@@ -30,7 +30,8 @@
 #include "vtkSMUndoElement.h"
 class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement
+  : public vtkSMUndoElement
 {
 public:
   static vtkSMPropertyModificationUndoElement* New();
@@ -75,7 +76,8 @@ protected:
   vtkSMMessage* PropertyState;
 
 private:
-  vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyModificationUndoElement(
+    const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
 };
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QtDebug>
 
-
 #include <vector>
 //-----------------------------------------------------------------------------
 class pqTimeKeeper::pqInternals
@@ -52,13 +51,13 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
-  vtkSMProxy* timekeeper, pqServer* server, QObject* _parent/*=0*/)
+pqTimeKeeper::pqTimeKeeper(const QString& group, const QString& name, vtkSMProxy* timekeeper,
+  pqServer* server, QObject* _parent /*=0*/)
   : pqProxy(group, name, timekeeper, server, _parent)
 {
   this->Internals = new pqInternals();
-  this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
-    vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
+  this->Internals->VTKConnect->Connect(
+    timekeeper->GetProperty("Time"), vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeStepsChanged()));
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
@@ -78,28 +77,26 @@ QList<double> pqTimeKeeper::getTimeSteps() const
 {
   vtkSMPropertyHelper helper(this->getProxy(), "TimestepValues");
   QList<double> list;
-  for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
-    {
+  for (unsigned int cc = 0; cc < helper.GetNumberOfElements(); cc++)
+  {
     list.push_back(helper.GetAsDouble(cc));
-    }
+  }
   return list;
 }
 
 //-----------------------------------------------------------------------------
 int pqTimeKeeper::getNumberOfTimeStepValues() const
 {
-  return vtkSMPropertyHelper(this->getProxy(),
-    "TimestepValues").GetNumberOfElements();
+  return vtkSMPropertyHelper(this->getProxy(), "TimestepValues").GetNumberOfElements();
 }
 
 //-----------------------------------------------------------------------------
 double pqTimeKeeper::getTimeStepValue(int index) const
 {
   if (index < this->getNumberOfTimeStepValues())
-    {
-    return vtkSMPropertyHelper(this->getProxy(),
-      "TimestepValues").GetAsDouble(index);
-    }
+  {
+    return vtkSMPropertyHelper(this->getProxy(), "TimestepValues").GetAsDouble(index);
+  }
 
   return 0.0;
 }
@@ -114,8 +111,7 @@ int pqTimeKeeper::getTimeStepValueIndex(double time) const
 QPair<double, double> pqTimeKeeper::getTimeRange() const
 {
   vtkSMPropertyHelper helper(this->getProxy(), "TimeRange");
-  return QPair<double, double>(helper.GetAsDouble(0),
-    helper.GetAsDouble(1));
+  return QPair<double, double>(helper.GetAsDouble(0), helper.GetAsDouble(1));
 }
 
 //-----------------------------------------------------------------------------
@@ -125,7 +121,7 @@ double pqTimeKeeper::getTime() const
 }
 
 //-----------------------------------------------------------------------------
-void pqTimeKeeper::setTime(double time) 
+void pqTimeKeeper::setTime(double time)
 {
   vtkSMPropertyHelper(this->getProxy(), "Time").Set(time);
   this->getProxy()->UpdateVTKObjects();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,18 +46,17 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 {
 }
 
-bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object, 
-         const QString& Command, const QString& Arguments, 
-         bool& Error)
+bool pqQVTKWidgetEventPlayer::playEvent(
+  QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   QVTKWidget* widget = qobject_cast<QVTKWidget*>(Object);
-  if(widget)
+  if (widget)
+  {
+    if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove")
     {
-    if (Command == "mousePress" || Command=="mouseRelease" || Command=="mouseMove")
-      {
       QRegExp mouseRegExp("\\(([^,]*),([^,]*),([^,]),([^,]),([^,]*)\\)");
-      if (mouseRegExp.indexIn(Arguments)!= -1)
-        {
+      if (mouseRegExp.indexIn(Arguments) != -1)
+      {
         QVariant v = mouseRegExp.cap(1);
         int x = static_cast<int>(v.toDouble() * widget->size().width());
         v = mouseRegExp.cap(2);
@@ -68,14 +67,14 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
         Qt::MouseButtons buttons = static_cast<Qt::MouseButton>(v.toInt());
         v = mouseRegExp.cap(5);
         Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(v.toInt());
-        QEvent::Type type = (Command == "mousePress")? QEvent::MouseButtonPress :
-          ((Command=="mouseMove")?  QEvent::MouseMove : QEvent::MouseButtonRelease);
-        QMouseEvent e(type, QPoint(x,y), button, buttons, keym);
+        QEvent::Type type = (Command == "mousePress")
+          ? QEvent::MouseButtonPress
+          : ((Command == "mouseMove") ? QEvent::MouseMove : QEvent::MouseButtonRelease);
+        QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
         qApp->notify(widget, &e);
-        }
-      return true;
       }
+      return true;
     }
+  }
   return this->Superclass::playEvent(Object, Command, Arguments, Error);
 }
-

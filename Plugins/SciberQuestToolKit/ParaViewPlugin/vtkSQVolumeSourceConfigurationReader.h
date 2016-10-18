@@ -50,28 +50,26 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkSQVolumeSourceConfigurationReader : public vtkSMProxyConfigurationReader
 {
 public:
-  vtkTypeMacro(vtkSQVolumeSourceConfigurationReader,vtkSMProxyConfigurationReader);
+  vtkTypeMacro(vtkSQVolumeSourceConfigurationReader, vtkSMProxyConfigurationReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSQVolumeSourceConfigurationReader *New();
+  static vtkSQVolumeSourceConfigurationReader* New();
 
   // Description:
   // Read the named file, and push the properties into the underying
   // managed render view proxy. This will make sure the renderview is
   // updated after the read.
-  virtual int ReadConfiguration(const char *filename);
-  virtual int ReadConfiguration(vtkPVXMLElement *x);
+  virtual int ReadConfiguration(const char* filename);
+  virtual int ReadConfiguration(vtkPVXMLElement* x);
   // unhide
-  virtual int ReadConfiguration()
-    {
-    return this->Superclass::ReadConfiguration();
-    }
+  virtual int ReadConfiguration() { return this->Superclass::ReadConfiguration(); }
 
 protected:
   vtkSQVolumeSourceConfigurationReader();
   virtual ~vtkSQVolumeSourceConfigurationReader();
 
 private:
-  vtkSQVolumeSourceConfigurationReader(const vtkSQVolumeSourceConfigurationReader&) VTK_DELETE_FUNCTION;
+  vtkSQVolumeSourceConfigurationReader(
+    const vtkSQVolumeSourceConfigurationReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSQVolumeSourceConfigurationReader&) VTK_DELETE_FUNCTION;
 };
 

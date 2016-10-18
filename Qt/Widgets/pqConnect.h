@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,19 +38,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QObject;
 
 /**
-  Using pqConnect, you can create and initialize Qt objects without having to create a bunch of temporaries:
-  
+  Using pqConnect, you can create and initialize Qt objects without having to create a bunch of
+  temporaries:
+
   \code
   menu->addAction("Open") << pqConnect(SIGNAL(triggered()), this, SLOT(onTriggered()));
   \endcode
- 
+
   \sa pqSetName, pqSetData
 */
-  
+
 struct PQWIDGETS_EXPORT pqConnect
 {
   pqConnect(const char* Signal, const QObject* Receiver, const char* Method);
-  
+
   const char* Signal;
   const QObject* Receiver;
   const char* Method;
@@ -59,7 +60,7 @@ struct PQWIDGETS_EXPORT pqConnect
 /**
 * Makes a Qt connection
 */
-template<typename T>
+template <typename T>
 T* operator<<(T* LHS, const pqConnect& RHS)
 {
   LHS->connect(LHS, RHS.Signal, RHS.Receiver, RHS.Method);
@@ -67,4 +68,3 @@ T* operator<<(T* LHS, const pqConnect& RHS)
 }
 
 #endif // !_pqConnect_h
-

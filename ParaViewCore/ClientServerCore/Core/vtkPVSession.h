@@ -39,7 +39,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum ServerFlags
-    {
+  {
     NONE = 0,
     DATA_SERVER = 0x01,
     DATA_SERVER_ROOT = 0x02,
@@ -48,7 +48,7 @@ public:
     SERVERS = DATA_SERVER | RENDER_SERVER,
     CLIENT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
-    };
+  };
 
   /**
    * Returns a ServerFlags indicate the nature of the current processes. e.g. if
@@ -62,9 +62,9 @@ public:
    * indicated role on this process.
    */
   bool HasProcessRole(vtkTypeUInt32 flag)
-    {
+  {
     return ((flag & static_cast<vtkTypeUInt32>(this->GetProcessRoles())) == flag);
-    }
+  }
 
   /**
    * Returns the controller used to communicate with the process. Value must be
@@ -77,8 +77,7 @@ public:
    * This is socket connection, if any to communicate between the data-server
    * and render-server nodes.
    */
-  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
-    { return NULL; }
+  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() { return NULL; }
 
   /**
    * vtkPVServerInformation is an information-object that provides information
@@ -89,7 +88,7 @@ public:
    * data-server and render-server (as was the case earlier). We can easily add
    * API for the same if needed.
    */
-  virtual vtkPVServerInformation* GetServerInformation()=0;
+  virtual vtkPVServerInformation* GetServerInformation() = 0;
 
   /**
    * Allow anyone to know easily if the current session is involved in
@@ -122,17 +121,16 @@ protected:
   vtkPVSession();
   ~vtkPVSession();
 
-  enum 
-    {
-    EXCEPTION_EVENT_TAG=31416
-    };
+  enum
+  {
+    EXCEPTION_EVENT_TAG = 31416
+  };
 
   /**
    * Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
    * Return true if the event was handle localy.
    */
-  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
-    void* calldata);
+  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   //@{
   /**
@@ -143,6 +141,7 @@ protected:
   //@}
 
   vtkPVProgressHandler* ProgressHandler;
+
 private:
   vtkPVSession(const vtkPVSession&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSession&) VTK_DELETE_FUNCTION;
@@ -151,7 +150,6 @@ private:
   // This flags ensures that while we are waiting for an previous progress-pair
   // to finish, we don't start new progress-pairs.
   bool InCleanupPendingProgress;
-
 };
 
 #endif

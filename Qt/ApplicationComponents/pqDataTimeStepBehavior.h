@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -46,8 +46,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataTimeStepBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqDataTimeStepBehavior(QObject* parent=0);
+  pqDataTimeStepBehavior(QObject* parent = 0);
 
 protected slots:
   /**
@@ -60,5 +61,3 @@ private:
 };
 
 #endif
-
-

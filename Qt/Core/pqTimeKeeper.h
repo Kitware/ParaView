@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,16 +39,16 @@ class vtkSMProxy;
 
 /**
 * pqTimeKeeper is pqProxy for "TimeKeeper" proxy. A timekeeper is
-* created by default per connection. pqServer keeps a pointer to the 
+* created by default per connection. pqServer keeps a pointer to the
 * connection's time keeper. A time keeper keeps track of the
 * global time and timesteps available currently.
 */
-class PQCORE_EXPORT pqTimeKeeper : public pqProxy 
+class PQCORE_EXPORT pqTimeKeeper : public pqProxy
 {
   Q_OBJECT
 public:
-  pqTimeKeeper(const QString& group, const QString& name,
-    vtkSMProxy* timekeeper, pqServer* server, QObject* parent=0);
+  pqTimeKeeper(const QString& group, const QString& name, vtkSMProxy* timekeeper, pqServer* server,
+    QObject* parent = 0);
   virtual ~pqTimeKeeper();
 
   /**
@@ -75,7 +75,7 @@ public:
   QList<double> getTimeSteps() const;
 
   /**
-  * Returns the time range. 
+  * Returns the time range.
   * Return (0,0) is getNumberOfTimeStepValues() == 0.
   */
   QPair<double, double> getTimeRange() const;

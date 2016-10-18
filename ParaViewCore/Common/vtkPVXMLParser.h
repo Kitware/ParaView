@@ -31,7 +31,7 @@ class vtkPVXMLElement;
 class VTKPVCOMMON_EXPORT vtkPVXMLParser : public vtkXMLParser
 {
 public:
-  vtkTypeMacro(vtkPVXMLParser,vtkXMLParser);
+  vtkTypeMacro(vtkPVXMLParser, vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVXMLParser* New();
 
@@ -70,7 +70,7 @@ public:
    * xmlcontents cannot be parsed.
    */
   static vtkSmartPointer<vtkPVXMLElement> ParseXML(
-    const char* xmlcontents, bool suppress_errors=false);
+    const char* xmlcontents, bool suppress_errors = false);
 
 protected:
   vtkPVXMLParser();

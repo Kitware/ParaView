@@ -70,10 +70,7 @@ public:
    * Returns if the merge was successful.
    * Default implementation doesn't do anything.
    */
-  virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element))
-    {
-    return false;
-    }
+  virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element)) { return false; }
 
   // Set the working context if run inside a UndoSet context, so object
   // that are cross referenced can leave long enought to be associated
@@ -82,10 +79,10 @@ public:
   // it will be automatically deleted. Therefore, we provide a collection
   // that will hold a reference during an undoset so the object has a chance
   // to be attached to the ProxyManager or any other object.
-  virtual void SetUndoSetWorkingContext(vtkCollection *workCTX)
-    {
+  virtual void SetUndoSetWorkingContext(vtkCollection* workCTX)
+  {
     this->UndoSetWorkingContext = workCTX;
-    }
+  }
 
 protected:
   vtkUndoElement();
@@ -98,14 +95,12 @@ protected:
    */
   bool Mergeable;
   vtkSetMacro(Mergeable, bool);
-  vtkCollection *UndoSetWorkingContext;
+  vtkCollection* UndoSetWorkingContext;
   //@}
 
 private:
   vtkUndoElement(const vtkUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const vtkUndoElement&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

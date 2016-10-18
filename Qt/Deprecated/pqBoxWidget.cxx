@@ -53,14 +53,12 @@ public:
   pqPropertyLinks Links;
 };
 
-
-#define PVBOXWIDGET_TRIGGER_RENDER(ui)  \
-  QObject::connect(this->Implementation->ui,\
-    SIGNAL(editingFinished()),\
-    this, SLOT(render()), Qt::QueuedConnection);
+#define PVBOXWIDGET_TRIGGER_RENDER(ui)                                                             \
+  QObject::connect(this->Implementation->ui, SIGNAL(editingFinished()), this, SLOT(render()),      \
+    Qt::QueuedConnection);
 //-----------------------------------------------------------------------------
-pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent) :
-  Superclass(refProxy, pxy, _parent)
+pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent)
+  : Superclass(refProxy, pxy, _parent)
 {
   this->Implementation = new pqImplementation();
   this->Implementation->setupUi(this);
@@ -88,32 +86,30 @@ pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent
   PVBOXWIDGET_TRIGGER_RENDER(rotationY);
   PVBOXWIDGET_TRIGGER_RENDER(rotationZ);
 
-  QObject::connect(this->Implementation->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+  QObject::connect(
+    this->Implementation->show3DWidget, SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
-  QObject::connect(this->Implementation->enableTranslation,
-    SIGNAL(toggled(bool)), this, SLOT(onEnableTranslation(bool)));
-  QObject::connect(this->Implementation->enableScaling,
-    SIGNAL(toggled(bool)), this, SLOT(onEnableScaling(bool)));
-  QObject::connect(this->Implementation->enableRotation,
-    SIGNAL(toggled(bool)), this, SLOT(onEnableRotation(bool)));
-  QObject::connect(this->Implementation->enableMoveFaces,
-    SIGNAL(toggled(bool)), this, SLOT(onEnableMoveFaces(bool)));
+  QObject::connect(this->Implementation->enableTranslation, SIGNAL(toggled(bool)), this,
+    SLOT(onEnableTranslation(bool)));
+  QObject::connect(
+    this->Implementation->enableScaling, SIGNAL(toggled(bool)), this, SLOT(onEnableScaling(bool)));
+  QObject::connect(this->Implementation->enableRotation, SIGNAL(toggled(bool)), this,
+    SLOT(onEnableRotation(bool)));
+  QObject::connect(this->Implementation->enableMoveFaces, SIGNAL(toggled(bool)), this,
+    SLOT(onEnableMoveFaces(bool)));
 
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this, SLOT(onWidgetVisibilityChanged(bool)));
+  QObject::connect(
+    this, SIGNAL(widgetVisibilityChanged(bool)), this, SLOT(onWidgetVisibilityChanged(bool)));
 
-  QObject::connect(this->Implementation->resetBounds,
-    SIGNAL(clicked()), this, SLOT(resetBounds()));
+  QObject::connect(this->Implementation->resetBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
 
-  //QObject::connect(this, SIGNAL(widgetStartInteraction()),
+  // QObject::connect(this, SIGNAL(widgetStartInteraction()),
   //  this, SLOT(showHandles()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(refProxy->GetSession()));
 }
 
@@ -123,32 +119,27 @@ pqBoxWidget::~pqBoxWidget()
   delete this->Implementation;
 }
 
-#define PVBOXWIDGET_LINK(ui, smproperty, index)\
-{\
-  this->Implementation->Links.addPropertyLink(\
-    this->Implementation->ui, "text2",\
-    SIGNAL(textChanged(const QString&)),\
-    widget, widget->GetProperty(smproperty), index);\
-}
+#define PVBOXWIDGET_LINK(ui, smproperty, index)                                                    \
+  {                                                                                                \
+    this->Implementation->Links.addPropertyLink(this->Implementation->ui, "text2",                 \
+      SIGNAL(textChanged(const QString&)), widget, widget->GetProperty(smproperty), index);        \
+  }
 
-#define PVBOXWIDGET_LINK2(ui, signal, smproperty)\
-{\
-  this->Implementation->Links.addPropertyLink(\
-    this->Implementation->ui, "checked",\
-    SIGNAL(toggled(bool)),\
-    widget, widget->GetProperty(smproperty));\
-}
+#define PVBOXWIDGET_LINK2(ui, signal, smproperty)                                                  \
+  {                                                                                                \
+    this->Implementation->Links.addPropertyLink(this->Implementation->ui, "checked",               \
+      SIGNAL(toggled(bool)), widget, widget->GetProperty(smproperty));                             \
+  }
 
 //-----------------------------------------------------------------------------
 void pqBoxWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("BoxWidgetRepresentation", server, this->getReferenceProxy());
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      "BoxWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
-
 
   PVBOXWIDGET_LINK(positionX, "Position", 0);
   PVBOXWIDGET_LINK(positionY, "Position", 1);
@@ -174,11 +165,11 @@ void pqBoxWidget::select()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
-  if (widget  && this->getReferenceInputBounds(input_bounds))
-    {
+  if (widget && this->getReferenceInputBounds(input_bounds))
+  {
     vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
     widget->UpdateVTKObjects();
-    }
+  }
 
   this->Superclass::select();
 }
@@ -244,10 +235,10 @@ void pqBoxWidget::onEnableTranslation(bool b)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqSMAdaptor::setElementProperty(widget->GetProperty("TranslationEnabled"), b ? 1 : 0);
     widget->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -255,10 +246,10 @@ void pqBoxWidget::onEnableScaling(bool b)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqSMAdaptor::setElementProperty(widget->GetProperty("ScalingEnabled"), b ? 1 : 0);
     widget->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -266,10 +257,10 @@ void pqBoxWidget::onEnableRotation(bool b)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqSMAdaptor::setElementProperty(widget->GetProperty("RotationEnabled"), b ? 1 : 0);
     widget->UpdateVTKObjects();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -277,8 +268,8 @@ void pqBoxWidget::onEnableMoveFaces(bool b)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
   if (widget)
-    {
+  {
     pqSMAdaptor::setElementProperty(widget->GetProperty("MoveFacesEnabled"), b ? 1 : 0);
     widget->UpdateVTKObjects();
-    }
+  }
 }

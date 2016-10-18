@@ -50,7 +50,6 @@ protected:
 private:
   vtkPVInstantiator(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

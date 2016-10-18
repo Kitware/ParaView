@@ -47,8 +47,8 @@
 
 vtkStandardNewMacro(vtkPointSpriteProperty)
 
-// the shader strings
-extern const char* Texture_vs;
+  // the shader strings
+  extern const char* Texture_vs;
 extern const char* Quadrics_vs;
 extern const char* Quadrics_fs;
 extern const char* FixedRadiusHelper;
@@ -117,55 +117,54 @@ void vtkPointSpriteProperty::SetRadiusMode(int radiusMode)
   this->PrepareForRendering();
 }
 
-void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
+void vtkPointSpriteProperty::Render(vtkActor* act, vtkRenderer* ren)
 {
   if (this->GetRepresentation() == VTK_POINTS)
-    {
+  {
     this->LoadPointSpriteExtensions(ren->GetRenderWindow());
     // force the Shading ivar depending on the chosen modes
-    if (this->RenderMode == Quadrics || (this->RenderMode == TexturedSprite
-        && this->RadiusMode == AttributeRadius))
-      {
+    if (this->RenderMode == Quadrics ||
+      (this->RenderMode == TexturedSprite && this->RadiusMode == AttributeRadius))
+    {
       this->ShadingOn();
-      }
+    }
     else
-      {
+    {
       this->ShadingOff();
-      }
+    }
 
     if (this->Internal->NeedRadiusAttributeMapping == true)
-      {
-      vtkPainterPolyDataMapper* mapper =
-          vtkPainterPolyDataMapper::SafeDownCast(act->GetMapper());
+    {
+      vtkPainterPolyDataMapper* mapper = vtkPainterPolyDataMapper::SafeDownCast(act->GetMapper());
       if (mapper)
-        {
+      {
         mapper->RemoveVertexAttributeMapping("Radius");
-        mapper->MapDataArrayToVertexAttribute("Radius", this->RadiusArrayName,
-            vtkDataObject::FIELD_ASSOCIATION_POINTS, 0);
-        }
+        mapper->MapDataArrayToVertexAttribute(
+          "Radius", this->RadiusArrayName, vtkDataObject::FIELD_ASSOCIATION_POINTS, 0);
       }
+    }
 
     if (this->Internal->PushedAttrib == 0)
-      {
+    {
       glPushAttrib(GL_ALL_ATTRIB_BITS);
       this->Internal->PushedAttrib = 1;
-      }
+    }
 
     // first test if only points are rendered
     if (this->RenderMode == SimplePoint)
-      {
+    {
       glEnable(GL_POINT_SMOOTH);
       this->Superclass::Render(act, ren);
       return;
-      }
+    }
 
-    int *rensize = ren->GetSize();
+    int* rensize = ren->GetSize();
 
     //
     // test if we only need the texture point sprite mode without shader
     //
     if (this->RenderMode == TexturedSprite && this->RadiusMode == FixedRadius)
-      {
+    {
 
       //
       // Get the max point size : we need it to control Point Fading
@@ -174,31 +173,31 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       float maxSize;
       glGetFloatv(vtkgl::POINT_SIZE_MAX_ARB, &maxSize);
       if (this->MaxPixelSize < maxSize)
-        {
+      {
         maxSize = this->MaxPixelSize;
-        }
+      }
 
       // if the Radius Mode is set to Scalar radius, then
       // I have to compute the point size in the shader
       float factor = this->ConstantRadius * rensize[1] / this->GetPointSize();
 
       if (ren->GetActiveCamera()->GetParallelProjection())
-        {
+      {
         factor /= ren->GetActiveCamera()->GetParallelScale();
         quadraticPointDistanceAttenuation[0] = 1.0 / (factor * factor);
         quadraticPointDistanceAttenuation[1] = 0.0;
         quadraticPointDistanceAttenuation[2] = 0.0;
-        }
+      }
       else
-        {
+      {
         factor *= 4.0;
         quadraticPointDistanceAttenuation[0] = 0.0;
         quadraticPointDistanceAttenuation[1] = 0.0;
         quadraticPointDistanceAttenuation[2] = 1.0 / (factor * factor);
-        }
+      }
 
-      vtkgl::PointParameterfvARB(vtkgl::POINT_DISTANCE_ATTENUATION_ARB,
-          quadraticPointDistanceAttenuation);
+      vtkgl::PointParameterfvARB(
+        vtkgl::POINT_DISTANCE_ATTENUATION_ARB, quadraticPointDistanceAttenuation);
 
       //
       // Set Point Fade Threshold size
@@ -210,10 +209,9 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       vtkgl::PointParameterfARB(vtkgl::POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
       vtkgl::PointParameterfARB(vtkgl::POINT_SIZE_MIN_ARB, 1.0f);
       vtkgl::PointParameterfARB(vtkgl::POINT_SIZE_MAX_ARB, maxSize);
-
-      }
+    }
     else // in all other cases, we need shaders
-      {
+    {
 
       glEnable(vtkgl::VERTEX_PROGRAM_POINT_SIZE_ARB);
 
@@ -222,24 +220,23 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       //
       float factor = 1.0;
 
-      if (ren->GetActiveCamera()->GetParallelProjection() && this->RenderMode
-          != Quadrics)
-        {
+      if (ren->GetActiveCamera()->GetParallelProjection() && this->RenderMode != Quadrics)
+      {
         factor = 0.25 / ren->GetActiveCamera()->GetParallelScale();
-        }
+      }
 
       if (this->RadiusMode == AttributeRadius)
-        {
+      {
         float radiusSpan[2];
         radiusSpan[0] = this->RadiusRange[0] * factor;
         radiusSpan[1] = (this->RadiusRange[1] - this->RadiusRange[0]) * factor;
         this->AddShaderVariable("RadiusSpan", 2, radiusSpan);
-        }
+      }
       else if (this->RadiusMode == FixedRadius)
-        {
+      {
         float radius = this->ConstantRadius * factor;
         this->AddShaderVariable("ConstantRadius", 1, &radius);
-        }
+      }
 
       //
       // send uniforms for the vertex shader
@@ -250,19 +247,18 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       this->AddShaderVariable("viewport", 2, viewport);
       this->AddShaderVariable("pointSizeThreshold", 1, &pointSizeThreshold);
       this->AddShaderVariable("MaxPixelSize", 1, &this->MaxPixelSize);
-
-      }
     }
+  }
 
   this->Superclass::Render(act, ren);
 
   if (this->GetRepresentation() == VTK_POINTS)
-    {
+  {
     //
     // Setup the specific texture parameters if the TexturedSprite mode in on
     //
     if (this->RenderMode == TexturedSprite)
-      {
+    {
       glEnable(vtkgl::POINT_SPRITE_ARB);
       //
       // Specify point sprite texture coordinate replacement mode for each texture unit
@@ -279,20 +275,20 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       // Blend the texture with the color.
       //
       glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      }
     }
+  }
 }
 
-void vtkPointSpriteProperty::PostRender(vtkActor *act, vtkRenderer *ren)
+void vtkPointSpriteProperty::PostRender(vtkActor* act, vtkRenderer* ren)
 {
   if (this->GetRepresentation() == VTK_POINTS)
-    {
+  {
     if (this->Internal->PushedAttrib == 1)
-      {
+    {
       glPopAttrib();
       this->Internal->PushedAttrib = 0;
-      }
     }
+  }
 
   this->Superclass::PostRender(act, ren);
 }
@@ -307,15 +303,15 @@ void vtkPointSpriteProperty::PrepareForRendering()
 
   // setup the shaders and initialize the texture if necessary
   switch (this->RenderMode)
-    {
+  {
     case SimplePoint:
       break;
     case TexturedSprite:
       if (this->RadiusMode == AttributeRadius)
-        {
+      {
         radius_shader = AttributeRadiusHelper;
         vertex_shader = Texture_vs;
-        }
+      }
       break;
     case Quadrics:
       if (this->RadiusMode == AttributeRadius)
@@ -326,94 +322,89 @@ void vtkPointSpriteProperty::PrepareForRendering()
       vertex_shader = Quadrics_vs;
       fragment_shader = Quadrics_fs;
       break;
-    }
+  }
 
   if (radius_shader != NULL || vertex_shader != NULL || fragment_shader != NULL)
-    {
+  {
     if (radius_shader != NULL)
-      {
+    {
       vtkShader2* shader = vtkShader2::New();
       shader->SetSourceCode(radius_shader);
       shader->SetType(VTK_SHADER_TYPE_VERTEX);
       prog->GetShaders()->AddItem(shader);
       shader->Delete();
-      }
+    }
 
     if (vertex_shader != NULL)
-      {
+    {
       vtkShader2* shader = vtkShader2::New();
       shader->SetSourceCode(vertex_shader);
       shader->SetType(VTK_SHADER_TYPE_VERTEX);
       prog->GetShaders()->AddItem(shader);
       shader->Delete();
-      }
+    }
 
     if (fragment_shader != NULL)
-      {
+    {
       vtkShader2* shader = vtkShader2::New();
       shader->SetSourceCode(fragment_shader);
       shader->SetType(VTK_SHADER_TYPE_FRAGMENT);
       prog->GetShaders()->AddItem(shader);
       shader->Delete();
-      }
+    }
 
     if (this->PropProgram != NULL)
-      {
+    {
       this->PropProgram->ReleaseGraphicsResources();
-      }
+    }
     this->SetPropProgram(prog);
 
     if (radius_shader == AttributeRadiusHelper)
-      {
-      this->Internal->NeedRadiusAttributeMapping = true;
-      }
-    else
-      {
-      this->Internal->NeedRadiusAttributeMapping = false;
-      }
-    this->ShadingOn();
-    }
-  else
     {
+      this->Internal->NeedRadiusAttributeMapping = true;
+    }
+    else
+    {
+      this->Internal->NeedRadiusAttributeMapping = false;
+    }
+    this->ShadingOn();
+  }
+  else
+  {
     if (this->PropProgram)
-      {
+    {
       this->PropProgram->ReleaseGraphicsResources();
       this->SetPropProgram(NULL);
-      }
+    }
     this->ShadingOff();
     this->Internal->NeedRadiusAttributeMapping = false;
-    }
+  }
   prog->Delete();
-
 }
 
-bool vtkPointSpriteProperty::IsSupported(vtkRenderWindow* renWin,
-    int renderMode,
-    int radiusMode)
+bool vtkPointSpriteProperty::IsSupported(vtkRenderWindow* renWin, int renderMode, int radiusMode)
 {
   this->LoadPointSpriteExtensions(renWin);
   if (renderMode == Quadrics)
-    {
-    return this->Internal->VertexShaderExtensionsOk
-        && this->Internal->FragmentShaderExtensionsOk;
-    }
+  {
+    return this->Internal->VertexShaderExtensionsOk && this->Internal->FragmentShaderExtensionsOk;
+  }
   if (renderMode == TexturedSprite && radiusMode == AttributeRadius)
-    {
-    return this->Internal->VertexShaderExtensionsOk
-        && this->Internal->SpriteExtensionsOk;
-    }
+  {
+    return this->Internal->VertexShaderExtensionsOk && this->Internal->SpriteExtensionsOk;
+  }
   if (renderMode == TexturedSprite && radiusMode == FixedRadius)
-    {
+  {
     return this->Internal->SpriteExtensionsOk;
-    }
+  }
   if (renderMode == SimplePoint)
-    {
+  {
     return true;
-    }
+  }
   return false;
 }
 
-void vtkPointSpriteProperty::LoadPointSpriteExtensions(vtkRenderWindow *renWin)
+void vtkPointSpriteProperty::LoadPointSpriteExtensions(vtkRenderWindow* renWin)
 {
 
   if (this->Internal->CachedRenderWindow == renWin)
@@ -428,30 +419,28 @@ void vtkPointSpriteProperty::LoadPointSpriteExtensions(vtkRenderWindow *renWin)
   //
   // Create Extension Manager
   //
-  vtkSmartPointer<vtkOpenGLExtensionManager> extensions = vtkSmartPointer<
-      vtkOpenGLExtensionManager>::New();
+  vtkSmartPointer<vtkOpenGLExtensionManager> extensions =
+    vtkSmartPointer<vtkOpenGLExtensionManager>::New();
   extensions->SetRenderWindow(renWin);
 
   //
   // Test for point sprite extensions
   //
-  int supports_GL_ARB_point_sprite = extensions->ExtensionSupported(
-      "GL_ARB_point_sprite");
-  int supports_GL_ARB_point_parameters = extensions->ExtensionSupported(
-      "GL_ARB_point_parameters");
+  int supports_GL_ARB_point_sprite = extensions->ExtensionSupported("GL_ARB_point_sprite");
+  int supports_GL_ARB_point_parameters = extensions->ExtensionSupported("GL_ARB_point_parameters");
   //
   // Set Sprite flags depending on test results
   //
   if (!supports_GL_ARB_point_sprite || !supports_GL_ARB_point_parameters)
-    {
+  {
     this->Internal->SpriteExtensionsOk = false;
-    }
+  }
   else
-    {
+  {
     this->Internal->SpriteExtensionsOk = true;
     extensions->LoadExtension("GL_ARB_point_sprite");
     extensions->LoadExtension("GL_ARB_point_parameters");
-    }
+  }
 
   //
   // Test support for GLSL
@@ -463,69 +452,63 @@ void vtkPointSpriteProperty::LoadPointSpriteExtensions(vtkRenderWindow *renWin)
   int supports_GL_ARB_vertex_program;
 
   if (supports_GL_2_0)
-    {
+  {
     supports_vertex_shader = 1;
     supports_fragment_shader = 1;
     supports_shader_objects = 1;
-    }
+  }
   else
-    {
-    supports_vertex_shader = extensions->ExtensionSupported(
-        "GL_ARB_vertex_shader");
-    supports_fragment_shader = extensions->ExtensionSupported(
-        "GL_ARB_fragment_shader");
-    supports_shader_objects = extensions->ExtensionSupported(
-        "GL_ARB_shader_objects");
-    }
-  supports_GL_ARB_vertex_program = extensions->ExtensionSupported(
-      "GL_ARB_vertex_program");
+  {
+    supports_vertex_shader = extensions->ExtensionSupported("GL_ARB_vertex_shader");
+    supports_fragment_shader = extensions->ExtensionSupported("GL_ARB_fragment_shader");
+    supports_shader_objects = extensions->ExtensionSupported("GL_ARB_shader_objects");
+  }
+  supports_GL_ARB_vertex_program = extensions->ExtensionSupported("GL_ARB_vertex_program");
 
   //
   // Set vertex and fragment shader flags depending on test results
   //
-  if (!supports_shader_objects || !supports_vertex_shader
-      || !supports_GL_ARB_vertex_program)
-    {
+  if (!supports_shader_objects || !supports_vertex_shader || !supports_GL_ARB_vertex_program)
+  {
     this->Internal->VertexShaderExtensionsOk = false;
-    }
+  }
   else
-    {
+  {
     this->Internal->VertexShaderExtensionsOk = true;
     if (supports_GL_2_0)
-      {
+    {
       extensions->LoadExtension("GL_VERSION_2_0");
-      }
+    }
     else
-      {
+    {
       extensions->LoadCorePromotedExtension("GL_ARB_vertex_shader");
       extensions->LoadCorePromotedExtension("GL_ARB_shader_objects");
-      }
+    }
     extensions->LoadExtension("GL_ARB_vertex_program");
     extensions->LoadExtension("GL_ARB_shading_language_100");
-    }
+  }
 
   if (!supports_shader_objects || !supports_fragment_shader)
-    {
+  {
     this->Internal->FragmentShaderExtensionsOk = false;
-    }
+  }
   else
-    {
+  {
     this->Internal->FragmentShaderExtensionsOk = true;
     if (supports_GL_2_0)
-      {
+    {
       extensions->LoadExtension("GL_VERSION_2_0");
-      }
+    }
     else
-      {
+    {
       extensions->LoadCorePromotedExtension("GL_ARB_fragment_shader");
       extensions->LoadCorePromotedExtension("GL_ARB_shader_objects");
-      }
-    extensions->LoadExtension("GL_ARB_shading_language_100");
     }
+    extensions->LoadExtension("GL_ARB_shading_language_100");
+  }
 }
 
 void vtkPointSpriteProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

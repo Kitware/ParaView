@@ -60,8 +60,9 @@ class PQCOMPONENTS_EXPORT pqViewFrame : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqViewFrame(QWidget* parent=0);
+  pqViewFrame(QWidget* parent = 0);
   virtual ~pqViewFrame();
 
   /**
@@ -98,14 +99,14 @@ public:
   bool isTitleBarVisible() const { return this->TitleBarVisible; }
 
   enum StandardButton
-    {
-    NoButton          =0x0000,
-    SplitHorizontal   =0x0001,
-    SplitVertical     =0x0002,
-    Maximize          =0x0004,
-    Restore           =0x0008,
-    Close             =0x0010
-    };
+  {
+    NoButton = 0x0000,
+    SplitHorizontal = 0x0001,
+    SplitVertical = 0x0002,
+    Maximize = 0x0004,
+    Restore = 0x0008,
+    Close = 0x0010
+  };
 
   Q_DECLARE_FLAGS(StandardButtons, StandardButton);
 
@@ -141,8 +142,7 @@ public:
   /**
   * provides access to the unique id assigned to the frame.
   */
-  QUuid uniqueID() const
-    { return this->UniqueID; }
+  QUuid uniqueID() const { return this->UniqueID; }
 
 signals:
   /**
@@ -171,25 +171,25 @@ public slots:
   * set whether the border is visible.
   */
   void setBorderVisibility(bool val)
-    {
+  {
     this->BorderVisible = val;
     this->updateComponentVisibilities();
-    }
+  }
 
   /**
   * set whether the title-bar is visible.
   */
   void setTitleBarVisibility(bool val)
-    {
+  {
     this->TitleBarVisible = val;
     this->updateComponentVisibilities();
-    }
+  }
 
   void setDecorationsVisibility(bool val)
-    {
+  {
     this->DecorationsVisible = val;
     this->updateComponentVisibilities();
-    }
+  }
 
   void onViewNameChanged(pqServerManagerModelItem*);
 

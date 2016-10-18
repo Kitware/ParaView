@@ -44,6 +44,7 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventTranslator : public pqWidgetEve
 {
   Q_OBJECT
   typedef pqWidgetEventTranslator Superclass;
+
 public:
   pqPluginTreeWidgetEventTranslator(QObject* parentObject = 0);
   ~pqPluginTreeWidgetEventTranslator();
@@ -64,7 +65,7 @@ private:
   pqPluginTreeWidgetEventTranslator(const pqPluginTreeWidgetEventTranslator&);
   pqPluginTreeWidgetEventTranslator& operator=(const pqPluginTreeWidgetEventTranslator&);
 
-   QPointer<pqPluginTreeWidget> TreeView;
+  QPointer<pqPluginTreeWidget> TreeView;
 };
 
 #endif // !_pqPluginTreeWidgetEventTranslator_h

@@ -114,8 +114,8 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   // since the UI file tends to change the name of the menu.
   menu.setObjectName(objectName);
 
-  QObject::connect(ui.actionFileExit, SIGNAL(triggered()),
-    pqApplicationCore::instance(), SLOT(quit()));
+  QObject::connect(
+    ui.actionFileExit, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(quit()));
 
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
@@ -164,92 +164,83 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildSourcesMenu(QMenu&  menu,
-  QMainWindow* mainWindow)
+void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWindow)
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   mgr->addProxyDefinitionUpdateListener("sources");
   new pqSourcesMenuReaction(mgr);
   pqPVApplicationCore::instance()->registerForQuicklaunch(mgr->widgetActionsHolder());
   if (mainWindow)
-    {
+  {
     // create toolbars for categories as needed.
     new pqCategoryToolbarsBehavior(mgr, mainWindow);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
-  QMainWindow* mainWindow)
+void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow)
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  pqFiltersMenuReaction *menuReaction = new pqFiltersMenuReaction(mgr);
-  pqPVApplicationCore *appCore = pqPVApplicationCore::instance();
+  pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr);
+  pqPVApplicationCore* appCore = pqPVApplicationCore::instance();
   appCore->registerForQuicklaunch(mgr->widgetActionsHolder());
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
   // to update the enabled/disabled state of the menu items via the
   // pqFiltersMenuReaction
-  QObject::connect(&menu, SIGNAL(aboutToShow()),menuReaction,SLOT(updateEnableState()));
-  QObject::connect(appCore,SIGNAL(aboutToShowQuickLaunch()),menuReaction,SLOT(updateEnableState()));
+  QObject::connect(&menu, SIGNAL(aboutToShow()), menuReaction, SLOT(updateEnableState()));
+  QObject::connect(
+    appCore, SIGNAL(aboutToShowQuickLaunch()), menuReaction, SLOT(updateEnableState()));
 
   if (mainWindow)
-    {
+  {
     // create toolbars for categories as needed.
     new pqCategoryToolbarsBehavior(mgr, mainWindow);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 {
-  new pqCreateCustomFilterReaction(menu.addAction("Create Custom Filter...") <<
-    pqSetName("actionToolsCreateCustomFilter"));
-  new pqCameraLinkReaction(menu.addAction("Add Camera Link...") <<
-    pqSetName("actionToolsAddCameraLink"));
-  new pqLinkSelectionReaction(menu.addAction("Link with Selection") <<
-    pqSetName("actionToolsLinkSelection"));
+  new pqCreateCustomFilterReaction(
+    menu.addAction("Create Custom Filter...") << pqSetName("actionToolsCreateCustomFilter"));
+  new pqCameraLinkReaction(
+    menu.addAction("Add Camera Link...") << pqSetName("actionToolsAddCameraLink"));
+  new pqLinkSelectionReaction(
+    menu.addAction("Link with Selection") << pqSetName("actionToolsLinkSelection"));
   menu.addSeparator();
-  new pqManageCustomFiltersReaction(menu.addAction("Manage Custom Filters...")
-    << pqSetName("actionToolsManageCustomFilters"));
-  new pqManageLinksReaction(menu.addAction("Manage Links...") <<
-    pqSetName("actionToolsManageLinks"));
+  new pqManageCustomFiltersReaction(
+    menu.addAction("Manage Custom Filters...") << pqSetName("actionToolsManageCustomFilters"));
+  new pqManageLinksReaction(
+    menu.addAction("Manage Links...") << pqSetName("actionToolsManageLinks"));
   //<addaction name="actionToolsAddCameraLink" />
   // Add support for importing plugins only if ParaView was built shared.
-  new pqManagePluginsReaction(menu.addAction("Manage Plugins...") <<
-    pqSetName("actionManage_Plugins"));
-
+  new pqManagePluginsReaction(
+    menu.addAction("Manage Plugins...") << pqSetName("actionManage_Plugins"));
 
   menu.addSeparator(); // --------------------------------------------------
 
   //<addaction name="actionToolsDumpWidgetNames" />
-  new pqTestingReaction(menu.addAction("Record Test...")
-    << pqSetName("actionToolsRecordTest"),
+  new pqTestingReaction(menu.addAction("Record Test...") << pqSetName("actionToolsRecordTest"),
     pqTestingReaction::RECORD);
-  new pqTestingReaction(menu.addAction("Play Test...")
-    << pqSetName("actionToolsPlayTest"),
-    pqTestingReaction::PLAYBACK,Qt::QueuedConnection);
-  new pqTestingReaction(menu.addAction("Lock View Size")
-    << pqSetName("actionTesting_Window_Size"),
+  new pqTestingReaction(menu.addAction("Play Test...") << pqSetName("actionToolsPlayTest"),
+    pqTestingReaction::PLAYBACK, Qt::QueuedConnection);
+  new pqTestingReaction(menu.addAction("Lock View Size") << pqSetName("actionTesting_Window_Size"),
     pqTestingReaction::LOCK_VIEW_SIZE);
-  new pqTestingReaction(menu.addAction("Lock View Size Custom...")
-    << pqSetName("actionTesting_Window_Size_Custom"),
+  new pqTestingReaction(
+    menu.addAction("Lock View Size Custom...") << pqSetName("actionTesting_Window_Size_Custom"),
     pqTestingReaction::LOCK_VIEW_SIZE_CUSTOM);
   menu.addSeparator();
-  new pqTimerLogReaction(menu.addAction("Timer Log")
-    << pqSetName("actionToolsTimerLog"));
-  QAction* action = menu.addAction("&Output Window")
-    << pqSetName("actionToolsOutputWindow");
-  QObject::connect(action, SIGNAL(triggered()),
-    pqApplicationCore::instance(),
-    SLOT(showOutputWindow()));
+  new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
+  QAction* action = menu.addAction("&Output Window") << pqSetName("actionToolsOutputWindow");
+  QObject::connect(
+    action, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(showOutputWindow()));
 
   menu.addSeparator(); // --------------------------------------------------
 
-  new pqPythonShellReaction(menu.addAction("Python Shell")
-    << pqSetName("actionToolsPythonShell"));
+  new pqPythonShellReaction(menu.addAction("Python Shell") << pqSetName("actionToolsPythonShell"));
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
@@ -274,13 +265,13 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   widget.setObjectName(objectName);
   widget.setContextMenuPolicy(Qt::ActionsContextMenu);
 
-  QByteArray signalName=QMetaObject::normalizedSignature("deleteKey()");
+  QByteArray signalName = QMetaObject::normalizedSignature("deleteKey()");
   if (widget.metaObject()->indexOfSignal(signalName) != -1)
-    {
+  {
     // Trigger a delete when the user requests a delete.
-    QObject::connect(&widget, SIGNAL(deleteKey()),
-      ui.actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
-    }
+    QObject::connect(
+      &widget, SIGNAL(deleteKey()), ui.actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
+  }
 
   // And here the reactions come in handy! Just reuse the reaction used for
   // File | Open.
@@ -299,25 +290,24 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildMacrosMenu
 #ifdef PARAVIEW_ENABLE_PYTHON
-(QMenu& menu)
+  (QMenu& menu)
 #else
-(QMenu& )
+  (QMenu&)
 #endif
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   // Give the macros menu to the pqPythonMacroSupervisor
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
-    {
-    new pqMacroReaction(menu.addAction("Add new macro...")
-                        << pqSetName("actionMacroCreate"));
-    QMenu *editMenu = menu.addMenu("Edit...");
-    QMenu *deleteMenu = menu.addMenu("Delete...");
+  {
+    new pqMacroReaction(menu.addAction("Add new macro...") << pqSetName("actionMacroCreate"));
+    QMenu* editMenu = menu.addMenu("Edit...");
+    QMenu* deleteMenu = menu.addMenu("Delete...");
     menu.addSeparator();
     manager->addWidgetForRunMacros(&menu);
     manager->addWidgetForEditMacros(editMenu);
     manager->addWidgetForDeleteMacros(deleteMenu);
-    }
+  }
 #endif
 }
 
@@ -328,8 +318,10 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
   QString appdir = QCoreApplication::applicationDirPath();
-  QString documentationPath = QFileInfo(appdir).fileName() == "bin" ?
-    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"  :
+  QString documentationPath = QFileInfo(appdir).fileName() == "bin"
+    ?
+    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"
+    :
     /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
 
@@ -338,36 +330,30 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QString paraViewTutorialFile = documentationPath + "/Tutorial.pdf";
 
   // Getting Started with ParaView
-  new pqDesktopServicesReaction(
-    QUrl::fromLocalFile(paraViewGettingStartedFile),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
-                    "Getting Started with ParaView") << pqSetName("actionGettingStarted")));
+  new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGettingStartedFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "Getting Started with ParaView")
+                                  << pqSetName("actionGettingStarted")));
 
   // ParaView Guide
-  QAction* guide = menu.addAction(
-    QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
+  QAction* guide = menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
   guide->setObjectName("actionGuide");
   guide->setShortcut(QKeySequence::HelpContents);
   new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGuideFile), guide);
 
-
   // Help
-  QAction * help = menu.addAction("Reader, Filter, and Writer Reference") <<
-    pqSetName("actionHelp");
+  QAction* help = menu.addAction("Reader, Filter, and Writer Reference") << pqSetName("actionHelp");
   new pqHelpReaction(help);
 
   // -----------------
   menu.addSeparator();
 
   // ParaView Tutorial notes
-  new pqDesktopServicesReaction(
-    QUrl::fromLocalFile(paraViewTutorialFile),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"),
-                    "ParaView Tutorial") << pqSetName("actionTutorialNotes")));
+  new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewTutorialFile),
+    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Tutorial")
+                                  << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
-  new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
     (menu.addAction("Sandia National Labs Tutorials") << pqSetName("actionSNLTutorial")));
 
   // Example Data Sets
@@ -380,27 +366,24 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   menu.addSeparator();
 
   // ParaView Web Site
-  new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org"),
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org"),
     (menu.addAction("ParaView Web Site") << pqSetName("actionWebSite")));
 
   // ParaView Wiki
-  new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org/Wiki/ParaView"),
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/ParaView"),
     (menu.addAction("ParaView Wiki") << pqSetName("actionWiki")));
 
   // ParaView Mailing Lists
-  new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org/mailing-lists/"),
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/mailing-lists/"),
     (menu.addAction("ParaView Mailing Lists") << pqSetName("actionMailingLists")));
 
   // ParaView Release Notes
   QString versionString(PARAVIEW_VERSION_FULL);
   int indexOfHyphen = versionString.indexOf('-');
   if (indexOfHyphen > -1)
-    {
+  {
     versionString = versionString.left(indexOfHyphen);
-    }
+  }
   versionString.replace('.', '-');
   new pqDesktopServicesReaction(
     QUrl("https://blog.kitware.com/paraview-" + versionString + "-release-notes/"),
@@ -410,23 +393,19 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   menu.addSeparator();
 
   // Professional Support
-  new pqDesktopServicesReaction(
-    QUrl("http://www.kitware.com/products/paraviewpro.html"),
+  new pqDesktopServicesReaction(QUrl("http://www.kitware.com/products/paraviewpro.html"),
     (menu.addAction("Professional Support") << pqSetName("actionProfessionalSupport")));
 
   // Professional Training
-  new pqDesktopServicesReaction(
-    QUrl("http://www.kitware.com/products/protraining.php"),
+  new pqDesktopServicesReaction(QUrl("http://www.kitware.com/products/protraining.php"),
     (menu.addAction("Professional Training") << pqSetName("actionTraining")));
 
   // Online Tutorials
-  new pqDesktopServicesReaction(
-    QUrl("http://www.paraview.org/tutorials/"),
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/tutorials/"),
     (menu.addAction("Online Tutorials") << pqSetName("actionTutorials")));
 
   // Online Blogs
-  new pqDesktopServicesReaction(
-    QUrl("https://blog.kitware.com/tag/ParaView/"),
+  new pqDesktopServicesReaction(QUrl("https://blog.kitware.com/tag/ParaView/"),
     (menu.addAction("Online Blogs") << pqSetName("actionBlogs")));
 
 #if !defined(__APPLE__)
@@ -435,9 +414,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 #endif
 
   // About
-  new pqAboutDialogReaction(
-    menu.addAction("About...")
-    << pqSetName("actionAbout"));
+  new pqAboutDialogReaction(menu.addAction("About...") << pqSetName("actionAbout"));
 }
 
 //-----------------------------------------------------------------------------
@@ -448,8 +425,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   mainToolBar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
 
-  QToolBar* vcrToolbar = new pqVCRToolbar(&mainWindow)
-    << pqSetName("VCRToolbar");
+  QToolBar* vcrToolbar = new pqVCRToolbar(&mainWindow) << pqSetName("VCRToolbar");
   vcrToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, vcrToolbar);
 
@@ -458,8 +434,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   timeToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, timeToolbar);
 
-  QToolBar* colorToolbar = new pqColorToolbar(&mainWindow)
-    << pqSetName("variableToolbar");
+  QToolBar* colorToolbar = new pqColorToolbar(&mainWindow) << pqSetName("variableToolbar");
   colorToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, colorToolbar);
   mainWindow.insertToolBarBreak(colorToolbar);
@@ -469,47 +444,40 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   reprToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, reprToolbar);
 
-  QToolBar* cameraToolbar = new pqCameraToolbar(&mainWindow)
-    << pqSetName("cameraToolbar");
+  QToolBar* cameraToolbar = new pqCameraToolbar(&mainWindow) << pqSetName("cameraToolbar");
   cameraToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, cameraToolbar);
 
-  QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow)
-    << pqSetName("axesToolbar");
+  QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow) << pqSetName("axesToolbar");
   axesToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, axesToolbar);
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   // Give the macros menu to the pqPythonMacroSupervisor
-  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
-    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  pqPythonManager* manager =
+    qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
   if (manager)
-    {
+  {
     QToolBar* macrosToolbar = new QToolBar("Macros Toolbars", &mainWindow)
       << pqSetName("MacrosToolbar");
     manager->addWidgetForRunMacros(macrosToolbar);
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
-    }
+  }
 #endif
 }
 
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 {
-  new pqCatalystConnectReaction(menu.addAction("Connect...")
-                                << pqSetName("actionCatalystConnect"));
+  new pqCatalystConnectReaction(menu.addAction("Connect...") << pqSetName("actionCatalystConnect"));
   new pqCatalystPauseSimulationReaction(
-    menu.addAction("Pause Simulation")
-    << pqSetName("actionCatalystPauseSimulation"));
+    menu.addAction("Pause Simulation") << pqSetName("actionCatalystPauseSimulation"));
 
-  new pqCatalystContinueReaction(
-    menu.addAction("Continue") << pqSetName("actionCatalystContinue"));
+  new pqCatalystContinueReaction(menu.addAction("Continue") << pqSetName("actionCatalystContinue"));
 
   new pqCatalystSetBreakpointReaction(
-    menu.addAction("Set Breakpoint") <<
-    pqSetName("actionCatalystSetBreakpoint"));
+    menu.addAction("Set Breakpoint") << pqSetName("actionCatalystSetBreakpoint"));
 
   new pqCatalystRemoveBreakpointReaction(
-    menu.addAction("Remove Breakpoint") <<
-    pqSetName("actionCatalystRemoveBreakpoint"));
+    menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
 }

@@ -37,7 +37,8 @@
 
 #include <SimpleObserver.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // *******************************************************************
 // Method: SimpleObserver::SimpleObserver
@@ -54,7 +55,7 @@ namespace pointsprite {
 
 SimpleObserver::SimpleObserver()
 {
-    doUpdate = true;
+  doUpdate = true;
 }
 
 // *******************************************************************
@@ -72,7 +73,7 @@ SimpleObserver::SimpleObserver()
 
 SimpleObserver::~SimpleObserver()
 {
-    // nothing special here.
+  // nothing special here.
 }
 
 // *******************************************************************
@@ -97,10 +98,9 @@ SimpleObserver::~SimpleObserver()
 //
 // *******************************************************************
 
-void
-SimpleObserver::SetUpdate(bool update)
+void SimpleObserver::SetUpdate(bool update)
 {
-    doUpdate = update;
+  doUpdate = update;
 }
 
 // *******************************************************************
@@ -122,10 +122,9 @@ SimpleObserver::SetUpdate(bool update)
 //
 // *******************************************************************
 
-bool
-SimpleObserver::GetUpdate()
+bool SimpleObserver::GetUpdate()
 {
-    return doUpdate;
+  return doUpdate;
 }
 
 // *******************************************************************
@@ -142,10 +141,8 @@ SimpleObserver::GetUpdate()
 //
 // *******************************************************************
 
-void
-SimpleObserver::SubjectRemoved(Subject *)
+void SimpleObserver::SubjectRemoved(Subject*)
 {
-    // nothing
+  // nothing
 }
-
 }

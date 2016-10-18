@@ -40,9 +40,9 @@ class pqMyPropertyWidgetDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
-  pqMyPropertyWidgetDecorator(
-    vtkPVXMLElement* config, pqPropertyWidget* parentObject);
+  pqMyPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
   virtual ~pqMyPropertyWidgetDecorator();
 
   /// Overridden to hide the widget when ShrinkFactor < 0.1

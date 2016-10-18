@@ -30,13 +30,13 @@
 
 class vtkClientServerStream;
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVGenericAttributeInformation : public vtkPVArrayInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVGenericAttributeInformation
+  : public vtkPVArrayInformation
 {
 public:
   static vtkPVGenericAttributeInformation* New();
   vtkTypeMacro(vtkPVGenericAttributeInformation, vtkPVArrayInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
-
 
   /**
    * Transfer information about a single object into this object.

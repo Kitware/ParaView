@@ -51,14 +51,14 @@ class vtkObject;
 * at most 1 view (and 1 type of selection) is in selection-mode at any given
 * time.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqRenderViewSelectionReaction :
-  public pqSelectionReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqRenderViewSelectionReaction : public pqSelectionReaction
 {
   Q_OBJECT
   typedef pqSelectionReaction Superclass;
+
 public:
   enum SelectionMode
-    {
+  {
     SELECT_SURFACE_CELLS,
     SELECT_SURFACE_POINTS,
     SELECT_FRUSTUM_CELLS,
@@ -73,14 +73,13 @@ public:
     SELECT_SURFACE_CELLS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_TOOLTIP
-    };
+  };
 
   /**
   * If \c view is NULL, this reaction will track the active-view maintained by
   * pqActiveObjects.
   */
-  pqRenderViewSelectionReaction(
-    QAction* parentAction, pqRenderView* view, SelectionMode mode,
+  pqRenderViewSelectionReaction(QAction* parentAction, pqRenderView* view, SelectionMode mode,
     QActionGroup* modifierGroup = NULL);
   virtual ~pqRenderViewSelectionReaction();
 

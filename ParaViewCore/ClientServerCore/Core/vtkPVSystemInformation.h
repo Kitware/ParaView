@@ -57,7 +57,7 @@ public:
   //@}
 
   struct SystemInformationType
-    {
+  {
     vtkProcessModule::ProcessTypes ProcessType;
     int ProcessId; // for parallel processes, this indicates the process id.
     int NumberOfProcesses;
@@ -73,21 +73,23 @@ public:
     size_t AvailablePhysicalMemory;
     size_t TotalVirtualMemory;
     size_t AvailableVirtualMemory;
-    };
+  };
 
   //  Provides access to the vector of informations.
   const std::vector<SystemInformationType>& GetSystemInformations()
-    { return this->SystemInformations; }
+  {
+    return this->SystemInformations;
+  }
 
 protected:
   vtkPVSystemInformation();
   ~vtkPVSystemInformation();
 
   std::vector<SystemInformationType> SystemInformations;
+
 private:
   vtkPVSystemInformation(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

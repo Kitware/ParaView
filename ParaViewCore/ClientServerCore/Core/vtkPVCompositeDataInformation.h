@@ -16,7 +16,7 @@
  * @class   vtkPVCompositeDataInformation
  * @brief   Light object for holding composite data information.
  *
- * vtkPVCompositeDataInformation is used to copy the meta information of 
+ * vtkPVCompositeDataInformation is used to copy the meta information of
  * a composite dataset from server to client. It holds a vtkPVDataInformation
  * for each block of the composite dataset.
  * @sa
@@ -101,7 +101,7 @@ public:
   //@}
 
   // TODO:
-  // Add API to obtain meta data information for each of the children. 
+  // Add API to obtain meta data information for each of the children.
 
 protected:
   vtkPVCompositeDataInformation();
@@ -115,19 +115,18 @@ protected:
   int DataIsMultiPiece;
   int DataIsComposite;
   unsigned int FlatIndexMax;
-  
+
   unsigned int NumberOfPieces;
   vtkSetMacro(NumberOfPieces, unsigned int);
 
   friend class vtkPVDataInformation;
-  vtkPVDataInformation* GetDataInformationForCompositeIndex(int *index);
-  
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
+
 private:
   vtkPVCompositeDataInformationInternals* Internal;
 
   vtkPVCompositeDataInformation(const vtkPVCompositeDataInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCompositeDataInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

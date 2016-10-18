@@ -47,7 +47,6 @@ protected:
 private:
   vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

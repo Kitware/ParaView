@@ -38,22 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QDialog;
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqPropertyGroupButton :
-  public pqPropertyGroupWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqPropertyGroupButton : public pqPropertyGroupWidget
 {
   Q_OBJECT
 
 public:
-  pqPropertyGroupButton(vtkSMProxy *proxy, vtkSMPropertyGroup* smGroup,
-                        QWidget *parent = 0);
+  pqPropertyGroupButton(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = 0);
 
   // This object takes ownership of the 'dialog' parameter and deletes it when
   // the object is deleted. Note QDialog destructor is virtual so memory is
   // property deleted.
-  void SetEditor (QDialog* dialog)
-  {
-    this->Editor = dialog;
-  }
+  void SetEditor(QDialog* dialog) { this->Editor = dialog; }
   ~pqPropertyGroupButton();
 
 private slots:
@@ -62,6 +57,5 @@ private slots:
 private:
   QDialog* Editor;
 };
-
 
 #endif

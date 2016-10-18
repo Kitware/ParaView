@@ -180,9 +180,7 @@ protected:
 
   // To support legacy configuration files.
   void RegisterPrototype(
-    const char* xmlgroup, const char* xmlname,
-    const char* extensions,
-    const char* description);
+    const char* xmlgroup, const char* xmlname, const char* extensions, const char* description);
 
   vtkSetStringMacro(ReaderName);
   vtkSetStringMacro(ReaderGroup);
@@ -197,8 +195,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif
-

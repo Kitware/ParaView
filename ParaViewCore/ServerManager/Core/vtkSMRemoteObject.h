@@ -36,12 +36,12 @@ class vtkSMLoadStateContext;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
 {
-// My friends are...
-  friend class vtkSMStateHelper;    // To pull state
-  friend class vtkSMStateLoader;    // To set GlobalId as the originals
+  // My friends are...
+  friend class vtkSMStateHelper; // To pull state
+  friend class vtkSMStateLoader; // To set GlobalId as the originals
 
 public:
-  vtkTypeMacro(vtkSMRemoteObject,vtkSMSessionObject);
+  vtkTypeMacro(vtkSMRemoteObject, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -80,7 +80,7 @@ public:
    * action. By default, any remote object is Undoable.
    */
   vtkBooleanMacro(Prototype, bool);
-  bool IsPrototype() {return this->Prototype;}
+  bool IsPrototype() { return this->Prototype; }
   vtkSetMacro(Prototype, bool);
   //@}
 
@@ -90,8 +90,7 @@ public:
    * This method will be used to fill the undo stack.
    * If not overriden this will return NULL.
    */
-  virtual const vtkSMMessage* GetFullState()
-    { return NULL; }
+  virtual const vtkSMMessage* GetFullState() { return NULL; }
 
   //@{
   /**
@@ -101,11 +100,11 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator)
-    {
-    (void) msg;
-    (void) locator;
-    }
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
+  {
+    (void)msg;
+    (void)locator;
+  }
   //@}
 
   /**
@@ -185,7 +184,6 @@ private:
   void operator=(const vtkSMRemoteObject&) VTK_DELETE_FUNCTION;
 
   char* GlobalIDString;
-
 };
 
 /// This defines a manipulator for the vtkClientServerStream that can be used
@@ -206,11 +204,15 @@ class VTKPVSERVERMANAGERCORE_EXPORT SIOBJECT
   vtkSMRemoteObject* Reference;
   friend VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const SIOBJECT& manipulator);
+
 public:
-  SIOBJECT(vtkSMRemoteObject* rmobject) : Reference(rmobject) {}
+  SIOBJECT(vtkSMRemoteObject* rmobject)
+    : Reference(rmobject)
+  {
+  }
 };
 
-VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
-  const SIOBJECT& manipulator);
+VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
+  vtkClientServerStream& stream, const SIOBJECT& manipulator);
 
 #endif // #ifndef vtkSMRemoteObject_h

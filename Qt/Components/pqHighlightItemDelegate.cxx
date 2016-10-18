@@ -36,19 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHighlightItemDelegate.h"
 #include <QPainter>
 
-void pqHighlightItemDelegate::paint(QPainter *painter,
-  const QStyleOptionViewItem &option, const QModelIndex &index) const
+void pqHighlightItemDelegate::paint(
+  QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  if(index.data().isValid())
-    {
+  if (index.data().isValid())
+  {
     QStyleOptionViewItem viewOption(option);
     painter->save();
     painter->fillRect(option.rect, this->HighlightColor);
     painter->restore();
     QStyledItemDelegate::paint(painter, viewOption, index);
-    }
+  }
   else
-    {
+  {
     QStyledItemDelegate::paint(painter, option, index);
-    }
+  }
 }

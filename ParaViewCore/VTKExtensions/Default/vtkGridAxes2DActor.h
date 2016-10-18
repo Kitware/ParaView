@@ -23,11 +23,11 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkProp3D.h"
 
-#include "vtkGridAxesHelper.h" // needed of Helper
+#include "vtkGridAxesHelper.h"       // needed of Helper
 #include "vtkGridAxesPlane2DActor.h" // needed for inline methods
-#include "vtkNew.h" // needed for vtkNew.
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include "vtkStdString.h" // needed for vtkStdString.
+#include "vtkNew.h"                  // needed for vtkNew.
+#include "vtkSmartPointer.h"         // needed for vtkSmartPointer.
+#include "vtkStdString.h"            // needed for vtkStdString.
 
 class vtkAxis;
 class vtkContextScene;
@@ -54,14 +54,14 @@ public:
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
-    {
+  {
     MIN_YZ = vtkGridAxesHelper::MIN_YZ,
     MIN_ZX = vtkGridAxesHelper::MIN_ZX,
     MIN_XY = vtkGridAxesHelper::MIN_XY,
     MAX_YZ = vtkGridAxesHelper::MAX_YZ,
     MAX_ZX = vtkGridAxesHelper::MAX_ZX,
     MAX_XY = vtkGridAxesHelper::MAX_XY
-    };
+  };
 
   //@{
   /**
@@ -75,14 +75,14 @@ public:
    * Valid values for LabelMask.
    */
   enum LabelMasks
-    {
-    MIN_X=vtkGridAxesHelper::MIN_X,
-    MIN_Y=vtkGridAxesHelper::MIN_Y,
-    MIN_Z=vtkGridAxesHelper::MIN_Z,
-    MAX_X=vtkGridAxesHelper::MAX_X,
-    MAX_Y=vtkGridAxesHelper::MAX_Y,
-    MAX_Z=vtkGridAxesHelper::MAX_Z
-    };
+  {
+    MIN_X = vtkGridAxesHelper::MIN_X,
+    MIN_Y = vtkGridAxesHelper::MIN_Y,
+    MIN_Z = vtkGridAxesHelper::MIN_Z,
+    MAX_X = vtkGridAxesHelper::MAX_X,
+    MAX_Y = vtkGridAxesHelper::MAX_Y,
+    MAX_Z = vtkGridAxesHelper::MAX_Z
+  };
 
   //@{
   /**
@@ -197,29 +197,22 @@ public:
   /**
    * Turn off to not generate polydata for the plane's grid.
    */
-  void SetGenerateGrid(bool val)
-    { this->PlaneActor->SetGenerateGrid(val); }
-  bool GetGenerateGrid()
-    { return this->PlaneActor->GetGenerateGrid(); }
+  void SetGenerateGrid(bool val) { this->PlaneActor->SetGenerateGrid(val); }
+  bool GetGenerateGrid() { return this->PlaneActor->GetGenerateGrid(); }
   vtkBooleanMacro(GenerateGrid, bool);
 
   /**
    * Turn off to not generate the polydata for the plane's edges. Which edges
    * are rendered is defined by the EdgeMask.
    */
-  void SetGenerateEdges(bool val)
-    { this->PlaneActor->SetGenerateEdges(val); }
-  bool GetGenerateEdges()
-    { return this->PlaneActor->GetGenerateEdges(); }
+  void SetGenerateEdges(bool val) { this->PlaneActor->SetGenerateEdges(val); }
+  bool GetGenerateEdges() { return this->PlaneActor->GetGenerateEdges(); }
   vtkBooleanMacro(GenerateEdges, bool);
-
 
   // Turn off to not generate the markers for the tick positions. Which egdes
   // are rendered is defined by the TickMask.
-  void SetGenerateTicks(bool val)
-    { this->PlaneActor->SetGenerateTicks(val); }
-  bool GetGenerateTicks()
-    { return this->PlaneActor->GetGenerateTicks(); }
+  void SetGenerateTicks(bool val) { this->PlaneActor->SetGenerateTicks(val); }
+  bool GetGenerateTicks() { return this->PlaneActor->GetGenerateTicks(); }
   vtkBooleanMacro(GenerateTicks, bool);
 
   //--------------------------------------------------------------------------
@@ -230,18 +223,18 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double *GetBounds()
-    {
+  virtual double* GetBounds()
+  {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
-    }
+  }
   //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport *);
+  virtual int RenderOpaqueGeometry(vtkViewport*);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
   virtual int RenderOverlay(vtkViewport* viewport);
   virtual int HasTranslucentPolygonalGeometry();
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
   /**
    * Overridden to include the mtime for the text properties.
@@ -286,7 +279,6 @@ private:
   friend class vtkLabels;
 
   bool DoRender;
-
 };
 
 #endif

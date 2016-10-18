@@ -46,19 +46,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqCinemaTrack.h"
 
-//widget and state for a cinema property track
+// widget and state for a cinema property track
 
 //-----------------------------------------------------------------------------
 pqCinemaTrack::pqCinemaTrack(
-  QWidget *parentObject, Qt::WindowFlags parentFlags,
-  pqPipelineFilter* filter)
-: QWidget(parentObject, parentFlags)
-, Track(new Ui::CinemaTrack())
-, valsWidget(NULL)
+  QWidget* parentObject, Qt::WindowFlags parentFlags, pqPipelineFilter* filter)
+  : QWidget(parentObject, parentFlags)
+  , Track(new Ui::CinemaTrack())
+  , valsWidget(NULL)
 {
   this->Track->setupUi(this);
 
-  vtkSMProxy *prox = filter->getProxy();
+  vtkSMProxy* prox = filter->getProxy();
   std::string vtkClassName = prox->GetVTKClassName();
 
   // only the following are currently supported by cinema
@@ -82,13 +81,14 @@ pqCinemaTrack::pqCinemaTrack(
   vtkSMProperty* prop = prox->GetProperty(tags.first.c_str());
   if (prop)
   {
-    vtkSMDoubleRangeDomain* dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain(tags.second.c_str()));
+    vtkSMDoubleRangeDomain* dom =
+      vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain(tags.second.c_str()));
 
     if (dom)
-      {
+    {
       this->Track->label->setText(filter->getSMName());
 
-      pqScalarValueListPropertyWidget *vals = new pqScalarValueListPropertyWidget(prop, prox, this);
+      pqScalarValueListPropertyWidget* vals = new pqScalarValueListPropertyWidget(prop, prox, this);
       vals->setRangeDomain(dom);
       vals->setEnabled(false);
       vals->setMinimumHeight(100);
@@ -97,8 +97,8 @@ pqCinemaTrack::pqCinemaTrack(
       this->layout()->addWidget(vals);
       this->valsWidget = vals;
       this->valsWidget->setEnabled(true);
-      }
     }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -109,8 +109,7 @@ pqCinemaTrack::~pqCinemaTrack()
 //-----------------------------------------------------------------------------
 bool pqCinemaTrack::explore() const
 {
-  return (this->valsWidget &&
-          !this->valsWidget->scalars().isEmpty());
+  return (this->valsWidget && !this->valsWidget->scalars().isEmpty());
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +125,7 @@ QString pqCinemaTrack::filterName() const
 }
 
 //-----------------------------------------------------------------------------
-void pqCinemaTrack::setFilterName(QString const & name)
+void pqCinemaTrack::setFilterName(QString const& name)
 {
   this->Track->label->setText(name);
 }

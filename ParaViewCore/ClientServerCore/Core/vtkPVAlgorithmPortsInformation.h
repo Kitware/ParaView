@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVAlgorithmPortsInformation : public v
 public:
   static vtkPVAlgorithmPortsInformation* New();
   vtkTypeMacro(vtkPVAlgorithmPortsInformation, vtkPVInformation);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -74,6 +74,7 @@ protected:
   int NumberOfRequiredInputs;
 
   vtkSetMacro(NumberOfOutputs, int);
+
 private:
   vtkPVAlgorithmPortsInformation(const vtkPVAlgorithmPortsInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVAlgorithmPortsInformation&) VTK_DELETE_FUNCTION;

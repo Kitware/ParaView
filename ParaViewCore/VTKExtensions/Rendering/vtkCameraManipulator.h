@@ -36,7 +36,7 @@ class vtkRenderWindowInteractor;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraManipulator : public vtkObject
 {
 public:
-  static vtkCameraManipulator *New();
+  static vtkCameraManipulator* New();
   vtkTypeMacro(vtkCameraManipulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -49,12 +49,9 @@ public:
   virtual void EndInteraction();
   //@}
 
-  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *iren);
-  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *iren);
-  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *iren);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
 
   //@{
   /**
@@ -112,6 +109,7 @@ public:
    */
   void SetGUIHelper(vtkCameraManipulatorGUIHelper*);
   vtkGetObjectMacro(GUIHelper, vtkCameraManipulatorGUIHelper);
+
 protected:
   vtkCameraManipulator();
   ~vtkCameraManipulator();
@@ -126,7 +124,7 @@ protected:
   double Center[3];
   double RotationFactor;
   double DisplayCenter[2];
-  void ComputeDisplayCenter(vtkRenderer *ren);
+  void ComputeDisplayCenter(vtkRenderer* ren);
 
   vtkCameraManipulatorGUIHelper* GUIHelper;
 

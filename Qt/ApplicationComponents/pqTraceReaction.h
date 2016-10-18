@@ -43,10 +43,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTraceReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqTraceReaction(QAction* parent,
-    const char* start_trace_label="Start Trace",
-    const char* stop_trace_label="Stop Trace");
+  pqTraceReaction(QAction* parent, const char* start_trace_label = "Start Trace",
+    const char* stop_trace_label = "Stop Trace");
   virtual ~pqTraceReaction();
 
   /**
@@ -58,6 +58,7 @@ public:
   * stop tracing.
   */
   void stop();
+
 protected:
   /**
   * Called when the action is triggered.

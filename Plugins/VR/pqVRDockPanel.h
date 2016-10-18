@@ -42,28 +42,35 @@ class pqVRDockPanel : public QDockWidget
 {
   Q_OBJECT
   typedef QDockWidget Superclass;
+
 public:
-  pqVRDockPanel(const QString &t, QWidget* p = 0, Qt::WindowFlags f=0):
-    Superclass(t, p, f) { this->constructor(); }
-  pqVRDockPanel(QWidget *p=0, Qt::WindowFlags f=0):
-    Superclass(p, f) { this->constructor(); }
+  pqVRDockPanel(const QString& t, QWidget* p = 0, Qt::WindowFlags f = 0)
+    : Superclass(t, p, f)
+  {
+    this->constructor();
+  }
+  pqVRDockPanel(QWidget* p = 0, Qt::WindowFlags f = 0)
+    : Superclass(p, f)
+  {
+    this->constructor();
+  }
   virtual ~pqVRDockPanel();
 
 private slots:
   void addConnection();
   void removeConnection();
   void updateConnections();
-  void editConnection(QListWidgetItem *item = NULL);
+  void editConnection(QListWidgetItem* item = NULL);
   void updateConnectionButtons(int row);
 
   void addStyle();
   void removeStyle();
   void updateStyles();
-  void editStyle(QListWidgetItem *item = NULL);
+  void editStyle(QListWidgetItem* item = NULL);
   void updateStyleButtons(int row);
 
   void proxyChanged(vtkSMProxy*);
-  void styleComboChanged(const QString &name);
+  void styleComboChanged(const QString& name);
   void setActiveView(pqView*);
 
   void saveState();

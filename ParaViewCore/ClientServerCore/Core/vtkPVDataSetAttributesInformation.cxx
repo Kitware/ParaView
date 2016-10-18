@@ -34,22 +34,20 @@
 
 namespace
 {
-  bool vtkSkipArray(const char* aname)
-    {
-    return (aname == NULL
-      || strcmp(aname, vtkDataSetAttributes::GhostArrayName()) == 0
-      || strcmp(aname, "vtkOriginalCellIds") == 0
-      || strcmp(aname, "vtkOriginalPointIds") == 0);
-    }
+bool vtkSkipArray(const char* aname)
+{
+  return (aname == NULL || strcmp(aname, vtkDataSetAttributes::GhostArrayName()) == 0 ||
+    strcmp(aname, "vtkOriginalCellIds") == 0 || strcmp(aname, "vtkOriginalPointIds") == 0);
+}
 }
 
 class vtkPVDataSetAttributesInformation::vtkInternals
 {
 public:
   struct comparator
-    {
+  {
     bool operator()(const std::string& s1, const std::string& s2) const
-      {
+    {
       int strcasecmpResult = 0;
 #if defined(_WIN32)
       strcasecmpResult = stricmp(s1.c_str(), s2.c_str());
@@ -57,17 +55,18 @@ public:
       strcasecmpResult = strcasecmp(s1.c_str(), s2.c_str());
 #endif
       if (strcasecmpResult == 0)
-        {
+      {
         return (strcmp(s1.c_str(), s2.c_str()) < 0);
-        }
-      else
-        {
-        return (strcasecmpResult < 0);
-        }
       }
-    };
+      else
+      {
+        return (strcasecmpResult < 0);
+      }
+    }
+  };
 
-  typedef std::map<std::string, vtkSmartPointer<vtkPVArrayInformation>, comparator> ArrayInformationType;
+  typedef std::map<std::string, vtkSmartPointer<vtkPVArrayInformation>, comparator>
+    ArrayInformationType;
   ArrayInformationType ArrayInformation;
 
   std::string AttributesInformation[vtkDataSetAttributes::NUM_ATTRIBUTES];
@@ -89,19 +88,17 @@ vtkPVDataSetAttributesInformation::~vtkPVDataSetAttributesInformation()
 }
 
 //----------------------------------------------------------------------------
-void
-vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "ArrayInformation, number of arrays: "
-     << this->GetNumberOfArrays() << endl;
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "ArrayInformation, number of arrays: " << this->GetNumberOfArrays() << endl;
   for (vtkInternals::ArrayInformationType::const_iterator iter =
-    this->Internals->ArrayInformation.begin();
-    iter != this->Internals->ArrayInformation.end(); ++iter)
-    {
+         this->Internals->ArrayInformation.begin();
+       iter != this->Internals->ArrayInformation.end(); ++iter)
+  {
     iter->second->PrintSelf(os, indent.GetNextIndent());
     os << endl;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -114,21 +111,21 @@ void vtkPVDataSetAttributesInformation::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformation *dataInfo)
+void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformation* dataInfo)
 {
   vtkInternals& internals = (*this->Internals);
   internals.ArrayInformation.clear();
 
   const vtkInternals& otherInternals = (*dataInfo->Internals);
 
-  for (vtkInternals::ArrayInformationType::const_iterator iter = otherInternals.ArrayInformation.begin();
-    iter != otherInternals.ArrayInformation.end();
-    ++iter)
-    {
+  for (vtkInternals::ArrayInformationType::const_iterator iter =
+         otherInternals.ArrayInformation.begin();
+       iter != otherInternals.ArrayInformation.end(); ++iter)
+  {
     vtkNew<vtkPVArrayInformation> arrayInfo;
     arrayInfo->DeepCopy(iter->second);
     internals.ArrayInformation[iter->first] = arrayInfo.Get();
-    }
+  }
 
   // Now the default attributes.
   std::copy(otherInternals.AttributesInformation,
@@ -137,7 +134,7 @@ void vtkPVDataSetAttributesInformation::DeepCopy(vtkPVDataSetAttributesInformati
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetAttributesInformation::CopyFromFieldData(vtkFieldData *da)
+void vtkPVDataSetAttributesInformation::CopyFromFieldData(vtkFieldData* da)
 {
   vtkInternals& internals = (*this->Internals);
 
@@ -147,44 +144,41 @@ void vtkPVDataSetAttributesInformation::CopyFromFieldData(vtkFieldData *da)
   internals.ArrayInformation.clear();
 
   // Copy Field Data
-  int num = da? da->GetNumberOfArrays() : 0;
+  int num = da ? da->GetNumberOfArrays() : 0;
   for (int idx = 0; idx < num; ++idx)
-    {
+  {
     vtkAbstractArray* const array = da->GetAbstractArray(idx);
-    if (array != NULL
-      && !vtkSkipArray(array->GetName()))
-      {
+    if (array != NULL && !vtkSkipArray(array->GetName()))
+    {
       vtkNew<vtkPVArrayInformation> info;
       info->CopyFromObject(array);
       internals.ArrayInformation[array->GetName()] = info.Get();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetAttributesInformation::CopyFromDataSetAttributes(vtkDataSetAttributes *da)
+void vtkPVDataSetAttributesInformation::CopyFromDataSetAttributes(vtkDataSetAttributes* da)
 {
   this->CopyFromFieldData(da);
 
   // update attribute information.
   vtkInternals& internals = (*this->Internals);
-  for (int cc=0, max=da->GetNumberOfArrays(); cc <  max; ++cc)
-    {
+  for (int cc = 0, max = da->GetNumberOfArrays(); cc < max; ++cc)
+  {
     vtkAbstractArray* aa = da->GetAbstractArray(cc);
     int attrIdx = da->IsArrayAnAttribute(cc);
-    if (aa != NULL
-      && aa->GetName()
-      && attrIdx >= 0
-      && internals.ArrayInformation.find(aa->GetName()) != internals.ArrayInformation.end())
-      {
+    if (aa != NULL && aa->GetName() && attrIdx >= 0 &&
+      internals.ArrayInformation.find(aa->GetName()) != internals.ArrayInformation.end())
+    {
       internals.AttributesInformation[attrIdx] = aa->GetName();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetAttributesInformation::CopyFromGenericAttributes(
-  vtkGenericAttributeCollection *da, int centering)
+  vtkGenericAttributeCollection* da, int centering)
 {
   vtkInternals& internals = (*this->Internals);
 
@@ -193,37 +187,35 @@ void vtkPVDataSetAttributesInformation::CopyFromGenericAttributes(
     static_cast<int>(vtkDataSetAttributes::NUM_ATTRIBUTES), std::string());
   internals.ArrayInformation.clear();
 
-  for (int cc=0, max=da->GetNumberOfAttributes(); cc<max; ++cc)
-    {
+  for (int cc = 0, max = da->GetNumberOfAttributes(); cc < max; ++cc)
+  {
     vtkGenericAttribute* array = da->GetAttribute(cc);
-    if (array != NULL
-      && array->GetName() != NULL
-      && !vtkSkipArray(array->GetName())
-      && array->GetCentering() == centering)
-      {
+    if (array != NULL && array->GetName() != NULL && !vtkSkipArray(array->GetName()) &&
+      array->GetCentering() == centering)
+    {
       vtkNew<vtkPVGenericAttributeInformation> info;
       info->CopyFromObject(array);
       internals.ArrayInformation[array->GetName()] = info.Get();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetAttributesInformation::CopyFromGenericAttributesOnPoints(
-  vtkGenericAttributeCollection *da)
+  vtkGenericAttributeCollection* da)
 {
   this->CopyFromGenericAttributes(da, vtkPointCentered);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetAttributesInformation::CopyFromGenericAttributesOnCells(
-  vtkGenericAttributeCollection *da)
+  vtkGenericAttributeCollection* da)
 {
   this->CopyFromGenericAttributes(da, vtkCellCentered);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInformation *info)
+void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInformation* info)
 {
   // merge `info` with `this`.
 
@@ -231,92 +223,92 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
   const vtkInternals& otherInternals = (*info->Internals);
 
   // Mark partial arrays not present in `info`
-  for (vtkInternals::ArrayInformationType::const_iterator miter = internals.ArrayInformation.begin();
-    miter != internals.ArrayInformation.end(); ++miter)
-    {
+  for (vtkInternals::ArrayInformationType::const_iterator miter =
+         internals.ArrayInformation.begin();
+       miter != internals.ArrayInformation.end(); ++miter)
+  {
     if (otherInternals.ArrayInformation.find(miter->first) == otherInternals.ArrayInformation.end())
-      {
-      miter->second->SetIsPartial(1);
-      }
-    }
-
-  for (vtkInternals::ArrayInformationType::const_iterator oiter = otherInternals.ArrayInformation.begin();
-    oiter != otherInternals.ArrayInformation.end(); ++oiter)
     {
-    vtkInternals::ArrayInformationType::iterator miter = internals.ArrayInformation.find(oiter->first);
+      miter->second->SetIsPartial(1);
+    }
+  }
+
+  for (vtkInternals::ArrayInformationType::const_iterator oiter =
+         otherInternals.ArrayInformation.begin();
+       oiter != otherInternals.ArrayInformation.end(); ++oiter)
+  {
+    vtkInternals::ArrayInformationType::iterator miter =
+      internals.ArrayInformation.find(oiter->first);
     if (miter == internals.ArrayInformation.end())
-      {
+    {
       vtkNew<vtkPVArrayInformation> ainfo;
       ainfo->DeepCopy(oiter->second);
       internals.ArrayInformation[oiter->first] = ainfo.Get();
       ainfo->SetIsPartial(1);
-      }
+    }
     else
-      {
+    {
       vtkTypeInt64 numTuples = miter->second->GetNumberOfTuples();
       miter->second->AddInformation(oiter->second);
       if (this->FieldAssociation == vtkDataObject::FIELD)
-        {
+      {
         // For field data, we accumulate the number of tuples as the maximum
         // number of tuples since field data is not appended together when the
         // geometries are reduced. This seems like a fair assumption that
         // addresses BUG #0015503.
-        miter->second->SetNumberOfTuples(std::max(
-            numTuples, oiter->second->GetNumberOfTuples()));
-        }
+        miter->second->SetNumberOfTuples(std::max(numTuples, oiter->second->GetNumberOfTuples()));
+      }
       else
-        {
-        miter->second->SetNumberOfTuples(
-          numTuples + oiter->second->GetNumberOfTuples());
-        }
+      {
+        miter->second->SetNumberOfTuples(numTuples + oiter->second->GetNumberOfTuples());
       }
     }
+  }
 
   // Merge AttributesInformation.
-  for (int idx=0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; idx++)
+  for (int idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; idx++)
+  {
+    if (internals.AttributesInformation[idx].empty() ||
+      internals.AttributesInformation[idx] == otherInternals.AttributesInformation[idx])
     {
-    if (internals.AttributesInformation[idx].empty()
-      || internals.AttributesInformation[idx] == otherInternals.AttributesInformation[idx])
-      {
       internals.AttributesInformation[idx] = otherInternals.AttributesInformation[idx];
-      }
-    else
-      {
-      internals.AttributesInformation[idx].clear();
-      }
     }
+    else
+    {
+      internals.AttributesInformation[idx].clear();
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataSetAttributesInformation::AddInformation(vtkPVInformation* info)
 {
-  vtkPVDataSetAttributesInformation* p =
-    vtkPVDataSetAttributesInformation::SafeDownCast(info);
-  if(p)
-    {
+  vtkPVDataSetAttributesInformation* p = vtkPVDataSetAttributesInformation::SafeDownCast(info);
+  if (p)
+  {
     this->AddInformation(p);
-    }
+  }
   else
-    {
-    vtkErrorMacro("AddInformation called with object of type "
-                  << (info? info->GetClassName():"<unknown>"));
-    }
+  {
+    vtkErrorMacro(
+      "AddInformation called with object of type " << (info ? info->GetClassName() : "<unknown>"));
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVDataSetAttributesInformation::IsArrayAnAttribute(int arrayIndex)
 {
   if (vtkPVArrayInformation* ainfo = this->GetArrayInformation(arrayIndex))
-    {
+  {
     vtkInternals& internals = (*this->Internals);
     for (int i = 0; i < vtkDataSetAttributes::NUM_ATTRIBUTES; ++i)
-      {
+    {
       if (internals.AttributesInformation[i] == ainfo->GetName())
-        {
+      {
         return i;
-        }
       }
     }
+  }
   return -1;
 }
 
@@ -324,12 +316,11 @@ int vtkPVDataSetAttributesInformation::IsArrayAnAttribute(int arrayIndex)
 vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetAttributeInformation(int attributeType)
 {
   const vtkInternals& internals = (*this->Internals);
-  if (attributeType >=0
-    && attributeType < vtkDataSetAttributes::NUM_ATTRIBUTES
-    && !internals.AttributesInformation[attributeType].empty())
-    {
+  if (attributeType >= 0 && attributeType < vtkDataSetAttributes::NUM_ATTRIBUTES &&
+    !internals.AttributesInformation[attributeType].empty())
+  {
     return this->GetArrayInformation(internals.AttributesInformation[attributeType].c_str());
-    }
+  }
   return NULL;
 }
 
@@ -342,14 +333,15 @@ int vtkPVDataSetAttributesInformation::GetNumberOfArrays() const
 //----------------------------------------------------------------------------
 int vtkPVDataSetAttributesInformation::GetMaximumNumberOfTuples() const
 {
- const vtkInternals& internals = (*this->Internals);
- vtkTypeInt64 maxvalue = 0;
- for (vtkInternals::ArrayInformationType::const_iterator miter = internals.ArrayInformation.begin();
-   miter != internals.ArrayInformation.end(); ++miter)
-   {
-   maxvalue = std::max(maxvalue, miter->second->GetNumberOfTuples());
-   }
- return maxvalue;
+  const vtkInternals& internals = (*this->Internals);
+  vtkTypeInt64 maxvalue = 0;
+  for (vtkInternals::ArrayInformationType::const_iterator miter =
+         internals.ArrayInformation.begin();
+       miter != internals.ArrayInformation.end(); ++miter)
+  {
+    maxvalue = std::max(maxvalue, miter->second->GetNumberOfTuples());
+  }
+  return maxvalue;
 }
 
 //----------------------------------------------------------------------------
@@ -357,26 +349,28 @@ vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(in
 {
   const vtkInternals& internals = (*this->Internals);
   int cc = 0;
-  for (vtkInternals::ArrayInformationType::const_iterator miter = internals.ArrayInformation.begin();
-    miter != internals.ArrayInformation.end(); ++miter, ++cc)
-    {
+  for (vtkInternals::ArrayInformationType::const_iterator
+         miter = internals.ArrayInformation.begin();
+       miter != internals.ArrayInformation.end(); ++miter, ++cc)
+  {
     if (cc == idx)
-      {
+    {
       return miter->second;
-      }
     }
+  }
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(const char *name) const
+vtkPVArrayInformation* vtkPVDataSetAttributesInformation::GetArrayInformation(
+  const char* name) const
 {
   if (name)
-    {
+  {
     const vtkInternals& internals = (*this->Internals);
     vtkInternals::ArrayInformationType::const_iterator iter = internals.ArrayInformation.find(name);
     return iter != internals.ArrayInformation.end() ? iter->second : NULL;
-    }
+  }
   return NULL;
 }
 
@@ -390,31 +384,34 @@ void vtkPVDataSetAttributesInformation::CopyToStream(vtkClientServerStream* css)
   std::fill_n(attributeIndices, static_cast<int>(vtkDataSetAttributes::NUM_ATTRIBUTES), -1);
 
   int arrayIdx = 0;
-  for (vtkInternals::ArrayInformationType::const_iterator miter = internals.ArrayInformation.begin();
-    miter != internals.ArrayInformation.end(); ++miter, ++arrayIdx)
+  for (vtkInternals::ArrayInformationType::const_iterator
+         miter = internals.ArrayInformation.begin();
+       miter != internals.ArrayInformation.end(); ++miter, ++arrayIdx)
+  {
+    for (int idx = 0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
     {
-    for (int idx=0; idx < vtkDataSetAttributes::NUM_ATTRIBUTES; ++idx)
-      {
       if (internals.AttributesInformation[idx] == miter->first)
-        {
+      {
         attributeIndices[idx] = arrayIdx;
-        }
       }
     }
+  }
 
   css->Reset();
   *css << vtkClientServerStream::Reply;
 
   // Default attributes.
-  *css << vtkClientServerStream::InsertArray(attributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES);
+  *css << vtkClientServerStream::InsertArray(
+    attributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES);
 
   // Number of arrays.
   *css << this->GetNumberOfArrays();
 
   // Serialize each array's information.
-  for (vtkInternals::ArrayInformationType::const_iterator miter = internals.ArrayInformation.begin();
-    miter != internals.ArrayInformation.end(); ++miter)
-    {
+  for (vtkInternals::ArrayInformationType::const_iterator miter =
+         internals.ArrayInformation.begin();
+       miter != internals.ArrayInformation.end(); ++miter)
+  {
     vtkClientServerStream acss;
     miter->second->CopyToStream(&acss);
 
@@ -422,7 +419,7 @@ void vtkPVDataSetAttributesInformation::CopyToStream(vtkClientServerStream* css)
     size_t length;
     acss.GetData(&data, &length);
     *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-    }
+  }
   *css << vtkClientServerStream::End;
 }
 
@@ -438,39 +435,38 @@ void vtkPVDataSetAttributesInformation::CopyFromStream(const vtkClientServerStre
 
   // Default attributes.
   if (!css->GetArgument(0, 0, attributeIndices, vtkDataSetAttributes::NUM_ATTRIBUTES))
-    {
+  {
     vtkErrorMacro("Error parsing default attributes from message.");
     return;
-    }
+  }
 
   // Number of arrays.
   int numArrays = 0;
-  if(!css->GetArgument(0, 1, &numArrays))
-    {
+  if (!css->GetArgument(0, 1, &numArrays))
+  {
     vtkErrorMacro("Error parsing number of arrays from message.");
     return;
-    }
+  }
 
   // Each array's information.
   std::vector<unsigned char> data;
   std::vector<std::string> arraynames;
 
-  for(int i=0; i < numArrays; ++i)
-    {
+  for (int i = 0; i < numArrays; ++i)
+  {
     vtkTypeUInt32 length;
-    if(!css->GetArgumentLength(0, i+2, &length))
-      {
-      vtkErrorMacro("Error parsing length of information for array number "
-                    << i << " from message.");
+    if (!css->GetArgumentLength(0, i + 2, &length))
+    {
+      vtkErrorMacro(
+        "Error parsing length of information for array number " << i << " from message.");
       return;
-      }
+    }
     data.resize(length);
-    if(!css->GetArgument(0, i+2, &*data.begin(), length))
-      {
-      vtkErrorMacro("Error parsing information for array number "
-                    << i << " from message.");
+    if (!css->GetArgument(0, i + 2, &*data.begin(), length))
+    {
+      vtkErrorMacro("Error parsing information for array number " << i << " from message.");
       return;
-      }
+    }
 
     vtkClientServerStream acss;
     acss.SetData(&*data.begin(), length);
@@ -478,11 +474,11 @@ void vtkPVDataSetAttributesInformation::CopyFromStream(const vtkClientServerStre
     ai->CopyFromStream(&acss);
     internals.ArrayInformation[ai->GetName()] = ai.Get();
     arraynames.push_back(ai->GetName());
-    }
+  }
 
-  for (int cc=0; cc < vtkDataSetAttributes::NUM_ATTRIBUTES; ++cc)
-    {
+  for (int cc = 0; cc < vtkDataSetAttributes::NUM_ATTRIBUTES; ++cc)
+  {
     internals.AttributesInformation[cc] =
       attributeIndices[cc] != -1 ? arraynames[attributeIndices[cc]] : std::string();
-    }
+  }
 }

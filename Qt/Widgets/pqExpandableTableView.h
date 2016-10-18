@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * pqExpandableTableView extends pqTableView to add support for the following
 * features:
 * \li Expand/Grow table: If the user edits past the last item
-*     the view will fire a signal (editPastLastRow()) 
+*     the view will fire a signal (editPastLastRow())
 *     enabling observer to add new row to the table.
 * \li Skip non-editable items: When editing, in a QTableView one can hit tab
 *     to edit the next item. However, if the next item is not editable, the
@@ -50,8 +50,9 @@ class PQWIDGETS_EXPORT pqExpandableTableView : public pqTableView
 {
   Q_OBJECT
   typedef pqTableView Superclass;
+
 public:
-  pqExpandableTableView(QWidget* parent=0);
+  pqExpandableTableView(QWidget* parent = 0);
   virtual ~pqExpandableTableView();
 
 signals:
@@ -67,21 +68,19 @@ protected:
   * Working together with logic in closeEditor(). This methods makes it
   * possible to skip past non-editable items.
   */
-  virtual QModelIndex	moveCursor(
-    CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+  virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
 
   /**
   * Overridden to set MoveToNextEditableItem so that moveCursor() can skip
   * non-editable items. Also if moved past the last rows/last column, this
   * will fire the editPastLastRow() signal.
   */
-  virtual void closeEditor(
-    QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
+  virtual void closeEditor(QWidget* editor, QAbstractItemDelegate::EndEditHint hint);
 
   /**
   * Overridden to capture Ctrl-V for pasting table data into the table.
   */
-  virtual void keyPressEvent(QKeyEvent * event);
+  virtual void keyPressEvent(QKeyEvent* event);
 
 private:
   Q_DISABLE_COPY(pqExpandableTableView)

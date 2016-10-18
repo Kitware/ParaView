@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilter : public vtkDataObjectAlgori
 {
 public:
   static vtkPVPostFilter* New();
-  vtkTypeMacro(vtkPVPostFilter,vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkPVPostFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -52,21 +52,17 @@ protected:
   vtkPVPostFilter();
   ~vtkPVPostFilter();
 
-
-  virtual int FillInputPortInformation( int port, vtkInformation* info);
-  virtual int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   int DoAnyNeededConversions(vtkDataObject* output);
-  int DoAnyNeededConversions(vtkDataSet* output,
-    const char* requested_name, int fieldAssociation,
+  int DoAnyNeededConversions(vtkDataSet* output, const char* requested_name, int fieldAssociation,
     const char* demangled_name, const char* demagled_component_name);
   void CellDataToPointData(vtkDataSet* output);
   void PointDataToCellData(vtkDataSet* output);
-  int ExtractComponent(vtkDataSetAttributes* dsa,
-    const char* requested_name, const char* demangled_name,
-    const char* demagled_component_name);
+  int ExtractComponent(vtkDataSetAttributes* dsa, const char* requested_name,
+    const char* demangled_name, const char* demagled_component_name);
 
 private:
   vtkPVPostFilter(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;

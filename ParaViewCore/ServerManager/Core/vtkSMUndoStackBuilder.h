@@ -14,15 +14,15 @@
 =========================================================================*/
 /**
  * @class   vtkSMUndoStackBuilder
- * @brief   builds server manager undo sets and 
+ * @brief   builds server manager undo sets and
  * pushes them on the undo stack.
  *
- * vtkSMUndoStackBuilder records Server Manager changes that are undo/redo 
- * able and collects them. To begin recording such changes one must call 
+ * vtkSMUndoStackBuilder records Server Manager changes that are undo/redo
+ * able and collects them. To begin recording such changes one must call
  * Begin(). To end recording use End(). One can have multiple blocks
- * of Begin-End before pushing the changes on the Undo Stack. To push all 
+ * of Begin-End before pushing the changes on the Undo Stack. To push all
  * collected changes onto the Undo Stack as a single undoable step,
- * use PushToStack(). 
+ * use PushToStack().
  * Applications can subclass vtkSMUndoStackBuilder to record GUI related
  * changes and add them to the undo stack.
 */
@@ -74,10 +74,10 @@ public:
    * Convenience method call End(); PushToStack(); in that order.
    */
   void EndAndPushToStack()
-    { 
+  {
     this->End();
     this->PushToStack();
-    }
+  }
   //@}
 
   /**
@@ -123,20 +123,16 @@ public:
   //@}
 
   // Record a state change on a RemoteObject
-  virtual void OnStateChange( vtkSMSession* session,
-                              vtkTypeUInt32 globalId,
-                              const vtkSMMessage* previousState,
-                              const vtkSMMessage* newState);
+  virtual void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
+    const vtkSMMessage* previousState, const vtkSMMessage* newState);
 
   // Indicate that a new object was created.
   // Simply fires the vtkSMUndoStack::ObjectCreationEvent from the undo-stack.
-  virtual void OnCreateObject(
-    vtkSMSession* session, vtkSMMessage* newState);
+  virtual void OnCreateObject(vtkSMSession* session, vtkSMMessage* newState);
 
 protected:
   vtkSMUndoStackBuilder();
   ~vtkSMUndoStackBuilder();
-
 
   vtkSMUndoStack* UndoStack;
   vtkUndoSet* UndoSet;
@@ -147,10 +143,7 @@ protected:
    * Returns if the event raised by the proxy manager should be
    * converted to undo elements.
    */
-  virtual bool HandleChangeEvents()
-    {
-    return (this->EnableMonitoring > 0);
-    }
+  virtual bool HandleChangeEvents() { return (this->EnableMonitoring > 0); }
 
   void InitializeUndoSet();
 
@@ -162,8 +155,6 @@ protected:
 private:
   vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

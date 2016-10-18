@@ -32,10 +32,10 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDataSetAlgorithmSelectorFilter : public vtkAlgorithm
 {
 public:
-  vtkTypeMacro(vtkPVDataSetAlgorithmSelectorFilter,vtkAlgorithm);
+  vtkTypeMacro(vtkPVDataSetAlgorithmSelectorFilter, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVDataSetAlgorithmSelectorFilter *New();
+  static vtkPVDataSetAlgorithmSelectorFilter* New();
 
   /**
    * Register a new filter that can be used underneath in the requestData call.
@@ -84,23 +84,21 @@ public:
   /**
    * Forward those methods to the underneath filters
    */
-  virtual int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inInfo,
-                             vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
 
   /**
    * Forward those methods to the underneath filters
    */
-  virtual int ProcessRequest(vtkInformation* request,
-                     vtkCollection* inInfo,
-                     vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo);
 
 protected:
   vtkPVDataSetAlgorithmSelectorFilter();
   ~vtkPVDataSetAlgorithmSelectorFilter();
 
-  virtual int RequestDataObject(vtkInformation *, vtkInformationVector**,
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
@@ -109,7 +107,8 @@ protected:
   int OutputType;
 
 private:
-  vtkPVDataSetAlgorithmSelectorFilter(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
+  vtkPVDataSetAlgorithmSelectorFilter(
+    const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;

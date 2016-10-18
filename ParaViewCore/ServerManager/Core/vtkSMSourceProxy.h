@@ -19,7 +19,7 @@
  * vtkSMSourceProxy manages VTK source(s) that are created on a server
  * using the proxy pattern. In addition to functionality provided
  * by vtkSMProxy, vtkSMSourceProxy provides method to connect and
- * update sources. Each source proxy has one or more output ports 
+ * update sources. Each source proxy has one or more output ports
  * (vtkSMOutputPort).
  * Each port represents one output of one filter. These are created
  * automatically (when CreateOutputPorts() is called) by the source.
@@ -138,10 +138,7 @@ public:
    * If \c update is false the pipeline will not
    * be updated before gathering the data information.
    */
-  vtkPVDataInformation* GetDataInformation()
-  {
-    return this->GetDataInformation(0);
-  }
+  vtkPVDataInformation* GetDataInformation() { return this->GetDataInformation(0); }
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
   //@}
 
@@ -156,8 +153,7 @@ public:
    * extarction proxy for the output port identified by \c portIndex.
    * If no extraction proxies are present, this method has no effect.
    */
-  void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input,
-    unsigned int outputPort);
+  void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input, unsigned int outputPort);
 
   //@{
   /**
@@ -235,7 +231,7 @@ protected:
   friend class vtkSMInputProperty;
   friend class vtkSMOutputPort;
 
-  int OutputPortsCreated; 
+  int OutputPortsCreated;
 
   int ProcessSupport;
   bool MPIRequired;
@@ -251,7 +247,7 @@ protected:
    */
   virtual void CreateVTKObjects();
 
-  char *ExecutiveName;
+  char* ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
 
   /**
@@ -270,11 +266,10 @@ protected:
    * add output ports. It replaces the output port at the given index, if any,
    * The output ports will be resize to fit the specified index.
    */
-  void SetOutputPort(unsigned int index, const char* name, 
-    vtkSMOutputPort* port, vtkSMDocumentation* doc);
+  void SetOutputPort(
+    unsigned int index, const char* name, vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();
-  void SetExtractSelectionProxy(unsigned int index,
-    vtkSMSourceProxy* proxy);
+  void SetExtractSelectionProxy(unsigned int index, vtkSMSourceProxy* proxy);
   void RemoveAllExtractSelectionProxies();
   //@}
 
@@ -287,6 +282,7 @@ protected:
   // proxy.
   bool DisableSelectionProxies;
   bool SelectionProxiesCreated;
+
 private:
   vtkSMSourceProxyInternals* PInternals;
 
@@ -297,7 +293,6 @@ private:
 
   vtkSMSourceProxy(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

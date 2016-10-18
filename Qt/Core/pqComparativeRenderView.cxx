@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -60,22 +60,19 @@ public:
   QMap<vtkSMViewProxy*, QPointer<pqQVTKWidget> > RenderWidgets;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
-  pqInternal()
-    {
-    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    }
+  pqInternal() { this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }
 };
 
 namespace
 {
 /// This helps us monitor QResizeEvent after it has been processed (unlike a
 /// generic event filter).
-class pqComparativeWidget  : public QWidget
+class pqComparativeWidget : public QWidget
 {
 public:
   vtkWeakPointer<vtkSMProxy> ViewProxy;
-  void resizeEvent(QResizeEvent * evt)
-    {
+  void resizeEvent(QResizeEvent* evt)
+  {
     this->QWidget::resizeEvent(evt);
 
     BEGIN_UNDO_EXCLUDE();
@@ -83,33 +80,28 @@ public:
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
-    this->ViewProxy->UpdateProperty( "ViewSize");
+    this->ViewProxy->UpdateProperty("ViewSize");
     END_UNDO_EXCLUDE();
-    }
+  }
 };
 }
 //-----------------------------------------------------------------------------
-pqComparativeRenderView::pqComparativeRenderView(
-  const QString& group,
-  const QString& name, 
-  vtkSMViewProxy* viewProxy,
-  pqServer* server, 
-  QObject* _parent):
-  Superclass(comparativeRenderViewType(), group, name, viewProxy, server, _parent)
+pqComparativeRenderView::pqComparativeRenderView(const QString& group, const QString& name,
+  vtkSMViewProxy* viewProxy, pqServer* server, QObject* _parent)
+  : Superclass(comparativeRenderViewType(), group, name, viewProxy, server, _parent)
 {
   this->Internal = new pqInternal();
   this->Internal->VTKConnect->Connect(
-    viewProxy, vtkCommand::ConfigureEvent,
-    this, SLOT(updateViewWidgets()));
+    viewProxy, vtkCommand::ConfigureEvent, this, SLOT(updateViewWidgets()));
 }
 
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::~pqComparativeRenderView()
 {
   foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
-    {
+  {
     delete wdg;
-    }
+  }
 
   delete this->Internal;
 }
@@ -132,46 +124,42 @@ vtkSMComparativeViewProxy* pqComparativeRenderView::getComparativeRenderViewProx
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy* pqComparativeRenderView::getRenderViewProxy() const
 {
-  return vtkSMRenderViewProxy::SafeDownCast(
-    this->getComparativeRenderViewProxy()->GetRootView());
+  return vtkSMRenderViewProxy::SafeDownCast(this->getComparativeRenderViewProxy()->GetRootView());
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeRenderView::updateViewWidgets(
-  QWidget* container/*=NULL*/)
+void pqComparativeRenderView::updateViewWidgets(QWidget* container /*=NULL*/)
 {
   // Create QVTKWidgets for new view modules and destroy old ones.
   vtkNew<vtkCollection> currentViews;
-  vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(
-    this->getProxy());
+  vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(this->getProxy());
   compView->GetViews(currentViews.GetPointer());
 
   QSet<vtkSMViewProxy*> currentViewsSet;
 
   currentViews->InitTraversal();
-  vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(
-    currentViews->GetNextItemAsObject());
-  for (; temp !=0; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
-    {
+  vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject());
+  for (; temp != 0; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
+  {
     currentViewsSet.insert(temp);
-    }
+  }
 
-  QSet<vtkSMViewProxy*> oldViews = QSet<vtkSMViewProxy*>::fromList(
-    this->Internal->RenderWidgets.keys());
+  QSet<vtkSMViewProxy*> oldViews =
+    QSet<vtkSMViewProxy*>::fromList(this->Internal->RenderWidgets.keys());
 
   QSet<vtkSMViewProxy*> removed = oldViews - currentViewsSet;
   QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
 
   // Destroy old QVTKWidgets widgets.
   foreach (vtkSMViewProxy* key, removed)
-    {
+  {
     pqQVTKWidget* item = this->Internal->RenderWidgets.take(key);
     delete item;
-    }
+  }
 
   // Create QVTKWidgets for new ones.
   foreach (vtkSMViewProxy* key, added)
-    {
+  {
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();
 
@@ -182,33 +170,32 @@ void pqComparativeRenderView::updateViewWidgets(
     wdg->installEventFilter(this);
     wdg->setContextMenuPolicy(Qt::NoContextMenu);
     this->Internal->RenderWidgets[key] = wdg;
-    }
+  }
 
   // Now layout the views.
   int dimensions[2];
   vtkSMPropertyHelper(compView, "Dimensions").Get(dimensions, 2);
-  if (vtkSMPropertyHelper(compView, "OverlayAllComparisons").GetAsInt() !=0)
-    {
+  if (vtkSMPropertyHelper(compView, "OverlayAllComparisons").GetAsInt() != 0)
+  {
     dimensions[0] = dimensions[1] = 1;
-    }
+  }
 
   // destroy the old layout and create a new one.
-  container = container? container : this->widget();
+  container = container ? container : this->widget();
   delete container->layout();
 
   QGridLayout* layout = new QGridLayout(container);
   layout->setHorizontalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(0));
   layout->setVerticalSpacing(vtkSMPropertyHelper(compView, "Spacing").GetAsInt(1));
   layout->setMargin(0);
-  for (int x=0; x < dimensions[0]; x++)
+  for (int x = 0; x < dimensions[0]; x++)
+  {
+    for (int y = 0; y < dimensions[1]; y++)
     {
-    for (int y=0; y < dimensions[1]; y++)
-      {
-      int index = y*dimensions[0]+x;
-      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
-        currentViews->GetItemAsObject(index));
+      int index = y * dimensions[0] + x;
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
       pqQVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
       layout->addWidget(vtkwidget, y, x);
-      }
     }
+  }
 }

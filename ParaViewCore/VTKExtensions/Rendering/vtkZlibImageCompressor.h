@@ -20,7 +20,7 @@
  * This class compresses Image data using Zlib. The compression level
  * varies between 1 and 9, 1 being the fastest at the cost of the
  * compression ratio, 9 producing the highest compression ratio at the
- * cost of speed. Optionally color depth may be reduced and alpha 
+ * cost of speed. Optionally color depth may be reduced and alpha
  * stripped/restored.
  * @par Thanks:
  * SciberQuest Inc. contributed this class.
@@ -55,12 +55,12 @@ public:
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
-  virtual void SaveConfiguration(vtkMultiProcessStream *stream);
+  virtual void SaveConfiguration(vtkMultiProcessStream* stream);
   virtual bool RestoreConfiguration(vtkMultiProcessStream* stream);
   //@}
 
-  virtual const char *SaveConfiguration();
-  virtual const char *RestoreConfiguration(const char *stream);
+  virtual const char* SaveConfiguration();
+  virtual const char* RestoreConfiguration(const char* stream);
 
   //@{
   /**
@@ -106,9 +106,8 @@ protected:
   vtkZlibImageCompressor();
   virtual ~vtkZlibImageCompressor();
 
-
 private:
-  vtkZlibCompressorImageConditioner *Conditioner; // manages color space reduction and strip alpha
+  vtkZlibCompressorImageConditioner* Conditioner; // manages color space reduction and strip alpha
   int CompressionLevel;                           // zlib compression level
 
 private:

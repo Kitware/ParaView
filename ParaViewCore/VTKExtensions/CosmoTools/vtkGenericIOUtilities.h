@@ -34,21 +34,24 @@
 class vtkMultiProcessController;
 class vtkDataArray;
 
-namespace gio {
+namespace gio
+{
 class GenericIOReader;
 class GenericIOWriter;
 }
 
-namespace vtkGenericIOUtilities {
+namespace vtkGenericIOUtilities
+{
 
 //==============================================================================
 //@{
 /**
  * Trims leading whitespace from a string.
  */
-inline std::string &ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-      std::not1(std::ptr_fun<int, int>(std::isspace))));
+inline std::string& ltrim(std::string& s)
+{
+  s.erase(
+    s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
   return s;
 }
 //@}
@@ -58,9 +61,11 @@ inline std::string &ltrim(std::string &s) {
 /**
  * Trims trailing whitespace from a string.
  */
-inline std::string &rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-      std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+inline std::string& rtrim(std::string& s)
+{
+  s.erase(
+    std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+    s.end());
   return s;
 }
 //@}
@@ -69,7 +74,8 @@ inline std::string &rtrim(std::string &s) {
 /**
  * Trims leading & trailing whitespace from a string.
  */
-inline std::string &trim(std::string &s) {
+inline std::string& trim(std::string& s)
+{
   return ltrim(rtrim(s));
 }
 
@@ -78,7 +84,7 @@ inline std::string &trim(std::string &s) {
  * Returns the corresponding MPI communicator for the multi-process
  * controller used by this instance.
  */
-MPI_Comm GetMPICommunicator(vtkMultiProcessController *mpc);
+MPI_Comm GetMPICommunicator(vtkMultiProcessController* mpc);
 
 //==============================================================================
 /**
@@ -86,8 +92,7 @@ MPI_Comm GetMPICommunicator(vtkMultiProcessController *mpc);
  * that can be attached as vtkPointData to a vtkDataSet, in this case, a
  * vtkUnstructuredGrid that consists of the particles.
  */
-vtkDataArray* GetVtkDataArray(
-      std::string name, int type, void* rawBuffer, int N);
+vtkDataArray* GetVtkDataArray(std::string name, int type, void* rawBuffer, int N);
 
 //==============================================================================
 /**
@@ -95,8 +100,7 @@ vtkDataArray* GetVtkDataArray(
  * returns the data as a vtkIdType. It is intended as a convenience method
  * to allow the user to access the data in an agnostic-type fashion.
  */
-vtkIdType GetIdFromRawBuffer(
-      const int type, void* buffer, vtkIdType buffer_idx);
+vtkIdType GetIdFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx);
 
 //==============================================================================
 /**
@@ -104,22 +108,21 @@ vtkIdType GetIdFromRawBuffer(
  * returns the data as a double. It is intended as a convenience method
  * to allow the user to access the data in an agnostic-type fashion.
  */
-double GetDoubleFromRawBuffer(
-      const int type, void* buffer, vtkIdType buffer_idx);
+double GetDoubleFromRawBuffer(const int type, void* buffer, vtkIdType buffer_idx);
 
 //==============================================================================
 /**
  * This method constructs and returns the underlying GenericIO reader.
  */
 gio::GenericIOReader* GetReader(
-    MPI_Comm comm, bool posix, int distribution, const std::string& fileName);
+  MPI_Comm comm, bool posix, int distribution, const std::string& fileName);
 
 //==============================================================================
 /**
  * This method constructs and returns the underlying GenericIO writer.
  * The returned writer will have its filename set already
  */
-gio::GenericIOWriter* GetWriter(MPI_Comm comm,const std::string& fileName);
+gio::GenericIOWriter* GetWriter(MPI_Comm comm, const std::string& fileName);
 
 //==============================================================================
 //@{
@@ -128,16 +131,15 @@ gio::GenericIOWriter* GetWriter(MPI_Comm comm,const std::string& fileName);
  * set the pointer to NULL.  This sets the pointer variable in the calling
  * function since the pointer is passed by reference.
  */
-inline void SafeDeleteString(char* & str)
+inline void SafeDeleteString(char*& str)
 {
-  if(str != NULL)
-    {
-    delete [] str;
+  if (str != NULL)
+  {
+    delete[] str;
     str = NULL;
-    }
+  }
 }
 //@}
-
 }
 
 #endif /* vtkGenericIOUtilities_h */

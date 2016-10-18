@@ -63,8 +63,7 @@ public:
    * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
    * vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
    */
-  vtkPVArrayInformation* GetArrayInformation(
-    const char* arrayname, int fieldAssociation);
+  vtkPVArrayInformation* GetArrayInformation(const char* arrayname, int fieldAssociation);
 
   //@{
   /**
@@ -124,7 +123,7 @@ public:
    */
   vtkGetMacro(DataSetType, int);
   vtkGetMacro(CompositeDataSetType, int);
-  const char *GetDataSetTypeAsString();
+  const char* GetDataSetTypeAsString();
   int DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
   vtkGetMacro(NumberOfCells, vtkTypeInt64);
@@ -134,7 +133,7 @@ public:
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
   //@}
-  
+
   /**
    * Returns a string describing the datatype that can be directly
    * shown in a user interface.
@@ -154,7 +153,7 @@ public:
    * Access to information about points. Only valid for subclasses
    * of vtkPointSet.
    */
-  vtkGetObjectMacro(PointArrayInformation,vtkPVArrayInformation);
+  vtkGetObjectMacro(PointArrayInformation, vtkPVArrayInformation);
   //@}
 
   //@{
@@ -172,7 +171,7 @@ public:
   /**
    * Accesse to information about field data, if any.
    */
-  vtkGetObjectMacro(FieldDataInformation,vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(FieldDataInformation, vtkPVDataSetAttributesInformation);
   //@}
 
   /**
@@ -189,7 +188,7 @@ public:
    * If data is composite, this provides information specific to
    * composite datasets.
    */
-  vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);
+  vtkGetObjectMacro(CompositeDataInformation, vtkPVCompositeDataInformation);
   //@}
 
   /**
@@ -277,54 +276,53 @@ public:
   /**
    * Allows run time addition of information getters for new classes
    */
-  static void RegisterHelper(const char *classname,
-                             const char *helperclassname);
+  static void RegisterHelper(const char* classname, const char* helperclassname);
 
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
 
-  void DeepCopy(vtkPVDataInformation *dataInfo, bool copyCompositeInformation=true);
+  void DeepCopy(vtkPVDataInformation* dataInfo, bool copyCompositeInformation = true);
 
   void AddFromMultiPieceDataSet(vtkCompositeDataSet* data);
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
   void CopyFromCompositeDataSetInitialize(vtkCompositeDataSet* data);
   void CopyFromCompositeDataSetFinalize(vtkCompositeDataSet* data);
   virtual void CopyFromDataSet(vtkDataSet* data);
-  void CopyFromGenericDataSet(vtkGenericDataSet *data);
+  void CopyFromGenericDataSet(vtkGenericDataSet* data);
   void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);
   void CopyFromSelection(vtkSelection* selection);
   void CopyCommonMetaData(vtkDataObject*, vtkInformation*);
 
-  static vtkPVDataInformationHelper *FindHelper(const char *classname);
+  static vtkPVDataInformationHelper* FindHelper(const char* classname);
 
   // Data information collected from remote processes.
-  int            DataSetType;
-  int            CompositeDataSetType;
-  int            NumberOfDataSets;
-  vtkTypeInt64   NumberOfPoints;
-  vtkTypeInt64   NumberOfCells;
-  vtkTypeInt64   NumberOfRows;
-  int            MemorySize;
-  vtkIdType      PolygonCount;
-  double         Bounds[6];
-  int            Extent[6];
-  double         TimeSpan[2];
-  double         Time;
-  int            HasTime;
-  int            NumberOfTimeSteps;
+  int DataSetType;
+  int CompositeDataSetType;
+  int NumberOfDataSets;
+  vtkTypeInt64 NumberOfPoints;
+  vtkTypeInt64 NumberOfCells;
+  vtkTypeInt64 NumberOfRows;
+  int MemorySize;
+  vtkIdType PolygonCount;
+  double Bounds[6];
+  int Extent[6];
+  double TimeSpan[2];
+  double Time;
+  int HasTime;
+  int NumberOfTimeSteps;
 
-  char*          DataClassName;
+  char* DataClassName;
   vtkSetStringMacro(DataClassName);
 
-  char*          TimeLabel;
+  char* TimeLabel;
   vtkSetStringMacro(TimeLabel);
 
-  char*          CompositeDataClassName;
+  char* CompositeDataClassName;
   vtkSetStringMacro(CompositeDataClassName);
 
-  char*          CompositeDataSetName;
+  char* CompositeDataSetName;
   vtkSetStringMacro(CompositeDataSetName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
@@ -340,6 +338,7 @@ protected:
 
   friend class vtkPVDataInformationHelper;
   friend class vtkPVCompositeDataInformation;
+
 private:
   vtkPVDataInformation(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;

@@ -121,7 +121,7 @@ public:
   /**
    * Access to information about field data, if any.
    */
-  vtkGetObjectMacro(FieldDataInformation,vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(FieldDataInformation, vtkPVDataSetAttributesInformation);
   //@}
 
   /**
@@ -133,8 +133,7 @@ public:
    * (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
    * vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
    */
-  vtkPVArrayInformation* GetArrayInformation(
-    const char* arrayname, int fieldAssociation);
+  vtkPVArrayInformation* GetArrayInformation(const char* arrayname, int fieldAssociation);
 
 protected:
   vtkPVTemporalDataInformation();
@@ -150,11 +149,10 @@ protected:
   double TimeRange[2];
   int NumberOfTimeSteps;
   int PortNumber;
+
 private:
   vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

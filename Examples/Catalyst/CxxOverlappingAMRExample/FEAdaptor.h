@@ -3,11 +3,11 @@
 
 namespace FEAdaptor
 {
-  void Initialize(int numScripts, char* scripts[]);
+void Initialize(int numScripts, char* scripts[]);
 
-  void Finalize();
+void Finalize();
 
-  void CoProcess(double time, unsigned int timeStep, bool lastTimeStep);
+void CoProcess(double time, unsigned int timeStep, bool lastTimeStep);
 }
 
 #endif

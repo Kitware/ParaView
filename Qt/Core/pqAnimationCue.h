@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,9 +41,10 @@ class PQCORE_EXPORT pqAnimationCue : public pqProxy
 {
   Q_OBJECT
   typedef pqProxy Superclass;
+
 public:
-  pqAnimationCue(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  pqAnimationCue(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
+    QObject* parent = NULL);
   virtual ~pqAnimationCue();
 
   // Returns the number of keyframes in this cue.
@@ -80,16 +81,14 @@ public:
   * Set the type of the keyframe created by default.
   * default is CompositeKeyFrame.
   */
-  void setKeyFrameType(const QString& type)
-    { this->KeyFrameType = type; }
+  void setKeyFrameType(const QString& type) { this->KeyFrameType = type; }
 
   /**
   * Used by editors to trigger keyframesModified() signal after bulk of
   * modifications have been made to the cue/key frames.
   */
-  void triggerKeyFramesModified()
-    { emit this->keyframesModified(); }
-   
+  void triggerKeyFramesModified() { emit this->keyframesModified(); }
+
   /**
   * Get/Set the enabled state for the cue.
   */
@@ -100,7 +99,7 @@ signals:
   // emitted when something about the keyframes changes.
   void keyframesModified();
 
-  // Fired when the animated proxy/property/index 
+  // Fired when the animated proxy/property/index
   // changes.
   void modified();
 

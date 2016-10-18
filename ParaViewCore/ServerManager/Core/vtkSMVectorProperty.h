@@ -54,7 +54,6 @@ public:
   virtual void ClearUncheckedElements() = 0;
   //@}
 
-
   //@{
   /**
    * If RepeatCommand is true, the command is invoked multiple times,
@@ -142,7 +141,7 @@ public:
    * a last resort, we check if the property has a non-empty \c information_property.
    * If so, we copy its values to this property as the default.
    */
-  virtual bool ResetToDomainDefaults(bool use_unchecked_values=false);
+  virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
 
 protected:
   vtkSMVectorProperty();
@@ -159,8 +158,7 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
 private:
   vtkSMVectorProperty(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;

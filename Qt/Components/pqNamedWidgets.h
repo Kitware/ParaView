@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -84,19 +84,17 @@ public:
   * Link a collection of Qt child widgets with server manager properties by name
   */
   static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager,
-                         const QStringList* exceptions=NULL);
+    const QStringList* exceptions = NULL);
   /**
   * Remove links between Qt widgets and server manager properties
   */
   static void unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
 
-  static void linkObject(QObject* object, pqSMProxy proxy, 
-                         const QString& property,
-                         pqPropertyManager* property_manager);
-  
-  static void unlinkObject(QObject* object, pqSMProxy proxy,
-                           const QString& property,
-                           pqPropertyManager* property_manager);
+  static void linkObject(
+    QObject* object, pqSMProxy proxy, const QString& property, pqPropertyManager* property_manager);
+
+  static void unlinkObject(
+    QObject* object, pqSMProxy proxy, const QString& property, pqPropertyManager* property_manager);
 
   /**
   * given an object, find the user property and its associated signal
@@ -105,27 +103,21 @@ public:
   * for QCheckBox and QTextEdit, the signal names not derived from the user
   * property
   */
-  static bool propertyInformation(QObject* object, 
-    QString& property, QString& signal);
+  static bool propertyInformation(QObject* object, QString& property, QString& signal);
 
   /**
   * this function does the actual linking, and adds a range domain if one is
   * needed
   */
-  static void linkObject(QObject* o, const QString& property,
-                         const QString& signal, pqSMProxy proxy,
-                         vtkSMProperty* smProperty, int index,
-                         pqPropertyManager* pm);
-  
+  static void linkObject(QObject* o, const QString& property, const QString& signal,
+    pqSMProxy proxy, vtkSMProperty* smProperty, int index, pqPropertyManager* pm);
+
   /**
   * this function does the actual un-linking, and removes a range domain if one
   * exists
   */
-  static void unlinkObject(QObject* o, const QString& property,
-                         const QString& signal, pqSMProxy proxy,
-                         vtkSMProperty* smProperty, int index,
-                         pqPropertyManager* pm);
+  static void unlinkObject(QObject* o, const QString& property, const QString& signal,
+    pqSMProxy proxy, vtkSMProperty* smProperty, int index, pqPropertyManager* pm);
 };
 
 #endif
-

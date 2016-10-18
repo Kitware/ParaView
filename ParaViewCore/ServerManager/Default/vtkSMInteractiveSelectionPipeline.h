@@ -32,12 +32,13 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMPreselectionPipeline.h"
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMInteractiveSelectionPipeline : public vtkSMPreselectionPipeline
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMInteractiveSelectionPipeline
+  : public vtkSMPreselectionPipeline
 {
 public:
   static vtkSMInteractiveSelectionPipeline* New();
-  vtkTypeMacro(vtkSMInteractiveSelectionPipeline,vtkSMPreselectionPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkSMInteractiveSelectionPipeline, vtkSMPreselectionPipeline);
+  void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMInteractiveSelectionPipeline* GetInstance();
 
 protected:
@@ -45,8 +46,7 @@ protected:
   ~vtkSMInteractiveSelectionPipeline();
 
 private:
-  vtkSMInteractiveSelectionPipeline(
-    const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMInteractiveSelectionPipeline(const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
 };
 

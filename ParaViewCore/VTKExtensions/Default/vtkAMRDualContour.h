@@ -53,12 +53,11 @@ class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperFace;
 class vtkAMRDualContourEdgeLocator;
 
-
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAMRDualContour *New();
-  vtkTypeMacro(vtkAMRDualContour,vtkMultiBlockDataSetAlgorithm);
+  static vtkAMRDualContour* New();
+  vtkTypeMacro(vtkAMRDualContour, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);
@@ -70,15 +69,15 @@ public:
    * and multiprocess comunication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
-  vtkSetMacro(EnableCapping,int);
-  vtkGetMacro(EnableCapping,int);
-  vtkBooleanMacro(EnableCapping,int);
-  vtkSetMacro(EnableDegenerateCells,int);
-  vtkGetMacro(EnableDegenerateCells,int);
-  vtkBooleanMacro(EnableDegenerateCells,int);
-  vtkSetMacro(EnableMultiProcessCommunication,int);
-  vtkGetMacro(EnableMultiProcessCommunication,int);
-  vtkBooleanMacro(EnableMultiProcessCommunication,int);
+  vtkSetMacro(EnableCapping, int);
+  vtkGetMacro(EnableCapping, int);
+  vtkBooleanMacro(EnableCapping, int);
+  vtkSetMacro(EnableDegenerateCells, int);
+  vtkGetMacro(EnableDegenerateCells, int);
+  vtkBooleanMacro(EnableDegenerateCells, int);
+  vtkSetMacro(EnableMultiProcessCommunication, int);
+  vtkGetMacro(EnableMultiProcessCommunication, int);
+  vtkBooleanMacro(EnableMultiProcessCommunication, int);
   //@}
 
   //@{
@@ -87,18 +86,18 @@ public:
    * boundary edges between blocks. It does not eliminate
    * boundary edges between processes.
    */
-  vtkSetMacro(EnableMergePoints,int);
-  vtkGetMacro(EnableMergePoints,int);
-  vtkBooleanMacro(EnableMergePoints,int);
+  vtkSetMacro(EnableMergePoints, int);
+  vtkGetMacro(EnableMergePoints, int);
+  vtkBooleanMacro(EnableMergePoints, int);
   //@}
 
   //@{
   /**
    * A flag that causes the polygons on the capping surfaces to be triagulated.
    */
-  vtkSetMacro(TriangulateCap,int);
-  vtkGetMacro(TriangulateCap,int);
-  vtkBooleanMacro(TriangulateCap,int);
+  vtkSetMacro(TriangulateCap, int);
+  vtkGetMacro(TriangulateCap, int);
+  vtkBooleanMacro(TriangulateCap, int);
   //@}
 
   //@{
@@ -108,13 +107,13 @@ public:
    * not necessary.  If this assumption is wrong, this option will produce
    * cracks / seams.
    */
-  vtkSetMacro(SkipGhostCopy,int);
-  vtkGetMacro(SkipGhostCopy,int);
-  vtkBooleanMacro(SkipGhostCopy,int);
+  vtkSetMacro(SkipGhostCopy, int);
+  vtkGetMacro(SkipGhostCopy, int);
+  vtkBooleanMacro(SkipGhostCopy, int);
   //@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkAMRDualContour();
@@ -130,47 +129,39 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * This should be called before any number of calls to DoRequestData
    */
-  void InitializeRequest (vtkNonOverlappingAMR* input);
+  void InitializeRequest(vtkNonOverlappingAMR* input);
 
   /**
    * This should be called after any number of calls to DoRequestData
    */
-  void FinalizeRequest ();
+  void FinalizeRequest();
 
   /**
    * Not a pipeline function. This is a helper function that
    * allows creating a new data set given a input and a cell array name.
    */
-  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
-                                          const char* arrayNameToProcess);
+  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  void ShareBlockLocatorWithNeighbors(
-    vtkAMRDualGridHelperBlock* block);
+  void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 
-  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId,
-                    const char* arrayName);
+  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId, const char* arrayName);
 
-
-  void ProcessDualCell(
-    vtkAMRDualGridHelperBlock* block, int blockId,
-    int x, int y, int z,
-    vtkIdType cornerOffsets[8],
-    vtkDataArray *volumeFractionArray);
+  void ProcessDualCell(vtkAMRDualGridHelperBlock* block, int blockId, int x, int y, int z,
+    vtkIdType cornerOffsets[8], vtkDataArray* volumeFractionArray);
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
   // This method is getting too many arguements!
   // Capping was an after thought...
-  void CapCell(
-    int cellX, int cellY, int cellZ,  // block coordinates
+  void CapCell(int cellX, int cellY, int cellZ, // block coordinates
     // Which cell faces need to be capped.
     unsigned char cubeBoundaryBits,
     // Marching cubes case for this cell
@@ -196,7 +187,7 @@ protected:
   vtkPoints* Points;
   vtkCellArray* Faces;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
   // I made these ivars to avoid allocating multiple times.
   // The buffer is not used too many times, but ...
@@ -206,21 +197,15 @@ protected:
   vtkAMRDualContourEdgeLocator* BlockLocator;
 
   // Stuff for passing cell attributes to point attributes.
-  void InitializeCopyAttributes(
-    vtkNonOverlappingAMR *hbdsInput,
-    vtkDataSet* mesh);
-  void InterpolateAttributes(
-    vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
+  void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
+  void InterpolateAttributes(vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
     vtkDataSet* mesh, vtkIdType outId);
-  void CopyAttributes(
-    vtkDataSet* uGrid, vtkIdType inId,
-    vtkDataSet* mesh, vtkIdType outId);
+  void CopyAttributes(vtkDataSet* uGrid, vtkIdType inId, vtkDataSet* mesh, vtkIdType outId);
   void FinalizeCopyAttributes(vtkDataSet* mesh);
 
 private:
   vtkAMRDualContour(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

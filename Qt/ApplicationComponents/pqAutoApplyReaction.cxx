@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,12 +40,10 @@ pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
   parentObject->setChecked(this->autoApply());
-  QObject::connect(parentObject, SIGNAL(triggered(bool)),
-    this, SLOT(checkStateChanged(bool)));
+  QObject::connect(parentObject, SIGNAL(triggered(bool)), this, SLOT(checkStateChanged(bool)));
 
   vtkPVGeneralSettings* gs = vtkPVGeneralSettings::GetInstance();
-  pqCoreUtilities::connect(gs, vtkCommand::ModifiedEvent,
-    this, SLOT(updateState()));
+  pqCoreUtilities::connect(gs, vtkCommand::ModifiedEvent, this, SLOT(updateState()));
 }
 
 //-----------------------------------------------------------------------------

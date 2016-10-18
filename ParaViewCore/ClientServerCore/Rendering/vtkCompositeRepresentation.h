@@ -37,7 +37,8 @@
 
 class vtkStringArray;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCompositeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCompositeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkCompositeRepresentation* New();
@@ -115,7 +116,7 @@ protected:
   vtkCompositeRepresentation();
   ~vtkCompositeRepresentation();
 
-  virtual int FillInputPortInformation( int, vtkInformation* info);
+  virtual int FillInputPortInformation(int, vtkInformation* info);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -143,7 +144,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   vtkCommand* Observer;
-
 };
 
 #endif

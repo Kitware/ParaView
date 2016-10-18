@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -61,12 +61,10 @@ public:
   vtkSmartPointer<vtkSMProxy> FSplineProxy;
   QPointer<pqProxyWidget> FSplineWidget;
   double Data[3];
-  pqInternal()
-    {
-    }
+  pqInternal() {}
 
   void setupValidators(QObject* parent)
-    {
+  {
     this->position0->setValidator(new QDoubleValidator(parent));
     this->position1->setValidator(new QDoubleValidator(parent));
     this->position2->setValidator(new QDoubleValidator(parent));
@@ -81,40 +79,40 @@ public:
 
     this->viewAngle->setValidator(new QDoubleValidator(parent));
     this->parallelScale->setValidator(new QDoubleValidator(parent));
-    }
+  }
 
   void setPosition(const double pos[3])
-    {
+  {
     this->position0->setTextAndResetCursor(QString::number(pos[0]));
     this->position1->setTextAndResetCursor(QString::number(pos[1]));
     this->position2->setTextAndResetCursor(QString::number(pos[2]));
-    }
+  }
 
   const double* position()
-    {
+  {
     this->Data[0] = this->position0->text().toDouble();
     this->Data[1] = this->position1->text().toDouble();
     this->Data[2] = this->position2->text().toDouble();
     return this->Data;
-    }
+  }
 
   void setFocalPoint(const double pos[3])
-    {
+  {
     this->focalPoint0->setTextAndResetCursor(QString::number(pos[0]));
     this->focalPoint1->setTextAndResetCursor(QString::number(pos[1]));
     this->focalPoint2->setTextAndResetCursor(QString::number(pos[2]));
-    }
+  }
 
   const double* focalPoint()
-    {
+  {
     this->Data[0] = this->focalPoint0->text().toDouble();
     this->Data[1] = this->focalPoint1->text().toDouble();
     this->Data[2] = this->focalPoint2->text().toDouble();
     return this->Data;
-    }
+  }
 
   void setViewUp(const double pos[3])
-    {
+  {
     this->viewUp0->setTextAndResetCursor(QString::number(pos[0]));
     this->viewUp1->setTextAndResetCursor(QString::number(pos[1]));
     this->viewUp2->setTextAndResetCursor(QString::number(pos[2]));
@@ -122,43 +120,34 @@ public:
     this->viewUpX->setTextAndResetCursor(QString::number(pos[0]));
     this->viewUpY->setTextAndResetCursor(QString::number(pos[1]));
     this->viewUpZ->setTextAndResetCursor(QString::number(pos[2]));
-    }
+  }
 
   const double* viewUp_NonPath()
-    {
+  {
     this->Data[0] = this->viewUp0->text().toDouble();
     this->Data[1] = this->viewUp1->text().toDouble();
     this->Data[2] = this->viewUp2->text().toDouble();
     return this->Data;
-    }
+  }
 
   const double* viewUp_Path()
-    {
+  {
     this->Data[0] = this->viewUpX->text().toDouble();
     this->Data[1] = this->viewUpY->text().toDouble();
     this->Data[2] = this->viewUpZ->text().toDouble();
     return this->Data;
-    }
+  }
 
-  void setViewAngle(double val)
-    {
-    this->viewAngle->setTextAndResetCursor(QString("%1").arg(val));
-    }
+  void setViewAngle(double val) { this->viewAngle->setTextAndResetCursor(QString("%1").arg(val)); }
 
-  double getViewAngle()
-    {
-    return this->viewAngle->text().toDouble();
-    }
+  double getViewAngle() { return this->viewAngle->text().toDouble(); }
 
   void setParallelScale(double val)
-    {
+  {
     this->parallelScale->setTextAndResetCursor(QString("%1").arg(val));
-    }
+  }
 
-  double getParallelScale() const
-    {
-    return this->parallelScale->text().toDouble();
-    }
+  double getParallelScale() const { return this->parallelScale->text().toDouble(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -176,28 +165,24 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->leftPane->setCurrentItem(0);
 
   this->connect(this->Internal->leftPane,
-    SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-    this, SLOT(changeCurrentPage()));
+    SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
+    SLOT(changeCurrentPage()));
 
   // * when user clicks useCurrent, we fire the useCurrentCamera signal.
-  this->connect(this->Internal->useCurrent,
-    SIGNAL(clicked(bool)), SIGNAL(useCurrentCamera()));
+  this->connect(this->Internal->useCurrent, SIGNAL(clicked(bool)), SIGNAL(useCurrentCamera()));
 
   // * Create the spline widget used for defining the paths.
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   if (!server)
-    {
-    qCritical() << 
-      "pqCameraKeyFrameWidget cannot be created without a server connection.";
+  {
+    qCritical() << "pqCameraKeyFrameWidget cannot be created without a server connection.";
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 
-  this->Internal->PSplineProxy.TakeReference(
-    pxm->NewProxy("parametric_functions", "Spline"));
-  this->Internal->PSplineProxy->SetLocation(
-    vtkPVSession::CLIENT);
+  this->Internal->PSplineProxy.TakeReference(pxm->NewProxy("parametric_functions", "Spline"));
+  this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
   this->Internal->PSplineProxy->UpdateVTKObjects();
 
   this->Internal->PSplineWidget = new pqProxyWidget(this->Internal->PSplineProxy, this);
@@ -207,12 +192,10 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->PSplineWidget->setView(pqActiveObjects::instance().activeView());
   this->Internal->PSplineWidget->filterWidgets();
 
-  (new QVBoxLayout(this->Internal->positionContainer))->addWidget(
-    this->Internal->PSplineWidget);
+  (new QVBoxLayout(this->Internal->positionContainer))->addWidget(this->Internal->PSplineWidget);
   this->Internal->positionContainer->layout()->setMargin(0);
 
-  this->Internal->FSplineProxy.TakeReference(
-    pxm->NewProxy("parametric_functions", "Spline"));
+  this->Internal->FSplineProxy.TakeReference(pxm->NewProxy("parametric_functions", "Spline"));
   this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
   this->Internal->FSplineProxy->UpdateVTKObjects();
 
@@ -222,8 +205,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
   this->Internal->FSplineWidget->setView(pqActiveObjects::instance().activeView());
   this->Internal->FSplineWidget->filterWidgets();
 
-  (new QVBoxLayout(this->Internal->focusContainer))->addWidget(
-    this->Internal->FSplineWidget);
+  (new QVBoxLayout(this->Internal->focusContainer))->addWidget(this->Internal->FSplineWidget);
   this->Internal->focusContainer->layout()->setMargin(0);
 }
 
@@ -233,11 +215,10 @@ pqCameraKeyFrameWidget::~pqCameraKeyFrameWidget()
   delete this->Internal;
 }
 
-
 //-----------------------------------------------------------------------------
 void pqCameraKeyFrameWidget::setUsePathBasedMode(bool use_paths)
 {
-  this->Internal->stackedWidgetMode->setCurrentIndex(use_paths? 0 : 1);
+  this->Internal->stackedWidgetMode->setCurrentIndex(use_paths ? 0 : 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,16 +231,11 @@ bool pqCameraKeyFrameWidget::usePathBasedMode() const
 /// Initialize the widget using the values from the key frame proxy.
 void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
 {
-  this->Internal->setPosition(
-    &vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray()[0]);
-  this->Internal->setFocalPoint(
-    &vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray()[0]);
-  this->Internal->setViewUp(
-    &vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
-  this->Internal->setViewAngle(
-    vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
-  this->Internal->setParallelScale(
-    vtkSMPropertyHelper(keyFrame, "ParallelScale").GetAsDouble());
+  this->Internal->setPosition(&vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray()[0]);
+  this->Internal->setFocalPoint(&vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray()[0]);
+  this->Internal->setViewUp(&vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
+  this->Internal->setViewAngle(vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
+  this->Internal->setParallelScale(vtkSMPropertyHelper(keyFrame, "ParallelScale").GetAsDouble());
 
   this->Internal->PSplineProxy->GetProperty("Points")->Copy(
     keyFrame->GetProperty("PositionPathPoints"));
@@ -295,34 +271,30 @@ void pqCameraKeyFrameWidget::saveToKeyFrame(vtkSMProxy* keyFrame)
   this->Internal->PSplineWidget->apply();
   this->Internal->FSplineWidget->apply();
 
-  vtkSMPropertyHelper(keyFrame,"Position").Set(
-    this->Internal->position(), 3);
+  vtkSMPropertyHelper(keyFrame, "Position").Set(this->Internal->position(), 3);
 
-  vtkSMPropertyHelper(keyFrame, "FocalPoint").Set(
-    this->Internal->focalPoint(), 3);
+  vtkSMPropertyHelper(keyFrame, "FocalPoint").Set(this->Internal->focalPoint(), 3);
 
-  vtkSMPropertyHelper(keyFrame, "ViewUp").Set(
-    this->usePathBasedMode()?
-    this->Internal->viewUp_Path():
-    this->Internal->viewUp_NonPath(), 3);
+  vtkSMPropertyHelper(keyFrame, "ViewUp")
+    .Set(
+      this->usePathBasedMode() ? this->Internal->viewUp_Path() : this->Internal->viewUp_NonPath(),
+      3);
 
-  vtkSMPropertyHelper(keyFrame, "ViewAngle").Set(
-    this->Internal->getViewAngle());
+  vtkSMPropertyHelper(keyFrame, "ViewAngle").Set(this->Internal->getViewAngle());
 
-  vtkSMPropertyHelper(keyFrame, "ParallelScale").Set(
-    this->Internal->getParallelScale());
+  vtkSMPropertyHelper(keyFrame, "ParallelScale").Set(this->Internal->getParallelScale());
 
-  keyFrame->GetProperty("PositionPathPoints")->Copy(
-    this->Internal->PSplineProxy->GetProperty("Points"));
+  keyFrame->GetProperty("PositionPathPoints")
+    ->Copy(this->Internal->PSplineProxy->GetProperty("Points"));
 
-  keyFrame->GetProperty("FocalPathPoints")->Copy(
-    this->Internal->FSplineProxy->GetProperty("Points"));
+  keyFrame->GetProperty("FocalPathPoints")
+    ->Copy(this->Internal->FSplineProxy->GetProperty("Points"));
 
-  keyFrame->GetProperty("ClosedPositionPath")->Copy(
-    this->Internal->PSplineProxy->GetProperty("Closed"));
+  keyFrame->GetProperty("ClosedPositionPath")
+    ->Copy(this->Internal->PSplineProxy->GetProperty("Closed"));
 
-  keyFrame->GetProperty("ClosedFocalPath")->Copy(
-    this->Internal->FSplineProxy->GetProperty("Closed"));
+  keyFrame->GetProperty("ClosedFocalPath")
+    ->Copy(this->Internal->FSplineProxy->GetProperty("Closed"));
   keyFrame->UpdateVTKObjects();
 }
 
@@ -331,21 +303,21 @@ void pqCameraKeyFrameWidget::changeCurrentPage()
 {
   QTreeWidgetItem* currentItem = this->Internal->leftPane->currentItem();
   if (!currentItem)
-    {
+  {
     this->Internal->stackedWidget->setCurrentIndex(0);
-    }
+  }
   else if (currentItem->text(0) == "Camera Position")
-    {
+  {
     this->Internal->stackedWidget->setCurrentIndex(1);
-    }
-  else if ( currentItem->text(0) == "Camera Focus")
-    {
+  }
+  else if (currentItem->text(0) == "Camera Focus")
+  {
     this->Internal->stackedWidget->setCurrentIndex(2);
-    }
+  }
   else
-    {
+  {
     this->Internal->stackedWidget->setCurrentIndex(3);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

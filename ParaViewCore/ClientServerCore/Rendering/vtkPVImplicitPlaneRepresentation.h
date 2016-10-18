@@ -26,7 +26,6 @@
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitPlaneRepresentation
   : public vtkImplicitPlaneRepresentation
 {

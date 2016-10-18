@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,56 +36,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 
-
-vtkPVXMLElement *pqXMLUtil::FindNestedElementByName(vtkPVXMLElement *element,
-    const char *name)
+vtkPVXMLElement* pqXMLUtil::FindNestedElementByName(vtkPVXMLElement* element, const char* name)
 {
-  if(element && name)
-    {
+  if (element && name)
+  {
     QString qname = name;
-    vtkPVXMLElement *child = 0;
+    vtkPVXMLElement* child = 0;
     unsigned int total = element->GetNumberOfNestedElements();
-    for(unsigned int i = 0; i < total; i++)
-      {
+    for (unsigned int i = 0; i < total; i++)
+    {
       child = element->GetNestedElement(i);
-      if(child && qname == child->GetName())
-        {
+      if (child && qname == child->GetName())
+      {
         return child;
-        }
       }
     }
+  }
 
   return 0;
 }
 
-QString pqXMLUtil::GetStringFromIntList(const QList<int> &list)
+QString pqXMLUtil::GetStringFromIntList(const QList<int>& list)
 {
   QString number;
   QStringList values;
   QList<int>::ConstIterator iter = list.begin();
-  for( ; iter != list.end(); ++iter)
-    {
+  for (; iter != list.end(); ++iter)
+  {
     number.setNum(*iter);
     values.append(number);
-    }
+  }
 
   return values.join(".");
 }
 
-QList<int> pqXMLUtil::GetIntListFromString(const char *value)
+QList<int> pqXMLUtil::GetIntListFromString(const char* value)
 {
   QList<int> list;
-  if(value)
-    {
+  if (value)
+  {
     QStringList values = QString(value).split(".");
     QStringList::Iterator iter = values.begin();
-    for( ; iter != values.end(); ++iter)
-      {
+    for (; iter != values.end(); ++iter)
+    {
       list.append((*iter).toInt());
-      }
     }
+  }
 
   return list;
 }
-
-

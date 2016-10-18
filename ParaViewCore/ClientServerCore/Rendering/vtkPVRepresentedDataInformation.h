@@ -25,7 +25,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataInformation.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation : public vtkPVDataInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation
+  : public vtkPVDataInformation
 {
 public:
   static vtkPVRepresentedDataInformation* New();
@@ -44,7 +45,6 @@ protected:
 private:
   vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

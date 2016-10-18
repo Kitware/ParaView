@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,20 +39,20 @@ class PQDEPRECATED_EXPORT pqSphereWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
+
 public:
   pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   virtual ~pqSphereWidget();
 
   /**
   * Resets the bounds of the 3D widget to the reference proxy bounds.
-  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * This typically calls PlaceWidget on the underlying 3D Widget
   * with reference proxy bounds.
   * This should be explicitly called after the panel is created
   * and the widget is initialized i.e. the reference proxy, controlled proxy
   * and hints have been set.
   */
-  virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
+  virtual void resetBounds() { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
   /**

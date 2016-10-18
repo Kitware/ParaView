@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,7 +45,6 @@ class pqServer;
 class vtkSMLiveInsituLinkProxy;
 class vtkSMProxy;
 
-
 /**
 * Singleton that provides access to Insitu objects. Some of these
 * objects are pqServer, pqLiveInsituVisualizationManager,
@@ -74,8 +73,7 @@ public:
   static bool isInsitu(pqPipelineSource* pipelineSource);
   static bool isWriterParametersProxy(vtkSMProxy* proxy);
   static pqPipelineSource* pipelineSource(pqServer* insituSession);
-  static void time(pqPipelineSource* source, double* time,
-                     vtkIdType* timeStep);
+  static void time(pqPipelineSource* source, double* time, vtkIdType* timeStep);
 
 signals:
   void connectionInitiated(pqServer* displaySession);
@@ -97,25 +95,18 @@ public:
   */
   bool isDisplayServer(pqServer* server);
   /**
-  * Returns the catalyst visualization manager associated with 
+  * Returns the catalyst visualization manager associated with
   * 'displaySession' or 'insituSession'
   */
   pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displaySession);
-  static pqLiveInsituVisualizationManager* managerFromInsitu(
-    pqServer* insituSession);
+  static pqLiveInsituVisualizationManager* managerFromInsitu(pqServer* insituSession);
   /**
   * Creates the manager and accept connections from Catalyst
   */
   pqLiveInsituVisualizationManager* connect(pqServer* displaySession);
 
-  double breakpointTime() const
-  {
-    return this->BreakpointTime;
-  }
-  double breakpointTimeStep() const
-  {
-    return this->BreakpointTimeStep;
-  }
+  double breakpointTime() const { return this->BreakpointTime; }
+  double breakpointTimeStep() const { return this->BreakpointTimeStep; }
   void setBreakpoint(double time);
   void setBreakpoint(vtkIdType timeStep);
   void removeBreakpoint();
@@ -125,17 +116,10 @@ public:
       this->breakpointTimeStep() != INVALID_TIME_STEP;
   }
 
-  double time() const
-  {
-    return this->Time;
-  }
-  vtkIdType timeStep() const
-  {
-    return this->TimeStep;
-  }
+  double time() const { return this->Time; }
+  vtkIdType timeStep() const { return this->TimeStep; }
   void waitTimestep(vtkIdType timeStep);
   void waitBreakpointHit();
-
 
 protected slots:
   /**

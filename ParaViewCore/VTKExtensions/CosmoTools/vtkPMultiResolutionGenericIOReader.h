@@ -32,8 +32,8 @@ class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkStringArray;
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPMultiResolutionGenericIOReader :
-  public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPMultiResolutionGenericIOReader
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPMultiResolutionGenericIOReader* New();
@@ -83,7 +83,7 @@ public:
    * Get the data array selection tables used to configure which data
    * arrays are loaded by the reader
    */
-  vtkGetObjectMacro(PointDataArraySelection,vtkDataArraySelection);
+  vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
   //@}
 
   /**
@@ -110,12 +110,9 @@ protected:
   vtkPMultiResolutionGenericIOReader();
   ~vtkPMultiResolutionGenericIOReader();
 
-  int RequestInformation(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
-  int RequestUpdateExtent(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
-  int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   char* FileName;
   char* XAxisVariableName;
@@ -126,17 +123,14 @@ protected:
   vtkCallbackCommand* SelectionObserver;
 
 private:
-
   static void SelectionModifiedCallback(
-    vtkObject* caller,unsigned long eid,
-    void* clientdata,void* calldata);
+    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
   class vtkInternal;
   vtkInternal* Internal;
 
   vtkPMultiResolutionGenericIOReader(const vtkPMultiResolutionGenericIOReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPMultiResolutionGenericIOReader&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

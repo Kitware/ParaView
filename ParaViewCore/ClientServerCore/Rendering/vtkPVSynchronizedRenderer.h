@@ -151,7 +151,7 @@ public:
   /**
    * Set the FXAA configuration.
    */
-  void SetFXAAOptions(vtkFXAAOptions *opts);
+  void SetFXAAOptions(vtkFXAAOptions* opts);
 
   //@{
   /**
@@ -182,17 +182,17 @@ protected:
 
   vtkSynchronizedRenderers* CSSynchronizer;
   vtkSynchronizedRenderers* ParallelSynchronizer;
-  vtkImageProcessingPass *ImageProcessingPass;
+  vtkImageProcessingPass* ImageProcessingPass;
   vtkRenderPass* RenderPass;
 
   enum ModeEnum
-    {
+  {
     INVALID,
     BUILTIN,
     CLIENT,
     SERVER,
     BATCH
-    };
+  };
 
   ModeEnum Mode;
   bool Enabled;
@@ -203,10 +203,10 @@ protected:
   bool UseDepthBuffer;
   bool RenderEmptyImages;
   bool DataReplicatedOnAllProcesses;
+
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

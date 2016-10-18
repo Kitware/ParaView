@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,8 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqSpreadSheetVisibilityBehavior::pqSpreadSheetVisibilityBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
-    SIGNAL(viewCreated(pqView*)),
+  QObject::connect(pqApplicationCore::instance()->getObjectBuilder(), SIGNAL(viewCreated(pqView*)),
     this, SLOT(showActiveSource(pqView*)));
 }
 
@@ -52,23 +51,20 @@ void pqSpreadSheetVisibilityBehavior::showActiveSource(pqView* view)
 {
   pqSpreadSheetView* spreadSheet = qobject_cast<pqSpreadSheetView*>(view);
   if (spreadSheet)
-    {
+  {
     pqPipelineSource* source = pqActiveObjects::instance().activeSource();
     if (source != 0 && source->modifiedState() != pqProxy::UNINITIALIZED)
-      {
+    {
       pqOutputPort* port = pqActiveObjects::instance().activePort();
       if (!port)
-        {
+      {
         port = source->getOutputPort(0);
-        }
+      }
       // If a new spreadsheet view is created, we show the active source in it by
       // default.
-      pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(
-        port, view);
+      pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(port, view);
       // trigger an eventual-render.
       view->render();
-      }
     }
+  }
 }
-
-

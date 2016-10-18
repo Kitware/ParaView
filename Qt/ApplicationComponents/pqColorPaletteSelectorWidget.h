@@ -46,8 +46,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorPaletteSelectorWidget : public pqPro
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent=0);
+  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqColorPaletteSelectorWidget();
 
 private slots:

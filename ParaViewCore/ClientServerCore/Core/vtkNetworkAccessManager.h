@@ -61,30 +61,30 @@ public:
    * * ssh://utkarsh@medea
    * * http://kitware-server/session?id=12322&authorization=12
    */
-  virtual vtkMultiProcessController* NewConnection(const char* url)=0;
+  virtual vtkMultiProcessController* NewConnection(const char* url) = 0;
 
   /**
    * Used to abort pending connection creation, if any. Refer to
    * NewConnection() for details.
    */
-  virtual void AbortPendingConnection()=0;
+  virtual void AbortPendingConnection() = 0;
 
   /**
    * Process any network activity.
    */
-  virtual int ProcessEvents(unsigned long timeout_msecs)=0;
+  virtual int ProcessEvents(unsigned long timeout_msecs) = 0;
 
   /**
    * Peeks to check if any activity is available. When this call returns true,
    * ProcessEvents() will always result in some activity processing if called
    * afterword.
    */
-  virtual bool GetNetworkEventsAvailable()=0;
+  virtual bool GetNetworkEventsAvailable() = 0;
 
   /**
    * Returns true is the manager is currently waiting for any connections.
    */
-  virtual bool GetPendingConnectionsPresent()=0;
+  virtual bool GetPendingConnectionsPresent() = 0;
 
 protected:
   vtkNetworkAccessManager();
@@ -93,7 +93,6 @@ protected:
 private:
   vtkNetworkAccessManager(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

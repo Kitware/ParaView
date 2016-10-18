@@ -30,7 +30,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkSmartPointer.h"                   // needed for vtkSmartPointer.
 
 class vtkPKdTree;
 class vtkAlgorithm;
@@ -57,9 +57,7 @@ public:
    * Set the optional extent translator to use to get aid in building the
    * KdTree.
    */
-  void SetStructuredDataInformation(
-    vtkExtentTranslator* translator,
-    const int whole_extent[6],
+  void SetStructuredDataInformation(vtkExtentTranslator* translator, const int whole_extent[6],
     const double origin[3], const double spacing[3]);
 
   //@{
@@ -89,8 +87,8 @@ protected:
   vtkKdTreeManager();
   ~vtkKdTreeManager();
 
-  void AddDataObjectToKdTree(vtkDataObject *data);
-  void AddDataSetToKdTree(vtkDataSet *data);
+  void AddDataObjectToKdTree(vtkDataObject* data);
+  void AddDataSetToKdTree(vtkDataSet* data);
 
   bool KdTreeInitialized;
   vtkPKdTree* KdTree;
@@ -111,7 +109,6 @@ private:
 
   class vtkDataObjectSet;
   vtkDataObjectSet* DataObjects;
-
 };
 
 #endif

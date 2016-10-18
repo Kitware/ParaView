@@ -26,7 +26,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkSmartPointer.h"              // needed for vtkSmartPointer.
 
 #include <vector> // needed for std::vector
 
@@ -45,11 +45,8 @@ public:
    * Reduce the stream to all processes calling the (*operation) for reduction.
    * The operation is assumed to be commutative.
    */
-  static int ReduceToAll(
-    vtkMultiProcessController* controller,
-    vtkMultiProcessStream& data, 
-    void (*operation)(vtkMultiProcessStream& A, vtkMultiProcessStream& B),
-    int tag);
+  static int ReduceToAll(vtkMultiProcessController* controller, vtkMultiProcessStream& data,
+    void (*operation)(vtkMultiProcessStream& A, vtkMultiProcessStream& B), int tag);
 
   /**
    * Utility method to merge pieces received from several processes. It does not
@@ -58,15 +55,13 @@ public:
    * success, else returns NULL. The caller is expected to release the memory
    * from the returned data-object.
    */
-  static vtkDataObject* MergePieces(
-    vtkDataObject** pieces, unsigned int num_pieces);
+  static vtkDataObject* MergePieces(vtkDataObject** pieces, unsigned int num_pieces);
 
   /**
    * Overload where the merged pieces are combined into result.
    */
   static bool MergePieces(
-    std::vector<vtkSmartPointer<vtkDataObject> >& pieces,
-    vtkDataObject* result);
+    std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result);
 
 protected:
   vtkMultiProcessControllerHelper();
@@ -75,7 +70,6 @@ protected:
 private:
   vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

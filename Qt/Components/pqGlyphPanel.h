@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,7 +39,7 @@ class QCheckBox;
 class QComboBox;
 
 /**
-* Custom panel for ArbitrarySourceGlyph and Glyph filters. 
+* Custom panel for ArbitrarySourceGlyph and Glyph filters.
 * This panel is only provided to add capabilities to reset the scalar factor
 * for the glyphs when the scale mode, vectors or scalar selections change.
 */
@@ -68,17 +68,15 @@ protected slots:
   void updateScaleFactorIfNeeded();
 
 protected:
-  QAbstractButton *LockScaleFactor;
-  QWidget *ScaleFactorWidget;
-  QWidget *ScalarsWidget;
-  QWidget *VectorsWidget;
-  QComboBox *ScaleModeWidget;
-  QCheckBox *OrientWidget;
+  QAbstractButton* LockScaleFactor;
+  QWidget* ScaleFactorWidget;
+  QWidget* ScalarsWidget;
+  QWidget* VectorsWidget;
+  QComboBox* ScaleModeWidget;
+  QCheckBox* OrientWidget;
 
 private:
   Q_DISABLE_COPY(pqGlyphPanel)
 };
 
 #endif
-
-

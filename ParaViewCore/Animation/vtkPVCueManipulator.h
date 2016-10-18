@@ -53,9 +53,9 @@ public:
    * vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
    */
   enum
-    {
+  {
     StateModifiedEvent = 2000
-    };
+  };
 
 protected:
   /**
@@ -70,20 +70,20 @@ protected:
    * it update the properties. This is done only once per Animation cycle. The Initialize method
    * is used to indicate that a new animation cycle has begun.
    */
-  virtual void Initialize(vtkPVAnimationCue*) { }
+  virtual void Initialize(vtkPVAnimationCue*) {}
 
   /**
    * This method is called when the AnimationCue's EndAnimationCueEvent is triggerred.
    * Typically, the Manipulator will set the state of the Cue to that at the
    * end of the cue.
    */
-  virtual void Finalize(vtkPVAnimationCue*) { }
+  virtual void Finalize(vtkPVAnimationCue*) {}
 
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy)=0;
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) = 0;
 
   vtkPVCueManipulator();
   ~vtkPVCueManipulator();
@@ -92,7 +92,6 @@ protected:
 private:
   vtkPVCueManipulator(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

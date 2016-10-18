@@ -27,9 +27,8 @@
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
 #include "vtkSMChartSeriesSelectionDomain.h"
 
-
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMFunctionalBagChartSeriesSelectionDomain :
-  public vtkSMChartSeriesSelectionDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMFunctionalBagChartSeriesSelectionDomain
+  : public vtkSMChartSeriesSelectionDomain
 {
 public:
   static vtkSMFunctionalBagChartSeriesSelectionDomain* New();
@@ -52,9 +51,9 @@ protected:
   virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
 
 private:
-  vtkSMFunctionalBagChartSeriesSelectionDomain(const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMFunctionalBagChartSeriesSelectionDomain(
+    const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

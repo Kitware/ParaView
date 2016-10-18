@@ -34,14 +34,14 @@ public:
   vtkMaterialInterfaceToProcMap();
   vtkMaterialInterfaceToProcMap(int nFragments);
   vtkMaterialInterfaceToProcMap(int nProcs, int nFragments);
-  vtkMaterialInterfaceToProcMap(const vtkMaterialInterfaceToProcMap &other);
+  vtkMaterialInterfaceToProcMap(const vtkMaterialInterfaceToProcMap& other);
   ~vtkMaterialInterfaceToProcMap();
-  vtkMaterialInterfaceToProcMap &operator=(const vtkMaterialInterfaceToProcMap &rhs);
+  vtkMaterialInterfaceToProcMap& operator=(const vtkMaterialInterfaceToProcMap& rhs);
   // logistics
   void Clear();
   void Initialize(int nFragments);
   void Initialize(int nProcs, int nFragments);
-  void DeepCopy(const vtkMaterialInterfaceToProcMap &from);
+  void DeepCopy(const vtkMaterialInterfaceToProcMap& from);
   // interface
   int GetProcOwnsPiece(int fragmentId) const;
   int GetProcOwnsPiece(int procId, int fragmentId) const;
@@ -50,19 +50,20 @@ public:
   std::vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
   std::vector<int> WhoHasAPiece(int fragmentId) const;
   int GetProcCount(int fragmentId);
+
 private:
   // proc -> fragment -> bit mask, bit is 1 if
   // the fragment is on proc
   class PieceToProcMapContainer;
-  PieceToProcMapContainer *PieceToProcMap;
+  PieceToProcMapContainer* PieceToProcMap;
   // fragment id -> count num procs
   class ProcCountContainer;
-  ProcCountContainer *ProcCount;
+  ProcCountContainer* ProcCount;
 
-  int NProcs;     // number of procs
-  int NFragments; // number of fragments to map
+  int NProcs;             // number of procs
+  int NFragments;         // number of fragments to map
   int PieceToProcMapSize; // length of map array
-  int BitsPerInt; // number of bits in an integer
+  int BitsPerInt;         // number of bits in an integer
 };
 #endif
 

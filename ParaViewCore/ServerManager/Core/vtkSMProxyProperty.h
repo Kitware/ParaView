@@ -206,9 +206,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
-
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   /**
    * Generic method used to generate XML state
@@ -221,13 +219,11 @@ protected:
    * property definition. If prop == NULL, you must Delete yourself the result
    * otherwise prop is olding a reference to the proxy element
    */
-  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement *prop,
-                                                unsigned int idx);
+  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement* prop, unsigned int idx);
   /**
    * Updates state from an XML element. Returns 0 on failure.
    */
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-
 
   /**
    * Called when a producer fires the vtkCommand::UpdateDataEvent. We update all
@@ -244,10 +240,10 @@ protected:
   class vtkPPInternals;
   friend class vtkPPInternals;
   vtkPPInternals* PPInternals;
+
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

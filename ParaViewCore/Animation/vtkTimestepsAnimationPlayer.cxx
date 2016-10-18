@@ -19,7 +19,9 @@
 
 #include <set>
 
-class vtkTimestepsAnimationPlayerSetOfDouble : public std::set<double> {};
+class vtkTimestepsAnimationPlayerSetOfDouble : public std::set<double>
+{
+};
 
 vtkStandardNewMacro(vtkTimestepsAnimationPlayer);
 //-----------------------------------------------------------------------------
@@ -44,12 +46,11 @@ void vtkTimestepsAnimationPlayer::AddTimeStep(double time)
 //-----------------------------------------------------------------------------
 void vtkTimestepsAnimationPlayer::RemoveTimeStep(double time)
 {
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter =
-    this->TimeSteps->find(time);
+  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->find(time);
   if (iter != this->TimeSteps->end())
-    {
+  {
     this->TimeSteps->erase(iter);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -58,7 +59,6 @@ void vtkTimestepsAnimationPlayer::RemoveAllTimeSteps()
   this->TimeSteps->clear();
 }
 
-
 //-----------------------------------------------------------------------------
 unsigned int vtkTimestepsAnimationPlayer::GetNumberOfTimeSteps()
 {
@@ -66,7 +66,7 @@ unsigned int vtkTimestepsAnimationPlayer::GetNumberOfTimeSteps()
 }
 
 //-----------------------------------------------------------------------------
-void vtkTimestepsAnimationPlayer::StartLoop(double , double, double* playbackWindow)
+void vtkTimestepsAnimationPlayer::StartLoop(double, double, double* playbackWindow)
 {
   this->PlaybackWindow[0] = playbackWindow[0];
   this->PlaybackWindow[1] = playbackWindow[1];
@@ -78,31 +78,28 @@ double vtkTimestepsAnimationPlayer::GetNextTime(double currentime)
 {
   this->Count++;
   if (this->Count < this->FramesPerTimestep)
-    {
+  {
     return currentime;
-    }
+  }
 
   this->Count = 0;
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = 
-    this->TimeSteps->upper_bound(currentime);
+  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->upper_bound(currentime);
   if (iter == this->TimeSteps->end() || currentime >= this->PlaybackWindow[1])
-    {
+  {
     return VTK_DOUBLE_MAX;
-    }
+  }
 
   return (*iter);
 }
 
-
 //-----------------------------------------------------------------------------
 double vtkTimestepsAnimationPlayer::GetNextTimeStep(double timestep)
 {
-  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = 
-    this->TimeSteps->upper_bound(timestep);
+  vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->upper_bound(timestep);
   if (iter == this->TimeSteps->end())
-    {
+  {
     return timestep;
-    }
+  }
   return (*iter);
 }
 
@@ -111,14 +108,14 @@ double vtkTimestepsAnimationPlayer::GetPreviousTimeStep(double timestep)
 {
   double value = timestep;
   vtkTimestepsAnimationPlayerSetOfDouble::iterator iter = this->TimeSteps->begin();
-  for (;iter != this->TimeSteps->end(); ++iter)
-    {
+  for (; iter != this->TimeSteps->end(); ++iter)
+  {
     if ((*iter) >= timestep)
-      {
+    {
       return value;
-      }
-    value = (*iter);
     }
+    value = (*iter);
+  }
   return value;
 }
 

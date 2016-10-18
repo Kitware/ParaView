@@ -44,6 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqRescaleCustomScalarRangeReaction : public
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqRescaleCustomScalarRangeReaction(QAction* parent);
 
@@ -60,10 +61,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    {
-    pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange();
-    }
+  virtual void onTriggered() { pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange(); }
 
 private:
   Q_DISABLE_COPY(pqRescaleCustomScalarRangeReaction)

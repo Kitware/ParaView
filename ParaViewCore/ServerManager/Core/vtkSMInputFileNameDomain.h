@@ -59,7 +59,7 @@ protected:
 private:
   vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
-  
+
   std::string FileName;
 };
 

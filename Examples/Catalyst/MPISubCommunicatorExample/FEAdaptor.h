@@ -8,12 +8,12 @@ class Grid;
 
 namespace FEAdaptor
 {
-  void Initialize(int numScripts, char* scripts[], MPI_Comm* comm);
+void Initialize(int numScripts, char* scripts[], MPI_Comm* comm);
 
-  void Finalize();
+void Finalize();
 
-  void CoProcess(Grid& grid, Attributes& attributes, double time,
-                 unsigned int timeStep, bool lastTimeStep);
+void CoProcess(
+  Grid& grid, Attributes& attributes, double time, unsigned int timeStep, bool lastTimeStep);
 }
 
 #endif

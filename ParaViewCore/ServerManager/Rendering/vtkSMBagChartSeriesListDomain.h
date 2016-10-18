@@ -29,8 +29,8 @@
 
 class vtkPVDataInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBagChartSeriesListDomain :
-  public vtkSMChartSeriesListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBagChartSeriesListDomain
+  : public vtkSMChartSeriesListDomain
 {
 public:
   static vtkSMBagChartSeriesListDomain* New();
@@ -53,7 +53,6 @@ protected:
 private:
   vtkSMBagChartSeriesListDomain(const vtkSMBagChartSeriesListDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMBagChartSeriesListDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

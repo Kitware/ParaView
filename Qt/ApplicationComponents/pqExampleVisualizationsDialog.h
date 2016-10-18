@@ -5,7 +5,8 @@
 
 #include "pqApplicationComponentsModule.h"
 
-namespace Ui {
+namespace Ui
+{
 class pqExampleVisualizationsDialog;
 }
 
@@ -17,8 +18,9 @@ class pqExampleVisualizationsDialog;
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialog : public QDialog
 {
- Q_OBJECT
- typedef QDialog Superclass;
+  Q_OBJECT
+  typedef QDialog Superclass;
+
 public:
   explicit pqExampleVisualizationsDialog(QWidget* parent = 0);
   virtual ~pqExampleVisualizationsDialog();
@@ -28,7 +30,6 @@ protected slots:
 
 private:
   Ui::pqExampleVisualizationsDialog* ui;
-
 };
 
 #endif // PQEXAMPLEVISUALIZATIONSDIALOG_H

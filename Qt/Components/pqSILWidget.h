@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -55,7 +55,7 @@ public:
   * first one to show. This is typically the sub-tree that you want to set on
   * the property.
   */
-  pqSILWidget(const QString& activeCategory, QWidget* parent=0);
+  pqSILWidget(const QString& activeCategory, QWidget* parent = 0);
   virtual ~pqSILWidget();
 
   /**
@@ -67,8 +67,7 @@ public:
   /**
   * Returns the proxy model for the active category.
   */
-  pqProxySILModel* activeModel()
-    { return this->ActiveModel; }
+  pqProxySILModel* activeModel() { return this->ActiveModel; }
 
 protected slots:
   void onModelReset();
@@ -77,7 +76,7 @@ protected slots:
   void toggleSelectedBlocks(bool checked = false);
 
 protected:
-  QTabWidget *TabWidget;
+  QTabWidget* TabWidget;
   QPointer<pqSILModel> Model;
   QList<pqTreeView*> Trees;
   pqProxySILModel* ActiveModel;
@@ -88,5 +87,3 @@ private:
 };
 
 #endif
-
-

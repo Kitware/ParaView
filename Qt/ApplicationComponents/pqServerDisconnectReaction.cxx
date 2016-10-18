@@ -53,15 +53,14 @@ pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
 
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
     &this->UpdateTimer, SLOT(start()));
-  QObject::connect(&this->UpdateTimer, SIGNAL(timeout()),
-    this, SLOT(updateState()));
+  QObject::connect(&this->UpdateTimer, SIGNAL(timeout()), this, SLOT(updateState()));
   this->updateState();
 
   // needed to disable server disconnection while an animation is playing
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
-                   SIGNAL(beginPlay()), this, SLOT(updateState()));
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
-                   SIGNAL(endPlay()), this, SLOT(updateState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
+    SLOT(updateState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
+    SLOT(updateState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -72,18 +71,17 @@ bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
   pqServer* server = pqActiveObjects::instance().activeServer();
 
   if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
-    {
+  {
     int ret = QMessageBox::warning(pqCoreUtilities::mainWidget(),
-      tr("Disconnect from current server?"),
-      tr("The current connection will be closed and \n"
-        "the state will be discarded.\n\n"
-        "Are you sure you want to continue?"),
+      tr("Disconnect from current server?"), tr("The current connection will be closed and \n"
+                                                "the state will be discarded.\n\n"
+                                                "Are you sure you want to continue?"),
       QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
-      {
+    {
       return false;
-      }
     }
+  }
 
   pqServerDisconnectReaction::disconnectFromServer();
   return true;
@@ -95,23 +93,22 @@ void pqServerDisconnectReaction::disconnectFromServer()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server)
-    {
+  {
     core->getObjectBuilder()->removeServer(server);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqServerDisconnectReaction::updateState()
 {
   if (pqPVApplicationCore::instance()->animationManager()->animationPlaying())
-    {
+  {
     this->parentAction()->setEnabled(false);
-    }
+  }
   else
-    {
-    this->parentAction()->setEnabled(
-      pqActiveObjects::instance().activeServer() != NULL);
-    }
+  {
+    this->parentAction()->setEnabled(pqActiveObjects::instance().activeServer() != NULL);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -119,9 +116,9 @@ void pqServerDisconnectReaction::onTriggered()
 {
   this->parentAction()->setEnabled(false);
   if (!pqServerDisconnectReaction::disconnectFromServerWithWarning())
-    {
+  {
     // re-enable the action since user cancelled the disconnect, otherwise the
     // action will be re-enabled when a new session, if any is created.
     this->parentAction()->setEnabled(true);
-    }
+  }
 }

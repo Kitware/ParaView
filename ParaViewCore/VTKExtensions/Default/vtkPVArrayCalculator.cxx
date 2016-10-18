@@ -33,31 +33,35 @@
 
 namespace
 {
-  template <class A, class B>
-    std::string vtkJoinToString(const A& a, const B& b)
-      {
-      std::ostringstream stream;
-      stream << a << "_" << b;
-      return stream.str();
-      }
-
-  class add_scalar_variables
-    {
-    vtkPVArrayCalculator* Calc;
-    const char* ArrayName;
-    int Component;
-  public:
-    add_scalar_variables(vtkPVArrayCalculator* calc,
-      const char* array_name, int component_num) :
-      Calc(calc), ArrayName(array_name), Component(component_num) { }
-    void operator() (const std::string& name)
-      {
-      this->Calc->AddScalarVariable(name.c_str(), this->ArrayName, this->Component);
-      }
-    };
+template <class A, class B>
+std::string vtkJoinToString(const A& a, const B& b)
+{
+  std::ostringstream stream;
+  stream << a << "_" << b;
+  return stream.str();
 }
 
-vtkStandardNewMacro( vtkPVArrayCalculator );
+class add_scalar_variables
+{
+  vtkPVArrayCalculator* Calc;
+  const char* ArrayName;
+  int Component;
+
+public:
+  add_scalar_variables(vtkPVArrayCalculator* calc, const char* array_name, int component_num)
+    : Calc(calc)
+    , ArrayName(array_name)
+    , Component(component_num)
+  {
+  }
+  void operator()(const std::string& name)
+  {
+    this->Calc->AddScalarVariable(name.c_str(), this->ArrayName, this->Component);
+  }
+};
+}
+
+vtkStandardNewMacro(vtkPVArrayCalculator);
 // ----------------------------------------------------------------------------
 vtkPVArrayCalculator::vtkPVArrayCalculator()
 {
@@ -69,8 +73,8 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVArrayCalculator::UpdateArrayAndVariableNames
-   ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
+void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
+  vtkDataObject* vtkNotUsed(theInputObj), vtkDataSetAttributes* inDataAttrs)
 {
   vtkMTimeType mtime = this->GetMTime();
 
@@ -84,36 +88,35 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
   this->RemoveAllVariables();
 
   // Add coordinate scalar and vector variables
-  this->AddCoordinateScalarVariable( "coordsX", 0 );
-  this->AddCoordinateScalarVariable( "coordsY", 1 );
-  this->AddCoordinateScalarVariable( "coordsZ", 2 );
-  this->AddCoordinateVectorVariable( "coords",  0, 1, 2 );
+  this->AddCoordinateScalarVariable("coordsX", 0);
+  this->AddCoordinateScalarVariable("coordsY", 1);
+  this->AddCoordinateScalarVariable("coordsZ", 2);
+  this->AddCoordinateVectorVariable("coords", 0, 1, 2);
 
   // add non-coordinate scalar and vector variables
   int numberArays = inDataAttrs->GetNumberOfArrays(); // the input
-  for (int j = 0; j < numberArays; j ++ )
-    {
+  for (int j = 0; j < numberArays; j++)
+  {
     vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
     const char* array_name = array->GetName();
     int numberComps = array->GetNumberOfComponents();
 
-    if ( numberComps == 1 )
-      {
-      this->AddScalarVariable( array_name, array_name, 0 );
-      }
+    if (numberComps == 1)
+    {
+      this->AddScalarVariable(array_name, array_name, 0);
+    }
     else
+    {
+      for (int i = 0; i < numberComps; i++)
       {
-      for (int i = 0; i < numberComps; i ++ )
-        {
         std::set<std::string> possible_names;
 
         if (array->GetComponentName(i))
-          {
-          possible_names.insert(
-            vtkJoinToString(array_name, array->GetComponentName(i)));
-          }
-        possible_names.insert(vtkJoinToString(array_name,
-            vtkPVPostFilter::DefaultComponentName(i, numberComps)));
+        {
+          possible_names.insert(vtkJoinToString(array_name, array->GetComponentName(i)));
+        }
+        possible_names.insert(
+          vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
 
         // also put a <ArrayName>_<ComponetNumber> to handle past versions of
         // vtkPVArrayCalculator when component names were not used and index was
@@ -121,85 +124,81 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
         std::string default_name = vtkJoinToString(array_name, i);
         possible_names.insert(default_name);
 
-        std::for_each(possible_names.begin(), possible_names.end(),
-          add_scalar_variables(this, array_name, i));
-        }
+        std::for_each(
+          possible_names.begin(), possible_names.end(), add_scalar_variables(this, array_name, i));
+      }
 
-      if ( numberComps == 3 )
-        {
-        this->AddVectorArrayName(array_name, 0, 1, 2 );
-        }
+      if (numberComps == 3)
+      {
+        this->AddVectorArrayName(array_name, 0, 1, 2);
       }
     }
+  }
 
-  assert(this->GetMTime() == mtime &&
-    "post: mtime cannot be changed in RequestData()");
+  assert(this->GetMTime() == mtime && "post: mtime cannot be changed in RequestData()");
   static_cast<void>(mtime); // added so compiler won't complain im release mode.
 }
 
 // ----------------------------------------------------------------------------
-int vtkPVArrayCalculator::RequestData
-  ( vtkInformation * request, vtkInformationVector ** inputVector,
-                              vtkInformationVector  * outputVector )
+int vtkPVArrayCalculator::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkDataObject  * input  = inputVector[0]->GetInformationObject( 0 )
-                            ->Get( vtkDataObject::DATA_OBJECT() );
+  vtkDataObject* input = inputVector[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
 
-  vtkIdType    numTuples  = 0;
-  vtkGraph   * graphInput = vtkGraph::SafeDownCast( input );
-  vtkDataSet * dsInput    = vtkDataSet::SafeDownCast( input );
-  vtkDataSetAttributes *  dataAttrs = NULL;
+  vtkIdType numTuples = 0;
+  vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
+  vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
+  vtkDataSetAttributes* dataAttrs = NULL;
 
-  if ( dsInput )
+  if (dsInput)
+  {
+    if (this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
+      this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA)
     {
-    if ( this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
-         this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA )
-      {
       dataAttrs = dsInput->GetPointData();
       numTuples = dsInput->GetNumberOfPoints();
-      }
+    }
     else
-      {
+    {
       dataAttrs = dsInput->GetCellData();
       numTuples = dsInput->GetNumberOfCells();
-      }
     }
-  else
-  if ( graphInput )
+  }
+  else if (graphInput)
+  {
+    if (this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
+      this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_VERTEX_DATA)
     {
-    if ( this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
-         this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_VERTEX_DATA )
-      {
       dataAttrs = graphInput->GetVertexData();
       numTuples = graphInput->GetNumberOfVertices();
-      }
+    }
     else
-      {
+    {
       dataAttrs = graphInput->GetEdgeData();
       numTuples = graphInput->GetNumberOfEdges();
-      }
     }
+  }
 
-  if ( numTuples > 0 )
-    {
+  if (numTuples > 0)
+  {
     // Let's update the (scalar and vector arrays / variables) names  to make
     // them consistent with those of the upstream calculator(s). This addresses
     // the scenarios where the user modifies the name of a calculator whose out-
     // put is the input of a (some) subsequent calculator(s) or the user changes
     // the input of a downstream calculator.
-    this->UpdateArrayAndVariableNames( input, dataAttrs );
-    }
+    this->UpdateArrayAndVariableNames(input, dataAttrs);
+  }
 
-  input      = NULL;
-  dsInput    = NULL;
-  dataAttrs  = NULL;
+  input = NULL;
+  dsInput = NULL;
+  dataAttrs = NULL;
   graphInput = NULL;
 
-  return this->Superclass::RequestData( request, inputVector, outputVector );
+  return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVArrayCalculator::PrintSelf( ostream & os, vtkIndent indent )
+void vtkPVArrayCalculator::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf( os, indent );
+  this->Superclass::PrintSelf(os, indent);
 }

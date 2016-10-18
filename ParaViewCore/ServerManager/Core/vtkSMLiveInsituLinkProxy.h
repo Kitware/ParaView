@@ -30,7 +30,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer.
 
 class vtkPVCatalystSessionCore;
 
@@ -50,12 +50,10 @@ public:
   void SetInsituProxyManager(vtkSMSessionProxyManager*);
   //@}
 
-  bool HasExtract(
-    const char* reg_group, const char* reg_name, int port_number);
+  bool HasExtract(const char* reg_group, const char* reg_name, int port_number);
 
   //@{
-  vtkSMProxy* CreateExtract(
-    const char* reg_group, const char* reg_name, int port_number);
+  vtkSMProxy* CreateExtract(const char* reg_group, const char* reg_name, int port_number);
   void RemoveExtract(vtkSMProxy*);
   //@}
   //@{
@@ -64,10 +62,7 @@ public:
    * several calls on the LIVE side.
    */
   void LiveChanged();
-  vtkIdType GetTimeStep()
-  {
-    return this->TimeStep;
-  }
+  vtkIdType GetTimeStep() { return this->TimeStep; }
   //@}
 
   /**
@@ -105,13 +100,13 @@ protected:
 
   bool StateDirty;
   vtkIdType TimeStep;
+
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

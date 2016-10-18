@@ -35,19 +35,19 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::New()
 vtkPVRenderViewSettings* vtkPVRenderViewSettings::GetInstance()
 {
   if (!vtkPVRenderViewSettings::Instance)
-    {
+  {
     vtkPVRenderViewSettings* instance = new vtkPVRenderViewSettings();
     instance->InitializeObjectBase();
     vtkPVRenderViewSettings::Instance.TakeReference(instance);
-    }
+  }
   return vtkPVRenderViewSettings::Instance;
 }
 
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings::vtkPVRenderViewSettings()
-  : OutlineThreshold(250),
-  PointPickingRadius(0),
-  DisableIceT(false)
+  : OutlineThreshold(250)
+  , PointPickingRadius(0)
+  , DisableIceT(false)
 {
 }
 
@@ -60,7 +60,7 @@ vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
 void vtkPVRenderViewSettings::SetUseDisplayLists(bool val)
 {
   // note: this is inverted.
-  vtkMapper::SetGlobalImmediateModeRendering(val? 0 : 1);
+  vtkMapper::SetGlobalImmediateModeRendering(val ? 0 : 1);
   this->Modified();
 }
 
@@ -68,32 +68,31 @@ void vtkPVRenderViewSettings::SetUseDisplayLists(bool val)
 void vtkPVRenderViewSettings::SetResolveCoincidentTopology(int mode)
 {
   switch (mode)
-    {
-  case OFFSET_FACES:
-    vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(1);
-    break;
+  {
+    case OFFSET_FACES:
+      vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+      vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(1);
+      break;
 
-  case OFFSET_LINES_AND_VERTS:
-    vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-    vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
-    break;
+    case OFFSET_LINES_AND_VERTS:
+      vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+      vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
+      break;
 
-  case ZSHIFT:
-    vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
-    break;
+    case ZSHIFT:
+      vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
+      break;
 
-  case DO_NOTHING:
-  default:
-    vtkMapper::SetResolveCoincidentTopologyToOff();
-    break;
-    }
+    case DO_NOTHING:
+    default:
+      vtkMapper::SetResolveCoincidentTopologyToOff();
+      break;
+  }
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewSettings::SetPolygonOffsetParameters(
-  double factor, double units)
+void vtkPVRenderViewSettings::SetPolygonOffsetParameters(double factor, double units)
 {
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(factor, units);
   this->Modified();

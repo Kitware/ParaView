@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -44,23 +44,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQWIDGETS_EXPORT pqTreeWidgetItem : public QTreeWidgetItem
 {
   typedef QTreeWidgetItem Superclass;
+
 public:
-  pqTreeWidgetItem(int atype=UserType):
-    Superclass(atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(const QStringList& strings, int atype=UserType):
-    Superclass(strings, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *aparent, int atype=UserType):
-    Superclass(aparent, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *aparent, const QStringList &strings, int atype=UserType):
-    Superclass(aparent, strings, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *aparent, QTreeWidgetItem *preceding, int atype=UserType):
-    Superclass(aparent, preceding, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *aparent, int atype=UserType):
-    Superclass(aparent, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *aparent, const QStringList& strings, int atype=UserType):
-    Superclass(aparent, strings, atype), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *aparent, QTreeWidgetItem* preceding, int atype=UserType):
-    Superclass(aparent, preceding, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(int atype = UserType)
+    : Superclass(atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(const QStringList& strings, int atype = UserType)
+    : Superclass(strings, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidget* aparent, int atype = UserType)
+    : Superclass(aparent, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidget* aparent, const QStringList& strings, int atype = UserType)
+    : Superclass(aparent, strings, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidget* aparent, QTreeWidgetItem* preceding, int atype = UserType)
+    : Superclass(aparent, preceding, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidgetItem* aparent, int atype = UserType)
+    : Superclass(aparent, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidgetItem* aparent, const QStringList& strings, int atype = UserType)
+    : Superclass(aparent, strings, atype)
+    , CallbackHandler(0)
+  {
+  }
+  pqTreeWidgetItem(QTreeWidgetItem* aparent, QTreeWidgetItem* preceding, int atype = UserType)
+    : Superclass(aparent, preceding, atype)
+    , CallbackHandler(0)
+  {
+  }
 
   /**
   * overload setData() to call callbacks if set.
@@ -69,53 +94,47 @@ public:
 
 public:
   class pqCallbackHandler
-    {
+  {
   public:
-    virtual ~pqCallbackHandler() {};
+    virtual ~pqCallbackHandler(){};
 
     /**
     * Called to indicate that the data is about to be changed.
     */
-    virtual void dataAboutToChange(
-      pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/) {};
+    virtual void dataAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/){};
 
     /**
     * Called to indicate that the data is about to be changed.
     */
-    virtual void checkStateAboutToChange(
-      pqTreeWidgetItem* /*item*/, int /*column*/) {};
+    virtual void checkStateAboutToChange(pqTreeWidgetItem* /*item*/, int /*column*/){};
 
     /**
     * Called to indicate that the check state for the item has been changed.
     */
-    virtual void checkStateChanged(pqTreeWidgetItem* /*item*/, int /*column*/) {};
+    virtual void checkStateChanged(pqTreeWidgetItem* /*item*/, int /*column*/){};
 
     /**
     * Called to indicate that the data has been changed.
     */
-    virtual void dataChanged(
-      pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/) {};
+    virtual void dataChanged(pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/){};
 
     /**
     * Called to check if the change has to be accepted or rejected.
     */
-    virtual bool acceptChange(
-      pqTreeWidgetItem* /*item*/,
-      const QVariant& /*curValue*/, const QVariant& /*newValue*/,
-      int /*column*/, int /*role*/)
-      { return true; }
-    };
+    virtual bool acceptChange(pqTreeWidgetItem* /*item*/, const QVariant& /*curValue*/,
+      const QVariant& /*newValue*/, int /*column*/, int /*role*/)
+    {
+      return true;
+    }
+  };
 
   /**
   * Set the name of the callback slot to call
   */
-  void setCallbackHandler(pqCallbackHandler* hdlr)
-    { this->CallbackHandler = hdlr; }
+  void setCallbackHandler(pqCallbackHandler* hdlr) { this->CallbackHandler = hdlr; }
 
 protected:
   pqCallbackHandler* CallbackHandler;
 };
 
 #endif
-
-

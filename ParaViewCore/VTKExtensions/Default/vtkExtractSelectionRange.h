@@ -70,19 +70,17 @@ protected:
   ~vtkExtractSelectionRange();
 
   int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(
-    vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   int FieldType;
   int Component;
-  char *ArrayName;
+  char* ArrayName;
   double Range[2];
 
 private:
   vtkExtractSelectionRange(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
   void operator=(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

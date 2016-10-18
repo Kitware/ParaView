@@ -50,8 +50,7 @@ class pqRemoteControl : public QDockWidget
 {
   Q_OBJECT
 public:
-
-  pqRemoteControl(QWidget* p=0, Qt::WindowFlags flags=0);
+  pqRemoteControl(QWidget* p = 0, Qt::WindowFlags flags = 0);
   virtual ~pqRemoteControl();
 
 protected slots:
@@ -78,7 +77,6 @@ protected slots:
   void onExportScene();
 
 protected:
-
   /// Called when a client has established a socket connection.  This will
   /// begin the remote control thread.
   void onNewConnection();
@@ -94,7 +92,6 @@ protected:
   pqRenderView* renderView();
 
 private:
-
   class pqInternal;
   pqInternal* Internal;
 };

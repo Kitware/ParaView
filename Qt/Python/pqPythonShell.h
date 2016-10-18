@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,9 +53,10 @@ class vtkPythonInteractiveInterpreter;
 class PQPYTHON_EXPORT pqPythonShell : public QWidget
 {
   Q_OBJECT
-  typedef QWidget Superclass; 
+  typedef QWidget Superclass;
+
 public:
-  pqPythonShell(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqPythonShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqPythonShell();
 
   /**
@@ -66,11 +67,11 @@ public:
   void* consoleLocals();
 
   enum PrintMode
-    {
+  {
     STATUS,
     OUTPUT,
     ERROR
-    };
+  };
 
 public slots:
   /**
@@ -99,15 +100,14 @@ public slots:
   /**
   * Returns true is the shell is currently executing a script/command.
   */
-  bool isExecuting() const
-    { return this->Executing; }
+  bool isExecuting() const { return this->Executing; }
 
   /**
   * Use this method instead of calling pqConsoleWidget::printString()
   * directly. That helps us keep track of whether we need to show the prompt
   * or not.
   */
-  void printString(const QString&, PrintMode mode=STATUS);
+  void printString(const QString&, PrintMode mode = STATUS);
 
   /**
   * Set a list of statements to be run each time the interpreter is reset.
@@ -150,10 +150,9 @@ protected:
   * Show the user-input prompt, if needed. Returns true if the prompt was
   * re-rendered, otherwise false.
   */
-  bool prompt(const QString& indent=QString());
+  bool prompt(const QString& indent = QString());
 
-  void HandleInterpreterEvents(
-    vtkObject* caller, unsigned long eventid, void* calldata);
+  void HandleInterpreterEvents(vtkObject* caller, unsigned long eventid, void* calldata);
 
 private:
   Q_DISABLE_COPY(pqPythonShell)

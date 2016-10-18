@@ -54,8 +54,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPVApplicationCore : public pqApplicationC
 {
   Q_OBJECT
   typedef pqApplicationCore Superclass;
+
 public:
-  pqPVApplicationCore(int& argc, char** argv, pqOptions* options=0);
+  pqPVApplicationCore(int& argc, char** argv, pqOptions* options = 0);
   ~pqPVApplicationCore();
 
   /**
@@ -63,7 +64,9 @@ public:
   * created then return NULL.
   */
   static pqPVApplicationCore* instance()
-    { return qobject_cast<pqPVApplicationCore*>(Superclass::instance()); }
+  {
+    return qobject_cast<pqPVApplicationCore*>(Superclass::instance());
+  }
 
   /**
   * Provides access to the selection manager. Selection manager provides
@@ -75,7 +78,7 @@ public:
   /**
   * Provides access to the animation manager. Animation manager helps with the
   */
-  //animation subsystem -- saving movies, creating scenes etc.
+  // animation subsystem -- saving movies, creating scenes etc.
   pqAnimationManager* animationManager() const;
 
   /**
@@ -115,11 +118,12 @@ signals:
   * dialog.
   */
   void aboutToShowQuickLaunch();
+
 protected:
   /**
   * Override event filter in order to catch file association mechanism
   */
-  virtual bool eventFilter ( QObject * obj, QEvent * event );
+  virtual bool eventFilter(QObject* obj, QEvent* event);
 
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
@@ -132,5 +136,3 @@ private:
 };
 
 #endif
-
-

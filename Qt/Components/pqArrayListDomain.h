@@ -53,10 +53,10 @@ class PQCOMPONENTS_EXPORT pqArrayListDomain : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqArrayListDomain(
-    QWidget* selectorWidget, const QString& qproperty,
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMDomain* domain);
+  pqArrayListDomain(QWidget* selectorWidget, const QString& qproperty, vtkSMProxy* proxy,
+    vtkSMProperty* smproperty, vtkSMDomain* domain);
   virtual ~pqArrayListDomain();
 
 private slots:

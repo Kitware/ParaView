@@ -36,10 +36,11 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGridCells: public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGridCells
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkCleanUnstructuredGridCells *New();
+  static vtkCleanUnstructuredGridCells* New();
 
   vtkTypeMacro(vtkCleanUnstructuredGridCells, vtkUnstructuredGridAlgorithm);
 
@@ -49,9 +50,8 @@ protected:
   vtkCleanUnstructuredGridCells();
   ~vtkCleanUnstructuredGridCells();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *);
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
 private:
   vtkCleanUnstructuredGridCells(const vtkCleanUnstructuredGridCells&) VTK_DELETE_FUNCTION;

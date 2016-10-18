@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCustomFilterManager_h
 #define _pqCustomFilterManager_h
 
-
 #include "pqComponentsModule.h"
 #include <QDialog>
 
@@ -46,7 +45,6 @@ class pqCustomFilterManagerForm;
 class pqCustomFilterManagerModel;
 class QItemSelection;
 class QStringList;
-
 
 /**
 * \class pqCustomFilterManager
@@ -70,7 +68,7 @@ public:
   * \param model The list of registered custom filters to display.
   * \param parent The parent widget for the dialog.
   */
-  pqCustomFilterManager(pqCustomFilterManagerModel *model, QWidget *parent=0);
+  pqCustomFilterManager(pqCustomFilterManagerModel* model, QWidget* parent = 0);
   virtual ~pqCustomFilterManager();
 
 public slots:
@@ -79,21 +77,21 @@ public slots:
   *   Selects the given custom filter in the list.
   * \param name The custom filter name to select.
   */
-  void selectCustomFilter(const QString &name);
+  void selectCustomFilter(const QString& name);
 
   /**
   * \brief
   *   Registers the custom filter definitions in the files.
   * \param files The list of files to import.
   */
-  void importFiles(const QStringList &files);
+  void importFiles(const QStringList& files);
 
   /**
   * \brief
   *   Saves the selected custom filter definitions to the given files.
   * \param files The list of files to export to.
   */
-  void exportSelected(const QStringList &files);
+  void exportSelected(const QStringList& files);
 
 private slots:
   /**
@@ -125,16 +123,14 @@ private slots:
   * \param selected The list of newly selected items.
   * \param deselected The list of deselected items.
   */
-  void updateButtons(const QItemSelection &selected,
-      const QItemSelection &deselected);
+  void updateButtons(const QItemSelection& selected, const QItemSelection& deselected);
 
 protected:
-
-  QString getUnusedFilterName(const QString& group, const QString &name);
+  QString getUnusedFilterName(const QString& group, const QString& name);
 
 private:
-  pqCustomFilterManagerModel *Model; ///< Stores the custom filter list.
-  pqCustomFilterManagerForm *Form;   ///< Defines the gui layout.
+  pqCustomFilterManagerModel* Model; ///< Stores the custom filter list.
+  pqCustomFilterManagerForm* Form;   ///< Defines the gui layout.
 };
 
 #endif

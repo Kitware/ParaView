@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,12 +52,12 @@ class pqPropertyLinks;
 class PQCORE_EXPORT pqPropertyManager : public QObject
 {
   Q_OBJECT
-  
+
 public:
   /**
   * constructor
   */
-  pqPropertyManager(QObject* p=0);
+  pqPropertyManager(QObject* p = 0);
   /**
   * destructor
   */
@@ -66,23 +66,22 @@ public:
   /**
   * register a QObject property to link with the server manager
   */
-  void registerLink(QObject* qObject, const char* qProperty, const char* signal,
-                       vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+  void registerLink(QObject* qObject, const char* qProperty, const char* signal, vtkSMProxy* Proxy,
+    vtkSMProperty* Property, int Index = -1);
 
   /**
   * unregister a QObject property to link with the server manager
   */
-  void unregisterLink(
-    QObject* qObject, const char* qProperty, const char* signal,
-    vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+  void unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
+    vtkSMProxy* Proxy, vtkSMProperty* Property, int Index = -1);
 
   /**
-  * returns whether there are modified properties to send to 
+  * returns whether there are modified properties to send to
   * the server manager
   */
   bool isModified() const;
 
-  // Call this method to un-links all property links 
+  // Call this method to un-links all property links
   // maintained by this object.
   void removeAllLinks();
 
@@ -116,10 +115,9 @@ public slots:
   * Called whenever a property changes from the GUI side
   */
   void propertyChanged();
-  
+
 protected:
   pqPropertyLinks* Links;
   bool Modified;
 };
 #endif // !_pqPropertyManager_h
-

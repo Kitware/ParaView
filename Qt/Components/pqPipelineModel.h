@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,15 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineModel_h
 #define _pqPipelineModel_h
 
-
 #include "pqComponentsModule.h"
 
 #include "pqView.h"
 #include "vtkSmartPointer.h"
 #include <QAbstractItemModel>
 #include <QPointer>
-
-
 
 class pqDataRepresentation;
 class pqPipelineModelFilter;
@@ -93,8 +90,8 @@ class vtkSession;
 
 /**
 * This class is the model for the PipelineLine browser tree view.
-* pqServerManagerModel models the vtkSMProxyManager for the GUI. The 
-* vtkSMProxyManager maintains all proxies and hence it is difficult 
+* pqServerManagerModel models the vtkSMProxyManager for the GUI. The
+* vtkSMProxyManager maintains all proxies and hence it is difficult
 * to detect/trasvers pipelines etc etc. The pqServerManagerModel
 * provides a simplified view of the Server Manager. This class
 * takes that simplified "model" and transforms it into hierarchical
@@ -105,7 +102,8 @@ class PQCOMPONENTS_EXPORT pqPipelineModel : public QAbstractItemModel
   Q_OBJECT;
 
 public:
-  enum ItemType {
+  enum ItemType
+  {
     Invalid = -1,
     Server = 0,
     Proxy,
@@ -113,13 +111,14 @@ public:
     Link
   };
 
-  enum ItemRole {
+  enum ItemRole
+  {
     AnnotationFilterRole = 33,
     SessionFilterRole = 34
-    };
+  };
 
 public:
-  pqPipelineModel(QObject *parent=0);
+  pqPipelineModel(QObject* parent = 0);
 
   /**
   * \brief
@@ -127,7 +126,7 @@ public:
   * \param other The pipeline model to copy.
   * \param parent The parent object.
   */
-  pqPipelineModel(const pqPipelineModel &other, QObject *parent=0);
+  pqPipelineModel(const pqPipelineModel& other, QObject* parent = 0);
 
   /**
   * \brief
@@ -135,7 +134,7 @@ public:
   * \param other Used to build a pipeline model.
   * \param parent The parent object.
   */
-  pqPipelineModel(const pqServerManagerModel &other, QObject *parent=0);
+  pqPipelineModel(const pqServerManagerModel& other, QObject* parent = 0);
 
   virtual ~pqPipelineModel();
 
@@ -150,7 +149,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -159,7 +158,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -168,7 +167,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex &parent=QModelIndex()) const;
+  virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -179,8 +178,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column,
-      const QModelIndex &parent=QModelIndex()) const;
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -189,7 +187,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex &index) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -199,16 +197,14 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex &index,
-      int role=Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   /**
   * \brief
-  *  Sets the role data for the item at index to value. Returns 
+  *  Sets the role data for the item at index to value. Returns
   *  true if successful; otherwise returns false.
   */
-  bool setData(const QModelIndex &index, const QVariant& value, 
-    int role = Qt::EditRole);
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
   /**
   * \brief
@@ -220,7 +216,7 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
   //@}
 
   /**
@@ -232,10 +228,9 @@ public:
   * Given the index, get the pqServerManagerModelItem it represents.
   * NULL is returned for root or invalid index.
   */
-  pqServerManagerModelItem* getItemFor(const QModelIndex& ) const;
+  pqServerManagerModelItem* getItemFor(const QModelIndex&) const;
 
-
-  QModelIndex getIndexFor(pqServerManagerModelItem *item) const;
+  QModelIndex getIndexFor(pqServerManagerModelItem* item) const;
 
   /**
   * \brief
@@ -244,23 +239,23 @@ public:
   * \return
   *   The type for the given index.
   */
-  ItemType getTypeFor(const QModelIndex &index) const;
+  ItemType getTypeFor(const QModelIndex& index) const;
   //@}
 
-   /**
-   * \brief
-  *   Gets whether or not the model indexes are editable.
-  * \return
-  *   True if the model indexes can be edited.
-  */
-  bool isEditable() const {return this->Editable;}
+  /**
+  * \brief
+ *   Gets whether or not the model indexes are editable.
+ * \return
+ *   True if the model indexes can be edited.
+ */
+  bool isEditable() const { return this->Editable; }
 
   /**
   * \brief
   *   Sets whether or not the model indexes are editable.
   * \param editable True if the model indexes can be edited.
   */
-  void setEditable(bool editable) {this->Editable = editable;}
+  void setEditable(bool editable) { this->Editable = editable; }
 
   /**
   * \brief
@@ -268,7 +263,7 @@ public:
   * \param index The model index.
   * \param selectable True if the index can be selected.
   */
-  void setSelectable(const QModelIndex &index, bool selectable);
+  void setSelectable(const QModelIndex& index, bool selectable);
 
   /**
   * \brief
@@ -277,7 +272,7 @@ public:
   * \return
   *   True if the given index is selectable.
   */
-  bool isSelectable(const QModelIndex &index) const;
+  bool isSelectable(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -285,7 +280,7 @@ public:
   * \param item The root of the subtree.
   * \param selectable True if the items can be selected.
   */
-  void setSubtreeSelectable(pqServerManagerModelItem *item, bool selectable);
+  void setSubtreeSelectable(pqServerManagerModelItem* item, bool selectable);
 
   /**
   * \brief
@@ -296,21 +291,19 @@ public:
   *   An index to the next item in the tree or an invalid index
   *   when the end of the tree is reached.
   */
-  QModelIndex getNextIndex(const QModelIndex index,
-      const QModelIndex &root=QModelIndex()) const;
+  QModelIndex getNextIndex(const QModelIndex index, const QModelIndex& root = QModelIndex()) const;
 
   /**
   * Provides access to the view.
   */
-  pqView* view() const
-    { return this->View; }
+  pqView* view() const { return this->View; }
 
   /**
   * \brief
   *   Sets the font hint for modified items.
   * \param font The font to use for modified items.
   */
-  void setModifiedFont(const QFont &font);
+  void setModifiedFont(const QFont& font);
 
   /**
   * \brief
@@ -319,7 +312,7 @@ public:
   *   get called.
   * \param annotation key that will be lookup inside the above code.
   */
-  void enableFilterAnnotationKey(const QString &expectedAnnotation);
+  void enableFilterAnnotationKey(const QString& expectedAnnotation);
 
   /**
   * \brief
@@ -351,12 +344,12 @@ public slots:
   * Called when a new server connection is detected. Adds the connection to the
   * list.
   */
-  void addServer(pqServer *server);
+  void addServer(pqServer* server);
 
   /**
   * Called when a server connection is closed. Removes the server from the list.
   */
-  void removeServer(pqServer *server);
+  void removeServer(pqServer* server);
 
   /**
   * Called when a new source/filter/bundle is registered.
@@ -372,13 +365,13 @@ public slots:
   * Called when new pipeline connection (between two pipeline objects)
   * is made.
   */
-  void addConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
+  void addConnection(pqPipelineSource* source, pqPipelineSource* sink, int);
 
   /**
   * Called when new pipeline connection (between two pipeline objects)
   * is broken.
   */
-  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
+  void removeConnection(pqPipelineSource* source, pqPipelineSource* sink, int);
 
   /**
   * Updates the icons in the current window column.
@@ -386,10 +379,10 @@ public slots:
   * displayed in the current window. When the current window changes
   * the entire column needs to be updated.
   */
-  void setView(pqView *module);
+  void setView(pqView* module);
 
 signals:
-  void firstChildAdded(const QModelIndex &index);
+  void firstChildAdded(const QModelIndex& index);
 
 private slots:
   void onInsituConnectionInitiated(pqServer* server);
@@ -421,8 +414,7 @@ private:
   // Note that this method does not actually change the underlying
   // pqServerManagerModel, it merely signals that such an addition
   // has taken place.
-  void addChild(pqPipelineModelDataItem* parent, 
-    pqPipelineModelDataItem* child);
+  void addChild(pqPipelineModelDataItem* parent, pqPipelineModelDataItem* child);
 
   // Remove a child item from under the parent.
   // Note that this method does not actually change the underlying
@@ -432,8 +424,7 @@ private:
 
   // Returns the pqPipelineModelDataItem for the given pqServerManagerModelItem.
   pqPipelineModelDataItem* getDataItem(pqServerManagerModelItem* item,
-    pqPipelineModelDataItem* subtreeRoot,
-    ItemType type=Invalid) const;
+    pqPipelineModelDataItem* subtreeRoot, ItemType type = Invalid) const;
 
   // called by pqPipelineModelDataItem to indicate that the data for the item
   // may have changed.
@@ -441,12 +432,13 @@ private:
   /**
   * used by the variant of setSubtreeSelectable() for recursion.
   */
-  void setSubtreeSelectable(pqPipelineModelDataItem *item, bool selectable);
+  void setSubtreeSelectable(pqPipelineModelDataItem* item, bool selectable);
 
   QModelIndex getIndex(pqPipelineModelDataItem* item) const;
+
 private:
-  pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
-  QPixmap *PixmapList;               ///< Stores the item icons.
+  pqPipelineModelInternal* Internal; ///< Stores the pipeline representation.
+  QPixmap* PixmapList;               ///< Stores the item icons.
   QPointer<pqView> View;
   bool Editable;
   QString FilterRoleAnnotationKey;

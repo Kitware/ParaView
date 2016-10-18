@@ -32,14 +32,14 @@ class VTKPVCOMMON_EXPORT vtkPVTestUtilities : public vtkObject
 {
 public:
   // the usual vtk stuff
-  vtkTypeMacro(vtkPVTestUtilities,vtkObject);
+  vtkTypeMacro(vtkPVTestUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPVTestUtilities *New();
+  static vtkPVTestUtilities* New();
 
   /**
    * Initialize the object from command tail arguments.
    */
-  void Initialize(int argc, char **argv);
+  void Initialize(int argc, char** argv);
   /**
    * Given a path relative to the Data root (provided
    * in argv by -D option), construct a OS independent path
@@ -48,8 +48,7 @@ public:
    * use '/'. Be sure to delete [] the return when you are
    * finished.
    */
-  char *GetDataFilePath(const char *name) {
-    return this->GetFilePath(this->DataRoot,name); }
+  char* GetDataFilePath(const char* name) { return this->GetFilePath(this->DataRoot, name); }
   /**
    * Given a path relative to the working directory (provided
    * in argv by -T option), construct a OS independent path
@@ -58,27 +57,26 @@ public:
    * use '/'. Be sure to delete [] the return when you are
    * finished.
    */
-  char *GetTempFilePath(const char *name) {
-    return this->GetFilePath(this->TempRoot,name); }
+  char* GetTempFilePath(const char* name) { return this->GetFilePath(this->TempRoot, name); }
 
 protected:
-  vtkPVTestUtilities(){ this->Initialize(0,0); }
-  ~vtkPVTestUtilities(){ this->Initialize(0,0); }
+  vtkPVTestUtilities() { this->Initialize(0, 0); }
+  ~vtkPVTestUtilities() { this->Initialize(0, 0); }
 
 private:
-  vtkPVTestUtilities(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
+  vtkPVTestUtilities(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
   ///
   char GetPathSep();
-  char *GetDataRoot();
-  char *GetTempRoot();
-  char *GetCommandTailArgument(const char *tag);
-  char *GetFilePath(const char *base, const char *name);
+  char* GetDataRoot();
+  char* GetTempRoot();
+  char* GetCommandTailArgument(const char* tag);
+  char* GetFilePath(const char* base, const char* name);
   //
   int Argc;
-  char **Argv;
-  char *DataRoot;
-  char *TempRoot;
+  char** Argv;
+  char* DataRoot;
+  char* TempRoot;
 };
 
 #endif

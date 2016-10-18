@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef _pqLinksModel_h
 #define _pqLinksModel_h
-
 
 #include "pqCoreModule.h"
 #include <QAbstractItemModel>
@@ -60,23 +59,23 @@ class PQCORE_EXPORT pqLinksModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
 
 public:
-    /**
-    * type of link (camera, proxy or property)
-    */
+  /**
+  * type of link (camera, proxy or property)
+  */
   enum ItemType
-    {
+  {
     Unknown,
     Proxy,
     Camera,
     Property,
     Selection
-    };
+  };
 
 public:
   /**
   * construct a links model
   */
-  pqLinksModel(QObject *parent=0);
+  pqLinksModel(QObject* parent = 0);
 
   /**
   * destruct a links model
@@ -87,20 +86,19 @@ public:
   /**
   * the number of rows (number of links)
   */
-  int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
   /**
   * the number of columns
   */
-  int columnCount(const QModelIndex &parent=QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const;
   /**
   * data for an index
   */
-  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   /**
   * header data
   */
-  QVariant headerData(int section, Qt::Orientation orient, 
-                      int role=Qt::DisplayRole) const;
+  QVariant headerData(int section, Qt::Orientation orient, int role = Qt::DisplayRole) const;
 
   // subclass specific implementation
   /**
@@ -120,8 +118,7 @@ public:
   * search for a link using an proxy and a direction
   * use a none direction to get input and output
   */
-  int FindLinksFromProxy(vtkSMProxy* inputProxy, int direction, 
-                         vtkCollection* links) const;
+  int FindLinksFromProxy(vtkSMProxy* inputProxy, int direction, vtkCollection* links) const;
 
   /**
   * get the first proxy for a link
@@ -131,7 +128,7 @@ public:
   * get the second proxy for a link
   */
   vtkSMProxy* getProxy2(const QModelIndex& idx) const;
-  
+
   /**
   * get the first property for a link
   */
@@ -140,7 +137,7 @@ public:
   * get the second property for a link
   */
   QString getProperty2(const QModelIndex& idx) const;
-  
+
   /**
   * get the name of a link
   */
@@ -153,16 +150,13 @@ public:
   /**
   * add a proxy based link
   */
-  void addProxyLink(const QString& name, 
-                    vtkSMProxy* proxy1, vtkSMProxy* proxy2);
-  
+  void addProxyLink(const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+
   /**
   * add a camera based link
   */
-  void addCameraLink(const QString& name, 
-                    vtkSMProxy* proxy1,
-                    vtkSMProxy* proxy2,
-                    bool interactiveViewLink = false);
+  void addCameraLink(
+    const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2, bool interactiveViewLink = false);
 
   /**
   * return true if pqLinksModels contain an interactive view link associated to name
@@ -177,16 +171,14 @@ public:
   /**
   * add a property based link
   */
-  void addPropertyLink(const QString& name,
-                       vtkSMProxy* proxy1, const QString& prop1,
-                       vtkSMProxy* proxy2, const QString& prop2);
+  void addPropertyLink(const QString& name, vtkSMProxy* proxy1, const QString& prop1,
+    vtkSMProxy* proxy2, const QString& prop2);
 
   /**
   * add a selection based link
   */
-  void addSelectionLink(const QString& name, 
-                    vtkSMProxy* proxy1, vtkSMProxy* proxy2);
- 
+  void addSelectionLink(const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+
   /**
   * remove a link by index
   */
@@ -202,7 +194,7 @@ public:
   * pqProxy.
   */
   static pqProxy* representativeProxy(vtkSMProxy* proxy);
-  
+
   /**
   * return the proxy list domain for a proxy
   * this domain is used to get internal linkable proxies
@@ -225,7 +217,7 @@ protected slots:
   void onSessionRemoved(pqServer*);
 
   /**
-  * method called when a state is loaded, 
+  * method called when a state is loaded,
   * will create interactive view link according to xml node
   */
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
@@ -239,14 +231,15 @@ protected slots:
   /**
   * Create a interactive view link with provided parameters
   */
-  void createInteractiveViewLink(const QString& name, vtkSMProxy* displayView, vtkSMProxy* linkedView, 
-    double xPos = 0.375, double yPos = 0.375, double xSize = 0.25, double ySize = 0.25);
+  void createInteractiveViewLink(const QString& name, vtkSMProxy* displayView,
+    vtkSMProxy* linkedView, double xPos = 0.375, double yPos = 0.375, double xSize = 0.25,
+    double ySize = 0.25);
 
   /**
   * Convenience method used by the internal
   */
   void emitLinkRemoved(const QString& name);
-  
+
 private:
   ItemType getLinkType(vtkSMLink* link) const;
   vtkSMProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
@@ -284,4 +277,3 @@ private:
 };
 
 #endif
-

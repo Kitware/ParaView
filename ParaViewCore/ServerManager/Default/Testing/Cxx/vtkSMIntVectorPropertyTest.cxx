@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMIntVectorPropertyTest::SetNumberOfElements()
 {
-  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty* smproperty = vtkSMIntVectorProperty::New();
   QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
   smproperty->SetNumberOfElements(4);
@@ -40,7 +40,7 @@ void vtkSMIntVectorPropertyTest::SetNumberOfElements()
 
 void vtkSMIntVectorPropertyTest::SetElement()
 {
-  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty* smproperty = vtkSMIntVectorProperty::New();
   smproperty->SetNumberOfElements(2);
   QCOMPARE(smproperty->GetNumberOfElements(), 2U);
   QCOMPARE(smproperty->GetElement(0), 0);
@@ -62,9 +62,9 @@ void vtkSMIntVectorPropertyTest::SetElement()
 
 void vtkSMIntVectorPropertyTest::SetElements()
 {
-  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty* smproperty = vtkSMIntVectorProperty::New();
 
-  int values[] = {9, 18, 27};
+  int values[] = { 9, 18, 27 };
   smproperty->SetElements(values, 3);
   QCOMPARE(smproperty->GetNumberOfElements(), 3U);
   QCOMPARE(smproperty->GetElement(0), 9);
@@ -76,8 +76,8 @@ void vtkSMIntVectorPropertyTest::SetElements()
 
 void vtkSMIntVectorPropertyTest::Copy()
 {
-  vtkSMIntVectorProperty *property1 = vtkSMIntVectorProperty::New();
-  vtkSMIntVectorProperty *property2 = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty* property1 = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty* property2 = vtkSMIntVectorProperty::New();
 
   property1->SetElement(0, 5);
   property1->SetElement(1, 10);

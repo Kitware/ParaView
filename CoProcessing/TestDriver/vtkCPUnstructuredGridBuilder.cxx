@@ -41,15 +41,15 @@ vtkCPUnstructuredGridBuilder::~vtkCPUnstructuredGridBuilder()
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkCPUnstructuredGridBuilder::GetGrid(
-  unsigned long timeStep, double time, int & builtNewGrid)
+  unsigned long timeStep, double time, int& builtNewGrid)
 {
   builtNewGrid = 0;
   vtkCPBaseFieldBuilder* fieldBuilder = this->GetFieldBuilder();
-  if(!fieldBuilder)
-    {
+  if (!fieldBuilder)
+  {
     vtkErrorMacro("FieldBuilder is not defined.");
     return 0;
-    }
+  }
 
   fieldBuilder->BuildField(timeStep, time, this->UnstructuredGrid);
 
@@ -67,35 +67,33 @@ vtkUnstructuredGrid* vtkCPUnstructuredGridBuilder::GetUnstructuredGrid()
 //----------------------------------------------------------------------------
 bool vtkCPUnstructuredGridBuilder::SetPoints(vtkPoints* points)
 {
-  if(!points || !this->UnstructuredGrid)
-    {
+  if (!points || !this->UnstructuredGrid)
+  {
     vtkWarningMacro("Unable to set points.");
     return 0;
-    }
-  if(points != this->UnstructuredGrid->GetPoints())
-    {
+  }
+  if (points != this->UnstructuredGrid->GetPoints())
+  {
     this->UnstructuredGrid->SetPoints(points);
     this->IsGridModified = 1;
-    }
+  }
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkCPUnstructuredGridBuilder::Allocate(vtkIdType numCells, int extSize)
 {
-  if(!this->UnstructuredGrid)
-    {
+  if (!this->UnstructuredGrid)
+  {
     vtkWarningMacro("UnstructuredGrid is NULL.");
     return;
-    }
+  }
   this->UnstructuredGrid->Allocate(numCells, extSize);
   this->IsGridModified = 1;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(
-  int type, vtkIdType npts, vtkIdType *pts)
+vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(int type, vtkIdType npts, vtkIdType* pts)
 {
   // for efficiency this doesn't check if UnstructuredGrid is null
   this->IsGridModified = 1;
@@ -103,8 +101,7 @@ vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(
-  int type, vtkIdList* ptIds)
+vtkIdType vtkCPUnstructuredGridBuilder::InsertNextCell(int type, vtkIdList* ptIds)
 {
   // for efficiency this doesn't check if UnstructuredGrid is null
   this->IsGridModified = 1;

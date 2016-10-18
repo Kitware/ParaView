@@ -47,8 +47,7 @@ public:
    * When a link is added, all output Selection values are
    * synchronized with that of the input.
    */
-  void AddLinkedSelection(vtkSMProxy* proxy,
-                          int updateDir);
+  void AddLinkedSelection(vtkSMProxy* proxy, int updateDir);
   void RemoveLinkedSelection(vtkSMProxy* proxy);
   //@}
 

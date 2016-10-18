@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -51,7 +51,7 @@ public:
   /**
   * constructor
   */
-  pqProxyInformationWidget(QWidget* p=0);
+  pqProxyInformationWidget(QWidget* p = 0);
   /**
   * destructor
   */
@@ -64,7 +64,7 @@ public:
 
 public slots:
   /**
-  * TODO: have this become automatic instead of relying on 
+  * TODO: have this become automatic instead of relying on
   * the accept button in case another client modifies the pipeline.
   */
   void updateInformation();
@@ -81,8 +81,8 @@ private:
   /**
   * builds the composite tree structure.
   */
-  QTreeWidgetItem* fillCompositeInformation(vtkPVDataInformation* info,
-    QTreeWidgetItem* parent=0);
+  QTreeWidgetItem* fillCompositeInformation(
+    vtkPVDataInformation* info, QTreeWidgetItem* parent = 0);
 
   void fillDataInformation(vtkPVDataInformation* info);
 
@@ -94,4 +94,3 @@ private:
 };
 
 #endif
-

@@ -35,17 +35,18 @@
 
 class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter
+  : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);
+  vtkTypeMacro(vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMCameraConfigurationWriter *New();
+  static vtkSMCameraConfigurationWriter* New();
 
   /**
    * Set the render view proxy to extract camera properties from.
    */
-  void SetRenderViewProxy(vtkSMProxy *rvProxy);
+  void SetRenderViewProxy(vtkSMProxy* rvProxy);
 
 protected:
   vtkSMCameraConfigurationWriter();
@@ -53,7 +54,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy*) { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&) VTK_DELETE_FUNCTION;
@@ -61,4 +62,3 @@ private:
 };
 
 #endif
-

@@ -60,13 +60,13 @@ bool vtkPVFileInformationHelper::GetActiveFileIsDirectory()
 void vtkPVFileInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Path: " << (this->Path? this->Path : "(null)") << endl;
-  os << indent << "WorkingDirectory: " <<
-    (this->WorkingDirectory? this->WorkingDirectory : "(null)") << endl;
+  os << indent << "Path: " << (this->Path ? this->Path : "(null)") << endl;
+  os << indent
+     << "WorkingDirectory: " << (this->WorkingDirectory ? this->WorkingDirectory : "(null)")
+     << endl;
   os << indent << "DirectoryListing: " << this->DirectoryListing << endl;
   os << indent << "SpecialDirectories: " << this->SpecialDirectories << endl;
-  os << indent << "PathSeparator: " 
-    <<  (this->PathSeparator? this->PathSeparator : "(null)") << endl;
-  os << indent << "FastFileTypeDetection: "
-    << this->FastFileTypeDetection << endl;
+  os << indent << "PathSeparator: " << (this->PathSeparator ? this->PathSeparator : "(null)")
+     << endl;
+  os << indent << "FastFileTypeDetection: " << this->FastFileTypeDetection << endl;
 }

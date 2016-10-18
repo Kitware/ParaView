@@ -31,8 +31,9 @@ class pqServer;
 class pqSierraPlotToolsDataLoadManager : public QDialog
 {
   Q_OBJECT;
+
 public:
-  pqSierraPlotToolsDataLoadManager(QWidget *p, Qt::WindowFlags f = 0);
+  pqSierraPlotToolsDataLoadManager(QWidget* p, Qt::WindowFlags f = 0);
   ~pqSierraPlotToolsDataLoadManager();
 
 public slots:
@@ -43,13 +44,13 @@ signals:
   void createdPipeline();
 
 protected:
-  pqServer *Server;
+  pqServer* Server;
 
 private:
   Q_DISABLE_COPY(pqSierraPlotToolsDataLoadManager)
 
   class pqUI;
-  pqUI *ui;
+  pqUI* ui;
 };
 
-#endif //pqSierraPlotToolsDataLoadManager_h
+#endif // pqSierraPlotToolsDataLoadManager_h

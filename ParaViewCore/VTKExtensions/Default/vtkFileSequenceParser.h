@@ -30,10 +30,10 @@
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
-namespace vtksys {
-  class RegularExpression;
+namespace vtksys
+{
+class RegularExpression;
 }
-
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSequenceParser : public vtkObject
 {
@@ -47,7 +47,7 @@ public:
    * Returns true if a sequence is detected and
    * sets SequenceName and SequenceIndex.
    */
-  bool ParseFileSequence(char * file);
+  bool ParseFileSequence(char* file);
 
   vtkGetStringMacro(SequenceName);
   vtkGetMacro(SequenceIndex, int);
@@ -56,18 +56,19 @@ protected:
   vtkFileSequenceParser();
   ~vtkFileSequenceParser();
 
-  vtksys::RegularExpression * reg_ex;
-  vtksys::RegularExpression * reg_ex2;
-  vtksys::RegularExpression * reg_ex3;
-  vtksys::RegularExpression * reg_ex4;
-  vtksys::RegularExpression * reg_ex5;
-  vtksys::RegularExpression * reg_ex_last;
+  vtksys::RegularExpression* reg_ex;
+  vtksys::RegularExpression* reg_ex2;
+  vtksys::RegularExpression* reg_ex3;
+  vtksys::RegularExpression* reg_ex4;
+  vtksys::RegularExpression* reg_ex5;
+  vtksys::RegularExpression* reg_ex_last;
 
   // Used internall so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);
 
   int SequenceIndex;
-  char * SequenceName;
+  char* SequenceName;
+
 private:
   vtkFileSequenceParser(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
   void operator=(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;

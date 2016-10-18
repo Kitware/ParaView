@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCustomFilterDefinitionWizard_h
 #define _pqCustomFilterDefinitionWizard_h
 
-
 #include "pqComponentsModule.h"
 #include <QDialog>
 
@@ -53,14 +52,14 @@ class vtkSMCompoundSourceProxy;
  *  \brief
  *    The pqCustomFilterDefinitionWizard class is used to create a
  *    compound proxy definition one step at a time.
- * 
+ *
  *  The wizard should be created with a pqCustomFilterDefinitionModel.
  *  The model stores the sources that will be placed in the custom
  *  filter. The model is also used when selecting the exposed
  *  properties.
- * 
+ *
  *  The following is an example of how to use the wizard:
- * 
+ *
  *  \code
  *  pqCustomFilterDefinitionModel filter(this);
  *  filter.setContents(
@@ -92,8 +91,7 @@ public:
   *   model should not be null.
   * \param parent The parent widget for the wizard.
   */
-  pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel *model,
-      QWidget *parent=0);
+  pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel* model, QWidget* parent = 0);
   virtual ~pqCustomFilterDefinitionWizard();
 
   /**
@@ -102,7 +100,7 @@ public:
   * \return
   *   A pointer to the custom filter definition model.
   */
-  pqCustomFilterDefinitionModel *getModel() const {return this->Model;}
+  pqCustomFilterDefinitionModel* getModel() const { return this->Model; }
 
   /**
   * \brief
@@ -132,12 +130,12 @@ private:
   * \brief
   *   Adds proxies referred to by the proxies in the custom filter that
   *   the user could not have explicitly selected/deselected.
-  * 
-  * A custom filter may includes proxies which refer to other internal 
+  *
+  * A custom filter may includes proxies which refer to other internal
   * proxies such as implicit functions, internal sources which are not shown
   * in the pipeline browser. We include these proxies into the custom filter
   * so that its definition is complete. This method is called after all proxies
-  * have been added to the custom filter and before its definition is 
+  * have been added to the custom filter and before its definition is
   * created.
   */
   void addAutoIncludedProxies();
@@ -188,7 +186,7 @@ private slots:
   *   Clears the custom filter overwite flag.
   * \param text The changed name text.
   */
-  void clearNameOverwrite(const QString &text);
+  void clearNameOverwrite(const QString& text);
   //@}
 
   /**
@@ -205,8 +203,7 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updateInputForm(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updateInputForm(const QModelIndex& current, const QModelIndex& previous);
 
   /**
   * \brief
@@ -214,8 +211,7 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updateOutputForm(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updateOutputForm(const QModelIndex& current, const QModelIndex& previous);
 
   /**
   * \brief
@@ -228,8 +224,7 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updatePropertyForm(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updatePropertyForm(const QModelIndex& current, const QModelIndex& previous);
   //@}
 
   /**
@@ -317,8 +312,7 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updateInputButtons(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updateInputButtons(const QModelIndex& current, const QModelIndex& previous);
 
   /**
   * \brief
@@ -326,8 +320,7 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updateOutputButtons(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updateOutputButtons(const QModelIndex& current, const QModelIndex& previous);
 
   /**
   * \brief
@@ -335,16 +328,15 @@ private slots:
   * \param current The currently selected index.
   * \param previous The previously selected index.
   */
-  void updatePropertyButtons(const QModelIndex &current,
-      const QModelIndex &previous);
+  void updatePropertyButtons(const QModelIndex& current, const QModelIndex& previous);
   //@}
 
 private:
   int CurrentPage;                          ///< Stores the current page.
   bool OverwriteOK;                         ///< Used with name validation.
-  vtkSMCompoundSourceProxy *Filter;         ///< Stores the custom filter.
-  pqCustomFilterDefinitionModel *Model;     ///< Stores the source hierarchy.
-  pqCustomFilterDefinitionWizardForm *Form; ///< Defines the gui layout.
+  vtkSMCompoundSourceProxy* Filter;         ///< Stores the custom filter.
+  pqCustomFilterDefinitionModel* Model;     ///< Stores the source hierarchy.
+  pqCustomFilterDefinitionWizardForm* Form; ///< Defines the gui layout.
 
   /**
   * Internal method called by addOutput().

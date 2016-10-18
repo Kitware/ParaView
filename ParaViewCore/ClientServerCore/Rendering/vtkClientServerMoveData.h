@@ -19,7 +19,7 @@
  *
  * This class moves all the input data available at the input on the root
  * server node to the client node. If not in server-client mode,
- * this filter behaves as a simple pass-through filter. 
+ * this filter behaves as a simple pass-through filter.
  * This can work with any data type, the application does not need to set
  * the output type before hand.
  * @warning
@@ -89,39 +89,37 @@ public:
   //@}
 
   enum ProcessTypes
-    {
-    AUTO=0,
-    SERVER=1,
-    CLIENT=2
-    };
+  {
+    AUTO = 0,
+    SERVER = 1,
+    CLIENT = 2
+  };
 
 protected:
   vtkClientServerMoveData();
   ~vtkClientServerMoveData();
- 
+
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // Create an output of the type defined by OutputDataType
-  virtual int RequestDataObject(vtkInformation* request, 
-                                vtkInformationVector** inputVector, 
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // If there is an input call superclass' RequestInformation
   // otherwise set the output WHOLE_EXTENT() to be WholeExtent
-  virtual int RequestInformation(vtkInformation* request, 
-                                 vtkInformationVector** inputVector, 
-                                 vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual int SendData(vtkDataObject*, vtkMultiProcessController*);
   virtual vtkDataObject* ReceiveData(vtkMultiProcessController*);
 
-  enum Tags {
+  enum Tags
+  {
     TRANSMIT_DATA_OBJECT = 23483
   };
 
@@ -133,7 +131,6 @@ protected:
 private:
   vtkClientServerMoveData(const vtkClientServerMoveData&) VTK_DELETE_FUNCTION;
   void operator=(const vtkClientServerMoveData&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

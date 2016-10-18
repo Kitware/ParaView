@@ -30,44 +30,44 @@ using std::vector;
 vtkStandardNewMacro(vtkPVTestUtilities);
 
 //-----------------------------------------------------------------------------
-void vtkPVTestUtilities::Initialize(int argc, char **argv)
+void vtkPVTestUtilities::Initialize(int argc, char** argv)
 {
   this->DataRoot = NULL;
   this->TempRoot = NULL;
-  this->Argc=argc;
-  this->Argv=argv;
-  if (!((argc==0)||(argv==0)))
+  this->Argc = argc;
+  this->Argv = argv;
+  if (!((argc == 0) || (argv == 0)))
   {
-    this->DataRoot=this->GetDataRoot();
-    this->TempRoot=this->GetTempRoot();
+    this->DataRoot = this->GetDataRoot();
+    this->TempRoot = this->GetTempRoot();
   }
 }
 //-----------------------------------------------------------------------------
-char *vtkPVTestUtilities::GetDataRoot()
+char* vtkPVTestUtilities::GetDataRoot()
 {
   return this->GetCommandTailArgument("-D");
 }
 //-----------------------------------------------------------------------------
-char *vtkPVTestUtilities::GetTempRoot()
+char* vtkPVTestUtilities::GetTempRoot()
 {
   return this->GetCommandTailArgument("-T");
 }
 //-----------------------------------------------------------------------------
-char *vtkPVTestUtilities::GetCommandTailArgument(const char *tag)
+char* vtkPVTestUtilities::GetCommandTailArgument(const char* tag)
 {
-  for (int i=1; i<this->Argc; ++i)
+  for (int i = 1; i < this->Argc; ++i)
+  {
+    if (string(this->Argv[i]) == string(tag))
     {
-    if (string(this->Argv[i])==string(tag))
+      if ((i + 1) < this->Argc)
       {
-      if ((i+1)<this->Argc)
-        {
-        return this->Argv[i+1];
-        }
-      else
-        {
-        break;
-        }
+        return this->Argv[i + 1];
       }
+      else
+      {
+        break;
+      }
+    }
   }
   return 0;
 }
@@ -86,70 +86,65 @@ char *vtkPVTestUtilities::GetCommandTailArgument(const char *tag)
 //-----------------------------------------------------------------------------
 char vtkPVTestUtilities::GetPathSep()
 {
-  #if defined _WIN32 && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
   return '\\';
-  #elif defined _WIN64 && !defined __CYGWIN__
+#elif defined _WIN64 && !defined __CYGWIN__
   return '\\';
-  #else
+#else
   return '/';
-  #endif
+#endif
 }
 //-----------------------------------------------------------------------------
 // Concat the data root path to the name supplied.
 // The return is a c string that has the correct
 // path seperators.
-char *vtkPVTestUtilities::GetFilePath(
-        const char *base,
-        const char *name)
+char* vtkPVTestUtilities::GetFilePath(const char* base, const char* name)
 {
-  int baseLen=static_cast<int>(strlen(base));
-  int nameLen=static_cast<int>(strlen(name));
-  int pathLen=baseLen+1+nameLen+1;
-  char *filePath=new char[pathLen];
-  int i=0;
-  for (; i<baseLen; ++i)
+  int baseLen = static_cast<int>(strlen(base));
+  int nameLen = static_cast<int>(strlen(name));
+  int pathLen = baseLen + 1 + nameLen + 1;
+  char* filePath = new char[pathLen];
+  int i = 0;
+  for (; i < baseLen; ++i)
+  {
+    if (this->GetPathSep() == '\\' && base[i] == '/')
     {
-    if ( this->GetPathSep()=='\\'
-          && base[i]=='/')
-      {
-      filePath[i]='\\';
-      }
-    else
-      {
-      filePath[i]=base[i];
-      }
+      filePath[i] = '\\';
     }
-  filePath[i]=this->GetPathSep();
+    else
+    {
+      filePath[i] = base[i];
+    }
+  }
+  filePath[i] = this->GetPathSep();
   ++i;
-  for (int j=0; j<nameLen; ++j, ++i)
+  for (int j = 0; j < nameLen; ++j, ++i)
+  {
+    if (this->GetPathSep() == '\\' && name[j] == '/')
     {
-    if ( this->GetPathSep()=='\\'
-          && name[j]=='/')
-      {
-      filePath[i]='\\';
-      }
-    else
-      {
-      filePath[i]=name[j];
-      }
+      filePath[i] = '\\';
     }
-  filePath[i]='\0';
+    else
+    {
+      filePath[i] = name[j];
+    }
+  }
+  filePath[i] = '\0';
   return filePath;
 }
 //-----------------------------------------------------------------------------
 void vtkPVTestUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "argc=" << this->Argc << endl;
   os << indent << "argv=" << this->Argv << endl;
-  if(this->DataRoot)
-    {
+  if (this->DataRoot)
+  {
     os << indent << "DataRoot=" << this->DataRoot << endl;
-    }
-  if(this->TempRoot)
-    {
+  }
+  if (this->TempRoot)
+  {
     os << indent << "TempRoot=" << this->TempRoot << endl;
-    }
+  }
 }
-

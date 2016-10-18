@@ -82,8 +82,7 @@ public:
   // Description:
   // Create a default representation for the given output port of source proxy.
   // Returns a new proxy.
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
-    vtkSMProxy*, int opport);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int opport);
 
   // Description:
   // Manta view's can not participate in selection so disable it.
@@ -108,14 +107,11 @@ protected:
   virtual void CreateVTKObjects();
 
 private:
-
   vtkSMMantaViewProxy(const vtkSMMantaViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMMantaViewProxy&) VTK_DELETE_FUNCTION;
 
   class Internal;
-  Internal *Internals;
-
+  Internal* Internals;
 };
-
 
 #endif

@@ -33,12 +33,11 @@ class vtkPVOptionsInternal;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptions : public vtkCommandOptions
 {
 protected:
-
   friend class vtkPVOptionsXMLParser;
 
 public:
   static vtkPVOptions* New();
-  vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
+  vtkTypeMacro(vtkPVOptions, vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -73,7 +72,7 @@ public:
    * State file to load on startup.
    */
   vtkGetStringMacro(StateFileName); // Bug #5711
-  //@}
+                                    //@}
 
   //@{
   /**
@@ -115,7 +114,9 @@ public:
    * pipeline and visualization.
    */
   virtual int GetMultiClientMode()
-  { return (this->MultiClientMode || this->MultiClientModeWithErrorMacro) ?1:0; }
+  {
+    return (this->MultiClientMode || this->MultiClientModeWithErrorMacro) ? 1 : 0;
+  }
   virtual int IsMultiClientModeDebug() { return this->MultiClientModeWithErrorMacro; }
 
   //@{
@@ -174,7 +175,7 @@ public:
    * Include originating process id text into server to client messages.
    */
   vtkSetMacro(SatelliteMessageIds, int);
-  vtkGetMacro(SatelliteMessageIds, int );
+  vtkGetMacro(SatelliteMessageIds, int);
   //@}
 
   //@{
@@ -221,19 +222,17 @@ public:
   //@}
 
   enum ProcessTypeEnum
-    {
+  {
     PARAVIEW = 0x2,
     PVCLIENT = 0x4,
     PVSERVER = 0x8,
     PVRENDER_SERVER = 0x10,
     PVDATA_SERVER = 0x20,
     PVBATCH = 0x40,
-    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER |
-      PVDATA_SERVER | PVBATCH
-    };
+    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER | PVDATA_SERVER | PVBATCH
+  };
 
 protected:
-
   /**
    * Default constructor.
    */
@@ -279,8 +278,8 @@ protected:
   int MultiClientModeWithErrorMacro;
   int MultiServerMode;
   int SymmetricMPIMode;
-  char* StateFileName;  // loading state file(Bug #5711)
-  char* TestPlugin; // to load plugins from command line for tests
+  char* StateFileName; // loading state file(Bug #5711)
+  char* TestPlugin;    // to load plugins from command line for tests
   char* TestPluginPath;
   int DisableXDisplayTests;
   //@}
@@ -325,4 +324,3 @@ private:
 };
 
 #endif
-

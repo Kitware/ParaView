@@ -16,7 +16,7 @@
  * @class   vtkCPTensorFieldFunction
  * @brief   Abstract class for specifying tensor fields at points.
  *
- * Abstract class for specifying tensor fields at specified points.  
+ * Abstract class for specifying tensor fields at specified points.
 */
 
 #ifndef vtkCPTensorFieldFunction_h
@@ -40,8 +40,8 @@ public:
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time) = 0;
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
 
 protected:
   vtkCPTensorFieldFunction();

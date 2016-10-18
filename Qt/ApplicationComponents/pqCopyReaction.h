@@ -43,8 +43,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCopyReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqCopyReaction(QAction* parent, bool paste_mode=false);
+  pqCopyReaction(QAction* parent, bool paste_mode = false);
   virtual ~pqCopyReaction();
 
   /**
@@ -68,17 +69,18 @@ protected:
   * Called when the action is triggered.
   */
   virtual void onTriggered()
-    {
+  {
     if (this->Paste)
-      {
+    {
       pqCopyReaction::paste();
-      }
-    else
-      {
-      pqCopyReaction::copy();
-      }
     }
+    else
+    {
+      pqCopyReaction::copy();
+    }
+  }
   bool Paste;
+
 private:
   Q_DISABLE_COPY(pqCopyReaction)
 };

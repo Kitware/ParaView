@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -55,8 +55,8 @@ public:
   * Get/Set whether the configuration is mutable. This variable is not
   * serialized.
   */
-  bool isMutable() const {return this->Mutable;}
-  void setMutable(bool val) {this->Mutable = val;}
+  bool isMutable() const { return this->Mutable; }
+  void setMutable(bool val) { this->Mutable = val; }
 
   /**
   * Get/Set the name for the configuration.
@@ -82,11 +82,11 @@ public:
   * Types of start
   */
   enum StartupType
-    {
+  {
     INVALID,
     MANUAL,
     COMMAND
-    };
+  };
 
   /**
   * returns the startup type for this configuration. There are 3 types of
@@ -109,8 +109,7 @@ public:
   /**
   * changes the startup type to command.
   */
-  void setStartupToCommand(
-    double timeout, double delay, const QString& command);
+  void setStartupToCommand(double timeout, double delay, const QString& command);
 
   /**
   * serialize to a string.
@@ -133,7 +132,7 @@ public:
   vtkPVXMLElement* hintsXML() const;
 
 protected:
-  vtkPVXMLElement* startupXML() const;  
+  vtkPVXMLElement* startupXML() const;
 
 private:
   void constructor(vtkPVXMLElement*);

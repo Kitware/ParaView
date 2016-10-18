@@ -100,10 +100,12 @@ protected:
   vtkSetMacro(NullOnEmpty, bool);
   bool NullOnEmpty;
 
-
-  enum TypeArg {
-    VTK, SMProxy, SIProxy
-    };
+  enum TypeArg
+  {
+    VTK,
+    SMProxy,
+    SIProxy
+  };
 
   // Proxy type: VTK (default), SMProxy, Kernel,
   // In the XML we expect argument_type="VTK"     (default value if not set)
@@ -121,11 +123,10 @@ private:
   vtkSIProxyProperty(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
   class InternalCache;
-  InternalCache *Cache;
+  InternalCache* Cache;
 
   class vtkObjectCache;
   vtkObjectCache* ObjectCache;
-
 };
 
 #endif

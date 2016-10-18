@@ -52,8 +52,6 @@ protected:
 private:
   vtkSMRenderViewExporterProxy(const vtkSMRenderViewExporterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRenderViewExporterProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

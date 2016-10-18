@@ -45,9 +45,9 @@ vtkSMViewExportHelper::~vtkSMViewExportHelper()
 vtkStdString vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
 {
   if (!view)
-    {
+  {
     return vtkStdString();
-    }
+  }
 
   std::ostringstream stream;
   int count = 0;
@@ -56,63 +56,57 @@ vtkStdString vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
   iter.TakeReference(pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("exporters"));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  {
+    vtkSMExporterProxy* prototype =
+      vtkSMExporterProxy::SafeDownCast(pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
+    if (prototype && prototype->CanExport(view) && prototype->GetFileExtension() != NULL)
     {
-    vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(
-      pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
-    if (prototype &&
-      prototype->CanExport(view) &&
-      prototype->GetFileExtension() != NULL)
-      {
       vtkSMDocumentation* doc = prototype->GetDocumentation();
       std::ostringstream helpstream;
       if (doc && doc->GetShortHelp())
-        {
+      {
         helpstream << doc->GetShortHelp();
-        }
-      else
-        {
-        helpstream
-          << vtksys::SystemTools::UpperCase(prototype->GetFileExtension()).c_str()
-          << " Files";
-        }
-      stream << (count > 0? ";;" : "")
-             << helpstream.str().c_str()
-             << " (*." << prototype->GetFileExtension() << ")";
-      count++;
       }
+      else
+      {
+        helpstream << vtksys::SystemTools::UpperCase(prototype->GetFileExtension()).c_str()
+                   << " Files";
+      }
+      stream << (count > 0 ? ";;" : "") << helpstream.str().c_str() << " (*."
+             << prototype->GetFileExtension() << ")";
+      count++;
     }
+  }
   return stream.str();
 }
 
 //----------------------------------------------------------------------------
-vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(const char* filename, vtkSMViewProxy* view)
+vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(
+  const char* filename, vtkSMViewProxy* view)
 {
   if (!view || filename == NULL || filename[0] == '\0')
-    {
+  {
     vtkErrorMacro("Invalid input arguments to Export.");
     return NULL;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
   iter.TakeReference(pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("exporters"));
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  {
+    vtkSMExporterProxy* prototype =
+      vtkSMExporterProxy::SafeDownCast(pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
+    if (prototype && prototype->CanExport(view) && prototype->GetFileExtension() != NULL)
     {
-    vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(
-      pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
-    if (prototype &&
-      prototype->CanExport(view) &&
-      prototype->GetFileExtension() != NULL)
-      {
       std::ostringstream reStream;
-      reStream << "^"     // start
-               << ".*"    // leading text
-               << "\\."   // extension separator
-               << prototype->GetFileExtension()
-               << "$";    // end
+      reStream << "^"                                   // start
+               << ".*"                                  // leading text
+               << "\\."                                 // extension separator
+               << prototype->GetFileExtension() << "$"; // end
       vtksys::RegularExpression re(reStream.str().c_str());
       if (re.find(filename))
-        {
+      {
         vtkSMExporterProxy* exporter =
           vtkSMExporterProxy::SafeDownCast(pxm->NewProxy("exporters", iter->GetProxyName()));
         vtkNew<vtkSMParaViewPipelineController> controller;
@@ -122,9 +116,9 @@ vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(const char* filename, 
         controller->PostInitializeProxy(exporter);
         exporter->UpdateVTKObjects();
         return exporter;
-        }
       }
     }
+  }
   return NULL;
 }
 

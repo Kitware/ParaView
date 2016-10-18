@@ -35,8 +35,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue(double currenttime,
-                           vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
 protected:
   vtkPVRampKeyFrame();
@@ -45,7 +44,6 @@ protected:
 private:
   vtkPVRampKeyFrame(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

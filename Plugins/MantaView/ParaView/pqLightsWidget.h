@@ -38,9 +38,9 @@ class pqLightsWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqLightsWidget(
-    vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget *parentObject=0);
+  pqLightsWidget(vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
   virtual ~pqLightsWidget();
 
 public slots:
@@ -49,7 +49,7 @@ public slots:
   void onNext();
   void forceRender();
 
- private:
+private:
   Q_DISABLE_COPY(pqLightsWidget)
 
   int CurrentLight;

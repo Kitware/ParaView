@@ -48,10 +48,10 @@ pqGlyphScaleFactorPropertyWidget::pqGlyphScaleFactorPropertyWidget(
 {
   // We add this extra dependency for the reset button.
   if (vtkSMProperty* scaleMode = smproxy->GetProperty("ScaleMode"))
-    {
-    pqCoreUtilities::connect(scaleMode, vtkCommand::UncheckedPropertyModifiedEvent,
-      this, SIGNAL(highlightResetButton()));
-    }
+  {
+    pqCoreUtilities::connect(
+      scaleMode, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(highlightResetButton()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -72,61 +72,60 @@ void pqGlyphScaleFactorPropertyWidget::resetButtonClicked()
   vtkSMProperty* smproperty = this->property();
 
   double scaledExtent = 1.0;
-  if (vtkSMBoundsDomain* domain = vtkSMBoundsDomain::SafeDownCast(
-      smproperty->GetDomain("bounds")))
-    {
+  if (vtkSMBoundsDomain* domain = vtkSMBoundsDomain::SafeDownCast(smproperty->GetDomain("bounds")))
+  {
     if (domain->GetMaximumExists(0))
-      {
+    {
       scaledExtent = domain->GetMaximum(0);
-      }
     }
+  }
 
   double divisor = 1.0;
-  switch (vtkSMUncheckedPropertyHelper(smproxy, "ScaleMode", /*quiet*/true).GetAsInt())
-    {
-  case VTK_SCALE_BY_SCALAR:
-    if (vtkSMArrayRangeDomain* domain = vtkSMArrayRangeDomain::SafeDownCast(
-        smproperty->GetDomain("scalar_range")))
+  switch (vtkSMUncheckedPropertyHelper(smproxy, "ScaleMode", /*quiet*/ true).GetAsInt())
+  {
+    case VTK_SCALE_BY_SCALAR:
+      if (vtkSMArrayRangeDomain* domain =
+            vtkSMArrayRangeDomain::SafeDownCast(smproperty->GetDomain("scalar_range")))
       {
-      if (domain->GetMaximumExists(0) /*&& domain->GetMinimumExists(0)*/)
+        if (domain->GetMaximumExists(0) /*&& domain->GetMinimumExists(0)*/)
         {
-        divisor = domain->GetMaximum(0)/*-domain->GetMinimum(0)*/;
+          divisor = domain->GetMaximum(0) /*-domain->GetMinimum(0)*/;
         }
       }
-    break;
+      break;
 
-  case VTK_SCALE_BY_VECTOR:
-  case VTK_SCALE_BY_VECTORCOMPONENTS:
-    if (vtkSMArrayRangeDomain* domain = vtkSMArrayRangeDomain::SafeDownCast(
-        smproperty->GetDomain("vector_range")))
+    case VTK_SCALE_BY_VECTOR:
+    case VTK_SCALE_BY_VECTORCOMPONENTS:
+      if (vtkSMArrayRangeDomain* domain =
+            vtkSMArrayRangeDomain::SafeDownCast(smproperty->GetDomain("vector_range")))
       {
-      if (domain->GetMaximumExists(3)/* && domain->GetMinimumExists(3)*/)
+        if (domain->GetMaximumExists(3) /* && domain->GetMinimumExists(3)*/)
         {
-        // we use the vector magnitude.
-        divisor = domain->GetMaximum(3)/*-domain->GetMinimum(3)*/;
+          // we use the vector magnitude.
+          divisor = domain->GetMaximum(3) /*-domain->GetMinimum(3)*/;
         }
       }
-    break;
+      break;
 
-  case VTK_DATA_SCALING_OFF:
-  default:
-    break;
-    }
+    case VTK_DATA_SCALING_OFF:
+    default:
+      break;
+  }
 
   divisor = fabs(divisor);
   // the divisor can sometimes be very close to 0, which happens in case the
   // vectors indeed have same value but due to precision issues are not reported
   // as identical. In that case we just treat it as 0.
-  divisor = (divisor < 0.000000001)? 1 : divisor;
+  divisor = (divisor < 0.000000001) ? 1 : divisor;
   double scalefactor = scaledExtent / divisor;
 
   vtkSMUncheckedPropertyHelper helper(smproperty);
   if (helper.GetAsDouble() != scalefactor)
-    {
+  {
     vtkSMUncheckedPropertyHelper(smproperty).Set(scalefactor);
     emit this->changeAvailable();
     emit this->changeFinished();
-    }
+  }
 
   emit this->clearHighlight();
 }

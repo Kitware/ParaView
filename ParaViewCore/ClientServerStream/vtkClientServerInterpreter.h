@@ -38,12 +38,8 @@ class vtkClientServerStream;
  * class wrapped.  It knows how to call the methods for that class at
  * run-time.
  */
-typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*,
-                                              vtkObjectBase* ptr,
-                                              const char* method,
-                                              const vtkClientServerStream& msg,
-                                              vtkClientServerStream& result,
-                                              void* ctx);
+typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*, vtkObjectBase* ptr,
+  const char* method, const vtkClientServerStream& msg, vtkClientServerStream& result, void* ctx);
 
 /**
  * The type of a new-instance function.
@@ -101,8 +97,7 @@ public:
    * Return a pointer to a vtkObjectBase for an ID whose message
    * contains only the one object.
    */
-  vtkObjectBase* GetObjectFromID(vtkClientServerID id)
-    { return this->GetObjectFromID(id, 0); }
+  vtkObjectBase* GetObjectFromID(vtkClientServerID id) { return this->GetObjectFromID(id, 0); }
   vtkObjectBase* GetObjectFromID(vtkClientServerID id, int noerror);
 
   /**
@@ -135,16 +130,13 @@ public:
    * Called by generated code to add an observer to a wrapped object.
    * Do not call directly.
    */
-  int NewObserver(vtkObject* obj, const char* event,
-                  const vtkClientServerStream& css);
+  int NewObserver(vtkObject* obj, const char* event, const vtkClientServerStream& css);
 
   /**
    * Add a command function for a class.
    */
-  void AddCommandFunction(const char* cname,
-                          vtkClientServerCommandFunction func,
-                          void* ctx = NULL,
-                          vtkContextFreeFunction ctx_free = NULL);
+  void AddCommandFunction(const char* cname, vtkClientServerCommandFunction func, void* ctx = NULL,
+    vtkContextFreeFunction ctx_free = NULL);
 
   /**
    * Return true if the classname has a command function, false otherwise.
@@ -154,19 +146,14 @@ public:
   /**
    * Call a command function.
    */
-  int CallCommandFunction(const char* classname,
-                          vtkObjectBase* ptr,
-                          const char* method,
-                          const vtkClientServerStream& msg,
-                          vtkClientServerStream& result);
+  int CallCommandFunction(const char* classname, vtkObjectBase* ptr, const char* method,
+    const vtkClientServerStream& msg, vtkClientServerStream& result);
 
   /**
    * Add a function used to create new objects.
    */
-  void AddNewInstanceFunction(const char*cname,
-                              vtkClientServerNewInstanceFunction f,
-                              void* ctx = NULL,
-                              vtkContextFreeFunction ctx_free = NULL);
+  void AddNewInstanceFunction(const char* cname, vtkClientServerNewInstanceFunction f,
+    void* ctx = NULL, vtkContextFreeFunction ctx_free = NULL);
 
   //@{
   /**
@@ -191,7 +178,7 @@ public:
    * 1 for success and 0 for failure.
    */
   int Load(const char* moduleName);
-  int Load(const char* moduleName, const char*const* optionalPaths);
+  int Load(const char* moduleName, const char* const* optionalPaths);
   //@}
 
   /**
@@ -219,8 +206,8 @@ protected:
 
   // Expand all the id_value arguments of a message starting with the
   // given argument index.
-  int ExpandMessage(const vtkClientServerStream& in, int inIndex,
-                    int startArgument, vtkClientServerStream& out);
+  int ExpandMessage(
+    const vtkClientServerStream& in, int inIndex, int startArgument, vtkClientServerStream& out);
 
   // Load a module from an alternate backend implementation.
   int LoadImpl(const char* moduleName);
@@ -228,7 +215,6 @@ protected:
   int LoadInternal(const char* moduleName, const char* fullPath);
 
 private:
-
   // Message containing the result of the last command.
   vtkClientServerStream* LastResultMessage;
 
@@ -236,6 +222,7 @@ private:
   vtkClientServerInterpreterInternals* Internal;
 
   friend class vtkClientServerInterpreterCommand;
+
 private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkClientServerInterpreter&) VTK_DELETE_FUNCTION;

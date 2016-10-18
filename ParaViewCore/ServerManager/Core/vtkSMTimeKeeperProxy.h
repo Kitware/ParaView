@@ -40,10 +40,10 @@ public:
    */
   virtual bool AddTimeSource(vtkSMProxy* proxy, bool suppress_input);
   static bool AddTimeSource(vtkSMProxy* timeKeeper, vtkSMProxy* proxy, bool suppress_input)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->AddTimeSource(proxy, suppress_input) : false;
-    }
+    return self ? self->AddTimeSource(proxy, suppress_input) : false;
+  }
   //@}
 
   //@{
@@ -52,10 +52,10 @@ public:
    */
   virtual bool RemoveTimeSource(vtkSMProxy* proxy, bool unsuppress_input);
   static bool RemoveTimeSource(vtkSMProxy* timeKeeper, vtkSMProxy* proxy, bool unsuppress_input)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->RemoveTimeSource(proxy, unsuppress_input) : false;
-    }
+    return self ? self->RemoveTimeSource(proxy, unsuppress_input) : false;
+  }
   //@}
 
   //@{
@@ -65,10 +65,10 @@ public:
    */
   virtual bool IsTimeSourceTracked(vtkSMProxy* proxy);
   static bool IsTimeSourceTracked(vtkSMProxy* timeKeeper, vtkSMProxy* proxy)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->IsTimeSourceTracked(proxy) : false;
-    }
+    return self ? self->IsTimeSourceTracked(proxy) : false;
+  }
   //@}
 
   //@{
@@ -79,10 +79,10 @@ public:
    */
   virtual bool SetSuppressTimeSource(vtkSMProxy* proxy, bool suppress);
   static bool SetSuppressTimeSource(vtkSMProxy* timeKeeper, vtkSMProxy* proxy, bool suppress)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->SetSuppressTimeSource(proxy, suppress) : false;
-    }
+    return self ? self->SetSuppressTimeSource(proxy, suppress) : false;
+  }
   //@}
 
   //@{
@@ -92,10 +92,10 @@ public:
    */
   virtual double GetLowerBoundTimeStep(double value);
   static double GetLowerBoundTimeStep(vtkSMProxy* timeKeeper, double value)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->GetLowerBoundTimeStep(value) : value;
-    }
+    return self ? self->GetLowerBoundTimeStep(value) : value;
+  }
   //@}
 
   //@{
@@ -105,10 +105,10 @@ public:
    */
   virtual int GetLowerBoundTimeStepIndex(double value);
   static int GetLowerBoundTimeStepIndex(vtkSMProxy* timeKeeper, double value)
-    {
+  {
     vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
-    return self? self->GetLowerBoundTimeStepIndex(value) : 0;
-    }
+    return self ? self->GetLowerBoundTimeStepIndex(value) : 0;
+  }
   //@}
 
 protected:
@@ -120,7 +120,6 @@ protected:
 private:
   vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

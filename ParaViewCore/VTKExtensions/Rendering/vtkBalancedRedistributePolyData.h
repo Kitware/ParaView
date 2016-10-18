@@ -29,21 +29,21 @@
 #include "vtkWeightedRedistributePolyData.h"
 class vtkMultiProcessController;
 
-
 //*******************************************************************
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData : public vtkWeightedRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData
+  : public vtkWeightedRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkBalancedRedistributePolyData *New();
+  static vtkBalancedRedistributePolyData* New();
 
 protected:
   vtkBalancedRedistributePolyData();
   ~vtkBalancedRedistributePolyData();
-  void MakeSchedule (vtkPolyData*, vtkCommSched*);
+  void MakeSchedule(vtkPolyData*, vtkCommSched*);
 
 private:
   vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
@@ -53,5 +53,3 @@ private:
 //****************************************************************
 
 #endif
-
-

@@ -52,14 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRemoteControl::pqInternal : public Ui::pqRemoteControl
 {
 public:
-
   int Port;
 
   pqRemoteControlThread Server;
 };
 
 //-----------------------------------------------------------------------------
-pqRemoteControl::pqRemoteControl(QWidget* p, Qt::WindowFlags flags) : QDockWidget(p, flags)
+pqRemoteControl::pqRemoteControl(QWidget* p, Qt::WindowFlags flags)
+  : QDockWidget(p, flags)
 {
   this->Internal = new pqInternal;
   QWidget* mainWidget = new QWidget(this);
@@ -67,7 +67,8 @@ pqRemoteControl::pqRemoteControl(QWidget* p, Qt::WindowFlags flags) : QDockWidge
   this->setWidget(mainWidget);
   this->setWindowTitle("Mobile Remote Control");
   this->connect(this->Internal->StartButton, SIGNAL(clicked()), SLOT(onButtonClicked()));
-  this->connect(this->Internal->DocLabel, SIGNAL(linkActivated(const QString&)), SLOT(onLinkClicked(const QString&)));
+  this->connect(this->Internal->DocLabel, SIGNAL(linkActivated(const QString&)),
+    SLOT(onLinkClicked(const QString&)));
   this->connect(&this->Internal->Server, SIGNAL(requestExportScene()), SLOT(onExportScene()));
 
   this->Internal->Port = 40000;
@@ -86,24 +87,25 @@ pqRemoteControl::~pqRemoteControl()
 void pqRemoteControl::onButtonClicked()
 {
   if (this->Internal->StartButton->text() == "Start")
-    {
+  {
     this->onStart();
-    }
+  }
   else if (this->Internal->StartButton->text() == "Stop")
-    {
+  {
     this->onStop();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqRemoteControl::onStart()
 {
   if (!this->Internal->Server.createServer(this->Internal->Port))
-    {
+  {
     return;
-    }
+  }
 
-  this->Internal->StatusLabel->setText(QString("Status: waiting for connection on port %1").arg(this->Internal->Port));
+  this->Internal->StatusLabel->setText(
+    QString("Status: waiting for connection on port %1").arg(this->Internal->Port));
   this->Internal->StartButton->setText("Stop");
   this->checkForConnection();
 }
@@ -114,11 +116,13 @@ void pqRemoteControl::onStop()
   this->Internal->StartButton->setText("Start");
   this->Internal->StatusLabel->setText("Status: inactive");
 
-  if (this->Internal->Server.clientIsConnected()) {
+  if (this->Internal->Server.clientIsConnected())
+  {
     this->Internal->Server.shouldQuit();
     this->Internal->Server.wait();
   }
-  else {
+  else
+  {
     this->Internal->Server.close();
   }
 }
@@ -127,43 +131,44 @@ void pqRemoteControl::onStop()
 void pqRemoteControl::checkForConnection()
 {
   if (!this->Internal->Server.serverIsOpen())
-    {
+  {
     return;
-    }
+  }
 
   if (this->Internal->Server.checkForConnection())
-    {
+  {
     this->Internal->StatusLabel->setText("Status: active");
     this->onNewConnection();
-    }
+  }
   else
-    {
+  {
     QTimer::singleShot(100, this, SLOT(checkForConnection()));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqRemoteControl::updateCamera()
 {
   if (!this->Internal->Server.clientIsConnected())
-    {
+  {
     this->onStop();
     return;
-    }
+  }
 
   pqRenderView* renView = this->renderView();
   if (!renView || !this->Internal->Server.hasNewCameraState())
-    {
+  {
     QTimer::singleShot(33, this, SLOT(updateCamera()));
     return;
-    }
+  }
 
   const pqRemoteControlThread::CameraStateStruct cameraState = this->Internal->Server.cameraState();
 
-  double cameraPosition[3] = {cameraState.Position[0],cameraState.Position[1],cameraState.Position[2]};
-  double cameraFocalPoint[3] = {cameraState.FocalPoint[0],cameraState.FocalPoint[1],cameraState.FocalPoint[2]};
-  double cameraViewUp[3] = {cameraState.ViewUp[0],cameraState.ViewUp[1],cameraState.ViewUp[2]};
-
+  double cameraPosition[3] = { cameraState.Position[0], cameraState.Position[1],
+    cameraState.Position[2] };
+  double cameraFocalPoint[3] = { cameraState.FocalPoint[0], cameraState.FocalPoint[1],
+    cameraState.FocalPoint[2] };
+  double cameraViewUp[3] = { cameraState.ViewUp[0], cameraState.ViewUp[1], cameraState.ViewUp[2] };
 
   vtkSMRenderViewProxy* viewProxy = renView->getRenderViewProxy();
   vtkSMPropertyHelper(viewProxy, "CameraPosition").Set(cameraPosition, 3);
@@ -172,9 +177,9 @@ void pqRemoteControl::updateCamera()
 
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(viewProxy->GetClientSideView());
   if (view)
-    {
+  {
     view->ResetCameraClippingRange();
-    }
+  }
   renView->render();
 
   QTimer::singleShot(33, this, SLOT(updateCamera()));
@@ -184,35 +189,36 @@ void pqRemoteControl::updateCamera()
 void pqRemoteControl::onLinkClicked(const QString& link)
 {
   if (link == "changeport")
-    {
+  {
     QString title = "Change port";
     QString label = "Enter port:";
     bool ok = true;
     int newPort = QInputDialog::getInt(this, title, label, this->Internal->Port, 0, 65535, 1, &ok);
     if (ok)
-      {
-      this->Internal->Port = newPort;
-      }
-    }
-  else
     {
-    QDesktopServices::openUrl(link);
+      this->Internal->Port = newPort;
     }
+  }
+  else
+  {
+    QDesktopServices::openUrl(link);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqRemoteControl::onHostLookup(const QHostInfo& hostInfo)
 {
   if (hostInfo.error() != QHostInfo::NoError || hostInfo.addresses().empty())
-    {
+  {
     qDebug() << "Lookup failed:" << hostInfo.errorString();
     return;
-    }
+  }
 
   QString hostName = hostInfo.hostName();
   QString hostAddress = hostInfo.addresses()[0].toString();
 
-  this->Internal->HostLabel->setText(QString("Host: %1<br>Address: %2").arg(hostName).arg(hostAddress));
+  this->Internal->HostLabel->setText(
+    QString("Host: %1<br>Address: %2").arg(hostName).arg(hostAddress));
 }
 
 //-----------------------------------------------------------------------------
@@ -221,9 +227,9 @@ pqRenderView* pqRemoteControl::renderView()
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
   if (views.empty())
-    {
+  {
     return 0;
-    }
+  }
 
   return views[0];
 }

@@ -51,11 +51,9 @@ public:
    * hence we not adding that code.
    */
   static vtkSMProxy* NewSelectionSourceFromSelection(
-    vtkSMSession* session, vtkSelection* selection,
-    bool ignore_composite_keys=false);
+    vtkSMSession* session, vtkSelection* selection, bool ignore_composite_keys = false);
 
-  static void NewSelectionSourcesFromSelection(
-    vtkSelection* selection, vtkSMProxy* view,
+  static void NewSelectionSourcesFromSelection(vtkSelection* selection, vtkSMProxy* view,
     vtkCollection* selSources, vtkCollection* selRepresentations);
 
   /**
@@ -63,9 +61,8 @@ public:
    * proxy generating the selection, the input selectionSourceProxy is used to
    * fill the default values for created selection source.
    */
-  static vtkSMProxy* ConvertSelection(int outputType,
-    vtkSMProxy* selectionSourceProxy,
-    vtkSMSourceProxy* dataSource, int outputport);
+  static vtkSMProxy* ConvertSelection(
+    int outputType, vtkSMProxy* selectionSourceProxy, vtkSMSourceProxy* dataSource, int outputport);
 
   /**
    * Updates output to be a combination of (input | output) if the two selection
@@ -73,8 +70,7 @@ public:
    * dataSource and outputport are needed if a conversion is needed to make the
    * input expandable to the type of the output.
    */
-  static bool MergeSelection(
-    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+  static bool MergeSelection(vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
   /**
@@ -83,8 +79,7 @@ public:
    * dataSource and outputport are needed if a conversion is needed to make the
    * input expandable to the type of the output.
    */
-  static bool SubtractSelection(
-    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+  static bool SubtractSelection(vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
   /**
@@ -94,30 +89,25 @@ public:
    * dataSource and outputport are needed if a conversion is needed to make the
    * input expandable to the type of the output.
    */
-  static bool ToggleSelection(
-    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+  static bool ToggleSelection(vtkSMSourceProxy* output, vtkSMSourceProxy* input,
     vtkSMSourceProxy* dataSource, int outputport);
 
 protected:
-  vtkSMSelectionHelper() {};
-  ~vtkSMSelectionHelper() {};
+  vtkSMSelectionHelper(){};
+  ~vtkSMSelectionHelper(){};
 
   static void ConvertSurfaceSelectionToVolumeSelectionInternal(
-    vtkIdType connectionID, vtkSelection* input, vtkSelection* output,
-    int global_ids);
+    vtkIdType connectionID, vtkSelection* input, vtkSelection* output, int global_ids);
 
 private:
   vtkSMSelectionHelper(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
-    vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource,
-    bool ignore_composite_keys);
+    vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource, bool ignore_composite_keys);
 
   static vtkSMProxy* ConvertInternal(
-    vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
-    int dataPort, int outputType);
+    vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource, int dataPort, int outputType);
 };
 
 #endif
-

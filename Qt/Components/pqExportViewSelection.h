@@ -35,16 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QWidget>
 
-
 class pqRenderViewBase;
 class pqContextView;
 class pqImageOutputInfo;
 
 namespace Ui
 {
-  class ExportViewSelection;
+class ExportViewSelection;
 }
-
 
 /**
 * @brief Widget to select views to be included in a coprocessing script.
@@ -58,12 +56,11 @@ class PQCOMPONENTS_EXPORT pqExportViewSelection : public QWidget
   Q_OBJECT;
 
 public:
-
   pqExportViewSelection(QWidget* parent_ = NULL);
   ~pqExportViewSelection();
 
-  void populateViews(QList<pqRenderViewBase*> const &  renderViews,
-    QList<pqContextView*> const & contextViews);
+  void populateViews(
+    QList<pqRenderViewBase*> const& renderViews, QList<pqContextView*> const& contextViews);
 
   /**
   * Hides/shows cinema options.
@@ -91,7 +88,7 @@ public:
   *            'ViewName2' : [...],
   *            ... (for N views)
   */
-  QString getSelectionAsString(QString const & scriptFromat);
+  QString getSelectionAsString(QString const& scriptFromat);
 
 private slots:
 
@@ -99,7 +96,6 @@ private slots:
   void onNextClicked();
 
 private:
-
   /**
   * Checks if a given string marker exists in infoFormat and replaces it with the
   * appropriate value in parameters.
@@ -107,7 +103,7 @@ private:
   * result is undefined when called on a string with no unreplaced "%i" markers. See
   * , http://doc.qt.io/qt-4.8/qstring.html#arg
   */
-  void patchFormatString(QMap<QString, QString> const & parameters, QString & infoFormat);
+  void patchFormatString(QMap<QString, QString> const& parameters, QString& infoFormat);
 
   /**
   * @note This is templated to handle pqRenderViewBase* and pqContextView*
@@ -115,11 +111,11 @@ private:
   * cinema gives support to all the pqView types the template will be removed.
   */
   template <typename T>
-  void addViews(T const & views, int numberOfViews);
+  void addViews(T const& views, int numberOfViews);
 
-/**
-*
-*/
+  /**
+  *
+  */
 
   Ui::ExportViewSelection* Ui;
 };

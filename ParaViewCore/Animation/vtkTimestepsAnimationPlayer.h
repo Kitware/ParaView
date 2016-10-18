@@ -74,33 +74,34 @@ public:
    * If no value exists, returns the argument \c time itself.
    */
   double GetPreviousTimeStep(double time);
+
 protected:
   vtkTimestepsAnimationPlayer();
   ~vtkTimestepsAnimationPlayer();
   //@}
 
   virtual void StartLoop(double, double, double*);
-  virtual void EndLoop() {};
+  virtual void EndLoop(){};
 
   /**
    * Return the next time given the current time.
    */
   virtual double GetNextTime(double currentime);
 
-
   virtual double GoToNext(double, double, double currenttime)
-    {
+  {
     return this->GetNextTimeStep(currenttime);
-    }
+  }
 
   virtual double GoToPrevious(double, double, double currenttime)
-    {
+  {
     return this->GetPreviousTimeStep(currenttime);
-    }
+  }
 
   double PlaybackWindow[2];
   unsigned long FramesPerTimestep;
   unsigned long Count;
+
 private:
   vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -49,13 +49,14 @@ class PQCORE_EXPORT pqFileDialogRecentDirsModel : public QAbstractListModel
 {
   Q_OBJECT
   typedef QAbstractListModel Superclass;
+
 public:
   /**
   * server is the server for which we need the listing.
   * if the server is NULL, we get file listings locally (i.e. builtin server).
   * pqFileDialogModel is used to test the validity of directories.
   */
-  pqFileDialogRecentDirsModel(pqFileDialogModel*model, pqServer* server, QObject* parent);
+  pqFileDialogRecentDirsModel(pqFileDialogModel* model, pqServer* server, QObject* parent);
   ~pqFileDialogRecentDirsModel();
 
   /**
@@ -73,12 +74,12 @@ public:
   * returns the data for an item
   */
   QVariant data(const QModelIndex& idx, int role) const;
- 
+
   /**
-  * return the number of rows in the model 
+  * return the number of rows in the model
   */
   int rowCount(const QModelIndex& idx) const;
-  
+
   /**
   * return header data
   */
@@ -97,5 +98,3 @@ private:
 };
 
 #endif
-
-

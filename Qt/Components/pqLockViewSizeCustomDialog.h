@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqLockViewSizeCustomDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqLockViewSizeCustomDialog(QWidget *parent, Qt::WindowFlags f=0);
+  pqLockViewSizeCustomDialog(QWidget* parent, Qt::WindowFlags f = 0);
   virtual ~pqLockViewSizeCustomDialog();
 
   /**
@@ -72,7 +72,7 @@ private:
   Q_DISABLE_COPY(pqLockViewSizeCustomDialog)
 
   class pqUI;
-  pqUI *ui;
+  pqUI* ui;
 };
 
-#endif //pqLockViewSizeCustomDialog_h
+#endif // pqLockViewSizeCustomDialog_h

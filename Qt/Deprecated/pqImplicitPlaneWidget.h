@@ -59,8 +59,7 @@ public slots:
   /**
   * Resets the bounds of the 3D widget to the reference proxy bounds.
   */
-  virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
+  virtual void resetBounds() { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
   /**
@@ -79,7 +78,6 @@ public slots:
   virtual void select();
 
 protected:
-
   /**
   * Makes the 3D widget plane visible (respects the overall visibility flag)
   */
@@ -96,8 +94,7 @@ protected:
   * so that default implementations can be provided for
   * accept/reset.
   */
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
+  virtual void setControlledProperty(const char* function, vtkSMProperty* controlled_property);
 
   /**
   * Called on pick.

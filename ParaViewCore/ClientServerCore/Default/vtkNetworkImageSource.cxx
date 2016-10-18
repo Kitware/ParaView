@@ -31,7 +31,6 @@
 
 #include <vtksys/SystemTools.hxx>
 
-
 vtkStandardNewMacro(vtkNetworkImageSource);
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::vtkNetworkImageSource()
@@ -53,53 +52,50 @@ vtkNetworkImageSource::~vtkNetworkImageSource()
 void vtkNetworkImageSource::UpdateImage()
 {
   if (this->GetMTime() < this->UpdateImageTime)
-    {
+  {
     return;
-    }
+  }
 
   if (this->FileName == NULL || this->FileName[0] == 0)
-    {
+  {
     return;
-    }
+  }
 
-  vtkPVSession* session = vtkPVSession::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetActiveSession());
+  vtkPVSession* session =
+    vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
   if (!session)
-    {
+  {
     vtkErrorMacro("Active session must be a vtkPVSession.");
     return;
-    }
+  }
 
   vtkPVSession::ServerFlags roles = session->GetProcessRoles();
-  if ( (roles & vtkPVSession::CLIENT) != 0)
-    {
+  if ((roles & vtkPVSession::CLIENT) != 0)
+  {
     // We are expected to read the image on this process.
     this->ReadImageFromFile(this->FileName);
-    vtkMultiProcessController* rs_controller =
-      session->GetController(vtkPVSession::RENDER_SERVER);
+    vtkMultiProcessController* rs_controller = session->GetController(vtkPVSession::RENDER_SERVER);
     if (rs_controller)
-      {
+    {
       rs_controller->Send(this->Buffer, 1, 0x287823);
-      }
     }
-  else if ( (roles & vtkPVSession::RENDER_SERVER) != 0 ||
+  }
+  else if ((roles & vtkPVSession::RENDER_SERVER) != 0 ||
     (roles & vtkPVSession::RENDER_SERVER_ROOT) != 0)
-    {
+  {
     // receive the image from the client.
-    vtkMultiProcessController* client_controller =
-      session->GetController(vtkPVSession::CLIENT);
+    vtkMultiProcessController* client_controller = session->GetController(vtkPVSession::CLIENT);
     if (client_controller)
-      {
-      client_controller->Receive(this->Buffer, 1, 0x287823);
-      }
-    }
-
-  vtkMultiProcessController* globalController =
-    vtkMultiProcessController::GetGlobalController();
-  if (globalController->GetNumberOfProcesses() > 1)
     {
-    globalController->Broadcast(this->Buffer, 0);
+      client_controller->Receive(this->Buffer, 1, 0x287823);
     }
+  }
+
+  vtkMultiProcessController* globalController = vtkMultiProcessController::GetGlobalController();
+  if (globalController->GetNumberOfProcesses() > 1)
+  {
+    globalController->Broadcast(this->Buffer, 0);
+  }
 
   this->UpdateImageTime.Modified();
 }
@@ -108,45 +104,45 @@ void vtkNetworkImageSource::UpdateImage()
 int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
 {
   if (!filename || !filename[0])
-    {
+  {
     vtkErrorMacro("FileName must be set.");
     return 0;
-    }
+  }
 
   vtkSmartPointer<vtkImageReader2> reader;
   // determine type of reader to create.
   std::string ext =
     vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename));
   if (ext == ".bmp")
-    {
+  {
     reader.TakeReference(vtkBMPReader::New());
-    }
-  else if ( ext == ".jpg")
-    {
+  }
+  else if (ext == ".jpg")
+  {
     reader.TakeReference(vtkJPEGReader::New());
-    }
-  else if ( ext == ".png")
-    {
+  }
+  else if (ext == ".png")
+  {
     reader.TakeReference(vtkPNGReader::New());
-    }
+  }
   else if (ext == ".ppm")
-    {
+  {
     reader.TakeReference(vtkPNMReader::New());
-    }
-  else if ( ext == ".tif")
-    {
+  }
+  else if (ext == ".tif")
+  {
     reader.TakeReference(vtkTIFFReader::New());
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("Unknown texture file extension: " << filename);
     return 0;
-    }
+  }
   if (!reader->CanReadFile(filename))
-    {
+  {
     vtkErrorMacro("Reader cannot read file " << filename);
     return 0;
-    }
+  }
   reader->SetFileName(filename);
   reader->Update();
   this->Buffer->ShallowCopy(reader->GetOutput());
@@ -154,28 +150,22 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-int vtkNetworkImageSource::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector),
-  vtkInformationVector* outputVector)
+int vtkNetworkImageSource::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
-               this->Buffer->GetExtent(), 6);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), this->Buffer->GetExtent(), 6);
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkNetworkImageSource::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector),
-  vtkInformationVector* outputVector)
+int vtkNetworkImageSource::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   // shallow copy internal buffer to output
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkImageData *output = vtkImageData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkImageData* output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   output->ShallowCopy(this->Buffer);
   return 1;
 }

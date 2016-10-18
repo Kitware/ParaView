@@ -19,7 +19,7 @@
  * cells. It uses vtkGeometryRepresentation and vtkPVDataRepresentation
  * internally.
  * @par Thanks:
- * The addition of a transformation matrix was supported by CEA/DIF 
+ * The addition of a transformation matrix was supported by CEA/DIF
  * Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 */
 
@@ -32,7 +32,8 @@
 class vtkGeometryRepresentation;
 class vtkDataLabelRepresentation;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkSelectionRepresentation* New();
@@ -151,7 +152,6 @@ protected:
 private:
   vtkSelectionRepresentation(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -63,10 +63,9 @@ public:
   /**
    * Overridden to leave defaults unchanged.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool){ return 1; }
+  virtual int SetDefaultValues(vtkSMProperty*, bool) { return 1; }
 
 protected:
-
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
@@ -86,8 +85,6 @@ protected:
 private:
   vtkSMSILDomain(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

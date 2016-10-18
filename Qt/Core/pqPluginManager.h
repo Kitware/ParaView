@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -56,6 +56,7 @@ class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   pqPluginManager(QObject* p = 0);
   ~pqPluginManager();
@@ -69,7 +70,12 @@ public:
   */
   void loadPluginsFromSettings();
 
-  enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
+  enum LoadStatus
+  {
+    LOADED,
+    NOTLOADED,
+    ALREADYLOADED
+  };
 
   /**
   * attempt to load an extension on a server
@@ -78,11 +84,11 @@ public:
   * If errorMsg is non-null, then errors are not reported, but the error
   * message is put in the errorMsg string
   */
-  LoadStatus loadExtension(pqServer* session, const QString& lib, 
-    QString* errorMsg=0, bool remote=true);
+  LoadStatus loadExtension(
+    pqServer* session, const QString& lib, QString* errorMsg = 0, bool remote = true);
 
   /**
-  * attempt to load all available plugins on a server, 
+  * attempt to load all available plugins on a server,
   * or client plugins if NULL
   */
   void loadExtensions(pqServer*);

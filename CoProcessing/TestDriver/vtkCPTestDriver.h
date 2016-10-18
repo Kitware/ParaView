@@ -17,7 +17,7 @@
  * @brief   Class for creating a co-processor test driver.
  *
  * Class for creating a co-processor test driver.  It is intended
- * as a framework for creating custom inputs replicating a simulation for 
+ * as a framework for creating custom inputs replicating a simulation for
  * the co-processing library.
 */
 
@@ -32,7 +32,7 @@ class vtkCPBaseGridBuilder;
 class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPTestDriver : public vtkObject
 {
 public:
-  static vtkCPTestDriver * New();
+  static vtkCPTestDriver* New();
   vtkTypeMacro(vtkCPTestDriver, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -100,6 +100,6 @@ private:
   double StartTime;
   double EndTime;
 };
-  //@}
+//@}
 
 #endif

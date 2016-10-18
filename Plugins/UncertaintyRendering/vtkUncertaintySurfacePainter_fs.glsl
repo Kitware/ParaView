@@ -32,13 +32,13 @@ float snoise(vec4 P)
 #define G4 0.138196601125
 
   // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
- 	float s = (P.x + P.y + P.z + P.w) * F4; // Factor for 4D skewing
+  float s = (P.x + P.y + P.z + P.w) * F4; // Factor for 4D skewing
   vec4 Pi = floor(P + s);
   float t = (Pi.x + Pi.y + Pi.z + Pi.w) * G4;
-  vec4 P0 = Pi - t; // Unskew the cell origin back to (x,y,z,w) space
+  vec4 P0 = Pi - t;        // Unskew the cell origin back to (x,y,z,w) space
   Pi = Pi * ONE + ONEHALF; // Integer part, scaled and offset for texture lookup
 
-  vec4 Pf0 = P - P0;  // The x,y distances from the cell origin
+  vec4 Pf0 = P - P0; // The x,y distances from the cell origin
 
   // For the 4D case, the simplex is a 4D shape I won't even try to describe.
   // To find out which of the 24 possible simplices we're in, we need to
@@ -62,11 +62,13 @@ float snoise(vec4 P)
   // Noise contribution from simplex origin
   float perm0xy = texture2D(permTexture, Pi.xy).a;
   float perm0zw = texture2D(permTexture, Pi.zw).a;
-  vec4  grad0 = texture2D(gradTexture, vec2(perm0xy, perm0zw)).rgba * 4.0 - 1.0;
+  vec4 grad0 = texture2D(gradTexture, vec2(perm0xy, perm0zw)).rgba * 4.0 - 1.0;
   float t0 = 0.6 - dot(Pf0, Pf0);
   float n0;
-  if (t0 < 0.0) n0 = 0.0;
-  else {
+  if (t0 < 0.0)
+    n0 = 0.0;
+  else
+  {
     t0 *= t0;
     n0 = t0 * t0 * dot(grad0, Pf0);
   }
@@ -76,52 +78,60 @@ float snoise(vec4 P)
   o1 = o1 * ONE;
   float perm1xy = texture2D(permTexture, Pi.xy + o1.xy).a;
   float perm1zw = texture2D(permTexture, Pi.zw + o1.zw).a;
-  vec4  grad1 = texture2D(gradTexture, vec2(perm1xy, perm1zw)).rgba * 4.0 - 1.0;
+  vec4 grad1 = texture2D(gradTexture, vec2(perm1xy, perm1zw)).rgba * 4.0 - 1.0;
   float t1 = 0.6 - dot(Pf1, Pf1);
   float n1;
-  if (t1 < 0.0) n1 = 0.0;
-  else {
+  if (t1 < 0.0)
+    n1 = 0.0;
+  else
+  {
     t1 *= t1;
     n1 = t1 * t1 * dot(grad1, Pf1);
   }
-  
+
   // Noise contribution from third corner
   vec4 Pf2 = Pf0 - o2 + 2.0 * G4;
   o2 = o2 * ONE;
   float perm2xy = texture2D(permTexture, Pi.xy + o2.xy).a;
   float perm2zw = texture2D(permTexture, Pi.zw + o2.zw).a;
-  vec4  grad2 = texture2D(gradTexture, vec2(perm2xy, perm2zw)).rgba * 4.0 - 1.0;
+  vec4 grad2 = texture2D(gradTexture, vec2(perm2xy, perm2zw)).rgba * 4.0 - 1.0;
   float t2 = 0.6 - dot(Pf2, Pf2);
   float n2;
-  if (t2 < 0.0) n2 = 0.0;
-  else {
+  if (t2 < 0.0)
+    n2 = 0.0;
+  else
+  {
     t2 *= t2;
     n2 = t2 * t2 * dot(grad2, Pf2);
   }
-  
+
   // Noise contribution from fourth corner
   vec4 Pf3 = Pf0 - o3 + 3.0 * G4;
   o3 = o3 * ONE;
   float perm3xy = texture2D(permTexture, Pi.xy + o3.xy).a;
   float perm3zw = texture2D(permTexture, Pi.zw + o3.zw).a;
-  vec4  grad3 = texture2D(gradTexture, vec2(perm3xy, perm3zw)).rgba * 4.0 - 1.0;
+  vec4 grad3 = texture2D(gradTexture, vec2(perm3xy, perm3zw)).rgba * 4.0 - 1.0;
   float t3 = 0.6 - dot(Pf3, Pf3);
   float n3;
-  if (t3 < 0.0) n3 = 0.0;
-  else {
+  if (t3 < 0.0)
+    n3 = 0.0;
+  else
+  {
     t3 *= t3;
     n3 = t3 * t3 * dot(grad3, Pf3);
   }
-  
+
   // Noise contribution from last corner
-  vec4 Pf4 = Pf0 - vec4(1.0-4.0*G4);
+  vec4 Pf4 = Pf0 - vec4(1.0 - 4.0 * G4);
   float perm4xy = texture2D(permTexture, Pi.xy + vec2(ONE, ONE)).a;
   float perm4zw = texture2D(permTexture, Pi.zw + vec2(ONE, ONE)).a;
-  vec4  grad4 = texture2D(gradTexture, vec2(perm4xy, perm4zw)).rgba * 4.0 - 1.0;
+  vec4 grad4 = texture2D(gradTexture, vec2(perm4xy, perm4zw)).rgba * 4.0 - 1.0;
   float t4 = 0.6 - dot(Pf4, Pf4);
   float n4;
-  if(t4 < 0.0) n4 = 0.0;
-  else {
+  if (t4 < 0.0)
+    n4 = 0.0;
+  else
+  {
     t4 *= t4;
     n4 = t4 * t4 * dot(grad4, Pf4);
   }
@@ -135,7 +145,7 @@ vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
   float n = 0.0;
   float s = uncertaintyScaleFactor;
   int octs = 5;
-  for(int i = 0; i < octs; i++)
+  for (int i = 0; i < octs; i++)
   {
     n += snoise(vec4(4.0 * pow(2.0, float(i)) * s * v_texCoord3D.xyz, gl_TexCoord[0].x));
   }
@@ -143,9 +153,7 @@ vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
 
   float scale = scalarValueRange;
 
-  inputCoord.x =
-    clamp(inputCoord.x + uncertaintyScaleFactor * uncertainty / scale * n,
-          0.0f, 1.0f);
+  inputCoord.x = clamp(inputCoord.x + uncertaintyScaleFactor * uncertainty / scale * n, 0.0f, 1.0f);
   return inputCoord;
 }
 

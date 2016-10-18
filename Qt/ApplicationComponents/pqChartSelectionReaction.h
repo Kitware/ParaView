@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -46,6 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqSelecti
 {
   Q_OBJECT
   typedef pqSelectionReaction Superclass;
+
 public:
   /**
   * Constructor. \c parent is expected to have data() that indicates the
@@ -58,8 +59,7 @@ public:
   * specified or no checked action is present, then the default mode of
   * vtkContextScene::SELECTION_DEFAULT is used.
   */
-  pqChartSelectionReaction(QAction* parent,
-    pqContextView* view, QActionGroup* modifierGroup);
+  pqChartSelectionReaction(QAction* parent, pqContextView* view, QActionGroup* modifierGroup);
 
   /**
   * start selection on the view where selectionType is one of
@@ -67,8 +67,7 @@ public:
   * selectionModifier is one of vtkContextScene::SELECTION_DEFAULT,
   * vtkContextScene::SELECTION_ADDITION, etc.
   */
-  static void startSelection(pqContextView* view, 
-    int selectionType, int selectionModifier);
+  static void startSelection(pqContextView* view, int selectionType, int selectionModifier);
 
 protected slots:
   /**
@@ -88,6 +87,7 @@ protected slots:
 
   // Get the current state of selection modifier, converting it to vtkScene enum
   int getSelectionModifier();
+
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)
   QPointer<pqContextView> View;

@@ -31,20 +31,19 @@ vtkPVInstantiator::~vtkPVInstantiator()
 
 vtkObject* vtkPVInstantiator::CreateInstance(const char* className)
 {
-  vtkClientServerInterpreter* interp =
-    vtkClientServerInterpreterInitializer::GetInitializer()?
-    vtkClientServerInterpreterInitializer::GetInitializer()->GetGlobalInterpreter() :
-    NULL;
-  vtkObjectBase* objbase = interp? interp->NewInstance(className) : NULL;
-  vtkObject* obj= vtkObject::SafeDownCast(objbase);
+  vtkClientServerInterpreter* interp = vtkClientServerInterpreterInitializer::GetInitializer()
+    ? vtkClientServerInterpreterInitializer::GetInitializer()->GetGlobalInterpreter()
+    : NULL;
+  vtkObjectBase* objbase = interp ? interp->NewInstance(className) : NULL;
+  vtkObject* obj = vtkObject::SafeDownCast(objbase);
   if (objbase != NULL && obj == NULL)
-    {
+  {
     objbase->Delete();
     objbase = NULL;
-    }
+  }
   return obj;
 }
-  
+
 //----------------------------------------------------------------------------
 void vtkPVInstantiator::PrintSelf(ostream& os, vtkIndent indent)
 {

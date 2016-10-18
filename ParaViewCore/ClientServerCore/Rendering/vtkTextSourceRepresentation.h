@@ -31,7 +31,8 @@ class vtk3DWidgetRepresentation;
 class vtkPolyData;
 class vtkPVCacheKeeper;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTextSourceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTextSourceRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkTextSourceRepresentation* New();
@@ -65,8 +66,7 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(
-    vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
 protected:
   vtkTextSourceRepresentation();
@@ -80,8 +80,7 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -109,7 +108,6 @@ protected:
 private:
   vtkTextSourceRepresentation(const vtkTextSourceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTextSourceRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -46,7 +46,6 @@ protected:
 private:
   vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

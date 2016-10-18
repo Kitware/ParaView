@@ -48,10 +48,11 @@ class PQCOMPONENTS_EXPORT pqProxyWidgetDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent=0, Qt::WindowFlags f = 0);
-  pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent=0,
-    Qt::WindowFlags f = 0);
+  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqProxyWidgetDialog(
+    vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqProxyWidgetDialog();
 
   /**
@@ -117,8 +118,8 @@ protected:
   /**
   * Overridden to resize widget before showing it the first time.
   */
-  virtual void showEvent(QShowEvent * event);
-  virtual void hideEvent(QHideEvent *event);
+  virtual void showEvent(QShowEvent* event);
+  virtual void hideEvent(QHideEvent* event);
   virtual void done(int r);
 
 private slots:

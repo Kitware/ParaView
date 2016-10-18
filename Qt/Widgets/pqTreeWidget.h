@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,7 +44,7 @@ class vtkSMPropertyGroup;
   1.  Automatic size hints based on contents
   2.  A check box added in a header if items have check boxes
   3.  Navigation through columns of top level items on Tab.
-  4.  Signal emitted when user navigates beyond end of the table giving an 
+  4.  Signal emitted when user navigates beyond end of the table giving an
       opportunity to the lister to grow the table.
 */
 class PQWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
@@ -52,7 +52,6 @@ class PQWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
   typedef QTreeWidget Superclass;
   Q_OBJECT
 public:
-  
   pqTreeWidget(QWidget* p = NULL);
   ~pqTreeWidget();
 
@@ -64,13 +63,11 @@ public:
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
 
-  void setMaximumRowCountBeforeScrolling(vtkSMPropertyGroup *smpropertygroup);
-  void setMaximumRowCountBeforeScrolling(vtkSMProperty *smproperty);
+  void setMaximumRowCountBeforeScrolling(vtkSMPropertyGroup* smpropertygroup);
+  void setMaximumRowCountBeforeScrolling(vtkSMProperty* smproperty);
   void setMaximumRowCountBeforeScrolling(vtkPVXMLElement* hints);
-  void setMaximumRowCountBeforeScrolling(int val)
-    { this->MaximumRowCountBeforeScrolling = val; }
-  int maximumRowCountBeforeScrolling() const
-    { return this->MaximumRowCountBeforeScrolling; }
+  void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
+  int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }
 
 public slots:
   void allOn();
@@ -95,11 +92,10 @@ protected:
   QPixmap pixmap(Qt::CheckState state, bool active);
 
   /**
-  * Move the cursor in the way described by cursorAction, 
+  * Move the cursor in the way described by cursorAction,
   * using the information provided by the button modifiers.
   */
-  virtual QModelIndex moveCursor(CursorAction cursorAction, 
-    Qt::KeyboardModifiers modifiers);
+  virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
 
   QTimer* Timer;
 
@@ -108,4 +104,3 @@ protected:
 };
 
 #endif // !_pqTreeWidget_h
-

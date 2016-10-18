@@ -136,6 +136,7 @@ protected:
    * attribute "skip_plotable_check".
    */
   bool SkipPlotableCheck;
+
 private:
   vtkSMContextViewProxy(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
@@ -148,8 +149,6 @@ private:
   void CopyAxisRangesFromChart();
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
-
 };
 
 #endif
-

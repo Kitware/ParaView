@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 //----------------------------------------------------------------------------
-pqItemViewSearchWidgetEventPlayer::pqItemViewSearchWidgetEventPlayer(
-  QObject* p) : Superclass(p)
+pqItemViewSearchWidgetEventPlayer::pqItemViewSearchWidgetEventPlayer(QObject* p)
+  : Superclass(p)
 {
 }
 
@@ -48,34 +48,32 @@ pqItemViewSearchWidgetEventPlayer::~pqItemViewSearchWidgetEventPlayer()
 
 //----------------------------------------------------------------------------
 bool pqItemViewSearchWidgetEventPlayer::playEvent(
-  QObject* w, const QString& command,
-    const QString& arguments, bool& error)
+  QObject* w, const QString& command, const QString& arguments, bool& error)
 {
   Q_UNUSED(error);
   if (command == pqItemViewSearchWidgetEventPlayer::EVENT_NAME())
-    {
+  {
     if (arguments == "ctrlF")
-      {
+    {
       QPointer<QAbstractItemView> focusItemView = qobject_cast<QAbstractItemView*>(w);
-      if(!focusItemView)
-        {
+      if (!focusItemView)
+      {
         return false;
-        }
-      QPointer<pqItemViewSearchWidget> searchWidget =
-        new pqItemViewSearchWidget(focusItemView);
+      }
+      QPointer<pqItemViewSearchWidget> searchWidget = new pqItemViewSearchWidget(focusItemView);
       searchWidget->setAttribute(Qt::WA_DeleteOnClose, true);
       searchWidget->showSearchWidget();
-      }
+    }
     return true;
-    }
+  }
   else
-    {
+  {
     return false;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-const QString &pqItemViewSearchWidgetEventPlayer::EVENT_NAME()
+const QString& pqItemViewSearchWidgetEventPlayer::EVENT_NAME()
 {
   static const QString eventName("launchSearchWidget");
   return eventName;

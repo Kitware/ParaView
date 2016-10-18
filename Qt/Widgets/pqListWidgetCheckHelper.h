@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,7 +45,7 @@ class QListWidgetItem;
 * However, sometimes we simply want the checkbox to be updated
 * when the user clicks on the entire row. For that
 * purpose, we use pqListWidgetCheckHelper. Simply create
-* and instance of pqListWidgetCheckHelper, and 
+* and instance of pqListWidgetCheckHelper, and
 * set a List to use.
 */
 class PQWIDGETS_EXPORT pqListWidgetCheckHelper : public QObject
@@ -58,8 +58,9 @@ public:
   pqListWidgetCheckHelper(QListWidget* ListWidget, QObject* parent);
 
 protected slots:
-  void onItemClicked (QListWidgetItem *item);
-  void onItemPressed (QListWidgetItem *item); 
+  void onItemClicked(QListWidgetItem* item);
+  void onItemPressed(QListWidgetItem* item);
+
 private:
   Q_DISABLE_COPY(pqListWidgetCheckHelper)
 
@@ -68,4 +69,3 @@ private:
 };
 
 #endif
-

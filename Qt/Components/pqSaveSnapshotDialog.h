@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,8 +42,9 @@ class PQCOMPONENTS_EXPORT pqSaveSnapshotDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqSaveSnapshotDialog(QWidget* parent, Qt::WindowFlags f=0);
+  pqSaveSnapshotDialog(QWidget* parent, Qt::WindowFlags f = 0);
   ~pqSaveSnapshotDialog();
 
   /**
@@ -81,7 +82,7 @@ public:
   bool saveAllViews() const;
 
   /**
-  * Returns the color palette chosen. If none is chosen 
+  * Returns the color palette chosen. If none is chosen
   * (i.e. "Current Palette" is selected, then an empty string is returned.
   */
   QString palette() const;
@@ -113,5 +114,3 @@ private:
 };
 
 #endif
-
-

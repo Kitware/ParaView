@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,9 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QWidget>
 
-
 /**
-* Widget which provides an editor for the properties of a 
+* Widget which provides an editor for the properties of a
 * representation.
 */
 class PQCOMPONENTS_EXPORT pqDisplayPanel : public QWidget
@@ -66,7 +65,7 @@ public slots:
   * inform us of Representation property changes
   */
   virtual void reloadGUI();
-  
+
   /**
   * Requests update on all views the
   * Representation is visible in.
@@ -83,4 +82,3 @@ protected:
 };
 
 #endif
-

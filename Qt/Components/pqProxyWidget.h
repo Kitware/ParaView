@@ -58,9 +58,11 @@ class PQCOMPONENTS_EXPORT pqProxyWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqProxyWidget(vtkSMProxy* proxy, QWidget *parent=0, Qt::WindowFlags flags=0);
-  pqProxyWidget(vtkSMProxy* proxy, const QStringList &properties, QWidget *parent=0, Qt::WindowFlags flags=0);
+  pqProxyWidget(vtkSMProxy* proxy, QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqProxyWidget(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0,
+    Qt::WindowFlags flags = 0);
   virtual ~pqProxyWidget();
 
   /**
@@ -74,8 +76,7 @@ public:
   * This is used for panels such as the display panel. Default is false.
   */
   void setApplyChangesImmediately(bool value);
-  bool applyChangesImmediately() const
-    { return this->ApplyChangesImmediately; }
+  bool applyChangesImmediately() const { return this->ApplyChangesImmediately; }
 
   /**
   * When this is true, the panel uses a descriptive layout where the
@@ -83,8 +84,7 @@ public:
   * automatically adopts this style of layout if <UseDocumentationForLabels />
   * hint is present in the proxy.
   */
-  bool useDocumentationForLabels() const
-    { return this->UseDocumentationForLabels; }
+  bool useDocumentationForLabels() const { return this->UseDocumentationForLabels; }
 
   /**
   * Returns a new widget that has the label and a h-line separator. This is
@@ -101,24 +101,25 @@ public:
   static bool useDocumentationForLabels(vtkSMProxy* proxy);
 
   enum DocumentationType
-    {
+  {
     NONE,
     USE_DESCRIPTION,
     USE_SHORT_HELP,
     USE_LONG_HELP
-    };
+  };
 
   /**
   * Returns formatted (HTML or plainText) documentation for the property.
   * \c type cannot be NONE.
   */
-  static QString documentationText(vtkSMProperty* property, DocumentationType type=USE_DESCRIPTION);
+  static QString documentationText(
+    vtkSMProperty* property, DocumentationType type = USE_DESCRIPTION);
 
   /**
   * Returns formatted (HTML or plainText) documentation for the proxy.
   * \c type cannot be NONE.
   */
-  static QString documentationText(vtkSMProxy* property, DocumentationType type=USE_DESCRIPTION);
+  static QString documentationText(vtkSMProxy* property, DocumentationType type = USE_DESCRIPTION);
 
   /**
   * Returns true if the proxy has XML hints indicating that the panel should
@@ -153,8 +154,7 @@ public slots:
   * result in the panel showing all the non-advanced properties.
   * Returns true, if any widgets were shown.
   */
-  bool filterWidgets(
-    bool show_advanced=false, const QString& filterText=QString());
+  bool filterWidgets(bool show_advanced = false, const QString& filterText = QString());
 
   /**
   * Accepts the property widget changes changes.
@@ -189,8 +189,8 @@ public slots:
   void saveAsDefaults();
 
 protected:
-  void showEvent(QShowEvent *event);
-  void hideEvent(QHideEvent *event);
+  void showEvent(QShowEvent* event);
+  void hideEvent(QHideEvent* event);
 
 private slots:
   /**
@@ -204,17 +204,17 @@ private:
   * the actual constructor implementation.
   */
   void constructor(
-    vtkSMProxy* proxy, const QStringList &properties, QWidget *parent, Qt::WindowFlags flags);
+    vtkSMProxy* proxy, const QStringList& properties, QWidget* parent, Qt::WindowFlags flags);
 
   /**
   * create all widgets
   */
-  void createWidgets(const QStringList &properties = QStringList());
+  void createWidgets(const QStringList& properties = QStringList());
 
   /**
   * create individual property widgets.
   */
-  void createPropertyWidgets(const QStringList &properties = QStringList());
+  void createPropertyWidgets(const QStringList& properties = QStringList());
 
   /**
   * create 3D widgets, if any.
@@ -225,7 +225,7 @@ private:
   * create a widget for a property.
   */
   pqPropertyWidget* createWidgetForProperty(
-    vtkSMProperty *property, vtkSMProxy *proxy, QWidget *parentObj);
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parentObj);
 
 private:
   Q_DISABLE_COPY(pqProxyWidget)

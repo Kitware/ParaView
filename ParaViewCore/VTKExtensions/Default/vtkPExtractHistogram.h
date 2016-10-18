@@ -54,14 +54,14 @@ protected:
    */
   virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
-  virtual int RequestData(vtkInformation *request,
-    vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   vtkMultiProcessController* Controller;
+
 private:
   vtkPExtractHistogram(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

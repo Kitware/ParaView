@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,6 +50,7 @@ public:
   virtual ~pqBrowser() {}
   virtual QWidget* widget() const = 0;
   virtual void setUrl(const QUrl& url) = 0;
+
 private:
   Q_DISABLE_COPY(pqBrowser)
 };
@@ -58,30 +59,22 @@ template <class T>
 class pqBrowserTemplate : public pqBrowser
 {
   QPointer<T> Widget;
+
 public:
   pqBrowserTemplate(QHelpEngine* engine, pqHelpWindow* self)
-    {
+  {
     this->Widget = T::newInstance(engine, self);
-    }
-  virtual ~pqBrowserTemplate()
-    {
-    delete this->Widget;
-    }
-  virtual QWidget* widget() const
-    {
-    return this->Widget;
-    }
-  virtual void setUrl(const QUrl& url)
-    {
-    this->Widget->setUrl(url);
-    }
+  }
+  virtual ~pqBrowserTemplate() { delete this->Widget; }
+  virtual QWidget* widget() const { return this->Widget; }
+  virtual void setUrl(const QUrl& url) { this->Widget->setUrl(url); }
 };
 
 #ifdef PARAVIEW_USE_QTWEBKIT
-# include "pqHelpWindowWebKit.h"
+#include "pqHelpWindowWebKit.h"
 typedef pqBrowserTemplate<pqWebView> PQBROWSER_TYPE;
 #else
-# include "pqHelpWindowNoWebKit.h"
+#include "pqHelpWindowNoWebKit.h"
 typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
 #endif
 
@@ -90,19 +83,18 @@ typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
 // ****************************************************************************
 
 //-----------------------------------------------------------------------------
-pqHelpWindow::pqHelpWindow(
-  QHelpEngine* engine, QWidget* parentObject, Qt::WindowFlags parentFlags)
-  : Superclass(parentObject, parentFlags),
-  HelpEngine(engine),
-  Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
+pqHelpWindow::pqHelpWindow(QHelpEngine* engine, QWidget* parentObject, Qt::WindowFlags parentFlags)
+  : Superclass(parentObject, parentFlags)
+  , HelpEngine(engine)
+  , Browser(new PQBROWSER_TYPE(this->HelpEngine, this))
 {
   Q_ASSERT(engine != NULL);
 
   Ui::pqHelpWindow ui;
   ui.setupUi(this);
 
-  QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
-    this, SIGNAL(helpWarnings(const QString&)));
+  QObject::connect(
+    this->HelpEngine, SIGNAL(warning(const QString&)), this, SIGNAL(helpWarnings(const QString&)));
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
@@ -117,17 +109,14 @@ pqHelpWindow::pqHelpWindow(
   vbox->addWidget(engine->searchEngine()->resultWidget());
   ui.searchDock->setWidget(searchPane);
 
-  QObject::connect(engine->searchEngine()->queryWidget(), SIGNAL(search()),
-    this, SLOT(search()));
-  QObject::connect(engine->searchEngine()->resultWidget(),
-    SIGNAL(requestShowLink(const QUrl&)),
+  QObject::connect(engine->searchEngine()->queryWidget(), SIGNAL(search()), this, SLOT(search()));
+  QObject::connect(engine->searchEngine()->resultWidget(), SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
   this->setCentralWidget(this->Browser->widget());
 
-  QObject::connect(
-    this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)),
-    this, SLOT(showPage(const QUrl&)));
+  QObject::connect(this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)), this,
+    SLOT(showPage(const QUrl&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -145,36 +134,34 @@ void pqHelpWindow::showPage(const QString& url)
 void pqHelpWindow::showPage(const QUrl& url)
 {
   if (url.scheme() == "http")
-    {
+  {
     QDesktopServices::openUrl(url);
-    }
+  }
   else
-    {
+  {
     this->Browser->setUrl(url);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::search()
 {
-  QList<QHelpSearchQuery> query =
-    this->HelpEngine->searchEngine()->queryWidget()->query();
+  QList<QHelpSearchQuery> query = this->HelpEngine->searchEngine()->queryWidget()->query();
   this->HelpEngine->searchEngine()->search(query);
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showHomePage(const QString& namespace_name)
 {
-  QList<QUrl> html_pages = this->HelpEngine->files(namespace_name,
-    QStringList(), "html");
+  QList<QUrl> html_pages = this->HelpEngine->files(namespace_name, QStringList(), "html");
   // now try to locate a file named index.html in this collection.
   foreach (QUrl url, html_pages)
-    {
+  {
     if (url.path().endsWith("index.html"))
-      {
+    {
       this->showPage(url);
       return;
-      }
     }
+  }
   qWarning() << "Could not locate index.html";
 }

@@ -24,7 +24,7 @@
 class vtkSMDoubleMapPropertyIteratorInternals
 {
 public:
-  std::map<vtkIdType, std::vector<double> > *Map;
+  std::map<vtkIdType, std::vector<double> >* Map;
   std::map<vtkIdType, std::vector<double> >::iterator MapIterator;
 };
 
@@ -46,32 +46,34 @@ vtkSMDoubleMapPropertyIterator::~vtkSMDoubleMapPropertyIterator()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleMapPropertyIterator::SetProperty(vtkSMDoubleMapProperty *property)
+void vtkSMDoubleMapPropertyIterator::SetProperty(vtkSMDoubleMapProperty* property)
 {
   if (this->Property != property)
+  {
+    if (this->Property != NULL)
     {
-    if (this->Property != NULL) { this->Property->UnRegister(this); }
+      this->Property->UnRegister(this);
+    }
     this->Property = property;
     if (this->Property != NULL)
-      {
+    {
       this->Property->Register(this);
       this->Begin();
-      }
-    this->Modified();
     }
+    this->Modified();
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMDoubleMapPropertyIterator::Begin()
 {
-  if(!this->Property)
-    {
+  if (!this->Property)
+  {
     return;
-    }
+  }
 
   this->Internals->Map =
-    static_cast<std::map<vtkIdType, std::vector<double> > *>(
-      this->Property->GetMapPointer());
+    static_cast<std::map<vtkIdType, std::vector<double> >*>(this->Property->GetMapPointer());
   this->Internals->MapIterator = this->Internals->Map->begin();
 }
 

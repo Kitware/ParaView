@@ -30,7 +30,8 @@
 class vtkGlyph3DMapper;
 class vtkPVArrowSource;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGlyph3DRepresentation : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGlyph3DRepresentation
+  : public vtkGeometryRepresentation
 {
 public:
   static vtkGlyph3DRepresentation* New();
@@ -43,8 +44,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * Toggle the visibility of the original mesh.
@@ -77,7 +78,6 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
 
-
   //***************************************************************************
   // Overridden to forward to the vtkActor used for the glyphs (GlyphActor)
   virtual void SetOrientation(double, double, double);
@@ -88,7 +88,6 @@ public:
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
 
-
 protected:
   vtkGlyph3DRepresentation();
   ~vtkGlyph3DRepresentation();
@@ -98,14 +97,12 @@ protected:
    */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Overridden to request single piece from the Glyph source.
    */
-  int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
@@ -125,8 +122,7 @@ protected:
   /**
    * Used in ConvertSelection to locate the prop used for actual rendering.
    */
-  virtual vtkPVLODActor* GetRenderedProp()
-    { return this->GlyphActor; }
+  virtual vtkPVLODActor* GetRenderedProp() { return this->GlyphActor; }
 
   /**
    * Overridden to ensure that the coloring decisions are passed over to the
@@ -150,7 +146,6 @@ protected:
 private:
   vtkGlyph3DRepresentation(const vtkGlyph3DRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGlyph3DRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

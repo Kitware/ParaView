@@ -27,10 +27,7 @@ public:
   {
     int PortNumber;
     std::string HostName;
-    NodeInformation()
-      {
-      this->PortNumber = -1;
-      }
+    NodeInformation() { this->PortNumber = -1; }
   };
   std::vector<NodeInformation> Connections;
 };
@@ -50,27 +47,28 @@ vtkMPIMToNSocketConnectionPortInformation::~vtkMPIMToNSocketConnectionPortInform
 }
 
 //----------------------------------------------------------------------------
-void vtkMPIMToNSocketConnectionPortInformation::PrintSelf(ostream &os, vtkIndent indent)
+void vtkMPIMToNSocketConnectionPortInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   vtkIndent i2 = indent.GetNextIndent();
   os << indent << "All Process Information:\n";
-  for(unsigned int i = 0; i < this->Internals->Connections.size(); ++i)
-    {
+  for (unsigned int i = 0; i < this->Internals->Connections.size(); ++i)
+  {
     os << i2 << "P" << i << ":  PortNumber: " << this->Internals->Connections[i].PortNumber << "\n";
-    os << i2 << "P" << i << ":  HostName: " << this->Internals->Connections[i].HostName.c_str() << "\n";
-    }
+    os << i2 << "P" << i << ":  HostName: " << this->Internals->Connections[i].HostName.c_str()
+       << "\n";
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkMPIMToNSocketConnectionPortInformation::CopyFromObject(vtkObject* obj)
 {
   vtkMPIMToNSocketConnection* c = vtkMPIMToNSocketConnection::SafeDownCast(obj);
-  if(!c)
-    {
+  if (!c)
+  {
     vtkErrorMacro("Cannot get class name from NULL object. Or incorrect object type.");
     return;
-    }
+  }
   c->GetPortInformation(this);
 }
 
@@ -85,51 +83,49 @@ void vtkMPIMToNSocketConnectionPortInformation::SetConnectionInformation(
   unsigned int processNumber, int port, const char* hostname)
 {
   if (processNumber >= this->Internals->Connections.size())
-    {
-    this->Internals->Connections.resize(processNumber+1);
-    }
+  {
+    this->Internals->Connections.resize(processNumber + 1);
+  }
 
-  this->Internals->Connections[processNumber].HostName =
-    hostname?  hostname : "";
+  this->Internals->Connections[processNumber].HostName = hostname ? hostname : "";
   this->Internals->Connections[processNumber].PortNumber = port;
 }
 
 //----------------------------------------------------------------------------
 void vtkMPIMToNSocketConnectionPortInformation::AddInformation(vtkPVInformation* i)
 {
-  vtkMPIMToNSocketConnectionPortInformation* info 
-    = vtkMPIMToNSocketConnectionPortInformation::SafeDownCast(i);
-  if(!info)
-    {
+  vtkMPIMToNSocketConnectionPortInformation* info =
+    vtkMPIMToNSocketConnectionPortInformation::SafeDownCast(i);
+  if (!info)
+  {
     vtkErrorMacro("Wrong type for AddInformation" << i);
     return;
-    }
+  }
 
   if (this->Internals->Connections.size() < info->Internals->Connections.size())
-    {
+  {
     this->Internals->Connections.resize(info->Internals->Connections.size());
-    }
+  }
 
-  for (size_t cc=0; cc < info->Internals->Connections.size(); cc++)
-    {
+  for (size_t cc = 0; cc < info->Internals->Connections.size(); cc++)
+  {
     if (info->Internals->Connections[cc].PortNumber > 0)
-      {
+    {
       this->Internals->Connections[cc] = info->Internals->Connections[cc];
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkMPIMToNSocketConnectionPortInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply 
-       << this->Internals->Connections.size();
-  for (size_t i=0; i < this->Internals->Connections.size(); ++i)
-    {
+  *css << vtkClientServerStream::Reply << this->Internals->Connections.size();
+  for (size_t i = 0; i < this->Internals->Connections.size(); ++i)
+  {
     *css << this->Internals->Connections[i].PortNumber
          << this->Internals->Connections[i].HostName.c_str();
-    }
+  }
   *css << vtkClientServerStream::End;
 }
 
@@ -143,41 +139,44 @@ void vtkMPIMToNSocketConnectionPortInformation::CopyFromStream(const vtkClientSe
   int port;
   int pos = 1;
   const char* hostname = 0;
-  for(int j =0; j < numProcesses; ++j)
-    {
-    css->GetArgument(0, pos, &port); pos++;
-    css->GetArgument(0, pos, &hostname); pos++;
+  for (int j = 0; j < numProcesses; ++j)
+  {
+    css->GetArgument(0, pos, &port);
+    pos++;
+    css->GetArgument(0, pos, &hostname);
+    pos++;
 
     this->Internals->Connections[j].PortNumber = port;
-    this->Internals->Connections[j].HostName = hostname? hostname : "";
-    }
+    this->Internals->Connections[j].HostName = hostname ? hostname : "";
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkMPIMToNSocketConnectionPortInformation::GetProcessPort(unsigned int processNumber)
 {
   if (processNumber >= this->Internals->Connections.size())
-    {
+  {
     vtkErrorMacro("Process number greater than number of processes");
     return 0;
-    }
+  }
 
   return this->Internals->Connections[processNumber].PortNumber;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkMPIMToNSocketConnectionPortInformation::GetProcessHostName(unsigned int processNumber)
+const char* vtkMPIMToNSocketConnectionPortInformation::GetProcessHostName(
+  unsigned int processNumber)
 {
   if (processNumber >= this->Internals->Connections.size())
-    {
+  {
     vtkErrorMacro("Process number greater than number of processes");
     return NULL;
-    }
+  }
 
   if (this->Internals->Connections[processNumber].HostName.size() == 0)
-    {
+  {
     return "localhost";
-    }
+  }
 
   return this->Internals->Connections[processNumber].HostName.c_str();
 }

@@ -33,26 +33,23 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVJoystickFly : public vtkCameraMani
 public:
   vtkTypeMacro(vtkPVJoystickFly, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *rwi);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
   //@}
 
   //@{
   /**
    * Set and get the speed of flying.
    */
-  vtkSetClampMacro(FlySpeed, double, 1, 30);  
-  vtkGetMacro(FlySpeed, double);  
+  vtkSetClampMacro(FlySpeed, double, 1, 30);
+  vtkGetMacro(FlySpeed, double);
   //@}
 
 protected:
@@ -69,8 +66,7 @@ protected:
   double CameraYAxis[3];
   double CameraZAxis[3];
 
-  void Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi, 
-           double scale, double speed);
+  void Fly(vtkRenderer* ren, vtkRenderWindowInteractor* rwi, double scale, double speed);
   void ComputeCameraAxes(vtkRenderer*);
 
   vtkPVJoystickFly(const vtkPVJoystickFly&) VTK_DELETE_FUNCTION;

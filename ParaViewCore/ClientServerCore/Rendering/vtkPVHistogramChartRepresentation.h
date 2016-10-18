@@ -32,7 +32,8 @@ class vtkInformationVector;
 class vtkPExtractHistogram;
 class vtkSelection;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHistogramChartRepresentation : public vtkXYChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHistogramChartRepresentation
+  : public vtkXYChartRepresentation
 {
 public:
   static vtkPVHistogramChartRepresentation* New();
@@ -97,15 +98,15 @@ public:
   /**
    * Method to be overrided to transform input data to a vtkTable.
    */
-  virtual vtkDataObject* TransformInputData(vtkInformationVector** inputVector,
-                                            vtkDataObject* data);
+  virtual vtkDataObject* TransformInputData(
+    vtkInformationVector** inputVector, vtkDataObject* data);
 
   //@{
   /**
    * Overload the vtkAlgorithm method to update after the change
    */
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    int fieldAssociation, const char *name);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, const char* name);
   using Superclass::SetInputArrayToProcess;
   //@}
 
@@ -124,7 +125,6 @@ protected:
   vtkPVHistogramChartRepresentation();
   ~vtkPVHistogramChartRepresentation();
 
-
   virtual void PrepareForRendering();
 
   vtkPExtractHistogram* ExtractHistogram;
@@ -135,7 +135,6 @@ private:
 
   std::string ArrayName;
   int AttributeType;
-
 };
 
 #endif

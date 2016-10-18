@@ -48,42 +48,28 @@ public:
   /**
    * Makes a new selection source proxy.
    */
-  bool SelectSurfaceCells(const int region[4],
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
-  bool SelectSurfacePoints(const int region[4],
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
-  bool SelectFrustumCells(const int region[4],
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
-  bool SelectFrustumPoints(const int region[4],
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
-  bool SelectPolygonPoints(vtkIntArray* polygon,
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
-  bool SelectPolygonCells(vtkIntArray* polygon,
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections=false);
+  bool SelectSurfaceCells(const int region[4], vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
+  bool SelectSurfacePoints(const int region[4], vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
+  bool SelectFrustumCells(const int region[4], vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
+  bool SelectFrustumPoints(const int region[4], vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
+  bool SelectPolygonPoints(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
+  bool SelectPolygonCells(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections = false);
   //@}
 
   //@{
   /**
    * Returns the range for visible elements in the current view.
    */
-  bool ComputeVisibleScalarRange(const int region[4],
-    int fieldAssociation, const char* scalarName,
+  bool ComputeVisibleScalarRange(const int region[4], int fieldAssociation, const char* scalarName,
     int component, double range[]);
   bool ComputeVisibleScalarRange(
-    int fieldAssociation, const char* scalarName,
-    int component, double range[]);
+    int fieldAssociation, const char* scalarName, int component, double range[]);
   //@}
 
   /**
@@ -97,7 +83,7 @@ public:
    * the selected representation. Furthermore, if it is a multi-block data set
    * the flat index of the selected block will be returned in flatIndex.
    */
-  vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int &flatIndex);
+  vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int& flatIndex);
 
   /**
    * Given a location is display coordinates (pixels), tries to compute and
@@ -121,10 +107,7 @@ public:
    */
   void ResetCamera();
   void ResetCamera(double bounds[6]);
-  void ResetCamera(
-    double xmin, double xmax,
-    double ymin, double ymax,
-    double zmin, double zmax);
+  void ResetCamera(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
   //@}
 
   /**
@@ -205,8 +188,7 @@ public:
    * Overridden to check through the various representations that this view can
    * create.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
 
   /**
    * Returns the render window used by this view.
@@ -243,7 +225,6 @@ protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
 
-
   /**
    * Calls UpdateLOD() on the vtkPVRenderView.
    */
@@ -263,16 +244,10 @@ protected:
   virtual void CaptureWindowInternalRender();
   //@}
 
-  bool SelectFrustumInternal(const int region[4],
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections,
-    int fieldAssociation);
-  bool SelectPolygonInternal(vtkIntArray* polygon,
-    vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources,
-    bool multiple_selections,
-    const char* method);
+  bool SelectFrustumInternal(const int region[4], vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
+  bool SelectPolygonInternal(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections, const char* method);
 
   virtual vtkTypeUInt32 PreRender(bool interactive);
   virtual void PostRender(bool interactive);
@@ -281,8 +256,7 @@ protected:
    * Fetches the LastSelection from the data-server and then converts it to a
    * selection source proxy and returns that.
    */
-  bool FetchLastSelection(bool multiple_selections,
-    vtkCollection* selectedRepresentations,
+  bool FetchLastSelection(bool multiple_selections, vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources);
 
   /**
@@ -313,7 +287,6 @@ private:
   void operator=(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
-
 };
 
 #endif

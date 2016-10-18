@@ -40,12 +40,12 @@ vtkStandardNewMacro(vtkSQHemisphereSourceConfigurationWriter);
 //-----------------------------------------------------------------------------
 vtkSQHemisphereSourceConfigurationWriter::vtkSQHemisphereSourceConfigurationWriter()
 {
-  vtkStringList *propNames=vtkStringList::New();
+  vtkStringList* propNames = vtkStringList::New();
   propNames->AddString("Center");
   propNames->AddString("Radius");
   propNames->AddString("Resolution");
 
-  vtkSMNamedPropertyIterator *propIt=vtkSMNamedPropertyIterator::New();
+  vtkSMNamedPropertyIterator* propIt = vtkSMNamedPropertyIterator::New();
   propIt->SetPropertyNames(propNames);
   propNames->Delete();
   this->SetPropertyIterator(propIt);
@@ -59,11 +59,11 @@ vtkSQHemisphereSourceConfigurationWriter::vtkSQHemisphereSourceConfigurationWrit
 
 //-----------------------------------------------------------------------------
 vtkSQHemisphereSourceConfigurationWriter::~vtkSQHemisphereSourceConfigurationWriter()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-void vtkSQHemisphereSourceConfigurationWriter::SetProxy(
-      vtkSMProxy *proxy)
+void vtkSQHemisphereSourceConfigurationWriter::SetProxy(vtkSMProxy* proxy)
 {
   this->vtkSMProxyConfigurationWriter::SetProxy(proxy);
   this->GetPropertyIterator()->SetProxy(proxy);
@@ -72,5 +72,5 @@ void vtkSQHemisphereSourceConfigurationWriter::SetProxy(
 //-----------------------------------------------------------------------------
 void vtkSQHemisphereSourceConfigurationWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

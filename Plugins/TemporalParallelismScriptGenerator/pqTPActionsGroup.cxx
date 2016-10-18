@@ -42,8 +42,7 @@ pqTPActionsGroup::pqTPActionsGroup(QObject* parentObject)
   export_action->setToolTip("Export state for spatio-temporal parallelism");
   export_action->setStatusTip("Export state for spatio-temporal parallelism");
 
-  QObject::connect(export_action, SIGNAL(triggered()),
-                   this, SLOT(exportState()));
+  QObject::connect(export_action, SIGNAL(triggered()), this, SLOT(exportState()));
 }
 
 //-----------------------------------------------------------------------------

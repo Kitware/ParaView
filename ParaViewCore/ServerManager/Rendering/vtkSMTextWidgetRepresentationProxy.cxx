@@ -41,54 +41,51 @@ vtkSMTextWidgetRepresentationProxy::~vtkSMTextWidgetRepresentationProxy()
 void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
   this->TextActorProxy = this->GetSubProxy("Prop2DActor");
   if (!this->TextActorProxy)
-    {
+  {
     vtkErrorMacro("Failed to find subproxy Prop2DActor.");
     return;
-    }
+  }
   this->TextPropertyProxy = this->GetSubProxy("Prop2DProperty");
   if (!this->TextPropertyProxy)
-    {
+  {
     vtkErrorMacro("Failed to find subproxy Prop2DProperty.");
     return;
-    }
+  }
 
-  this->TextActorProxy->SetLocation( vtkProcessModule::RENDER_SERVER |
-                                     vtkProcessModule::CLIENT);
-  this->TextPropertyProxy->SetLocation( vtkProcessModule::RENDER_SERVER |
-                                       vtkProcessModule::CLIENT);
+  this->TextActorProxy->SetLocation(vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
+  this->TextPropertyProxy->SetLocation(vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
 
   this->Superclass::CreateVTKObjects();
 
   if (!this->RepresentationProxy)
-    {
+  {
     vtkErrorMacro("Failed to find subproxy Prop2D.");
     return;
-    }
+  }
 
-  vtkSMProxyProperty* tppp = vtkSMProxyProperty::SafeDownCast(
-    this->TextActorProxy->GetProperty("TextProperty"));
+  vtkSMProxyProperty* tppp =
+    vtkSMProxyProperty::SafeDownCast(this->TextActorProxy->GetProperty("TextProperty"));
   if (!tppp)
-    {
+  {
     vtkErrorMacro("Failed to find property TextProperty on TextActorProxy.");
     return;
-    }
+  }
   tppp->AddProxy(this->TextPropertyProxy);
 
-  vtkSMProxyProperty* tapp = vtkSMProxyProperty::SafeDownCast(
-    this->RepresentationProxy->GetProperty("TextActor"));
+  vtkSMProxyProperty* tapp =
+    vtkSMProxyProperty::SafeDownCast(this->RepresentationProxy->GetProperty("TextActor"));
   if (!tapp)
-    {
+  {
     vtkErrorMacro("Failed to find property TextActor on TextRepresentationProxy.");
     return;
-    }
+  }
   tapp->AddProxy(this->TextActorProxy);
-
 
   // Mark TextActor properties modified so the default value will be pushed at
   // the UpdateVTKObject call. This prevent them from behing overriden by some
@@ -99,6 +96,5 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMTextWidgetRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-
+  this->Superclass::PrintSelf(os, indent);
 }

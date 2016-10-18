@@ -29,7 +29,8 @@
 
 class vtkGeometrySliceRepresentation;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepresentation : public vtkPVCompositeRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepresentation
+  : public vtkPVCompositeRepresentation
 {
 public:
   static vtkPVCompositeOrthographicSliceRepresentation* New();
@@ -38,11 +39,17 @@ public:
 
   void SetSliceRepresentation(int index, vtkGeometrySliceRepresentation*);
   void SetSliceRepresentation0(vtkGeometrySliceRepresentation* repr)
-    { this->SetSliceRepresentation(0, repr); }
+  {
+    this->SetSliceRepresentation(0, repr);
+  }
   void SetSliceRepresentation1(vtkGeometrySliceRepresentation* repr)
-    { this->SetSliceRepresentation(1, repr); }
+  {
+    this->SetSliceRepresentation(1, repr);
+  }
   void SetSliceRepresentation2(vtkGeometrySliceRepresentation* repr)
-    { this->SetSliceRepresentation(2, repr); }
+  {
+    this->SetSliceRepresentation(2, repr);
+  }
 
   /**
    * Set visibility of the representation.
@@ -96,9 +103,9 @@ protected:
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
 
 private:
-  vtkPVCompositeOrthographicSliceRepresentation(const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeOrthographicSliceRepresentation(
+    const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

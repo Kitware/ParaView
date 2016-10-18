@@ -29,17 +29,16 @@
 int main(int argc, char* argv[])
 {
   // Easy to use variables.
-  typedef vtkSmartPointer<vtkRTAnalyticSource>      vtkRTAnalyticSourceRefPtr;
-  typedef vtkSmartPointer<vtkPVThreshold>           vtkPVThresholdRefPtr;
-  typedef vtkSmartPointer<vtkDataSetSurfaceFilter>  vtkDataSetSurfaceFilterRefPtr;
-  typedef vtkSmartPointer<vtkPolyDataMapper>        vtkPolyDataMapperRefPtr;
-  typedef vtkSmartPointer<vtkPVLODActor>            vtkPVLODActorRefPtr;
-  typedef vtkSmartPointer<vtkRenderer>              vtkRendererRefPtr;
-  typedef vtkSmartPointer<vtkRenderWindow>          vtkRenderWindowRefPtr;
-  typedef vtkSmartPointer<vtkRenderWindowInteractor>
-                                                    vtkRenderWindowInteractorRefPtr;
+  typedef vtkSmartPointer<vtkRTAnalyticSource> vtkRTAnalyticSourceRefPtr;
+  typedef vtkSmartPointer<vtkPVThreshold> vtkPVThresholdRefPtr;
+  typedef vtkSmartPointer<vtkDataSetSurfaceFilter> vtkDataSetSurfaceFilterRefPtr;
+  typedef vtkSmartPointer<vtkPolyDataMapper> vtkPolyDataMapperRefPtr;
+  typedef vtkSmartPointer<vtkPVLODActor> vtkPVLODActorRefPtr;
+  typedef vtkSmartPointer<vtkRenderer> vtkRendererRefPtr;
+  typedef vtkSmartPointer<vtkRenderWindow> vtkRenderWindowRefPtr;
+  typedef vtkSmartPointer<vtkRenderWindowInteractor> vtkRenderWindowInteractorRefPtr;
 
-  vtkRTAnalyticSourceRefPtr source1  (vtkRTAnalyticSourceRefPtr::New());
+  vtkRTAnalyticSourceRefPtr source1(vtkRTAnalyticSourceRefPtr::New());
   source1->SetWholeExtent(-10, 10, -10, 10, -10, 10);
   source1->SetCenter(0.0, 0.0, 0.0);
   source1->SetXFreq(60.0);
@@ -52,37 +51,37 @@ int main(int argc, char* argv[])
   source1->SetStandardDeviation(0.5);
   source1->SetSubsampleRate(1);
 
-  vtkPVThresholdRefPtr pvt1 (vtkPVThresholdRefPtr::New());
+  vtkPVThresholdRefPtr pvt1(vtkPVThresholdRefPtr::New());
   pvt1->SetInputConnection(source1->GetOutputPort());
   pvt1->ThresholdBetween(100, 150);
   pvt1->Update();
 
-  vtkDataSetSurfaceFilterRefPtr sf1 (vtkDataSetSurfaceFilterRefPtr::New());
+  vtkDataSetSurfaceFilterRefPtr sf1(vtkDataSetSurfaceFilterRefPtr::New());
   sf1->SetInputConnection(pvt1->GetOutputPort(0));
 
-  vtkPolyDataMapperRefPtr mapper1 (vtkPolyDataMapperRefPtr::New());
+  vtkPolyDataMapperRefPtr mapper1(vtkPolyDataMapperRefPtr::New());
   mapper1->SetInputConnection(sf1->GetOutputPort());
 
-  vtkPVLODActorRefPtr actor1 (vtkPVLODActorRefPtr::New());
+  vtkPVLODActorRefPtr actor1(vtkPVLODActorRefPtr::New());
   actor1->SetMapper(mapper1);
 
-  vtkRendererRefPtr ren (vtkRendererRefPtr::New());
+  vtkRendererRefPtr ren(vtkRendererRefPtr::New());
   ren->AddActor(actor1);
   ren->ResetCamera();
 
-  vtkRenderWindowRefPtr renWin (vtkRenderWindowRefPtr::New());
+  vtkRenderWindowRefPtr renWin(vtkRenderWindowRefPtr::New());
   renWin->AddRenderer(ren);
 
-  vtkRenderWindowInteractorRefPtr iren (vtkRenderWindowInteractorRefPtr::New());
+  vtkRenderWindowInteractorRefPtr iren(vtkRenderWindowInteractorRefPtr::New());
   iren->SetRenderWindow(renWin);
   renWin->SetSize(300, 300);
-  iren->SetRenderWindow( renWin );
+  iren->SetRenderWindow(renWin);
   renWin->Render();
 
   int retVal = vtkRegressionTestImage(renWin);
-  if(retVal == vtkRegressionTester::DO_INTERACTOR)
-    {
+  if (retVal == vtkRegressionTester::DO_INTERACTOR)
+  {
     iren->Start();
-    }
+  }
   return !retVal;
 }

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkClientServerStream.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkMapper.h"                 // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
+#include "vtkMapper.h" // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -73,7 +73,7 @@ class pqServer::pqInternals
 {
 public:
   QPointer<pqTimeKeeper> TimeKeeper;
-  // Used to send an heart beat message to the server to avoid 
+  // Used to send an heart beat message to the server to avoid
   // inactivity timeouts.
   QTimer HeartbeatTimer;
 
@@ -86,65 +86,59 @@ public:
 // pqServer
 
 //-----------------------------------------------------------------------------
-pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
-  pqServerManagerModelItem(_parent)
+pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent)
+  : pqServerManagerModelItem(_parent)
 {
   this->Internals = new pqInternals;
 
   this->ConnectionID = connectionID;
   this->Options = options;
-  this->Session = vtkSMSession::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetSession(connectionID));
+  this->Session =
+    vtkSMSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetSession(connectionID));
 
   vtkPVServerInformation* serverInfo = this->getServerInformation();
   if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
-    {
+  {
     int timeout = serverInfo->GetTimeout();
     if (timeout > 5)
-      {
+    {
       // 5 minute warning is shown only if timeout > 5.
-      QTimer::singleShot(
-        (timeout-5)*60*1000, this, SIGNAL(fiveMinuteTimeoutWarning()));
-      }
-
-    // 1 minute warning.
-    QTimer::singleShot(
-        (timeout-1)*60*1000, this, SIGNAL(finalTimeoutWarning()));
+      QTimer::singleShot((timeout - 5) * 60 * 1000, this, SIGNAL(fiveMinuteTimeoutWarning()));
     }
 
-  QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()),
-    this, SLOT(heartBeat()));
+    // 1 minute warning.
+    QTimer::singleShot((timeout - 1) * 60 * 1000, this, SIGNAL(finalTimeoutWarning()));
+  }
+
+  QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
 
   this->setHeartBeatTimeout(pqServer::getHeartBeatTimeoutSetting());
 
   // Setup idle Timer for collaboration in order to get server notification
   this->IdleCollaborationTimer.setInterval(100);
   this->IdleCollaborationTimer.setSingleShot(true);
-  QObject::connect(&this->IdleCollaborationTimer, SIGNAL(timeout()),
-                   this, SLOT(processServerNotification()));
+  QObject::connect(
+    &this->IdleCollaborationTimer, SIGNAL(timeout()), this, SLOT(processServerNotification()));
 
   // Monitor server crash for better error management
-  this->Internals->VTKConnect->Connect(
-    this->Session, vtkPVSessionBase::ConnectionLost,
-    this, SLOT(onConnectionLost(vtkObject*,ulong,void*,void*)));
+  this->Internals->VTKConnect->Connect(this->Session, vtkPVSessionBase::ConnectionLost, this,
+    SLOT(onConnectionLost(vtkObject*, ulong, void*, void*)));
 
   // In case of Multi-clients connection, the client has to listen
   // server notification so collaboration could happen
   if (this->session()->IsMultiClients())
-    {
+  {
     vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
-    if(currentSession)
-      {
+    if (currentSession)
+    {
       // Initialise the CollaborationManager to listen server notification
       this->Internals->CollaborationCommunicator = currentSession->GetCollaborationManager();
-      this->Internals->VTKConnect->Connect(
-          currentSession->GetCollaborationManager(),
-          vtkCommand::AnyEvent,
-          this,
-          SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
-      }
-    this->setMonitorServerNotifications(true);
+      this->Internals->VTKConnect->Connect(currentSession->GetCollaborationManager(),
+        vtkCommand::AnyEvent, this,
+        SLOT(onCollaborationCommunication(vtkObject*, ulong, void*, void*)));
     }
+    this->setMonitorServerNotifications(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -157,7 +151,7 @@ pqServer::~pqServer()
      */
   /*
   if (this->ConnectionID != vtkProcessModuleConnectionManager::GetNullConnectionID()
-    && this->ConnectionID 
+    && this->ConnectionID
     != vtkProcessModuleConnectionManager::GetSelfConnectionID())
     {
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
@@ -172,26 +166,25 @@ pqServer::~pqServer()
 void pqServer::setMonitorServerNotifications(bool val)
 {
   if (val)
-    {
+  {
     this->IdleCollaborationTimer.start();
-    }
+  }
   else
-    {
+  {
     this->IdleCollaborationTimer.stop();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqTimeKeeper* pqServer::getTimeKeeper() const
 {
   if (!this->Internals->TimeKeeper)
-    {
+  {
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkSMProxy* proxy = controller->FindTimeKeeper(this->session());
-    pqServerManagerModel* smmodel =
-        pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
     this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
-    }
+  }
 
   return this->Internals->TimeKeeper;
 }
@@ -244,14 +237,14 @@ bool pqServer::isRemote() const
 //-----------------------------------------------------------------------------
 bool pqServer::isMaster() const
 {
-  if(this->session()->IsMultiClients())
-    {
+  if (this->session()->IsMultiClients())
+  {
     vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
-    if(currentSession)
-      {
+    if (currentSession)
+    {
       return currentSession->GetCollaborationManager()->IsMaster();
-      }
     }
+  }
   return true;
 }
 
@@ -259,15 +252,15 @@ bool pqServer::isMaster() const
 bool pqServer::isRenderServerSeparate()
 {
   if (this->isRemote())
-    {
+  {
     return this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
       this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::setResource(const pqServerResource &server_resource)
+void pqServer::setResource(const pqServerResource& server_resource)
 {
   this->Resource = server_resource;
   emit this->nameChanged(this);
@@ -296,17 +289,17 @@ void pqServer::setHeartBeatTimeout(int msec)
 {
   // no need to set heart beats if not a remote connection.
   if (this->isRemote())
-    {
+  {
     if (msec <= 0)
-      {
+    {
       this->Internals->HeartbeatTimer.stop();
-      }
+    }
     else
-      {
+    {
       this->heartBeat();
       this->Internals->HeartbeatTimer.start(msec);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -314,18 +307,16 @@ void pqServer::heartBeat()
 {
   // Send random stream to all processes to produce some traffic and prevent
   // automatic disconnection
-  if(this->Session && !this->Session->GetPendingProgress())
-    {
+  if (this->Session && !this->Session->GetPendingProgress())
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << "HeartBeat"
-           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << "HeartBeat" << vtkClientServerStream::End;
     this->Session->ExecuteStream(vtkPVSession::SERVERS, stream, true);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-const char* pqServer::HEARBEAT_TIME_SETTING_KEY() 
+const char* pqServer::HEARBEAT_TIME_SETTING_KEY()
 {
   return "/server/HeartBeatTime";
 }
@@ -336,17 +327,17 @@ void pqServer::setHeartBeatTimeoutSetting(int msec)
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
   if (settings)
-    {
+  {
     settings->setValue(pqServer::HEARBEAT_TIME_SETTING_KEY(), QVariant(msec));
-    }
+  }
 
   // update all current servers.
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   QList<pqServer*> servers = smmodel->findItems<pqServer*>();
   foreach (pqServer* server, servers)
-    {
+  {
     server->setHeartBeatTimeout(msec);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -355,15 +346,15 @@ int pqServer::getHeartBeatTimeoutSetting()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
   if (settings && settings->contains(pqServer::HEARBEAT_TIME_SETTING_KEY()))
-    {
+  {
     bool ok;
     int timeout = settings->value(pqServer::HEARBEAT_TIME_SETTING_KEY()).toInt(&ok);
     if (ok)
-      {
+    {
       return timeout;
-      }
     }
-  return 1*60*1000; // 1 minutes.
+  }
+  return 1 * 60 * 1000; // 1 minutes.
 }
 
 //-----------------------------------------------------------------------------
@@ -376,40 +367,38 @@ vtkSMSessionProxyManager* pqServer::proxyManager() const
 void pqServer::processServerNotification()
 {
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
-  if ( (sessionClient && !sessionClient->IsNotBusy()) ||
-    this->isProgressPending())
-    {
+  if ((sessionClient && !sessionClient->IsNotBusy()) || this->isProgressPending())
+  {
     // try again later.
     this->IdleCollaborationTimer.start();
     return;
-    }
+  }
 
   // process all server-notification events.
-  vtkNetworkAccessManager* nam =
-    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
-  while (nam->ProcessEvents(1) == 1) { }
+  vtkNetworkAccessManager* nam = vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
+  while (nam->ProcessEvents(1) == 1)
+  {
+  }
 
-  foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
-    {
+  foreach (pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+  {
     vtkSMViewProxy* viewProxy = view->getViewProxy();
-    if(viewProxy && viewProxy->HasDirtyRepresentation())
-      {
+    if (viewProxy && viewProxy->HasDirtyRepresentation())
+    {
       view->render();
-      }
     }
+  }
   this->IdleCollaborationTimer.start();
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
-                                            unsigned long event_,
-                                            void* vtkNotUsed(method),
-                                            void* data)
+void pqServer::onCollaborationCommunication(
+  vtkObject* vtkNotUsed(src), unsigned long event_, void* vtkNotUsed(method), void* data)
 {
   int userId;
   QString userName;
-  switch(event_)
-    {
+  switch (event_)
+  {
     case vtkSMCollaborationManager::UpdateUserName:
       userId = *reinterpret_cast<int*>(data);
       userName = this->Internals->CollaborationCommunicator->GetUserLabel(userId);
@@ -430,28 +419,28 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
       vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
       emit sentFromOtherClient(this, msg);
       break;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::onConnectionLost(vtkObject*, unsigned long,void*,void*)
+void pqServer::onConnectionLost(vtkObject*, unsigned long, void*, void*)
 {
   emit serverSideDisconnected();
 }
 //-----------------------------------------------------------------------------
 void pqServer::sendToOtherClients(vtkSMMessage* msg)
 {
-  if(this->Internals->CollaborationCommunicator)
-    {
+  if (this->Internals->CollaborationCommunicator)
+  {
     this->Internals->CollaborationCommunicator->SendToOtherClients(msg);
-    }
+  }
 }
 //-----------------------------------------------------------------------------
 bool pqServer::isProcessingPending() const
 {
   // check with the network access manager if there are any messages to receive
   // from the server.
-  bool retVal = vtkProcessModule::GetProcessModule()->
-    GetNetworkAccessManager()->GetNetworkEventsAvailable();
+  bool retVal =
+    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->GetNetworkEventsAvailable();
   return retVal;
 }

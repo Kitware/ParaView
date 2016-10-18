@@ -57,8 +57,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqApplyBehavior(QObject* parent=0);
+  pqApplyBehavior(QObject* parent = 0);
   virtual ~pqApplyBehavior();
 
   /**

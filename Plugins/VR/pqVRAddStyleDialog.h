@@ -40,11 +40,12 @@ class pqVRAddStyleDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqVRAddStyleDialog(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqVRAddStyleDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqVRAddStyleDialog();
 
-  void setInteractorStyle(vtkVRInteractorStyle *, const QString &name);
+  void setInteractorStyle(vtkVRInteractorStyle*, const QString& name);
   void updateInteractorStyle();
 
   // Returns true if there are any user-configurable options.

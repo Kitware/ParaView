@@ -24,7 +24,7 @@ vtkCxxSetObjectMacro(vtkPVCameraAnimationCue, View, vtkPVRenderView);
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
   this->View = 0;
-  vtkPVCameraCueManipulator * manip = vtkPVCameraCueManipulator::New();
+  vtkPVCameraCueManipulator* manip = vtkPVCameraCueManipulator::New();
   this->SetManipulator(manip);
   manip->Delete();
 }
@@ -38,7 +38,7 @@ vtkPVCameraAnimationCue::~vtkPVCameraAnimationCue()
 //----------------------------------------------------------------------------
 vtkCamera* vtkPVCameraAnimationCue::GetCamera()
 {
-  return this->View? this->View->GetActiveCamera() : NULL;
+  return this->View ? this->View->GetActiveCamera() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -51,16 +51,15 @@ void vtkPVCameraAnimationCue::SetMode(int mode)
 void vtkPVCameraAnimationCue::EndUpdateAnimationValues()
 {
   if (this->View)
-    {
+  {
     this->View->ResetCameraClippingRange();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCameraAnimationCue::SetDataSourceProxy(vtkSMProxy *dataSourceProxy)
+void vtkPVCameraAnimationCue::SetDataSourceProxy(vtkSMProxy* dataSourceProxy)
 {
-  vtkPVCameraCueManipulator::SafeDownCast(this->Manipulator)->
-    SetDataSourceProxy(dataSourceProxy);
+  vtkPVCameraCueManipulator::SafeDownCast(this->Manipulator)->SetDataSourceProxy(dataSourceProxy);
 }
 
 //----------------------------------------------------------------------------

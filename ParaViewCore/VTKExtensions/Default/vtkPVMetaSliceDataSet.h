@@ -26,13 +26,14 @@
 
 class vtkImplicitFunction;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet : public vtkPVDataSetAlgorithmSelectorFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet
+  : public vtkPVDataSetAlgorithmSelectorFilter
 {
 public:
-  vtkTypeMacro(vtkPVMetaSliceDataSet,vtkPVDataSetAlgorithmSelectorFilter);
+  vtkTypeMacro(vtkPVMetaSliceDataSet, vtkPVDataSetAlgorithmSelectorFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVMetaSliceDataSet *New();
+  static vtkPVMetaSliceDataSet* New();
 
   /**
    * Enable or disable the Extract Cells By Regions.
@@ -51,8 +52,7 @@ public:
   /**
    * Expose method from vtkCutter
    */
-  void SetCutFunction(vtkImplicitFunction* func)
-  { this->SetImplicitFunction(func); };
+  void SetCutFunction(vtkImplicitFunction* func) { this->SetImplicitFunction(func); };
 
   /**
    * Expose method from vtkCutter
@@ -69,7 +69,6 @@ public:
    */
   void SetGenerateTriangles(int status);
 
-
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet();
@@ -79,7 +78,7 @@ private:
   void operator=(const vtkPVMetaSliceDataSet&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
-  vtkInternals *Internal;
+  vtkInternals* Internal;
 };
 
 #endif

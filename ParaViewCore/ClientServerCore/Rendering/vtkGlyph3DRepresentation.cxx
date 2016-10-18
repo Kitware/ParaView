@@ -19,8 +19,8 @@
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMatrix4x4.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrowSource.h"
@@ -69,9 +69,9 @@ bool vtkGlyph3DRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->AddActor(this->GlyphActor);
-    }
+  }
   return this->Superclass::AddToView(view);
 }
 
@@ -80,9 +80,9 @@ bool vtkGlyph3DRepresentation::RemoveFromView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->RemoveActor(this->GlyphActor);
-    }
+  }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -90,92 +90,85 @@ bool vtkGlyph3DRepresentation::RemoveFromView(vtkView* view)
 void vtkGlyph3DRepresentation::SetVisibility(bool val)
 {
   this->Superclass::SetVisibility(val);
-  this->GlyphActor->SetVisibility(val?  1 : 0);
-  this->Actor->SetVisibility((val && this->MeshVisibility)? 1 : 0);
+  this->GlyphActor->SetVisibility(val ? 1 : 0);
+  this->Actor->SetVisibility((val && this->MeshVisibility) ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkGlyph3DRepresentation::SetMeshVisibility(bool val)
 {
   this->MeshVisibility = val;
-  this->Actor->SetVisibility((val && this->MeshVisibility)? 1 : 0);
+  this->Actor->SetVisibility((val && this->MeshVisibility) ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
-int vtkGlyph3DRepresentation::FillInputPortInformation(int port,
-  vtkInformation *info)
+int vtkGlyph3DRepresentation::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (port == 0)
-    {
+  {
     return this->Superclass::FillInputPortInformation(port, info);
-    }
+  }
   else if (port == 1)
-    {
+  {
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
     return 1;
-    }
+  }
 
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkGlyph3DRepresentation::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (inputVector[1]->GetNumberOfInformationObjects()==1)
-    {
-    this->GlyphMapper->SetInputDataObject(1,
-      vtkDataObject::GetData(inputVector[1], 0));
-    this->LODGlyphMapper->SetInputDataObject(1,
-      vtkDataObject::GetData(inputVector[1], 0));
-    }
+  if (inputVector[1]->GetNumberOfInformationObjects() == 1)
+  {
+    this->GlyphMapper->SetInputDataObject(1, vtkDataObject::GetData(inputVector[1], 0));
+    this->LODGlyphMapper->SetInputDataObject(1, vtkDataObject::GetData(inputVector[1], 0));
+  }
   else
-    {
+  {
     this->GlyphMapper->SetInputConnection(1, this->DummySource->GetOutputPort());
-    this->LODGlyphMapper->SetInputConnection(1,
-      this->DummySource->GetOutputPort());
-    }
+    this->LODGlyphMapper->SetInputConnection(1, this->DummySource->GetOutputPort());
+  }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
-int vtkGlyph3DRepresentation::RequestUpdateExtent(vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkGlyph3DRepresentation::RequestUpdateExtent(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::RequestUpdateExtent(request, inputVector, outputVector))
-    {
+  {
     return 0;
-    }
+  }
 
   // For the input geometry used as the Glyph, we need it duplicated on all
   // ranks.
-  for (int kk=0; kk < inputVector[1]->GetNumberOfInformationObjects(); kk++)
-    {
+  for (int kk = 0; kk < inputVector[1]->GetNumberOfInformationObjects(); kk++)
+  {
     vtkInformation* info = inputVector[1]->GetInformationObject(kk);
     info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), 0);
     info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 1);
     info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 0);
     info->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
-    }
+  }
   return 1;
 }
 
-
 //----------------------------------------------------------------------------
 int vtkGlyph3DRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type,
-  vtkInformation* inInfo, vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
+  {
     // A little trick to report correct bounds.
     // Representations are required to report the bounds for the rendered geometry
     // in vtkPVView::REQUEST_UPDATE() pass. For glyphs, the vtkGlyph3DMapper has
@@ -194,19 +187,18 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     vtkNew<vtkMatrix4x4> matrix;
     this->GlyphActor->GetMatrix(matrix.GetPointer());
     vtkPVRenderView::SetGeometryBounds(inInfo, bounds, matrix.GetPointer());
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
     vtkAlgorithmOutput* producerPortLOD = vtkPVRenderView::GetPieceProducerLOD(inInfo, this);
     this->GlyphMapper->SetInputConnection(0, producerPort);
     this->LODGlyphMapper->SetInputConnection(0, producerPortLOD);
 
-    bool lod = this->SuppressLOD? false :
-      (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
-    this->GlyphActor->SetEnableLOD(lod? 1 : 0);
-    }
+    bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
+    this->GlyphActor->SetEnableLOD(lod ? 1 : 0);
+  }
 
   return 1;
 }
@@ -215,10 +207,10 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
 void vtkGlyph3DRepresentation::UpdateColoringParameters()
 {
   this->Superclass::UpdateColoringParameters();
-  
+
   if (this->Mapper->GetScalarVisibility() == 0 ||
     this->Mapper->GetScalarMode() != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
-    {
+  {
     // we are not coloring the glyphs with scalars.
     const char* null = NULL;
     this->GlyphMapper->SetScalarVisibility(0);
@@ -226,19 +218,17 @@ void vtkGlyph3DRepresentation::UpdateColoringParameters()
     this->GlyphMapper->SelectColorArray(null);
     this->LODGlyphMapper->SelectColorArray(null);
     return;
-    }
+  }
 
   this->GlyphMapper->SetScalarVisibility(1);
   this->GlyphMapper->SelectColorArray(this->Mapper->GetArrayName());
   this->GlyphMapper->SetUseLookupTableScalarRange(1);
-  this->GlyphMapper->SetScalarMode(
-    VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  this->GlyphMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
   this->LODGlyphMapper->SetScalarVisibility(1);
   this->LODGlyphMapper->SelectColorArray(this->Mapper->GetArrayName());
   this->LODGlyphMapper->SetUseLookupTableScalarRange(1);
-  this->LODGlyphMapper->SetScalarMode(
-    VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  this->LODGlyphMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 }
 
 //----------------------------------------------------------------------------
@@ -247,9 +237,9 @@ void vtkGlyph3DRepresentation::ComputeGlyphBounds(double bounds[6])
   // we're changing the glyph mapper's input connection temporarily.
   vtkSmartPointer<vtkAlgorithmOutput> port;
   if (this->GlyphMapper->GetNumberOfInputConnections(0) == 1)
-    {
+  {
     port = this->GlyphMapper->GetInputConnection(0, 0);
-    }
+  }
 
   this->GlyphMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
   this->GlyphMapper->GetBounds(bounds);

@@ -62,7 +62,6 @@ public:
    */
   void Clear();
 
-
   /**
    * Called to record the state at the beginning of an interaction.
    * Usually, this method isn't called directly, since the builder
@@ -90,24 +89,20 @@ protected:
   vtkSMUndoStack* UndoStack;
   vtkUndoSet* UndoSet;
 
-
   /**
    * Event handler.
    */
   void ExecuteEvent(vtkObject* caller, unsigned long event, void* data);
 
-
   void PropertyModified(const char* pname);
 
   friend class vtkSMInteractionUndoStackBuilderObserver;
+
 private:
   vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
 
-
   vtkSMInteractionUndoStackBuilderObserver* Observer;
-
 };
-
 
 #endif

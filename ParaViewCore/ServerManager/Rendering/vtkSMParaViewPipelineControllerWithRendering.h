@@ -41,8 +41,8 @@ class vtkSMSourceProxy;
 class vtkSMViewLayoutProxy;
 class vtkSMViewProxy;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMParaViewPipelineControllerWithRendering :
-  public vtkSMParaViewPipelineController
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMParaViewPipelineControllerWithRendering
+  : public vtkSMParaViewPipelineController
 {
 public:
   static vtkSMParaViewPipelineControllerWithRendering* New();
@@ -53,15 +53,13 @@ public:
    * Show the output data in the view. If data cannot be shown in the view,
    * returns NULL. If \c view is NULL, this simply calls ShowInPreferredView().
    */
-  virtual vtkSMProxy* Show(
-    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
+  virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
    * Opposite of Show(). Locates the representation for the producer and then
    * hides it, if found. Returns that representation, if found.
    */
-  virtual vtkSMProxy* Hide(
-    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
+  virtual vtkSMProxy* Hide(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
    * Same as above, except that when we already have the representation located.
@@ -78,17 +76,15 @@ public:
    */
   vtkSMProxy* SetVisibility(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view, bool visible)
-    {
-    return (visible?
-      this->Show(producer, outputPort, view):
-      this->Hide(producer, outputPort, view));
-    }
+  {
+    return (
+      visible ? this->Show(producer, outputPort, view) : this->Hide(producer, outputPort, view));
+  }
 
   /**
    * Returns whether the producer/port are shown in the given view.
    */
-  virtual bool GetVisibility(
-    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
+  virtual bool GetVisibility(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
    * Same as Show() except that if the \c view is NULL or not the "preferred"
@@ -133,10 +129,10 @@ public:
   /**
    * Methods to save/capture images from views.
    */
-  virtual bool WriteImage(vtkSMViewProxy* view,
-      const char* filename, int magnification, int quality);
-  virtual bool WriteImage(vtkSMViewLayoutProxy* layout,
-      const char* filename, int magnification, int quality);
+  virtual bool WriteImage(
+    vtkSMViewProxy* view, const char* filename, int magnification, int quality);
+  virtual bool WriteImage(
+    vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality);
   //@}
 
   /**
@@ -155,7 +151,7 @@ public:
   /**
    * Register layout proxy.
    */
-  virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname=NULL);
+  virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname = NULL);
 
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
@@ -165,11 +161,11 @@ protected:
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
 private:
-  vtkSMParaViewPipelineControllerWithRendering(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
+  vtkSMParaViewPipelineControllerWithRendering(
+    const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
-
 };
 
 #endif

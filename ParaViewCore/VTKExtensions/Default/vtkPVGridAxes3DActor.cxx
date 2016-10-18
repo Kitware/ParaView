@@ -42,21 +42,21 @@ vtkPVGridAxes3DActor::~vtkPVGridAxes3DActor()
 }
 
 //----------------------------------------------------------------------------
-double *vtkPVGridAxes3DActor::GetBounds()
+double* vtkPVGridAxes3DActor::GetBounds()
 {
   this->UpdateGridBounds();
   return this->Superclass::GetBounds();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGridAxes3DActor::SetModelTransformMatrix(double *matrix)
+void vtkPVGridAxes3DActor::SetModelTransformMatrix(double* matrix)
 {
-  if (!std::equal(matrix, matrix+16, &this->ModelTransformMatrix->Element[0][0]))
-    {
-    std::copy(matrix, matrix+16, &this->ModelTransformMatrix->Element[0][0]);
+  if (!std::equal(matrix, matrix + 16, &this->ModelTransformMatrix->Element[0][0]))
+  {
+    std::copy(matrix, matrix + 16, &this->ModelTransformMatrix->Element[0][0]);
     this->ModelTransformMatrix->Modified();
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -70,17 +70,17 @@ void vtkPVGridAxes3DActor::Update(vtkViewport* viewport)
 void vtkPVGridAxes3DActor::UpdateGridBounds()
 {
   if (this->BoundsUpdateTime < this->GetMTime())
-    {
+  {
     if (this->UseModelTransform)
-      {
+    {
       this->UpdateGridBoundsUsingModelTransform();
-      }
-    else
-      {
-      this->UpdateGridBoundsUsingDataBounds();
-      }
-    this->BoundsUpdateTime.Modified();
     }
+    else
+    {
+      this->UpdateGridBoundsUsingDataBounds();
+    }
+    this->BoundsUpdateTime.Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -97,56 +97,58 @@ void vtkPVGridAxes3DActor::UpdateGridBoundsUsingDataBounds()
 {
   vtkBoundingBox bbox(this->TransformedBounds);
   if (bbox.IsValid())
-    {
+  {
     if (this->DataPosition[0] != 0 || this->DataPosition[1] != 0 || this->DataPosition[2] != 0)
-      {
+    {
       double bds[6];
       bbox.GetBounds(bds);
-      bds[0] -= this->DataPosition[0]; bds[1] -= this->DataPosition[0];
-      bds[2] -= this->DataPosition[1]; bds[3] -= this->DataPosition[1];
-      bds[4] -= this->DataPosition[2]; bds[5] -= this->DataPosition[2];
+      bds[0] -= this->DataPosition[0];
+      bds[1] -= this->DataPosition[0];
+      bds[2] -= this->DataPosition[1];
+      bds[3] -= this->DataPosition[1];
+      bds[4] -= this->DataPosition[2];
+      bds[5] -= this->DataPosition[2];
       bbox.SetBounds(bds);
       this->SetPosition(this->DataPosition);
-      }
+    }
     else
-      {
+    {
       this->SetPosition(0, 0, 0);
-      }
+    }
     if (this->DataScale[0] != 1 || this->DataScale[1] != 1 || this->DataScale[2] != 1)
-      {
-      bbox.Scale(1.0/this->DataScale[0], 1.0/this->DataScale[1], 1.0/this->DataScale[2]);
+    {
+      bbox.Scale(1.0 / this->DataScale[0], 1.0 / this->DataScale[1], 1.0 / this->DataScale[2]);
       this->SetScale(this->DataScale);
-      }
+    }
     else
-      {
+    {
       this->SetScale(1, 1, 1);
-      }
+    }
     double bds[6];
     bbox.GetBounds(bds);
     this->SetGridBounds(bds);
-    }
+  }
   else
-    {
+  {
     this->SetGridBounds(this->TransformedBounds);
     this->SetPosition(0, 0, 0);
     this->SetScale(1, 1, 1);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGridAxes3DActor::ShallowCopy(vtkProp *prop)
+void vtkPVGridAxes3DActor::ShallowCopy(vtkProp* prop)
 {
   this->Superclass::ShallowCopy(prop);
   if (vtkPVGridAxes3DActor* other = vtkPVGridAxes3DActor::SafeDownCast(prop))
-    {
+  {
     this->SetDataScale(other->GetDataScale());
     this->SetDataPosition(other->GetDataPosition());
     this->SetTransformedBounds(other->GetTransformedBounds());
     this->SetUseModelTransform(other->GetUseModelTransform());
     this->SetModelBounds(other->GetModelBounds());
-    this->SetModelTransformMatrix(
-      reinterpret_cast<double*>(other->ModelTransformMatrix->Element));
-    }
+    this->SetModelTransformMatrix(reinterpret_cast<double*>(other->ModelTransformMatrix->Element));
+  }
 }
 
 //----------------------------------------------------------------------------

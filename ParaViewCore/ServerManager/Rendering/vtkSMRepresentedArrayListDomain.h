@@ -33,7 +33,8 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkSMRepresentationProxy;
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentedArrayListDomain : public vtkSMArrayListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentedArrayListDomain
+  : public vtkSMArrayListDomain
 {
 public:
   static vtkSMRepresentedArrayListDomain* New();
@@ -69,15 +70,13 @@ protected:
    */
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
 
-
   /**
    * Returns true if an array should be filtered out based on its name or number
    * of tuples (for field data arrays).
    * This implementation returns true if the array name matches
    * an expression in the vtkPVColorArrayListSettings singleton.
    */
-  virtual bool IsFilteredArray(
-    vtkPVDataInformation* info, int association, const char* arrayName);
+  virtual bool IsFilteredArray(vtkPVDataInformation* info, int association, const char* arrayName);
 
   /**
    * HACK: Provides a temporary mechanism for subclasses to provide an
@@ -98,7 +97,6 @@ protected:
 private:
   vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

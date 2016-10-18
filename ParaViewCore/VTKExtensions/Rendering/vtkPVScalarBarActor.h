@@ -38,9 +38,9 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkScalarBarActor.h"
 
-#include "vtkNew.h" // For ivars
+#include "vtkNew.h"          // For ivars
 #include "vtkSmartPointer.h" // For ivars
-#include <vector> // For ivars
+#include <vector>            // For ivars
 
 class vtkAxis;
 class vtkContextScene;
@@ -49,8 +49,8 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVScalarBarActor : public vtkScalarB
 {
 public:
   vtkTypeMacro(vtkPVScalarBarActor, vtkScalarBarActor);
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
-  static vtkPVScalarBarActor *New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkPVScalarBarActor* New();
 
   //@{
   /**
@@ -121,8 +121,7 @@ public:
   /**
    * Add value as annotation label on scalar bar at the given position
    */
-  virtual void AddValueLabelIfUnoccluded(
-    double value, double pos, double diff);
+  virtual void AddValueLabelIfUnoccluded(double value, double pos, double diff);
 
   //@{
   /**
@@ -202,8 +201,7 @@ protected:
    * respectively.  The index to the newly created entries is returned.
    */
   virtual int CreateLabel(
-    double value, int minDigits,
-    int targetWidth, int targetHeight, vtkViewport* viewport);
+    double value, int minDigits, int targetWidth, int targetHeight, vtkViewport* viewport);
 
   double AspectRatio;
   int AutomaticLabelFormat;
@@ -248,8 +246,8 @@ protected:
   int AddRangeAnnotations;
 
 private:
-  vtkPVScalarBarActor(const vtkPVScalarBarActor &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVScalarBarActor &) VTK_DELETE_FUNCTION;
+  vtkPVScalarBarActor(const vtkPVScalarBarActor&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVScalarBarActor&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkPVScalarBarActor_h
+#endif // vtkPVScalarBarActor_h

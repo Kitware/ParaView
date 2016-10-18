@@ -26,34 +26,28 @@
 #include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation :
-  public vtkGeometryRepresentationWithFaces
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkOutlineRepresentation* New();
   vtkTypeMacro(vtkOutlineRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void SetRepresentation(const char*)
-    { this->Superclass::SetRepresentation("Wireframe"); }
-  virtual void SetUseOutline(int)
-    { this->Superclass::SetUseOutline(1); }
-  virtual void SetSuppressLOD(bool)
-    { this->Superclass::SetSuppressLOD(true); }
-  virtual void SetPickable(int)
-    { this->Superclass::SetPickable(0); }
+  virtual void SetRepresentation(const char*) { this->Superclass::SetRepresentation("Wireframe"); }
+  virtual void SetUseOutline(int) { this->Superclass::SetUseOutline(1); }
+  virtual void SetSuppressLOD(bool) { this->Superclass::SetSuppressLOD(true); }
+  virtual void SetPickable(int) { this->Superclass::SetPickable(0); }
 
 protected:
   vtkOutlineRepresentation();
   ~vtkOutlineRepresentation();
 
-  virtual void SetRepresentation(int)
-    { this->Superclass::SetRepresentation(WIREFRAME); }
+  virtual void SetRepresentation(int) { this->Superclass::SetRepresentation(WIREFRAME); }
 
 private:
   vtkOutlineRepresentation(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

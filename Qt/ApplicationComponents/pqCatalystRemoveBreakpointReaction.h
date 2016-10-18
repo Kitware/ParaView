@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -44,13 +44,13 @@ class vtkSMLiveInsituLinkProxy;
 * @ingroup Reactions
 * @LiveInsitu
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystRemoveBreakpointReaction :
-  public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystRemoveBreakpointReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqCatalystRemoveBreakpointReaction(QAction* parent=0);
+  pqCatalystRemoveBreakpointReaction(QAction* parent = 0);
 
 public slots:
   virtual void updateEnableState();

@@ -34,26 +34,27 @@ vtkSMCustomBoundsDomain::~vtkSMCustomBoundsDomain()
 void vtkSMCustomBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
 {
   if (!info)
-    {
+  {
     return;
-    }
+  }
   vtkIdType npts = info->GetNumberOfPoints();
   if (npts == 0)
-    {
+  {
     npts = 1;
-    }
+  }
   double bounds[6];
   info->GetBounds(bounds);
 
-  double diag = sqrt(((bounds[1] - bounds[0]) * (bounds[1] - bounds[0])
-      + (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) + (bounds[5]
-        - bounds[4]) * (bounds[5] - bounds[4])) / 3.0);
+  double diag = sqrt(((bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+                       (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+                       (bounds[5] - bounds[4]) * (bounds[5] - bounds[4])) /
+    3.0);
 
   double nn = pow(static_cast<double>(npts), 1.0 / 3.0) - 1.0;
   if (nn < 1.0)
-    {
+  {
     nn = 1.0;
-    }
+  }
 
   std::vector<vtkEntry> entries;
   entries.push_back(vtkEntry(0, diag / nn / 2.0));
@@ -61,35 +62,34 @@ void vtkSMCustomBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMCustomBoundsDomain::SetDefaultValues(
-  vtkSMProperty* prop, bool use_unchecked_values)
+int vtkSMCustomBoundsDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
   if (!dvp)
-    {
+  {
     vtkErrorMacro("vtkSMBoundsDomain only works on vtkSMDoubleVectorProperty.");
     return 0;
-    }
+  }
   vtkSMPropertyHelper helper(dvp);
   helper.SetUseUnchecked(use_unchecked_values);
 
   if (this->GetMaximumExists(0) && this->GetMinimumExists(0))
-    {
+  {
     double min = this->GetMinimum(0);
     double max = this->GetMaximum(0);
 
     if (helper.GetNumberOfElements() == 2)
-      {
+    {
       helper.Set(0, min);
       helper.Set(1, max);
       return 1;
-      }
-    else if(helper.GetNumberOfElements() == 1)
-      {
+    }
+    else if (helper.GetNumberOfElements() == 1)
+    {
       helper.Set(0, max);
       return 1;
-      }
     }
+  }
   return 0;
 }
 

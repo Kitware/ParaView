@@ -48,15 +48,13 @@ protected:
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+
 private:
   vtkAppendArcLength(const vtkAppendArcLength&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAppendArcLength&) VTK_DELETE_FUNCTION;
   //@}
-
 };
 
 #endif
-

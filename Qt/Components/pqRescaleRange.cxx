@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog {};
+class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog
+{
+};
 
-
-pqRescaleRange::pqRescaleRange(QWidget *widgetParent)
+pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
   : QDialog(widgetParent)
 {
   this->Form = new pqRescaleRangeForm();
@@ -55,15 +56,13 @@ pqRescaleRange::pqRescaleRange(QWidget *widgetParent)
   this->Form->MaximumScalar->setValidator(validator);
 
   // Connect the gui elements.
-  this->connect(this->Form->MinimumScalar, SIGNAL(textChanged(const QString &)),
-      this, SLOT(validate()));
-  this->connect(this->Form->MaximumScalar, SIGNAL(textChanged(const QString &)),
-      this, SLOT(validate()));
-  
-  this->connect(this->Form->RescaleButton, SIGNAL(clicked()),
-      this, SLOT(accept()));
-  this->connect(this->Form->CancelButton, SIGNAL(clicked()),
-      this, SLOT(reject()));
+  this->connect(
+    this->Form->MinimumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
+  this->connect(
+    this->Form->MaximumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
+
+  this->connect(this->Form->RescaleButton, SIGNAL(clicked()), this, SLOT(accept()));
+  this->connect(this->Form->CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 pqRescaleRange::~pqRescaleRange()
@@ -73,12 +72,12 @@ pqRescaleRange::~pqRescaleRange()
 
 void pqRescaleRange::setRange(double min, double max)
 {
-  if(min > max)
-    {
+  if (min > max)
+  {
     double tmp = min;
     min = max;
     max = tmp;
-    }
+  }
 
   // Update the displayed range.
   this->Form->MinimumScalar->setText(QString::number(min, 'g', 6));
@@ -101,17 +100,14 @@ void pqRescaleRange::validate()
   QString tmp1 = this->Form->MinimumScalar->text();
   QString tmp2 = this->Form->MaximumScalar->text();
 
-  if(this->Form->MinimumScalar->validator()->validate(tmp1, dummy) ==
-    QValidator::Acceptable &&
-     this->Form->MaximumScalar->validator()->validate(tmp2, dummy) ==
-    QValidator::Acceptable &&
+  if (this->Form->MinimumScalar->validator()->validate(tmp1, dummy) == QValidator::Acceptable &&
+    this->Form->MaximumScalar->validator()->validate(tmp2, dummy) == QValidator::Acceptable &&
     tmp1.toDouble() <= tmp2.toDouble())
-    {
+  {
     this->Form->RescaleButton->setEnabled(true);
-    }
+  }
   else
-    {
+  {
     this->Form->RescaleButton->setEnabled(false);
-    }
+  }
 }
-

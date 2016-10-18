@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -48,9 +48,9 @@ class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
+
 public:
-  pqHelpWindow(QHelpEngine* engine,
-    QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqHelpWindow(QHelpEngine* engine, QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqHelpWindow();
 
 public slots:

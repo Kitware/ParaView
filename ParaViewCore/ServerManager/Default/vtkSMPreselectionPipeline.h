@@ -41,8 +41,8 @@ class vtkSMSourceProxy;
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPreselectionPipeline : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkSMPreselectionPipeline,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkSMPreselectionPipeline, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -58,8 +58,8 @@ public:
    * If either sourceRepresentation or selection are null it hides the
    * interactive selection.
    */
-  virtual void Show(vtkSMSourceProxy* sourceRepresentation,
-            vtkSMSourceProxy* selection, vtkSMRenderViewProxy* view);
+  virtual void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
+    vtkSMRenderViewProxy* view);
   /**
    * Hides the interactive selection
    */
@@ -74,17 +74,14 @@ protected:
   vtkSMPreselectionPipeline();
   ~vtkSMPreselectionPipeline();
   static void OnColorModified(
-    vtkObject* source, unsigned long eid, void* clientdata, void *calldata);
-  static void ClearCache(
-    vtkObject* source, unsigned long eid, void* clientdata, void *calldata);
+    vtkObject* source, unsigned long eid, void* clientdata, void* calldata);
+  static void ClearCache(vtkObject* source, unsigned long eid, void* clientdata, void* calldata);
   virtual void ClearCache();
   vtkSMSourceProxy* ConnectPVExtractSelection(
-    vtkSMSourceProxy* source, unsigned int sourceOutputPort,
-    vtkSMSourceProxy* selection);
+    vtkSMSourceProxy* source, unsigned int sourceOutputPort, vtkSMSourceProxy* selection);
 
 private:
-  vtkSMPreselectionPipeline(
-    const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMPreselectionPipeline(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
 
 protected:

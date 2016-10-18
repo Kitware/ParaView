@@ -60,11 +60,10 @@ protected:
 
   void SetSIL(vtkGraph*);
   vtkGraph* SIL;
+
 private:
   vtkPVSILInformation(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

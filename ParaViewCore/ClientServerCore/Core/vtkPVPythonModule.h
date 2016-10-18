@@ -40,8 +40,8 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonModule : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVPythonModule, vtkObject);
-  static vtkPVPythonModule *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkPVPythonModule* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -74,19 +74,20 @@ public:
    * with GetModule and HaveModule.  Python interpreters can query these
    * global methods in a custom import mechanism.
    */
-  static void RegisterModule(vtkPVPythonModule *module);
+  static void RegisterModule(vtkPVPythonModule* module);
 
   /**
    * Return the registered Python module with the given full module name.  If
    * no such module has been registered, this returns NULL.
    */
-  static vtkPVPythonModule *GetModule(const char *fullname);
+  static vtkPVPythonModule* GetModule(const char* fullname);
 
   /**
    * Returns 1 if a Python module with the given full name has been registered,
    * 0 otherwise.
    */
-  static int HasModule(const char *fullname) {
+  static int HasModule(const char* fullname)
+  {
     return (vtkPVPythonModule::GetModule(fullname) != NULL);
   }
 
@@ -94,13 +95,13 @@ protected:
   vtkPVPythonModule();
   ~vtkPVPythonModule();
 
-  char *Source;
-  char *FullName;
-  int   IsPackage;
+  char* Source;
+  char* FullName;
+  int IsPackage;
 
 private:
-  vtkPVPythonModule(const vtkPVPythonModule &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPythonModule &) VTK_DELETE_FUNCTION;
+  vtkPVPythonModule(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkPVPythonModule_h
+#endif // vtkPVPythonModule_h

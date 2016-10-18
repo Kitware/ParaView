@@ -36,16 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoolPropertyWidgetDecorator.h"
 #include "vtkWeakPointer.h"
 
-
 /**
 * pqShowWidgetDecorator can be used to show/hide a widget based on the
 * status of another property not directly controlled by the widget.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator :
-  public pqBoolPropertyWidgetDecorator
+class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqBoolPropertyWidgetDecorator Superclass;
+
 public:
   pqShowWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
 

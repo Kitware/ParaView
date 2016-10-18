@@ -49,7 +49,7 @@ public:
   /**
    * Set/get the axes actor to be displayed in this 3D widget.
    */
-  void SetAxesActor(vtkPVAxesActor *actor);
+  void SetAxesActor(vtkPVAxesActor* actor);
   vtkGetObjectMacro(AxesActor, vtkPVAxesActor);
   //@}
 
@@ -62,7 +62,7 @@ public:
   /**
    * Set the renderer this 3D widget will be contained in.
    */
-  void SetParentRenderer(vtkRenderer *ren);
+  void SetParentRenderer(vtkRenderer* ren);
   vtkRenderer* GetParentRenderer();
   //@}
 
@@ -77,7 +77,7 @@ public:
    * Callback to keep the camera for the axes actor up to date with the
    * camera in the parent renderer
    */
-  void ExecuteEvent(vtkObject *o, unsigned long event, void *calldata);
+  void ExecuteEvent(vtkObject* o, unsigned long event, void* calldata);
 
   //@{
   /**
@@ -94,7 +94,7 @@ public:
    * when (in interactive mode) the cursor is over this 3D widget.
    */
   void SetOutlineColor(double r, double g, double b);
-  double *GetOutlineColor();
+  double* GetOutlineColor();
   //@}
 
   //@{
@@ -102,7 +102,7 @@ public:
    * Set/get the color of the axis labels of this widget.
    */
   void SetAxisLabelColor(double r, double g, double b);
-  double *GetAxisLabelColor();
+  double* GetAxisLabelColor();
   //@}
 
   //@{
@@ -117,17 +117,17 @@ protected:
   vtkPVAxesWidget();
   ~vtkPVAxesWidget();
 
-  vtkRenderer *Renderer;
-  vtkRenderer *ParentRenderer;
+  vtkRenderer* Renderer;
+  vtkRenderer* ParentRenderer;
 
-  vtkPVAxesActor *AxesActor;
-  vtkPolyData *Outline;
-  vtkActor2D *OutlineActor;
+  vtkPVAxesActor* AxesActor;
+  vtkPolyData* Outline;
+  vtkActor2D* OutlineActor;
 
-  static void ProcessEvents(vtkObject *object, unsigned long event,
-                            void *clientdata, void *calldata);
+  static void ProcessEvents(
+    vtkObject* object, unsigned long event, void* clientdata, void* calldata);
 
-  vtkPVAxesWidgetObserver *Observer;
+  vtkPVAxesWidgetObserver* Observer;
   int StartTag;
 
   int MouseCursorState;
@@ -164,10 +164,10 @@ protected:
   void SquareRenderer();
 
   unsigned long StartEventObserverId;
+
 private:
   vtkPVAxesWidget(const vtkPVAxesWidget&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVAxesWidget&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

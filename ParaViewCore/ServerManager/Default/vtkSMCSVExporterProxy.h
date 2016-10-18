@@ -53,7 +53,6 @@ protected:
 private:
   vtkSMCSVExporterProxy(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

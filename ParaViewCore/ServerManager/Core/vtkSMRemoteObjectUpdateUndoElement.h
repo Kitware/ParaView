@@ -58,8 +58,7 @@ public:
   /**
    * Set the state of the UndoElement
    */
-  virtual void SetUndoRedoState(const vtkSMMessage* before,
-                                const vtkSMMessage* after);
+  virtual void SetUndoRedoState(const vtkSMMessage* before, const vtkSMMessage* after);
 
   // Current full state of the UndoElement
   vtkSMMessage* BeforeState;
@@ -79,7 +78,6 @@ protected:
 private:
   vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

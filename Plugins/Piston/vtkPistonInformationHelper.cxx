@@ -33,23 +33,23 @@ vtkPistonInformationHelper::~vtkPistonInformationHelper()
 //----------------------------------------------------------------------------
 void vtkPistonInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-const char * vtkPistonInformationHelper::GetPrettyDataTypeString()
+const char* vtkPistonInformationHelper::GetPrettyDataTypeString()
 {
   return "Piston Data Object";
 }
 
 //----------------------------------------------------------------------------
-bool vtkPistonInformationHelper::ValidateType(vtkDataObject *data)
+bool vtkPistonInformationHelper::ValidateType(vtkDataObject* data)
 {
-  vtkPistonDataObject *pdo = vtkPistonDataObject::SafeDownCast(data);
+  vtkPistonDataObject* pdo = vtkPistonDataObject::SafeDownCast(data);
   if (!pdo)
-    {
+  {
     return false;
-    }
+  }
   return true;
 }
 
@@ -60,9 +60,9 @@ int vtkPistonInformationHelper::GetNumberOfDataSets()
 }
 
 //----------------------------------------------------------------------------
-double *vtkPistonInformationHelper::GetBounds()
+double* vtkPistonInformationHelper::GetBounds()
 {
-  vtkPistonDataObject *pdo = vtkPistonDataObject::SafeDownCast(this->Data);
+  vtkPistonDataObject* pdo = vtkPistonDataObject::SafeDownCast(this->Data);
   return pdo->GetBounds();
 }
 

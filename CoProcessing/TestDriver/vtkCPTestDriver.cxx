@@ -42,45 +42,43 @@ vtkCPTestDriver::~vtkCPTestDriver()
 //----------------------------------------------------------------------------
 int vtkCPTestDriver::Run()
 {
-  if(this->GridBuilder == 0)
-    {
+  if (this->GridBuilder == 0)
+  {
     vtkErrorMacro("Need to set the grid builder.");
     return 1;
-    }
-  
+  }
+
   // create the coprocessor
-  vtkSmartPointer<vtkCPProcessor> processor = 
-    vtkSmartPointer<vtkCPProcessor>::New();
+  vtkSmartPointer<vtkCPProcessor> processor = vtkSmartPointer<vtkCPProcessor>::New();
   // here we should add in a pipeline for the processor to use
-  
-  for(unsigned long i=0;i<this->NumberOfTimeSteps;i++)
-    {
+
+  for (unsigned long i = 0; i < this->NumberOfTimeSteps; i++)
+  {
     vtkSmartPointer<vtkCPDataDescription> dataDescription =
       vtkSmartPointer<vtkCPDataDescription>::New();
     dataDescription->SetTimeData(this->GetTime(i), i);
     dataDescription->AddInput("input");
-    if(processor->RequestDataDescription(dataDescription))
-      {
+    if (processor->RequestDataDescription(dataDescription))
+    {
       int builtNewGrid = 0;
       dataDescription->GetInputDescriptionByName("input")->SetGrid(
         this->GridBuilder->GetGrid(i, this->GetTime(i), builtNewGrid));
       // now call the coprocessing library
       processor->CoProcess(dataDescription);
-      }
     }
+  }
   return 0;
 }
 
 //----------------------------------------------------------------------------
 double vtkCPTestDriver::GetTime(unsigned long timeStep)
 {
-  if(this->EndTime == this->StartTime)
-    {
+  if (this->EndTime == this->StartTime)
+  {
     vtkWarningMacro("EndTime equals StartTime.");
-    }
-  double deltaTimeStep = 
-    (this->EndTime - this->StartTime)/(1.*this->NumberOfTimeSteps);
-  return this->StartTime + deltaTimeStep*timeStep;
+  }
+  double deltaTimeStep = (this->EndTime - this->StartTime) / (1. * this->NumberOfTimeSteps);
+  return this->StartTime + deltaTimeStep * timeStep;
 }
 
 //----------------------------------------------------------------------------

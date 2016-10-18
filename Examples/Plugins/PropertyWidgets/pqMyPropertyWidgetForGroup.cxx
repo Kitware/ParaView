@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqMyPropertyWidgetForGroup::pqMyPropertyWidgetForGroup(
-  vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget *parentObject)
+  vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
   Q_UNUSED(smgroup);

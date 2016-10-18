@@ -36,23 +36,22 @@ class vtkSMCameraConfigurationFileInfo
 {
 public:
   vtkSMCameraConfigurationFileInfo()
-        :
-    FileIdentifier("PVCameraConfiguration"),
-    FileDescription("ParaView camera configuration"),
-    FileExtension(".pvcc")
-      { }
+    : FileIdentifier("PVCameraConfiguration")
+    , FileDescription("ParaView camera configuration")
+    , FileExtension(".pvcc")
+  {
+  }
 
-  void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << endl
-      << indent << "FileDescription: " << this->FileDescription << endl
-      << indent << "FileExtension: " << this->FileExtension << endl;
-    }
+  void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << endl
+       << indent << "FileDescription: " << this->FileDescription << endl
+       << indent << "FileExtension: " << this->FileExtension << endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

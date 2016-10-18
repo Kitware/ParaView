@@ -38,14 +38,14 @@ class vtkMomentVectors : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkMomentVectors, vtkDataSetAlgorithm);
-  static vtkMomentVectors *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkMomentVectors* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // These are basically a convenience method that calls SetInputArrayToProcess
   // to set the array used as the input scalars.  The fieldAttributeType comes
   // from the vtkDataSetAttributes::AttributeTypes enum.
-  virtual void SetInputMoment(const char *name);
+  virtual void SetInputMoment(const char* name);
   virtual void SetInputMoment(int fieldAttributeType);
 
   // Description:
@@ -69,14 +69,16 @@ public:
   // array.  The returned string is not guaranteed to be equal to array names
   // created from the last call to Update, but will be the same if neither the
   // input or state of this filter changes.  This method is NOT thread safe.
-  const char *GetOutputMomentTotalName() {
+  const char* GetOutputMomentTotalName()
+  {
     return this->GetOutputMomentTotalName(this->GetInput());
   }
-  const char *GetOutputMomentDensityName() {
+  const char* GetOutputMomentDensityName()
+  {
     return this->GetOutputMomentDensityName(this->GetInput());
   }
-  virtual const char *GetOutputMomentTotalName(vtkDataObject *input);
-  virtual const char *GetOutputMomentDensityName(vtkDataObject *input);
+  virtual const char* GetOutputMomentTotalName(vtkDataObject* input);
+  virtual const char* GetOutputMomentDensityName(vtkDataObject* input);
 
 protected:
   vtkMomentVectors();
@@ -84,16 +86,15 @@ protected:
 
   int InputMomentIsDensity;
 
-  char *OutputMomentTotalName;
-  char *OutputMomentDensityName;
+  char* OutputMomentTotalName;
+  char* OutputMomentDensityName;
 
-  virtual int RequestData(vtkInformation *request,
-                          vtkInformationVector **inputVector,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
-  vtkMomentVectors(const vtkMomentVectors &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMomentVectors &) VTK_DELETE_FUNCTION;
+  vtkMomentVectors(const vtkMomentVectors&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMomentVectors&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkMomentVectors_h
+#endif // vtkMomentVectors_h

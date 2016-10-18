@@ -43,11 +43,11 @@ class pqColorOpacityEditorWidget;
 // columns are r,g,b colors, respectively.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorTableModel : public QAbstractTableModel
 {
-Q_OBJECT
+  Q_OBJECT
   typedef QAbstractTableModel Superclass;
 
 public:
-  pqColorTableModel(pqColorOpacityEditorWidget * widget, QObject* parentObject = 0);
+  pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
 
   virtual ~pqColorTableModel() {}
 
@@ -55,15 +55,15 @@ public:
   * All columns are editable. The first and last value in the first column
   * are not editable as they are set by the range.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &idx) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& idx) const;
 
-  virtual bool setData(const QModelIndex &idx, const QVariant &value, int role=Qt::EditRole);
+  virtual bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole);
 
-  virtual int rowCount(const QModelIndex & parent=QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
-  virtual int columnCount(const QModelIndex & parent=QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
-  virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const;
 
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
@@ -72,7 +72,7 @@ public:
 private:
   Q_DISABLE_COPY(pqColorTableModel)
 
-  pqColorOpacityEditorWidget * Widget;
+  pqColorOpacityEditorWidget* Widget;
 
   int NumberOfRowsCache;
 };

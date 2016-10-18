@@ -25,8 +25,7 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMRenderViewExporterProxy.h"
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMGL2PSExporterProxy :
-    public vtkSMRenderViewExporterProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMGL2PSExporterProxy : public vtkSMRenderViewExporterProxy
 {
 public:
   static vtkSMGL2PSExporterProxy* New();
@@ -48,7 +47,7 @@ public:
   /**
    * See superclass documentation for description.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager *pm, vtkPVXMLElement *element);
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
 protected:
   vtkSMGL2PSExporterProxy();
@@ -58,14 +57,18 @@ protected:
   /**
    * Type of view that this exporter is configured to export.
    */
-  enum { None, ContextView, RenderView };
+  enum
+  {
+    None,
+    ContextView,
+    RenderView
+  };
   int ViewType;
   //@}
 
 private:
   vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

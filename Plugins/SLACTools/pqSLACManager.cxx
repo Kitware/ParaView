@@ -64,31 +64,32 @@ class pqSLACManager::pqInternal
 {
 public:
   Ui::pqSLACActionHolder Actions;
-  QWidget *ActionPlaceholder;
+  QWidget* ActionPlaceholder;
 };
 
 //=============================================================================
 QPointer<pqSLACManager> pqSLACManagerInstance = NULL;
 
-pqSLACManager *pqSLACManager::instance()
+pqSLACManager* pqSLACManager::instance()
 {
   if (pqSLACManagerInstance == NULL)
-    {
-    pqApplicationCore *core = pqApplicationCore::instance();
+  {
+    pqApplicationCore* core = pqApplicationCore::instance();
     if (!core)
-      {
+    {
       qFatal("Cannot use the SLAC Tools without an application core instance.");
       return NULL;
-      }
+    }
 
     pqSLACManagerInstance = new pqSLACManager(core);
-    }
+  }
 
   return pqSLACManagerInstance;
 }
 
 //-----------------------------------------------------------------------------
-pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
+pqSLACManager::pqSLACManager(QObject* p)
+  : QObject(p)
 {
   this->Internal = new pqSLACManager::pqInternal;
 
@@ -101,30 +102,26 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 
   this->actionShowParticles()->setChecked(true);
 
-  QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
-                   this, SLOT(showDataLoadManager()));
-  QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)),
-                   this, SLOT(showEField()));
-  QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)),
-                   this, SLOT(showBField()));
-  QObject::connect(this->actionShowParticles(), SIGNAL(toggled(bool)),
-                   this, SLOT(showParticles(bool)));
-  QObject::connect(this->actionSolidMesh(), SIGNAL(triggered(bool)),
-                   this, SLOT(showSolidMesh()));
-  QObject::connect(this->actionWireframeSolidMesh(), SIGNAL(triggered(bool)),
-                   this, SLOT(showWireframeSolidMesh()));
-  QObject::connect(this->actionWireframeAndBackMesh(), SIGNAL(triggered(bool)),
-                   this, SLOT(showWireframeAndBackMesh()));
-  QObject::connect(this->actionPlotOverZ(), SIGNAL(triggered(bool)),
-                   this, SLOT(createPlotOverZ()));
-  QObject::connect(this->actionToggleBackgroundBW(), SIGNAL(triggered(bool)),
-                   this, SLOT(toggleBackgroundBW()));
-  QObject::connect(this->actionShowStandardViewpoint(), SIGNAL(triggered(bool)),
-                   this, SLOT(showStandardViewpoint()));
-  QObject::connect(this->actionTemporalResetRange(), SIGNAL(triggered(bool)),
-                   this, SLOT(resetRangeTemporal()));
-  QObject::connect(this->actionCurrentTimeResetRange(), SIGNAL(triggered(bool)),
-                   this, SLOT(resetRangeCurrentTime()));
+  QObject::connect(
+    this->actionDataLoadManager(), SIGNAL(triggered(bool)), this, SLOT(showDataLoadManager()));
+  QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)), this, SLOT(showEField()));
+  QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)), this, SLOT(showBField()));
+  QObject::connect(
+    this->actionShowParticles(), SIGNAL(toggled(bool)), this, SLOT(showParticles(bool)));
+  QObject::connect(this->actionSolidMesh(), SIGNAL(triggered(bool)), this, SLOT(showSolidMesh()));
+  QObject::connect(this->actionWireframeSolidMesh(), SIGNAL(triggered(bool)), this,
+    SLOT(showWireframeSolidMesh()));
+  QObject::connect(this->actionWireframeAndBackMesh(), SIGNAL(triggered(bool)), this,
+    SLOT(showWireframeAndBackMesh()));
+  QObject::connect(this->actionPlotOverZ(), SIGNAL(triggered(bool)), this, SLOT(createPlotOverZ()));
+  QObject::connect(
+    this->actionToggleBackgroundBW(), SIGNAL(triggered(bool)), this, SLOT(toggleBackgroundBW()));
+  QObject::connect(this->actionShowStandardViewpoint(), SIGNAL(triggered(bool)), this,
+    SLOT(showStandardViewpoint()));
+  QObject::connect(
+    this->actionTemporalResetRange(), SIGNAL(triggered(bool)), this, SLOT(resetRangeTemporal()));
+  QObject::connect(this->actionCurrentTimeResetRange(), SIGNAL(triggered(bool)), this,
+    SLOT(resetRangeCurrentTime()));
 
   this->checkActionEnabled();
 }
@@ -136,211 +133,207 @@ pqSLACManager::~pqSLACManager()
 }
 
 //-----------------------------------------------------------------------------
-QAction *pqSLACManager::actionDataLoadManager()
+QAction* pqSLACManager::actionDataLoadManager()
 {
   return this->Internal->Actions.actionDataLoadManager;
 }
 
-QAction *pqSLACManager::actionShowEField()
+QAction* pqSLACManager::actionShowEField()
 {
   return this->Internal->Actions.actionShowEField;
 }
 
-QAction *pqSLACManager::actionShowBField()
+QAction* pqSLACManager::actionShowBField()
 {
   return this->Internal->Actions.actionShowBField;
 }
 
-QAction *pqSLACManager::actionShowParticles()
+QAction* pqSLACManager::actionShowParticles()
 {
   return this->Internal->Actions.actionShowParticles;
 }
 
-QAction *pqSLACManager::actionSolidMesh()
+QAction* pqSLACManager::actionSolidMesh()
 {
   return this->Internal->Actions.actionSolidMesh;
 }
 
-QAction *pqSLACManager::actionWireframeSolidMesh()
+QAction* pqSLACManager::actionWireframeSolidMesh()
 {
   return this->Internal->Actions.actionWireframeSolidMesh;
 }
 
-QAction *pqSLACManager::actionWireframeAndBackMesh()
+QAction* pqSLACManager::actionWireframeAndBackMesh()
 {
   return this->Internal->Actions.actionWireframeAndBackMesh;
 }
 
-QAction *pqSLACManager::actionPlotOverZ()
+QAction* pqSLACManager::actionPlotOverZ()
 {
   return this->Internal->Actions.actionPlotOverZ;
 }
 
-QAction *pqSLACManager::actionToggleBackgroundBW()
+QAction* pqSLACManager::actionToggleBackgroundBW()
 {
   return this->Internal->Actions.actionToggleBackgroundBW;
 }
 
-QAction *pqSLACManager::actionShowStandardViewpoint()
+QAction* pqSLACManager::actionShowStandardViewpoint()
 {
   return this->Internal->Actions.actionShowStandardViewpoint;
 }
 
-QAction *pqSLACManager::actionTemporalResetRange()
+QAction* pqSLACManager::actionTemporalResetRange()
 {
   return this->Internal->Actions.actionTemporalResetRange;
 }
 
-QAction *pqSLACManager::actionCurrentTimeResetRange()
+QAction* pqSLACManager::actionCurrentTimeResetRange()
 {
   return this->Internal->Actions.actionCurrentTimeResetRange;
 }
 
 //-----------------------------------------------------------------------------
-pqServer *pqSLACManager::getActiveServer()
+pqServer* pqSLACManager::getActiveServer()
 {
-  pqApplicationCore *app = pqApplicationCore::instance();
-  pqServerManagerModel *smModel = app->getServerManagerModel();
-  pqServer *server = smModel->getItemAtIndex<pqServer*>(0);
+  pqApplicationCore* app = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = app->getServerManagerModel();
+  pqServer* server = smModel->getItemAtIndex<pqServer*>(0);
   return server;
 }
 
 //-----------------------------------------------------------------------------
-QWidget *pqSLACManager::getMainWindow()
+QWidget* pqSLACManager::getMainWindow()
 {
-  foreach(QWidget *topWidget, QApplication::topLevelWidgets())
-    {
-    if (qobject_cast<QMainWindow*>(topWidget)) return topWidget;
-    }
+  foreach (QWidget* topWidget, QApplication::topLevelWidgets())
+  {
+    if (qobject_cast<QMainWindow*>(topWidget))
+      return topWidget;
+  }
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-pqView *pqSLACManager::findView(pqPipelineSource *source, int port,
-                                const QString &viewType)
+pqView* pqSLACManager::findView(pqPipelineSource* source, int port, const QString& viewType)
 {
   // Step 1, try to find a view in which the source is already shown.
   if (source)
+  {
+    foreach (pqView* view, source->getViews())
     {
-    foreach (pqView *view, source->getViews())
-      {
-      pqDataRepresentation *repr = source->getRepresentation(port, view);
-      if (repr && repr->isVisible()) return view;
-      }
+      pqDataRepresentation* repr = source->getRepresentation(port, view);
+      if (repr && repr->isVisible())
+        return view;
     }
+  }
 
   // Step 2, check to see if the active view is the right type.
-  pqView *view = pqActiveObjects::instance().activeView();
-  if (view->getViewType() == viewType) return view;
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (view->getViewType() == viewType)
+    return view;
 
   // Step 3, check all the views and see if one is the right type and not
   // showing anything.
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqServerManagerModel *smModel = core->getServerManagerModel();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
   foreach (view, smModel->findItems<pqView*>())
+  {
+    if (view && (view->getViewType() == viewType) &&
+      (view->getNumberOfVisibleRepresentations() < 1))
     {
-    if (   view && (view->getViewType() == viewType)
-        && (view->getNumberOfVisibleRepresentations() < 1) )
-      {
       return view;
-      }
     }
+  }
 
   // Give up.  A new view needs to be created.
   return NULL;
 }
 
-pqView *pqSLACManager::getMeshView()
+pqView* pqSLACManager::getMeshView()
 {
-  return this->findView(this->getMeshReader(), 0,
-                        pqRenderView::renderViewType());
+  return this->findView(this->getMeshReader(), 0, pqRenderView::renderViewType());
 }
 
-pqRenderView *pqSLACManager::getMeshRenderView()
+pqRenderView* pqSLACManager::getMeshRenderView()
 {
   return reinterpret_cast<pqRenderView*>(this->getMeshView());
 }
 
-pqView *pqSLACManager::getPlotView()
+pqView* pqSLACManager::getPlotView()
 {
-  return this->findView(this->getPlotFilter(), 0,
-                        pqXYChartView::XYChartViewType());
+  return this->findView(this->getPlotFilter(), 0, pqXYChartView::XYChartViewType());
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource *pqSLACManager::findPipelineSource(const char *SMName)
+pqPipelineSource* pqSLACManager::findPipelineSource(const char* SMName)
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqServerManagerModel *smModel = core->getServerManagerModel();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
 
-  QList<pqPipelineSource*> sources
-    = smModel->findItems<pqPipelineSource*>(this->getActiveServer());
-  foreach(pqPipelineSource *s, sources)
-    {
-    if (strcmp(s->getProxy()->GetXMLName(), SMName) == 0) return s;
-    }
+  QList<pqPipelineSource*> sources = smModel->findItems<pqPipelineSource*>(this->getActiveServer());
+  foreach (pqPipelineSource* s, sources)
+  {
+    if (strcmp(s->getProxy()->GetXMLName(), SMName) == 0)
+      return s;
+  }
 
   return NULL;
 }
 
-pqPipelineSource *pqSLACManager::getMeshReader()
+pqPipelineSource* pqSLACManager::getMeshReader()
 {
   return this->findPipelineSource("SLACReader");
 }
 
-pqPipelineSource *pqSLACManager::getParticlesReader()
+pqPipelineSource* pqSLACManager::getParticlesReader()
 {
   return this->findPipelineSource("SLACParticleReader");
 }
 
-pqPipelineSource *pqSLACManager::getPlotFilter()
+pqPipelineSource* pqSLACManager::getPlotFilter()
 {
   return this->findPipelineSource("ProbeLine");
 }
 
-pqPipelineSource *pqSLACManager::getTemporalRanges()
+pqPipelineSource* pqSLACManager::getTemporalRanges()
 {
   return this->findPipelineSource("TemporalRanges");
 }
 
 //-----------------------------------------------------------------------------
-static void destroyPortConsumers(pqOutputPort *port)
+static void destroyPortConsumers(pqOutputPort* port)
 {
-  foreach (pqPipelineSource *consumer, port->getConsumers())
-    {
+  foreach (pqPipelineSource* consumer, port->getConsumers())
+  {
     pqSLACManager::destroyPipelineSourceAndConsumers(consumer);
-    }
+  }
 }
 
-void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource *source)
+void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource* source)
 {
-  if (!source) return;
+  if (!source)
+    return;
 
-  foreach (pqOutputPort *port, source->getOutputPorts())
-    {
+  foreach (pqOutputPort* port, source->getOutputPorts())
+  {
     destroyPortConsumers(port);
-    }
+  }
 
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqObjectBuilder *builder = core->getObjectBuilder();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
   builder->destroy(source);
 }
 
 //-----------------------------------------------------------------------------
 void pqSLACManager::showDataLoadManager()
 {
-  pqSLACDataLoadManager *dialog
-    = new pqSLACDataLoadManager(this->getMainWindow());
+  pqSLACDataLoadManager* dialog = new pqSLACDataLoadManager(this->getMainWindow());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
-  QObject::connect(dialog, SIGNAL(createdPipeline()),
-                   this, SLOT(checkActionEnabled()));
-  QObject::connect(dialog, SIGNAL(createdPipeline()),
-                   this, SLOT(showEField()));
-  QObject::connect(dialog, SIGNAL(createdPipeline()),
-                   this, SLOT(showStandardViewpoint()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(checkActionEnabled()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showEField()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(showStandardViewpoint()));
 #ifdef AUTO_FIND_TEMPORAL_RANGE
-  QObject::connect(dialog, SIGNAL(createdPipeline()),
-                   this, SLOT(resetRangeTemporal()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()), this, SLOT(resetRangeTemporal()));
 #endif
   dialog->show();
 }
@@ -348,11 +341,11 @@ void pqSLACManager::showDataLoadManager()
 //-----------------------------------------------------------------------------
 void pqSLACManager::checkActionEnabled()
 {
-  pqPipelineSource *meshReader = this->getMeshReader();
-  pqPipelineSource *particlesReader = this->getParticlesReader();
+  pqPipelineSource* meshReader = this->getMeshReader();
+  pqPipelineSource* particlesReader = this->getParticlesReader();
 
   if (!meshReader)
-    {
+  {
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
     this->actionSolidMesh()->setEnabled(false);
@@ -361,29 +354,25 @@ void pqSLACManager::checkActionEnabled()
     this->actionPlotOverZ()->setEnabled(false);
     this->actionTemporalResetRange()->setEnabled(false);
     this->actionCurrentTimeResetRange()->setEnabled(false);
-    }
+  }
   else
-    {
-    pqOutputPort *outputPort = meshReader->getOutputPort(0);
-    vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
-    vtkPVDataSetAttributesInformation *pointFields
-      = dataInfo->GetPointDataInformation();
+  {
+    pqOutputPort* outputPort = meshReader->getOutputPort(0);
+    vtkPVDataInformation* dataInfo = outputPort->getDataInformation();
+    vtkPVDataSetAttributesInformation* pointFields = dataInfo->GetPointDataInformation();
 
-    this->actionShowEField()->setEnabled(
-                            pointFields->GetArrayInformation("efield") != NULL);
-    this->actionShowBField()->setEnabled(
-                            pointFields->GetArrayInformation("bfield") != NULL);
+    this->actionShowEField()->setEnabled(pointFields->GetArrayInformation("efield") != NULL);
+    this->actionShowBField()->setEnabled(pointFields->GetArrayInformation("bfield") != NULL);
 
     this->actionSolidMesh()->setEnabled(true);
     this->actionWireframeSolidMesh()->setEnabled(true);
     this->actionWireframeAndBackMesh()->setEnabled(true);
 
-    this->actionPlotOverZ()->setEnabled(
-                            pointFields->GetArrayInformation("efield") != NULL);
+    this->actionPlotOverZ()->setEnabled(pointFields->GetArrayInformation("efield") != NULL);
 
     this->actionTemporalResetRange()->setEnabled(true);
     this->actionCurrentTimeResetRange()->setEnabled(true);
-    }
+  }
 
   this->actionShowParticles()->setEnabled(particlesReader != NULL);
 }
@@ -394,66 +383,64 @@ void pqSLACManager::showField(QString name)
   this->showField(name.toLatin1().data());
 }
 
-void pqSLACManager::showField(const char *name)
+void pqSLACManager::showField(const char* name)
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqUndoStack *stack = core->getUndoStack();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqUndoStack* stack = core->getUndoStack();
 
-  pqPipelineSource *meshReader = this->getMeshReader();
-  if (!meshReader) return;
+  pqPipelineSource* meshReader = this->getMeshReader();
+  if (!meshReader)
+    return;
 
-  pqView *view = this->getMeshView();
-  if (!view) return;
+  pqView* view = this->getMeshView();
+  if (!view)
+    return;
 
   // Get the (downcasted) representation.
-  pqDataRepresentation *_repr = meshReader->getRepresentation(0, view);
-  pqPipelineRepresentation *repr
-    = qobject_cast<pqPipelineRepresentation*>(_repr);
+  pqDataRepresentation* _repr = meshReader->getRepresentation(0, view);
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(_repr);
   if (!repr)
-    {
+  {
     qWarning() << "Could not find representation object.";
     return;
-    }
+  }
 
   // Get information about the field we are supposed to be showing.
-  vtkPVDataInformation *dataInfo = repr->getInputDataInformation();
-  vtkPVDataSetAttributesInformation *pointInfo
-    = dataInfo->GetPointDataInformation();
-  vtkPVArrayInformation *arrayInfo = pointInfo->GetArrayInformation(name);
-  if (!arrayInfo) return;
+  vtkPVDataInformation* dataInfo = repr->getInputDataInformation();
+  vtkPVDataSetAttributesInformation* pointInfo = dataInfo->GetPointDataInformation();
+  vtkPVArrayInformation* arrayInfo = pointInfo->GetArrayInformation(name);
+  if (!arrayInfo)
+    return;
 
-  if (stack) stack->beginUndoSet(QString("Show field %1").arg(name));
+  if (stack)
+    stack->beginUndoSet(QString("Show field %1").arg(name));
 
   this->CurrentFieldName = name;
 
   // Set the field to color by.
-  vtkSMPVRepresentationProxy::SetScalarColoring(
-    repr->getProxy(), name, vtkDataObject::POINT);
+  vtkSMPVRepresentationProxy::SetScalarColoring(repr->getProxy(), name, vtkDataObject::POINT);
 
   // Adjust the color map to be rainbow.
-  pqScalarsToColors *lut = repr->getLookupTable();
-  vtkSMProxy *lutProxy = lut->getProxy();
+  pqScalarsToColors* lut = repr->getLookupTable();
+  vtkSMProxy* lutProxy = lut->getProxy();
 
-  pqSMAdaptor::setEnumerationProperty(lutProxy->GetProperty("ColorSpace"),
-                                      "HSV");
+  pqSMAdaptor::setEnumerationProperty(lutProxy->GetProperty("ColorSpace"), "HSV");
 
   // Control points are 4-tuples comprising scalar value + RGB
   QList<QVariant> RGBPoints;
   RGBPoints << 0.0 << 0.0 << 0.0 << 1.0;
   RGBPoints << 1.0 << 1.0 << 0.0 << 0.0;
-  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"),
-                                          RGBPoints);
+  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"), RGBPoints);
 
   // NaN color is a 3-tuple RGB.
   QList<QVariant> NanColor;
   NanColor << 0.5 << 0.5 << 0.5;
-  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("NanColor"),
-                                          NanColor);
+  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("NanColor"), NanColor);
 
   // Set up range of scalars to best we know of.
-  pqPipelineSource *temporalRanges = this->getTemporalRanges();
+  pqPipelineSource* temporalRanges = this->getTemporalRanges();
   if (temporalRanges)
-    {
+  {
 #ifdef AUTO_FIND_TEMPORAL_RANGE
     // NOTE TO DEVELOPER:
     // ClientDeliveryStrategy is no longer available. However
@@ -462,58 +449,57 @@ void pqSLACManager::showField(const char *name)
     // to use this API.
 
     // Retrieve the ranges of data over all time.
-    vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
-    vtkSMRepresentationStrategy *delivery
-      = vtkSMRepresentationStrategy::SafeDownCast(
-                          pm->NewProxy("strategies", "ClientDeliveryStrategy"));
-    vtkSMSourceProxy *temporalRangesProxy
-      = vtkSMSourceProxy::SafeDownCast(temporalRanges->getProxy());
+    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+    vtkSMRepresentationStrategy* delivery = vtkSMRepresentationStrategy::SafeDownCast(
+      pm->NewProxy("strategies", "ClientDeliveryStrategy"));
+    vtkSMSourceProxy* temporalRangesProxy =
+      vtkSMSourceProxy::SafeDownCast(temporalRanges->getProxy());
     delivery->AddInput(temporalRangesProxy, NULL);
     delivery->Update();
-    vtkAlgorithm *alg = vtkAlgorithm::SafeDownCast(
-                                  delivery->GetOutput()->GetClientSideObject());
-    vtkTable *ranges = vtkTable::SafeDownCast(alg->GetOutputDataObject(0));
-    vtkAbstractArray *rangeData = ranges->GetColumnByName(name);
+    vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(delivery->GetOutput()->GetClientSideObject());
+    vtkTable* ranges = vtkTable::SafeDownCast(alg->GetOutputDataObject(0));
+    vtkAbstractArray* rangeData = ranges->GetColumnByName(name);
     if (!rangeData)
-      {
+    {
       QString magName = QString("%1_M").arg(name);
       rangeData = ranges->GetColumnByName(magName.toLatin1().data());
-      }
+    }
 
     this->CurrentFieldRangeKnown = true;
-    this->CurrentFieldRange[0]
-      = rangeData->GetVariantValue(vtkTemporalRanges::MINIMUM_ROW).ToDouble();
-    this->CurrentFieldRange[1]
-      = rangeData->GetVariantValue(vtkTemporalRanges::MAXIMUM_ROW).ToDouble();
-    this->CurrentFieldAverage
-      = rangeData->GetVariantValue(vtkTemporalRanges::AVERAGE_ROW).ToDouble();
+    this->CurrentFieldRange[0] =
+      rangeData->GetVariantValue(vtkTemporalRanges::MINIMUM_ROW).ToDouble();
+    this->CurrentFieldRange[1] =
+      rangeData->GetVariantValue(vtkTemporalRanges::MAXIMUM_ROW).ToDouble();
+    this->CurrentFieldAverage =
+      rangeData->GetVariantValue(vtkTemporalRanges::AVERAGE_ROW).ToDouble();
 
     // Cleanup.
     delivery->Delete();
 #endif
-    }
+  }
   else
-    {
+  {
     this->CurrentFieldRangeKnown = false;
-    }
+  }
 
   if (this->ScaleFieldsByCurrentTimeStep || !this->CurrentFieldRangeKnown)
-    {
+  {
     // Set the range of the scalars to the current range of the field.
     double range[2];
     arrayInfo->GetComponentRange(-1, range);
     lut->setScalarRange(range[0], range[1]);
-    }
+  }
   else
-    {
-    lut->setScalarRange(0.0, 2.0*this->CurrentFieldAverage);
-    }
+  {
+    lut->setScalarRange(0.0, 2.0 * this->CurrentFieldAverage);
+  }
 
   lutProxy->UpdateVTKObjects();
 
   this->updatePlotField();
 
-  if (stack) stack->endUndoSet();
+  if (stack)
+    stack->endUndoSet();
 
   view->render();
 }
@@ -532,83 +518,83 @@ void pqSLACManager::showBField()
 void pqSLACManager::updatePlotField()
 {
   // Get the plot source, view, and representation.
-  pqPipelineSource *plotFilter = this->getPlotFilter();
-  if (!plotFilter) return;
+  pqPipelineSource* plotFilter = this->getPlotFilter();
+  if (!plotFilter)
+    return;
 
-  pqView *plotView = this->getPlotView();
-  if (!plotView) return;
+  pqView* plotView = this->getPlotView();
+  if (!plotView)
+    return;
 
-  pqDataRepresentation *repr = plotFilter->getRepresentation(plotView);
-  if (!repr) return;
-  vtkSMProxy *reprProxy = repr->getProxy();
+  pqDataRepresentation* repr = plotFilter->getRepresentation(plotView);
+  if (!repr)
+    return;
+  vtkSMProxy* reprProxy = repr->getProxy();
 
   QString fieldName = this->CurrentFieldName;
 
-  if (fieldName == "Solid Color") fieldName = "efield";
+  if (fieldName == "Solid Color")
+    fieldName = "efield";
 
   // Iterate over all the series.  Turn them all off except the one associated
   // with the viewed mesh.
-  vtkSMChartSeriesSelectionDomain* domain =
-    vtkSMChartSeriesSelectionDomain::SafeDownCast(
+  vtkSMChartSeriesSelectionDomain* domain = vtkSMChartSeriesSelectionDomain::SafeDownCast(
     reprProxy->GetProperty("SeriesVisibility")->FindDomain("vtkSMChartSeriesSelectionDomain"));
-  if (domain == NULL) { return; }
+  if (domain == NULL)
+  {
+    return;
+  }
 
   QList<QVariant> visibility;
-  for (unsigned int i=0; i <  domain->GetNumberOfStrings(); i++)
-    {
+  for (unsigned int i = 0; i < domain->GetNumberOfStrings(); i++)
+  {
     QString seriesName = domain->GetString(i);
     if ((fieldName == seriesName) || (fieldName + "_Magnitude" == seriesName))
-      {
+    {
       fieldName = seriesName;
       visibility << seriesName << 1;
 
-      double color[3] = {0.0, 0.0, 0.0};
-      vtkSMPropertyHelper(reprProxy, "SeriesColor").SetStatus(
-        seriesName.toLatin1().data(), color, 3);
+      double color[3] = { 0.0, 0.0, 0.0 };
+      vtkSMPropertyHelper(reprProxy, "SeriesColor")
+        .SetStatus(seriesName.toLatin1().data(), color, 3);
 
-      vtkSMPropertyHelper(reprProxy, "SeriesLineThickness").SetStatus(
-        seriesName.toLatin1().data(), 1);
+      vtkSMPropertyHelper(reprProxy, "SeriesLineThickness")
+        .SetStatus(seriesName.toLatin1().data(), 1);
 
-      vtkSMPropertyHelper(reprProxy, "SeriesLineStyle").SetStatus(
-        seriesName.toLatin1().data(), 1);
-      }
-    else
-      {
-      visibility << seriesName << 0;
-      }
+      vtkSMPropertyHelper(reprProxy, "SeriesLineStyle").SetStatus(seriesName.toLatin1().data(), 1);
     }
-  pqSMAdaptor::setMultipleElementProperty(
-                        reprProxy->GetProperty("SeriesVisibility"), visibility);
+    else
+    {
+      visibility << seriesName << 0;
+    }
+  }
+  pqSMAdaptor::setMultipleElementProperty(reprProxy->GetProperty("SeriesVisibility"), visibility);
   reprProxy->UpdateVTKObjects();
 
   // Update the view options.
-  vtkSMProxy *viewProxy = plotView->getProxy();
+  vtkSMProxy* viewProxy = plotView->getProxy();
 
   pqSMAdaptor::setElementProperty(viewProxy->GetProperty("ShowLegend"), 0);
 
-  pqSMAdaptor::setElementProperty(viewProxy->GetProperty("LeftAxisTitle"),
-                                  fieldName);
+  pqSMAdaptor::setElementProperty(viewProxy->GetProperty("LeftAxisTitle"), fieldName);
 
   if (this->CurrentFieldRangeKnown)
-    {
+  {
     QList<QVariant> axisBehavior;
     axisBehavior << 1 << 0 << 0 << 0;
-    pqSMAdaptor::setMultipleElementProperty(
-                          viewProxy->GetProperty("AxisBehavior"), axisBehavior);
+    pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisBehavior"), axisBehavior);
 
     QList<QVariant> axisRange;
-    axisRange << this->CurrentFieldRange[0] << this->CurrentFieldRange[1]
-              << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0;
-    pqSMAdaptor::setMultipleElementProperty(
-                                viewProxy->GetProperty("AxisRange"), axisRange);
-    }
+    axisRange << this->CurrentFieldRange[0] << this->CurrentFieldRange[1] << 0.0 << 0.0 << 0.0
+              << 0.0 << 0.0 << 0.0;
+    pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisRange"), axisRange);
+  }
   else
-    {
+  {
     QList<QVariant> axisBehavior;
     axisBehavior << 0 << 0 << 0 << 0;
-    pqSMAdaptor::setMultipleElementProperty(
-                          viewProxy->GetProperty("AxisBehavior"), axisBehavior);
-    }
+    pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisBehavior"), axisBehavior);
+  }
 
   viewProxy->UpdateVTKObjects();
 
@@ -618,13 +604,15 @@ void pqSLACManager::updatePlotField()
 //-----------------------------------------------------------------------------
 void pqSLACManager::showParticles(bool show)
 {
-  pqPipelineSource *reader = this->getParticlesReader();
-  if (!reader) return;
+  pqPipelineSource* reader = this->getParticlesReader();
+  if (!reader)
+    return;
 
-  pqView *view = this->getMeshView();
-  if (!view) return;
+  pqView* view = this->getMeshView();
+  if (!view)
+    return;
 
-  pqDataRepresentation *repr = reader->getRepresentation(view);
+  pqDataRepresentation* repr = reader->getRepresentation(view);
   repr->setVisible(show);
 
   view->render();
@@ -633,87 +621,99 @@ void pqSLACManager::showParticles(bool show)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showSolidMesh()
 {
-  pqPipelineSource *reader = this->getMeshReader();
-  if (!reader) return;
+  pqPipelineSource* reader = this->getMeshReader();
+  if (!reader)
+    return;
 
-  pqView *view = this->getMeshView();
-  if (!view) return;
+  pqView* view = this->getMeshView();
+  if (!view)
+    return;
 
-  pqDataRepresentation *repr = reader->getRepresentation(0, view);
-  if (!repr) return;
-  vtkSMProxy *reprProxy = repr->getProxy();
+  pqDataRepresentation* repr = reader->getRepresentation(0, view);
+  if (!repr)
+    return;
+  vtkSMProxy* reprProxy = repr->getProxy();
 
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqUndoStack *stack = core->getUndoStack();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqUndoStack* stack = core->getUndoStack();
 
-  if (stack) stack->beginUndoSet("Show Solid Mesh");
+  if (stack)
+    stack->beginUndoSet("Show Solid Mesh");
 
+  pqSMAdaptor::setEnumerationProperty(reprProxy->GetProperty("Representation"), "Surface");
   pqSMAdaptor::setEnumerationProperty(
-                           reprProxy->GetProperty("Representation"), "Surface");
-  pqSMAdaptor::setEnumerationProperty(
-          reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
+    reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
 
   reprProxy->UpdateVTKObjects();
 
-  if (stack) stack->endUndoSet();
+  if (stack)
+    stack->endUndoSet();
 
   view->render();
 }
 
 void pqSLACManager::showWireframeSolidMesh()
 {
-  pqPipelineSource *reader = this->getMeshReader();
-  if (!reader) return;
+  pqPipelineSource* reader = this->getMeshReader();
+  if (!reader)
+    return;
 
-  pqView *view = this->getMeshView();
-  if (!view) return;
+  pqView* view = this->getMeshView();
+  if (!view)
+    return;
 
-  pqDataRepresentation *repr = reader->getRepresentation(0, view);
-  if (!repr) return;
-  vtkSMProxy *reprProxy = repr->getProxy();
+  pqDataRepresentation* repr = reader->getRepresentation(0, view);
+  if (!repr)
+    return;
+  vtkSMProxy* reprProxy = repr->getProxy();
 
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqUndoStack *stack = core->getUndoStack();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqUndoStack* stack = core->getUndoStack();
 
-  if (stack) stack->beginUndoSet("Show Wireframe Mesh");
+  if (stack)
+    stack->beginUndoSet("Show Wireframe Mesh");
 
   pqSMAdaptor::setEnumerationProperty(
-                reprProxy->GetProperty("Representation"), "Surface With Edges");
+    reprProxy->GetProperty("Representation"), "Surface With Edges");
   pqSMAdaptor::setEnumerationProperty(
-          reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
+    reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
 
   reprProxy->UpdateVTKObjects();
 
-  if (stack) stack->endUndoSet();
+  if (stack)
+    stack->endUndoSet();
 
   view->render();
 }
 
 void pqSLACManager::showWireframeAndBackMesh()
 {
-  pqPipelineSource *reader = this->getMeshReader();
-  if (!reader) return;
+  pqPipelineSource* reader = this->getMeshReader();
+  if (!reader)
+    return;
 
-  pqView *view = this->getMeshView();
-  if (!view) return;
+  pqView* view = this->getMeshView();
+  if (!view)
+    return;
 
-  pqDataRepresentation *repr = reader->getRepresentation(0, view);
-  if (!repr) return;
-  vtkSMProxy *reprProxy = repr->getProxy();
+  pqDataRepresentation* repr = reader->getRepresentation(0, view);
+  if (!repr)
+    return;
+  vtkSMProxy* reprProxy = repr->getProxy();
 
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqUndoStack *stack = core->getUndoStack();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqUndoStack* stack = core->getUndoStack();
 
-  if (stack) stack->beginUndoSet("Show Wireframe Front and Solid Back");
+  if (stack)
+    stack->beginUndoSet("Show Wireframe Front and Solid Back");
 
-  pqSMAdaptor::setEnumerationProperty(
-                         reprProxy->GetProperty("Representation"), "Wireframe");
-  pqSMAdaptor::setEnumerationProperty(
-                   reprProxy->GetProperty("BackfaceRepresentation"), "Surface");
+  pqSMAdaptor::setEnumerationProperty(reprProxy->GetProperty("Representation"), "Wireframe");
+  pqSMAdaptor::setEnumerationProperty(reprProxy->GetProperty("BackfaceRepresentation"), "Surface");
 
   reprProxy->UpdateVTKObjects();
 
-  if (stack) stack->endUndoSet();
+  if (stack)
+    stack->endUndoSet();
 
   view->render();
 }
@@ -721,67 +721,62 @@ void pqSLACManager::showWireframeAndBackMesh()
 //-----------------------------------------------------------------------------
 void pqSLACManager::createPlotOverZ()
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqObjectBuilder *builder = core->getObjectBuilder();
-  pqDisplayPolicy *displayPolicy = core->getDisplayPolicy();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqDisplayPolicy* displayPolicy = core->getDisplayPolicy();
 
-  pqPipelineSource *meshReader = this->getMeshReader();
-  if (!meshReader) return;
+  pqPipelineSource* meshReader = this->getMeshReader();
+  if (!meshReader)
+    return;
 
   BEGIN_UNDO_SET("Plot Over Z");
 
   // Determine view.  Do this before deleting existing pipeline objects.
-  pqView *plotView = this->getPlotView();
+  pqView* plotView = this->getPlotView();
 
   // Delete existing plot objects.  We will replace them.
   this->destroyPipelineSourceAndConsumers(this->getPlotFilter());
 
   // Turn on reading the internal volume, which is necessary for plotting
   // through the volume.
-  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
-  pqSMAdaptor::setElementProperty(
-                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
+  vtkSMProxy* meshReaderProxy = meshReader->getProxy();
+  pqSMAdaptor::setElementProperty(meshReaderProxy->GetProperty("ReadInternalVolume"), true);
   meshReaderProxy->UpdateVTKObjects();
   meshReader->updatePipeline();
 
   // Get the mesh data bounds (which we will use later to set up the plot).
-  vtkPVDataInformation *dataInfo
-    = meshReader->getOutputPort(1)->getDataInformation();
+  vtkPVDataInformation* dataInfo = meshReader->getOutputPort(1)->getDataInformation();
   double bounds[6];
   dataInfo->GetBounds(bounds);
 
   // Create the plot filter.
   QMap<QString, QList<pqOutputPort*> > namedInputs;
-  QList<pqOutputPort *> inputs;
+  QList<pqOutputPort*> inputs;
   inputs.push_back(meshReader->getOutputPort(1));
   namedInputs["Input"] = inputs;
-  pqPipelineSource *plotFilter = builder->createFilter("filters", "ProbeLine",
-                                                       namedInputs,
-                                                       this->getActiveServer());
+  pqPipelineSource* plotFilter =
+    builder->createFilter("filters", "ProbeLine", namedInputs, this->getActiveServer());
 
   // Set up the line for the plot.  The line is one of the inputs to the filter
   // which is implicitly set up through a proxy list domain.
-  vtkSMProxy *plotProxy = plotFilter->getProxy();
-  pqSMProxy lineProxy
-    = pqSMAdaptor::getProxyProperty(plotProxy->GetProperty("Source"));
+  vtkSMProxy* plotProxy = plotFilter->getProxy();
+  pqSMProxy lineProxy = pqSMAdaptor::getProxyProperty(plotProxy->GetProperty("Source"));
   if (!lineProxy)
-    {
+  {
     qWarning() << "Could not retrieve plot line source.  "
                << "Plot not set up correctly.";
-    }
+  }
   else
-    {
+  {
     QList<QVariant> minPoint;
     minPoint << 0.0 << 0.0 << bounds[4];
-    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point1"),
-                                            minPoint);
+    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point1"), minPoint);
     QList<QVariant> maxPoint;
     maxPoint << 0.0 << 0.0 << bounds[5];
-    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point2"),
-                                            maxPoint);
+    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point2"), maxPoint);
     pqSMAdaptor::setElementProperty(lineProxy->GetProperty("Resolution"), 1000);
     lineProxy->UpdateVTKObjects();
-    }
+  }
   plotFilter->updatePipeline();
 
   // Make representation
@@ -800,38 +795,35 @@ void pqSLACManager::createPlotOverZ()
 //-----------------------------------------------------------------------------
 void pqSLACManager::toggleBackgroundBW()
 {
-  pqRenderView *view = this->getMeshRenderView();
-  if (!view) return;
+  pqRenderView* view = this->getMeshRenderView();
+  if (!view)
+    return;
 
-  vtkSMProxy *viewProxy = view->getProxy();
+  vtkSMProxy* viewProxy = view->getProxy();
   vtkSMProperty* smProperty = viewProxy->GetProperty("Background");
   if (!smProperty)
-    {
+  {
     return;
-    }
+  }
 
   double color[3];
   vtkSMPropertyHelper helper(smProperty);
   helper.Get(color, 3);
 
-  if (   (color[0] == 0.0)
-      && (color[1] == 0.0)
-      && (color[2] == 0.0) )
-    {
+  if ((color[0] == 0.0) && (color[1] == 0.0) && (color[2] == 0.0))
+  {
     color[0] = color[1] = color[2] = 1.0;
     helper.Set(color, 3);
-    }
-  else if (   (color[0] == 1.0)
-           && (color[1] == 1.0)
-           && (color[2] == 1.0) )
-    {
+  }
+  else if ((color[0] == 1.0) && (color[1] == 1.0) && (color[2] == 1.0))
+  {
     smProperty->ResetToXMLDefaults();
-    }
+  }
   else
-    {
+  {
     color[0] = color[1] = color[2] = 0.0;
     helper.Set(color, 3);
-    }
+  }
   viewProxy->UpdateVTKObjects();
   view->render();
 }
@@ -839,12 +831,11 @@ void pqSLACManager::toggleBackgroundBW()
 //-----------------------------------------------------------------------------
 void pqSLACManager::showStandardViewpoint()
 {
-  pqRenderView *view = qobject_cast<pqRenderView*>(this->getMeshView());
+  pqRenderView* view = qobject_cast<pqRenderView*>(this->getMeshView());
   if (view)
-    {
-    view->resetViewDirection(1, 0, 0,
-                             0, 1, 0);
-    }
+  {
+    view->resetViewDirection(1, 0, 0, 0, 1, 0);
+  }
   view->render();
 }
 
@@ -855,32 +846,31 @@ void pqSLACManager::resetRangeTemporal()
 
   // Check to see if the ranges are already computed.
   if (this->getTemporalRanges())
-    {
+  {
     this->showField(this->CurrentFieldName);
     return;
-    }
+  }
 
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqObjectBuilder *builder = core->getObjectBuilder();
-  pqUndoStack *stack = core->getUndoStack();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqUndoStack* stack = core->getUndoStack();
 
-  pqPipelineSource *meshReader = this->getMeshReader();
-  if (!meshReader) return;
+  pqPipelineSource* meshReader = this->getMeshReader();
+  if (!meshReader)
+    return;
 
-  if (stack) stack->beginUndoSet("Compute Ranges Over Time");
+  if (stack)
+    stack->beginUndoSet("Compute Ranges Over Time");
 
   // Turn on reading the internal volume, which is necessary for plotting
   // through the volume.
-  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
-  pqSMAdaptor::setElementProperty(
-                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
+  vtkSMProxy* meshReaderProxy = meshReader->getProxy();
+  pqSMAdaptor::setElementProperty(meshReaderProxy->GetProperty("ReadInternalVolume"), true);
   meshReaderProxy->UpdateVTKObjects();
   meshReader->updatePipeline();
 
   // Create the temporal ranges filter.
-  pqPipelineSource *rangeFilter = builder->createFilter("filters",
-                                                        "TemporalRanges",
-                                                        meshReader, 1);
+  pqPipelineSource* rangeFilter = builder->createFilter("filters", "TemporalRanges", meshReader, 1);
 
   this->showField(this->CurrentFieldName);
 
@@ -890,7 +880,8 @@ void pqSLACManager::resetRangeTemporal()
   meshReader->setModifiedState(pqProxy::UNMODIFIED);
   rangeFilter->setModifiedState(pqProxy::UNMODIFIED);
 
-  if (stack) stack->endUndoSet();
+  if (stack)
+    stack->endUndoSet();
 }
 
 //-----------------------------------------------------------------------------

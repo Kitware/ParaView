@@ -28,8 +28,8 @@
 
 vtkStandardNewMacro(vtkPVGL2PSExporter)
 
-//----------------------------------------------------------------------------
-vtkPVGL2PSExporter::vtkPVGL2PSExporter()
+  //----------------------------------------------------------------------------
+  vtkPVGL2PSExporter::vtkPVGL2PSExporter()
 {
 }
 
@@ -45,48 +45,46 @@ void vtkPVGL2PSExporter::WriteData()
   // and sets the extension itself, while the ParaView export mechanism uses the
   // full filename). The full name of the temporary file will be
   // this->FileName + ".pvtmp.[format extension]".
-  vtkStdString tmpFilePrefix (this->FileName + ".pvtmp");
+  vtkStdString tmpFilePrefix(this->FileName + ".pvtmp");
   this->SetFilePrefix(tmpFilePrefix.c_str());
 
   // Setup raster exclusions if needed
   if (this->Write3DPropsAsRasterImage != 0)
-    {
+  {
     if (this->RasterExclusions == NULL)
-      {
+    {
       vtkNew<vtkPropCollection> coll;
       this->SetRasterExclusions(coll.GetPointer());
+    }
+
+    vtkRendererCollection* renCol = this->RenderWindow->GetRenderers();
+    vtkRenderer* ren;
+    for (renCol->InitTraversal(); (ren = renCol->GetNextItem());)
+    {
+      vtkActorCollection* actorCol = ren->GetActors();
+      vtkActor* actor;
+      for (actorCol->InitTraversal(); (actor = actorCol->GetNextItem());)
+      {
+        // Add cubeaxes actors to raster exclusions if requested
+        if (this->ExcludeCubeAxesActorsFromRasterization != 0 && actor->IsA("vtkCubeAxesActor") &&
+          !this->RasterExclusions->IsItemPresent(actor))
+        {
+          this->RasterExclusions->AddItem(actor);
+        }
       }
 
-    vtkRendererCollection *renCol = this->RenderWindow->GetRenderers();
-    vtkRenderer *ren;
-    for (renCol->InitTraversal(); (ren = renCol->GetNextItem());)
-      {
-      vtkActorCollection *actorCol = ren->GetActors();
-      vtkActor *actor;
-      for (actorCol->InitTraversal(); (actor = actorCol->GetNextItem());)
-        {
-        // Add cubeaxes actors to raster exclusions if requested
-        if (this->ExcludeCubeAxesActorsFromRasterization != 0 &&
-            actor->IsA("vtkCubeAxesActor") &&
-            !this->RasterExclusions->IsItemPresent(actor))
-          {
-          this->RasterExclusions->AddItem(actor);
-          }
-        }
-
-      vtkPropCollection *viewProps = ren->GetViewProps();
-      vtkProp *prop;
+      vtkPropCollection* viewProps = ren->GetViewProps();
+      vtkProp* prop;
       for (viewProps->InitTraversal(); (prop = viewProps->GetNextProp());)
-        {
+      {
         // Always exclude instances of PVAxesActor from rasterization
-        if (prop->IsA("vtkPVAxesActor") &&
-            !this->RasterExclusions->IsItemPresent(prop))
-          {
+        if (prop->IsA("vtkPVAxesActor") && !this->RasterExclusions->IsItemPresent(prop))
+        {
           this->RasterExclusions->AddItem(prop);
-          }
         }
       }
     }
+  }
 
   this->Superclass::WriteData();
 
@@ -94,7 +92,7 @@ void vtkPVGL2PSExporter::WriteData()
   vtkStdString tmpFileName(tmpFilePrefix);
 
   switch (this->FileFormat)
-    {
+  {
     case PS_FILE:
       tmpFileName += ".ps";
       break;
@@ -110,18 +108,17 @@ void vtkPVGL2PSExporter::WriteData()
     case SVG_FILE:
       tmpFileName += ".svg";
       break;
-    }
+  }
   if (this->Compress)
-    {
+  {
     tmpFileName += ".gz";
-    }
+  }
 
-  int result = this->Compress
-      ? std::rename(tmpFileName.c_str(), (this->FileName + ".gz").c_str())
-      : std::rename(tmpFileName.c_str(), this->FileName.c_str());
+  int result = this->Compress ? std::rename(tmpFileName.c_str(), (this->FileName + ".gz").c_str())
+                              : std::rename(tmpFileName.c_str(), this->FileName.c_str());
 
   if (result != 0)
-    {
+  {
     std::perror("Could not rename exported graphics file");
     vtkErrorMacro("Cannot rename exported graphics file.");
     return;

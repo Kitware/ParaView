@@ -46,11 +46,12 @@ class vtkIdList;
 class vtkUnstructuredPOPReaderInternal;
 class VTKPointIterator;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkUnstructuredPOPReader : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkUnstructuredPOPReader
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeMacro(vtkUnstructuredPOPReader,vtkUnstructuredGridAlgorithm);
-  static vtkUnstructuredPOPReader *New();
+  vtkTypeMacro(vtkUnstructuredPOPReader, vtkUnstructuredGridAlgorithm);
+  static vtkUnstructuredPOPReader* New();
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -86,9 +87,9 @@ public:
    * Variable array selection.
    */
   virtual int GetNumberOfVariableArrays();
-  virtual const char *GetVariableArrayName(int idx);
-  virtual int GetVariableArrayStatus(const char *name);
-  virtual void SetVariableArrayStatus(const char *name, int status);
+  virtual const char* GetVariableArrayName(int idx);
+  virtual int GetVariableArrayStatus(const char* name);
+  virtual void SetVariableArrayStatus(const char* name, int status);
   //@}
 
   //@{
@@ -123,21 +124,19 @@ protected:
   vtkUnstructuredPOPReader();
   ~vtkUnstructuredPOPReader();
 
-  int RequestData(vtkInformation*,vtkInformationVector**,
-                  vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
-                                        void *clientdata, void *calldata);
+  static void SelectionModifiedCallback(
+    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
-  static void EventCallback(vtkObject* caller, unsigned long eid,
-                            void* clientdata, void* calldata);
+  static void EventCallback(vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
   vtkCallbackCommand* SelectionObserver;
 
   /**
    * The name of the file to be opened.
    */
-  char *FileName;
+  char* FileName;
 
   //@{
   /**
@@ -195,16 +194,15 @@ protected:
    * shaped grid and do any vector transformations on field data that
    * is needed.
    */
-  bool Transform(vtkUnstructuredGrid* grid, size_t* start, size_t* count,
-                 int* wholeExtent, int* subExtent, int numberOfGhostLevels,
-                 int wrapped, int piece, int numberOfPieces);
+  bool Transform(vtkUnstructuredGrid* grid, size_t* start, size_t* count, int* wholeExtent,
+    int* subExtent, int numberOfGhostLevels, int wrapped, int piece, int numberOfPieces);
 
   /**
    * Given the meta data about the grid partitioning, read in the
    * data from the file and create the unstructured grid.
    */
-  int ProcessGrid(vtkUnstructuredGrid* grid, int piece,
-                  int numberOfPieces, int numberOfGhostLevels);
+  int ProcessGrid(
+    vtkUnstructuredGrid* grid, int piece, int numberOfPieces, int numberOfGhostLevels);
 
   /**
    * Reads the meta data from the NetCDF file for information like what
@@ -213,25 +211,22 @@ protected:
    */
   bool ReadMetaData(int wholeExtent[6]);
 
-  int RequestInformation(vtkInformation *request,
-                         vtkInformationVector **inputVector,
-                         vtkInformationVector *outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   /**
    * Adds a point data field given by varidp in the NetCDF file
    * to the grid's point data.  If the units is "centimeter/s"
    * it scales the value by 1/100 (i.e. meter/s).
    */
-  void LoadPointData(
-    vtkUnstructuredGrid* grid, int netCDFFD, int varidp, size_t* start,
+  void LoadPointData(vtkUnstructuredGrid* grid, int netCDFFD, int varidp, size_t* start,
     size_t* count, ptrdiff_t* rStride, const char* arrayName);
 
   /**
    * Compute the vertical velocity component and add it into
    * the velocity field.
    */
-  void ComputeVerticalVelocity(
-    vtkUnstructuredGrid* grid, int* wholeExtent, int* subExtent,
+  void ComputeVerticalVelocity(vtkUnstructuredGrid* grid, int* wholeExtent, int* subExtent,
     int numberOfGhostLevels, int latlonFileId);
 
   /**
@@ -239,9 +234,8 @@ protected:
    * communication to finish the vertical velocity integration
    * on each process.
    */
-  void CommunicateParallelVerticalVelocity(
-    int* wholeExtent, int* subExtent, int numberOfGhostLevels,
-    VTKPointIterator& pointIterator, double* w);
+  void CommunicateParallelVerticalVelocity(int* wholeExtent, int* subExtent,
+    int numberOfGhostLevels, VTKPointIterator& pointIterator, double* w);
 
   /**
    * Given ijk indices with respect to WholeExtent, return the
@@ -251,8 +245,7 @@ protected:
    * vertical velocity value. This method returns -1 if no
    * appropriate piece is found.
    */
-  int GetPointOwnerPiece(
-    int iIndex, int jIndex, int kKindex, int numberOfPieces,
+  int GetPointOwnerPiece(int iIndex, int jIndex, int kKindex, int numberOfPieces,
     int numberOfGhostLevels, int* wholeExtent);
 
   /**
@@ -262,8 +255,7 @@ protected:
    * included in the returned Id list.  The indices are with
    * respect to WholeExtent.
    */
-  void GetPiecesNeedingPoint(
-    int iIndex, int jIndex, int kKindex, int numberOfPieces,
+  void GetPiecesNeedingPoint(int iIndex, int jIndex, int kKindex, int numberOfPieces,
     int numberOfGhostLevels, int* wholeExtent, vtkIdList* pieceIds);
 
   /**
@@ -271,8 +263,7 @@ protected:
    * this method fills in subExtent. This method returns true for success.
    */
   bool GetExtentInformation(
-    int piece, int numberOfPieces, int numberOfGhostLevels,
-    int* wholeExtent, int *subExtent);
+    int piece, int numberOfPieces, int numberOfGhostLevels, int* wholeExtent, int* subExtent);
 
   /**
    * Build up the requested ghost information.  Note that if the
@@ -280,8 +271,7 @@ protected:
    * layer of ghost cells.  This extra layer is removed before
    * RequestData() is exited.  The method returns true for success.
    */
-  bool BuildGhostInformation(
-    vtkUnstructuredGrid* grid, int numberOfGhostLevels, int* wholeExtent,
+  bool BuildGhostInformation(vtkUnstructuredGrid* grid, int numberOfGhostLevels, int* wholeExtent,
     int* subExtent, int wrapped, int piece, int numberOfPieces);
 
 private:

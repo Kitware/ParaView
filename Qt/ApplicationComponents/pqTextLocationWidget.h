@@ -41,8 +41,7 @@ class vtkSMPropertyGroup;
 * pqTextLocationWidget is a pqPropertyWidget that can be used to set
 * the location of the a text representation relative to the viewport.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget : public pqPropertyWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString windowLocation READ windowLocation WRITE setWindowLocation)
@@ -50,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget :
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqTextLocationWidget();
 
   QString windowLocation() const;
@@ -72,4 +71,4 @@ private:
   pqInternals* Internals;
 };
 
-#endif //pqTextWindowLocationWidget_h
+#endif // pqTextWindowLocationWidget_h

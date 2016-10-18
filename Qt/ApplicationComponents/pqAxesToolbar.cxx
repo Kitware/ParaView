@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,35 +48,29 @@ void pqAxesToolbar::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(viewChanged(pqView*)),
-    this, SLOT(updateEnabledState()),
-    Qt::QueuedConnection);
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
+    SLOT(updateEnabledState()), Qt::QueuedConnection);
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(sourceChanged(pqPipelineSource*)),
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnabledState()));
+
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqRepresentation*)),
     this, SLOT(updateEnabledState()));
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqRepresentation*)),
-    this, SLOT(updateEnabledState()));
+  QObject::connect(this->Internals->actionShowOrientationAxes, SIGNAL(toggled(bool)), this,
+    SLOT(showOrientationAxes(bool)));
 
-  QObject::connect(this->Internals->actionShowOrientationAxes,
-    SIGNAL(toggled(bool)), this, SLOT(showOrientationAxes(bool)));
-
-  QObject::connect(this->Internals->actionShowCenterAxes, SIGNAL(toggled(bool)),
-    this, SLOT(showCenterAxes(bool)));
-
-  QObject::connect(this->Internals->actionResetCenter, SIGNAL(triggered()),
-    this, SLOT(resetCenterOfRotationToCenterOfCurrentData()));
-
-  pqRenderViewSelectionReaction* selectionReaction = new
-    pqRenderViewSelectionReaction(
-      this->Internals->actionPickCenter, NULL /* track active view*/,
-      pqRenderViewSelectionReaction::SELECT_CUSTOM_BOX);
   QObject::connect(
-    selectionReaction, SIGNAL(selectedCustomBox(int, int, int, int)),
-    this, SLOT(pickCenterOfRotation(int, int)));
+    this->Internals->actionShowCenterAxes, SIGNAL(toggled(bool)), this, SLOT(showCenterAxes(bool)));
+
+  QObject::connect(this->Internals->actionResetCenter, SIGNAL(triggered()), this,
+    SLOT(resetCenterOfRotationToCenterOfCurrentData()));
+
+  pqRenderViewSelectionReaction* selectionReaction =
+    new pqRenderViewSelectionReaction(this->Internals->actionPickCenter,
+      NULL /* track active view*/, pqRenderViewSelectionReaction::SELECT_CUSTOM_BOX);
+  QObject::connect(selectionReaction, SIGNAL(selectedCustomBox(int, int, int, int)), this,
+    SLOT(pickCenterOfRotation(int, int)));
 
   this->updateEnabledState();
 }
@@ -91,19 +85,18 @@ pqAxesToolbar::~pqAxesToolbar()
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::updateEnabledState()
 {
-  pqRenderView* renderView =
-    qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
 
   this->Internals->actionShowOrientationAxes->setEnabled(renderView != NULL);
   this->Internals->actionShowOrientationAxes->blockSignals(true);
   this->Internals->actionShowOrientationAxes->setChecked(
-    renderView? renderView->getOrientationAxesVisibility() : false);
+    renderView ? renderView->getOrientationAxesVisibility() : false);
   this->Internals->actionShowOrientationAxes->blockSignals(false);
 
   this->Internals->actionShowCenterAxes->setEnabled(renderView != NULL);
   this->Internals->actionShowCenterAxes->blockSignals(true);
   this->Internals->actionShowCenterAxes->setChecked(
-    renderView? renderView->getCenterAxesVisibility() : false);
+    renderView ? renderView->getCenterAxesVisibility() : false);
   this->Internals->actionShowCenterAxes->blockSignals(false);
   this->Internals->actionResetCenter->setEnabled(
     pqActiveObjects::instance().activeRepresentation() != NULL);
@@ -112,12 +105,11 @@ void pqAxesToolbar::updateEnabledState()
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::showOrientationAxes(bool show_axes)
 {
-  pqRenderView* renderView =
-    qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!renderView)
-    {
+  {
     return;
-    }
+  }
 
   renderView->setOrientationAxesVisibility(show_axes);
   renderView->render();
@@ -126,12 +118,11 @@ void pqAxesToolbar::showOrientationAxes(bool show_axes)
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::showCenterAxes(bool show_axes)
 {
-  pqRenderView* renderView =
-    qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!renderView)
-    {
+  {
     return;
-    }
+  }
 
   renderView->setCenterAxesVisibility(show_axes);
   renderView->render();
@@ -140,43 +131,40 @@ void pqAxesToolbar::showCenterAxes(bool show_axes)
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::resetCenterOfRotationToCenterOfCurrentData()
 {
-  pqRenderView* renderView =
-    qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
   if (!repr || !renderView)
-    {
-    //qDebug() << "Active source not shown in active view. Cannot set center.";
+  {
+    // qDebug() << "Active source not shown in active view. Cannot set center.";
     return;
-    }
+  }
 
   double bounds[6];
   if (repr->getDataBounds(bounds))
-    {
+  {
     double center[3];
-    center[0] = (bounds[1]+bounds[0])/2.0;
-    center[1] = (bounds[3]+bounds[2])/2.0;
-    center[2] = (bounds[5]+bounds[4])/2.0;
+    center[0] = (bounds[1] + bounds[0]) / 2.0;
+    center[1] = (bounds[3] + bounds[2]) / 2.0;
+    center[2] = (bounds[5] + bounds[4]) / 2.0;
     renderView->setCenterOfRotation(center);
     renderView->render();
-    }
-
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::pickCenterOfRotation(int posx, int posy)
 {
-  pqRenderView* rm = qobject_cast<pqRenderView*>(
-    pqActiveObjects::instance().activeView());
+  pqRenderView* rm = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (rm)
-    {
-    int posxy[2] = {posx, posy};
+  {
+    int posxy[2] = { posx, posy };
     double center[3];
 
     vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
     if (proxy->ConvertDisplayToPointOnSurface(posxy, center))
-      {
+    {
       rm->setCenterOfRotation(center);
       rm->render();
-      }
     }
+  }
 }

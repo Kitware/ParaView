@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -57,21 +57,25 @@ class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 {
   Q_OBJECT
 public:
-
   /**
   * The modification state of this proxy
   */
-  enum ModifiedState { UNINITIALIZED, MODIFIED, UNMODIFIED };
+  enum ModifiedState
+  {
+    UNINITIALIZED,
+    MODIFIED,
+    UNMODIFIED
+  };
 
-  pqProxy(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  pqProxy(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
+    QObject* parent = NULL);
   virtual ~pqProxy();
 
   /**
   * Get the server on which this proxy exists.
   */
-  pqServer *getServer() const;
-  
+  pqServer* getServer() const;
+
   /**
   * This is a convenience method. It re-registers the underlying proxy
   * with the requested new name under the same group. Then it unregisters
@@ -85,7 +89,7 @@ public:
   * Get the name with which this proxy is registered on the
   * server manager. A proxy can be registered with more than
   * one name on the Server Manager. This is the name/group which
-  * this pqProxy stands for. 
+  * this pqProxy stands for.
   */
   const QString& getSMName();
   const QString& getSMGroup();
@@ -96,14 +100,14 @@ public:
   * one and only one Server Manager proxy.
   */
   vtkSMProxy* getProxy() const;
-  
+
   /**
   * \brief
   *   Gets whether or not the source has been modified.
   * \return
   *   True if the source has been modified.
   */
-  ModifiedState modifiedState() const {return this->Modified;}
+  ModifiedState modifiedState() const { return this->Modified; }
 
   /**
   * \brief
@@ -140,12 +144,12 @@ public:
 
   /**
   * Concept of helper proxies:
-  * A pqProxy is created for every important vtkSMProxy registered. Many a times, 
+  * A pqProxy is created for every important vtkSMProxy registered. Many a times,
   * there may be other proxies associated with that proxy, eg. lookup table proxies,
-  * implicit function proxies may be associated with a filter/source proxy. 
+  * implicit function proxies may be associated with a filter/source proxy.
   * The GUI can create "associated" proxies and add them as helper proxies.
-  * Helper proxies get registered under special groups, so that they are 
-  * undo/redo-able, and state save-restore-able. The pqProxy makes sure that 
+  * Helper proxies get registered under special groups, so that they are
+  * undo/redo-able, and state save-restore-able. The pqProxy makes sure that
   * the helper proxies are unregistered when the main proxy is unregistered.
   */
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
@@ -187,9 +191,9 @@ protected:
   /**
   * Make this pqProxy take on a new identity. This is following case:
   * Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
-  * pqServerManagerModel does not create a new pqProxy for (gA, nA2). 
+  * pqServerManagerModel does not create a new pqProxy for (gA, nA2).
   * However, if (gA, nA) is now unregistered, the same old instace of pqProxy
-  * which represented (gA, nA) will now "take on a new identity" and 
+  * which represented (gA, nA) will now "take on a new identity" and
   * represent proxy (gA, nA2). This method will trigger the
   * nameChanged() signal.
   */
@@ -197,7 +201,7 @@ protected:
 
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
+  // after the object has been created.
   virtual void initialize();
 
   // Method used to update the internal structure whithout affecting
@@ -211,7 +215,7 @@ protected slots:
   void onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*);
 
 private:
-  QPointer<pqServer> Server;           ///< Stores the parent server.
+  QPointer<pqServer> Server; ///< Stores the parent server.
   QString SMName;
   QString SMGroup;
   pqProxyInternal* Internal;

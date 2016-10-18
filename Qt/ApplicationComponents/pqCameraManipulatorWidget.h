@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCameraManipulatorWidget_h
 #define pqCameraManipulatorWidget_h
 
-
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
@@ -40,14 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * pqCameraManipulatorWidget used on "Camera2DManipulators" and
 * "Camera3DManipulators" property on a RenderView proxy.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraManipulatorWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraManipulatorWidget : public pqPropertyWidget
 {
   Q_OBJECT;
   typedef pqPropertyWidget Superclass;
   Q_PROPERTY(QList<QVariant> manipulatorTypes READ manipulatorTypes WRITE setManipulatorTypes);
+
 public:
-  pqCameraManipulatorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent=0);
+  pqCameraManipulatorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqCameraManipulatorWidget();
 
   /**

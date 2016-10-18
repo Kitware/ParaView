@@ -3,10 +3,10 @@
 #include "vtkRenderWindow.h"
 #include "vtkSetGet.h"
 #if defined(TEST_MPI_CAPS)
-# include "vtkMPI.h"
+#include "vtkMPI.h"
 #endif
 #if defined(TEST_PY_CAPS)
-# include "patchlevel.h"
+#include "patchlevel.h"
 #endif
 #include <sstream>
 #include <string>
@@ -37,14 +37,14 @@ string GetPythonVersion()
 string GetMPIVersion()
 {
   ostringstream oss;
-  int major=-1, minor=-1;
+  int major = -1, minor = -1;
 #if defined(MPI_VERSION)
   major = MPI_VERSION;
 #endif
 #if defined(MPI_SUBVERSION)
   minor = MPI_SUBVERSION;
 #endif
-  //MPI_Get_version(&major, &minor);
+  // MPI_Get_version(&major, &minor);
   oss << major << "." << minor;
   return oss.str();
 }
@@ -57,13 +57,13 @@ string GetMPILibraryVersion()
 {
   ostringstream oss;
 #if defined(MPI_VERSION) && (MPI_VERSION >= 3)
-  char libVer[MPI_MAX_LIBRARY_VERSION_STRING] = {'\0'};
+  char libVer[MPI_MAX_LIBRARY_VERSION_STRING] = { '\0' };
   int libVerLen = MPI_MAX_LIBRARY_VERSION_STRING;
   MPI_Get_library_version(libVer, &libVerLen);
   libVer[libVerLen] = '\0';
   oss << libVer;
 #else
-  // Open MPI
+// Open MPI
 #if defined(OPEN_MPI)
   oss << "Open MPI";
 #if defined(OMPI_MAJOR_VERSION)
@@ -75,7 +75,7 @@ string GetMPILibraryVersion()
 #if defined(OMPI_RELEASE_VERSION)
   oss << "." << OMPI_RELEASE_VERSION;
 #endif
-  // MPICH
+// MPICH
 #elif defined(MPICH2)
   oss << "MPICH2";
 #if defined(MPICH2_VERSION)
@@ -91,22 +91,21 @@ string GetMPILibraryVersion()
 }
 #endif
 
-int TestSystemCaps(int argc, char *argv[])
+int TestSystemCaps(int argc, char* argv[])
 {
   (void)argc;
   (void)argv;
 
   // for info about the Open GL
-  vtkRenderWindow *rwin = vtkRenderWindow::New();
+  vtkRenderWindow* rwin = vtkRenderWindow::New();
   rwin->Render();
-  vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(rwin);
+  vtkOpenGLRenderWindow* context = vtkOpenGLRenderWindow::SafeDownCast(rwin);
   if (!context)
-    {
-    vtkGenericWarningMacro(
-      << "ERROR: Implement support for" << rwin->GetClassName());
+  {
+    vtkGenericWarningMacro(<< "ERROR: Implement support for" << rwin->GetClassName());
     return 1;
-    }
-  vtkOpenGLExtensionManager *extensions = context->GetExtensionManager();
+  }
+  vtkOpenGLExtensionManager* extensions = context->GetExtensionManager();
 
   // for info about the host
   vtksys::SystemInformation sysinfo;
@@ -115,29 +114,29 @@ int TestSystemCaps(int argc, char *argv[])
 
   // make the report
   cout << "CTEST_FULL_OUTPUT (Avoid ctest truncation of output)" << endl
-    << endl
-    << "Host System:" << endl
-    << "OS = " << sysinfo.GetOSDescription() << endl
-    << "CPU = " << sysinfo.GetCPUDescription() << endl
-    << "RAM = " << sysinfo.GetMemoryDescription() << endl
-    << endl
+       << endl
+       << "Host System:" << endl
+       << "OS = " << sysinfo.GetOSDescription() << endl
+       << "CPU = " << sysinfo.GetCPUDescription() << endl
+       << "RAM = " << sysinfo.GetMemoryDescription() << endl
+       << endl
 #if defined(TEST_MPI_CAPS)
-    << "MPI:" << endl
-    << "Version = " << GetMPIVersion() << endl
-    << "Library = " << GetMPILibraryVersion() << endl
-    << endl
+       << "MPI:" << endl
+       << "Version = " << GetMPIVersion() << endl
+       << "Library = " << GetMPILibraryVersion() << endl
+       << endl
 #endif
 #if defined(TEST_PY_CAPS)
-    << "Python:" << endl
-    << "Version = " << GetPythonVersion() << endl
-    << endl
+       << "Python:" << endl
+       << "Version = " << GetPythonVersion() << endl
+       << endl
 #endif
-    << "OpenGL:" << endl
-    << "DriverGLVersion = " << extensions->GetDriverGLVersion() << endl
-    << "DriverGLVendor = " << extensions->GetDriverGLVendor() << endl
-    << "DriverGLRenderer = " << extensions->GetDriverGLRenderer() << endl
-    << "Extensions = " << extensions->GetExtensionsString() << endl
-    << endl;
+       << "OpenGL:" << endl
+       << "DriverGLVersion = " << extensions->GetDriverGLVersion() << endl
+       << "DriverGLVendor = " << extensions->GetDriverGLVendor() << endl
+       << "DriverGLRenderer = " << extensions->GetDriverGLRenderer() << endl
+       << "Extensions = " << extensions->GetExtensionsString() << endl
+       << endl;
 
   rwin->Delete();
 

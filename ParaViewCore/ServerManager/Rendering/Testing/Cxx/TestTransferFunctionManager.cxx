@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 int TestTransferFunctionManager(int argc, char* argv[])
 {
-  (void) argc;
+  (void)argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
   // Create a new session.
@@ -37,49 +37,47 @@ int TestTransferFunctionManager(int argc, char* argv[])
   vtkNew<vtkSMTransferFunctionManager> mgr;
   vtkSMProxy* colorTF = mgr->GetColorTransferFunction("arrayOne", pxm);
   if (colorTF == NULL)
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
 
   // colorTF must match on multiple calls.
   if (colorTF != mgr->GetColorTransferFunction("arrayOne", pxm))
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
 
   // colorTF must be different for different arrays.
   if (colorTF == mgr->GetColorTransferFunction("arrayTwo", pxm))
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
 
   vtkSMProxy* opacityTF = mgr->GetOpacityTransferFunction("arrayOne", pxm);
   if (!opacityTF)
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
   if (opacityTF != mgr->GetOpacityTransferFunction("arrayOne", pxm))
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
   if (opacityTF == mgr->GetOpacityTransferFunction("arrayTwo", pxm))
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
 
-  if (vtkSMPropertyHelper(colorTF, "ScalarOpacityFunction").GetAsProxy() !=
-    opacityTF)
-    {
+  if (vtkSMPropertyHelper(colorTF, "ScalarOpacityFunction").GetAsProxy() != opacityTF)
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
-
+  }
 
   // **** Test scalar bar API ****
 
@@ -92,16 +90,16 @@ int TestTransferFunctionManager(int argc, char* argv[])
 
   sbProxy = mgr->GetScalarBarRepresentation(colorTF, view);
   if (sbProxy == NULL)
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
 
   if (sbProxy != mgr->GetScalarBarRepresentation(colorTF, view))
-    {
+  {
     cerr << "ERROR: Failed at line " << __LINE__ << endl;
     return EXIT_FAILURE;
-    }
+  }
   view->Delete();
 
   session->Delete();

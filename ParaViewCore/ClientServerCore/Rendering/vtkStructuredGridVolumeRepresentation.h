@@ -34,8 +34,8 @@
 
 class vtkTableExtentTranslator;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkStructuredGridVolumeRepresentation :
-  public vtkUnstructuredGridVolumeRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkStructuredGridVolumeRepresentation
+  : public vtkUnstructuredGridVolumeRepresentation
 {
 public:
   static vtkStructuredGridVolumeRepresentation* New();
@@ -59,8 +59,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
 protected:
   vtkStructuredGridVolumeRepresentation();
@@ -71,15 +71,15 @@ protected:
    */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   bool UseDataPartitions;
   vtkTableExtentTranslator* TableExtentTranslator;
-private:
-  vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkStructuredGridVolumeRepresentation(
+    const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 };
 
 #endif

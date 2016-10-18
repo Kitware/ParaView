@@ -54,22 +54,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 
 pqLinksManager::pqLinksManager(QWidget* p)
-  : QDialog(p),
-    Ui(new Ui::pqLinksManager())
+  : QDialog(p)
+  , Ui(new Ui::pqLinksManager())
 {
   this->Ui->setupUi(this);
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   this->Ui->treeView->setModel(model);
-  QObject::connect(this->Ui->treeView, SIGNAL(clicked(const QModelIndex&)),
-                   this, SLOT(selectionChanged(const QModelIndex&)));
-  QObject::connect(this->Ui->treeView, SIGNAL(activated(const QModelIndex&)),
-                   this, SLOT(editLink()));
-  QObject::connect(this->Ui->addButton, SIGNAL(clicked(bool)),
-                   this, SLOT(addLink()));
-  QObject::connect(this->Ui->editButton, SIGNAL(clicked(bool)),
-                   this, SLOT(editLink()));
-  QObject::connect(this->Ui->removeButton, SIGNAL(clicked(bool)),
-                   this, SLOT(removeLink()));
+  QObject::connect(this->Ui->treeView, SIGNAL(clicked(const QModelIndex&)), this,
+    SLOT(selectionChanged(const QModelIndex&)));
+  QObject::connect(
+    this->Ui->treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(editLink()));
+  QObject::connect(this->Ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addLink()));
+  QObject::connect(this->Ui->editButton, SIGNAL(clicked(bool)), this, SLOT(editLink()));
+  QObject::connect(this->Ui->removeButton, SIGNAL(clicked(bool)), this, SLOT(removeLink()));
   this->Ui->editButton->setEnabled(false);
   this->Ui->removeButton->setEnabled(false);
 }
@@ -83,35 +80,32 @@ void pqLinksManager::addLink()
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   pqLinksEditor editor(NULL, this);
   editor.setWindowTitle("Add Link");
-  if(editor.exec() == QDialog::Accepted)
+  if (editor.exec() == QDialog::Accepted)
+  {
+    if (editor.linkType() == pqLinksModel::Proxy)
     {
-    if(editor.linkType() == pqLinksModel::Proxy)
-      {
       vtkSMProxy* inP = editor.selectedProxy1();
       vtkSMProxy* outP = editor.selectedProxy2();
 
-      if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
-        {
+      if (inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
+      {
         model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
-        }
+      }
       else
-        {
+      {
         model->addProxyLink(editor.linkName(), inP, outP);
-        }
-      }
-    else if(editor.linkType() == pqLinksModel::Property)
-      {
-      model->addPropertyLink(editor.linkName(),
-                                editor.selectedProxy1(),
-                                editor.selectedProperty1(),
-                                editor.selectedProxy2(),
-                                editor.selectedProperty2());
-      }
-    else if (editor.linkType() == pqLinksModel::Selection)
-      {
-      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
       }
     }
+    else if (editor.linkType() == pqLinksModel::Property)
+    {
+      model->addPropertyLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProperty1(),
+        editor.selectedProxy2(), editor.selectedProperty2());
+    }
+    else if (editor.linkType() == pqLinksModel::Selection)
+    {
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
+    }
+  }
 }
 
 void pqLinksManager::editLink()
@@ -121,37 +115,34 @@ void pqLinksManager::editLink()
   vtkSMLink* link = model->getLink(idx);
   pqLinksEditor editor(link, this);
   editor.setWindowTitle("Edit Link");
-  if(editor.exec() == QDialog::Accepted)
-    {
+  if (editor.exec() == QDialog::Accepted)
+  {
     model->removeLink(idx);
 
-    if(editor.linkType() == pqLinksModel::Proxy)
-      {
+    if (editor.linkType() == pqLinksModel::Proxy)
+    {
       vtkSMProxy* inP = editor.selectedProxy1();
       vtkSMProxy* outP = editor.selectedProxy2();
 
-      if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
-        {
+      if (inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
+      {
         model->addCameraLink(editor.linkName(), inP, outP, editor.interactiveViewLinkChecked());
-        }
+      }
       else
-        {
+      {
         model->addProxyLink(editor.linkName(), inP, outP);
-        }
-      }
-    else if(editor.linkType() == pqLinksModel::Property)
-      {
-      model->addPropertyLink(editor.linkName(),
-                                editor.selectedProxy1(),
-                                editor.selectedProperty1(),
-                                editor.selectedProxy2(),
-                                editor.selectedProperty2());
-      }
-    else if (editor.linkType() == pqLinksModel::Selection)
-      {
-      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
       }
     }
+    else if (editor.linkType() == pqLinksModel::Property)
+    {
+      model->addPropertyLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProperty1(),
+        editor.selectedProxy2(), editor.selectedProperty2());
+    }
+    else if (editor.linkType() == pqLinksModel::Selection)
+    {
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
+    }
+  }
 }
 
 void pqLinksManager::removeLink()
@@ -160,33 +151,31 @@ void pqLinksManager::removeLink()
   QModelIndexList idxs = this->Ui->treeView->selectionModel()->selectedIndexes();
   QStringList names;
   // convert indexes to names so our indexes don't become invalid during removal
-  foreach(QModelIndex idx, idxs)
-    {
+  foreach (QModelIndex idx, idxs)
+  {
     QString name = model->getLinkName(idx);
-    if(!names.contains(name))
-      {
-      names.append(name);
-      }
-    }
-
-  foreach(QString name, names)
+    if (!names.contains(name))
     {
-    model->removeLink(name);
+      names.append(name);
     }
+  }
+
+  foreach (QString name, names)
+  {
+    model->removeLink(name);
+  }
 }
 
 void pqLinksManager::selectionChanged(const QModelIndex& idx)
 {
-  if(!idx.isValid())
-    {
+  if (!idx.isValid())
+  {
     this->Ui->editButton->setEnabled(false);
     this->Ui->removeButton->setEnabled(false);
-    }
+  }
   else
-    {
+  {
     this->Ui->editButton->setEnabled(true);
     this->Ui->removeButton->setEnabled(true);
-    }
+  }
 }
-
-

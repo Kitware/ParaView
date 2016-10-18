@@ -110,7 +110,7 @@ public:
   void AddBlock(vtkIdType blockno);
   void RemoveAllBlocks();
   //@}
-  
+
   /**
    * For threshold and value selection, this controls the name of the
    * scalar array that will be thresholded within.
@@ -161,16 +161,13 @@ protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource();
 
-  virtual int RequestInformation(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   enum Modes
-    {
+  {
     FRUSTUM,
     GLOBALIDS,
     ID,
@@ -181,15 +178,15 @@ protected:
     BLOCKS,
     PEDIGREEIDS,
     QUERY
-    };
+  };
 
   Modes Mode;
   int FieldType;
   int ContainingCells;
   int Inverse;
   double Frustum[32];
-  char *ArrayName;
-  char *QueryString;
+  char* ArrayName;
+  char* QueryString;
 
 private:
   vtkPVSelectionSource(const vtkPVSelectionSource&) VTK_DELETE_FUNCTION;
@@ -197,8 +194,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif
-

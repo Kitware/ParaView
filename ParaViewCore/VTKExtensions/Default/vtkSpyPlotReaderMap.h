@@ -46,12 +46,11 @@ public:
   // file. In case of later, we detect fileseries automatically.
   // This method should ideally be called only on the 0th node to avoid reading
   // reads for meta-data on all the nodes.
-  bool Initialize(const char *filename);
+  bool Initialize(const char* filename);
 
   void Clean(vtkSpyPlotUniReader* save);
-  vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, 
-                                 vtkSpyPlotReader* parent);
-  void TellReadersToCheck(vtkSpyPlotReader *parent);
+  vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, vtkSpyPlotReader* parent);
+  void TellReadersToCheck(vtkSpyPlotReader* parent);
 
   bool Save(vtkMultiProcessStream& stream);
   bool Load(vtkMultiProcessStream& stream);
@@ -63,7 +62,7 @@ private:
    * case file.
    */
   bool InitializeFromSpyFile(const char*);
- 
+
   //@{
   /**
    * This does the updating of the meta data for a series, when no case file
@@ -72,8 +71,7 @@ private:
    */
   bool InitializeFromCaseFile(const char*);
 };
-  //@}
-
+//@}
 
 #endif
 

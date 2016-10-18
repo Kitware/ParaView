@@ -18,7 +18,7 @@
  * while loading state files.
  *
  * vtkSMProxyLocator is used to locate proxies referred to in state xmls (and
- * otherwise) when loading state files. 
+ * otherwise) when loading state files.
 */
 
 #ifndef vtkSMProxyLocator_h
@@ -78,7 +78,9 @@ public:
   virtual void GetLocatedProxies(vtkCollection* collectionToFill);
 
   virtual void UseSessionToLocateProxy(bool useSessionToo)
-    { this->LocateProxyWithSessionToo = useSessionToo; }
+  {
+    this->LocateProxyWithSessionToo = useSessionToo;
+  }
 
   /**
    * For custom applications managing custom state loading, one can use this
@@ -108,8 +110,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif
-

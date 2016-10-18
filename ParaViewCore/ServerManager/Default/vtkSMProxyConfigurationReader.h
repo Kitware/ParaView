@@ -47,8 +47,8 @@ class vtkSMProxy;
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationReader : public vtkSMObject
 {
 public:
-  static vtkSMProxyConfigurationReader *New();
-  vtkTypeMacro(vtkSMProxyConfigurationReader,vtkSMObject);
+  static vtkSMProxyConfigurationReader* New();
+  vtkTypeMacro(vtkSMProxyConfigurationReader, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -63,8 +63,8 @@ public:
   /**
    * Set the proxy to write out.
    */
-  virtual void SetProxy(vtkSMProxy *proxy);
-  vtkGetObjectMacro(Proxy,vtkSMProxy);
+  virtual void SetProxy(vtkSMProxy* proxy);
+  vtkGetObjectMacro(Proxy, vtkSMProxy);
   //@}
 
   //@{
@@ -88,19 +88,19 @@ public:
    * The read fails if they do not match. The feature is on by
    * default.
    */
-  vtkSetMacro(ValidateProxyType,int);
-  vtkGetMacro(ValidateProxyType,int);
+  vtkSetMacro(ValidateProxyType, int);
+  vtkGetMacro(ValidateProxyType, int);
   //@}
 
   /**
    * Return the reader version.
    */
-  virtual const char *GetReaderVersion(){ return "1.0"; }
+  virtual const char* GetReaderVersion() { return "1.0"; }
 
   /**
    * Return true if the reader can read the specified version.
    */
-  virtual bool CanReadVersion(const char *version);
+  virtual bool CanReadVersion(const char* version);
 
   //@{
   /**
@@ -110,27 +110,27 @@ public:
    * place.
    */
   virtual int ReadConfiguration();
-  virtual int ReadConfiguration(const char *filename);
+  virtual int ReadConfiguration(const char* filename);
   //@}
   /**
    * Read the configuration from the stream. PV state machinery is
    * employed.
    */
-  virtual int ReadConfiguration(vtkPVXMLElement *xmlStream);
+  virtual int ReadConfiguration(vtkPVXMLElement* xmlStream);
 
 protected:
   vtkSMProxyConfigurationReader();
   virtual ~vtkSMProxyConfigurationReader();
 
 private:
-  char *FileName;
+  char* FileName;
   int ValidateProxyType;
   //-------------------
-  vtkSMProxy *Proxy;
+  vtkSMProxy* Proxy;
   //-------------------
-  char *FileIdentifier;
-  char *FileDescription;
-  char *FileExtension;
+  char* FileIdentifier;
+  char* FileDescription;
+  char* FileExtension;
 
 private:
   vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&) VTK_DELETE_FUNCTION;
@@ -138,4 +138,3 @@ private:
 };
 
 #endif
-

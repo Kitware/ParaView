@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVPlugin
- * @brief   defines the core interface for any ParaView plugin. 
+ * @brief   defines the core interface for any ParaView plugin.
  *
  * vtkPVPlugin defines the core interface for any ParaView plugin. A plugin
  * implementing merely this interface is pretty much useless.
@@ -31,20 +31,20 @@
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkPVConfig.h"                     // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
+#include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
 #include <string>
 #include <vector>
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
-# define C_DECL __cdecl
-# define C_EXPORT extern "C" __declspec(dllexport)
+#define C_DECL __cdecl
+#define C_EXPORT extern "C" __declspec(dllexport)
 #elif defined(__GNUC__)
-# define C_DECL
-# define C_EXPORT extern "C" __attribute__ ((visibility ("default")))
+#define C_DECL
+#define C_EXPORT extern "C" __attribute__((visibility("default")))
 #else
-# define C_DECL
-# define C_EXPORT extern "C"
+#define C_DECL
+#define C_EXPORT extern "C"
 #endif
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPlugin
@@ -52,12 +52,12 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPlugin
   char* FileName;
   void SetFileName(const char* filename);
   friend class vtkPVPluginLoader;
+
 public:
   vtkPVPlugin();
   virtual ~vtkPVPlugin();
 
-  const char* GetFileName()
-    { return this->FileName; }
+  const char* GetFileName() { return this->FileName; }
 
   /**
    * Returns the name for this plugin.
@@ -100,11 +100,11 @@ public:
    */
   static void ImportPlugin(vtkPVPlugin* plugin);
 };
-  //@}
+//@}
 
 #ifndef __WRAP__
-typedef const char* (C_DECL *pv_plugin_query_verification_data_fptr)();
-typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
+typedef const char*(C_DECL* pv_plugin_query_verification_data_fptr)();
+typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 #endif
 
 /// TODO: add compiler version.
@@ -117,27 +117,28 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 // builds, plugins cannot be loaded at runtime (only at compile time) so
 // verification is not necessary.
 #ifdef BUILD_SHARED_LIBS
-# define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN) \
-  C_EXPORT const char* C_DECL pv_plugin_query_verification_data()\
-  { return _PV_PLUGIN_VERIFICATION_STRING; } \
-  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() \
-  { return pv_plugin_instance_##PLUGIN(); }
+#define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)                                                        \
+  C_EXPORT const char* C_DECL pv_plugin_query_verification_data()                                  \
+  {                                                                                                \
+    return _PV_PLUGIN_VERIFICATION_STRING;                                                         \
+  }                                                                                                \
+  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() { return pv_plugin_instance_##PLUGIN(); }
 #else // BUILD_SHARED_LIBS
 // define empty export. When building static, we don't want to define the global
 // functions.
-# define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
+#define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
 #endif // BUILD_SHARED_LIBS
 
 // vtkPVPluginLoader uses this function to obtain the vtkPVPlugin instance  for
 // this plugin. In a plugin, there can only be one call to this macro. When
 // using the CMake macro ADD_PARAVIEW_PLUGIN, you don't have to worry about
 // this, the CMake macro takes care of it.
-# define PV_PLUGIN_EXPORT(PLUGIN, PLUGINCLASS) \
-  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance_##PLUGIN()  \
-  { \
-    static PLUGINCLASS instance;\
-    return &instance;\
-  }\
+#define PV_PLUGIN_EXPORT(PLUGIN, PLUGINCLASS)                                                      \
+  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance_##PLUGIN()                                       \
+  {                                                                                                \
+    static PLUGINCLASS instance;                                                                   \
+    return &instance;                                                                              \
+  }                                                                                                \
   _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN);
 
 // PV_PLUGIN_IMPORT_INIT and PV_PLUGIN_IMPORT are provided to make it possible
@@ -147,12 +148,9 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 // cxx file, while PV_PLUGIN_IMPORT must be called at a point after all the
 // plugin managers for the application, including the vtkSMPluginManager,
 // have been initialized.
-# define PV_PLUGIN_IMPORT_INIT(PLUGIN) \
-  extern "C" vtkPVPlugin* pv_plugin_instance_##PLUGIN();
+#define PV_PLUGIN_IMPORT_INIT(PLUGIN) extern "C" vtkPVPlugin* pv_plugin_instance_##PLUGIN();
 
-# define PV_PLUGIN_IMPORT(PLUGIN)\
-  vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
+#define PV_PLUGIN_IMPORT(PLUGIN) vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
 
 #endif // vtkPVPlugin_h
 // VTK-HeaderTest-Exclude: vtkPVPlugin.h
-

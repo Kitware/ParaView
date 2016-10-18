@@ -47,15 +47,11 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   /**
   * the time as a fraction of scene time that this keyframe starts at
   */
-  Q_PROPERTY(double normalizedStartTime
-             READ normalizedStartTime
-             WRITE setNormalizedStartTime)
+  Q_PROPERTY(double normalizedStartTime READ normalizedStartTime WRITE setNormalizedStartTime)
   /**
   * the time as a fraction of scene time that this keyframe ends at
   */
-  Q_PROPERTY(double normalizedEndTime
-             READ normalizedEndTime
-             WRITE setNormalizedEndTime)
+  Q_PROPERTY(double normalizedEndTime READ normalizedEndTime WRITE setNormalizedEndTime)
   /**
   * the value at the start of the keyframe
   */
@@ -72,7 +68,6 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   Q_INTERFACES(QGraphicsItem)
 #endif
 public:
-
   pqAnimationKeyFrame(pqAnimationTrack* p);
   ~pqAnimationKeyFrame();
 
@@ -104,10 +99,7 @@ protected:
   */
   pqAnimationTrack* parentTrack() const;
 
-  virtual void paint(QPainter* p,
-                     const QStyleOptionGraphicsItem * option,
-                     QWidget * widget);
-
+  virtual void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
 private:
   double NormalizedStartTime;
@@ -117,8 +109,6 @@ private:
   QIcon Icon;
 
   QRectF Rect;
-
 };
 
 #endif // pqAnimationKeyFrame_h
-

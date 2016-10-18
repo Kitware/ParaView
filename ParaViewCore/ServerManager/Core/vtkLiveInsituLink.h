@@ -22,7 +22,6 @@
  *  Catalyst module.
  */
 
-
 /**
  * @class   vtkLiveInsituLink
  * @brief   link for live-coprocessing.
@@ -82,10 +81,10 @@ public:
    * process or the insitu process.
    */
   enum
-    {
-    LIVE=0,
-    INSITU=1
-    };
+  {
+    LIVE = 0,
+    INSITU = 1
+  };
   vtkSetClampMacro(ProcessType, int, LIVE, INSITU);
   vtkGetMacro(ProcessType, int);
   //@}
@@ -107,7 +106,7 @@ public:
    * every time step.
    */
   vtkGetMacro(SimulationPaused, int);
-  void SetSimulationPaused (int paused);
+  void SetSimulationPaused(int paused);
   //@}
 
   /**
@@ -157,8 +156,8 @@ public:
   // **************************************************************************
   // API to be used from the LIVE side.
   // Register/unregister a producer for an extract.
-  void RegisterExtract(vtkTrivialProducer* producer,
-    const char* groupname, const char* proxyname, int portnumber);
+  void RegisterExtract(
+    vtkTrivialProducer* producer, const char* groupname, const char* proxyname, int portnumber);
   void UnRegisterExtract(vtkTrivialProducer* producer);
 
   void OnInsituUpdate(double time, vtkIdType timeStep);
@@ -172,11 +171,11 @@ public:
   // **************************************************************************
 
   enum NotificationTags
-    {
+  {
     CONNECTED = 1200,
     NEXT_TIMESTEP_AVAILABLE = 1201,
     DISCONNECTED = 1202
-    };
+  };
 
   void UpdateInsituXMLState(const char* txt);
 
@@ -200,17 +199,17 @@ protected:
   ~vtkLiveInsituLink();
 
   enum RMITags
-    {
-    UPDATE_RMI_TAG=8800,
-    POSTPROCESS_RMI_TAG=8801,
-    INITIALIZE_CONNECTION=8802,
-    DROP_CAT2PV_CONNECTION=8803,
+  {
+    UPDATE_RMI_TAG = 8800,
+    POSTPROCESS_RMI_TAG = 8801,
+    INITIALIZE_CONNECTION = 8802,
+    DROP_CAT2PV_CONNECTION = 8803,
     // Message from LIVE, sent when simulation is paused,
     // signalling a change.  INSITU wakes up and checks for new
     // simulation state, changed extracts or if it should continue the
     // simulation
-    LIVE_CHANGED=8804
-    };
+    LIVE_CHANGED = 8804
+  };
 
   /**
    * Called by Initialize() to initialize on a ParaView Live process.
@@ -232,8 +231,7 @@ protected:
    * Callback on Visualization process when a connection dies during
    * vtkNetworkAccessManager::ProcessEvents().
    */
-  void OnConnectionClosedEvent(
-    vtkObject*, unsigned long eventid, void* calldata);
+  void OnConnectionClosedEvent(vtkObject*, unsigned long eventid, void* calldata);
 
   char* Hostname;
   int InsituPort;
@@ -262,7 +260,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

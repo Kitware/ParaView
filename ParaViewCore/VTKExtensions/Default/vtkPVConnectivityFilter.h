@@ -33,12 +33,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVConnectivityFilter : public vtkConne
 public:
   vtkTypeMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  static vtkPVConnectivityFilter *New();
-  
+
+  static vtkPVConnectivityFilter* New();
+
 protected:
   vtkPVConnectivityFilter();
-  ~vtkPVConnectivityFilter() {};
+  ~vtkPVConnectivityFilter(){};
 
 private:
   vtkPVConnectivityFilter(const vtkPVConnectivityFilter&) VTK_DELETE_FUNCTION;

@@ -78,12 +78,12 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkStdString.h" // needed for vtkStdString.
-#include <vector> // needed for vector.
+#include "vtkStdString.h"                 // needed for vtkStdString.
+#include <vector>                         // needed for vector.
 
 namespace Json
 {
-  class Value;
+class Value;
 }
 
 class vtkSMProperty;
@@ -108,13 +108,13 @@ public:
    * contain values for the same setting, then the setting from the
    * collection with higher priority will be used.
    */
-  bool AddCollectionFromString(const std::string & settings, double priority);
+  bool AddCollectionFromString(const std::string& settings, double priority);
 
   /**
    * The same as AddCollectionFromString, but this method reads the settings
    * string from the named file. The fileName should be a full path.
    */
-  bool AddCollectionFromFile(const std::string & fileName, double priority);
+  bool AddCollectionFromFile(const std::string& fileName, double priority);
 
   /**
    * Clear out all settings, deleting all collections.
@@ -129,7 +129,7 @@ public:
   /**
    * Save highest priority setting collection to file.
    */
-  bool SaveSettingsToFile(const std::string & filePath);
+  bool SaveSettingsToFile(const std::string& filePath);
 
   /**
    * Check whether a setting is defined for the requested names.
@@ -152,27 +152,19 @@ public:
    * Get a vector setting as a scalar value.
    * Shortcut for GetSettingAs...(settingName, 0, defaultValue)
    */
-  int GetSettingAsInt(const char* settingName,
-                      int defaultValue);
-  double GetSettingAsDouble(const char* settingName,
-                            double defaultValue);
-  std::string GetSettingAsString(const char* settingName,
-                                 const std::string & defaultValue);
+  int GetSettingAsInt(const char* settingName, int defaultValue);
+  double GetSettingAsDouble(const char* settingName, double defaultValue);
+  std::string GetSettingAsString(const char* settingName, const std::string& defaultValue);
   //@}
 
   //@{
   /**
    * Get a single element of a vector setting.
    */
-  int GetSettingAsInt(const char* settingName,
-                      unsigned int index,
-                      int defaultValue);
-  double GetSettingAsDouble(const char* settingName,
-                            unsigned int index,
-                            double defaultValue);
-  std::string GetSettingAsString(const char* settingName,
-                                 unsigned int index,
-                                 const std::string & defaultValue);
+  int GetSettingAsInt(const char* settingName, unsigned int index, int defaultValue);
+  double GetSettingAsDouble(const char* settingName, unsigned int index, double defaultValue);
+  std::string GetSettingAsString(
+    const char* settingName, unsigned int index, const std::string& defaultValue);
   //@}
 
   /**
@@ -195,8 +187,7 @@ public:
    * Set the property value from the setting collections under the given prefix.
    * that have priority at or less than the given priority.
    */
-  bool GetPropertySetting(const char* prefix, vtkSMProperty* property,
-                           double maxPriority);
+  bool GetPropertySetting(const char* prefix, vtkSMProperty* property, double maxPriority);
 
   /**
    * Set the property values in a vtkSMProxy from the setting collections.
@@ -219,8 +210,8 @@ public:
    * Set the property values in a vtkSMProxy from the settings collections
    * under the given prefix at or less than the given priority.
    */
-  bool GetProxySettings(const char* prefix, vtkSMProxy* proxy,
-                        double maxPriority);;
+  bool GetProxySettings(const char* prefix, vtkSMProxy* proxy, double maxPriority);
+  ;
 
   /**
    * Get description for a setting.
@@ -234,7 +225,7 @@ public:
    */
   void SetSetting(const char* settingName, int value);
   void SetSetting(const char* settingName, double value);
-  void SetSetting(const char* settingName, const std::string & value);
+  void SetSetting(const char* settingName, const std::string& value);
   //@}
 
   //@{
@@ -243,7 +234,7 @@ public:
    */
   void SetSetting(const char* settingName, unsigned int index, int value);
   void SetSetting(const char* settingName, unsigned int index, double value);
-  void SetSetting(const char* settingName, unsigned int index, const std::string & value);
+  void SetSetting(const char* settingName, unsigned int index, const std::string& value);
   //@}
 
   /**
@@ -255,9 +246,8 @@ public:
    * skip serializing properties that have domains whose values change at
    * runtime.
    */
-  void SetProxySettings(vtkSMProxy* proxy,
-                        vtkSMPropertyIterator* propertyIt = NULL,
-                        bool skipPropertiesWithDynamicDomains=true);
+  void SetProxySettings(vtkSMProxy* proxy, vtkSMPropertyIterator* propertyIt = NULL,
+    bool skipPropertiesWithDynamicDomains = true);
 
   /**
    * Save non-default settings in the current user settings under the given prefix.
@@ -269,8 +259,7 @@ public:
    * runtime.
    */
   void SetProxySettings(const char* prefix, vtkSMProxy* proxy,
-                        vtkSMPropertyIterator* propertyIt = NULL,
-                        bool skipPropertiesWithDynamicDomains=true);
+    vtkSMPropertyIterator* propertyIt = NULL, bool skipPropertiesWithDynamicDomains = true);
 
   /**
    * Set the description of a setting.
@@ -281,17 +270,14 @@ public:
    * Saves the state of the proxy as JSON. The implementation simply
    * converts the state XML to JSON.
    */
-  static Json::Value SerializeAsJSON(
-    vtkSMProxy* proxy, vtkSMPropertyIterator* iter=NULL);
+  static Json::Value SerializeAsJSON(vtkSMProxy* proxy, vtkSMPropertyIterator* iter = NULL);
 
   /**
    * Restores a proxy state using the JSON equivalent. The implementation
    * converts JSON to XML state for the proxy and then attempts to restore the
    * XML state.
    */
-  static bool DeserializeFromJSON(
-    vtkSMProxy* proxy, const Json::Value& value);
-
+  static bool DeserializeFromJSON(vtkSMProxy* proxy, const Json::Value& value);
 
 protected:
   vtkSMSettings();
@@ -302,7 +288,7 @@ private:
   void operator=(const vtkSMSettings&) VTK_DELETE_FUNCTION;
 
   class vtkSMSettingsInternal;
-  vtkSMSettingsInternal * Internal;
+  vtkSMSettingsInternal* Internal;
 };
 
 #endif

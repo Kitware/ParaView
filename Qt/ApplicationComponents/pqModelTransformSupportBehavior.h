@@ -49,20 +49,22 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqModelTransformSupportBehavior : public QO
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqModelTransformSupportBehavior(QObject* parent=0);
+  pqModelTransformSupportBehavior(QObject* parent = 0);
   virtual ~pqModelTransformSupportBehavior();
 
   static vtkTuple<double, 16> getChangeOfBasisMatrix(
-    vtkSMSourceProxy*, int outputPort=0, bool* isvalid=NULL);
+    vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
   static vtkTuple<double, 6> getBoundingBoxInModelCoordinates(
-    vtkSMSourceProxy*, int outputPort=0, bool* isvalid=NULL);
+    vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
   static vtkTuple<vtkStdString, 3> getAxisTitles(
-    vtkSMSourceProxy*, int outputPort=0, bool* isvalid=NULL);
+    vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
 
 protected slots:
   virtual void viewAdded(pqView*);
   virtual void viewUpdated();
+
 protected:
   virtual void enableModelTransform(pqView*, vtkSMSourceProxy*);
   virtual void disableModelTransform(pqView*);

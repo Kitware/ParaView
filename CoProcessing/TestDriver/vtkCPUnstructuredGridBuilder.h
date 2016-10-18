@@ -43,8 +43,7 @@ public:
    * that were returned were already built before.
    * vtkCPUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time,
-                                 int & builtNewGrid);
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid);
 
   /**
    * Get the UnstructuredGrid.
@@ -60,15 +59,15 @@ public:
   /**
    * Allocate memory for the cells on UnstructuredGrid.
    */
-  virtual void Allocate(vtkIdType numCells=1000, int extSize=1000);
+  virtual void Allocate(vtkIdType numCells = 1000, int extSize = 1000);
 
   //@{
   /**
    * Insert/create cell in object by type and list of point
    * ids defining cell topology.
    */
-  vtkIdType InsertNextCell(int type, vtkIdType npts, vtkIdType *pts);
-  vtkIdType InsertNextCell(int type, vtkIdList *ptIds);
+  vtkIdType InsertNextCell(int type, vtkIdType npts, vtkIdType* pts);
+  vtkIdType InsertNextCell(int type, vtkIdList* ptIds);
   //@}
 
 protected:
@@ -97,4 +96,4 @@ private:
   vtkUnstructuredGrid* UnstructuredGrid;
 };
 #endif
-  //@}
+//@}

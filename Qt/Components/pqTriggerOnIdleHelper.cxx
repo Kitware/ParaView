@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,8 +39,7 @@ pqTriggerOnIdleHelper::pqTriggerOnIdleHelper(QObject* parentObject)
 {
   this->Timer.setInterval(0);
   this->Timer.setSingleShot(true);
-  QObject::connect(&this->Timer, SIGNAL(timeout()), this,
-    SLOT(triggerInternal()));
+  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(triggerInternal()));
 }
 
 //-----------------------------------------------------------------------------
@@ -70,11 +69,11 @@ void pqTriggerOnIdleHelper::trigger()
 void pqTriggerOnIdleHelper::triggerInternal()
 {
   if (this->Server && this->Server->isProgressPending())
-    {
+  {
     this->trigger();
-    }
+  }
   else
-    {
+  {
     emit this->triggered();
-    }
+  }
 }

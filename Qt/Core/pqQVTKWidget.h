@@ -55,6 +55,7 @@ class PQCORE_EXPORT pqQVTKWidget : public QVTKWidget
 {
   Q_OBJECT
   typedef QVTKWidget Superclass;
+
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
   virtual ~pqQVTKWidget();
@@ -79,10 +80,8 @@ public:
   * Set/Get the name of the property to use to update the size of the widget
   * on the proxy. By default "ViewSize" is used.
   */
-  void setSizePropertyName(const QString& pname)
-    { this->SizePropertyName = pname; }
-  const QString& sizePropertyName() const
-    { return this->SizePropertyName; }
+  void setSizePropertyName(const QString& pname) { this->SizePropertyName = pname; }
+  const QString& sizePropertyName() const { return this->SizePropertyName; }
 
 public slots:
   void paintMousePointer(int x, int y);

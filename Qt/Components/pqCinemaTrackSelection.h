@@ -37,10 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QWidget>
 
-
 namespace Ui
 {
-  class CinemaTrackSelection;
+class CinemaTrackSelection;
 }
 
 class QModelIndex;
@@ -64,7 +63,6 @@ class PQCOMPONENTS_EXPORT pqCinemaTrackSelection : public QWidget
   Q_OBJECT;
 
 public:
-
   typedef std::pair<pqArraySelectionModel*, pqCinemaTrack*> ItemValues;
   typedef std::map<pqPipelineSource*, ItemValues> ItemValuesMap;
 
@@ -84,7 +82,7 @@ public:
   * format = "'%1' : 2%"
   * returns -> 'name1' : [a, b, c], 'name2' : [d, e, f], ... (for N tracks)
   */
-  QString getTrackSelectionAsString(QString const & format);
+  QString getTrackSelectionAsString(QString const& format);
 
   /**
   * Returns a string containing a comma separated set of cinema tracks each with
@@ -96,7 +94,7 @@ public:
   * format = "'%1' : %2"
   * returns -> 'nameTrack1' : ['array1', 'array2', ...], 'nameTrack1' : ['array1', ...], ...
   */
-  QString getArraySelectionAsString(QString const & format);
+  QString getArraySelectionAsString(QString const& format);
 
   /**
   * Creates a PipelineModel which gets populated using the current
@@ -109,18 +107,17 @@ private slots:
   /**
   * Selection change handler.
   */
-  void onPipelineItemChanged(QModelIndex const & current, QModelIndex const & previous);
+  void onPipelineItemChanged(QModelIndex const& current, QModelIndex const& previous);
 
 private:
-
   /**
   * Creates cinema track widgets (for value customization) and value
   * array selection models.
   * @note Only some filters are currently supported by Cinema.
   */
-  void initializePipelineItemValues(QList<pqPipelineSource*> const & items);
+  void initializePipelineItemValues(QList<pqPipelineSource*> const& items);
 
-  pqPipelineSource* getPipelineSource(QModelIndex const & index) const;
+  pqPipelineSource* getPipelineSource(QModelIndex const& index) const;
 
   /**
   *

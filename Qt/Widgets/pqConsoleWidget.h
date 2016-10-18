@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,14 +45,13 @@ class pqConsoleWidgetCompleter;
   Qt widget that provides an interactive console - you can send text to the
   console by calling printString() and receive user input by connecting to the
   executeCommand() slot.
-  
+
   \sa pqPythonShell, pqOutputWindow
 */
-class PQWIDGETS_EXPORT pqConsoleWidget :
-  public QWidget
+class PQWIDGETS_EXPORT pqConsoleWidget : public QWidget
 {
   Q_OBJECT
-  
+
 public:
   pqConsoleWidget(QWidget* Parent);
   virtual ~pqConsoleWidget();
@@ -72,7 +71,7 @@ public:
   void setCompleter(pqConsoleWidgetCompleter* completer);
 
   QPoint getCursorPosition();
-  
+
 signals:
   /**
   * Signal emitted whenever the user enters a command
@@ -130,11 +129,9 @@ private:
   void printAndExecuteCommand(const QString& text);
 };
 
-
 class PQWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
 {
 public:
-
   /**
   * Update the completion model given a string.  The given string
   * is the current console text between the cursor and the start of
@@ -143,6 +140,4 @@ public:
   virtual void updateCompletionModel(const QString& str) = 0;
 };
 
-
 #endif // !_pqConsoleWidget_h
-

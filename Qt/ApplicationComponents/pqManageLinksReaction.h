@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -42,8 +42,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqManageLinksReaction : public pqMasterOnly
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;
+
 public:
-  pqManageLinksReaction(QAction* action): Superclass(action) { }
+  pqManageLinksReaction(QAction* action)
+    : Superclass(action)
+  {
+  }
 
   /**
   * Pops-up the pqLinksManager dialog.
@@ -51,14 +55,9 @@ public:
   static void manageLinks();
 
 protected:
-  virtual void onTriggered()
-    {
-    pqManageLinksReaction::manageLinks();
-    }
+  virtual void onTriggered() { pqManageLinksReaction::manageLinks(); }
 private:
   Q_DISABLE_COPY(pqManageLinksReaction)
 };
 
 #endif
-
-

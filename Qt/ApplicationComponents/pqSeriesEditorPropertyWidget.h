@@ -48,49 +48,34 @@ class vtkSMPropertyGroup;
 * If any of optional property functions are missing from the group, the
 * corresponding widgets will be hidden.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget :
-  public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-  Q_PROPERTY(QList<QVariant> seriesVisibility
-             READ seriesVisibility
-             WRITE setSeriesVisibility
-             NOTIFY seriesVisibilityChanged)
+  Q_PROPERTY(QList<QVariant> seriesVisibility READ seriesVisibility WRITE setSeriesVisibility NOTIFY
+      seriesVisibilityChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesLabel
-             READ seriesLabel
-             WRITE setSeriesLabel
-             NOTIFY seriesLabelChanged)
+  Q_PROPERTY(
+    QList<QVariant> seriesLabel READ seriesLabel WRITE setSeriesLabel NOTIFY seriesLabelChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesColor
-             READ seriesColor
-             WRITE setSeriesColor
-             NOTIFY seriesColorChanged)
+  Q_PROPERTY(
+    QList<QVariant> seriesColor READ seriesColor WRITE setSeriesColor NOTIFY seriesColorChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesLineThickness
-             READ seriesLineThickness
-             WRITE setSeriesLineThickness
-             NOTIFY seriesLineThicknessChanged)
+  Q_PROPERTY(QList<QVariant> seriesLineThickness READ seriesLineThickness WRITE
+      setSeriesLineThickness NOTIFY seriesLineThicknessChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesLineStyle
-             READ seriesLineStyle
-             WRITE setSeriesLineStyle
-             NOTIFY seriesLineStyleChanged)
+  Q_PROPERTY(QList<QVariant> seriesLineStyle READ seriesLineStyle WRITE setSeriesLineStyle NOTIFY
+      seriesLineStyleChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesMarkerStyle
-             READ seriesMarkerStyle
-             WRITE setSeriesMarkerStyle
-             NOTIFY seriesMarkerStyleChanged)
+  Q_PROPERTY(QList<QVariant> seriesMarkerStyle READ seriesMarkerStyle WRITE setSeriesMarkerStyle
+      NOTIFY seriesMarkerStyleChanged)
 
-  Q_PROPERTY(QList<QVariant> seriesPlotCorner
-             READ seriesPlotCorner
-             WRITE setSeriesPlotCorner
-             NOTIFY seriesPlotCornerChanged)
+  Q_PROPERTY(QList<QVariant> seriesPlotCorner READ seriesPlotCorner WRITE setSeriesPlotCorner NOTIFY
+      seriesPlotCornerChanged)
 
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqSeriesEditorPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqSeriesEditorPropertyWidget();
 
   /**
@@ -134,7 +119,7 @@ public:
   */
   QList<QVariant> seriesPlotCorner() const;
   void setSeriesPlotCorner(const QList<QVariant>&);
- 
+
 signals:
   /**
   * Fired when the series visibility changes.
@@ -193,7 +178,7 @@ private slots:
   * update all selected series with the value from the sender widget.
   */
   void savePropertiesWidgets();
-  
+
   /**
   * called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
   */

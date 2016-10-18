@@ -28,7 +28,8 @@
 #include "vtkLogoRepresentation.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractiveViewLinkRepresentation : public vtkLogoRepresentation
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractiveViewLinkRepresentation
+  : public vtkLogoRepresentation
 {
 public:
   static vtkPVInteractiveViewLinkRepresentation* New();
@@ -37,7 +38,8 @@ public:
 
   /**
    * Considering an eventPosition and current interaction state, this method will adjust
-   * internal position and shape so the widget behave correctly, ie: resizable, movable, but not going
+   * internal position and shape so the widget behave correctly, ie: resizable, movable, but not
+   * going
    * over the edges of the render window
    */
   virtual void WidgetInteraction(double eventPos[2]);
@@ -45,16 +47,16 @@ public:
 protected:
   vtkPVInteractiveViewLinkRepresentation();
   ~vtkPVInteractiveViewLinkRepresentation();
-  
+
   /**
    * Redefining method to avoid adjustment of image
    */
   virtual void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]);
 
 private:
-  vtkPVInteractiveViewLinkRepresentation(const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVInteractiveViewLinkRepresentation(
+    const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

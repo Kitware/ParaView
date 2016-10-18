@@ -26,33 +26,31 @@ uniform int vtkPVColorMaterialHelper_Mode;
 gl_MaterialParameters getMaterialParameters()
 {
   if (vtkPVColorMaterialHelper_Mode == 0)
-    {
+  {
     return gl_FrontMaterial;
-    }
+  }
 
   gl_MaterialParameters materialParams = gl_FrontMaterial;
   if (vtkPVColorMaterialHelper_Mode == gl_ambient)
-    {
+  {
     materialParams.ambient = gl_Color;
-    }
+  }
   else if (vtkPVColorMaterialHelper_Mode == gl_diffuse)
-    {
+  {
     materialParams.diffuse = gl_Color;
-    }
+  }
   else if (vtkPVColorMaterialHelper_Mode == gl_specular)
-    {
+  {
     materialParams.specular = gl_Color;
-    }
+  }
   else if (vtkPVColorMaterialHelper_Mode == gl_ambient_and_diffuse)
-    {
+  {
     materialParams.ambient = gl_Color;
     materialParams.diffuse = gl_Color;
-    }
+  }
   else if (vtkPVColorMaterialHelper_Mode == gl_emission)
-    {
+  {
     materialParams.emission = gl_Color;
-    }
+  }
   return materialParams;
 }
-
-

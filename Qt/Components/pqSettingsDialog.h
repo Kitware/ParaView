@@ -49,8 +49,9 @@ class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
 {
   Q_OBJECT;
   typedef QDialog Superclass;
+
 public:
-  pqSettingsDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqSettingsDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqSettingsDialog();
 
   /**

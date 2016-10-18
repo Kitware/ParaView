@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #if defined(NDEBUG) && !defined(QT_NO_DEBUG)
-# define QT_NO_DEBUG
+#define QT_NO_DEBUG
 #endif
 
 #include "QtWidgetsExport.h"
 #ifndef QTWIDGETS_BUILD_SHARED_LIBS
-# define QT_STATICPLUGIN
+#define QT_STATICPLUGIN
 #endif
 
 #include "QtWidgetsPlugin.h"
@@ -54,15 +54,15 @@ QString pqCollapsedGroupPlugin::name() const
 QString pqCollapsedGroupPlugin::domXml() const
 {
   return "<widget class=\"pqCollapsedGroup\" name=\"collapsedGroup\">\n"
-    " <property name=\"geometry\">\n"
-    "  <rect>\n"
-    "   <x>0</x>\n"
-    "   <y>0</y>\n"
-    "   <width>100</width>\n"
-    "   <height>100</height>\n"
-    "  </rect>\n"
-    " </property>\n"
-    "</widget>\n";
+         " <property name=\"geometry\">\n"
+         "  <rect>\n"
+         "   <x>0</x>\n"
+         "   <y>0</y>\n"
+         "   <width>100</width>\n"
+         "   <height>100</height>\n"
+         "  </rect>\n"
+         " </property>\n"
+         "</widget>\n";
 }
 
 QWidget* pqCollapsedGroupPlugin::createWidget(QWidget* parent)
@@ -111,15 +111,15 @@ QString pqDoubleRangeWidgetPlugin::name() const
 QString pqDoubleRangeWidgetPlugin::domXml() const
 {
   return "<widget class=\"pqDoubleRangeWidget\" name=\"doubleRange\">\n"
-    " <property name=\"geometry\">\n"
-    "  <rect>\n"
-    "   <x>0</x>\n"
-    "   <y>0</y>\n"
-    "   <width>24</width>\n"
-    "   <height>100</height>\n"
-    "  </rect>\n"
-    " </property>\n"
-    "</widget>\n";
+         " <property name=\"geometry\">\n"
+         "  <rect>\n"
+         "   <x>0</x>\n"
+         "   <y>0</y>\n"
+         "   <width>24</width>\n"
+         "   <height>100</height>\n"
+         "  </rect>\n"
+         " </property>\n"
+         "</widget>\n";
 }
 
 QWidget* pqDoubleRangeWidgetPlugin::createWidget(QWidget* parent)
@@ -160,8 +160,8 @@ bool pqDoubleRangeWidgetPlugin::isContainer() const
 /////////////////////////////////////////////////////////////////////////////
 // QtWidgetsPlugin
 
-QtWidgetsPlugin::QtWidgetsPlugin(QObject* p) :
-  QObject(p)
+QtWidgetsPlugin::QtWidgetsPlugin(QObject* p)
+  : QObject(p)
 {
   this->List.append(new pqCollapsedGroupPlugin());
   this->List.append(new pqDoubleRangeWidgetPlugin());
@@ -173,4 +173,3 @@ QList<QDesignerCustomWidgetInterface*> QtWidgetsPlugin::customWidgets() const
 }
 
 Q_EXPORT_PLUGIN2(QtWidgets, QtWidgetsPlugin);
-

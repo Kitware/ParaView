@@ -51,9 +51,8 @@ public:
   /**
    * Provide the informations needed to restore the previous state
    */
-  void SetLinkState( const char* mgrname,
-                     const char* globalpropname,
-                     vtkSMProxy* proxy, const char* propname, bool isAddAction);
+  void SetLinkState(const char* mgrname, const char* globalpropname, vtkSMProxy* proxy,
+    const char* propname, bool isAddAction);
 
 protected:
   vtkSMGlobalPropertiesLinkUndoElement();
@@ -72,10 +71,11 @@ protected:
   vtkSetStringMacro(ProxyPropertyName);
 
   int UndoRedoInternal(bool undo);
-private:
-  vtkSMGlobalPropertiesLinkUndoElement(const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkSMGlobalPropertiesLinkUndoElement(
+    const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
 };
 
 #endif

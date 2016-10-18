@@ -37,7 +37,7 @@
 
 class vtkDataArray;
 
-class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DTransferFunction: public vtkObject
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DTransferFunction : public vtkObject
 {
 public:
   vtkTypeMacro(vtk1DTransferFunction, vtkObject);
@@ -46,7 +46,7 @@ public:
   // Description:
   // map the input array to the output array using the Table.
   // the output will have 1 component and as many tuples as the input.
-  virtual void  MapArray(vtkDataArray* input, vtkDataArray* output);
+  virtual void MapArray(vtkDataArray* input, vtkDataArray* output);
 
   // Set/Get the range of the input values
   vtkSetVector2Macro(InputRange, double);
@@ -61,7 +61,7 @@ public:
 
   // map a value and store it in the output at the given index
   // using the Lookup Table
-  virtual double  MapValue(double value, double* range) = 0;
+  virtual double MapValue(double value, double* range) = 0;
 
 protected:
   vtk1DTransferFunction();
@@ -77,4 +77,3 @@ private:
 };
 
 #endif
-

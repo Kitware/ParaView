@@ -35,15 +35,13 @@ void vtkSMDirectoryProxy::List(const char* dir)
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << VTKOBJECT(this) << "Open"
-    << dir
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "Open" << dir
+         << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkProcessModule::DATA_SERVER_ROOT);
   this->UpdatePropertyInformation();
 }
@@ -52,27 +50,24 @@ bool vtkSMDirectoryProxy::MakeDirectory(const char* dir, vtkTypeUInt32 processes
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated)
-    {
+  {
     return false;
-    }
+  }
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << VTKOBJECT(this) << "MakeDirectory"
-    << dir
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "MakeDirectory" << dir
+         << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, processes);
 
   vtkClientServerStream result = this->GetSession()->GetLastResult(processes);
-  if(result.GetNumberOfMessages() == 1 &&
-    result.GetNumberOfArguments(0) == 1)
-    {
+  if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+  {
     int tmp;
-    if(result.GetArgument(0, 0, &tmp) && tmp)
-      {
+    if (result.GetArgument(0, 0, &tmp) && tmp)
+    {
       return true;
-      }
     }
+  }
   return false;
 }
 
@@ -81,57 +76,50 @@ bool vtkSMDirectoryProxy::DeleteDirectory(const char* dir, vtkTypeUInt32 process
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated)
-    {
+  {
     return false;
-    }
+  }
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << VTKOBJECT(this) << "DeleteDirectory"
-    << dir
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "DeleteDirectory" << dir
+         << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, processes);
 
   vtkClientServerStream result = this->GetSession()->GetLastResult(processes);
-  if(result.GetNumberOfMessages() == 1 &&
-    result.GetNumberOfArguments(0) == 1)
-    {
+  if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+  {
     int tmp;
-    if(result.GetArgument(0, 0, &tmp) && tmp)
-      {
+    if (result.GetArgument(0, 0, &tmp) && tmp)
+    {
       return true;
-      }
     }
+  }
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDirectoryProxy::Rename(const char* oldname, const char* newname,
-  vtkTypeUInt32 processes)
+bool vtkSMDirectoryProxy::Rename(const char* oldname, const char* newname, vtkTypeUInt32 processes)
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated)
-    {
+  {
     return false;
-    }
+  }
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << VTKOBJECT(this) << "Rename"
-    << oldname << newname
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "Rename" << oldname << newname
+         << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, processes);
 
   vtkClientServerStream result = this->GetSession()->GetLastResult(processes);
-  if(result.GetNumberOfMessages() == 1 &&
-    result.GetNumberOfArguments(0) == 1)
-    {
+  if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+  {
     int tmp;
-    if(result.GetArgument(0, 0, &tmp) && tmp)
-      {
+    if (result.GetArgument(0, 0, &tmp) && tmp)
+    {
       return true;
-      }
     }
+  }
 
   return false;
 }

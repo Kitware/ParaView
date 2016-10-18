@@ -39,9 +39,9 @@ public:
 vtkStandardNewMacro(vtkPVBoxChartRepresentation);
 //----------------------------------------------------------------------------
 vtkPVBoxChartRepresentation::vtkPVBoxChartRepresentation()
-: LineThickness(2),
-  LineStyle(0),
-  Legend(true)
+  : LineThickness(2)
+  , LineStyle(0)
+  , Legend(true)
 {
   this->Internals = new vtkInternals();
   this->Color[0] = this->Color[1] = this->Color[2] = 0.0;
@@ -64,14 +64,14 @@ void vtkPVBoxChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPVBoxChartRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
-    {
+  {
     return false;
-    }
+  }
 
   if (this->GetChart())
-    {
+  {
     this->GetChart()->SetVisible(this->GetVisibility());
-    }
+  }
 
   return true;
 }
@@ -80,10 +80,10 @@ bool vtkPVBoxChartRepresentation::AddToView(vtkView* view)
 bool vtkPVBoxChartRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
-    {
+  {
     this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
-    }
+  }
 
   return this->Superclass::RemoveFromView(view);
 }
@@ -92,10 +92,9 @@ bool vtkPVBoxChartRepresentation::RemoveFromView(vtkView* view)
 vtkChartBox* vtkPVBoxChartRepresentation::GetChart()
 {
   if (this->ContextView)
-    {
-    return vtkChartBox::SafeDownCast(
-      this->ContextView->GetContextItem());
-    }
+  {
+    return vtkChartBox::SafeDownCast(this->ContextView->GetContextItem());
+  }
 
   return 0;
 }
@@ -107,18 +106,17 @@ void vtkPVBoxChartRepresentation::SetVisibility(bool visible)
 
   vtkChartBox* chart = this->GetChart();
   if (chart && !visible)
-    {
+  {
     // Refer to vtkChartRepresentation::PrepareForRendering() documentation to
     // know why this is cannot be done in PrepareForRendering();
     chart->SetVisible(false);
-    }
+  }
 
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxChartRepresentation::SetSeriesVisibility(
-  const char* series, bool visibility)
+void vtkPVBoxChartRepresentation::SetSeriesVisibility(const char* series, bool visibility)
 {
   assert(series != NULL);
   this->Internals->SeriesVisibilities[series] = visibility;
@@ -126,14 +124,13 @@ void vtkPVBoxChartRepresentation::SetSeriesVisibility(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxChartRepresentation::SetSeriesColor(const char* seriesname,
-                                                 double r, double g, double b)
+void vtkPVBoxChartRepresentation::SetSeriesColor(
+  const char* seriesname, double r, double g, double b)
 {
   assert(seriesname != NULL);
   this->Internals->SeriesColors[seriesname] = vtkColor3d(r, g, b);
   this->Modified();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVBoxChartRepresentation::ClearSeriesVisibilities()
@@ -168,38 +165,35 @@ void vtkPVBoxChartRepresentation::PrepareForRendering()
   plot->GetPen()->SetOpacityF(1.0);
 
   if (plotInput)
-    {
+  {
     // only consider the first vtkTable.
-    plot->SetInputData(plotInput);  
+    plot->SetInputData(plotInput);
     chart->SetColumnVisibilityAll(true);
     vtkIdType numCols = plotInput->GetNumberOfColumns();
     for (vtkIdType cc = 0; cc < numCols; cc++)
-      {
+    {
       std::string name = plotInput->GetColumnName(cc);
-      std::map<std::string, bool>::iterator iter =
-        this->Internals->SeriesVisibilities.find(name);
+      std::map<std::string, bool>::iterator iter = this->Internals->SeriesVisibilities.find(name);
 
-      if (iter != this->Internals->SeriesVisibilities.end() &&
-        iter->second == true)
-        {
+      if (iter != this->Internals->SeriesVisibilities.end() && iter->second == true)
+      {
         chart->SetColumnVisibility(name, true);
-        }
+      }
       else
-        {
+      {
         chart->SetColumnVisibility(name, false);
-        }
+      }
 
-      std::map<std::string, vtkColor3d>::iterator citer =
-        this->Internals->SeriesColors.find(name);
+      std::map<std::string, vtkColor3d>::iterator citer = this->Internals->SeriesColors.find(name);
       if (citer != this->Internals->SeriesColors.end())
-        {
+      {
         plot->SetColumnColor(name, citer->second.GetData());
-        }
       }
     }
+  }
 
   if (chart->GetYAxis())
-    {
+  {
     chart->GetYAxis()->SetTitle("");
-    }
+  }
 }

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -47,8 +47,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultViewBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqDefaultViewBehavior(QObject* parent=0);
+  pqDefaultViewBehavior(QObject* parent = 0);
 
 protected slots:
   void onServerCreation(pqServer*);
@@ -56,20 +57,19 @@ protected slots:
   void finalTimeoutWarning();
 
   void showWarnings();
+
 private:
   Q_DISABLE_COPY(pqDefaultViewBehavior)
 
   enum WarningModes
-    {
+  {
     NONE,
     SERVER_DISPLAY_INACCESSIBLE,
     SERVER_OPENGL_INADEQUATE,
     CLIENT_OPENGL_INADEQUATE
-    };
+  };
   WarningModes WarningMode;
   QString ExtraWarningMessage;
 };
 
 #endif
-
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,64 +47,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqChartSelectionReaction::pqChartSelectionReaction(
-  QAction *parentObject, pqContextView *view, QActionGroup* modifierGroup)
-: Superclass(parentObject, modifierGroup),
-  View(view)
+  QAction* parentObject, pqContextView* view, QActionGroup* modifierGroup)
+  : Superclass(parentObject, modifierGroup)
+  , View(view)
 {
   parentObject->setEnabled(view != NULL && view->supportsSelection());
   this->connect(parentObject, SIGNAL(triggered(bool)), SLOT(triggered(bool)));
 
-  vtkRenderWindowInteractor* interactor = 
-    (view ? view->getVTKContextView()->GetInteractor() : 0);
+  vtkRenderWindowInteractor* interactor = (view ? view->getVTKContextView()->GetInteractor() : 0);
   if (interactor)
-    {
+  {
     pqCoreUtilities::connect(
-      interactor, vtkCommand::LeftButtonReleaseEvent,
-      this, SLOT(stopSelection()));
-    }
+      interactor, vtkCommand::LeftButtonReleaseEvent, this, SLOT(stopSelection()));
+  }
 }
 
 //-----------------------------------------------------------------------------
-inline void setChartParameters(
-  pqContextView* view,
-  int selectionType, bool update_type,
+inline void setChartParameters(pqContextView* view, int selectionType, bool update_type,
   int selectionModifier, bool update_modifier)
 {
   if (view == NULL && !view->supportsSelection() && view->getContextViewProxy() == NULL)
-    {
+  {
     return;
-    }
+  }
 
-  vtkAbstractContextItem* contextItem =
-    view->getContextViewProxy()->GetContextItem();
-  vtkChart *chart = vtkChart::SafeDownCast(contextItem);
-  vtkScatterPlotMatrix *chartMatrix =
-    vtkScatterPlotMatrix::SafeDownCast(contextItem);
+  vtkAbstractContextItem* contextItem = view->getContextViewProxy()->GetContextItem();
+  vtkChart* chart = vtkChart::SafeDownCast(contextItem);
+  vtkScatterPlotMatrix* chartMatrix = vtkScatterPlotMatrix::SafeDownCast(contextItem);
   if (chartMatrix)
-    {
+  {
     chart = chartMatrix->GetMainChart();
-    }
+  }
 
-  if (update_modifier &&
-    (selectionModifier < vtkContextScene::SELECTION_NONE ||
-     selectionModifier > vtkContextScene::SELECTION_TOGGLE))
-    {
+  if (update_modifier && (selectionModifier < vtkContextScene::SELECTION_NONE ||
+                           selectionModifier > vtkContextScene::SELECTION_TOGGLE))
+  {
     qWarning() << "Invalid selection modifier  " << selectionModifier
-      << ", using vtkContextScene::SELECTION_DEFAULT";
+               << ", using vtkContextScene::SELECTION_DEFAULT";
     selectionModifier = vtkContextScene::SELECTION_DEFAULT;
-    }
+  }
 
   if (chart)
-    {
+  {
     if (update_type)
-      {
+    {
       chart->SetActionToButton(selectionType, vtkContextMouseEvent::LEFT_BUTTON);
-      }
-    if (update_modifier)
-      {
-      chart->SetSelectionMode(selectionModifier);
-      }
     }
+    if (update_modifier)
+    {
+      chart->SetSelectionMode(selectionModifier);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -117,8 +110,7 @@ void pqChartSelectionReaction::startSelection(
 //-----------------------------------------------------------------------------
 void pqChartSelectionReaction::stopSelection()
 {
-  ::setChartParameters(this->View,
-    vtkChart::PAN, true, vtkContextScene::SELECTION_DEFAULT, true);
+  ::setChartParameters(this->View, vtkChart::PAN, true, vtkContextScene::SELECTION_DEFAULT, true);
   this->parentAction()->setChecked(false);
 }
 
@@ -132,50 +124,47 @@ void pqChartSelectionReaction::modifiersChanged()
 //-----------------------------------------------------------------------------
 void pqChartSelectionReaction::triggered(bool checked)
 {
-  if (this->View &&
-      this->View->supportsSelection() &&
-      this->View->getContextViewProxy())
-    {
+  if (this->View && this->View->supportsSelection() && this->View->getContextViewProxy())
+  {
     QAction* _action = this->parentAction();
     int selectionType = vtkChart::SELECT_RECTANGLE;
     if (_action->data().isValid())
-      {
+    {
       selectionType = _action->data().toInt();
-      }
+    }
 
     int selectionModifier = this->getSelectionModifier();
     if (checked)
-      {
-      pqChartSelectionReaction::startSelection(this->View,
-        selectionType, selectionModifier);
-      }
-    else
-      {
-      pqChartSelectionReaction::stopSelection();
-      }
+    {
+      pqChartSelectionReaction::startSelection(this->View, selectionType, selectionModifier);
     }
+    else
+    {
+      pqChartSelectionReaction::stopSelection();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 int pqChartSelectionReaction::getSelectionModifier()
 {
   int selectionModifier = this->Superclass::getSelectionModifier();
-  switch(selectionModifier)
-    {
-   case(pqView::PV_SELECTION_DEFAULT):
-      return vtkContextScene::SELECTION_DEFAULT; 
+  switch (selectionModifier)
+  {
+    case (pqView::PV_SELECTION_DEFAULT):
+      return vtkContextScene::SELECTION_DEFAULT;
       break;
-    case(pqView::PV_SELECTION_ADDITION):
-      return vtkContextScene::SELECTION_ADDITION; 
+    case (pqView::PV_SELECTION_ADDITION):
+      return vtkContextScene::SELECTION_ADDITION;
       break;
-    case(pqView::PV_SELECTION_SUBTRACTION):
-      return vtkContextScene::SELECTION_SUBTRACTION; 
+    case (pqView::PV_SELECTION_SUBTRACTION):
+      return vtkContextScene::SELECTION_SUBTRACTION;
       break;
-    case(pqView::PV_SELECTION_TOGGLE):
-      return vtkContextScene::SELECTION_TOGGLE; 
+    case (pqView::PV_SELECTION_TOGGLE):
+      return vtkContextScene::SELECTION_TOGGLE;
       break;
     default:
       return vtkContextScene::SELECTION_NONE;
       break;
-    }
+  }
 }

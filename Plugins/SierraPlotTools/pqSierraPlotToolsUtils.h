@@ -28,24 +28,21 @@
 #include <QString>
 #include <QStringList>
 
-
 //=============================================================================
 class pqSierraPlotToolsUtils
 {
 
 public:
-
   pqSierraPlotToolsUtils();
   ~pqSierraPlotToolsUtils();
 
-  QString removeAllWhiteSpace(const QString & inString);
+  QString removeAllWhiteSpace(const QString& inString);
 
   bool validChar(char inChar);
 
   int getNumber(int begIndex, int endIndex, QString lineEditText);
 
 protected:
-
 };
 
 #endif // pqSierraPlotToolsUtils_h

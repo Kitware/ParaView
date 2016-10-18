@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,7 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <limits>
 
-class pqTimerLogDisplayUi : public Ui::pqTimerLogDisplay {};
+class pqTimerLogDisplayUi : public Ui::pqTimerLogDisplay
+{
+};
 
 //-----------------------------------------------------------------------------
 typedef struct
@@ -67,29 +69,17 @@ typedef struct
   float value;
 } pqTimerLogDisplayIntChoices;
 
-static pqTimerLogDisplayFloatChoices ThresholdChoices[] = {
-  { "Show All", 0.0f },
-  { "0.001", 0.001f },
-  { "0.01", 0.01f },
-  { "0.1", 0.1f }
-};
-static const int NumThresholdChoices
-  = sizeof(ThresholdChoices)/sizeof(pqTimerLogDisplayFloatChoices);
+static pqTimerLogDisplayFloatChoices ThresholdChoices[] = { { "Show All", 0.0f },
+  { "0.001", 0.001f }, { "0.01", 0.01f }, { "0.1", 0.1f } };
+static const int NumThresholdChoices =
+  sizeof(ThresholdChoices) / sizeof(pqTimerLogDisplayFloatChoices);
 
-static pqTimerLogDisplayIntChoices LengthChoices[] = {
-  { "100", 100 },
-  { "500", 500 },
-  { "1000", 1000 },
-  { "5000", 5000 },
-  { "10000", 10000 },
-  { "50000", 50000 },
-  { "90000", 90000 }
-};
-static const int NumLengthChoices
-  = sizeof(LengthChoices)/sizeof(pqTimerLogDisplayIntChoices);
+static pqTimerLogDisplayIntChoices LengthChoices[] = { { "100", 100 }, { "500", 500 },
+  { "1000", 1000 }, { "5000", 5000 }, { "10000", 10000 }, { "50000", 50000 }, { "90000", 90000 } };
+static const int NumLengthChoices = sizeof(LengthChoices) / sizeof(pqTimerLogDisplayIntChoices);
 
 //-----------------------------------------------------------------------------
-pqTimerLogDisplay::pqTimerLogDisplay(QWidget *p)
+pqTimerLogDisplay::pqTimerLogDisplay(QWidget* p)
   : QDialog(p)
 {
   this->ui = new pqTimerLogDisplayUi;
@@ -97,26 +87,20 @@ pqTimerLogDisplay::pqTimerLogDisplay(QWidget *p)
 
   int i;
   for (i = 0; i < NumThresholdChoices; i++)
-    {
+  {
     this->ui->timeThreshold->addItem(ThresholdChoices[i].name);
-    }
+  }
   for (i = 0; i < NumLengthChoices; i++)
-    {
+  {
     this->ui->bufferLength->addItem(LengthChoices[i].name);
-    }
+  }
 
-  connect(this->ui->refreshButton, SIGNAL(clicked(bool)),
-          this, SLOT(refresh()));
-  connect(this->ui->clearButton, SIGNAL(clicked(bool)),
-          this, SLOT(clear()));
-  connect(this->ui->timeThreshold, SIGNAL(activated(int)),
-          this, SLOT(setTimeThresholdById(int)));
-  connect(this->ui->bufferLength, SIGNAL(activated(int)),
-          this, SLOT(setBufferLengthById(int)));
-  connect(this->ui->enable, SIGNAL(toggled(bool)),
-          this, SLOT(setEnable(bool)));
-  connect(this->ui->saveButton, SIGNAL(clicked(bool)),
-          this, SLOT(save()));
+  connect(this->ui->refreshButton, SIGNAL(clicked(bool)), this, SLOT(refresh()));
+  connect(this->ui->clearButton, SIGNAL(clicked(bool)), this, SLOT(clear()));
+  connect(this->ui->timeThreshold, SIGNAL(activated(int)), this, SLOT(setTimeThresholdById(int)));
+  connect(this->ui->bufferLength, SIGNAL(activated(int)), this, SLOT(setBufferLengthById(int)));
+  connect(this->ui->enable, SIGNAL(toggled(bool)), this, SLOT(setEnable(bool)));
+  connect(this->ui->saveButton, SIGNAL(clicked(bool)), this, SLOT(save()));
 
   this->LogThreshold = 0.0;
   this->setTimeThreshold(0.01f);
@@ -138,12 +122,11 @@ void pqTimerLogDisplay::refresh()
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
-    {
+  {
     qWarning() << "No active server located. Cannot refresh timer-log.";
     return;
-    }
-  vtkSmartPointer<vtkPVTimerInformation> timerInfo
-    = vtkSmartPointer<vtkPVTimerInformation>::New();
+  }
+  vtkSmartPointer<vtkPVTimerInformation> timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
 
   // Get information about the local process.
   timerInfo->SetLogThreshold(this->LogThreshold);
@@ -152,50 +135,46 @@ void pqTimerLogDisplay::refresh()
 
   // Get information about servers.
   if (server->isRemote())
-    {
+  {
     // Clear out information by creating a new info object.
     timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
     timerInfo->SetLogThreshold(this->LogThreshold);
-    server->session()->GatherInformation(
-      vtkPVSession::RENDER_SERVER, timerInfo, 0);
+    server->session()->GatherInformation(vtkPVSession::RENDER_SERVER, timerInfo, 0);
     if (server->isRenderServerSeparate())
-      {
+    {
       this->addToLog("Server", timerInfo);
-      }
+    }
     else
-      {
+    {
       this->addToLog("Render Server", timerInfo);
 
       // We just reported on the render server.  Now report on the data server.
       timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
       timerInfo->SetLogThreshold(this->LogThreshold);
-      server->session()->GatherInformation(vtkPVSession::DATA_SERVER,
-        timerInfo, 0);
+      server->session()->GatherInformation(vtkPVSession::DATA_SERVER, timerInfo, 0);
       this->addToLog("Data Server", timerInfo);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::addToLog(const QString &source,
-                                 vtkPVTimerInformation *timerInfo)
+void pqTimerLogDisplay::addToLog(const QString& source, vtkPVTimerInformation* timerInfo)
 {
   this->ui->log->insertHtml("<p><hr><p>");
 
   int numLogs = timerInfo->GetNumberOfLogs();
   for (int id = 0; id < numLogs; id++)
-    {
+  {
     if (numLogs > 1)
-      {
-      this->ui->log->insertHtml(QString("<br><p><h1>%1, Process %2</h1><p>")
-                                .arg(source).arg(id));
-      }
-    else
-      {
-      this->ui->log->insertHtml(QString("<br><p><h1>%1</h1><p>").arg(source));
-      }
-    this->ui->log->insertHtml(QString("<pre>%1</pre>").arg(timerInfo->GetLog(id)));
+    {
+      this->ui->log->insertHtml(QString("<br><p><h1>%1, Process %2</h1><p>").arg(source).arg(id));
     }
+    else
+    {
+      this->ui->log->insertHtml(QString("<br><p><h1>%1</h1><p>").arg(source));
+    }
+    this->ui->log->insertHtml(QString("<pre>%1</pre>").arg(timerInfo->GetLog(id)));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -203,9 +182,9 @@ void pqTimerLogDisplay::clear()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
@@ -225,13 +204,13 @@ float pqTimerLogDisplay::timeThreshold() const
 void pqTimerLogDisplay::setTimeThreshold(float value)
 {
   for (int i = 0; i < NumThresholdChoices; i++)
-    {
+  {
     if (ThresholdChoices[i].value == value)
-      {
+    {
       this->setTimeThresholdById(i);
       return;
-      }
     }
+  }
   qWarning("Invalid time threshold: %f", value);
 }
 
@@ -251,13 +230,13 @@ int pqTimerLogDisplay::bufferLength() const
 void pqTimerLogDisplay::setBufferLength(int value)
 {
   for (int i = 0; i < NumLengthChoices; i++)
-    {
+  {
     if (LengthChoices[i].value == value)
-      {
+    {
       this->setBufferLengthById(i);
       return;
-      }
     }
+  }
   qWarning("Invalid buffer length: %d", value);
 }
 
@@ -267,14 +246,13 @@ void pqTimerLogDisplay::setBufferLengthById(int id)
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
-  vtkSMPropertyHelper(proxy, "MaxEntries").Set(
-    2*LengthChoices[id].value);
+  vtkSMPropertyHelper(proxy, "MaxEntries").Set(2 * LengthChoices[id].value);
   proxy->UpdateVTKObjects();
   proxy->Delete();
 }
@@ -291,13 +269,13 @@ void pqTimerLogDisplay::setEnable(bool state)
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
-  vtkSMPropertyHelper(proxy, "Enable").Set(state? 1:0);
+  vtkSMPropertyHelper(proxy, "Enable").Set(state ? 1 : 0);
   proxy->UpdateVTKObjects();
   proxy->Delete();
 }
@@ -309,93 +287,87 @@ void pqTimerLogDisplay::save()
   filters += "Text Files (*.txt)";
   filters += ";;All files (*)";
 
- pqFileDialog *const fileDialog = new pqFileDialog(NULL,
-                                                   this,
-                                                   tr("Save Timer Log"),
-                                                   QString(),
-                                                   filters);
+  pqFileDialog* const fileDialog =
+    new pqFileDialog(NULL, this, tr("Save Timer Log"), QString(), filters);
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("TimerLogSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
-  connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),
-          this, SLOT(save(const QStringList &)));
+  connect(
+    fileDialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(save(const QStringList&)));
   fileDialog->setModal(true);
   fileDialog->show();
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::save(const QStringList &files)
+void pqTimerLogDisplay::save(const QStringList& files)
 {
   for (int i = 0; i < files.size(); i++)
-    {
+  {
     this->save(files[i]);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::save(const QString &filename)
+void pqTimerLogDisplay::save(const QString& filename)
 {
   QFile file(filename);
   file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
   if (file.error() != QFile::NoError)
-    {
+  {
     qWarning("Could not open %s for reading.", filename.toLatin1().data());
     return;
-    }
+  }
   QTextStream(&file) << this->ui->log->toPlainText();
   if (file.error() != QFile::NoError)
-    {
+  {
     qWarning("Error writing to %s.", filename.toLatin1().data());
-    }
+  }
   file.close();
 }
 
 //-----------------------------------------------------------------------------
 void pqTimerLogDisplay::saveState()
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
+  pqApplicationCore* core = pqApplicationCore::instance();
   if (core)
-    {
-    pqSettings *settings = core->settings();
+  {
+    pqSettings* settings = core->settings();
     settings->saveState(*this, "TimerLog");
     settings->beginGroup("TimerLog");
     settings->setValue("TimeThreshold", this->timeThreshold());
     settings->setValue("BufferLength", this->bufferLength());
     settings->setValue("Enable", this->isEnabled());
     settings->endGroup();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqTimerLogDisplay::restoreState()
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
+  pqApplicationCore* core = pqApplicationCore::instance();
   if (core)
-    {
-    pqSettings *settings = core->settings();
+  {
+    pqSettings* settings = core->settings();
 
     settings->restoreState("TimerLog", *this);
 
     settings->beginGroup("TimerLog");
-    this->setTimeThreshold(settings->value("TimeThreshold",
-                                           this->timeThreshold()).toDouble());
-    this->setBufferLength(settings->value("BufferLength",
-                                          this->bufferLength()).toInt());
-    this->setEnable(settings->value("Enable",
-                                    this->isEnabled()).toBool());
+    this->setTimeThreshold(settings->value("TimeThreshold", this->timeThreshold()).toDouble());
+    this->setBufferLength(settings->value("BufferLength", this->bufferLength()).toInt());
+    this->setEnable(settings->value("Enable", this->isEnabled()).toBool());
     settings->endGroup();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::showEvent(QShowEvent *e)
+void pqTimerLogDisplay::showEvent(QShowEvent* e)
 {
   this->restoreState();
   this->Superclass::showEvent(e);
 }
 
 //-----------------------------------------------------------------------------
-void pqTimerLogDisplay::hideEvent(QHideEvent *e)
+void pqTimerLogDisplay::hideEvent(QHideEvent* e)
 {
   this->saveState();
   this->Superclass::hideEvent(e);

@@ -41,7 +41,7 @@ public:
    * Copies data from source proxy object to object represented by this
    * source proxy object.
    */
-  void CopyData(vtkSMSourceProxy *sourceProxy);
+  void CopyData(vtkSMSourceProxy* sourceProxy);
 
 protected:
   vtkSMDataSourceProxy();
@@ -50,8 +50,6 @@ protected:
 private:
   vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

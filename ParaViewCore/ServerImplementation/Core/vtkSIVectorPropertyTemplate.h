@@ -24,7 +24,7 @@
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"
 
-template <class T, class force_idtype=int>
+template <class T, class force_idtype = int>
 class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIVectorPropertyTemplate : public vtkSIVectorProperty
 {
 public:
@@ -76,7 +76,6 @@ protected:
 private:
   vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

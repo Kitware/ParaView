@@ -62,9 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadDataReaction.h"
 
 //-----------------------------------------------------------------------------
-pqPVApplicationCore::pqPVApplicationCore(
-  int& argc, char** argv, pqOptions* options)
-: Superclass(argc, argv, options)
+pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
+  : Superclass(argc, argv, options)
 {
   // Initialize pqComponents resources.
   pqApplicationComponentsInit();
@@ -72,19 +71,17 @@ pqPVApplicationCore::pqPVApplicationCore(
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
 
-  pqApplicationCore::instance()->registerManager("SELECTION_MANAGER",
-    this->SelectionManager);
+  pqApplicationCore::instance()->registerManager("SELECTION_MANAGER", this->SelectionManager);
 
   this->PythonManager = 0;
 #ifdef PARAVIEW_ENABLE_PYTHON
   this->PythonManager = new pqPythonManager(this);
 
-  // Ensure that whenever Python is initialized, we tell paraview.servermanager
-  // that is being done from the GUI.
+// Ensure that whenever Python is initialized, we tell paraview.servermanager
+// that is being done from the GUI.
 #endif
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(serverChanged(pqServer*)),
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
     this->AnimationManager, SLOT(onActiveServerChanged(pqServer*)));
 }
 
@@ -102,9 +99,9 @@ pqPVApplicationCore::~pqPVApplicationCore()
 void pqPVApplicationCore::registerForQuicklaunch(QWidget* menu)
 {
   if (menu)
-    {
+  {
     this->QuickLaunchMenus.push_back(menu);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -112,27 +109,27 @@ void pqPVApplicationCore::quickLaunch()
 {
   emit this->aboutToShowQuickLaunch();
   if (this->QuickLaunchMenus.size() > 0)
-    {
+  {
     pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());
     foreach (QWidget* menu, this->QuickLaunchMenus)
-      {
+    {
       if (menu)
-        {
+      {
         // don't use QMenu::actions() since that includes only the top-level
         // actions.
         // --> BUT pqProxyGroupMenuManager in order to handle multi-server
         //         setting properly add actions into an internal widget so
         //         actions() should be used instead of findChildren()
-        if(menu->findChildren<QAction*>().size() == 0)
-          {
+        if (menu->findChildren<QAction*>().size() == 0)
+        {
           dialog.addActions(menu->actions());
-          }
+        }
         else
-          {
+        {
           dialog.addActions(menu->findChildren<QAction*>());
-          }
         }
       }
+    }
     // If shift modifier is pressed, let's force the auto apply
     bool forceAutoApply = QApplication::keyboardModifiers() & Qt::ShiftModifier;
     bool autoApplyState = pqPropertiesPanel::autoApply();
@@ -140,30 +137,28 @@ void pqPVApplicationCore::quickLaunch()
     dialog.exec();
     // Restore the auto apply state
     pqPropertiesPanel::setAutoApply(autoApplyState);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPVApplicationCore::startSearch()
 {
-  if(!QApplication::focusWidget())
-    {
+  if (!QApplication::focusWidget())
+  {
     return;
-    }
-  QAbstractItemView* focusItemView =
-    qobject_cast<QAbstractItemView*>(QApplication::focusWidget());
-  if(!focusItemView)
-    {
+  }
+  QAbstractItemView* focusItemView = qobject_cast<QAbstractItemView*>(QApplication::focusWidget());
+  if (!focusItemView)
+  {
     return;
-    }
+  }
   // currently we don't support search on pqSpreadSheetViewModel
-  if(qobject_cast<pqSpreadSheetViewModel*>(focusItemView->model()))
-    {
+  if (qobject_cast<pqSpreadSheetViewModel*>(focusItemView->model()))
+  {
     return;
-    }
+  }
 
-  pqItemViewSearchWidget* searchDialog =
-    new pqItemViewSearchWidget(focusItemView);
+  pqItemViewSearchWidget* searchDialog = new pqItemViewSearchWidget(focusItemView);
   searchDialog->setAttribute(Qt::WA_DeleteOnClose, true);
   searchDialog->showSearchWidget();
 }
@@ -194,20 +189,20 @@ pqPythonManager* pqPVApplicationCore::pythonManager() const
 pqTestUtility* pqPVApplicationCore::testUtility()
 {
   if (!this->TestUtility)
-    {
+  {
     this->TestUtility = new pqComponentsTestUtility(this);
-    }
+  }
   return this->TestUtility;
 }
 
 //-----------------------------------------------------------------------------
-bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event_ )
+bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
 {
   if (event_->type() == QEvent::FileOpen)
-    {
+  {
     QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event_);
     if (!fileEvent->file().isEmpty())
-      {
+    {
       QList<QString> files;
       files.append(fileEvent->file());
 
@@ -215,16 +210,16 @@ bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event_ )
       this->Options->SetParaViewDataName(files[0].toLatin1().data());
 
       // If the application is already started just load the data
-      if(vtkProcessModule::GetProcessModule()->GetSession())
-        {
+      if (vtkProcessModule::GetProcessModule()->GetSession())
+      {
         pqLoadDataReaction::loadData(files);
-        }
       }
-    return false;
     }
+    return false;
+  }
   else
-    {
+  {
     // standard event processing
     return QObject::eventFilter(obj, event_);
-    }
+  }
 }

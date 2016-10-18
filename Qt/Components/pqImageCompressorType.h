@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,9 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImageCompressorType_h
 #define _pqImageCompressorType_h
 
-enum {
-  COMPRESSOR_NONE=0,
-  COMPRESSOR_SQUIRT=1,
-  COMPRESSOR_ZLIB=2 };
+enum
+{
+  COMPRESSOR_NONE = 0,
+  COMPRESSOR_SQUIRT = 1,
+  COMPRESSOR_ZLIB = 2
+};
 
 #endif

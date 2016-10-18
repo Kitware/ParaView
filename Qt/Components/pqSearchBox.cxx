@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,37 +49,34 @@ class pqSearchBox::pqInternals : public Ui::SearchBox
 {
 public:
   pqInternals(pqSearchBox* self)
-    {
+  {
     this->setupUi(self);
 
-    self->connect(this->SearchLineEdit, SIGNAL(textChanged(QString)),
-      self, SIGNAL(textChanged(QString)));
-    self->connect(this->AdvancedButton, SIGNAL(clicked(bool)),
-      self, SLOT(onAdvancedButtonClicked(bool)));
-    self->connect(self->settings(), SIGNAL(modified()),
-      self, SLOT(updateFromSettings()));
-    };
+    self->connect(
+      this->SearchLineEdit, SIGNAL(textChanged(QString)), self, SIGNAL(textChanged(QString)));
+    self->connect(
+      this->AdvancedButton, SIGNAL(clicked(bool)), self, SLOT(onAdvancedButtonClicked(bool)));
+    self->connect(self->settings(), SIGNAL(modified()), self, SLOT(updateFromSettings()));
+  };
 };
 
 //-----------------------------------------------------------------------------
 // Class
 
 //-----------------------------------------------------------------------------
-pqSearchBox::pqSearchBox(QWidget *_parent) :
-  Superclass(_parent),
-  Internals(new pqSearchBox::pqInternals(this)),
-  SettingKey("")
+pqSearchBox::pqSearchBox(QWidget* _parent)
+  : Superclass(_parent)
+  , Internals(new pqSearchBox::pqInternals(this))
+  , SettingKey("")
 {
   this->setAdvancedSearchEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
-pqSearchBox::pqSearchBox(bool advancedSearchEnabled,
-                         const QString& settingKey,
-                         QWidget *_parent):
-  Superclass(_parent),
-  Internals(new pqSearchBox::pqInternals(this)),
-  SettingKey("")
+pqSearchBox::pqSearchBox(bool advancedSearchEnabled, const QString& settingKey, QWidget* _parent)
+  : Superclass(_parent)
+  , Internals(new pqSearchBox::pqInternals(this))
+  , SettingKey("")
 {
   this->setAdvancedSearchEnabled(advancedSearchEnabled);
   this->setSettingKey(settingKey);
@@ -94,16 +91,15 @@ pqSearchBox::~pqSearchBox()
 void pqSearchBox::keyPressEvent(QKeyEvent* keyEvent)
 {
   // Remove the current text in the line edit on escape pressed
-  if (keyEvent &&
-    keyEvent->key() == Qt::Key_Escape &&
+  if (keyEvent && keyEvent->key() == Qt::Key_Escape &&
     !this->Internals->SearchLineEdit->text().isEmpty())
-    {
+  {
     this->Internals->SearchLineEdit->clear();
-    }
+  }
   else
-    {
+  {
     this->Superclass::keyPressEvent(keyEvent);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -122,9 +118,9 @@ void pqSearchBox::setText(const QString& text)
 bool pqSearchBox::isAdvancedSearchActive() const
 {
   if (this->isAdvancedSearchEnabled())
-    {
+  {
     return this->Internals->AdvancedButton->isChecked();
-    }
+  }
   return false;
 }
 
@@ -132,9 +128,9 @@ bool pqSearchBox::isAdvancedSearchActive() const
 void pqSearchBox::setAdvancedSearchActive(bool use)
 {
   if (this->isAdvancedSearchEnabled())
-    {
+  {
     this->Internals->AdvancedButton->setChecked(use);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -168,9 +164,9 @@ QString pqSearchBox::setSettingKey(const QString& key)
 {
   QString oldKey = this->SettingKey;
   if (this->SettingKey == key)
-    {
+  {
     return oldKey;
-    }
+  }
 
   this->SettingKey = key;
   this->updateFromSettings();
@@ -191,10 +187,9 @@ void pqSearchBox::updateFromSettings()
 {
   QSettings* settings = this->settings();
   if (settings && !this->SettingKey.isEmpty())
-    {
-    this->Internals->AdvancedButton->setChecked(
-      settings->value(this->SettingKey, false).toBool());
-    }
+  {
+    this->Internals->AdvancedButton->setChecked(settings->value(this->SettingKey, false).toBool());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -202,10 +197,9 @@ void pqSearchBox::updateSettings()
 {
   QSettings* settings = this->settings();
   if (settings && !this->SettingKey.isEmpty())
-    {
-    settings->setValue(
-      this->SettingKey, this->Internals->AdvancedButton->isChecked());
-    }
+  {
+    settings->setValue(this->SettingKey, this->Internals->AdvancedButton->isChecked());
+  }
 }
 
 //-----------------------------------------------------------------------------

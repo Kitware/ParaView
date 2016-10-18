@@ -35,7 +35,7 @@ class vtkUniformGrid;
 class vtkIdTypeArray;
 class vtkIntArray;
 class vtkAMRDualGridHelper;
-class vtkAMRDualGridHelperBlock; 
+class vtkAMRDualGridHelperBlock;
 class vtkAMRConnectivityEquivalence;
 class vtkMPIController;
 class vtkUnsignedCharArray;
@@ -43,9 +43,9 @@ class vtkUnsignedCharArray;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkAMRConnectivity,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkAMRConnectivity, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkAMRConnectivity *New();
+  static vtkAMRConnectivity* New();
 
   //@{
   /**
@@ -86,7 +86,7 @@ protected:
   double VolumeFractionSurfaceValue;
   vtkAMRDualGridHelper* Helper;
   vtkAMRConnectivityEquivalence* Equivalence;
-  
+
   bool ResolveBlocks;
   bool PropagateGhosts;
 
@@ -95,42 +95,32 @@ protected:
 
   std::vector<std::string> VolumeArrays;
 
-  std::vector<std::vector <vtkSmartPointer<vtkIdTypeArray> > > BoundaryArrays;
-  std::vector<std::vector <int> > ReceiveList;
+  std::vector<std::vector<vtkSmartPointer<vtkIdTypeArray> > > BoundaryArrays;
+  std::vector<std::vector<int> > ReceiveList;
 
   std::vector<bool> ValidNeighbor;
-  std::vector<std::vector <std::vector <int> > > NeighborList;
-  std::vector< vtkSmartPointer<vtkIntArray> > EquivPairs;
+  std::vector<std::vector<std::vector<int> > > NeighborList;
+  std::vector<vtkSmartPointer<vtkIntArray> > EquivPairs;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  int DoRequestData (vtkNonOverlappingAMR*, const char*);
-  int WavePropagation (vtkIdType cellIdStart, 
-                       vtkUniformGrid* grid, 
-                       vtkIdTypeArray* regionId,
-                       vtkDataArray* volArray,
-                       vtkUnsignedCharArray* ghostArray);
+  int DoRequestData(vtkNonOverlappingAMR*, const char*);
+  int WavePropagation(vtkIdType cellIdStart, vtkUniformGrid* grid, vtkIdTypeArray* regionId,
+    vtkDataArray* volArray, vtkUnsignedCharArray* ghostArray);
 
-  vtkAMRDualGridHelperBlock* GetBlockNeighbor (
-                       vtkAMRDualGridHelperBlock* block, 
-                       int dir);
-  void ProcessBoundaryAtBlock (vtkNonOverlappingAMR* volume,
-                               vtkAMRDualGridHelperBlock* block, 
-                               vtkAMRDualGridHelperBlock* neighbor, 
-                               int dir);
-  int ExchangeBoundaries (vtkMPIController* controller);
-  int ExchangeEquivPairs (vtkMPIController* controller);
-  void ProcessBoundaryAtNeighbor (vtkNonOverlappingAMR* volume,
-                                  vtkIdTypeArray *array);
+  vtkAMRDualGridHelperBlock* GetBlockNeighbor(vtkAMRDualGridHelperBlock* block, int dir);
+  void ProcessBoundaryAtBlock(vtkNonOverlappingAMR* volume, vtkAMRDualGridHelperBlock* block,
+    vtkAMRDualGridHelperBlock* neighbor, int dir);
+  int ExchangeBoundaries(vtkMPIController* controller);
+  int ExchangeEquivPairs(vtkMPIController* controller);
+  void ProcessBoundaryAtNeighbor(vtkNonOverlappingAMR* volume, vtkIdTypeArray* array);
 
 private:
   vtkAMRConnectivity(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif /* vtkAMRConnectivity_h */

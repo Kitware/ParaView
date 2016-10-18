@@ -37,10 +37,10 @@ public:
    * Get/Set Position of the box.
    */
   void SetPosition(double x, double y, double z)
-    {
-    double pos[3] = {x, y, z};
+  {
+    double pos[3] = { x, y, z };
     this->SetPosition(pos);
-    }
+  }
   void SetPosition(const double pos[3]);
   vtkGetVector3Macro(Position, double);
   //@}
@@ -50,10 +50,10 @@ public:
    * Get/Set Rotation for the box.
    */
   void SetRotation(double x, double y, double z)
-    {
-    double pos[3] = {x, y, z};
+  {
+    double pos[3] = { x, y, z };
     this->SetRotation(pos);
-    }
+  }
   void SetRotation(const double pos[3]);
   vtkGetVector3Macro(Rotation, double);
   //@}
@@ -63,10 +63,10 @@ public:
    * Get/Set Scale for the box.
    */
   void SetScale(double x, double y, double z)
-    {
-    double pos[3] = {x, y, z};
+  {
+    double pos[3] = { x, y, z };
     this->SetScale(pos);
-    }
+  }
   void SetScale(const double pos[3]);
   vtkGetVector3Macro(Scale, double);
   //@}
@@ -83,7 +83,6 @@ protected:
 private:
   vtkPVBox(const vtkPVBox&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVBox&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

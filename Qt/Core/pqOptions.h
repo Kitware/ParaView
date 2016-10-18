@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,15 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** \brief Command line options for pqClient.
  *
- * pqOptions extends vtkPVOptions to handle pqClient specific command line 
+ * pqOptions extends vtkPVOptions to handle pqClient specific command line
  * options.
  */
 class PQCORE_EXPORT pqOptions : public vtkPVOptions
 {
 public:
-  static pqOptions *New();
+  static pqOptions* New();
   vtkTypeMacro(pqOptions, vtkPVOptions);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetStringMacro(TileImagePath);
   vtkGetStringMacro(BaselineDirectory);
@@ -55,7 +55,7 @@ public:
   vtkGetStringMacro(DataDirectory);
 
   vtkGetMacro(ExitAppWhenTestsDone, int);
- 
+
   // Returns the test scripts as a list.
   QStringList GetTestScripts();
 
@@ -70,14 +70,10 @@ public:
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
 
-  int GetNumberOfTestScripts()
-    { return this->TestScripts.size(); }
-  QString GetTestScript(int cc)
-    { return this->TestScripts[cc].TestFile; }
-  QString GetTestBaseline(int cc)
-    { return this->TestScripts[cc].TestBaseline; }
-  int GetTestImageThreshold(int cc)
-    { return this->TestScripts[cc].ImageThreshold; }
+  int GetNumberOfTestScripts() { return this->TestScripts.size(); }
+  QString GetTestScript(int cc) { return this->TestScripts[cc].TestFile; }
+  QString GetTestBaseline(int cc) { return this->TestScripts[cc].TestBaseline; }
+  int GetTestImageThreshold(int cc) { return this->TestScripts[cc].ImageThreshold; }
 
   /**
   * HACK: When playing back tests, this variable is set to make it easier to locate
@@ -108,7 +104,7 @@ protected:
   virtual ~pqOptions();
 
   virtual void Initialize();
-  virtual int PostProcess(int argc, const char * const *argv);
+  virtual int PostProcess(int argc, const char* const* argv);
 
   char* BaselineDirectory;
   char* TestDirectory;
@@ -127,12 +123,15 @@ protected:
   vtkSetStringMacro(ServerResourceName);
 
   struct TestInfo
-    {
+  {
     QString TestFile;
     QString TestBaseline;
     int ImageThreshold;
-    TestInfo():ImageThreshold(12) { }
-    };
+    TestInfo()
+      : ImageThreshold(12)
+    {
+    }
+  };
 
   QList<TestInfo> TestScripts;
 
@@ -140,10 +139,10 @@ protected:
   // This method is called when wrong argument is found. If it returns 0, then
   // the parsing will fail.
   virtual int WrongArgument(const char* argument);
+
 private:
-  pqOptions(const pqOptions &);
-  void operator=(const pqOptions &);
+  pqOptions(const pqOptions&);
+  void operator=(const pqOptions&);
 };
 
-#endif //pqOptions_h
-
+#endif // pqOptions_h

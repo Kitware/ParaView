@@ -30,7 +30,7 @@
 #include "vtkObject.h"
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkVector.h" // needed for vtkVector.
+#include "vtkVector.h"                       // needed for vtkVector.
 
 class vtkMatrix4x4;
 class vtkViewport;
@@ -54,14 +54,14 @@ public:
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
-    {
+  {
     MIN_YZ,
     MIN_ZX,
     MIN_XY,
     MAX_YZ,
     MAX_ZX,
     MAX_XY
-    };
+  };
 
   //@{
   /**
@@ -75,14 +75,14 @@ public:
    * Valid values for LabelMask.
    */
   enum LabelMasks
-    {
-    MIN_X=0x01,
-    MIN_Y=0x02,
-    MIN_Z=0x04,
-    MAX_X=0x08,
-    MAX_Y=0x010,
-    MAX_Z=0x020
-    };
+  {
+    MIN_X = 0x01,
+    MIN_Y = 0x02,
+    MIN_Z = 0x04,
+    MAX_X = 0x08,
+    MAX_Y = 0x010,
+    MAX_Z = 0x020
+  };
 
   //@{
   /**
@@ -156,21 +156,21 @@ public:
    */
   vtkTuple<vtkVector2i, 4> GetViewportPoints() const { return this->ViewportPoints; }
   vtkTuple<vtkVector2d, 4> GetViewportPointsAsDouble() const
-    { return this->ViewportPointsAsDouble; }
+  {
+    return this->ViewportPointsAsDouble;
+  }
 
   /**
    * Get the axis vectors formed using the points returned by
    * GetViewportPoints(). These are in non-normalized form.
    */
-  vtkTuple<vtkVector2d, 4> GetViewportVectors() const
-    { return this->ViewportVectors; }
+  vtkTuple<vtkVector2d, 4> GetViewportVectors() const { return this->ViewportVectors; }
 
   /**
    * Get the normals to the axis vectors in viewport space. There are not true
    * normals to the axis vector. These are normalized.
    */
-  vtkTuple<vtkVector2d, 4> GetViewportNormals() const
-    { return this->ViewportNormals; }
+  vtkTuple<vtkVector2d, 4> GetViewportNormals() const { return this->ViewportNormals; }
 
   //@{
   /**
@@ -189,9 +189,10 @@ protected:
    * makes that possible.
    */
   void SetLabelVisibilityOverrides(const vtkTuple<bool, 4>& overrides)
-    { this->LabelVisibilityOverrides = overrides; }
-  vtkTuple<bool, 4> GetLabelVisibilityOverrides()
-    { return this->LabelVisibilityOverrides; }
+  {
+    this->LabelVisibilityOverrides = overrides;
+  }
+  vtkTuple<bool, 4> GetLabelVisibilityOverrides() { return this->LabelVisibilityOverrides; }
   friend class vtkGridAxes3DActor;
 
   double GridBounds[6];
@@ -220,7 +221,6 @@ protected:
 private:
   vtkGridAxesHelper(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

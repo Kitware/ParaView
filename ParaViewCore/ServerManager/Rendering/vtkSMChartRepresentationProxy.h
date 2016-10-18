@@ -26,7 +26,8 @@
 
 class vtkChartRepresentation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartRepresentationProxy
+  : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMChartRepresentationProxy* New();
@@ -57,7 +58,6 @@ protected:
 private:
   vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

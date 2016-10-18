@@ -30,13 +30,12 @@
 #include "vtkPVServerImplementationCoreModule.h" // needed for exports
 #include "vtkSIProperty.h"
 
-class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIndexSelectionProperty :
-    public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIndexSelectionProperty : public vtkSIProperty
 {
 public:
   static vtkSIIndexSelectionProperty* New();
-  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
 protected:
   vtkSIIndexSelectionProperty();
@@ -52,7 +51,6 @@ protected:
 private:
   vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -20,7 +20,7 @@
  *
  * vtkSMCompositeTreeDomain can be added to a vtkSMIntVectorProperty. This
  * domain requires a vtkSMInputProperty which is used to provide the input to
- * the filter. This domain obtains data information from the input selected on 
+ * the filter. This domain obtains data information from the input selected on
  * the required input property and then decides the range for the flat-index. A
  * flat index for a tree is obtained by performing a pre-order traversal of the
  * tree eg. A ( B ( D, E), C (F, G)) becomes: [A,B,D,E,C,F,G], so flat-index of A is
@@ -102,7 +102,7 @@ public:
    * Is the (unchecked) value of the property in the domain? Overwritten by
    * sub-classes.
    */
-  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) {return 1; }
+  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) { return 1; }
 
   //@{
   /**
@@ -115,19 +115,18 @@ public:
   //@}
 
   enum
-    {
-    ALL=0,
-    LEAVES=1,
-    NON_LEAVES=2,
-    NONE=3
-    };
-
+  {
+    ALL = 0,
+    LEAVES = 1,
+    NON_LEAVES = 2,
+    NONE = 3
+  };
 
   enum DefaultModes
-    {
-    DEFAULT=0,
-    NONEMPTY_LEAF=1
-    };
+  {
+    DEFAULT = 0,
+    NONEMPTY_LEAF = 1
+  };
 
   //@{
   /**
@@ -175,11 +174,10 @@ protected:
   int Mode;
   int DefaultMode;
   int SourcePort;
+
 private:
   vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

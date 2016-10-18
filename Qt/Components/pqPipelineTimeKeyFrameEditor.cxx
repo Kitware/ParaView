@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -59,9 +59,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPipelineTimeKeyFrameEditor::pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, 
-                                   pqAnimationCue* cue, 
-                                   QWidget* p)
+pqPipelineTimeKeyFrameEditor::pqPipelineTimeKeyFrameEditor(
+  pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p)
   : QDialog(p)
 {
   this->Internal = new pqInternal;
@@ -71,21 +70,17 @@ pqPipelineTimeKeyFrameEditor::pqPipelineTimeKeyFrameEditor(pqAnimationScene* sce
   this->Internal->Cue = cue;
   this->Internal->Scene = scene;
 
-  this->Internal->Editor = new pqKeyFrameEditor(scene, cue, QString(),
-                        this->Internal->Ui.container);
+  this->Internal->Editor =
+    new pqKeyFrameEditor(scene, cue, QString(), this->Internal->Ui.container);
   QHBoxLayout* l = new QHBoxLayout(this->Internal->Ui.container);
   l->setMargin(0);
   l->addWidget(this->Internal->Editor);
 
-  connect(this, SIGNAL(accepted()), 
-          this, SLOT(writeKeyFrameData()));
-  
-  connect(this->Internal->Ui.noneRadio, SIGNAL(toggled(bool)), 
-          this, SLOT(updateState()));
-  connect(this->Internal->Ui.constantRadio, SIGNAL(toggled(bool)), 
-          this, SLOT(updateState()));
-  connect(this->Internal->Ui.variableRadio, SIGNAL(toggled(bool)), 
-          this, SLOT(updateState()));
+  connect(this, SIGNAL(accepted()), this, SLOT(writeKeyFrameData()));
+
+  connect(this->Internal->Ui.noneRadio, SIGNAL(toggled(bool)), this, SLOT(updateState()));
+  connect(this->Internal->Ui.constantRadio, SIGNAL(toggled(bool)), this, SLOT(updateState()));
+  connect(this->Internal->Ui.variableRadio, SIGNAL(toggled(bool)), this, SLOT(updateState()));
 
   this->readKeyFrameData();
 }
@@ -107,29 +102,27 @@ void pqPipelineTimeKeyFrameEditor::readKeyFrameData()
   pqTimeKeeper* tk = server->getTimeKeeper();
   this->Internal->Ui.constantTime->setText(QString("%1").arg(tk->getTime()));
 
-  if(num < 2)
-    {
+  if (num < 2)
+  {
     this->Internal->Ui.noneRadio->setChecked(true);
     return;
-    }
+  }
 
-  if(num == 2)
-    {
+  if (num == 2)
+  {
     // could possibly be constant time
     vtkSMProxy* keyFrame = this->Internal->Cue->getKeyFrame(0);
-    QVariant val1 =
-      pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues"));
+    QVariant val1 = pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues"));
 
     keyFrame = this->Internal->Cue->getKeyFrame(1);
-    QVariant val2 =
-      pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues"));
-    if(val1 == val2)
-      {
+    QVariant val2 = pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues"));
+    if (val1 == val2)
+    {
       this->Internal->Ui.constantRadio->setChecked(true);
       this->Internal->Ui.constantTime->setText(val1.toString());
       return;
-      }
     }
+  }
   this->Internal->Ui.variableRadio->setChecked(true);
 }
 
@@ -139,53 +132,53 @@ void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
   BEGIN_UNDO_SET("Edit Keyframes");
 
   vtkSMProxy* cueProxy = this->Internal->Cue->getProxy();
-  if(this->Internal->Ui.variableRadio->isChecked())
-    {
+  if (this->Internal->Ui.variableRadio->isChecked())
+  {
     this->Internal->Editor->writeKeyFrameData();
     vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(0);
-    }
-  else if(this->Internal->Ui.constantRadio->isChecked())
-    {
+  }
+  else if (this->Internal->Ui.constantRadio->isChecked())
+  {
     vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(0);
 
     int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
     int newNumber = 2;
-    for(int i=0; i<oldNumber-newNumber; i++)
-      {
+    for (int i = 0; i < oldNumber - newNumber; i++)
+    {
       this->Internal->Cue->deleteKeyFrame(0);
-      }
-    for(int i=0; i<newNumber-oldNumber; i++)
-      {
+    }
+    for (int i = 0; i < newNumber - oldNumber; i++)
+    {
       this->Internal->Cue->insertKeyFrame(0);
-      }
-    
+    }
+
     vtkSMProxy* keyFrame = this->Internal->Cue->getKeyFrame(0);
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), 0);
-    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"),
-      this->Internal->Ui.constantTime->text());
+    pqSMAdaptor::setElementProperty(
+      keyFrame->GetProperty("KeyValues"), this->Internal->Ui.constantTime->text());
     keyFrame->UpdateVTKObjects();
-    
+
     keyFrame = this->Internal->Cue->getKeyFrame(1);
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), 1);
-    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"),
-      this->Internal->Ui.constantTime->text());
+    pqSMAdaptor::setElementProperty(
+      keyFrame->GetProperty("KeyValues"), this->Internal->Ui.constantTime->text());
     keyFrame->UpdateVTKObjects();
-    
+
     // for convenience, set the current time
     pqServer* server = this->Internal->Scene->getServer();
     pqTimeKeeper* tk = server->getTimeKeeper();
     tk->setTime(this->Internal->Ui.constantTime->text().toDouble());
-    }
+  }
   else // use animation time
-    {
+  {
     // remove all keyframes
     int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
-    for(int i=0; i<oldNumber; i++)
-      {
+    for (int i = 0; i < oldNumber; i++)
+    {
       this->Internal->Cue->deleteKeyFrame(0);
-      }
-    vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(1);
     }
+    vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(1);
+  }
   cueProxy->UpdateVTKObjects();
 
   END_UNDO_SET();
@@ -197,14 +190,12 @@ void pqPipelineTimeKeyFrameEditor::updateState()
   this->Internal->Ui.constantTime->setEnabled(false);
   this->Internal->Ui.container->setEnabled(false);
 
-  if(this->Internal->Ui.variableRadio->isChecked())
-    {
+  if (this->Internal->Ui.variableRadio->isChecked())
+  {
     this->Internal->Ui.container->setEnabled(true);
-    }
-  if(this->Internal->Ui.constantRadio->isChecked())
-    {
+  }
+  if (this->Internal->Ui.constantRadio->isChecked())
+  {
     this->Internal->Ui.constantTime->setEnabled(true);
-    }
+  }
 }
-
-

@@ -20,7 +20,7 @@
  *
  * vtkPVStreamingPiecesInformation is an information object used by
  * vtkSMDataDeliveryManager to get information about representations that have
- * pieces to stream from the data-server. 
+ * pieces to stream from the data-server.
 */
 
 #ifndef vtkPVStreamingPiecesInformation_h
@@ -31,7 +31,8 @@
 
 #include <vector> // needed for internal API
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVStreamingPiecesInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVStreamingPiecesInformation
+  : public vtkPVInformation
 {
 public:
   static vtkPVStreamingPiecesInformation* New();
@@ -71,7 +72,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

@@ -43,7 +43,7 @@ public:
    * The user can set the controller used for inter-process communication. By
    * default set to the global communicator.
    */
-  void SetController(vtkMultiProcessController *controller);
+  void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
@@ -61,13 +61,13 @@ protected:
   vtkCleanArrays();
   ~vtkCleanArrays();
 
-  virtual int RequestData(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   vtkMultiProcessController* Controller;
 
   bool FillPartialArrays;
+
 private:
   vtkCleanArrays(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
@@ -75,8 +75,6 @@ private:
 public:
   class vtkArrayData;
   class vtkArraySet;
-
 };
 
 #endif
-

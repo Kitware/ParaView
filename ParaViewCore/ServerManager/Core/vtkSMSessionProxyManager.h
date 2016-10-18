@@ -168,8 +168,8 @@ public:
    * the deletion of object created through other methods. Use
    * UnRegister instead.
    */
-  vtkSMProxy* NewProxy(const char* groupName, const char* proxyName,
-                       const char* subProxyName = NULL);
+  vtkSMProxy* NewProxy(
+    const char* groupName, const char* proxyName, const char* subProxyName = NULL);
 
   /**
    * Returns a vtkSMDocumentation object with the documentation
@@ -177,8 +177,7 @@ public:
    * name are not those with the which the proxy is registered, but those
    * with which the proxy is created i.e. the arguments used for NewProxy().
    */
-  vtkSMDocumentation* GetProxyDocumentation( const char* groupName,
-                                             const char* proxyName );
+  vtkSMDocumentation* GetProxyDocumentation(const char* groupName, const char* proxyName);
 
   /**
    * Returns a vtkSMDocumentation object with the documentation
@@ -188,9 +187,8 @@ public:
    * with which the proxy is created i.e. the arguments used for NewProxy().
    * Also, the property name is the name of an exposed property.
    */
-  vtkSMDocumentation* GetPropertyDocumentation( const char* groupName,
-                                                const char* proxyName,
-                                                const char* propertyName );
+  vtkSMDocumentation* GetPropertyDocumentation(
+    const char* groupName, const char* proxyName, const char* propertyName);
 
   /**
    * Used to pass the control of the proxy to the manager. The user code can
@@ -225,10 +223,11 @@ public:
    * Returns all proxies registered under the given group with the given name.
    * The collection is cleared before the proxies are added to it.
    */
-  void GetProxies(const char* groupname, const char* name,
-    vtkCollection* collection);
+  void GetProxies(const char* groupname, const char* name, vtkCollection* collection);
   void GetProxies(const char* groupname, vtkCollection* collection)
-    { this->GetProxies(groupname, NULL, collection); }
+  {
+    this->GetProxies(groupname, NULL, collection);
+  }
 
   /**
    * Returns the prototype proxy for the given type. This method may create
@@ -261,8 +260,7 @@ public:
    * the group.
    * NOTE: This operation is slow.
    */
-  void GetProxyNames(const char* groupname, vtkSMProxy* proxy,
-    vtkStringList* names);
+  void GetProxyNames(const char* groupname, vtkSMProxy* proxy, vtkStringList* names);
 
   /**
    * Given a group, returns a name not already used for proxies registered in
@@ -305,7 +303,7 @@ public:
    * not pushed to the VTK objects.
    */
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
-  void UpdateRegisteredProxies(int modified_only=1);
+  void UpdateRegisteredProxies(int modified_only = 1);
   //@}
 
   //@{
@@ -316,7 +314,7 @@ public:
    * vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
    * proxies as well if the flag is set.
    */
-  void UpdateRegisteredProxiesInOrder(int modified_only=1);
+  void UpdateRegisteredProxiesInOrder(int modified_only = 1);
   void UpdateProxyInOrder(vtkSMProxy* proxy);
   //@}
 
@@ -366,8 +364,7 @@ public:
    * definition added using this method or by parsing a server manager
    * configuration file.
    */
-  void RegisterCustomProxyDefinition(
-    const char* group, const char* name, vtkPVXMLElement* top);
+  void RegisterCustomProxyDefinition(const char* group, const char* name, vtkPVXMLElement* top);
 
   /**
    * Given its name, unregisters a custom proxy definition.
@@ -408,9 +405,9 @@ public:
    * Loads the state of the server manager from XML.
    * If loader is not specified, a vtkSMStateLoader instance is used.
    */
-  void LoadXMLState(const char* filename, vtkSMStateLoader* loader=NULL);
-  void LoadXMLState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL,
-                    bool keepOriginalIds = false);
+  void LoadXMLState(const char* filename, vtkSMStateLoader* loader = NULL);
+  void LoadXMLState(
+    vtkPVXMLElement* rootElement, vtkSMStateLoader* loader = NULL, bool keepOriginalIds = false);
   //@}
 
   /**
@@ -442,7 +439,7 @@ public:
   /**
    * Return true if the XML Definition was found by vtkSMProxyDefinitionManager
    */
-  bool HasDefinition( const char* groupName, const char* proxyName );
+  bool HasDefinition(const char* groupName, const char* proxyName);
 
   /**
    * Get if there are any registered proxies that have their properties in
@@ -460,9 +457,8 @@ public:
    * associated with this proxy/property, if any, otherwise returns NULL.
    */
   vtkPVXMLElement* GetProxyHints(const char* xmlgroup, const char* xmlname);
-  vtkPVXMLElement* GetPropertyHints(const char* groupName,
-                                    const char* proxyName,
-                                    const char* propertyName);
+  vtkPVXMLElement* GetPropertyHints(
+    const char* groupName, const char* proxyName, const char* propertyName);
   //@}
 
   //@{
@@ -517,14 +513,13 @@ public:
   void UnRegisterSelectionModel(const char* name);
   //@}
 
-
   /**
    * Method used to fetch the last state of the ProxyManager from the pvserver.
    * This is used in the collaboration context when the user connects to a remote
    * server and wants to update its state before doing anything.
    */
   void UpdateFromRemote();
-    
+
   //@{
   /**
    * These methods allow the user to make atomic change set in the notification
@@ -555,8 +550,7 @@ public:
    * Find proxy of the group type (xmlgroup, xmltype) registered under a
    * particular group (reggroup). Returns the first proxy found, if any.
    */
-  vtkSMProxy* FindProxy(
-    const char* reggroup, const char* xmlgroup, const char* xmltype);
+  vtkSMProxy* FindProxy(const char* reggroup, const char* xmlgroup, const char* xmltype);
 
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);
@@ -571,16 +565,15 @@ protected:
    * Given an XML element and group name create a proxy
    * and all of it's properties.
    */
-  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname,
-                       const char* proxyname, const char* subProxyName = NULL);
+  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname, const char* proxyname,
+    const char* subProxyName = NULL);
 
   /**
    * Given the proxy name and group name, returns the XML element for
    * the proxy.
    */
-  vtkPVXMLElement* GetProxyElement( const char* groupName,
-                                    const char* proxyName,
-                                    const char* subProxyName = NULL);
+  vtkPVXMLElement* GetProxyElement(
+    const char* groupName, const char* proxyName, const char* subProxyName = NULL);
 
   /**
    * Handles events.
@@ -616,27 +609,25 @@ protected:
   /**
    * Recursively collects all proxies referred by the proxy in the set.
    */
-  void CollectReferredProxies( vtkSMProxyManagerProxySet& setOfProxies,
-                               vtkSMProxy* proxy);
+  void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies, vtkSMProxy* proxy);
 
   int UpdateInputProxies;
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;
   bool StateUpdateNotification;
+
 private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
 
 #ifndef __WRAP__
-  static vtkSMSessionProxyManager* New()
-    { return NULL; }
+  static vtkSMSessionProxyManager* New() { return NULL; }
 #endif
 
 private:
   vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

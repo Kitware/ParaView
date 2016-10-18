@@ -42,11 +42,10 @@
 #ifndef PIPELINE_EXCEPTION_H
 #define PIPELINE_EXCEPTION_H
 
-
 #include <VisItException.h>
 
-namespace pointsprite {
-
+namespace pointsprite
+{
 
 // ****************************************************************************
 //  Class: PipelineException
@@ -62,9 +61,8 @@ namespace pointsprite {
 
 class PipelineException : public VisItException
 {
-  public:
-                         ~PipelineException() VISIT_THROW_NOTHING {;};
+public:
+  ~PipelineException() VISIT_THROW_NOTHING { ; };
 };
-
 }
 #endif

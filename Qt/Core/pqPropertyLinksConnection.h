@@ -55,19 +55,17 @@ class PQCORE_EXPORT pqPropertyLinksConnection : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   /**
   * This also sets up observers to monitor any changes. This does not change
   * any values on either items.
   */
-  pqPropertyLinksConnection(
-    QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
-    bool use_unchecked_modified_event,
-    QObject* parentObject=0);
+  pqPropertyLinksConnection(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
+    QObject* parentObject = 0);
 
   virtual ~pqPropertyLinksConnection();
-
 
   void setUseUncheckedProperties(bool useUnchecked);
 

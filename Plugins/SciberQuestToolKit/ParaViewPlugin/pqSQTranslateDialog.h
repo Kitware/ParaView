@@ -38,13 +38,13 @@ class pqSQTranslateDialogUI;
 
 class pqSQTranslateDialog : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  pqSQTranslateDialog(QWidget *parent,Qt::WindowFlags f);
+  pqSQTranslateDialog(QWidget* parent, Qt::WindowFlags f);
   ~pqSQTranslateDialog();
 
-  void GetTranslation(double *t);
+  void GetTranslation(double* t);
 
   double GetTranslateX();
   double GetTranslateY();
@@ -54,7 +54,7 @@ public:
   bool GetTypeIsOffset();
 
 private:
-  pqSQTranslateDialogUI *Ui;
+  pqSQTranslateDialogUI* Ui;
 };
 
 #endif

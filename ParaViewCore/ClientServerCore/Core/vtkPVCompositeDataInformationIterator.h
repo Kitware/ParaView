@@ -88,13 +88,12 @@ protected:
   vtkPVDataInformation* DataInformation;
 
 private:
-  vtkPVCompositeDataInformationIterator(const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeDataInformationIterator(
+    const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif
-

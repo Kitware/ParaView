@@ -78,8 +78,7 @@ public:
    * Provides access to the "active" tracer. There can only be one active tracer
    * in the application currently.
    */
-  static vtkSMTrace* GetActiveTracer()
-    { return vtkSMTrace::ActiveTracer.GetPointer(); }
+  static vtkSMTrace* GetActiveTracer() { return vtkSMTrace::ActiveTracer.GetPointer(); }
 
   /**
    * Methods to start/stop tracing. This will create a new instance of
@@ -126,14 +125,14 @@ public:
   //@}
 
   enum
-    {
-    RECORD_ALL_PROPERTIES=0,
-    RECORD_MODIFIED_PROPERTIES=1,
-    RECORD_USER_MODIFIED_PROPERTIES=2
-    };
+  {
+    RECORD_ALL_PROPERTIES = 0,
+    RECORD_MODIFIED_PROPERTIES = 1,
+    RECORD_USER_MODIFIED_PROPERTIES = 2
+  };
 
-  vtkSetClampMacro(PropertiesToTraceOnCreate, int,
-    RECORD_ALL_PROPERTIES, RECORD_USER_MODIFIED_PROPERTIES);
+  vtkSetClampMacro(
+    PropertiesToTraceOnCreate, int, RECORD_ALL_PROPERTIES, RECORD_USER_MODIFIED_PROPERTIES);
   vtkGetMacro(PropertiesToTraceOnCreate, int);
 
   /**
@@ -145,8 +144,7 @@ public:
    * Save a Python state for the application and return it. Note this cannot be
    * called when tracing is active.
    */
-  static vtkStdString GetState(
-    int propertiesToTraceOnCreate, bool skipHiddenRepresentations);
+  static vtkStdString GetState(int propertiesToTraceOnCreate, bool skipHiddenRepresentations);
 
   // ************** BEGIN INTERNAL *************************
   //@{
@@ -155,11 +153,11 @@ public:
    */
   class TraceItem;
   class VTKPVSERVERMANAGERCORE_EXPORT TraceItemArgs
-    {
+  {
   public:
     TraceItemArgs();
     ~TraceItemArgs();
-  //@}
+    //@}
 
     // Overloads for keyword arguments.
     TraceItemArgs& arg(const char* key, vtkObject* val);
@@ -182,21 +180,22 @@ public:
     friend class TraceItem;
     class vtkInternals;
     vtkInternals* Internals;
-    };
+  };
 
   class VTKPVSERVERMANAGERCORE_EXPORT TraceItem
-    {
+  {
   public:
     TraceItem(const char* type);
     ~TraceItem();
     void operator=(const TraceItemArgs& arguments);
+
   private:
     TraceItem(const TraceItem&);
     void operator=(const TraceItem&);
     const char* Type;
     class TraceItemInternals;
     TraceItemInternals* Internals;
-    };
+  };
   // ************** END INTERNAL *************************
 
 protected:
@@ -226,9 +225,9 @@ private:
   const vtkSmartPyObject& GetCreateItemFunction() const;
 };
 
-#define SM_SCOPED_TRACE_0(x, y) x ## y
+#define SM_SCOPED_TRACE_0(x, y) x##y
 #define SM_SCOPED_TRACE_1(x, y) SM_SCOPED_TRACE_0(x, y)
-#define SM_SCOPED_TRACE(_A_TRACE_TYPE) \
-  vtkSMTrace::TraceItem SM_SCOPED_TRACE_1(_trace_item,__LINE__)(#_A_TRACE_TYPE); \
-  SM_SCOPED_TRACE_1(_trace_item,__LINE__) = vtkSMTrace::TraceItemArgs()
+#define SM_SCOPED_TRACE(_A_TRACE_TYPE)                                                             \
+  vtkSMTrace::TraceItem SM_SCOPED_TRACE_1(_trace_item, __LINE__)(#_A_TRACE_TYPE);                  \
+  SM_SCOPED_TRACE_1(_trace_item, __LINE__) = vtkSMTrace::TraceItemArgs()
 #endif

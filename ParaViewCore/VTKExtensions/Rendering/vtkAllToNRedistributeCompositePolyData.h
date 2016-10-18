@@ -26,7 +26,8 @@
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributeCompositePolyData : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributeCompositePolyData
+  : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAllToNRedistributeCompositePolyData* New();
@@ -56,20 +57,18 @@ protected:
    */
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   int NumberOfProcesses;
   vtkMultiProcessController* Controller;
-private:
-  vtkAllToNRedistributeCompositePolyData(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkAllToNRedistributeCompositePolyData(
+    const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
 };
 
 #endif

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -42,8 +42,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimerLogReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqTimerLogReaction(QAction* parentObject): Superclass(parentObject) { }
+  pqTimerLogReaction(QAction* parentObject)
+    : Superclass(parentObject)
+  {
+  }
 
   /**
   * Pops up (or raises) the timer log dialog.
@@ -54,14 +58,10 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { pqTimerLogReaction::showTimerLog(); }
+  virtual void onTriggered() { pqTimerLogReaction::showTimerLog(); }
 
 private:
   Q_DISABLE_COPY(pqTimerLogReaction)
-
 };
 
 #endif
-
-

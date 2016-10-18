@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,13 +41,13 @@ class QTreeWidget;
 class QTreeWidgetItem;
 
 /**
-* pqSignalAdaptorTreeWidget can be used to connect any property with 
+* pqSignalAdaptorTreeWidget can be used to connect any property with
 * repeat_command to a tree widget that displays the property value.
 * The TreeWidget must have exactly as many columns as the number of
-* elements in each command for the property 
+* elements in each command for the property
 * (i.e. number_of_element_per_command).
-* Note that the adaptor does not force the repeat command or 
-* size requirements mentioned above. 
+* Note that the adaptor does not force the repeat command or
+* size requirements mentioned above.
 */
 class PQCOMPONENTS_EXPORT pqSignalAdaptorTreeWidget : public QObject
 {
@@ -58,7 +58,7 @@ public:
   /**
   * Constructor.
   * \param treeWidget is the tree widget we are connecting.
-  * \param editable indicates if items in the widget can be edited by 
+  * \param editable indicates if items in the widget can be edited by
   * the user.
   */
   pqSignalAdaptorTreeWidget(QTreeWidget* treeWidget, bool editable);
@@ -85,11 +85,10 @@ public:
   * The signature for the callback is:
   * QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
   */
-  void setItemCreatorFunction(
-    QTreeWidgetItem* (fptr)(QTreeWidget*, const QStringList&))
-    {
+  void setItemCreatorFunction(QTreeWidgetItem*(fptr)(QTreeWidget*, const QStringList&))
+  {
     this->ItemCreatorFunctionPtr = fptr;
-    }
+  }
 signals:
   /**
   * Fired when the tree widget is modified.
@@ -139,4 +138,3 @@ private:
 };
 
 #endif
-

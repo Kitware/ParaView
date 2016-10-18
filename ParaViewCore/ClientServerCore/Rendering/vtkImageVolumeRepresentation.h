@@ -44,7 +44,8 @@ class vtkPVLODVolume;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageVolumeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkImageVolumeRepresentation* New();
@@ -57,8 +58,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -94,7 +95,7 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
   void SetIndependantComponents(bool);
-  
+
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
@@ -108,9 +109,8 @@ public:
    * Helper method to pass input image extent information to the view to use in
    * determining the cuts for ordered compositing.
    */
-  VTK_LEGACY(
-    static void PassOrderedCompositingInformation(
-      vtkPVDataRepresentation* self, vtkInformation* inInfo));
+  VTK_LEGACY(static void PassOrderedCompositingInformation(
+    vtkPVDataRepresentation* self, vtkInformation* inInfo));
 
 protected:
   vtkImageVolumeRepresentation();
@@ -121,8 +121,7 @@ protected:
    */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Adds the representation to the view.  This is called from
@@ -151,8 +150,7 @@ protected:
   /**
    * Used in ConvertSelection to locate the rendered prop.
    */
-  virtual vtkPVLODVolume* GetRenderedProp()
-    { return this->Actor; };
+  virtual vtkPVLODVolume* GetRenderedProp() { return this->Actor; };
 
   vtkImageData* Cache;
   vtkPVCacheKeeper* CacheKeeper;
@@ -161,7 +159,8 @@ protected:
   vtkPVLODVolume* Actor;
 
   vtkOutlineSource* OutlineSource;
-  vtkPolyDataMapper* OutlineMapper;;
+  vtkPolyDataMapper* OutlineMapper;
+  ;
 
   unsigned long DataSize;
   double DataBounds[6];
@@ -172,10 +171,10 @@ protected:
   double Origin[3];
   double Spacing[3];
   int WholeExtent[6];
+
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

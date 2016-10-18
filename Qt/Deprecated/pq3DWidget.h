@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,11 +54,12 @@ class PQDEPRECATED_EXPORT pq3DWidget : public pqProxyPanel
 {
   Q_OBJECT
   typedef pqProxyPanel Superclass;
+
 public:
-  pq3DWidget(vtkSMProxy* referenceProxy, vtkSMProxy* proxy, QWidget* parent=0);
+  pq3DWidget(vtkSMProxy* referenceProxy, vtkSMProxy* proxy, QWidget* parent = 0);
   virtual ~pq3DWidget();
 
-  // This method creates widgets using the hints provided by 
+  // This method creates widgets using the hints provided by
   // the proxy. If a proxy needs more that one
   // 3D widget, this method will create all the 3D widgets and
   // return them. There is no parent associated with the newly
@@ -73,7 +74,7 @@ public:
   * 3D widget.
   */
   vtkSMProxy* getControlledProxy() const;
-  
+
   vtkSMProxy* getReferenceProxy() const;
 
   /**
@@ -101,7 +102,7 @@ public:
   * Returns true if 3D widget is selected.
   */
   bool widgetSelected() const;
-  
+
   /**
   * Returns the current render view.
   */
@@ -109,10 +110,10 @@ public:
 
   /**
   * Reset the bounds to the specified bounds.
-  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * This typically calls PlaceWidget on the underlying 3D Widget
   * with reference proxy bounds.
   */
-  virtual void resetBounds(double bounds[6])=0;
+  virtual void resetBounds(double bounds[6]) = 0;
 
 signals:
   /**
@@ -141,7 +142,7 @@ public slots:
   */
   void setWidgetVisible(bool);
   /**
-  * Makes the 3D widget visible. 
+  * Makes the 3D widget visible.
   */
   void showWidget();
   /**
@@ -184,7 +185,7 @@ public slots:
 
   /**
   * Resets the bounds of the 3D widget to the reference proxy bounds.
-  * This typically calls PlaceWidget on the underlying 3D Widget 
+  * This typically calls PlaceWidget on the underlying 3D Widget
   * with reference proxy bounds.
   * This should be explicitly called after the panel is created
   * and the widget is initialized i.e. the reference proxy, controlled proxy
@@ -202,10 +203,8 @@ public slots:
   * pqApplicationCore::getSelectionModel()->getSelectionDataBounds().
   * Default is false.
   */
-  virtual void setUseSelectionDataBounds(bool use)
-    { this->UseSelectionDataBounds = use; }
-  bool useSelectionDataBounds()
-    {return this->UseSelectionDataBounds; }
+  virtual void setUseSelectionDataBounds(bool use) { this->UseSelectionDataBounds = use; }
+  bool useSelectionDataBounds() { return this->UseSelectionDataBounds; }
 
 protected slots:
   /**
@@ -213,18 +212,19 @@ protected slots:
   */
   void render();
 
-  // When set to true, instead of intersecting with the mesh surface for picking, it will only get a close point from the mesh
+  // When set to true, instead of intersecting with the mesh surface for picking, it will only get a
+  // close point from the mesh
   void setPickOnMeshPoint(bool);
 
   /**
   * triggers a pick action using the current location of the mouse.
   */
   void pickPoint();
-  
+
   /**
   * Called on each pick, default implementation does nothing.
   */
-  virtual void pick(double, double, double) {};
+  virtual void pick(double, double, double){};
 
   /**
   * Called when master/slave change
@@ -237,19 +237,17 @@ protected slots:
   void handleReferenceProxyUserEvent(vtkObject*, unsigned long, void*);
 
 protected:
- 
   // Return true if picking is on mesh point only
   bool pickOnMeshPoint() const;
 
   /**
   * Subclasses can override this method to map properties to
   * GUI. Default implementation updates the internal datastructures
-  * so that default implementations can be provided for 
+  * so that default implementations can be provided for
   * accept/reset.
   */
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
-  
+  virtual void setControlledProperty(const char* function, vtkSMProperty* controlled_property);
+
   /**
   * Subclasses should call this method if they support picking.
   * When the user picks a position,
@@ -272,23 +270,23 @@ protected:
   * returns 1 on success, 0 otherwise.
   */
   int getReferenceInputBounds(double bounds[6]) const;
-  
+
   /**
   * Update the widget visibility according to the WidgetVisible and Selected flags
   */
   virtual void updateWidgetVisibility();
-  
+
   /**
   * Update the widget visibility and enable state
   */
   virtual void updateWidgetState(bool visible, bool enable);
-  
+
   /**
   * updates the enable state of the picking shortcut.
   */
   virtual void updatePickShortcut();
   virtual void updatePickShortcut(bool pickable);
-  
+
 private:
   void setControlledProxy(vtkSMProxy*);
 

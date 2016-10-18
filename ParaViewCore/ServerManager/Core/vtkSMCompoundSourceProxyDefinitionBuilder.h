@@ -60,9 +60,7 @@ public:
    * whose property is being exposed must have been already added using
    * AddProxy().
    */
-  void ExposeProperty(const char* proxyName,
-                      const char* propertyName,
-                      const char* exposedName);
+  void ExposeProperty(const char* proxyName, const char* propertyName, const char* exposedName);
 
   /**
    * Expose an output port from a subproxy. Exposed output ports are treated as
@@ -70,9 +68,7 @@ public:
    * This method does not may the output port available. One must call
    * CreateOutputPorts().
    */
-  void ExposeOutputPort(const char* proxyName,
-                        const char* portName,
-                        const char* exposedName);
+  void ExposeOutputPort(const char* proxyName, const char* portName, const char* exposedName);
 
   /**
    * Expose an output port from a subproxy. Exposed output ports are treated as
@@ -80,9 +76,7 @@ public:
    * This method does not may the output port available. One must call
    * CreateOutputPorts().
    */
-  void ExposeOutputPort(const char* proxyName,
-                        unsigned int portIndex,
-                        const char* exposedName);
+  void ExposeOutputPort(const char* proxyName, unsigned int portIndex, const char* exposedName);
 
   /**
    * Returns the number of sub-proxies.
@@ -120,7 +114,8 @@ protected:
   ~vtkSMCompoundSourceProxyDefinitionBuilder();
 
 private:
-  vtkSMCompoundSourceProxyDefinitionBuilder(const vtkSMCompoundSourceProxyDefinitionBuilder&) VTK_DELETE_FUNCTION;
+  vtkSMCompoundSourceProxyDefinitionBuilder(
+    const vtkSMCompoundSourceProxyDefinitionBuilder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCompoundSourceProxyDefinitionBuilder&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
@@ -132,7 +127,6 @@ private:
   int ShouldWriteValue(vtkPVXMLElement* valueElem);
   void TraverseForProperties(vtkPVXMLElement* root);
   void StripValues(vtkPVXMLElement* propertyElem);
-
 };
 
 #endif

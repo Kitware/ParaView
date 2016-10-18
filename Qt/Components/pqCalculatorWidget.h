@@ -49,8 +49,9 @@ class PQCOMPONENTS_EXPORT pqCalculatorWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent=0);
+  pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   virtual ~pqCalculatorWidget();
 
 protected slots:
@@ -58,7 +59,7 @@ protected slots:
   * called when the user selects a variable from the scalars/vectors menus.
   */
   void variableChosen(QAction* action);
-  
+
   /**
   * called when user clicks one of the function buttons
   */

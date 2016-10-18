@@ -64,10 +64,9 @@ public:
 
   void CopyFromFieldData(vtkFieldData* data);
 
-  void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *data);
-  void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *data);
-  void CopyFromGenericAttributes(vtkGenericAttributeCollection *data, int centering);
-
+  void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection* data);
+  void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection* data);
+  void CopyFromGenericAttributes(vtkGenericAttributeCollection* data, int centering);
 
   //@{
   /**
@@ -88,11 +87,11 @@ public:
   /**
    * Access to information.
    */
-  int                    GetNumberOfArrays() const;
+  int GetNumberOfArrays() const;
   // Because not all the arrays have to be the same length:
-  int                    GetMaximumNumberOfTuples() const;
+  int GetMaximumNumberOfTuples() const;
   vtkPVArrayInformation* GetArrayInformation(int idx) const;
-  vtkPVArrayInformation* GetArrayInformation(const char *name) const;
+  vtkPVArrayInformation* GetArrayInformation(const char* name) const;
   //@}
 
   /**

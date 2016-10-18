@@ -47,24 +47,20 @@ void vtkSIMetaReaderProxy::OnCreateVTKObjects()
   this->Superclass::OnCreateVTKObjects();
 
   // Connect reader and set filename method
-  vtkObjectBase *reader = this->GetSubSIProxy("Reader")->GetVTKObject();
+  vtkObjectBase* reader = this->GetSubSIProxy("Reader")->GetVTKObject();
   if (!reader)
-    {
+  {
     vtkErrorMacro("Missing subproxy: Reader");
     return;
-    }
+  }
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetVTKObject() << "SetReader" << reader
+  stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "SetReader" << reader
          << vtkClientServerStream::End;
   if (this->GetFileNameMethod())
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << "SetFileNameMethod"
-           << this->GetFileNameMethod()
-           << vtkClientServerStream::End;
-    }
+  {
+    stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "SetFileNameMethod"
+           << this->GetFileNameMethod() << vtkClientServerStream::End;
+  }
   this->Interpreter->ProcessStream(stream);
 }
 
@@ -73,10 +69,10 @@ bool vtkSIMetaReaderProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   bool ret = this->Superclass::ReadXMLAttributes(element);
   const char* fileNameMethod = element->GetAttribute("file_name_method");
-  if(fileNameMethod && ret)
-    {
+  if (fileNameMethod && ret)
+  {
     this->SetFileNameMethod(fileNameMethod);
-    }
+  }
   return ret;
 }
 

@@ -38,8 +38,7 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
   this->Processor->Initialize();
 
   // Specify how the field varies over space and time.
-  vtkCPLinearScalarFieldFunction* fieldFunction =
-    vtkCPLinearScalarFieldFunction::New();
+  vtkCPLinearScalarFieldFunction* fieldFunction = vtkCPLinearScalarFieldFunction::New();
   fieldFunction->SetConstant(2.);
   fieldFunction->SetTimeMultiplier(100);
   fieldFunction->SetXMultiplier(23.);
@@ -54,11 +53,11 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 
   // Set the type of grid we are building.
   vtkCPUniformGridBuilder* gridBuilder = vtkCPUniformGridBuilder::New();
-  int dimensions[3] = {50, 50, 50};
+  int dimensions[3] = { 50, 50, 50 };
   gridBuilder->SetDimensions(dimensions);
-  double spacing[3] = {.2, .2, .3};
+  double spacing[3] = { .2, .2, .3 };
   gridBuilder->SetSpacing(spacing);
-  double origin[3] = {0,20,300};
+  double origin[3] = { 0, 20, 300 };
   gridBuilder->SetOrigin(origin);
   gridBuilder->SetFieldBuilder(fieldBuilder);
   fieldBuilder->Delete();
@@ -70,71 +69,72 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 //----------------------------------------------------------------------------
 vtkPVCustomTestDriver::~vtkPVCustomTestDriver()
 {
-  if(this->Processor)
-    {
+  if (this->Processor)
+  {
     this->Processor->Delete();
     this->Processor = 0;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVCustomTestDriver::Run()
 {
   vtkCPBaseGridBuilder* gridBuilder = this->GetGridBuilder();
-  if(gridBuilder == 0)
-    {
+  if (gridBuilder == 0)
+  {
     vtkErrorMacro("Need to set the grid builder.");
     return 1;
-    }
+  }
 
-  for(unsigned long i=0;i<this->GetNumberOfTimeSteps();i++)
-    {
+  for (unsigned long i = 0; i < this->GetNumberOfTimeSteps(); i++)
+  {
     // now call the coprocessing library
     vtkCPDataDescription* dataDescription = vtkCPDataDescription::New();
     double time = this->GetTime(i);
     dataDescription->SetTimeData(time, i);
     dataDescription->AddInput("input");
 
-    if(this->Processor->RequestDataDescription(dataDescription))
-      {
+    if (this->Processor->RequestDataDescription(dataDescription))
+    {
       unsigned int numberOfFields =
         dataDescription->GetInputDescriptionByName("input")->GetNumberOfFields();
-      if(!numberOfFields)
-        {
+      if (!numberOfFields)
+      {
         cout << "No fields for coprocessing.\n";
-        }
+      }
       int builtNewGrid = 0;
       vtkDataObject* grid = gridBuilder->GetGrid(i, this->GetTime(i), builtNewGrid);
       dataDescription->GetInputDescriptionByName("input")->SetGrid(grid);
       // we need to get the whole extent of any structured grids
       int extent[6];
-      if(vtkImageData* image = vtkImageData::SafeDownCast(grid))
-        {
+      if (vtkImageData* image = vtkImageData::SafeDownCast(grid))
+      {
         image->GetExtent(extent);
-        }
-      else if(vtkRectilinearGrid* rgrid = vtkRectilinearGrid::SafeDownCast(grid))
-        {
+      }
+      else if (vtkRectilinearGrid* rgrid = vtkRectilinearGrid::SafeDownCast(grid))
+      {
         rgrid->GetExtent(extent);
-        }
-      else if(vtkStructuredGrid* sgrid = vtkStructuredGrid::SafeDownCast(grid))
-        {
+      }
+      else if (vtkStructuredGrid* sgrid = vtkStructuredGrid::SafeDownCast(grid))
+      {
         sgrid->GetExtent(extent);
-        }
-      for(int j=0;j<3;j++)
-        {
-        extent[2*j] = -extent[2*j];
-        }
+      }
+      for (int j = 0; j < 3; j++)
+      {
+        extent[2 * j] = -extent[2 * j];
+      }
       int wholeExtent[6];
-      vtkMultiProcessController::GetGlobalController()->AllReduce(extent, wholeExtent, 6, vtkCommunicator::MAX_OP);
-      for(int j=0;j<3;j++)
-        {
-        wholeExtent[2*j] = -wholeExtent[2*j];
-        }
+      vtkMultiProcessController::GetGlobalController()->AllReduce(
+        extent, wholeExtent, 6, vtkCommunicator::MAX_OP);
+      for (int j = 0; j < 3; j++)
+      {
+        wholeExtent[2 * j] = -wholeExtent[2 * j];
+      }
       dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(wholeExtent);
       this->Processor->CoProcess(dataDescription);
-      }
-    dataDescription->Delete();
     }
+    dataDescription->Delete();
+  }
 
   return 0;
 }
@@ -152,28 +152,28 @@ int vtkPVCustomTestDriver::Initialize(const char* fileName)
   vtkCPPythonScriptPipeline* tempPipeline = vtkCPPythonScriptPipeline::New();
   this->Processor->AddPipeline(tempPipeline);
   tempPipeline->Delete();
-  if(this->Processor->GetNumberOfPipelines() != 2)
-    {
+  if (this->Processor->GetNumberOfPipelines() != 2)
+  {
     vtkErrorMacro("Wrong amount of pipelines.");
     success = 0;
-    }
-  else if(this->Processor->GetPipeline(0) != pipeline ||
-          this->Processor->GetPipeline(1) != tempPipeline)
-    {
+  }
+  else if (this->Processor->GetPipeline(0) != pipeline ||
+    this->Processor->GetPipeline(1) != tempPipeline)
+  {
     vtkErrorMacro("Bad ordering of the processor's pipeline.");
     success = 0;
-    }
+  }
   this->Processor->RemovePipeline(tempPipeline);
-  if(this->Processor->GetNumberOfPipelines() != 1)
-    {
+  if (this->Processor->GetNumberOfPipelines() != 1)
+  {
     vtkErrorMacro("Wrong amount of pipelines.");
     success = 0;
-    }
-  else if(this->Processor->GetPipeline(0) != pipeline)
-    {
+  }
+  else if (this->Processor->GetPipeline(0) != pipeline)
+  {
     vtkErrorMacro("Bad ordering of the processor's pipeline.");
     success = 0;
-    }
+  }
 
   return success;
 }

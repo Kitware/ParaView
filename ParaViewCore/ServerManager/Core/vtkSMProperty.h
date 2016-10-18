@@ -16,9 +16,9 @@
  * @class   vtkSMProperty
  * @brief   superclass for all SM properties
  *
- * Each instance of vtkSMProperty or a sub-class represents a method 
- * and associated arguments (if any) of a VTK object stored on one 
- * or more client manager or server nodes. It may have a state and can push 
+ * Each instance of vtkSMProperty or a sub-class represents a method
+ * and associated arguments (if any) of a VTK object stored on one
+ * or more client manager or server nodes. It may have a state and can push
  * this state to the vtk object it refers to. vtkSMProperty only supports
  * methods with no arguments. Sub-classes support methods with different
  * arguments types and numbers.
@@ -329,50 +329,50 @@ public:
    * By default, all properties have "default" visibility.
    */
   vtkSetStringMacro(PanelVisibility)
-  //@}
+    //@}
 
-  //@{
-  /**
-   * Returns the panel visibility for the property.
-   */
-  vtkGetStringMacro(PanelVisibility)
-  //@}
+    //@{
+    /**
+     * Returns the panel visibility for the property.
+     */
+    vtkGetStringMacro(PanelVisibility)
+    //@}
 
-  //@{
-  /**
-   * Sets the panel visibility to default if the current
-   * representation type matches \p representation.
-   */
-  vtkSetStringMacro(PanelVisibilityDefaultForRepresentation)
-  //@}
+    //@{
+    /**
+     * Sets the panel visibility to default if the current
+     * representation type matches \p representation.
+     */
+    vtkSetStringMacro(PanelVisibilityDefaultForRepresentation)
+    //@}
 
-  //@{
-  /**
-   * Returns which representation type the property will be shown by
-   * default for.
-   */
-  vtkGetStringMacro(PanelVisibilityDefaultForRepresentation)
-  //@}
+    //@{
+    /**
+     * Returns which representation type the property will be shown by
+     * default for.
+     */
+    vtkGetStringMacro(PanelVisibilityDefaultForRepresentation)
+    //@}
 
-  //@{
-  /**
-   * Sets the name of the custom panel widget to use for the property.
-   */
-  vtkSetStringMacro(PanelWidget)
-  //@}
+    //@{
+    /**
+     * Sets the name of the custom panel widget to use for the property.
+     */
+    vtkSetStringMacro(PanelWidget)
+    //@}
 
-  //@{
-  /**
-   * Returns name of the panel widget for the property.
-   */
-  vtkGetStringMacro(PanelWidget)
-  //@}
+    //@{
+    /**
+     * Returns name of the panel widget for the property.
+     */
+    vtkGetStringMacro(PanelWidget)
+    //@}
 
-  /**
-   * Copy all property values. This will copy both checked and unchecked values,
-   * if applicable.
-   */
-  virtual void Copy(vtkSMProperty* src);
+    /**
+     * Copy all property values. This will copy both checked and unchecked values,
+     * if applicable.
+     */
+    virtual void Copy(vtkSMProperty* src);
 
   //@{
   /**
@@ -404,7 +404,7 @@ public:
    * vtkSMVectorProperty overrides this method to add support for settting
    * default values using information_property.
    */
-  virtual bool ResetToDomainDefaults(bool use_unchecked_values=false);
+  virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
 
   //@{
   /**
@@ -450,17 +450,17 @@ public:
    * Overridden to support blocking of modified events.
    */
   virtual void Modified()
-    {
+  {
     if (this->BlockModifiedEvents)
-      {
+    {
       this->PendingModifiedEvents = true;
-      }
+    }
     else
-      {
+    {
       this->Superclass::Modified();
       this->PendingModifiedEvents = false;
-      }
     }
+  }
   //@}
 
   /**
@@ -513,21 +513,19 @@ protected:
   /**
    * Let the property read and set its content from the stream
    */
-  virtual void ReadFrom( const vtkSMMessage*, int vtkNotUsed(message_offset),
-                         vtkSMProxyLocator*) {};
+  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset), vtkSMProxyLocator*){};
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   /**
    * Update all proxies referred by this property (if any). Overwritten
    * by vtkSMProxyProperty and sub-classes.
    */
-  virtual void UpdateAllInputs() {};
+  virtual void UpdateAllInputs(){};
 
   //@{
   /**
@@ -538,7 +536,7 @@ protected:
    */
   vtkSetStringMacro(XMLName);
   //@}
-  
+
   /**
    * Internal. Used during XML parsing to get a property with
    * given name. Used by the domains when setting required properties.
@@ -574,8 +572,8 @@ protected:
    * This method create the property definition and rely on SaveStateValues
    * to fill this definition with the concrete property values
    */
-  virtual void SaveState(vtkPVXMLElement* parent, const char* property_name,
-                         const char* uid, int saveDomains=1);
+  virtual void SaveState(
+    vtkPVXMLElement* parent, const char* property_name, const char* uid, int saveDomains = 1);
   /**
    * This method must be overiden by concrete class in order to save the real
    * property data
@@ -634,11 +632,11 @@ protected:
    * Block/unblock modified events, returns the current state of the block flag.
    */
   bool SetBlockModifiedEvents(bool block)
-    {
+  {
     bool prev = this->BlockModifiedEvents;
     this->BlockModifiedEvents = block;
     return prev;
-    }
+  }
   //@}
 
   //@{
@@ -679,20 +677,19 @@ private:
 
   bool PendingModifiedEvents;
   bool BlockModifiedEvents;
-
 };
 
-#define vtkSMPropertyTemplateMacroCase(typeSMProperty, type, prop, call) \
-  if (typeSMProperty* SM_PROPERTY = typeSMProperty::SafeDownCast(prop)) \
-    { \
-    (void) SM_PROPERTY; \
-    typedef type SM_TT; \
-    call; \
-    }
-#define vtkSMVectorPropertyTemplateMacro(prop, call) \
-  vtkSMPropertyTemplateMacroCase(vtkSMDoubleVectorProperty, double, prop, call)       \
-  vtkSMPropertyTemplateMacroCase(vtkSMIntVectorProperty, int, prop, call)             \
-  vtkSMPropertyTemplateMacroCase(vtkSMIdTypeVectorProperty, vtkIdType, prop, call)    \
-  vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call) \
+#define vtkSMPropertyTemplateMacroCase(typeSMProperty, type, prop, call)                           \
+  if (typeSMProperty* SM_PROPERTY = typeSMProperty::SafeDownCast(prop))                            \
+  {                                                                                                \
+    (void)SM_PROPERTY;                                                                             \
+    typedef type SM_TT;                                                                            \
+    call;                                                                                          \
+  }
+#define vtkSMVectorPropertyTemplateMacro(prop, call)                                               \
+  vtkSMPropertyTemplateMacroCase(vtkSMDoubleVectorProperty, double, prop, call)                    \
+    vtkSMPropertyTemplateMacroCase(vtkSMIntVectorProperty, int, prop, call)                        \
+      vtkSMPropertyTemplateMacroCase(vtkSMIdTypeVectorProperty, vtkIdType, prop, call)             \
+        vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call)
 
 #endif

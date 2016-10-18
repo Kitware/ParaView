@@ -56,40 +56,42 @@ class pqProxyWidgetDialog::pqInternals
   bool HideAdvancedProperties;
 
   QString KEY_VALID()
-    {
+  {
     Q_ASSERT(!this->SettingsKey.isEmpty());
     return QString("%1.Valid").arg(this->SettingsKey);
-    }
+  }
   QString KEY_GEOMETRY()
-    {
+  {
     Q_ASSERT(!this->SettingsKey.isEmpty());
     return QString("%1.Geometry").arg(this->SettingsKey);
-    }
+  }
   QString KEY_SEARCHBOX()
-    {
+  {
     Q_ASSERT(!this->SettingsKey.isEmpty());
     return QString("%1.SearchBox").arg(this->SettingsKey);
-    }
+  }
 
   /// Returns true if the proxy has any advanced properties.
   static bool hasAdvancedProperties(vtkSMProxy* proxy)
+  {
+    if (!proxy)
     {
-    if (!proxy) { return false; }
+      return false;
+    }
     vtkSmartPointer<vtkSMPropertyIterator> iter;
     iter.TakeReference(proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-      {
+    {
       if (vtkSMProperty* prop = iter->GetProperty())
+      {
+        if (prop->GetPanelVisibility() && strcmp(prop->GetPanelVisibility(), "advanced") == 0)
         {
-        if (prop->GetPanelVisibility() &&
-          strcmp(prop->GetPanelVisibility(), "advanced") == 0)
-          {
           return true;
-          }
         }
       }
-    return false;
     }
+    return false;
+  }
 
 public:
   Ui::ProxyWidgetDialog Ui;
@@ -97,16 +99,16 @@ public:
   bool HasVisibleWidgets;
   bool HasAdvancedProperties;
 
-  pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
-    const QStringList& properties = QStringList()) :
-    SearchEnabled(false),
-    Resized(false),
-    GeometryLoaded(false),
-    HideAdvancedProperties(false),
-    Proxy(proxy),
-    HasVisibleWidgets(false),
-    HasAdvancedProperties(hasAdvancedProperties(proxy))
-    {
+  pqInternals(
+    vtkSMProxy* proxy, pqProxyWidgetDialog* self, const QStringList& properties = QStringList())
+    : SearchEnabled(false)
+    , Resized(false)
+    , GeometryLoaded(false)
+    , HideAdvancedProperties(false)
+    , Proxy(proxy)
+    , HasVisibleWidgets(false)
+    , HasAdvancedProperties(hasAdvancedProperties(proxy))
+  {
     Q_ASSERT(proxy != NULL);
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
@@ -117,7 +119,7 @@ public:
     self->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterWidgets()));
     self->connect(ui.SearchBox, SIGNAL(textChanged(const QString&)), SLOT(filterWidgets()));
 
-    QWidget *container = new QWidget(self);
+    QWidget* container = new QWidget(self);
     container->setObjectName("Container");
     QVBoxLayout* vbox = new QVBoxLayout(container);
     vbox->setContentsMargins(0, 0, 0, 0);
@@ -125,9 +127,8 @@ public:
     this->Container = container;
 
     // Set up the widget for the proxy
-    pqProxyWidget *widget = properties.size() > 0?
-      new pqProxyWidget(proxy, properties, container):
-      new pqProxyWidget(proxy, container);
+    pqProxyWidget* widget = properties.size() > 0 ? new pqProxyWidget(proxy, properties, container)
+                                                  : new pqProxyWidget(proxy, container);
     widget->setObjectName("ProxyWidget");
     this->HasVisibleWidgets = widget->filterWidgets(true);
     vbox->addWidget(widget);
@@ -135,18 +136,12 @@ public:
 
     // Set some icons for the buttons
     QStyle* applicationStyle = QApplication::style();
-    ui.RestoreDefaultsButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_BrowserReload));
-    ui.SaveButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogSaveButton));
-    ui.ApplyButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogApplyButton));
-    ui.ResetButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogResetButton));
-    ui.CancelButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogCancelButton));
-    ui.OKButton->
-      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogOkButton));
+    ui.RestoreDefaultsButton->setIcon(applicationStyle->standardIcon(QStyle::SP_BrowserReload));
+    ui.SaveButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogSaveButton));
+    ui.ApplyButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogApplyButton));
+    ui.ResetButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogResetButton));
+    ui.CancelButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogCancelButton));
+    ui.OKButton->setIcon(applicationStyle->standardIcon(QStyle::SP_DialogOkButton));
 
     self->connect(ui.RestoreDefaultsButton, SIGNAL(clicked()), SLOT(onRestoreDefaults()));
     self->connect(ui.SaveButton, SIGNAL(clicked()), SLOT(onSaveAsDefaults()));
@@ -156,17 +151,19 @@ public:
     self->connect(ui.CancelButton, SIGNAL(clicked()), SLOT(reject()));
     self->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
 
-    QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
-      QSizePolicy::MinimumExpanding);
+    QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
 
     // There should be no changes initially, so disable the Apply button
-    this->updateButtons(/*dirty*/false);
-    }
+    this->updateButtons(/*dirty*/ false);
+  }
 
   void resize(QWidget* self)
+  {
+    if (this->Resized)
     {
-    if (this->Resized) { return; }
+      return;
+    }
     this->Resized = true;
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
@@ -188,93 +185,87 @@ public:
     // Finaly set the maximum and current dialog size
     self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
     if (this->GeometryLoaded == false)
-      {
+    {
       self->resize(dialogSize);
-      }
     }
+  }
 
   void setEnableSearchBar(bool val)
-    {
+  {
     if (val != this->SearchEnabled)
-      {
+    {
       this->SearchEnabled = val;
       Ui::ProxyWidgetDialog& ui = this->Ui;
       ui.SearchBox->setVisible(val);
       this->filterWidgets();
-      }
     }
-  bool enableSearchBar() const
-    {
-    return this->SearchEnabled;
-    }
+  }
+  bool enableSearchBar() const { return this->SearchEnabled; }
 
   void setHideAdvancedProperties(bool val)
-    {
+  {
     if (val != this->HideAdvancedProperties)
-      {
+    {
       this->HideAdvancedProperties = val;
       Ui::ProxyWidgetDialog& ui = this->Ui;
       ui.SearchBox->setAdvancedSearchEnabled(!val);
       this->filterWidgets();
-      }
     }
-  bool hideAdvancedProperties() const
-    {
-    return this->HideAdvancedProperties;
-    }
+  }
+  bool hideAdvancedProperties() const { return this->HideAdvancedProperties; }
 
   void filterWidgets()
-    {
+  {
     Ui::ProxyWidgetDialog& ui = this->Ui;
     if (this->SearchEnabled)
-      {
+    {
       this->ProxyWidget->filterWidgets(
         ui.SearchBox->isAdvancedSearchActive() && ui.SearchBox->isAdvancedSearchEnabled(),
         ui.SearchBox->text());
-      }
-    else
-      {
-      this->ProxyWidget->filterWidgets(!this->HideAdvancedProperties);
-      }
     }
+    else
+    {
+      this->ProxyWidget->filterWidgets(!this->HideAdvancedProperties);
+    }
+  }
 
   QString setSettingsKey(QWidget* self, const QString& key)
-    {
+  {
     QString old = this->SettingsKey;
     this->SettingsKey = key;
     pqSettings* settings = pqApplicationCore::instance()->settings();
     if (!key.isEmpty() && settings->value(this->KEY_VALID(), false).toBool())
-      {
+    {
       this->Ui.SearchBox->setSettingKey(this->KEY_SEARCHBOX());
       this->filterWidgets();
-      this->GeometryLoaded = self->restoreGeometry(
-        settings->value(this->KEY_GEOMETRY()).toByteArray());
-      }
-    else
-      {
-      this->Ui.SearchBox->setSettingKey(key);
-      }
-    return old;
+      this->GeometryLoaded =
+        self->restoreGeometry(settings->value(this->KEY_GEOMETRY()).toByteArray());
     }
+    else
+    {
+      this->Ui.SearchBox->setSettingKey(key);
+    }
+    return old;
+  }
 
   void saveSettings(QWidget* self)
-    {
+  {
     if (!this->SettingsKey.isEmpty())
-      {
+    {
       pqSettings* settings = pqApplicationCore::instance()->settings();
       settings->setValue(this->KEY_VALID(), true);
       settings->setValue(this->KEY_GEOMETRY(), self->saveGeometry());
-      }
     }
+  }
 
   /// update the buttons based on whether any property/widget on the panel is
   /// modified.
   void updateButtons(bool dirty)
-    {
-    Ui::ProxyWidgetDialog &ui = this->Ui;
+  {
+    Ui::ProxyWidgetDialog& ui = this->Ui;
 
     // if applying changes immediately, then we're really not dirty.
-    dirty = this->applyChangesImmediately()? false: dirty;
+    dirty = this->applyChangesImmediately() ? false : dirty;
 
     ui.ApplyButton->setEnabled(dirty);
     ui.ResetButton->setEnabled(dirty);
@@ -283,66 +274,60 @@ public:
     ui.SaveButton->setEnabled(!dirty);
     ui.OKButton->setEnabled(true);
     ui.CancelButton->setEnabled(true);
-    }
+  }
 
   /// accept all changes and update buttons.
   void acceptChanges()
-    {
+  {
     this->ProxyWidget->apply();
     this->updateButtons(false);
-    }
+  }
 
   /// reject all changes and update buttons.
   void rejectChanges()
-    {
+  {
     this->ProxyWidget->reset();
     this->updateButtons(false);
-    }
+  }
 
   /// load values from settings.
   bool restoreDefaults()
-    {
+  {
     if (this->ProxyWidget->restoreDefaults())
-      {
+    {
       // If values changed, we pretend the user accepted those changes.
       this->acceptChanges();
       return true;
-      }
+    }
     return false;
-    }
+  }
 
-  void saveAsDefaults()
-    {
-    this->ProxyWidget->saveAsDefaults();
-    }
+  void saveAsDefaults() { this->ProxyWidget->saveAsDefaults(); }
 
   void setApplyChangesImmediately(bool val)
-    {
+  {
     this->ProxyWidget->setApplyChangesImmediately(val);
-    Ui::ProxyWidgetDialog &ui = this->Ui;
+    Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.ApplyButton->setVisible(!val);
     ui.ResetButton->setVisible(!val);
-    }
+  }
 
-  bool applyChangesImmediately() const
-    {
-    return this->ProxyWidget->applyChangesImmediately();
-    }
+  bool applyChangesImmediately() const { return this->ProxyWidget->applyChangesImmediately(); }
 };
 
 //-----------------------------------------------------------------------------
 pqProxyWidgetDialog::pqProxyWidgetDialog(
   vtkSMProxy* smproxy, QWidget* parentObject, Qt::WindowFlags f)
-  : Superclass(parentObject, f),
-  Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this))
+  : Superclass(parentObject, f)
+  , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this))
 {
 }
 
 //-----------------------------------------------------------------------------
-pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* smproxy,
-  const QStringList& properties, QWidget* parentObject, Qt::WindowFlags f)
-  : Superclass(parentObject, f),
-  Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this, properties))
+pqProxyWidgetDialog::pqProxyWidgetDialog(
+  vtkSMProxy* smproxy, const QStringList& properties, QWidget* parentObject, Qt::WindowFlags f)
+  : Superclass(parentObject, f)
+  , Internals(new pqProxyWidgetDialog::pqInternals(smproxy, this, properties))
 {
 }
 
@@ -378,14 +363,14 @@ bool pqProxyWidgetDialog::hasAdvancedProperties() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::showEvent(QShowEvent *evt)
+void pqProxyWidgetDialog::showEvent(QShowEvent* evt)
 {
   this->Internals->resize(this);
   this->Superclass::showEvent(evt);
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::hideEvent(QHideEvent *evt)
+void pqProxyWidgetDialog::hideEvent(QHideEvent* evt)
 {
   this->Internals->saveSettings(this);
   this->Superclass::hideEvent(evt);
@@ -421,15 +406,15 @@ void pqProxyWidgetDialog::done(int status)
 {
   // this gets called when user presses the Esc key.
   switch (status)
-    {
-  case QDialog::Accepted:
-    this->Internals->acceptChanges();
-    break;
+  {
+    case QDialog::Accepted:
+      this->Internals->acceptChanges();
+      break;
 
-  case QDialog::Rejected:
-    this->Internals->rejectChanges();
-    break;
-    }
+    case QDialog::Rejected:
+      this->Internals->rejectChanges();
+      break;
+  }
   this->Superclass::done(status);
 }
 
@@ -437,9 +422,9 @@ void pqProxyWidgetDialog::done(int status)
 void pqProxyWidgetDialog::onRestoreDefaults()
 {
   if (this->Internals->restoreDefaults())
-    {
+  {
     emit this->accepted();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

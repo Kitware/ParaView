@@ -17,7 +17,7 @@
 // vtkVisibleLinesPainter is a hidden lines removal painter that removes hidden
 // lines. Once this painter is inserted in the painter chain, if the
 // representation type is VTK_WIREFRAME, then it will automatically remove the
-// hidden lines. 
+// hidden lines.
 
 #ifndef vtkVisibleLinesPainter_h
 #define vtkVisibleLinesPainter_h
@@ -35,7 +35,7 @@ public:
   // Release any graphics resources that are being consumed by this mapper.
   // The parameter window could be used to determine which graphic
   // resources to release. In this case, releases the display lists.
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
 protected:
   vtkVisibleLinesPainter();
@@ -51,8 +51,8 @@ protected:
 
   // Description:
   // Changes the polygon mode according to the representation.
-  void RenderInternal(vtkRenderer* renderer, vtkActor* actor, 
-                      unsigned long typeflags, bool forceCompileOnly);
+  void RenderInternal(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
   // Description:
   // Returns true when rendering is possible.
@@ -64,9 +64,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif
-
-

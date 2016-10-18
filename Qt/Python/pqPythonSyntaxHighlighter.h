@@ -51,7 +51,8 @@ class QTextEdit;
 * capture presses of the tab key that would go to the QTextEdit and
 * insert 4 spaces instead of the tab.  This option is enabled by default.
 */
-class PQPYTHON_EXPORT pqPythonSyntaxHighlighter : public QObject {
+class PQPYTHON_EXPORT pqPythonSyntaxHighlighter : public QObject
+{
   Q_OBJECT
 public:
   typedef QObject Superclass;
@@ -72,6 +73,7 @@ public:
   * Passing true will cause the tab key to insert 4 spaces in the QTextEdit
   */
   void setReplaceTabs(bool replaceTabs);
+
 protected:
   /**
   * This event filter is applied to the TextEdit to translate presses of the
@@ -80,9 +82,10 @@ protected:
   bool eventFilter(QObject*, QEvent*);
 private slots:
   void rehighlightSyntax();
+
 private:
   class pqInternal;
-  const QScopedPointer< pqInternal > Internals;
+  const QScopedPointer<pqInternal> Internals;
   Q_DISABLE_COPY(pqPythonSyntaxHighlighter)
 };
 

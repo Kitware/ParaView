@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -54,8 +54,9 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqMultiViewWidget(QWidget * parent=0, Qt::WindowFlags f=0);
+  pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqMultiViewWidget();
 
   /**
@@ -68,8 +69,7 @@ public:
   /**
   * Returns whether window decorations and splitter handles are visible.
   */
-  bool isDecorationsVisible() const
-     { return this->DecorationsVisible; }
+  bool isDecorationsVisible() const { return this->DecorationsVisible; }
 
   /**
   * Captures an image for the views in the layout. Note that there must be
@@ -91,7 +91,7 @@ public:
   /**
   * Capture an image and saves it out to a file.
   */
-  bool writeImage(const QString& filename, int width, int height, int quality=-1);
+  bool writeImage(const QString& filename, int width, int height, int quality = -1);
 
   /**
   * Returns list of views assigned to frames in this widget.
@@ -220,8 +220,7 @@ protected:
   virtual bool eventFilter(QObject* caller, QEvent* evt);
 
 private:
-  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg,
-    int& maxIndex);
+  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg, int& maxIndex);
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget)

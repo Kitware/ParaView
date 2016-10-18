@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,88 +48,89 @@ pqFileDialogEventPlayer::pqFileDialogEventPlayer(QObject* p)
 }
 
 //-----------------------------------------------------------------------------
-bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command, 
-  const QString& Arguments, bool& Error)
+bool pqFileDialogEventPlayer::playEvent(
+  QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   // Handle playback for pqFileDialog and all its children ...
   pqFileDialog* object = 0;
-  for(QObject* o = Object; o; o = o->parent())
-    {
+  for (QObject* o = Object; o; o = o->parent())
+  {
     if ((object = qobject_cast<pqFileDialog*>(o)))
-      {
-      break;
-      }
-    }
-  if (!object)
     {
-    return false;
+      break;
     }
+  }
+  if (!object)
+  {
+    return false;
+  }
 
   QString fileString = Arguments;
 
   const QString data_directory = pqCoreTestUtility::DataRoot();
-  if(fileString.contains("PARAVIEW_DATA_ROOT") && data_directory.isEmpty())
-    {
-    qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
+  if (fileString.contains("PARAVIEW_DATA_ROOT") && data_directory.isEmpty())
+  {
+    qCritical()
+      << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
     Error = true;
     return true;
-    }
+  }
 
   const QString test_directory = pqCoreTestUtility::TestDirectory();
   if (fileString.contains("PARAVIEW_TEST_ROOT") && test_directory.isEmpty())
-    {
+  {
     qCritical() << "You must specify --test-directory in the command line options.";
     Error = true;
     return true;
-    }
+  }
 
   fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
   fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
-  if(Command == "filesSelected")
+  if (Command == "filesSelected")
+  {
+    if (object->selectFile(fileString))
     {
-    if(object->selectFile(fileString))
-      {
       pqEventDispatcher::processEventsAndWait(0);
-      }
+    }
     else
-      {
+    {
       qCritical() << "Dialog couldn't accept " << fileString;
       Error = true;
-      }
-
-    return true;
     }
 
-  if(Command == "cancelled")
-    {
+    return true;
+  }
+
+  if (Command == "cancelled")
+  {
     object->reject();
     return true;
-    }
+  }
   if (Command == "remove")
-    {
+  {
     // Delete the file.
     vtksys::SystemTools::RemoveFile(fileString.toLatin1().data());
     return true;
-    }
+  }
   if (Command == "copy")
-    {
+  {
     QStringList parts = fileString.split(';', QString::SkipEmptyParts);
     if (parts.size() != 2)
-      {
+    {
       qCritical() << "Invalid argument to `copy`. Expecting paths separated by `;`.";
       Error = true;
-      }
+    }
     if (!QFile::copy(parts[0], parts[1]))
-      {
+    {
       qCritical() << "Failed to copy `" << parts[0] << "` to `" << parts[1] << "`.";
       Error = true;
-      }
-    return true;
     }
+    return true;
+  }
   if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
-    {
+  {
     qCritical() << "Unknown pqFileDialog command: " << Object << " " << Command << " " << Arguments;
     Error = true;
-    }
+  }
   return true;
 }

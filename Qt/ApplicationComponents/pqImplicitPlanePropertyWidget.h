@@ -48,13 +48,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * \li \c Input: (optional) a vtkSMInputProperty that is used to get data
 * information for bounds when placing/resetting the widget.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget : public pqInteractivePropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget
+  : public pqInteractivePropertyWidget
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
   pqImplicitPlanePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqImplicitPlanePropertyWidget();
 
   /**

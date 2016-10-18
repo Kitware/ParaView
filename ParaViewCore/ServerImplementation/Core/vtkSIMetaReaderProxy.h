@@ -58,7 +58,6 @@ protected:
 private:
   vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

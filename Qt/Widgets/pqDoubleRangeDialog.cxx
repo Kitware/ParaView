@@ -39,27 +39,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleRangeWidget.h"
 
-pqDoubleRangeDialog::pqDoubleRangeDialog(const QString &label,
-                                         double minimum,
-                                         double maximum,
-                                         QWidget *parent_)
+pqDoubleRangeDialog::pqDoubleRangeDialog(
+  const QString& label, double minimum, double maximum, QWidget* parent_)
   : QDialog(parent_)
 {
   this->Widget = new pqDoubleRangeWidget(this);
   this->Widget->setMinimum(minimum);
   this->Widget->setMaximum(maximum);
 
-  QDialogButtonBox *buttonBox =
-      new QDialogButtonBox(QDialogButtonBox::Ok |
-                           QDialogButtonBox::Cancel);
+  QDialogButtonBox* buttonBox =
+    new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  QHBoxLayout *widgetLayout = new QHBoxLayout;
+  QHBoxLayout* widgetLayout = new QHBoxLayout;
   widgetLayout->addWidget(new QLabel(label, this));
   widgetLayout->addWidget(this->Widget);
 
-  QVBoxLayout *layout_ = new QVBoxLayout;
+  QVBoxLayout* layout_ = new QVBoxLayout;
   layout_->addLayout(widgetLayout);
   layout_->addWidget(buttonBox);
   this->setLayout(layout_);

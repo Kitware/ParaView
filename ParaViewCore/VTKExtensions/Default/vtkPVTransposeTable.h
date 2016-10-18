@@ -60,17 +60,15 @@ protected:
   vtkPVTransposeTable();
   virtual ~vtkPVTransposeTable();
 
-  int RequestData(vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   PVTransposeTableInternal* Internal;
 
   bool DoNotTranspose;
 
 private:
-  vtkPVTransposeTable( const vtkPVTransposeTable& ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPVTransposeTable& ) VTK_DELETE_FUNCTION;
+  vtkPVTransposeTable(const vtkPVTransposeTable&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTransposeTable&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVTransposeTable_h

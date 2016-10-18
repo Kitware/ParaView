@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -57,8 +57,8 @@ class pqPointSourceWidget::pqImplementation
 public:
   pqImplementation()
   {
-  this->Links.setUseUncheckedProperties(false);
-  this->Links.setAutoUpdateVTKObjects(true);
+    this->Links.setUseUncheckedProperties(false);
+    this->Links.setAutoUpdateVTKObjects(true);
   }
   QWidget ControlsContainer;
   Ui::pqPointSourceControls Controls;
@@ -69,23 +69,23 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqPointSourceWidget
 
-pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p),
-  Implementation(new pqImplementation())
+pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
+  : Superclass(o, pxy, p)
+  , Implementation(new pqImplementation())
 {
-  this->Implementation->Controls.setupUi(
-    &this->Implementation->ControlsContainer);
-    
-  this->Implementation->Controls.Radius->
-    setValidator(new QDoubleValidator(this->Implementation->Controls.Radius));
+  this->Implementation->Controls.setupUi(&this->Implementation->ControlsContainer);
+
+  this->Implementation->Controls.Radius->setValidator(
+    new QDoubleValidator(this->Implementation->Controls.Radius));
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
-  QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
+  QLabel* label =
+    new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
   label->setWordWrap(1);
   this->layout()->addWidget(label);
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -100,35 +100,32 @@ void pqPointSourceWidget::resetBounds(double input_bounds[6])
   this->Superclass::resetBounds(input_bounds);
 
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double min_diameter = input_bounds[1]-input_bounds[0];
-  min_diameter = qMin(min_diameter, input_bounds[3]-input_bounds[2]);
-  min_diameter = qMin(min_diameter, input_bounds[5]-input_bounds[4]);
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget->GetProperty("Radius"));
+  double min_diameter = input_bounds[1] - input_bounds[0];
+  min_diameter = qMin(min_diameter, input_bounds[3] - input_bounds[2]);
+  min_diameter = qMin(min_diameter, input_bounds[5] - input_bounds[4]);
+  vtkSMDoubleVectorProperty* dvp =
+    vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("Radius"));
   if (dvp)
-    {
+  {
     dvp->SetElement(0, min_diameter * 0.1);
-    }
+  }
   widget->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
-void pqPointSourceWidget::setControlledProperty(const char* function,
-  vtkSMProperty* _property)
+void pqPointSourceWidget::setControlledProperty(const char* function, vtkSMProperty* _property)
 {
   if (strcmp(function, "NumberOfPoints") == 0)
-    {
-    this->Implementation->Links.addPropertyLink(
-      this->Implementation->Controls.NumberOfPoints, "value", 
-      SIGNAL(valueChanged(int)),
-      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("NumberOfPoints"));
-    }
+  {
+    this->Implementation->Links.addPropertyLink(this->Implementation->Controls.NumberOfPoints,
+      "value", SIGNAL(valueChanged(int)), this->getWidgetProxy(),
+      this->getWidgetProxy()->GetProperty("NumberOfPoints"));
+  }
   else if (strcmp(function, "Radius") == 0)
-    {
-    this->Implementation->Links.addPropertyLink(
-      this->Implementation->Controls.Radius, "text", 
-      SIGNAL(textChanged(QString)),
-      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("Radius"));
-    }
+  {
+    this->Implementation->Links.addPropertyLink(this->Implementation->Controls.Radius, "text",
+      SIGNAL(textChanged(QString)), this->getWidgetProxy(),
+      this->getWidgetProxy()->GetProperty("Radius"));
+  }
   this->Superclass::setControlledProperty(function, _property);
 }

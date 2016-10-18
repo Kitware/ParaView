@@ -42,15 +42,14 @@ bool pqFileDialogTestUtility::playTests(const QStringList& filenames)
   this->setupFiles();
   bool val = this->pqTestUtility::playTests(filenames);
 
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
-  if(options && options->GetExitAppWhenTestsDone())
-    {
-    QApplication::exit(val? 0 : 1);
-    }
+  pqOptions* const options =
+    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  if (options && options->GetExitAppWhenTestsDone())
+  {
+    QApplication::exit(val ? 0 : 1);
+  }
   return val;
 }
-
 
 static void CreateEmptyFile(const QString& f)
 {
@@ -63,16 +62,16 @@ static void CreateEmptyFile(const QString& f)
 
 void pqFileDialogTestUtility::setupFiles()
 {
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  pqOptions* const options =
+    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   QString testDirName = options ? options->GetTestDirectory() : QString();
-  if(!testDirName.isEmpty())
-    {
+  if (!testDirName.isEmpty())
+  {
     QDir testDir(testDirName);
-    if(!testDir.exists())
-      {
+    if (!testDir.exists())
+    {
       return;
-      }
+    }
     testDir.mkdir("FileDialogTest");
     testDir.cd("FileDialogTest");
     CreateEmptyFile(testDir.path() + QDir::separator() + "Filea.png");
@@ -87,19 +86,19 @@ void pqFileDialogTestUtility::setupFiles()
     testDir.mkdir("SubDir1");
     testDir.mkdir("SubDir2");
     testDir.mkdir("SubDir3");
-    }
+  }
 }
 
 void pqFileDialogTestUtility::cleanupFiles()
 {
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  pqOptions* const options =
+    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   QString testDirName = options ? options->GetTestDirectory() : QString();
-  if(!testDirName.isEmpty())
-    {
+  if (!testDirName.isEmpty())
+  {
     QDir testDir(testDirName);
-    if(testDir.exists())
-      {
+    if (testDir.exists())
+    {
       testDir.cd("FileDialogTest");
       testDir.rmdir("SubDir1");
       testDir.rmdir("SubDir2");
@@ -115,8 +114,8 @@ void pqFileDialogTestUtility::cleanupFiles()
       testDir.remove("Filec.jpg");
       testDir.cdUp();
       testDir.rmdir("FileDialogTest");
-      }
     }
+  }
 }
 
 pqFileDialogTestWidget::pqFileDialogTestWidget()
@@ -164,42 +163,41 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   this->ReturnLabel->setObjectName("ReturnLabel");
   this->ReturnLabel->setText("(nul)");
   l->addWidget(this->ReturnLabel);
-  QObject::connect(this->OpenButton, SIGNAL(clicked(bool)),
-                   this, SLOT(openFileDialog()));
+  QObject::connect(this->OpenButton, SIGNAL(clicked(bool)), this, SLOT(openFileDialog()));
 }
 
 void pqFileDialogTestWidget::openFileDialog()
 {
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  pqOptions* const options =
+    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   QString testDirName = options ? options->GetTestDirectory() : QString();
   QDir testDir(testDirName);
-  if(testDir.exists())
-    {
+  if (testDir.exists())
+  {
     testDirName += QDir::separator();
     testDirName += "FileDialogTest";
-    }
+  }
 
   pqServer* server = this->Server;
-  if(this->ConnectionMode->currentText() == "Local")
-    {
+  if (this->ConnectionMode->currentText() == "Local")
+  {
     server = NULL;
-    }
+  }
 
-  pqFileDialog diag(server, this, this->FileMode->currentText(),
-                    testDirName, this->FileFilter->text());
+  pqFileDialog diag(
+    server, this, this->FileMode->currentText(), testDirName, this->FileFilter->text());
   QVariant mode = this->FileMode->itemData(this->FileMode->currentIndex());
   diag.setFileMode(static_cast<pqFileDialog::FileMode>(mode.toInt()));
-  QObject::connect(&diag, SIGNAL(filesSelected(const QList<QStringList>&)),
-                   this, SLOT(emittedFiles(const QList<QStringList>&)));
-  if(diag.exec() == QDialog::Accepted)
-    {
+  QObject::connect(&diag, SIGNAL(filesSelected(const QList<QStringList>&)), this,
+    SLOT(emittedFiles(const QList<QStringList>&)));
+  if (diag.exec() == QDialog::Accepted)
+  {
     this->ReturnLabel->setText(diag.getSelectedFiles().join(";"));
-    }
+  }
   else
-    {
+  {
     this->ReturnLabel->setText("cancelled");
-    }
+  }
 }
 
 void pqFileDialogTestWidget::emittedFiles(const QList<QStringList>& files)
@@ -210,12 +208,11 @@ void pqFileDialogTestWidget::emittedFiles(const QList<QStringList>& files)
 void pqFileDialogTestWidget::record()
 {
   QString file = QFileDialog::getSaveFileName();
-  if(file != QString::null)
-    {
+  if (file != QString::null)
+  {
     this->TestUtility.recordTests(file);
-    }
+  }
 }
-
 
 int main(int argc, char** argv)
 {
@@ -227,9 +224,7 @@ int main(int argc, char** argv)
   pqFileDialogTestWidget mainWidget;
   mainWidget.show();
 
-  QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests",
-    Qt::QueuedConnection,
+  QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests", Qt::QueuedConnection,
     Q_ARG(QStringList, options->GetTestScripts()));
   return app.exec();
 }
-

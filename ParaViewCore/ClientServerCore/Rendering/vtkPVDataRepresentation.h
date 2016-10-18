@@ -42,8 +42,8 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * This is one of the most important functions. In VTK pipelines, it's very
@@ -92,15 +92,16 @@ public:
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
-  virtual void SetVisibility(bool val)
-    { this->Visibility = val; }
+  virtual void SetVisibility(bool val) { this->Visibility = val; }
   vtkGetMacro(Visibility, bool);
 
   /**
    * Returns the data object that is rendered from the given input port.
    */
   virtual vtkDataObject* GetRenderedDataObject(int vtkNotUsed(port))
-    { return this->GetInputDataObject(0, 0); }
+  {
+    return this->GetInputDataObject(0, 0);
+  }
 
   //@{
   /**
@@ -134,10 +135,8 @@ public:
    * views). In which case these ivars can up set. If ForcedCacheKey is true, it
    * overrides UseCache and CacheKey. Instead, ForcedCacheKey is used.
    */
-  virtual void SetForcedCacheKey(double val)
-    { this->ForcedCacheKey = val; }
-  virtual void SetForceUseCache(bool val)
-    { this->ForceUseCache = val; }
+  virtual void SetForcedCacheKey(double val) { this->ForcedCacheKey = val; }
+  virtual void SetForceUseCache(bool val) { this->ForceUseCache = val; }
 
   //@{
   /**
@@ -156,7 +155,7 @@ public:
    */
   bool GetUsingCacheForUpdate();
 
-  vtkGetMacro(NeedUpdate,  bool);
+  vtkGetMacro(NeedUpdate, bool);
 
   //@{
   /**
@@ -173,10 +172,11 @@ public:
    * internal pipeline.
    * Overridden to use vtkPVTrivialProducer instead of vtkTrivialProducer
    */
-  virtual vtkAlgorithmOutput* GetInternalOutputPort()
-    { return this->GetInternalOutputPort(0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort() { return this->GetInternalOutputPort(0); }
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port)
-    { return this->GetInternalOutputPort(port, 0); }
+  {
+    return this->GetInternalOutputPort(port, 0);
+  }
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn);
 
   /**
@@ -193,7 +193,10 @@ protected:
    * indicate if the particular key is cached. Default returns false.
    */
   virtual bool IsCached(double cache_key)
-    { (void)cache_key; return false; }
+  {
+    (void)cache_key;
+    return false;
+  }
 
   /**
    * Create a default executive.
@@ -203,20 +206,17 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int RequestUpdateTime (vtkInformation*,
-                                  vtkInformationVector**,
-                                 vtkInformationVector*);
+  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   double UpdateTime;
   bool UpdateTimeValid;
   unsigned int UniqueIdentifier;
+
 private:
   vtkPVDataRepresentation(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
@@ -229,7 +229,6 @@ private:
   class Internals;
   Internals* Implementation;
   vtkWeakPointer<vtkView> View;
-
 };
 
 #endif

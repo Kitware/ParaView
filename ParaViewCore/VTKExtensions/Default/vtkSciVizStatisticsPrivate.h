@@ -27,14 +27,9 @@
 class vtkSciVizStatisticsP : public vtkStatisticsAlgorithmPrivate
 {
 public:
-  bool Has( vtkStdString arrName )
-    {
-    return this->Buffer.find( arrName ) != this->Buffer.end();
-    }
+  bool Has(vtkStdString arrName) { return this->Buffer.find(arrName) != this->Buffer.end(); }
 };
 
-
 #endif // vtkSciVizStatisticsPrivate_h
-
 
 // VTK-HeaderTest-Exclude: vtkSciVizStatisticsPrivate.h

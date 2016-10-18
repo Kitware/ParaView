@@ -56,20 +56,19 @@ class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
   typedef QPair<int, QString> ValueType;
+
 public:
-  pqDisplayColorWidget(QWidget *parent=0);
+  pqDisplayColorWidget(QWidget* parent = 0);
   ~pqDisplayColorWidget();
 
   /**
   * Get/Set the array name as pair (association-number, arrayname).
   */
   ValueType arraySelection() const;
-  QString getCurrentText() const
-    {
-    return this->arraySelection().second;
-    }
+  QString getCurrentText() const { return this->arraySelection().second; }
 
   /**
   * Get/Set the component number (-1 == magnitude).
@@ -143,8 +142,6 @@ protected:
 private:
   QVariant itemData(int association, const QString& arrayName) const;
   QIcon* itemIcon(int association, const QString& arrayName) const;
-
-
 
   /**
   * called to add an out-of-domain value to the combo-box. Such a value is

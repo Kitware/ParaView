@@ -72,16 +72,16 @@ protected:
   vtkPVPLYWriter();
   ~vtkPVPLYWriter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual void WriteData();
 
   bool EnableColoring;
   vtkNew<vtkPLYWriter> Writer;
   vtkSmartPointer<vtkScalarsToColors> LookupTable;
+
 private:
   vtkPVPLYWriter(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

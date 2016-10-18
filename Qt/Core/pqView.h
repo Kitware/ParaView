@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #ifndef pqView_h
 #define pqView_h
-
 
 #include "pqProxy.h"
 #include "vtkSetGet.h" // needed for VTK_LEGACY.
@@ -58,8 +57,10 @@ class PQCORE_EXPORT pqView : public pqProxy
 {
   Q_OBJECT
   typedef pqProxy Superclass;
+
 public:
-  enum SelectionModifier {
+  enum SelectionModifier
+  {
     PV_SELECTION_DEFAULT = 0,
     PV_SELECTION_ADDITION,
     PV_SELECTION_SUBTRACTION,
@@ -91,10 +92,10 @@ public:
   QWidget* widget();
 
   /**
-  * Returns if this view module can support 
+  * Returns if this view module can support
   * undo/redo. Returns false by default. Subclassess must override
   * if that's not the case.
-  * View modules that support undo must fire 
+  * View modules that support undo must fire
   * all undo related signals defined by this class.
   */
   virtual bool supportsUndo() const { return false; }
@@ -102,8 +103,7 @@ public:
   /**
   * Returns the type of this view module.
   */
-  QString getViewType() const
-    { return this->ViewType; }
+  QString getViewType() const { return this->ViewType; }
 
   /**
   * Computes the magnification and view size given the current view size for
@@ -113,7 +113,7 @@ public:
 
 public slots:
   /**
-  * Request a StillRender on idle. Multiple calls are collapsed into one. 
+  * Request a StillRender on idle. Multiple calls are collapsed into one.
   */
   virtual void render();
 
@@ -150,12 +150,12 @@ public:
   /**
   * Returns true if undo can be done.
   */
-  virtual bool canUndo() const {return false;}
+  virtual bool canUndo() const { return false; }
 
   /**
   * Returns true if redo can be done.
   */
-  virtual bool canRedo() const {return false;}
+  virtual bool canRedo() const { return false; }
 
   /**
   * Returns the current size of the rendering context.
@@ -185,7 +185,7 @@ public:
   /**
   * Capture an image and saves it out to a file.
   */
-  bool writeImage(const QString& filename, const QSize&, int quality=-1);
+  bool writeImage(const QString& filename, const QSize&, int quality = -1);
 
   /**
   * This method checks if the representation is shown in this view.
@@ -206,7 +206,7 @@ public:
   * (index < getNumberOfRepresentations()).
   */
   pqRepresentation* getRepresentation(int index) const;
- 
+
   /**
   * Returns a list of representations in this view.
   */
@@ -216,7 +216,7 @@ public:
   * This method returns is any pqPipelineSource can be dislayed in this
   * view. NOTE: This is no longer virtual. Simply forwards to
   */
-  //vtkSMViewProxy::CanDisplayData().
+  // vtkSMViewProxy::CanDisplayData().
   bool canDisplay(pqOutputPort* opPort) const;
 
   /**
@@ -266,14 +266,14 @@ signals:
   * Fired when interaction undo stack status changes.
   */
   void canUndoChanged(bool);
-  
+
   /**
   * Fired when interaction undo stack status changes.
   */
   void canRedoChanged(bool);
 
   /**
-  * Fired when a selection is made in this view. 
+  * Fired when a selection is made in this view.
   * \c opport is the output port for the source that got selected.
   *    the selection input on the source proxy for the opport must already
   *    have been initialized to a selection source.
@@ -313,13 +313,13 @@ signals:
 
   /**
   * Fired when UseMultipleRepresentationSelection is set to on and
-  * selection on multiple representations is made in this view. 
-  * \c opports is a list of opport, and opport is the output port for 
-  *    the source that got selected. the selection input on the source 
-  *    proxy for the opport must already have been 
+  * selection on multiple representations is made in this view.
+  * \c opports is a list of opport, and opport is the output port for
+  *    the source that got selected. the selection input on the source
+  *    proxy for the opport must already have been
   *    initialized to a selection source.
   */
-   void multipleSelected(QList<pqOutputPort*> opports);
+  void multipleSelected(QList<pqOutputPort*> opports);
 
 private slots:
   /**
@@ -365,17 +365,13 @@ protected:
   * \c server:- server on which the proxy is created.
   * \c parent:- QObject parent.
   */
-  pqView( const QString& type,
-          const QString& group, 
-          const QString& name, 
-          vtkSMViewProxy* view, 
-          pqServer* server, 
-          QObject* parent=NULL);
+  pqView(const QString& type, const QString& group, const QString& name, vtkSMViewProxy* view,
+    pqServer* server, QObject* parent = NULL);
 
   /**
   * Use this method to initialize the pqObject state using the
   * underlying vtkSMProxy. This needs to be done only once,
-  * after the object has been created. 
+  * after the object has been created.
   * Overridden to update the list of representations currently available.
   */
   virtual void initialize();
@@ -393,4 +389,3 @@ private:
 };
 
 #endif
-

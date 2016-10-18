@@ -22,7 +22,7 @@
 #ifndef vtkRulerSourceRepresentation_h
 #define vtkRulerSourceRepresentation_h
 
-#include "vtkNew.h"                               //needed for instances of vtkPVCacheKeeper, vtkPolyData
+#include "vtkNew.h" //needed for instances of vtkPVCacheKeeper, vtkPolyData
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
@@ -32,7 +32,8 @@ class vtkProperty2D;
 class vtkPVCacheKeeper;
 class vtkTextProperty;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkRulerSourceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkRulerSourceRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkRulerSourceRepresentation* New();
@@ -122,15 +123,13 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(
-    vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
 protected:
   vtkRulerSourceRepresentation();
   ~vtkRulerSourceRepresentation();
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Fill input port information.
@@ -163,7 +162,6 @@ protected:
 private:
   vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QShortcut>
 
-#define PQ_BEHAVIOR_DEFINE_FLAG(_name,_default) bool pqParaViewBehaviors:: _name = _default;
+#define PQ_BEHAVIOR_DEFINE_FLAG(_name, _default) bool pqParaViewBehaviors::_name = _default;
 PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets, true);
 PQ_BEHAVIOR_DEFINE_FLAG(StandardViewFrameActions, true);
 PQ_BEHAVIOR_DEFINE_FLAG(QtMessageHandlerBehavior, true);
@@ -95,158 +95,153 @@ PQ_BEHAVIOR_DEFINE_FLAG(LockPanelsBehavior, true);
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
 
 //-----------------------------------------------------------------------------
-pqParaViewBehaviors::pqParaViewBehaviors(
-  QMainWindow* mainWindow, QObject* parentObject)
+pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* parentObject)
   : Superclass(parentObject)
 {
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
   if (PQ_IS_BEHAVIOR_ENABLED(StandardPropertyWidgets))
-    {
+  {
     // Register standard types of property widgets.
     pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
-    }
+  }
 
   if (PQ_IS_BEHAVIOR_ENABLED(StandardViewFrameActions))
-    {
+  {
     // Register standard types of view-frame actions.
     pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
-    }
+  }
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();
 
   // Define application behaviors.
   if (PQ_IS_BEHAVIOR_ENABLED(QtMessageHandlerBehavior))
-    {
+  {
     new pqQtMessageHandlerBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(DataTimeStepBehavior))
-    {
+  {
     new pqDataTimeStepBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(SpreadSheetVisibilityBehavior))
-    {
+  {
     new pqSpreadSheetVisibilityBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(PipelineContextMenuBehavior))
-    {
+  {
     new pqPipelineContextMenuBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(ObjectPickingBehavior))
-    {
+  {
     new pqObjectPickingBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(DefaultViewBehavior))
-    {
+  {
     new pqDefaultViewBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(UndoRedoBehavior))
-    {
+  {
     new pqUndoRedoBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(AlwaysConnectedBehavior))
-    {
+  {
     new pqAlwaysConnectedBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(CrashRecoveryBehavior))
-    {
+  {
     new pqCrashRecoveryBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(AutoLoadPluginXMLBehavior))
-    {
+  {
     new pqAutoLoadPluginXMLBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(PluginDockWidgetsBehavior))
-    {
+  {
     new pqPluginDockWidgetsBehavior(mainWindow);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(VerifyRequiredPluginBehavior))
-    {
+  {
     new pqVerifyRequiredPluginBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(PluginActionGroupBehavior))
-    {
+  {
     new pqPluginActionGroupBehavior(mainWindow);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(FixPathsInStateFilesBehavior))
-    {
+  {
     new pqFixPathsInStateFilesBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(CommandLineOptionsBehavior))
-    {
+  {
     new pqCommandLineOptionsBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(PersistentMainWindowStateBehavior))
-    {
+  {
     new pqPersistentMainWindowStateBehavior(mainWindow);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(CollaborationBehavior))
-    {
+  {
     new pqCollaborationBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(ViewStreamingBehavior))
-    {
+  {
     // some special handling for pqStreamingTestingEventPlayer
     pqViewStreamingBehavior* vsbehv = new pqViewStreamingBehavior(this);
-    pqWidgetEventPlayer* player = pqApplicationCore::instance()->
-      testUtility()->eventPlayer()->getWidgetEventPlayer("pqStreamingTestingEventPlayer");
+    pqWidgetEventPlayer* player =
+      pqApplicationCore::instance()->testUtility()->eventPlayer()->getWidgetEventPlayer(
+        "pqStreamingTestingEventPlayer");
     pqStreamingTestingEventPlayer* splayer = NULL;
-    if(!player)
-      {
+    if (!player)
+    {
       splayer = new pqStreamingTestingEventPlayer(NULL);
       // the testUtility takes ownership of the player.
-      pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(
-        splayer);
-      }
+      pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(splayer);
+    }
     else
-      {
+    {
       splayer = qobject_cast<pqStreamingTestingEventPlayer*>(player);
-      }
-    if(splayer)
-      {
+    }
+    if (splayer)
+    {
       splayer->setViewStreamingBehavior(vsbehv);
-      }
     }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(PluginSettingsBehavior))
-    {
+  {
     new pqPluginSettingsBehavior(this);
-    }
+  }
   if (PQ_IS_BEHAVIOR_ENABLED(ApplyBehavior))
-    {
+  {
     pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
     foreach (pqPropertiesPanel* ppanel, mainWindow->findChildren<pqPropertiesPanel*>())
-      {
+    {
       applyBehavior->registerPanel(ppanel);
-      }
     }
+  }
 
   if (PQ_IS_BEHAVIOR_ENABLED(QuickLaunchShortcuts))
-    {
+  {
     // Setup quick-launch shortcuts.
-    QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
-      mainWindow);
-    QObject::connect(ctrlSpace, SIGNAL(activated()),
-      pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut *ctrlShiftSpace = new QShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Space,
-      mainWindow);
-    QObject::connect(ctrlShiftSpace, SIGNAL(activated()),
-      pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut *altSpace = new QShortcut(Qt::ALT + Qt::Key_Space,
-      mainWindow);
-    QObject::connect(altSpace, SIGNAL(activated()),
-      pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut *ctrlF = new QShortcut(Qt::CTRL + Qt::Key_F,
-      mainWindow);
-    QObject::connect(ctrlF, SIGNAL(activated()),
-      pqApplicationCore::instance(), SLOT(startSearch()));
-    }
+    QShortcut* ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space, mainWindow);
+    QObject::connect(
+      ctrlSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
+    QShortcut* ctrlShiftSpace = new QShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Space, mainWindow);
+    QObject::connect(
+      ctrlShiftSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
+    QShortcut* altSpace = new QShortcut(Qt::ALT + Qt::Key_Space, mainWindow);
+    QObject::connect(
+      altSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
+    QShortcut* ctrlF = new QShortcut(Qt::CTRL + Qt::Key_F, mainWindow);
+    QObject::connect(
+      ctrlF, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(startSearch()));
+  }
 
   if (PQ_IS_BEHAVIOR_ENABLED(LockPanelsBehavior))
-    {
+  {
     new pqLockPanelsBehavior(mainWindow);
-    }
+  }
 
   CLEAR_UNDO_STACK();
 }

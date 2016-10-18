@@ -85,19 +85,18 @@ protected:
   bool DisableUpdateDomainEntries;
 
   // When true, "Point Data" and "Cell Data" is included to the domain even
-  //if they don't have any properties. This is used by the spreadsheet
-  //view.( false by default )
+  // if they don't have any properties. This is used by the spreadsheet
+  // view.( false by default )
   bool ForcePointAndCellDataSelection;
-private:
 
+private:
   // Used by SetDefaultValues.
   int DefaultValue;
 
   /**
    * Utility functions called by Update()
    */
-  void UpdateDomainEntries(
-    int acceptable_association, vtkPVDataInformation* dataInfo);
+  void UpdateDomainEntries(int acceptable_association, vtkPVDataInformation* dataInfo);
 
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMFieldDataDomain&) VTK_DELETE_FUNCTION;

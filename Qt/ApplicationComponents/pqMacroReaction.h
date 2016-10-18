@@ -42,6 +42,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqMacroReaction : public pqMasterOnlyReacti
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;
+
 public:
   pqMacroReaction(QAction* parent);
 
@@ -57,10 +58,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    {
-    pqMacroReaction::createMacro();
-    }
+  virtual void onTriggered() { pqMacroReaction::createMacro(); }
 
 private:
   Q_DISABLE_COPY(pqMacroReaction)

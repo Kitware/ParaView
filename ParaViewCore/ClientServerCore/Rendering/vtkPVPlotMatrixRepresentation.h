@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,12 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkScatterPlotMatrix;
 class vtkStringArray;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVPlotMatrixRepresentation* New();
   vtkTypeMacro(vtkPVPlotMatrixRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Sets the visibility for the plot matrix representation.
@@ -128,12 +129,12 @@ protected:
   /**
    * Add the plot matrix representation to the view.
    */
-  virtual bool AddToView(vtkView *view);
+  virtual bool AddToView(vtkView* view);
 
   /**
    * Remove the plot matrix representation from the view.
    */
-  virtual bool RemoveFromView(vtkView *view);
+  virtual bool RemoveFromView(vtkView* view);
 
 private:
   vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;

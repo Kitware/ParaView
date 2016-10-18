@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -51,7 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 MultiServerClientMainWindow::MultiServerClientMainWindow(
-  QWidget* parentObject, Qt::WindowFlags wflags) : Superclass(parentObject, wflags)
+  QWidget* parentObject, Qt::WindowFlags wflags)
+  : Superclass(parentObject, wflags)
 {
   // tells the ParaView libraries to enable support for multiple simultaneous
   // server connections.
@@ -63,7 +64,7 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
   ui.objectInspectorDock->raise();
 
   // create the representation when user hits "Apply";
-  //ui.proxyTabWidget->setShowOnAccept(true);
+  // ui.proxyTabWidget->setShowOnAccept(true);
 
   new pqServerConnectReaction(ui.action_Connect);
 
@@ -78,25 +79,22 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
   this->comboBox2 = ui.filteringServer2;
 
   // Add empty filtering
-  this->comboBox->addItem("No filtering",QVariant());
-  this->comboBox2->addItem("No filtering",QVariant());
+  this->comboBox->addItem("No filtering", QVariant());
+  this->comboBox2->addItem("No filtering", QVariant());
 
   // Add current server in filtering
   addServerInFiltering(pqActiveObjects::instance().activeServer());
 
   // Listen when new connection occurs
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-                   SIGNAL(serverAdded(pqServer*)),
-                   this, SLOT(addServerInFiltering(pqServer*)),
-                   Qt::QueuedConnection);
+    SIGNAL(serverAdded(pqServer*)), this, SLOT(addServerInFiltering(pqServer*)),
+    Qt::QueuedConnection);
 
   // Listen when we filter with different criteria
-  QObject::connect(this->comboBox, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(applyPipelineFiltering(int)),
-                   Qt::QueuedConnection);
-  QObject::connect(this->comboBox2, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(applyPipelineFiltering2(int)),
-                   Qt::QueuedConnection);
+  QObject::connect(this->comboBox, SIGNAL(currentIndexChanged(int)), this,
+    SLOT(applyPipelineFiltering(int)), Qt::QueuedConnection);
+  QObject::connect(this->comboBox2, SIGNAL(currentIndexChanged(int)), this,
+    SLOT(applyPipelineFiltering2(int)), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -108,37 +106,38 @@ MultiServerClientMainWindow::~MultiServerClientMainWindow()
 void MultiServerClientMainWindow::applyPipelineFiltering(int index)
 {
   QVariant sessionIdFiltering = this->comboBox->itemData(index);
-  if(sessionIdFiltering.isValid())
-    {
+  if (sessionIdFiltering.isValid())
+  {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    this->pipelineBrowser->enableSessionFilter(pm->GetSession(static_cast<vtkIdType>(sessionIdFiltering.toInt())));
+    this->pipelineBrowser->enableSessionFilter(
+      pm->GetSession(static_cast<vtkIdType>(sessionIdFiltering.toInt())));
     this->pipelineBrowser->expandAll();
-    }
+  }
   else
-    {
+  {
     this->pipelineBrowser->disableAnnotationFilter();
     this->pipelineBrowser->disableSessionFilter();
     this->pipelineBrowser->expandAll();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void MultiServerClientMainWindow::applyPipelineFiltering2(int index)
 {
   QVariant sessionIdFiltering = this->comboBox2->itemData(index);
-  if(sessionIdFiltering.isValid())
-    {
+  if (sessionIdFiltering.isValid())
+  {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     this->pipelineBrowser2->enableSessionFilter(
       pm->GetSession(static_cast<vtkIdType>(sessionIdFiltering.toInt())));
     this->pipelineBrowser2->expandAll();
-    }
+  }
   else
-    {
+  {
     this->pipelineBrowser2->disableAnnotationFilter();
     this->pipelineBrowser2->disableSessionFilter();
     this->pipelineBrowser2->expandAll();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

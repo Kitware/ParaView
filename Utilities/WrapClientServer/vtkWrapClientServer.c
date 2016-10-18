@@ -21,276 +21,331 @@
 #include <string.h>
 
 int numberOfWrappedFunctions = 0;
-FunctionInfo *wrappedFunctions[1000];
-extern FunctionInfo *currentFunction;
-HierarchyInfo *hierarchyInfo = NULL;
+FunctionInfo* wrappedFunctions[1000];
+extern FunctionInfo* currentFunction;
+HierarchyInfo* hierarchyInfo = NULL;
 
 /* make a guess about whether a class is wrapped */
-static int class_is_wrapped(const char *classname)
+static int class_is_wrapped(const char* classname)
 {
-  HierarchyEntry *entry;
+  HierarchyEntry* entry;
 
   if (hierarchyInfo)
-    {
+  {
     entry = vtkParseHierarchy_FindEntry(hierarchyInfo, classname);
 
     if (entry)
-      {
+    {
       /* only allow non-excluded vtkObjects as args */
       if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE") ||
-          !vtkParseHierarchy_IsTypeOf(hierarchyInfo, entry, "vtkObjectBase"))
-        {
+        !vtkParseHierarchy_IsTypeOf(hierarchyInfo, entry, "vtkObjectBase"))
+      {
         return 0;
-        }
       }
     }
+  }
 
   return 1;
 }
 
 int arg_is_pointer_to_data(unsigned int argType, int count)
 {
-  return
-    (count == 0 &&
-     (argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER && /* T*   */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING && /* vtkStdString* */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VOID && /* void*    */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_CHAR && /* char*    */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_BOOL && /* bool*    */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_UNKNOWN && /* Foo*  */
-     (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT /* vtkFoo*  */);
+  return (count == 0 && (argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER && /* T*   */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING &&                     /* vtkStdString* */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VOID &&                       /* void*    */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_CHAR &&                       /* char*    */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_BOOL &&                       /* bool*    */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_UNKNOWN &&                    /* Foo*  */
+    (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT /* vtkFoo*  */);
 }
 
-void output_temp(FILE *fp, int i, unsigned int argType, const char *Id,
-                 int count)
+void output_temp(FILE* fp, int i, unsigned int argType, const char* Id, int count)
 {
   /* Store whether this is pointer to data.  */
   int isPointerToData = i != MAX_ARGS && arg_is_pointer_to_data(argType, count);
 
   /* ignore void */
-  if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VOID) &&
-      ((argType & VTK_PARSE_INDIRECT) == 0))
-    {
+  if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VOID) && ((argType & VTK_PARSE_INDIRECT) == 0))
+  {
     return;
-    }
+  }
 
   /* for const * return types prototype with const */
   if ((i == MAX_ARGS) && ((argType & VTK_PARSE_CONST) != 0))
-    {
-    fprintf(fp,"    const ");
-    }
+  {
+    fprintf(fp, "    const ");
+  }
   else
-    {
-    fprintf(fp,"    ");
-    }
+  {
+    fprintf(fp, "    ");
+  }
 
   /* Handle some objects of known type.  */
-  if(((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT) &&
-     (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) ||
-      ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)) &&
-     strcmp(Id, "vtkClientServerStream") == 0)
-    {
-    fprintf(fp, "vtkClientServerStream temp%i_inst, *temp%i = &temp%i_inst;\n",
-            i, i, i);
+  if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT) &&
+    (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) ||
+        ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)) &&
+    strcmp(Id, "vtkClientServerStream") == 0)
+  {
+    fprintf(fp, "vtkClientServerStream temp%i_inst, *temp%i = &temp%i_inst;\n", i, i, i);
     return;
-    }
+  }
 
   /* Start pointer-to-data arguments.  */
-  if(isPointerToData)
-    {
+  if (isPointerToData)
+  {
     fprintf(fp, "vtkClientServerStreamDataArg<");
-    }
+  }
 
   if (argType & VTK_PARSE_UNSIGNED)
-    {
-    fprintf(fp,"unsigned ");
-    }
+  {
+    fprintf(fp, "unsigned ");
+  }
 
   switch ((argType & VTK_PARSE_BASE_TYPE) & ~VTK_PARSE_UNSIGNED)
-    {
-    case VTK_PARSE_FLOAT:       fprintf(fp,"float  "); break;
-    case VTK_PARSE_DOUBLE:      fprintf(fp,"double "); break;
-    case VTK_PARSE_INT:         fprintf(fp,"int    "); break;
-    case VTK_PARSE_SHORT:       fprintf(fp,"short  "); break;
-    case VTK_PARSE_LONG:        fprintf(fp,"long   "); break;
-    case VTK_PARSE_VOID:        fprintf(fp,"void   "); break;
-    case VTK_PARSE_CHAR:        fprintf(fp,"char   "); break;
-    case VTK_PARSE_ID_TYPE:     fprintf(fp,"vtkIdType "); break;
-    case VTK_PARSE_LONG_LONG:   fprintf(fp,"long long "); break;
-    case VTK_PARSE___INT64:     fprintf(fp,"__int64 "); break;
-    case VTK_PARSE_SIGNED_CHAR: fprintf(fp,"signed char "); break;
-    case VTK_PARSE_BOOL:        fprintf(fp,"bool "); break;
-    case VTK_PARSE_VTK_OBJECT:  fprintf(fp,"%s ",Id); break;
+  {
+    case VTK_PARSE_FLOAT:
+      fprintf(fp, "float  ");
+      break;
+    case VTK_PARSE_DOUBLE:
+      fprintf(fp, "double ");
+      break;
+    case VTK_PARSE_INT:
+      fprintf(fp, "int    ");
+      break;
+    case VTK_PARSE_SHORT:
+      fprintf(fp, "short  ");
+      break;
+    case VTK_PARSE_LONG:
+      fprintf(fp, "long   ");
+      break;
+    case VTK_PARSE_VOID:
+      fprintf(fp, "void   ");
+      break;
+    case VTK_PARSE_CHAR:
+      fprintf(fp, "char   ");
+      break;
+    case VTK_PARSE_ID_TYPE:
+      fprintf(fp, "vtkIdType ");
+      break;
+    case VTK_PARSE_LONG_LONG:
+      fprintf(fp, "long long ");
+      break;
+    case VTK_PARSE___INT64:
+      fprintf(fp, "__int64 ");
+      break;
+    case VTK_PARSE_SIGNED_CHAR:
+      fprintf(fp, "signed char ");
+      break;
+    case VTK_PARSE_BOOL:
+      fprintf(fp, "bool ");
+      break;
+    case VTK_PARSE_VTK_OBJECT:
+      fprintf(fp, "%s ", Id);
+      break;
     case VTK_PARSE_STRING:
-      if (i == MAX_ARGS)      { fprintf(fp,"%s ",Id); break; }
-      else                    { fprintf(fp,"char    *"); } break;
+      if (i == MAX_ARGS)
+      {
+        fprintf(fp, "%s ", Id);
+        break;
+      }
+      else
+      {
+        fprintf(fp, "char    *");
+      }
+      break;
 
-    case VTK_PARSE_UNKNOWN: return;
-    }
+    case VTK_PARSE_UNKNOWN:
+      return;
+  }
 
   /* Finish pointer-to-data arguments.  */
-  if(isPointerToData)
-    {
-    fprintf(fp, "> temp%i(msg, 0, %i);\n", i, i+2);
+  if (isPointerToData)
+  {
+    fprintf(fp, "> temp%i(msg, 0, %i);\n", i, i + 2);
     return;
-    }
+  }
 
   /* handle array arguements */
   if (count > 1)
-    {
-    fprintf(fp,"temp%i[%i];\n",i,count);
+  {
+    fprintf(fp, "temp%i[%i];\n", i, count);
     return;
-    }
+  }
 
   switch (argType & VTK_PARSE_INDIRECT)
-    {
+  {
     case VTK_PARSE_REF:
       if (i == MAX_ARGS)
-        {
+      {
         fprintf(fp, " *"); /* act " &" */
-        }
+      }
       break;
-    case VTK_PARSE_POINTER:         fprintf(fp, " *"); break;
-    case VTK_PARSE_POINTER_REF:     fprintf(fp, "*&"); break;
-    case VTK_PARSE_POINTER_POINTER: fprintf(fp, "**"); break;
-    default:                        fprintf(fp,"  "); break;
-    }
+    case VTK_PARSE_POINTER:
+      fprintf(fp, " *");
+      break;
+    case VTK_PARSE_POINTER_REF:
+      fprintf(fp, "*&");
+      break;
+    case VTK_PARSE_POINTER_POINTER:
+      fprintf(fp, "**");
+      break;
+    default:
+      fprintf(fp, "  ");
+      break;
+  }
 
-  fprintf(fp,"temp%i",i);
-  fprintf(fp,";\n");
+  fprintf(fp, "temp%i", i);
+  fprintf(fp, ";\n");
 }
 
 /* when the cpp file doesn't have enough info use the hint file */
-void use_hints(FILE *fp)
+void use_hints(FILE* fp)
 {
   unsigned int rType = currentFunction->ReturnType;
 
   /* use the hint */
   if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
-    {
+  {
     switch (rType & VTK_PARSE_BASE_TYPE)
-      {
-      case VTK_PARSE_FLOAT: case VTK_PARSE_DOUBLE:
-      case VTK_PARSE_INT: case VTK_PARSE_SHORT: case VTK_PARSE_LONG:
+    {
+      case VTK_PARSE_FLOAT:
+      case VTK_PARSE_DOUBLE:
+      case VTK_PARSE_INT:
+      case VTK_PARSE_SHORT:
+      case VTK_PARSE_LONG:
       case VTK_PARSE_ID_TYPE:
-      case VTK_PARSE_LONG_LONG: case VTK_PARSE___INT64:
-      case VTK_PARSE_UNSIGNED_CHAR: case VTK_PARSE_SIGNED_CHAR:
-      case VTK_PARSE_UNSIGNED_INT: case VTK_PARSE_UNSIGNED_SHORT:
-      case VTK_PARSE_UNSIGNED_LONG: case VTK_PARSE_UNSIGNED_ID_TYPE:
-      case VTK_PARSE_UNSIGNED_LONG_LONG: case VTK_PARSE_UNSIGNED___INT64:
-      fprintf(fp,
-              "      resultStream.Reset();\n"
-              "      resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
-      break;
-      }
+      case VTK_PARSE_LONG_LONG:
+      case VTK_PARSE___INT64:
+      case VTK_PARSE_UNSIGNED_CHAR:
+      case VTK_PARSE_SIGNED_CHAR:
+      case VTK_PARSE_UNSIGNED_INT:
+      case VTK_PARSE_UNSIGNED_SHORT:
+      case VTK_PARSE_UNSIGNED_LONG:
+      case VTK_PARSE_UNSIGNED_ID_TYPE:
+      case VTK_PARSE_UNSIGNED_LONG_LONG:
+      case VTK_PARSE_UNSIGNED___INT64:
+        fprintf(fp,
+          "      resultStream.Reset();\n"
+          "      resultStream << vtkClientServerStream::Reply << "
+          "vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n",
+          MAX_ARGS, currentFunction->HintSize);
+        break;
     }
+  }
 }
 
-void return_result(FILE *fp)
+void return_result(FILE* fp)
 {
   unsigned int rType = currentFunction->ReturnType;
-  const char *rClass = currentFunction->ReturnClass;
+  const char* rClass = currentFunction->ReturnClass;
 
   switch (rType & VTK_PARSE_BASE_TYPE)
-    {
+  {
     case VTK_PARSE_VOID:
       if ((rType & VTK_PARSE_INDIRECT) == 0)
-        {
+      {
         return;
-        }
+      }
       break;
 
-    case VTK_PARSE_FLOAT: case VTK_PARSE_CHAR: case VTK_PARSE_INT:
-    case VTK_PARSE_SHORT: case VTK_PARSE_LONG: case VTK_PARSE_DOUBLE:
+    case VTK_PARSE_FLOAT:
+    case VTK_PARSE_CHAR:
+    case VTK_PARSE_INT:
+    case VTK_PARSE_SHORT:
+    case VTK_PARSE_LONG:
+    case VTK_PARSE_DOUBLE:
     case VTK_PARSE_ID_TYPE:
-    case VTK_PARSE_LONG_LONG: case VTK_PARSE___INT64:
-    case VTK_PARSE_SIGNED_CHAR: case VTK_PARSE_BOOL:
-    case VTK_PARSE_UNSIGNED_CHAR: case VTK_PARSE_UNSIGNED_INT:
-    case VTK_PARSE_UNSIGNED_SHORT: case VTK_PARSE_UNSIGNED_LONG:
+    case VTK_PARSE_LONG_LONG:
+    case VTK_PARSE___INT64:
+    case VTK_PARSE_SIGNED_CHAR:
+    case VTK_PARSE_BOOL:
+    case VTK_PARSE_UNSIGNED_CHAR:
+    case VTK_PARSE_UNSIGNED_INT:
+    case VTK_PARSE_UNSIGNED_SHORT:
+    case VTK_PARSE_UNSIGNED_LONG:
     case VTK_PARSE_UNSIGNED_ID_TYPE:
-    case VTK_PARSE_UNSIGNED_LONG_LONG: case VTK_PARSE_UNSIGNED___INT64:
+    case VTK_PARSE_UNSIGNED_LONG_LONG:
+    case VTK_PARSE_UNSIGNED___INT64:
     case VTK_PARSE_STRING:
       if ((rType & VTK_PARSE_INDIRECT) == 0 ||
-          (((rType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
-           ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
-                MAX_ARGS);
+        (((rType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
+            ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
+      {
+        fprintf(fp, "      resultStream.Reset();\n"
+                    "      resultStream << vtkClientServerStream::Reply << temp%i << "
+                    "vtkClientServerStream::End;\n",
+          MAX_ARGS);
         return;
-        }
+      }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << *temp%i << vtkClientServerStream::End;\n",
-                MAX_ARGS);
+      {
+        fprintf(fp, "      resultStream.Reset();\n"
+                    "      resultStream << vtkClientServerStream::Reply << *temp%i << "
+                    "vtkClientServerStream::End;\n",
+          MAX_ARGS);
         return;
-        }
+      }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
-        {
+      {
         /* handle functions returning vectors */
         /* this is done by looking them up in a hint file */
         use_hints(fp);
         return;
-        }
+      }
       break;
 
     case VTK_PARSE_VTK_OBJECT:
       /* Handle some objects of known type.  */
-      if(strcmp(rClass, "vtkClientServerStream") == 0)
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << *temp%i << vtkClientServerStream::End;\n",
-                MAX_ARGS);
+      if (strcmp(rClass, "vtkClientServerStream") == 0)
+      {
+        fprintf(fp, "      resultStream.Reset();\n"
+                    "      resultStream << vtkClientServerStream::Reply << *temp%i << "
+                    "vtkClientServerStream::End;\n",
+          MAX_ARGS);
         return;
-        }
+      }
       else if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
+      {
+        fprintf(fp, "      resultStream.Reset();\n"
+                    "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i "
+                    "<< vtkClientServerStream::End;\n",
+          MAX_ARGS);
         return;
-        }
+      }
       break;
-    }
+  }
 
   /* if we get to here, then the type was not recognized */
 
-  fprintf(fp,
-          "      resultStream.Reset();\n"
-          "      resultStream << vtkClientServerStream::Reply\n"
-          "                   << \"unable to return result of type(%#x).\"\n"
-          "                   << vtkClientServerStream::End;\n",
-          (rType & VTK_PARSE_UNQUALIFIED_TYPE));
+  fprintf(fp, "      resultStream.Reset();\n"
+              "      resultStream << vtkClientServerStream::Reply\n"
+              "                   << \"unable to return result of type(%#x).\"\n"
+              "                   << vtkClientServerStream::End;\n",
+    (rType & VTK_PARSE_UNQUALIFIED_TYPE));
 }
 
-void get_args(FILE *fp, int i)
+void get_args(FILE* fp, int i)
 {
   unsigned int argType = currentFunction->ArgTypes[i];
   int argCount = currentFunction->ArgCounts[i];
-  const char *argClass = currentFunction->ArgClasses[i];
+  const char* argClass = currentFunction->ArgClasses[i];
   int j;
   int start_arg = 2;
 
   /* what arg do we start with */
   for (j = 0; j < i; j++)
-    {
-    start_arg = start_arg +
-      (currentFunction->ArgCounts[j] ? currentFunction->ArgCounts[j] : 1);
-    }
+  {
+    start_arg = start_arg + (currentFunction->ArgCounts[j] ? currentFunction->ArgCounts[j] : 1);
+  }
 
   /* ignore void */
-  if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VOID) &&
-      ((argType & VTK_PARSE_INDIRECT) == 0))
-    {
+  if (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VOID) && ((argType & VTK_PARSE_INDIRECT) == 0))
+  {
     return;
-    }
+  }
 
   switch (argType & VTK_PARSE_BASE_TYPE)
-    {
+  {
     case VTK_PARSE_FLOAT:
     case VTK_PARSE_DOUBLE:
     case VTK_PARSE_INT:
@@ -311,155 +366,143 @@ void get_args(FILE *fp, int i)
     case VTK_PARSE_UNSIGNED___INT64:
     case VTK_PARSE_STRING:
       if (((argType & VTK_PARSE_INDIRECT) == 0) ||
-          ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) ||
-          (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
-           ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
-        {
-        fprintf(fp, "msg.GetArgument(0, %i, &temp%i)", i+2, i);
-        }
+        ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) ||
+        (((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR) &&
+            ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)))
+      {
+        fprintf(fp, "msg.GetArgument(0, %i, &temp%i)", i + 2, i);
+      }
+      else if (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) && (argCount > 1))
+      {
+        fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)", i + 2, i, argCount);
+      }
       else if (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) &&
-               (argCount > 1))
-        {
-        fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)", i+2, i, argCount);
-        }
-      else if (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) &&
-               (arg_is_pointer_to_data(argType, argCount)))
-        {
+        (arg_is_pointer_to_data(argType, argCount)))
+      {
         /* Pointer-to-data arguments are handled by an object
            convertible to bool.  */
         fprintf(fp, "temp%i", i);
-        }
+      }
 
-     break;
+      break;
 
     case VTK_PARSE_VTK_OBJECT:
       /* Handle some objects of known type.  */
       if ((((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) ||
-           ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)) &&
-          strcmp(argClass, "vtkClientServerStream") == 0)
-        {
-        fprintf(fp,
-                "msg.GetArgument(0, %i, temp%i)", i+2, i);
-        }
+            ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)) &&
+        strcmp(argClass, "vtkClientServerStream") == 0)
+      {
+        fprintf(fp, "msg.GetArgument(0, %i, temp%i)", i + 2, i);
+      }
       else if ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
-        {
-        fprintf(fp,
-                "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")",
-                i+2, i, argClass);
-        }
+      {
+        fprintf(fp, "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")", i + 2, i,
+          argClass);
+      }
       break;
 
     case VTK_PARSE_VOID:
     case VTK_PARSE_UNKNOWN:
       break;
-    }
+  }
 }
 
 /* declare these so they can be used in outputFunction */
-int managableArguments(FunctionInfo *curFunction);
-int notWrappable(FunctionInfo *curFunction);
+int managableArguments(FunctionInfo* curFunction);
+int notWrappable(FunctionInfo* curFunction);
 
-void outputFunction(FILE *fp, ClassInfo *data)
+void outputFunction(FILE* fp, ClassInfo* data)
 {
   int i;
 
   if (notWrappable(currentFunction))
-    {
+  {
     return;
-    }
+  }
 
   /* if the args are OK and it is not a constructor or destructor */
-  if (managableArguments(currentFunction) &&
-      strcmp(data->Name,currentFunction->Name) &&
-      strcmp(data->Name,currentFunction->Name + 1))
+  if (managableArguments(currentFunction) && strcmp(data->Name, currentFunction->Name) &&
+    strcmp(data->Name, currentFunction->Name + 1))
+  {
+    if (currentFunction->IsLegacy)
     {
-    if(currentFunction->IsLegacy)
-      {
-      fprintf(fp,"#if !defined(VTK_LEGACY_REMOVE)\n");
-      }
-    fprintf(fp,"  if (!strcmp(\"%s\",method) && msg.GetNumberOfArguments(0) == %i)\n",
-            currentFunction->Name, currentFunction->NumberOfArguments+2);
+      fprintf(fp, "#if !defined(VTK_LEGACY_REMOVE)\n");
+    }
+    fprintf(fp, "  if (!strcmp(\"%s\",method) && msg.GetNumberOfArguments(0) == %i)\n",
+      currentFunction->Name, currentFunction->NumberOfArguments + 2);
     fprintf(fp, "    {\n");
 
     /* process the args */
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
-      {
-      output_temp(fp, i, currentFunction->ArgTypes[i],
-                  currentFunction->ArgClasses[i],
-                  currentFunction->ArgCounts[i]);
-      }
-    output_temp(fp, MAX_ARGS,currentFunction->ReturnType,
-                currentFunction->ReturnClass, 0);
+    {
+      output_temp(fp, i, currentFunction->ArgTypes[i], currentFunction->ArgClasses[i],
+        currentFunction->ArgCounts[i]);
+    }
+    output_temp(fp, MAX_ARGS, currentFunction->ReturnType, currentFunction->ReturnClass, 0);
 
-    if(currentFunction->NumberOfArguments > 0)
-      {
+    if (currentFunction->NumberOfArguments > 0)
+    {
       const char* amps = "    if(";
       /* now get the required args from the stack */
       for (i = 0; i < currentFunction->NumberOfArguments; i++)
-        {
+      {
         fprintf(fp, "%s", amps);
         amps = " &&\n      ";
-        get_args(fp,i);
-        }
-      fprintf(fp, ")\n");
+        get_args(fp, i);
       }
+      fprintf(fp, ")\n");
+    }
     fprintf(fp, "      {\n");
 
-    if ((currentFunction->ReturnType & VTK_PARSE_UNQUALIFIED_TYPE) ==
-        VTK_PARSE_VOID)
-      {
-      fprintf(fp,"      op->%s(",currentFunction->Name);
-      }
-    else if ((currentFunction->ReturnType & VTK_PARSE_INDIRECT) ==
-             VTK_PARSE_REF)
-      {
-      fprintf(fp,"      temp%i = &(op)->%s(",MAX_ARGS,currentFunction->Name);
-      }
+    if ((currentFunction->ReturnType & VTK_PARSE_UNQUALIFIED_TYPE) == VTK_PARSE_VOID)
+    {
+      fprintf(fp, "      op->%s(", currentFunction->Name);
+    }
+    else if ((currentFunction->ReturnType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
+    {
+      fprintf(fp, "      temp%i = &(op)->%s(", MAX_ARGS, currentFunction->Name);
+    }
     else
-      {
-      fprintf(fp,"      temp%i = (op)->%s(",MAX_ARGS,currentFunction->Name);
-      }
+    {
+      fprintf(fp, "      temp%i = (op)->%s(", MAX_ARGS, currentFunction->Name);
+    }
 
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
-      {
+    {
       if (i)
-        {
-        fprintf(fp,",");
-        }
-      if (((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT)
-           == VTK_PARSE_REF) &&
-          ((currentFunction->ArgTypes[i] & VTK_PARSE_BASE_TYPE)
-           == VTK_PARSE_VTK_OBJECT))
-        {
-        fprintf(fp,"*(temp%i)",i);
-        }
-      else if ((((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT) == 0) ||
-                ((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT) ==
-                 VTK_PARSE_REF)) &&
-                ((currentFunction->ArgTypes[i] & VTK_PARSE_BASE_TYPE) ==
-                 VTK_PARSE_STRING))
-        {
-        /* explicit construction avoids possible ambiguity */
-        fprintf(fp,"vtkStdString(temp%i)",i);
-        }
-      else
-        {
-        fprintf(fp,"temp%i",i);
-        }
-      }
-    fprintf(fp,");\n");
-    return_result(fp);
-    fprintf(fp,"      return 1;\n");
-    fprintf(fp,"      }\n");
-    fprintf(fp,"    }\n");
-    if(currentFunction->IsLegacy)
       {
-      fprintf(fp,"#endif\n");
+        fprintf(fp, ",");
       }
+      if (((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT) == VTK_PARSE_REF) &&
+        ((currentFunction->ArgTypes[i] & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+      {
+        fprintf(fp, "*(temp%i)", i);
+      }
+      else if ((((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT) == 0) ||
+                 ((currentFunction->ArgTypes[i] & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)) &&
+        ((currentFunction->ArgTypes[i] & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING))
+      {
+        /* explicit construction avoids possible ambiguity */
+        fprintf(fp, "vtkStdString(temp%i)", i);
+      }
+      else
+      {
+        fprintf(fp, "temp%i", i);
+      }
+    }
+    fprintf(fp, ");\n");
+    return_result(fp);
+    fprintf(fp, "      return 1;\n");
+    fprintf(fp, "      }\n");
+    fprintf(fp, "    }\n");
+    if (currentFunction->IsLegacy)
+    {
+      fprintf(fp, "#endif\n");
+    }
 
     wrappedFunctions[numberOfWrappedFunctions] = currentFunction;
     numberOfWrappedFunctions++;
-    }
+  }
 
 #if 0
   if (!strcmp("vtkObject",data->Name))
@@ -489,11 +532,10 @@ void outputFunction(FILE *fp, ClassInfo *data)
  */
 typedef struct _UniqueFunctionInfo
 {
-  const char *Name;
+  const char* Name;
   int TotalPolymorphTypes;
-  FunctionInfo *Function[20];
+  FunctionInfo* Function[20];
 } UniqueFunctionInfo;
-
 
 //--------------------------------------------------------------------------nix
 /*
@@ -503,20 +545,20 @@ typedef struct _UniqueFunctionInfo
  */
 typedef struct _NewClassInfo
 {
-  int          HasDelete;
-  int          IsAbstract;
-  int          IsConcrete;
-  const        char *ClassName;
-  const        char *FileName;
-  const        char *OutputFileName;
-  const        char *SuperClasses[10];
-  int          NumberOfSuperClasses;
-  int          NumberOfFunctions;
+  int HasDelete;
+  int IsAbstract;
+  int IsConcrete;
+  const char* ClassName;
+  const char* FileName;
+  const char* OutputFileName;
+  const char* SuperClasses[10];
+  int NumberOfSuperClasses;
+  int NumberOfFunctions;
   UniqueFunctionInfo Functions[1000];
-  const char  *NameComment;
-  const char  *Description;
-  const char  *Caveats;
-  const char  *SeeAlso;
+  const char* NameComment;
+  const char* Description;
+  const char* Caveats;
+  const char* SeeAlso;
 } NewClassInfo;
 
 //--------------------------------------------------------------------------nix
@@ -527,12 +569,10 @@ typedef struct _NewClassInfo
  *
  * @return true if the function is not wrappable
  */
-int notWrappable(FunctionInfo *curFunction)
+int notWrappable(FunctionInfo* curFunction)
 {
-  return (curFunction->IsOperator ||
-          curFunction->ArrayFailure ||
-          !curFunction->IsPublic ||
-          !curFunction->Name);
+  return (curFunction->IsOperator || curFunction->ArrayFailure || !curFunction->IsPublic ||
+    !curFunction->Name);
 }
 
 //--------------------------------------------------------------------------nix
@@ -544,20 +584,14 @@ int notWrappable(FunctionInfo *curFunction)
  *
  * @return true if the arguments are okay for code generation
  */
-int managableArguments(FunctionInfo *curFunction)
+int managableArguments(FunctionInfo* curFunction)
 {
-  static unsigned int supported_types[] = {
-    VTK_PARSE_VOID, VTK_PARSE_BOOL, VTK_PARSE_FLOAT, VTK_PARSE_DOUBLE,
-    VTK_PARSE_CHAR, VTK_PARSE_UNSIGNED_CHAR, VTK_PARSE_SIGNED_CHAR,
-    VTK_PARSE_INT, VTK_PARSE_UNSIGNED_INT,
-    VTK_PARSE_SHORT, VTK_PARSE_UNSIGNED_SHORT,
-    VTK_PARSE_LONG, VTK_PARSE_UNSIGNED_LONG,
-    VTK_PARSE_ID_TYPE, VTK_PARSE_UNSIGNED_ID_TYPE,
-    VTK_PARSE_LONG_LONG, VTK_PARSE_UNSIGNED_LONG_LONG,
-    VTK_PARSE___INT64, VTK_PARSE_UNSIGNED___INT64,
-    VTK_PARSE_VTK_OBJECT, VTK_PARSE_STRING,
-    0
-  };
+  static unsigned int supported_types[] = { VTK_PARSE_VOID, VTK_PARSE_BOOL, VTK_PARSE_FLOAT,
+    VTK_PARSE_DOUBLE, VTK_PARSE_CHAR, VTK_PARSE_UNSIGNED_CHAR, VTK_PARSE_SIGNED_CHAR, VTK_PARSE_INT,
+    VTK_PARSE_UNSIGNED_INT, VTK_PARSE_SHORT, VTK_PARSE_UNSIGNED_SHORT, VTK_PARSE_LONG,
+    VTK_PARSE_UNSIGNED_LONG, VTK_PARSE_ID_TYPE, VTK_PARSE_UNSIGNED_ID_TYPE, VTK_PARSE_LONG_LONG,
+    VTK_PARSE_UNSIGNED_LONG_LONG, VTK_PARSE___INT64, VTK_PARSE_UNSIGNED___INT64,
+    VTK_PARSE_VTK_OBJECT, VTK_PARSE_STRING, 0 };
 
   int i, j;
   int args_ok = 1;
@@ -567,172 +601,179 @@ int managableArguments(FunctionInfo *curFunction)
 
   /* check to see if we can handle the args */
   for (i = 0; i < curFunction->NumberOfArguments; i++)
-    {
-    int isPointerToData = arg_is_pointer_to_data(curFunction->ArgTypes[i],
-                                                 curFunction->ArgCounts[i]);
+  {
+    int isPointerToData =
+      arg_is_pointer_to_data(curFunction->ArgTypes[i], curFunction->ArgCounts[i]);
     argType = (curFunction->ArgTypes[i] & VTK_PARSE_UNQUALIFIED_TYPE);
     baseType = (argType & VTK_PARSE_BASE_TYPE);
 
     if (curFunction->ArgTypes[i] != VTK_PARSE_FUNCTION)
-      {
+    {
       for (j = 0; supported_types[j] != 0; j++)
+      {
+        if (baseType == supported_types[j])
         {
-        if (baseType == supported_types[j]) { break; }
-        }
-      if (supported_types[j] == 0)
-        {
-        args_ok = 0;
+          break;
         }
       }
+      if (supported_types[j] == 0)
+      {
+        args_ok = 0;
+      }
+    }
 
     /* if its a pointer arg make sure we have the ArgCount */
-    if (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) &&
-        !isPointerToData &&
-        ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_CHAR) &&
-        ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT))
+    if (((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) && !isPointerToData &&
+      ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_CHAR) &&
+      ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT))
+    {
+      if (curFunction->NumberOfArguments > 1 || curFunction->ArgCounts[i] == 0 ||
+        ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING))
       {
-      if (curFunction->NumberOfArguments > 1 ||
-          curFunction->ArgCounts[i] == 0 ||
-          ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING))
-        {
         args_ok = 0;
-        }
       }
+    }
 
     /* if it has a reference arg, don't wrap it */
     if ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
-      {
+    {
       /* make exception for "vtkClientServerStream&" */
       if (((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-          strcmp(curFunction->ArgClasses[i], "vtkClientServerStream"))
-        {
+        strcmp(curFunction->ArgClasses[i], "vtkClientServerStream"))
+      {
         /* also make exception for "const vtkStdString&" */
         if ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING ||
-            (curFunction->ArgTypes[i] & VTK_PARSE_CONST) == 0)
-          {
+          (curFunction->ArgTypes[i] & VTK_PARSE_CONST) == 0)
+        {
           args_ok = 0;
-          }
         }
       }
+    }
 
     /* if it is a vtk object that isn't a pointer or ref, don't wrap it */
     if (((argType & VTK_PARSE_INDIRECT) == 0) &&
-        ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
-      {
+      ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+    {
       args_ok = 0;
-      }
+    }
 
     /* if arg is a vtk object, make sure it is a wrapped object */
     if ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT &&
-        !class_is_wrapped(curFunction->ArgClasses[i]))
-      {
+      !class_is_wrapped(curFunction->ArgClasses[i]))
+    {
       args_ok = 0;
-      }
+    }
 
     /* if it is "**" or "*&" then don't wrap it */
     if (((argType & VTK_PARSE_INDIRECT) != 0) &&
-        ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
-        ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
-      {
+      ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
+      ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
+    {
       args_ok = 0;
-      }
+    }
 
     /* if it is an array of chars, then don't wrap it */
-    if ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR &&
-        curFunction->ArgCounts[i] != 0)
-      {
+    if ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_CHAR && curFunction->ArgCounts[i] != 0)
+    {
       args_ok = 0;
-      }
-
-    if ((argType & VTK_PARSE_UNSIGNED) &&
-        (argType != VTK_PARSE_UNSIGNED_CHAR)&&
-        (argType != VTK_PARSE_UNSIGNED_INT)&&
-        (argType != VTK_PARSE_UNSIGNED_SHORT)&&
-        (argType != VTK_PARSE_UNSIGNED_LONG)&&
-        (argType != VTK_PARSE_UNSIGNED_ID_TYPE)&&
-        !isPointerToData)
-      {
-      args_ok = 0;
-      }
     }
+
+    if ((argType & VTK_PARSE_UNSIGNED) && (argType != VTK_PARSE_UNSIGNED_CHAR) &&
+      (argType != VTK_PARSE_UNSIGNED_INT) && (argType != VTK_PARSE_UNSIGNED_SHORT) &&
+      (argType != VTK_PARSE_UNSIGNED_LONG) && (argType != VTK_PARSE_UNSIGNED_ID_TYPE) &&
+      !isPointerToData)
+    {
+      args_ok = 0;
+    }
+  }
 
   /* check the return type */
   returnType = (curFunction->ReturnType & VTK_PARSE_UNQUALIFIED_TYPE);
   baseType = (returnType & VTK_PARSE_BASE_TYPE);
 
   for (j = 0; supported_types[j] != 0; j++)
+  {
+    if (baseType == supported_types[j])
     {
-    if (baseType == supported_types[j]) { break; }
+      break;
     }
+  }
   if (supported_types[j] == 0)
-    {
+  {
     args_ok = 0;
-    }
+  }
 
   /* if it is a reference, then don't wrap it */
   if ((returnType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
-    {
+  {
     /* make exception for "vtkClientServerStream&" */
     if (((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-        strcmp(curFunction->ReturnClass, "vtkClientServerStream"))
-      {
+      strcmp(curFunction->ReturnClass, "vtkClientServerStream"))
+    {
       /* also make exception for "vtkStdString" */
       if ((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING)
-        {
+      {
         args_ok = 0;
-        }
       }
     }
+  }
 
   /* if it is a vtk object that isn't a pointer, don't wrap it */
   if (((returnType & VTK_PARSE_INDIRECT) == 0) &&
-      ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
-    {
+    ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+  {
     args_ok = 0;
-    }
+  }
 
   /* if arg is a vtk object, make sure it is a wrapped object */
   if ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT &&
-      !class_is_wrapped(curFunction->ReturnClass))
-    {
+    !class_is_wrapped(curFunction->ReturnClass))
+  {
     args_ok = 0;
-    }
+  }
 
   /* if it is "**" or "*&" then don't wrap it */
   if (((returnType & VTK_PARSE_INDIRECT) != 0) &&
-      ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
-      ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
-    {
+    ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
+    ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
+  {
     args_ok = 0;
-    }
+  }
 
   /* cannot wrap function pointers */
-  if (curFunction->NumberOfArguments &&
-      (curFunction->ArgTypes[0] == VTK_PARSE_FUNCTION))
-    {
+  if (curFunction->NumberOfArguments && (curFunction->ArgTypes[0] == VTK_PARSE_FUNCTION))
+  {
     args_ok = 0;
-    }
+  }
 
   /* we can't handle void * return types */
   if (((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VOID) &&
-      ((returnType & VTK_PARSE_INDIRECT) != 0))
-    {
+    ((returnType & VTK_PARSE_INDIRECT) != 0))
+  {
     args_ok = 0;
-    }
+  }
 
   /* watch out for functions that dont have enough info */
   if ((returnType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
-    {
+  {
     switch (returnType & VTK_PARSE_BASE_TYPE)
-      {
-      case VTK_PARSE_FLOAT: case VTK_PARSE_DOUBLE:
-      case VTK_PARSE_INT: case VTK_PARSE_SHORT:
-      case VTK_PARSE_LONG: case VTK_PARSE_ID_TYPE:
-      case VTK_PARSE_LONG_LONG: case VTK_PARSE___INT64:
-      case VTK_PARSE_SIGNED_CHAR: case VTK_PARSE_UNSIGNED_CHAR:
-      case VTK_PARSE_UNSIGNED_INT: case VTK_PARSE_UNSIGNED_SHORT:
-      case VTK_PARSE_UNSIGNED_LONG: case VTK_PARSE_UNSIGNED_ID_TYPE:
-      case VTK_PARSE_UNSIGNED_LONG_LONG: case VTK_PARSE_UNSIGNED___INT64:
+    {
+      case VTK_PARSE_FLOAT:
+      case VTK_PARSE_DOUBLE:
+      case VTK_PARSE_INT:
+      case VTK_PARSE_SHORT:
+      case VTK_PARSE_LONG:
+      case VTK_PARSE_ID_TYPE:
+      case VTK_PARSE_LONG_LONG:
+      case VTK_PARSE___INT64:
+      case VTK_PARSE_SIGNED_CHAR:
+      case VTK_PARSE_UNSIGNED_CHAR:
+      case VTK_PARSE_UNSIGNED_INT:
+      case VTK_PARSE_UNSIGNED_SHORT:
+      case VTK_PARSE_UNSIGNED_LONG:
+      case VTK_PARSE_UNSIGNED_ID_TYPE:
+      case VTK_PARSE_UNSIGNED_LONG_LONG:
+      case VTK_PARSE_UNSIGNED___INT64:
         args_ok = curFunction->HaveHint;
         break;
 
@@ -743,8 +784,8 @@ int managableArguments(FunctionInfo *curFunction)
       default:
         args_ok = 0;
         break;
-      }
     }
+  }
 
   return args_ok;
 }
@@ -760,11 +801,11 @@ int managableArguments(FunctionInfo *curFunction)
  * @return values returned by strcmp
  */
 
-int funCmp(const void  *fun1, const void *fun2)
+int funCmp(const void* fun1, const void* fun2)
 {
-  FunctionInfo *a = (FunctionInfo*)fun1;
-  FunctionInfo *b = (FunctionInfo*)fun2;
-  return strcmp(a->Name,b->Name);
+  FunctionInfo* a = (FunctionInfo*)fun1;
+  FunctionInfo* b = (FunctionInfo*)fun2;
+  return strcmp(a->Name, b->Name);
 }
 
 //--------------------------------------------------------------------------nix
@@ -801,25 +842,21 @@ int copy(FunctionInfo* from, int fromSize, FunctionInfo* to)
  *
  * @return the size of the destination array (this may not be the size of the source)
  */
-int extractWrappable(FunctionInfo* from[],
-                     int fromSize,
-                     FunctionInfo* to[],
-                     const char* ClassName)
+int extractWrappable(FunctionInfo* from[], int fromSize, FunctionInfo* to[], const char* ClassName)
 {
-  int i,j;
-  for (i=0,j=0 ; i<fromSize ;i++)
-    {
+  int i, j;
+  for (i = 0, j = 0; i < fromSize; i++)
+  {
     /* if the function is wrappable and
        args are OK and
        it is not a constructor or destructor */
-    if(!notWrappable(from[i]) &&
-       managableArguments(from[i]) &&
-       strcmp(ClassName,from[i]->Name) && strcmp(ClassName,from[i]->Name + 1))
-      {
+    if (!notWrappable(from[i]) && managableArguments(from[i]) && strcmp(ClassName, from[i]->Name) &&
+      strcmp(ClassName, from[i]->Name + 1))
+    {
       to[j] = from[i];
       ++j;
-      }
     }
+  }
   return j;
 }
 
@@ -834,34 +871,34 @@ int extractWrappable(FunctionInfo* from[],
  *
  * @return the total number of elements in the dest array
  */
-int collectUniqueFunctionInfo(FunctionInfo *src[], int srcSize, UniqueFunctionInfo dest[])
+int collectUniqueFunctionInfo(FunctionInfo* src[], int srcSize, UniqueFunctionInfo dest[])
 {
-  int i,j,k;
+  int i, j, k;
 
-  for (i=0; i < srcSize; i++)
-    {
+  for (i = 0; i < srcSize; i++)
+  {
     dest[i].Name = src[i]->Name;
     dest[i].TotalPolymorphTypes = 1;
     dest[i].Function[0] = src[i];
-    for(j=i+1; j < srcSize; j++)
+    for (j = i + 1; j < srcSize; j++)
+    {
+      if (strcmp(dest[i].Name, src[j]->Name) == 0)
       {
-      if(strcmp(dest[i].Name, src[j]->Name) == 0)
-        {
-        //printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
-        //printf("    > [SAME]\n");
+        // printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
+        // printf("    > [SAME]\n");
         dest[i].Function[dest[i].TotalPolymorphTypes] = src[j];
         dest[i].TotalPolymorphTypes++;
 
-        for(k=j; k < srcSize-1; k++)
-          {
-          //printf("remaining = %s\n",src[k]->Name);
-          src[k] = src[k+1];
-          }
+        for (k = j; k < srcSize - 1; k++)
+        {
+          // printf("remaining = %s\n",src[k]->Name);
+          src[k] = src[k + 1];
+        }
         j--;
         srcSize--;
-        }
       }
     }
+  }
 
   return srcSize;
 }
@@ -875,13 +912,12 @@ int collectUniqueFunctionInfo(FunctionInfo *src[], int srcSize, UniqueFunctionIn
  * @param data hold the collected file data form the parser
  * @param classData the form into which we want to convert
  */
-void getClassInfo(FileInfo *fileInfo, ClassInfo *data, NewClassInfo* classData)
+void getClassInfo(FileInfo* fileInfo, ClassInfo* data, NewClassInfo* classData)
 {
   int i;
-  int TotalUniqueFunctions=0;
+  int TotalUniqueFunctions = 0;
   int TotalFunctions;
-  FunctionInfo **tempFun =(FunctionInfo**)malloc
-    (sizeof(FunctionInfo*)*data->NumberOfFunctions);
+  FunctionInfo** tempFun = (FunctionInfo**)malloc(sizeof(FunctionInfo*) * data->NumberOfFunctions);
 
   /* Collect all the information */
   classData->HasDelete = data->HasDelete;
@@ -892,38 +928,33 @@ void getClassInfo(FileInfo *fileInfo, ClassInfo *data, NewClassInfo* classData)
   classData->OutputFileName = "";
   classData->NumberOfSuperClasses = data->NumberOfSuperClasses;
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
-    {
+  {
     classData->SuperClasses[i] = data->SuperClasses[i];
-    }
+  }
   classData->NameComment = fileInfo->NameComment;
   classData->Description = fileInfo->Description;
   classData->Caveats = fileInfo->Caveats;
   classData->SeeAlso = fileInfo->SeeAlso;
 
   /* Collect only wrappable functions*/
-  TotalFunctions = extractWrappable(data->Functions,
-                                    data->NumberOfFunctions,
-                                    tempFun,
-                                    data->Name);
+  TotalFunctions = extractWrappable(data->Functions, data->NumberOfFunctions, tempFun, data->Name);
   /* Sort the function data. */
-  //qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
+  // qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
 
-/*   for(i=0;i<TotalFunctions;i++) */
-/*     { */
-/*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
-/*     } */
+  /*   for(i=0;i<TotalFunctions;i++) */
+  /*     { */
+  /*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
+  /*     } */
 
-//  printf("START\n");
+  //  printf("START\n");
   /* Collect unique and group polymorphed functions in UniqueFunctionInfo */
-  TotalUniqueFunctions = collectUniqueFunctionInfo(tempFun,
-                                                   TotalFunctions,
-                                                   classData->Functions);
-//  printf("END\n");
+  TotalUniqueFunctions = collectUniqueFunctionInfo(tempFun, TotalFunctions, classData->Functions);
+  //  printf("END\n");
 
- /*  for(i=0;i<TotalUniqueFunctions;i++) */
-/*     { */
-/*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
-/*     } */
+  /*  for(i=0;i<TotalUniqueFunctions;i++) */
+  /*     { */
+  /*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
+  /*     } */
 
   classData->NumberOfFunctions = TotalUniqueFunctions;
   free(tempFun);
@@ -939,14 +970,14 @@ void getClassInfo(FileInfo *fileInfo, ClassInfo *data, NewClassInfo* classData)
  *
  * @return 0 if found and 1 if not
  */
-int isUniqueString(const char* main, const char *list[], int total)
+int isUniqueString(const char* main, const char* list[], int total)
 {
   int i;
   for (i = 0; i < total; ++i)
-    {
-    if(strcmp(main,list[i])==0)
+  {
+    if (strcmp(main, list[i]) == 0)
       return 0;
-    }
+  }
   return 1;
 }
 
@@ -960,29 +991,29 @@ int isUniqueString(const char* main, const char *list[], int total)
  *
  * @return the total list of unique classes
  */
-int uniqueClasses(const char *classes[],int total,const char *classSelfName)
+int uniqueClasses(const char* classes[], int total, const char* classSelfName)
 {
-  int i,j=0;
-  const char *temp[1000];
+  int i, j = 0;
+  const char* temp[1000];
   const char* current_class_name;
-  for (i = total-1; i>=0; --i)
+  for (i = total - 1; i >= 0; --i)
   {
     current_class_name = classes[i];
-    if (strcmp(current_class_name,classSelfName)!=0  &&
-       // hack
-       strcmp(current_class_name,"vtkClientServerStream")!=0 &&
-       isUniqueString(current_class_name,&temp[0],j)
-       // && strcmp(classes[i],"vtkObjectBase")!=0)
-       )
-      {
-      temp[j]= current_class_name;
-      ++j;
-      }
-  }
-  for(i=0;i<j;++i)
+    if (strcmp(current_class_name, classSelfName) != 0 &&
+      // hack
+      strcmp(current_class_name, "vtkClientServerStream") != 0 &&
+      isUniqueString(current_class_name, &temp[0], j)
+      // && strcmp(classes[i],"vtkObjectBase")!=0)
+      )
     {
-    classes[i]=temp[i];
+      temp[j] = current_class_name;
+      ++j;
     }
+  }
+  for (i = 0; i < j; ++i)
+  {
+    classes[i] = temp[i];
+  }
   return j;
 }
 
@@ -997,23 +1028,19 @@ int uniqueClasses(const char *classes[],int total,const char *classSelfName)
  *
  * @return true if argclass is external to classname's kit
  */
-static int isExternalObject(const char *classname, const char *argclass)
+static int isExternalObject(const char* classname, const char* argclass)
 {
-  static const char *wrapExtern[] = {
-    "vtkInformation", "vtkDataObject",
-    "vtkPolyDataSilhouette", "vtkProp3D",
-    "vtkPolyDataSilhouette", "vtkCamera",
-    0, 0 };
-  const char **externCheck;
+  static const char* wrapExtern[] = { "vtkInformation", "vtkDataObject", "vtkPolyDataSilhouette",
+    "vtkProp3D", "vtkPolyDataSilhouette", "vtkCamera", 0, 0 };
+  const char** externCheck;
 
   for (externCheck = wrapExtern; *externCheck != 0; externCheck += 2)
+  {
+    if (strcmp(externCheck[0], classname) == 0 && strcmp(externCheck[1], argclass) == 0)
     {
-    if (strcmp(externCheck[0], classname) == 0 &&
-        strcmp(externCheck[1], argclass) == 0)
-      {
       return 1;
-      }
     }
+  }
 
   return 0;
 }
@@ -1029,47 +1056,45 @@ static int isExternalObject(const char *classname, const char *argclass)
  *
  * @return the count of the extracted unique classes
  */
-int extractOtherClassesUsed(NewClassInfo *data, const char *classes[])
+int extractOtherClassesUsed(NewClassInfo* data, const char* classes[])
 {
-  int i,j,k;
-  int count=0;
+  int i, j, k;
+  int count = 0;
   // Collect all the superclasses
-  for ( i = 0; i < data->NumberOfSuperClasses; ++i)
-    classes[i]=data->SuperClasses[i];
+  for (i = 0; i < data->NumberOfSuperClasses; ++i)
+    classes[i] = data->SuperClasses[i];
   count = data->NumberOfSuperClasses;
   // return count; // HACK only returns the super classes
 
   // Collect all the functions params and return types
-  for ( i = 0; i < data->NumberOfFunctions; ++i)
-    {
+  for (i = 0; i < data->NumberOfFunctions; ++i)
+  {
     for (j = 0; j < data->Functions[i].TotalPolymorphTypes; ++j)
+    {
+      for (k = 0; k < data->Functions[i].Function[j]->NumberOfArguments; ++k)
       {
-      for (k=0; k < data->Functions[i].Function[j]->NumberOfArguments; ++k)
+        if ((data->Functions[i].Function[j]->ArgTypes[k] & VTK_PARSE_BASE_TYPE) ==
+          VTK_PARSE_VTK_OBJECT)
         {
-        if((data->Functions[i].Function[j]->ArgTypes[k] & VTK_PARSE_BASE_TYPE)
-           == VTK_PARSE_VTK_OBJECT)
+          if (!isExternalObject(data->ClassName, data->Functions[i].Function[j]->ArgClasses[k]))
           {
-          if (!isExternalObject(data->ClassName,
-                 data->Functions[i].Function[j]->ArgClasses[k]))
-            {
-            classes[count]=data->Functions[i].Function[j]->ArgClasses[k];
+            classes[count] = data->Functions[i].Function[j]->ArgClasses[k];
             ++count;
-            }
-          }
-        }
-      if((data->Functions[i].Function[j]->ReturnType & VTK_PARSE_BASE_TYPE)
-         == VTK_PARSE_VTK_OBJECT)
-        {
-        if (!isExternalObject(data->ClassName,
-               data->Functions[i].Function[j]->ReturnClass))
-          {
-          classes[count]=data->Functions[i].Function[j]->ReturnClass;
-          ++count;
           }
         }
       }
+      if ((data->Functions[i].Function[j]->ReturnType & VTK_PARSE_BASE_TYPE) ==
+        VTK_PARSE_VTK_OBJECT)
+      {
+        if (!isExternalObject(data->ClassName, data->Functions[i].Function[j]->ReturnClass))
+        {
+          classes[count] = data->Functions[i].Function[j]->ReturnClass;
+          ++count;
+        }
+      }
     }
-  return uniqueClasses(classes,count,data->ClassName);
+  }
+  return uniqueClasses(classes, count, data->ClassName);
 }
 
 //--------------------------------------------------------------------------nix
@@ -1082,70 +1107,71 @@ int extractOtherClassesUsed(NewClassInfo *data, const char *classes[])
  * @param fp file to write into
  * @param data data which will be used to write into file
  */
-void output_InitFunction(FILE *fp, NewClassInfo *data)
+void output_InitFunction(FILE* fp, NewClassInfo* data)
 {
-  fprintf(fp,"\n");
-  fprintf(fp,
-          "\n"
-          "//-------------------------------------------------------------------------auto\n"
-          "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
-          "{\n"
-          "  static vtkClientServerInterpreter* last = NULL;\n"
-          "  if(last != csi)\n"
-          "    {\n"
-          "    last = csi;\n", data->ClassName);
-  if(!data->IsAbstract)
-    fprintf(fp,"    csi->AddNewInstanceFunction(\"%s\", %sClientServerNewCommand);\n",
-            data->ClassName,data->ClassName);
-  fprintf(fp,"    csi->AddCommandFunction(\"%s\", %sCommand);\n",
-          data->ClassName,data->ClassName);
+  fprintf(fp, "\n");
+  fprintf(fp, "\n"
+              "//-------------------------------------------------------------------------auto\n"
+              "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
+              "{\n"
+              "  static vtkClientServerInterpreter* last = NULL;\n"
+              "  if(last != csi)\n"
+              "    {\n"
+              "    last = csi;\n",
+    data->ClassName);
+  if (!data->IsAbstract)
+    fprintf(fp, "    csi->AddNewInstanceFunction(\"%s\", %sClientServerNewCommand);\n",
+      data->ClassName, data->ClassName);
+  fprintf(
+    fp, "    csi->AddCommandFunction(\"%s\", %sCommand);\n", data->ClassName, data->ClassName);
   fprintf(fp, "    }\n}\n");
 }
 
 /* check all methods for use of vtkStdString */
-int classUsesStdString(ClassInfo *data)
+int classUsesStdString(ClassInfo* data)
 {
   int i, j;
-  FunctionInfo *info;
+  FunctionInfo* info;
 
   for (i = 0; i < data->NumberOfFunctions; i++)
-    {
+  {
     info = data->Functions[i];
     if ((info->ReturnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING)
-      {
+    {
       return 1;
-      }
+    }
     for (j = 0; j < info->NumberOfArguments; j++)
-      {
+    {
       if ((info->ArgTypes[j] & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING)
-        {
+      {
         return 1;
-        }
       }
     }
+  }
   return 0;
 }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-# define snprintf _snprintf
+#define snprintf _snprintf
 #endif
 
 /* print the parsed structures */
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  OptionInfo *options;
-  FileInfo *fileInfo;
-  ClassInfo *data;
-  NamespaceInfo *ns;
+  OptionInfo* options;
+  FileInfo* fileInfo;
+  ClassInfo* data;
+  NamespaceInfo* ns;
   char nsname[1024];
-  struct {
-    NamespaceInfo *ns;
+  struct
+  {
+    NamespaceInfo* ns;
     size_t nsnamepos;
     int n;
   } nsstack[32];
   size_t nspos;
-  FILE *fp;
-  NewClassInfo *classData;
+  FILE* fp;
+  NewClassInfo* classData;
   int i;
 
   /* get command-line args and parse the header file */
@@ -1158,10 +1184,10 @@ int main(int argc, char *argv[])
   fp = fopen(options->OutputFileName, "w");
 
   if (!fp)
-    {
+  {
     fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
     exit(1);
-    }
+  }
 
   data = fileInfo->MainClass;
 
@@ -1174,21 +1200,21 @@ int main(int argc, char *argv[])
   ns = nsstack[nspos].ns;
 
   while (!data && ns)
-    {
+  {
     if (ns->Name)
-      {
+    {
       size_t namelen = strlen(nsname);
       snprintf(nsname + namelen, sizeof(nsname) - namelen, "::%s", ns->Name);
-      }
+    }
 
     if (ns->NumberOfClasses > 0)
-      {
+    {
       data = ns->Classes[0];
       break;
-      }
+    }
 
     if (ns->NumberOfNamespaces > nsstack[nspos].n)
-      {
+    {
       /* Use the next namespace. */
       ns = ns->Namespaces[nsstack[nspos].n];
       nsstack[nspos].n++;
@@ -1198,184 +1224,178 @@ int main(int argc, char *argv[])
       nsstack[nspos].ns = ns;
       nsstack[nspos].nsnamepos = strlen(nsname);
       nsstack[nspos].n = 0;
-      }
+    }
     else
-      {
+    {
       if (nspos)
-        {
+      {
         --nspos;
         /* Reset the namespace name. */
         nsname[nsstack[nspos].nsnamepos] = '\0';
         /* Go back up the stack. */
         ns = nsstack[nspos].ns;
-        }
+      }
       else
-        {
+      {
         /* Nothing left to search. */
         ns = NULL;
-        }
       }
     }
+  }
 
-  if(!data)
-    {
+  if (!data)
+  {
     fclose(fp);
     exit(1);
-    }
+  }
 
   /* get the hierarchy info for accurate typing */
   if (options->HierarchyFileName)
-    {
+  {
     hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
     if (hierarchyInfo)
-      {
+    {
       /* resolve using declarations within the header files */
       vtkWrap_ApplyUsingDeclarations(data, fileInfo, hierarchyInfo);
-      }
     }
+  }
 
-  fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->Name);
-  fprintf(fp,"#define VTK_WRAPPING_CXX\n");
-  if(strcmp("vtkObjectBase", data->Name) != 0)
-    {
+  fprintf(fp, "// ClientServer wrapper for %s object\n//\n", data->Name);
+  fprintf(fp, "#define VTK_WRAPPING_CXX\n");
+  if (strcmp("vtkObjectBase", data->Name) != 0)
+  {
     /* Block inclusion of full streams. */
-    fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
-    }
-  fprintf(fp,"#include \"%s.h\"\n",data->Name);
-  fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
+    fprintf(fp, "#define VTK_STREAMS_FWD_ONLY\n");
+  }
+  fprintf(fp, "#include \"%s.h\"\n", data->Name);
+  fprintf(fp, "#include \"vtkSystemIncludes.h\"\n");
   if (classUsesStdString(data))
-    {
-    fprintf(fp,"#include \"vtkStdString.h\"\n");
-    }
-  fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
-  fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
+  {
+    fprintf(fp, "#include \"vtkStdString.h\"\n");
+  }
+  fprintf(fp, "#include \"vtkClientServerInterpreter.h\"\n");
+  fprintf(fp, "#include \"vtkClientServerStream.h\"\n\n");
 #if 0
   if (!strcmp("vtkObject",data->Name))
     {
     fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
     }
 #endif
-  if (!strcmp("vtkObjectBase",data->Name))
-    {
-    fprintf(fp,"#include <sstream>\n");
-    }
+  if (!strcmp("vtkObjectBase", data->Name))
+  {
+    fprintf(fp, "#include <sstream>\n");
+  }
   if (*nsname)
-    {
-    fprintf(fp,"using namespace %s;\n", nsname);
-    }
+  {
+    fprintf(fp, "using namespace %s;\n", nsname);
+  }
   if (!data->IsAbstract)
-    {
-    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand(void* /*ctx*/)\n{\n",data->Name);
-    fprintf(fp,"  return %s::New();\n}\n\n",data->Name);
-    }
+  {
+    fprintf(fp, "\nvtkObjectBase *%sClientServerNewCommand(void* /*ctx*/)\n{\n", data->Name);
+    fprintf(fp, "  return %s::New();\n}\n\n", data->Name);
+  }
 
-  fprintf(fp,
-          "\n"
-          "int VTK_EXPORT"
-          " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
-          " const char *method, const vtkClientServerStream& msg,"
-          " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
-          "{\n",
-          data->Name);
+  fprintf(fp, "\n"
+              "int VTK_EXPORT"
+              " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
+              " const char *method, const vtkClientServerStream& msg,"
+              " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
+              "{\n",
+    data->Name);
 
-  if(strcmp(data->Name, "vtkObjectBase") == 0)
-    {
-    fprintf(fp,"  %s *op = ob;\n",
-            data->Name);
-    }
+  if (strcmp(data->Name, "vtkObjectBase") == 0)
+  {
+    fprintf(fp, "  %s *op = ob;\n", data->Name);
+  }
   else
-    {
-    fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n",
-            data->Name, data->Name);
-    fprintf(fp,
-            "  if(!op)\n"
-            "    {\n"
-            "    vtkOStrStreamWrapper vtkmsg;\n"
-            "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
-            "           << \"This probably means the class specifies the incorrect superclass in vtkTypeMacro.\";\n"
-            "    resultStream.Reset();\n"
-            "    resultStream << vtkClientServerStream::Error\n"
-            "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
-            "    return 0;\n"
-            "    }\n", data->Name);
-    }
+  {
+    fprintf(fp, "  %s *op = %s::SafeDownCast(ob);\n", data->Name, data->Name);
+    fprintf(fp, "  if(!op)\n"
+                "    {\n"
+                "    vtkOStrStreamWrapper vtkmsg;\n"
+                "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
+                "           << \"This probably means the class specifies the incorrect superclass "
+                "in vtkTypeMacro.\";\n"
+                "    resultStream.Reset();\n"
+                "    resultStream << vtkClientServerStream::Error\n"
+                "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
+                "    return 0;\n"
+                "    }\n",
+      data->Name);
+  }
 
   fprintf(fp, "  (void)arlu;\n");
-
 
   /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
 
   /* insert function handling code here */
   for (i = 0; i < data->NumberOfFunctions; i++)
-    {
+  {
     currentFunction = data->Functions[i];
     outputFunction(fp, data);
-    }
+  }
 
   /* try superclasses */
   for (i = 0; i < data->NumberOfSuperClasses; i++)
-    {
-    fprintf(fp,
-      "\n"
-      "  {\n"
-      "    const char* commandName = \"%s\";\n"
-      "    if (arlu->HasCommandFunction(commandName) &&\n"
-      "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { return 1; }\n"
-      "  }\n",
+  {
+    fprintf(fp, "\n"
+                "  {\n"
+                "    const char* commandName = \"%s\";\n"
+                "    if (arlu->HasCommandFunction(commandName) &&\n"
+                "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { "
+                "return 1; }\n"
+                "  }\n",
       data->SuperClasses[i]);
-    }
+  }
   /* Add the Print method to vtkObjectBase. */
-  if (!strcmp("vtkObjectBase",data->Name))
-    {
-    fprintf(fp,
-            "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
-            "    {\n"
-            "    std::ostringstream buf_with_warning_C4701;\n"
-            "    op->Print(buf_with_warning_C4701);\n"
-            "    resultStream.Reset();\n"
-            "    resultStream << vtkClientServerStream::Reply\n"
-            "                 << buf_with_warning_C4701.str().c_str()\n"
-            "                 << vtkClientServerStream::End;\n"
-            "    return 1;\n"
-            "    }\n");
-    }
+  if (!strcmp("vtkObjectBase", data->Name))
+  {
+    fprintf(fp, "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
+                "    {\n"
+                "    std::ostringstream buf_with_warning_C4701;\n"
+                "    op->Print(buf_with_warning_C4701);\n"
+                "    resultStream.Reset();\n"
+                "    resultStream << vtkClientServerStream::Reply\n"
+                "                 << buf_with_warning_C4701.str().c_str()\n"
+                "                 << vtkClientServerStream::End;\n"
+                "    return 1;\n"
+                "    }\n");
+  }
   /* Add the special form of AddObserver to vtkObject. */
-  if (!strcmp("vtkObject",data->Name))
-    {
-    fprintf(fp,
-            "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
-            "    {\n"
-            "    const char* event;\n"
-            "    vtkClientServerStream css;\n"
-            "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
-            "      {\n"
-            "      return arlu->NewObserver(op, event, css);\n"
-            "      }\n"
-            "    }\n");
-    }
+  if (!strcmp("vtkObject", data->Name))
+  {
+    fprintf(fp, "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
+                "    {\n"
+                "    const char* event;\n"
+                "    vtkClientServerStream css;\n"
+                "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
+                "      {\n"
+                "      return arlu->NewObserver(op, event, css);\n"
+                "      }\n"
+                "    }\n");
+  }
   fprintf(fp,
-          "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
-          "     resultStream.GetCommand(0) == vtkClientServerStream::Error &&\n"
-          "     resultStream.GetNumberOfArguments(0) > 1)\n"
-          "    {\n"
-          "    /* A superclass wrapper prepared a special message. */\n"
-          "    return 0;\n"
-          "    }\n"
-          "  vtkOStrStreamWrapper vtkmsg;\n"
-          "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
-          "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
-          "  resultStream.Reset();\n"
-          "  resultStream << vtkClientServerStream::Error\n"
-          "               << vtkmsg.str() << vtkClientServerStream::End;\n"
-          "  vtkmsg.rdbuf()->freeze(0);\n",
-          data->Name);
-  fprintf(fp,
-          "  return 0;\n"
-          "}\n");
+    "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
+    "     resultStream.GetCommand(0) == vtkClientServerStream::Error &&\n"
+    "     resultStream.GetNumberOfArguments(0) > 1)\n"
+    "    {\n"
+    "    /* A superclass wrapper prepared a special message. */\n"
+    "    return 0;\n"
+    "    }\n"
+    "  vtkOStrStreamWrapper vtkmsg;\n"
+    "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
+    "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
+    "  resultStream.Reset();\n"
+    "  resultStream << vtkClientServerStream::Error\n"
+    "               << vtkmsg.str() << vtkClientServerStream::End;\n"
+    "  vtkmsg.rdbuf()->freeze(0);\n",
+    data->Name);
+  fprintf(fp, "  return 0;\n"
+              "}\n");
 
   classData = (NewClassInfo*)malloc(sizeof(NewClassInfo));
-  getClassInfo(fileInfo,data,classData);
-  output_InitFunction(fp,classData);
+  getClassInfo(fileInfo, data, classData);
+  output_InitFunction(fp, classData);
   free(classData);
 
   vtkParse_Free(fileInfo);

@@ -43,6 +43,4 @@ private:
   void operator=(const vtkSMPSWriterProxy&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

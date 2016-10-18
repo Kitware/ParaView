@@ -66,7 +66,7 @@ private:
   void operator=(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
-  vtkInternal *Internal;
+  vtkInternal* Internal;
 };
 
 #endif

@@ -37,33 +37,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkVRUITrackerState : public vtkObject
 {
 public:
-  static vtkVRUITrackerState *New();
-  vtkTypeMacro(vtkVRUITrackerState,vtkObjectBase);
+  static vtkVRUITrackerState* New();
+  vtkTypeMacro(vtkVRUITrackerState, vtkObjectBase);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Ditto.
   // Initial value is (0,0,0).
-  vtkGetVector3Macro(Position,float);
-  vtkSetVector3Macro(Position,float);
+  vtkGetVector3Macro(Position, float);
+  vtkSetVector3Macro(Position, float);
 
   // Description:
   // Unit quaternion representing the orientation.
   // Initial value is (0,0,0,1).
-  vtkGetVector4Macro(UnitQuaternion,float);
-  vtkSetVector4Macro(UnitQuaternion,float);
+  vtkGetVector4Macro(UnitQuaternion, float);
+  vtkSetVector4Macro(UnitQuaternion, float);
 
   // Description:
   // Linear velocity in units/s.
   // Initial value is (0,0,0).
-  vtkGetVector3Macro(LinearVelocity,float);
-  vtkSetVector3Macro(LinearVelocity,float);
+  vtkGetVector3Macro(LinearVelocity, float);
+  vtkSetVector3Macro(LinearVelocity, float);
 
   // Description:
   // Angular velocity in units/s.
   // Initial value is (0,0,0)
-  vtkGetVector3Macro(AngularVelocity,float);
-  vtkSetVector3Macro(AngularVelocity,float);
+  vtkGetVector3Macro(AngularVelocity, float);
+  vtkSetVector3Macro(AngularVelocity, float);
 
 protected:
   vtkVRUITrackerState();
@@ -79,6 +79,5 @@ private:
   vtkVRUITrackerState(const vtkVRUITrackerState&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVRUITrackerState&) VTK_DELETE_FUNCTION;
 };
-
 
 #endif // #ifndef vtkVRUITrackerState_h

@@ -52,9 +52,10 @@ class PQCOMPONENTS_EXPORT pqSGWritersMenuManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqSGWritersMenuManager(const char* writersMenuName, const char* objectMenuName,
-                         QObject* parent=0);
+  pqSGWritersMenuManager(
+    const char* writersMenuName, const char* objectMenuName, QObject* parent = 0);
   ~pqSGWritersMenuManager();
 
 public slots:
@@ -75,6 +76,7 @@ protected slots:
   * Called when user requests to create a writer.
   */
   void onActionTriggered(QAction*);
+
 protected:
   void createWriter(const QString& xmlgroup, const QString& xmlname);
 

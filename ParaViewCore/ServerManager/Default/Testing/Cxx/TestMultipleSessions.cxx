@@ -30,9 +30,9 @@ PURPOSE.  See the above copyright notice for more information.
 int TestMultipleSessions(int argc, char* argv[])
 {
   vtkNew<vtkPVOptions> options;
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule::PROCESS_CLIENT, options.GetPointer());
-  
+  vtkInitializationHelper::Initialize(
+    argc, argv, vtkProcessModule::PROCESS_CLIENT, options.GetPointer());
+
   vtkIdType session1ID = vtkSMSession::ConnectToSelf();
   vtkIdType session2ID = vtkSMSession::ConnectToRemote("localhost", 11111);
 
@@ -55,7 +55,8 @@ int TestMultipleSessions(int argc, char* argv[])
 
   vtkSMViewProxy::SafeDownCast(view1)->StillRender();
   vtkSMViewProxy::SafeDownCast(view2)->StillRender();
-  int foo; cin >> foo;
+  int foo;
+  cin >> foo;
 
   vtkSMViewProxy::SafeDownCast(view1)->StillRender();
   vtkSMViewProxy::SafeDownCast(view2)->StillRender();

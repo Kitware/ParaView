@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAbstractMapper.h"
 
 #ifdef PARAVIEW_USE_ICE_T
-# include "vtkIceTSynchronizedRenderers.h"
+#include "vtkIceTSynchronizedRenderers.h"
 #endif
 
 #include <map>
@@ -66,27 +66,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 //----------------------------------------------------------------------------
-namespace {
-  struct PixelOrder
+namespace
+{
+struct PixelOrder
+{
+  float z;
+  unsigned char idx;
+
+  PixelOrder(unsigned char cIdx, float zBuffer)
   {
-    float z;
-    unsigned char idx;
+    this->idx = cIdx;
+    this->z = zBuffer;
+  }
 
-    PixelOrder(unsigned char cIdx, float zBuffer)
-    {
-      this->idx = cIdx;
-      this->z = zBuffer;
-    }
-
-    bool operator< (const PixelOrder& other) const
-    {
-      return this->z < other.z;
-    }
-  };
+  bool operator<(const PixelOrder& other) const { return this->z < other.z; }
+};
 };
 
 //----------------------------------------------------------------------------
-struct vtkPVRenderViewForAssembly::vtkInternals {
+struct vtkPVRenderViewForAssembly::vtkInternals
+{
 
   vtkInternals(vtkPVRenderViewForAssembly* owner)
   {
@@ -110,7 +109,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     this->TIFFWriter->SetInputData(this->ImageStack.GetPointer());
     this->PNGWriter->SetInputData(this->ImageStack.GetPointer());
 
-    this->FieldAssociation =  VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
+    this->FieldAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
     this->FieldNameSet = false;
     this->FieldAttributeType = 0;
     this->Component = 0;
@@ -131,17 +130,18 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   void RemoveRepresentation(vtkPVDataRepresentation* r)
   {
     std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
-    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
+    for (iter = this->CompositeRepresentations.begin();
+         iter != this->CompositeRepresentations.end(); ++iter)
+    {
+      if (*iter == r)
       {
-      if(*iter == r)
-        {
         break;
-        }
       }
-    if(iter != this->CompositeRepresentations.end())
-      {
+    }
+    if (iter != this->CompositeRepresentations.end())
+    {
       this->CompositeRepresentations.erase(iter);
-      }
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -150,11 +150,12 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   {
     int index = 0;
     std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
-    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
-      {
+    for (iter = this->CompositeRepresentations.begin();
+         iter != this->CompositeRepresentations.end(); ++iter)
+    {
       vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(*iter);
       this->VisibilityState[index++] = rep ? rep->GetVisibility() : false;
-      }
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -163,15 +164,16 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   {
     int index = 0;
     std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
-    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
-      {
+    for (iter = this->CompositeRepresentations.begin();
+         iter != this->CompositeRepresentations.end(); ++iter)
+    {
       vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(*iter);
-      if(rep)
-        {
+      if (rep)
+      {
         rep->SetVisibility(this->VisibilityState[index]);
-        }
-      index++;
       }
+      index++;
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -179,14 +181,15 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   void ClearVisibility()
   {
     std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
-    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
-      {
+    for (iter = this->CompositeRepresentations.begin();
+         iter != this->CompositeRepresentations.end(); ++iter)
+    {
       vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(*iter);
-      if(rep)
-        {
+      if (rep)
+      {
         rep->SetVisibility(false);
-        }
       }
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -201,33 +204,34 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   void UpdateVisibleRepresentation(int idx)
   {
     this->ClearVisibility();
-    vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(this->CompositeRepresentations[idx]);
-    if(rep)
-      {
+    vtkPVDataRepresentation* rep =
+      vtkPVDataRepresentation::SafeDownCast(this->CompositeRepresentations[idx]);
+    if (rep)
+    {
       rep->SetVisibility(true);
-      }
+    }
   }
 
   //----------------------------------------------------------------------------
 
   vtkFloatArray* CaptureZBuffer()
   {
-  this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
+    this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
 #ifdef PARAVIEW_USE_ICE_T
-  if (this->IceTSynchronizedRenderers)
+    if (this->IceTSynchronizedRenderers)
     {
-    vtkIceTCompositePass* iceTPass = this->IceTSynchronizedRenderers->GetIceTCompositePass();
-    if (iceTPass && iceTPass->GetLastRenderedDepths())
+      vtkIceTCompositePass* iceTPass = this->IceTSynchronizedRenderers->GetIceTCompositePass();
+      if (iceTPass && iceTPass->GetLastRenderedDepths())
       {
-      this->ArrayHolder->DeepCopy(iceTPass->GetLastRenderedDepths());
+        this->ArrayHolder->DeepCopy(iceTPass->GetLastRenderedDepths());
       }
     }
-  else
+    else
 #endif
     {
-    this->ZGrabber->Modified();
-    this->ZGrabber->Update();
-    this->ArrayHolder->DeepCopy(this->ZGrabber->GetOutput()->GetPointData()->GetScalars());
+      this->ZGrabber->Modified();
+      this->ZGrabber->Update();
+      this->ArrayHolder->DeepCopy(this->ZGrabber->GetOutput()->GetPointData()->GetScalars());
     }
 
     return this->ArrayHolder;
@@ -237,10 +241,10 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   void CaptureImage(int idx)
   {
-    if(idx > this->Owner->GetRGBStackSize())
-      {
+    if (idx > this->Owner->GetRGBStackSize())
+    {
       return;
-      }
+    }
 
     // Local vars
     int width = this->Owner->GetSize()[0];
@@ -251,8 +255,8 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     this->ImageGrabber->Update();
 
     // Ensure buffer stack is the right size
-    if(idx == 0)
-      {
+    if (idx == 0)
+    {
       int nbImages = this->Owner->GetRGBStackSize();
 
       this->ImageStack->SetDimensions(width, height * nbImages, 1);
@@ -263,57 +267,57 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
       rgbStack->SetNumberOfTuples(width * height * nbImages);
       this->ImageStack->GetPointData()->SetScalars(rgbStack.GetPointer());
       this->RGBBuffer = rgbStack.GetPointer();
-      }
+    }
 
     // Copy buffer into buffer stack
-    vtkUnsignedCharArray* rgb =
-        vtkUnsignedCharArray::SafeDownCast(
-          this->ImageGrabber->GetOutput()->GetPointData()->GetScalars());
+    vtkUnsignedCharArray* rgb = vtkUnsignedCharArray::SafeDownCast(
+      this->ImageGrabber->GetOutput()->GetPointData()->GetScalars());
     vtkIdType offset = idx * width * height * 3;
     vtkIdType count = rgb->GetNumberOfTuples();
     vtkIdType position = 0;
-    while(count--)
-      {
-      position = count*3;
+    while (count--)
+    {
+      position = count * 3;
       this->RGBBuffer->SetValue(offset + position + 0, rgb->GetValue(position + 0));
       this->RGBBuffer->SetValue(offset + position + 1, rgb->GetValue(position + 1));
       this->RGBBuffer->SetValue(offset + position + 2, rgb->GetValue(position + 2));
-      }
+    }
   }
   //----------------------------------------------------------------------------
 
   void WriteImage()
   {
-    if(this->ActiveWriter == NULL)
+    if (this->ActiveWriter == NULL)
+    {
+      if (this->Owner->ImageFormatExtension == NULL ||
+        !strcmp("jpg", this->Owner->ImageFormatExtension))
       {
-      if(this->Owner->ImageFormatExtension == NULL || !strcmp("jpg", this->Owner->ImageFormatExtension))
-        {
         this->Owner->SetImageFormatExtension("jpg");
         this->ActiveWriter = this->JPEGWriter.GetPointer();
-        }
-      else if(!strcmp("png", this->Owner->ImageFormatExtension))
-        {
-        this->ActiveWriter = this->PNGWriter.GetPointer();
-        }
-      else if(!strcmp("tiff", this->Owner->ImageFormatExtension))
-        {
-        this->ActiveWriter = this->TIFFWriter.GetPointer();
-        }
-      else
-        {
-        this->Owner->SetImageFormatExtension("jpg");
-        this->ActiveWriter = this->JPEGWriter.GetPointer();
-        }
       }
+      else if (!strcmp("png", this->Owner->ImageFormatExtension))
+      {
+        this->ActiveWriter = this->PNGWriter.GetPointer();
+      }
+      else if (!strcmp("tiff", this->Owner->ImageFormatExtension))
+      {
+        this->ActiveWriter = this->TIFFWriter.GetPointer();
+      }
+      else
+      {
+        this->Owner->SetImageFormatExtension("jpg");
+        this->ActiveWriter = this->JPEGWriter.GetPointer();
+      }
+    }
 
-    vtkTimerLog::MarkStartEvent( "WriteRGBImageToDisk" );
+    vtkTimerLog::MarkStartEvent("WriteRGBImageToDisk");
     // Write image
     std::stringstream ss;
     ss << this->Owner->GetCompositeDirectory() << "/rgb." << this->Owner->ImageFormatExtension;
     this->ActiveWriter->SetFileName(ss.str().c_str());
     this->ActiveWriter->Modified();
     this->ActiveWriter->Write();
-    vtkTimerLog::MarkEndEvent( "WriteRGBImageToDisk" );
+    vtkTimerLog::MarkEndEvent("WriteRGBImageToDisk");
   }
 
   //----------------------------------------------------------------------------
@@ -332,20 +336,21 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     buffer[bufferOffset] = '\0';
 
     std::set<PixelOrder>::iterator iter;
-    for(iter = orderFinder.begin(); iter != orderFinder.end(); ++iter)
+    for (iter = orderFinder.begin(); iter != orderFinder.end(); ++iter)
+    {
+      if (iter->idx > 0 && iter->z < 1.0f)
       {
-      if(iter->idx > 0 && iter->z < 1.0f)
-        {
-        buffer[bufferOffset - 1] = vtkPVRenderViewForAssembly::vtkInternals::CODING_TABLE[iter->idx];
+        buffer[bufferOffset - 1] =
+          vtkPVRenderViewForAssembly::vtkInternals::CODING_TABLE[iter->idx];
         buffer[bufferOffset++] = '+';
         buffer[bufferOffset] = '\0';
-        }
+      }
       else
-        {
+      {
         this->IncrementPixelOrderCount(&buffer[startIdx]);
         return;
-        }
       }
+    }
     this->IncrementPixelOrderCount(&buffer[startIdx]);
   }
 
@@ -356,48 +361,50 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     char* lineStartPointer = buffer;
     char* nextLineStartPointer;
     int count;
-    while(lineStartPointer[0] != '\0' && lineStartPointer[1] != '\0' && lineStartPointer[2] != '\0' && lineStartPointer[3] != '\0' && lineStartPointer[4] != '\0')
-      {
+    while (lineStartPointer[0] != '\0' && lineStartPointer[1] != '\0' &&
+      lineStartPointer[2] != '\0' && lineStartPointer[3] != '\0' && lineStartPointer[4] != '\0')
+    {
 
       // Find number of + next to each others
       count = 0;
-      while(lineStartPointer[count] == '+')
-        {
+      while (lineStartPointer[count] == '+')
+      {
         ++count;
-        }
+      }
 
       // If enough record their number $count+
-      if(count > 4)
-        {
+      if (count > 4)
+      {
         int numberToWrite = count;
         // Need to compress buffer
         int offset = 0;
         lineStartPointer[offset++] = '@';
-        while(numberToWrite)
-          {
-          lineStartPointer[offset++] = vtkPVRenderViewForAssembly::vtkInternals::NUMBER_TABLE[numberToWrite%10];
+        while (numberToWrite)
+        {
+          lineStartPointer[offset++] =
+            vtkPVRenderViewForAssembly::vtkInternals::NUMBER_TABLE[numberToWrite % 10];
           numberToWrite /= 10;
-          }
+        }
         this->ReverseNumber(&lineStartPointer[offset - 1], offset - 2);
 
         lineStartPointer[offset++] = '+';
         nextLineStartPointer = lineStartPointer + count;
         lineStartPointer += offset;
         ShiftBuffer(lineStartPointer, nextLineStartPointer);
-        }
+      }
       else
-        {
+      {
         // Move to the next location that has at least 2 + in a row
-        while(lineStartPointer[0] != '\0' && lineStartPointer[0] != '+')
-          {
+        while (lineStartPointer[0] != '\0' && lineStartPointer[0] != '+')
+        {
           lineStartPointer++;
-          }
-        if(lineStartPointer[0] != '\0')
-          {
+        }
+        if (lineStartPointer[0] != '\0')
+        {
           lineStartPointer++;
-          }
         }
       }
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -407,26 +414,26 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     char* left = buffer - size;
     char* right = buffer;
     char tmp;
-    while(left < right)
-      {
+    while (left < right)
+    {
       tmp = left[0];
       left[0] = right[0];
       right[0] = tmp;
       right--;
       left++;
-      }
+    }
   }
 
   //----------------------------------------------------------------------------
 
   void ShiftBuffer(char* left, char* right)
   {
-    while(right[0] != '\0')
-      {
+    while (right[0] != '\0')
+    {
       left[0] = right[0];
       left++;
       right++;
-      }
+    }
     left[0] = '\0';
   }
 
@@ -436,66 +443,61 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   {
     int index = 0;
     std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
-    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
-      {
+    for (iter = this->CompositeRepresentations.begin();
+         iter != this->CompositeRepresentations.end(); ++iter)
+    {
       vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(*iter);
-      if(rep == r)
-        {
+      if (rep == r)
+      {
         return index;
-        }
-      index++;
       }
+      index++;
+    }
     return -1;
   }
 
   //----------------------------------------------------------------------------
 
-  void ResetPixelOrderCount()
-  {
-    this->PixelOrderCount.clear();
-  }
+  void ResetPixelOrderCount() { this->PixelOrderCount.clear(); }
 
   //----------------------------------------------------------------------------
 
   void IncrementPixelOrderCount(const char* order)
   {
-    std::map<std::string, int>::iterator findEntry =
-        this->PixelOrderCount.find(order);
+    std::map<std::string, int>::iterator findEntry = this->PixelOrderCount.find(order);
 
-    if(findEntry == this->PixelOrderCount.end())
-      {
+    if (findEntry == this->PixelOrderCount.end())
+    {
       this->PixelOrderCount[order] = 1;
-      }
+    }
     else
-      {
+    {
       ++this->PixelOrderCount[order];
-      }
+    }
   }
 
   //----------------------------------------------------------------------------
 
   void WriteOrderMap(ostream& out)
   {
-    vtkTimerLog::MarkStartEvent( "WriteOrderMapToDisk" );
+    vtkTimerLog::MarkStartEvent("WriteOrderMapToDisk");
     std::map<std::string, int>::iterator entry;
-    for( entry = this->PixelOrderCount.begin();
-         entry != this->PixelOrderCount.end();
-         entry++)
+    for (entry = this->PixelOrderCount.begin(); entry != this->PixelOrderCount.end(); entry++)
+    {
+      if (entry == this->PixelOrderCount.begin())
       {
-      if(entry == this->PixelOrderCount.begin())
-        {
         out << "\n\"";
-        }
-      else
-        {
-        out << ",\n\"";
-        }
-      out << entry->first.c_str() << "\" : " << entry->second;
       }
-    vtkTimerLog::MarkEndEvent("WriteOrderMapToDisk" );
+      else
+      {
+        out << ",\n\"";
+      }
+      out << entry->first.c_str() << "\" : " << entry->second;
+    }
+    vtkTimerLog::MarkEndEvent("WriteOrderMapToDisk");
   }
 
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #ifdef PARAVIEW_USE_ICE_T
   vtkWeakPointer<vtkIceTSynchronizedRenderers> IceTSynchronizedRenderers;
 #endif
@@ -517,9 +519,8 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   static const char* NUMBER_TABLE;
   std::map<std::string, int> PixelOrderCount;
 
-
   vtkNew<vtkValuePasses> ValuePasses;
-  vtkRenderPass *SavedRenderPass;
+  vtkRenderPass* SavedRenderPass;
 
   int FieldAssociation;
   int FieldAttributeType;
@@ -530,10 +531,10 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   bool ScalarRangeSet;
   bool SavedOrientationState;
   bool SavedAnnotationState;
-
 };
 
-const char* vtkPVRenderViewForAssembly::vtkInternals::CODING_TABLE = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const char* vtkPVRenderViewForAssembly::vtkInternals::CODING_TABLE =
+  "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const char* vtkPVRenderViewForAssembly::vtkInternals::NUMBER_TABLE = "0123456789";
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderViewForAssembly);
@@ -561,12 +562,12 @@ vtkPVRenderViewForAssembly::vtkPVRenderViewForAssembly()
 vtkPVRenderViewForAssembly::~vtkPVRenderViewForAssembly()
 {
   this->SetCompositeDirectory(NULL);
-  if(this->OrderingBuffer)
-    {
+  if (this->OrderingBuffer)
+  {
     delete[] this->OrderingBuffer;
     this->OrderingBuffer = NULL;
     this->OrderingBufferSize = -1;
-    }
+  }
   delete this->Internal;
   this->SetImageFormatExtension(NULL);
 }
@@ -578,9 +579,8 @@ void vtkPVRenderViewForAssembly::Initialize(unsigned int id)
 
 #ifdef PARAVIEW_USE_ICE_T
   // If vtkIceTSynchronizedRenderers is used, we'll use that to access frame buffers.
-  this->Internal->IceTSynchronizedRenderers =
-    vtkIceTSynchronizedRenderers::SafeDownCast(
-      this->SynchronizedRenderers->GetParallelSynchronizer());
+  this->Internal->IceTSynchronizedRenderers = vtkIceTSynchronizedRenderers::SafeDownCast(
+    this->SynchronizedRenderers->GetParallelSynchronizer());
 #endif
 }
 
@@ -588,16 +588,16 @@ void vtkPVRenderViewForAssembly::Initialize(unsigned int id)
 void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
 {
   if (this->GetMakingSelection() || skip_rendering || interactive || this->InRender)
-    {
+  {
     this->Superclass::Render(interactive, skip_rendering);
     return;
-    }
+  }
 
   this->InRender = true;
 
-  if(this->InsideComputeZOrdering)
-    {
-    vtkTimerLog::MarkStartEvent("CaptureZBuffer" );
+  if (this->InsideComputeZOrdering)
+  {
+    vtkTimerLog::MarkStartEvent("CaptureZBuffer");
     this->Internal->StoreVisibilityState();
     bool orientationVisibilityOrigin = (this->OrientationWidget->GetEnabled() != 0);
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
@@ -608,91 +608,91 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     // Disable all representation and start rendering each one independantly
     // to capture the Z Buffer and compute the ordering.
     int nbReps = this->Internal->GetNumberOfRepresentations();
-    zBuffers.resize(nbReps+1, NULL);
+    zBuffers.resize(nbReps + 1, NULL);
 
     // Get Background Z buffer
     this->Internal->ClearVisibility();
     this->Superclass::Render(interactive, skip_rendering);
-    if(this->SynchronizedWindows->GetLocalProcessIsDriver())
-      {
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
       zBuffers[0] = this->Internal->CaptureZBuffer();
-      }
+    }
 
     // Change orientation + center visibility
     this->SetCenterAxesVisibility(false);
     this->SetOrientationAxesVisibility(false);
 
     // Update visibility to match only the active one
-    for(int i=0; i < nbReps; ++i)
-      {
+    for (int i = 0; i < nbReps; ++i)
+    {
       this->Internal->UpdateVisibleRepresentation(i);
 
       // Lets render
       this->Superclass::Render(interactive, skip_rendering);
 
       // Grab Z-buffer
-      if(this->SynchronizedWindows->GetLocalProcessIsDriver())
-        {
-        zBuffers[i+1] = this->Internal->CaptureZBuffer();
-        }
+      if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+      {
+        zBuffers[i + 1] = this->Internal->CaptureZBuffer();
       }
-    vtkTimerLog::MarkEndEvent("CaptureZBuffer" );
-    vtkTimerLog::MarkStartEvent("ComputeZOrdering" );
+    }
+    vtkTimerLog::MarkEndEvent("CaptureZBuffer");
+    vtkTimerLog::MarkStartEvent("ComputeZOrdering");
 
     // Do the ordering computation only on ROOT node
-    if(this->SynchronizedWindows->GetLocalProcessIsDriver())
-      {
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
       // Make sure the ordered String buffer is big enough
       int sizeX = this->GetRenderWindow()->GetSize()[0];
       int sizeY = this->GetRenderWindow()->GetSize()[1];
-      int maxBufferSize = sizeX * sizeY * (1+nbReps);
-      if(maxBufferSize > this->OrderingBufferSize)
+      int maxBufferSize = sizeX * sizeY * (1 + nbReps);
+      if (maxBufferSize > this->OrderingBufferSize)
+      {
+        if (this->OrderingBuffer != NULL)
         {
-        if(this->OrderingBuffer != NULL)
-          {
           delete[] this->OrderingBuffer;
-          }
+        }
         this->OrderingBufferSize = maxBufferSize;
         this->OrderingBuffer = new char[this->OrderingBufferSize + 1];
-        }
+      }
 
       // Lets encode the representation order for each pixel while inverting the Y
       int pixelIdx = -1;
       int bufferOffset = 0;
       std::set<PixelOrder> orderFinder;
       this->Internal->ResetPixelOrderCount();
-      for(int lineIdx = sizeY; lineIdx; --lineIdx)
+      for (int lineIdx = sizeY; lineIdx; --lineIdx)
+      {
+        for (int colIdx = 0; colIdx < sizeX; ++colIdx)
         {
-        for(int colIdx = 0; colIdx < sizeX; ++colIdx)
-          {
-          pixelIdx = ((lineIdx-1)*sizeX) + colIdx;
+          pixelIdx = ((lineIdx - 1) * sizeX) + colIdx;
 
           // Compute odering
           orderFinder.clear();
-          for(unsigned char repIdx = 0; repIdx <= nbReps; ++repIdx)
+          for (unsigned char repIdx = 0; repIdx <= nbReps; ++repIdx)
+          {
+            if (zBuffers[repIdx])
             {
-            if(zBuffers[repIdx])
-              {
               orderFinder.insert(PixelOrder(repIdx, zBuffers[repIdx]->GetValue(pixelIdx)));
-              }
             }
+          }
 
           // Write ordering to buffer
           this->Internal->Encode(this->OrderingBuffer, bufferOffset, orderFinder);
-          }
         }
       }
+    }
 
     // Reset to previous state representation visibility
     this->Internal->RestoreVisibilityState();
     this->SetCenterAxesVisibility(centerOfRotationOrigin);
     this->SetOrientationAxesVisibility(orientationVisibilityOrigin);
 
-    vtkTimerLog::MarkEndEvent("ComputeZOrdering" );
-    }
-  else if(this->InsideRGBDump)
-    {
-    vtkTimerLog::MarkStartEvent("CaptureRGB" );
+    vtkTimerLog::MarkEndEvent("ComputeZOrdering");
+  }
+  else if (this->InsideRGBDump)
+  {
+    vtkTimerLog::MarkStartEvent("CaptureRGB");
     this->Internal->StoreVisibilityState();
     bool orientationVisibilityOrigin = (this->OrientationWidget->GetEnabled() != 0);
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
@@ -701,11 +701,11 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     this->Internal->ClearVisibility();
 
     this->Superclass::Render(interactive, skip_rendering);
-    if(this->SynchronizedWindows->GetLocalProcessIsDriver() && this->ActiveStack == 0)
-      {
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver() && this->ActiveStack == 0)
+    {
       this->Internal->CaptureImage(0);
       this->ActiveStack++;
-      }
+    }
 
     // Change orientation + center visibility
     this->SetCenterAxesVisibility(false);
@@ -714,47 +714,46 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     // Disable all representation and start rendering each one independantly
     // to capture the RGB Buffer and save a JPEG file.
     int nbReps = this->Internal->GetNumberOfRepresentations();
-    if(this->RepresentationToRender == -1)
+    if (this->RepresentationToRender == -1)
+    {
+      for (int idx = 0; idx < nbReps; ++idx)
       {
-      for(int idx = 0; idx < nbReps; ++idx)
-        {
         this->Internal->UpdateVisibleRepresentation(idx);
         this->Superclass::Render(interactive, skip_rendering);
-        if(this->SynchronizedWindows->GetLocalProcessIsDriver())
-          {
+        if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+        {
           this->Internal->CaptureImage(this->ActiveStack++);
-          }
         }
       }
+    }
     else
-      {
+    {
       this->Internal->UpdateVisibleRepresentation(this->RepresentationToRender);
       this->Superclass::Render(interactive, skip_rendering);
-      if(this->SynchronizedWindows->GetLocalProcessIsDriver())
-        {
+      if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+      {
         this->Internal->CaptureImage(this->ActiveStack++);
-        }
       }
+    }
 
     // Reset to previous state representation visibility
     this->Internal->RestoreVisibilityState();
     this->SetCenterAxesVisibility(centerOfRotationOrigin);
     this->SetOrientationAxesVisibility(orientationVisibilityOrigin);
-    vtkTimerLog::MarkEndEvent("CaptureRGB" );
-    }
+    vtkTimerLog::MarkEndEvent("CaptureRGB");
+  }
   else
-    {
+  {
     this->Superclass::Render(interactive, skip_rendering);
-    }
+  }
   this->InRender = false;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewForAssembly::SetClippingBounds( double b1, double b2,
-                                                    double b3, double b4,
-                                                    double b5, double b6)
+void vtkPVRenderViewForAssembly::SetClippingBounds(
+  double b1, double b2, double b3, double b4, double b5, double b6)
 {
-  double bds[6] = {b1, b2, b3, b4, b5, b6};
+  double bds[6] = { b1, b2, b3, b4, b5, b6 };
   this->SetClippingBounds(bds);
 }
 
@@ -762,16 +761,16 @@ void vtkPVRenderViewForAssembly::SetClippingBounds( double b1, double b2,
 void vtkPVRenderViewForAssembly::ResetCameraClippingRange()
 {
   if (this->ClippingBounds.IsValid())
-    {
+  {
     double bounds[6];
     this->ClippingBounds.GetBounds(bounds);
     this->GetRenderer()->ResetCameraClippingRange(bounds);
     this->GetNonCompositedRenderer()->ResetCameraClippingRange(bounds);
-    }
+  }
   else
-    {
+  {
     this->Superclass::ResetCameraClippingRange();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -816,20 +815,20 @@ const char* vtkPVRenderViewForAssembly::GetRepresentationCodes()
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::WriteImage()
 {
-  if(this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
+  if (this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
+  {
     return;
-    }
+  }
   this->Internal->WriteImage();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::WriteComposite()
 {
-  if(this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
+  if (this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
+  {
     return;
-    }
+  }
 
   // Write order as info.json
   vtkTimerLog::MarkStartEvent("WriteJSONData");
@@ -837,11 +836,10 @@ void vtkPVRenderViewForAssembly::WriteComposite()
   jsonFileName << this->CompositeDirectory << "/composite.json";
   ofstream file(jsonFileName.str().c_str(), ios::out);
   if (file.fail())
-    {
-    vtkErrorMacro("RecursiveWrite: Could not open file " <<
-                  jsonFileName.str().c_str());
+  {
+    vtkErrorMacro("RecursiveWrite: Could not open file " << jsonFileName.str().c_str());
     return;
-    }
+  }
 
   int xSize = this->GetRenderWindow()->GetSize()[0];
   int ySize = this->GetRenderWindow()->GetSize()[1];
@@ -861,22 +859,20 @@ void vtkPVRenderViewForAssembly::WriteComposite()
   file.close();
   vtkTimerLog::MarkEndEvent("WriteJSONData");
 
-
   // Write collapsed order for image query
   vtkTimerLog::MarkStartEvent("WriteJSONData");
   std::stringstream queryFileName;
   queryFileName << this->CompositeDirectory << "/query.json";
   ofstream queryFile(queryFileName.str().c_str(), ios::out);
   if (queryFile.fail())
-    {
-    vtkErrorMacro("RecursiveWrite: Could not open file " <<
-                  queryFileName.str().c_str());
+  {
+    vtkErrorMacro("RecursiveWrite: Could not open file " << queryFileName.str().c_str());
     return;
-    }
+  }
 
   queryFile << "{"
-       << "\n\"dimensions\": [" << xSize << ", " << ySize << "]"
-       << ",\n\"counts\": {";
+            << "\n\"dimensions\": [" << xSize << ", " << ySize << "]"
+            << ",\n\"counts\": {";
 
   // Write order counts
   this->Internal->WriteOrderMap(queryFile);
@@ -904,14 +900,14 @@ void vtkPVRenderViewForAssembly::RemoveRepresentationForComposite(vtkPVDataRepre
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::SetActiveRepresentationForComposite(vtkPVDataRepresentation* r)
 {
-  if(r == NULL)
-    {
+  if (r == NULL)
+  {
     this->RepresentationToRender = -1;
-    }
+  }
   else
-    {
+  {
     this->RepresentationToRender = this->Internal->GetRepresentationIdx(r);
-    }
+  }
 }
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::ResetActiveImageStack()
@@ -922,10 +918,10 @@ void vtkPVRenderViewForAssembly::ResetActiveImageStack()
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::CaptureActiveRepresentation()
 {
-  if(this->CompositeDirectory == NULL)
-    {
+  if (this->CompositeDirectory == NULL)
+  {
     return;
-    }
+  }
 
   this->InsideRGBDump = true;
   this->Render(false, false);
@@ -937,88 +933,85 @@ void vtkPVRenderViewForAssembly::SetDrawCells(int choice)
 {
   bool mod = false;
   if (choice)
-    {
+  {
     if (this->Internal->FieldAssociation != VTK_SCALAR_MODE_USE_CELL_FIELD_DATA)
-      {
+    {
       this->Internal->FieldAssociation = VTK_SCALAR_MODE_USE_CELL_FIELD_DATA;
       mod = true;
-      }
     }
+  }
   else
-    {
+  {
     if (this->Internal->FieldAssociation != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
-      {
+    {
       this->Internal->FieldAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
       mod = true;
-      }
     }
+  }
 
   if (mod)
-    {
+  {
     if (this->Internal->FieldNameSet)
-      {
-      this->Internal->ValuePasses->SetInputArrayToProcess
-        (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
-      }
-    else
-      {
-      this->Internal->ValuePasses->SetInputArrayToProcess
-        (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
-      }
-    this->Modified();
+    {
+      this->Internal->ValuePasses->SetInputArrayToProcess(
+        this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
     }
+    else
+    {
+      this->Internal->ValuePasses->SetInputArrayToProcess(
+        this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+    }
+    this->Modified();
+  }
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVRenderViewForAssembly::SetArrayNameToDraw(const char *name)
+void vtkPVRenderViewForAssembly::SetArrayNameToDraw(const char* name)
 {
-  if ( !this->Internal->FieldNameSet
-       || (this->Internal->FieldName != name) )
-    {
+  if (!this->Internal->FieldNameSet || (this->Internal->FieldName != name))
+  {
     this->Internal->FieldName = name;
     this->Internal->FieldNameSet = true;
-    this->Internal->ValuePasses->SetInputArrayToProcess
-      (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
+    this->Internal->ValuePasses->SetInputArrayToProcess(
+      this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
     this->Modified();
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::SetArrayNumberToDraw(int fieldAttributeType)
 {
-  if ( this->Internal->FieldNameSet
-       || (this->Internal->FieldAttributeType != fieldAttributeType) )
-    {
+  if (this->Internal->FieldNameSet || (this->Internal->FieldAttributeType != fieldAttributeType))
+  {
     this->Internal->FieldAttributeType = fieldAttributeType;
     this->Internal->FieldNameSet = false;
-    this->Internal->ValuePasses->SetInputArrayToProcess
-      (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+    this->Internal->ValuePasses->SetInputArrayToProcess(
+      this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
     this->Modified();
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::SetArrayComponentToDraw(int comp)
 {
   if (this->Internal->Component != comp)
-    {
+  {
     this->Internal->Component = comp;
     this->Internal->ValuePasses->SetInputComponentToProcess(comp);
     this->Modified();
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::SetScalarRange(double min, double max)
 {
-  if (this->Internal->ScalarRange[0] != min ||
-      this->Internal->ScalarRange[1] != max)
-    {
+  if (this->Internal->ScalarRange[0] != min || this->Internal->ScalarRange[1] != max)
+  {
     this->Internal->ScalarRange[0] = min;
     this->Internal->ScalarRange[1] = max;
     this->Internal->ValuePasses->SetScalarRange(min, max);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1026,24 +1019,24 @@ void vtkPVRenderViewForAssembly::StartCaptureValues()
 {
   this->Internal->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
   if (this->Internal->SavedRenderPass != NULL)
-    {
+  {
     this->Internal->SavedRenderPass->Register(NULL);
-    }
+  }
   this->Internal->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
   this->Internal->SavedAnnotationState = this->ShowAnnotation;
   this->SetOrientationAxesVisibility(false);
   this->SetShowAnnotation(false);
 
   if (this->Internal->FieldNameSet)
-    {
-    this->Internal->ValuePasses->SetInputArrayToProcess
-      (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
-    }
+  {
+    this->Internal->ValuePasses->SetInputArrayToProcess(
+      this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
+  }
   else
-    {
-    this->Internal->ValuePasses->SetInputArrayToProcess
-      (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
-    }
+  {
+    this->Internal->ValuePasses->SetInputArrayToProcess(
+      this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+  }
 
   this->SynchronizedRenderers->SetRenderPass(this->Internal->ValuePasses.GetPointer());
 }
@@ -1053,9 +1046,9 @@ void vtkPVRenderViewForAssembly::StopCaptureValues()
 {
   this->SynchronizedRenderers->SetRenderPass(this->Internal->SavedRenderPass);
   if (this->Internal->SavedRenderPass)
-    {
+  {
     this->Internal->SavedRenderPass->UnRegister(NULL);
-    }
+  }
   this->SetOrientationAxesVisibility(this->Internal->SavedOrientationState);
   this->SetShowAnnotation(this->Internal->SavedAnnotationState);
 }

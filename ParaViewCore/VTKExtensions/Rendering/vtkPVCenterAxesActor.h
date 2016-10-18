@@ -52,11 +52,9 @@ protected:
   vtkAxes* Axes;
   vtkPolyDataMapper* Mapper;
 
-
 private:
   vtkPVCenterAxesActor(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -70,16 +70,16 @@ protected:
   vtkBoundedPlaneSource();
   ~vtkBoundedPlaneSource();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   double Center[3];
   double Normal[3];
   double BoundingBox[6];
   int Resolution;
+
 private:
   vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

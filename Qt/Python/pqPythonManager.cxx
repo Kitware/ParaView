@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -78,84 +78,80 @@ class pqPythonManager::pqInternal
 {
 
   void importParaViewModule()
-    {
+  {
     const char* command = "try:\n"
-      "  import paraview\n"
-      "except: pass\n";
+                          "  import paraview\n"
+                          "except: pass\n";
     vtkPythonInterpreter::RunSimpleString(command);
-    }
+  }
 
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
   void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
-    {
+  {
     if (eventid == vtkCommand::EnterEvent)
-      {
+    {
       importParaViewModule();
-      }
+    }
     else if (eventid == vtkCommand::ErrorEvent)
-      {
+    {
       const char* message = reinterpret_cast<const char*>(calldata);
       if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
-        {
+      {
         this->PythonDialog->shell()->printString(message, pqPythonShell::ERROR);
-        }
-      else
-        {
-        pqOutputWindowAdapter* window =
-          pqApplicationCore::instance()->outputWindowAdapter();
-        if (window)
-          {
-          window->DisplayErrorTextInWindow(message);
-          }
-        }
       }
-    else if (eventid == vtkCommand::SetOutputEvent)
-      {
-      const char* message = reinterpret_cast<const char*>(calldata);
-      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
-        {
-        this->PythonDialog->shell()->printString(message, pqPythonShell::OUTPUT);
-        }
       else
-        {
-        pqOutputWindowAdapter* window =
-          pqApplicationCore::instance()->outputWindowAdapter();
+      {
+        pqOutputWindowAdapter* window = pqApplicationCore::instance()->outputWindowAdapter();
         if (window)
-          {
-          window->DisplayTextInWindow(message);
-          }
+        {
+          window->DisplayErrorTextInWindow(message);
         }
       }
     }
-
-public:
-  pqInternal() : Editor(NULL) 
-  {
-  this->DummyInterpreter->AddObserver(vtkCommand::AnyEvent,
-    this, &pqPythonManager::pqInternal::interpreterEvents);
-
-  // import the paraview module now if Python was already
-  // initialized (by a startup plugin, for example)
-  if (vtkPythonInterpreter::IsInitialized())
+    else if (eventid == vtkCommand::SetOutputEvent)
     {
-    importParaViewModule();
+      const char* message = reinterpret_cast<const char*>(calldata);
+      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
+      {
+        this->PythonDialog->shell()->printString(message, pqPythonShell::OUTPUT);
+      }
+      else
+      {
+        pqOutputWindowAdapter* window = pqApplicationCore::instance()->outputWindowAdapter();
+        if (window)
+        {
+          window->DisplayTextInWindow(message);
+        }
+      }
     }
   }
-  ~pqInternal()
-    {
-    this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent);
-    }
 
-  QTimer                              StatusBarUpdateTimer;
-  QPointer<pqPythonDialog>            PythonDialog;
-  QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
-  bool                                IsPythonTracing;
-  QPointer<pqPythonScriptEditor>      Editor;
+public:
+  pqInternal()
+    : Editor(NULL)
+  {
+    this->DummyInterpreter->AddObserver(
+      vtkCommand::AnyEvent, this, &pqPythonManager::pqInternal::interpreterEvents);
+
+    // import the paraview module now if Python was already
+    // initialized (by a startup plugin, for example)
+    if (vtkPythonInterpreter::IsInitialized())
+    {
+      importParaViewModule();
+    }
+  }
+  ~pqInternal() { this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent); }
+
+  QTimer StatusBarUpdateTimer;
+  QPointer<pqPythonDialog> PythonDialog;
+  QPointer<pqPythonMacroSupervisor> MacroSupervisor;
+  bool IsPythonTracing;
+  QPointer<pqPythonScriptEditor> Editor;
 };
 
 //-----------------------------------------------------------------------------
-pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
-  QObject(_parent)
+pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
+  : QObject(_parent)
 {
   this->Internal = new pqInternal;
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -163,28 +159,24 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
 
   // Create an instance of the macro supervisor
   this->Internal->MacroSupervisor = new pqPythonMacroSupervisor(this);
-  this->connect(this->Internal->MacroSupervisor,
-    SIGNAL(executeScriptRequested(const QString&)),
+  this->connect(this->Internal->MacroSupervisor, SIGNAL(executeScriptRequested(const QString&)),
     SLOT(executeScript(const QString&)));
 
   // Listen the signal when a macro wants to be edited
-  QObject::connect(this->Internal->MacroSupervisor,
-    SIGNAL(onEditMacro(const QString&)),
-    this,
+  QObject::connect(this->Internal->MacroSupervisor, SIGNAL(onEditMacro(const QString&)), this,
     SLOT(editMacro(const QString&)));
 
   // Listen for signal when server is about to be removed
-  this->connect(core->getServerManagerModel(),
-      SIGNAL(aboutToRemoveServer(pqServer*)),
-      this, SLOT(onRemovingServer(pqServer*)));
+  this->connect(core->getServerManagerModel(), SIGNAL(aboutToRemoveServer(pqServer*)), this,
+    SLOT(onRemovingServer(pqServer*)));
 
   // Init Python tracing ivar
   this->Internal->IsPythonTracing = false;
-  this->Internal->Editor          = NULL;
+  this->Internal->Editor = NULL;
 
   // Start StatusBar message update timer
-  connect( &this->Internal->StatusBarUpdateTimer, SIGNAL(timeout()),
-           this, SLOT(updateStatusMessage()));
+  connect(
+    &this->Internal->StatusBarUpdateTimer, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
   this->Internal->StatusBarUpdateTimer.start(5000); // 5 second
 }
 
@@ -195,15 +187,15 @@ pqPythonManager::~pqPythonManager()
   // Make sure the python dialog is cleaned up in case it was never
   // given a parent.
   if (this->Internal->PythonDialog && !this->Internal->PythonDialog->parent())
-    {
+  {
     delete this->Internal->PythonDialog;
-    }
+  }
   // Make sure the python editor is cleaned up in case it was never
   // given a parent.
-  if(this->Internal->Editor && !this->Internal->Editor->parent())
-    {
+  if (this->Internal->Editor && !this->Internal->Editor->parent())
+  {
     delete this->Internal->Editor;
-    }
+  }
   delete this->Internal;
 }
 
@@ -219,14 +211,13 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   // Create the dialog and initialize the interpreter the first time this
   // method is called.
   if (!this->Internal->PythonDialog)
-    {
+  {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     vtkPythonInterpreter::Initialize();
-    this->Internal->PythonDialog =
-      new pqPythonDialog(pqCoreUtilities::mainWidget());
+    this->Internal->PythonDialog = new pqPythonDialog(pqCoreUtilities::mainWidget());
     this->Internal->PythonDialog->shell()->setupInterpreter();
     QApplication::restoreOverrideCursor();
-    }
+  }
   return this->Internal->PythonDialog;
 }
 
@@ -247,7 +238,7 @@ void pqPythonManager::addWidgetForDeleteMacros(QWidget* widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::executeScript(const QString & filename)
+void pqPythonManager::executeScript(const QString& filename)
 {
   pqPythonDialog* dialog = this->pythonShellDialog();
   dialog->runScript(QStringList(filename));
@@ -257,16 +248,16 @@ void pqPythonManager::executeScript(const QString & filename)
 void pqPythonManager::onRemovingServer(pqServer* /*server*/)
 {
   if (this->Internal->PythonDialog)
-    {
+  {
     this->Internal->PythonDialog->shell()->reset();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
-  return vtkSMTrace::GetActiveTracer()?
-    vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str() : "";
+  return vtkSMTrace::GetActiveTracer() ? vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str()
+                                       : "";
 }
 
 //-----------------------------------------------------------------------------
@@ -274,23 +265,23 @@ void pqPythonManager::editTrace(const QString& txt, bool update)
 {
   // Create the editor if needed and only the first time
   bool new_editor = this->Internal->Editor == NULL;
-  if(!this->Internal->Editor)
-    {
+  if (!this->Internal->Editor)
+  {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
     this->Internal->Editor->setPythonManager(this);
-    }
+  }
 
-  QString traceString = txt.isEmpty()? this->getTraceString() : txt;
+  QString traceString = txt.isEmpty() ? this->getTraceString() : txt;
   this->Internal->Editor->show();
   if (new_editor || !update) // don't raise the window if we are just updating the trace.
-    {
+  {
     this->Internal->Editor->raise();
     this->Internal->Editor->activateWindow();
-    }
+  }
   if (update || this->Internal->Editor->newFile())
-    {
+  {
     this->Internal->Editor->setText(traceString);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -306,11 +297,11 @@ void pqPythonManager::addMacro(const QString& fileName)
   QDir dir;
   dir.setPath(userMacroDir);
   // Copy macro file to user directory
-  if(!dir.exists(userMacroDir) && !dir.mkpath(userMacroDir))
-    {
+  if (!dir.exists(userMacroDir) && !dir.mkpath(userMacroDir))
+  {
     qWarning() << "Could not create user Macro directory:" << userMacroDir;
     return;
-    }
+  }
 
   QString expectedFilePath = userMacroDir + "/" + QFileInfo(fileName).fileName();
   expectedFilePath = pqCoreUtilities::getNoneExistingFileName(expectedFilePath);
@@ -324,11 +315,11 @@ void pqPythonManager::addMacro(const QString& fileName)
 void pqPythonManager::editMacro(const QString& fileName)
 {
   // Create the editor if needed and only the first time
-  if(!this->Internal->Editor)
-    {
+  if (!this->Internal->Editor)
+  {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
     this->Internal->Editor->setPythonManager(this);
-    }
+  }
 
   this->Internal->Editor->show();
   this->Internal->Editor->raise();
@@ -338,12 +329,12 @@ void pqPythonManager::editMacro(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::updateStatusMessage()
 {
-  if(this->Internal->IsPythonTracing)
+  if (this->Internal->IsPythonTracing)
+  {
+    QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+    if (mainWindow)
     {
-    QMainWindow *mainWindow = qobject_cast<QMainWindow *>(pqCoreUtilities::mainWidget());
-    if(mainWindow)
-      {
       mainWindow->statusBar()->showMessage("Recording python trace...");
-      }
     }
+  }
 }

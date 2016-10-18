@@ -81,32 +81,33 @@ class vtkInformationVector;
 class vtkUnstructuredGrid;
 
 // CosmoTools Forward declarations
-namespace cosmotk {
-  class CosmoHaloFinderP;
+namespace cosmotk
+{
+class CosmoHaloFinderP;
 }
 
 // HaloFinderInternals Forward declarations
-namespace HaloFinderInternals {
-  class ParticleData;
-  class HaloData;
+namespace HaloFinderInternals
+{
+class ParticleData;
+class HaloData;
 }
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
-  public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder : public vtkUnstructuredGridAlgorithm
 {
- public:
-
-  enum {
-    AVERAGE        = 0,
+public:
+  enum
+  {
+    AVERAGE = 0,
     CENTER_OF_MASS = 1,
-    MBP            = 2,
-    MCP            = 3,
+    MBP = 2,
+    MCP = 3,
     NUMBER_OF_CENTER_FINDING_METHODS
   } CenterDetectionAlgorithm;
 
-  static vtkPLANLHaloFinder *New();
+  static vtkPLANLHaloFinder* New();
 
-  vtkTypeMacro(vtkPLANLHaloFinder,vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkPLANLHaloFinder, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -244,13 +245,11 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
   vtkGetMacro(MinFOFMass, float);
   //@}
 
- protected:
+protected:
   vtkPLANLHaloFinder();
   ~vtkPLANLHaloFinder();
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Checks the integrid of the output particles. Primarily the method ensures
@@ -262,23 +261,18 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
    * Computes the FOF halos based on the user-supplied linking length and
    * PMin parameters.
    */
-  void ComputeFOFHalos(
-      vtkUnstructuredGrid *particles,
-      vtkUnstructuredGrid *haloCenters );
+  void ComputeFOFHalos(vtkUnstructuredGrid* particles, vtkUnstructuredGrid* haloCenters);
 
   /**
    * Given pre-computed FOF halos, this method computes the SOD halos.
    */
-  void ComputeSODHalos(
-      vtkUnstructuredGrid *particles,
-      vtkUnstructuredGrid *haloCenters );
+  void ComputeSODHalos(vtkUnstructuredGrid* particles, vtkUnstructuredGrid* haloCenters);
 
   /**
    * Vectorize the data since the halo-finder expects the data as different
    * vectors.
    */
-  void VectorizeData(
-      vtkUnstructuredGrid *particles);
+  void VectorizeData(vtkUnstructuredGrid* particles);
 
   /**
    * Computes FOF halo properties, i.e., fofMass, fofXPos, etc.
@@ -290,19 +284,14 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
    * data-structure is ready to store all FOF properties for each of the
    * N halos.
    */
-  void InitializeHaloCenters(
-      vtkUnstructuredGrid *haloCenters, unsigned int N );
+  void InitializeHaloCenters(vtkUnstructuredGrid* haloCenters, unsigned int N);
 
   /**
    * Marks the halos of the given halo and computes the center using the
    * prescribed center-finding method.
    */
-  void MarkHaloParticlesAndGetCenter(
-      const unsigned int halo,
-      const int internalHaloIdx,
-      double center[3],
-      vtkUnstructuredGrid *particles);
-
+  void MarkHaloParticlesAndGetCenter(const unsigned int halo, const int internalHaloIdx,
+    double center[3], vtkUnstructuredGrid* particles);
 
   /**
    * Resets halo-finder internal data-structures
@@ -312,36 +301,34 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
   /**
    * Initialize the SOD haloArrays
    */
-  void InitializeSODHaloArrays( vtkUnstructuredGrid* haloCenters );
+  void InitializeSODHaloArrays(vtkUnstructuredGrid* haloCenters);
 
   vtkMultiProcessController* Controller;
 
-  int NP;                   // num particles in the original simulation
-  float RL;                 // The physical box dimensions (rL)
-  float Overlap;            // The ghost cell boundary space
-  int PMin;                 // The minimum particles for a halo
-  float BB;                 // The linking length
+  int NP;        // num particles in the original simulation
+  float RL;      // The physical box dimensions (rL)
+  float Overlap; // The ghost cell boundary space
+  int PMin;      // The minimum particles for a halo
+  float BB;      // The linking length
 
-  int CenterFindingMethod;  // Halo center detection method
-  int ComputeSOD;           // Turn on Spherical OverDensity (SOD) halos
+  int CenterFindingMethod; // Halo center detection method
+  int ComputeSOD;          // Turn on Spherical OverDensity (SOD) halos
 
+  float RhoC;            // SOD rho_C (2.77536627e11)
+  float SODMass;         // Initial SOD mass (1.0e14)
+  float MinRadiusFactor; // Minimum factor of SOD radius (0.5)
+  float MaxRadiusFactor; // Maximum factor of SOD radius (2.0)
+  int SODBins;           // Number of log scale bins for SOD (20)
+  int MinFOFSize;        // Minimum FOF size for SOD (1000)
+  float MinFOFMass;      // Minimum FOF mass for SOD (5.0e12)
 
-  float RhoC;             // SOD rho_C (2.77536627e11)
-  float SODMass;          // Initial SOD mass (1.0e14)
-  float MinRadiusFactor;  // Minimum factor of SOD radius (0.5)
-  float MaxRadiusFactor;  // Maximum factor of SOD radius (2.0)
-  int SODBins;            // Number of log scale bins for SOD (20)
-  int MinFOFSize;         // Minimum FOF size for SOD (1000)
-  float MinFOFMass;       // Minimum FOF mass for SOD (5.0e12)
+  HaloFinderInternals::ParticleData* Particles;
+  HaloFinderInternals::HaloData* Halos;
+  cosmotk::CosmoHaloFinderP* HaloFinder;
 
-  HaloFinderInternals::ParticleData *Particles;
-  HaloFinderInternals::HaloData *Halos;
-  cosmotk::CosmoHaloFinderP *HaloFinder;
-
- private:
+private:
   vtkPLANLHaloFinder(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif //  vtkPLANLHaloFinder_h

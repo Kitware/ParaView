@@ -69,18 +69,17 @@ protected:
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
 
   enum
-    {
-    LOCAL_RENDERING_AND_FULL_RES=0,
-    LOCAL_RENDERING_AND_LOW_RES=1,
-    REMOTE_RENDERING_AND_FULL_RES=2,
-    REMOTE_RENDERING_AND_LOW_RES=3,
-    };
+  {
+    LOCAL_RENDERING_AND_FULL_RES = 0,
+    LOCAL_RENDERING_AND_LOW_RES = 1,
+    REMOTE_RENDERING_AND_FULL_RES = 2,
+    REMOTE_RENDERING_AND_LOW_RES = 3,
+  };
   vtkTimeStamp DeliveryTimestamps[4];
 
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDataDeliveryManager&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

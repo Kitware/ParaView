@@ -32,7 +32,7 @@ class VTKPVANIMATION_EXPORT vtkPVServerSideAnimationPlayer : public vtkObject
 {
 public:
   static vtkPVServerSideAnimationPlayer* New();
-  vtkTypeMacro(vtkPVServerSideAnimationPlayer,vtkObject);
+  vtkTypeMacro(vtkPVServerSideAnimationPlayer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetWriter(vtkSMAnimationSceneImageWriter* writer);

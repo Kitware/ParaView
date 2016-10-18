@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -48,19 +48,17 @@ ParticlesViewerStarter::ParticlesViewerStarter(QObject* parentObject)
 //-----------------------------------------------------------------------------
 void ParticlesViewerStarter::startApplication()
 {
-  QMainWindow* window =
-    qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  QMainWindow* window = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
   Q_ASSERT(window != 0);
 
   Ui::ParticlesViewerMainWindow ui;
   ui.setupUi(window);
 
   new pqLoadDataReaction(ui.action_Open_Dataset);
-  QObject::connect(ui.action_Exit, SIGNAL(triggered()),
-    pqApplicationCore::instance(), SLOT(quit()));
+  QObject::connect(
+    ui.action_Exit, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(quit()));
 
-  pqApplicationCore::instance()->setDisplayPolicy(
-    new ParticlesViewerDisplayPolicy(this));
+  pqApplicationCore::instance()->setDisplayPolicy(new ParticlesViewerDisplayPolicy(this));
 
   pqParaViewMenuBuilders::buildViewMenu(*ui.menu_View, *window);
 

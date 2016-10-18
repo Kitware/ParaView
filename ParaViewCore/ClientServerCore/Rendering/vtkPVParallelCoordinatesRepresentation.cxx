@@ -37,9 +37,9 @@ public:
 vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
 //----------------------------------------------------------------------------
 vtkPVParallelCoordinatesRepresentation::vtkPVParallelCoordinatesRepresentation()
-: LineThickness(1),
-  LineStyle(0),
-  Opacity(0.1)
+  : LineThickness(1)
+  , LineStyle(0)
+  , Opacity(0.1)
 {
   this->Internals = new vtkInternals();
   this->Color[0] = this->Color[1] = this->Color[2] = 0.0;
@@ -62,14 +62,14 @@ void vtkPVParallelCoordinatesRepresentation::PrintSelf(ostream& os, vtkIndent in
 bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
-    {
+  {
     return false;
-    }
+  }
 
   if (this->GetChart())
-    {
+  {
     this->GetChart()->SetVisible(this->GetVisibility());
-    }
+  }
 
   return true;
 }
@@ -78,10 +78,10 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
-    {
+  {
     this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
-    }
+  }
 
   return this->Superclass::RemoveFromView(view);
 }
@@ -90,10 +90,9 @@ bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 vtkChartParallelCoordinates* vtkPVParallelCoordinatesRepresentation::GetChart()
 {
   if (this->ContextView)
-    {
-    return vtkChartParallelCoordinates::SafeDownCast(
-      this->ContextView->GetContextItem());
-    }
+  {
+    return vtkChartParallelCoordinates::SafeDownCast(this->ContextView->GetContextItem());
+  }
 
   return 0;
 }
@@ -105,11 +104,11 @@ void vtkPVParallelCoordinatesRepresentation::SetVisibility(bool visible)
 
   vtkChartParallelCoordinates* chart = this->GetChart();
   if (chart && !visible)
-    {
+  {
     // Refer to vtkChartRepresentation::PrepareForRendering() documentation to
     // know why this is cannot be done in PrepareForRendering();
     chart->SetVisible(false);
-    }
+  }
 
   this->Modified();
 }
@@ -144,27 +143,25 @@ void vtkPVParallelCoordinatesRepresentation::PrepareForRendering()
   chart->GetPlot(0)->GetPen()->SetOpacityF(this->Opacity);
 
   if (plotInput)
-    {
+  {
     // only consider the first vtkTable.
     chart->GetPlot(0)->SetInputData(plotInput);
     vtkIdType numCols = plotInput->GetNumberOfColumns();
-    for (vtkIdType cc=0; cc < numCols; cc++)
-      {
+    for (vtkIdType cc = 0; cc < numCols; cc++)
+    {
       std::string name = plotInput->GetColumnName(cc);
-      std::map<std::string, bool>::iterator iter =
-        this->Internals->SeriesVisibilities.find(name);
+      std::map<std::string, bool>::iterator iter = this->Internals->SeriesVisibilities.find(name);
 
-      if (iter != this->Internals->SeriesVisibilities.end() &&
-        iter->second == true)
-        {
+      if (iter != this->Internals->SeriesVisibilities.end() && iter->second == true)
+      {
         chart->SetColumnVisibility(name, true);
-        }
+      }
       else
-        {
+      {
         chart->SetColumnVisibility(name, false);
-        }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -173,17 +170,17 @@ bool vtkPVParallelCoordinatesRepresentation::Export(vtkCSVExporter* exporter)
   vtkChartParallelCoordinates* chart = this->GetChart();
   vtkTable* plotInput = this->GetLocalOutput();
   if (!plotInput || this->GetVisibility() == false)
-    {
+  {
     return false;
-    }
+  }
   const vtkIdType numCols = plotInput->GetNumberOfColumns();
-  for (vtkIdType cc=0; cc < numCols; cc++)
-    {
+  for (vtkIdType cc = 0; cc < numCols; cc++)
+  {
     std::string name = plotInput->GetColumnName(cc);
     if (chart->GetColumnVisibility(name))
-      {
+    {
       exporter->AddColumn(plotInput->GetColumnByName(name.c_str()), name.c_str());
-      }
     }
+  }
   return true;
 }

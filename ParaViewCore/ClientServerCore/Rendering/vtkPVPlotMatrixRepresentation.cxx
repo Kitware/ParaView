@@ -54,41 +54,40 @@ public:
   std::vector<std::pair<std::string, bool> > SeriesVisibilities;
 
   vtkSmartPointer<vtkStringArray> GetOrderedVisibleColumnNames(vtkTable* table)
-    {
-    vtkSmartPointer<vtkStringArray> result =
-      vtkSmartPointer<vtkStringArray>::New();
+  {
+    vtkSmartPointer<vtkStringArray> result = vtkSmartPointer<vtkStringArray>::New();
 
     std::set<std::string> columnNames;
 
     vtkIdType numCols = table->GetNumberOfColumns();
-    for (vtkIdType cc=0; cc < numCols; cc++)
-      {
+    for (vtkIdType cc = 0; cc < numCols; cc++)
+    {
       columnNames.insert(table->GetColumnName(cc));
-      }
+    }
 
-    for (size_t cc=0; cc < this->SeriesVisibilities.size(); ++cc)
-      {
+    for (size_t cc = 0; cc < this->SeriesVisibilities.size(); ++cc)
+    {
       if (this->SeriesVisibilities[cc].second == true &&
-          columnNames.find(this->SeriesVisibilities[cc].first) != columnNames.end())
-        {
+        columnNames.find(this->SeriesVisibilities[cc].first) != columnNames.end())
+      {
         result->InsertNextValue(this->SeriesVisibilities[cc].first.c_str());
-        }
       }
+    }
 
     return result;
-    }
+  }
 
   bool GetSeriesVisibility(const std::string& name)
+  {
+    for (size_t cc = 0; cc < this->SeriesVisibilities.size(); ++cc)
     {
-    for (size_t cc=0; cc < this->SeriesVisibilities.size(); ++cc)
-      {
       if (this->SeriesVisibilities[cc].first == name)
-        {
+      {
         return this->SeriesVisibilities[cc].second;
-        }
       }
-    return false;
     }
+    return false;
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -97,12 +96,12 @@ vtkPVPlotMatrixRepresentation::vtkPVPlotMatrixRepresentation()
   this->Internals = new vtkInternals();
 
   // default colors are black (0, 0, 0)
-  for(int i = 0; i < 3; i++)
-    {
+  for (int i = 0; i < 3; i++)
+  {
     this->ScatterPlotColor[i] = 0;
     this->ActivePlotColor[i] = 0;
     this->HistogramColor[i] = 0;
-    }
+  }
   this->ScatterPlotColor[3] = 255;
   this->ActivePlotColor[3] = 255;
   this->HistogramColor[3] = 255;
@@ -121,17 +120,17 @@ vtkPVPlotMatrixRepresentation::~vtkPVPlotMatrixRepresentation()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVPlotMatrixRepresentation::AddToView(vtkView *view)
+bool vtkPVPlotMatrixRepresentation::AddToView(vtkView* view)
 {
-  if(!this->Superclass::AddToView(view))
-    {
+  if (!this->Superclass::AddToView(view))
+  {
     return false;
-    }
+  }
 
-  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
-    {
+  if (vtkScatterPlotMatrix* plotMatrix = this->GetPlotMatrix())
+  {
     plotMatrix->SetVisible(this->GetVisibility());
-    }
+  }
 
   return true;
 }
@@ -139,11 +138,11 @@ bool vtkPVPlotMatrixRepresentation::AddToView(vtkView *view)
 //----------------------------------------------------------------------------
 bool vtkPVPlotMatrixRepresentation::RemoveFromView(vtkView* view)
 {
-  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
-    {
+  if (vtkScatterPlotMatrix* plotMatrix = this->GetPlotMatrix())
+  {
     plotMatrix->SetInput(0);
     plotMatrix->SetVisible(false);
-    }
+  }
 
   return this->Superclass::RemoveFromView(view);
 }
@@ -153,39 +152,32 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
 {
   this->Superclass::PrepareForRendering();
 
-  vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix();
+  vtkScatterPlotMatrix* plotMatrix = this->GetPlotMatrix();
 
   // set chart properties
-  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::SCATTERPLOT,
-                           this->ScatterPlotColor);
-  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::HISTOGRAM,
-                           this->HistogramColor);
-  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::ACTIVEPLOT,
-                           this->ActivePlotColor);
-  plotMatrix->SetPlotMarkerStyle(vtkScatterPlotMatrix::SCATTERPLOT,
-                           this->ScatterPlotMarkerStyle);
-  plotMatrix->SetPlotMarkerStyle(vtkScatterPlotMatrix::ACTIVEPLOT,
-                           this->ActivePlotMarkerStyle);
-  plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::SCATTERPLOT,
-                           this->ScatterPlotMarkerSize);
-  plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::ACTIVEPLOT,
-                           this->ActivePlotMarkerSize);
+  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotColor);
+  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::HISTOGRAM, this->HistogramColor);
+  plotMatrix->SetPlotColor(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotColor);
+  plotMatrix->SetPlotMarkerStyle(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotMarkerStyle);
+  plotMatrix->SetPlotMarkerStyle(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerStyle);
+  plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotMarkerSize);
+  plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerSize);
 
   // vtkPVPlotMatrixRepresentation doesn't support multiblock of tables, so we
   // only consider the first vtkTable.
   vtkTable* table = this->GetLocalOutput();
   plotMatrix->SetVisible(table != NULL && this->GetVisibility());
   if (plotMatrix && table)
-    {
+  {
     plotMatrix->SetInput(table);
 
     // Set column visibilities
     vtkIdType numCols = table->GetNumberOfColumns();
-    for (vtkIdType cc=0; cc < numCols; cc++)
-      {
+    for (vtkIdType cc = 0; cc < numCols; cc++)
+    {
       const char* name = table->GetColumnName(cc);
       plotMatrix->SetColumnVisibility(name, this->Internals->GetSeriesVisibility(name));
-      }
+    }
 
     vtkSmartPointer<vtkStringArray> orderedVisibleColumns =
       this->Internals->GetOrderedVisibleColumnNames(table);
@@ -193,25 +185,24 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
     // this is essential since SetVisibleColumns doesn't seem to resize the
     // matrix to the new size (is that a bug?).
     plotMatrix->SetSize(vtkVector2i(
-        orderedVisibleColumns->GetNumberOfTuples(),
-        orderedVisibleColumns->GetNumberOfTuples()));
+      orderedVisibleColumns->GetNumberOfTuples(), orderedVisibleColumns->GetNumberOfTuples()));
 
     // Set column order
     plotMatrix->SetVisibleColumns(orderedVisibleColumns.GetPointer());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
-  vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix();
+  vtkScatterPlotMatrix* plotMatrix = this->GetPlotMatrix();
   if (plotMatrix && !visible)
-    {
+  {
     // Refer to vtkChartRepresentation::PrepareForRendering() documentation to
     // know why this is cannot be done in PrepareForRendering();
     plotMatrix->SetVisible(false);
-    }
+  }
   this->Modified();
 }
 
@@ -219,8 +210,7 @@ void vtkPVPlotMatrixRepresentation::SetVisibility(bool visible)
 void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char* series, bool visibility)
 {
   assert(series != NULL);
-  this->Internals->SeriesVisibilities.push_back(
-    std::pair<std::string, bool>(series, visibility));
+  this->Internals->SeriesVisibilities.push_back(std::pair<std::string, bool>(series, visibility));
   this->Modified();
 }
 
@@ -235,8 +225,7 @@ void vtkPVPlotMatrixRepresentation::ClearSeriesVisibilities()
 void vtkPVPlotMatrixRepresentation::SetColor(double r, double g, double b)
 {
   this->ScatterPlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-                                       static_cast<unsigned char>(g * 255),
-                                       static_cast<unsigned char>(b * 255));
+    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
 
   this->Modified();
 }
@@ -245,8 +234,7 @@ void vtkPVPlotMatrixRepresentation::SetColor(double r, double g, double b)
 void vtkPVPlotMatrixRepresentation::SetActivePlotColor(double r, double g, double b)
 {
   this->ActivePlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-                                      static_cast<unsigned char>(g * 255),
-                                      static_cast<unsigned char>(b * 255));
+    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
   this->Modified();
 }
 
@@ -254,8 +242,7 @@ void vtkPVPlotMatrixRepresentation::SetActivePlotColor(double r, double g, doubl
 void vtkPVPlotMatrixRepresentation::SetHistogramColor(double r, double g, double b)
 {
   this->HistogramColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-                                     static_cast<unsigned char>(g * 255),
-                                     static_cast<unsigned char>(b * 255));
+    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
   this->Modified();
 }
 
@@ -288,7 +275,7 @@ void vtkPVPlotMatrixRepresentation::SetActivePlotMarkerSize(double size)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVPlotMatrixRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
@@ -296,10 +283,10 @@ void vtkPVPlotMatrixRepresentation::PrintSelf(ostream &os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkScatterPlotMatrix* vtkPVPlotMatrixRepresentation::GetPlotMatrix() const
 {
-  if(this->ContextView)
-    {
+  if (this->ContextView)
+  {
     return vtkScatterPlotMatrix::SafeDownCast(this->ContextView->GetContextItem());
-    }
+  }
 
   return 0;
 }

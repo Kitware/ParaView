@@ -43,7 +43,8 @@ struct vtkPVMultiServerDataSource::vtkInternal
   int DataTypeToUse;
   unsigned long LastUpdatedDataTimeStamp;
 
-  vtkInternal() : DataTypeToUse(VTK_DATA_OBJECT) {};
+  vtkInternal()
+    : DataTypeToUse(VTK_DATA_OBJECT){};
 
   void InitializeDataStructure(vtkSMSourceProxy* proxyFromAnotherServer, int portNumber)
   {
@@ -51,19 +52,19 @@ struct vtkPVMultiServerDataSource::vtkInternal
     this->PortToExport = portNumber;
     this->ExternalProxy = proxyFromAnotherServer;
     this->OutputPortInformation->Initialize();
-    if(this->ExternalProxy)
-      {
+    if (this->ExternalProxy)
+    {
       this->OutputPortInformation->AddInformation(this->ExternalProxy->GetDataInformation());
       this->DataTypeToUse = this->OutputPortInformation->GetDataSetType();
-      if(this->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
-        {
-        this->DataTypeToUse = this->OutputPortInformation->GetCompositeDataSetType();
-        }
-      }
-    else
+      if (this->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
       {
-      this->DataTypeToUse = VTK_DATA_OBJECT;
+        this->DataTypeToUse = this->OutputPortInformation->GetCompositeDataSetType();
       }
+    }
+    else
+    {
+      this->DataTypeToUse = VTK_DATA_OBJECT;
+    }
   }
 };
 vtkStandardNewMacro(vtkPVMultiServerDataSource);
@@ -89,64 +90,62 @@ void vtkPVMultiServerDataSource::PrintSelf(ostream& os, vtkIndent indent)
 }
 //---------------------------------------------------------------------------
 void vtkPVMultiServerDataSource::SetExternalProxy(
-    vtkSMSourceProxy* proxyFromAnotherServer, int portNumber)
+  vtkSMSourceProxy* proxyFromAnotherServer, int portNumber)
 {
   this->Internal->InitializeDataStructure(proxyFromAnotherServer, portNumber);
   this->Modified();
 }
 //---------------------------------------------------------------------------
-void vtkPVMultiServerDataSource::FetchData(vtkDataObject *dataObjectToFill)
+void vtkPVMultiServerDataSource::FetchData(vtkDataObject* dataObjectToFill)
 {
-  if( this->Internal->ExternalProxy &&
-      this->Internal->LastUpdatedDataTimeStamp < this->GetMTime())
-    {
+  if (this->Internal->ExternalProxy && this->Internal->LastUpdatedDataTimeStamp < this->GetMTime())
+  {
     this->Internal->LastUpdatedDataTimeStamp = this->GetMTime();
 
     // If fetching data from a distributed server handle that with a reducer
     vtkSmartPointer<vtkSMSourceProxy> reductionFilter;
-    reductionFilter.TakeReference(
-          vtkSMSourceProxy::SafeDownCast(
-            this->Internal->ExternalProxy->GetSessionProxyManager()->NewProxy(
-              "filters", "ReductionFilter", NULL)));
+    reductionFilter.TakeReference(vtkSMSourceProxy::SafeDownCast(
+      this->Internal->ExternalProxy->GetSessionProxyManager()->NewProxy(
+        "filters", "ReductionFilter", NULL)));
 
     // Set default appender
     std::string postGatherHelperName = "vtkAppendFilter";
     int datasetType = this->Internal->OutputPortInformation->GetDataSetType();
 
     // Handle custom ones
-    if(this->Internal->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
-      {
+    if (this->Internal->OutputPortInformation->GetCompositeDataInformation()->GetDataIsComposite())
+    {
       postGatherHelperName = "vtkMultiBlockDataGroupFilter";
-      }
-    else if(datasetType == VTK_POLY_DATA)
-      {
+    }
+    else if (datasetType == VTK_POLY_DATA)
+    {
       postGatherHelperName = "vtkAppendPolyData";
-      }
-    else if(datasetType == VTK_RECTILINEAR_GRID)
-      {
+    }
+    else if (datasetType == VTK_RECTILINEAR_GRID)
+    {
       postGatherHelperName = "vtkAppendRectilinearGrid";
-      }
+    }
 
     // Set the post gather helper if any
-    if(!postGatherHelperName.empty())
-      {
-      vtkSMPropertyHelper(reductionFilter, "PostGatherHelperName").Set(
-            postGatherHelperName.c_str());
-      }
+    if (!postGatherHelperName.empty())
+    {
+      vtkSMPropertyHelper(reductionFilter, "PostGatherHelperName")
+        .Set(postGatherHelperName.c_str());
+    }
 
     // Reduce the data
-    vtkSMPropertyHelper(reductionFilter, "Input").Set(
-          this->Internal->ExternalProxy, this->Internal->PortToExport);
+    vtkSMPropertyHelper(reductionFilter, "Input")
+      .Set(this->Internal->ExternalProxy, this->Internal->PortToExport);
     reductionFilter->UpdateVTKObjects();
     reductionFilter->UpdatePipeline();
     vtkPVDataInformation* dataInfo = reductionFilter->GetDataInformation();
 
     // Handle type
     int dataType = dataInfo->GetDataSetType();
-    if(dataInfo->GetCompositeDataSetType() > 0)
-      {
+    if (dataInfo->GetCompositeDataSetType() > 0)
+    {
       dataType = dataInfo->GetCompositeDataSetType();
-      }
+    }
 
     // Handle extent
     int extent[6];
@@ -155,9 +154,8 @@ void vtkPVMultiServerDataSource::FetchData(vtkDataObject *dataObjectToFill)
     // Based on the reduced data fetch it
     vtkSmartPointer<vtkSMSourceProxy> fetcher;
     fetcher.TakeReference(
-          vtkSMSourceProxy::SafeDownCast(
-            reductionFilter->GetSessionProxyManager()->NewProxy(
-              "filters", "ClientServerMoveData", NULL)));
+      vtkSMSourceProxy::SafeDownCast(reductionFilter->GetSessionProxyManager()->NewProxy(
+        "filters", "ClientServerMoveData", NULL)));
     vtkSMPropertyHelper(fetcher, "Input").Set(reductionFilter);
     vtkSMPropertyHelper(fetcher, "OutputDataType").Set(dataType);
     vtkSMPropertyHelper(fetcher, "WholeExtent").Set(extent, 6);
@@ -166,42 +164,41 @@ void vtkPVMultiServerDataSource::FetchData(vtkDataObject *dataObjectToFill)
 
     // Shallow copy the local fetched data into our local output
     vtkDataObjectAlgorithm* localObj =
-        vtkDataObjectAlgorithm::SafeDownCast(fetcher->GetClientSideObject());
+      vtkDataObjectAlgorithm::SafeDownCast(fetcher->GetClientSideObject());
     dataObjectToFill->ShallowCopy(localObj->GetOutputDataObject(0));
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
-int vtkPVMultiServerDataSource::RequestDataObject(
-    vtkInformation *, vtkInformationVector** vtkNotUsed(inputVector),
-    vtkInformationVector* outputVector)
+int vtkPVMultiServerDataSource::RequestDataObject(vtkInformation*,
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
   int datasetType = this->Internal->DataTypeToUse;
 
   // Make sure our output is of the correct type
-  if( output == NULL || output->GetDataObjectType() != datasetType )
-    {
+  if (output == NULL || output->GetDataObjectType() != datasetType)
+  {
     output = vtkDataObjectTypes::NewDataObject(datasetType);
     outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
     output->FastDelete();
-    }
+  }
 
   return 1;
 }
 
 //---------------------------------------------------------------------------
 int vtkPVMultiServerDataSource::RequestInformation(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector*)
 {
-  //We don't want this to operate in parallel so we do not set CAN_HANDLE_PIECE_REQUEST
+  // We don't want this to operate in parallel so we do not set CAN_HANDLE_PIECE_REQUEST
   return 1;
 }
 
 //---------------------------------------------------------------------------
 int vtkPVMultiServerDataSource::RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector*)
 {
   // As we don't support Image data we don't care
   return 1;
@@ -209,9 +206,9 @@ int vtkPVMultiServerDataSource::RequestUpdateExtent(
 
 //---------------------------------------------------------------------------
 int vtkPVMultiServerDataSource::RequestData(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *outputVector)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkDataObject* output = vtkDataObject::GetData(outInfo);
 
   // The real fetch will only happen if its really needed

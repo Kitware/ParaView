@@ -36,17 +36,18 @@ void vtkSMChartUseIndexForAxisDomain::Update(vtkSMProperty* requestingProperty)
 
   vtkSMProperty* arrayName = this->GetRequiredProperty("ArraySelection");
   if (requestingProperty == arrayName)
-    {
+  {
     this->DomainModified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values)
+int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkSMProperty* arrayName = this->GetRequiredProperty("ArraySelection");
   if (arrayName)
-    {
+  {
     vtkSMPropertyHelper helper(arrayName);
     helper.SetUseUnchecked(use_unchecked_values);
 
@@ -54,19 +55,18 @@ int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(vtkSMProperty* property, b
     helper2.SetUseUnchecked(use_unchecked_values);
 
     const char* value = helper.GetAsString();
-    const char** known_names =
-      vtkSMChartSeriesListDomain::GetKnownSeriesNames();
-    for (int cc=0; known_names[cc] != NULL && value != NULL; cc++)
-      {
+    const char** known_names = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
+    for (int cc = 0; known_names[cc] != NULL && value != NULL; cc++)
+    {
       if (strcmp(known_names[cc], value) == 0)
-        {
+      {
         helper2.Set(0);
         return 1;
-        }
       }
+    }
     helper2.Set(1);
     return 1;
-    }
+  }
 
   return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }

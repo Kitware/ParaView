@@ -18,9 +18,9 @@
 
 #include <iostream>
 
-int TestSpecialDirectories(int , char* [])
+int TestSpecialDirectories(int, char* [])
 {
-  vtkPVFileInformationHelper *helper = vtkPVFileInformationHelper::New();
+  vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
   vtkPVFileInformation* info = vtkPVFileInformation::New();
 
   helper->SetSpecialDirectories(true);
@@ -31,12 +31,12 @@ int TestSpecialDirectories(int , char* [])
   coll->InitTraversal();
   vtkObject* obj;
   while ((obj = coll->GetNextItemAsObject()))
-    {
+  {
     vtkPVFileInformation* finfo = vtkPVFileInformation::SafeDownCast(obj);
     std::cerr << "name: " << finfo->GetName() << std::endl;
     std::cerr << "path: " << finfo->GetFullPath() << std::endl;
     std::cerr << std::endl;
-    }
+  }
 
   info->Delete();
   helper->Delete();

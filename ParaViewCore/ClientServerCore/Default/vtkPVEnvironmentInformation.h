@@ -59,7 +59,7 @@ protected:
   vtkPVEnvironmentInformation();
   ~vtkPVEnvironmentInformation();
 
-  char* Variable;     // value of an environment variable
+  char* Variable; // value of an environment variable
 
   vtkSetStringMacro(Variable);
 
@@ -68,6 +68,4 @@ private:
   void operator=(const vtkPVEnvironmentInformation&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

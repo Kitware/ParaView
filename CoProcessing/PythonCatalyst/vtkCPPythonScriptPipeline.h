@@ -30,10 +30,10 @@ class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipelin
 {
 public:
   static vtkCPPythonScriptPipeline* New();
-  vtkTypeMacro(vtkCPPythonScriptPipeline,vtkCPPipeline);
+  vtkTypeMacro(vtkCPPythonScriptPipeline, vtkCPPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /// Initialize this pipeline from given the file name of a 
+  /// Initialize this pipeline from given the file name of a
   /// python script. Returns 1 for success and 0 for failure.
   int Initialize(const char* fileName);
 

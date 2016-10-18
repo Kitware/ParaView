@@ -20,7 +20,7 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 class vtkProcessModuleAutoMPIInternals;
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModuleAutoMPI: public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModuleAutoMPI : public vtkObject
 {
 public:
   static vtkProcessModuleAutoMPI* New();
@@ -47,13 +47,12 @@ public:
   // scans for an available free port and starts the server on that
   // port. The port over which the connection is made is returned for
   // the client to consequently connect to it. Returns 0 on failure.
-  int ConnectToRemoteBuiltInSelf ();
+  int ConnectToRemoteBuiltInSelf();
 
 private:
   vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
   void operator=(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
-  vtkProcessModuleAutoMPIInternals *Internals;
+  vtkProcessModuleAutoMPIInternals* Internals;
 };
 
-
-#endif      /* !vtkProcessModuleAutoMPI_h */
+#endif /* !vtkProcessModuleAutoMPI_h */

@@ -17,7 +17,7 @@
  * @brief   union of proxies.
  *
  * This domain is a collection of proxies that can be assigned as the value
- * to a vtkSMProxyProperty. 
+ * to a vtkSMProxyProperty.
  * The Server Mananger configuration defines the proxy types that form this list,
  * while the value of this domain is the list of instances of proxies.
  * Example usage :
@@ -131,6 +131,7 @@ public:
    * property.
    */
   virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values);
+
 protected:
   vtkSMProxyListDomain();
   ~vtkSMProxyListDomain();
@@ -153,8 +154,7 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
 
   // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMProxyLocator* loader);
+  virtual int LoadState(vtkPVXMLElement* domainElement, vtkSMProxyLocator* loader);
 
   friend class vtkSMProxyProperty;
   void SetProxies(vtkSMProxy** proxies, unsigned int count);
@@ -167,4 +167,3 @@ private:
 };
 
 #endif
-

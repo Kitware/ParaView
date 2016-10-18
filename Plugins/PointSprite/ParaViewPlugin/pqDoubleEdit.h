@@ -37,19 +37,18 @@ class pqDoubleEdit : public QLineEdit
   Q_OBJECT
   Q_PROPERTY(double value READ value WRITE setValue)
 
-public :
+public:
   pqDoubleEdit(QWidget* parent);
   ~pqDoubleEdit();
 
   double value();
-signals :
-  void  valueChanged(double);
+signals:
+  void valueChanged(double);
 
 public slots:
-  void  setValue(double);
+  void setValue(double);
 
-protected slots :
-  void  valueEdited(const QString&);
-
+protected slots:
+  void valueEdited(const QString&);
 };
-#endif// pqDoubleEdit_h
+#endif // pqDoubleEdit_h

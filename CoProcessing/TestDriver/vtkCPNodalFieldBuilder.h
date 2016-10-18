@@ -16,7 +16,7 @@
  * @class   vtkCPNodalFieldBuilder
  * @brief   Class for specifying nodal fields over grids.
  *
- * Class for specifying nodal fields over grids for a test driver.  
+ * Class for specifying nodal fields over grids for a test driver.
 */
 
 #ifndef vtkCPNodalFieldBuilder_h
@@ -28,15 +28,14 @@
 class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPNodalFieldBuilder : public vtkCPFieldBuilder
 {
 public:
-  static vtkCPNodalFieldBuilder * New();
+  static vtkCPNodalFieldBuilder* New();
   vtkTypeMacro(vtkCPNodalFieldBuilder, vtkCPFieldBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long timeStep, double time,
-                          vtkDataSet* grid);
+  virtual void BuildField(unsigned long timeStep, double time, vtkDataSet* grid);
 
 protected:
   vtkCPNodalFieldBuilder();

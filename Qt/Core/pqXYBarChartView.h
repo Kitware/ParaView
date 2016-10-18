@@ -52,14 +52,11 @@ public:
   /**
   * Currently the bar chart view is not supporting selection.
   */
-  virtual bool supportsSelection() const {return false;}
+  virtual bool supportsSelection() const { return false; }
 
 public:
-  pqXYBarChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYBarChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYBarChartView();
 

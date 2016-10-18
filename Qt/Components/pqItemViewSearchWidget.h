@@ -7,7 +7,7 @@ Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
 All rights reserved.
 
 ParaView is a free software; you can redistribute it and/or modify it
-under the terms of the ParaView license version 1.2. 
+under the terms of the ParaView license version 1.2.
 
 See License_v1.2.txt for the full ParaView license.
 A copy of this license can be obtained by contacting
@@ -54,11 +54,11 @@ public:
   pqItemViewSearchWidget(QWidget* parent = 0);
   virtual ~pqItemViewSearchWidget();
   enum ItemSearchType
-    {
+  {
     Current,
     Next,
     Previous
-    };
+  };
 
 public slots:
   virtual void showSearchWidget();
@@ -82,27 +82,26 @@ protected:
   * Overridden to capture key presses.
   */
   virtual bool eventFilter(QObject* obj, QEvent* event);
-  virtual void keyPressEvent(QKeyEvent *e);
+  virtual void keyPressEvent(QKeyEvent* e);
   /**
   * Recursive to search all QModelIndices in the model.
   */
-  virtual bool searchModel( const QAbstractItemModel * M,
-    const QModelIndex & Top, const QString & S,
-    ItemSearchType searchType = Current ) const;
+  virtual bool searchModel(const QAbstractItemModel* M, const QModelIndex& Top, const QString& S,
+    ItemSearchType searchType = Current) const;
   /**
   * Overwrite to focus the lineEdit box
   */
-  void showEvent(QShowEvent *);
+  void showEvent(QShowEvent*);
   /**
   * match the input string with the index's text
   */
-  virtual bool matchString( const QAbstractItemModel * M,
-    const QModelIndex & curIdx,
-    const QString & searchString) const;
+  virtual bool matchString(
+    const QAbstractItemModel* M, const QModelIndex& curIdx, const QString& searchString) const;
+
 private:
   Q_DISABLE_COPY(pqItemViewSearchWidget)
 
   class PIMPL;
-  PIMPL *Private;
+  PIMPL* Private;
 };
 #endif

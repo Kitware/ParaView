@@ -31,8 +31,9 @@ class pqServer;
 class pqSLACDataLoadManager : public QDialog
 {
   Q_OBJECT;
+
 public:
-  pqSLACDataLoadManager(QWidget *p, Qt::WindowFlags f = 0);
+  pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f = 0);
   ~pqSLACDataLoadManager();
 
 public slots:
@@ -43,13 +44,13 @@ signals:
   void createdPipeline();
 
 protected:
-  pqServer *Server;
+  pqServer* Server;
 
 private:
   Q_DISABLE_COPY(pqSLACDataLoadManager)
 
   class pqUI;
-  pqUI *ui;
+  pqUI* ui;
 };
 
-#endif //pqSLACDataLoadManager_h
+#endif // pqSLACDataLoadManager_h

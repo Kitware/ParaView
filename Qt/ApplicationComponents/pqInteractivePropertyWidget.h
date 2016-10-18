@@ -58,10 +58,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractivePropertyWidget : public pqProp
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
   Q_PROPERTY(pqSMProxy dataSource READ dataSource WRITE setDataSource);
+
 public:
-  pqInteractivePropertyWidget(
-    const char* widget_smgroup, const char* widget_smname,
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqInteractivePropertyWidget(const char* widget_smgroup, const char* widget_smname,
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqInteractivePropertyWidget();
 
   /**

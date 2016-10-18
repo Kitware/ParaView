@@ -34,7 +34,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartWarning : public vtkBlockIte
 {
 public:
   static vtkChartWarning* New();
-  vtkTypeMacro(vtkChartWarning,vtkBlockItem);
+  vtkTypeMacro(vtkChartWarning, vtkBlockItem);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -47,8 +47,8 @@ public:
    */
   virtual bool Hit(const vtkContextMouseEvent& mouse);
 
-  vtkSetMacro(TextPad,double);
-  vtkGetMacro(TextPad,double);
+  vtkSetMacro(TextPad, double);
+  vtkGetMacro(TextPad, double);
 
 protected:
   vtkChartWarning();
@@ -60,8 +60,7 @@ protected:
 
 private:
   vtkChartWarning(const vtkChartWarning&) VTK_DELETE_FUNCTION;
-  void operator = (const vtkChartWarning&) VTK_DELETE_FUNCTION;
-
+  void operator=(const vtkChartWarning&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkChartWarning_h
+#endif // vtkChartWarning_h

@@ -33,7 +33,8 @@
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPythonAnnotationFilter.h"
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateGlobalDataFilter : public vtkPythonAnnotationFilter
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateGlobalDataFilter
+  : public vtkPythonAnnotationFilter
 {
 public:
   static vtkAnnotateGlobalDataFilter* New();
@@ -73,6 +74,7 @@ protected:
   char* Prefix;
   char* Postfix;
   char* FieldArrayName;
+
 private:
   vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMProxyTest::SetAnnotation()
 {
-  vtkSMProxy *proxy = vtkSMProxy::New();
+  vtkSMProxy* proxy = vtkSMProxy::New();
 
   // set annotations
   proxy->SetAnnotation("Color", "#FFAA00");
@@ -67,13 +67,13 @@ void vtkSMProxyTest::SetAnnotation()
 
 void vtkSMProxyTest::GetProperty()
 {
-  vtkSMSession *session = vtkSMSession::New();
-  vtkSMSessionProxyManager *pxm = session->GetSessionProxyManager();
-  vtkSMProxy *proxy = pxm->NewProxy("sources", "SphereSource");
+  vtkSMSession* session = vtkSMSession::New();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
   QVERIFY(proxy != NULL);
 
   // get 'Center' smproperty
-  vtkSMProperty *smproperty = proxy->GetProperty("Center");
+  vtkSMProperty* smproperty = proxy->GetProperty("Center");
   QVERIFY(smproperty != NULL);
   QCOMPARE(proxy->GetPropertyName(smproperty), "Center");
 
@@ -88,7 +88,7 @@ void vtkSMProxyTest::GetProperty()
 
 void vtkSMProxyTest::GetVTKClassName()
 {
-  vtkSMProxy *proxy = vtkSMProxy::New();
+  vtkSMProxy* proxy = vtkSMProxy::New();
   QVERIFY(proxy->GetVTKClassName() == NULL);
 
   proxy->SetVTKClassName("vtkSphereSource");

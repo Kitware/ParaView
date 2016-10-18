@@ -108,8 +108,7 @@ public:
    * requirement is not met, the StatusMessage includes the error message.
    */
   static bool PluginRequirementsSatisfied(
-    vtkPVPluginsInformation* client_plugins,
-    vtkPVPluginsInformation* server_plugins);
+    vtkPVPluginsInformation* client_plugins, vtkPVPluginsInformation* server_plugins);
 
 protected:
   vtkPVPluginsInformation();
@@ -124,7 +123,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

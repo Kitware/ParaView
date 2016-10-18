@@ -51,28 +51,25 @@ void pqProxyModifiedStateUndoElement::MadeUninitialized(pqProxy* source)
 bool pqProxyModifiedStateUndoElement::InternalUndoRedo(bool undo)
 {
   vtkSMProxy* proxy =
-      vtkSMProxy::SafeDownCast(
-          this->GetSession()->GetRemoteObject(this->ProxySourceGlobalId));
+    vtkSMProxy::SafeDownCast(this->GetSession()->GetRemoteObject(this->ProxySourceGlobalId));
 
   if (!proxy)
-    {
+  {
     vtkErrorMacro("Failed to locate the proxy to register.");
     return false;
-    }
+  }
 
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smModel = core->getServerManagerModel();
   pqProxy* pqproxy = smModel->findItem<pqProxy*>(proxy);
   if (pqproxy && !this->Reverse)
-    {
-    pqproxy->setModifiedState(undo? pqProxy::UNINITIALIZED :
-      pqProxy::UNMODIFIED);
-    }
+  {
+    pqproxy->setModifiedState(undo ? pqProxy::UNINITIALIZED : pqProxy::UNMODIFIED);
+  }
   else if (pqproxy && this->Reverse)
-    {
-    pqproxy->setModifiedState(undo? pqProxy::UNMODIFIED:
-      pqProxy::UNINITIALIZED);
-    }
+  {
+    pqproxy->setModifiedState(undo ? pqProxy::UNMODIFIED : pqProxy::UNINITIALIZED);
+  }
   return true;
 }
 
@@ -81,5 +78,3 @@ void pqProxyModifiedStateUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

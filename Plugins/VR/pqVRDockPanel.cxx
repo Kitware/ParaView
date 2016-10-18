@@ -75,7 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:
-  QString createName(vtkVRInteractorStyle *);
+  QString createName(vtkVRInteractorStyle*);
 
   bool IsRunning;
 
@@ -101,89 +101,71 @@ void pqVRDockPanel::constructor()
 
   this->Internals->propertyCombo->setCollapseVectors(true);
 
-  vtkVRInteractorStyleFactory *styleFactory =
-      vtkVRInteractorStyleFactory::GetInstance();
-  std::vector<std::string> styleDescs =
-      styleFactory->GetInteractorStyleDescriptions();
+  vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
+  std::vector<std::string> styleDescs = styleFactory->GetInteractorStyleDescriptions();
   for (size_t i = 0; i < styleDescs.size(); ++i)
-    {
-    this->Internals->stylesCombo->addItem(
-          QString::fromStdString(styleDescs[i]));
-    }
+  {
+    this->Internals->stylesCombo->addItem(QString::fromStdString(styleDescs[i]));
+  }
 
   // Connections
-  connect(this->Internals->addConnection, SIGNAL(clicked()),
-          this, SLOT(addConnection()));
+  connect(this->Internals->addConnection, SIGNAL(clicked()), this, SLOT(addConnection()));
 
-  connect(this->Internals->removeConnection, SIGNAL(clicked()),
-          this, SLOT(removeConnection()));
+  connect(this->Internals->removeConnection, SIGNAL(clicked()), this, SLOT(removeConnection()));
 
-  connect(this->Internals->editConnection, SIGNAL(clicked()),
-          this, SLOT(editConnection()));
+  connect(this->Internals->editConnection, SIGNAL(clicked()), this, SLOT(editConnection()));
 
-  connect(this->Internals->connectionsTable,
-          SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-          this, SLOT(editConnection(QListWidgetItem*)));
+  connect(this->Internals->connectionsTable, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this,
+    SLOT(editConnection(QListWidgetItem*)));
 
-  connect(this->Internals->connectionsTable, SIGNAL(currentRowChanged(int)),
-          this, SLOT(updateConnectionButtons(int)));
+  connect(this->Internals->connectionsTable, SIGNAL(currentRowChanged(int)), this,
+    SLOT(updateConnectionButtons(int)));
 
-  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
-          this, SLOT(updateConnections()));
+  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()), this,
+    SLOT(updateConnections()));
 
-  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
-          this, SLOT(updateStartStopButtonStates()));
+  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()), this,
+    SLOT(updateStartStopButtonStates()));
 
   // Styles
-  connect(this->Internals->addStyle, SIGNAL(clicked()),
-          this, SLOT(addStyle()));
+  connect(this->Internals->addStyle, SIGNAL(clicked()), this, SLOT(addStyle()));
 
-  connect(this->Internals->removeStyle, SIGNAL(clicked()),
-          this, SLOT(removeStyle()));
+  connect(this->Internals->removeStyle, SIGNAL(clicked()), this, SLOT(removeStyle()));
 
-  connect(this->Internals->editStyle, SIGNAL(clicked()),
-          this, SLOT(editStyle()));
+  connect(this->Internals->editStyle, SIGNAL(clicked()), this, SLOT(editStyle()));
 
-  connect(this->Internals->stylesTable,
-          SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-          this, SLOT(editStyle(QListWidgetItem*)));
+  connect(this->Internals->stylesTable, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this,
+    SLOT(editStyle(QListWidgetItem*)));
 
-  connect(this->Internals->stylesTable, SIGNAL(currentRowChanged(int)),
-          this, SLOT(updateStyleButtons(int)));
+  connect(this->Internals->stylesTable, SIGNAL(currentRowChanged(int)), this,
+    SLOT(updateStyleButtons(int)));
 
-  connect(pqVRQueueHandler::instance(), SIGNAL(stylesChanged()),
-          this, SLOT(updateStyles()));
+  connect(pqVRQueueHandler::instance(), SIGNAL(stylesChanged()), this, SLOT(updateStyles()));
 
   // Other
-  connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-          this, SLOT(setActiveView(pqView*)));
+  connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setActiveView(pqView*)));
 
-  connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)),
-          this, SLOT(proxyChanged(vtkSMProxy*)));
+  connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)), this,
+    SLOT(proxyChanged(vtkSMProxy*)));
 
-  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)),
-          this, SLOT(styleComboChanged(QString)));
+  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)), this,
+    SLOT(styleComboChanged(QString)));
 
-  connect(this->Internals->saveState, SIGNAL(clicked()),
-          this, SLOT(saveState()));
+  connect(this->Internals->saveState, SIGNAL(clicked()), this, SLOT(saveState()));
 
-  connect(this->Internals->restoreState, SIGNAL(clicked()),
-          this, SLOT(restoreState()));
+  connect(this->Internals->restoreState, SIGNAL(clicked()), this, SLOT(restoreState()));
 
-  connect(this->Internals->startButton, SIGNAL(clicked()),
-          this, SLOT(start()));
+  connect(this->Internals->startButton, SIGNAL(clicked()), this, SLOT(start()));
 
-  connect(this->Internals->stopButton, SIGNAL(clicked()),
-          this, SLOT(stop()));
+  connect(this->Internals->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 
   this->styleComboChanged(this->Internals->stylesCombo->currentText());
-  this->updateConnectionButtons(
-        this->Internals->connectionsTable->currentRow());
+  this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
 
   // Add the render view to the proxy combo
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   QList<pqRenderView*> rviews = ::pqFindItems<pqRenderView*>(smmodel);
   if (rviews.size() != 0)
@@ -194,9 +176,9 @@ void pqVRDockPanel::constructor()
 pqVRDockPanel::~pqVRDockPanel()
 {
   if (this->Internals->IsRunning)
-    {
+  {
     this->stop();
-    }
+  }
   delete this->Internals;
 }
 
@@ -204,32 +186,32 @@ pqVRDockPanel::~pqVRDockPanel()
 void pqVRDockPanel::updateConnections()
 {
   this->Internals->connectionsTable->clear();
-  
+
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
   QList<QString> connectionNames = mgr->connectionNames();
   foreach (const QString& name, connectionNames)
-    {
+  {
     this->Internals->connectionsTable->addItem(name);
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::editConnection(QListWidgetItem *item)
+void pqVRDockPanel::editConnection(QListWidgetItem* item)
 {
   if (this->Internals->IsRunning)
-    {
+  {
     return;
-    }
+  }
 
   if (!item)
-    {
+  {
     item = this->Internals->connectionsTable->currentItem();
-    }
+  }
 
   if (!item)
-    {
+  {
     return;
-    }
+  }
 
   // Lookup connection
   QString connName = item->text();
@@ -238,45 +220,45 @@ void pqVRDockPanel::editConnection(QListWidgetItem *item)
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
 #ifdef PARAVIEW_USE_VRPN
-  if (pqVRPNConnection *vrpnConn = mgr->GetVRPNConnection(connName))
-    {
+  if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(connName))
+  {
     set = true;
     dialog.setConnection(vrpnConn);
-    }
+  }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(connName))
-    {
+  if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(connName))
+  {
     if (!set)
-      {
+    {
       set = true;
       dialog.setConnection(vruiConn);
-      }
     }
+  }
 #endif
 
   if (!set)
-    {
+  {
     // Connection not found!
     return;
-    }
+  }
 
   if (dialog.exec() == QDialog::Accepted)
-    {
+  {
     dialog.updateConnection();
     this->updateConnections();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::updateConnectionButtons(int row)
 {
   if (!this->Internals->IsRunning)
-    {
+  {
     bool enabled = (row >= 0);
     this->Internals->editConnection->setEnabled(enabled);
     this->Internals->removeConnection->setEnabled(enabled);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -284,22 +266,22 @@ void pqVRDockPanel::addConnection()
 {
   pqVRAddConnectionDialog dialog(this);
   if (dialog.exec() == QDialog::Accepted)
-    {
+  {
     pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
     dialog.updateConnection();
 #ifdef PARAVIEW_USE_VRPN
     if (dialog.isVRPN())
-      {
-      pqVRPNConnection *conn = dialog.getVRPNConnection();
+    {
+      pqVRPNConnection* conn = dialog.getVRPNConnection();
       mgr->add(conn);
-      }
+    }
 #endif
 #ifdef PARAVIEW_USE_VRUI
     if (dialog.isVRUI())
-      {
-      pqVRUIConnection *conn = dialog.getVRUIConnection();
+    {
+      pqVRUIConnection* conn = dialog.getVRUIConnection();
       mgr->add(conn);
-      }
+    }
 #endif
   }
 }
@@ -307,48 +289,45 @@ void pqVRDockPanel::addConnection()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::removeConnection()
 {
-  QListWidgetItem *item = this->Internals->connectionsTable->currentItem();
+  QListWidgetItem* item = this->Internals->connectionsTable->currentItem();
   if (!item)
-    {
+  {
     return;
-    }
+  }
   QString name = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
   pqVRAddConnectionDialog dialog(this);
 #ifdef PARAVIEW_USE_VRPN
-  if (pqVRPNConnection *vrpnConn = mgr->GetVRPNConnection(name))
-    {
+  if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(name))
+  {
     mgr->remove(vrpnConn);
     return;
-    }
+  }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(name))
-    {
+  if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(name))
+  {
     mgr->remove(vruiConn);
-    }
+  }
 #endif
 }
 
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::addStyle()
 {
-  vtkSMProxy *proxy = this->Internals->propertyCombo->getCurrentProxy();
-  QByteArray property =
-      this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
+  vtkSMProxy* proxy = this->Internals->propertyCombo->getCurrentProxy();
+  QByteArray property = this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
   QString styleString = this->Internals->stylesCombo->currentText();
 
-  vtkVRInteractorStyleFactory *styleFactory =
-      vtkVRInteractorStyleFactory::GetInstance();
-  vtkVRInteractorStyle *style =
-      styleFactory->NewInteractorStyleFromDescription(
-        styleString.toStdString());
+  vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
+  vtkVRInteractorStyle* style =
+    styleFactory->NewInteractorStyleFromDescription(styleString.toStdString());
 
   if (!style)
-    {
+  {
     return;
-    }
+  }
 
   style->SetControlledProxy(proxy);
   style->SetControlledPropertyName(property.data());
@@ -357,11 +336,11 @@ void pqVRDockPanel::addStyle()
   QString name = this->Internals->createName(style);
   dialog.setInteractorStyle(style, name);
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
-    {
+  {
     dialog.updateInteractorStyle();
-    pqVRQueueHandler *handler = pqVRQueueHandler::instance();
+    pqVRQueueHandler* handler = pqVRQueueHandler::instance();
     handler->add(style);
-    }
+  }
 
   // Clean up reference
   style->Delete();
@@ -370,18 +349,18 @@ void pqVRDockPanel::addStyle()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::removeStyle()
 {
-  QListWidgetItem *item = this->Internals->stylesTable->currentItem();
+  QListWidgetItem* item = this->Internals->stylesTable->currentItem();
   if (!item)
-    {
+  {
     return;
-    }
+  }
   QString name = item->text();
 
-  vtkVRInteractorStyle *style = this->Internals->StyleNameMap.value(name, NULL);
+  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, NULL);
   if (!style)
-    {
+  {
     return;
-    }
+  }
 
   pqVRQueueHandler::instance()->remove(style);
 }
@@ -392,38 +371,38 @@ void pqVRDockPanel::updateStyles()
   this->Internals->StyleNameMap.clear();
   this->Internals->stylesTable->clear();
 
-  foreach(vtkVRInteractorStyle *style, pqVRQueueHandler::instance()->styles())
-    {
+  foreach (vtkVRInteractorStyle* style, pqVRQueueHandler::instance()->styles())
+  {
     QString name = this->Internals->createName(style);
     this->Internals->StyleNameMap.insert(name, style);
     this->Internals->stylesTable->addItem(name);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::editStyle(QListWidgetItem *item)
+void pqVRDockPanel::editStyle(QListWidgetItem* item)
 {
   if (!item)
-    {
+  {
     item = this->Internals->stylesTable->currentItem();
-    }
+  }
 
   if (!item)
-    {
+  {
     return;
-    }
+  }
 
   pqVRAddStyleDialog dialog(this);
   QString name = item->text();
-  vtkVRInteractorStyle *style = this->Internals->StyleNameMap.value(name, NULL);
+  vtkVRInteractorStyle* style = this->Internals->StyleNameMap.value(name, NULL);
   if (!style)
-    {
+  {
     return;
-    }
+  }
 
   dialog.setInteractorStyle(style, name);
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
-    {
+  {
     dialog.updateInteractorStyle();
   }
 }
@@ -437,92 +416,86 @@ void pqVRDockPanel::updateStyleButtons(int row)
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
+void pqVRDockPanel::proxyChanged(vtkSMProxy* pxy)
 {
   this->Internals->propertyCombo->setSource(pxy);
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::styleComboChanged(const QString &name)
+void pqVRDockPanel::styleComboChanged(const QString& name)
 {
-  vtkVRInteractorStyleFactory *styleFactory =
-      vtkVRInteractorStyleFactory::GetInstance();
-  vtkVRInteractorStyle *style =
-      styleFactory->NewInteractorStyleFromDescription(name.toStdString());
+  vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
+  vtkVRInteractorStyle* style = styleFactory->NewInteractorStyleFromDescription(name.toStdString());
   int size = style ? style->GetControlledPropertySize() : -1;
   if (style)
-    {
+  {
     style->Delete();
-    }
+  }
   this->Internals->propertyCombo->setVectorSizeFilter(size);
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::setActiveView(pqView *view)
+void pqVRDockPanel::setActiveView(pqView* view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
 
   // Remove any RenderView.* entries in the combobox
   Qt::MatchFlags matchFlags = Qt::MatchStartsWith | Qt::MatchCaseSensitive;
   int ind = this->Internals->proxyCombo->findText("RenderView", matchFlags);
-  while (ind != -1 )
-    {
+  while (ind != -1)
+  {
     QString label = this->Internals->proxyCombo->itemText(ind);
     this->Internals->proxyCombo->removeProxy(label);
     ind = this->Internals->proxyCombo->findText("RenderView", matchFlags);
-    }
+  }
 
   if (rview)
-    {
-    this->Internals->proxyCombo->addProxy(0, rview->getSMName(),
-                                          rview->getProxy());
-    }
+  {
+    this->Internals->proxyCombo->addProxy(0, rview->getSMName(), rview->getProxy());
+  }
 
   this->Internals->Camera = NULL;
   if (rview)
+  {
+    if (vtkSMRenderViewProxy* renPxy = rview->getRenderViewProxy())
     {
-    if (vtkSMRenderViewProxy *renPxy = rview->getRenderViewProxy())
-      {
       if (this->Internals->Camera = renPxy->GetActiveCamera())
-        {
-        pqCoreUtilities::connect(this->Internals->Camera,
-                                 vtkCommand::ModifiedEvent,
-                                 this, SLOT(updateDebugLabel()));
-        }
+      {
+        pqCoreUtilities::connect(
+          this->Internals->Camera, vtkCommand::ModifiedEvent, this, SLOT(updateDebugLabel()));
       }
     }
+  }
   this->updateDebugLabel();
 }
 
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::saveState()
 {
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(),
-                          "Save VR plugin template",
-                          QString(),
-                          "VR plugin template files (*.pvvr)");
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save VR plugin template", QString(),
+    "VR plugin template files (*.pvvr)");
 
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
   if (fileDialog.exec() != pqFileDialog::Accepted)
-    {
+  {
     // User canceled
     return;
-    }
+  }
 
   QString filename = fileDialog.getSelectedFiles().first();
 
   vtkNew<vtkPVXMLElement> root;
   root->SetName("VRPluginState");
 
-  if (pqVRConnectionManager *connMgr = pqVRConnectionManager::instance())
-    {
+  if (pqVRConnectionManager* connMgr = pqVRConnectionManager::instance())
+  {
     connMgr->saveConnectionsConfiguration(root.GetPointer());
-    }
-  if (pqVRQueueHandler *queueHandler = pqVRQueueHandler::instance())
-    {
+  }
+  if (pqVRQueueHandler* queueHandler = pqVRQueueHandler::instance())
+  {
     queueHandler->saveStylesConfiguration(root.GetPointer());
-    }
+  }
 
   // Avoid temporary QByteArrays in QString --> const char * conversion:
   QByteArray filename_ba = filename.toLocal8Bit();
@@ -533,19 +506,17 @@ void pqVRDockPanel::saveState()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::restoreState()
 {
-  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(),
-                          "Load VR plugin template",
-                          QString(),
-                          "VR plugin template files (*.pvvr);;"
-                          "ParaView state files (*.pvsm)");
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Load VR plugin template", QString(),
+    "VR plugin template files (*.pvvr);;"
+    "ParaView state files (*.pvsm)");
 
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (fileDialog.exec() != pqFileDialog::Accepted)
-    {
+  {
     // User canceled
     return;
-    }
+  }
 
   QString filename = fileDialog.getSelectedFiles().first();
 
@@ -553,23 +524,21 @@ void pqVRDockPanel::restoreState()
   xmlParser->SetFileName(qPrintable(filename));
   xmlParser->Parse();
 
-  vtkPVXMLElement *root = xmlParser->GetRootElement();
+  vtkPVXMLElement* root = xmlParser->GetRootElement();
 
-  pqVRConnectionManager *connMgr = pqVRConnectionManager::instance();
-  vtkPVXMLElement *connRoot =
-      root->FindNestedElementByName("VRConnectionManager");
+  pqVRConnectionManager* connMgr = pqVRConnectionManager::instance();
+  vtkPVXMLElement* connRoot = root->FindNestedElementByName("VRConnectionManager");
   if (connMgr && connRoot)
-    {
+  {
     connMgr->configureConnections(connRoot, NULL);
-    }
+  }
 
-  pqVRQueueHandler *queueHandler = pqVRQueueHandler::instance();
-  vtkPVXMLElement *stylesRoot =
-      root->FindNestedElementByName("VRInteractorStyles");
+  pqVRQueueHandler* queueHandler = pqVRQueueHandler::instance();
+  vtkPVXMLElement* stylesRoot = root->FindNestedElementByName("VRInteractorStyles");
   if (queueHandler && stylesRoot)
-    {
+  {
     queueHandler->configureStyles(root, NULL);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -591,24 +560,23 @@ void pqVRDockPanel::enableConnectionButtons()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::updateStartStopButtonStates()
 {
-  pqVRConnectionManager *mgr = pqVRConnectionManager::instance();
+  pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
   bool canStart = !this->Internals->IsRunning && mgr->numConnections() != 0;
   bool canStop = this->Internals->IsRunning;
 
   this->Internals->startButton->setEnabled(canStart);
   this->Internals->stopButton->setEnabled(canStop);
-
 }
 
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::start()
 {
   if (this->Internals->IsRunning)
-    {
+  {
     qWarning() << "pqVRDockPanel: Cannot start listening for VR events --"
                   " already running!";
     return;
-    }
+  }
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   this->disableConnectionButtons();
   pqVRConnectionManager::instance()->start();
@@ -622,18 +590,17 @@ void pqVRDockPanel::start()
 void pqVRDockPanel::stop()
 {
   if (!this->Internals->IsRunning)
-    {
+  {
     qWarning() << "pqVRDockPanel: Cannot stop listening for VR events --"
                   " not started!";
     return;
-    }
+  }
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   this->enableConnectionButtons();
   pqVRConnectionManager::instance()->stop();
   pqVRQueueHandler::instance()->stop();
   this->Internals->IsRunning = false;
-  this->updateConnectionButtons(
-        this->Internals->connectionsTable->currentRow());
+  this->updateConnectionButtons(this->Internals->connectionsTable->currentRow());
   this->updateStartStopButtonStates();
   QApplication::restoreOverrideCursor();
 }
@@ -642,11 +609,11 @@ void pqVRDockPanel::stop()
 void pqVRDockPanel::updateDebugLabel()
 {
   if (this->Internals->Camera)
-    {
-    double *pos = this->Internals->Camera->GetPosition();
-    QString debugString = QString("Camera position: %1 %2 %3\n")
-        .arg(pos[0]).arg(pos[1]).arg(pos[2]);
-    vtkMatrix4x4 *mv = this->Internals->Camera->GetModelViewTransformMatrix();
+  {
+    double* pos = this->Internals->Camera->GetPosition();
+    QString debugString =
+      QString("Camera position: %1 %2 %3\n").arg(pos[0]).arg(pos[1]).arg(pos[2]);
+    vtkMatrix4x4* mv = this->Internals->Camera->GetModelViewTransformMatrix();
     debugString += "ModelView Matrix:\n";
     for (int i = 0; i < 4; ++i)
     {
@@ -655,38 +622,38 @@ void pqVRDockPanel::updateDebugLabel()
       double e2 = mv->GetElement(i, 2);
       double e3 = mv->GetElement(i, 3);
       debugString += QString("%1 %2 %3 %4\n")
-          .arg(fabs(e0) < 1e-5 ? 0.0 : e0, 8, 'g', 3)
-          .arg(fabs(e1) < 1e-5 ? 0.0 : e1, 8, 'g', 3)
-          .arg(fabs(e2) < 1e-5 ? 0.0 : e2, 8, 'g', 3)
-          .arg(fabs(e3) < 1e-5 ? 0.0 : e3, 8, 'g', 3);
+                       .arg(fabs(e0) < 1e-5 ? 0.0 : e0, 8, 'g', 3)
+                       .arg(fabs(e1) < 1e-5 ? 0.0 : e1, 8, 'g', 3)
+                       .arg(fabs(e2) < 1e-5 ? 0.0 : e2, 8, 'g', 3)
+                       .arg(fabs(e3) < 1e-5 ? 0.0 : e3, 8, 'g', 3);
     }
     // Pop off trailing newline
     debugString.remove(QRegExp("\n$"));
     this->Internals->debugLabel->setText(debugString);
     this->Internals->debugLabel->show();
-    }
+  }
   else
-    {
+  {
     this->Internals->debugLabel->hide();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle *style)
+QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle* style)
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqServerManagerModel *model = core->getServerManagerModel();
-  vtkVRInteractorStyleFactory *styleFactory
-      = vtkVRInteractorStyleFactory::GetInstance();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* model = core->getServerManagerModel();
+  vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
 
   QString className = style->GetClassName();
-  QString desc = QString::fromStdString(
-        styleFactory->GetDescriptionFromClassName(className.toStdString()));
-  vtkSMProxy *smControlledProxy = style->GetControlledProxy();
-  pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
-  QString name = QString("%1 on %2's %3").arg(desc)
-      .arg(pqControlledProxy ? pqControlledProxy->getSMName()
-                             : smControlledProxy->GetXMLLabel())
+  QString desc =
+    QString::fromStdString(styleFactory->GetDescriptionFromClassName(className.toStdString()));
+  vtkSMProxy* smControlledProxy = style->GetControlledProxy();
+  pqProxy* pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
+  QString name =
+    QString("%1 on %2's %3")
+      .arg(desc)
+      .arg(pqControlledProxy ? pqControlledProxy->getSMName() : smControlledProxy->GetXMLLabel())
       .arg(style->GetControlledPropertyName());
 
   return name;

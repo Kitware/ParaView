@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,13 +39,11 @@ class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqDoubleVectorPropertyWidget(vtkSMProperty *property,
-                               vtkSMProxy *proxy,
-                               QWidget *parent = 0);
+  pqDoubleVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
 
   virtual ~pqDoubleVectorPropertyWidget();
-
 
   // Overridden to clear highlights from the pqHighlightablePushButton.
   virtual void apply();

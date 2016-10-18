@@ -67,48 +67,44 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation::pqDataRepresentation(const QString& group,
-  const QString& name, vtkSMProxy* repr, pqServer* server,
-  QObject *_p)
-: pqRepresentation(group, name, repr, server, _p)
+pqDataRepresentation::pqDataRepresentation(
+  const QString& group, const QString& name, vtkSMProxy* repr, pqServer* server, QObject* _p)
+  : pqRepresentation(group, name, repr, server, _p)
 {
   this->Internal = new pqDataRepresentationInternal;
   this->Internal->VisibilityChangedSinceLastUpdate = false;
   vtkEventQtSlotConnect* vtkconnector = this->getConnector();
 
-  vtkconnector->Connect(repr->GetProperty("Input"),
-    vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
-  vtkconnector->Connect(repr, vtkCommand::UpdateDataEvent,
-    this, SIGNAL(dataUpdated()));
+  vtkconnector->Connect(
+    repr->GetProperty("Input"), vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
+  vtkconnector->Connect(repr, vtkCommand::UpdateDataEvent, this, SIGNAL(dataUpdated()));
 
   // fire signals when LUT changes.
   if (vtkSMProperty* prop = repr->GetProperty("LookupTable"))
-    {
-    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent,
-      this, SIGNAL(colorTransferFunctionModified()));
-    }
+  {
+    vtkconnector->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(colorTransferFunctionModified()));
+  }
   if (vtkSMProperty* prop = repr->GetProperty("ColorArrayName"))
-    {
-    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent,
-      this, SIGNAL(colorArrayNameModified()));
-    }
+  {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(colorArrayNameModified()));
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation::~pqDataRepresentation()
 {
   if (this->Internal->InputPort)
-    {
+  {
     this->Internal->InputPort->removeRepresentation(this);
-    }
+  }
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqDataRepresentation::getInput() const
 {
-  return (this->Internal->InputPort?
-    this->Internal->InputPort->getSource() : 0);
+  return (this->Internal->InputPort ? this->Internal->InputPort->getSource() : 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -120,72 +116,69 @@ pqOutputPort* pqDataRepresentation::getOutputPortFromInput() const
 //-----------------------------------------------------------------------------
 void pqDataRepresentation::onInputChanged()
 {
-  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
-    this->getProxy()->GetProperty("Input"));
+  vtkSMInputProperty* ivp =
+    vtkSMInputProperty::SafeDownCast(this->getProxy()->GetProperty("Input"));
   if (!ivp)
-    {
+  {
     qDebug() << "Representation proxy has no input property!";
     return;
-    }
+  }
 
   pqOutputPort* oldValue = this->Internal->InputPort;
 
   int new_proxes_count = ivp->GetNumberOfProxies();
   if (new_proxes_count == 0)
-    {
+  {
     this->Internal->InputPort = 0;
-    }
+  }
   else if (new_proxes_count == 1)
-    {
-    pqServerManagerModel* smModel =
-      pqApplicationCore::instance()->getServerManagerModel();
+  {
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
     if (ivp->GetProxy(0) && !input)
-      {
+    {
       qDebug() << "Representation could not locate the pqPipelineSource object "
-        << "for the input proxy.";
-      }
+               << "for the input proxy.";
+    }
     else
-      {
+    {
       int portnumber = ivp->GetOutputPortForConnection(0);
       this->Internal->InputPort = input->getOutputPort(portnumber);
-      }
     }
+  }
   else if (new_proxes_count > 1)
-    {
+  {
     qDebug() << "Representations with more than 1 inputs are not handled.";
     return;
-    }
+  }
 
   if (oldValue != this->Internal->InputPort)
-    {
+  {
     // Now tell the pqPipelineSource about the changes in the representations.
     if (oldValue)
-      {
+    {
       oldValue->removeRepresentation(this);
-      }
-    if (this->Internal->InputPort)
-      {
-      this->Internal->InputPort->addRepresentation(this);
-      }
     }
+    if (this->Internal->InputPort)
+    {
+      this->Internal->InputPort->addRepresentation(this);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqDataRepresentation::getLookupTableProxy()
 {
-  return pqSMAdaptor::getProxyProperty(
-    this->getProxy()->GetProperty("LookupTable"));
+  return pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
 }
 
 //-----------------------------------------------------------------------------
 pqScalarsToColors* pqDataRepresentation::getLookupTable()
 {
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   vtkSMProxy* lut = this->getLookupTableProxy();
 
-  return (lut? smmodel->findItem<pqScalarsToColors*>(lut): 0);
+  return (lut ? smmodel->findItem<pqScalarsToColors*>(lut) : 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -193,9 +186,9 @@ unsigned long pqDataRepresentation::getFullResMemorySize()
 {
   vtkPVDataInformation* info = this->getRepresentedDataInformation(true);
   if (!info)
-    {
+  {
     return 0;
-    }
+  }
   return static_cast<unsigned long>(info->GetMemorySize());
 }
 
@@ -204,23 +197,22 @@ bool pqDataRepresentation::getDataBounds(double bounds[6])
 {
   vtkPVDataInformation* info = this->getRepresentedDataInformation(true);
   if (!info)
-    {
+  {
     return false;
-    }
+  }
   info->GetBounds(bounds);
   return true;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
-  bool vtkNotUsed(update)/*=true*/) const
+  bool vtkNotUsed(update) /*=true*/) const
 {
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    this->getProxy());
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(this->getProxy());
   if (repr)
-    {
+  {
     return repr->GetRepresentedDataInformation();
-    }
+  }
   return NULL;
 }
 
@@ -228,9 +220,9 @@ vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
 vtkPVDataInformation* pqDataRepresentation::getInputDataInformation() const
 {
   if (!this->getOutputPortFromInput())
-    {
+  {
     return 0;
-    }
+  }
 
   return this->getOutputPortFromInput()->getDataInformation();
 }
@@ -239,9 +231,9 @@ vtkPVDataInformation* pqDataRepresentation::getInputDataInformation() const
 vtkPVTemporalDataInformation* pqDataRepresentation::getInputTemporalDataInformation() const
 {
   if (!this->getOutputPortFromInput())
-    {
+  {
     return 0;
-    }
+  }
 
   return this->getOutputPortFromInput()->getTemporalDataInformation();
 }
@@ -249,21 +241,21 @@ vtkPVTemporalDataInformation* pqDataRepresentation::getInputTemporalDataInformat
 //-----------------------------------------------------------------------------
 pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource() const
 {
- pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(this->getInput());
- pqView* view = this->getView();
- if (!filter || filter->getInputCount() == 0 || view == 0)
-   {
-   return 0;
-   }
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(this->getInput());
+  pqView* view = this->getView();
+  if (!filter || filter->getInputCount() == 0 || view == 0)
+  {
+    return 0;
+  }
 
- // find a repre for the input of the filter
- pqOutputPort* input = filter->getInputs()[0];
- if (!input)
-   {
-   return 0;
-   }
+  // find a repre for the input of the filter
+  pqOutputPort* input = filter->getInputs()[0];
+  if (!input)
+  {
+    return 0;
+  }
 
- return input->getRepresentation(view);
+  return input->getRepresentation(view);
 }
 
 //-----------------------------------------------------------------------------
@@ -281,15 +273,16 @@ void pqDataRepresentation::updateLookupTable()
   vtkSMProxy* representationProxy = this->getProxy();
   vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable").GetAsProxy();
   if (!lut)
-    {
+  {
     return;
-    }
+  }
 
-  int rescaleOnVisibilityChange = vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", 1).GetAsInt(0);
+  int rescaleOnVisibilityChange =
+    vtkSMPropertyHelper(lut, "RescaleOnVisibilityChange", 1).GetAsInt(0);
   if (rescaleOnVisibilityChange && this->Internal->VisibilityChangedSinceLastUpdate)
-    {
+  {
     this->resetAllTransferFunctionRangesUsingCurrentData();
-    }
+  }
   this->Internal->VisibilityChangedSinceLastUpdate = false;
 }
 
@@ -299,9 +292,8 @@ void pqDataRepresentation::resetAllTransferFunctionRangesUsingCurrentData()
   vtkSMProxy* representationProxy = this->getProxy();
   vtkSMProxy* lut = vtkSMPropertyHelper(representationProxy, "LookupTable").GetAsProxy();
   if (lut)
-    {
+  {
     vtkNew<vtkSMTransferFunctionManager> tfmgr;
-    tfmgr->ResetAllTransferFunctionRangesUsingCurrentData(
-      this->getServer()->proxyManager(), false);
-    }
+    tfmgr->ResetAllTransferFunctionRangesUsingCurrentData(this->getServer()->proxyManager(), false);
+  }
 }

@@ -52,8 +52,8 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTContext : public vtkObject
 {
 public:
   vtkTypeMacro(vtkIceTContext, vtkObject);
-  static vtkIceTContext *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkIceTContext* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -61,7 +61,7 @@ public:
    * be a vtkMPIController.  The context is not valid until a controller is
    * set.
    */
-  virtual void SetController(vtkMultiProcessController *controller);
+  virtual void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
 
@@ -85,7 +85,7 @@ public:
   /**
    * Copy the state from the given context to this context.
    */
-  virtual void CopyState(vtkIceTContext *src);
+  virtual void CopyState(vtkIceTContext* src);
 
   /**
    * Returns true if the current state is valid.
@@ -96,16 +96,15 @@ protected:
   vtkIceTContext();
   ~vtkIceTContext();
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
   int UseOpenGL;
 
 private:
-  vtkIceTContext(const vtkIceTContext &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIceTContext &) VTK_DELETE_FUNCTION;
+  vtkIceTContext(const vtkIceTContext&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkIceTContext&) VTK_DELETE_FUNCTION;
 
-  vtkIceTContextOpaqueHandle *Context;
+  vtkIceTContextOpaqueHandle* Context;
 };
 
-#endif //vtkIceTContext_h
-
+#endif // vtkIceTContext_h

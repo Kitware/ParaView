@@ -25,7 +25,8 @@
  * both. Having a special exporter helps us with that. It provides two sets of
  * APIs:
  *
- * \li \c STREAM_ROWS: to use to stream a single large vtkTable as contiguous chunks where each chuck
+ * \li \c STREAM_ROWS: to use to stream a single large vtkTable as contiguous chunks where each
+ * chuck
  * is a subset of the rows (ideal for use by vtkSpreadSheetView) viz. OpenFile,
  * WriteHeader, WriteData (which can be repeated as many times as needed), and CloseFile,
  * \li \c STREAM_COLUMNS: to use to add columns (idea for chart views) viz. OpenFile,
@@ -76,17 +77,16 @@ public:
   vtkGetMacro(FilterColumnsByVisibility, bool);
   //@}
 
-
   enum ExporterModes
-    {
+  {
     STREAM_ROWS,
     STREAM_COLUMNS
-    };
+  };
 
   /**
    * Open the file and set mode in which the exporter is operating.
    */
-  bool Open(ExporterModes mode=STREAM_ROWS);
+  bool Open(ExporterModes mode = STREAM_ROWS);
 
   /**
    * Closes the file cleanly. Call this at the end to close the file and dump
@@ -117,7 +117,8 @@ public:
    * makes it possible to add multiple columns with varying number of samples.
    * The final output will have empty cells for missing values.
    */
-  void AddColumn(vtkAbstractArray* yarray, const char* yarrayname=NULL, vtkDataArray* xarray=NULL);
+  void AddColumn(
+    vtkAbstractArray* yarray, const char* yarrayname = NULL, vtkDataArray* xarray = NULL);
 
 protected:
   vtkCSVExporter();
@@ -126,7 +127,7 @@ protected:
   char* FileName;
   char* FieldDelimiter;
   bool FilterColumnsByVisibility;
-  ofstream *FileStream;
+  ofstream* FileStream;
   ExporterModes Mode;
 
 private:
@@ -135,8 +136,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif
-

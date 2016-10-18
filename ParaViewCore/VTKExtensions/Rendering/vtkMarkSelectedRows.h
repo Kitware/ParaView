@@ -63,30 +63,25 @@ protected:
   ~vtkMarkSelectedRows();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Overridden to create a vtkTable or vtkMultiBlockDataSet as the output based
    * on  the input type.
    */
-  virtual int RequestDataObject(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Operates on vtkTable instances. RequestData() handles composite datasets
    * by iterating over the leaves and calling this method.
    */
-  int RequestDataInternal(
-    vtkTable* input, vtkTable* extractedInput, vtkTable* output);
-
+  int RequestDataInternal(vtkTable* input, vtkTable* extractedInput, vtkTable* output);
 
   int FieldAssociation;
+
 private:
   vtkMarkSelectedRows(const vtkMarkSelectedRows&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMarkSelectedRows&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

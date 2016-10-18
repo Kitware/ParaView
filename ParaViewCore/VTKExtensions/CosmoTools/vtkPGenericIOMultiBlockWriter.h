@@ -39,7 +39,7 @@ protected:
   vtkPGenericIOMultiBlockWriter();
   ~vtkPGenericIOMultiBlockWriter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual void WriteData();
 
 private:
@@ -49,7 +49,6 @@ private:
   vtkMultiProcessController* Controller;
   vtkPGenericIOMultiBlockWriter(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,15 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
-
 //-----------------------------------------------------------------------------
 class pqUndoStack::pqImplementation
 {
 public:
-  pqImplementation()
-    {
-    this->NestedCount = 0;
-    }
+  pqImplementation() { this->NestedCount = 0; }
   vtkSmartPointer<vtkSMUndoStack> UndoStack;
   vtkSmartPointer<vtkSMUndoStackBuilder> UndoStackBuilder;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
@@ -68,24 +64,23 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqUndoStack::pqUndoStack( vtkSMUndoStackBuilder* builder,
-  QObject* _parent/*=null*/) 
-:QObject(_parent)
+pqUndoStack::pqUndoStack(vtkSMUndoStackBuilder* builder, QObject* _parent /*=null*/)
+  : QObject(_parent)
 {
   this->Implementation = new pqImplementation();
   this->Implementation->UndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
 
   if (builder)
-    {
+  {
     this->Implementation->UndoStackBuilder = builder;
-    }
+  }
   else
-    {
+  {
     // create default builder.
     builder = vtkSMUndoStackBuilder::New();
     this->Implementation->UndoStackBuilder = builder;
     builder->Delete();
-    }
+  }
 
   builder->SetUndoStack(this->Implementation->UndoStack);
 
@@ -121,26 +116,26 @@ bool pqUndoStack::canRedo()
 //-----------------------------------------------------------------------------
 const QString pqUndoStack::undoLabel()
 {
-  return this->Implementation->UndoStack->CanUndo() ?
-    this->Implementation->UndoStack->GetUndoSetLabel(0) :
-    QString();
+  return this->Implementation->UndoStack->CanUndo()
+    ? this->Implementation->UndoStack->GetUndoSetLabel(0)
+    : QString();
 }
 
 //-----------------------------------------------------------------------------
 const QString pqUndoStack::redoLabel()
 {
-  return this->Implementation->UndoStack->CanRedo() ?
-    this->Implementation->UndoStack->GetRedoSetLabel(0) :
-    QString();
+  return this->Implementation->UndoStack->CanRedo()
+    ? this->Implementation->UndoStack->GetRedoSetLabel(0)
+    : QString();
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::addToActiveUndoSet(vtkUndoElement* element)
 {
   if (this->ignoreAllChanges())
-    {
+  {
     return;
-    }
+  }
 
   this->Implementation->UndoStackBuilder->Add(element);
 }
@@ -153,16 +148,16 @@ void pqUndoStack::onStackChanged()
   QString undo_label;
   QString redo_label;
   if (this->Implementation->UndoStack->CanUndo())
-    {
+  {
     can_undo = true;
     undo_label = this->Implementation->UndoStack->GetUndoSetLabel(0);
-    }
+  }
   if (this->Implementation->UndoStack->CanRedo())
-    {
+  {
     can_redo = true;
     redo_label = this->Implementation->UndoStack->GetRedoSetLabel(0);
-    }
-    
+  }
+
   emit this->stackChanged(can_undo, undo_label, can_redo, redo_label);
   emit this->canUndoChanged(can_undo);
   emit this->canRedoChanged(can_redo);
@@ -173,10 +168,10 @@ void pqUndoStack::onStackChanged()
 //-----------------------------------------------------------------------------
 void pqUndoStack::beginUndoSet(QString label)
 {
-  if(this->Implementation->NestedCount == 0)
-    {
+  if (this->Implementation->NestedCount == 0)
+  {
     this->Implementation->UndoStackBuilder->Begin(label.toLatin1().data());
-    }
+  }
 
   this->Implementation->NestedCount++;
 }
@@ -184,17 +179,17 @@ void pqUndoStack::beginUndoSet(QString label)
 //-----------------------------------------------------------------------------
 void pqUndoStack::endUndoSet()
 {
-  if(this->Implementation->NestedCount == 0)
-    {
+  if (this->Implementation->NestedCount == 0)
+  {
     qDebug() << "endUndoSet called without a beginUndoSet.";
     return;
-    }
+  }
 
   this->Implementation->NestedCount--;
-  if(this->Implementation->NestedCount == 0)
-    {
+  if (this->Implementation->NestedCount == 0)
+  {
     this->Implementation->UndoStackBuilder->EndAndPushToStack();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -230,11 +225,11 @@ void pqUndoStack::updateAllModifiedProxies()
   vtkSessionIterator* iter = pm->NewSessionIterator();
   iter->InitTraversal();
 
-  while(!iter->IsDoneWithTraversal())
-    {
+  while (!iter->IsDoneWithTraversal())
+  {
     vtkSMSession* session = vtkSMSession::SafeDownCast(iter->GetCurrentSession());
-    if(session)
-      {
+    if (session)
+    {
       vtkSMSessionProxyManager* spxm = pxm->GetSessionProxyManager(session);
       // Update of proxies have to happen in order.
       spxm->UpdateRegisteredProxies("sources", 1);
@@ -242,12 +237,11 @@ void pqUndoStack::updateAllModifiedProxies()
       spxm->UpdateRegisteredProxies("representations", 1);
       spxm->UpdateRegisteredProxies("scalar_bars", 1);
       spxm->UpdateRegisteredProxies(1);
-      }
-    iter->GoToNextItem();
     }
+    iter->GoToNextItem();
+  }
   iter->Delete();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::clear()
@@ -256,12 +250,11 @@ void pqUndoStack::clear()
   this->Implementation->UndoStackBuilder->Clear();
   this->Implementation->IgnoreAllChangesStack.clear();
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqUndoStack::beginNonUndoableChanges()
 {
-  this->Implementation->IgnoreAllChangesStack.push_back(
-    this->ignoreAllChanges());
+  this->Implementation->IgnoreAllChangesStack.push_back(this->ignoreAllChanges());
 
   this->Implementation->UndoStackBuilder->SetIgnoreAllChanges(true);
 }
@@ -271,9 +264,9 @@ void pqUndoStack::endNonUndoableChanges()
 {
   bool ignore = false;
   if (this->Implementation->IgnoreAllChangesStack.size() > 0)
-    {
+  {
     ignore = this->Implementation->IgnoreAllChangesStack.takeLast();
-    }
+  }
   this->Implementation->UndoStackBuilder->SetIgnoreAllChanges(ignore);
 }
 

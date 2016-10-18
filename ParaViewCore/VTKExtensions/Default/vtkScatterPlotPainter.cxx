@@ -76,13 +76,13 @@ vtkCxxSetObjectMacro(vtkScatterPlotPainter, LookupTable, vtkScalarsToColors);
 template <class T>
 static T vtkClamp(T val, T min, T max)
 {
-  val = val < min? min : val;
-  val = val > max? max : val;
+  val = val < min ? min : val;
+  val = val > max ? max : val;
   return val;
 }
 
-#define max(a,b)(((a)>(b))?(a):(b))
-#define min(a,b)(((a)>(b))?(b):(a))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define min(a, b) (((a) > (b)) ? (b) : (a))
 
 // ---------------------------------------------------------------------------
 vtkScatterPlotPainter::vtkScatterPlotPainter()
@@ -92,8 +92,8 @@ vtkScatterPlotPainter::vtkScatterPlotPainter()
   this->GlyphMode = vtkScatterPlotMapper::NoGlyph;
   this->ScaleMode = vtkScatterPlotMapper::SCALE_BY_MAGNITUDE;
   this->ScaleFactor = 1.0;
-//   this->Range[0] = 0.0;
-//   this->Range[1] = 1.0;
+  //   this->Range[0] = 0.0;
+  //   this->Range[1] = 1.0;
   this->OrientationMode = vtkScatterPlotMapper::DIRECTION;
   this->NestedDisplayLists = 1;
   this->ParallelToCamera = 1;
@@ -103,62 +103,62 @@ vtkScatterPlotPainter::vtkScatterPlotPainter()
 
   this->DisplayListId = 0; // for the matrices and color per glyph
 
-  //this->Masking = false;
+  // this->Masking = false;
   this->SelectionColorId = 1;
 
-  //this->PainterInformation = vtkInformation::New();
+  // this->PainterInformation = vtkInformation::New();
   this->LookupTable = NULL;
 }
 
 // ---------------------------------------------------------------------------
 vtkScatterPlotPainter::~vtkScatterPlotPainter()
 {
-  if(this->SourceGlyphMappers != 0)
-    {
+  if (this->SourceGlyphMappers != 0)
+  {
     this->SourceGlyphMappers->Delete();
-    this->SourceGlyphMappers=0;
-    }
-/* done in vtkPainter::~vtkPainter
-  if (this->LastWindow)
-    {
-    this->ReleaseGraphicsResources(this->LastWindow);
-    this->LastWindow = 0;
-    }
-*/
+    this->SourceGlyphMappers = 0;
+  }
+  /* done in vtkPainter::~vtkPainter
+    if (this->LastWindow)
+      {
+      this->ReleaseGraphicsResources(this->LastWindow);
+      this->LastWindow = 0;
+      }
+  */
   if (this->ScalarsToColorsPainter)
-    {
+  {
     this->ScalarsToColorsPainter->Delete();
     this->ScalarsToColorsPainter = 0;
-    }
+  }
 
   if (this->LookupTable)
-    {
+  {
     this->LookupTable->Delete();
     this->LookupTable = 0;
-    }
-  //this->PainterInformation->Delete();
-  //this->PainterInformation = 0;
+  }
+  // this->PainterInformation->Delete();
+  // this->PainterInformation = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkInformation *vtkScatterPlotPainter::GetInputArrayInformation(int idx)
+vtkInformation* vtkScatterPlotPainter::GetInputArrayInformation(int idx)
 {
   // add this info into the algorithms info object
-  vtkInformationVector *inArrayVec =
+  vtkInformationVector* inArrayVec =
     this->Information->Get(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS());
   if (!inArrayVec)
-    {
+  {
     inArrayVec = vtkInformationVector::New();
-    this->Information->Set(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS(),inArrayVec);
+    this->Information->Set(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS(), inArrayVec);
     inArrayVec->Delete();
-    }
-  vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(idx);
+  }
+  vtkInformation* inArrayInfo = inArrayVec->GetInformationObject(idx);
   if (!inArrayInfo)
-    {
+  {
     inArrayInfo = vtkInformation::New();
-    inArrayVec->SetInformationObject(idx,inArrayInfo);
+    inArrayVec->SetInformationObject(idx, inArrayInfo);
     inArrayInfo->Delete();
-    }
+  }
   return inArrayInfo;
 }
 
@@ -167,8 +167,8 @@ vtkDataArray* vtkScatterPlotPainter::GetArray(int idx)
 {
   vtkDataObject* object = this->GetInput();
 
-  //vtkInformation* array = this->GetInputArrayInformation(idx);
-  //vtkDataObject* object =
+  // vtkInformation* array = this->GetInputArrayInformation(idx);
+  // vtkDataObject* object =
   //  this->GetInputDataObject(INPUTS_PORT, array->Get(INPUT_CONNECTION()));
   /*
   if(vtkCompositeDataSet::SafeDownCast(object))
@@ -191,69 +191,67 @@ vtkDataArray* vtkScatterPlotPainter::GetArray(int idx)
 // ---------------------------------------------------------------------------
 vtkDataArray* vtkScatterPlotPainter::GetArray(int idx, vtkDataSet* input)
 {
-  //cout << "GetArray:" << idx << " " << input << " " << input->GetClassName() << endl;
+  // cout << "GetArray:" << idx << " " << input << " " << input->GetClassName() << endl;
   vtkDataArray* array = NULL;
-  switch(idx)
-    {
+  switch (idx)
+  {
     case vtkScatterPlotMapper::Z_COORDS:
-      if(!this->ThreeDMode)
-        {
+      if (!this->ThreeDMode)
+      {
         return array;
-        }
+      }
       break;
     case vtkScatterPlotMapper::COLOR:
-      if(!this->Colorize)
-        {
+      if (!this->Colorize)
+      {
         return array;
-        }
+      }
       break;
     case vtkScatterPlotMapper::GLYPH_X_SCALE:
     case vtkScatterPlotMapper::GLYPH_Y_SCALE:
     case vtkScatterPlotMapper::GLYPH_Z_SCALE:
-      if(!(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph))
-        {
+      if (!(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph))
+      {
         return array;
-        }
+      }
       break;
     case vtkScatterPlotMapper::GLYPH_SOURCE:
-      if(!(this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph))
-        {
+      if (!(this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph))
+      {
         return array;
-        }
+      }
       break;
     case vtkScatterPlotMapper::GLYPH_X_ORIENTATION:
     case vtkScatterPlotMapper::GLYPH_Y_ORIENTATION:
     case vtkScatterPlotMapper::GLYPH_Z_ORIENTATION:
-      if(!(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph))
-        {
+      if (!(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph))
+      {
         return array;
-        }
+      }
       break;
     default:
       break;
-    }
+  }
   bool useCellData;
   vtkInformation* info = this->GetInputArrayInformation(idx);
-  if(info->Has(vtkDataObject::FIELD_NAME()))
-    {
-    array = vtkDataArray::SafeDownCast(this->GetInputArrayToProcess(
-      info->Get(vtkDataObject::FIELD_ASSOCIATION()),
-      info->Get(vtkDataObject::FIELD_NAME()),
-      input, &useCellData));
-    }
-  else if(info->Has(vtkDataObject::FIELD_ATTRIBUTE_TYPE()))
-    {
-    array = vtkDataArray::SafeDownCast(this->GetInputArrayToProcess(
-      info->Get(vtkDataObject::FIELD_ASSOCIATION()),
-      info->Get(vtkDataObject::FIELD_ATTRIBUTE_TYPE()),
-      input, &useCellData));
-    }
+  if (info->Has(vtkDataObject::FIELD_NAME()))
+  {
+    array = vtkDataArray::SafeDownCast(
+      this->GetInputArrayToProcess(info->Get(vtkDataObject::FIELD_ASSOCIATION()),
+        info->Get(vtkDataObject::FIELD_NAME()), input, &useCellData));
+  }
+  else if (info->Has(vtkDataObject::FIELD_ATTRIBUTE_TYPE()))
+  {
+    array = vtkDataArray::SafeDownCast(
+      this->GetInputArrayToProcess(info->Get(vtkDataObject::FIELD_ASSOCIATION()),
+        info->Get(vtkDataObject::FIELD_ATTRIBUTE_TYPE()), input, &useCellData));
+  }
   else
-    {
+  {
     vtkPointSet* pointSet = vtkPointSet::SafeDownCast(input);
-    vtkPoints*   points = pointSet ? pointSet->GetPoints() : NULL;
+    vtkPoints* points = pointSet ? pointSet->GetPoints() : NULL;
     array = points ? points->GetData() : NULL;
-    }
+  }
   return array;
 }
 
@@ -264,17 +262,16 @@ int vtkScatterPlotPainter::GetArrayComponent(int idx)
   return array->Get(vtkScatterPlotMapper::FIELD_ACTIVE_COMPONENT());
 }
 
-
 // ---------------------------------------------------------------------------
 // Get a pointer to a source object at a specified table location.
-vtkPolyData *vtkScatterPlotPainter::GetGlyphSource(int id)
+vtkPolyData* vtkScatterPlotPainter::GetGlyphSource(int id)
 {
   if (!this->SourceGlyphMappers)
-    {
+  {
     return NULL;
-    }
-  vtkPainterPolyDataMapper* mapper = vtkPainterPolyDataMapper::SafeDownCast(
-    this->SourceGlyphMappers->GetItemAsObject(id));
+  }
+  vtkPainterPolyDataMapper* mapper =
+    vtkPainterPolyDataMapper::SafeDownCast(this->SourceGlyphMappers->GetItemAsObject(id));
   return mapper ? vtkPolyData::SafeDownCast(mapper->GetInput()) : NULL;
 }
 
@@ -283,68 +280,68 @@ vtkUnsignedCharArray* vtkScatterPlotPainter::GetColors()
 {
   return vtkUnsignedCharArray::SafeDownCast(
     vtkDataSet::SafeDownCast(this->ScalarsToColorsPainter->GetOutput())
-    ->GetPointData()->GetScalars());
+      ->GetPointData()
+      ->GetScalars());
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkScatterPlotPainter::ProcessInformation(vtkInformation* info)
 {
   // the input arrays to process are handled automatically by the superclasses
   if (info->Has(THREED_MODE()))
-    {
+  {
     this->SetThreeDMode(info->Get(THREED_MODE()));
-    }
+  }
 
   if (info->Has(COLORIZE()))
-    {
+  {
     this->SetColorize(info->Get(COLORIZE()));
-    }
+  }
 
   if (info->Has(GLYPH_MODE()))
-    {
+  {
     this->SetGlyphMode(info->Get(GLYPH_MODE()));
-    }
+  }
 
   if (info->Has(SCALING_ARRAY_MODE()))
-    {
+  {
     this->SetScalingArrayMode(info->Get(SCALING_ARRAY_MODE()));
-    }
+  }
 
   if (info->Has(SCALE_MODE()))
-    {
+  {
     this->SetScaleMode(info->Get(SCALE_MODE()));
-    }
+  }
 
   if (info->Has(SCALE_FACTOR()))
-    {
+  {
     this->SetScaleFactor(info->Get(SCALE_FACTOR()));
-    }
+  }
 
   if (info->Has(ORIENTATION_MODE()))
-    {
+  {
     this->SetOrientationMode(info->Get(ORIENTATION_MODE()));
-    }
+  }
 
   if (info->Has(NESTED_DISPLAY_LISTS()))
-    {
+  {
     this->SetNestedDisplayLists(info->Get(NESTED_DISPLAY_LISTS()));
-    }
+  }
 
   if (info->Has(PARALLEL_TO_CAMERA()))
-    {
+  {
     this->SetParallelToCamera(info->Get(PARALLEL_TO_CAMERA()));
-    }
+  }
 
   if (info->Has(vtkScalarsToColorsPainter::LOOKUP_TABLE()))
-    {
-    vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
-      info->Get(vtkScalarsToColorsPainter::LOOKUP_TABLE()));
+  {
+    vtkScalarsToColors* lut =
+      vtkScalarsToColors::SafeDownCast(info->Get(vtkScalarsToColorsPainter::LOOKUP_TABLE()));
     if (lut)
-      {
+    {
       this->SetLookupTable(lut);
-      }
     }
+  }
 
   // when the iVars will be set, this->MTime will get updated.
   // This will eventually get caught by PrepareForRendering()
@@ -355,109 +352,99 @@ void vtkScatterPlotPainter::ProcessInformation(vtkInformation* info)
 // ---------------------------------------------------------------------------
 void vtkScatterPlotPainter::UpdatePainterInformation()
 {
-  if (this->GetMTime() < this->ColorPainterUpdateTime ||
-      !this->ScalarsToColorsPainter)
-    {
+  if (this->GetMTime() < this->ColorPainterUpdateTime || !this->ScalarsToColorsPainter)
+  {
     return;
-    }
+  }
 
-  if(this->Colorize)
-    {
+  if (this->Colorize)
+  {
     vtkInformation* info = this->ScalarsToColorsPainter->GetInformation();
-//    vtkInformation* info = this->PainterInformation;
+    //    vtkInformation* info = this->PainterInformation;
     vtkInformation* colorArrayInformation =
       this->GetInputArrayInformation(vtkScatterPlotMapper::COLOR);
     vtkDataArray* array = this->GetArray(vtkScatterPlotMapper::COLOR);
-    if(!array)
-      {
+    if (!array)
+    {
       return;
-      }
-    //info->Set(vtkPainter::STATIC_DATA(), this->Static);
-    info->Set(vtkPainter::STATIC_DATA(),
-              this->Information->Get(vtkPainter::STATIC_DATA()));
+    }
+    // info->Set(vtkPainter::STATIC_DATA(), this->Static);
+    info->Set(vtkPainter::STATIC_DATA(), this->Information->Get(vtkPainter::STATIC_DATA()));
     info->Set(vtkScalarsToColorsPainter::USE_LOOKUP_TABLE_SCALAR_RANGE(),
-              //this->GetUseLookupTableScalarRange());
-              false);
+      // this->GetUseLookupTableScalarRange());
+      false);
     info->Set(vtkScalarsToColorsPainter::SCALAR_RANGE(),
-              //          this->GetScalarRange(), 2);
-              array->GetRange(),2);
-    if(colorArrayInformation->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
-       (colorArrayInformation->Get(vtkDataObject::FIELD_ASSOCIATION())
-        == vtkDataObject::FIELD_ASSOCIATION_POINTS ||
-        colorArrayInformation->Get(vtkDataObject::FIELD_ASSOCIATION())
-        == vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS))
-      {
-      info->Set(vtkScalarsToColorsPainter::SCALAR_MODE(),
-                VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-      }
+      //          this->GetScalarRange(), 2);
+      array->GetRange(), 2);
+    if (colorArrayInformation->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+      (colorArrayInformation->Get(vtkDataObject::FIELD_ASSOCIATION()) ==
+            vtkDataObject::FIELD_ASSOCIATION_POINTS ||
+          colorArrayInformation->Get(vtkDataObject::FIELD_ASSOCIATION()) ==
+            vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS))
+    {
+      info->Set(vtkScalarsToColorsPainter::SCALAR_MODE(), VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    }
     else
-      {
+    {
       info->Set(vtkScalarsToColorsPainter::SCALAR_MODE(),
-                //this->GetScalarMode());
-                this->Information->Get(vtkScalarsToColorsPainter::SCALAR_MODE()));
-
-      }
+        // this->GetScalarMode());
+        this->Information->Get(vtkScalarsToColorsPainter::SCALAR_MODE()));
+    }
     // not sure yet
     info->Set(vtkScalarsToColorsPainter::COLOR_MODE(),
-              //this->GetColorMode());
-              this->Information->Get(vtkScalarsToColorsPainter::COLOR_MODE()));
+      // this->GetColorMode());
+      this->Information->Get(vtkScalarsToColorsPainter::COLOR_MODE()));
 
-    //if INTERPOLATE_SCALARS_BEFORE_MAPPING is set to 1, then
+    // if INTERPOLATE_SCALARS_BEFORE_MAPPING is set to 1, then
     // we would have to use texture coordinates: (vtkScalarsToColorsPainter
     // ->GetOutputData()->GetPointData()->GetScalars() will be NULL).
     info->Set(vtkScalarsToColorsPainter::INTERPOLATE_SCALARS_BEFORE_MAPPING(),
-//              this->GetInterpolateScalarsBeforeMapping());
-              //this->Information->Get(vtkScalarsToColorsPainter::INTERPOLATE_SCALARS_BEFORE_MAPPING()));
-              false);
-    info->Set(vtkScalarsToColorsPainter::LOOKUP_TABLE(),
-              this->GetLookupTable());
+      //              this->GetInterpolateScalarsBeforeMapping());
+      // this->Information->Get(vtkScalarsToColorsPainter::INTERPOLATE_SCALARS_BEFORE_MAPPING()));
+      false);
+    info->Set(vtkScalarsToColorsPainter::LOOKUP_TABLE(), this->GetLookupTable());
     info->Set(vtkScalarsToColorsPainter::SCALAR_VISIBILITY(),
-              //          this->GetScalarVisibility());
-              //1);
-              this->Information->Get(vtkScalarsToColorsPainter::SCALAR_VISIBILITY()));
-    if(colorArrayInformation->Has(vtkDataObject::FIELD_ATTRIBUTE_TYPE()))
-      {
-      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(),
-                VTK_GET_ARRAY_BY_ID);
+      //          this->GetScalarVisibility());
+      // 1);
+      this->Information->Get(vtkScalarsToColorsPainter::SCALAR_VISIBILITY()));
+    if (colorArrayInformation->Has(vtkDataObject::FIELD_ATTRIBUTE_TYPE()))
+    {
+      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(), VTK_GET_ARRAY_BY_ID);
       info->Set(vtkScalarsToColorsPainter::ARRAY_ID(),
-                colorArrayInformation->Get(
-                  vtkDataObject::FIELD_ATTRIBUTE_TYPE()));
+        colorArrayInformation->Get(vtkDataObject::FIELD_ATTRIBUTE_TYPE()));
       info->Remove(vtkScalarsToColorsPainter::ARRAY_NAME());
-      }
-    else if(colorArrayInformation->Has(vtkDataObject::FIELD_NAME()))
-      {
-      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(),
-                VTK_GET_ARRAY_BY_NAME);
-      info->Set(vtkScalarsToColorsPainter::ARRAY_NAME(),
-                colorArrayInformation->Get(vtkDataObject::FIELD_NAME()));
-      info->Remove(vtkScalarsToColorsPainter::ARRAY_ID());
-      }
-    else
-      {
-      info->Remove(vtkScalarsToColorsPainter::ARRAY_ID());
-      info->Remove(vtkScalarsToColorsPainter::ARRAY_NAME());
-      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(),
-                //this->ArrayAccessMode);
-                this->Information->Get(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE()));
-      }
-    info->Set(vtkScalarsToColorsPainter::ARRAY_COMPONENT(),
-              colorArrayInformation->Get(
-                vtkScatterPlotMapper::FIELD_ACTIVE_COMPONENT()));
-    //info->Set(vtkScalarsToColorsPainter::ARRAY_ID(), this->ArrayId);
-    //info->Set(vtkScalarsToColorsPainter::ARRAY_NAME(), this->ArrayName);
-    //info->Set(vtkScalarsToColorsPainter::ARRAY_COMPONENT(), this->ArrayComponent);
-    info->Set(vtkScalarsToColorsPainter::SCALAR_MATERIAL_MODE(),
-              //this->GetScalarMaterialMode());
-              this->Information->Get(vtkScalarsToColorsPainter::SCALAR_MATERIAL_MODE()));
     }
+    else if (colorArrayInformation->Has(vtkDataObject::FIELD_NAME()))
+    {
+      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(), VTK_GET_ARRAY_BY_NAME);
+      info->Set(vtkScalarsToColorsPainter::ARRAY_NAME(),
+        colorArrayInformation->Get(vtkDataObject::FIELD_NAME()));
+      info->Remove(vtkScalarsToColorsPainter::ARRAY_ID());
+    }
+    else
+    {
+      info->Remove(vtkScalarsToColorsPainter::ARRAY_ID());
+      info->Remove(vtkScalarsToColorsPainter::ARRAY_NAME());
+      info->Set(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE(),
+        // this->ArrayAccessMode);
+        this->Information->Get(vtkScalarsToColorsPainter::ARRAY_ACCESS_MODE()));
+    }
+    info->Set(vtkScalarsToColorsPainter::ARRAY_COMPONENT(),
+      colorArrayInformation->Get(vtkScatterPlotMapper::FIELD_ACTIVE_COMPONENT()));
+    // info->Set(vtkScalarsToColorsPainter::ARRAY_ID(), this->ArrayId);
+    // info->Set(vtkScalarsToColorsPainter::ARRAY_NAME(), this->ArrayName);
+    // info->Set(vtkScalarsToColorsPainter::ARRAY_COMPONENT(), this->ArrayComponent);
+    info->Set(vtkScalarsToColorsPainter::SCALAR_MATERIAL_MODE(),
+      // this->GetScalarMaterialMode());
+      this->Information->Get(vtkScalarsToColorsPainter::SCALAR_MATERIAL_MODE()));
+  }
   this->ColorPainterUpdateTime.Modified();
 }
 
 void vtkScatterPlotPainter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
-
 
 vtkMTimeType vtkScatterPlotPainter::GetMTime()
 {
@@ -466,33 +453,29 @@ vtkMTimeType vtkScatterPlotPainter::GetMTime()
   vtkDataArray* xCoordsArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
   vtkDataArray* yCoordsArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
   vtkDataArray* zCoordsArray = this->GetArray(vtkScatterPlotMapper::Z_COORDS);
-  vtkDataArray* colorArray   = this->GetArray(vtkScatterPlotMapper::COLOR);
-  if(xCoordsArray)
-    {
-    mTime = max(mTime,xCoordsArray->GetMTime());
-    }
-  if(yCoordsArray)
-    {
-    mTime = max(mTime,yCoordsArray->GetMTime());
-    }
-  if(this->ThreeDMode && zCoordsArray)
-    {
-    mTime = max(mTime,zCoordsArray->GetMTime());
-    }
-  if(this->Colorize && colorArray)
-    {
-    mTime = max(mTime,colorArray->GetMTime());
-    }
-  if(this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
-    {
-    vtkDataArray* glyphXScaleArray =
-      this->GetArray(vtkScatterPlotMapper::GLYPH_X_SCALE);
-    vtkDataArray* glyphYScaleArray =
-      this->GetArray(vtkScatterPlotMapper::GLYPH_Y_SCALE);
-    vtkDataArray* glyphZScaleArray =
-      this->GetArray(vtkScatterPlotMapper::GLYPH_Z_SCALE);
-    vtkDataArray* glyphSourceArray =
-      this->GetArray(vtkScatterPlotMapper::GLYPH_SOURCE);
+  vtkDataArray* colorArray = this->GetArray(vtkScatterPlotMapper::COLOR);
+  if (xCoordsArray)
+  {
+    mTime = max(mTime, xCoordsArray->GetMTime());
+  }
+  if (yCoordsArray)
+  {
+    mTime = max(mTime, yCoordsArray->GetMTime());
+  }
+  if (this->ThreeDMode && zCoordsArray)
+  {
+    mTime = max(mTime, zCoordsArray->GetMTime());
+  }
+  if (this->Colorize && colorArray)
+  {
+    mTime = max(mTime, colorArray->GetMTime());
+  }
+  if (this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
+  {
+    vtkDataArray* glyphXScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_X_SCALE);
+    vtkDataArray* glyphYScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Y_SCALE);
+    vtkDataArray* glyphZScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Z_SCALE);
+    vtkDataArray* glyphSourceArray = this->GetArray(vtkScatterPlotMapper::GLYPH_SOURCE);
     vtkDataArray* glyphXOrientationArray =
       this->GetArray(vtkScatterPlotMapper::GLYPH_X_ORIENTATION);
     vtkDataArray* glyphYOrientationArray =
@@ -500,58 +483,52 @@ vtkMTimeType vtkScatterPlotPainter::GetMTime()
     vtkDataArray* glyphZOrientationArray =
       this->GetArray(vtkScatterPlotMapper::GLYPH_Z_ORIENTATION);
 
-    if(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph && glyphXScaleArray)
-      {
-      mTime = max(mTime,glyphXScaleArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
-       this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc &&
-       glyphYScaleArray)
-      {
-      mTime = max(mTime,glyphYScaleArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
-       this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc &&
-       glyphZScaleArray)
-      {
-      mTime = max(mTime,glyphZScaleArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph &&
-       glyphSourceArray)
-      {
-      mTime = max(mTime,glyphSourceArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph &&
-       glyphXOrientationArray)
-      {
-      mTime = max(mTime,glyphXOrientationArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph &&
-       glyphYOrientationArray)
-      {
-      mTime = max(mTime,glyphYOrientationArray->GetMTime());
-      }
-    if(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph &&
-       glyphZOrientationArray)
-      {
-      mTime = max(mTime,glyphZOrientationArray->GetMTime());
-      }
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph && glyphXScaleArray)
+    {
+      mTime = max(mTime, glyphXScaleArray->GetMTime());
     }
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
+      this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc && glyphYScaleArray)
+    {
+      mTime = max(mTime, glyphYScaleArray->GetMTime());
+    }
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
+      this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc && glyphZScaleArray)
+    {
+      mTime = max(mTime, glyphZScaleArray->GetMTime());
+    }
+    if (this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph && glyphSourceArray)
+    {
+      mTime = max(mTime, glyphSourceArray->GetMTime());
+    }
+    if (this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph && glyphXOrientationArray)
+    {
+      mTime = max(mTime, glyphXOrientationArray->GetMTime());
+    }
+    if (this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph && glyphYOrientationArray)
+    {
+      mTime = max(mTime, glyphYOrientationArray->GetMTime());
+    }
+    if (this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph && glyphZOrientationArray)
+    {
+      mTime = max(mTime, glyphZOrientationArray->GetMTime());
+    }
+  }
   return mTime;
 }
 //-------------------------------------------------------------------------
 void vtkScatterPlotPainter::UpdateBounds(double* bounds)
 {
   //  static double bounds[] = {-1.0,1.0, -1.0,1.0, -1.0,1.0};
-  //vtkMath::UninitializeBounds(bounds);
+  // vtkMath::UninitializeBounds(bounds);
   // do we have an input
-  if(!this->GetInput())
-    {
+  if (!this->GetInput())
+  {
     return;
-    }
+  }
 
   if (this->InformationProcessTime < this->Information->GetMTime())
-    {
+  {
     // If the information object was modified, some subclass may
     // want to get the modified information.
     // Using ProcessInformation avoids the need to access the Information
@@ -559,99 +536,97 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
     // expensive information key accesses.
     this->ProcessInformation(this->Information);
     this->InformationProcessTime.Modified();
-    }
+  }
 
-/*
-  if (!this->Static)
-    {
-    // For proper clipping, this would be this->Piece,
-    // this->NumberOfPieces.
-    // But that removes all benefites of streaming.
-    // Update everything as a hack for paraview streaming.
-    // This should not affect anything else, because no one uses this.
-    // It should also render just the same.
-    // Just remove this lie if we no longer need streaming in paraview :)
-    //Note: Not sure if it is still true
-    //this->GetInput()->SetUpdateExtent(0, 1, 0);
-    //this->GetInput()->Update();
+  /*
+    if (!this->Static)
+      {
+      // For proper clipping, this would be this->Piece,
+      // this->NumberOfPieces.
+      // But that removes all benefites of streaming.
+      // Update everything as a hack for paraview streaming.
+      // This should not affect anything else, because no one uses this.
+      // It should also render just the same.
+      // Just remove this lie if we no longer need streaming in paraview :)
+      //Note: Not sure if it is still true
+      //this->GetInput()->SetUpdateExtent(0, 1, 0);
+      //this->GetInput()->Update();
 
-    // first get the bounds from the input
-    this->Update();
-    }
-*/
-  //vtkDataSet *input = this->GetInput();
-  //input->GetBounds(bounds);
-  vtkDataArray *xArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
-  vtkDataArray *yArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
-  vtkDataArray *zArray = this->GetArray(vtkScatterPlotMapper::Z_COORDS);
+      // first get the bounds from the input
+      this->Update();
+      }
+  */
+  // vtkDataSet *input = this->GetInput();
+  // input->GetBounds(bounds);
+  vtkDataArray* xArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
+  vtkDataArray* yArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
+  vtkDataArray* zArray = this->GetArray(vtkScatterPlotMapper::Z_COORDS);
 
-  if(xArray)
-    {
-    xArray->GetRange(bounds,this->GetArrayComponent(vtkScatterPlotMapper::X_COORDS));
-    }
-  if(yArray)
-    {
-    yArray->GetRange(bounds+2,this->GetArrayComponent(vtkScatterPlotMapper::Y_COORDS));
-    }
-  if(zArray && this->ThreeDMode)
-    {
-    zArray->GetRange(bounds+4,this->GetArrayComponent(vtkScatterPlotMapper::Z_COORDS));
-    }
+  if (xArray)
+  {
+    xArray->GetRange(bounds, this->GetArrayComponent(vtkScatterPlotMapper::X_COORDS));
+  }
+  if (yArray)
+  {
+    yArray->GetRange(bounds + 2, this->GetArrayComponent(vtkScatterPlotMapper::Y_COORDS));
+  }
+  if (zArray && this->ThreeDMode)
+  {
+    zArray->GetRange(bounds + 4, this->GetArrayComponent(vtkScatterPlotMapper::Z_COORDS));
+  }
   else
-    {
+  {
     bounds[4] = 0.;
     bounds[5] = 0.;
-    }
+  }
 
-  if(!(this->GlyphMode & vtkScatterPlotMapper::UseGlyph))
-    {
+  if (!(this->GlyphMode & vtkScatterPlotMapper::UseGlyph))
+  {
     // cout << __FUNCTION__ << " bounds: "
     //        << bounds[0] << " " << bounds[1] << " "
     //        << bounds[2] << " " << bounds[3] << " "
     //        << bounds[4] << " " << bounds[5] << endl;
     return;
-    }
+  }
 
-   // if the input is not conform to what the mapper expects (use vector
-   // but no vector data), nothing will be mapped.
-   // It make sense to return uninitialized bounds.
+  // if the input is not conform to what the mapper expects (use vector
+  // but no vector data), nothing will be mapped.
+  // It make sense to return uninitialized bounds.
 
-//   vtkDataArray *scaleArray = this->GetScaleArray(input);
-//   vtkDataArray *orientArray = this->GetOrientationArray(input);
-   // TODO:
-   // 1. cumulative bbox of all the glyph
-   // 2. scale it by scale factor and maximum scalar value (or vector mag)
-   // 3. enlarge the input bbox half-way in each direction with the
-   // glyphs bbox.
+  //   vtkDataArray *scaleArray = this->GetScaleArray(input);
+  //   vtkDataArray *orientArray = this->GetOrientationArray(input);
+  // TODO:
+  // 1. cumulative bbox of all the glyph
+  // 2. scale it by scale factor and maximum scalar value (or vector mag)
+  // 3. enlarge the input bbox half-way in each direction with the
+  // glyphs bbox.
 
+  //   double den=this->Range[1]-this->Range[0];
+  //   if(den==0.0)
+  //     {
+  //     den=1.0;
+  //     }
 
-//   double den=this->Range[1]-this->Range[0];
-//   if(den==0.0)
-//     {
-//     den=1.0;
-//     }
-
-  double maxScale[2] = {1.0, 1.0};
+  double maxScale[2] = { 1.0, 1.0 };
 
   vtkDataArray* glyphXScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_X_SCALE);
   vtkDataArray* glyphYScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Y_SCALE);
   vtkDataArray* glyphZScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Z_SCALE);
 
-  if (this->GlyphMode && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
-      glyphXScaleArray)
-    {
-    double xScaleRange[2] = {1.0, 1.0};
-    double yScaleRange[2] = {1.0, 1.0};
-    double zScaleRange[2] = {1.0, 1.0};
-    double x0ScaleRange[2] = {1.0, 1.0};
-    double x1ScaleRange[2] = {1.0, 1.0};
-    double x2ScaleRange[2] = {1.0, 1.0};
+  if (this->GlyphMode && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph && glyphXScaleArray)
+  {
+    double xScaleRange[2] = { 1.0, 1.0 };
+    double yScaleRange[2] = { 1.0, 1.0 };
+    double zScaleRange[2] = { 1.0, 1.0 };
+    double x0ScaleRange[2] = { 1.0, 1.0 };
+    double x1ScaleRange[2] = { 1.0, 1.0 };
+    double x2ScaleRange[2] = { 1.0, 1.0 };
     double range[3];
-    switch(this->ScaleMode)
-      {
+    switch (this->ScaleMode)
+    {
       case vtkScatterPlotMapper::SCALE_BY_MAGNITUDE:
-        switch(this->ScalingArrayMode)
-          {
+        switch (this->ScalingArrayMode)
+        {
           case vtkScatterPlotMapper::Xc_Yc_Zc:
             glyphXScaleArray->GetRange(
               xScaleRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE));
@@ -696,11 +671,11 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
           default:
             vtkErrorMacro("Wrong ScalingArray mode");
             break;
-          }
+        }
         break;
       case vtkScatterPlotMapper::SCALE_BY_COMPONENTS:
-        switch(this->ScalingArrayMode)
-          {
+        switch (this->ScalingArrayMode)
+        {
           case vtkScatterPlotMapper::Xc_Yc_Zc:
             glyphXScaleArray->GetRange(
               xScaleRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE));
@@ -708,10 +683,10 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
               yScaleRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Y_SCALE));
             glyphZScaleArray->GetRange(
               zScaleRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Z_SCALE));
-            maxScale[0] = min(xScaleRange[0],yScaleRange[0]);
-            maxScale[0] = min(maxScale[0],zScaleRange[0]);
-            maxScale[1] = max(xScaleRange[1],yScaleRange[1]);
-            maxScale[1] = max(maxScale[1],zScaleRange[1]);
+            maxScale[0] = min(xScaleRange[0], yScaleRange[0]);
+            maxScale[0] = min(maxScale[0], zScaleRange[0]);
+            maxScale[1] = max(xScaleRange[1], yScaleRange[1]);
+            maxScale[1] = max(maxScale[1], zScaleRange[1]);
             break;
           case vtkScatterPlotMapper::Xc0_Xc1_Xc2:
             glyphXScaleArray->GetRange(x0ScaleRange, 0);
@@ -733,142 +708,141 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
           default:
             vtkErrorMacro("Wrong ScalingArray mode");
             break;
-          }
+        }
         break;
 
       default:
         // NO_DATA_SCALING: do nothing, set variables to avoid warnings.
         break;
-      }
     }
-//     if (this->Clamping && this->ScaleMode != NO_DATA_SCALING)
-//       {
-//       xScaleRange[0]=vtkMath::ClampAndNormalizeValue(xScaleRange[0],
-//                                                      this->Range);
-//       xScaleRange[1]=vtkMath::ClampAndNormalizeValue(xScaleRange[1],
-//                                                      this->Range);
-//       yScaleRange[0]=vtkMath::ClampAndNormalizeValue(yScaleRange[0],
-//                                                      this->Range);
-//       yScaleRange[1]=vtkMath::ClampAndNormalizeValue(yScaleRange[1],
-//                                                      this->Range);
-//       zScaleRange[0]=vtkMath::ClampAndNormalizeValue(zScaleRange[0],
-//                                                      this->Range);
-//       zScaleRange[1]=vtkMath::ClampAndNormalizeValue(zScaleRange[1],
-//                                                      this->Range);
-//       }
-//     }
-//   // FB
-/*
-   if(this->GetGlyphSource(0) == 0)
-     {
-     this->GenerateDefaultGlyphs();
-     }
-*/
-  int indexRange[2] = {0, 0};
+  }
+  //     if (this->Clamping && this->ScaleMode != NO_DATA_SCALING)
+  //       {
+  //       xScaleRange[0]=vtkMath::ClampAndNormalizeValue(xScaleRange[0],
+  //                                                      this->Range);
+  //       xScaleRange[1]=vtkMath::ClampAndNormalizeValue(xScaleRange[1],
+  //                                                      this->Range);
+  //       yScaleRange[0]=vtkMath::ClampAndNormalizeValue(yScaleRange[0],
+  //                                                      this->Range);
+  //       yScaleRange[1]=vtkMath::ClampAndNormalizeValue(yScaleRange[1],
+  //                                                      this->Range);
+  //       zScaleRange[0]=vtkMath::ClampAndNormalizeValue(zScaleRange[0],
+  //                                                      this->Range);
+  //       zScaleRange[1]=vtkMath::ClampAndNormalizeValue(zScaleRange[1],
+  //                                                      this->Range);
+  //       }
+  //     }
+  //   // FB
+  /*
+     if(this->GetGlyphSource(0) == 0)
+       {
+       this->GenerateDefaultGlyphs();
+       }
+  */
+  int indexRange[2] = { 0, 0 };
   int numberOfGlyphSources = this->SourceGlyphMappers->GetNumberOfItems();
   vtkDataArray* glyphSourceArray = this->GetArray(vtkScatterPlotMapper::GLYPH_SOURCE);
   // Compute indexRange.
-  double sourceRange[2] = {0.,1.};
+  double sourceRange[2] = { 0., 1. };
   double sourceRangeDiff = 1.;
-  if(glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph)
-    {
-    glyphSourceArray->GetRange(sourceRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_SOURCE));
+  if (glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph)
+  {
+    glyphSourceArray->GetRange(
+      sourceRange, this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_SOURCE));
     sourceRangeDiff = sourceRange[1] - sourceRange[0];
-    if(sourceRangeDiff == 0.0)
-      {
+    if (sourceRangeDiff == 0.0)
+    {
       sourceRangeDiff = 1.0;
-      }
+    }
     double range[2];
     glyphSourceArray->GetRange(range, -1);
-    for (int i=0; i < 2; ++i)
-      {
-      indexRange[i] = static_cast<int>(((range[i]-sourceRange[0])/sourceRangeDiff)*numberOfGlyphSources);
-      indexRange[i] = ::vtkClamp(indexRange[i], 0, numberOfGlyphSources-1);
-      }
+    for (int i = 0; i < 2; ++i)
+    {
+      indexRange[i] =
+        static_cast<int>(((range[i] - sourceRange[0]) / sourceRangeDiff) * numberOfGlyphSources);
+      indexRange[i] = ::vtkClamp(indexRange[i], 0, numberOfGlyphSources - 1);
     }
+  }
 
   vtkBoundingBox bbox; // empty
 
-  for(int index = indexRange[0]; index <= indexRange[1]; ++index )
-    {
-    vtkPolyData *source = this->GetGlyphSource(index);
+  for (int index = indexRange[0]; index <= indexRange[1]; ++index)
+  {
+    vtkPolyData* source = this->GetGlyphSource(index);
     // Make sure we're not indexing into empty glyph
-    if(source == 0)
-      {
+    if (source == 0)
+    {
       continue;
-      }
-    double sourcebounds[6];
-    source->GetBounds(sourcebounds);// can be invalid/uninitialized
-    if(vtkMath::AreBoundsInitialized(sourcebounds))
-      {
-      bbox.AddBounds(sourcebounds);
-      }
     }
+    double sourcebounds[6];
+    source->GetBounds(sourcebounds); // can be invalid/uninitialized
+    if (vtkMath::AreBoundsInitialized(sourcebounds))
+    {
+      bbox.AddBounds(sourcebounds);
+    }
+  }
 
   if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph)
-    {
+  {
     vtkBoundingBox bbox2(bbox);
     bbox.Scale(maxScale[0], maxScale[0], maxScale[0]);
     bbox2.Scale(maxScale[1], maxScale[1], maxScale[1]);
     bbox.AddBox(bbox2);
-    }
+  }
   bbox.Scale(this->ScaleFactor, this->ScaleFactor, this->ScaleFactor);
 
-  if(bbox.IsValid())
-    {
+  if (bbox.IsValid())
+  {
     double tmpBounds[6];
-    if(this->GlyphMode &&
-       this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph &&
-       this->GetArray(vtkScatterPlotMapper::GLYPH_X_ORIENTATION))
-      {
+    if (this->GlyphMode && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph &&
+      this->GetArray(vtkScatterPlotMapper::GLYPH_X_ORIENTATION))
+    {
       // bounding sphere.
       double c[3];
       bbox.GetCenter(c);
-      double l = bbox.GetDiagonalLength()/2.0;
+      double l = bbox.GetDiagonalLength() / 2.0;
       tmpBounds[0] = c[0] - l;
       tmpBounds[1] = c[0] + l;
       tmpBounds[2] = c[1] - l;
       tmpBounds[3] = c[1] + l;
       tmpBounds[4] = c[2] - l;
       tmpBounds[5] = c[2] + l;
-      }
-    else
-      {
-      bbox.GetBounds(tmpBounds);
-      }
-
-    for(int j = 0; j < 6; ++j)
-      {
-      bounds[j] += tmpBounds[j];
-      }
     }
-  else
+    else
     {
+      bbox.GetBounds(tmpBounds);
+    }
+
+    for (int j = 0; j < 6; ++j)
+    {
+      bounds[j] += tmpBounds[j];
+    }
+  }
+  else
+  {
     double tmpBounds[6];
     bbox.GetBounds(tmpBounds);
     vtkMath::UninitializeBounds(bounds);
-    }
+  }
 }
 // ---------------------------------------------------------------------------
 // Description:
 // Release any graphics resources that are being consumed by this mapper.
 // The parameter window could be used to determine which graphic
 // resources to release.
-void vtkScatterPlotPainter::ReleaseGraphicsResources(vtkWindow *window)
+void vtkScatterPlotPainter::ReleaseGraphicsResources(vtkWindow* window)
 {
-  //this->ReleaseDisplayList();
-  size_t count = this->SourceGlyphMappers ?
-    this->SourceGlyphMappers->GetNumberOfItems() : 0;
-  for(size_t i = 0; i < count; ++i)
+  // this->ReleaseDisplayList();
+  size_t count = this->SourceGlyphMappers ? this->SourceGlyphMappers->GetNumberOfItems() : 0;
+  for (size_t i = 0; i < count; ++i)
+  {
+    vtkPainterPolyDataMapper* mapper = vtkPainterPolyDataMapper::SafeDownCast(
+      this->SourceGlyphMappers->GetItemAsObject(static_cast<int>(i)));
+    if (mapper)
     {
-    vtkPainterPolyDataMapper* mapper =
-      vtkPainterPolyDataMapper::SafeDownCast(
-        this->SourceGlyphMappers->GetItemAsObject(static_cast<int>(i)));
-    if(mapper)
-      {
       mapper->ReleaseGraphicsResources(window);
-      }
     }
+  }
   this->Superclass::ReleaseGraphicsResources(window);
 }
 
@@ -877,55 +851,51 @@ void vtkScatterPlotPainter::ReleaseGraphicsResources(vtkWindow *window)
 // Release display list used for matrices and color.
 void vtkScatterPlotPainter::ReleaseDisplayList()
 {
-  if(this->DisplayListId>0)
-    {
+  if (this->DisplayListId > 0)
+  {
     vtkOpenGLClearErrorMacro();
-    glDeleteLists(this->DisplayListId,1);
+    glDeleteLists(this->DisplayListId, 1);
     this->DisplayListId = 0;
     vtkOpenGLCheckErrorMacro("failed after ReleaseDisplayList");
-    }
+  }
 }
 
-
 //-----------------------------------------------------------------------------
-void vtkScatterPlotPainter::ReportReferences(vtkGarbageCollector *collector)
+void vtkScatterPlotPainter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
-  vtkGarbageCollectorReport(collector, this->ScalarsToColorsPainter,
-                            "ScalarsToColorsPainter");
+  vtkGarbageCollectorReport(collector, this->ScalarsToColorsPainter, "ScalarsToColorsPainter");
 }
 
 //-----------------------------------------------------------------------------
-void vtkScatterPlotPainter::PrepareForRendering(vtkRenderer *ren,
-                                               vtkActor *actor)
+void vtkScatterPlotPainter::PrepareForRendering(vtkRenderer* ren, vtkActor* actor)
 {
   // Get the color ready
   this->UpdatePainterInformation();
-  //vtkInformation* array = this->GetInputArrayInformation(vtkScatterPlotMapper::COLOR);
-  //vtkDataObject* object = this->GetInputDataObject(
+  // vtkInformation* array = this->GetInputArrayInformation(vtkScatterPlotMapper::COLOR);
+  // vtkDataObject* object = this->GetInputDataObject(
   //  INPUTS_PORT,array->Get(INPUT_CONNECTION()));
 
   vtkDataObject* object = this->GetInput();
-/*
-  if(vtkCompositeDataSet::SafeDownCast(object))
-    {
-    vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(object);
-    vtkCompositeDataIterator* iterator = composite->NewIterator();
-    this->ScalarsToColorsPainter->SetInput(
-    composite->GetDataSet(iterator));
-    iterator->Delete();
-    }
-    else
-    {
-*/
-  if(this->Colorize)
-    {
+  /*
+    if(vtkCompositeDataSet::SafeDownCast(object))
+      {
+      vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(object);
+      vtkCompositeDataIterator* iterator = composite->NewIterator();
+      this->ScalarsToColorsPainter->SetInput(
+      composite->GetDataSet(iterator));
+      iterator->Delete();
+      }
+      else
+      {
+  */
+  if (this->Colorize)
+  {
     this->ScalarsToColorsPainter->SetInput(object);
-  /* } */
-
+    /* } */
 
     this->ScalarsToColorsPainter->Render(ren, actor, 0xff, true);
-    }
+  }
 
   /* done in vtkScatterPlotMapper because it's a pb when using displaylists
   size_t count = this->SourceGlyphMappers ?
@@ -949,58 +919,56 @@ void vtkScatterPlotPainter::PrepareForRendering(vtkRenderer *ren,
 // Description:
 // Method initiates the mapping process. Generally sent by the actor
 // as each frame is rendered.
-void vtkScatterPlotPainter::RenderInternal(vtkRenderer *ren, vtkActor *actor,
-                                   unsigned long typeflags,
-                                   bool forceCompileOnly)
+void vtkScatterPlotPainter::RenderInternal(
+  vtkRenderer* ren, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly)
 {
   this->Timer->StartTimer();
-  if(this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
-    {
+  if (this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
+  {
     this->RenderGlyphs(ren, actor, typeflags, forceCompileOnly);
-    }
+  }
   else
-    {
+  {
     this->RenderPoints(ren, actor, typeflags, forceCompileOnly);
-    }
+  }
   this->Timer->StopTimer();
   this->TimeToDraw = this->Timer->GetElapsedTime();
 }
 
 //-----------------------------------------------------------------------------
-void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
-                                         vtkActor *vtkNotUsed(actor),
-                                         unsigned long vtkNotUsed(typeflags),
-                                         bool vtkNotUsed(forceCompileOnly))
+void vtkScatterPlotPainter::RenderPoints(vtkRenderer* vtkNotUsed(ren), vtkActor* vtkNotUsed(actor),
+  unsigned long vtkNotUsed(typeflags), bool vtkNotUsed(forceCompileOnly))
 {
   vtkOpenGLClearErrorMacro();
 
-  //cout << "render points" << endl;
+  // cout << "render points" << endl;
   vtkDataArray* xCoordsArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
   vtkDataArray* yCoordsArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
-  vtkDataArray* zCoordsArray = this->ThreeDMode ? this->GetArray(vtkScatterPlotMapper::Z_COORDS) : NULL;
-  vtkDataArray* colorArray   = this->Colorize ? this->GetArray(vtkScatterPlotMapper::COLOR) : NULL;
+  vtkDataArray* zCoordsArray =
+    this->ThreeDMode ? this->GetArray(vtkScatterPlotMapper::Z_COORDS) : NULL;
+  vtkDataArray* colorArray = this->Colorize ? this->GetArray(vtkScatterPlotMapper::COLOR) : NULL;
 
-  if(!xCoordsArray)
-    {
+  if (!xCoordsArray)
+  {
     vtkErrorMacro("The X coord array is not set.");
     return;
-    }
+  }
 
-  if(!yCoordsArray)
-    {
+  if (!yCoordsArray)
+  {
     vtkErrorMacro("The Y coord array is not set.");
     return;
-    }
+  }
 
-  if(!zCoordsArray && this->ThreeDMode)
-    {
+  if (!zCoordsArray && this->ThreeDMode)
+  {
     vtkWarningMacro("The Z coord array is not set.");
-    }
+  }
 
-  if(!colorArray && this->Colorize)
-    {
+  if (!colorArray && this->Colorize)
+  {
     vtkWarningMacro("The color array is not set.");
-    }
+  }
   /*
   vtkHardwareSelector* selector = ren->GetSelector();
   bool selecting_points = selector && (selector->GetFieldAssociation() ==
@@ -1013,71 +981,70 @@ void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
 
   vtkIdType numPts = xCoordsArray->GetNumberOfTuples();
   if (numPts < 1)
-    {
-    vtkDebugMacro(<<"No points to glyph!");
+  {
+    vtkDebugMacro(<< "No points to glyph!");
     return;
-    }
+  }
   int Xc = this->GetArrayComponent(vtkScatterPlotMapper::X_COORDS);
   int Yc = this->GetArrayComponent(vtkScatterPlotMapper::Y_COORDS);
   int Zc = this->GetArrayComponent(vtkScatterPlotMapper::Z_COORDS);
 
-  double point[3] = {0.,0.,0.};
+  double point[3] = { 0., 0., 0. };
   glDisable(GL_LIGHTING);
   glBegin(GL_POINTS);
   // Traverse all Input points, transforming Source points
-  for(vtkIdType inPtId=0; inPtId < numPts; inPtId++)
+  for (vtkIdType inPtId = 0; inPtId < numPts; inPtId++)
+  {
+    if (!(inPtId % 10000))
     {
-    if(!(inPtId % 10000))
-      {
-      this->UpdateProgress (static_cast<double>(inPtId)/
-                            static_cast<double>(numPts));
+      this->UpdateProgress(static_cast<double>(inPtId) / static_cast<double>(numPts));
       /*if (this->GetAbortExecute())
         {
         cout << "abort" << endl;
         break;
         }
       */
-      }
+    }
 
-    //COLORING
+    // COLORING
     // Copy scalar value
-/*    if(selecting_points)
+    /*    if(selecting_points)
       {
       selector->RenderAttributeId(inPtId);
       }
-      else*/ if(colors)
-      {
+      else*/ if (colors)
+    {
       unsigned char rgba[4];
       colors->GetTypedTuple(inPtId, rgba);
       glColor4ub(rgba[0], rgba[1], rgba[2], rgba[3]);
-      }
+    }
 
     // translate Source to Input point
-    //input->GetPoint(inPtId, point);
+    // input->GetPoint(inPtId, point);
     point[0] = xCoordsArray->GetTuple(inPtId)[Xc];
     point[1] = yCoordsArray->GetTuple(inPtId)[Yc];
-    if(zCoordsArray)
-      {
+    if (zCoordsArray)
+    {
       point[2] = zCoordsArray->GetTuple(inPtId)[Zc];
-      }
-    glVertex3f(point[0], point[1], point[2]);
     }
-  //glVertex3f(0, 0, 0);
+    glVertex3f(point[0], point[1], point[2]);
+  }
+  // glVertex3f(0, 0, 0);
   glEnd();
 
   vtkOpenGLCheckErrorMacro("failed after RenderPoints");
 }
 
 //-----------------------------------------------------------------------------
-void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
-                                         unsigned long vtkNotUsed(typeflags),
-                                         bool vtkNotUsed(forceCompileOnly))
+void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer* ren, vtkActor* actor,
+  unsigned long vtkNotUsed(typeflags), bool vtkNotUsed(forceCompileOnly))
 {
   vtkOpenGLClearErrorMacro();
 
   vtkDataArray* xCoordsArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
   vtkDataArray* yCoordsArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
-  vtkDataArray* zCoordsArray = this->ThreeDMode ? this->GetArray(vtkScatterPlotMapper::Z_COORDS) : NULL;
+  vtkDataArray* zCoordsArray =
+    this->ThreeDMode ? this->GetArray(vtkScatterPlotMapper::Z_COORDS) : NULL;
   vtkDataArray* colorArray = this->Colorize ? this->GetArray(vtkScatterPlotMapper::COLOR) : NULL;
   vtkDataArray* glyphXScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_X_SCALE);
   vtkDataArray* glyphYScaleArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Y_SCALE);
@@ -1087,48 +1054,48 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
   vtkDataArray* glyphYOrientationArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Y_ORIENTATION);
   vtkDataArray* glyphZOrientationArray = this->GetArray(vtkScatterPlotMapper::GLYPH_Z_ORIENTATION);
 
-  if(!xCoordsArray)
-    {
+  if (!xCoordsArray)
+  {
     vtkErrorMacro("The X coord array is not set.");
     return;
-    }
+  }
 
-  if(!yCoordsArray)
-    {
+  if (!yCoordsArray)
+  {
     vtkErrorMacro("The Y coord array is not set.");
     return;
-    }
+  }
 
-  if(!zCoordsArray && this->ThreeDMode)
-    {
+  if (!zCoordsArray && this->ThreeDMode)
+  {
     vtkWarningMacro("The Z coord array is not set.");
-    }
+  }
 
-  if(!colorArray && this->Colorize)
-    {
+  if (!colorArray && this->Colorize)
+  {
     vtkWarningMacro("The color array is not set.");
-    }
+  }
 
-  if((!glyphXScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph) ||
-     (!glyphYScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
-      this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE)!=-1) ||
-     (!glyphZScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
-      this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE)!=-1))
-    {
+  if ((!glyphXScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph) ||
+    (!glyphYScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
+        this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE) != -1) ||
+    (!glyphZScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
+        this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE) != -1))
+  {
     vtkWarningMacro("The glyph scale array is not set.");
-    }
+  }
 
-  if(!glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph)
-    {
+  if (!glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph)
+  {
     vtkWarningMacro("The glyph source array is not set.");
-    }
+  }
 
-  if((!glyphXOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
-     (!glyphYOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
-     (!glyphZOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph))
-    {
+  if ((!glyphXOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
+    (!glyphYOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
+    (!glyphZOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph))
+  {
     vtkWarningMacro("The glyph orientation array is not set.");
-    }
+  }
   /*
   vtkHardwareSelector* selector = ren->GetSelector();
   bool selecting_points = selector && (selector->GetFieldAssociation() ==
@@ -1138,10 +1105,12 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
   int Yc = this->GetArrayComponent(vtkScatterPlotMapper::Y_COORDS);
   int Zc = this->GetArrayComponent(vtkScatterPlotMapper::Z_COORDS);
   int SXc = this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE);
-  int SYc = this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc ?
-    this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Y_SCALE) : 0;
-  int SZc = this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc ?
-    this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Z_SCALE) : 0;
+  int SYc = this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc
+    ? this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Y_SCALE)
+    : 0;
+  int SZc = this->ScalingArrayMode == vtkScatterPlotMapper::Xc_Yc_Zc
+    ? this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Z_SCALE)
+    : 0;
   int SOc = this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_SOURCE);
   int OXc = this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_ORIENTATION);
   int OYc = this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_Y_ORIENTATION);
@@ -1149,22 +1118,21 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
 
   // Check input for consistency
   //
-  double sourceRange[2] = {0.,1.};
+  double sourceRange[2] = { 0., 1. };
   double sourceRangeDiff = 1.;
-  if(glyphSourceArray)
-    {
-    glyphSourceArray->GetRange(sourceRange,SOc);
+  if (glyphSourceArray)
+  {
+    glyphSourceArray->GetRange(sourceRange, SOc);
     sourceRangeDiff = sourceRange[1] - sourceRange[0];
-    if(sourceRangeDiff==0.0)
-      {
-      sourceRangeDiff=1.0;
-      }
+    if (sourceRangeDiff == 0.0)
+    {
+      sourceRangeDiff = 1.0;
     }
+  }
 
-  //int numberOfGlyphSources = this->GetNumberOfInputConnections(GLYPHS_PORT);
+  // int numberOfGlyphSources = this->GetNumberOfInputConnections(GLYPHS_PORT);
   int numberOfGlyphSources =
-    this->SourceGlyphMappers ? this->SourceGlyphMappers->GetNumberOfItems()
-    : 0;
+    this->SourceGlyphMappers ? this->SourceGlyphMappers->GetNumberOfItems() : 0;
 
   // COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR
   //   COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR
@@ -1178,75 +1146,72 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
   camTrans->RotateWXYZ(camRot[0], camRot[1], camRot[2], camRot[3]);
   camTrans->Inverse();
 
-  vtkTransform *trans = vtkTransform::New();
+  vtkTransform* trans = vtkTransform::New();
 
-  //vtkIdType numPts = input->GetNumberOfPoints();
+  // vtkIdType numPts = input->GetNumberOfPoints();
   vtkIdType numPts = xCoordsArray->GetNumberOfTuples();
   if (numPts < 1)
-    {
-    vtkDebugMacro(<<"No points to glyph!");
+  {
+    vtkDebugMacro(<< "No points to glyph!");
     return;
-    }
+  }
   glMatrixMode(GL_MODELVIEW);
   // Traverse all Input points, transforming Source points
-  for(vtkIdType inPtId=0; inPtId < numPts; inPtId++)
+  for (vtkIdType inPtId = 0; inPtId < numPts; inPtId++)
+  {
+    if (!(inPtId % 10000))
     {
-    if(!(inPtId % 10000))
-      {
-      this->UpdateProgress (static_cast<double>(inPtId)/
-                            static_cast<double>(numPts));
+      this->UpdateProgress(static_cast<double>(inPtId) / static_cast<double>(numPts));
       /*
       if (this->GetAbortExecute())
         {
         break;
         }
       */
-      }
+    }
 
-//      if (maskArray && maskArray->GetValue(inPtId)==0)
-//        {
-//        continue;
-//        }
+    //      if (maskArray && maskArray->GetValue(inPtId)==0)
+    //        {
+    //        continue;
+    //        }
 
     // TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE
     //   TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE
     //      TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE  TRANSLATE
     // translate Source to Input point
-    double point[3] = {0.,0.,0.};
-    //input->GetPoint(inPtId, point);
+    double point[3] = { 0., 0., 0. };
+    // input->GetPoint(inPtId, point);
     point[0] = xCoordsArray->GetTuple(inPtId)[Xc];
     point[1] = yCoordsArray->GetTuple(inPtId)[Yc];
-    if(this->ThreeDMode)
-      {
+    if (this->ThreeDMode)
+    {
       point[2] = zCoordsArray->GetTuple(inPtId)[Zc];
-      }
+    }
 
     // SCALING  SCALING  SCALING  SCALING  SCALING  SCALING  SCALING
     //   SCALING  SCALING  SCALING  SCALING  SCALING  SCALING  SCALING
     //      SCALING  SCALING  SCALING  SCALING  SCALING  SCALING  SCALING
-    double scale[3] = {1.,1.,1.};
-    if(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph)
-      {
+    double scale[3] = { 1., 1., 1. };
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph)
+    {
       // Get the scalar and vector data
       double* xTuple = glyphXScaleArray->GetTuple(inPtId);
-      double* yTuple = glyphYScaleArray?glyphYScaleArray->GetTuple(inPtId):NULL;
-      double* zTuple = glyphZScaleArray?glyphZScaleArray->GetTuple(inPtId):NULL;
+      double* yTuple = glyphYScaleArray ? glyphYScaleArray->GetTuple(inPtId) : NULL;
+      double* zTuple = glyphZScaleArray ? glyphZScaleArray->GetTuple(inPtId) : NULL;
       switch (this->ScaleMode)
-        {
+      {
         case vtkScatterPlotMapper::SCALE_BY_MAGNITUDE:
-          switch(this->ScalingArrayMode)
-            {
+          switch (this->ScalingArrayMode)
+          {
             case vtkScatterPlotMapper::Xc_Yc_Zc:
               scale[0] = xTuple[SXc];
               scale[1] = yTuple[SYc];
               scale[2] = zTuple[SZc];
-              scale[0] = scale[1] = scale[2] =
-                vtkMath::Norm(scale);
+              scale[0] = scale[1] = scale[2] = vtkMath::Norm(scale);
               break;
             case vtkScatterPlotMapper::Xc0_Xc1_Xc2:
               scale[0] = scale[1] = scale[2] =
-                vtkMath::Norm( xTuple+SXc,
-                               glyphXScaleArray->GetNumberOfComponents() );
+                vtkMath::Norm(xTuple + SXc, glyphXScaleArray->GetNumberOfComponents());
               break;
             case vtkScatterPlotMapper::Xc_Xc_Xc:
               scale[0] = scale[1] = scale[2] = xTuple[SXc];
@@ -1254,26 +1219,25 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
             default:
               vtkErrorMacro("Wrong ScalingArray mode");
               break;
-            }
+          }
           break;
         case vtkScatterPlotMapper::SCALE_BY_COMPONENTS:
-          switch(this->ScalingArrayMode)
-            {
+          switch (this->ScalingArrayMode)
+          {
             case vtkScatterPlotMapper::Xc_Yc_Zc:
               scale[0] = xTuple[SXc];
               scale[1] = yTuple[SYc];
               scale[2] = zTuple[SZc];
               break;
             case vtkScatterPlotMapper::Xc0_Xc1_Xc2:
-              if(glyphXScaleArray->GetNumberOfComponents() < 3)
-                {
-                vtkErrorMacro("Cannot scale by components since " <<
-                              glyphXScaleArray->GetName() <<
-                              " does not have at least 3 components.");
-                }
+              if (glyphXScaleArray->GetNumberOfComponents() < 3)
+              {
+                vtkErrorMacro("Cannot scale by components since "
+                  << glyphXScaleArray->GetName() << " does not have at least 3 components.");
+              }
               scale[0] = xTuple[SXc];
-              scale[1] = xTuple[SXc+1];
-              scale[2] = xTuple[SXc+2];
+              scale[1] = xTuple[SXc + 1];
+              scale[2] = xTuple[SXc + 2];
               break;
             case vtkScatterPlotMapper::Xc_Xc_Xc:
               scale[0] = scale[1] = scale[2] = xTuple[SXc];
@@ -1281,92 +1245,92 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
             default:
               vtkErrorMacro("Wrong ScalingArray mode");
               break;
-            }
+          }
           break;
         default:
           vtkErrorMacro("Wrong Scale mode");
           break;
-        }
+      }
 
       // Clamp data scale if enabled
-//        if (this->Clamping && this->ScaleMode != NO_DATA_SCALING)
-//          {
-//          scalex = (scalex < this->Range[0] ? this->Range[0] :
-//                    (scalex > this->Range[1] ? this->Range[1] : scalex));
-//          scalex = (scalex - this->Range[0]) / den;
-//          scaley = (scaley < this->Range[0] ? this->Range[0] :
-//                    (scaley > this->Range[1] ? this->Range[1] : scaley));
-//          scaley = (scaley - this->Range[0]) / den;
-//          scalez = (scalez < this->Range[0] ? this->Range[0] :
-//                    (scalez > this->Range[1] ? this->Range[1] : scalez));
-//          scalez = (scalez - this->Range[0]) / den;
-//          }
-      }
+      //        if (this->Clamping && this->ScaleMode != NO_DATA_SCALING)
+      //          {
+      //          scalex = (scalex < this->Range[0] ? this->Range[0] :
+      //                    (scalex > this->Range[1] ? this->Range[1] : scalex));
+      //          scalex = (scalex - this->Range[0]) / den;
+      //          scaley = (scaley < this->Range[0] ? this->Range[0] :
+      //                    (scaley > this->Range[1] ? this->Range[1] : scaley));
+      //          scaley = (scaley - this->Range[0]) / den;
+      //          scalez = (scalez < this->Range[0] ? this->Range[0] :
+      //                    (scalez > this->Range[1] ? this->Range[1] : scalez));
+      //          scalez = (scalez - this->Range[0]) / den;
+      //          }
+    }
 
     scale[0] *= this->ScaleFactor;
     scale[1] *= this->ScaleFactor;
     scale[2] *= this->ScaleFactor;
 
-    if(scale[0] == 0.0)
-      {
+    if (scale[0] == 0.0)
+    {
       scale[0] = 1.0e-10;
-      }
-    if(scale[1] == 0.0)
-      {
+    }
+    if (scale[1] == 0.0)
+    {
       scale[1] = 1.0e-10;
-      }
-    if(scale[2] == 0.0)
-      {
+    }
+    if (scale[2] == 0.0)
+    {
       scale[2] = 1.0e-10;
-      }
+    }
 
     // MULTI  MULTI  MULTI  MULTI  MULTI  MULTI  MULTI MULTI  MULTI
     //   MULTI  MULTI  MULTI  MULTI  MULTI  MULTI  MULTI MULTI  MULTI
     //      MULTI  MULTI  MULTI  MULTI  MULTI  MULTI  MULTI MULTI  MULTI
     int index = 0;
     // Compute index into table of glyphs
-    if(this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph && glyphSourceArray)
-      {
+    if (this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph && glyphSourceArray)
+    {
       double value = 0.;
-      if(SOc == -1)
-        {
-        value = vtkMath::Norm(glyphSourceArray->GetTuple(inPtId),
-                              glyphSourceArray->GetNumberOfComponents());
-        }
-      else
-        {
-        value = glyphSourceArray->GetTuple(inPtId)[SOc];
-        }
-      index = static_cast<int>(((value - sourceRange[0])/sourceRangeDiff)*numberOfGlyphSources);
-      index = ::vtkClamp(index, 0, numberOfGlyphSources-1);
+      if (SOc == -1)
+      {
+        value = vtkMath::Norm(
+          glyphSourceArray->GetTuple(inPtId), glyphSourceArray->GetNumberOfComponents());
       }
+      else
+      {
+        value = glyphSourceArray->GetTuple(inPtId)[SOc];
+      }
+      index = static_cast<int>(((value - sourceRange[0]) / sourceRangeDiff) * numberOfGlyphSources);
+      index = ::vtkClamp(index, 0, numberOfGlyphSources - 1);
+    }
 
     // source can be null.
-    vtkPolyData *source = this->GetGlyphSource(index);
+    vtkPolyData* source = this->GetGlyphSource(index);
 
     // Make sure we're not indexing into empty glyph
     if (!source)
-      {
+    {
       vtkErrorMacro("Glyph " << index << " is not set");
-      }
+    }
 
     // ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION
     //   ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION
     //      ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION  ORIENTATION
-    double orientation[3] = {0.,0.,0.};
-    if(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph)
+    double orientation[3] = { 0., 0., 0. };
+    if (this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph)
+    {
+      if (OXc == -1)
       {
-      if(OXc == -1)
-        {
         glyphXOrientationArray->GetTuple(inPtId, orientation);
-        }
+      }
       else
-        {
+      {
         orientation[0] = glyphXOrientationArray->GetTuple(inPtId)[OXc];
         orientation[1] = glyphYOrientationArray->GetTuple(inPtId)[OYc];
         orientation[2] = glyphZOrientationArray->GetTuple(inPtId)[OZc];
-        }
       }
+    }
 
     // Now begin copying/transforming glyph
     trans->Identity();
@@ -1375,18 +1339,17 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
     trans->Translate(point);
 
     // Get the 2D glyphs parallel to the camera
-    if(this->ThreeDMode &&
-       this->GlyphMode & vtkScatterPlotMapper::UseGlyph &&
-       this->ParallelToCamera)
-      {
+    if (this->ThreeDMode && this->GlyphMode & vtkScatterPlotMapper::UseGlyph &&
+      this->ParallelToCamera)
+    {
       trans->Concatenate(camTrans);
-      }
+    }
 
     // ORIENTATION
-    if(this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph)
-      {
+    if (this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph)
+    {
       switch (this->OrientationMode)
-        {
+      {
         case vtkScatterPlotMapper::ROTATION:
           trans->RotateZ(orientation[2]);
           trans->RotateX(orientation[0]);
@@ -1395,47 +1358,46 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
 
         case vtkScatterPlotMapper::DIRECTION:
           if (orientation[1] == 0.0 && orientation[2] == 0.0)
+          {
+            if (orientation[0] < 0) // just flip x if we need to
             {
-            if (orientation[0] < 0) //just flip x if we need to
-              {
-              trans->RotateWXYZ(180.0,0,1,0);
-              }
+              trans->RotateWXYZ(180.0, 0, 1, 0);
             }
+          }
           else
-            {
+          {
             double vMag = vtkMath::Norm(orientation);
             double vNew[3];
-            vNew[0] = (orientation[0]+vMag) / 2.0;
+            vNew[0] = (orientation[0] + vMag) / 2.0;
             vNew[1] = orientation[1] / 2.0;
             vNew[2] = orientation[2] / 2.0;
             trans->RotateWXYZ(180.0, vNew[0], vNew[1], vNew[2]);
-            }
+          }
           break;
-        }
       }
+    }
 
     // multiply points and normals by resulting matrix
     glPushMatrix();
 
-    //COLORING
+    // COLORING
     // Copy scalar value
     /*if(selecting_points)
       {
       selector->RenderAttributeId(inPtId);
       }
-      else*/ if(colors)
-      {
+      else*/ if (colors)
+    {
       unsigned char rgba[4];
       colors->GetTypedTuple(inPtId, rgba);
       glColor4ub(rgba[0], rgba[1], rgba[2], rgba[3]);
-      }
+    }
 
-    //SCALING
-    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph ||
-        this->ScaleFactor != 1.)
-      {
+    // SCALING
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph || this->ScaleFactor != 1.)
+    {
       trans->Scale(scale[0], scale[1], scale[2]);
-      }
+    }
 
     // Get the 2D glyphs parallel to the camera (billboarding)
     /*
@@ -1464,7 +1426,7 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
       glLoadMatrixf(modelview);
       }
     */
-    double *mat = trans->GetMatrix()->Element[0];
+    double* mat = trans->GetMatrix()->Element[0];
     float mat2[16]; // transpose for OpenGL, float is native OpenGL
     // format.
     mat2[0] = static_cast<float>(mat[0]);
@@ -1485,20 +1447,19 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
     mat2[15] = static_cast<float>(mat[15]);
     glMultMatrixf(mat2);
 
-    vtkPainterPolyDataMapper* mapper =
-      vtkPainterPolyDataMapper::SafeDownCast(
-        this->SourceGlyphMappers->GetItemAsObject(static_cast<size_t>(index)));
-    if(mapper)
-      {
-      mapper->Render(ren,actor);
-      }
+    vtkPainterPolyDataMapper* mapper = vtkPainterPolyDataMapper::SafeDownCast(
+      this->SourceGlyphMappers->GetItemAsObject(static_cast<size_t>(index)));
+    if (mapper)
+    {
+      mapper->Render(ren, actor);
+    }
     // Don't know why but can't assume glMatrix(GL_MODELVIEW);
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
-    }
+  }
 
   trans->Delete();
   camTrans->Delete();
 
   vtkOpenGLCheckErrorMacro("failed after RenderGlyphs");
- }
+}

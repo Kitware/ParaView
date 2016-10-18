@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * This is a QDialog subclass that is aware of the undo-redo
 * sub-system. Many dialogs show information about server manager
 * objects. The user can change the information and then when he/she
-* hits "Accept" or "Apply", we change the underlying server manager 
+* hits "Accept" or "Apply", we change the underlying server manager
 * object(s). For this change to be undoable, it is essential that
-* the undo set generation is commenced before doing any 
+* the undo set generation is commenced before doing any
 * changes to the server manager. This manages the start/end
 * of building the undo stack for us. For any such dialogs, instead of
 * using a QDialog, one should simply use this.
@@ -54,15 +54,15 @@ class PQCOMPONENTS_EXPORT pqDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqDialog(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqDialog();
 
   /**
   * Set the lable used for undo command.
   */
-  void setUndoLabel(const QString& label) 
-    { this->UndoLabel = label; }
+  void setUndoLabel(const QString& label) { this->UndoLabel = label; }
 signals:
   /**
   * Fired when dialog begins undo-able changes.
@@ -96,4 +96,3 @@ protected:
 };
 
 #endif
-

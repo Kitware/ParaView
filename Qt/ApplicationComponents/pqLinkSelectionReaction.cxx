@@ -39,62 +39,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 //-----------------------------------------------------------------------------
-pqLinkSelectionReaction::pqLinkSelectionReaction(
-  QAction* parentObject)
-: Superclass(parentObject)
+pqLinkSelectionReaction::pqLinkSelectionReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnableState()));
 
   // nameChanged() is fired even when modified state is changed ;).
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-    this, SLOT(updateEnableState()));
+    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqLinkSelectionReaction::updateEnableState()
 {
-  pqSelectionManager *selectionManager =
-    qobject_cast<pqSelectionManager*>(
-      pqApplicationCore::instance()->manager("SelectionManager"));
-  if(selectionManager)
-    {
+  pqSelectionManager* selectionManager =
+    qobject_cast<pqSelectionManager*>(pqApplicationCore::instance()->manager("SelectionManager"));
+  if (selectionManager)
+  {
     pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
     if (activeSource != NULL && selectionManager->hasActiveSelection())
-      {
+    {
       foreach (pqOutputPort* port, selectionManager->getSelectedPorts())
-        {
+      {
         if (port->getSource() == activeSource)
-          {
+        {
           this->parentAction()->setEnabled(false);
           return;
-          }
         }
+      }
       this->parentAction()->setEnabled(true);
       return;
-      }
     }
+  }
   this->parentAction()->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
 void pqLinkSelectionReaction::linkSelection()
 {
-  pqSelectionManager *selectionManager =
-    qobject_cast<pqSelectionManager*>(
-      pqApplicationCore::instance()->manager("SelectionManager"));
+  pqSelectionManager* selectionManager =
+    qobject_cast<pqSelectionManager*>(pqApplicationCore::instance()->manager("SelectionManager"));
 
   int index = 0;
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   QString name = QString("SelectionLink%1").arg(index);
-  while(model->getLink(name))
-    {
+  while (model->getLink(name))
+  {
     name = QString("SelectionLink%1").arg(++index);
-    }
+  }
 
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
-  model->addSelectionLink(name, activeSource->getProxy(), selectionManager->getSelectedPort()->getSourceProxy());
+  model->addSelectionLink(
+    name, activeSource->getProxy(), selectionManager->getSelectedPort()->getSourceProxy());
 }

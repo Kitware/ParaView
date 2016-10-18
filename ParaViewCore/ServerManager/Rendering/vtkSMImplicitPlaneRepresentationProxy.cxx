@@ -33,29 +33,25 @@ vtkSMImplicitPlaneRepresentationProxy::~vtkSMImplicitPlaneRepresentationProxy()
 //---------------------------------------------------------------------------
 void vtkSMImplicitPlaneRepresentationProxy::SendRepresentation()
 {
-  vtkImplicitPlaneRepresentation* rep = 
-      vtkImplicitPlaneRepresentation::SafeDownCast(this->GetClientSideObject());
+  vtkImplicitPlaneRepresentation* rep =
+    vtkImplicitPlaneRepresentation::SafeDownCast(this->GetClientSideObject());
 
   int repState = rep->GetRepresentationState();
   // Don't bother to server if representation is the same.
   if (repState == this->RepresentationState)
-    {
+  {
     return;
-    }
+  }
   this->RepresentationState = repState;
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "SetRepresentationState"
-         << repState
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetRepresentationState" << repState
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMImplicitPlaneRepresentationProxy::PrintSelf( ostream& os,
-                                                       vtkIndent indent )
+void vtkSMImplicitPlaneRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

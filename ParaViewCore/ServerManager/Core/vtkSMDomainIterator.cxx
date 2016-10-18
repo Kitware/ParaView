@@ -36,9 +36,9 @@ vtkSMDomainIterator::vtkSMDomainIterator()
 vtkSMDomainIterator::~vtkSMDomainIterator()
 {
   if (this->Property)
-    {
+  {
     this->Property->Delete();
-    }
+  }
   delete this->Internals;
 }
 
@@ -46,44 +46,45 @@ vtkSMDomainIterator::~vtkSMDomainIterator()
 void vtkSMDomainIterator::SetProperty(vtkSMProperty* proxy)
 {
   if (this->Property != proxy)
+  {
+    if (this->Property != NULL)
     {
-    if (this->Property != NULL) { this->Property->UnRegister(this); }
-    this->Property = proxy;
-    if (this->Property != NULL) 
-      { 
-      this->Property->Register(this); 
-      this->Begin();
-      }
-    this->Modified();
+      this->Property->UnRegister(this);
     }
+    this->Property = proxy;
+    if (this->Property != NULL)
+    {
+      this->Property->Register(this);
+      this->Begin();
+    }
+    this->Modified();
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMDomainIterator::Begin()
 {
   if (!this->Property)
-    {
+  {
     vtkErrorMacro("Property is not set. Can not perform operation: Begin()");
     return;
-    }
+  }
 
-  this->Internals->DomainIterator = 
-    this->Property->PInternals->Domains.begin(); 
+  this->Internals->DomainIterator = this->Property->PInternals->Domains.begin();
 }
 
 //---------------------------------------------------------------------------
 int vtkSMDomainIterator::IsAtEnd()
 {
   if (!this->Property)
-    {
+  {
     vtkErrorMacro("Property is not set. Can not perform operation: IsAtEnd()");
     return 1;
-    }
-  if ( this->Internals->DomainIterator == 
-       this->Property->PInternals->Domains.end() )
-    {
+  }
+  if (this->Internals->DomainIterator == this->Property->PInternals->Domains.end())
+  {
     return 1;
-    }
+  }
   return 0;
 }
 
@@ -91,33 +92,31 @@ int vtkSMDomainIterator::IsAtEnd()
 void vtkSMDomainIterator::Next()
 {
   if (!this->Property)
-    {
+  {
     vtkErrorMacro("Property is not set. Can not perform operation: Next()");
     return;
-    }
+  }
 
-  if (this->Internals->DomainIterator != 
-      this->Property->PInternals->Domains.end())
-    {
+  if (this->Internals->DomainIterator != this->Property->PInternals->Domains.end())
+  {
     this->Internals->DomainIterator++;
     return;
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 const char* vtkSMDomainIterator::GetKey()
 {
   if (!this->Property)
-    {
+  {
     vtkErrorMacro("Property is not set. Can not perform operation: GetKey()");
     return 0;
-    }
+  }
 
-  if (this->Internals->DomainIterator != 
-      this->Property->PInternals->Domains.end())
-    {
+  if (this->Internals->DomainIterator != this->Property->PInternals->Domains.end())
+  {
     return this->Internals->DomainIterator->first.c_str();
-    }
+  }
 
   return 0;
 }
@@ -126,16 +125,15 @@ const char* vtkSMDomainIterator::GetKey()
 vtkSMDomain* vtkSMDomainIterator::GetDomain()
 {
   if (!this->Property)
-    {
+  {
     vtkErrorMacro("Property is not set. Can not perform operation: GetProperty()");
     return 0;
-    }
+  }
 
-  if (this->Internals->DomainIterator != 
-      this->Property->PInternals->Domains.end())
-    {
+  if (this->Internals->DomainIterator != this->Property->PInternals->Domains.end())
+  {
     return this->Internals->DomainIterator->second.GetPointer();
-    }
+  }
 
   return 0;
 }

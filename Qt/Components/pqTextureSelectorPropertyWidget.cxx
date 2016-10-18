@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,23 +39,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 
-pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *smProxy, QWidget *pWidget)
+pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
+  vtkSMProxy* smProxy, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
 {
-  QVBoxLayout *l = new QVBoxLayout;
+  QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
 
   this->Selector = new pqTextureComboBox(this);
 
-  pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
-  if(repr)
-    {
+  pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
+  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation*>(smProxy);
+  if (repr)
+  {
     this->Selector->setRepresentation(repr);
-    }
+  }
 
-  this->connect(this, SIGNAL(viewChanged(pqView*)),
-                this, SLOT(handleViewChanged(pqView*)));
+  this->connect(this, SIGNAL(viewChanged(pqView*)), this, SLOT(handleViewChanged(pqView*)));
 
   l->addWidget(this->Selector);
   this->setLayout(l);
@@ -65,11 +65,11 @@ pqTextureSelectorPropertyWidget::~pqTextureSelectorPropertyWidget()
 {
 }
 
-void pqTextureSelectorPropertyWidget::handleViewChanged(pqView *v)
+void pqTextureSelectorPropertyWidget::handleViewChanged(pqView* v)
 {
-  pqRenderView *renderView = qobject_cast<pqRenderView *>(v);
-  if(renderView)
-    {
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(v);
+  if (renderView)
+  {
     this->Selector->setRenderView(renderView);
-    }
+  }
 }

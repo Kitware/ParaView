@@ -44,8 +44,7 @@ class vtkIntArray;
 class vtkOverlappingAMR;
 class vtkPointData;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkResampledAMRImageSource :
-  public vtkTrivialProducer
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkResampledAMRImageSource : public vtkTrivialProducer
 {
 public:
   static vtkResampledAMRImageSource* New();
@@ -87,16 +86,15 @@ public:
    * Returns true if the resampler will reinitialize the volume in the next call
    * to UpdateResampledVolume().
    */
-  bool NeedsInitialization() const
-    { return (this->MTime > this->InitializationTime); }
+  bool NeedsInitialization() const { return (this->MTime > this->InitializationTime); }
 
 protected:
   vtkResampledAMRImageSource();
   ~vtkResampledAMRImageSource();
 
   bool Initialize(vtkOverlappingAMR* amr);
-  bool UpdateResampledVolume(const unsigned int &level,
-    const unsigned& index, const vtkAMRBox& box, vtkImageData* data);
+  bool UpdateResampledVolume(
+    const unsigned int& level, const unsigned& index, const vtkAMRBox& box, vtkImageData* data);
 
   int MaxDimensions[3];
   double SpatialBounds[6];
@@ -111,7 +109,6 @@ private:
   void operator=(const vtkResampledAMRImageSource&) VTK_DELETE_FUNCTION;
 
   vtkTimeStamp InitializationTime;
-
 };
 
 #endif

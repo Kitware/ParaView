@@ -57,7 +57,7 @@ public:
   /**
    * Returns true if all parts of the source proxy are in the domain.
    */
-  int IsInDomain(vtkSMSourceProxy* proxy, int outputport=0);
+  int IsInDomain(vtkSMSourceProxy* proxy, int outputport = 0);
 
   /**
    * Returns the number of acceptable data types.
@@ -88,7 +88,6 @@ protected:
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

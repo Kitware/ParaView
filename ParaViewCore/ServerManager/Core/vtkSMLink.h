@@ -40,11 +40,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum UpdateDirections
-    {
+  {
     NONE = 0,
     INPUT = 1,
     OUTPUT = 2
-    };
+  };
 
   //@{
   /**
@@ -85,7 +85,7 @@ public:
    * globalIDs set. This enables splitting the load process in 2 step to prevent
    * invalid state when a property refers to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
   /**
    * Update the internal protobuf state
@@ -107,7 +107,7 @@ public:
    * Get a proxy involved in this link.
    */
   virtual vtkSMProxy* GetLinkedProxy(int index) = 0;
- 
+
 protected:
   vtkSMLink();
   ~vtkSMLink();
@@ -122,21 +122,21 @@ protected:
    * Called when an input proxy is updated (UpdateVTKObjects).
    * Argument is the input proxy.
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* proxy)=0;
+  virtual void UpdateVTKObjects(vtkSMProxy* proxy) = 0;
 
   /**
    * Called when a property of an input proxy is modified.
    * caller:- the input proxy.
    * pname:- name of the property being modified.
    */
-  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname)=0;
+  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname) = 0;
 
   /**
    * Called when a property is pushed.
    * caller :- the input proxy.
    * pname :- name of property that was pushed.
    */
-  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname)=0;
+  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname) = 0;
 
   /**
    * Subclasses call this method to observer events on a INPUT proxy.
@@ -167,11 +167,10 @@ protected:
 
   // Cached version of State
   vtkSMMessage* State;
+
 private:
   vtkSMLink(const vtkSMLink&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLink&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

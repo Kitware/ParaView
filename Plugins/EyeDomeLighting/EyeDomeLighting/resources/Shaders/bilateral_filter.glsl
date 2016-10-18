@@ -54,58 +54,58 @@ Ph.D. thesis of Christian BOUCHENY.
 //////////////////////////////////////////////////////////////////////////
 
 /****************************************************/
-uniform sampler2D   s2_I;
-uniform sampler2D   s2_D;
-uniform float       SX;
-uniform float       SY;
-uniform int         N;
+uniform sampler2D s2_I;
+uniform sampler2D s2_D;
+uniform float SX;
+uniform float SY;
+uniform int N;
 // filter size (full width, necessarily odd, like 3, 5...)
-uniform float       sigma;
+uniform float sigma;
 /****************************************************/
 
 /****************************************************/
-vec3    C;
-float   z;
-float   sigmaz = 0.005;
+vec3 C;
+float z;
+float sigmaz = 0.005;
 /****************************************************/
 
-void main (void)
+void main(void)
 {
-  C = texture2D(s2_I,gl_TexCoord[0].st).rgb;
+  C = texture2D(s2_I, gl_TexCoord[0].st).rgb;
   // gl_FragColor = vec4( z,z,z , 1. );
   // return;
-  z = texture2D(s2_D,gl_TexCoord[0].st).r;
+  z = texture2D(s2_D, gl_TexCoord[0].st).r;
 
-  float ALL = 0.;       // sum of all weights
-  vec3  RES = vec3(0.); // sum of all contributions
-  int   hN  = N/2;      // filter half width
-  vec2  coordi = vec2(0.,0.);
-  vec3  Ci;
+  float ALL = 0.;      // sum of all weights
+  vec3 RES = vec3(0.); // sum of all contributions
+  int hN = N / 2;      // filter half width
+  vec2 coordi = vec2(0., 0.);
+  vec3 Ci;
   float zi;
   float dist;
   float dz;
-  float Fi,Gi;
+  float Fi, Gi;
 
-  int   c,d;
-  for(c=-hN;c<hN+1;c++)
+  int c, d;
+  for (c = -hN; c < hN + 1; c++)
   {
-    for(d=-hN;d<hN+1;d++)
+    for (d = -hN; d < hN + 1; d++)
     {
-    coordi = vec2(float(c)*SX,float(d)*SY);
-    Ci = texture2D(s2_I,gl_TexCoord[0].st+coordi).rgb;
-    zi = texture2D(s2_D,gl_TexCoord[0].st+coordi).r;
+      coordi = vec2(float(c) * SX, float(d) * SY);
+      Ci = texture2D(s2_I, gl_TexCoord[0].st + coordi).rgb;
+      zi = texture2D(s2_D, gl_TexCoord[0].st + coordi).r;
 
-    dist = clamp( float(c*c+d*d)/float(hN*hN) , 0., 1. );
-    dz   = (z-zi)*(z-zi);
+      dist = clamp(float(c * c + d * d) / float(hN * hN), 0., 1.);
+      dz = (z - zi) * (z - zi);
 
-    Fi = exp(-dist*dist/(2.* sigma*sigma));
-    Gi = exp(-dz*dz/(2.* sigmaz*sigmaz));
+      Fi = exp(-dist * dist / (2. * sigma * sigma));
+      Gi = exp(-dz * dz / (2. * sigmaz * sigmaz));
 
-    RES += Ci * Fi * Gi;
-    ALL += Fi * Gi;
+      RES += Ci * Fi * Gi;
+      ALL += Fi * Gi;
     }
   }
   RES /= ALL;
 
-  gl_FragColor = vec4( RES , z );
+  gl_FragColor = vec4(RES, z);
 }

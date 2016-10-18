@@ -52,8 +52,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqEditScalarBarReaction(QAction* parent=0, bool track_active_objects=true);
+  pqEditScalarBarReaction(QAction* parent = 0, bool track_active_objects = true);
   virtual ~pqEditScalarBarReaction();
 
 public slots:

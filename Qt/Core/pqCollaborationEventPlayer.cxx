@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -55,11 +55,10 @@ void pqCollaborationEventPlayer::waitForMaster()
   pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
     pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
   // this process should just wait patiently until it becomes the master.
-  while ( mgr && mgr->activeCollaborationManager() &&
-          !mgr->activeCollaborationManager()->IsMaster())
-    {
-    pqEventDispatcher::processEventsAndWait(500); 
-    }
+  while (mgr && mgr->activeCollaborationManager() && !mgr->activeCollaborationManager()->IsMaster())
+  {
+    pqEventDispatcher::processEventsAndWait(500);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -68,38 +67,38 @@ void pqCollaborationEventPlayer::waitForConnections(int num_connections)
   pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
     pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
   // this process should just wait patiently until it becomes the master.
-  while ( mgr && mgr->activeCollaborationManager() &&
-          mgr->activeCollaborationManager()->GetNumberOfConnectedClients() < num_connections)
-    {
-    pqEventDispatcher::processEventsAndWait(500); 
-    }
-  pqEventDispatcher::processEventsAndWait(1000); 
+  while (mgr && mgr->activeCollaborationManager() &&
+    mgr->activeCollaborationManager()->GetNumberOfConnectedClients() < num_connections)
+  {
+    pqEventDispatcher::processEventsAndWait(500);
+  }
+  pqEventDispatcher::processEventsAndWait(1000);
 }
 
 //-----------------------------------------------------------------------------
 void pqCollaborationEventPlayer::wait(int ms)
 {
-  pqEventDispatcher::processEventsAndWait(ms); 
+  pqEventDispatcher::processEventsAndWait(ms);
 }
 
 //-----------------------------------------------------------------------------
-bool pqCollaborationEventPlayer::playEvent(QObject* , 
-  const QString& command, const QString& vtkNotUsed(arguments), bool& vtkNotUsed(error))
+bool pqCollaborationEventPlayer::playEvent(
+  QObject*, const QString& command, const QString& vtkNotUsed(arguments), bool& vtkNotUsed(error))
 {
   if (command == "waitForMaster")
-    {
+  {
     pqCollaborationEventPlayer::waitForMaster();
     return true;
-    }
+  }
   else if (command == "waitForConnections")
-    {
+  {
     pqCollaborationEventPlayer::waitForConnections(2);
     return true;
-    }
+  }
   else if (command == "wait")
-    {
+  {
     pqCollaborationEventPlayer::wait(1000);
     return true;
-    }
+  }
   return false;
 }

@@ -53,31 +53,32 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizPCAStats : public vtkSciVizStat
 {
 public:
   static vtkPSciVizPCAStats* New();
-  vtkTypeMacro(vtkPSciVizPCAStats,vtkSciVizStatistics);
-  virtual void PrintSelf( ostream& os, vtkIndent indent );
+  vtkTypeMacro(vtkPSciVizPCAStats, vtkSciVizStatistics);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkSetMacro(NormalizationScheme,int);
-  vtkGetMacro(NormalizationScheme,int);
+  vtkSetMacro(NormalizationScheme, int);
+  vtkGetMacro(NormalizationScheme, int);
 
-  vtkSetMacro(BasisScheme,int);
-  vtkGetMacro(BasisScheme,int);
+  vtkSetMacro(BasisScheme, int);
+  vtkGetMacro(BasisScheme, int);
 
-  vtkSetMacro(FixedBasisSize,int);
-  vtkGetMacro(FixedBasisSize,int);
+  vtkSetMacro(FixedBasisSize, int);
+  vtkGetMacro(FixedBasisSize, int);
 
-  vtkSetClampMacro(FixedBasisEnergy,double,0.,1.);
-  vtkGetMacro(FixedBasisEnergy,double);
+  vtkSetClampMacro(FixedBasisEnergy, double, 0., 1.);
+  vtkGetMacro(FixedBasisEnergy, double);
 
-  vtkSetMacro(RobustPCA,bool);
-  vtkGetMacro(RobustPCA,bool);
-  vtkBooleanMacro(RobustPCA,bool);
+  vtkSetMacro(RobustPCA, bool);
+  vtkGetMacro(RobustPCA, bool);
+  vtkBooleanMacro(RobustPCA, bool);
 
 protected:
   vtkPSciVizPCAStats();
   virtual ~vtkPSciVizPCAStats();
 
-  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
-  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
+  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData);
+  virtual int AssessData(
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model);
 
   int NormalizationScheme;
   int BasisScheme;
@@ -86,8 +87,8 @@ protected:
   bool RobustPCA;
 
 private:
-  vtkPSciVizPCAStats( const vtkPSciVizPCAStats& ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPSciVizPCAStats& ) VTK_DELETE_FUNCTION;
+  vtkPSciVizPCAStats(const vtkPSciVizPCAStats&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPSciVizPCAStats&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPSciVizPCAStats_h

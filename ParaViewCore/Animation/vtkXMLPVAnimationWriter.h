@@ -28,12 +28,12 @@
 
 class vtkXMLPVAnimationWriterInternals;
 
-class VTKPVANIMATION_EXPORT vtkXMLPVAnimationWriter: public vtkXMLPVDWriter
+class VTKPVANIMATION_EXPORT vtkXMLPVAnimationWriter : public vtkXMLPVDWriter
 {
 public:
   static vtkXMLPVAnimationWriter* New();
-  vtkTypeMacro(vtkXMLPVAnimationWriter,vtkXMLPVDWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);  
+  vtkTypeMacro(vtkXMLPVAnimationWriter, vtkXMLPVDWriter);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**
@@ -47,39 +47,39 @@ public:
    * Start a new animation with the current set of inputs.
    */
   void Start();
-  
+
   /**
    * Write the current time step.
    */
   void WriteTime(double time);
-  
+
   /**
    * Finish an animation by writing the collection file.
    */
   void Finish();
-  
+
 protected:
   vtkXMLPVAnimationWriter();
-  ~vtkXMLPVAnimationWriter();  
+  ~vtkXMLPVAnimationWriter();
 
   // Replace vtkXMLWriter's writing driver method.
   virtual int WriteInternal();
-  
+
   // Status safety check for method call ordering.
   int StartCalled;
   int FinishCalled;
-  
+
   // Internal implementation details.
   vtkXMLPVAnimationWriterInternals* Internal;
 
-  char **FileNamesCreated;
+  char** FileNamesCreated;
   int NumberOfFileNamesCreated;
-  void AddFileName(const char *fileName);
+  void AddFileName(const char* fileName);
   void DeleteFileNames();
   void DeleteFiles();
 
   void AddInputInternal(const char* group);
-  
+
 private:
   vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;

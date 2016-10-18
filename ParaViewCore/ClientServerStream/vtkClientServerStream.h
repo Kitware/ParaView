@@ -40,7 +40,7 @@ public:
    * Constructor/Destructor manage references of vtk objects stored in
    * the stream along with the rest of the stream data.
    */
-  vtkClientServerStream(vtkObjectBase* owner=0);
+  vtkClientServerStream(vtkObjectBase* owner = 0);
   ~vtkClientServerStream();
   //@}
 
@@ -48,7 +48,7 @@ public:
   /**
    * Copy constructor and assignment operator copy all stream data.
    */
-  vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner=0);
+  vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner = 0);
   vtkClientServerStream& operator=(const vtkClientServerStream&);
   //@}
 
@@ -57,25 +57,44 @@ public:
    * This must be kept in sync with the string table in this class's
    * .cxx file.
    */
-  enum Commands { New, Invoke, Delete, Assign,
-                  Reply, Error, EndOfCommands};
+  enum Commands
+  {
+    New,
+    Invoke,
+    Delete,
+    Assign,
+    Reply,
+    Error,
+    EndOfCommands
+  };
 
   /**
    * Enumeration of data types that may be stored in a stream.  This
    * must be kept in sync with the string table in this class's .cxx
    * file.
    */
-  enum Types {
-    int8_value, int8_array,
-    int16_value, int16_array,
-    int32_value, int32_array,
-    int64_value, int64_array,
-    uint8_value, uint8_array,
-    uint16_value, uint16_array,
-    uint32_value, uint32_array,
-    uint64_value, uint64_array,
-    float32_value, float32_array,
-    float64_value, float64_array,
+  enum Types
+  {
+    int8_value,
+    int8_array,
+    int16_value,
+    int16_array,
+    int32_value,
+    int32_array,
+    int64_value,
+    int64_array,
+    uint8_value,
+    uint8_array,
+    uint16_value,
+    uint16_array,
+    uint32_value,
+    uint32_array,
+    uint64_value,
+    uint64_array,
+    float32_value,
+    float32_array,
+    float64_value,
+    float64_array,
     bool_value,
     string_value,
     id_value,
@@ -204,8 +223,7 @@ public:
    * particular vtkObjectBase type.  Returns whether the argument is
    * really of the requested type.
    */
-  int GetArgumentObject(int message, int argument, vtkObjectBase** value,
-                        const char* type) const;
+  int GetArgumentObject(int message, int argument, vtkObjectBase** value, const char* type) const;
 
   //@{
   /**
@@ -224,8 +242,7 @@ public:
    * sent to another stream.  Returns an empty argument if it either
    * index is out of range.
    */
-  vtkClientServerStream::Argument GetArgument(int message,
-                                              int argument) const;
+  vtkClientServerStream::Argument GetArgument(int message, int argument) const;
 
   /**
    * Get a pointer to the stream data and its length.  The values are
@@ -256,42 +273,42 @@ public:
   /**
    * Stream operators for special types.
    */
-  vtkClientServerStream& operator << (vtkClientServerStream::Commands);
-  vtkClientServerStream& operator << (vtkClientServerStream::Types);
-  vtkClientServerStream& operator << (vtkClientServerStream::Argument);
-  vtkClientServerStream& operator << (vtkClientServerStream::Array);
-  vtkClientServerStream& operator << (const vtkClientServerStream&);
-  vtkClientServerStream& operator << (vtkClientServerID);
-  vtkClientServerStream& operator << (vtkObjectBase*);
-  vtkClientServerStream& operator << (const vtkStdString&);
-  vtkClientServerStream& operator << (const vtkVariant&);
+  vtkClientServerStream& operator<<(vtkClientServerStream::Commands);
+  vtkClientServerStream& operator<<(vtkClientServerStream::Types);
+  vtkClientServerStream& operator<<(vtkClientServerStream::Argument);
+  vtkClientServerStream& operator<<(vtkClientServerStream::Array);
+  vtkClientServerStream& operator<<(const vtkClientServerStream&);
+  vtkClientServerStream& operator<<(vtkClientServerID);
+  vtkClientServerStream& operator<<(vtkObjectBase*);
+  vtkClientServerStream& operator<<(const vtkStdString&);
+  vtkClientServerStream& operator<<(const vtkVariant&);
   //@}
 
   //@{
   /**
    * Stream operators for native types.
    */
-  vtkClientServerStream& operator << (bool value);
-  vtkClientServerStream& operator << (char value);
-  vtkClientServerStream& operator << (short value);
-  vtkClientServerStream& operator << (int value);
-  vtkClientServerStream& operator << (long value);
-  vtkClientServerStream& operator << (signed char value);
-  vtkClientServerStream& operator << (unsigned char value);
-  vtkClientServerStream& operator << (unsigned short value);
-  vtkClientServerStream& operator << (unsigned int value);
-  vtkClientServerStream& operator << (unsigned long value);
+  vtkClientServerStream& operator<<(bool value);
+  vtkClientServerStream& operator<<(char value);
+  vtkClientServerStream& operator<<(short value);
+  vtkClientServerStream& operator<<(int value);
+  vtkClientServerStream& operator<<(long value);
+  vtkClientServerStream& operator<<(signed char value);
+  vtkClientServerStream& operator<<(unsigned char value);
+  vtkClientServerStream& operator<<(unsigned short value);
+  vtkClientServerStream& operator<<(unsigned int value);
+  vtkClientServerStream& operator<<(unsigned long value);
 #if defined(VTK_TYPE_USE_LONG_LONG)
-  vtkClientServerStream& operator << (long long value);
-  vtkClientServerStream& operator << (unsigned long long value);
+  vtkClientServerStream& operator<<(long long value);
+  vtkClientServerStream& operator<<(unsigned long long value);
 #endif
 #if defined(VTK_TYPE_USE___INT64)
-  vtkClientServerStream& operator << (__int64 value);
-  vtkClientServerStream& operator << (unsigned __int64 value);
+  vtkClientServerStream& operator<<(__int64 value);
+  vtkClientServerStream& operator<<(unsigned __int64 value);
 #endif
-  vtkClientServerStream& operator << (float value);
-  vtkClientServerStream& operator << (double value);
-  vtkClientServerStream& operator << (const char *value);
+  vtkClientServerStream& operator<<(float value);
+  vtkClientServerStream& operator<<(double value);
+  vtkClientServerStream& operator<<(const char* value);
   //@}
 
   //@{
@@ -338,8 +355,7 @@ public:
    * the index is too high, the last name is used.
    */
   static const char* GetStringFromType(vtkClientServerStream::Types type);
-  static const char* GetStringFromType(vtkClientServerStream::Types type,
-                                       int index);
+  static const char* GetStringFromType(vtkClientServerStream::Types type, int index);
   //@}
 
   /**
@@ -359,8 +375,7 @@ public:
    * vtkClientServerStream::EndOfCommands if the string is not
    * recognized.
    */
-  static
-  vtkClientServerStream::Commands GetCommandFromString(const char* name);
+  static vtkClientServerStream::Commands GetCommandFromString(const char* name);
 
   //@{
   /**
@@ -396,28 +411,29 @@ protected:
 
   // Data parsing utilities for SetData.
   int ParseData();
-  unsigned char* ParseCommand(int order, unsigned char* data,
-                              unsigned char* begin, unsigned char* end);
+  unsigned char* ParseCommand(
+    int order, unsigned char* data, unsigned char* begin, unsigned char* end);
   void ParseEnd();
-  unsigned char* ParseType(int order, unsigned char* data,
-                           unsigned char* begin, unsigned char* end,
-                           vtkClientServerStream::Types* type);
-  unsigned char* ParseValue(int order, unsigned char* data,
-                            unsigned char* end, unsigned int wordSize);
-  unsigned char* ParseArray(int order, unsigned char* data,
-                            unsigned char* end, unsigned int wordSize);
-  unsigned char* ParseString(int order, unsigned char* data,
-                             unsigned char* end);
-  unsigned char* ParseStream(int order, unsigned char* data,
-                             unsigned char* end);
+  unsigned char* ParseType(int order, unsigned char* data, unsigned char* begin, unsigned char* end,
+    vtkClientServerStream::Types* type);
+  unsigned char* ParseValue(
+    int order, unsigned char* data, unsigned char* end, unsigned int wordSize);
+  unsigned char* ParseArray(
+    int order, unsigned char* data, unsigned char* end, unsigned int wordSize);
+  unsigned char* ParseString(int order, unsigned char* data, unsigned char* end);
+  unsigned char* ParseStream(int order, unsigned char* data, unsigned char* end);
 
   // Enumeration of possible byte orderings of data in the stream.
-  enum { BigEndian, LittleEndian };
+  enum
+  {
+    BigEndian,
+    LittleEndian
+  };
 
   // Byte swap data in the given byte order to match the current
   // machine's byte order.
-  void PerformByteSwap(int dataByteOrder, unsigned char* data,
-                       unsigned int numWords, unsigned int wordSize);
+  void PerformByteSwap(
+    int dataByteOrder, unsigned char* data, unsigned int numWords, unsigned int wordSize);
 
   // Get a pointer to the given value within the given message.
   // Returns 0 if either index is out of range.
@@ -430,8 +446,7 @@ protected:
 
   // Internal implementation shared between PrintArgument and
   // PrintArgumentValue.
-  void PrintArgumentInternal(ostream&, int message, int argument,
-                             int annotate, vtkIndent) const;
+  void PrintArgumentInternal(ostream&, int message, int argument, int annotate, vtkIndent) const;
 
   // String writing routines.
   void StreamToString(ostream& os, vtkIndent indent) const;
@@ -439,25 +454,19 @@ protected:
   void MessageToString(ostream& os, int m, vtkIndent indent) const;
   void ArgumentToString(ostream& os, int m, int a) const;
   void ArgumentToString(ostream& os, int m, int a, vtkIndent indent) const;
-  void ArgumentValueToString(ostream& os, int m, int a,
-                             vtkIndent indent) const;
+  void ArgumentValueToString(ostream& os, int m, int a, vtkIndent indent) const;
 
   // Allow strings without null terminators to be passed into the stream.
-  static vtkClientServerStream::Array InsertString(const char* begin,
-                                                   const char* end);
+  static vtkClientServerStream::Array InsertString(const char* begin, const char* end);
 
   // String reading routines.
-  static vtkClientServerStream::Types GetTypeFromString(const char* begin,
-                                                        const char* end);
-  static
-  vtkClientServerStream::Commands GetCommandFromString(const char* begin,
-                                                       const char* end);
+  static vtkClientServerStream::Types GetTypeFromString(const char* begin, const char* end);
+  static vtkClientServerStream::Commands GetCommandFromString(const char* begin, const char* end);
 
   int StreamFromStringInternal(const char* begin, const char* end);
-  int AddMessageFromString(const char* begin, const char* end,
-                           const char** next);
-  int AddArgumentFromString(const char* begin, const char* end,
-                            const char** next);
+  int AddMessageFromString(const char* begin, const char* end, const char** next);
+  int AddArgumentFromString(const char* begin, const char* end, const char** next);
+
 private:
   vtkClientServerStreamInternals* Internal;
   friend class vtkClientServerStreamInternals;
@@ -470,17 +479,15 @@ private:
  * argument was really of the requested type.
  */
 template <class T>
-int
-vtkClientServerStreamGetArgumentObject(const vtkClientServerStream& msg,
-                                       int message, int argument,
-                                       T** result, const char* type)
+int vtkClientServerStreamGetArgumentObject(
+  const vtkClientServerStream& msg, int message, int argument, T** result, const char* type)
 {
   vtkObjectBase* obj;
-  if(msg.GetArgumentObject(message, argument, &obj, type))
-    {
+  if (msg.GetArgumentObject(message, argument, &obj, type))
+  {
     *result = reinterpret_cast<T*>(obj);
     return 1;
-    }
+  }
   return 0;
 }
 //@}
@@ -494,39 +501,39 @@ class vtkClientServerStreamDataArg
 public:
   // Constructor checks the argument type and length, allocates
   // memory, and extracts the data from the message.
-  vtkClientServerStreamDataArg(const vtkClientServerStream& msg,
-                               int message, int argument): Data(0)
-    {
+  vtkClientServerStreamDataArg(const vtkClientServerStream& msg, int message, int argument)
+    : Data(0)
+  {
     // Check the argument length.
     vtkTypeUInt32 length = 0;
-    if(msg.GetArgumentLength(message, argument, &length) && length > 0)
-      {
+    if (msg.GetArgumentLength(message, argument, &length) && length > 0)
+    {
       // Allocate memory without throwing.
       try
-        {
-        this->Data = new T[length];
-        }
-      catch(...)
-        {
-        }
-      }
-
-    // Extract the data into the allocated memory.
-    if(this->Data && !msg.GetArgument(message, argument, this->Data, length))
       {
-      delete [] this->Data;
-      this->Data = 0;
+        this->Data = new T[length];
+      }
+      catch (...)
+      {
       }
     }
+
+    // Extract the data into the allocated memory.
+    if (this->Data && !msg.GetArgument(message, argument, this->Data, length))
+    {
+      delete[] this->Data;
+      this->Data = 0;
+    }
+  }
 
   // Destructor frees data memory.
   ~vtkClientServerStreamDataArg()
+  {
+    if (this->Data)
     {
-    if(this->Data)
-      {
-      delete [] this->Data;
-      }
+      delete[] this->Data;
     }
+  }
 
   // Allow this object to be passed as if it were a pointer.
   operator T*() { return this->Data; }

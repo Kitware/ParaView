@@ -45,8 +45,8 @@ class vtkPVDataInformation;
 class vtkPVArrayInformation;
 class vtkChartRepresentation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesSelectionDomain :
-  public vtkSMStringListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesSelectionDomain
+  : public vtkSMStringListDomain
 {
 public:
   static vtkSMChartSeriesSelectionDomain* New();
@@ -60,13 +60,13 @@ public:
   virtual void Update(vtkSMProperty*);
 
   enum DefaultModes
-    {
+  {
     UNDEFINED,
     VISIBILITY,
     LABEL,
     COLOR,
     VALUE
-    };
+  };
 
   /**
    * Set the property's default value based on the domain. How the value is
@@ -91,9 +91,10 @@ public:
    * (b) setting default visibility to off.
    */
   static void SetLoadNoChartVariables(bool choice)
-  { vtkSMChartSeriesSelectionDomain::LoadNoVariables = choice; }
-  static bool GetLoadNoChartVariables()
-  { return vtkSMChartSeriesSelectionDomain::LoadNoVariables; }
+  {
+    vtkSMChartSeriesSelectionDomain::LoadNoVariables = choice;
+  }
+  static bool GetLoadNoChartVariables() { return vtkSMChartSeriesSelectionDomain::LoadNoVariables; }
 
 protected:
   vtkSMChartSeriesSelectionDomain();
@@ -125,22 +126,18 @@ protected:
    * Add arrays from dataInfo to strings. If blockName is non-empty, then it's
    * used to "uniquify" the array names.
    */
-  virtual void PopulateAvailableArrays(
-    const std::string& blockName,
-    std::vector<vtkStdString>& strings,
-    vtkPVDataInformation* dataInfo, int fieldAssociation, bool flattenTable);
+  virtual void PopulateAvailableArrays(const std::string& blockName,
+    std::vector<vtkStdString>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
+    bool flattenTable);
 
   /**
    * Build up the domain with provided array.
    * Add array component from dataArray to strings. If blockName is non-empty, then it's
    * used to "uniquify" the array names.
    */
-  virtual void PopulateArrayComponents(
-    vtkChartRepresentation* chartRepr,
-    const std::string& blockName, 
-    std::vector<vtkStdString>& strings,
-    std::set<vtkStdString>& unique_strings, 
-    vtkPVArrayInformation* dataInfo, bool flattenTable);
+  virtual void PopulateArrayComponents(vtkChartRepresentation* chartRepr,
+    const std::string& blockName, std::vector<vtkStdString>& strings,
+    std::set<vtkStdString>& unique_strings, vtkPVArrayInformation* dataInfo, bool flattenTable);
 
   /**
    * Call this method in PopulateAvailableArrays() to override a specific array's
@@ -177,7 +174,6 @@ private:
   // property's value.
   void OnDomainModified();
   void UpdateDefaultValues(vtkSMProperty*, bool preserve_previous_values);
-
 };
 
 #endif

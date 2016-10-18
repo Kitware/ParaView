@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,21 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * content so the content can only be selected and Copy to the clipboard.
 */
 
-class PQCORE_EXPORT pqNonEditableStyledItemDelegate :
-  public QStyledItemDelegate
+class PQCORE_EXPORT pqNonEditableStyledItemDelegate : public QStyledItemDelegate
 {
   typedef QStyledItemDelegate Superclass;
 
   Q_OBJECT
 
 public:
-  pqNonEditableStyledItemDelegate(QObject * parent = 0);
-  virtual QWidget* createEditor (
-      QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+  pqNonEditableStyledItemDelegate(QObject* parent = 0);
+  virtual QWidget* createEditor(
+    QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
   Q_DISABLE_COPY(pqNonEditableStyledItemDelegate)
 };
 
 #endif
-

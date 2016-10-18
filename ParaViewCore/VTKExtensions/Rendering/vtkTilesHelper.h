@@ -67,24 +67,22 @@ public:
    * i.e. treating all tiles as one large display if TileDimensions > (1, 1).
    * Returns false to indicate the result hasn't been computed.
    */
-  bool GetTileViewport(const double *viewport, int rank,
-    int out_tile_viewport[4]);
+  bool GetTileViewport(const double* viewport, int rank, int out_tile_viewport[4]);
 
   /**
    * Same as GetTileViewport() except that the returns values are in
    * normalized-display coordinates instead of display coordinates.
    * Returns false to indicate the result hasn't been computed.
    */
-  bool GetNormalizedTileViewport(const double* viewport, int rank,
-    double out_tile_viewport[4]);
+  bool GetNormalizedTileViewport(const double* viewport, int rank, double out_tile_viewport[4]);
 
   /**
    * Given a global-viewport for a renderer, returns the physical viewport on
    * the rank indicated.
    * Returns false to indicate the result hasn't been computed.
    */
-  bool GetPhysicalViewport(const double *global_viewport, int rank,
-    double out_phyiscal_viewport[4]);
+  bool GetPhysicalViewport(
+    const double* global_viewport, int rank, double out_phyiscal_viewport[4]);
 
   /**
    * Given the rank, returns the tile location.
@@ -102,7 +100,6 @@ protected:
 private:
   vtkTilesHelper(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

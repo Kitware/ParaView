@@ -18,10 +18,10 @@
  * undone/redone in a single step.
  *
  * This is a concrete class that stores a collection of vtkUndoElement objects.
- * A vtkUndoSet object represents an atomic undo-redoable operation. It can 
+ * A vtkUndoSet object represents an atomic undo-redoable operation. It can
  * contain one or more vtkUndoElement objects. When added vtkUndoElement objects
  * to a vtkUndoSet they must be added in the sequence of operation. When undoing
- * the operations are performed in reverse order, while when redoing they are 
+ * the operations are performed in reverse order, while when redoing they are
  * performed in forward order.
  *
  * vtkUndoElement, vtkUndoSet and vtkUndoStack form the undo/redo framework core.
@@ -92,11 +92,10 @@ protected:
 
   vtkCollection* Collection;
   vtkCollection* TmpWorkingCollection;
+
 private:
   vtkUndoSet(const vtkUndoSet&) VTK_DELETE_FUNCTION;
   void operator=(const vtkUndoSet&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

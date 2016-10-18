@@ -40,7 +40,7 @@ public:
    */
   static vtkInformationDoubleVectorKey* WHOLE_BOUNDING_BOX();
 };
-  //@}
+//@}
 
 #endif // vtkPVInformationKeys_h
 // VTK-HeaderTest-Exclude: vtkPVInformationKeys.h

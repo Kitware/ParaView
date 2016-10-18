@@ -57,15 +57,16 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSplinePropertyWidget : public pqInteracti
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
   enum ModeTypes
-    {
-    SPLINE=0,
-    POLYLINE=1
-    };
+  {
+    SPLINE = 0,
+    POLYLINE = 1
+  };
 
   pqSplinePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode=SPLINE, QWidget* parent=0);
+    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode = SPLINE, QWidget* parent = 0);
   virtual ~pqSplinePropertyWidget();
 
 public slots:
@@ -81,6 +82,7 @@ private slots:
   void addPoint();
   void removePoints();
   void pick(double x, double y, double z);
+
 private:
   Q_DISABLE_COPY(pqSplinePropertyWidget)
   class pqInternals;

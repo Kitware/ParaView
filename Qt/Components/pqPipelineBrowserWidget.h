@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -50,15 +50,16 @@ class PQCOMPONENTS_EXPORT pqPipelineBrowserWidget : public pqFlatTreeView
 {
   Q_OBJECT
   typedef pqFlatTreeView Superclass;
+
 public:
-  pqPipelineBrowserWidget(QWidget* parent=0);
+  pqPipelineBrowserWidget(QWidget* parent = 0);
   virtual ~pqPipelineBrowserWidget();
 
   /**
   * Used to monitor the key press events in the tree view.
   * Returns True if the event should not be sent to the object.
   */
-  virtual bool eventFilter(QObject *object, QEvent *e);
+  virtual bool eventFilter(QObject* object, QEvent* e);
 
   /**
   * Set the visibility of selected items.
@@ -118,7 +119,7 @@ public slots:
 
 protected slots:
   void handleIndexClicked(const QModelIndex& index);
-  void expandWithModelIndexTranslation(const QModelIndex &);
+  void expandWithModelIndexTranslation(const QModelIndex&);
 
 protected:
   /**
@@ -139,5 +140,3 @@ private:
 };
 
 #endif
-
-

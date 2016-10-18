@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,26 +53,23 @@ public:
   QTimer Timer;
 
   pqInternals()
-    {
+  {
     this->Timer.setInterval(100);
     this->Timer.setSingleShot(true);
-    }
+  }
 };
 
 //-----------------------------------------------------------------------------
-pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(
-  QHelpEngine* parentObject)
-  : Superclass(parentObject),
-  Internals(new pqInternals())
+pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(QHelpEngine* parentObject)
+  : Superclass(parentObject)
+  , Internals(new pqInternals())
 {
   Q_ASSERT(parentObject != NULL);
 
-  QObject::connect(&this->Internals->Timer,
-    SIGNAL(timeout()), this, SLOT(refreshHelpEngine()));
+  QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(refreshHelpEngine()));
 
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
-  pqCoreUtilities::connect(tracker, vtkCommand::RegisterEvent,
-    this, SLOT(updatePlugins()));
+  pqCoreUtilities::connect(tracker, vtkCommand::RegisterEvent, this, SLOT(updatePlugins()));
   this->updatePlugins();
 }
 
@@ -87,23 +84,22 @@ pqPluginDocumentationBehavior::~pqPluginDocumentationBehavior()
 void pqPluginDocumentationBehavior::updatePlugins()
 {
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
-  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
-    {
+  for (unsigned int cc = 0; cc < tracker->GetNumberOfPlugins(); cc++)
+  {
     if (tracker->GetPluginLoaded(cc))
-      {
+    {
       this->updatePlugin(tracker->GetPlugin(cc));
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
 {
-  if (!plugin ||
-    this->Internals->RegisteredPlugins.contains(plugin->GetPluginName()))
-    {
+  if (!plugin || this->Internals->RegisteredPlugins.contains(plugin->GetPluginName()))
+  {
     return;
-    }
+  }
 
   std::vector<std::string> resources;
   plugin->GetBinaryResources(resources);
@@ -111,35 +107,33 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
   QHelpEngine* engine = qobject_cast<QHelpEngine*>(this->parent());
   Q_ASSERT(engine);
 
-  for (size_t cc=0; cc < resources.size(); cc++)
-    {
+  for (size_t cc = 0; cc < resources.size(); cc++)
+  {
     const std::string& str = resources[cc];
     unsigned char* decoded_stream = new unsigned char[str.size()];
-    size_t length = vtksysBase64_Decode(
-      reinterpret_cast<const unsigned char*>(str.c_str()),
-      static_cast<unsigned long>(str.size()),
-      decoded_stream,
-      0);
+    size_t length = vtksysBase64_Decode(reinterpret_cast<const unsigned char*>(str.c_str()),
+      static_cast<unsigned long>(str.size()), decoded_stream, 0);
 
     // the file gets deleted with the pqPluginDocumentationBehavior is deleted.
     QTemporaryFile* file = new QTemporaryFile(this);
     if (!file->open())
-      {
+    {
       qCritical() << "Failed to create temporary files." << endl;
-      delete [] decoded_stream;
+      delete[] decoded_stream;
       decoded_stream = NULL;
       continue;
-      }
-    qint64 written = file->write(reinterpret_cast<char*>(decoded_stream), static_cast<qint64>(length));
+    }
+    qint64 written =
+      file->write(reinterpret_cast<char*>(decoded_stream), static_cast<qint64>(length));
     Q_ASSERT(written == static_cast<qint64>(length));
     (void)written;
     engine->registerDocumentation(file->fileName());
 
-    delete [] decoded_stream;
+    delete[] decoded_stream;
     decoded_stream = NULL;
 
     this->Internals->Timer.start();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

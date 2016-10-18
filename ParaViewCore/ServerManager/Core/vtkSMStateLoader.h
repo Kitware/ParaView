@@ -16,7 +16,7 @@
  * @class   vtkSMStateLoader
  * @brief   Utility class to load state from XML
  *
- * vtkSMStateLoader can load server manager state from a given 
+ * vtkSMStateLoader can load server manager state from a given
  * vtkPVXMLElement. This element is usually populated by a vtkPVXMLParser.
  * @sa
  * vtkPVXMLParser vtkPVXMLElement
@@ -28,7 +28,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"
 
-#include <map> // needed for API
+#include <map>    // needed for API
 #include <string> // needed for API
 
 class vtkPVXMLElement;
@@ -75,7 +75,8 @@ public:
    * [key, value, key, value, ...]
    * The array is kept internaly using a std::vector
    */
-  vtkTypeUInt32* GetMappingArray(int &size);
+  vtkTypeUInt32* GetMappingArray(int& size);
+
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
@@ -106,8 +107,8 @@ protected:
    * Overridden so that when new views are to be created, we create views
    * suitable for the connection.
    */
-  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
-                                  const char* subProxyName = NULL);
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL);
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
@@ -123,8 +124,7 @@ protected:
    * the proxy should be registered as (as indicated in the state file).
    */
   virtual void RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
-  virtual void RegisterProxyInternal(const char* group, 
-    const char* name, vtkSMProxy* proxy);
+  virtual void RegisterProxyInternal(const char* group, const char* name, vtkSMProxy* proxy);
   //@}
 
   /**
@@ -136,8 +136,7 @@ protected:
    * @param[in]     proxy  proxy being registered
    * @returns true to continue registering the proxy, false to skip registering it.
    */
-  virtual bool UpdateRegistrationInfo(
-    std::string& group, std::string& name, vtkSMProxy* proxy);
+  virtual bool UpdateRegistrationInfo(std::string& group, std::string& name, vtkSMProxy* proxy);
 
   /**
    * Return the xml element for the state of the proxy with the given id.
@@ -166,6 +165,7 @@ protected:
   vtkPVXMLElement* ServerManagerStateElement;
   vtkSMProxyLocator* ProxyLocator;
   int KeepIdMapping;
+
 private:
   vtkSMStateLoader(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;

@@ -28,7 +28,8 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxyInitializationHelper.h"
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPLYWriterProxyInitializationHelper : public vtkSMProxyInitializationHelper
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPLYWriterProxyInitializationHelper
+  : public vtkSMProxyInitializationHelper
 {
 public:
   static vtkSMPLYWriterProxyInitializationHelper* New();
@@ -42,7 +43,8 @@ protected:
   ~vtkSMPLYWriterProxyInitializationHelper();
 
 private:
-  vtkSMPLYWriterProxyInitializationHelper(const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
+  vtkSMPLYWriterProxyInitializationHelper(
+    const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
 };
 

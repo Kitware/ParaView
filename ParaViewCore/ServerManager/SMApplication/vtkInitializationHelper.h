@@ -27,13 +27,13 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerApplicationModule.h" // needed for exports
-#include <string> // needed for std::string
+#include <string>                                // needed for std::string
 class vtkPVOptions;
 
 class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkInitializationHelper,vtkObject);
+  vtkTypeMacro(vtkInitializationHelper, vtkObject);
   void PrintSelf(ostream&, vtkIndent);
 
   //@{
@@ -50,7 +50,7 @@ public:
    * command line arguments and the vtkPVOptions instance to use to process the
    * command line options.
    */
-  static void Initialize(int argc, char**argv, int type, vtkPVOptions* options);
+  static void Initialize(int argc, char** argv, int type, vtkPVOptions* options);
 
   /**
    * Finalizes the server manager. Do not use the server manager
@@ -84,8 +84,8 @@ public:
    * Sets the organization producing this application. This is
    * "ParaView" by default, but can be different for branded applications.
    */
-  static void SetOrganizationName(const std::string & organizationName);
-  static const std::string & GetOrganizationName();
+  static void SetOrganizationName(const std::string& organizationName);
+  static const std::string& GetOrganizationName();
   //@}
 
   //@{
@@ -93,13 +93,13 @@ public:
    * Sets the name of the application. This is "ParaView" by default, but
    * can be different for branded applications.
    */
-  static void SetApplicationName(const std::string & appName);
-  static const std::string & GetApplicationName();
+  static void SetApplicationName(const std::string& appName);
+  static const std::string& GetApplicationName();
   //@}
 
 protected:
-  vtkInitializationHelper() {};
-  virtual ~vtkInitializationHelper() {};
+  vtkInitializationHelper(){};
+  virtual ~vtkInitializationHelper(){};
 
   /**
    * Load user and site settings

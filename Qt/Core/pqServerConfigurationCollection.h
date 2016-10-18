@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -61,8 +61,9 @@ class PQCORE_EXPORT pqServerConfigurationCollection : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqServerConfigurationCollection(QObject* parent=0);
+  pqServerConfigurationCollection(QObject* parent = 0);
   virtual ~pqServerConfigurationCollection();
 
   /**
@@ -89,7 +90,7 @@ public:
   /**
   * Add a server configuration.
   */
-  void addConfiguration(vtkPVXMLElement* configuration, bool mutable_config=true);
+  void addConfiguration(vtkPVXMLElement* configuration, bool mutable_config = true);
   void addConfiguration(const pqServerConfiguration&);
 
   /**
@@ -105,15 +106,13 @@ public:
   /**
   * returns the configurations matching the selector's host.
   */
-  QList<pqServerConfiguration> configurations(
-    const pqServerResource& selector) const;
+  QList<pqServerConfiguration> configurations(const pqServerResource& selector) const;
 
   /**
   * Returns a configuration with the given name. Returns NULL when none is
   * found.
   */
-  const pqServerConfiguration* configuration(
-    const char* configuration_name) const;
+  const pqServerConfiguration* configuration(const char* configuration_name) const;
 
 signals:
   /**

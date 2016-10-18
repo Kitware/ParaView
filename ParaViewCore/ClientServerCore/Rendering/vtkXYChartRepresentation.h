@@ -143,8 +143,7 @@ protected:
    */
   virtual bool RemoveFromView(vtkView* view);
 
-  virtual int RequestData(vtkInformation *,
-    vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual void PrepareForRendering();
 
@@ -162,7 +161,6 @@ private:
   bool PlotDataHasChanged;
   double SelectionColor[3];
   char* SeriesLabelPrefix;
-
 };
 
 #endif

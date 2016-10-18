@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,11 +48,10 @@ class QTreeWidgetItem;
 * It also updates the list of available values every time
 * the domain changes.
 * Example use of this adaptor is to connect :
-* \li "AddVolumeArrayName" property of a CTHPart filter to a 
+* \li "AddVolumeArrayName" property of a CTHPart filter to a
 *     pqTreeWidget widget.
 * \li "Functions" property of "P3DReader" with a pqTreeWidget.
 */
-
 
 class PQCOMPONENTS_EXPORT pqSignalAdaptorSelectionTreeWidget : public QObject
 {
@@ -65,8 +64,7 @@ public:
   *        can obtain the list of possible values for this widget.
   * \param treeWidget The QTreeWidget controlled by this adaptor.
   */
-  pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget,
-                                     vtkSMProperty* property);
+  pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget, vtkSMProperty* property);
 
   virtual ~pqSignalAdaptorSelectionTreeWidget();
 
@@ -85,11 +83,10 @@ public:
   * The signature for the callback is:
   * QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
   */
-  void setItemCreatorFunction(
-    QTreeWidgetItem* (fptr)(QTreeWidget*, const QStringList&))
-    {
+  void setItemCreatorFunction(QTreeWidgetItem*(fptr)(QTreeWidget*, const QStringList&))
+  {
     this->ItemCreatorFunctionPtr = fptr;
-    }
+  }
 
 signals:
   /**
@@ -99,7 +96,7 @@ signals:
 
 public slots:
   /**
-  * Set the selected value on the widget. All the strings in the 
+  * Set the selected value on the widget. All the strings in the
   * \values are set as selected in the tree widget.
   * If a string is present that is not in the domain, it will
   * be ignored.
@@ -123,4 +120,3 @@ private:
 };
 
 #endif
-

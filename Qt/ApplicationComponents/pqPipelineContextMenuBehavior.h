@@ -57,8 +57,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObj
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqPipelineContextMenuBehavior(QObject* parent=0);
+  pqPipelineContextMenuBehavior(QObject* parent = 0);
   virtual ~pqPipelineContextMenuBehavior();
 
 protected slots:
@@ -142,8 +143,7 @@ protected:
   /**
   * called to build the color arrays submenu.
   */
-  virtual void buildColorFieldsMenu(
-    pqPipelineRepresentation* pipelineRepr, QMenu* menu);
+  virtual void buildColorFieldsMenu(pqPipelineRepresentation* pipelineRepr, QMenu* menu);
 
   /**
   * event filter to capture the right-click. We don't directly use mechanisms
@@ -162,9 +162,9 @@ protected:
   QPoint Position;
   QPointer<pqDataRepresentation> PickedRepresentation;
   QList<unsigned int> PickedBlocks;
+
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
-
 };
 
 #endif

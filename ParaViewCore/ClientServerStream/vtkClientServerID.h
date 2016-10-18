@@ -31,33 +31,29 @@
 
 struct VTKCLIENTSERVER_EXPORT vtkClientServerID
 {
-  vtkClientServerID() : ID(0) {}
-  explicit vtkClientServerID(vtkTypeUInt32 id) : ID(id) {}
+  vtkClientServerID()
+    : ID(0)
+  {
+  }
+  explicit vtkClientServerID(vtkTypeUInt32 id)
+    : ID(id)
+  {
+  }
 
   bool IsNull() { return this->ID == 0; }
   void SetToNull() { this->ID = 0; }
 
   // Convenience operators.
-  bool operator<(const vtkClientServerID& i) const
-    {
-    return this->ID < i.ID;
-    }
-  bool operator==(const vtkClientServerID& i) const
-    {
-    return this->ID == i.ID;
-    }
-  bool operator!=(const vtkClientServerID& i) const
-    {
-    return this->ID != i.ID;
-    }
+  bool operator<(const vtkClientServerID& i) const { return this->ID < i.ID; }
+  bool operator==(const vtkClientServerID& i) const { return this->ID == i.ID; }
+  bool operator!=(const vtkClientServerID& i) const { return this->ID != i.ID; }
   // The identifying integer.
   vtkTypeUInt32 ID;
 };
 
-VTKCLIENTSERVER_EXPORT ostream& operator<<(
-  ostream& os, const vtkClientServerID& id);
+VTKCLIENTSERVER_EXPORT ostream& operator<<(ostream& os, const vtkClientServerID& id);
 VTKCLIENTSERVER_EXPORT vtkOStreamWrapper& operator<<(
   vtkOStreamWrapper& os, const vtkClientServerID& id);
-                      
+
 #endif
 // VTK-HeaderTest-Exclude: vtkClientServerID.h

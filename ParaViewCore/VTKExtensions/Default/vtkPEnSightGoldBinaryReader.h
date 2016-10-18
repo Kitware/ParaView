@@ -46,18 +46,17 @@ class vtkPoints;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkPEnSightReader
 {
- public:
-  static vtkPEnSightGoldBinaryReader *New();
+public:
+  static vtkPEnSightGoldBinaryReader* New();
   vtkTypeMacro(vtkPEnSightGoldBinaryReader, vtkPEnSightReader);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
- protected:
+protected:
   vtkPEnSightGoldBinaryReader();
   ~vtkPEnSightGoldBinaryReader();
 
   // Returns 1 if successful.  Sets file size as a side action.
   int OpenFile(const char* filename);
-
 
   // Returns 1 if successful.  Handles constructing the filename, opening the file and checking
   // if it's binary
@@ -66,97 +65,87 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
   /**
    * Read the geometry file.  If an error occurred, 0 is returned; otherwise 1.
    */
-  virtual int ReadGeometryFile(const char* fileName, int timeStep,
-                               vtkMultiBlockDataSet *output);
+  virtual int ReadGeometryFile(const char* fileName, int timeStep, vtkMultiBlockDataSet* output);
 
   /**
    * Read the measured geometry file.  If an error occurred, 0 is returned;
    * otherwise 1.
    */
-  virtual int ReadMeasuredGeometryFile(const char* fileName, int timeStep,
-                                       vtkMultiBlockDataSet *output);
+  virtual int ReadMeasuredGeometryFile(
+    const char* fileName, int timeStep, vtkMultiBlockDataSet* output);
 
   /**
    * Read scalars per node for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.  If there will be more than one component in
    * the data array, it is assumed that 0 is the first component added.
    */
-  virtual int ReadScalarsPerNode(const char* fileName, const char* description,
-                                 int timeStep, vtkMultiBlockDataSet *output,
-                                 int measured = 0, int numberOfComponents = 1,
-                                 int component = 0);
+  virtual int ReadScalarsPerNode(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output, int measured = 0, int numberOfComponents = 1, int component = 0);
 
   /**
    * Read vectors per node for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadVectorsPerNode(const char* fileName, const char* description,
-                                 int timeStep, vtkMultiBlockDataSet *output,
-                                 int measured = 0);
+  virtual int ReadVectorsPerNode(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output, int measured = 0);
 
   /**
    * Read tensors per node for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadTensorsPerNode(const char* fileName, const char* description,
-                                 int timeStep, vtkMultiBlockDataSet *output);
+  virtual int ReadTensorsPerNode(
+    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output);
 
   /**
    * Read scalars per element for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.  If there will be more than one componenet in the
    * data array, it is assumed that 0 is the first component added.
    */
-  virtual int ReadScalarsPerElement(const char* fileName, const char* description,
-                                    int timeStep, vtkMultiBlockDataSet *output,
-                                    int numberOfComponents = 1,
-                                    int component = 0);
+  virtual int ReadScalarsPerElement(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output, int numberOfComponents = 1, int component = 0);
 
   /**
    * Read vectors per element for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadVectorsPerElement(const char* fileName, const char* description,
-                                    int timeStep, vtkMultiBlockDataSet *output);
+  virtual int ReadVectorsPerElement(
+    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output);
 
   /**
    * Read tensors per element for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadTensorsPerElement(const char* fileName, const char* description,
-                                    int timeStep, vtkMultiBlockDataSet *output);
+  virtual int ReadTensorsPerElement(
+    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output);
 
   /**
    * Read an unstructured part (partId) from the geometry file and create a
    * vtkUnstructuredGrid output.  Return 0 if EOF reached. Return -1 if
    * an error occurred.
    */
-  virtual int CreateUnstructuredGridOutput(int partId,
-                                           char line[80],
-                                           const char* name,
-                                           vtkMultiBlockDataSet *output);
+  virtual int CreateUnstructuredGridOutput(
+    int partId, char line[80], const char* name, vtkMultiBlockDataSet* output);
 
   /**
    * Read a structured part from the geometry file and create a
    * vtkStructuredGrid output.  Return 0 if EOF reached.
    */
-  virtual int CreateStructuredGridOutput(int partId,
-                                         char line[256],
-                                         const char* name,
-                                         vtkMultiBlockDataSet *output);
+  virtual int CreateStructuredGridOutput(
+    int partId, char line[256], const char* name, vtkMultiBlockDataSet* output);
 
   /**
    * Read a structured part from the geometry file and create a
    * vtkRectilinearGrid output.  Return 0 if EOF reached.
    */
-  int CreateRectilinearGridOutput(int partId, char line[256], const char* name,
-                                  vtkMultiBlockDataSet *output);
+  int CreateRectilinearGridOutput(
+    int partId, char line[256], const char* name, vtkMultiBlockDataSet* output);
 
   /**
    * Read a structured part from the geometry file and create a
    * vtkImageData output.  Return 0 if EOF reached.
    */
-  int CreateImageDataOutput(int partId, char line[80], const char* name,
-                            vtkMultiBlockDataSet *output);
+  int CreateImageDataOutput(
+    int partId, char line[80], const char* name, vtkMultiBlockDataSet* output);
 
   /**
    * Internal function to read in a line up to 80 characters.
@@ -169,21 +158,21 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
    * Internal function to read in a single integer.
    * Returns zero if there was an error.
    */
-  int ReadInt(int *result);
-  int ReadPartId(int *result);
+  int ReadInt(int* result);
+  int ReadPartId(int* result);
   //@}
 
   /**
    * Internal function to read in an integer array.
    * Returns zero if there was an error.
    */
-  int ReadIntArray(int *result, int numInts);
+  int ReadIntArray(int* result, int numInts);
 
   /**
    * Internal function to read in a float array.
    * Returns zero if there was an error.
    */
-  int ReadFloatArray(float *result, int numFloats);
+  int ReadFloatArray(float* result, int numFloats);
 
   /**
    * Read Coordinates, or just skip the part in the file.
@@ -194,7 +183,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
    * Internal method to inject Coordinates and Global Ids at the end
    * of a part read for Unstructured data.
    */
-  int InjectCoordinatesAtEnd(vtkUnstructuredGrid* output, long coordinatesOffset, int partId );
+  int InjectCoordinatesAtEnd(vtkUnstructuredGrid* output, long coordinatesOffset, int partId);
 
   /**
    * Counts the number of timesteps in the geometry file
@@ -219,15 +208,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
   int ElementIdsListed;
   int Fortran;
 
-  ifstream *IFile;
+  ifstream* IFile;
   // The size of the file could be used to choose byte order.
   long FileSize;
 
   // Float Vector Buffer utils
-  void GetVectorFromFloatBuffer(int i, float *vector);
+  void GetVectorFromFloatBuffer(int i, float* vector);
   void UpdateFloatBuffer();
   // The buffer
-  float **FloatBuffer;
+  float** FloatBuffer;
   // The buffer size. Default is 1000
   int FloatBufferSize;
   // The FloatBuffer store the vectors
@@ -238,7 +227,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkP
   // Total number of vectors;
   int FloatBufferNumberOfVectors;
 
- private:
+private:
   vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
 };

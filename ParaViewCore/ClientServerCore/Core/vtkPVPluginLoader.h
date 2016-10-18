@@ -47,10 +47,8 @@ public:
   /**
    * Tries to the load the plugin given the path to the plugin file.
    */
-  bool LoadPlugin(const char* filename)
-    { return this->LoadPluginInternal(filename, false); }
-  bool LoadPluginSilently(const char* filename)
-    { return this->LoadPluginInternal(filename, true); }
+  bool LoadPlugin(const char* filename) { return this->LoadPluginInternal(filename, false); }
+  bool LoadPluginSilently(const char* filename) { return this->LoadPluginInternal(filename, true); }
 
   /**
    * Simply forwards the call to
@@ -153,7 +151,7 @@ protected:
    * Called by LoadPluginInternal() to do the final steps in loading of a
    * plugin.
    */
-  bool LoadPlugin(const char*file, vtkPVPlugin* plugin);
+  bool LoadPlugin(const char* file, vtkPVPlugin* plugin);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);
@@ -168,6 +166,7 @@ protected:
   char* SearchPaths;
   bool DebugPlugin;
   bool Loaded;
+
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;

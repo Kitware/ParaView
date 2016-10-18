@@ -28,7 +28,7 @@ class VTKPVCATALYST_EXPORT vtkCPDataDescription : public vtkObject
 {
 public:
   static vtkCPDataDescription* New();
-  vtkTypeMacro(vtkCPDataDescription,vtkObject);
+  vtkTypeMacro(vtkCPDataDescription, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Set the time step and current simulation time.
@@ -74,13 +74,13 @@ public:
   void ResetAll();
 
   /// Provides access to a grid description using the index.
-  vtkCPInputDataDescription *GetInputDescription(unsigned int);
- 
+  vtkCPInputDataDescription* GetInputDescription(unsigned int);
+
   /// Provides the name for the input description at the given index.
   const char* GetInputDescriptionName(unsigned int);
 
   /// Provides access to a grid description using the grid name.
-  vtkCPInputDataDescription *GetInputDescriptionByName(const char*);
+  vtkCPInputDataDescription* GetInputDescriptionByName(const char*);
 
   /// Returns true if the grid is necessary, given the grid's name.
   bool GetIfGridIsNecessary(const char*);
@@ -126,7 +126,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

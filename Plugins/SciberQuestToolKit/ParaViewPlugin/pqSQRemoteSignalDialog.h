@@ -47,10 +47,10 @@ class pqSQRemoteSignalDialogUI;
 
 class pqSQRemoteSignalDialog : public QDialog
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-  pqSQRemoteSignalDialog(QWidget *parent, Qt::WindowFlags f);
+  pqSQRemoteSignalDialog(QWidget* parent, Qt::WindowFlags f);
   ~pqSQRemoteSignalDialog();
 
   // Description:
@@ -70,14 +70,14 @@ public:
   void SetTrapFPEUnderflow(int enable);
   int GetTrapFPEUnderflow();
 
-  int GetModified(){ return this->Modified; }
+  int GetModified() { return this->Modified; }
 
 private slots:
-  void SetModified(){ ++this->Modified; }
+  void SetModified() { ++this->Modified; }
 
 private:
   int Modified;
-  pqSQRemoteSignalDialogUI *Ui;
+  pqSQRemoteSignalDialogUI* Ui;
 };
 
 #endif

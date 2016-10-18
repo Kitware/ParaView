@@ -20,9 +20,9 @@
  * not have different input types after input is set the first time. For
  * example, a sub-class vtkDataSetToDataSetFilter, once connected in
  * a pipeline can not change it's input type, say, from vtkImageData to
- * vtkUnstructuredGrid because it's output can not change. 
+ * vtkUnstructuredGrid because it's output can not change.
  * @sa
- * vtkSMDomain 
+ * vtkSMDomain
 */
 
 #ifndef vtkSMFixedTypeDomain_h
@@ -53,8 +53,7 @@ public:
    * Returns true if old and new source proxies have the same
    * output data type, false otherwise.
    */
-  virtual int IsInDomain(vtkSMSourceProxy* oldProxy,
-                         vtkSMSourceProxy* newProxy);
+  virtual int IsInDomain(vtkSMSourceProxy* oldProxy, vtkSMSourceProxy* newProxy);
 
 protected:
   vtkSMFixedTypeDomain();

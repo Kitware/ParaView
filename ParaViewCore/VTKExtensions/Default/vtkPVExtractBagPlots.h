@@ -30,8 +30,7 @@ class vtkMultiBlockDataSet;
 
 class PVExtractBagPlotsInternal;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractBagPlots
-  : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractBagPlots : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPVExtractBagPlots* New();
@@ -108,13 +107,13 @@ protected:
   vtkPVExtractBagPlots();
   virtual ~vtkPVExtractBagPlots();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   void GetEigenvalues(vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvalues);
-  void GetEigenvectors(vtkMultiBlockDataSet* outputMetaDS,
-    vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues);
+  void GetEigenvectors(
+    vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues);
 
   PVExtractBagPlotsInternal* Internal;
 
@@ -126,8 +125,8 @@ protected:
   bool UseSilvermanRule;
 
 private:
-  vtkPVExtractBagPlots( const vtkPVExtractBagPlots& ) VTK_DELETE_FUNCTION;
-  void operator = ( const vtkPVExtractBagPlots& ) VTK_DELETE_FUNCTION;
+  vtkPVExtractBagPlots(const vtkPVExtractBagPlots&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVExtractBagPlots&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVExtractBagPlots_h

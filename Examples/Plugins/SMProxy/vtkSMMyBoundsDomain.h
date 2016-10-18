@@ -19,8 +19,6 @@ public:
 protected:
   vtkSMMyBoundsDomain();
   ~vtkSMMyBoundsDomain();
-
 };
 
 #endif // vtkSMMyBoundsDomain_h
-

@@ -45,6 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqServerConnectReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * Constructor. Parent cannot be NULL.
@@ -68,8 +69,7 @@ public:
   /**
   * To connect to a server given a configuration, use this API.
   */
-  static bool connectToServerUsingConfiguration(
-    const pqServerConfiguration& config);
+  static bool connectToServerUsingConfiguration(const pqServerConfiguration& config);
 
   /**
   * Connect to server using the resource. This will create a temporary
@@ -81,8 +81,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { pqServerConnectReaction::connectToServerWithWarning(); }
+  virtual void onTriggered() { pqServerConnectReaction::connectToServerWithWarning(); }
 
 private slots:
   /**

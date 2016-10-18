@@ -53,7 +53,7 @@ public:
   /**
    * Shallow copy from another vtkPVGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp *prop);
+  virtual void ShallowCopy(vtkProp* prop);
 
   //@{
   /**
@@ -76,13 +76,13 @@ public:
   vtkBooleanMacro(UseModelTransform, bool);
   vtkSetVector6Macro(ModelBounds, double);
   vtkGetVector6Macro(ModelBounds, double);
-  void SetModelTransformMatrix(double *matrix);
+  void SetModelTransformMatrix(double* matrix);
 
   /**
    * Overridden to ensure that the transform information is passed on the
    * superclass.
    */
-  virtual double *GetBounds();
+  virtual double* GetBounds();
 
 protected:
   vtkPVGridAxes3DActor();
@@ -106,7 +106,6 @@ private:
   void operator=(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;
 
   vtkTimeStamp BoundsUpdateTime;
-
 };
 
 #endif

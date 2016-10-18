@@ -27,13 +27,14 @@
 #include <vtkNew.h>
 
 vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
-vtkSetObjectImplementationMacro(vtkSMRemoteObjectUpdateUndoElement, ProxyLocator, vtkSMProxyLocator);
+vtkSetObjectImplementationMacro(
+  vtkSMRemoteObjectUpdateUndoElement, ProxyLocator, vtkSMProxyLocator);
 //-----------------------------------------------------------------------------
 vtkSMRemoteObjectUpdateUndoElement::vtkSMRemoteObjectUpdateUndoElement()
 {
   this->ProxyLocator = NULL;
-  this->AfterState   = new vtkSMMessage();
-  this->BeforeState  = new vtkSMMessage();
+  this->AfterState = new vtkSMMessage();
+  this->BeforeState = new vtkSMMessage();
 }
 
 //-----------------------------------------------------------------------------
@@ -41,7 +42,7 @@ vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 {
   delete this->AfterState;
   delete this->BeforeState;
-  this->AfterState  = NULL;
+  this->AfterState = NULL;
   this->BeforeState = NULL;
 
   this->SetProxyLocator(NULL);
@@ -53,9 +54,11 @@ void vtkSMRemoteObjectUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GlobalId: " << this->GetGlobalId() << endl;
   os << indent << "Before state: " << endl;
-  if(this->BeforeState) this->BeforeState->PrintDebugString();
+  if (this->BeforeState)
+    this->BeforeState->PrintDebugString();
   os << indent << "After state: " << endl;
-  if(this->AfterState) this->AfterState->PrintDebugString();
+  if (this->AfterState)
+    this->AfterState->PrintDebugString();
 }
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::Undo()
@@ -72,48 +75,48 @@ int vtkSMRemoteObjectUpdateUndoElement::Redo()
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
 {
-  if(this->Session && state && state->has_global_id())
-    {
+  if (this->Session && state && state->has_global_id())
+  {
     // Creation or update
-    vtkSMRemoteObject* remoteObj = vtkSMRemoteObject::SafeDownCast(
-        this->Session->GetRemoteObject(state->global_id()));
+    vtkSMRemoteObject* remoteObj =
+      vtkSMRemoteObject::SafeDownCast(this->Session->GetRemoteObject(state->global_id()));
 
-    if(remoteObj)
-      {
+    if (remoteObj)
+    {
       // This prevent in-between object to be accenditaly removed
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      if(this->ProxyLocator)
-        {
+      if (this->ProxyLocator)
+      {
         this->ProxyLocator->SetSession(this->Session);
         remoteObj->LoadState(state, this->ProxyLocator);
-        }
+      }
       else
-        {
+      {
         remoteObj->LoadState(state, this->Session->GetProxyLocator());
-        }
       }
     }
+  }
   return 1; // OK, we say that everything is fine.
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
-    const vtkSMMessage* before, const vtkSMMessage* after)
+  const vtkSMMessage* before, const vtkSMMessage* after)
 {
   this->BeforeState->Clear();
   this->AfterState->Clear();
-  if(before && after)
-    {
+  if (before && after)
+  {
     this->BeforeState->CopyFrom(*before);
     this->AfterState->CopyFrom(*after);
-    }
+  }
   else
-    {
-    vtkErrorMacro( "Invalid SetUndoRedoState. "
-                   << "At least one of the provided states is NULL.");
-    }
+  {
+    vtkErrorMacro("Invalid SetUndoRedoState. "
+      << "At least one of the provided states is NULL.");
+  }
 }
 //-----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMRemoteObjectUpdateUndoElement::GetGlobalId()

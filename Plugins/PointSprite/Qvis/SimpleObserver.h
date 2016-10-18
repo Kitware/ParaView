@@ -38,7 +38,8 @@
 #ifndef SIMPLEOBSERVER_H
 #define SIMPLEOBSERVER_H
 
-namespace pointsprite {
+namespace pointsprite
+{
 class Subject;
 
 // *******************************************************************
@@ -64,15 +65,15 @@ class Subject;
 class SimpleObserver
 {
 public:
-    SimpleObserver();
-    virtual ~SimpleObserver();
-    virtual void Update(Subject *TheChangedSubject) = 0;
-    virtual void SubjectRemoved(Subject *TheRemovedSubject);
-    void SetUpdate(bool);
-    bool GetUpdate();
-private:
-    bool doUpdate;
-};
+  SimpleObserver();
+  virtual ~SimpleObserver();
+  virtual void Update(Subject* TheChangedSubject) = 0;
+  virtual void SubjectRemoved(Subject* TheRemovedSubject);
+  void SetUpdate(bool);
+  bool GetUpdate();
 
+private:
+  bool doUpdate;
+};
 }
 #endif

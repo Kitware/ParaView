@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,13 +39,12 @@ void pqTimerLogReaction::showTimerLog()
 {
   static QPointer<pqTimerLogDisplay> dialog;
   if (!dialog)
-    {
+  {
     dialog = new pqTimerLogDisplay();
-    }
+  }
   dialog->setAttribute(Qt::WA_QuitOnClose, false);
   dialog->show();
   dialog->raise();
   dialog->activateWindow();
   dialog->refresh();
 }
-

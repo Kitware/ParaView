@@ -37,20 +37,19 @@ vtkVRUIServerState::vtkVRUIServerState()
 }
 
 // ----------------------------------------------------------------------------
-std::vector<vtkSmartPointer<vtkVRUITrackerState> > *
-vtkVRUIServerState::GetTrackerStates()
+std::vector<vtkSmartPointer<vtkVRUITrackerState> >* vtkVRUIServerState::GetTrackerStates()
 {
   return &(this->TrackerStates);
 }
 
 // ----------------------------------------------------------------------------
-std::vector<bool> *vtkVRUIServerState::GetButtonStates()
+std::vector<bool>* vtkVRUIServerState::GetButtonStates()
 {
   return &(this->ButtonStates);
 }
 
 // ----------------------------------------------------------------------------
-std::vector<float> *vtkVRUIServerState::GetValuatorStates()
+std::vector<float>* vtkVRUIServerState::GetValuatorStates()
 {
   return &(this->ValuatorStates);
 }

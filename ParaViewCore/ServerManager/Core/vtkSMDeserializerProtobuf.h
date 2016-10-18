@@ -61,10 +61,10 @@ protected:
   virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator);
 
   vtkSMStateLocator* StateLocator;
+
 private:
   vtkSMDeserializerProtobuf(const vtkSMDeserializerProtobuf&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDeserializerProtobuf&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

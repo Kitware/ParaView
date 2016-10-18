@@ -27,12 +27,12 @@ vtkPythonAnimationCue::vtkPythonAnimationCue()
 {
   this->Enabled = true;
   this->Script = 0;
-  this->AddObserver(vtkCommand::StartAnimationCueEvent,
-    this, &vtkPythonAnimationCue::HandleStartCueEvent);
-  this->AddObserver(vtkCommand::AnimationCueTickEvent,
-    this, &vtkPythonAnimationCue::HandleTickEvent);
-  this->AddObserver(vtkCommand::EndAnimationCueEvent,
-    this, &vtkPythonAnimationCue::HandleEndCueEvent);
+  this->AddObserver(
+    vtkCommand::StartAnimationCueEvent, this, &vtkPythonAnimationCue::HandleStartCueEvent);
+  this->AddObserver(
+    vtkCommand::AnimationCueTickEvent, this, &vtkPythonAnimationCue::HandleTickEvent);
+  this->AddObserver(
+    vtkCommand::EndAnimationCueEvent, this, &vtkPythonAnimationCue::HandleEndCueEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -45,21 +45,20 @@ vtkPythonAnimationCue::~vtkPythonAnimationCue()
 void vtkPythonAnimationCue::HandleStartCueEvent()
 {
   if (!this->Enabled)
-    {
+  {
     return;
-    }
+  }
 
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
-    ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-    {
-    aplus += 2; //skip over "0x"
-    }
+  sprintf(addrofthis, "%p", this);
+  char* aplus = addrofthis;
+  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+  {
+    aplus += 2; // skip over "0x"
+  }
   if (this->Script)
-    {
+  {
     std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << "def start_cue(foo): pass" << endl;
@@ -75,28 +74,27 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
     // ensure Python is initialized.
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleTickEvent()
 {
   if (!this->Enabled)
-    {
+  {
     return;
-    }
+  }
 
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
-    ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-    {
-    aplus += 2; //skip over "0x"
-    }
+  sprintf(addrofthis, "%p", this);
+  char* aplus = addrofthis;
+  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+  {
+    aplus += 2; // skip over "0x"
+  }
   if (this->Script)
-    {
+  {
     std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << this->Script << endl;
@@ -111,28 +109,27 @@ void vtkPythonAnimationCue::HandleTickEvent()
     // ensure Python is initialized.
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleEndCueEvent()
 {
   if (!this->Enabled)
-    {
+  {
     return;
-    }
+  }
 
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
-    ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-    {
-    aplus += 2; //skip over "0x"
-    }
+  sprintf(addrofthis, "%p", this);
+  char* aplus = addrofthis;
+  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+  {
+    aplus += 2; // skip over "0x"
+  }
   if (this->Script)
-    {
+  {
     std::ostringstream stream;
     stream << "from paraview import servermanager" << endl;
     stream << "def end_cue(foo): pass" << endl;
@@ -146,7 +143,7 @@ void vtkPythonAnimationCue::HandleEndCueEvent()
               "  gc.collect()\n";
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

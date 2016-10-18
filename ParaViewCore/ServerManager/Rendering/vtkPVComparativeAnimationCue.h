@@ -93,14 +93,10 @@ public:
    * These methods are convenience methods when the value can only be a single
    * value.
    */
-  void UpdateXRange(int y, double minx, double maxx)
-    { this->UpdateXRange(y, &minx, &maxx, 1); }
-  void UpdateYRange(int x, double miny, double maxy)
-    { this->UpdateYRange(x, &miny, &maxy, 1); }
-  void UpdateWholeRange(double mint, double maxt)
-    { this->UpdateWholeRange(&mint, &maxt, 1); }
-  void UpdateValue(int x, int y, double value)
-    { this->UpdateValue(x, y, &value, 1); }
+  void UpdateXRange(int y, double minx, double maxx) { this->UpdateXRange(y, &minx, &maxx, 1); }
+  void UpdateYRange(int x, double miny, double maxy) { this->UpdateYRange(x, &miny, &maxy, 1); }
+  void UpdateWholeRange(double mint, double maxt) { this->UpdateWholeRange(&mint, &maxt, 1); }
+  void UpdateValue(int x, int y, double value) { this->UpdateValue(x, y, &value, 1); }
 
   //@{
   /**
@@ -108,15 +104,14 @@ public:
    * for the Contour filter. The "AnimatedElement" for such properties must be
    * set to -1, otherwise UpdateAnimatedValue() will raise an error.
    */
-  void UpdateXRange(int y, double *minx, double* maxx, unsigned int numvalues);
-  void UpdateYRange(int x, double *minx, double* maxx, unsigned int numvalues);
-  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues)
-    {
+  void UpdateXRange(int y, double* minx, double* maxx, unsigned int numvalues);
+  void UpdateYRange(int x, double* minx, double* maxx, unsigned int numvalues);
+  void UpdateWholeRange(double* mint, double* maxt, unsigned int numValues)
+  {
     this->UpdateWholeRange(mint, maxt, numValues, false);
-    }
-  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues,
-    bool vertical_first);
-  void UpdateValue(int x, int y, double *value, unsigned int numValues);
+  }
+  void UpdateWholeRange(double* mint, double* maxt, unsigned int numValues, bool vertical_first);
+  void UpdateValue(int x, int y, double* value, unsigned int numValues);
   //@}
 
   /**
@@ -133,22 +128,22 @@ public:
    * (dx, dy) are the dimensions of the comparative grid.
    */
   double GetValue(int x, int y, int dx, int dy)
-    {
-    unsigned int numValues=0;
+  {
+    unsigned int numValues = 0;
     double* vals = this->GetValues(x, y, dx, dy, numValues);
     if (numValues > 0)
-      {
+    {
       return vals[0];
-      }
-    return -1.0;
     }
+    return -1.0;
+  }
   //@}
 
   /**
    * NOTE: Returned values is only valid until the next call to this method.
    * Return value is only valid when numValues > 0.
    */
-  double* GetValues(int x, int y, int dx, int dy, unsigned int &numValues);
+  double* GetValues(int x, int y, int dx, int dy, unsigned int& numValues);
 
   vtkPVXMLElement* AppendCommandInfo(vtkPVXMLElement* proxyElem);
   int LoadCommandInfo(vtkPVXMLElement* proxyElement);
@@ -173,13 +168,13 @@ protected:
   char* AnimatedDomainName;
   double* Values;
   bool Enabled;
+
 private:
   vtkPVComparativeAnimationCue(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

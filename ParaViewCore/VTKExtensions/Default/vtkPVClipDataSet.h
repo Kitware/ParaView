@@ -30,14 +30,12 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
 {
 public:
-  vtkTypeMacro(vtkPVClipDataSet,vtkTableBasedClipDataSet);
+  vtkTypeMacro(vtkPVClipDataSet, vtkTableBasedClipDataSet);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPVClipDataSet* New();
 
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   //@{
   /**
@@ -50,16 +48,12 @@ public:
   //@}
 
 protected:
-  vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
+  vtkPVClipDataSet(vtkImplicitFunction* cf = NULL);
   ~vtkPVClipDataSet();
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**, vtkInformationVector* );
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
-
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillInputPortInformation(int, vtkInformation* info);
   virtual int FillOutputPortInformation(int, vtkInformation* info);
@@ -70,19 +64,17 @@ protected:
    * (since superclass does not handle composite datasets). This method loops
    * over the composite dataset calling superclass repeatedly.
    */
-  int ClipUsingSuperclass(
-    vtkInformation* request, vtkInformationVector** inputVector,
+  int ClipUsingSuperclass(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
-  int ClipUsingThreshold(
-    vtkInformation* request, vtkInformationVector** inputVector,
+  int ClipUsingThreshold(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   //@}
 
   bool UseAMRDualClipForAMR;
+
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

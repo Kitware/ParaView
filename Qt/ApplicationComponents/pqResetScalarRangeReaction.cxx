@@ -51,50 +51,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
-    {
-    vtkSMProxy* reprProxy = repr? repr->getProxy() : NULL;
-    if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
-      {
-      return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
-      }
-    return NULL;
-    }
+vtkSMProxy* lutProxy(pqPipelineRepresentation* repr)
+{
+  vtkSMProxy* reprProxy = repr ? repr->getProxy() : NULL;
+  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+  {
+    return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
+  }
+  return NULL;
+}
 }
 
 //-----------------------------------------------------------------------------
 pqResetScalarRangeReaction::pqResetScalarRangeReaction(
   QAction* parentObject, bool track_active_objects, pqResetScalarRangeReaction::Modes mode)
-  : Superclass(parentObject),
-  Mode(mode), Connection(NULL)
+  : Superclass(parentObject)
+  , Mode(mode)
+  , Connection(NULL)
 {
   if (track_active_objects)
-    {
+  {
     QObject::connect(&pqActiveObjects::instance(),
-      SIGNAL(representationChanged(pqDataRepresentation*)),
-      this, SLOT(setRepresentation(pqDataRepresentation*)));
+      SIGNAL(representationChanged(pqDataRepresentation*)), this,
+      SLOT(setRepresentation(pqDataRepresentation*)));
     this->setRepresentation(pqActiveObjects::instance().activeRepresentation());
 
     if (this->Mode == TEMPORAL)
-      {
+    {
       // Get ready to connect timekeepers with the reaction enabled state
       this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
       pqServerManagerModel* model = pqApplicationCore::instance()->getServerManagerModel();
-      this->connect(model, SIGNAL(serverAdded(pqServer*)),
-        SLOT(onServerAdded(pqServer*)));
-      this->connect(model, SIGNAL(aboutToRemoveServer(pqServer*)),
-        SLOT(onAboutToRemoveServer(pqServer*)));
-      }
+      this->connect(model, SIGNAL(serverAdded(pqServer*)), SLOT(onServerAdded(pqServer*)));
+      this->connect(
+        model, SIGNAL(aboutToRemoveServer(pqServer*)), SLOT(onAboutToRemoveServer(pqServer*)));
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqResetScalarRangeReaction::~pqResetScalarRangeReaction()
 {
   if (this->Connection)
-    {
+  {
     this->Connection->Disconnect();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -109,12 +109,13 @@ void pqResetScalarRangeReaction::updateEnableState()
 {
   bool enabled = this->Representation != NULL;
   if (enabled && this->Mode == TEMPORAL)
-    {
+  {
     pqPipelineSource* source = this->Representation->getInput();
     pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
-    enabled = (this->Representation->getOutputPortFromInput()->getDataInformation()->GetHasTime() != 0) &&
+    enabled =
+      (this->Representation->getOutputPortFromInput()->getDataInformation()->GetHasTime() != 0) &&
       vtkSMTimeKeeperProxy::IsTimeSourceTracked(timeKeeper->getProxy(), source->getProxy());
-    }
+  }
   this->parentAction()->setEnabled(enabled);
 }
 
@@ -122,34 +123,34 @@ void pqResetScalarRangeReaction::updateEnableState()
 void pqResetScalarRangeReaction::onTriggered()
 {
   switch (this->Mode)
-    {
-  case DATA:
-    pqResetScalarRangeReaction::resetScalarRangeToData(this->Representation);
-    break;
+  {
+    case DATA:
+      pqResetScalarRangeReaction::resetScalarRangeToData(this->Representation);
+      break;
 
-  case CUSTOM:
-    pqResetScalarRangeReaction::resetScalarRangeToCustom(this->Representation);
-    break;
+    case CUSTOM:
+      pqResetScalarRangeReaction::resetScalarRangeToCustom(this->Representation);
+      break;
 
-  case TEMPORAL:
-    pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(this->Representation);
-    break;
-    }
+    case TEMPORAL:
+      pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(this->Representation);
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation* repr)
 {
   if (repr == NULL)
-    {
-    repr = qobject_cast<pqPipelineRepresentation*>(
-      pqActiveObjects::instance().activeRepresentation());
+  {
+    repr =
+      qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
     if (!repr)
-      {
+    {
       qCritical() << "No representation provided.";
       return false;
-      }
     }
+  }
 
   BEGIN_UNDO_SET("Reset transfer function ranges using data range");
   repr->resetLookupTableScalarRange();
@@ -162,21 +163,21 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
 bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentation* repr)
 {
   if (repr == NULL)
-    {
-    repr = qobject_cast<pqPipelineRepresentation*>(
-      pqActiveObjects::instance().activeRepresentation());
+  {
+    repr =
+      qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
     if (!repr)
-      {
+    {
       qCritical() << "No representation provided.";
       return false;
-      }
     }
+  }
 
   vtkSMProxy* lut = lutProxy(repr);
   if (!lut)
-    {
+  {
     return false;
-    }
+  }
 
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(lut->GetClientSideObject());
@@ -186,15 +187,15 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
   pqRescaleRange dialog(pqCoreUtilities::mainWidget());
   dialog.setRange(range[0], range[1]);
   if (dialog.exec() == QDialog::Accepted)
-    {
+  {
     BEGIN_UNDO_SET("Reset transfer function ranges");
     vtkSMTransferFunctionProxy::RescaleTransferFunction(
       lut, dialog.getMinimum(), dialog.getMaximum());
     if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy())
-      {
+    {
       vtkSMTransferFunctionProxy::RescaleTransferFunction(
         sofProxy, dialog.getMinimum(), dialog.getMaximum());
-      }
+    }
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
     vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
@@ -202,7 +203,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
     repr->renderViewEventually();
     END_UNDO_SET();
     return true;
-    }
+  }
   return false;
 }
 
@@ -210,36 +211,35 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
 bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr)
 {
   if (repr == NULL)
-    {
-    repr = qobject_cast<pqPipelineRepresentation*>(
-      pqActiveObjects::instance().activeRepresentation());
+  {
+    repr =
+      qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
     if (!repr)
-      {
+    {
       qCritical() << "No representation provided.";
       return false;
-      }
     }
+  }
 
-  if (QMessageBox::warning(pqCoreUtilities::mainWidget(),
-      "Potentially slow operation",
-      "This can potentially take a long time to complete. \n"
-      "Are you sure you want to continue?",
-      QMessageBox::Yes |QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
-    {
+  if (QMessageBox::warning(pqCoreUtilities::mainWidget(), "Potentially slow operation",
+        "This can potentially take a long time to complete. \n"
+        "Are you sure you want to continue?",
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
+  {
     BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
     if (vtkSMProxy* lut = lutProxy(repr))
-      {
+    {
       vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
       lut->UpdateVTKObjects();
-      }
+    }
     repr->renderViewEventually();
     END_UNDO_SET();
     return true;
-    }
+  }
   return false;
 }
 
@@ -247,22 +247,22 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
 void pqResetScalarRangeReaction::onServerAdded(pqServer* server)
 {
   if (server)
-    {
+  {
     // Connect new server timekeeper with the reaction enable state
     vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
     this->Connection->Connect(timeKeeper->GetProperty("SuppressedTimeSources"),
       vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqResetScalarRangeReaction::onAboutToRemoveServer(pqServer* server)
 {
   if (server)
-    {
+  {
     // Disconnect previously connected timekeeper
     vtkSMProxy* timeKeeper = server->getTimeKeeper()->getProxy();
     this->Connection->Disconnect(timeKeeper->GetProperty("SuppressedTimeSources"),
       vtkCommand::ModifiedEvent, this, SLOT(updateEnableState()));
-    }
+  }
 }

@@ -16,7 +16,7 @@
  * @class   vtkCPVector3FieldFunction
  * @brief   Abstract class for specifying vectors at points.
  *
- * Abstract class for specifying vector values at specified points.  
+ * Abstract class for specifying vector values at specified points.
 */
 
 #ifndef vtkCPVector3FieldFunction_h
@@ -34,13 +34,13 @@ public:
   /**
    * Get the NumberOfComponents.
    */
-  virtual unsigned int GetNumberOfComponents() {return 3;};
+  virtual unsigned int GetNumberOfComponents() { return 3; };
 
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time) = 0;
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
 
 protected:
   vtkCPVector3FieldFunction();

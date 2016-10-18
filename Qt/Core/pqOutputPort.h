@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -58,6 +58,7 @@ class PQCORE_EXPORT pqOutputPort : public pqServerManagerModelItem
 {
   Q_OBJECT
   typedef pqServerManagerModelItem Superclass;
+
 public:
   pqOutputPort(pqPipelineSource* source, int portno);
   virtual ~pqOutputPort();
@@ -70,14 +71,12 @@ public:
   /**
   * Returns the pqPipelineSource whose output port this is.
   */
-  pqPipelineSource* getSource() const
-    { return this->Source; }
+  pqPipelineSource* getSource() const { return this->Source; }
 
   /**
   * Return the vtkSMSourceProxy for the source.
   */
   vtkSMSourceProxy* getSourceProxy() const;
-
 
   /**
   * Returns the server connection on which this output port exists.
@@ -87,8 +86,7 @@ public:
   /**
   * Returns the port number of the output port which this item represents.
   */
-  int getPortNumber() const
-    { return this->PortNumber; }
+  int getPortNumber() const { return this->PortNumber; }
 
   /**
   * Returns the port name for this output port.
@@ -96,7 +94,7 @@ public:
   QString getPortName() const;
 
   /**
-  * Returns the number of consumers connected to this output port. 
+  * Returns the number of consumers connected to this output port.
   */
   int getNumberOfConsumers() const;
 
@@ -165,11 +163,11 @@ public:
 
 public slots:
   /**
-  * This method updates all render modules to which all  
-  * representations for this source belong, if force is true, it for an 
+  * This method updates all render modules to which all
+  * representations for this source belong, if force is true, it for an
   * immediate render otherwise render on idle.
   */
-  void renderAllViews(bool force=false);
+  void renderAllViews(bool force = false);
 
 signals:
   /**
@@ -211,7 +209,7 @@ protected:
   /**
   * called by pqPipelineSource when the connections change.
   */
-  void removeConsumer(pqPipelineSource *);
+  void removeConsumer(pqPipelineSource*);
   void addConsumer(pqPipelineSource*);
 
   /**
@@ -231,5 +229,3 @@ private:
 };
 
 #endif
-
-

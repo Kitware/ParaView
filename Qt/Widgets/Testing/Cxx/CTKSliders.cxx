@@ -19,7 +19,7 @@ int CTKSliders(int argc, char* argv[])
 
   ctkRangeSlider* rangeSlider = new ctkRangeSlider(Qt::Horizontal, 0);
   ctkDoubleRangeSlider* doubleSlider = new ctkDoubleRangeSlider(Qt::Horizontal);
-  
+
   layout->addWidget(rangeSlider);
   layout->addWidget(doubleSlider);
 
@@ -27,11 +27,11 @@ int CTKSliders(int argc, char* argv[])
 
   SignalCatcher* catcher = new SignalCatcher();
 
-  rangeSlider->connect(rangeSlider, SIGNAL(valuesChanged(int, int)),
-                       catcher, SLOT(onValuesChanged(int,int)));
+  rangeSlider->connect(
+    rangeSlider, SIGNAL(valuesChanged(int, int)), catcher, SLOT(onValuesChanged(int, int)));
 
-  doubleSlider->connect(doubleSlider, SIGNAL(valuesChanged(double, double)),
-                        catcher, SLOT(onValuesChanged(double,double)));
+  doubleSlider->connect(doubleSlider, SIGNAL(valuesChanged(double, double)), catcher,
+    SLOT(onValuesChanged(double, double)));
 
   root->show();
 

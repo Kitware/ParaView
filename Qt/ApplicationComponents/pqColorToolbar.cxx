@@ -51,17 +51,14 @@ void pqColorToolbar::constructor()
   new pqEditColorMapReaction(ui.actionEditColorMap);
   new pqResetScalarRangeReaction(ui.actionResetRange);
   new pqRescaleCustomScalarRangeReaction(ui.actionRescaleCustomRange);
-  new pqResetScalarRangeReaction(ui.actionRescaleTemporalRange, true, pqResetScalarRangeReaction::TEMPORAL);
+  new pqResetScalarRangeReaction(
+    ui.actionRescaleTemporalRange, true, pqResetScalarRangeReaction::TEMPORAL);
   new pqRescaleVisibleScalarRangeReaction(ui.actionRescaleVisibleRange);
 
-  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this)
-    << pqSetName("displayColor");
+  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this) << pqSetName("displayColor");
   this->addWidget(display_color);
 
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    display_color,
+    SIGNAL(representationChanged(pqDataRepresentation*)), display_color,
     SLOT(setRepresentation(pqDataRepresentation*)));
 }
-
-

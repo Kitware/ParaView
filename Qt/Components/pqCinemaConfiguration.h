@@ -35,12 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqPropertyWidget.h"
 
-
 namespace Ui
 {
-  class CinemaConfiguration;
+class CinemaConfiguration;
 }
- 
+
 /**
 * @brief PropertyWidget used to define specifics of a Cinema database to be exported.
 *
@@ -58,7 +57,6 @@ class PQCOMPONENTS_EXPORT pqCinemaConfiguration : public pqPropertyWidget
   typedef pqPropertyWidget Superclass;
 
 public:
-
   pqCinemaConfiguration(vtkSMProxy* proxy_, vtkSMPropertyGroup* smpgroup, QWidget* parent_ = NULL);
   virtual ~pqCinemaConfiguration();
 
@@ -83,7 +81,6 @@ public:
   QString arraySelection();
 
 protected:
-
   /**
   * Updates the vtkCinemaExporter proxy by emitting pqPropertyWidget's changeFinished() signal.
   */
@@ -98,7 +95,6 @@ signals:
   void arraySelectionChanged();
 
 private:
-
   void populateElements();
 
   Ui::CinemaConfiguration* Ui;

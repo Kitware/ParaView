@@ -26,8 +26,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-pqResizingScrollArea::pqResizingScrollArea(QWidget *_parent)
-:QScrollArea(_parent)
+pqResizingScrollArea::pqResizingScrollArea(QWidget* _parent)
+  : QScrollArea(_parent)
 {
   setWidgetResizable(true);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -35,25 +35,25 @@ pqResizingScrollArea::pqResizingScrollArea(QWidget *_parent)
 
 QSize pqResizingScrollArea::sizeHint() const
 {
-  //return QScrollArea::sizeHint();
+  // return QScrollArea::sizeHint();
 
-  QWidget *currentWidget = widget();
+  QWidget* currentWidget = widget();
 
   if (!currentWidget)
-    {  
+  {
     return QScrollArea::sizeHint();
-    }
-  
+  }
+
   QSize newSize;
   newSize.setWidth(QScrollArea::sizeHint().width());
-  
+
   // retrieve the scrollarea margins
   int leftMargin, topMargin, rightMargin, bottomMargin;
-  getContentsMargins(&leftMargin, &topMargin, &rightMargin, &bottomMargin );
+  getContentsMargins(&leftMargin, &topMargin, &rightMargin, &bottomMargin);
 
-  int widgetHintHeight =  currentWidget->sizeHint().height() + topMargin + bottomMargin;
+  int widgetHintHeight = currentWidget->sizeHint().height() + topMargin + bottomMargin;
   int scrollHintHeight = QScrollArea::sizeHint().height();
-  
+
   newSize.setHeight(qMax(widgetHintHeight, scrollHintHeight));
 
   int deskTopHeight = QApplication::desktop()->availableGeometry().height();
@@ -62,5 +62,4 @@ QSize pqResizingScrollArea::sizeHint() const
   newSize.setHeight(qMin(newSize.height(), int(deskTopHeight * 0.4)));
 
   return newSize;
-
 }

@@ -35,8 +35,8 @@
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkRulerSourceRepresentation);
-vtkCxxSetObjectMacro(vtkRulerSourceRepresentation, DistanceRepresentation,
-  vtkDistanceRepresentation2D);
+vtkCxxSetObjectMacro(
+  vtkRulerSourceRepresentation, DistanceRepresentation, vtkDistanceRepresentation2D);
 //----------------------------------------------------------------------------
 vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
 {
@@ -61,9 +61,9 @@ void vtkRulerSourceRepresentation::SetVisibility(bool val)
 {
   this->Superclass::SetVisibility(val);
   if (this->DistanceRepresentation)
-    {
+  {
     this->DistanceRepresentation->SetVisibility(val);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -79,9 +79,10 @@ bool vtkRulerSourceRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
-    {
-    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->AddActor(this->DistanceRepresentation);
-    }
+  {
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)
+      ->AddActor(this->DistanceRepresentation);
+  }
   return this->Superclass::AddToView(view);
 }
 
@@ -90,9 +91,10 @@ bool vtkRulerSourceRepresentation::RemoveFromView(vtkView* view)
 {
   vtkPVRenderView* rView = vtkPVRenderView::SafeDownCast(view);
   if (this->DistanceRepresentation && rView)
-    {
-    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)->RemoveActor(this->DistanceRepresentation);
-    }
+  {
+    rView->GetRenderer(vtkPVRenderView::NON_COMPOSITED_RENDERER)
+      ->RemoveActor(this->DistanceRepresentation);
+  }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -100,10 +102,10 @@ bool vtkRulerSourceRepresentation::RemoveFromView(vtkView* view)
 void vtkRulerSourceRepresentation::MarkModified()
 {
   if (!this->GetUseCache())
-    {
+  {
     // Cleanup caches when not using cache.
     this->CacheKeeper->RemoveAllCaches();
-    }
+  }
   this->Superclass::MarkModified();
 }
 
@@ -128,8 +130,7 @@ void vtkRulerSourceRepresentation::SetAxisLineWidth(float width)
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetAxisColor(double red, double green, double blue)
 {
-  this->DistanceRepresentation->GetAxisProperty()->
-  SetColor(red, green, blue);
+  this->DistanceRepresentation->GetAxisProperty()->SetColor(red, green, blue);
 }
 
 //----------------------------------------------------------------------------
@@ -142,16 +143,16 @@ void vtkRulerSourceRepresentation::SetLabelFormat(char* labelFormat)
   vtkMTimeType previousMTime = this->DistanceRepresentation->GetMTime();
   this->DistanceRepresentation->SetLabelFormat(labelFormat);
   if (this->DistanceRepresentation->GetMTime() != previousMTime)
-    {
+  {
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkRulerSourceRepresentation::SetRulerMode(int choice)
 {
   if (choice != this->GetRulerMode())
-    {
+  {
     this->DistanceRepresentation->SetRulerMode(choice);
     this->Modified();
   }
@@ -167,10 +168,10 @@ int vtkRulerSourceRepresentation::GetRulerMode()
 void vtkRulerSourceRepresentation::SetRulerDistance(double distance)
 {
   if (distance != this->GetRulerDistance())
-    {
+  {
     this->DistanceRepresentation->SetRulerDistance(distance);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -183,10 +184,10 @@ double vtkRulerSourceRepresentation::GetRulerDistance()
 void vtkRulerSourceRepresentation::SetScale(double scale)
 {
   if (scale != this->GetScale())
-    {
+  {
     this->DistanceRepresentation->SetScale(scale);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -199,25 +200,24 @@ double vtkRulerSourceRepresentation::GetScale()
 void vtkRulerSourceRepresentation::SetNumberOfRulerTicks(int n)
 {
   if (n != this->DistanceRepresentation->GetNumberOfRulerTicks())
-    {
+  {
     this->DistanceRepresentation->SetNumberOfRulerTicks(n);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkRulerSourceRepresentation::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+  {
     this->Clone->ShallowCopy(vtkPolyData::GetData(inputVector[0], 0));
-    }
+  }
   this->Clone->Modified();
   this->CacheKeeper->Update();
 
@@ -226,42 +226,37 @@ int vtkRulerSourceRepresentation::RequestData(
 
 //----------------------------------------------------------------------------
 int vtkRulerSourceRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type,
-  vtkInformation* inInfo, vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     // i.e. this->GetVisibility() == false, hence nothing to do.
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
-    vtkPVRenderView::SetPiece(inInfo, this,
-                              this->CacheKeeper->GetOutputDataObject(0));
+  {
+    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
     // `gather_before_delivery` is true, since vtkLineSource (which is the
     // source for the ruler) doesn't produce any data on ranks except the root.
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
-      /*deliver_to_client=*/ true, /*gather_before_delivery=*/ true);
-    }
+      /*deliver_to_client=*/true, /*gather_before_delivery=*/true);
+  }
   else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
 
     // since there's no direct connection between the mapper and the collector,
     // we don't put an update-suppressor in the pipeline.
 
     vtkPolyData* line = vtkPolyData::SafeDownCast(
-      producerPort->GetProducer()->GetOutputDataObject(
-        producerPort->GetIndex()));
+      producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
     if (line && line->GetNumberOfPoints() == 2)
-      {
-      this->DistanceRepresentation->SetPoint1WorldPosition(
-        line->GetPoints()->GetPoint(0));
-      this->DistanceRepresentation->SetPoint2WorldPosition(
-        line->GetPoints()->GetPoint(1));
-      }
+    {
+      this->DistanceRepresentation->SetPoint1WorldPosition(line->GetPoints()->GetPoint(0));
+      this->DistanceRepresentation->SetPoint2WorldPosition(line->GetPoints()->GetPoint(1));
     }
+  }
 
   return 1;
 }

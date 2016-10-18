@@ -50,23 +50,23 @@ public:
 
   // Description:
   // Set/Get values to/from the UI.
-  void GetOrigin(double *o);
-  void SetOrigin(double *o);
+  void GetOrigin(double* o);
+  void SetOrigin(double* o);
 
-  void GetPoint1(double *p1);
-  void SetPoint1(double *p1);
+  void GetPoint1(double* p1);
+  void SetPoint1(double* p1);
 
-  void GetPoint2(double *p2);
-  void SetPoint2(double *p2);
+  void GetPoint2(double* p2);
+  void SetPoint2(double* p2);
 
-  void GetResolution(int *res);
-  void SetResolution(int *res);
+  void GetResolution(int* res);
+  void SetResolution(int* res);
 
-  void GetSpacing(double *dx);
-  void SetSpacing(double *dx);
+  void GetSpacing(double* dx);
+  void SetSpacing(double* dx);
 
-  void GetNormal(double *n);
-  void SetNormal(double *n);
+  void GetNormal(double* n);
+  void SetNormal(double* n);
 
   int GetConstraint();
   void SetConstraint(int type);
@@ -74,7 +74,7 @@ public:
   int GetDecompType();
   void SetDecompType(int type);
 
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent* event);
 
 protected slots:
   // Description:
@@ -98,7 +98,7 @@ protected slots:
   // Description:
   // calculate the normal to the plane for display. Return 0
   // if the coordinate system is invalid.
-  int CalculateNormal(double *n);
+  int CalculateNormal(double* n);
 
   // Description:
   // update and display computed values, and enforce aspect ratio lock.
@@ -142,9 +142,9 @@ private:
   int Nx[2];
 
 private:
-  pqSQPlaneSourceForm *Form;
-  vtkEventQtSlotConnect *VTKConnect;
-  pqPropertyLinks *Links;
+  pqSQPlaneSourceForm* Form;
+  vtkEventQtSlotConnect* VTKConnect;
+  pqPropertyLinks* Links;
 };
 
 #endif

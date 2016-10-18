@@ -56,8 +56,8 @@ public:
   /**
    * Set the proxy to write out.
    */
-  virtual void SetProxy(vtkSMProxy *proxy);
-  vtkGetObjectMacro(Proxy,vtkSMProxy);
+  virtual void SetProxy(vtkSMProxy* proxy);
+  vtkGetObjectMacro(Proxy, vtkSMProxy);
   //@}
 
   //@{
@@ -65,8 +65,8 @@ public:
    * Set the ieterator used to traverse properties during the write.
    * If no iterator is set then all properties are written.
    */
-  virtual void SetPropertyIterator(vtkSMPropertyIterator *iter);
-  vtkGetObjectMacro(PropertyIterator,vtkSMPropertyIterator);
+  virtual void SetPropertyIterator(vtkSMPropertyIterator* iter);
+  vtkGetObjectMacro(PropertyIterator, vtkSMPropertyIterator);
   //@}
 
   //@{
@@ -94,20 +94,19 @@ public:
   /**
    * Return the writer version string.
    */
-  virtual const char *GetWriterVersion(){ return "1.0"; }
+  virtual const char* GetWriterVersion() { return "1.0"; }
 
   //@{
   /**
    * Write the proxy's state directly to an XML file, in PV state format.
    */
   virtual int WriteConfiguration();
-  virtual int WriteConfiguration(const char *fileName);
+  virtual int WriteConfiguration(const char* fileName);
   //@}
   /**
    * Write the proxy's state to a stream, in PV state format.
    */
-  virtual int WriteConfiguration(ostream &os);
-
+  virtual int WriteConfiguration(ostream& os);
 
 protected:
   vtkSMProxyConfigurationWriter();
@@ -118,15 +117,14 @@ private:
   void operator=(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
 
 private:
-  char *FileName;
+  char* FileName;
   //-------------------
-  vtkSMProxy *Proxy;
-  vtkSMPropertyIterator *PropertyIterator;
+  vtkSMProxy* Proxy;
+  vtkSMPropertyIterator* PropertyIterator;
   //-------------------
-  char *FileIdentifier;
-  char *FileDescription;
-  char *FileExtension;
+  char* FileIdentifier;
+  char* FileDescription;
+  char* FileExtension;
 };
 
 #endif
-

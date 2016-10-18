@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqExodusIIVariableSelectionWidget : public pqTreeWidge
   typedef pqTreeWidget Superclass;
 
 public:
-  pqExodusIIVariableSelectionWidget(QWidget* parent=0);
+  pqExodusIIVariableSelectionWidget(QWidget* parent = 0);
   virtual ~pqExodusIIVariableSelectionWidget();
 
 signals:
@@ -73,7 +73,7 @@ protected:
   * added/removed/updated.
   */
   bool eventFilter(QObject* object, QEvent* qevent);
- 
+
   void propertyChanged(const QString& pname);
 
   void setStatus(const QString& key, const QString& text, bool value);

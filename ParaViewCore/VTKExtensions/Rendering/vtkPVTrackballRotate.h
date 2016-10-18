@@ -29,21 +29,18 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballRotate : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballRotate *New();
+  static vtkPVTrackballRotate* New();
   vtkTypeMacro(vtkPVTrackballRotate, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
-                           vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
-                            vtkRenderWindowInteractor *rwi);
-  virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
-                          vtkRenderWindowInteractor *rwi);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi);
   //@}
 
   //@{
@@ -70,6 +67,7 @@ public:
    * Returns the currently pressed key code.
    */
   vtkGetMacro(KeyCode, char);
+
 protected:
   vtkPVTrackballRotate();
   ~vtkPVTrackballRotate();

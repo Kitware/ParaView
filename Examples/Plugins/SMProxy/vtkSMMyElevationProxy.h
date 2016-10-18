@@ -15,8 +15,6 @@ public:
 protected:
   vtkSMMyElevationProxy();
   ~vtkSMMyElevationProxy();
-
 };
 
 #endif // vtkSMMyElevationProxy_h
-

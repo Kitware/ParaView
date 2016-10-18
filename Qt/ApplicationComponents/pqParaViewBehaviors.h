@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -56,8 +56,8 @@ class QMainWindow;
 * ParaView.
 */
 
-#define PQ_BEHAVIOR_DEFINE_METHODS(_name) \
-  static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; } \
+#define PQ_BEHAVIOR_DEFINE_METHODS(_name)                                                          \
+  static void setEnable##_name(bool val) { pqParaViewBehaviors::_name = val; }                     \
   static bool enable##_name() { return pqParaViewBehaviors::_name; }
 
 #define PQ_BEHAVIOR_DECLARE_FLAG(_name) static bool _name;
@@ -66,6 +66,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqParaViewBehaviors : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   PQ_BEHAVIOR_DEFINE_METHODS(StandardPropertyWidgets);
   PQ_BEHAVIOR_DEFINE_METHODS(StandardViewFrameActions);
@@ -92,7 +93,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
 
-  pqParaViewBehaviors(QMainWindow* window, QObject* parent=NULL);
+  pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
   virtual ~pqParaViewBehaviors();
 
 private:
@@ -128,5 +129,3 @@ private:
 #undef PQ_BEHAVIOR_DEFINE_METHODS
 
 #endif
-
-

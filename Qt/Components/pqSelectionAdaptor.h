@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -56,8 +56,7 @@ public:
   /**
   * Returns a pointer to the QItemSelectionModel.
   */
-  QItemSelectionModel* getQSelectionModel() const
-    { return this->QSelectionModel; }
+  QItemSelectionModel* getQSelectionModel() const { return this->QSelectionModel; }
 
 protected:
   pqSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel);
@@ -70,12 +69,12 @@ protected:
   /**
   * Maps a QModelIndex to a pqServerManagerModelItem.
   */
-  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const =0;
+  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const = 0;
 
   /**
   * Returns the QAbstractItemModel used by the QSelectionModel.
   * If QSelectionModel uses a QAbstractProxyModel, this method skips
-  * over all such proxy models and returns the first non-proxy model 
+  * over all such proxy models and returns the first non-proxy model
   * encountered.
   */
   const QAbstractItemModel* getQModel() const;
@@ -93,32 +92,31 @@ protected slots:
   virtual void proxySelectionChanged();
 
   /**
-  * subclasses can override this method to provide model specific selection 
+  * subclasses can override this method to provide model specific selection
   * overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
   */
-  virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const 
-    { return QItemSelectionModel::NoUpdate; }
+  virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const
+  {
+    return QItemSelectionModel::NoUpdate;
+  }
 
 private:
   /**
   * Given a QModelIndex for the QAbstractItemModel under the QItemSelectionModel,
-  * this returns the QModelIndex for the inner most non-proxy 
+  * this returns the QModelIndex for the inner most non-proxy
   * QAbstractItemModel.
   */
   QModelIndex mapToSource(const QModelIndex& inIndex) const;
 
   /**
   * Given a QModelIndex for the innermost non-proxy QAbstractItemModel,
-  * this returns the QModelIndex for the QAbstractItemModel under the 
+  * this returns the QModelIndex for the QAbstractItemModel under the
   * QItemSelectionModel.
   */
-  QModelIndex mapFromSource(const QModelIndex& inIndex, 
-    const QAbstractItemModel* model) const;
+  QModelIndex mapFromSource(const QModelIndex& inIndex, const QAbstractItemModel* model) const;
 
   QItemSelectionModel* QSelectionModel;
   bool IgnoreSignals;
 };
 
-
 #endif
-

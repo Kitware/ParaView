@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,18 +48,18 @@ class PQCORE_EXPORT pqAnimationScene : public pqProxy
 {
   Q_OBJECT
   typedef pqProxy Superclass;
+
 public:
-  pqAnimationScene(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  pqAnimationScene(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
+    QObject* parent = NULL);
   virtual ~pqAnimationScene();
 
   /**
-  * Returns the cue that animates the given 
+  * Returns the cue that animates the given
   * \c index of the given \c property on the given \c proxy, in this scene,
   * if any.
   */
-  pqAnimationCue* getCue(vtkSMProxy* proxy, const char* propertyname, 
-    int index) const;
+  pqAnimationCue* getCue(vtkSMProxy* proxy, const char* propertyname, int index) const;
 
   /**
   * Creates and initializes a new cue that can animate
@@ -67,17 +67,16 @@ public:
   * in this scene. This method does not check is such a cue already
   * exists, use getCue() before calling this to avoid duplicates.
   */
-  pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
-    int index);
-  pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
-    int index, const QString& cuetype);
+  pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname, int index);
+  pqAnimationCue* createCue(
+    vtkSMProxy* proxy, const char* propertyname, int index, const QString& cuetype);
   pqAnimationCue* createCue(const QString& cuetype);
 
   /**
   * Removes all cues which animate the indicated proxy, if any.
   */
   void removeCues(vtkSMProxy* proxy);
-  
+
   /**
   * Removes cue
   */
@@ -161,13 +160,13 @@ signals:
   void endPlay();
 
   /**
-  * Emitted when playing animation. 
+  * Emitted when playing animation.
   * Argument is the percent of play completed.
   */
   void tick(int percentCompleted);
 
   /**
-  * Emitted when playing (or when animation time for the scene is set). 
+  * Emitted when playing (or when animation time for the scene is set).
   * \c time is the animation clock time.
   */
   void animationTime(double time);
@@ -176,7 +175,7 @@ signals:
   * Emitted when the number of frames changes
   */
   void frameCountChanged();
-  
+
   /**
   * Emitted when the number of timesteps changes
   */
@@ -192,7 +191,7 @@ public slots:
   * Play animation.
   */
   void play();
-  
+
   /**
   * Pause animation.
   */
@@ -226,18 +225,16 @@ protected:
   /**
   * Initializes the newly create animation cue with default keyframes.
   */
-  void initializeCue(
-    vtkSMProxy* proxy, const char* propertyname, int index,
-    pqAnimationCue* cue);
+  void initializeCue(vtkSMProxy* proxy, const char* propertyname, int index, pqAnimationCue* cue);
+
 private:
   Q_DISABLE_COPY(pqAnimationScene)
 
   class pqInternals;
   pqInternals* Internals;
 
-  pqAnimationCue* createCueInternal(const QString& cuetype,
-    vtkSMProxy* proxy, const char* propertyname, int index);
+  pqAnimationCue* createCueInternal(
+    const QString& cuetype, vtkSMProxy* proxy, const char* propertyname, int index);
 };
 
 #endif
-

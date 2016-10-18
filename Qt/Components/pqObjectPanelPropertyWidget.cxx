@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,20 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(pqObjectPanel *objectPanel,
-                                                         QWidget *parentObject)
+pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(
+  pqObjectPanel* objectPanel, QWidget* parentObject)
   : pqPropertyWidget(objectPanel->proxy(), parentObject)
 {
   this->ObjectPanel = objectPanel;
-  this->connect(this->ObjectPanel, SIGNAL(modified()),
-    this, SIGNAL(changeAvailable()));
-  this->connect(this->ObjectPanel, SIGNAL(modified()),
-    this, SIGNAL(changeFinished()));
+  this->connect(this->ObjectPanel, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
+  this->connect(this->ObjectPanel, SIGNAL(modified()), this, SIGNAL(changeFinished()));
 
-  this->connect(this, SIGNAL(viewChanged(pqView*)),
-                this->ObjectPanel, SLOT(setView(pqView*)));
+  this->connect(this, SIGNAL(viewChanged(pqView*)), this->ObjectPanel, SLOT(setView(pqView*)));
 
-  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  QVBoxLayout* layoutLocal = new QVBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->addWidget(objectPanel);
   setLayout(layoutLocal);
@@ -66,7 +63,6 @@ void pqObjectPanelPropertyWidget::reset()
 {
   this->ObjectPanel->reset();
 }
-
 
 void pqObjectPanelPropertyWidget::select()
 {

@@ -26,7 +26,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMWidgetRepresentationProxy.h"
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMImplicitPlaneRepresentationProxy
+  : public vtkSMWidgetRepresentationProxy
 {
 public:
   static vtkSMImplicitPlaneRepresentationProxy* New();
@@ -40,7 +41,8 @@ protected:
   virtual void SendRepresentation();
 
 private:
-  vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMImplicitPlaneRepresentationProxy(
+    const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
 };
 

@@ -29,10 +29,10 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVJoystickFlyIn : public vtkPVJoystickFly
 {
 public:
-  static vtkPVJoystickFlyIn *New();
+  static vtkPVJoystickFlyIn* New();
   vtkTypeMacro(vtkPVJoystickFlyIn, vtkPVJoystickFly);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
 protected:
   vtkPVJoystickFlyIn();
   ~vtkPVJoystickFlyIn();

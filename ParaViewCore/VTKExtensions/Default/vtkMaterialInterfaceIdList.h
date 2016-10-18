@@ -43,19 +43,20 @@ public:
    * Initialize the container with a list of id's
    * these must be in ascending order.
    */
-  void Initialize(const std::vector<int>& ids, bool preSorted=false);
+  void Initialize(const std::vector<int>& ids, bool preSorted = false);
   //@{
   /**
    * Given a global id, get the local id, or -1 if the
    * global id is not in the list.
    */
   int GetLocalId(int globalId);
+
 private:
   bool IsInitialized;
   class IdListContainer;
-  IdListContainer *IdList;
+  IdListContainer* IdList;
 };
 #endif
-  //@}
+//@}
 
 // VTK-HeaderTest-Exclude: vtkMaterialInterfaceIdList.h

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCustomFilterDefinitionModel_h
 #define _pqCustomFilterDefinitionModel_h
 
-
 #include "pqComponentsModule.h"
 #include <QAbstractItemModel>
 
@@ -47,7 +46,6 @@ class pqPipelineSource;
 class pqProxySelection;
 class QPixmap;
 class vtkCollection;
-
 
 /**
 * \class pqCustomFilterDefinitionModel
@@ -64,17 +62,17 @@ class PQCOMPONENTS_EXPORT pqCustomFilterDefinitionModel : public QAbstractItemMo
 {
 public:
   enum ItemType
-    {
+  {
     Invalid = -1,
     Source = 0,
     Filter,
     CustomFilter,
     Link,
     LastType = Link
-    };
+  };
 
 public:
-  pqCustomFilterDefinitionModel(QObject *parent=0);
+  pqCustomFilterDefinitionModel(QObject* parent = 0);
   virtual ~pqCustomFilterDefinitionModel();
 
   /**
@@ -88,7 +86,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -97,7 +95,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex &parent=QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -106,7 +104,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex &parent=QModelIndex()) const;
+  virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -117,8 +115,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column,
-      const QModelIndex &parent=QModelIndex()) const;
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 
   /**
   * \brief
@@ -127,7 +124,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex &index) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -137,8 +134,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex &index,
-      int role=Qt::DisplayRole) const;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
   /**
   * \brief
@@ -150,7 +146,7 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
   //@}
 
   /**
@@ -172,7 +168,7 @@ public:
   * \return
   *   A model index for the next item in the hierarchy.
   */
-  QModelIndex getNextIndex(const QModelIndex &index) const;
+  QModelIndex getNextIndex(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -181,7 +177,7 @@ public:
   * \return
   *   A pointer to the source object or null if there is none.
   */
-  pqPipelineSource *getSourceFor(const QModelIndex &index) const;
+  pqPipelineSource* getSourceFor(const QModelIndex& index) const;
 
 private:
   /**
@@ -191,8 +187,7 @@ private:
   * \return
   *   A pointer to the model object or null if there is none.
   */
-  pqCustomFilterDefinitionModelItem *getModelItemFor(
-      const QModelIndex &index) const;
+  pqCustomFilterDefinitionModelItem* getModelItemFor(const QModelIndex& index) const;
 
   /**
   * \brief
@@ -201,12 +196,11 @@ private:
   * \return
   *   A pointer to the next model item or null if the end is reached.
   */
-  pqCustomFilterDefinitionModelItem *getNextItem(
-      pqCustomFilterDefinitionModelItem *item) const;
+  pqCustomFilterDefinitionModelItem* getNextItem(pqCustomFilterDefinitionModelItem* item) const;
 
 private:
-  pqCustomFilterDefinitionModelItem *Root; ///< The root of the model tree.
-  QPixmap *PixmapList;                     ///< Stores the item icons.
+  pqCustomFilterDefinitionModelItem* Root; ///< The root of the model tree.
+  QPixmap* PixmapList;                     ///< Stores the item icons.
 };
 
 #endif

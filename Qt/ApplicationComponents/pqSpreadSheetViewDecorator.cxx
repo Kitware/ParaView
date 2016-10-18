@@ -70,20 +70,18 @@ public:
   QPointer<pqSignalAdaptorSpinBox> DecimalPrecisionAdaptor;
   QMenu ColumnToggleMenu;
 
-  pqInternal()
-    {
-    }
+  pqInternal() {}
   ~pqInternal()
-    {
+  {
     delete this->AttributeAdaptor;
     delete this->AttributeDomain;
     delete this->DecimalPrecisionAdaptor;
-    }
+  }
 };
 
 //-----------------------------------------------------------------------------
-pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
-  Superclass(view->widget()) // we make our parent the view's widget.
+pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
+  : Superclass(view->widget()) // we make our parent the view's widget.
 {
   this->Spreadsheet = view;
   QWidget* container = view->widget();
@@ -96,36 +94,35 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
   this->Internal->Source->setAutoUpdateIndex(false);
   this->Internal->Source->addCustomEntry("None", NULL);
   this->Internal->Source->fillExistingPorts();
-  this->Internal->AttributeAdaptor =
-    new pqSignalAdaptorComboBox(this->Internal->Attribute);
+  this->Internal->AttributeAdaptor = new pqSignalAdaptorComboBox(this->Internal->Attribute);
   this->Internal->spinBoxPrecision->setValue(
     this->Spreadsheet->getViewModel()->getDecimalPrecision());
-  this->Internal->DecimalPrecisionAdaptor = new pqSignalAdaptorSpinBox(
-    this->Internal->spinBoxPrecision);
-  QObject::connect(this->Internal->spinBoxPrecision, SIGNAL(valueChanged(int)),
-    this, SLOT(displayPrecisionChanged(int)));
+  this->Internal->DecimalPrecisionAdaptor =
+    new pqSignalAdaptorSpinBox(this->Internal->spinBoxPrecision);
+  QObject::connect(this->Internal->spinBoxPrecision, SIGNAL(valueChanged(int)), this,
+    SLOT(displayPrecisionChanged(int)));
 
   this->Internal->AttributeDomain = 0;
 
-  QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
-    this->Spreadsheet, SLOT(render()));
+  QObject::connect(
+    &this->Internal->Links, SIGNAL(smPropertyChanged()), this->Spreadsheet, SLOT(render()));
 
-  QObject::connect(this->Internal->ToggleColumnVisibility, SIGNAL(clicked()),
-    this, SLOT(showToggleColumnPopupMenu()));
+  QObject::connect(this->Internal->ToggleColumnVisibility, SIGNAL(clicked()), this,
+    SLOT(showToggleColumnPopupMenu()));
 
-  QObject::connect(this->Internal->ToggleCellConnectivity, SIGNAL(clicked()),
-    this, SLOT(toggleCellConnectivity()));
+  QObject::connect(this->Internal->ToggleCellConnectivity, SIGNAL(clicked()), this,
+    SLOT(toggleCellConnectivity()));
 
-  QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)),
-    this, SLOT(currentIndexChanged(pqOutputPort*)));
-  QObject::connect(this->Spreadsheet, SIGNAL(showing(pqDataRepresentation*)),
-    this, SLOT(showing(pqDataRepresentation*)));
+  QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)), this,
+    SLOT(currentIndexChanged(pqOutputPort*)));
+  QObject::connect(this->Spreadsheet, SIGNAL(showing(pqDataRepresentation*)), this,
+    SLOT(showing(pqDataRepresentation*)));
 
   this->Internal->ExportSpreadsheet->setDefaultAction(this->Internal->actionExport);
   new pqExportReaction(this->Internal->ExportSpreadsheet->defaultAction());
 
   layout->insertWidget(0, header);
-  this->showing(0); //TODO: get the actual repr currently shown by the view.
+  this->showing(0); // TODO: get the actual repr currently shown by the view.
 }
 
 //-----------------------------------------------------------------------------
@@ -138,35 +135,31 @@ pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
 {
-  QObject::disconnect(this->Internal->AttributeAdaptor,
-    SIGNAL(currentTextChanged(const QString&)),
+  QObject::disconnect(this->Internal->AttributeAdaptor, SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(resetColumnVisibility()));
   this->Internal->Links.removeAllPropertyLinks();
   delete this->Internal->AttributeDomain;
   this->Internal->AttributeDomain = 0;
   if (repr)
-    {
+  {
     vtkSMProxy* reprProxy = repr->getProxy();
 
     this->Internal->AttributeDomain = new pqComboBoxDomain(
-      this->Internal->Attribute,
-      reprProxy->GetProperty("FieldAssociation"), "enum");
+      this->Internal->Attribute, reprProxy->GetProperty("FieldAssociation"), "enum");
     this->Internal->Source->setCurrentPort(repr->getOutputPortFromInput());
-    this->Internal->Links.addPropertyLink(this->Internal->AttributeAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      reprProxy, reprProxy->GetProperty("FieldAssociation"));
-    this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
-      "checked", SIGNAL(toggled(bool)),
-      this->Spreadsheet->getProxy(),
+    this->Internal->Links.addPropertyLink(this->Internal->AttributeAdaptor, "currentText",
+      SIGNAL(currentTextChanged(const QString&)), reprProxy,
+      reprProxy->GetProperty("FieldAssociation"));
+    this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly, "checked",
+      SIGNAL(toggled(bool)), this->Spreadsheet->getProxy(),
       this->Spreadsheet->getProxy()->GetProperty("SelectionOnly"));
-    QObject::connect(this->Internal->AttributeAdaptor,
-      SIGNAL(currentTextChanged(const QString&)),
+    QObject::connect(this->Internal->AttributeAdaptor, SIGNAL(currentTextChanged(const QString&)),
       this, SLOT(resetColumnVisibility()));
-    }
+  }
   else
-    {
+  {
     this->Internal->Source->setCurrentPort(NULL);
-    }
+  }
 
   this->Internal->Attribute->setEnabled(repr != 0);
 }
@@ -175,27 +168,27 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
 void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
 {
   if (port)
-    {
+  {
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-    if (controller->Show(port->getSourceProxy(), port->getPortNumber(),
-        this->Spreadsheet->getViewProxy()))
-      {
-      this->Spreadsheet->render();
-      }
-    }
-  else
+    if (controller->Show(
+          port->getSourceProxy(), port->getPortNumber(), this->Spreadsheet->getViewProxy()))
     {
+      this->Spreadsheet->render();
+    }
+  }
+  else
+  {
     QList<pqRepresentation*> reprs = this->Spreadsheet->getRepresentations();
     foreach (pqRepresentation* repr, reprs)
-      {
+    {
       if (repr->isVisible())
-        {
+      {
         repr->setVisible(false);
         this->Spreadsheet->render();
         break; // since only 1 repr can be visible at a time.
-        }
       }
     }
+  }
   this->resetColumnVisibility();
 }
 
@@ -203,112 +196,109 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
 void pqSpreadSheetViewDecorator::displayPrecisionChanged(int precision)
 {
   this->Spreadsheet->getViewModel()->setDecimalPrecision(precision);
-  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
-    {
+  for (int i = 0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+  {
     this->Spreadsheet->getViewModel()->setVisible(i, true);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::showToggleColumnPopupMenu()
 {
   // Update toggle list
-  QMap<QString,bool> userRole;
+  QMap<QString, bool> userRole;
   this->Internal->ColumnToggleMenu.clear();
-  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
-    {
-    QString name =
-        this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
+  for (int i = 0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+  {
+    QString name = this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
     userRole[name] = this->Spreadsheet->getViewModel()->isVisible(i);
-    if(!name.startsWith("__"))
-      {
-      this->Internal->ColumnToggleMenu.addAction(name);
-      }
-    }
-
-  foreach(QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+    if (!name.startsWith("__"))
     {
+      this->Internal->ColumnToggleMenu.addAction(name);
+    }
+  }
+
+  foreach (QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+  {
     a->setCheckable(true);
     a->setChecked(userRole[a->text()]);
     QObject::connect(a, SIGNAL(changed()), this, SLOT(updateColumnVisibility()));
-    }
-
-  if(userRole.size() > 0)
-    {
-    this->Internal->ColumnToggleMenu.popup(
-          this->Internal->ToggleColumnVisibility->mapToGlobal(
-            QPoint(0, this->Internal->ToggleColumnVisibility->height())));
-    }
   }
+
+  if (userRole.size() > 0)
+  {
+    this->Internal->ColumnToggleMenu.popup(this->Internal->ToggleColumnVisibility->mapToGlobal(
+      QPoint(0, this->Internal->ToggleColumnVisibility->height())));
+  }
+}
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::updateColumnVisibility()
 {
   QList<QString> headers;
-  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
-    {
-    headers.append(
-        this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString());
-    }
+  for (int i = 0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+  {
+    headers.append(this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString());
+  }
 
   QList<QPair<QString, bool> > visibilities;
-  foreach(QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
-    {
+  foreach (QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+  {
     int index = headers.indexOf(a->text());
-    if(index >= 0)
-      {
+    if (index >= 0)
+    {
       this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
 
       // Recover actual name to update ColumnVisibility in vtkSpreadsheetView
       // for a potential export. This property has no effect on actual
       // table generation for the view in paraview.
       QString actualName = a->text();
-      if (actualName == "Point ID" || actualName == "Cell ID" || actualName == "Row ID"
-          || actualName == "Vertex ID" || actualName == "Edge ID")
-        {
+      if (actualName == "Point ID" || actualName == "Cell ID" || actualName == "Row ID" ||
+        actualName == "Vertex ID" || actualName == "Edge ID")
+      {
         actualName = "vtkOriginalIndices";
-        }
-      if (actualName == "Block Number")
-        {
-        actualName = "vtkCompositeIndexArray";
-        }
-      if (actualName == "Process ID")
-        {
-        actualName = "vtkOriginalProcessIds";
-        }
-      visibilities.push_back(QPair<QString, bool>(actualName, a->isChecked()));
       }
+      if (actualName == "Block Number")
+      {
+        actualName = "vtkCompositeIndexArray";
+      }
+      if (actualName == "Process ID")
+      {
+        actualName = "vtkOriginalProcessIds";
+      }
+      visibilities.push_back(QPair<QString, bool>(actualName, a->isChecked()));
     }
+  }
 
   // Add Already hidden columns
-  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+  for (int i = 0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+  {
+    QString name = this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
+    if (name.startsWith("__"))
     {
-    QString name =
-      this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
-    if(name.startsWith("__"))
-      {
       visibilities.push_back(QPair<QString, bool>(name, false));
-      }
     }
+  }
 
   // If no AttributeDomain is present, it means there is no data to work with.
   if (this->Internal->AttributeDomain)
-    {
+  {
     int index = 0;
     vtkSMPropertyHelper columnVisiHelper(this->Spreadsheet->getProxy(), "ColumnVisibility");
     columnVisiHelper.SetNumberOfElements(visibilities.size() * 3);
-    int fieldAssociation = vtkSMIntVectorProperty::SafeDownCast(
-      this->Internal->AttributeDomain->getProperty())->GetElement(0);
+    int fieldAssociation =
+      vtkSMIntVectorProperty::SafeDownCast(this->Internal->AttributeDomain->getProperty())
+        ->GetElement(0);
     QPair<QString, bool> pair;
-    foreach(pair, visibilities)
-      {
+    foreach (pair, visibilities)
+    {
       columnVisiHelper.Set(index, fieldAssociation);
-      columnVisiHelper.Set(index+1, pair.first.toLatin1().data());
-      columnVisiHelper.Set(index+2, pair.second);
+      columnVisiHelper.Set(index + 1, pair.first.toLatin1().data());
+      columnVisiHelper.Set(index + 2, pair.second);
       index += 3;
-      }
-    this->Spreadsheet->getProxy()->UpdateVTKObjects();
     }
+    this->Spreadsheet->getProxy()->UpdateVTKObjects();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -322,19 +312,18 @@ void pqSpreadSheetViewDecorator::resetColumnVisibility()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::toggleCellConnectivity()
 {
-  if(vtkSMProxy* proxy = this->Spreadsheet->getRepresentation(0)->getProxy())
-    {
-    vtkSMPropertyHelper(proxy, "GenerateCellConnectivity").Set(
-          this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
+  if (vtkSMProxy* proxy = this->Spreadsheet->getRepresentation(0)->getProxy())
+  {
+    vtkSMPropertyHelper(proxy, "GenerateCellConnectivity")
+      .Set(this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
     proxy->UpdateVTKObjects();
-    if(vtkSpreadSheetView* view =
-       vtkSpreadSheetView::SafeDownCast(
-         this->Spreadsheet->getViewProxy()->GetClientSideView()))
-      {
+    if (vtkSpreadSheetView* view =
+          vtkSpreadSheetView::SafeDownCast(this->Spreadsheet->getViewProxy()->GetClientSideView()))
+    {
       view->ClearCache();
-      }
-    this->Spreadsheet->render();
     }
+    this->Spreadsheet->render();
+  }
   this->resetColumnVisibility();
 }
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,30 +43,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqAnimatableProxyComboBox::pqAnimatableProxyComboBox(QWidget* _parent)
-  :Superclass(_parent)
+  : Superclass(_parent)
 {
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>();
-  foreach(pqPipelineSource* src, sources)
-    {
+  foreach (pqPipelineSource* src, sources)
+  {
     QVariant p;
     p.setValue(pqSMProxy(src->getProxy()));
     this->addItem(src->getSMName(), p);
-    }
-  
-  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
-    this, SLOT(onSourceRemoved(pqPipelineSource*)));
-  
-  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this, SLOT(onSourceAdded(pqPipelineSource*)));
+  }
 
-  QObject::connect(smmodel, SIGNAL(nameChanged(pqServerManagerModelItem*)),
-    this, SLOT(onNameChanged(pqServerManagerModelItem*)));
-  
-  QObject::connect(this, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(onCurrentSourceChanged(int)));
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)), this,
+    SLOT(onSourceRemoved(pqPipelineSource*)));
+
+  QObject::connect(
+    smmodel, SIGNAL(sourceAdded(pqPipelineSource*)), this, SLOT(onSourceAdded(pqPipelineSource*)));
+
+  QObject::connect(smmodel, SIGNAL(nameChanged(pqServerManagerModelItem*)), this,
+    SLOT(onNameChanged(pqServerManagerModelItem*)));
+
+  QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentSourceChanged(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -93,14 +91,14 @@ void pqAnimatableProxyComboBox::onSourceAdded(pqPipelineSource* src)
 void pqAnimatableProxyComboBox::onSourceRemoved(pqPipelineSource* source)
 {
   int index = this->findProxy(source->getProxy());
-  if(index != -1)
-    {
+  if (index != -1)
+  {
     this->removeItem(index);
-    if(this->count() == 0)
-      {
+    if (this->count() == 0)
+    {
       emit this->currentProxyChanged(NULL);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -108,14 +106,14 @@ void pqAnimatableProxyComboBox::onNameChanged(pqServerManagerModelItem* item)
 {
   pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
   if (src)
-    {
+  {
     int index = this->findProxy(src->getProxy());
     if (index != -1 && src->getSMName() != this->itemText(index))
-      {
+    {
       QModelIndex midx = this->model()->index(index, 0);
       this->model()->setData(midx, src->getSMName(), Qt::DisplayRole);
-      }
     }
+  }
 }
 
 void pqAnimatableProxyComboBox::onCurrentSourceChanged(int idx)
@@ -134,26 +132,25 @@ void pqAnimatableProxyComboBox::addProxy(int index, const QString& label, vtkSMP
 void pqAnimatableProxyComboBox::removeProxy(const QString& label)
 {
   int index = this->findText(label);
-  if(index != -1)
-    {
+  if (index != -1)
+  {
     this->removeItem(index);
-    if(this->count() == 0)
-      {
+    if (this->count() == 0)
+    {
       emit this->currentProxyChanged(NULL);
-      }
     }
+  }
 }
 
 int pqAnimatableProxyComboBox::findProxy(vtkSMProxy* pxy)
 {
   int c = this->count();
-  for(int i=0; i<c; i++)
+  for (int i = 0; i < c; i++)
+  {
+    if (pxy == this->itemData(i).value<pqSMProxy>())
     {
-    if(pxy == this->itemData(i).value<pqSMProxy>())
-      {
       return i;
-      }
     }
+  }
   return -1;
 }
-

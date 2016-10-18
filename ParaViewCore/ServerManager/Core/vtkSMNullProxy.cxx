@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-
 vtkStandardNewMacro(vtkSMNullProxy);
 //-----------------------------------------------------------------------------
 vtkSMNullProxy::vtkSMNullProxy()

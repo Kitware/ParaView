@@ -34,8 +34,10 @@ class vtkSIProxyProperty::InternalCache : public std::set<vtkTypeUInt32>
 {
 };
 
-class vtkSIProxyProperty::vtkObjectCache :
-  public std::map<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase> > {};
+class vtkSIProxyProperty::vtkObjectCache
+  : public std::map<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase> >
+{
+};
 
 //****************************************************************************/
 vtkStandardNewMacro(vtkSIProxyProperty);
@@ -61,13 +63,12 @@ vtkSIProxyProperty::~vtkSIProxyProperty()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIProxyProperty::ReadXMLAttributes(
-  vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
+bool vtkSIProxyProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(proxyhelper, element))
-    {
+  {
     return false;
-    }
+  }
 
   this->SetCleanCommand(element->GetAttribute("clean_command"));
 
@@ -76,38 +77,38 @@ bool vtkSIProxyProperty::ReadXMLAttributes(
   // Allow to choose the kind of object to pass as argument based on
   // its global id.
   const char* arg_type = element->GetAttribute("argument_type");
-  if(arg_type != NULL && arg_type[0] != 0)
+  if (arg_type != NULL && arg_type[0] != 0)
+  {
+    if (strcmp(arg_type, "VTK") == 0)
     {
-    if(strcmp(arg_type, "VTK") == 0)
-      {
       this->ArgumentType = VTK;
-      }
-    else if(strcmp(arg_type, "SMProxy") == 0)
-      {
-      this->ArgumentType = SMProxy;
-      }
-    else if(strcmp(arg_type, "SIProxy") == 0)
-      {
-      this->ArgumentType = SIProxy;
-      }
     }
-  else
+    else if (strcmp(arg_type, "SMProxy") == 0)
     {
+      this->ArgumentType = SMProxy;
+    }
+    else if (strcmp(arg_type, "SIProxy") == 0)
+    {
+      this->ArgumentType = SIProxy;
+    }
+  }
+  else
+  {
     // If not set, DEFAULT value
     this->ArgumentType = VTK;
-    }
+  }
 
   int null_on_empty;
   if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
-    {
+  {
     this->SetNullOnEmpty(null_on_empty != 0);
-    }
+  }
 
   if (this->InformationOnly)
-    {
+  {
     vtkErrorMacro("InformationOnly proxy properties are not supported!");
     return false;
-    }
+  }
 
   return true;
 }
@@ -116,15 +117,14 @@ bool vtkSIProxyProperty::ReadXMLAttributes(
 bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
 {
   assert(message->ExtensionSize(ProxyState::property) > offset);
-  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property,
-                                                           offset);
+  const ProxyState_Property* prop = &message->GetExtension(ProxyState::property, offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
   std::set<vtkTypeUInt32> new_value;
-  for (int cc=0; cc < prop->value().proxy_global_id_size(); cc++)
-    {
-    new_value.insert( prop->value().proxy_global_id(cc) );
-    }
+  for (int cc = 0; cc < prop->value().proxy_global_id_size(); cc++)
+  {
+    new_value.insert(prop->value().proxy_global_id(cc));
+  }
 
   std::set<vtkTypeUInt32> to_add = new_value;
 
@@ -133,89 +133,74 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
 
   // Deal with previous values to remove
   if (this->CleanCommand)
-    {
-    stream << vtkClientServerStream::Invoke
-           << object
-           << this->CleanCommand
+  {
+    stream << vtkClientServerStream::Invoke << object << this->CleanCommand
            << vtkClientServerStream::End;
 
     this->ObjectCache->clear();
-    }
-  else if(this->RemoveCommand)
-    {
+  }
+  else if (this->RemoveCommand)
+  {
     std::set<vtkTypeUInt32> to_remove;
-    std::set_difference(this->Cache->begin(), this->Cache->end(),
-      new_value.begin(), new_value.end(), 
-      std::inserter(to_remove, to_remove.begin()));
+    std::set_difference(this->Cache->begin(), this->Cache->end(), new_value.begin(),
+      new_value.end(), std::inserter(to_remove, to_remove.begin()));
 
-    for (std::set<vtkTypeUInt32>::iterator iter = to_remove.begin();
-      iter != to_remove.end(); ++iter)
-      {
+    for (std::set<vtkTypeUInt32>::iterator iter = to_remove.begin(); iter != to_remove.end();
+         ++iter)
+    {
       vtkObjectBase* arg = this->GetObjectBase(*iter);
       if (arg == NULL)
-        {
+      {
         arg = (*this->ObjectCache)[*iter].GetPointer();
-        }
-      if(arg != NULL)
-        {
-        stream << vtkClientServerStream::Invoke
-               << object
-               << this->GetRemoveCommand()
-               << arg
+      }
+      if (arg != NULL)
+      {
+        stream << vtkClientServerStream::Invoke << object << this->GetRemoveCommand() << arg
                << vtkClientServerStream::End;
 
         this->ObjectCache->erase(*iter);
-        }
-      else
-        {
-        vtkWarningMacro("Failed to locate vtkObjectBase for id : " << *iter);
-        }
       }
-
-    to_add.clear();
-    std::set_difference(new_value.begin(), new_value.end(), 
-      this->Cache->begin(), this->Cache->end(),
-      std::inserter(to_add, to_add.begin()));
+      else
+      {
+        vtkWarningMacro("Failed to locate vtkObjectBase for id : " << *iter);
+      }
     }
 
+    to_add.clear();
+    std::set_difference(new_value.begin(), new_value.end(), this->Cache->begin(),
+      this->Cache->end(), std::inserter(to_add, to_add.begin()));
+  }
+
   // Deal with proxy to add
-  for (std::set<vtkTypeUInt32>::iterator iter = to_add.begin();
-      iter != to_add.end(); ++iter)
-    {
+  for (std::set<vtkTypeUInt32>::iterator iter = to_add.begin(); iter != to_add.end(); ++iter)
+  {
     vtkObjectBase* arg = this->GetObjectBase(*iter);
-    if(arg != NULL || this->IsValidNull(*iter))
-      {
-      stream << vtkClientServerStream::Invoke
-             << object
-             << this->GetCommand()
-             << arg
+    if (arg != NULL || this->IsValidNull(*iter))
+    {
+      stream << vtkClientServerStream::Invoke << object << this->GetCommand() << arg
              << vtkClientServerStream::End;
 
       // we keep an object cache so that even if the object gets unregistered
       // before the property is pushed, we have a reference to it.
       (*this->ObjectCache)[*iter] = arg;
-      }
-    else
-      {
-      vtkWarningMacro("Try to ADD a Proxy to a ProxyProperty but the proxy was not found");
-      }
     }
+    else
+    {
+      vtkWarningMacro("Try to ADD a Proxy to a ProxyProperty but the proxy was not found");
+    }
+  }
 
   // Take care of the Empty case
   if (this->NullOnEmpty && this->CleanCommand == NULL && new_value.size() == 0)
-    {
-    stream << vtkClientServerStream::Invoke
-           << object
-           << this->GetCommand()
-           << vtkClientServerID(0)
+  {
+    stream << vtkClientServerStream::Invoke << object << this->GetCommand() << vtkClientServerID(0)
            << vtkClientServerStream::End;
 
     this->ObjectCache->clear();
-    }
+  }
 
   this->Cache->clear();
-  std::copy(new_value.begin(), new_value.end(),
-    std::inserter(*this->Cache, this->Cache->begin()));
+  std::copy(new_value.begin(), new_value.end(), std::inserter(*this->Cache, this->Cache->begin()));
 
   // Save to cache when pulled for collaboration
   this->SaveValueToCache(message, offset);
@@ -232,8 +217,8 @@ void vtkSIProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 {
   vtkSIProxy* siProxy = NULL;
-  switch(this->ArgumentType)
-    {
+  switch (this->ArgumentType)
+  {
     case VTK:
       siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
       return (siProxy == NULL) ? NULL : siProxy->GetVTKObject();
@@ -241,18 +226,19 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
       return this->SIProxyObject->GetRemoteObject(globalId);
     case SIProxy:
       return this->SIProxyObject->GetSIObject(globalId);
-    }
+  }
   return NULL;
 }
 //----------------------------------------------------------------------------
 bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
-  if(globalId == 0)
-    {
+  if (globalId == 0)
+  {
     return true;
-    }
+  }
 
   vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
-  assert("SIProxy shouldn't be null otherwise it's a Proxy location issue in the XML" && siProxy != 0);
+  assert(
+    "SIProxy shouldn't be null otherwise it's a Proxy location issue in the XML" && siProxy != 0);
   return siProxy->IsNullProxy();
 }

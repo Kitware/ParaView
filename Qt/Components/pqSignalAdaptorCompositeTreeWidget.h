@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QVariant>
 
-
 class pqTreeWidgetItem;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -60,12 +59,11 @@ class PQCOMPONENTS_EXPORT pqSignalAdaptorCompositeTreeWidget : public QObject
   Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
 public:
   enum IndexModes
-    {
+  {
     INDEX_MODE_FLAT,
     INDEX_MODE_LEVEL_INDEX, // this mode works only for 1 level deep trees.
-    INDEX_MODE_LEVEL,       // this mode works only for 1 level deep trees. 
-    };
-
+    INDEX_MODE_LEVEL,       // this mode works only for 1 level deep trees.
+  };
 
   /**
   * Constructor. \c domain is used to build the tree layout to show in the
@@ -78,17 +76,16 @@ public:
   *                                selected elements (cells|points).
   */
   pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMIntVectorProperty* smproperty,
-    bool autoUpdateWidgetVisibility=false,
-    bool showSelectedElementCounts=false);
+    bool autoUpdateWidgetVisibility = false, bool showSelectedElementCounts = false);
 
   /**
-  * Alternate constructor. 
-  * \c outputport - the output port producing the composite dataset to show. 
-  * \c domainMode - vtkSMCompositeTreeDomain::ALL|LEAVES|NON_LEAVES|NONE. 
-  *                 Indicates what types of nodes in the composite tree 
+  * Alternate constructor.
+  * \c outputport - the output port producing the composite dataset to show.
+  * \c domainMode - vtkSMCompositeTreeDomain::ALL|LEAVES|NON_LEAVES|NONE.
+  *                 Indicates what types of nodes in the composite tree
   *                 are selectable.
   * \c indexMode  - indicates how the values are set/get (using
-  *                 composite-flat-index, using level-dataset-index or using 
+  *                 composite-flat-index, using level-dataset-index or using
   *                 only the level number.
   * \c selectMultiple - true if possible to select multiple nodes.
   * \c autoUpdateWidgetVisibility -  is true, the tree widget is hidden if the
@@ -98,12 +95,9 @@ public:
   *                                will be added showing the number of
   *                                selected elements (cells|points).
   */
-  pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMOutputPort* outputport,
-    int domainMode,
-    IndexModes indexMode=INDEX_MODE_FLAT,
-    bool selectMultiple=false,
-    bool autoUpdateWidgetVisibility=false,
-    bool showSelectedElementCounts=false);
+  pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMOutputPort* outputport, int domainMode,
+    IndexModes indexMode = INDEX_MODE_FLAT, bool selectMultiple = false,
+    bool autoUpdateWidgetVisibility = false, bool showSelectedElementCounts = false);
 
   /**
   * Destructor
@@ -120,10 +114,8 @@ public:
   * When set, the adaptor will update the visibility of the widget depending
   * on whether the data is composite or not.
   */
-  void setAutoUpdateWidgetVisibility(bool val)
-    { this->AutoUpdateWidgetVisibility = val; }
-  bool autoUpdateWidgetVisibility() const
-    { return this->AutoUpdateWidgetVisibility; }
+  void setAutoUpdateWidgetVisibility(bool val) { this->AutoUpdateWidgetVisibility = val; }
+  bool autoUpdateWidgetVisibility() const { return this->AutoUpdateWidgetVisibility; }
 
   /**
   * Select the item with the given flat index.
@@ -134,7 +126,7 @@ public:
   * API to get information about the currently selected item.
   * Returns the flat index for the current item.
   */
-  unsigned int getCurrentFlatIndex(bool* valid=NULL);
+  unsigned int getCurrentFlatIndex(bool* valid = NULL);
 
   /**
   * API to get information about an item.
@@ -184,7 +176,7 @@ signals:
   void valuesChanged();
 
 private slots:
-  
+
   /**
   * Called to update the labels to show the current selected elements
   * information.
@@ -200,8 +192,7 @@ private:
   */
   void setupSelectionUpdatedCallback(vtkSMSourceProxy* source, unsigned int port);
 
-  void buildTree(pqTreeWidgetItem* item, 
-    vtkPVDataInformation* info);
+  void buildTree(pqTreeWidgetItem* item, vtkPVDataInformation* info);
 
   /**
   * updates the check flags for all the items.
@@ -212,26 +203,26 @@ private:
   pqInternal* Internal;
 
   enum MetaData
-    {
+  {
     FLAT_INDEX = Qt::UserRole,
-    AMR_LEVEL_NUMBER = Qt::UserRole+1,
-    AMR_BLOCK_INDEX = Qt::UserRole+2,
-    NODE_TYPE = Qt::UserRole+3,
-    ORIGINAL_LABEL = Qt::UserRole+4,
-    BLOCK_NAME = Qt::UserRole+5
-    };
+    AMR_LEVEL_NUMBER = Qt::UserRole + 1,
+    AMR_BLOCK_INDEX = Qt::UserRole + 2,
+    NODE_TYPE = Qt::UserRole + 3,
+    ORIGINAL_LABEL = Qt::UserRole + 4,
+    BLOCK_NAME = Qt::UserRole + 5
+  };
 
   enum NodeTypes
-    {
+  {
     LEAF = 21,
     NON_LEAF = 22,
-    };
+  };
 
   enum CheckModes
-    {
+  {
     SINGLE_ITEM,
     MULTIPLE_ITEMS
-    };
+  };
 
   IndexModes IndexMode;
 
@@ -269,5 +260,3 @@ private:
 };
 
 #endif
-
-

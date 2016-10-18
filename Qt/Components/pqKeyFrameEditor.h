@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -50,8 +50,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
   Q_OBJECT
 
 public:
-  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
-                   const QString& label, QWidget* p);
+  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, const QString& label, QWidget* p);
   ~pqKeyFrameEditor();
 
   /**
@@ -84,7 +83,6 @@ private:
   pqInternal* Internal;
 };
 
-
 // internal class
 class pqKeyFrameEditorDialog : public QDialog
 {
@@ -96,4 +94,3 @@ public:
 };
 
 #endif
-

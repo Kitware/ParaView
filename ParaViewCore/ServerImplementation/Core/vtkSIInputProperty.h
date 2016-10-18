@@ -57,10 +57,10 @@ protected:
 
   vtkSetMacro(PortIndex, int);
   int PortIndex;
+
 private:
   vtkSIInputProperty(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

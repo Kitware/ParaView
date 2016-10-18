@@ -33,4 +33,3 @@ float GetRadius()
 {
   return ConstantRadius;
 }
-

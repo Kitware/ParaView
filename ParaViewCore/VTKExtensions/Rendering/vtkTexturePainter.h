@@ -154,13 +154,13 @@ public:
   //@}
 
   enum
-    {
+  {
     YZ_PLANE = 0,
     XZ_PLANE = 1,
     XY_PLANE = 2,
-    };
+  };
 
-  virtual void ReleaseGraphicsResources (vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
   vtkSetVector6Macro(WholeExtent, int);
 
@@ -181,10 +181,8 @@ protected:
    * DelegatePainter is in sync with this painter i.e. UpdateDelegatePainter()
    * has been called.
    */
-  virtual void RenderInternal(vtkRenderer *renderer,
-                              vtkActor *actor,
-                              unsigned long typeflags,
-                              bool forceCompileOnly);
+  virtual void RenderInternal(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
   /**
    * Internal method passes correct scalars to the Texture and returns 1 if cell
@@ -210,12 +208,10 @@ protected:
   vtkTexture* Texture;
 
   vtkTimeStamp UpdateTime;
+
 private:
   vtkTexturePainter(const vtkTexturePainter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTexturePainter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-
-

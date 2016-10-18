@@ -28,7 +28,8 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor
+  : public vtkDataObjectAlgorithm
 {
 public:
   static vtkBlockDeliveryPreprocessor* New();
@@ -97,26 +98,21 @@ protected:
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   int FieldAssociation;
   int FlattenTable;
   bool GenerateOriginalIds;
   bool GenerateCellConnectivity;
+
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
 
   class CompositeDataSetIndicesType;
-  CompositeDataSetIndicesType *CompositeDataSetIndices;
-
+  CompositeDataSetIndicesType* CompositeDataSetIndices;
 };
 
 #endif
-

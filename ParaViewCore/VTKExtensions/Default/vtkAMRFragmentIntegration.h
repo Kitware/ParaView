@@ -20,7 +20,7 @@
  *
  *   Input 0: The AMR Volume
  *
- *   Output 0: A multiblock containing tables of fragments, one block 
+ *   Output 0: A multiblock containing tables of fragments, one block
  *             for each requested material
 */
 
@@ -36,35 +36,33 @@ class vtkTable;
 class vtkNonOverlappingAMR;
 class vtkDataSet;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRFragmentIntegration : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRFragmentIntegration
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAMRFragmentIntegration *New();
-  vtkTypeMacro(vtkAMRFragmentIntegration,vtkMultiBlockDataSetAlgorithm);
+  static vtkAMRFragmentIntegration* New();
+  vtkTypeMacro(vtkAMRFragmentIntegration, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkAMRFragmentIntegration();
   virtual ~vtkAMRFragmentIntegration();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Pipeline helper.  Run on each material independently.
    */
-  vtkTable* DoRequestData(vtkNonOverlappingAMR* volume, 
-                          const char* volumeArray,
-                          const char* massArray,
-                          std::vector<std::string> volumeWeightedNames,
-                          std::vector<std::string> massWeightedNames);
+  vtkTable* DoRequestData(vtkNonOverlappingAMR* volume, const char* volumeArray,
+    const char* massArray, std::vector<std::string> volumeWeightedNames,
+    std::vector<std::string> massWeightedNames);
 
 private:
   vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif /* vtkAMRFragmentIntegration_h */

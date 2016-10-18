@@ -53,9 +53,8 @@ class PQWIDGETS_EXPORT pqTableView : public QTableView
   * Set this to 0, and this will behave exactly as QTableView.
   * Default is 0.
   */
-  Q_PROPERTY(int maximumRowCountBeforeScrolling
-             READ maximumRowCountBeforeScrolling
-             WRITE setMaximumRowCountBeforeScrolling);
+  Q_PROPERTY(int maximumRowCountBeforeScrolling READ maximumRowCountBeforeScrolling WRITE
+      setMaximumRowCountBeforeScrolling);
 
   /**
   * The number of rows to use as the minimum to determine the size of the
@@ -73,7 +72,7 @@ class PQWIDGETS_EXPORT pqTableView : public QTableView
   Q_PROPERTY(int padding READ padding WRITE setPadding);
 
 public:
-  pqTableView(QWidget* parent=0);
+  pqTableView(QWidget* parent = 0);
   virtual ~pqTableView();
 
   /**
@@ -83,19 +82,15 @@ public:
   * Set this to 0, and this will behave exactly as QTableView.
   * Default is 0.
   */
-  void setMaximumRowCountBeforeScrolling(int val)  
-    { this->MaximumRowCountBeforeScrolling = val; }
-  int maximumRowCountBeforeScrolling() const
-    { return this->MaximumRowCountBeforeScrolling; }
+  void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
+  int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }
 
   /**
   * Set the number of rows to use as the minimum to determine the size of the
   * widget when there are fewer or no rows.
   */
-  void setMinimumRowCount(int val)
-    { this->MinimumRowCount = val; }
-  int minimumRowCount() const
-    { return this->MinimumRowCount; }
+  void setMinimumRowCount(int val) { this->MinimumRowCount = val; }
+  int minimumRowCount() const { return this->MinimumRowCount; }
 
   /**
   * Set the number of rows to always pad the widget with. This is used
@@ -110,8 +105,8 @@ public:
   * Overridden to ensure the view updates its size as rows are
   * added/removed.
   */
-  virtual void setModel(QAbstractItemModel *model);
-  virtual void setRootIndex(const QModelIndex &index);
+  virtual void setModel(QAbstractItemModel* model);
+  virtual void setRootIndex(const QModelIndex& index);
 
   /**
   * Overridden to report size as per the state of this pqTableView.
@@ -122,7 +117,7 @@ public:
   /**
   * Overridden to handle events from QScrollBar.
   */
-  virtual bool eventFilter(QObject *watched, QEvent *evt);
+  virtual bool eventFilter(QObject* watched, QEvent* evt);
 
 private slots:
   void invalidateLayout();

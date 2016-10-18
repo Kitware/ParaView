@@ -39,13 +39,13 @@ void vtkPVDataSizeInformation::CopyFromObject(vtkObject* object)
 
   vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(object);
   if (alg)
-    {
+  {
     dinfo->CopyFromObject(alg->GetOutputDataObject(0));
-    }
+  }
   else
-    {
+  {
     dinfo->CopyFromObject(object);
-    }
+  }
   this->MemorySize = dinfo->GetMemorySize();
   dinfo->Delete();
   this->Modified();
@@ -56,11 +56,11 @@ void vtkPVDataSizeInformation::AddInformation(vtkPVInformation* info)
 {
   vtkPVDataSizeInformation* dsinfo = vtkPVDataSizeInformation::SafeDownCast(info);
   if (!dsinfo)
-    {
+  {
     vtkErrorMacro("Could not cast object to data size information.");
     return;
-    }
-  this->MemorySize += dsinfo->MemorySize; 
+  }
+  this->MemorySize += dsinfo->MemorySize;
 }
 
 //----------------------------------------------------------------------------
@@ -75,14 +75,14 @@ void vtkPVDataSizeInformation::CopyToStream(vtkClientServerStream* css)
 //----------------------------------------------------------------------------
 void vtkPVDataSizeInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  if(!css->GetArgument(0, 0, &this->MemorySize))
-    {
+  if (!css->GetArgument(0, 0, &this->MemorySize))
+  {
     vtkErrorMacro("Error parsing memory size.");
-    }
+  }
   else
-    {
+  {
     this->Modified();
-    }
+  }
 }
 //----------------------------------------------------------------------------
 void vtkPVDataSizeInformation::Initialize()
@@ -96,5 +96,3 @@ void vtkPVDataSizeInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MemorySize: " << this->MemorySize << endl;
 }
-
-

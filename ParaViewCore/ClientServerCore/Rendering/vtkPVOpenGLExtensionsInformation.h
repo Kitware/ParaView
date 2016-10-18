@@ -30,7 +30,8 @@
 
 class vtkPVOpenGLExtensionsInformationInternal;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation
+  : public vtkPVInformation
 {
 public:
   static vtkPVOpenGLExtensionsInformation* New();
@@ -60,6 +61,7 @@ public:
    * Merge another information object.
    */
   virtual void AddInformation(vtkPVInformation*);
+
 protected:
   vtkPVOpenGLExtensionsInformation();
   ~vtkPVOpenGLExtensionsInformation();
@@ -70,7 +72,6 @@ private:
   void operator=(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
 
   vtkPVOpenGLExtensionsInformationInternal* Internal;
-
 };
 
 #endif

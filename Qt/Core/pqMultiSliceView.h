@@ -29,6 +29,7 @@ class PQCORE_EXPORT pqMultiSliceView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
+
 public:
   static QString multiSliceViewType() { return "MultiSlice"; }
 
@@ -36,32 +37,30 @@ public:
   * constructor takes a bunch of init stuff and must have this signature to
   * satisfy pqView
   */
-  pqMultiSliceView( const QString& viewtype,
-                    const QString& group,
-                    const QString& name,
-                    vtkSMViewProxy* viewmodule,
-                    pqServer* server,
-                    QObject* p);
+  pqMultiSliceView(const QString& viewtype, const QString& group, const QString& name,
+    vtkSMViewProxy* viewmodule, pqServer* server, QObject* p);
   virtual ~pqMultiSliceView();
 
   /**
   * Provide access to visible slices positions for any axis.
   * Precondition: 0 <= axisIndex <= 2
   */
-  const double* GetVisibleSlices(int axisIndex, int &numberOfSlices);
+  const double* GetVisibleSlices(int axisIndex, int& numberOfSlices);
 
   /**
   * @deprecated. Use GetVisibleSlices() or GetAllSlices(). This method simply
   * calls GetVisibleSlices().
   */
-  const double* GetSlices(int axisIndex, int &numberOfSlices)
-    { return this->GetVisibleSlices(axisIndex, numberOfSlices); }
+  const double* GetSlices(int axisIndex, int& numberOfSlices)
+  {
+    return this->GetVisibleSlices(axisIndex, numberOfSlices);
+  }
 
   /**
   * Provides access to all (visible and invisible) slice positions for any
   * Precondition: 0 <= axisIndex <= 2
   */
-  const double* GetAllSlices(int axisIndex, int &numberOfSlices);
+  const double* GetAllSlices(int axisIndex, int& numberOfSlices);
 
   /**
   * Provide access to slices normal for any axis.
@@ -78,7 +77,7 @@ public:
   /**
   * Override for custom management
   */
-  virtual void setCursor(const QCursor &);
+  virtual void setCursor(const QCursor&);
 
   /**
   * Update Outline visibility
@@ -109,7 +108,7 @@ private slots:
   void onSliceModified(int activeSliceIndex);
 
 protected:
-  void updateViewModelCallBack(vtkObject*,unsigned long, void*);
+  void updateViewModelCallBack(vtkObject*, unsigned long, void*);
 
   /**
   * Override to decorate the QVTKWidget

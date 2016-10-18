@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -58,14 +58,13 @@ class PQCOMPONENTS_EXPORT pqServerConnectDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
   /**
   * If \c selector is specified, only those server-configurations that match the
   * selector's scheme and hostname are shown.
   */
-  pqServerConnectDialog(
-    QWidget* parent=0,
-    const pqServerResource& selector=pqServerResource());
+  pqServerConnectDialog(QWidget* parent = 0, const pqServerResource& selector = pqServerResource());
   virtual ~pqServerConnectDialog();
 
   /**
@@ -81,10 +80,8 @@ public:
   * connect to the server. When the method returns true,
   * selected_configuration will be set to the chosen configuration.
   */
-  static bool selectServer(
-    pqServerConfiguration& selected_configuration,
-    QWidget* dialogParent=NULL,
-    const pqServerResource& selector=pqServerResource());
+  static bool selectServer(pqServerConfiguration& selected_configuration,
+    QWidget* dialogParent = NULL, const pqServerResource& selector = pqServerResource());
 
 protected slots:
   /**

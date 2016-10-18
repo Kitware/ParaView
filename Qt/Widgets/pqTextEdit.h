@@ -58,9 +58,10 @@ class PQWIDGETS_EXPORT pqTextEdit : public QTextEdit
 {
   Q_OBJECT
   typedef QTextEdit Superclass;
+
 public:
-  pqTextEdit(QWidget *parent=0);
-  pqTextEdit(const QString &contents, QWidget *parent=0);
+  pqTextEdit(QWidget* parent = 0);
+  pqTextEdit(const QString& contents, QWidget* parent = 0);
 
   virtual ~pqTextEdit();
 

@@ -37,29 +37,29 @@ class vtkPiecewiseFunction;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
-  vtkTypeMacro(vtkPVLODActor,vtkActor);
+  vtkTypeMacro(vtkPVLODActor, vtkActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVLODActor *New();
+  static vtkPVLODActor* New();
 
   /**
    * This causes the actor to be rendered. It, in turn, will render the actor's
    * property and then mapper.
    */
-  virtual void Render(vtkRenderer *, vtkMapper *);
+  virtual void Render(vtkRenderer*, vtkMapper*);
 
   /**
    * This method is used internally by the rendering process.
    * We overide the superclass method to properly set the estimated render time.
    */
-  int RenderOpaqueGeometry(vtkViewport *viewport);
+  int RenderOpaqueGeometry(vtkViewport* viewport);
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow *);
+  void ReleaseGraphicsResources(vtkWindow*);
 
   //@{
   /**
@@ -73,22 +73,22 @@ public:
    * This is a bit of a hack.  This returns the last mapper used to render.
    * It does this so that compositing can descide if anything was actually renderered.
    */
-  vtkMapper *GetMapper() {return this->SelectMapper();}
+  vtkMapper* GetMapper() { return this->SelectMapper(); }
 
   /**
    * When this objects gets modified, this method also modifies the object.
    */
   void Modified();
-  
+
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  void ShallowCopy(vtkProp *prop);
+  void ShallowCopy(vtkProp* prop);
 
   /**
    * Get the bounds of the current mapper.
    */
-  double *GetBounds();
+  double* GetBounds();
 
   /**
    * When set, LODMapper, if present it used, otherwise the regular mapper is
@@ -105,16 +105,16 @@ public:
    */
   virtual void SetEnableScaling(int v);
   virtual void SetScalingArrayName(const char*);
-  virtual void SetScalingFunction(vtkPiecewiseFunction *pwf);
+  virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
   //@}
 
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();
-  vtkActor            *Device;
-  vtkMapper           *LODMapper;
+  vtkActor* Device;
+  vtkMapper* LODMapper;
 
-  vtkMapper *SelectMapper();
+  vtkMapper* SelectMapper();
 
   int EnableLOD;
 
@@ -124,5 +124,3 @@ private:
 };
 
 #endif
-
-

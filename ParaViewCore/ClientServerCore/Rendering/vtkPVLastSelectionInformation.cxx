@@ -36,9 +36,9 @@ void vtkPVLastSelectionInformation::CopyFromObject(vtkObject* obj)
 
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(obj);
   if (pvview)
-    {
+  {
     this->GetSelection()->ShallowCopy(pvview->GetLastSelection());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

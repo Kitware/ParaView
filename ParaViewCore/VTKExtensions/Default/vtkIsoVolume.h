@@ -55,22 +55,20 @@ public:
 
 protected:
   vtkIsoVolume();
- ~vtkIsoVolume();
+  ~vtkIsoVolume();
 
   // Usual data generation methods.
-  virtual int RequestData(vtkInformation* request, vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * This filter produces a vtkMultiBlockDataSet when the input is a
    * vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
    */
-  virtual int RequestDataObject(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  vtkDataObject* Clip(vtkDataObject* input,
-    double value, const char* array_name, int fieldAssociation, bool invert);
+  vtkDataObject* Clip(
+    vtkDataObject* input, double value, const char* array_name, int fieldAssociation, bool invert);
 
   double LowerThreshold;
   double UpperThreshold;

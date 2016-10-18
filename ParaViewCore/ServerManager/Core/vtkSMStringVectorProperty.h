@@ -20,7 +20,7 @@
  * representing a vector of strings. vtkSMStringVectorProperty can also
  * be used to store double and int values as strings. The strings
  * are converted to the appropriate type when they are being passed
- * to the stream. This is generally used for calling methods that have mixed 
+ * to the stream. This is generally used for calling methods that have mixed
  * type arguments.
  * @sa
  * vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMIntVectorProperty
@@ -98,8 +98,8 @@ public:
    * Returns the index of an element with a particular value.
    * exists is set to false if element does not exist.
    */
-  unsigned int GetElementIndex(const char *value, int& exists);
-  
+  unsigned int GetElementIndex(const char* value, int& exists);
+
   //@{
   /**
    * Set the cast type used when passing a value to the stream.
@@ -143,7 +143,12 @@ public:
    */
   virtual unsigned int GetNumberOfUncheckedElements();
 
-  enum ElementTypes{ INT, DOUBLE, STRING };
+  enum ElementTypes
+  {
+    INT,
+    DOUBLE,
+    STRING
+  };
 
   /**
    * Copy all property values.

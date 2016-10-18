@@ -52,37 +52,37 @@ Ph.D. thesis of Christian BOUCHENY.
 //////////////////////////////////////////////////////////////////////////
 
 /**************************************************/
-uniform sampler2D    s2_depth; // - Z Map
-uniform float        d;        // [1.0 in full res - 2.0 at lower res]
-                               //- Extension in image space, in pixels
-uniform vec4         N[8];     //- Array of neighbours
-                               // [No support for TabUniform in VTK
-                               // --> constant array, hereafter]
-uniform float        F_scale;  // [5.] - Shading amplification factor
+uniform sampler2D s2_depth; // - Z Map
+uniform float d;            // [1.0 in full res - 2.0 at lower res]
+                            //- Extension in image space, in pixels
+uniform vec4 N[8];          //- Array of neighbours
+                            // [No support for TabUniform in VTK
+                            // --> constant array, hereafter]
+uniform float F_scale;      // [5.] - Shading amplification factor
 
-uniform float        SX;      // - pixel horizontal step (image distance: 1/w)
-uniform float        SY;      //- pixel vertical step (image distance: 1/h)
-uniform float        Znear;     // near clipping plane
-uniform float        Zfar;      // far clipping plane
-uniform float        SceneSize; // typical scene size, to scale the depth by.
+uniform float SX;        // - pixel horizontal step (image distance: 1/w)
+uniform float SY;        //- pixel vertical step (image distance: 1/h)
+uniform float Znear;     // near clipping plane
+uniform float Zfar;      // far clipping plane
+uniform float SceneSize; // typical scene size, to scale the depth by.
 
-uniform vec3         L;         // [0.,0.,-1.] - Light direction [frontal]
+uniform vec3 L; // [0.,0.,-1.] - Light direction [frontal]
 /**************************************************/
 
 /**************************************************/
-int    Nnb = 1;  // nombre de voisins par rayon
-float  Zm  = 0.; // minimal z in image
-float  ZM  = 1.; // maximal z in image
-float  Z;        // initial Z
+int Nnb = 1;   // nombre de voisins par rayon
+float Zm = 0.; // minimal z in image
+float ZM = 1.; // maximal z in image
+float Z;       // initial Z
 
-vec3   WHITE3 = vec3(1.,1.,1.);
+vec3 WHITE3 = vec3(1., 1., 1.);
 
-float    t;
-vec4     Zn[8];  // profondeurs des voisins
-float    D[8];   // ombrage genere par les voisins
-vec4     tn, tnw, tw, tsw, ts, tse, te, tne;
-float    dn, dnw, dw, dsw, ds, dse, de, dne;
-float    S;      // image step, corresponds to one pixel size
+float t;
+vec4 Zn[8]; // profondeurs des voisins
+float D[8]; // ombrage genere par les voisins
+vec4 tn, tnw, tw, tsw, ts, tse, te, tne;
+float dn, dnw, dw, dsw, ds, dse, de, dne;
+float S; // image step, corresponds to one pixel size
 /**************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ float    S;      // image step, corresponds to one pixel size
 //    delta   distance between the two
 float angleP(float zi, float zj, float delta)
 {
-  return max(0.,zj-zi) / (delta/S);
+  return max(0., zj - zi) / (delta / S);
 }
 
 //    zi      elevation of current pixel
@@ -103,7 +103,7 @@ float angleP(float zi, float zj, float delta)
 //    delta   distance between the two
 float obscurance(float zi, float zj, float delta)
 {
-  return angleP(zi,zj,delta);
+  return angleP(zi, zj, delta);
 }
 //
 //    Local shading functions
@@ -121,7 +121,7 @@ float zflip(float z)
 
 float zscale(float z)
 {
-  return clamp((z-Zm)/(ZM-Zm),0.,1.);
+  return clamp((z - Zm) / (ZM - Zm), 0., 1.);
 }
 
 //    Inversion of OpenGL perspective projection
@@ -130,10 +130,10 @@ float zscale(float z)
 float ztransform(float z)
 {
   float Z;
-  Z = (z-0.5)*2.;
-  Z = -2.*Zfar*Znear/( (Zfar-Znear) * (Z-(Zfar+Znear)/(Zfar-Znear)) );
-  Z = (Z-Znear)/SceneSize;
-  return 1.-Z;
+  Z = (z - 0.5) * 2.;
+  Z = -2. * Zfar * Znear / ((Zfar - Znear) * (Z - (Zfar + Znear) / (Zfar - Znear)));
+  Z = (Z - Znear) / SceneSize;
+  return 1. - Z;
 }
 //
 //      Z transformation
@@ -147,47 +147,47 @@ float ztransform(float z)
 void computeNeighbours8(float dist)
 {
   // Plan Lumiere-point
-  vec4  P =    vec4( L.xyz , -dot(L.xyz,vec3(0.,0.,t)) );
+  vec4 P = vec4(L.xyz, -dot(L.xyz, vec3(0., 0., t)));
 
   // 0 at the back of the scene
-  int   c;
-  vec2  V;  // pixel voisin
+  int c;
+  vec2 V; // pixel voisin
   float di = dist;
   float Znp[8]; // profondeur des 8 voisins sur le plan
 
-  for(c=0; c<8;c++)
+  for (c = 0; c < 8; c++)
   {
-  V = gl_TexCoord[0].st + di*vec2(SX,SY)*N[c].xy;
-  Zn[c].x = ztransform(texture2D(s2_depth,V).r);
-  // profondeur du voisin reel dans l'image
+    V = gl_TexCoord[0].st + di * vec2(SX, SY) * N[c].xy;
+    Zn[c].x = ztransform(texture2D(s2_depth, V).r);
+    // profondeur du voisin reel dans l'image
 
-  // VERSION qui ombre le fond
-  Znp[c] = dot( vec4(di*vec2(SX,SY)*N[c].xy,Zn[c].x,1.) , P );
+    // VERSION qui ombre le fond
+    Znp[c] = dot(vec4(di * vec2(SX, SY) * N[c].xy, Zn[c].x, 1.), P);
   }
-  dn    =  obscurance( 0., Znp[0] ,di*SX);
-  dnw   =  obscurance( 0., Znp[1],di*SX);
-  dw    =  obscurance( 0., Znp[2] ,di*SX);
-  dsw   =  obscurance( 0., Znp[3],di*SX);
-  ds    =  obscurance( 0., Znp[4] ,di*SX);
-  dse   =  obscurance( 0., Znp[5],di*SX);
-  de    =  obscurance( 0., Znp[6] ,di*SX);
-  dne   =  obscurance( 0., Znp[7],di*SX);
+  dn = obscurance(0., Znp[0], di * SX);
+  dnw = obscurance(0., Znp[1], di * SX);
+  dw = obscurance(0., Znp[2], di * SX);
+  dsw = obscurance(0., Znp[3], di * SX);
+  ds = obscurance(0., Znp[4], di * SX);
+  dse = obscurance(0., Znp[5], di * SX);
+  de = obscurance(0., Znp[6], di * SX);
+  dne = obscurance(0., Znp[7], di * SX);
 }
 
-float computeObscurance(float F,float scale,float weight)
+float computeObscurance(float F, float scale, float weight)
 {
-  computeNeighbours8( scale );
+  computeNeighbours8(scale);
 
-  float S  =  F;
-  float WE =  weight;
+  float S = F;
+  float WE = weight;
 
-  S += dn  * WE;
+  S += dn * WE;
   S += dnw * WE;
-  S += dw  * WE;
+  S += dw * WE;
   S += dsw * WE;
-  S += ds  * WE;
+  S += ds * WE;
   S += dse * WE;
-  S += de  * WE;
+  S += de * WE;
   S += dne * WE;
 
   return S;
@@ -195,28 +195,28 @@ float computeObscurance(float F,float scale,float weight)
 
 void ambientOcclusion()
 {
-  float F       = 0.;
-  float weight  = 20.; // 2. * 3.14159;
-  int   filter  = 0;
-  F = computeObscurance(F,d,weight);
-  F = exp(-F_scale*F);
+  float F = 0.;
+  float weight = 20.; // 2. * 3.14159;
+  int filter = 0;
+  F = computeObscurance(F, d, weight);
+  F = exp(-F_scale * F);
   vec3 color = WHITE3;
 
-  if(false)
-    {
-    gl_FragColor = vec4(1.,1.,1.,Z);
-    }
+  if (false)
+  {
+    gl_FragColor = vec4(1., 1., 1., Z);
+  }
   else
-    {
-    gl_FragColor = vec4(F,F,F,Z);
-    }
+  {
+    gl_FragColor = vec4(F, F, F, Z);
+  }
 }
 
-void main (void)
+void main(void)
 {
-  S  = SX;
-  Z  = texture2D(s2_depth,gl_TexCoord[0].st).r;
-  t  = ztransform(Z);
+  S = SX;
+  Z = texture2D(s2_depth, gl_TexCoord[0].st).r;
+  t = ztransform(Z);
 
   ambientOcclusion();
 }

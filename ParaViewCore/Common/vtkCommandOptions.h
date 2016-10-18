@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkCommandOptions.h
 
@@ -35,7 +35,7 @@ class VTKPVCOMMON_EXPORT vtkCommandOptions : public vtkObject
 {
 public:
   static vtkCommandOptions* New();
-  vtkTypeMacro(vtkCommandOptions,vtkObject);
+  vtkTypeMacro(vtkCommandOptions, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   int Parse(int argc, const char* const argv[]);
@@ -61,8 +61,8 @@ public:
    * Set/Get the type of the process for this set of options.
    * data-server, render-server, combined-server or client.
    */
-  int GetProcessType() { return this->ProcessType;}
-  void SetProcessType(int p) {this->ProcessType = p;}
+  int GetProcessType() { return this->ProcessType; }
+  void SetProcessType(int p) { this->ProcessType = p; }
 
   //@{
   /**
@@ -99,10 +99,9 @@ public:
    * Pass in the name and the attributes for all tags that are not Options.
    * If it returns 1, then it is successful, and 0 if it failed.
    */
-  virtual int ParseExtraXMLTag(const char* , const char** ) {return 1;}
+  virtual int ParseExtraXMLTag(const char*, const char**) { return 1; }
 
 protected:
-
   /**
    * Default constructor.
    */
@@ -116,8 +115,7 @@ protected:
   /**
    * Prototype for callbacks.
    */
-  typedef int(*CallbackType)(const char* argument, const char* value, 
-    void* call_data);
+  typedef int (*CallbackType)(const char* argument, const char* value, void* call_data);
 
   //@{
   /**
@@ -130,20 +128,19 @@ protected:
    * Each option can specify in a bit flag int the processes that the option
    * is valid for, the default is to be valid for all paraview processes.
    */
-  void AddBooleanArgument(const char* longarg, const char* shortarg,
-                          int* var, const char* help, int type=EVERYBODY);
-  void AddDeprecatedArgument(const char* longarg, const char* shortarg,
-                             const char* help, int type=EVERYBODY);
-  void AddArgument(const char* longarg, const char* shortarg,
-                   int* var, const char* help, int type=EVERYBODY);
-  void AddArgument(const char* longarg, const char* shortarg,
-                   char** var, const char* help, int type=EVERYBODY);
+  void AddBooleanArgument(
+    const char* longarg, const char* shortarg, int* var, const char* help, int type = EVERYBODY);
+  void AddDeprecatedArgument(
+    const char* longarg, const char* shortarg, const char* help, int type = EVERYBODY);
+  void AddArgument(
+    const char* longarg, const char* shortarg, int* var, const char* help, int type = EVERYBODY);
+  void AddArgument(
+    const char* longarg, const char* shortarg, char** var, const char* help, int type = EVERYBODY);
   //@}
 
-  void AddCallback(const char* longarg, const char* shortarg,
-    CallbackType callback, void* call_data, const char* help,
-    int type=EVERYBODY);
-  
+  void AddCallback(const char* longarg, const char* shortarg, CallbackType callback,
+    void* call_data, const char* help, int type = EVERYBODY);
+
   /**
    * Initialize arguments.
    */
@@ -204,8 +201,6 @@ private:
 
   static int UnknownArgumentHandler(const char* argument, void* call_data);
   static int DeprecatedArgumentHandler(const char* argument, const char* value, void* call_data);
-
 };
 
 #endif
-

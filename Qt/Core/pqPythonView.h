@@ -35,12 +35,8 @@ public:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqPythonView(const QString& type,
-               const QString& group,
-               const QString& name, 
-               vtkSMViewProxy* renModule, 
-               pqServer* server, 
-               QObject* parent=NULL);
+  pqPythonView(const QString& type, const QString& group, const QString& name,
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
   // Destructor.
   virtual ~pqPythonView();
@@ -48,7 +44,7 @@ public:
   /**
   * Set/get the Python script
   */
-  void setPythonScript(QString & script);
+  void setPythonScript(QString& script);
   QString getPythonScript();
 
   /**
@@ -83,7 +79,7 @@ protected:
   /**
   * Use this method to initialize the pqObject state using the
   * underlying vtkSMProxy. This needs to be done only once,
-  * after the object has been created. 
+  * after the object has been created.
   */
   virtual void initialize();
 
@@ -93,7 +89,7 @@ protected:
   //  updates.
   bool AllowCaching;
 
-private: 
+private:
   Q_DISABLE_COPY(pqPythonView)
 
   class pqInternal;

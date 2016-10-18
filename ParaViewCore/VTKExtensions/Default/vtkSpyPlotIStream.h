@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 /**
  * @class   vtkSpyPlotIStream
  *
- * vtkSpyPlotIStream represents input functionality required by 
+ * vtkSpyPlotIStream represents input functionality required by
  * the vtkSpyPlotReader and vtkSpyPlotUniReader classes.  The class
  * was factored out of vtkSpyPlotReader.cxx.  The class wraps an already
  * opened istream
@@ -28,12 +28,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSystemIncludes.h"
 #include "vtkType.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotIStream {
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotIStream
+{
 public:
   vtkSpyPlotIStream();
   virtual ~vtkSpyPlotIStream();
-  void SetStream(istream *);
-  istream *GetStream();
+  void SetStream(istream*);
+  istream* GetStream();
   int ReadString(char* str, size_t len);
   int ReadString(unsigned char* str, size_t len);
   int ReadInt32s(int* val, int num);
@@ -41,20 +42,21 @@ public:
   int ReadDoubles(double* val, int num);
   void Seek(vtkTypeInt64 offset, bool rel = false);
   vtkTypeInt64 Tell();
+
 protected:
   const int FileBufferSize;
   char* Buffer;
-  istream *IStream;
+  istream* IStream;
+
 private:
   void operator=(const vtkSpyPlotIStream&);
 };
 
-inline istream*vtkSpyPlotIStream::GetStream()
+inline istream* vtkSpyPlotIStream::GetStream()
 {
   return this->IStream;
 }
 
 #endif
-
 
 // VTK-HeaderTest-Exclude: vtkSpyPlotIStream.h

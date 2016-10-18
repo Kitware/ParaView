@@ -43,7 +43,7 @@ public:
   /**
    * Provides empty handlers to simulate the vtkPVView API.
    */
-  void Initialize(unsigned int) {};
+  void Initialize(unsigned int){};
 
   /**
    * Call StillRender() on the root view.
@@ -141,11 +141,11 @@ public:
    * views correctly.
    */
   void SetViewSize(int x, int y)
-    {
+  {
     this->ViewSize[0] = x;
     this->ViewSize[1] = y;
     this->UpdateViewLayout();
-    }
+  }
   //@}
 
   //@{
@@ -154,11 +154,11 @@ public:
    * views correctly.
    */
   void SetViewPosition(int x, int y)
-    {
+  {
     this->ViewPosition[0] = x;
     this->ViewPosition[1] = y;
     this->UpdateViewLayout();
-    }
+  }
   //@}
 
   //@{
@@ -182,14 +182,14 @@ public:
    * Get/Set the view time.
    */
   vtkGetMacro(ViewTime, double);
-  void SetViewTime (double time)
+  void SetViewTime(double time)
   {
     if (this->ViewTime != time)
-      {
+    {
       this->ViewTime = time;
       this->Modified();
       this->MarkOutdated();
-      }
+    }
   }
   //@}
 
@@ -197,9 +197,7 @@ public:
    * Marks the view dirty i.e. on next Update() it needs to regenerate the
    * comparative vis by replaying the animation(s).
    */
-  void MarkOutdated()
-    { this->Outdated=true; }
-
+  void MarkOutdated() { this->Outdated = true; }
 
   /**
    * These methods mimic the vtkPVView API. They do nothing here since each view
@@ -252,6 +250,7 @@ protected:
 
   void SetRootView(vtkSMViewProxy*);
   vtkSMViewProxy* RootView;
+
 private:
   vtkPVComparativeView(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;

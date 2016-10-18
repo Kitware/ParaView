@@ -92,11 +92,11 @@ public:
   vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
   enum RenderingMode
-    {
+  {
     RENDERING_NOT_AVAILABLE = 0x00,
     RENDERING_UNIFIED = 0x01,
     RENDERING_SPLIT = 0x02
-    };
+  };
 
   /**
    * Convenient method to determine if the rendering is done in a pvrenderer
@@ -148,14 +148,12 @@ public:
   /**
    * Sends the message to all clients.
    */
-  virtual void NotifyAllClients(const vtkSMMessage* msg)
-    { this->ProcessNotification(msg); }
+  virtual void NotifyAllClients(const vtkSMMessage* msg) { this->ProcessNotification(msg); }
 
   /**
    * Sends the message to all but the active client-session.
    */
-  virtual void NotifyOtherClients(const vtkSMMessage*)
-    { /* nothing to do. */ }
+  virtual void NotifyOtherClients(const vtkSMMessage*) { /* nothing to do. */}
 
   //---------------------------------------------------------------------------
   // API for Collaboration management
@@ -200,7 +198,9 @@ public:
    * else return false to abort the wait.
    */
   static vtkIdType ReverseConnectToRemote(int port)
-    { return vtkSMSession::ReverseConnectToRemote(port, (bool (*)()) NULL); }
+  {
+    return vtkSMSession::ReverseConnectToRemote(port, (bool (*)())NULL);
+  }
   static vtkIdType ReverseConnectToRemote(int port, bool (*callback)());
 
   /**
@@ -210,8 +210,7 @@ public:
    * This overload is used to create a client-dataserver-renderserver session on
    * client.
    */
-  static vtkIdType ConnectToRemote(const char* dshost, int dsport,
-    const char* rshost, int rsport);
+  static vtkIdType ConnectToRemote(const char* dshost, int dsport, const char* rshost, int rsport);
 
   /**
    * Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -221,7 +220,9 @@ public:
    * else return false to abort the wait.
    */
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
-    { return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL); }
+  {
+    return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL);
+  }
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
 
   //@{
@@ -248,14 +249,14 @@ protected:
   // Subclasses should set initialize_during_constructor to false so that
   // this->Initialize() is not called in constructor but only after the session
   // has been created/setup correctly.
-  vtkSMSession(bool initialize_during_constructor=true, vtkPVSessionCore* preExistingSessionCore=NULL);
+  vtkSMSession(
+    bool initialize_during_constructor = true, vtkPVSessionCore* preExistingSessionCore = NULL);
   ~vtkSMSession();
 
   /**
    * Internal method used by ConnectToRemote().
    */
-  static vtkIdType ConnectToRemoteInternal(
-    const char* hostname, int port, bool is_auto_mpi);
+  static vtkIdType ConnectToRemoteInternal(const char* hostname, int port, bool is_auto_mpi);
 
   /**
    * Process the Notifation message sent using API to communicate from
@@ -288,7 +289,6 @@ private:
 
   // AutoMPI helper class
   static vtkSmartPointer<vtkProcessModuleAutoMPI> AutoMPI;
-
 };
 
 #endif

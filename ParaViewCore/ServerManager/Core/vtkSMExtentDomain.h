@@ -38,18 +38,17 @@ public:
   static vtkSMExtentDomain* New();
   vtkTypeMacro(vtkSMExtentDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   /**
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
   virtual void Update(vtkSMProperty*);
-  
+
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty *property, int idx,
-                                 double value);
+  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
 
   //@{
   /**
@@ -62,12 +61,13 @@ public:
    * property.
    */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+
 protected:
   vtkSMExtentDomain();
   ~vtkSMExtentDomain();
   //@}
-  
-  void Update(vtkSMProxyProperty *pp);
+
+  void Update(vtkSMProxyProperty* pp);
 
 private:
   vtkSMExtentDomain(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;

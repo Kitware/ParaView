@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,12 +41,14 @@ class QTableView;
 
 struct MessageT
 {
-  MessageT(int type, int count, const QString& location, 
-           const QString& message) :
-    Type(type), Count(count), Location(location), Message(message)
+  MessageT(int type, int count, const QString& location, const QString& message)
+    : Type(type)
+    , Count(count)
+    , Location(location)
+    , Message(message)
   {
   }
-  int Type;         // pqOutputWindow::MessageType
+  int Type; // pqOutputWindow::MessageType
   int Count;
   QString Location;
   QString Message;
@@ -60,20 +62,19 @@ class PQCORE_EXPORT pqOutputWindowModel : public QAbstractTableModel
 {
   Q_OBJECT
 public:
-  pqOutputWindowModel(QObject *parent, const QList<MessageT>& messages);
+  pqOutputWindowModel(QObject* parent, const QList<MessageT>& messages);
   ~pqOutputWindowModel();
 
-  int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
-  int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-  virtual Qt::ItemFlags flags(const QModelIndex & index) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
 
-  virtual bool setData(const QModelIndex & index, const QVariant & value, 
-                       int role = Qt::EditRole);
-  
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+
   void setView(QTableView* view);
 
   /**
@@ -88,7 +89,7 @@ public:
 
   /**
   * Shows in the table only messages that match the 'show' array.
-  * 'show' tells us if a pqOutputArray::MessageType element should be shown 
+  * 'show' tells us if a pqOutputArray::MessageType element should be shown
   * or not
   */
   void ShowMessages(bool* show);
@@ -107,14 +108,14 @@ public:
 
 private:
   /**
-  * Resize all columns but the last to fit the contents. 
+  * Resize all columns but the last to fit the contents.
   */
   void resizeColumnsToContents();
 
 private:
-  const QList<MessageT>& Messages; 
-  QList<int> Rows;  // element is index in Messages,
-                    // when an element is expanded, the index is duplicated
+  const QList<MessageT>& Messages;
+  QList<int> Rows; // element is index in Messages,
+                   // when an element is expanded, the index is duplicated
   QTableView* View;
 
   struct pqInternals;

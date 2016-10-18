@@ -26,18 +26,19 @@
 #include "vtkCPScalarFieldFunction.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros
 
-class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPLinearScalarFieldFunction : public vtkCPScalarFieldFunction
+class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPLinearScalarFieldFunction
+  : public vtkCPScalarFieldFunction
 {
 public:
-  static vtkCPLinearScalarFieldFunction * New();
+  static vtkCPLinearScalarFieldFunction* New();
   vtkTypeMacro(vtkCPLinearScalarFieldFunction, vtkCPScalarFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
    * Compute the field value at Point.
    */
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time);
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time);
 
   //@{
   /**
@@ -113,6 +114,6 @@ private:
    */
   double TimeMultiplier;
 };
-  //@}
+//@}
 
 #endif

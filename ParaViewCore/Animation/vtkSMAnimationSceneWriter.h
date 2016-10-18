@@ -100,10 +100,10 @@ protected:
    */
   virtual bool SaveFrame(double time) = 0;
 
- /**
-  * Subclasses should override this method.
-  * Called to finalize saving.
-  */
+  /**
+   * Subclasses should override this method.
+   * Called to finalize saving.
+   */
   virtual bool SaveFinalize() = 0;
 
   void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* calldata);
@@ -114,7 +114,8 @@ protected:
   bool SaveFailed;
   char* FileName;
   double PlaybackTimeWindow[2];
-  int    StartFileCount;
+  int StartFileCount;
+
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;

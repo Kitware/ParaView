@@ -71,11 +71,10 @@ protected:
   ~vtkPVDataSizeInformation();
 
   int MemorySize;
+
 private:
   vtkPVDataSizeInformation(const vtkPVDataSizeInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDataSizeInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

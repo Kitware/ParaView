@@ -45,7 +45,7 @@ public:
   /**
    * Exports the view.
    */
-  virtual void Write()=0;
+  virtual void Write() = 0;
 
   /**
    * Returns if the view can be exported.
@@ -71,11 +71,10 @@ protected:
   vtkSetStringMacro(FileExtension);
   vtkSMViewProxy* View;
   char* FileExtension;
+
 private:
   vtkSMExporterProxy(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

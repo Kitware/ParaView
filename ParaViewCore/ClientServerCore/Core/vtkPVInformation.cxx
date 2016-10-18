@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVInformation.h"
 
-
 //----------------------------------------------------------------------------
 vtkPVInformation::vtkPVInformation()
 {
@@ -29,7 +28,7 @@ vtkPVInformation::~vtkPVInformation()
 //----------------------------------------------------------------------------
 void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "RootOnly: " << this->RootOnly << endl;
 }
 

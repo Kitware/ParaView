@@ -43,36 +43,36 @@ pqRescaleVisibleScalarRangeReaction::pqRescaleVisibleScalarRangeReaction(QAction
   : Superclass(parentObject)
 {
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
+    Qt::QueuedConnection);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqRescaleVisibleScalarRangeReaction::updateEnableState()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+  pqPipelineRepresentation* repr =
+    qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
   this->parentAction()->setEnabled(repr != NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+  pqPipelineRepresentation* repr =
+    qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
   if (!repr)
-    {
+  {
     qCritical() << "No active representation.";
     return;
-    }
+  }
 
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
-    {
+  {
     qCritical() << "No active view.";
     return;
-    }
+  }
 
   BEGIN_UNDO_SET("Rescale Visible Range");
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(

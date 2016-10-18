@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,8 +43,9 @@ class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqQuickLaunchDialog(QWidget *parent=0);
+  pqQuickLaunchDialog(QWidget* parent = 0);
   virtual ~pqQuickLaunchDialog();
 
   /**
@@ -76,19 +77,18 @@ protected:
   /**
   * Overridden to capture key presses.
   */
-  virtual bool eventFilter(QObject *watched, QEvent *event);
+  virtual bool eventFilter(QObject* watched, QEvent* event);
 
   /**
   * Given the user entered text, update the GUI.
   */
   void updateSearch();
+
 private:
   Q_DISABLE_COPY(pqQuickLaunchDialog)
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 };
 
 #endif
-
-

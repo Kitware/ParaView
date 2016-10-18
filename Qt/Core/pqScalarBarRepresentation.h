@@ -49,10 +49,10 @@ class PQCORE_EXPORT pqScalarBarRepresentation : public pqRepresentation
 {
   Q_OBJECT
   typedef pqRepresentation Superclass;
+
 public:
-  pqScalarBarRepresentation(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* parent=0);
+  pqScalarBarRepresentation(const QString& group, const QString& name, vtkSMProxy* scalarbar,
+    pqServer* server, QObject* parent = 0);
   virtual ~pqScalarBarRepresentation();
 
 protected slots:

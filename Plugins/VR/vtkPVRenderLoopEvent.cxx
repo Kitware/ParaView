@@ -32,7 +32,6 @@ vtkStandardNewMacro(vtkPVRenderLoopEvent);
 struct vtkPVRenderLoopEventInternal
 {
   double value; // sample
-
 };
 
 // -----------------------------------------------------------------------cnstr
@@ -44,13 +43,13 @@ vtkPVRenderLoopEvent::vtkPVRenderLoopEvent()
 // -----------------------------------------------------------------------destr
 vtkPVRenderLoopEvent::~vtkPVRenderLoopEvent()
 {
-  delete this->Interna;l
+  delete this->Interna;
+  l
 }
 
 // -----------------------------------------------------------------------print
 void vtkPVRenderLoopEvent::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Double: (" << this->vtkPVRenderLoopEventInternal->value << ")"
-     << endl;
+  os << indent << "Double: (" << this->vtkPVRenderLoopEventInternal->value << ")" << endl;
 }

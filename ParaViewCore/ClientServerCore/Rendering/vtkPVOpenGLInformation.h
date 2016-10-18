@@ -27,8 +27,7 @@
 
 #include <string> // for string type
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLInformation
-    : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLInformation : public vtkPVInformation
 {
 public:
   static vtkPVOpenGLInformation* New();
@@ -60,8 +59,8 @@ public:
    * information itself. For example, PortNumber on vtkPVDataInformation
    * controls what output port the data-information is gathered from.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) {};
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) {};
+  virtual void CopyParametersToStream(vtkMultiProcessStream&){};
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&){};
   //@}
 
   const std::string& GetVendor();
@@ -82,17 +81,15 @@ protected:
 
   void SetLocalDisplay(bool);
 
-
-
 private:
   vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
 
-bool LocalDisplay;
+  bool LocalDisplay;
 
-std::string Vendor;
-std::string Version;
-std::string Renderer;
+  std::string Vendor;
+  std::string Version;
+  std::string Renderer;
 };
 
 #endif

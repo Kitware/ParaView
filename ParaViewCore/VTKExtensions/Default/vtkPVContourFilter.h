@@ -41,38 +41,31 @@ public:
 
   static vtkPVContourFilter* New();
 
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
-
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 protected:
-
   vtkPVContourFilter();
- ~vtkPVContourFilter();
+  ~vtkPVContourFilter();
 
- virtual int RequestData(vtkInformation* request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
- virtual int RequestDataObject(vtkInformation* request,
-                               vtkInformationVector** inputVector,
-                               vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
- virtual int FillInputPortInformation(int port, vtkInformation* info);
- virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
- /**
-  * Class superclass request data. Also handles iterating over
-  * vtkHierarchicalBoxDataSet.
-  */
- int ContourUsingSuperclass(
-   vtkInformation* request, vtkInformationVector** inputVector,
-   vtkInformationVector* outputVector);
+  /**
+   * Class superclass request data. Also handles iterating over
+   * vtkHierarchicalBoxDataSet.
+   */
+  int ContourUsingSuperclass(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
- vtkPVContourFilter(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
- void operator=(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
+  vtkPVContourFilter(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkPVContourFilter_h

@@ -32,11 +32,12 @@
 // Forware declaration.
 class vtkPVAMRFragmentIntegrationInternal;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRFragmentIntegration : public vtkAMRFragmentIntegration
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRFragmentIntegration
+  : public vtkAMRFragmentIntegration
 {
 public:
   static vtkPVAMRFragmentIntegration* New();
-  vtkTypeMacro(vtkPVAMRFragmentIntegration,vtkAMRFragmentIntegration);
+  vtkTypeMacro(vtkPVAMRFragmentIntegration, vtkAMRFragmentIntegration);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkPVAMRFragmentIntegration();
@@ -74,10 +75,9 @@ public:
   void ClearInputMassWeightedArrayToProcess();
   //@}
 
-  void SetContourConnection (vtkAlgorithmOutput*);
+  void SetContourConnection(vtkAlgorithmOutput*);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;

@@ -62,19 +62,17 @@ protected:
   vtkBoundedVolumeSource();
   ~vtkBoundedVolumeSource();
 
-  virtual int RequestInformation(vtkInformation *request,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector);
-  virtual void ExecuteDataWithInformation(vtkDataObject *data, vtkInformation *outInfo);
-
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  virtual void ExecuteDataWithInformation(vtkDataObject* data, vtkInformation* outInfo);
 
   double Origin[3];
   double Scale[3];
   int Resolution[3];
+
 private:
   vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

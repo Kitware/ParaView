@@ -44,12 +44,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * if delete_all is false, then only selected items will be deleted if
   * possible.
   */
-  pqDeleteReaction(QAction* parent, bool delete_all=false);
+  pqDeleteReaction(QAction* parent, bool delete_all = false);
 
   static void deleteAll();
   static void deleteSelected();
@@ -63,7 +64,7 @@ public:
   * modified to remove all deleted sources. Any undeleted sources will remain
   * in the set.
   */
-  static void deleteSources(QSet<pqPipelineSource*> &sources);
+  static void deleteSources(QSet<pqPipelineSource*>& sources);
 
 public slots:
   /**
@@ -82,16 +83,16 @@ protected:
   * Called when the action is triggered.
   */
   virtual void onTriggered()
-    {
+  {
     if (this->DeleteAll)
-      {
+    {
       pqDeleteReaction::deleteAll();
-      }
-    else
-      {
-      pqDeleteReaction::deleteSelected();
-      }
     }
+    else
+    {
+      pqDeleteReaction::deleteSelected();
+    }
+  }
 
 private:
   Q_DISABLE_COPY(pqDeleteReaction)

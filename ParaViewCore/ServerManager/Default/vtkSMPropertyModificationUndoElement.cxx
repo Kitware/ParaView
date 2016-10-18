@@ -53,39 +53,36 @@ int vtkSMPropertyModificationUndoElement::Redo()
 int vtkSMPropertyModificationUndoElement::RevertToState()
 {
   if (this->ProxyGlobalID == 0)
-    {
+  {
     vtkErrorMacro("Invalid State.");
     return 0;
-    }
+  }
   if (!this->Session)
-    {
+  {
     vtkErrorMacro("No session set. Cannot Revert to state.");
     return 0;
-    }
-  vtkSMProxy* proxy =
-      vtkSMProxy::SafeDownCast(
-          this->Session->GetRemoteObject(this->ProxyGlobalID));
-  vtkSMProperty* property = ( proxy ?
-                              proxy->GetProperty(this->PropertyName) : NULL );
+  }
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(this->Session->GetRemoteObject(this->ProxyGlobalID));
+  vtkSMProperty* property = (proxy ? proxy->GetProperty(this->PropertyName) : NULL);
   if (property)
-    {
+  {
     property->ReadFrom(this->PropertyState, 0, NULL); // 0 because only one
     proxy->UpdateProperty(this->PropertyName);
-    }
+  }
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyModificationUndoElement::ModifiedProperty(vtkSMProxy* proxy,
-  const char* propertyname)
+void vtkSMPropertyModificationUndoElement::ModifiedProperty(
+  vtkSMProxy* proxy, const char* propertyname)
 {
   vtkSMProperty* property = proxy->GetProperty(propertyname);
   if (!property)
-    {
-    vtkErrorMacro("Failed to locate property with name : " << propertyname
-      << " on the proxy. Cannot note its modification state for undo/redo.");
+  {
+    vtkErrorMacro("Failed to locate property with name : "
+      << propertyname << " on the proxy. Cannot note its modification state for undo/redo.");
     return;
-    }
+  }
 
   this->SetSession(proxy->GetSession());
   this->ProxyGlobalID = proxy->GetGlobalID();
@@ -96,8 +93,7 @@ void vtkSMPropertyModificationUndoElement::ModifiedProperty(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMPropertyModificationUndoElement::Merge(vtkUndoElement*
-  vtkNotUsed(new_element))
+bool vtkSMPropertyModificationUndoElement::Merge(vtkUndoElement* vtkNotUsed(new_element))
 {
   return false;
 }

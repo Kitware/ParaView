@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef _pqImageUtil_h
 #define _pqImageUtil_h
-
 
 #include "pqCoreModule.h"
 class QImage;
@@ -61,7 +60,7 @@ public:
   * if file is successfully saved).
   * quality [0,100] -- 0 = low, 100=high, -1=default
   */
-  static int saveImage(vtkImageData* vtkimage, const QString& filename, int quality=-1);
+  static int saveImage(vtkImageData* vtkimage, const QString& filename, int quality = -1);
 
   /**
   * Save an image to a file. Determines the type of the file using the file
@@ -69,8 +68,7 @@ public:
   * if file is successfully saved).
   * quality [0,100] -- 0 = low, 100=high, -1=default
   */
-  static int saveImage(const QImage& image, const QString& filename, int quality=-1);
+  static int saveImage(const QImage& image, const QString& filename, int quality = -1);
 };
 
 #endif
-

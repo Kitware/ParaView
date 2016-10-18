@@ -38,9 +38,9 @@ class pqTPExportStateWizard : public pqSGExportStateWizard
 {
   Q_OBJECT
   typedef pqSGExportStateWizard Superclass;
+
 public:
-  pqTPExportStateWizard(
-    QWidget *parentObject=0, Qt::WindowFlags parentFlags=0);
+  pqTPExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
   virtual ~pqTPExportStateWizard();
 
   void customize();

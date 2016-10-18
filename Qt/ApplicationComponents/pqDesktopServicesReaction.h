@@ -51,6 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDesktopServicesReaction : public pqReacti
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqDesktopServicesReaction(const QUrl& url, QAction* parent);
   virtual ~pqDesktopServicesReaction();
@@ -62,8 +63,7 @@ public:
   static bool openUrl(const QUrl& url);
 
 protected:
-  virtual void onTriggered()
-    { pqDesktopServicesReaction::openUrl(this->URL); }
+  virtual void onTriggered() { pqDesktopServicesReaction::openUrl(this->URL); }
 
 private:
   Q_DISABLE_COPY(pqDesktopServicesReaction)

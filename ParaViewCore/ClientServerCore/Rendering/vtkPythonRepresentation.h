@@ -43,9 +43,8 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-                                 vtkInformation* inInfo,
-                                 vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   //@{
   /**
@@ -88,7 +87,7 @@ public:
    * and attribute type in the input will be copied to the
    * client. Status is 0 by default.
    */
-  int GetAttributeArrayStatus( int attributeType, const char* name);
+  int GetAttributeArrayStatus(int attributeType, const char* name);
 
   /**
    * Enable all arrays. When called, all arrays will be marked as enabled.
@@ -166,13 +165,12 @@ private:
   /**
    * Sends the data type from the root node of the server to the client
    */
-  int SendDataTypeToClient(int & dataType);
+  int SendDataTypeToClient(int& dataType);
 
   /**
    * Transfers local data from the server nodes to the client.
    */
   void TransferLocalDataToClient();
-
 };
 
 #endif // vtkPythonRepresentation_h

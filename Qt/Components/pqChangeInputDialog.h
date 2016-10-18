@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -49,6 +49,7 @@ class PQCOMPONENTS_EXPORT pqChangeInputDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
   /**
   * Constructor. \c filterProxy is the proxy for the filter whose inputs are
@@ -57,8 +58,7 @@ public:
   * The values from the input properties of the \c filterProxy are used as the
   * default values shown by this dialog.
   */
-  pqChangeInputDialog(
-    vtkSMProxy* filterProxy, QWidget* parent=0);
+  pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* parent = 0);
   virtual ~pqChangeInputDialog();
 
   /**
@@ -85,5 +85,3 @@ private:
 };
 
 #endif
-
-

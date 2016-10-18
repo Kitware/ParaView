@@ -53,11 +53,8 @@ public:
   virtual bool supportsSelection() const { return true; }
 
 public:
-  pqXYBagChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYBagChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYBagChartView();
 

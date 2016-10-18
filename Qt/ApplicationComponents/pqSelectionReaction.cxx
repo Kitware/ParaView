@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,52 +37,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int pqSelectionReaction::getSelectionModifier()
 {
   if (this->ModifierGroup)
-    {
+  {
     // we cannot use QActionGroup::checkedAction() since the ModifierGroup may
     // not be exclusive.
     foreach (QAction* maction, this->ModifierGroup->actions())
-      {
+    {
       if (maction->isChecked() && maction->data().isValid())
-        {
+      {
         return maction->data().toInt();
-        }
       }
     }
+  }
   return pqView::PV_SELECTION_DEFAULT;
 }
 
 void pqSelectionReaction::uncheckSelectionModifiers()
 {
   if (this->ModifierGroup)
-    {
+  {
     foreach (QAction* act, this->ModifierGroup->actions())
-      {
+    {
       act->setChecked(false);
-      }
-    } 
+    }
+  }
 }
 
 void pqSelectionReaction::disableSelectionModifiers(bool disable)
 {
   if (this->ModifierGroup)
-    { 
+  {
     this->ModifierGroup->setEnabled(!disable);
-    if(disable)
-      {
+    if (disable)
+    {
       this->uncheckSelectionModifiers();
-      }
     }
+  }
 }
 //-----------------------------------------------------------------------------
-pqSelectionReaction::pqSelectionReaction(
-  QAction *parentObject, QActionGroup* modifierGroup)
-: Superclass(parentObject), ModifierGroup(modifierGroup)
+pqSelectionReaction::pqSelectionReaction(QAction* parentObject, QActionGroup* modifierGroup)
+  : Superclass(parentObject)
+  , ModifierGroup(modifierGroup)
 {
   // if modified is changed while selection is in progress, we need to ensure we
   // update the selection modifier on the view.
   if (modifierGroup)
-    {
-    this->connect(modifierGroup, SIGNAL(triggered(QAction*)),
-      SLOT(modifiersChanged()));
-    }
+  {
+    this->connect(modifierGroup, SIGNAL(triggered(QAction*)), SLOT(modifiersChanged()));
+  }
 }

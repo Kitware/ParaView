@@ -65,7 +65,7 @@ Ph.D. thesis of Christian BOUCHENY.
 
 #include "vtkDepthImageProcessingPass.h"
 #include "vtkEyeDomeLightingModule.h" // needed for exports.
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkSmartPointer.h"          // needed for vtkSmartPointer
 
 class vtkOpenGLRenderWindow;
 class vtkDepthPeelingPassLayerList; // Pimpl
@@ -77,22 +77,22 @@ class vtkTextureObject;
 class VTKEYEDOMELIGHTING_EXPORT vtkEDLShading : public vtkDepthImageProcessingPass
 {
 public:
-  static vtkEDLShading *New();
-  vtkTypeMacro(vtkEDLShading,vtkDepthImageProcessingPass);
+  static vtkEDLShading* New();
+  vtkTypeMacro(vtkEDLShading, vtkDepthImageProcessingPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Perform rendering according to a render state \p s.
   // \pre s_exists: s!=0
-  virtual void Render(const vtkRenderState *s);
+  virtual void Render(const vtkRenderState* s);
 
   // Description:
   // Release graphics resources and ask components to release their own
   // resources.
   // \pre w_exists: w!=0
-  void ReleaseGraphicsResources(vtkWindow *w);
+  void ReleaseGraphicsResources(vtkWindow* w);
 
- protected:
+protected:
   // Description:
   // Default constructor. DelegatePass is set to NULL.
   vtkEDLShading();
@@ -103,7 +103,7 @@ public:
 
   // Description:
   // Initialization of required framebuffer objects
-  void EDLInitializeFramebuffers(vtkRenderState &s);
+  void EDLInitializeFramebuffers(vtkRenderState& s);
 
   // Description:
   // Initialization of required GLSL shaders
@@ -111,41 +111,41 @@ public:
 
   // Description:
   // Render EDL in full resolution buffer
-  bool EDLShadeHigh(vtkRenderState &s);
+  bool EDLShadeHigh(vtkRenderState& s);
 
   // Description:
   // Render EDL in middle resolution buffer
-  bool EDLShadeLow(vtkRenderState &s);
+  bool EDLShadeLow(vtkRenderState& s);
 
   // Description:
   // Render EDL in middle resolution buffer
-  bool EDLBlurLow(vtkRenderState &s);
+  bool EDLBlurLow(vtkRenderState& s);
 
   // Description:
   // Compose color and shaded images
-  bool EDLCompose(const vtkRenderState *s);
+  bool EDLCompose(const vtkRenderState* s);
 
   // Description:
   // Framebuffer object and textures for initial projection
-  vtkFrameBufferObject  *ProjectionFBO;
-                        // used to record scene data
-  vtkTextureObject      *ProjectionColorTexture;
-                        // color render target for projection pass
-  vtkTextureObject      *ProjectionDepthTexture;
-                        // depth render target for projection pass
+  vtkFrameBufferObject* ProjectionFBO;
+  // used to record scene data
+  vtkTextureObject* ProjectionColorTexture;
+  // color render target for projection pass
+  vtkTextureObject* ProjectionDepthTexture;
+  // depth render target for projection pass
 
   // Framebuffer objects and textures for EDL
-  vtkFrameBufferObject *EDLHighFBO;
-                       // for EDL full res shading
-  vtkTextureObject     *EDLHighShadeTexture;
-                       // color render target for EDL full res pass
-  vtkFrameBufferObject *EDLLowFBO;
-                       // for EDL low res shading (image size/4)
-  vtkTextureObject     *EDLLowShadeTexture;
-                       // color render target for EDL low res pass
-  vtkTextureObject     *EDLLowBlurTexture;
-                       // color render target for EDL low res
-                       // bilateral filter pass
+  vtkFrameBufferObject* EDLHighFBO;
+  // for EDL full res shading
+  vtkTextureObject* EDLHighShadeTexture;
+  // color render target for EDL full res pass
+  vtkFrameBufferObject* EDLLowFBO;
+  // for EDL low res shading (image size/4)
+  vtkTextureObject* EDLLowShadeTexture;
+  // color render target for EDL low res pass
+  vtkTextureObject* EDLLowBlurTexture;
+  // color render target for EDL low res
+  // bilateral filter pass
 
   // Shader prohrams
   vtkSmartPointer<vtkShaderProgram2> EDLShadeProgram;
@@ -153,13 +153,13 @@ public:
   vtkSmartPointer<vtkShaderProgram2> BilateralProgram;
 
   float EDLNeighbours[32];
-  bool  EDLIsFiltered;
-  int   EDLLowResFactor; // basically 4
+  bool EDLIsFiltered;
+  int EDLLowResFactor; // basically 4
 
-  float Zn;  // near clipping plane
-  float Zf;  // far clipping plane
+  float Zn; // near clipping plane
+  float Zf; // far clipping plane
 
- private:
+private:
   vtkEDLShading(const vtkEDLShading&) VTK_DELETE_FUNCTION;
   void operator=(const vtkEDLShading&) VTK_DELETE_FUNCTION;
 };

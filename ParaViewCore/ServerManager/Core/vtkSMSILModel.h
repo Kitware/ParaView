@@ -33,7 +33,7 @@
  * changes. calldata = vertexid for the element whose check state changed.
 */
 
-#ifndef vtkSMSILModel_h 
+#ifndef vtkSMSILModel_h
 #define vtkSMSILModel_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
@@ -52,11 +52,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum CheckState
-    {
+  {
     UNCHECKED = 0,
     PARTIAL = 1,
     CHECKED = 2
-    };
+  };
 
   //@{
   /**
@@ -132,15 +132,15 @@ public:
    */
   bool SetCheckState(vtkIdType vertex, int status);
   bool SetCheckState(const char* name, int status)
-    {
+  {
     vtkIdType vertex = this->FindVertex(name);
     if (vertex != -1)
-      {
+    {
       return this->SetCheckState(vertex, status);
-      }
+    }
     vtkErrorMacro("Failed to locate " << name);
     return false;
-    }
+  }
   //@}
 
   //@{
@@ -167,8 +167,8 @@ public:
    */
   vtkIdType FindVertex(const char* name);
 
-  void GetLeaves(std::set<vtkIdType>& leaves,
-    vtkIdType root, bool traverse_cross_edges);
+  void GetLeaves(std::set<vtkIdType>& leaves, vtkIdType root, bool traverse_cross_edges);
+
 protected:
   vtkSMSILModel();
   virtual ~vtkSMSILModel();
@@ -194,15 +194,13 @@ protected:
   vtkGraph* SIL;
   vtkCommand* PropertyObserver;
   vtkCommand* DomainObserver;
+
 private:
   vtkSMSILModel(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif
-
-

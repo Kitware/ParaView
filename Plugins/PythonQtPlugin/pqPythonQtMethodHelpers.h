@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,18 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
 
-class  pqPythonQtMethodHelpers : public QObject
+class pqPythonQtMethodHelpers : public QObject
 {
   Q_OBJECT
 
 public:
-
-
   static pqProxy* findProxyItem(pqServerManagerModel* model, vtkSMProxy* proxy)
-      {
-      return model->findItem<pqProxy*>(proxy);
-      }
-
+  {
+    return model->findItem<pqProxy*>(proxy);
+  }
 };
 
 #endif

@@ -18,8 +18,8 @@ public:
   void createPipelineWithAnnotation(pqServer* server);
 
 protected:
-  QStringList                       FilterNames;
-  QPointer<QComboBox>               FilterSelector;
+  QStringList FilterNames;
+  QPointer<QComboBox> FilterSelector;
   QPointer<pqPipelineBrowserWidget> PipelineWidget;
 
 public slots:

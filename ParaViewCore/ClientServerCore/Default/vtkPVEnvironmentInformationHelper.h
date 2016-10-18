@@ -33,7 +33,7 @@ public:
   static vtkPVEnvironmentInformationHelper* New();
   vtkTypeMacro(vtkPVEnvironmentInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //@{
   /**
    * Get/Set the environment variable that we want to get the value of
@@ -53,6 +53,4 @@ private:
   void operator=(const vtkPVEnvironmentInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,7 +47,7 @@ class PQCOMPONENTS_EXPORT pqSignalAdaptorProxy : public QObject
   Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
 public:
   /**
-  * constructor requires a QObject, the name of the QString proxy name, and 
+  * constructor requires a QObject, the name of the QString proxy name, and
   * a signal for property changes
   */
   pqSignalAdaptorProxy(QObject* p, const char* Property, const char* signal);
@@ -67,9 +67,9 @@ public slots:
   void setProxy(const QVariant&);
 protected slots:
   void handleProxyChanged();
+
 protected:
   QByteArray PropertyName;
 };
 
 #endif
-

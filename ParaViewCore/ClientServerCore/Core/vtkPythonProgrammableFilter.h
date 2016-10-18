@@ -49,45 +49,42 @@ class vtkPythonProgrammableFilterImplementation;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
 {
 public:
-  vtkTypeMacro(vtkPythonProgrammableFilter,vtkProgrammableFilter);
+  vtkTypeMacro(vtkPythonProgrammableFilter, vtkProgrammableFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPythonProgrammableFilter *New();
+  static vtkPythonProgrammableFilter* New();
 
   //@{
   /**
    * Set the text of the python script to execute.
    */
-  vtkSetStringMacro(Script)
-  vtkGetStringMacro(Script)
-  //@}
+  vtkSetStringMacro(Script) vtkGetStringMacro(Script)
+    //@}
 
-  //@{
-  /**
-   * Set the text of the python script to execute in RequestInformation().
-   */
-  vtkSetStringMacro(InformationScript)
-  vtkGetStringMacro(InformationScript)
-  //@}
+    //@{
+    /**
+     * Set the text of the python script to execute in RequestInformation().
+     */
+    vtkSetStringMacro(InformationScript) vtkGetStringMacro(InformationScript)
+    //@}
 
-  //@{
-  /**
-   * Set the text of the python script to execute in RequestUpdateExtent().
-   */
-  vtkSetStringMacro(UpdateExtentScript)
-  vtkGetStringMacro(UpdateExtentScript)
-  //@}
+    //@{
+    /**
+     * Set the text of the python script to execute in RequestUpdateExtent().
+     */
+    vtkSetStringMacro(UpdateExtentScript) vtkGetStringMacro(UpdateExtentScript)
+    //@}
 
-  //@{
-  /**
-   * Set a name-value parameter that will be available to the script
-   * when it is run
-   */
-  void SetParameterInternal(const char *name, const char *value);
-  void SetParameter(const char *name, const char *value);
-  void SetParameter(const char *name, int value);
-  void SetParameter(const char *name, double value);
-  void SetParameter(const char *name, double value1, double value2);
-  void SetParameter(const char *name, double value1, double value2, double value3);
+    //@{
+    /**
+     * Set a name-value parameter that will be available to the script
+     * when it is run
+     */
+    void SetParameterInternal(const char* name, const char* value);
+  void SetParameter(const char* name, const char* value);
+  void SetParameter(const char* name, int value);
+  void SetParameter(const char* name, double value);
+  void SetParameter(const char* name, double value1, double value2);
+  void SetParameter(const char* name, double value1, double value2, double value3);
   //@}
 
   //@{
@@ -106,7 +103,7 @@ public:
   /**
    * For internal use only.
    */
-  static void ExecuteScript(void *);
+  static void ExecuteScript(void*);
 
   //@{
   /**
@@ -131,7 +128,9 @@ public:
    * This function is explicitly exposed to enable a vtkClientServerInterpreter to call it
    */
   void SetNumberOfInputPorts(int numberOfInputPorts)
-    { this->Superclass::SetNumberOfInputPorts(numberOfInputPorts); }
+  {
+    this->Superclass::SetNumberOfInputPorts(numberOfInputPorts);
+  }
 
 protected:
   vtkPythonProgrammableFilter();
@@ -144,37 +143,33 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  //overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  // overridden to allow multiple inputs to port 0
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   /**
    * Creates whatever output data set type is selected.
    */
-  virtual int RequestDataObject(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual int RequestUpdateExtent(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   /**
    * We want to temporarilly cache request to be used in the Python
    * code so we override this method to store request for later use
    * since otherwise we won't have access to it.
    */
-  virtual int ProcessRequest(vtkInformation* request,
-                             vtkInformationVector** inInfo,
-                             vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
 
-  char *Script;
-  char *InformationScript;
-  char *UpdateExtentScript;
-  char *PythonPath;
+  char* Script;
+  char* InformationScript;
+  char* UpdateExtentScript;
+  char* PythonPath;
   int OutputDataSetType;
 
 private:
@@ -189,7 +184,6 @@ private:
   vtkInformation* Request;
 
   vtkPythonProgrammableFilterImplementation* const Implementation;
-
 };
 
 #endif

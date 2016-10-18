@@ -14,10 +14,10 @@
 =========================================================================*/
 /**
  * @class   vtkSMUndoElement
- * @brief   abstract superclass for Server Manager undo 
+ * @brief   abstract superclass for Server Manager undo
  * elements.
  *
- * Abstract superclass for Server Manager undo elements. 
+ * Abstract superclass for Server Manager undo elements.
  * This class keeps the session, so undoelement could work accross a set of
  * communication Sessions.
 */
@@ -59,6 +59,4 @@ private:
   void operator=(const vtkSMUndoElement&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

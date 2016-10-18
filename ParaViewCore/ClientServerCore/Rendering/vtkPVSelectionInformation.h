@@ -17,7 +17,7 @@
  * @brief   Used to gather selection information
  *
  * Used to get information about selection from server to client.
- * The results are stored in a vtkSelection. 
+ * The results are stored in a vtkSelection.
  * @sa
  * vtkSelection
 */

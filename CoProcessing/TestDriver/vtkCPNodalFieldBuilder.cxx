@@ -30,39 +30,35 @@ vtkCPNodalFieldBuilder::vtkCPNodalFieldBuilder()
 }
 
 //----------------------------------------------------------------------------
-void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time,
-                                        vtkDataSet* grid)
+void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time, vtkDataSet* grid)
 {
-  vtkCPTensorFieldFunction* tensorFieldFunction = 
-    this->GetTensorFieldFunction();
-  if(tensorFieldFunction == 0)
-    {
+  vtkCPTensorFieldFunction* tensorFieldFunction = this->GetTensorFieldFunction();
+  if (tensorFieldFunction == 0)
+  {
     vtkErrorMacro("Must set TensorFieldFunction.");
     return;
-    }
-  if(this->GetArrayName() == 0)
-    {
+  }
+  if (this->GetArrayName() == 0)
+  {
     vtkErrorMacro("Must set ArrayName.");
     return;
-    }
+  }
   vtkIdType numberOfPoints = grid->GetNumberOfPoints();
-  unsigned int numberOfComponents = 
-    tensorFieldFunction->GetNumberOfComponents();
+  unsigned int numberOfComponents = tensorFieldFunction->GetNumberOfComponents();
   vtkDoubleArray* array = vtkDoubleArray::New();
   array->SetNumberOfComponents(numberOfComponents);
   array->SetNumberOfTuples(numberOfPoints);
   std::vector<double> tupleValues(numberOfComponents);
   double point[3];
-  for(vtkIdType i=0;i<numberOfPoints;i++)
-    {
+  for (vtkIdType i = 0; i < numberOfPoints; i++)
+  {
     grid->GetPoint(i, point);
-    for(unsigned int uj=0;uj<numberOfComponents;uj++)
-      {
-      tupleValues[uj] = tensorFieldFunction->ComputeComponenentAtPoint(
-        uj, point, timeStep, time);
-      }
-    array->SetTypedTuple(i, &tupleValues[0]);
+    for (unsigned int uj = 0; uj < numberOfComponents; uj++)
+    {
+      tupleValues[uj] = tensorFieldFunction->ComputeComponenentAtPoint(uj, point, timeStep, time);
     }
+    array->SetTypedTuple(i, &tupleValues[0]);
+  }
   array->SetName(this->GetArrayName());
   grid->GetPointData()->AddArray(array);
   array->Delete();

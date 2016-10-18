@@ -28,19 +28,17 @@ vtkSMDeserializer::~vtkSMDeserializer()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
-                                           const char* xmlname,
-                                           const char* subname)
+vtkSMProxy* vtkSMDeserializer::CreateProxy(
+  const char* xmlgroup, const char* xmlname, const char* subname)
 {
   vtkSMSessionProxyManager* pxm = this->SessionProxyManager;
-  return pxm? pxm->NewProxy(xmlgroup, xmlname, subname) : NULL;
+  return pxm ? pxm->NewProxy(xmlgroup, xmlname, subname) : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDeserializer::SetSession(vtkSMSession* session)
 {
-  this->SetSessionProxyManager(
-    session? session->GetSessionProxyManager() : NULL);
+  this->SetSessionProxyManager(session ? session->GetSessionProxyManager() : NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -58,14 +56,12 @@ vtkSMSessionProxyManager* vtkSMDeserializer::GetSessionProxyManager()
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMDeserializer::GetSession()
 {
-  return this->SessionProxyManager?
-    this->SessionProxyManager->GetSession() : NULL;
+  return this->SessionProxyManager ? this->SessionProxyManager->GetSession() : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDeserializer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SessionProxyManager: " <<
-    this->SessionProxyManager.GetPointer() << endl;
+  os << indent << "SessionProxyManager: " << this->SessionProxyManager.GetPointer() << endl;
 }

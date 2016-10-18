@@ -33,7 +33,8 @@
 
 class vtkSelectionRepresentation;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation : public vtkCompositeRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation
+  : public vtkCompositeRepresentation
 {
 public:
   static vtkPVCompositeRepresentation* New();
@@ -109,7 +110,6 @@ protected:
 private:
   vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

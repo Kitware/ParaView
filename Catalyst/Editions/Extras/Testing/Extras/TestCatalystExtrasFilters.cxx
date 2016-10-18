@@ -26,52 +26,42 @@ int main(int argc, char* argv[])
 {
   // Initialization
   vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_BATCH,
-                                      options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_BATCH, options);
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   //---------------------------------------------------------------------------
 
   if (!pxm)
-    {
+  {
     cout << "Null proxy manager" << endl;
     session->Delete();
     return EXIT_FAILURE;
-    }
+  }
 
-  static const char* const filters[] = {
-      "PVExtractSelection",
-      "ExtractHistogram",
-      "Glyph",
-      "WarpScalar",
-      "WarpVector",
-      "IntegrateAttributes",
-      "DataSetSurfaceFilter",
-      NULL
-  };
+  static const char* const filters[] = { "PVExtractSelection", "ExtractHistogram", "Glyph",
+    "WarpScalar", "WarpVector", "IntegrateAttributes", "DataSetSurfaceFilter", NULL };
 
   const char* const* name = &filters[0];
 
   int result = EXIT_SUCCESS;
 
   while (*name)
-    {
+  {
     // Create proxy and change main radius value
     vtkSmartPointer<vtkSMProxy> proxy;
     proxy.TakeReference(pxm->NewProxy("filters", *name));
     ++name;
 
     if (!proxy)
-      {
+    {
       cout << "Null proxy for " << *name << endl;
       result = EXIT_FAILURE;
       continue;
-      }
-    proxy->UpdateVTKObjects();
     }
+    proxy->UpdateVTKObjects();
+  }
 
   // *******************************************************************
 

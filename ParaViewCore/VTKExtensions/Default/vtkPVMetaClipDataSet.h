@@ -26,13 +26,14 @@
 
 class vtkImplicitFunction;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaClipDataSet : public vtkPVDataSetAlgorithmSelectorFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaClipDataSet
+  : public vtkPVDataSetAlgorithmSelectorFilter
 {
 public:
-  vtkTypeMacro(vtkPVMetaClipDataSet,vtkPVDataSetAlgorithmSelectorFilter);
+  vtkTypeMacro(vtkPVMetaClipDataSet, vtkPVDataSetAlgorithmSelectorFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVMetaClipDataSet *New();
+  static vtkPVMetaClipDataSet* New();
 
   /**
    * Enable or disable the Extract Cells By Regions.
@@ -48,23 +49,21 @@ public:
   /**
    * Expose method from vtkCutter
    */
-  void SetClipFunction(vtkImplicitFunction* func)
-  { this->SetImplicitFunction(func); };
+  void SetClipFunction(vtkImplicitFunction* func) { this->SetImplicitFunction(func); };
 
   /**
    * Expose method from vtkClip
    */
   void SetValue(double value);
 
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              int fieldAssociation,
-                              const char *name);
-  virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                              int fieldAssociation,
-                              int fieldAttributeType);
-  virtual void SetInputArrayToProcess(int idx, vtkInformation *info);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, const char* name);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType);
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info);
 
-  virtual void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldName, const char* fieldType);
+  virtual void SetInputArrayToProcess(
+    int idx, int port, int connection, const char* fieldName, const char* fieldType);
 
   /**
    * Expose method from vtkClip
@@ -75,15 +74,13 @@ public:
    * Add validation for active filter so that the vtkExtractGeometry
    * won't be used without ImplicifFuntion being set.
    */
-  virtual int ProcessRequest(vtkInformation* request,
-    vtkInformationVector** inInfo,
-    vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
 
   // Add validation for active filter so that the vtkExtractGeometry
   // won't be used without ImplicifFuntion being set.
-  virtual int ProcessRequest(vtkInformation* request,
-    vtkCollection* inInfo,
-    vtkInformationVector* outInfo);
+  virtual int ProcessRequest(
+    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo);
 
 protected:
   vtkPVMetaClipDataSet();
@@ -98,7 +95,7 @@ private:
   void operator=(const vtkPVMetaClipDataSet&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
-  vtkInternals *Internal;
+  vtkInternals* Internal;
 };
 
 #endif

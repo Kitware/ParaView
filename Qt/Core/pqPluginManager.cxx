@@ -60,28 +60,26 @@ public:
   QList<QPointer<pqServer> > Servers;
 
   QString getXML(vtkPVPluginsInformation* info, bool remote)
-    {
+  {
     std::ostringstream stream;
     stream << "<?xml version=\"1.0\" ?>\n";
     stream << "<Plugins>\n";
-    for (unsigned int cc=0; cc < info->GetNumberOfPlugins(); cc++)
+    for (unsigned int cc = 0; cc < info->GetNumberOfPlugins(); cc++)
+    {
+      if ((remote && this->RemoteHiddenPlugins.contains(info->GetPluginFileName(cc))) ||
+        (!remote && this->LocalHiddenPlugins.contains(info->GetPluginFileName(cc))))
       {
-      if ((remote &&
-          this->RemoteHiddenPlugins.contains(info->GetPluginFileName(cc))) ||
-        (!remote &&
-         this->LocalHiddenPlugins.contains(info->GetPluginFileName(cc))))
-        {
         continue;
-        }
+      }
 
       stream << "  <Plugin name=\"" << info->GetPluginName(cc) << "\""
-        << " filename=\"" << info->GetPluginFileName(cc) << "\""
-        << " auto_load=\"" << (info->GetAutoLoad(cc)? 1 : 0) << "\" />\n";
-      }
-    stream << "</Plugins>\n";
-    //cout << stream.str().c_str() << endl;
-    return QString(stream.str().c_str());
+             << " filename=\"" << info->GetPluginFileName(cc) << "\""
+             << " auto_load=\"" << (info->GetAutoLoad(cc) ? 1 : 0) << "\" />\n";
     }
+    stream << "</Plugins>\n";
+    // cout << stream.str().c_str() << endl;
+    return QString(stream.str().c_str());
+  }
 };
 
 //=============================================================================
@@ -91,17 +89,16 @@ static QString pqPluginManagerSettingsKeyForRemote(pqServer* server)
   // locate the xml-config from settings associated with this server and ask
   // the server to parse it.
   const pqServerResource& resource = server->getResource();
-  QString uri = resource.configuration().isNameDefault() ?
-    resource.schemeHostsPorts().toURI() : resource.configuration().name();
-  QString key = QString("/PluginsList/%1:%2").arg(uri).arg(
-    QCoreApplication::applicationFilePath());
+  QString uri = resource.configuration().isNameDefault() ? resource.schemeHostsPorts().toURI()
+                                                         : resource.configuration().name();
+  QString key = QString("/PluginsList/%1:%2").arg(uri).arg(QCoreApplication::applicationFilePath());
   return key;
 }
 
 //=============================================================================
 static QString pqPluginManagerSettingsKeyForLocal()
 {
- return QString("/PluginsList/Local:%1").arg(QCoreApplication::applicationFilePath());
+  return QString("/PluginsList/Local:%1").arg(QCoreApplication::applicationFilePath());
 }
 
 //-----------------------------------------------------------------------------
@@ -110,29 +107,26 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
 {
   this->Internals = new pqInternals();
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   // we ensure that the auto-load plugins are loaded before the application
   // realizes that a new server connection has been made.
   // (BUG #12238).
-  QObject::connect(smmodel, SIGNAL(serverReady(pqServer*)),
-    this, SLOT(loadPluginsFromSettings(pqServer*)));
-  QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
-    this, SLOT(onServerDisconnected(pqServer*)));
+  QObject::connect(
+    smmodel, SIGNAL(serverReady(pqServer*)), this, SLOT(loadPluginsFromSettings(pqServer*)));
+  QObject::connect(
+    smmodel, SIGNAL(serverRemoved(pqServer*)), this, SLOT(onServerDisconnected(pqServer*)));
 
   // After the new server has been setup, we can validate if the plugin
   // requirements have been met successfully.
   QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
-    SIGNAL(finishedAddingServer(pqServer*)),
-    this, SLOT(onServerConnected(pqServer*)));
+    SIGNAL(finishedAddingServer(pqServer*)), this, SLOT(onServerConnected(pqServer*)));
 
   // observer plugin loaded events from PluginManager to detect plugins loaded
   // from Python or otherwise.
-  vtkSMPluginManager* mgr =
-    vtkSMProxyManager::GetProxyManager()->GetPluginManager();
-  mgr->AddObserver(vtkSMPluginManager::PluginLoadedEvent,
-    this, &pqPluginManager::updatePluginLists);
+  vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+  mgr->AddObserver(
+    vtkSMPluginManager::PluginLoadedEvent, this, &pqPluginManager::updatePluginLists);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,9 +134,9 @@ pqPluginManager::~pqPluginManager()
 {
   // save all settings for each open server session.
   foreach (pqServer* server, this->Internals->Servers)
-    {
+  {
     this->onServerDisconnected(server);
-    }
+  }
   delete this->Internals;
 }
 
@@ -154,13 +148,11 @@ void pqPluginManager::loadPluginsFromSettings()
   QString key = pqPluginManagerSettingsKeyForLocal();
   QString local_plugin_config = settings->value(key).toString();
   if (!local_plugin_config.isEmpty())
-    {
-    pqDebug("PV_PLUGIN_DEBUG") <<
-      "Loading local Plugin configuration using settings key: " << key;
-    vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
-      LoadPluginConfigurationXMLFromString(
-        local_plugin_config.toLatin1().data(), NULL, false);
-    }
+  {
+    pqDebug("PV_PLUGIN_DEBUG") << "Loading local Plugin configuration using settings key: " << key;
+    vtkSMProxyManager::GetProxyManager()->GetPluginManager()->LoadPluginConfigurationXMLFromString(
+      local_plugin_config.toLatin1().data(), NULL, false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -168,7 +160,7 @@ void pqPluginManager::loadPluginsFromSettings(pqServer* server)
 {
   // Tell the server to load all default-plugins.
   if (server && server->isRemote())
-    {
+  {
     // locate the xml-config from settings associated with this server and ask
     // the server to parse it.
     QString key = pqPluginManagerSettingsKeyForRemote(server);
@@ -177,14 +169,15 @@ void pqPluginManager::loadPluginsFromSettings(pqServer* server)
     // now pass this xml to the vtkPVPluginTracker on the remote
     // processes.
     if (!remote_plugin_config.isEmpty())
-      {
-      pqDebug("PV_PLUGIN_DEBUG") <<
-        "Loading remote Plugin configuration using settings key: " << key;
-      vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
-        LoadPluginConfigurationXMLFromString(
+    {
+      pqDebug("PV_PLUGIN_DEBUG") << "Loading remote Plugin configuration using settings key: "
+                                 << key;
+      vtkSMProxyManager::GetProxyManager()
+        ->GetPluginManager()
+        ->LoadPluginConfigurationXMLFromString(
           remote_plugin_config.toLatin1().data(), server->session(), true);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -196,9 +189,9 @@ void pqPluginManager::onServerConnected(pqServer* server)
   // Validate plugins i.e. check plugins that are required on client and server
   // are indeed present on both.
   if (!this->verifyPlugins(server))
-    {
+  {
     emit this->requiredPluginsNotLoaded(server);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -206,22 +199,20 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   if (server && server->isRemote())
-    {
+  {
     QString remoteKey = pqPluginManagerSettingsKeyForRemote(server);
     // locate the xml-config from settings associated with this server and ask
     // the server to parse it.
-    settings->setValue(remoteKey,
-      this->Internals->getXML(this->loadedExtensions(server, true), true));
-    pqDebug("PV_PLUGIN_DEBUG") <<
-      "Saving remote Plugin configuration using settings key: " << remoteKey;
-    }
+    settings->setValue(
+      remoteKey, this->Internals->getXML(this->loadedExtensions(server, true), true));
+    pqDebug("PV_PLUGIN_DEBUG") << "Saving remote Plugin configuration using settings key: "
+                               << remoteKey;
+  }
 
   // just save the local plugin info to be on the safer side.
   QString key = pqPluginManagerSettingsKeyForLocal();
-  settings->setValue(key,
-    this->Internals->getXML(this->loadedExtensions(server, false), false));
-  pqDebug("PV_PLUGIN_DEBUG") <<
-    "Saving local Plugin configuration using settings key: " << key;
+  settings->setValue(key, this->Internals->getXML(this->loadedExtensions(server, false), false));
+  pqDebug("PV_PLUGIN_DEBUG") << "Saving local Plugin configuration using settings key: " << key;
 
   this->Internals->Servers.removeAll(server);
 }
@@ -233,13 +224,11 @@ void pqPluginManager::updatePluginLists()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVPluginsInformation* pqPluginManager::loadedExtensions(
-  pqServer* session, bool remote)
+vtkPVPluginsInformation* pqPluginManager::loadedExtensions(pqServer* session, bool remote)
 {
   vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
-  return (remote && session && session->isRemote())?
-    mgr->GetRemoteInformation(session->session()) :
-    mgr->GetLocalInformation();
+  return (remote && session && session->isRemote()) ? mgr->GetRemoteInformation(session->session())
+                                                    : mgr->GetLocalInformation();
 }
 
 //-----------------------------------------------------------------------------
@@ -250,23 +239,23 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
 
   bool ret_val = false;
   if (remote && server && server->isRemote())
-    {
+  {
     ret_val = mgr->LoadRemotePlugin(lib.toLatin1().data(), server->session());
-    }
+  }
   else
-    {
+  {
     ret_val = mgr->LoadLocalPlugin(lib.toLatin1().data());
-    }
+  }
 
-  return ret_val? LOADED : NOTLOADED;
+  return ret_val ? LOADED : NOTLOADED;
 }
 
 //-----------------------------------------------------------------------------
 QStringList pqPluginManager::pluginPaths(pqServer* session, bool remote)
 {
   vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
-  QString paths = remote?  mgr->GetRemotePluginSearchPaths(session->session()):
-    mgr->GetLocalPluginSearchPaths();
+  QString paths =
+    remote ? mgr->GetRemotePluginSearchPaths(session->session()) : mgr->GetLocalPluginSearchPaths();
   return paths.split(';', QString::SkipEmptyParts);
 }
 
@@ -274,34 +263,32 @@ QStringList pqPluginManager::pluginPaths(pqServer* session, bool remote)
 void pqPluginManager::hidePlugin(const QString& lib, bool remote)
 {
   if (remote)
-    {
+  {
     this->Internals->RemoteHiddenPlugins.insert(lib);
-    }
+  }
   else
-    {
+  {
     this->Internals->LocalHiddenPlugins.insert(lib);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool pqPluginManager::isHidden(const QString& lib, bool remote)
 {
-  return remote?
-    this->Internals->RemoteHiddenPlugins.contains(lib) :
-    this->Internals->LocalHiddenPlugins.contains(lib);
+  return remote ? this->Internals->RemoteHiddenPlugins.contains(lib)
+                : this->Internals->LocalHiddenPlugins.contains(lib);
 }
 
 //-----------------------------------------------------------------------------
 bool pqPluginManager::verifyPlugins(pqServer* activeServer)
 {
-  if (!activeServer  || !activeServer->isRemote())
-    {
+  if (!activeServer || !activeServer->isRemote())
+  {
     // no verification needed for non-remote servers.
     return true;
-    }
+  }
 
   vtkPVPluginsInformation* local_info = this->loadedExtensions(activeServer, false);
   vtkPVPluginsInformation* remote_info = this->loadedExtensions(activeServer, true);
-  return vtkPVPluginsInformation::PluginRequirementsSatisfied(
-      local_info, remote_info);
+  return vtkPVPluginsInformation::PluginRequirementsSatisfied(local_info, remote_info);
 }

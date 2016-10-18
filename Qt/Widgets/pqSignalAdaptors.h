@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,9 +43,9 @@ class QSpinBox;
 
 #include "pqWidgetsModule.h"
 
-
 /**
-* signal adaptor to allow getting/setting/observing of a pseudo 'currentText' property of a combo box 
+* signal adaptor to allow getting/setting/observing of a pseudo 'currentText' property of a combo
+* box
 * the QComboBox currentIndexChanged signal is forwarded to this currentTextChanged signal
 */
 class PQWIDGETS_EXPORT pqSignalAdaptorComboBox : public QObject
@@ -78,7 +78,7 @@ signals:
   /**
   * signal text changed in a combo box
   */
-  void currentTextChanged(const QString&);  
+  void currentTextChanged(const QString&);
 
   void currentIndexChanged(int);
 public slots:
@@ -96,6 +96,7 @@ public slots:
   * set the current index to the index with user data as the argument.
   */
   void setCurrentData(const QVariant& data);
+
 protected:
 };
 
@@ -108,10 +109,10 @@ class PQWIDGETS_EXPORT pqSignalAdaptorColor : public QObject
   Q_PROPERTY(QVariant color READ color WRITE setColor)
 public:
   /**
-  * constructor requires a QObject, the name of the QColor property, and a signal for property changes
+  * constructor requires a QObject, the name of the QColor property, and a signal for property
+  * changes
   */
-  pqSignalAdaptorColor(QObject* p, const char* colorProperty, const char* signal,
-    bool enableAlpha);
+  pqSignalAdaptorColor(QObject* p, const char* colorProperty, const char* signal, bool enableAlpha);
   /**
   * get the color components
   */
@@ -129,11 +130,11 @@ public slots:
   void setColor(const QVariant&);
 protected slots:
   void handleColorChanged();
+
 protected:
   QByteArray PropertyName;
   bool EnableAlpha;
 };
-
 
 /**
 * signal adaptor to adjust the range of a int slider to (0.0-1.0)
@@ -186,12 +187,12 @@ signals:
   /**
   * signal text changed
   */
-  void textChanged();  
+  void textChanged();
 public slots:
   void setText(const QString&);
+
 protected:
 };
-
 
 /**
 * signal adaptor that lets us set/get the integer value inside a QSpinBox
@@ -214,11 +215,11 @@ signals:
   /**
   * signal text changed
   */
-  void valueChanged(int val);  
+  void valueChanged(int val);
 public slots:
   void setValue(int val);
+
 protected:
 };
 
 #endif
-

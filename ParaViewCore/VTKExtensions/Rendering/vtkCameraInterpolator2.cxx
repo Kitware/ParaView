@@ -90,17 +90,17 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
   this->PositionSpline->SetClosed(this->ClosedPositionPath);
 
   if (this->FocalPointMode == PATH)
-    {
+  {
     this->Evaluate(u, this->FocalSpline, tuple);
     camera->SetFocalPoint(tuple);
-    }
+  }
 
   if (this->PositionMode == PATH)
-    {
+  {
     this->Evaluate(u, this->PositionSpline, tuple);
     camera->SetPosition(tuple);
     if (this->PositionSpline->GetPoints()->GetNumberOfPoints() > 1)
-      {
+    {
       // This is assuming that the camera is passed in having the first
       // timestep's view up.
       vtkVector3<double> firstPos, secondPos;
@@ -108,9 +108,9 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
       this->PositionSpline->GetPoints()->GetPoint(1, secondPos.GetData());
       vtkVector3<double> delta;
       for (int i = 0; i < 3; ++i)
-        {
+      {
         delta[i] = secondPos[i] - firstPos[i];
-        }
+      }
       vtkVector3<double> initialViewUp;
       camera->GetViewUp(initialViewUp.GetData());
       delta.Normalize();
@@ -122,46 +122,44 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
       // with the view plane normal in many cases such as an orbit about
       // the x-axis)
       if (std::abs(delta.Dot(initialViewUp)) > sqrt(0.5))
-        {
+      {
         vtkVector3<double> p1, p2;
         double t1 = u, t2 = u + 0.05;
         if (t2 > 1)
-          {
+        {
           t1 = u - 0.05;
           t2 = u;
-          }
+        }
         this->Evaluate(t1, this->PositionSpline, p1.GetData());
         this->Evaluate(t2, this->PositionSpline, p2.GetData());
         for (int i = 0; i < 3; ++i)
-          {
+        {
           delta[i] = p2[i] - p1[i];
-          }
+        }
         delta.Normalize();
         camera->SetViewUp(delta.GetData());
-        }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkCameraInterpolator2::Evaluate(double u,
-  vtkParametricSpline* spline,
-  double tuple[3])
+void vtkCameraInterpolator2::Evaluate(double u, vtkParametricSpline* spline, double tuple[3])
 {
   if (spline->GetPoints()->GetNumberOfPoints() <= 0)
-    {
+  {
     vtkWarningMacro("No path specified.");
     return;
-    }
+  }
 
   if (spline->GetPoints()->GetNumberOfPoints() == 1)
-    {
+  {
     // Fixed point.
     spline->GetPoints()->GetPoint(0, tuple);
     return;
-    }
+  }
 
-  double temp[3] = {u, 0, 0 };
+  double temp[3] = { u, 0, 0 };
   spline->Evaluate(temp, tuple, temp);
 }
 
@@ -170,5 +168,3 @@ void vtkCameraInterpolator2::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

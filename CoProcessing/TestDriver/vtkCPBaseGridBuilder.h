@@ -16,7 +16,7 @@
  * @class   vtkCPBaseGridBuilder
  * @brief   Abstract class for creating grids.
  *
- * Abstract class for creating grids for a test driver.  
+ * Abstract class for creating grids for a test driver.
 */
 
 #ifndef vtkCPBaseGridBuilder_h
@@ -37,8 +37,7 @@ public:
    * Return a grid.  BuiltNewGrid is 0 if the grid is the same
    * as the last time step.
    */
-  virtual vtkDataObject* GetGrid(unsigned long TimeStep, double Time,
-                                 int & BuiltNewGrid) = 0;
+  virtual vtkDataObject* GetGrid(unsigned long TimeStep, double Time, int& BuiltNewGrid) = 0;
 
   // maybe also have a subdivide grid cells here as well
 

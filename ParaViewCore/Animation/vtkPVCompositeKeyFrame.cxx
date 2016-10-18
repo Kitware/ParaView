@@ -27,20 +27,20 @@ vtkPVCompositeKeyFrame::vtkPVCompositeKeyFrame()
 {
   this->Type = RAMP;
   this->BooleanKeyFrame = vtkPVBooleanKeyFrame::New();
-  this->RampKeyFrame =  vtkPVRampKeyFrame::New();
+  this->RampKeyFrame = vtkPVRampKeyFrame::New();
   this->ExponentialKeyFrame = vtkPVExponentialKeyFrame::New();
   this->SinusoidKeyFrame = vtkPVSinusoidKeyFrame::New();
 
   // Whenever any of the internal keyframes is modified, we fired a modified
   // event as well.
-  this->BooleanKeyFrame->AddObserver(vtkCommand::ModifiedEvent,
-    this, &vtkPVCompositeKeyFrame::Modified);
-  this->RampKeyFrame->AddObserver(vtkCommand::ModifiedEvent,
-    this, &vtkPVCompositeKeyFrame::Modified);
-  this->ExponentialKeyFrame->AddObserver(vtkCommand::ModifiedEvent,
-    this, &vtkPVCompositeKeyFrame::Modified);
-  this->SinusoidKeyFrame->AddObserver(vtkCommand::ModifiedEvent,
-    this, &vtkPVCompositeKeyFrame::Modified);
+  this->BooleanKeyFrame->AddObserver(
+    vtkCommand::ModifiedEvent, this, &vtkPVCompositeKeyFrame::Modified);
+  this->RampKeyFrame->AddObserver(
+    vtkCommand::ModifiedEvent, this, &vtkPVCompositeKeyFrame::Modified);
+  this->ExponentialKeyFrame->AddObserver(
+    vtkCommand::ModifiedEvent, this, &vtkPVCompositeKeyFrame::Modified);
+  this->SinusoidKeyFrame->AddObserver(
+    vtkCommand::ModifiedEvent, this, &vtkPVCompositeKeyFrame::Modified);
 }
 
 //-----------------------------------------------------------------------------
@@ -56,22 +56,22 @@ vtkPVCompositeKeyFrame::~vtkPVCompositeKeyFrame()
 const char* vtkPVCompositeKeyFrame::GetTypeAsString(int type)
 {
   switch (type)
-    {
-  case NONE:
-    return "None";
+  {
+    case NONE:
+      return "None";
 
-  case BOOLEAN:
-    return "Boolean";
+    case BOOLEAN:
+      return "Boolean";
 
-  case RAMP:
-    return "Ramp";
+    case RAMP:
+      return "Ramp";
 
-  case EXPONENTIAL:
-    return "Exponential";
+    case EXPONENTIAL:
+      return "Exponential";
 
-  case SINUSOID:
-    return "Sinusoid";
-    }
+    case SINUSOID:
+      return "Sinusoid";
+  }
 
   return "Unknown";
 }
@@ -80,36 +80,35 @@ const char* vtkPVCompositeKeyFrame::GetTypeAsString(int type)
 int vtkPVCompositeKeyFrame::GetTypeFromString(const char* type)
 {
   if (!type)
-    {
+  {
     return NONE;
-    }
+  }
 
   if (strcmp(type, "Boolean") == 0)
-    {
+  {
     return BOOLEAN;
-    }
+  }
   else if (strcmp(type, "Ramp") == 0)
-    {
+  {
     return RAMP;
-    }
+  }
   else if (strcmp(type, "Exponential") == 0)
-    {
+  {
     return EXPONENTIAL;
-    }
+  }
   else if (strcmp(type, "Sinusoid") == 0)
-    {
+  {
     return SINUSOID;
-    }
+  }
   return NONE;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVCompositeKeyFrame::UpdateValue( double currenttime,
-                                          vtkPVAnimationCue* cue,
-                                          vtkPVKeyFrame* next)
+void vtkPVCompositeKeyFrame::UpdateValue(
+  double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next)
 {
   switch (this->Type)
-    {
+  {
     case BOOLEAN:
       this->BooleanKeyFrame->UpdateValue(currenttime, cue, next);
       break;
@@ -128,7 +127,7 @@ void vtkPVCompositeKeyFrame::UpdateValue( double currenttime,
 
     default:
       this->Superclass::UpdateValue(currenttime, cue, next);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

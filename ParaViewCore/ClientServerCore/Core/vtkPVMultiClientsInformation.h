@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkPVMultiClientsInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void DeepCopy(vtkPVMultiClientsInformation *info);
+  void DeepCopy(vtkPVMultiClientsInformation* info);
 
   /**
    * Transfer information about a single object into this object.

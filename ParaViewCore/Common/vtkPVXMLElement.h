@@ -34,7 +34,7 @@ struct vtkPVXMLElementInternals;
 class VTKPVCOMMON_EXPORT vtkPVXMLElement : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkPVXMLElement,vtkObject);
+  vtkTypeMacro(vtkPVXMLElement, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVXMLElement* New();
 
@@ -59,15 +59,16 @@ public:
    * Get the attribute with the given name.  If it doesn't exist,
    * returns NULL.
    */
-  const char* GetAttribute(const char* name)
-    { return this->GetAttributeOrDefault(name, NULL); }
+  const char* GetAttribute(const char* name) { return this->GetAttributeOrDefault(name, NULL); }
 
   /**
    * Get the attribute with the given name.  If it doesn't exist,
    * returns "".
    */
   const char* GetAttributeOrEmpty(const char* name)
-    { return this->GetAttributeOrDefault(name, ""); }
+  {
+    return this->GetAttributeOrDefault(name, "");
+  }
 
   /**
    * Get the attribute with the given name.
@@ -231,8 +232,7 @@ public:
    * in the vtkCollection passed as an argument.
    */
   void GetElementsByName(const char* name, vtkCollection* elements);
-  void GetElementsByName(const char* name, vtkCollection* elements,
-                         bool recursively);
+  void GetElementsByName(const char* name, vtkCollection* elements, bool recursively);
   //@}
 
   /**
@@ -273,7 +273,6 @@ protected:
   vtkSetStringMacro(Id);
   void ReadXMLAttributes(const char** atts);
   void AddCharacterData(const char* data, int length);
-
 
   // Internal utility methods.
   vtkPVXMLElement* LookupElementInScope(const char* id);

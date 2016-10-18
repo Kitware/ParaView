@@ -40,11 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyClipboard.h"
 //-----------------------------------------------------------------------------
 pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode)
-  : Superclass(parentObject), Paste(paste_mode)
+  : Superclass(parentObject)
+  , Paste(paste_mode)
 {
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -57,17 +57,15 @@ pqCopyReaction::~pqCopyReaction()
 void pqCopyReaction::updateEnableState()
 {
   if (this->Paste)
-    {
+  {
     QObject* clipboard = pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD");
     pqPipelineSource* active = pqActiveObjects::instance().activeSource();
-    this->parentAction()->setEnabled(
-      clipboard != NULL && active != clipboard && active != NULL);
-    }
+    this->parentAction()->setEnabled(clipboard != NULL && active != clipboard && active != NULL);
+  }
   else
-    {
-    this->parentAction()->setEnabled(
-      pqActiveObjects::instance().activeSource() != NULL);
-    }
+  {
+    this->parentAction()->setEnabled(pqActiveObjects::instance().activeSource() != NULL);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -75,10 +73,10 @@ void pqCopyReaction::copy()
 {
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
   if (!activeSource)
-    {
+  {
     qDebug("Could not find an active source to copy to.");
     return;
-    }
+  }
 
   // since pqApplicationCore uses QPointer for the managers, we don't have to
   // worry about unregistering the source when it is deleted.
@@ -93,13 +91,13 @@ void pqCopyReaction::copy()
 void pqCopyReaction::paste()
 {
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
-  pqPipelineSource* clipboard = qobject_cast<pqPipelineSource*>(
-    pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD"));
+  pqPipelineSource* clipboard =
+    qobject_cast<pqPipelineSource*>(pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD"));
   if (!clipboard)
-    {
+  {
     qDebug("No source on clipboard to copy from.");
     return;
-    }
+  }
   pqCopyReaction::copy(activeSource->getProxy(), clipboard->getProxy());
   activeSource->renderAllViews();
 }
@@ -108,7 +106,7 @@ void pqCopyReaction::paste()
 void pqCopyReaction::copy(vtkSMProxy* dest, vtkSMProxy* source)
 {
   if (dest && source)
-    {
+  {
     BEGIN_UNDO_SET("Copy Properties");
 
     vtkNew<vtkSMProxyClipboard> clipboard;
@@ -116,5 +114,5 @@ void pqCopyReaction::copy(vtkSMProxy* dest, vtkSMProxy* source)
     clipboard->Paste(dest);
 
     END_UNDO_SET();
-    }
+  }
 }

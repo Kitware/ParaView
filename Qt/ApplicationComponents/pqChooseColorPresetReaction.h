@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include <QPointer> // needed for QPointer
+#include <QPointer>         // needed for QPointer
 
 class pqDataRepresentation;
 class vtkSMProxy;
@@ -70,8 +70,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChooseColorPresetReaction : public pqReac
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqChooseColorPresetReaction(QAction* parent, bool track_active_objects=true);
+  pqChooseColorPresetReaction(QAction* parent, bool track_active_objects = true);
   virtual ~pqChooseColorPresetReaction();
 
 public slots:
@@ -80,7 +81,7 @@ public slots:
   * Returns false if representation cannot be located or its is not using
   * scalar coloring.
   */
-  bool choosePreset(const char* presetName=NULL);
+  bool choosePreset(const char* presetName = NULL);
 
   /**
   * Set the data representation explicitly when track_active_objects is false.

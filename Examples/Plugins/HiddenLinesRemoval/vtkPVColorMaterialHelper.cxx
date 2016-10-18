@@ -40,69 +40,69 @@ vtkPVColorMaterialHelper::~vtkPVColorMaterialHelper()
 void vtkPVColorMaterialHelper::Initialize(vtkShaderProgram2* pgm)
 {
   if (this->Shader != pgm)
-    {
+  {
     this->SetShader(pgm);
     if (pgm)
-      {
-      vtkShader2 *s=vtkShader2::New();
+    {
+      vtkShader2* s = vtkShader2::New();
       s->SetSourceCode(vtkPVColorMaterialHelper_vs);
       s->SetType(VTK_SHADER_TYPE_VERTEX);
       s->SetContext(pgm->GetContext());
       pgm->GetShaders()->AddItem(s);
       s->Delete();
-      }
     }
+  }
 }
 //----------------------------------------------------------------------------
 void vtkPVColorMaterialHelper::PrepareForRendering()
 {
   if (!this->Shader)
-    {
+  {
     vtkErrorMacro("Please Initialize() before calling PrepareForRendering().");
-    return ;
-    }
+    return;
+  }
 
   this->Mode = vtkPVColorMaterialHelper::DISABLED;
   if (glIsEnabled(GL_COLOR_MATERIAL))
-    {
+  {
     GLint colorMaterialParameter;
     glGetIntegerv(GL_COLOR_MATERIAL_PARAMETER, &colorMaterialParameter);
     switch (colorMaterialParameter)
-      {
-    case GL_AMBIENT:
-      this->Mode = vtkPVColorMaterialHelper::AMBIENT;
-      break;
+    {
+      case GL_AMBIENT:
+        this->Mode = vtkPVColorMaterialHelper::AMBIENT;
+        break;
 
-    case GL_DIFFUSE:
-      this->Mode = vtkPVColorMaterialHelper::DIFFUSE;
-      break;
+      case GL_DIFFUSE:
+        this->Mode = vtkPVColorMaterialHelper::DIFFUSE;
+        break;
 
-    case GL_SPECULAR:
-      this->Mode = vtkPVColorMaterialHelper::SPECULAR;
-      break;
+      case GL_SPECULAR:
+        this->Mode = vtkPVColorMaterialHelper::SPECULAR;
+        break;
 
-    case GL_AMBIENT_AND_DIFFUSE:
-      this->Mode = vtkPVColorMaterialHelper::AMBIENT_AND_DIFFUSE;
-      break;
+      case GL_AMBIENT_AND_DIFFUSE:
+        this->Mode = vtkPVColorMaterialHelper::AMBIENT_AND_DIFFUSE;
+        break;
 
-    case GL_EMISSION:
-      this->Mode = vtkPVColorMaterialHelper::EMISSION;
-      break;
-      }
+      case GL_EMISSION:
+        this->Mode = vtkPVColorMaterialHelper::EMISSION;
+        break;
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVColorMaterialHelper::Render()
 {
   if (!this->Shader)
-    {
+  {
     vtkErrorMacro("Please Initialize() before calling Render().");
     return;
-    }
-  
-  int value=this->Mode;
-  this->Shader->GetUniformVariables()->SetUniformi("vtkPVColorMaterialHelper_Mode",1,&value);
+  }
+
+  int value = this->Mode;
+  this->Shader->GetUniformVariables()->SetUniformi("vtkPVColorMaterialHelper_Mode", 1, &value);
 }
 
 //----------------------------------------------------------------------------

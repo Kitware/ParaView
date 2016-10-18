@@ -16,7 +16,7 @@
  * @class   vtkSMPropertyLink
  *
  * Creates a link between two properties. Can create M->N links.
- * At the time when the link is created every output property is synchornized 
+ * At the time when the link is created every output property is synchornized
  * with the first input property.
 */
 
@@ -47,9 +47,7 @@ public:
    * When a link is added, all output property values are
    * synchronized with that of the input.
    */
-  void AddLinkedProperty(vtkSMProxy* proxy, 
-                         const char* propertyname, 
-                         int updateDir);
+  void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
   void RemoveLinkedProperty(vtkSMProxy* proxy, const char* propertyname);
   //@}
 
@@ -70,12 +68,12 @@ public:
    * Get a proxy involved in this link.
    */
   vtkSMProxy* GetLinkedProxy(int index);
-  
+
   /**
    * Get a property involved in this link.
    */
   const char* GetLinkedPropertyName(int index);
-  
+
   //@{
   /**
    * Get the direction of a property involved in this link
@@ -84,7 +82,7 @@ public:
   int GetLinkedObjectDirection(int index);
   int GetLinkedPropertyDirection(int index);
   //@}
-  
+
   /**
    * Remove all links.
    */
@@ -97,7 +95,7 @@ public:
    * globalIDs set. This enables splitting the load process in 2 step to prevent
    * invalid state when a property refers to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMPropertyLink();
@@ -120,7 +118,7 @@ protected:
    * Save the state of the link.
    */
   virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
-  
+
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void PropertyModified(vtkSMProxy* caller, const char* pname);
   virtual void PropertyModified(vtkSMProperty* property);
@@ -137,9 +135,6 @@ private:
 
   vtkSMPropertyLink(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
-
 };
 
-
 #endif
-

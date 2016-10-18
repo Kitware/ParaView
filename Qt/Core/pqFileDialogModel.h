@@ -43,7 +43,6 @@ class vtkProcessModule;
 class pqServer;
 class QModelIndex;
 
-
 /**
 pqFileDialogModel allows remote browsing of a connected ParaView server's
 filesystem, as well as browsing of the local file system.
@@ -79,7 +78,7 @@ public:
   /**
   * Return true if the file at the index is hidden
   */
-  bool isHidden( const QModelIndex& );
+  bool isHidden(const QModelIndex&);
 
   /**
   * Return true if the given row is a directory
@@ -144,7 +143,7 @@ public:
   /**
   * return the data for an item
   */
-  QVariant data(const QModelIndex & idx, int role) const;
+  QVariant data(const QModelIndex& idx, int role) const;
   /**
   * return an index from another index
   */
@@ -175,12 +174,21 @@ private:
   pqImplementation* const Implementation;
 };
 
-
 class pqFileDialogModelIconProvider : protected QFileIconProvider
 {
 public:
-  enum IconType { Computer, Drive, Folder, File, FolderLink, FileLink,
-                  NetworkRoot, NetworkDomain, NetworkFolder };
+  enum IconType
+  {
+    Computer,
+    Drive,
+    Folder,
+    File,
+    FolderLink,
+    FileLink,
+    NetworkRoot,
+    NetworkDomain,
+    NetworkFolder
+  };
   pqFileDialogModelIconProvider();
   QIcon icon(IconType t) const;
   QIcon icon(vtkPVFileInformation::FileTypes f) const;
@@ -195,6 +203,4 @@ protected:
   QIcon NetworkIcon;
 };
 
-
 #endif // !_pqFileDialogModel_h
-

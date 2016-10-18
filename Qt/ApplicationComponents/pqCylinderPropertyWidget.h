@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqInteractivePropertyWidget.h"
 
-
 class QWidget;
 
 /**
@@ -57,9 +56,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCylinderPropertyWidget : public pqInterac
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqCylinderPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqCylinderPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqCylinderPropertyWidget();
 
 public slots:
@@ -103,7 +102,7 @@ private:
   void updateWidget(bool showing_advanced_properties);
 
   pqPropertyLinks WidgetLinks;
-  QWidget *AdvancedPropertyWidgets[2];
+  QWidget* AdvancedPropertyWidgets[2];
 };
 
 #endif

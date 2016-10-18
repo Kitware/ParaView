@@ -79,7 +79,7 @@ public:
    * on the client.
    */
   virtual void BeginUpdateAnimationValues() = 0;
-  virtual void SetAnimationValue(int index, double value) =0;
+  virtual void SetAnimationValue(int index, double value) = 0;
   virtual void EndUpdateAnimationValues() = 0;
   //@}
 
@@ -107,8 +107,7 @@ protected:
 
   //@{
   virtual void StartCueInternal();
-  virtual void TickInternal(double currenttime, double deltatime,
-    double clocktime);
+  virtual void TickInternal(double currenttime, double deltatime, double clocktime);
   virtual void EndCueInternal();
   //@}
 
@@ -119,8 +118,9 @@ protected:
   int AnimatedElement;
   int Enabled;
 
-  vtkAnimationCue *AnimationCue;
+  vtkAnimationCue* AnimationCue;
   vtkPVCueManipulator* Manipulator;
+
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;

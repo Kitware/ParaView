@@ -48,8 +48,7 @@ public:
    * executing the implicit function.
    */
   virtual void SetTransform(vtkAbstractTransform*);
-  virtual void SetTransform(const double elements[16])
-    {  this->Superclass::SetTransform(elements); }
+  virtual void SetTransform(const double elements[16]) { this->Superclass::SetTransform(elements); }
 
   /**
    * Evaluate function at position x-y-z and return value.  You should
@@ -59,7 +58,9 @@ public:
    */
   virtual double EvaluateFunction(double x[3]);
   double EvaluateFunction(double x, double y, double z)
-    { return this->Superclass::EvaluateFunction(x, y, z); }
+  {
+    return this->Superclass::EvaluateFunction(x, y, z);
+  }
 
   /**
    * Evaluate function gradient at position x-y-z and pass back vector.
@@ -79,7 +80,6 @@ protected:
 private:
   vtkPVPlane(const vtkPVPlane&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPlane&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -45,6 +45,7 @@ class PQDEPRECATED_EXPORT pqContourWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
+
 public:
   pqContourWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
   virtual ~pqContourWidget();
@@ -58,8 +59,7 @@ public:
   * and hints have been set.
   */
   virtual void resetBounds(double /*bounds*/[6]) {}
-  virtual void resetBounds()
-    { return this->Superclass::resetBounds(); }
+  virtual void resetBounds() { return this->Superclass::resetBounds(); }
 
   // Some convenient methods
   // Set the point placer/line interpolator
@@ -100,17 +100,17 @@ public slots:
   /**
   *Move to the next mode ( Drawing, Editing, Done )
   */
-  void updateMode( );
+  void updateMode();
 
   /**
   *Toggle the edit mode, which will switch between Edit/Modify mode
   */
-  void toggleEditMode( );
+  void toggleEditMode();
 
   /**
   *Finish editing the contour
   */
-  void finishContour( );
+  void finishContour();
 
   /**
   * Resets pending changes. Default implementation
@@ -138,8 +138,7 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqContourWidget)
 
-  void updateRepProperty(vtkSMProxy* smProxy,
-    const char* propertyName);
+  void updateRepProperty(vtkSMProxy* smProxy, const char* propertyName);
 
   class pqInternals;
   pqInternals* Internals;

@@ -26,7 +26,7 @@
 
 // Tell the template header how to give our superclass a DLL interface.
 #if !defined(vtkSMDoubleRangeDomain_cxx)
-# define VTK_DATA_ARRAY_TEMPLATE_TYPE double
+#define VTK_DATA_ARRAY_TEMPLATE_TYPE double
 #endif
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
@@ -53,7 +53,9 @@ public:
    * An unspecified min. is equivalent to -inf
    */
   double GetMinimum(unsigned int idx, int& exists)
-    { return this->RealSuperclass::GetMinimum(idx, exists); }
+  {
+    return this->RealSuperclass::GetMinimum(idx, exists);
+  }
 
   /**
    * Return a max. value if it exists. If the max. exists
@@ -61,25 +63,29 @@ public:
    * An unspecified max. is equivalent to +inf
    */
   double GetMaximum(unsigned int idx, int& exists)
-    { return this->RealSuperclass::GetMaximum(idx, exists); }
+  {
+    return this->RealSuperclass::GetMaximum(idx, exists);
+  }
 
   /**
    * Returns if minimum/maximum bound is set for the domain.
    */
   int GetMinimumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMinimumExists(idx)? 1 : 0; }
+  {
+    return this->RealSuperclass::GetMinimumExists(idx) ? 1 : 0;
+  }
   int GetMaximumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMaximumExists(idx)? 1 : 0; }
+  {
+    return this->RealSuperclass::GetMaximumExists(idx) ? 1 : 0;
+  }
 
   /**
    * Returns the minimum/maximum value, is exists, otherwise
    * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
    * the bound is set.
    */
-  double GetMinimum(unsigned int idx)
-    { return this->RealSuperclass::GetMinimum(idx); }
-  double GetMaximum(unsigned int idx)
-    { return this->RealSuperclass::GetMaximum(idx); }
+  double GetMinimum(unsigned int idx) { return this->RealSuperclass::GetMinimum(idx); }
+  double GetMaximum(unsigned int idx) { return this->RealSuperclass::GetMaximum(idx); }
 
 protected:
   vtkSMDoubleRangeDomain();
@@ -93,7 +99,7 @@ private:
 };
 
 #if !defined(vtkSMDoubleRangeDomain_cxx)
-# undef VTK_DATA_ARRAY_TEMPLATE_TYPE
+#undef VTK_DATA_ARRAY_TEMPLATE_TYPE
 #endif
 
 #endif

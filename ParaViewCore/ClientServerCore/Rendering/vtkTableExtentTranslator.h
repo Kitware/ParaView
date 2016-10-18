@@ -32,11 +32,10 @@
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
 {
 public:
-  vtkTypeMacro(vtkTableExtentTranslator,vtkExtentTranslator);
+  vtkTypeMacro(vtkTableExtentTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkTableExtentTranslator* New();
-
 
   // Set the number of pieces into which the whole extent will be
   // split.  If this is 1 then the whole extent will be returned.  If
@@ -68,10 +67,8 @@ public:
   /**
    * Not supported by this subclass of vtkExtentTranslator.
    */
-  int PieceToExtentThreadSafe(int piece, int numPieces,
-                              int ghostLevel, int *wholeExtent,
-                              int *resultExtent, int splitMode,
-                              int byPoints);
+  int PieceToExtentThreadSafe(int piece, int numPieces, int ghostLevel, int* wholeExtent,
+    int* resultExtent, int splitMode, int byPoints);
 
   /**
    * Set the extent to be used for a piece.  This sets the extent table

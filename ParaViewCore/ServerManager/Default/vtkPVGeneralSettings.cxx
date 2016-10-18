@@ -42,17 +42,17 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 
 //----------------------------------------------------------------------------
 vtkPVGeneralSettings::vtkPVGeneralSettings()
-  : BlockColorsDistinctValues(7),
-  AutoApply(false),
-  AutoApplyActiveOnly(false),
-  DefaultViewType(NULL),
-  TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),
-  ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS),
-  CacheGeometryForAnimation(false),
-  AnimationGeometryCacheLimit(0),
-  AnimationTimePrecision(17),
-  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE),
-  LockPanels(false)
+  : BlockColorsDistinctValues(7)
+  , AutoApply(false)
+  , AutoApplyActiveOnly(false)
+  , DefaultViewType(NULL)
+  , TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY)
+  , ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
+  , CacheGeometryForAnimation(false)
+  , AnimationGeometryCacheLimit(0)
+  , AnimationTimePrecision(17)
+  , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
+  , LockPanels(false)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -67,11 +67,11 @@ vtkPVGeneralSettings::~vtkPVGeneralSettings()
 vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
 {
   if (!vtkPVGeneralSettings::Instance)
-    {
+  {
     vtkPVGeneralSettings* instance = new vtkPVGeneralSettings();
     instance->InitializeObjectBase();
     vtkPVGeneralSettings::Instance.TakeReference(instance);
-    }
+  }
   return vtkPVGeneralSettings::Instance;
 }
 
@@ -79,10 +79,10 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
 void vtkPVGeneralSettings::SetAutoConvertProperties(bool val)
 {
   if (this->GetAutoConvertProperties() != val)
-    {
+  {
     vtkSMInputArrayDomain::SetAutomaticPropertyConversion(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -95,10 +95,10 @@ bool vtkPVGeneralSettings::GetAutoConvertProperties()
 void vtkPVGeneralSettings::SetEnableAutoMPI(bool val)
 {
   if (this->GetEnableAutoMPI() != val)
-    {
+  {
     vtkProcessModuleAutoMPI::SetEnableAutoMPI(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -111,9 +111,9 @@ bool vtkPVGeneralSettings::GetEnableAutoMPI()
 void vtkPVGeneralSettings::SetAutoMPILimit(int val)
 {
   if (this->GetAutoMPILimit() != val && val >= 1)
-    {
+  {
     vtkProcessModuleAutoMPI::SetNumberOfCores(val);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -125,59 +125,57 @@ int vtkPVGeneralSettings::GetAutoMPILimit()
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
 {
-  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(
-    val? this->AnimationGeometryCacheLimit : 0);
+  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(val ? this->AnimationGeometryCacheLimit : 0);
   if (this->CacheGeometryForAnimation != val)
-    {
+  {
     this->CacheGeometryForAnimation = val;
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
 {
-  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(
-    this->CacheGeometryForAnimation? val : 0);
+  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(this->CacheGeometryForAnimation ? val : 0);
   if (this->AnimationGeometryCacheLimit != val)
-    {
+  {
     this->AnimationGeometryCacheLimit = val;
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetScalarBarMode(int val)
 {
   switch (val)
-    {
-  case AUTOMATICALLY_HIDE_SCALAR_BARS:
-    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
-    break;
+  {
+    case AUTOMATICALLY_HIDE_SCALAR_BARS:
+      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
+      break;
 
-  case AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
-    break;
+    case AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
+      break;
 
-  default:
-    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(false);
-    }
+    default:
+      vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(false);
+  }
 
   if (val != this->ScalarBarMode)
-    {
+  {
     this->ScalarBarMode = val;
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
 {
   if (val != vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
-    {
+  {
     vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -191,30 +189,30 @@ void vtkPVGeneralSettings::SetMultiViewImageBorderColor(double r, double g, doub
 void vtkPVGeneralSettings::SetMultiViewImageBorderWidth(int width)
 {
   if (width != vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth())
-    {
+  {
     vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetTransparentBackground(bool val)
 {
   if (val != vtkSMViewProxy::GetTransparentBackground())
-    {
+  {
     vtkSMViewProxy::SetTransparentBackground(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetLoadAllVariables(bool val)
 {
   if (val != vtkSMArraySelectionDomain::GetLoadAllVariables())
-    {
+  {
     vtkSMArraySelectionDomain::SetLoadAllVariables(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -227,10 +225,10 @@ bool vtkPVGeneralSettings::GetLoadAllVariables()
 void vtkPVGeneralSettings::SetLoadNoChartVariables(bool val)
 {
   if (val != vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables())
-    {
+  {
     vtkSMChartSeriesSelectionDomain::SetLoadNoChartVariables(val);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

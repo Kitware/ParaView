@@ -31,7 +31,7 @@ class vtkCPProcessor;
 class VTK_EXPORT vtkPVCustomTestDriver : public vtkCPTestDriver
 {
 public:
-  static vtkPVCustomTestDriver * New();
+  static vtkPVCustomTestDriver* New();
   vtkTypeMacro(vtkPVCustomTestDriver, vtkCPTestDriver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -66,6 +66,6 @@ private:
    */
   vtkCPProcessor* Processor;
 };
-  //@}
+//@}
 
 #endif

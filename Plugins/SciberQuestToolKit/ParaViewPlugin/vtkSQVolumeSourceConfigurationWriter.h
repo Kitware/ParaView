@@ -49,20 +49,21 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSQVolumeSourceConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeMacro(vtkSQVolumeSourceConfigurationWriter,vtkObject);
+  vtkTypeMacro(vtkSQVolumeSourceConfigurationWriter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSQVolumeSourceConfigurationWriter *New();
+  static vtkSQVolumeSourceConfigurationWriter* New();
 
   // Description:
   // Override sets iterator proxy.
-  virtual void SetProxy(vtkSMProxy *proxy);
+  virtual void SetProxy(vtkSMProxy* proxy);
 
 protected:
   vtkSQVolumeSourceConfigurationWriter();
   ~vtkSQVolumeSourceConfigurationWriter();
 
 private:
-  vtkSQVolumeSourceConfigurationWriter(const vtkSQVolumeSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  vtkSQVolumeSourceConfigurationWriter(
+    const vtkSQVolumeSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSQVolumeSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 

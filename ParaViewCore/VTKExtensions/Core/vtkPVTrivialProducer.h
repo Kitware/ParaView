@@ -53,9 +53,7 @@ public:
    * output data object is never modified, but it is queried to
    * fulfill requests.
    */
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 protected:
   vtkPVTrivialProducer();
@@ -70,7 +68,6 @@ protected:
 private:
   vtkPVTrivialProducer(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

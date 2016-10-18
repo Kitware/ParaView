@@ -47,12 +47,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqRe
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   /**
   * if \c track_active_objects is false, then the reaction will not track
   * pqActiveObjects automatically.
   */
-  pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects=true);
+  pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects = true);
   virtual ~pqScalarBarVisibilityReaction();
 
   /**
@@ -87,11 +88,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    {
-    this->setScalarBarVisibility(
-      this->parentAction()->isChecked());
-    }
+  virtual void onTriggered() { this->setScalarBarVisibility(this->parentAction()->isChecked()); }
 
 private:
   Q_DISABLE_COPY(pqScalarBarVisibilityReaction)

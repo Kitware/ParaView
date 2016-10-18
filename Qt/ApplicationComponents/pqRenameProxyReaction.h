@@ -44,6 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqRenameProxyReaction : pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy);
 

@@ -33,8 +33,7 @@ vtkSMSessionObject::~vtkSMSessionObject()
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMSessionObject::GetSessionProxyManager()
 {
-  return
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Session);
+  return vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Session);
 }
 
 //----------------------------------------------------------------------------
@@ -47,10 +46,10 @@ vtkSMSession* vtkSMSessionObject::GetSession()
 void vtkSMSessionObject::SetSession(vtkSMSession* session)
 {
   if (this->Session != session)
-    {
+  {
     this->Session = session;
     this->Modified();
-    }
+  }
 }
 
 //---------------------------------------------------------------------------

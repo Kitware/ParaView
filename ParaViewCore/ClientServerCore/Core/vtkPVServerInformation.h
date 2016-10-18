@@ -48,7 +48,7 @@ public:
   vtkGetMacro(RemoteRendering, int);
   //@}
 
-  void DeepCopy(vtkPVServerInformation *info);
+  void DeepCopy(vtkPVServerInformation* info);
 
   /**
    * Transfer information about a single object into this object.

@@ -47,8 +47,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFixPathsInStateFilesBehavior : public QOb
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqFixPathsInStateFilesBehavior(QObject* parent=0);
+  pqFixPathsInStateFilesBehavior(QObject* parent = 0);
   virtual ~pqFixPathsInStateFilesBehavior();
 
   /**

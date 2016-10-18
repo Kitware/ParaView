@@ -16,8 +16,8 @@
  * @class   vtkUndoStack
  * @brief   undo/redo stack.
  *
- * This an undo stack. Each undo/redo-able operation is a vtkUndoSet object. 
- * This class fires a vtkCommand::ModifiedEvent when  the undo/redo stack 
+ * This an undo stack. Each undo/redo-able operation is a vtkUndoSet object.
+ * This class fires a vtkCommand::ModifiedEvent when  the undo/redo stack
  * changes.
  *
  * On Undo, vtkUndoSet::Undo is called on the vtkUndoSet at the top of the
@@ -47,12 +47,11 @@ class vtkUndoSet;
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoStack : public vtkObject
 {
 public:
-
   enum EventIds
-    {
+  {
     UndoSetRemovedEvent = 1989,
     UndoSetClearedEvent = 1990
-    };
+  };
 
   static vtkUndoStack* New();
   vtkTypeMacro(vtkUndoStack, vtkObject);
@@ -82,34 +81,26 @@ public:
    */
   const char* GetRedoSetLabel(unsigned int position);
 
-  
   /**
    * Returns the number of sets on the undo stack.
    */
   unsigned int GetNumberOfUndoSets();
 
-
   /**
    * Returns the number of sets on the undo stack.
    */
   unsigned int GetNumberOfRedoSets();
- 
+
   /**
    * Returns if undo operation can be performed.
    */
-  int CanUndo()
-    {
-    return (this->GetNumberOfUndoSets() > 0);
-    }
+  int CanUndo() { return (this->GetNumberOfUndoSets() > 0); }
 
   /**
    * Returns if redo operation can be performed.
    */
-  int CanRedo()
-    {
-    return (this->GetNumberOfRedoSets() > 0);
-    }
- 
+  int CanRedo() { return (this->GetNumberOfRedoSets() > 0); }
+
   /**
    * Get the UndoSet on the top of the Undo stack, if any.
    */
@@ -179,6 +170,7 @@ public:
    */
   vtkSetClampMacro(StackDepth, int, 1, 100);
   vtkGetMacro(StackDepth, int);
+
 protected:
   vtkUndoStack();
   ~vtkUndoStack();
@@ -196,4 +188,3 @@ private:
 };
 
 #endif
-

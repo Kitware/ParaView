@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -51,8 +51,9 @@ class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqAnimationViewWidget(QWidget* parent=0);
+  pqAnimationViewWidget(QWidget* parent = 0);
   virtual ~pqAnimationViewWidget();
 
 public slots:
@@ -114,9 +115,9 @@ protected slots:
   // set active view changed
   void setActiveView(pqView*);
   // set the current proxy selection
-  void setCurrentSelection(pqPipelineSource *);
+  void setCurrentSelection(pqPipelineSource*);
   void setCurrentProxy(vtkSMProxy* pxy);
-  
+
   // sets the current time
   void setCurrentTime(double);
   void setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double);
@@ -135,8 +136,7 @@ private:
   Q_DISABLE_COPY(pqAnimationViewWidget)
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 };
 
 #endif
-

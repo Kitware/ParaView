@@ -61,8 +61,7 @@ public:
    * The "useParent" flag allow to disable parent lookup but by default it
    * is set to true.
    */
-  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill,
-                         bool useParent = true );
+  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent = true);
 
   /**
    * Register the given state in the current locator. If a previous state was
@@ -114,7 +113,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internals;
-
 };
 
 #endif

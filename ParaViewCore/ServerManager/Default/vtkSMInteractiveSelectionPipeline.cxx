@@ -35,18 +35,17 @@ vtkSMInteractiveSelectionPipeline* vtkSMInteractiveSelectionPipeline::GetInstanc
 {
   static vtkSmartPointer<vtkSMInteractiveSelectionPipeline> Instance;
   if (Instance.GetPointer() == NULL)
-    {
-    vtkSMInteractiveSelectionPipeline* pipeline =
-      vtkSMInteractiveSelectionPipeline::New();
+  {
+    vtkSMInteractiveSelectionPipeline* pipeline = vtkSMInteractiveSelectionPipeline::New();
     Instance = pipeline;
     pipeline->FastDelete();
-    }
+  }
 
   return Instance;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMInteractiveSelectionPipeline::PrintSelf(ostream& os, vtkIndent indent )
+void vtkSMInteractiveSelectionPipeline::PrintSelf(ostream& os, vtkIndent indent)
 {
   (void)os;
   (void)indent;

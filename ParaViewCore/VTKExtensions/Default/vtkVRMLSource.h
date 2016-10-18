@@ -32,9 +32,9 @@ class vtkVRMLImporter;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkVRMLSource : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkVRMLSource,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkVRMLSource, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkVRMLSource *New();
+  static vtkVRMLSource* New();
 
   //@{
   /**
@@ -48,9 +48,9 @@ public:
   /**
    * Descided whether to generate color arrays or not.
    */
-  vtkSetMacro(Color,int);
-  vtkGetMacro(Color,int);
-  vtkBooleanMacro(Color,int);
+  vtkSetMacro(Color, int);
+  vtkGetMacro(Color, int);
+  vtkBooleanMacro(Color, int);
   //@}
 
   //@{
@@ -58,26 +58,24 @@ public:
    * This method allows all parts to be put into a single output.
    * By default this flag is on.
    */
-  vtkSetMacro(Append,int);
-  vtkGetMacro(Append,int);
-  vtkBooleanMacro(Append,int);
+  vtkSetMacro(Append, int);
+  vtkGetMacro(Append, int);
+  vtkBooleanMacro(Append, int);
   //@}
 
-  static int CanReadFile(const char *filename);
+  static int CanReadFile(const char* filename);
 
 protected:
   vtkVRMLSource();
   ~vtkVRMLSource();
 
-  int RequestData(vtkInformation*, 
-                  vtkInformationVector**, 
-                  vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   void InitializeImporter();
   void CopyImporterToOutputs(vtkMultiBlockDataSet*);
 
   char* FileName;
-  vtkVRMLImporter *Importer;
+  vtkVRMLImporter* Importer;
   int Color;
   int Append;
 
@@ -87,4 +85,3 @@ private:
 };
 
 #endif
-

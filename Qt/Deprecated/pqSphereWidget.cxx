@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,17 +54,16 @@ public:
   pqPropertyLinks Links;
 };
 
-#define PVSPHEREWIDGET_TRIGGER_RENDER(ui)  \
-  QObject::connect(this->Implementation->ui,\
-    SIGNAL(editingFinished()),\
-    this, SLOT(render()), Qt::QueuedConnection);
+#define PVSPHEREWIDGET_TRIGGER_RENDER(ui)                                                          \
+  QObject::connect(this->Implementation->ui, SIGNAL(editingFinished()), this, SLOT(render()),      \
+    Qt::QueuedConnection);
 //-----------------------------------------------------------------------------
-pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent) :
-  Superclass(refProxy, pxy, _parent)
+pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent)
+  : Superclass(refProxy, pxy, _parent)
 {
   this->Implementation = new pqImplementation();
   this->Implementation->setupUi(this);
-  this->Implementation->show3DWidget->setChecked(this->widgetVisible());  
+  this->Implementation->show3DWidget->setChecked(this->widgetVisible());
 
   QDoubleValidator* validator = new QDoubleValidator(this);
   this->Implementation->centerX->setValidator(validator);
@@ -73,7 +72,7 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   this->Implementation->normalX->setValidator(validator);
   this->Implementation->normalY->setValidator(validator);
   this->Implementation->normalZ->setValidator(validator);
-  
+
   validator = new QDoubleValidator(this);
   validator->setBottom(0.0);
   this->Implementation->radius->setValidator(validator);
@@ -86,20 +85,18 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   PVSPHEREWIDGET_TRIGGER_RENDER(normalZ);
   PVSPHEREWIDGET_TRIGGER_RENDER(radius);
 
-  QObject::connect(this->Implementation->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+  QObject::connect(
+    this->Implementation->show3DWidget, SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this, SLOT(onWidgetVisibilityChanged(bool)));
+  QObject::connect(
+    this, SIGNAL(widgetVisibilityChanged(bool)), this, SLOT(onWidgetVisibilityChanged(bool)));
 
-  QObject::connect(this->Implementation->resetBounds,
-    SIGNAL(clicked()), this, SLOT(resetBounds()));
+  QObject::connect(this->Implementation->resetBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(refProxy->GetSession()));
 
   // by default, we don't use this widget for direction.
@@ -131,20 +128,18 @@ void pqSphereWidget::enableDirection(bool enable)
 }
 
 //-----------------------------------------------------------------------------
-#define PVSPHEREWIDGET_LINK(ui, smproperty, index)\
-{\
-  this->Implementation->Links.addPropertyLink(\
-    this->Implementation->ui, "text2",\
-    SIGNAL(textChanged(const QString&)),\
-    widget, widget->GetProperty(smproperty), index);\
-}
+#define PVSPHEREWIDGET_LINK(ui, smproperty, index)                                                 \
+  {                                                                                                \
+    this->Implementation->Links.addPropertyLink(this->Implementation->ui, "text2",                 \
+      SIGNAL(textChanged(const QString&)), widget, widget->GetProperty(smproperty), index);        \
+  }
 
 //-----------------------------------------------------------------------------
 void pqSphereWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("SphereWidgetRepresentation", server, this->getReferenceProxy());
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      "SphereWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();
@@ -179,7 +174,7 @@ void pqSphereWidget::resetBounds(double input_bounds[6])
 
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
   vtkSMPropertyHelper(widget, "Center").Set(center, 3);
-  vtkSMPropertyHelper(widget, "Radius").Set(box.GetMaxLength()/2.0);
+  vtkSMPropertyHelper(widget, "Radius").Set(box.GetMaxLength() / 2.0);
   widget->UpdateVTKObjects();
 }
 

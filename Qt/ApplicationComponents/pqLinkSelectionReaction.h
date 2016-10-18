@@ -42,8 +42,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinkSelectionReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqLinkSelectionReaction(QAction* parent=0);
+  pqLinkSelectionReaction(QAction* parent = 0);
 
   /**
   * Link selection of the current active source with
@@ -62,8 +63,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-    { pqLinkSelectionReaction::linkSelection(); }
+  virtual void onTriggered() { pqLinkSelectionReaction::linkSelection(); }
 
 private:
   Q_DISABLE_COPY(pqLinkSelectionReaction)

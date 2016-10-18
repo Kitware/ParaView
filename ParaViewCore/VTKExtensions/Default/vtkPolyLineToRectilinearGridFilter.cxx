@@ -37,8 +37,7 @@ vtkPolyLineToRectilinearGridFilter::~vtkPolyLineToRectilinearGridFilter()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPolyLineToRectilinearGridFilter::FillInputPortInformation(int port,
-  vtkInformation* info)
+int vtkPolyLineToRectilinearGridFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
   this->Superclass::FillInputPortInformation(port, info);
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
@@ -47,40 +46,36 @@ int vtkPolyLineToRectilinearGridFilter::FillInputPortInformation(int port,
 
 //-----------------------------------------------------------------------------
 int vtkPolyLineToRectilinearGridFilter::RequestInformation(
-  vtkInformation* request, vtkInformationVector** inputVector, 
-  vtkInformationVector* outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  return this->Superclass::RequestInformation(
-    request, inputVector, outputVector); 
+  return this->Superclass::RequestInformation(request, inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------
-int vtkPolyLineToRectilinearGridFilter::RequestData(
-                                     vtkInformation* vtkNotUsed(request), 
-                                     vtkInformationVector** inputVector, 
-                                     vtkInformationVector* outputVector)
+int vtkPolyLineToRectilinearGridFilter::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDebugMacro("Executing vtkPolyLineToRectilinearGridFilter");
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
-  vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
-    output_info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkRectilinearGrid* const output_data =
+    vtkRectilinearGrid::SafeDownCast(output_info->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkInformation* const input_info = inputVector[0]->GetInformationObject(0);
   vtkDataObject* inputDO = input_info->Get(vtkDataObject::DATA_OBJECT());
   vtkRectilinearGrid* inputRG = vtkRectilinearGrid::SafeDownCast(inputDO);
   if (inputRG)
-    {
+  {
     // input is already a rectilinear grid. do nothing.
     output_data->ShallowCopy(inputRG);
     return 1;
-    }
-  
+  }
+
   vtkPolyData* const input = vtkPolyData::SafeDownCast(inputDO);
   if (!input)
-    {
+  {
     vtkErrorMacro("Input must be either a vtkPolyData or vtkRectilinearGrid.");
     return 0;
-    }
+  }
 
   vtkPointData* outPD = output_data->GetPointData();
   vtkCellData* outCD = output_data->GetCellData();
@@ -90,18 +85,18 @@ int vtkPolyLineToRectilinearGridFilter::RequestData(
   vtkCellArray* lines = input->GetLines();
   int num_lines = lines->GetNumberOfCells();
   if (num_lines == 0)
-    {
+  {
     // vtkWarningMacro("No lines in the input.");
     return 1;
-    }
+  }
 
   if (num_lines > 1)
-    {
+  {
     vtkWarningMacro("Input has more than 1 polyline. Currently this filter only"
-      " uses the first one.");
-    }
+                    " uses the first one.");
+  }
 
-  vtkIdType number_of_points=0;
+  vtkIdType number_of_points = 0;
   vtkIdType* points;
   vtkIdType cc;
   lines->GetCell(0, number_of_points, points);
@@ -136,25 +131,23 @@ int vtkPolyLineToRectilinearGridFilter::RequestData(
   arcLength->SetNumberOfComponents(1);
   arcLength->SetNumberOfTuples(number_of_points);
   arcLength->SetValue(0, 0.0);
-  
 
   outPD->CopyAllocate(inPD, number_of_points);
-  double prevPoint[3]={0,0,0};
-  double curPoint[3]={0,0,0};
-  for (cc=0;  cc < number_of_points; ++cc)
-    {
+  double prevPoint[3] = { 0, 0, 0 };
+  double curPoint[3] = { 0, 0, 0 };
+  for (cc = 0; cc < number_of_points; ++cc)
+  {
     xcoords->SetValue(cc, cc);
     outPD->CopyData(inPD, points[(int)cc], cc);
-    memcpy(prevPoint, curPoint, sizeof(double)*3);
+    memcpy(prevPoint, curPoint, sizeof(double) * 3);
     input->GetPoint(points[(int)cc], curPoint);
     pointArray->SetTuple(cc, curPoint);
     if (cc > 0)
-      {
+    {
       arcLength->SetValue(cc,
-        arcLength->GetValue(cc-1) + 
-        sqrt(vtkMath::Distance2BetweenPoints(prevPoint, curPoint)));
-      }
+        arcLength->GetValue(cc - 1) + sqrt(vtkMath::Distance2BetweenPoints(prevPoint, curPoint)));
     }
+  }
   outPD->AddArray(pointArray);
   pointArray->Delete();
   outPD->AddArray(arcLength);
@@ -167,4 +160,3 @@ void vtkPolyLineToRectilinearGridFilter::PrintSelf(ostream& os, vtkIndent indent
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

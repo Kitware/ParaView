@@ -35,7 +35,8 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSortedTableStreamer : public vtkTabl
 {
 private:
   class InternalsBase;
-  template<class T> class Internals;
+  template <class T>
+  class Internals;
   InternalsBase* Internal;
 
 public:
@@ -76,8 +77,8 @@ public:
   /**
    * Choose on which colum the sort operation should occurs
    */
-  vtkGetMacro(SelectedComponent,int);
-  vtkSetMacro(SelectedComponent,int);
+  vtkGetMacro(SelectedComponent, int);
+  vtkSetMacro(SelectedComponent, int);
   //@}
 
   //@{
@@ -104,9 +105,7 @@ protected:
   vtkSortedTableStreamer();
   ~vtkSortedTableStreamer();
 
-  int RequestData( vtkInformation*,
-                   vtkInformationVector**,
-                   vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   void CreateInternalIfNeeded(vtkTable* input, vtkDataArray* data);
   vtkDataArray* GetDataArrayToProcess(vtkTable* input);
@@ -119,7 +118,6 @@ protected:
   vtkSetStringMacro(ColumnToSort);
   //@}
 
-
   vtkIdType Block;
   vtkIdType BlockSize;
   vtkMultiProcessController* Controller;
@@ -127,6 +125,7 @@ protected:
   char* ColumnToSort;
   int SelectedComponent;
   int InvertOrder;
+
 private:
   vtkSortedTableStreamer(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;

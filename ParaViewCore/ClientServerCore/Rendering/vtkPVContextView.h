@@ -127,8 +127,7 @@ public:
    * the local process alone. The view does not manage data movement for the
    * selection.
    */
-  virtual void SetSelection(vtkChartRepresentation* repr,
-    vtkSelection* selection) = 0;
+  virtual void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) = 0;
 
   /**
    * Get the current selection created in the view. This will call
@@ -183,6 +182,7 @@ protected:
 
   bool UseOffscreenRenderingForScreenshots;
   bool UseOffscreenRendering;
+
 private:
   vtkPVContextView(const vtkPVContextView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVContextView&) VTK_DELETE_FUNCTION;
@@ -194,7 +194,6 @@ private:
 
   template <class T>
   vtkSelection* GetSelectionImplementation(T* chart);
-
 };
 
 #endif

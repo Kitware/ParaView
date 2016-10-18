@@ -38,7 +38,7 @@ class QColor;
 
 /**
 * pqLinePropertyWidget is a custom property widget that uses
-* "LineWidgetRepresentation" to help the users 
+* "LineWidgetRepresentation" to help the users
 */
 
 /**
@@ -59,9 +59,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinePropertyWidget : public pqInteractive
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqLinePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqLinePropertyWidget();
 
 public slots:

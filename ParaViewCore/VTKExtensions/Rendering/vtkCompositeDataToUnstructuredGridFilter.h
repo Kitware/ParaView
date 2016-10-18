@@ -20,7 +20,7 @@
  *
  * vtkCompositeDataToUnstructuredGridFilter appends all vtkUnstructuredGrid
  * leaves of the input composite dataset to a single unstructure grid. The
- * subtree to be combined can be chosen using the SubTreeCompositeIndex. If 
+ * subtree to be combined can be chosen using the SubTreeCompositeIndex. If
  * the SubTreeCompositeIndex is a leaf node, then no appending is required.
 */
 
@@ -33,13 +33,12 @@
 class vtkCompositeDataSet;
 class vtkAppendFilter;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCompositeDataToUnstructuredGridFilter : 
-  public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCompositeDataToUnstructuredGridFilter
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCompositeDataToUnstructuredGridFilter* New();
-  vtkTypeMacro(vtkCompositeDataToUnstructuredGridFilter,
-    vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkCompositeDataToUnstructuredGridFilter, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
@@ -69,9 +68,8 @@ protected:
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
@@ -85,11 +83,11 @@ protected:
   void ExecuteSubTree(vtkCompositeDataSet* cd, vtkAppendFilter* output);
   unsigned int SubTreeCompositeIndex;
   bool MergePoints;
-private:
-  vtkCompositeDataToUnstructuredGridFilter(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkCompositeDataToUnstructuredGridFilter(
+    const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

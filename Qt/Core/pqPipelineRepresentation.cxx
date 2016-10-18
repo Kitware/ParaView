@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,12 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 //-----------------------------------------------------------------------------
-pqPipelineRepresentation::pqPipelineRepresentation(
-  const QString& group,
-  const QString& name,
-  vtkSMProxy* display,
-  pqServer* server, QObject* p/*=null*/) :
-  Superclass(group, name, display, server, p)
+pqPipelineRepresentation::pqPipelineRepresentation(const QString& group, const QString& name,
+  vtkSMProxy* display, pqServer* server, QObject* p /*=null*/)
+  : Superclass(group, name, display, server, p)
 {
 }
 
@@ -63,16 +60,14 @@ void pqPipelineRepresentation::setView(pqView* view)
   this->Superclass::setView(view);
 
   if (view)
-    {
-    this->connect(view, SIGNAL(updateDataEvent()),
-                  this, SLOT(updateLookupTable()));
-    }
+  {
+    this->connect(view, SIGNAL(updateDataEvent()), this, SLOT(updateLookupTable()));
+  }
 
   if (oldView && oldView != view)
-    {
-    this->disconnect(oldView, SIGNAL(updateDataEvent()),
-                     this, SLOT(updateLookupTable()));
-    }
+  {
+    this->disconnect(oldView, SIGNAL(updateDataEvent()), this, SLOT(updateLookupTable()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -80,9 +75,9 @@ void pqPipelineRepresentation::resetLookupTableScalarRange()
 {
   vtkSMProxy* proxy = this->getProxy();
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
-    {
+  {
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -90,7 +85,7 @@ void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
 {
   vtkSMProxy* proxy = this->getProxy();
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
-    {
+  {
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(proxy);
-    }
+  }
 }

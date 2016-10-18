@@ -29,50 +29,49 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyGroup : public vtkSMObject
 {
 public:
   static vtkSMPropertyGroup* New();
-  vtkTypeMacro(vtkSMPropertyGroup, vtkSMObject)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSMPropertyGroup, vtkSMObject) void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Sets the name of the property group to \p name.
   vtkSetStringMacro(Name)
 
-  // Description:
-  // Returns the name of the property group.
-  vtkGetStringMacro(Name)
+    // Description:
+    // Returns the name of the property group.
+    vtkGetStringMacro(Name)
 
-  // Description:
-  // Sets the name of the property group to \p name.
-  vtkSetStringMacro(XMLLabel)
+    // Description:
+    // Sets the name of the property group to \p name.
+    vtkSetStringMacro(XMLLabel)
 
-  // Description:
-  // Returns the name of the property group.
-  vtkGetStringMacro(XMLLabel)
+    // Description:
+    // Returns the name of the property group.
+    vtkGetStringMacro(XMLLabel)
 
-  // Description:
-  // Sets the name of the panel widget to use for the property group.
-  vtkSetStringMacro(PanelWidget)
+    // Description:
+    // Sets the name of the panel widget to use for the property group.
+    vtkSetStringMacro(PanelWidget)
 
-  // Description:
-  // Gets the name of the panel widget to use for the property group.
-  vtkGetStringMacro(PanelWidget)
+    // Description:
+    // Gets the name of the panel widget to use for the property group.
+    vtkGetStringMacro(PanelWidget)
 
-  // Description:
-  // Sets the panel visibility for the property group.
-  //
-  // \see vtkSMProperty::SetPanelVisibility()
-  vtkSetStringMacro(PanelVisibility)
+    // Description:
+    // Sets the panel visibility for the property group.
+    //
+    // \see vtkSMProperty::SetPanelVisibility()
+    vtkSetStringMacro(PanelVisibility)
 
-  // Description:
-  // Returns the panel visibility for the property group.
-  vtkGetStringMacro(PanelVisibility)
+    // Description:
+    // Returns the panel visibility for the property group.
+    vtkGetStringMacro(PanelVisibility)
 
-  // Description:
-  // Returns true if the property group contains zero properties.
-  bool IsEmpty() const;
+    // Description:
+    // Returns true if the property group contains zero properties.
+    bool IsEmpty() const;
 
   // Description:
   // Adds \p property to the group. function can be NULL.
-  void AddProperty(const char* function, vtkSMProperty *property);
+  void AddProperty(const char* function, vtkSMProperty* property);
 
   // Description:
   // Returns the property at \p index.
@@ -94,7 +93,7 @@ public:
   // Description:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
-  
+
   // Description:
   // The server manager configuration XML may define <Hints /> element for
   // a property. Hints are metadata associated with the property. The
@@ -115,14 +114,15 @@ protected:
   vtkPVXMLElement* Hints;
 
   vtkSMDocumentation* Documentation;
+
 private:
   vtkSMPropertyGroup(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
 
-  char *Name;
-  char *XMLLabel;
-  char *PanelWidget;
-  char *PanelVisibility;
+  char* Name;
+  char* XMLLabel;
+  char* PanelWidget;
+  char* PanelVisibility;
 
   vtkSMPropertyGroupInternals* const Internals;
 };

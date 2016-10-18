@@ -77,10 +77,8 @@
 
 #include <vtksys/CommandLineArguments.hxx>
 
-
-void ResetCameraClippingRange(vtkObject *caller,
-  unsigned long vtkNotUsed(eid), void *clientdata,
-  void *vtkNotUsed(calldata))
+void ResetCameraClippingRange(
+  vtkObject* caller, unsigned long vtkNotUsed(eid), void* clientdata, void* vtkNotUsed(calldata))
 {
   double* bounds = reinterpret_cast<double*>(clientdata);
   vtkRenderer* ren = vtkRenderer::SafeDownCast(caller);
@@ -95,8 +93,9 @@ class MyProcess : public vtkProcess
   bool UseBlurPass;
   bool UseSobelPass;
   bool DepthOnly;
+
 public:
-  static MyProcess *New();
+  static MyProcess* New();
   vtkTypeMacro(MyProcess, vtkProcess);
 
   vtkSetVector2Macro(TileDimensions, int);
@@ -111,9 +110,10 @@ public:
   vtkSetMacro(DepthOnly, bool);
   vtkSetObjectMacro(SocketController, vtkMultiProcessController);
 
-  void SetArgs(int anArgc, char *anArgv[]);
+  void SetArgs(int anArgc, char* anArgv[]);
 
   virtual void Execute();
+
 private:
   // Creates the visualization pipeline and adds it to the renderer.
   void CreatePipeline(vtkRenderer* renderer);
@@ -130,7 +130,7 @@ protected:
 
   vtkMultiProcessController* SocketController;
   int Argc;
-  char **Argv;
+  char** Argv;
 
   int ImageReductionFactor;
   int TileDimensions[2];
@@ -142,8 +142,8 @@ vtkStandardNewMacro(MyProcess);
 //-----------------------------------------------------------------------------
 MyProcess::MyProcess()
 {
-  this->Argc=0;
-  this->Argv=0;
+  this->Argc = 0;
+  this->Argv = 0;
   this->ImageReductionFactor = 1;
   this->TileDimensions[0] = this->TileDimensions[1];
   this->UseOrderedCompositing = false;
@@ -152,7 +152,7 @@ MyProcess::MyProcess()
   this->SocketController = 0;
   this->UseBlurPass = false;
   this->UseSobelPass = false;
-  this->DepthOnly=false;
+  this->DepthOnly = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -162,10 +162,10 @@ MyProcess::~MyProcess()
 }
 
 //-----------------------------------------------------------------------------
-void MyProcess::SetArgs(int anArgc, char *anArgv[])
+void MyProcess::SetArgs(int anArgc, char* anArgv[])
 {
-  this->Argc=anArgc;
-  this->Argv=anArgv;
+  this->Argc = anArgc;
+  this->Argv = anArgv;
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +187,7 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
   vtkDataSetSurfaceFilter* surface = vtkDataSetSurfaceFilter::New();
   surface->SetInputConnection(d3->GetOutputPort());
 
-  vtkPieceScalars *piecescalars = vtkPieceScalars::New();
+  vtkPieceScalars* piecescalars = vtkPieceScalars::New();
   piecescalars->SetInputConnection(surface->GetOutputPort());
   piecescalars->SetScalarModeToCellData();
 
@@ -195,7 +195,7 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
   mapper->SetInputConnection(piecescalars->GetOutputPort());
   mapper->SetScalarModeToUseCellFieldData();
   mapper->SelectColorArray("Piece");
-  mapper->SetScalarRange(0, num_procs-1);
+  mapper->SetScalarRange(0, num_procs - 1);
   mapper->SetPiece(my_id);
   mapper->SetNumberOfPieces(num_procs);
   mapper->Update();
@@ -204,7 +204,7 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
 
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
-  actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
+  actor->GetProperty()->SetOpacity(this->UseOrderedCompositing ? 0.5 : 1.0);
   actor->GetProperty()->SetInterpolationToFlat();
   actor->GetProperty()->EdgeVisibilityOn();
   renderer->AddActor(actor);
@@ -222,7 +222,7 @@ void MyProcess::CreatePipeline2(vtkRenderer* renderer)
 {
   renderer->SetInteractive(0);
 
-  vtkPlaneSource *plane=vtkPlaneSource::New();
+  vtkPlaneSource* plane = vtkPlaneSource::New();
   plane->SetOrigin(-0.5, -0.5, 2);
   plane->SetPoint1(0.5, -0.5, 2);
   plane->SetPoint2(-0.5, 0.5, 2);
@@ -238,7 +238,7 @@ void MyProcess::CreatePipeline2(vtkRenderer* renderer)
   mapper->Delete();
   plane->Delete();
 
-  double bds[] = {-0.25, 0.25, -0.25, 0.25, 2, 2};
+  double bds[] = { -0.25, 0.25, -0.25, 0.25, 2, 2 };
   renderer->ResetCamera(bds);
 }
 
@@ -246,35 +246,35 @@ void MyProcess::CreatePipeline2(vtkRenderer* renderer)
 void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 {
   // the rendering passes
-  vtkCameraPass *cameraP=vtkCameraPass::New();
-  vtkSequencePass *seq=vtkSequencePass::New();
-  vtkOpaquePass *opaque=vtkOpaquePass::New();
-  vtkDepthPeelingPass *peeling=vtkDepthPeelingPass::New();
+  vtkCameraPass* cameraP = vtkCameraPass::New();
+  vtkSequencePass* seq = vtkSequencePass::New();
+  vtkOpaquePass* opaque = vtkOpaquePass::New();
+  vtkDepthPeelingPass* peeling = vtkDepthPeelingPass::New();
   peeling->SetMaximumNumberOfPeels(200);
   peeling->SetOcclusionRatio(0.1);
 
-  vtkTranslucentPass *translucent=vtkTranslucentPass::New();
+  vtkTranslucentPass* translucent = vtkTranslucentPass::New();
   peeling->SetTranslucentPass(translucent);
 
-  vtkVolumetricPass *volume=vtkVolumetricPass::New();
-  vtkOverlayPass *overlay=vtkOverlayPass::New();
-  vtkLightsPass *lights=vtkLightsPass::New();
+  vtkVolumetricPass* volume = vtkVolumetricPass::New();
+  vtkOverlayPass* overlay = vtkOverlayPass::New();
+  vtkLightsPass* lights = vtkLightsPass::New();
 
-  vtkClearZPass *clearZ=vtkClearZPass::New();
+  vtkClearZPass* clearZ = vtkClearZPass::New();
   clearZ->SetDepth(0.9);
 
-  vtkRenderPassCollection *passes=vtkRenderPassCollection::New();
+  vtkRenderPassCollection* passes = vtkRenderPassCollection::New();
   passes->AddItem(lights);
   passes->AddItem(opaque);
   //  passes->AddItem(clearZ);
   if (this->UseDepthPeeling && this->UseOrderedCompositing)
-    {
+  {
     passes->AddItem(peeling);
-    }
+  }
   else
-    {
+  {
     passes->AddItem(translucent);
-    }
+  }
   passes->AddItem(volume);
   passes->AddItem(overlay);
   seq->SetPasses(passes);
@@ -290,7 +290,7 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
   iceTPass->SetFixBackground(true);
 
   if (this->ServerMode && this->Controller->GetLocalProcessId() == 0)
-    {
+  {
     vtkClientServerCompositePass* csPass = vtkClientServerCompositePass::New();
     csPass->SetRenderPass(iceTPass);
     csPass->SetProcessIsServer(true);
@@ -298,37 +298,35 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
     csPass->SetController(this->SocketController);
     cameraP->SetDelegatePass(csPass);
     csPass->Delete();
-    }
+  }
   else
-    {
+  {
     cameraP->SetDelegatePass(iceTPass);
-    }
+  }
 
-  cameraP->SetAspectRatioOverride(
-    (double)this->TileDimensions[0] / this->TileDimensions[1]);
+  cameraP->SetAspectRatioOverride((double)this->TileDimensions[0] / this->TileDimensions[1]);
 
-  vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
+  vtkOpenGLRenderer* glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
   glrenderer->SetPass(cameraP);
 
   if (this->UseBlurPass)
-    {
+  {
     vtkGaussianBlurPass* blurPass = vtkGaussianBlurPass::New();
     blurPass->SetDelegatePass(glrenderer->GetPass());
     glrenderer->SetPass(blurPass);
     blurPass->Delete();
-    }
+  }
 
   if (this->UseSobelPass)
-    {
-    vtkSobelGradientMagnitudePass *sobelPass =
-      vtkSobelGradientMagnitudePass::New();
+  {
+    vtkSobelGradientMagnitudePass* sobelPass = vtkSobelGradientMagnitudePass::New();
     sobelPass->SetDelegatePass(glrenderer->GetPass());
     glrenderer->SetPass(sobelPass);
     sobelPass->Delete();
-    }
+  }
 
   // setting viewport doesn't work in tile-display mode correctly yet.
-  //renderer->SetViewport(0, 0, 0.75, 1);
+  // renderer->SetViewport(0, 0, 0.75, 1);
 
   iceTPass->Delete();
   opaque->Delete();
@@ -347,30 +345,29 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 void MyProcess::Execute()
 {
   // test required extensions by creating a dummy rendering context.
-  vtkSmartPointer<vtkRenderWindow> temp =
-    vtkSmartPointer<vtkRenderWindow>::New();
+  vtkSmartPointer<vtkRenderWindow> temp = vtkSmartPointer<vtkRenderWindow>::New();
   if (!vtkFrameBufferObject::IsSupported(temp))
-    {
+  {
     vtkWarningMacro("Rendering context doesn't support required extensions.\n"
-      "Skipping test.");
-    this->ReturnValue =vtkTesting::PASSED;
+                    "Skipping test.");
+    this->ReturnValue = vtkTesting::PASSED;
     return;
-    }
+  }
   temp = NULL;
 
   int myId = this->Controller->GetLocalProcessId();
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
 
-  int y=myId/this->TileDimensions[0];
-  int x=myId%this->TileDimensions[0];
+  int y = myId / this->TileDimensions[0];
+  int x = myId % this->TileDimensions[0];
 
-  const int width=400;
-  const int height=400;
+  const int width = 400;
+  const int height = 400;
 
   // 400x400 windows, +24 in y to avoid gnome menu bar.
-  renWin->SetPosition(x*(width+6),y*(height+20)+24);
-  renWin->SetSize(width,height);
+  renWin->SetPosition(x * (width + 6), y * (height + 20) + 24);
+  renWin->SetSize(width, height);
 
   // enable alpha bit-planes.
   renWin->AlphaBitPlanesOn();
@@ -386,20 +383,20 @@ void MyProcess::Execute()
 
   vtkRenderer* renderer = vtkRenderer::New();
   renWin->AddRenderer(renderer);
-  renderer->SetBackground(0.66,0.66,0.66);
-  renderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
+  renderer->SetBackground(0.66, 0.66, 0.66);
+  renderer->SetBackground2(157.0 / 255.0 * 0.66, 186 / 255.0 * 0.66, 192.0 / 255.0 * 0.66);
   renderer->SetGradientBackground(true);
   vtkCallbackCommand* observer = vtkCallbackCommand::New();
   observer->SetCallback(&ResetCameraClippingRange);
-  double bounds[6] = {-0.5, 0.5, -0.5, 0.5, -0.5, 0.5};
+  double bounds[6] = { -0.5, 0.5, -0.5, 0.5, -0.5, 0.5 };
   observer->SetClientData(&bounds);
   renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent, observer);
   observer->Delete();
 
-  vtkSynchronizedRenderers *syncRenderers2=0;
+  vtkSynchronizedRenderers* syncRenderers2 = 0;
   if (this->DepthOnly)
-    {
-    vtkRenderer *renderer2=vtkRenderer::New();
+  {
+    vtkRenderer* renderer2 = vtkRenderer::New();
     renderer2->SetLayer(1);
     renderer2->SetPreserveDepthBuffer(true);
 
@@ -407,10 +404,9 @@ void MyProcess::Execute()
     renWin->SetNumberOfLayers(2);
     renderer2->Delete();
     this->CreatePipeline2(renderer2);
-    }
+  }
 
-  vtkSynchronizedRenderWindows* syncWindows =
-    vtkSynchronizedRenderWindows::New();
+  vtkSynchronizedRenderWindows* syncWindows = vtkSynchronizedRenderWindows::New();
   syncWindows->SetRenderWindow(renWin);
   syncWindows->SetParallelController(this->Controller);
   syncWindows->SetIdentifier(1);
@@ -422,18 +418,17 @@ void MyProcess::Execute()
   this->CreatePipeline(renderer);
   this->SetupRenderPasses(renderer);
 
-  int retVal=vtkTesting::FAILED;
+  int retVal = vtkTesting::FAILED;
   if (myId == 0)
-    {
+  {
     // root node
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
     iren->SetRenderWindow(renWin);
     renWin->SwapBuffersOn();
 
     if (this->ServerMode)
-      {
-      vtkSynchronizedRenderWindows* syncWindows2 =
-        vtkSynchronizedRenderWindows::New();
+    {
+      vtkSynchronizedRenderWindows* syncWindows2 = vtkSynchronizedRenderWindows::New();
       syncWindows2->SetRenderWindow(renWin);
       syncWindows2->SetParallelController(this->SocketController);
       syncWindows2->SetIdentifier(2);
@@ -444,58 +439,58 @@ void MyProcess::Execute()
       syncRenderers2->SetRootProcessId(1);
 
       this->SocketController->ProcessRMIs();
-      retVal=vtkTesting::PASSED;
-      }
+      retVal = vtkTesting::PASSED;
+    }
     else
-      {
+    {
       if (!this->DepthOnly)
-        {
+      {
         renderer->GetActiveCamera()->SetPosition(-0.78, 0.68, -0.20);
         renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
         renderer->GetActiveCamera()->SetViewUp(-0.3, -0.57, -0.75);
-        }
-      else
-        {
-        renderer->ResetCamera(bounds);
-        }
-      renWin->Render();
-      retVal=vtkTesting::Test(this->Argc, this->Argv, renWin, 10);
-      if(retVal==vtkRegressionTester::DO_INTERACTOR)
-        {
-        iren->Start();
-        }
       }
+      else
+      {
+        renderer->ResetCamera(bounds);
+      }
+      renWin->Render();
+      retVal = vtkTesting::Test(this->Argc, this->Argv, renWin, 10);
+      if (retVal == vtkRegressionTester::DO_INTERACTOR)
+      {
+        iren->Start();
+      }
+    }
     iren->Delete();
 
     this->Controller->TriggerBreakRMIs();
     this->Controller->Barrier();
-    }
+  }
   else
-    {
+  {
     // satellite nodes
     if (this->TileDimensions[0] > 1 || this->TileDimensions[1] > 1)
-      {
+    {
       renWin->SwapBuffersOn();
-      }
+    }
     this->Controller->ProcessRMIs();
     this->Controller->Barrier();
-    retVal=vtkTesting::PASSED;
-    }
+    retVal = vtkTesting::PASSED;
+  }
 
   renderer->Delete();
   renWin->Delete();
   syncWindows->Delete();
   syncRenderers->Delete();
-  if(syncRenderers2!=0)
-    {
+  if (syncRenderers2 != 0)
+  {
     syncRenderers2->Delete();
-    }
+  }
 
-  this->ReturnValue=retVal;
+  this->ReturnValue = retVal;
 }
 
 //-----------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   int retVal = 1;
 
@@ -508,15 +503,15 @@ int main(int argc, char **argv)
   vtkSmartPointer<vtkMPIController> contr = vtkSmartPointer<vtkMPIController>::New();
   contr->Initialize(&argc, &argv, 1);
 
-  int tile_dimensions[2] = {1, 1};
+  int tile_dimensions[2] = { 1, 1 };
   int image_reduction_factor = 1;
   int use_ordered_compositing = 0;
   int use_depth_peeling = 0;
   int act_as_server = 0;
   int add_blur_pass = 0;
   int add_sobel_pass = 0;
-  int depthOnly=0;
-  int interactive=0;
+  int depthOnly = 0;
+  int interactive = 0;
   std::string data;
   std::string temp;
   std::string baseline;
@@ -524,100 +519,83 @@ int main(int argc, char **argv)
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);
   args.StoreUnusedArguments(false);
-  args.AddArgument("-D", vtksys::CommandLineArguments::SPACE_ARGUMENT,
-                   &data, "");
-  args.AddArgument("-T", vtksys::CommandLineArguments::SPACE_ARGUMENT,
-                   &temp, "");
-  args.AddArgument("-V", vtksys::CommandLineArguments::SPACE_ARGUMENT,
-                   &baseline, "");
-  args.AddArgument("-I", vtksys::CommandLineArguments::NO_ARGUMENT,
-                   &interactive, "");
-  args.AddArgument("--tdx", vtksys::CommandLineArguments::SPACE_ARGUMENT,
-    &tile_dimensions[0], "");
-  args.AddArgument("--tdy", vtksys::CommandLineArguments::SPACE_ARGUMENT,
-    &tile_dimensions[1], "");
-  args.AddArgument("--image-reduction-factor",
-    vtksys::CommandLineArguments::SPACE_ARGUMENT,
+  args.AddArgument("-D", vtksys::CommandLineArguments::SPACE_ARGUMENT, &data, "");
+  args.AddArgument("-T", vtksys::CommandLineArguments::SPACE_ARGUMENT, &temp, "");
+  args.AddArgument("-V", vtksys::CommandLineArguments::SPACE_ARGUMENT, &baseline, "");
+  args.AddArgument("-I", vtksys::CommandLineArguments::NO_ARGUMENT, &interactive, "");
+  args.AddArgument("--tdx", vtksys::CommandLineArguments::SPACE_ARGUMENT, &tile_dimensions[0], "");
+  args.AddArgument("--tdy", vtksys::CommandLineArguments::SPACE_ARGUMENT, &tile_dimensions[1], "");
+  args.AddArgument("--image-reduction-factor", vtksys::CommandLineArguments::SPACE_ARGUMENT,
     &image_reduction_factor, "Image reduction factor");
-  args.AddArgument("--irf",
-    vtksys::CommandLineArguments::SPACE_ARGUMENT,
-    &image_reduction_factor, "Image reduction factor");
-  args.AddArgument("--use-ordered-compositing",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
+  args.AddArgument("--irf", vtksys::CommandLineArguments::SPACE_ARGUMENT, &image_reduction_factor,
+    "Image reduction factor");
+  args.AddArgument("--use-ordered-compositing", vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_ordered_compositing, "Use ordered compositing");
-  args.AddArgument("--use-depth-peeling",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
+  args.AddArgument("--use-depth-peeling", vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_depth_peeling, "Use depth peeling."
-    "This works only when --use-ordered-compositing is true.");
-  args.AddArgument("--depth-only",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
-    &depthOnly, "pass depth buffer only.");
-  args.AddArgument("--server",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
-    &act_as_server,
+                        "This works only when --use-ordered-compositing is true.");
+  args.AddArgument("--depth-only", vtksys::CommandLineArguments::NO_ARGUMENT, &depthOnly,
+    "pass depth buffer only.");
+  args.AddArgument("--server", vtksys::CommandLineArguments::NO_ARGUMENT, &act_as_server,
     "When present, the root process acts as a server process for a client.");
-  args.AddArgument("--blur",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
-    &add_blur_pass,
+  args.AddArgument("--blur", vtksys::CommandLineArguments::NO_ARGUMENT, &add_blur_pass,
     "When present, a vtkGaussianBlurPass will be added.");
-   args.AddArgument("--sobel",
-    vtksys::CommandLineArguments::NO_ARGUMENT,
-    &add_sobel_pass,
+  args.AddArgument("--sobel", vtksys::CommandLineArguments::NO_ARGUMENT, &add_sobel_pass,
     "When present, a vtkGaussianBlurPass will be added.");
 
   if (!args.Parse())
-    {
+  {
     if (contr->GetLocalProcessId() == 0)
-      {
+    {
       cout << args.GetHelp() << endl;
-      }
+    }
     contr->Finalize();
     return 1;
-    }
+  }
 
-  tile_dimensions[0] = tile_dimensions[0] < 1? 1 : tile_dimensions[0];
-  tile_dimensions[1] = tile_dimensions[1] < 1? 1 : tile_dimensions[1];
+  tile_dimensions[0] = tile_dimensions[0] < 1 ? 1 : tile_dimensions[0];
+  tile_dimensions[1] = tile_dimensions[1] < 1 ? 1 : tile_dimensions[1];
 
   int numProcs = contr->GetNumberOfProcesses();
   if (tile_dimensions[0] > 1 || tile_dimensions[1] > 1)
-    {
+  {
     if (numProcs != tile_dimensions[0] * tile_dimensions[1])
-      {
+    {
       cerr << "When running in tile-display mode, number of processes must "
-        "match number of tiles" << endl;
+              "match number of tiles"
+           << endl;
       return 1;
-      }
-    cout << "Rendering as a " << tile_dimensions[0] << "x"
-      << tile_dimensions[1] << " tile display" << endl;
     }
+    cout << "Rendering as a " << tile_dimensions[0] << "x" << tile_dimensions[1] << " tile display"
+         << endl;
+  }
 
   vtkMultiProcessController::SetGlobalController(contr);
 
-  MyProcess *p=MyProcess::New();
-  p->SetArgs(argc,argv);
+  MyProcess* p = MyProcess::New();
+  p->SetArgs(argc, argv);
   p->SetTileDimensions(tile_dimensions);
   p->SetImageReductionFactor(image_reduction_factor);
-  p->SetUseOrderedCompositing(use_ordered_compositing==1);
-  p->SetUseDepthPeeling(use_depth_peeling==1);
+  p->SetUseOrderedCompositing(use_ordered_compositing == 1);
+  p->SetUseDepthPeeling(use_depth_peeling == 1);
   p->SetServerMode(act_as_server != 0);
   p->SetUseBlurPass(add_blur_pass != 0);
   p->SetUseSobelPass(add_sobel_pass != 0);
-  p->SetDepthOnly(depthOnly==1);
+  p->SetDepthOnly(depthOnly == 1);
 
   if (contr->GetLocalProcessId() == 0 && act_as_server)
-    {
-    vtkSmartPointer<vtkSocketController> socket_contr =
-      vtkSmartPointer<vtkSocketController>::New();
+  {
+    vtkSmartPointer<vtkSocketController> socket_contr = vtkSmartPointer<vtkSocketController>::New();
     socket_contr->Initialize(&argc, &argv);
     cout << "Waiting for client on 11111" << endl;
     socket_contr->WaitForConnection(11111);
     p->SetSocketController(socket_contr);
-    }
+  }
 
   contr->SetSingleProcessObject(p);
   contr->SingleMethodExecute();
 
-  retVal=p->GetReturnValue();
+  retVal = p->GetReturnValue();
 
   vtkMultiProcessController::SetGlobalController(0);
   p->Delete();

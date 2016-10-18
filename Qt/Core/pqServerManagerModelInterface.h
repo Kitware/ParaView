@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -58,12 +58,10 @@ public:
   * \arg \c proxy    - vtkSMProxy instance to create the pqProxy for.
   * \arg \c server   - pqServer instance on which the proxy is present.
   */
-  virtual pqProxy* createPQProxy(const QString& regGroup,
-    const QString& regName, vtkSMProxy* proxy, pqServer* server) const = 0;
+  virtual pqProxy* createPQProxy(
+    const QString& regGroup, const QString& regName, vtkSMProxy* proxy, pqServer* server) const = 0;
 };
 
 Q_DECLARE_INTERFACE(pqServerManagerModelInterface, "com.kitware/paraview/servermanagermodel")
 
 #endif
-
-

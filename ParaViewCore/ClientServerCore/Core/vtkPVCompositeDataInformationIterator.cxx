@@ -24,17 +24,17 @@ class vtkPVCompositeDataInformationIterator::vtkInternal
 {
 public:
   struct vtkItem
-    {
+  {
     vtkPVDataInformation* Node;
     unsigned int NextChildIndex;
     const char* Name;
     vtkItem(vtkPVDataInformation* node, const char* name)
-      {
+    {
       this->Node = node;
       this->NextChildIndex = 0;
       this->Name = name;
-      }
-    };
+    }
+  };
 
   std::vector<vtkItem> Stack;
 };
@@ -62,10 +62,9 @@ void vtkPVCompositeDataInformationIterator::InitTraversal()
 {
   this->Internal->Stack.clear();
   if (this->DataInformation)
-    {
-    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation,
-        NULL));
-    }
+  {
+    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation, NULL));
+  }
   this->CurrentFlatIndex = 0;
 }
 
@@ -73,9 +72,9 @@ void vtkPVCompositeDataInformationIterator::InitTraversal()
 vtkPVDataInformation* vtkPVCompositeDataInformationIterator::GetCurrentDataInformation()
 {
   if (this->IsDoneWithTraversal())
-    {
+  {
     return NULL;
-    }
+  }
 
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
   return item.Node;
@@ -85,9 +84,9 @@ vtkPVDataInformation* vtkPVCompositeDataInformationIterator::GetCurrentDataInfor
 const char* vtkPVCompositeDataInformationIterator::GetCurrentName()
 {
   if (this->IsDoneWithTraversal())
-    {
+  {
     return NULL;
-    }
+  }
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
   return item.Name;
 }
@@ -102,28 +101,28 @@ bool vtkPVCompositeDataInformationIterator::IsDoneWithTraversal()
 void vtkPVCompositeDataInformationIterator::GoToNextItem()
 {
   if (this->IsDoneWithTraversal())
-    {
+  {
     return;
-    }
+  }
 
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
   if (item.Node)
-    {
+  {
     vtkPVCompositeDataInformation* cdInfo = item.Node->GetCompositeDataInformation();
-    if (cdInfo && cdInfo->GetDataIsComposite() && item.NextChildIndex < cdInfo->GetNumberOfChildren())
-      {
+    if (cdInfo && cdInfo->GetDataIsComposite() &&
+      item.NextChildIndex < cdInfo->GetNumberOfChildren())
+    {
       vtkPVDataInformation* current = cdInfo->GetDataInformation(item.NextChildIndex);
       const char* name = cdInfo->GetName(item.NextChildIndex);
       // current may be NULL for multi piece datasets.
       item.NextChildIndex++;
       this->CurrentFlatIndex++;
-      this->Internal->Stack.push_back(
-        vtkInternal::vtkItem(current, name));
+      this->Internal->Stack.push_back(vtkInternal::vtkItem(current, name));
       return;
-      }
     }
+  }
   this->Internal->Stack.pop_back();
-  this->GoToNextItem(); 
+  this->GoToNextItem();
 }
 
 //----------------------------------------------------------------------------
@@ -133,5 +132,3 @@ void vtkPVCompositeDataInformationIterator::PrintSelf(ostream& os, vtkIndent ind
   os << indent << "DataInformation: " << this->DataInformation << endl;
   os << indent << "CurrentFlatIndex: " << this->CurrentFlatIndex << endl;
 }
-
-

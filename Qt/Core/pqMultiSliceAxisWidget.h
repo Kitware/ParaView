@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqMultiSliceAxisWidget : public QWidget
   Q_PROPERTY(QString title READ title WRITE setTitle);
 
 public:
-  pqMultiSliceAxisWidget(QWidget* parent=NULL);
+  pqMultiSliceAxisWidget(QWidget* parent = NULL);
   virtual ~pqMultiSliceAxisWidget();
 
   /**
@@ -64,7 +64,7 @@ public:
   /**
   * Title that appears inside the view
   */
-  QString title()const;
+  QString title() const;
   void setTitle(const QString& title);
 
   /**
@@ -76,12 +76,12 @@ public:
   * Return the locations of the visible slices within the range as well as
   * the number of values that can be read from the pointer
   */
-  const double* getVisibleSlices(int &nbSlices) const;
+  const double* getVisibleSlices(int& nbSlices) const;
 
   /**
   * Returns the locations for all slices (visible or otherwise).
   */
-  const double* getSlices(int &nbSlices) const;
+  const double* getSlices(int& nbSlices) const;
 
   /**
   * Update our internal model to reflect the proxy state

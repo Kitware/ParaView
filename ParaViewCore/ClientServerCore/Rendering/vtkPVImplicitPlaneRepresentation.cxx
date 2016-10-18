@@ -18,19 +18,18 @@
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 
-
 vtkStandardNewMacro(vtkPVImplicitPlaneRepresentation);
 
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneRepresentation::vtkPVImplicitPlaneRepresentation()
 {
-  vtkMultiProcessController * ctrl = NULL;
+  vtkMultiProcessController* ctrl = NULL;
   ctrl = vtkMultiProcessController::GetGlobalController();
   double opacity = 1;
-  if(ctrl == NULL || ctrl->GetNumberOfProcesses() == 1)
-    {
+  if (ctrl == NULL || ctrl->GetNumberOfProcesses() == 1)
+  {
     opacity = 0.25;
-    }
+  }
 
   this->GetPlaneProperty()->SetOpacity(opacity);
   this->GetSelectedPlaneProperty()->SetOpacity(opacity);

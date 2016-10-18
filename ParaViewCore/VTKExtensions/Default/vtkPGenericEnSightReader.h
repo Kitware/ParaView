@@ -34,7 +34,7 @@ class vtkIdListCollection;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPGenericEnSightReader : public vtkGenericEnSightReader
 {
 public:
-  static vtkPGenericEnSightReader *New();
+  static vtkPGenericEnSightReader* New();
   vtkTypeMacro(vtkPGenericEnSightReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -42,9 +42,7 @@ protected:
   vtkPGenericEnSightReader();
   ~vtkPGenericEnSightReader();
 
-  virtual int RequestInformation(vtkInformation*,
-                                 vtkInformationVector**,
-                                 vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Multi Process cache. Will be read a lot of times.

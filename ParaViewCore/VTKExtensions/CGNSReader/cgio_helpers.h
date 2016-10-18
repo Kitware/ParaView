@@ -38,7 +38,6 @@
 
 #include "vtkCGNSReaderInternal.h"
 
-
 namespace CGNSRead
 {
 
@@ -52,27 +51,27 @@ inline int readNodeData(int cgioNum, double nodeId, std::vector<T>& data)
   int ndim;
 
   if (cgio_get_dimensions(cgioNum, nodeId, &ndim, dimVals) != CG_OK)
-    {
+  {
     cgio_error_exit("cgio_get_dimensions");
     return 1;
-    }
+  }
 
   // allocate data
   for (n = 0; n < ndim; n++)
-    {
+  {
     size *= dimVals[n];
-    }
+  }
   if (size <= 0)
-    {
+  {
     return 1;
-    }
+  }
   data.resize(size);
 
   // read data
   if (cgio_read_all_data(cgioNum, nodeId, &data[0]) != CG_OK)
-    {
+  {
     return 1;
-    }
+  }
 
   return 0;
 }
@@ -92,7 +91,7 @@ int getNodeChildrenId(int cgioNum, double fatherId, std::vector<double>& childre
 int readBaseIds(int cgioNum, double rootId, std::vector<double>& baseIds);
 
 //------------------------------------------------------------------------------
-int readBaseCoreInfo(int cgioNum, double baseId, CGNSRead::BaseInformation &baseInfo);
+int readBaseCoreInfo(int cgioNum, double baseId, CGNSRead::BaseInformation& baseInfo);
 
 //------------------------------------------------------------------------------
 int readBaseIteration(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
@@ -111,6 +110,5 @@ int readBaseReferenceState(int cgioNum, double nodeId, CGNSRead::BaseInformation
 
 //------------------------------------------------------------------------------
 int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
-
 }
-#endif //cgio_helpers_h
+#endif // cgio_helpers_h

@@ -40,7 +40,10 @@ public:
    */
   virtual void UpdatePropertyInformation();
   virtual void UpdatePropertyInformation(vtkSMProperty* prop)
-    { this->Superclass::UpdatePropertyInformation(prop); }
+  {
+    this->Superclass::UpdatePropertyInformation(prop);
+  }
+
 protected:
   vtkSMCameraProxy();
   ~vtkSMCameraProxy();
@@ -52,4 +55,3 @@ private:
 };
 
 #endif
-

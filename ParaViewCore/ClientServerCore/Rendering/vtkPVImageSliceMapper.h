@@ -53,9 +53,9 @@ public:
   /**
    * This calls RenderPiece (in a for loop is streaming is necessary).
    */
-  virtual void Render(vtkRenderer *ren, vtkActor *act);
+  virtual void Render(vtkRenderer* ren, vtkActor* act);
 
-  virtual void ReleaseGraphicsResources (vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
   //@{
   /**
@@ -69,33 +69,30 @@ public:
   /**
    * Specify the input data to map.
    */
-  void SetInputData(vtkImageData *in);
-  virtual vtkImageData *GetInput();
+  void SetInputData(vtkImageData* in);
+  virtual vtkImageData* GetInput();
   //@}
 
   //@{
   /**
    * Set/Get the current X/Y or Z slice number.
    */
-  vtkSetMacro(Slice,int);
-  vtkGetMacro(Slice,int);
+  vtkSetMacro(Slice, int);
+  vtkGetMacro(Slice, int);
   //@}
 
   enum
-    {
+  {
     XY_PLANE = VTK_XY_PLANE,
     YZ_PLANE = VTK_YZ_PLANE,
     XZ_PLANE = VTK_XZ_PLANE,
-    };
+  };
 
   vtkSetClampMacro(SliceMode, int, XY_PLANE, XZ_PLANE);
   vtkGetMacro(SliceMode, int);
-  void SetSliceModeToYZPlane()
-    { this->SetSliceMode(YZ_PLANE); }
-  void SetSliceModeToXZPlane()
-    { this->SetSliceMode(XZ_PLANE); }
-  void SetSliceModeToXYPlane()
-    { this->SetSliceMode(XY_PLANE); }
+  void SetSliceModeToYZPlane() { this->SetSliceMode(YZ_PLANE); }
+  void SetSliceModeToXZPlane() { this->SetSliceMode(XZ_PLANE); }
+  void SetSliceModeToXYPlane() { this->SetSliceMode(XY_PLANE); }
 
   //@{
   /**
@@ -111,12 +108,12 @@ public:
    * Update that sets the update piece first.
    */
   virtual void Update(int port);
-  virtual void Update()
-    { this->Superclass::Update(); }
+  virtual void Update() { this->Superclass::Update(); }
   virtual int Update(int port, vtkInformationVector* requests)
-    { return this->Superclass::Update(port, requests); }
-  virtual int Update(vtkInformation* requests)
-    { return this->Superclass::Update(requests); }
+  {
+    return this->Superclass::Update(port, requests);
+  }
+  virtual int Update(vtkInformation* requests) { return this->Superclass::Update(requests); }
 
   //@{
   /**
@@ -143,16 +140,14 @@ public:
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
-  virtual double *GetBounds();
-  virtual void GetBounds(double bounds[6])
-    {this->Superclass::GetBounds(bounds);};
+  virtual double* GetBounds();
+  virtual void GetBounds(double bounds[6]) { this->Superclass::GetBounds(bounds); };
   //@}
 
   /**
    * Make a shallow copy of this mapper.
    */
-  virtual void ShallowCopy(vtkAbstractMapper *m);
-
+  virtual void ShallowCopy(vtkAbstractMapper* m);
 
 protected:
   vtkPVImageSliceMapper();
@@ -164,14 +159,14 @@ protected:
   /**
    * Perform the actual rendering.
    */
-  virtual void RenderPiece(vtkRenderer *ren, vtkActor *act);
+  virtual void RenderPiece(vtkRenderer* ren, vtkActor* act);
 
 #ifdef VTKGL2
-  vtkOpenGLTexture *Texture;
+  vtkOpenGLTexture* Texture;
   int SetupScalars(vtkImageData*);
-  void RenderInternal(vtkRenderer *ren, vtkActor *act);
+  void RenderInternal(vtkRenderer* ren, vtkActor* act);
   vtkTimeStamp UpdateTime;
-  vtkActor *PolyDataActor;
+  vtkActor* PolyDataActor;
 #else
   /**
    * Called when the PainterInformation becomes obsolete. It is called before
@@ -200,7 +195,6 @@ protected:
 private:
   vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

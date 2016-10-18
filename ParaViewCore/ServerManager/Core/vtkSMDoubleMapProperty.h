@@ -53,12 +53,12 @@ public:
   /**
    * Sets the elements at index to values.
    */
-  void SetElements(vtkIdType index, const double *values);
+  void SetElements(vtkIdType index, const double* values);
 
   /**
    * Sets the elements at index to values.
    */
-  void SetElements(vtkIdType index, const double *values, unsigned int numValues);
+  void SetElements(vtkIdType index, const double* values, unsigned int numValues);
 
   /**
    * Sets the component at index to value.
@@ -121,12 +121,10 @@ protected:
 
   virtual void WriteTo(vtkSMMessage* msg);
 
-  virtual void ReadFrom(const vtkSMMessage *message,
-                        int message_offset,
-                        vtkSMProxyLocator* locator);
+  virtual void ReadFrom(
+    const vtkSMMessage* message, int message_offset, vtkSMProxyLocator* locator);
 
-  virtual int ReadXMLAttributes(vtkSMProxy* parent,
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
@@ -135,7 +133,7 @@ private:
   vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
 
-  vtkSMDoubleMapPropertyPrivate *Private;
+  vtkSMDoubleMapPropertyPrivate* Private;
 };
 
 #endif // vtkSMDoubleMapProperty_h

@@ -53,16 +53,16 @@ class PQCOMPONENTS_EXPORT pqFindDataCreateSelectionFrame : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqFindDataCreateSelectionFrame(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqFindDataCreateSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFindDataCreateSelectionFrame();
 
   /**
   * Helper method used to fill up a combo-box showing allowed selection types
   * based on the data-type produced on the port.
   */
-  static void populateSelectionTypeCombo(
-    QComboBox* bbox, pqOutputPort* port);
+  static void populateSelectionTypeCombo(QComboBox* bbox, pqOutputPort* port);
 
 public slots:
   /**

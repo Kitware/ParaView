@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqRepresentation_h
 #define _pqRepresentation_h
 
-
 #include "pqProxy.h"
 #include <QPair>
 
@@ -55,24 +54,21 @@ public:
   // \c repr  :- the representation proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqRepresentation(const QString& group, 
-                   const QString& name, 
-                   vtkSMProxy* repr, 
-                   pqServer* server, 
-                   QObject* parent=NULL);
+  pqRepresentation(const QString& group, const QString& name, vtkSMProxy* repr, pqServer* server,
+    QObject* parent = NULL);
   virtual ~pqRepresentation();
 
   /**
   * Returns if the status of the visbility property of this display.
   * Note that for a display to be visible in a view,
-  * it must be added to that view as well as 
+  * it must be added to that view as well as
   * visibility must be set to 1.
   */
   virtual bool isVisible() const;
 
   /**
   * Set the visibility. Note that this affects the visibility of the
-  * display in the view it has been added to, if any. This method does not 
+  * display in the view it has been added to, if any. This method does not
   * call a re-render on the view, caller must call that explicitly.
   */
   virtual void setVisible(bool visible);
@@ -100,8 +96,7 @@ public slots:
   /**
   * Simply calls renderView(false);
   */
-  void renderViewEventually()
-    { this->renderView(false); }
+  void renderViewEventually() { this->renderView(false); }
 
 signals:
   /**
@@ -133,8 +128,7 @@ protected:
 
 private:
   class pqInternal;
-  pqInternal *Internal; 
+  pqInternal* Internal;
 };
 
 #endif
-

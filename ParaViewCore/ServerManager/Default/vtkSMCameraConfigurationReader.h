@@ -36,18 +36,18 @@
 class vtkSMProxy;
 class vtkPVXMLElement;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationReader : public vtkSMProxyConfigurationReader
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationReader
+  : public vtkSMProxyConfigurationReader
 {
 public:
-  vtkTypeMacro(vtkSMCameraConfigurationReader,vtkSMProxyConfigurationReader);
+  vtkTypeMacro(vtkSMCameraConfigurationReader, vtkSMProxyConfigurationReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMCameraConfigurationReader *New();
+  static vtkSMCameraConfigurationReader* New();
 
   /**
    * Set the render view proxy to extract camera properties from.
    */
-  void SetRenderViewProxy(vtkSMProxy *rvProxy);
-
+  void SetRenderViewProxy(vtkSMProxy* rvProxy);
 
   //@{
   /**
@@ -55,13 +55,10 @@ public:
    * managed render view proxy. This will make sure the renderview is
    * updated after the read.
    */
-  virtual int ReadConfiguration(const char *filename);
-  virtual int ReadConfiguration(vtkPVXMLElement *x);
+  virtual int ReadConfiguration(const char* filename);
+  virtual int ReadConfiguration(vtkPVXMLElement* x);
   // unhide
-  virtual int ReadConfiguration()
-    {
-    return this->Superclass::ReadConfiguration();
-    }
+  virtual int ReadConfiguration() { return this->Superclass::ReadConfiguration(); }
   //@}
 
 protected:
@@ -70,7 +67,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy*) { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;
@@ -78,4 +75,3 @@ private:
 };
 
 #endif
-

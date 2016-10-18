@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -61,15 +61,15 @@ class vtkSMSessionProxyManager;
 * vtkSMSession, it also performs some initialization of session-related
 * proxies such as time-keeper and global-mapper-properties proxies.
 */
-class PQCORE_EXPORT pqServer : public pqServerManagerModelItem 
+class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
 {
   Q_OBJECT
-public:  
+public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
 
   const pqServerResource& getResource();
-  void setResource(const pqServerResource &server_resource);
+  void setResource(const pqServerResource& server_resource);
 
   /**
   * Returns the session instance which the pqServer represents.
@@ -99,7 +99,7 @@ public:
   vtkSMProxySelectionModel* activeViewSelectionModel() const;
 
   /**
-  * Return the number of data server partitions on this 
+  * Return the number of data server partitions on this
   * server connection. A convenience method.
   */
   int getNumberOfPartitions();
@@ -180,7 +180,7 @@ signals:
   void fiveMinuteTimeoutWarning();
 
   /**
-  * Fired about 1 minute before the server timesout. 
+  * Fired about 1 minute before the server timesout.
   * The server timeout is specified by --timeout option on the server process.
   * This is not fired if timeout is not specified on the server process.
   */
@@ -216,7 +216,7 @@ signals:
   *                      this,   SLOT(onClientMessage(vtkSMMessage*)),
   *                      Qt::QueuedConnection);
   */
-  void sentFromOtherClient(pqServer*,vtkSMMessage* msg);
+  void sentFromOtherClient(pqServer*, vtkSMMessage* msg);
 
   /**
   * Signal triggered when user information get updated
@@ -266,7 +266,7 @@ private:
   vtkWeakPointer<vtkSMSession> Session;
 
   // TODO:
-  // Each connection will eventually have a PVOptions object. 
+  // Each connection will eventually have a PVOptions object.
   // For now, this is same as the vtkProcessModule::Options.
   vtkSmartPointer<vtkPVOptions> Options;
 

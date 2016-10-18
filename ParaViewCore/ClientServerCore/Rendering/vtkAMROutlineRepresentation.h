@@ -35,8 +35,8 @@ class vtkAMRStreamingPriorityQueue;
 class vtkCompositePolyDataMapper2;
 class vtkPVLODActor;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMROutlineRepresentation :
-  public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMROutlineRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkAMROutlineRepresentation* New();
@@ -46,8 +46,8 @@ public:
   /**
    * Overridden to handle various view passes.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -83,9 +83,8 @@ protected:
    * should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
    * and the input pipeline provides necessary AMR meta-data.
    */
-  virtual int RequestInformation(vtkInformation *rqst,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  virtual int RequestInformation(
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   /**
    * Setup the block request. During StreamingUpdate, this will request the
@@ -94,8 +93,7 @@ protected:
    * absence of specific block request to mean various things. It's expected
    * that read only the root block (or a few more) in that case.
    */
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   /**
@@ -103,9 +101,8 @@ protected:
    * When not in StreamingUpdate, this also initializes the priority queue since
    * the input AMR may have totally changed, including its structure.
    */
-  virtual int RequestData(vtkInformation *rqst,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector);
+  virtual int RequestData(
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   //@{
   /**
@@ -190,7 +187,6 @@ private:
    * longer valid.
    */
   bool InStreamingUpdate;
-
 };
 
 #endif

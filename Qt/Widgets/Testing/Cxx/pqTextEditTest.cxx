@@ -13,10 +13,9 @@ void pqTextEditTester::init()
 {
   this->TextEdit = new pqTextEdit();
   this->TextChangedSpy = new QSignalSpy(this->TextEdit, SIGNAL(textChanged()));
-  this->EditingFinishedSpy = new
-    QSignalSpy(this->TextEdit, SIGNAL(editingFinished()));
-  this->TextChangedAndEditingFinishedSpy = new QSignalSpy(
-    this->TextEdit, SIGNAL(textChangedAndEditingFinished()));
+  this->EditingFinishedSpy = new QSignalSpy(this->TextEdit, SIGNAL(editingFinished()));
+  this->TextChangedAndEditingFinishedSpy =
+    new QSignalSpy(this->TextEdit, SIGNAL(textChangedAndEditingFinished()));
 }
 
 // ----------------------------------------------------------------------------
@@ -32,29 +31,29 @@ void pqTextEditTester::cleanup()
 QSignalSpy* pqTextEditTester::spy(int spyType)
 {
   switch (spyType)
-    {
+  {
     case pqTextEditTester::TextChanged:
-      {
+    {
       return this->TextChangedSpy;
       break;
-      }
+    }
     case pqTextEditTester::EditingFinished:
-      {
+    {
       return this->EditingFinishedSpy;
       break;
-      }
+    }
     case pqTextEditTester::TextChangedAndEditingFinished:
-      {
+    {
       return this->TextChangedAndEditingFinishedSpy;
       break;
-      }
+    }
     default:
-      {
+    {
       qCritical("Developer Error. No such spy (that's what a spy would say)");
       return 0;
       break;
-      }
     }
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -111,8 +110,7 @@ void pqTextEditTester::testTypeText()
   this->TextEdit->setFocus();
 
   QTest::keyClicks(this->TextEdit, text);
-  QTest::keyClick(this->TextEdit,
-    static_cast<Qt::Key>(focusOutKey),
+  QTest::keyClick(this->TextEdit, static_cast<Qt::Key>(focusOutKey),
     static_cast<Qt::KeyboardModifier>(focusOutModifier));
 
   QCOMPARE(this->TextEdit->toPlainText(), expectedText);
@@ -134,66 +132,64 @@ void pqTextEditTester::testTypeText_data()
   QString text = "My WEIrD CaSIng !@#$%)%^_*)[]{}|:'\" text.";
 
   QTest::newRow("textChanged: Key_A no modifier")
-    << 0 << text.length() +1 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << 0 << text.length() + 1 << text << text + QTest::keyToAscii(Qt::Key_A)
     << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("textChanged: Key_Return and SHIFT")
-    << 0 << text.length() +1 << text << text + "\n"
+    << 0 << text.length() + 1 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("textChanged: Key_Return and CTRL")
-    << 0 << text.length() << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Return and ALT")
-    << 0 << text.length() << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 0 << text.length() << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT") << 0 << text.length() << text << text
+                                                   << static_cast<int>(Qt::Key_Return)
+                                                   << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("textChanged: Key_Enter and CTRL")
-    << 0 << text.length() << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Enter and ALT")
-    << 0 << text.length() << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
-
+    << 0 << text.length() << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT") << 0 << text.length() << text << text
+                                                  << static_cast<int>(Qt::Key_Enter)
+                                                  << static_cast<int>(Qt::AltModifier) << false;
 
   QTest::newRow("editingFinished: Key_A no modifier")
-    << 1<< 0 << text << text + QTest::keyToAscii(Qt::Key_A)
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+    << 1 << 0 << text << text + QTest::keyToAscii(Qt::Key_A) << static_cast<int>(Qt::Key_A)
+    << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("editingFinished: Key_Return and SHIFT")
-    << 1<< 0 << text << text + "\n"
+    << 1 << 0 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("editingFinished: Key_Return and CTRL")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("editingFinished: Key_Return and ALT")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("editingFinished: Key_Enter and CTRL")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("editingFinished: Key_Enter and ALT")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
-
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and ALT") << 1 << 1 << text << text
+                                                      << static_cast<int>(Qt::Key_Enter)
+                                                      << static_cast<int>(Qt::AltModifier) << false;
 
   QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
-    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A)
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A) << static_cast<int>(Qt::Key_A)
+    << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("textChangedAndEditingFinished: Key_Return and SHIFT")
     << 2 << 0 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("textChangedAndEditingFinished: Key_Return and CTRL")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Return and ALT")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Enter and CTRL")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Enter and ALT")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::AltModifier) << false;
 }
 
 // ----------------------------------------------------------------------------
@@ -211,8 +207,7 @@ void pqTextEditTester::testFocus()
 #endif
   this->TextEdit->setFocus();
 
-  QTest::keyClick(this->TextEdit,
-    static_cast<Qt::Key>(focusOutKey),
+  QTest::keyClick(this->TextEdit, static_cast<Qt::Key>(focusOutKey),
     static_cast<Qt::KeyboardModifier>(focusOutModifier));
   QCOMPARE(this->TextEdit->hasFocus(), focus);
 
@@ -229,25 +224,24 @@ void pqTextEditTester::testFocus_data()
   QTest::addColumn<int>("focusOutModifier");
   QTest::addColumn<bool>("focus");
 
-  QTest::newRow("textChanged: Key_A no modifier")
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
-  QTest::newRow("textChanged: Key_Return and SHIFT")
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
-  QTest::newRow("textChanged: Key_Enter and SHIFT")
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ShiftModifier) << true;
+  QTest::newRow("textChanged: Key_A no modifier") << static_cast<int>(Qt::Key_A)
+                                                  << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChanged: Key_Return and SHIFT") << static_cast<int>(Qt::Key_Return)
+                                                     << static_cast<int>(Qt::ShiftModifier) << true;
+  QTest::newRow("textChanged: Key_Enter and SHIFT") << static_cast<int>(Qt::Key_Enter)
+                                                    << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("textChanged: Key_Return and CTRL")
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Return and ALT")
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT") << static_cast<int>(Qt::Key_Return)
+                                                   << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("textChanged: Key_Enter and CTRL")
     << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Enter and ALT")
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT") << static_cast<int>(Qt::Key_Enter)
+                                                  << static_cast<int>(Qt::AltModifier) << false;
 
-
-  QTest::newRow("editingFinished: Key_A no modifier")
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("editingFinished: Key_A no modifier") << static_cast<int>(Qt::Key_A)
+                                                      << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("editingFinished: Key_Return and SHIFT")
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
   QTest::newRow("editingFinished: Key_Enter and SHIFT")
@@ -259,9 +253,8 @@ void pqTextEditTester::testFocus_data()
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("editingFinished: Key_Enter and CTRL")
     << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("editingFinished: Key_Enter and ALT")
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
-
+  QTest::newRow("editingFinished: Key_Enter and ALT") << static_cast<int>(Qt::Key_Enter)
+                                                      << static_cast<int>(Qt::AltModifier) << false;
 
   QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
     << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
@@ -292,7 +285,7 @@ void pqTextEditTester::testReTypeText()
   QFETCH(bool, focus);
 
   this->TextEdit->append(text); // Init Text
-  this->spy(spyType)->clear(); // Reset spy
+  this->spy(spyType)->clear();  // Reset spy
 
   this->TextEdit->show();
 #if QT_VERSION >= 0x050000
@@ -303,13 +296,12 @@ void pqTextEditTester::testReTypeText()
   this->TextEdit->setFocus();
 
   for (int i = 0; i < text.length(); ++i) // Remove previous text
-    {
+  {
     QTest::keyClick(this->TextEdit, Qt::Key_Backspace);
-    }
+  }
 
   QTest::keyClicks(this->TextEdit, text); // Re-type it.
-  QTest::keyClick(this->TextEdit,
-    static_cast<Qt::Key>(focusOutKey),
+  QTest::keyClick(this->TextEdit, static_cast<Qt::Key>(focusOutKey),
     static_cast<Qt::KeyboardModifier>(focusOutModifier));
 
   QCOMPARE(this->TextEdit->toPlainText(), expectedText);
@@ -336,75 +328,73 @@ void pqTextEditTester::testReTypeText_data()
   // Once after each letter is retyped
 
   QTest::newRow("textChanged: Key_A no modifier")
-    << 0 << 3*text.length() + 1 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << 0 << 3 * text.length() + 1 << text << text + QTest::keyToAscii(Qt::Key_A)
     << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("textChanged: Key_Return and SHIFT")
-    << 0 << 3*text.length() +1 << text << text + "\n"
+    << 0 << 3 * text.length() + 1 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("textChanged: Key_Return and CTRL")
-    << 0 << 3*text.length() << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Return and ALT")
-    << 0 << 3*text.length() << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 0 << 3 * text.length() << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT") << 0 << 3 * text.length() << text << text
+                                                   << static_cast<int>(Qt::Key_Return)
+                                                   << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("textChanged: Key_Enter and CTRL")
-    << 0 << 3*text.length() << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("textChanged: Key_Enter and ALT")
-    << 0 << 3*text.length() << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
-
+    << 0 << 3 * text.length() << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT") << 0 << 3 * text.length() << text << text
+                                                  << static_cast<int>(Qt::Key_Enter)
+                                                  << static_cast<int>(Qt::AltModifier) << false;
 
   QTest::newRow("editingFinished: Key_A no modifier")
-    << 1<< 0 << text << text + QTest::keyToAscii(Qt::Key_A)
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+    << 1 << 0 << text << text + QTest::keyToAscii(Qt::Key_A) << static_cast<int>(Qt::Key_A)
+    << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("editingFinished: Key_Return and SHIFT")
-    << 1<< 0 << text << text + "\n"
+    << 1 << 0 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("editingFinished: Key_Return and CTRL")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("editingFinished: Key_Return and ALT")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("editingFinished: Key_Enter and CTRL")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
-  QTest::newRow("editingFinished: Key_Enter and ALT")
-    << 1<< 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
-
+    << 1 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and ALT") << 1 << 1 << text << text
+                                                      << static_cast<int>(Qt::Key_Enter)
+                                                      << static_cast<int>(Qt::AltModifier) << false;
 
   // Even though the text is the same, the textChangedAndEditingFinished
   // signal is still sent. See pqTextEdit doc.
 
   QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
-    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A)
-    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A) << static_cast<int>(Qt::Key_A)
+    << static_cast<int>(Qt::NoModifier) << true;
   QTest::newRow("textChangedAndEditingFinished: Key_Return and SHIFT")
     << 2 << 0 << text << text + "\n"
     << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
 
   QTest::newRow("textChangedAndEditingFinished: Key_Return and CTRL")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Return and ALT")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Return)
+    << static_cast<int>(Qt::AltModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Enter and CTRL")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::ControlModifier) << false;
   QTest::newRow("textChangedAndEditingFinished: Key_Enter and ALT")
-    << 2 << 1 << text << text
-    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+    << 2 << 1 << text << text << static_cast<int>(Qt::Key_Enter)
+    << static_cast<int>(Qt::AltModifier) << false;
 }
 
 // --------------------------------------------------------------------------
 int pqTextEditTest(int argc, char* argv[])
 {
-  QApplication app(argc, argv); 
+  QApplication app(argc, argv);
   pqTextEditTester test1;
   return QTest::qExec(&test1);
 }

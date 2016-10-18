@@ -42,21 +42,19 @@ vtkBoundedPlaneSource::~vtkBoundedPlaneSource()
 
 //----------------------------------------------------------------------------
 int vtkBoundedPlaneSource::RequestData(
-  vtkInformation *, vtkInformationVector **, vtkInformationVector *outputVector)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
 
-  vtkBoundingBox bbox (this->BoundingBox);
+  vtkBoundingBox bbox(this->BoundingBox);
   if (!bbox.IsValid())
-    {
+  {
     vtkErrorMacro("Invalid bounding box specified. Please choose a valid BoundingBox.");
     return 0;
-    }
+  }
 
   vtkNew<vtkImageData> image;
-  image->SetExtent(0, this->Resolution-1,
-                   0, this->Resolution-1,
-                   0, this->Resolution-1);
+  image->SetExtent(0, this->Resolution - 1, 0, this->Resolution - 1, 0, this->Resolution - 1);
 
   double lengths[3];
   bbox.GetLengths(lengths);
@@ -65,9 +63,8 @@ int vtkBoundedPlaneSource::RequestData(
   bbox.GetMinPoint(origin[0], origin[1], origin[2]);
 
   image->SetOrigin(origin);
-  image->SetSpacing(lengths[0] / this->Resolution,
-    lengths[1] / this->Resolution,
-    lengths[2] / this->Resolution);
+  image->SetSpacing(
+    lengths[0] / this->Resolution, lengths[1] / this->Resolution, lengths[2] / this->Resolution);
 
   image->AllocateScalars(VTK_CHAR, 1);
   // this, alas, is needed since vtkFlyingEdgesPlaneCutter cannot work without
@@ -91,12 +88,12 @@ int vtkBoundedPlaneSource::RequestData(
 void vtkBoundedPlaneSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Center: "
-    << this->Center[0] << ", " << this->Center[1] << ", " << this->Center[2] << endl;
-  os << indent << "Normal: "
-    << this->Normal[0] << ", " << this->Normal[1] << ", " << this->Normal[2] << endl;
-  os << indent << "BoundingBox: "
-    << this->BoundingBox[0] << ", " << this->BoundingBox[1] << ", " << this->BoundingBox[2] << ", "
-    << this->BoundingBox[3] << ", " << this->BoundingBox[4] << ", " << this->BoundingBox[5] << endl;
+  os << indent << "Center: " << this->Center[0] << ", " << this->Center[1] << ", "
+     << this->Center[2] << endl;
+  os << indent << "Normal: " << this->Normal[0] << ", " << this->Normal[1] << ", "
+     << this->Normal[2] << endl;
+  os << indent << "BoundingBox: " << this->BoundingBox[0] << ", " << this->BoundingBox[1] << ", "
+     << this->BoundingBox[2] << ", " << this->BoundingBox[3] << ", " << this->BoundingBox[4] << ", "
+     << this->BoundingBox[5] << endl;
   os << indent << "Resolution: " << this->Resolution << endl;
 }

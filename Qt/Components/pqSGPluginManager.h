@@ -43,8 +43,9 @@ class PQCOMPONENTS_EXPORT pqSGPluginManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqSGPluginManager(QObject* parent=0);
+  pqSGPluginManager(QObject* parent = 0);
   ~pqSGPluginManager();
 
   /**

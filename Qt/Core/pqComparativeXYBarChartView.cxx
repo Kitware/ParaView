@@ -32,11 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeXYBarChartView.h"
 
 //-----------------------------------------------------------------------------
-pqComparativeXYBarChartView::pqComparativeXYBarChartView(const QString& group,
-                                                         const QString& name,
-                                                         vtkSMComparativeViewProxy* view,
-                                                         pqServer* server,
-                                                         QObject* parentObject)
+pqComparativeXYBarChartView::pqComparativeXYBarChartView(const QString& group, const QString& name,
+  vtkSMComparativeViewProxy* view, pqServer* server, QObject* parentObject)
   : Superclass(chartViewType(), group, name, view, server, parentObject)
 {
 }

@@ -49,34 +49,33 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
   return this->GetSessionProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
-void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
-                                    vtkSMProxyLocator* locator)
+void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   assert("Session should be valid" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  if(this->ClientOnlyLocationFlag)
-    {
+  if (this->ClientOnlyLocationFlag)
+  {
     pxm->DisableStateUpdateNotification();
     pxm->LoadState(msg, locator);
     pxm->EnableStateUpdateNotification();
-    }
+  }
   else
-    {
+  {
     pxm->LoadState(msg, locator);
-    }
+  }
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()
 {
-  if(this->Session)
-    {
+  if (this->Session)
+  {
     vtkSMMessage msg;
     msg.CopyFrom(*this->GetFullState());
-//    cout << "~~~~~~~~~~~~~ PUSH pxm state to server ~~~~~~~~~~~~~~~~" << endl;
-//    msg.PrintDebugString();
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    //    cout << "~~~~~~~~~~~~~ PUSH pxm state to server ~~~~~~~~~~~~~~~~" << endl;
+    //    msg.PrintDebugString();
+    //    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     this->PushState(&msg);
-    }
+  }
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::PrintSelf(ostream& os, vtkIndent indent)

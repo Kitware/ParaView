@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,8 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqTextEditPrivate
 {
   Q_DECLARE_PUBLIC(pqTextEdit);
+
 protected:
   pqTextEdit* const q_ptr;
+
 public:
   pqTextEditPrivate(pqTextEdit& object);
 
@@ -56,12 +58,12 @@ public:
   int StopFocusModifiers;
 
 private:
-  pqTextEditPrivate & operator=(const pqTextEditPrivate &);
+  pqTextEditPrivate& operator=(const pqTextEditPrivate&);
 };
 
 // --------------------------------------------------------------------------
 pqTextEditPrivate::pqTextEditPrivate(pqTextEdit& object)
-  :q_ptr(&object)
+  : q_ptr(&object)
 {
 }
 
@@ -80,18 +82,18 @@ void pqTextEditPrivate::init()
 }
 
 //-----------------------------------------------------------------------------
-pqTextEdit::pqTextEdit(QWidget *_parent) :
-  Superclass(_parent),
-  d_ptr(new pqTextEditPrivate(*this))
+pqTextEdit::pqTextEdit(QWidget* _parent)
+  : Superclass(_parent)
+  , d_ptr(new pqTextEditPrivate(*this))
 {
   Q_D(pqTextEdit);
   d->init();
 }
 
 //-----------------------------------------------------------------------------
-pqTextEdit::pqTextEdit(const QString &_contents, QWidget *_parent):
-  Superclass(_contents, _parent),
-  d_ptr(new pqTextEditPrivate(*this))
+pqTextEdit::pqTextEdit(const QString& _contents, QWidget* _parent)
+  : Superclass(_contents, _parent)
+  , d_ptr(new pqTextEditPrivate(*this))
 {
   Q_D(pqTextEdit);
   d->init();
@@ -114,27 +116,26 @@ void pqTextEdit::onEditingFinished()
 {
   Q_D(pqTextEdit);
   if (d->TextChangedAndEditingFinishedPending)
-    {
+  {
     emit this->textChangedAndEditingFinished();
     d->TextChangedAndEditingFinishedPending = false;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqTextEdit::keyPressEvent(QKeyEvent *e)
+void pqTextEdit::keyPressEvent(QKeyEvent* e)
 {
   Q_D(pqTextEdit);
 
   if (e)
-    {
+  {
     d->TextChangedAndEditingFinishedPending = true;
 
-    if (d->StopFocusKeys.contains(e->key())
-      && e->modifiers() & d->StopFocusModifiers)
-      {
+    if (d->StopFocusKeys.contains(e->key()) && e->modifiers() & d->StopFocusModifiers)
+    {
       this->clearFocus();
-      }
     }
+  }
 
   this->Superclass::keyPressEvent(e);
 }

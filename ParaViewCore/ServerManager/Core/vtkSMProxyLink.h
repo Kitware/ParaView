@@ -64,7 +64,7 @@ public:
    * Get a proxy involved in this link.
    */
   vtkSMProxy* GetLinkedProxy(int index);
-  
+
   //@{
   /**
    * Get the direction of a proxy involved in this link
@@ -73,7 +73,7 @@ public:
   int GetLinkedObjectDirection(int index);
   int GetLinkedProxyDirection(int index);
   //@}
-  
+
   //@{
   /**
    * It is possible to exclude certain properties from being synchronized
@@ -96,7 +96,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxyLink();
@@ -142,7 +142,6 @@ private:
 
   vtkSMProxyLink(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

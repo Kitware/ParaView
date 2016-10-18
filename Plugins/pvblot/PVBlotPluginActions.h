@@ -31,22 +31,23 @@ class pqServer;
 class PVBlotPluginActions : public QActionGroup
 {
   Q_OBJECT;
-public:
-  PVBlotPluginActions(QObject *p);
 
-  virtual pqServer *activeServer();
-  virtual QWidget *mainWindow();
+public:
+  PVBlotPluginActions(QObject* p);
+
+  virtual pqServer* activeServer();
+  virtual QWidget* mainWindow();
 
 public slots:
   virtual void startPVBlot();
-  virtual void startPVBlot(const QString &filename);
+  virtual void startPVBlot(const QString& filename);
 
 protected slots:
-  virtual void startPVBlot(const QStringList &filenames);
+  virtual void startPVBlot(const QStringList& filenames);
 
 private:
-  PVBlotPluginActions(const PVBlotPluginActions &) VTK_DELETE_FUNCTION;
-  void operator=(const PVBlotPluginActions &) VTK_DELETE_FUNCTION;
+  PVBlotPluginActions(const PVBlotPluginActions&) VTK_DELETE_FUNCTION;
+  void operator=(const PVBlotPluginActions&) VTK_DELETE_FUNCTION;
 };
 
-#endif //PVBlotPluginActions_h
+#endif // PVBlotPluginActions_h

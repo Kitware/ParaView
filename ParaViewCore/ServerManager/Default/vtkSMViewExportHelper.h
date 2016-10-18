@@ -62,7 +62,6 @@ protected:
 private:
   vtkSMViewExportHelper(const vtkSMViewExportHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMViewExportHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

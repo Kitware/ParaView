@@ -49,15 +49,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
 {
 public:
   enum GlyphModeType
-    {
+  {
     ALL_POINTS,
     EVERY_NTH_POINT,
     SPATIALLY_UNIFORM_DISTRIBUTION
-    };
+  };
 
-  vtkTypeMacro(vtkPVGlyphFilter,vtkGlyph3D);
+  vtkTypeMacro(vtkPVGlyphFilter, vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPVGlyphFilter *New();
+  static vtkPVGlyphFilter* New();
 
   //@{
   /**
@@ -106,18 +106,16 @@ public:
   /**
    * Overridden to create output data of appropriate type.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
   //@}
 
   // Standard Pipeline methods
-  virtual int RequestData(
-      vtkInformation*, vtkInformationVector**,vtkInformationVector*);
-  virtual int RequestDataObject(
-      vtkInformation*, vtkInformationVector**,vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   virtual int FillInputPortInformation(int, vtkInformation*);
   virtual int FillOutputPortInformation(int, vtkInformation*);
 
@@ -141,9 +139,8 @@ protected:
    * apply a Cell Centers before the Glyph. The \c input, filling up the \c output
    * based on the filter parameters.
    */
-  virtual bool ExecuteWithCellCenters(vtkDataSet* input,
-                                      vtkInformationVector* sourceVector,
-                                      vtkPolyData* output);
+  virtual bool ExecuteWithCellCenters(
+    vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output);
 
   int GlyphMode;
   int MaximumNumberOfSamplePoints;

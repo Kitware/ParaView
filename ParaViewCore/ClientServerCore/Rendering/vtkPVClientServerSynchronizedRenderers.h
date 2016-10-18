@@ -29,7 +29,8 @@
 class vtkImageCompressor;
 class vtkUnsignedCharArray;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRenderers
+  : public vtkSynchronizedRenderers
 {
 public:
   static vtkPVClientServerSynchronizedRenderers* New();
@@ -48,7 +49,7 @@ public:
    * is used by ParaView to configure the compressor from application wide
    * user settings.
    */
-  virtual void ConfigureCompressor(const char *stream);
+  virtual void ConfigureCompressor(const char* stream);
 
 protected:
   vtkPVClientServerSynchronizedRenderers();
@@ -65,8 +66,8 @@ protected:
   /**
    * Set/Get the compressor object, it's setting can be manipulated directly.
    */
-  void SetCompressor(vtkImageCompressor *comp);
-  vtkGetObjectMacro(Compressor,vtkImageCompressor);
+  void SetCompressor(vtkImageCompressor* comp);
+  vtkGetObjectMacro(Compressor, vtkImageCompressor);
   //@}
 
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
@@ -78,10 +79,11 @@ protected:
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;
-private:
-  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkPVClientServerSynchronizedRenderers(
+    const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 };
 
 #endif

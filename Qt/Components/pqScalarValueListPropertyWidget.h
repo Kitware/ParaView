@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -50,13 +50,12 @@ class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWid
   Q_PROPERTY(QVariantList scalars READ scalars WRITE setScalars)
 
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqScalarValueListPropertyWidget(vtkSMProperty *property,
-                                  vtkSMProxy *proxy,
-                                  QWidget *parent = 0);
+  pqScalarValueListPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqScalarValueListPropertyWidget();
 
-  void setScalars(const QVariantList &scalars);
+  void setScalars(const QVariantList& scalars);
   QVariantList scalars() const;
 
   /**
@@ -79,6 +78,7 @@ private slots:
   void remove();
   void removeAll();
   void editPastLastRow();
+
 private:
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
 

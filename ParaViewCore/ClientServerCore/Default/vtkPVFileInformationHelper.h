@@ -19,7 +19,7 @@
  *
  * When collection information, ProcessModule cannot pass parameters to
  * the information object. In case of vtkPVFileInformation, we need data on
- * the server side such as which directory/file are we concerned with. 
+ * the server side such as which directory/file are we concerned with.
  * To make such information available, we use vtkPVFileInformationHelper.
  * One creates a server side representation of vtkPVFileInformationHelper and
  * sets attributes on it, then requests a gather information on the helper object.
@@ -127,10 +127,10 @@ protected:
 
   char* PathSeparator;
   vtkSetStringMacro(PathSeparator);
+
 private:
   vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

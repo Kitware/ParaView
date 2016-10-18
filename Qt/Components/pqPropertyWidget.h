@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -55,8 +55,9 @@ class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  pqPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   virtual ~pqPropertyWidget();
 
   virtual void apply();
@@ -69,8 +70,8 @@ public:
   * override these methods to select/deselect the 3D widgets.
   * Default implementation does nothing.
   */
-  virtual void select() {this->Selected = true;}
-  virtual void deselect() {this->Selected = false;}
+  virtual void select() { this->Selected = true; }
+  virtual void deselect() { this->Selected = false; }
   bool isSelected() const { return this->Selected; }
 
   // This method is called on pqPropertyWidget instances that pqProxyWidget
@@ -79,7 +80,9 @@ public:
   // whether advanced properties are currently being shown by the pqProxyWidget
   // or not.
   virtual void updateWidget(bool showing_advanced_properties)
-    {Q_UNUSED(showing_advanced_properties);}
+  {
+    Q_UNUSED(showing_advanced_properties);
+  }
 
   pqView* view() const;
   vtkSMProxy* proxy() const;
@@ -87,7 +90,7 @@ public:
   using Superclass::property; // Don't hide superclass method
 
   /**
-  * Forward calls to vtkSMProperty. Are overwritten by pqPropertyGroupWidget 
+  * Forward calls to vtkSMProperty. Are overwritten by pqPropertyGroupWidget
   *   to forward calls to vtkSMPropertyGroup
   */
   virtual char* panelVisibility() const;
@@ -108,8 +111,8 @@ public:
   * For example, to get the XML name of a vtkSMIntRangeDomain:
   * QString name = pqPropertyWidget::getXMLName(domain);
   */
-  template<class T>
-  static QString getXMLName(T *object)
+  template <class T>
+  static QString getXMLName(T* object)
   {
     return QString(object->GetXMLName());
   }
@@ -117,10 +120,7 @@ public:
   /**
   * Provides access to the decorators for this widget.
   */
-  const QList<QPointer<pqPropertyWidgetDecorator> >& decorators() const
-    {
-    return this->Decorators;
-    }
+  const QList<QPointer<pqPropertyWidgetDecorator> >& decorators() const { return this->Decorators; }
 
   /**
   * unhide superclass method. Note this is not virtual in QObject so don't add
@@ -137,7 +137,7 @@ signals:
   /**
   * This signal is emitted when the current view changes.
   */
-  void viewChanged(pqView *view);
+  void viewChanged(pqView* view);
 
   /**
   * This signal is fired as soon as the user starts editing in the widget. The
@@ -164,28 +164,14 @@ public slots:
   virtual void setView(pqView*);
 
 protected:
-  void addPropertyLink(QObject *qobject,
-                       const char *qproperty,
-                       const char *qsignal,
-                       vtkSMProperty *smproperty,
-                       int smindex = -1);
-  void addPropertyLink(QObject *qobject,
-                       const char *qproperty,
-                       const char *qsignal,
-                       vtkSMProxy *smproxy,
-                       vtkSMProperty *smproperty,
-                       int smindex = -1);
-  void removePropertyLink(QObject *qobject,
-                       const char *qproperty,
-                       const char *qsignal,
-                       vtkSMProperty *smproperty,
-                       int smindex = -1);
-  void removePropertyLink(QObject *qobject,
-                       const char *qproperty,
-                       const char *qsignal,
-                       vtkSMProxy *smproxy,
-                       vtkSMProperty *smproperty,
-                       int smindex = -1);
+  void addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProperty* smproperty, int smindex = -1);
+  void addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
+  void removePropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProperty* smproperty, int smindex = -1);
+  void removePropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
   void setShowLabel(bool show);
 
   /**
@@ -197,7 +183,9 @@ protected:
   * changeFinished() signal.
   */
   void setChangeAvailableAsChangeFinished(bool status)
-    { this->ChangeAvailableAsChangeFinished = status; }
+  {
+    this->ChangeAvailableAsChangeFinished = status;
+  }
 
   /**
   * Register a decorator. The pqPropertyWidget takes over the ownership of the
@@ -209,14 +197,12 @@ protected:
   /**
   * Provides access to the pqPropertyLinks instance.
   */
-  pqPropertyLinks& links()
-    { return this->Links; }
+  pqPropertyLinks& links() { return this->Links; }
 
 public:
-  void setProperty(vtkSMProperty *property);
+  void setProperty(vtkSMProperty* property);
 
 private:
-
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;
 
@@ -227,8 +213,8 @@ private slots:
   void onChangeAvailable();
 
 private:
-  vtkSMProxy *Proxy;
-  vtkSMProperty *Property;
+  vtkSMProxy* Proxy;
+  vtkSMProperty* Property;
   QPointer<pqView> View;
   QList<QPointer<pqPropertyWidgetDecorator> > Decorators;
 

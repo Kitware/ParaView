@@ -31,32 +31,33 @@ int TestSubProxy(int argc, char* argv[])
 {
   vtkPVOptions* options = vtkPVOptions::New();
   bool success = true;
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule::PROCESS_CLIENT, options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
   if (!success)
-    {
+  {
     return -1;
-    }
+  }
 
   vtkSMSession* session = vtkSMSession::New();
   cout << "Starting..." << endl;
 
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
 
   // *******************************************************************
   // Test specific code
   // *******************************************************************
   double value, valueA, valueB;
-  if(options->GetUnknownArgument())
-    {
+  if (options->GetUnknownArgument())
+  {
     cout << "Load Proxy definition: " << options->GetUnknownArgument() << endl;
     pxm->LoadConfigurationXML(options->GetUnknownArgument());
-    }
+  }
   else
-    {
-    pxm->LoadConfigurationXML("/home/seb/Kitware/Projects/DOE-Collaboration-SBIR-II/code/git/ParaView4/Servers/ServerManager/Testing/Cxx/TestCustomSubProxyDefinition.xml");
-    }
+  {
+    pxm->LoadConfigurationXML("/home/seb/Kitware/Projects/DOE-Collaboration-SBIR-II/code/git/"
+                              "ParaView4/Servers/ServerManager/Testing/Cxx/"
+                              "TestCustomSubProxyDefinition.xml");
+  }
 
   // Create proxy and change main radius value
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource3");

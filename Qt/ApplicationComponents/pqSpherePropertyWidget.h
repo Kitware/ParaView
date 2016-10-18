@@ -51,9 +51,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpherePropertyWidget : public pqInteracti
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqSpherePropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqSpherePropertyWidget();
 
 public slots:

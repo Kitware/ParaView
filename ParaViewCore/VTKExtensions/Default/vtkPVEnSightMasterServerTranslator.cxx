@@ -35,32 +35,24 @@ void vtkPVEnSightMasterServerTranslator::PrintSelf(ostream& os, vtkIndent indent
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ProcessId: " << this->ProcessId << "\n";
-  
 }
 
 //----------------------------------------------------------------------------
-int
-vtkPVEnSightMasterServerTranslator::PieceToExtentThreadSafe(int vtkNotUsed(piece),
-                                                            int vtkNotUsed(numPieces), 
-                                                            int vtkNotUsed(ghostLevel), 
-                                                            int *wholeExtent, 
-                                                            int *resultExtent, 
-                                                            int splitMode, 
-                                                            int byPoints)
+int vtkPVEnSightMasterServerTranslator::PieceToExtentThreadSafe(int vtkNotUsed(piece),
+  int vtkNotUsed(numPieces), int vtkNotUsed(ghostLevel), int* wholeExtent, int* resultExtent,
+  int splitMode, int byPoints)
 {
-  if(this->Piece == this->ProcessId)
-    {
+  if (this->Piece == this->ProcessId)
+  {
     // Return whole extent.
-    return this->Superclass::PieceToExtentThreadSafe(0, 1, 0, wholeExtent,
-                                                     resultExtent, splitMode,
-                                                     byPoints);
-    }
+    return this->Superclass::PieceToExtentThreadSafe(
+      0, 1, 0, wholeExtent, resultExtent, splitMode, byPoints);
+  }
   else
-    {
+  {
     // Return empty extent.
-    int extent[6] = {0, -1, 0, -1, 0, -1};
-    return this->Superclass::PieceToExtentThreadSafe(0, 1, 0, extent,
-                                                     resultExtent, splitMode,
-                                                     byPoints);
-    }
+    int extent[6] = { 0, -1, 0, -1, 0, -1 };
+    return this->Superclass::PieceToExtentThreadSafe(
+      0, 1, 0, extent, resultExtent, splitMode, byPoints);
+  }
 }

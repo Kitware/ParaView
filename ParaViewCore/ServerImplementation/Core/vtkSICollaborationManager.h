@@ -59,7 +59,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif // #ifndef vtkSICollaborationManager_h

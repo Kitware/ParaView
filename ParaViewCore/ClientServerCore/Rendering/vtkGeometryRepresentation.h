@@ -43,7 +43,8 @@ class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkGeometryRepresentation* New();
@@ -56,8 +57,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -85,8 +86,7 @@ public:
   /**
    * Enable/Disable LOD;
    */
-  virtual void SetSuppressLOD(bool suppress)
-    { this->SuppressLOD = suppress; }
+  virtual void SetSuppressLOD(bool suppress) { this->SuppressLOD = suppress; }
 
   //@{
   /**
@@ -105,12 +105,12 @@ public:
   //@}
 
   enum RepresentationTypes
-    {
+  {
     POINTS = VTK_POINTS,
     WIREFRAME = VTK_WIREFRAME,
     SURFACE = VTK_SURFACE,
     SURFACE_WITH_EDGES = 3
-    };
+  };
 
   //@{
   /**
@@ -214,7 +214,7 @@ public:
    * Set/get the color for a single block.
    */
   virtual void SetBlockColor(unsigned int index, double r, double g, double b);
-  virtual void SetBlockColor(unsigned int index, double *color);
+  virtual void SetBlockColor(unsigned int index, double* color);
   virtual double* GetBlockColor(unsigned int index);
   virtual void RemoveBlockColor(unsigned int index);
   virtual void RemoveBlockColors();
@@ -225,7 +225,7 @@ public:
    * Set/get the opacityfor a single block.
    */
   virtual void SetBlockOpacity(unsigned int index, double opacity);
-  virtual void SetBlockOpacity(unsigned int index, double *opacity);
+  virtual void SetBlockOpacity(unsigned int index, double* opacity);
   virtual double GetBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacities();
@@ -243,8 +243,8 @@ public:
    * blocks of the data will be used to compute the bounds.
    * Returns true if valid bounds were computed.
    */
-  static bool GetBounds(vtkDataObject* dataObject, double bounds[6],
-                        vtkCompositeDataDisplayAttributes* cdAttributes);
+  static bool GetBounds(
+    vtkDataObject* dataObject, double bounds[6], vtkCompositeDataDisplayAttributes* cdAttributes);
 
   //@{
   /**
@@ -253,7 +253,7 @@ public:
    */
   virtual void SetEnableScaling(int v);
   virtual void SetScalingArrayName(const char*);
-  virtual void SetScalingFunction(vtkPiecewiseFunction *pwf);
+  virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
   //@}
 
   //@{
@@ -294,14 +294,13 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   /**
    * Overridden to request correct ghost-level to avoid internal surfaces.
    */
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   /**
    * Produce meta-data about this representation that the view may find useful.
@@ -330,8 +329,7 @@ protected:
   /**
    * Used in ConvertSelection to locate the prop used for actual rendering.
    */
-  virtual vtkPVLODActor* GetRenderedProp()
-    { return this->Actor; }
+  virtual vtkPVLODActor* GetRenderedProp() { return this->Actor; }
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
@@ -357,7 +355,7 @@ protected:
   bool RequestGhostCellsIfNeeded;
   double DataBounds[6];
 
-  vtkPiecewiseFunction *PWF;
+  vtkPiecewiseFunction* PWF;
 
   bool UseDataPartitions;
 
@@ -368,7 +366,6 @@ private:
   friend class vtkSelectionRepresentation;
   char* DebugString;
   vtkSetStringMacro(DebugString);
-
 };
 
 #endif

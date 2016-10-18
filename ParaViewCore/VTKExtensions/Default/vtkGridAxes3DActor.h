@@ -24,8 +24,8 @@
 #include "vtkProp3D.h"
 
 #include "vtkGridAxesHelper.h" //  needed for vtkGridAxesHelper.
-#include "vtkNew.h" // needed for vtkNew.
-#include "vtkStdString.h" // needed for vtkStdString.
+#include "vtkNew.h"            // needed for vtkNew.
+#include "vtkStdString.h"      // needed for vtkStdString.
 
 class vtkDoubleArray;
 class vtkGridAxes2DActor;
@@ -42,7 +42,7 @@ public:
   /**
    * Shallow copy from another vtkGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp *prop);
+  virtual void ShallowCopy(vtkProp* prop);
 
   //@{
   /**
@@ -60,14 +60,14 @@ public:
    * vtkGridAxesHelper::Faces which is same order as faces in vtkVoxel.
    */
   enum FaceMasks
-    {
-    MIN_YZ=0x01,
-    MIN_ZX=0x02,
-    MIN_XY=0x04,
-    MAX_YZ=0x08,
-    MAX_ZX=0x010,
-    MAX_XY=0x020
-    };
+  {
+    MIN_YZ = 0x01,
+    MIN_ZX = 0x02,
+    MIN_XY = 0x04,
+    MAX_YZ = 0x08,
+    MAX_ZX = 0x010,
+    MAX_XY = 0x020
+  };
 
   //@{
   /**
@@ -80,14 +80,14 @@ public:
   //@}
 
   enum LabelMasks
-    {
+  {
     MIN_X = vtkGridAxesHelper::MIN_X,
     MIN_Y = vtkGridAxesHelper::MIN_Y,
     MIN_Z = vtkGridAxesHelper::MIN_Z,
     MAX_X = vtkGridAxesHelper::MAX_X,
     MAX_Y = vtkGridAxesHelper::MAX_Y,
     MAX_Z = vtkGridAxesHelper::MAX_Z
-    };
+  };
 
   //@{
   /**
@@ -152,12 +152,9 @@ public:
    * Note that the alignment properties are not used.
    */
   void SetTitleTextProperty(int axis, vtkTextProperty*);
-  void SetXTitleTextProperty(vtkTextProperty* prop)
-    { this->SetTitleTextProperty(0, prop); }
-  void SetYTitleTextProperty(vtkTextProperty* prop)
-    { this->SetTitleTextProperty(1, prop); }
-  void SetZTitleTextProperty(vtkTextProperty* prop)
-    { this->SetTitleTextProperty(2, prop); }
+  void SetXTitleTextProperty(vtkTextProperty* prop) { this->SetTitleTextProperty(0, prop); }
+  void SetYTitleTextProperty(vtkTextProperty* prop) { this->SetTitleTextProperty(1, prop); }
+  void SetZTitleTextProperty(vtkTextProperty* prop) { this->SetTitleTextProperty(2, prop); }
   vtkTextProperty* GetTitleTextProperty(int axis);
   //@}
 
@@ -201,12 +198,9 @@ public:
    * Note that the alignment properties are not used.
    */
   void SetLabelTextProperty(int axis, vtkTextProperty*);
-  void SetXLabelTextProperty(vtkTextProperty* prop)
-    { this->SetLabelTextProperty(0, prop); }
-  void SetYLabelTextProperty(vtkTextProperty* prop)
-    { this->SetLabelTextProperty(1, prop); }
-  void SetZLabelTextProperty(vtkTextProperty* prop)
-    { this->SetLabelTextProperty(2, prop); }
+  void SetXLabelTextProperty(vtkTextProperty* prop) { this->SetLabelTextProperty(0, prop); }
+  void SetYLabelTextProperty(vtkTextProperty* prop) { this->SetLabelTextProperty(1, prop); }
+  void SetZLabelTextProperty(vtkTextProperty* prop) { this->SetLabelTextProperty(2, prop); }
   vtkTextProperty* GetLabelTextProperty(int axis);
   //@}
 
@@ -216,9 +210,9 @@ public:
    * Accepted values are vtkAxis::AUTO, vtkAxis::FIXED, vtkAxis::CUSTOM.
    */
   void SetNotation(int axis, int notation);
-  void SetXNotation(int notation) { this->SetNotation(0, notation);}
-  void SetYNotation(int notation) { this->SetNotation(1, notation);}
-  void SetZNotation(int notation) { this->SetNotation(2, notation);}
+  void SetXNotation(int notation) { this->SetNotation(0, notation); }
+  void SetYNotation(int notation) { this->SetNotation(1, notation); }
+  void SetZNotation(int notation) { this->SetNotation(2, notation); }
   int GetNotation(int axis);
   //@}
 
@@ -227,9 +221,9 @@ public:
    * Get/set the numerical precision to use, default is 2.
    */
   void SetPrecision(int axis, int val);
-  void SetXPrecision(int val) { this->SetPrecision(0, val);}
-  void SetYPrecision(int val) { this->SetPrecision(1, val);}
-  void SetZPrecision(int val) { this->SetPrecision(2, val);}
+  void SetXPrecision(int val) { this->SetPrecision(0, val); }
+  void SetYPrecision(int val) { this->SetPrecision(1, val); }
+  void SetZPrecision(int val) { this->SetPrecision(2, val); }
   int GetPrecision(int axis);
   //@}
 
@@ -280,13 +274,13 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double *GetBounds();
+  virtual double* GetBounds();
 
-  virtual int RenderOpaqueGeometry(vtkViewport *);
+  virtual int RenderOpaqueGeometry(vtkViewport*);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
   virtual int RenderOverlay(vtkViewport* viewport);
   virtual int HasTranslucentPolygonalGeometry();
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
 protected:
   vtkGridAxes3DActor();
@@ -303,13 +297,12 @@ protected:
   vtkMTimeType CustomLabelsMTime;
 
   vtkTuple<vtkNew<vtkGridAxes2DActor>, 6> GridAxes2DActors;
+
 private:
   vtkGridAxes3DActor(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
 
   vtkMTimeType GetBoundsMTime;
-
 };
-
 
 #endif

@@ -36,40 +36,38 @@ vtkSMTimeStepIndexDomain::~vtkSMTimeStepIndexDomain()
 //---------------------------------------------------------------------------
 void vtkSMTimeStepIndexDomain::Update(vtkSMProperty*)
 {
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->GetRequiredProperty("Input"));
   if (pp)
-    {
+  {
     this->Update(pp);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMTimeStepIndexDomain::Update(vtkSMProxyProperty *pp)
+void vtkSMTimeStepIndexDomain::Update(vtkSMProxyProperty* pp)
 {
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
 
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (unsigned int i = 0; i < numProxs; i++)
-    {
-    vtkSMSourceProxy* sp =
-      vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
+  {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
-      {
-      vtkPVDataInformation *info = sp->GetDataInformation(
-        (ip? ip->GetUncheckedOutputPortForConnection(i):0));
+    {
+      vtkPVDataInformation* info =
+        sp->GetDataInformation((ip ? ip->GetUncheckedOutputPortForConnection(i) : 0));
       if (!info)
-        {
+      {
         continue;
-        }
+      }
       int numberOfTimeSteps = info->GetNumberOfTimeSteps();
 
       std::vector<vtkEntry> entries;
       entries.push_back(vtkEntry(0, numberOfTimeSteps - 1));
       this->SetEntries(entries);
       return;
-      }
     }
+  }
 }
 
 //---------------------------------------------------------------------------

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,8 +49,9 @@ class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqComparativeVisPanel(QWidget* parent=0);
+  pqComparativeVisPanel(QWidget* parent = 0);
   ~pqComparativeVisPanel();
 
   /**
@@ -71,7 +72,7 @@ protected slots:
   * If vtkSMProxy has a TimestepValues property then this method will set the
   * TimeRange property of vtkSMComparativeViewProxy to reflect the values.
   */
-  //void setTimeRangeFromSource(vtkSMProxy*);
+  // void setTimeRangeFromSource(vtkSMProxy*);
 
   /**
   * Called when the "+" button is clicked to add a new parameter.
@@ -96,14 +97,14 @@ protected slots:
   void removeParameter(int index);
 
 protected:
-  //void activateCue(vtkSMProperty* cuesProperty, 
-  //vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+  // void activateCue(vtkSMProperty* cuesProperty,
+  // vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 
   /**
   * Finds the row (-1 if none found) for the given (proxy,property).
   */
-  int findRow(
-    vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+  int findRow(vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+
 private:
   Q_DISABLE_COPY(pqComparativeVisPanel)
 
@@ -113,5 +114,3 @@ private:
 };
 
 #endif
-
-

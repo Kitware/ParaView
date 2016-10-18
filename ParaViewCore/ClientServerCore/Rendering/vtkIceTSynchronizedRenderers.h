@@ -38,7 +38,8 @@ class vtkCameraPass;
 class vtkImageProcessingPass;
 class vtkMyImagePasterPass;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkIceTSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkIceTSynchronizedRenderers
+  : public vtkSynchronizedRenderers
 {
 public:
   static vtkIceTSynchronizedRenderers* New();
@@ -65,15 +66,13 @@ public:
    * Set the tile dimensions. Default is (1, 1).
    * If any of the dimensions is > 1 then tile display mode is assumed.
    */
-  void SetTileDimensions(int x, int y)
-    { this->IceTCompositePass->SetTileDimensions(x, y); }
+  void SetTileDimensions(int x, int y) { this->IceTCompositePass->SetTileDimensions(x, y); }
 
   /**
    * Set the tile mullions. The mullions are measured in pixels. Use
    * negative numbers for overlap.
    */
-  void SetTileMullions(int x, int y)
-    { this->IceTCompositePass->SetTileMullions(x, y); }
+  void SetTileMullions(int x, int y) { this->IceTCompositePass->SetTileMullions(x, y); }
 
   /**
    * Set to true if data is replicated on all processes. This will enable IceT
@@ -81,14 +80,18 @@ public:
    * default.
    */
   void SetDataReplicatedOnAllProcesses(bool val)
-    { this->IceTCompositePass->SetDataReplicatedOnAllProcesses(val); }
+  {
+    this->IceTCompositePass->SetDataReplicatedOnAllProcesses(val);
+  }
 
   /**
    * partition ordering that gives processes ordering. Initial value is a NULL pointer.
    * This is used only when UseOrderedCompositing is true.
    */
-  void SetPartitionOrdering(vtkPartitionOrderingInterface *partitionOrdering)
-    { this->IceTCompositePass->SetPartitionOrdering(partitionOrdering); }
+  void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering)
+  {
+    this->IceTCompositePass->SetPartitionOrdering(partitionOrdering);
+  }
 
   /**
    * Set this to true, if compositing must be done in a specific order. This is
@@ -97,14 +100,18 @@ public:
    * well. The PartitionOrdering is used to decide the process-order for compositing.
    */
   void SetUseOrderedCompositing(bool uoc)
-    { this->IceTCompositePass->SetUseOrderedCompositing(uoc); }
+  {
+    this->IceTCompositePass->SetUseOrderedCompositing(uoc);
+  }
 
   /**
    * Set the image reduction factor. Overrides superclass implementation.
    */
   virtual void SetImageReductionFactor(int val);
   virtual int GetImageReductionFactor()
-    { return this->IceTCompositePass->GetImageReductionFactor(); }
+  {
+    return this->IceTCompositePass->GetImageReductionFactor();
+  }
 
   //@{
   /**
@@ -112,10 +119,10 @@ public:
    * processes.
    */
   virtual void SetParallelController(vtkMultiProcessController* cont)
-    {
+  {
     this->Superclass::SetParallelController(cont);
     this->IceTCompositePass->SetController(cont);
-    }
+  }
   //@}
 
   //@{
@@ -178,14 +185,13 @@ protected:
 
   // User specified custom passes
   vtkRenderPass* RenderPass;
-  vtkImageProcessingPass *ImageProcessingPass;
+  vtkImageProcessingPass* ImageProcessingPass;
 
   virtual void SlaveStartRender();
 
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
   void operator=(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

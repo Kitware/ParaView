@@ -30,7 +30,7 @@
 
 #include "vtkOpenGLHardwareSelector.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkWeakPointer.h"                       // needed for vtkWeakPointer.
 
 class vtkPVSynchronizedRenderWindows;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkOpenGLHardwareSelector
@@ -60,8 +60,7 @@ public:
   /**
    * Called to invalidate the cache.
    */
-  void InvalidateCachedSelection()
-    { this->Modified(); }
+  void InvalidateCachedSelection() { this->Modified(); }
 
   int AssignUniqueId(vtkProp*);
 
@@ -76,7 +75,7 @@ public:
   /**
    * Set the local ProcessId.
    */
-  void BeginRenderProp(vtkRenderWindow *);
+  void BeginRenderProp(vtkRenderWindow*);
 
 protected:
   vtkPVHardwareSelector();
@@ -106,13 +105,13 @@ protected:
   vtkTimeStamp CaptureTime;
   int UniqueId;
   vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
+
 private:
   vtkPVHardwareSelector(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

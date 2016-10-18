@@ -36,10 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
-vtkVRVectorPropertyStyle::vtkVRVectorPropertyStyle(
-  QObject* parentObject)
-  : Superclass(parentObject),
-  Mode(DISPLACEMENT)
+vtkVRVectorPropertyStyle::vtkVRVectorPropertyStyle(QObject* parentObject)
+  : Superclass(parentObject)
+  , Mode(DISPLACEMENT)
 {
 }
 
@@ -49,22 +48,21 @@ vtkVRVectorPropertyStyle::~vtkVRVectorPropertyStyle()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkVRVectorPropertyStyle::configure(vtkPVXMLElement* child,
-  vtkSMProxyLocator* locator)
+bool vtkVRVectorPropertyStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
   if (!this->Superclass::configure(child, locator))
-    {
+  {
     return false;
-    }
+  }
   const char* mode = child->GetAttributeOrEmpty("mode");
   if (strcmp(mode, "direction") == 0)
-    {
+  {
     this->Mode = DIRECTION_VECTOR;
-    }
+  }
   else
-    {
+  {
     this->Mode = DISPLACEMENT;
-    }
+  }
   return true;
 }
 
@@ -73,13 +71,11 @@ vtkPVXMLElement* vtkVRVectorPropertyStyle::saveConfiguration() const
 {
   vtkPVXMLElement* element = this->Superclass::saveConfiguration();
   if (element && this->getSMProperty())
-    {
-    element->AddAttribute(
-      "mode", this->Mode == DIRECTION_VECTOR? "direction" : "displacement");
-    }
+  {
+    element->AddAttribute("mode", this->Mode == DIRECTION_VECTOR ? "direction" : "displacement");
+  }
   return element;
 }
-
 
 //-----------------------------------------------------------------------------
 bool vtkVRVectorPropertyStyle::handleEvent(const vtkVREventData& data)
@@ -87,18 +83,18 @@ bool vtkVRVectorPropertyStyle::handleEvent(const vtkVREventData& data)
   std::cout << "this is something new" << std::endl;
   //(void)data;
   switch (this->Mode)
-    {
+  {
     // TODO:handle the data and compute the 3-tuple based on the mode.
     // then call this->setValue(...);
-   case DIRECTION_VECTOR:
-     break;
+    case DIRECTION_VECTOR:
+      break;
 
-   case  DISPLACEMENT:
-     break;
+    case DISPLACEMENT:
+      break;
 
-  default:
-    break;
-    }
+    default:
+      break;
+  }
 
   // FIXME: return true or false as the case may be
   return false;
@@ -110,12 +106,11 @@ void vtkVRVectorPropertyStyle::setValue(double x, double y, double z)
   vtkSMProperty* smprop = this->getSMProperty();
   vtkSMProxy* smproxy = this->getSMProxy();
   if (smproxy && smprop)
-    {
-    double values[3] = {x, y, z};
-    vtkSMPropertyHelper(smproxy,
-      this->getSMPropertyName().toLatin1().data()).Set(values, 3);
+  {
+    double values[3] = { x, y, z };
+    vtkSMPropertyHelper(smproxy, this->getSMPropertyName().toLatin1().data()).Set(values, 3);
     smproxy->UpdateVTKObjects();
-    }
+  }
 }
 
 bool vtkVRVectorPropertyStyle::update()
@@ -123,8 +118,8 @@ bool vtkVRVectorPropertyStyle::update()
   vtkSMProperty* smprop = this->getSMProperty();
   vtkSMProxy* smproxy = this->getSMProxy();
   if (smproxy && smprop)
-    {
-      smproxy->UpdateVTKObjects();
-    }
+  {
+    smproxy->UpdateVTKObjects();
+  }
   return false;
 }

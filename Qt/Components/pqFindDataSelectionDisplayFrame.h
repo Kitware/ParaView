@@ -49,13 +49,12 @@ class pqView;
 class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(bool useVerticalLayout
-             READ useVerticalLayout
-             WRITE setUseVerticalLayout)
+  Q_PROPERTY(bool useVerticalLayout READ useVerticalLayout WRITE setUseVerticalLayout)
 
   typedef QWidget Superclass;
+
 public:
-  pqFindDataSelectionDisplayFrame(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqFindDataSelectionDisplayFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFindDataSelectionDisplayFrame();
 
   /**

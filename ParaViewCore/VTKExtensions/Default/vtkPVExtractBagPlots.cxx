@@ -30,24 +30,21 @@ public:
   bool Clear()
   {
     if (this->Columns.empty())
-      {
+    {
       return false;
-      }
+    }
     this->Columns.clear();
     return true;
   }
 
-  bool Has(const std::string& v)
-  {
-    return this->Columns.find(v) != this->Columns.end();
-  }
+  bool Has(const std::string& v) { return this->Columns.find(v) != this->Columns.end(); }
 
   bool Set(const std::string& v)
   {
     if (this->Has(v))
-      {
+    {
       return false;
-      }
+    }
     this->Columns.insert(v);
     return true;
   }
@@ -79,8 +76,7 @@ vtkPVExtractBagPlots::~vtkPVExtractBagPlots()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVExtractBagPlots::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation *info)
+int vtkPVExtractBagPlots::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
   return 1;
@@ -90,21 +86,21 @@ int vtkPVExtractBagPlots::FillInputPortInformation(
 void vtkPVExtractBagPlots::EnableAttributeArray(const char* arrName)
 {
   if (arrName)
-    {
+  {
     if (this->Internal->Set(arrName))
-      {
+    {
       this->Modified();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVExtractBagPlots::ClearAttributeArrays()
 {
   if (this->Internal->Clear())
-    {
+  {
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -121,115 +117,108 @@ void vtkPVExtractBagPlots::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 // ----------------------------------------------------------------------
-void vtkPVExtractBagPlots::GetEigenvalues(vtkMultiBlockDataSet* outputMetaDS,
-  vtkDoubleArray* eigenvalues)
+void vtkPVExtractBagPlots::GetEigenvalues(
+  vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvalues)
 {
   vtkTable* outputMeta = vtkTable::SafeDownCast(outputMetaDS->GetBlock(1));
 
   if (!outputMeta)
-    {
+  {
     vtkErrorMacro(<< "NULL table pointer!");
     return;
-    }
+  }
 
-  vtkDoubleArray* meanCol =
-    vtkDoubleArray::SafeDownCast(outputMeta->GetColumnByName("Mean"));
-  vtkStringArray* rowNames =
-    vtkStringArray::SafeDownCast(outputMeta->GetColumnByName("Column"));
+  vtkDoubleArray* meanCol = vtkDoubleArray::SafeDownCast(outputMeta->GetColumnByName("Mean"));
+  vtkStringArray* rowNames = vtkStringArray::SafeDownCast(outputMeta->GetColumnByName("Column"));
 
   eigenvalues->SetNumberOfComponents(1);
 
   // Get values
   for (vtkIdType i = 0, eval = 0; i < meanCol->GetNumberOfTuples(); i++)
-    {
+  {
     std::stringstream ss;
     ss << "PCA " << eval;
 
     std::string rowName = rowNames->GetValue(i);
     if (rowName.compare(ss.str()) == 0)
-      {
+    {
       eigenvalues->InsertNextValue(meanCol->GetValue(i));
       eval++;
-      }
     }
+  }
 }
 
 // ----------------------------------------------------------------------
-void vtkPVExtractBagPlots::GetEigenvectors(vtkMultiBlockDataSet* outputMetaDS,
-  vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues)
+void vtkPVExtractBagPlots::GetEigenvectors(
+  vtkMultiBlockDataSet* outputMetaDS, vtkDoubleArray* eigenvectors, vtkDoubleArray* eigenvalues)
 {
   // Count eigenvalues
   this->GetEigenvalues(outputMetaDS, eigenvalues);
   vtkIdType numberOfEigenvalues = eigenvalues->GetNumberOfTuples();
 
   if (!outputMetaDS)
-    {
+  {
     vtkErrorMacro(<< "NULL dataset pointer!");
-    }
+  }
 
   vtkTable* outputMeta = vtkTable::SafeDownCast(outputMetaDS->GetBlock(1));
 
   if (!outputMeta)
-    {
+  {
     vtkErrorMacro(<< "NULL table pointer!");
-    }
+  }
 
-  vtkDoubleArray* meanCol =
-    vtkDoubleArray::SafeDownCast(outputMeta->GetColumnByName("Mean"));
-  vtkStringArray* rowNames =
-    vtkStringArray::SafeDownCast(outputMeta->GetColumnByName("Column"));
+  vtkDoubleArray* meanCol = vtkDoubleArray::SafeDownCast(outputMeta->GetColumnByName("Mean"));
+  vtkStringArray* rowNames = vtkStringArray::SafeDownCast(outputMeta->GetColumnByName("Column"));
 
   eigenvectors->SetNumberOfComponents(numberOfEigenvalues);
 
   // Get vectors
   for (vtkIdType i = 0, eval = 0; i < meanCol->GetNumberOfTuples(); i++)
-    {
+  {
     std::stringstream ss;
     ss << "PCA " << eval;
 
     std::string rowName = rowNames->GetValue(i);
     if (rowName.compare(ss.str()) == 0)
-      {
+    {
       std::vector<double> eigenvector;
       for (int val = 0; val < numberOfEigenvalues; val++)
-        {
+      {
         // The first two columns will always be "Column" and "Mean",
         // so start with the next one
-        vtkDoubleArray* currentCol =
-          vtkDoubleArray::SafeDownCast(outputMeta->GetColumn(val+2));
+        vtkDoubleArray* currentCol = vtkDoubleArray::SafeDownCast(outputMeta->GetColumn(val + 2));
         eigenvector.push_back(currentCol->GetValue(i));
-        }
+      }
 
       eigenvectors->InsertNextTypedTuple(&eigenvector.front());
       eval++;
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
-int vtkPVExtractBagPlots::RequestData(vtkInformation*,
-                                     vtkInformationVector** inputVector,
-                                     vtkInformationVector* outputVector)
+int vtkPVExtractBagPlots::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
   vtkTable* inTable = vtkTable::GetData(inputVector[0]);
   vtkMultiBlockDataSet* outTables =
-    vtkMultiBlockDataSet::SafeDownCast(
-      outputInfo->Get(vtkDataObject::DATA_OBJECT()));
+    vtkMultiBlockDataSet::SafeDownCast(outputInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkTable* outTable = 0;
   vtkTable* outTable2 = 0;
 
   if (inTable->GetNumberOfColumns() == 0)
-    {
+  {
     return 1;
-    }
+  }
 
   if (!outTables)
-    {
+  {
     return 0;
-    }
+  }
   outTables->SetNumberOfBlocks(2);
 
   vtkNew<vtkTransposeTable> transpose;
@@ -237,27 +226,27 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   // Construct a table that holds only the selected columns
   vtkNew<vtkTable> subTable;
   std::set<std::string>::iterator iter = this->Internal->Columns.begin();
-  for (; iter!=this->Internal->Columns.end(); ++iter)
-    {
+  for (; iter != this->Internal->Columns.end(); ++iter)
+  {
     if (vtkAbstractArray* arr = inTable->GetColumnByName(iter->c_str()))
-      {
+    {
       subTable->AddColumn(arr);
-      }
     }
+  }
 
-  vtkTable *inputTable = subTable.GetPointer();
+  vtkTable* inputTable = subTable.GetPointer();
 
   outTable = subTable.GetPointer();
 
   if (this->TransposeTable)
-    {
+  {
     transpose->SetInputData(subTable.GetPointer());
     transpose->SetAddIdColumn(true);
     transpose->SetIdColumnName("ColName");
     transpose->Update();
 
     inputTable = transpose->GetOutput();
-    }
+  }
 
   outTable2 = inputTable;
 
@@ -266,13 +255,13 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   pca->SetInputData(inputTable);
   pca->SetAttributeMode(vtkDataObject::ROW);
   for (vtkIdType i = 0; i < inputTable->GetNumberOfColumns(); i++)
-    {
+  {
     vtkAbstractArray* arr = inputTable->GetColumn(i);
     if (strcmp(arr->GetName(), "ColName"))
-      {
+    {
       pca->EnableAttributeArray(arr->GetName());
-      }
     }
+  }
 
   pca->SetBasisScheme(vtkPCAStatistics::FIXED_BASIS_SIZE);
   pca->SetFixedBasisSize(2);
@@ -280,8 +269,8 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   pca->SetRobustPCA(this->RobustPCA);
   pca->Update();
 
-  vtkTable* outputPCATable = vtkTable::SafeDownCast(
-    pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
+  vtkTable* outputPCATable =
+    vtkTable::SafeDownCast(pca->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
 
   outTable2 = outputPCATable;
 
@@ -295,11 +284,11 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
 
   double sumOfEigenValues = 0;
   for (vtkIdType i = 0; i < eigenValues->GetNumberOfTuples(); i++)
-    {
+  {
     sumOfEigenValues += eigenValues->GetValue(i);
-    }
-  double explainedVariance = 100. *
-    ((eigenValues->GetValue(0) + eigenValues->GetValue(1)) / sumOfEigenValues);
+  }
+  double explainedVariance =
+    100. * ((eigenValues->GetValue(0) + eigenValues->GetValue(1)) / sumOfEigenValues);
 
   // Compute HDR
   vtkNew<vtkHighestDensityRegionsStatistics> hdr;
@@ -309,48 +298,47 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   vtkDataArray* xArray = NULL;
   vtkDataArray* yArray = NULL;
   for (vtkIdType i = 0; i < outputPCATable->GetNumberOfColumns(); i++)
-    {
+  {
     vtkAbstractArray* arr = outputPCATable->GetColumn(i);
     char* str = arr->GetName();
     if (strstr(str, "PCA"))
-      {
+    {
       if (strstr(str, "(0)"))
-        {
+      {
         arr->SetName("x");
         xArray = vtkDataArray::SafeDownCast(arr);
-        }
+      }
       else
-        {
+      {
         arr->SetName("y");
         yArray = vtkDataArray::SafeDownCast(arr);
-        }
       }
     }
+  }
 
-  double bounds[4] =
-    { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
+  double bounds[4] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
   xArray->GetRange(&bounds[0], 0);
   yArray->GetRange(&bounds[2], 0);
 
   double sigma = this->KernelWidth;
   if (this->UseSilvermanRule)
-    {
+  {
     vtkIdType len = xArray->GetNumberOfTuples();
     double xMean = 0.0;
     for (vtkIdType i = 0; i < len; i++)
-      {
+    {
       xMean += xArray->GetTuple1(i);
-      }
+    }
     xMean /= len;
 
     sigma = 0.0;
     for (vtkIdType i = 0; i < len; i++)
-      {
+    {
       sigma += (xArray->GetTuple1(i) - xMean) * (xArray->GetTuple1(i) - xMean);
-      }
+    }
     sigma /= len;
     sigma = sqrt(sigma) * pow(len, -1. / 6.);
-    }
+  }
 
   hdr->SetSigma(sigma);
   hdr->AddColumnPair("x", "y");
@@ -385,16 +373,16 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
 
   vtkIdType pointId = 0;
   for (int j = 0; j < gridHeight; j++)
-    {
+  {
     for (int i = 0; i < gridWidth; i++)
-      {
+    {
       double x = bounds[0] + i * spaceX;
       double y = bounds[2] + j * spaceY;
 
       inPOI->SetTuple2(pointId, x, y);
       ++pointId;
-      }
     }
+  }
 
   vtkDataArray* outDens = vtkDataArray::CreateDataArray(inObs->GetDataType());
   outDens->SetNumberOfComponents(1);
@@ -417,10 +405,10 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   double totalSumOfDensities = 0.;
   std::vector<double> sortedDensities;
   sortedDensities.reserve(densities->GetNumberOfTuples());
-  //double maxDensity = VTK_DOUBLE_MIN;
-  //int maxX, maxY;
+  // double maxDensity = VTK_DOUBLE_MIN;
+  // int maxX, maxY;
   for (vtkIdType pixel = 0; pixel < densities->GetNumberOfTuples(); ++pixel)
-    {
+  {
     double density = densities->GetTuple1(pixel);
     sortedDensities.push_back(density);
     totalSumOfDensities += density;
@@ -430,28 +418,28 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
       maxY = pixel / gridWidth;
       maxDensity = density;
       }*/
-    }
+  }
 
   // Sort the densities and save the densities associated to the quantiles.
   std::sort(sortedDensities.begin(), sortedDensities.end());
   double sumOfDensities = 0.;
   double sumForP50 = totalSumOfDensities * 0.5;
-  double sumForPUser = totalSumOfDensities * ((100.-this->UserQuantile)  / 100.);
+  double sumForPUser = totalSumOfDensities * ((100. - this->UserQuantile) / 100.);
   double p50 = 0.;
   double pUser = 0.;
   for (std::vector<double>::const_iterator it = sortedDensities.begin();
        it != sortedDensities.end(); ++it)
-    {
+  {
     sumOfDensities += *it;
     if (sumOfDensities >= sumForP50 && p50 == 0.)
-      {
+    {
       p50 = *it;
-      }
-    if (sumOfDensities >= sumForPUser && pUser == 0.)
-      {
-      pUser = *it;
-      }
     }
+    if (sumOfDensities >= sumForPUser && pUser == 0.)
+    {
+      pUser = *it;
+    }
+  }
 
   // Save information on the quantiles (% and density) in a specific table.
   // It will be used downstream by the bag plot representation for instance
@@ -473,32 +461,30 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
     hdr->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
   vtkTable* outputHDRTable = vtkTable::SafeDownCast(outputHDR->GetBlock(0));
   outTable2 = outputHDRTable;
-  vtkAbstractArray *cname = inputTable->GetColumnByName("ColName");
+  vtkAbstractArray* cname = inputTable->GetColumnByName("ColName");
   if (cname)
-    {
+  {
     outputHDRTable->AddColumn(cname);
-    }
+  }
   else
-    {
+  {
     vtkNew<vtkStringArray> colNameArray;
     colNameArray->SetName("ColName");
     vtkIdType len = inputTable->GetNumberOfColumns();
     colNameArray->SetNumberOfValues(len);
-    for (vtkIdType i  = 0 ; i < len; i++)
-      {
+    for (vtkIdType i = 0; i < len; i++)
+    {
       colNameArray->SetValue(i, inputTable->GetColumn(i)->GetName());
-      }
-    outputHDRTable->AddColumn(colNameArray.GetPointer());
     }
+    outputHDRTable->AddColumn(colNameArray.GetPointer());
+  }
 
   // Extract the bag plot columns for functional bag plots
   vtkNew<vtkExtractFunctionalBagPlot> ebp;
   ebp->SetInputData(0, outTable);
   ebp->SetInputData(1, outputHDRTable);
-  ebp->SetInputArrayToProcess(0, 1, 0,
-    vtkDataObject::FIELD_ASSOCIATION_ROWS, "HDR (y,x)");
-  ebp->SetInputArrayToProcess(1, 1, 0,
-    vtkDataObject::FIELD_ASSOCIATION_ROWS, "ColName");
+  ebp->SetInputArrayToProcess(0, 1, 0, vtkDataObject::FIELD_ASSOCIATION_ROWS, "HDR (y,x)");
+  ebp->SetInputArrayToProcess(1, 1, 0, vtkDataObject::FIELD_ASSOCIATION_ROWS, "ColName");
   ebp->SetDensityForP50(p50);
   ebp->SetDensityForPUser(pUser);
   ebp->SetPUser(this->UserQuantile);
@@ -514,23 +500,23 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
     vtkStringArray::SafeDownCast(outputHDRTable->GetColumnByName("ColName"));
   assert(seriesHdr && seriesColName);
   for (vtkIdType i = 0; i < seriesHdr->GetNumberOfTuples(); i++)
-    {
+  {
     double v = seriesHdr->GetTuple1(i);
     if (v > maxHdr)
-      {
+    {
       maxHdr = v;
       maxHdrCName = seriesColName->GetValue(i);
-      }
     }
+  }
 
   // Compute the mean function by back-projecting the point of the
   // highest-density with the PCA eigen-vectors and the mean
   vtkDoubleArray* medianFunction =
     vtkDoubleArray::SafeDownCast(outTable->GetColumnByName("QMedianLine"));
   if (medianFunction)
-    {
+  {
     outTable->RemoveColumnByName(medianFunction->GetName());
-    }
+  }
 
   vtkDataArray* maxHdrColumn =
     vtkDataArray::SafeDownCast(outTable->GetColumnByName(maxHdrCName.c_str()));
@@ -560,20 +546,16 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   // Finally setup the output multi-block
   unsigned int blockID = 0;
   outTables->SetBlock(blockID, outTable);
-  outTables->GetMetaData(blockID)->Set(
-    vtkCompositeDataSet::NAME(), "Functional Bag Plot Data");
+  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Functional Bag Plot Data");
   blockID = 1;
   outTables->SetBlock(blockID, outTable2);
-  outTables->GetMetaData(blockID)->Set(
-    vtkCompositeDataSet::NAME(), "Bag Plot Data");
+  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Bag Plot Data");
   blockID = 2;
   outTables->SetBlock(blockID, grid.Get());
-  outTables->GetMetaData(blockID)->Set(
-    vtkCompositeDataSet::NAME(), "Grid Data");
+  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Grid Data");
   blockID = 3;
   outTables->SetBlock(blockID, thresholdTable.Get());
-  outTables->GetMetaData(blockID)->Set(
-    vtkCompositeDataSet::NAME(), "Threshold Data");
+  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Threshold Data");
 
   return 1;
 }

@@ -65,14 +65,12 @@ public:
    * target property is modified outside by someone other than this
    * vtkSMGlobalPropertiesProxy instance or when the targetProxy is destroyed.
    */
-  bool Link(const char* propertyname,
-    vtkSMProxy* targetProxy, const char* targetPropertyName);
+  bool Link(const char* propertyname, vtkSMProxy* targetProxy, const char* targetPropertyName);
 
   /**
    * Unlink a property link,
    */
-  bool Unlink(const char* propertyname,
-    vtkSMProxy* targetProxy, const char* targetPropertyName);
+  bool Unlink(const char* propertyname, vtkSMProxy* targetProxy, const char* targetPropertyName);
 
   /**
    * Remove all links.
@@ -118,7 +116,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

@@ -26,7 +26,8 @@
 #include "vtkGeometryRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentationWithFaces : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentationWithFaces
+  : public vtkGeometryRepresentation
 {
 public:
   static vtkGeometryRepresentationWithFaces* New();
@@ -34,11 +35,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum RepresentationTypesEx
-    {
-    FOLLOW_FRONTFACE=400,
-    CULL_BACKFACE=401,
-    CULL_FRONTFACE=402
-    };
+  {
+    FOLLOW_FRONTFACE = 400,
+    CULL_BACKFACE = 401,
+    CULL_FRONTFACE = 402
+  };
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -46,8 +47,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -109,7 +110,6 @@ protected:
 private:
   vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

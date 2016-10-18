@@ -45,9 +45,7 @@ public:
    * Build from a process loading from a sorted
    * vector of process loading items.
    */
-  void Initialize(
-      std::vector<vtkMaterialInterfaceProcessLoading> &Q,
-      vtkIdType upperLoadingBound);
+  void Initialize(std::vector<vtkMaterialInterfaceProcessLoading>& Q, vtkIdType upperLoadingBound);
   /**
    * Get the next process id from the ring.
    */
@@ -61,7 +59,7 @@ private:
   vtkIdType NextElement;
   vtkIdType BufferSize;
   class BufferContainer;
-  BufferContainer *Buffer;
+  BufferContainer* Buffer;
 };
 #endif
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,18 +44,18 @@ class pqPythonSyntaxHighlighter;
 
 class PQPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    typedef QMainWindow Superclass;
-    pqPythonScriptEditor(QWidget* parent = 0);
+  typedef QMainWindow Superclass;
+  pqPythonScriptEditor(QWidget* parent = 0);
 
   void setSaveDialogDefaultDirectory(const QString& dir);
   void setPythonManager(pqPythonManager* manager);
 
 public slots:
 
-  void open(const QString & filename);
+  void open(const QString& filename);
   void setText(const QString& text);
 
   // Returns true if the new file was created.  If the user was prompted to save
@@ -67,47 +67,47 @@ signals:
   void fileSaved();
 
 protected:
-    void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent* event);
 
 private slots:
-    void open();
-    bool save();
-    bool saveAs();
-    bool saveAsMacro();
-    void documentWasModified();
+  void open();
+  bool save();
+  bool saveAs();
+  bool saveAsMacro();
+  void documentWasModified();
 
 private:
-    void createActions();
-    void createMenus();
-    void createStatusBar();
-    void readSettings();
-    void writeSettings();
-    bool maybeSave();
-    void loadFile(const QString &fileName);
-    bool saveFile(const QString &fileName);
-    void setCurrentFile(const QString &fileName);
-    QString strippedName(const QString &fullFileName);
+  void createActions();
+  void createMenus();
+  void createStatusBar();
+  void readSettings();
+  void writeSettings();
+  bool maybeSave();
+  void loadFile(const QString& fileName);
+  bool saveFile(const QString& fileName);
+  void setCurrentFile(const QString& fileName);
+  QString strippedName(const QString& fullFileName);
 
-    QTextEdit* TextEdit;
-    QString    CurrentFile;
-    QString    DefaultSaveDirectory;
+  QTextEdit* TextEdit;
+  QString CurrentFile;
+  QString DefaultSaveDirectory;
 
-    QMenu*    fileMenu;
-    QMenu*    editMenu;
-    QMenu*    helpMenu;
-    QAction*  newAct;
-    QAction*  openAct;
-    QAction*  saveAct;
-    QAction*  saveAsAct;
-    QAction*  saveAsMacroAct;
-    QAction*  exitAct;
-    QAction*  cutAct;
-    QAction*  copyAct;
-    QAction*  pasteAct;
+  QMenu* fileMenu;
+  QMenu* editMenu;
+  QMenu* helpMenu;
+  QAction* newAct;
+  QAction* openAct;
+  QAction* saveAct;
+  QAction* saveAsAct;
+  QAction* saveAsMacroAct;
+  QAction* exitAct;
+  QAction* cutAct;
+  QAction* copyAct;
+  QAction* pasteAct;
 
-    pqPythonManager* pythonManager;
+  pqPythonManager* pythonManager;
 
-    pqPythonSyntaxHighlighter *SyntaxHighlighter;
+  pqPythonSyntaxHighlighter* SyntaxHighlighter;
 };
 
 #endif

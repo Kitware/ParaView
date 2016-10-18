@@ -20,8 +20,8 @@
 #include "vtkView.h"
 
 vtkStandardNewMacro(vtkPVCompositeRepresentation);
-vtkCxxSetObjectMacro(vtkPVCompositeRepresentation, SelectionRepresentation,
-  vtkSelectionRepresentation);
+vtkCxxSetObjectMacro(
+  vtkPVCompositeRepresentation, SelectionRepresentation, vtkSelectionRepresentation);
 //----------------------------------------------------------------------------
 vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 {
@@ -48,17 +48,16 @@ void vtkPVCompositeRepresentation::SetVisibility(bool visible)
 void vtkPVCompositeRepresentation::SetSelectionVisibility(bool visible)
 {
   this->SelectionVisibility = visible;
-  this->SelectionRepresentation->SetVisibility(
-    this->GetVisibility() && visible);
+  this->SelectionRepresentation->SetVisibility(this->GetVisibility() && visible);
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
-    {
+  {
     return false;
-    }
+  }
 
   view->AddRepresentation(this->SelectionRepresentation);
   return true;
@@ -117,10 +116,10 @@ void vtkPVCompositeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //----------------------------------------------------------------------------
-unsigned int vtkPVCompositeRepresentation::Initialize(unsigned int minIdAvailable,
-                                                    unsigned int maxIdAvailable)
+unsigned int vtkPVCompositeRepresentation::Initialize(
+  unsigned int minIdAvailable, unsigned int maxIdAvailable)
 {
   unsigned int minId = minIdAvailable;
   minId = this->SelectionRepresentation->Initialize(minId, maxIdAvailable);
-  return  this->Superclass::Initialize(minId, maxIdAvailable);
+  return this->Superclass::Initialize(minId, maxIdAvailable);
 }

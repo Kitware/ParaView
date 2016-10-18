@@ -49,8 +49,9 @@ class vtkVRStyleGrabNTranslateWorld : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
-  vtkVRStyleGrabNTranslateWorld(QObject* parent=0);
+  vtkVRStyleGrabNTranslateWorld(QObject* parent = 0);
   virtual ~vtkVRStyleGrabNTranslateWorld();
 
   /// called to handle an event. If the style does not handle this event or
@@ -72,24 +73,23 @@ public:
   virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  void SetButtonValue( std::string dest, int value );
-  void SetAnalogValue( std::string dest, double value );
-  void SetAnalogVectorValue( std::string dest,
-                             const double* value,
-                             unsigned int total);
+  void HandleButton(const vtkVREventData& data);
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleTracker(const vtkVREventData& data);
+  void SetButtonValue(std::string dest, int value);
+  void SetAnalogValue(std::string dest, double value);
+  void SetAnalogVectorValue(std::string dest, const double* value, unsigned int total);
   void RecordCurrentPosition(const vtkVREventData& data);
-  void SetTrackerValue( std::string dest, double value );
-  void SetTrackerVectorValue( std::string dest, const double value[16] );
-  std::vector<std::string> tokenize( std::string input);
+  void SetTrackerValue(std::string dest, double value);
+  void SetTrackerVectorValue(std::string dest, const double value[16]);
+  std::vector<std::string> tokenize(std::string input);
   std::string Button;
   std::string Tracker;
   bool Enabled;
   bool InitialPositionRecorded;
   double InitialPos[3];
   vtkTransform *Old, *Tx, *Neo;
+
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNTranslateWorld)
 };

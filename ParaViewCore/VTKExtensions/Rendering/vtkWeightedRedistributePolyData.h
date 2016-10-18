@@ -32,7 +32,8 @@ class vtkMultiProcessController;
 
 //*******************************************************************
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkWeightedRedistributePolyData : public vtkRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkWeightedRedistributePolyData
+  : public vtkRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkWeightedRedistributePolyData, vtkRedistributePolyData);
@@ -41,10 +42,9 @@ public:
   /**
    * Construct object.
    */
-  static vtkWeightedRedistributePolyData *New();
+  static vtkWeightedRedistributePolyData* New();
 
-  void SetWeights (int, int, float );
-
+  void SetWeights(int, int, float);
 
 protected:
   vtkWeightedRedistributePolyData();
@@ -52,15 +52,15 @@ protected:
 
   enum
   {
-    NUM_LOC_CELLS_TAG  = 70,
-    
-    SCHED_LEN_1_TAG    = 300,
-    SCHED_LEN_2_TAG    = 301,
-    SCHED_1_TAG        = 310,
-    SCHED_2_TAG        = 311
+    NUM_LOC_CELLS_TAG = 70,
+
+    SCHED_LEN_1_TAG = 300,
+    SCHED_LEN_2_TAG = 301,
+    SCHED_1_TAG = 310,
+    SCHED_2_TAG = 311
   };
 
-  virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
+  virtual void MakeSchedule(vtkPolyData* input, vtkCommSched*);
   float* Weights;
 
 private:
@@ -71,5 +71,3 @@ private:
 //****************************************************************
 
 #endif
-
-
