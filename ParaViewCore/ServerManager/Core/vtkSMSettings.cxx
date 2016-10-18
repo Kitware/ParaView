@@ -1410,6 +1410,46 @@ Json::Value vtkConvertXMLElementToJSON(
   return value;
 }
 
+// We need a specialized template for `vtkIdType`, if compiling
+// with `VTK_USE_64BIT_IDS=ON`, because JSONcpp >= 1.7.7 switched
+// from at-least width (long long int) to fixed width (Int64)
+// integers.  If compiling with `VTK_USE_64BIT_IDS=OFF` this is
+// not needed, because `vtkIdType` represents plain (Int32)
+// integers in this case.
+//
+// See: https://gitlab.kitware.com/paraview/paraview/issues/16938
+#ifdef VTK_USE_64BIT_IDS
+template <>
+Json::Value vtkConvertXMLElementToJSON <vtkIdType>(
+  vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
+{
+  // Since we need to handle enumeration domain :/.
+  vtkSMEnumerationDomain* enumDomain =
+    vtkSMEnumerationDomain::SafeDownCast(vp->FindDomain("vtkSMEnumerationDomain"));
+  Json::Value value(Json::arrayValue);
+  for (size_t cc = 0; cc < elements.size(); ++cc)
+  {
+    vtkIdType xmlValue;
+    elements[cc]->GetScalarAttribute("value", &xmlValue);
+    const char* txt = enumDomain ? enumDomain->GetEntryTextForValue(xmlValue) : NULL;
+    if (txt)
+    {
+      value[static_cast<unsigned int>(cc)] = Json::Value(txt);
+    }
+    else
+    {
+      // We need to cast from `vtkIdType` to `Int64`-type explicitly.
+      value[static_cast<unsigned int>(cc)] = Json::Value(static_cast<Json::Value::Int64>(xmlValue));
+    }
+  }
+  if (vp->GetNumberOfElements() == 1 && vp->GetRepeatCommand() == 0 && value.size() == 1)
+  {
+    return value[0];
+  }
+  return value;
+}
+#endif // VTK_USE_64BIT_IDS
+
 template <>
 Json::Value vtkConvertXMLElementToJSON<vtkStdString>(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
