@@ -34,27 +34,29 @@
 
 class pqPipelineRepresentation;
 
-class pqTransferFunctionEditor: public QWidget
+class pqTransferFunctionEditor : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
   pqTransferFunctionEditor();
   ~pqTransferFunctionEditor();
 
   enum EditorConfiguration
   {
-    Opacity, Radius
+    Opacity,
+    Radius
   };
 
   void configure(EditorConfiguration);
 
   void setRepresentation(pqPipelineRepresentation* repr);
 
-public slots :
-  void  needReloadGUI();
+public slots:
+  void needReloadGUI();
 
-protected slots :
+protected slots:
   void reloadGUI();
 
   void onFreeFormToggled(bool);
@@ -63,7 +65,7 @@ protected slots :
   void onProportionnalEdited();
 
   void onAutoScalarRange(bool);
-  //void onAutoScaleRange(bool);
+  // void onAutoScaleRange(bool);
 
   void onScalarRangeModified();
   void onScaleRangeModified();
@@ -80,10 +82,10 @@ protected:
   void setFreeformValues(const QList<QVariant>&);
   void setGaussianControlPoints(const QList<QVariant>&);
 
-  QList<QVariant> GetProxyValueList(const char *name);
-  void SetProxyValue(const char *name, QList<QVariant> val, bool update = true);
+  QList<QVariant> GetProxyValueList(const char* name);
+  void SetProxyValue(const char* name, QList<QVariant> val, bool update = true);
 
-  //void  initialize();
+  // void  initialize();
 
 private:
   class pqInternals;
@@ -93,4 +95,3 @@ private:
 };
 
 #endif
-

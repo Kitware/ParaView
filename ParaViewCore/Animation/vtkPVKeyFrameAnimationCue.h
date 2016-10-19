@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVKeyFrameAnimationCue
-// .SECTION Description
-// vtkPVKeyFrameAnimationCue is a specialization of vtkPVAnimationCue that uses
-// the vtkPVKeyFrameCueManipulator as the manipulator.
+/**
+ * @class   vtkPVKeyFrameAnimationCue
+ *
+ * vtkPVKeyFrameAnimationCue is a specialization of vtkPVAnimationCue that uses
+ * the vtkPVKeyFrameCueManipulator as the manipulator.
+*/
 
 #ifndef vtkPVKeyFrameAnimationCue_h
 #define vtkPVKeyFrameAnimationCue_h
@@ -31,12 +33,15 @@ public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCue, vtkPVAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Forwarded to the internal vtkPVKeyFrameCueManipulator.
-  int AddKeyFrame (vtkPVKeyFrame* keyframe);
+  //@{
+  /**
+   * Forwarded to the internal vtkPVKeyFrameCueManipulator.
+   */
+  int AddKeyFrame(vtkPVKeyFrame* keyframe);
   int GetLastAddedKeyFrameIndex();
   void RemoveKeyFrame(vtkPVKeyFrame*);
   void RemoveAllKeyFrames();
+  //@}
 
 protected:
   vtkPVKeyFrameAnimationCue();
@@ -47,7 +52,6 @@ protected:
 private:
   vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

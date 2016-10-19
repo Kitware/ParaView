@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,37 +42,52 @@ class pqPipelineSource;
 class pqView;
 class vtkSMProxy;
 
-/// This is the Animation panel widget. It controls the behavior
-/// of the Animation panel which includes adding of key frames,
-/// changing of keyframes etc etc.
+/**
+* This is the Animation panel widget. It controls the behavior
+* of the Animation panel which includes adding of key frames,
+* changing of keyframes etc etc.
+*/
 class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqAnimationViewWidget(QWidget* parent=0);
+  pqAnimationViewWidget(QWidget* parent = 0);
   virtual ~pqAnimationViewWidget();
 
 public slots:
 
-  /// set the scene to view
+  /**
+  * set the scene to view
+  */
   void setScene(pqAnimationScene* scene);
 
 protected slots:
 
-  /// The cues in the scene have changed, so we make sure
-  /// that we are not displaying a removed or added cue, if so
-  /// we update the GUI.
+  /**
+  * The cues in the scene have changed, so we make sure
+  * that we are not displaying a removed or added cue, if so
+  * we update the GUI.
+  */
   void onSceneCuesChanged();
 
-  /// called when keyframes change
+  /**
+  * called when keyframes change
+  */
   void keyFramesChanged(QObject*);
 
-  /// called when scene time range changes
+  /**
+  * called when scene time range changes
+  */
   void updateSceneTimeRange();
-  /// called when scene time changes
+  /**
+  * called when scene time changes
+  */
   void updateSceneTime();
-  /// called when time steps changes
+  /**
+  * called when time steps changes
+  */
   void updateTicks();
 
   // called when track is double clicked
@@ -81,7 +96,9 @@ protected slots:
   // called when play mode changes
   void updatePlayMode();
 
-  /// Called to toggle a track's enabled state.
+  /**
+  * Called to toggle a track's enabled state.
+  */
   void toggleTrackEnabled(pqAnimationTrack* track);
 
   // called when deleting a track
@@ -89,16 +106,18 @@ protected slots:
   // called when creating a track
   void createTrack();
 
-  /// called to create a new python animation track.
-  /// we allow creating as many python tracks as needed.
+  /**
+  * called to create a new python animation track.
+  * we allow creating as many python tracks as needed.
+  */
   void createPythonTrack();
 
   // set active view changed
   void setActiveView(pqView*);
   // set the current proxy selection
-  void setCurrentSelection(pqPipelineSource *);
+  void setCurrentSelection(pqPipelineSource*);
   void setCurrentProxy(vtkSMProxy* pxy);
-  
+
   // sets the current time
   void setCurrentTime(double);
   void setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double);
@@ -117,8 +136,7 @@ private:
   Q_DISABLE_COPY(pqAnimationViewWidget)
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 };
 
 #endif
-

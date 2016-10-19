@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBooleanDomain - a domain with two values: true or false
-// .SECTION Description
-// vtkSMBooleanDomain does not really restrict the values of the property
-// that contains it. All integer values are valid. Rather, it is used to
-// specified that the property represents a true/false state. This domains
-// works with only vtkSMIntVectorProperty.
-// .SECTION See Also
-// vtkSMDomain vtkSMIntVectorProperty
+/**
+ * @class   vtkSMBooleanDomain
+ * @brief   a domain with two values: true or false
+ *
+ * vtkSMBooleanDomain does not really restrict the values of the property
+ * that contains it. All integer values are valid. Rather, it is used to
+ * specified that the property represents a true/false state. This domains
+ * works with only vtkSMIntVectorProperty.
+ * @sa
+ * vtkSMDomain vtkSMIntVectorProperty
+*/
 
 #ifndef vtkSMBooleanDomain_h
 #define vtkSMBooleanDomain_h
@@ -34,15 +37,16 @@ public:
   vtkTypeMacro(vtkSMBooleanDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true if the propery is a vtkSMIntVectorProperty.
-  // Return 0 otherwise.
+  /**
+   * Returns true if the propery is a vtkSMIntVectorProperty.
+   * Return 0 otherwise.
+   */
   virtual int IsInDomain(vtkSMProperty* property);
 
-  // Description:
-  // Set the value of an element of a property from the animation editor.
-  virtual void SetAnimationValue(vtkSMProperty *property, int idx,
-                                 double value);
+  /**
+   * Set the value of an element of a property from the animation editor.
+   */
+  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
 
 protected:
   vtkSMBooleanDomain();

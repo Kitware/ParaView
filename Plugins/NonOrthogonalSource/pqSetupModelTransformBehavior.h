@@ -38,8 +38,9 @@ class VTK_EXPORT pqSetupModelTransformBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqSetupModelTransformBehavior(QObject* parent=0);
+  pqSetupModelTransformBehavior(QObject* parent = 0);
   virtual ~pqSetupModelTransformBehavior();
 
 private:

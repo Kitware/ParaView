@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSICompoundSourceProxy
-// .SECTION Description
-// vtkSICompoundSourceProxy is the server-side helper for a
-// vtkSMCompoundSourceProxy.
-// It provides the mapping to the exposed output port to the underneath
-// internal sub-proxy.
+/**
+ * @class   vtkSICompoundSourceProxy
+ *
+ * vtkSICompoundSourceProxy is the server-side helper for a
+ * vtkSMCompoundSourceProxy.
+ * It provides the mapping to the exposed output port to the underneath
+ * internal sub-proxy.
+*/
 
 #ifndef vtkSICompoundSourceProxy_h
 #define vtkSICompoundSourceProxy_h
@@ -34,20 +36,23 @@ public:
   vtkTypeMacro(vtkSICompoundSourceProxy, vtkSISourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the vtkAlgorithmOutput for an output port, if valid.
+  /**
+   * Returns the vtkAlgorithmOutput for an output port, if valid.
+   */
   virtual vtkAlgorithmOutput* GetOutputPort(int port);
 
 protected:
   vtkSICompoundSourceProxy();
   ~vtkSICompoundSourceProxy();
 
-  // Description:
-  // Read xml-attributes.
+  /**
+   * Read xml-attributes.
+   */
   virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
 
-  // Description:
-  // Create the output ports and add post filters for each output port.
+  /**
+   * Create the output ports and add post filters for each output port.
+   */
   virtual bool CreateOutputPorts();
 
 private:
@@ -56,7 +61,6 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

@@ -43,11 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCursor>
 #include <QTextEdit>
 
+#include <vtkPythonCompatibility.h>
 #include <vtkPythonInterpreter.h>
 #include <vtkSmartPyObject.h>
-#include <vtkPythonCompatibility.h>
 
-class pqPythonSyntaxHighlighter::pqInternal {
+class pqPythonSyntaxHighlighter::pqInternal
+{
 public:
   QPointer<QTextEdit> TextEdit;
   vtkSmartPyObject PygmentsModule;
@@ -58,52 +59,47 @@ public:
   bool ReplaceTabs;
 };
 
-pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(
-        QTextEdit *textEdit, QObject *p) :
-    Superclass(p),
-    Internals(new pqPythonSyntaxHighlighter::pqInternal())
+pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObject* p)
+  : Superclass(p)
+  , Internals(new pqPythonSyntaxHighlighter::pqInternal())
 {
   this->Internals->TextEdit = textEdit;
   this->Internals->TextEdit->installEventFilter(this);
   vtkPythonInterpreter::Initialize();
 
-    {
+  {
     vtkPythonScopeGilEnsurer gilEnsurer;
     this->Internals->PygmentsModule.TakeReference(PyImport_ImportModule("pygments"));
     if (this->Internals->PygmentsModule && this->Internals->TextEdit != NULL)
-      {
+    {
       this->Internals->HighlightFunction.TakeReference(
         PyObject_GetAttrString(this->Internals->PygmentsModule, "highlight"));
       vtkSmartPyObject lexersModule(PyImport_ImportModule("pygments.lexers"));
-      vtkSmartPyObject formattersModule(PyImport_ImportModule(
-        "pygments.formatters.redtabhtml"));
+      vtkSmartPyObject formattersModule(PyImport_ImportModule("pygments.formatters.redtabhtml"));
       vtkSmartPyObject htmlFormatterClass;
       // If we have the custom formatter written for ParaView, great.
       // otherwise just default to the HtmlFormatter in pygments
       if (formattersModule)
-        {
+      {
         htmlFormatterClass.TakeReference(
           PyObject_GetAttrString(formattersModule, "RedTabHtmlFormatter"));
-        }
+      }
       else
-        {
+      {
         formattersModule.TakeReference(PyImport_ImportModule("pygments.formatters"));
-        htmlFormatterClass.TakeReference(
-          PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
-        }
-      vtkSmartPyObject pythonLexerClass(
-        PyObject_GetAttrString(lexersModule, "PythonLexer"));
+        htmlFormatterClass.TakeReference(PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
+      }
+      vtkSmartPyObject pythonLexerClass(PyObject_GetAttrString(lexersModule, "PythonLexer"));
       vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
-      this->Internals->PythonLexer.TakeReference(
-        PyObject_Call(pythonLexerClass, emptyTuple, NULL));
+      this->Internals->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, NULL));
       this->Internals->HtmlFormatter.TakeReference(
         PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
       PyObject_SetAttrString(this->Internals->HtmlFormatter, "noclasses", Py_True);
       PyObject_SetAttrString(this->Internals->HtmlFormatter, "nobackground", Py_True);
-      this->connect(this->Internals->TextEdit.data(), SIGNAL(textChanged()),
-                    this, SLOT(rehighlightSyntax()));
-      }
+      this->connect(
+        this->Internals->TextEdit.data(), SIGNAL(textChanged()), this, SLOT(rehighlightSyntax()));
     }
+  }
 
   this->Internals->IsSyntaxHighlighting = false;
   // Replace tabs with 4 spaces
@@ -133,15 +129,15 @@ void pqPythonSyntaxHighlighter::setReplaceTabs(bool replaceTabs)
   this->Internals->ReplaceTabs = replaceTabs;
 }
 
-bool pqPythonSyntaxHighlighter::eventFilter(QObject*, QEvent *ev)
+bool pqPythonSyntaxHighlighter::eventFilter(QObject*, QEvent* ev)
 {
   if (!this->Internals->ReplaceTabs)
-    {
+  {
     return false;
-    }
+  }
   if (ev->type() == QEvent::KeyPress)
   {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(ev);
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
     if (keyEvent->key() == Qt::Key_Tab)
     {
       if (!this->Internals->TextEdit.isNull())
@@ -156,8 +152,8 @@ bool pqPythonSyntaxHighlighter::eventFilter(QObject*, QEvent *ev)
 
 void pqPythonSyntaxHighlighter::rehighlightSyntax()
 {
-  if (this->Internals->IsSyntaxHighlighting || !this->Internals->PygmentsModule
-      || this->Internals->TextEdit.isNull())
+  if (this->Internals->IsSyntaxHighlighting || !this->Internals->PygmentsModule ||
+    this->Internals->TextEdit.isNull())
   {
     return;
   }
@@ -168,15 +164,14 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
   int hScrollBarValue = this->Internals->TextEdit->horizontalScrollBar()->value();
   int leadingWhiteSpaceLength = 0;
   int trailingWhiteSpaceLength = 0;
-  while (leadingWhiteSpaceLength < text.length() &&
-         text.at(leadingWhiteSpaceLength).isSpace())
+  while (leadingWhiteSpaceLength < text.length() && text.at(leadingWhiteSpaceLength).isSpace())
   {
     ++leadingWhiteSpaceLength;
   }
   if (leadingWhiteSpaceLength < text.length())
   {
     while (trailingWhiteSpaceLength < text.length() &&
-           text.at(text.length()-1-trailingWhiteSpaceLength).isSpace())
+      text.at(text.length() - 1 - trailingWhiteSpaceLength).isSpace())
     {
       ++trailingWhiteSpaceLength;
     }
@@ -184,12 +179,12 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     QString trailingWhitespace = text.right(trailingWhiteSpaceLength);
 
     QByteArray bytes = text.trimmed().toUtf8();
-  
+
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
-    vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
-      this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
-    vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
+    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(), bytes.size(), NULL));
+    vtkSmartPyObject args(Py_BuildValue("OOO", unicode.GetPointer(),
+      this->Internals->PythonLexer.GetPointer(), this->Internals->HtmlFormatter.GetPointer()));
+    vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction, args, NULL));
 
     vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
     char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
@@ -197,18 +192,19 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
 
     // the first span tag always should follow the pre tag like this; <pre ...><span
-    int startOfPre = pygmentsOutput.indexOf(">",pygmentsOutput.indexOf("<pre"))+1;
+    int startOfPre = pygmentsOutput.indexOf(">", pygmentsOutput.indexOf("<pre")) + 1;
     int endOfPre = pygmentsOutput.lastIndexOf("</pre>");
     QString startOfHtml = pygmentsOutput.left(startOfPre);
-    QString formatted = pygmentsOutput.mid(startOfPre,endOfPre-startOfPre).trimmed();
-    QString endOfHtml = pygmentsOutput.right(pygmentsOutput.length()-endOfPre).trimmed();
+    QString formatted = pygmentsOutput.mid(startOfPre, endOfPre - startOfPre).trimmed();
+    QString endOfHtml = pygmentsOutput.right(pygmentsOutput.length() - endOfPre).trimmed();
     // The <pre ...> tag will ignore a newline immediately following the >,
     // so insert one to be ignored.  Similarly, the </pre> will ignore a
     // newline immediately preceding it, so put one in.  These quirks allow
     // inserting newlines at the beginning and end of the text and took a
     // long time to figure out.
-    QString result = QString("%1\n%2%3%4\n%5").arg(
-                startOfHtml,leadingWhitespace,formatted,trailingWhitespace,endOfHtml);
+    QString result =
+      QString("%1\n%2%3%4\n%5")
+        .arg(startOfHtml, leadingWhitespace, formatted, trailingWhitespace, endOfHtml);
     this->Internals->TextEdit->setHtml(result);
     QTextCursor cursor = this->Internals->TextEdit->textCursor();
     cursor.setPosition(cursorPosition);

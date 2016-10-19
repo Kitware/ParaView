@@ -38,7 +38,7 @@ public:
   virtual void Initialize(unsigned int id);
 
   // Description:
-  //Controls number of render threads.
+  // Controls number of render threads.
   virtual void SetThreads(int val);
   vtkGetMacro(Threads, int);
 
@@ -56,16 +56,16 @@ public:
   // renderer.
   virtual void SetActiveCamera(vtkCamera*);
 
-  //Description:
+  // Description:
   // World space environment map up vector
   void SetBackgroundUp(double x, double y, double z);
 
-  //Description:
+  // Description:
   // World space environment map right vector
   void SetBackgroundRight(double x, double y, double z);
 
-  //Description:
-  //Make a particular light the active one. Add it to the renderer if new.
+  // Description:
+  // Make a particular light the active one. Add it to the renderer if new.
   void SetCurrentLight(vtkMantaLight*);
 
 protected:
@@ -80,7 +80,6 @@ protected:
 private:
   vtkPVMantaView(const vtkPVMantaView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVMantaView&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

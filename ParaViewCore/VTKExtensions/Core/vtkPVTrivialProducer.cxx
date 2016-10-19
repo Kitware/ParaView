@@ -23,7 +23,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
@@ -46,11 +45,11 @@ vtkPVTrivialProducer::vtkPVTrivialProducer()
 //----------------------------------------------------------------------------
 vtkPVTrivialProducer::~vtkPVTrivialProducer()
 {
-  if(this->Internals)
-    {
+  if (this->Internals)
+  {
     delete this->Internals;
     this->Internals = NULL;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -62,11 +61,10 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output)
 //----------------------------------------------------------------------------
 void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
 {
-  if( this->Internals->TimeSteps.empty() == false &&
-      time <= this->Internals->TimeSteps.back() )
-    {
+  if (this->Internals->TimeSteps.empty() == false && time <= this->Internals->TimeSteps.back())
+  {
     vtkWarningMacro("New time step is not after last time step.");
-    }
+  }
   this->Internals->TimeSteps.push_back(time);
 
   this->Modified();
@@ -74,73 +72,66 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVTrivialProducerPieceToExtentThreadSafe(
-  int *resultExtent, vtkDataObject* dataSet)
+int vtkPVTrivialProducerPieceToExtentThreadSafe(int* resultExtent, vtkDataObject* dataSet)
 {
   // this is really only meant for topologically structured grids
   if (vtkImageData* id = vtkImageData::SafeDownCast(dataSet))
-    {
+  {
     id->GetExtent(resultExtent);
-    }
+  }
   else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(dataSet))
-    {
+  {
     sd->GetExtent(resultExtent);
-    }
+  }
   else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(dataSet))
-    {
+  {
     rd->GetExtent(resultExtent);
-    }
+  }
   else
-    {
+  {
     return 0;
-    }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int
-vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
-                                     vtkInformationVector** inputVector,
-                                     vtkInformationVector* outputVector)
+int vtkPVTrivialProducer::ProcessRequest(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::ProcessRequest(request, inputVector, outputVector))
-    {
+  {
     return 0;
-    }
+  }
 
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
-  if( request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()) &&
-      outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) )
-    {
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()) &&
+    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  {
     double uTime = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    if( this->Internals->TimeSteps.empty() )
-      {
-      //vtkWarningMacro("Requesting a time step when none is available");
-      }
-    else if(uTime != this->Internals->TimeSteps.back())
-      {
-      vtkWarningMacro("Requesting time " << uTime << " but only "
-                      << this->Internals->TimeSteps.back()
-                      << " is available");
-      }
-    outputInfo->Get(vtkDataObject::DATA_OBJECT())->GetInformation()->Set(
-      vtkDataObject::DATA_TIME_STEP(), uTime);
-    }
-
-  if(this->Internals->TimeSteps.empty() == false)
+    if (this->Internals->TimeSteps.empty())
     {
+      // vtkWarningMacro("Requesting a time step when none is available");
+    }
+    else if (uTime != this->Internals->TimeSteps.back())
+    {
+      vtkWarningMacro("Requesting time " << uTime << " but only "
+                                         << this->Internals->TimeSteps.back() << " is available");
+    }
+    outputInfo->Get(vtkDataObject::DATA_OBJECT())
+      ->GetInformation()
+      ->Set(vtkDataObject::DATA_TIME_STEP(), uTime);
+  }
+
+  if (this->Internals->TimeSteps.empty() == false)
+  {
     // outputInfo->Set(
     //   vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
-    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-                    &this->Internals->TimeSteps[0],
-                    static_cast<int>(this->Internals->TimeSteps.size()) );
-    double timeRange[2] = {this->Internals->TimeSteps[0],
-                           this->Internals->TimeSteps.back()};
-    outputInfo->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
-    }
-
+    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &this->Internals->TimeSteps[0],
+      static_cast<int>(this->Internals->TimeSteps.size()));
+    double timeRange[2] = { this->Internals->TimeSteps[0], this->Internals->TimeSteps.back() };
+    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+  }
 
   return 1;
 }

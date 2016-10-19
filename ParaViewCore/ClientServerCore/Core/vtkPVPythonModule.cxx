@@ -32,22 +32,22 @@
 typedef std::list<vtkSmartPointer<vtkPVPythonModule> > vtkPVPythonModuleContainerType;
 static vtkPVPythonModuleContainerType vtkPVPythonModuleRegisteredModules;
 
-void vtkPVPythonModule::RegisterModule(vtkPVPythonModule *module)
+void vtkPVPythonModule::RegisterModule(vtkPVPythonModule* module)
 {
   vtkPVPythonModuleRegisteredModules.push_front(module);
 }
 
-vtkPVPythonModule *vtkPVPythonModule::GetModule(const char *fullname)
+vtkPVPythonModule* vtkPVPythonModule::GetModule(const char* fullname)
 {
   vtkPVPythonModuleContainerType::iterator iter;
   for (iter = vtkPVPythonModuleRegisteredModules.begin();
        iter != vtkPVPythonModuleRegisteredModules.end(); iter++)
-    {
+  {
     if (strcmp((*iter)->GetFullName(), fullname) == 0)
-      {
+    {
       return *iter;
-      }
     }
+  }
   return NULL;
 }
 
@@ -68,7 +68,7 @@ vtkPVPythonModule::~vtkPVPythonModule()
   this->SetFullName(NULL);
 }
 
-void vtkPVPythonModule::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVPythonModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 

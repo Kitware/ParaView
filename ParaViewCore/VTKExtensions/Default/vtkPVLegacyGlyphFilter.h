@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVLegacyGlyphFilter - Glyph filter
-//
-// .SECTION Description
-// This is a subclass of vtkGlyph3D that allows selection of input scalars
+/**
+ * @class   vtkPVLegacyGlyphFilter
+ * @brief   Glyph filter
+ *
+ *
+ * This is a subclass of vtkGlyph3D that allows selection of input scalars
+*/
 
 #ifndef vtkPVLegacyGlyphFilter_h
 #define vtkPVLegacyGlyphFilter_h
@@ -28,50 +31,59 @@ class vtkMaskPoints;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLegacyGlyphFilter : public vtkGlyph3D
 {
 public:
-  vtkTypeMacro(vtkPVLegacyGlyphFilter,vtkGlyph3D);
+  vtkTypeMacro(vtkPVLegacyGlyphFilter, vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description
-  static vtkPVLegacyGlyphFilter *New();
+  static vtkPVLegacyGlyphFilter* New();
 
-  // Description:
-  // Limit the number of points to glyph
+  //@{
+  /**
+   * Limit the number of points to glyph
+   */
   vtkSetMacro(MaximumNumberOfPoints, int);
   vtkGetMacro(MaximumNumberOfPoints, int);
+  //@}
 
-  // Description:
-  // Get the number of processes used to run this filter.
+  //@{
+  /**
+   * Get the number of processes used to run this filter.
+   */
   vtkGetMacro(NumberOfProcesses, int);
+  //@}
 
-  // Description:
-  // Set/get whether to mask points
+  //@{
+  /**
+   * Set/get whether to mask points
+   */
   void SetUseMaskPoints(int useMaskPoints);
   vtkGetMacro(UseMaskPoints, int);
+  //@}
 
-  // Description:
-  // Set/get flag to cause randomization of which points to mask.
+  //@{
+  /**
+   * Set/get flag to cause randomization of which points to mask.
+   */
   void SetRandomMode(int mode);
   int GetRandomMode();
+  //@}
 
-  // Description:
-  // In processing composite datasets, will check if a point
-  // is visible as long as the dataset being process if a
-  // vtkUniformGrid.
+  /**
+   * In processing composite datasets, will check if a point
+   * is visible as long as the dataset being process if a
+   * vtkUniformGrid.
+   */
   virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
 
   void SetKeepRandomPoints(int keepRandomPoints);
-  vtkGetMacro(KeepRandomPoints,int);
+  vtkGetMacro(KeepRandomPoints, int);
 
 protected:
   vtkPVLegacyGlyphFilter();
   ~vtkPVLegacyGlyphFilter();
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
-  virtual int RequestCompositeData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   virtual int FillInputPortInformation(int, vtkInformation*);
 
@@ -80,13 +92,14 @@ protected:
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
 
-  //Description:
-  //This is a generic function that can be called per
-  //block of the dataset to calculate indices of points
-  //to be glyphed in the block
- void CalculatePtsToGlyph(double PtsNotBlanked);
+  /**
+   * This is a generic function that can be called per
+   * block of the dataset to calculate indices of points
+   * to be glyphed in the block
+   */
+  void CalculatePtsToGlyph(double PtsNotBlanked);
 
-  vtkMaskPoints *MaskPoints;
+  vtkMaskPoints* MaskPoints;
   int MaximumNumberOfPoints;
   int NumberOfProcesses;
   int UseMaskPoints;
@@ -99,7 +112,7 @@ protected:
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
 
-  std::vector< vtkIdType > RandomPtsInDataset;
+  std::vector<vtkIdType> RandomPtsInDataset;
 
   int RandomMode;
 
@@ -113,13 +126,11 @@ private:
   void operator=(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
 
 public:
-
   enum CommunicationIds
-   {
-     GlyphNPointsGather=1000,
-     GlyphNPointsScatter
-   };
-
+  {
+    GlyphNPointsGather = 1000,
+    GlyphNPointsScatter
+  };
 };
 
 #endif

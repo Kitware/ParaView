@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSpreadSheetRepresentationProxy
-// .SECTION Description
-// vtkSMSpreadSheetRepresentationProxy is a representation proxy used for
-// spreadsheet view. This class overrides vtkSMRepresentationProxy to ensure
-// that the selection inputs are setup correctly.
+/**
+ * @class   vtkSMSpreadSheetRepresentationProxy
+ *
+ * vtkSMSpreadSheetRepresentationProxy is a representation proxy used for
+ * spreadsheet view. This class overrides vtkSMRepresentationProxy to ensure
+ * that the selection inputs are setup correctly.
+*/
 
 #ifndef vtkSMSpreadSheetRepresentationProxy_h
 #define vtkSMSpreadSheetRepresentationProxy_h
@@ -24,29 +26,29 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSpreadSheetRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSpreadSheetRepresentationProxy
+  : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMSpreadSheetRepresentationProxy* New();
-  vtkTypeMacro(vtkSMSpreadSheetRepresentationProxy,
-    vtkSMRepresentationProxy);
+  vtkTypeMacro(vtkSMSpreadSheetRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkSMSpreadSheetRepresentationProxy();
   ~vtkSMSpreadSheetRepresentationProxy();
 
-  // Description:
-  // Overridden to ensure that whenever "Input" property changes, we update the
-  // "Input" properties for all internal representations (including setting up
-  // of the link to the extract-selection representation).
+  /**
+   * Overridden to ensure that whenever "Input" property changes, we update the
+   * "Input" properties for all internal representations (including setting up
+   * of the link to the extract-selection representation).
+   */
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
 private:
-  vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSpreadSheetRepresentationProxy(
+    const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

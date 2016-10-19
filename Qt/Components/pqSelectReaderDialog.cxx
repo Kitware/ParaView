@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #include "pqSelectReaderDialog.h"
 #include "ui_pqSelectReaderDialog.h"
 
@@ -44,13 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog
 {
 public:
-  pqInternal(QObject* p) : QObject(p) {}
+  pqInternal(QObject* p)
+    : QObject(p)
+  {
+  }
 };
 
 //-----------------------------------------------------------------------------
-pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
-                       pqServer* s,
-                       vtkSMReaderFactory* readerFactory, QWidget* p)
+pqSelectReaderDialog::pqSelectReaderDialog(
+  const QString& file, pqServer* s, vtkSMReaderFactory* readerFactory, QWidget* p)
   : QDialog(p)
 {
   this->Internal = new pqInternal(this);
@@ -58,33 +59,31 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
 
   // set the helper/information string
   QString info = QString("A reader for \"%1\" could not be found."
-                         "  Please choose one:").arg(file);
+                         "  Please choose one:")
+                   .arg(file);
   this->Internal->FileInfo->setText(info);
 
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
 
-  vtkStringList* readers = readerFactory->GetPossibleReaders(
-    file.toLatin1().data(), s->session());
+  vtkStringList* readers = readerFactory->GetPossibleReaders(file.toLatin1().data(), s->session());
 
-  for (int cc=0; (cc+2) < readers->GetNumberOfStrings(); cc+=3)
-    {
-    QString desc = readers->GetString(cc+2);
-    //We want the first character to always be uppercase so:
-    //1 the list looks nicer
-    //2 the list case sensitive sort works "better"
-    desc.replace(0,1,desc.at(0).toUpper());
+  for (int cc = 0; (cc + 2) < readers->GetNumberOfStrings(); cc += 3)
+  {
+    QString desc = readers->GetString(cc + 2);
+    // We want the first character to always be uppercase so:
+    // 1 the list looks nicer
+    // 2 the list case sensitive sort works "better"
+    desc.replace(0, 1, desc.at(0).toUpper());
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
-    item->setData(Qt::UserRole, readers->GetString(cc+0));
-    item->setData(Qt::UserRole+1, readers->GetString(cc+1));
-    }
+    item->setData(Qt::UserRole, readers->GetString(cc + 0));
+    item->setData(Qt::UserRole + 1, readers->GetString(cc + 1));
+  }
 };
 
-
 //-----------------------------------------------------------------------------
-pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
-                       pqServer* vtkNotUsed(server),
-                       vtkStringList* list, QWidget* p)
+pqSelectReaderDialog::pqSelectReaderDialog(
+  const QString& file, pqServer* vtkNotUsed(server), vtkStringList* list, QWidget* p)
   : QDialog(p)
 {
   this->Internal = new pqInternal(this);
@@ -92,25 +91,25 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
 
   // set the helper/information string
   QString info = QString("More than one reader for \"%1\" found."
-                         "  Please choose one:").arg(file);
+                         "  Please choose one:")
+                   .arg(file);
   this->Internal->FileInfo->setText(info);
 
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
 
-  for (int cc=0; (cc+2) < list->GetNumberOfStrings(); cc+=3)
-    {
-    QString desc = list->GetString(cc+2);
-    //We want the first character to always be uppercase so:
-    //1 the list looks nicer
-    //2 the list case sensitive sort works "better"
-    desc.replace(0,1,desc.at(0).toUpper());
+  for (int cc = 0; (cc + 2) < list->GetNumberOfStrings(); cc += 3)
+  {
+    QString desc = list->GetString(cc + 2);
+    // We want the first character to always be uppercase so:
+    // 1 the list looks nicer
+    // 2 the list case sensitive sort works "better"
+    desc.replace(0, 1, desc.at(0).toUpper());
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
-    item->setData(Qt::UserRole, list->GetString(cc+0));
-    item->setData(Qt::UserRole+1, list->GetString(cc+1));
-    }
+    item->setData(Qt::UserRole, list->GetString(cc + 0));
+    item->setData(Qt::UserRole + 1, list->GetString(cc + 1));
+  }
 };
-
 
 //-----------------------------------------------------------------------------
 pqSelectReaderDialog::~pqSelectReaderDialog()
@@ -122,14 +121,14 @@ QString pqSelectReaderDialog::getGroup() const
 {
   QListWidget* lw = this->Internal->listWidget;
   QList<QListWidgetItem*> selection = lw->selectedItems();
-  if(selection.empty())
-    {
+  if (selection.empty())
+  {
     return QString();
-    }
+  }
 
   // should have only one with single selection mode
   QListWidgetItem* item = selection[0];
-  return item->data(Qt::UserRole+0).toString();
+  return item->data(Qt::UserRole + 0).toString();
 }
 
 //-----------------------------------------------------------------------------
@@ -139,15 +138,13 @@ QString pqSelectReaderDialog::getReader() const
 
   QList<QListWidgetItem*> selection = lw->selectedItems();
 
-  if(selection.empty())
-    {
+  if (selection.empty())
+  {
     return QString();
-    }
+  }
 
   // should have only one with single selection mode
   QListWidgetItem* item = selection[0];
 
-  return item->data(Qt::UserRole+1).toString();
-
+  return item->data(Qt::UserRole + 1).toString();
 }
-

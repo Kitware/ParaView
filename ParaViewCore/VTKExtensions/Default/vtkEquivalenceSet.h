@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkEquivalenceSet - records groups of integers that are equivalent.
-// .SECTION Description
-// Useful for connectivity on multiple processes.  Run connectivity
-// on each processes, then make touching fragments equivalent.
+/**
+ * @class   vtkEquivalenceSet
+ * @brief   records groups of integers that are equivalent.
+ *
+ * Useful for connectivity on multiple processes.  Run connectivity
+ * on each processes, then make touching fragments equivalent.
+*/
 
 #ifndef vtkEquivalenceSet_h
 #define vtkEquivalenceSet_h
@@ -24,14 +27,13 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 class vtkIntArray;
 
-
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEquivalenceSet : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkEquivalenceSet,vtkObject);
+  vtkTypeMacro(vtkEquivalenceSet, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkEquivalenceSet *New();
-  
+  static vtkEquivalenceSet* New();
+
   void Initialize();
   void AddEquivalence(int id1, int id2);
 
@@ -41,8 +43,7 @@ public:
 
   // Valid only after set is resolved.
   // The range of the map is [0 numberOfResolvedSets)
-  int GetNumberOfResolvedSets() { return this->NumberOfResolvedSets;}
-
+  int GetNumberOfResolvedSets() { return this->NumberOfResolvedSets; }
 
   // Return the id of the equivalent set.
   int GetEquivalentSetId(int memberId);
@@ -54,7 +55,7 @@ public:
   void DeepCopy(vtkEquivalenceSet* in);
 
   // Needed for sending the set over MPI.
-  // Be very careful with the pointer.  
+  // Be very careful with the pointer.
   // I guess this means do not write to the memory.
   int* GetPointer();
 
@@ -68,6 +69,7 @@ public:
   int Resolved;
 
   int GetReference(int memberId);
+
 protected:
   vtkEquivalenceSet();
   ~vtkEquivalenceSet();
@@ -76,7 +78,7 @@ protected:
 
   // To merge connected framgments that have different ids because they were
   // traversed by different processes or passes.
-  vtkIntArray *EquivalenceArray;
+  vtkIntArray* EquivalenceArray;
 
   // Return the id of the equivalent set.
   void EquateInternal(int id1, int id2);

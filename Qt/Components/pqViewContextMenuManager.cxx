@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,16 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QString>
 
-
 class pqViewContextMenuManagerInternal
 {
 public:
   pqViewContextMenuManagerInternal();
   ~pqViewContextMenuManagerInternal() {}
 
-  QMap<QString, pqViewContextMenuHandler *> Handlers;
+  QMap<QString, pqViewContextMenuHandler*> Handlers;
 };
-
 
 //----------------------------------------------------------------------------
 pqViewContextMenuManagerInternal::pqViewContextMenuManagerInternal()
@@ -58,9 +56,8 @@ pqViewContextMenuManagerInternal::pqViewContextMenuManagerInternal()
 {
 }
 
-
 //----------------------------------------------------------------------------
-pqViewContextMenuManager::pqViewContextMenuManager(QObject *parentObject)
+pqViewContextMenuManager::pqViewContextMenuManager(QObject* parentObject)
   : QObject(parentObject)
 {
   this->Internal = new pqViewContextMenuManagerInternal();
@@ -71,97 +68,89 @@ pqViewContextMenuManager::~pqViewContextMenuManager()
   delete this->Internal;
 }
 
-bool pqViewContextMenuManager::registerHandler(const QString &viewType,
-    pqViewContextMenuHandler *handler)
+bool pqViewContextMenuManager::registerHandler(
+  const QString& viewType, pqViewContextMenuHandler* handler)
 {
-  if(!handler)
-    {
+  if (!handler)
+  {
     return false;
-    }
+  }
 
   // Make sure the view type doesn't already have a handler.
-  QMap<QString, pqViewContextMenuHandler *>::Iterator iter =
-      this->Internal->Handlers.find(viewType);
-  if(iter != this->Internal->Handlers.end())
-    {
+  QMap<QString, pqViewContextMenuHandler*>::Iterator iter = this->Internal->Handlers.find(viewType);
+  if (iter != this->Internal->Handlers.end())
+  {
     return false;
-    }
+  }
 
   this->Internal->Handlers.insert(viewType, handler);
   return true;
 }
 
-void pqViewContextMenuManager::unregisterHandler(
-    pqViewContextMenuHandler *handler)
+void pqViewContextMenuManager::unregisterHandler(pqViewContextMenuHandler* handler)
 {
-  if(!handler)
-    {
+  if (!handler)
+  {
     return;
-    }
+  }
 
   // Find all the view types with the given handler.
-  QMap<QString, pqViewContextMenuHandler *>::Iterator iter =
-      this->Internal->Handlers.begin();
-  while(iter != this->Internal->Handlers.end())
+  QMap<QString, pqViewContextMenuHandler*>::Iterator iter = this->Internal->Handlers.begin();
+  while (iter != this->Internal->Handlers.end())
+  {
+    if (*iter == handler)
     {
-    if(*iter == handler)
-      {
       iter = this->Internal->Handlers.erase(iter);
-      }
-    else
-      {
-      ++iter;
-      }
     }
+    else
+    {
+      ++iter;
+    }
+  }
 }
 
-bool pqViewContextMenuManager::isRegistered(
-    pqViewContextMenuHandler *handler) const
+bool pqViewContextMenuManager::isRegistered(pqViewContextMenuHandler* handler) const
 {
-  QMap<QString, pqViewContextMenuHandler *>::ConstIterator iter =
-      this->Internal->Handlers.begin();
-  for( ; iter != this->Internal->Handlers.end(); ++iter)
+  QMap<QString, pqViewContextMenuHandler*>::ConstIterator iter = this->Internal->Handlers.begin();
+  for (; iter != this->Internal->Handlers.end(); ++iter)
+  {
+    if (*iter == handler)
     {
-    if(*iter == handler)
-      {
       return true;
-      }
     }
+  }
 
   return false;
 }
 
-pqViewContextMenuHandler *pqViewContextMenuManager::getHandler(
-    const QString &viewType) const
+pqViewContextMenuHandler* pqViewContextMenuManager::getHandler(const QString& viewType) const
 {
-  QMap<QString, pqViewContextMenuHandler *>::ConstIterator iter =
-      this->Internal->Handlers.find(viewType);
-  if(iter != this->Internal->Handlers.end())
-    {
+  QMap<QString, pqViewContextMenuHandler*>::ConstIterator iter =
+    this->Internal->Handlers.find(viewType);
+  if (iter != this->Internal->Handlers.end())
+  {
     return *iter;
-    }
+  }
 
   return 0;
 }
 
-void pqViewContextMenuManager::setupContextMenu(pqView *view)
+void pqViewContextMenuManager::setupContextMenu(pqView* view)
 {
-  QMap<QString, pqViewContextMenuHandler *>::Iterator iter =
-      this->Internal->Handlers.find(view->getViewType());
-  if(iter != this->Internal->Handlers.end())
-    {
+  QMap<QString, pqViewContextMenuHandler*>::Iterator iter =
+    this->Internal->Handlers.find(view->getViewType());
+  if (iter != this->Internal->Handlers.end())
+  {
     (*iter)->setupContextMenu(view);
-    }
+  }
 }
 
-void pqViewContextMenuManager::cleanupContextMenu(pqView *view)
+void pqViewContextMenuManager::cleanupContextMenu(pqView* view)
 {
-  QMap<QString, pqViewContextMenuHandler *>::Iterator iter =
-      this->Internal->Handlers.find(view->getViewType());
-  if(iter != this->Internal->Handlers.end())
-    {
+  QMap<QString, pqViewContextMenuHandler*>::Iterator iter =
+    this->Internal->Handlers.find(view->getViewType());
+  if (iter != this->Internal->Handlers.end())
+  {
     (*iter)->cleanupContextMenu(view);
-    }
+  }
 }
-
-

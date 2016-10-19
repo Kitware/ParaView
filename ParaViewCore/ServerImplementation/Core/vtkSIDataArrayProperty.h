@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIDataArrayProperty - InformationOnly property
-// .SECTION Description
-// SIProperty that deals with vtkDataArray object type
+/**
+ * @class   vtkSIDataArrayProperty
+ * @brief   InformationOnly property
+ *
+ * SIProperty that deals with vtkDataArray object type
+*/
 
 #ifndef vtkSIDataArrayProperty_h
 #define vtkSIDataArrayProperty_h
@@ -35,14 +38,14 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
 private:
   vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

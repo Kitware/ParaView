@@ -10,6 +10,4 @@ public:
 
 public slots:
   void onAction();
-
 };
-

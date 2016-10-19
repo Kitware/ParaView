@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,29 +39,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSelectionInputWidget;
 class pqProxySelectionWidget;
 
-/// This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
-/// property and properties with ProxyListDomain.
+/**
+* This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
+* property and properties with ProxyListDomain.
+*/
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
-public:
-  pqProxyPropertyWidget(vtkSMProperty *property,
-                        vtkSMProxy *proxy,
-                        QWidget *parent = 0);
 
-  /// Overridden to pass the calls to internal widgets.
+public:
+  pqProxyPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+
+  /**
+  * Overridden to pass the calls to internal widgets.
+  */
   virtual void apply();
   virtual void reset();
 
-  /// These methods are called when the pqProxyPropertiesPanel containing the
-  /// widget is activated/deactivated. Only widgets that have 3D widgets need to
-  /// override these methods to select/deselect the 3D widgets.
+  /**
+  * These methods are called when the pqProxyPropertiesPanel containing the
+  * widget is activated/deactivated. Only widgets that have 3D widgets need to
+  * override these methods to select/deselect the 3D widgets.
+  */
   virtual void select();
   virtual void deselect();
 
-  /// Overridden to hide the properties for proxies in a vtkSMProxyListDomain if
-  /// requested.
+  /**
+  * Overridden to hide the properties for proxies in a vtkSMProxyListDomain if
+  * requested.
+  */
   virtual void updateWidget(bool showing_advanced_properties);
 
 private:

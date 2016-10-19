@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDeserializerXMLCache - deserializes proxies from their XML states.
-// .SECTION Description
-// vtkSMDeserializerXMLCache is used to deserialize proxies from previously
-// stored XML states.
+/**
+ * @class   vtkSMDeserializerXMLCache
+ * @brief   deserializes proxies from their XML states.
+ *
+ * vtkSMDeserializerXMLCache is used to deserialize proxies from previously
+ * stored XML states.
+*/
 
 #ifndef vtkSMDeserializerXMLCache_h
 #define vtkSMDeserializerXMLCache_h
@@ -35,8 +38,9 @@ public:
   vtkTypeMacro(vtkSMDeserializerXMLCache, vtkSMDeserializerXML);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Allow to register a given XML state for a given proxy GlobalId
+  /**
+   * Allow to register a given XML state for a given proxy GlobalId
+   */
   virtual void CacheXMLProxyState(vtkTypeUInt32 id, vtkPVXMLElement* xml);
 
 protected:
@@ -46,8 +50,9 @@ protected:
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
 
-  // Description:
-  // Locate the XML for the proxy with the given id.
+  /**
+   * Locate the XML for the proxy with the given id.
+   */
   virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
 
 private:
@@ -56,7 +61,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internals;
-
 };
 
 #endif

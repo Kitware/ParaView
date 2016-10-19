@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkTCPNetworkAccessManager
-// .SECTION Description
-// vtkTCPNetworkAccessManager is a concrete implementation of
-// vtkNetworkAccessManager that uses tcp/ip sockets for communication between
-// processes. It supports urls that use "tcp" as their protocol specifier.
+/**
+ * @class   vtkTCPNetworkAccessManager
+ *
+ * vtkTCPNetworkAccessManager is a concrete implementation of
+ * vtkNetworkAccessManager that uses tcp/ip sockets for communication between
+ * processes. It supports urls that use "tcp" as their protocol specifier.
+*/
 
 #ifndef vtkTCPNetworkAccessManager_h
 #define vtkTCPNetworkAccessManager_h
@@ -33,60 +35,65 @@ public:
   vtkTypeMacro(vtkTCPNetworkAccessManager, vtkNetworkAccessManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Creates a new connection given the url.
-  // This call may block until the connection can be established. To keep
-  // user-interfaces responsive, one can listen to the vtkCommand::ProgressEvent
-  // fired periodically by this class while waiting.
-  //
-  // vtkNetworkAccessManager can  be waiting for atmost one connection at a
-  // time. Calling NewConnection() while another connection is pending will
-  // raise an error.
-  //
-  // To abort the connection and cancel the waiting, simply call
-  // AbortPendingConnection() in the vtkCommand::ProgressEvent callback.
-  //
-  // Returns the new connection instance on success, otherwise NULL.
-  //
-  // URLs are of the following form:
-  // <transport>://<address>
-  //   * tcp://<hostname>:<port>
-  //   * tcp://localhost:<port>?listen=true& -- listen for connection on port.
-  //   * tcp://localhost:<port>?listen=true&multiple=true -- listen for multiple
-  // Examples:
-  //   * tcp://medea:12345
-  //   * tcp://localhost:12345?listen&handshake=3.8.12
-  // Supported parameters:
-  // handshake :- specify a message that is matched with the other side
-  // listen    :- open a server-socket for a client to connect to
-  // multiple  :- leave server-socket open for more than 1 client to connect
-  //              (listen must be set to true)
-  // nonblocking:- When listen is true, this will result in the call returning
-  //               NULL if a client connection is not available immediately.
-  //               It leaves the server socket open for client to connect.
-  // timeout   :- When connecting to remote i.e listen==false, specify the time
-  //              (in seconds) for which this call blocks to retry attempts to
-  //              connect to the host/port. If absent, default is 60s. 0 or
-  //              negative implies no retry attempts.
+  /**
+   * Creates a new connection given the url.
+   * This call may block until the connection can be established. To keep
+   * user-interfaces responsive, one can listen to the vtkCommand::ProgressEvent
+   * fired periodically by this class while waiting.
+
+   * vtkNetworkAccessManager can  be waiting for atmost one connection at a
+   * time. Calling NewConnection() while another connection is pending will
+   * raise an error.
+
+   * To abort the connection and cancel the waiting, simply call
+   * AbortPendingConnection() in the vtkCommand::ProgressEvent callback.
+
+   * Returns the new connection instance on success, otherwise NULL.
+
+   * URLs are of the following form:
+   * <transport>://<address>
+   * * tcp://<hostname>:<port>
+   * * tcp://localhost:<port>?listen=true& -- listen for connection on port.
+   * * tcp://localhost:<port>?listen=true&multiple=true -- listen for multiple
+   * Examples:
+   * * tcp://medea:12345
+   * * tcp://localhost:12345?listen&handshake=3.8.12
+   * Supported parameters:
+   * handshake :- specify a message that is matched with the other side
+   * listen    :- open a server-socket for a client to connect to
+   * multiple  :- leave server-socket open for more than 1 client to connect
+   * (listen must be set to true)
+   * nonblocking:- When listen is true, this will result in the call returning
+   * NULL if a client connection is not available immediately.
+   * It leaves the server socket open for client to connect.
+   * timeout   :- When connecting to remote i.e listen==false, specify the time
+   * (in seconds) for which this call blocks to retry attempts to
+   * connect to the host/port. If absent, default is 60s. 0 or
+   * negative implies no retry attempts.
+   */
   virtual vtkMultiProcessController* NewConnection(const char* url);
 
-  // Description:
-  // Used to abort pending connection creation, if any. Refer to
-  // NewConnection() for details.
+  /**
+   * Used to abort pending connection creation, if any. Refer to
+   * NewConnection() for details.
+   */
   virtual void AbortPendingConnection();
 
-  // Description:
-  // Process any network activity.
+  /**
+   * Process any network activity.
+   */
   virtual int ProcessEvents(unsigned long timeout_msecs);
 
-  // Description:
-  // Peeks to check if any activity is available. When this call returns true,
-  // ProcessEvents() will always result in some activity processing if called
-  // afterword.
+  /**
+   * Peeks to check if any activity is available. When this call returns true,
+   * ProcessEvents() will always result in some activity processing if called
+   * afterword.
+   */
   virtual bool GetNetworkEventsAvailable();
 
-  // Description:
-  // Returns true is the manager is currently waiting for any connections.
+  /**
+   * Returns true is the manager is currently waiting for any connections.
+   */
   virtual bool GetPendingConnectionsPresent();
 
 protected:
@@ -96,27 +103,29 @@ protected:
   // used by GetPendingConnectionsPresent and ProcessEvents
   int ProcessEventsInternal(unsigned long timeout_msecs, bool do_processing);
 
-  // Description:
-  // Connects to remote processes.
-  vtkMultiProcessController* ConnectToRemote(const char* hostname, int port,
-    const char* handshake, int timeout_in_seconds);
+  /**
+   * Connects to remote processes.
+   */
+  vtkMultiProcessController* ConnectToRemote(
+    const char* hostname, int port, const char* handshake, int timeout_in_seconds);
 
-  // Description:
-  // Waits for connection from remote process.
-  vtkMultiProcessController* WaitForConnection(int port, bool once,
-    const char* handshake, bool nonblocking);
+  /**
+   * Waits for connection from remote process.
+   */
+  vtkMultiProcessController* WaitForConnection(
+    int port, bool once, const char* handshake, bool nonblocking);
 
-  bool ParaViewHandshake(vtkMultiProcessController* controller,
-    bool server_side, const char* handshake);
+  bool ParaViewHandshake(
+    vtkMultiProcessController* controller, bool server_side, const char* handshake);
 
   bool AbortPendingConnectionFlag;
+
 private:
   vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
   void operator=(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

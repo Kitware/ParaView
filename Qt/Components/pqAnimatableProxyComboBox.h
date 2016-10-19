@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,19 +40,23 @@ class vtkSMProxy;
 class pqPipelineSource;
 class pqServerManagerModelItem;
 
-/// pqAnimatableProxyComboBox is a combo box that can list the animatable 
-/// proxies.  All pqPipelineSources are automatically in this list
-/// Any other proxies must be manually added.
+/**
+* pqAnimatableProxyComboBox is a combo box that can list the animatable
+* proxies.  All pqPipelineSources are automatically in this list
+* Any other proxies must be manually added.
+*/
 class PQCOMPONENTS_EXPORT pqAnimatableProxyComboBox : public QComboBox
 {
   Q_OBJECT
   typedef QComboBox Superclass;
 
 public:
-  pqAnimatableProxyComboBox(QWidget* parent=0);
+  pqAnimatableProxyComboBox(QWidget* parent = 0);
   ~pqAnimatableProxyComboBox();
 
-  /// Returns the current source
+  /**
+  * Returns the current source
+  */
   vtkSMProxy* getCurrentProxy() const;
 
   void addProxy(int index, const QString& label, vtkSMProxy*);
@@ -73,5 +77,3 @@ private:
 };
 
 #endif
-
-

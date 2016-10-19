@@ -43,7 +43,10 @@
 
 class QPixmap;
 
-namespace pointsprite { class ColorControlPointList; }
+namespace pointsprite
+{
+class ColorControlPointList;
+}
 
 // ****************************************************************************
 //  Class:  QvisAbstractOpacityBar
@@ -57,35 +60,35 @@ namespace pointsprite { class ColorControlPointList; }
 // ****************************************************************************
 class VTKQVIS_EXPORT QvisAbstractOpacityBar : public QFrame
 {
-    Q_OBJECT
-  public:
-                   QvisAbstractOpacityBar(QWidget *parent=NULL, const char *name=NULL);
-    virtual       ~QvisAbstractOpacityBar();
-    virtual void   getRawOpacities(int, float *) = 0;
-    void           SetBackgroundColorControlPoints(const pointsprite::ColorControlPointList *ccp);
-    void           SetBackgroundPixmap(QPixmap *background);
-    void           SetShowBackgroundPixmap(bool show);
+  Q_OBJECT
+public:
+  QvisAbstractOpacityBar(QWidget* parent = NULL, const char* name = NULL);
+  virtual ~QvisAbstractOpacityBar();
+  virtual void getRawOpacities(int, float*) = 0;
+  void SetBackgroundColorControlPoints(const pointsprite::ColorControlPointList* ccp);
+  void SetBackgroundPixmap(QPixmap* background);
+  void SetShowBackgroundPixmap(bool show);
 
-  protected:
-    int            val2x(float);
-    float          x2val(int);
-    int            val2y(float);
-    float          y2val(int);
+protected:
+  int val2x(float);
+  float x2val(int);
+  int val2y(float);
+  float y2val(int);
 
-    virtual void   paintEvent(QPaintEvent*);
-    virtual void   resizeEvent(QResizeEvent*);
-    virtual void   paintToPixmap(int,int) = 0;
-    virtual void   paintBackground(QPainter &painter, int w, int h);
+  virtual void paintEvent(QPaintEvent*);
+  virtual void resizeEvent(QResizeEvent*);
+  virtual void paintToPixmap(int, int) = 0;
+  virtual void paintBackground(QPainter& painter, int w, int h);
 
-    QPixmap       *pix;
-    QPixmap       *backgroundPixmap;
-    bool           showBackgroundPixmap;
-    const pointsprite::ColorControlPointList *backgroundColorControlPoints;
+  QPixmap* pix;
+  QPixmap* backgroundPixmap;
+  bool showBackgroundPixmap;
+  const pointsprite::ColorControlPointList* backgroundColorControlPoints;
 
-  signals:
-    void           mouseReleased();
-    void           mouseMoved();
-    void           resized();
+signals:
+  void mouseReleased();
+  void mouseMoved();
+  void resized();
 };
 
 #endif

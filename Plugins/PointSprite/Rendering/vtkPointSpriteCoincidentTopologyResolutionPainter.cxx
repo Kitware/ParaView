@@ -26,23 +26,19 @@ vtkStandardNewMacro(vtkPointSpriteCoincidentTopologyResolutionPainter);
 
 //-----------------------------------------------------------------------------
 vtkPointSpriteCoincidentTopologyResolutionPainter::
-vtkPointSpriteCoincidentTopologyResolutionPainter()
+  vtkPointSpriteCoincidentTopologyResolutionPainter()
 {
-  
 }
 
 //-----------------------------------------------------------------------------
 vtkPointSpriteCoincidentTopologyResolutionPainter::
-~vtkPointSpriteCoincidentTopologyResolutionPainter()
+  ~vtkPointSpriteCoincidentTopologyResolutionPainter()
 {
 }
 
 //-----------------------------------------------------------------------------
 void vtkPointSpriteCoincidentTopologyResolutionPainter::RenderInternal(
-   vtkRenderer *renderer,
-   vtkActor *actor,
-   unsigned long typeflags,
-    bool forceCompileOnly)
+  vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly)
 {
   this->ResolveCoincidentTopology = VTK_RESOLVE_OFF;
 
@@ -50,8 +46,7 @@ void vtkPointSpriteCoincidentTopologyResolutionPainter::RenderInternal(
 }
 
 //-----------------------------------------------------------------------------
-void vtkPointSpriteCoincidentTopologyResolutionPainter::PrintSelf(
-  ostream& os, vtkIndent indent)
+void vtkPointSpriteCoincidentTopologyResolutionPainter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

@@ -29,7 +29,7 @@ class vtkCPDataDescription;
 class VTKPVCATALYST_EXPORT vtkCPPipeline : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkCPPipeline,vtkObject);
+  vtkTypeMacro(vtkCPPipeline, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Configuration Step:

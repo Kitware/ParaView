@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSystemConfigInformation
-// .SECTION Description
-// A vtkClientServerStream serializable conatiner of information describing
-// memory configuration of the host of a single process.
+/**
+ * @class   vtkPVSystemConfigInformation
+ *
+ * A vtkClientServerStream serializable conatiner of information describing
+ * memory configuration of the host of a single process.
+*/
 
 #ifndef vtkPVSystemConfigInformation_h
 #define vtkPVSystemConfigInformation_h
@@ -31,78 +33,84 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSystemConfigInformation : public vtk
 {
 public:
   class ConfigInfo
+  {
+  public:
+    ConfigInfo()
+      : OSDescriptor("")
+      , CPUDescriptor("")
+      , MemDescriptor("")
+      , HostName("")
+      , ProcessType(-1)
+      , SystemType(-1)
+      , Rank(-1)
+      , Pid(0)
+      , HostMemoryTotal(0)
+      , HostMemoryAvailable(0)
+      , ProcMemoryAvailable(0)
     {
-    public:
-      ConfigInfo()
-            :
-        OSDescriptor(""),
-        CPUDescriptor(""),
-        MemDescriptor(""),
-        HostName(""),
-        ProcessType(-1),
-        SystemType(-1),
-        Rank(-1),
-        Pid(0),
-        HostMemoryTotal(0),
-        HostMemoryAvailable(0),
-        ProcMemoryAvailable(0)
-      {}
+    }
 
-      void Print();
+    void Print();
 
-      bool operator<(const ConfigInfo &other) const
-      { return this->Rank<other.Rank; }
+    bool operator<(const ConfigInfo& other) const { return this->Rank < other.Rank; }
 
-    public:
-      string OSDescriptor;
-      string CPUDescriptor;
-      string MemDescriptor;
-      string HostName;
-      int ProcessType;
-      int SystemType;
-      int Rank;
-      long long Pid;
-      long long HostMemoryTotal;
-      long long HostMemoryAvailable;
-      long long ProcMemoryAvailable;
-    };
+  public:
+    string OSDescriptor;
+    string CPUDescriptor;
+    string MemDescriptor;
+    string HostName;
+    int ProcessType;
+    int SystemType;
+    int Rank;
+    long long Pid;
+    long long HostMemoryTotal;
+    long long HostMemoryAvailable;
+    long long ProcMemoryAvailable;
+  };
 
 public:
   static vtkPVSystemConfigInformation* New();
   vtkTypeMacro(vtkPVSystemConfigInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject* obj);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation* info);
 
-  // Description:
-  // Manage a serialized version of the information.
-  virtual void CopyToStream(vtkClientServerStream *css);
-  virtual void CopyFromStream(const vtkClientServerStream *css);
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
+  virtual void CopyToStream(vtkClientServerStream* css);
+  virtual void CopyFromStream(const vtkClientServerStream* css);
+  //@}
 
-  // Description:
-  // Access managed information
-  size_t GetSize(){ return this->Configs.size(); }
+  /**
+   * Access managed information
+   */
+  size_t GetSize() { return this->Configs.size(); }
 
-  const char *GetOSDescriptor(size_t i){ return this->Configs[i].OSDescriptor.c_str(); }
-  const char *GetCPUDescriptor(size_t i){ return this->Configs[i].CPUDescriptor.c_str(); }
-  const char *GetMemoryDescriptor(size_t i){ return this->Configs[i].MemDescriptor.c_str(); }
-  const char *GetHostName(size_t i){ return this->Configs[i].HostName.c_str(); }
-  int GetProcessType(size_t i){ return this->Configs[i].ProcessType; }
-  int GetSystemType(size_t i){ return this->Configs[i].SystemType; }
-  int GetRank(size_t i){ return this->Configs[i].Rank; }
-  long long GetPid(size_t i){ return this->Configs[i].Pid; }
-  long long GetHostMemoryTotal(size_t i){ return this->Configs[i].HostMemoryTotal; }
-  long long GetHostMemoryAvailable(size_t i){ return this->Configs[i].HostMemoryAvailable; }
-  long long GetProcMemoryAvailable(size_t i){ return this->Configs[i].ProcMemoryAvailable; }
+  const char* GetOSDescriptor(size_t i) { return this->Configs[i].OSDescriptor.c_str(); }
+  const char* GetCPUDescriptor(size_t i) { return this->Configs[i].CPUDescriptor.c_str(); }
+  const char* GetMemoryDescriptor(size_t i) { return this->Configs[i].MemDescriptor.c_str(); }
+  const char* GetHostName(size_t i) { return this->Configs[i].HostName.c_str(); }
+  int GetProcessType(size_t i) { return this->Configs[i].ProcessType; }
+  int GetSystemType(size_t i) { return this->Configs[i].SystemType; }
+  int GetRank(size_t i) { return this->Configs[i].Rank; }
+  long long GetPid(size_t i) { return this->Configs[i].Pid; }
+  long long GetHostMemoryTotal(size_t i) { return this->Configs[i].HostMemoryTotal; }
+  long long GetHostMemoryAvailable(size_t i) { return this->Configs[i].HostMemoryAvailable; }
+  long long GetProcMemoryAvailable(size_t i) { return this->Configs[i].ProcMemoryAvailable; }
 
-  // Description:
-  // Sort elements by mpi rank.
+  /**
+   * Sort elements by mpi rank.
+   */
   void Sort();
 
 protected:
@@ -110,7 +118,6 @@ protected:
   ~vtkPVSystemConfigInformation();
 
 private:
-
   vector<ConfigInfo> Configs;
 
 private:

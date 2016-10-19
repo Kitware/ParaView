@@ -35,14 +35,14 @@ vtkPVPlugin::vtkPVPlugin()
 //-----------------------------------------------------------------------------
 vtkPVPlugin::~vtkPVPlugin()
 {
-  delete [] this->FileName;
+  delete[] this->FileName;
   this->FileName = NULL;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::SetFileName(const char* filename)
 {
-  delete [] this->FileName;
+  delete[] this->FileName;
   this->FileName = NULL;
   this->FileName = vtksys::SystemTools::DuplicateString(filename);
 }

@@ -40,9 +40,9 @@ class vtkMatrix4x4;
 class vtkVRControlSliceOrientationStyle : public vtkVRInteractorStyle
 {
 public:
-  static vtkVRControlSliceOrientationStyle *New();
-  vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle)
-  void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkVRControlSliceOrientationStyle* New();
+  vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
   virtual int GetControlledPropertySize() { return 3; }
 

@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSITimeRangeProperty
-// .SECTION Description
-// SIProperty that deals with TimeRange on Algorithm object type
+/**
+ * @class   vtkSITimeRangeProperty
+ *
+ * SIProperty that deals with TimeRange on Algorithm object type
+*/
 
 #ifndef vtkSITimeStepsProperty_h
 #define vtkSITimeStepsProperty_h
@@ -35,14 +37,14 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
 private:
   vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

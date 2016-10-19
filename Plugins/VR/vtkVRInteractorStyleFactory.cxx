@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyleFactory)
-vtkVRInteractorStyleFactory *vtkVRInteractorStyleFactory::Instance = NULL;
+  vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = NULL;
 
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
@@ -66,7 +66,7 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add SpaceNavigatorGrabWorldStye
   this->InteractorStyleClassNames.push_back("vtkVRSpaceNavigatorGrabWorldStyle");
   this->InteractorStyleDescriptions.push_back("Space Navigator Grab");
-  
+
   // Add Virtual Hand - DJZ
   this->InteractorStyleClassNames.push_back("vtkVRVirtualHandStyle");
   this->InteractorStyleDescriptions.push_back("Virtual Hand");
@@ -78,120 +78,112 @@ vtkVRInteractorStyleFactory::~vtkVRInteractorStyleFactory()
 }
 
 //-----------------------------------------------------------------------------
-void vtkVRInteractorStyleFactory::SetInstance(vtkVRInteractorStyleFactory *ins)
+void vtkVRInteractorStyleFactory::SetInstance(vtkVRInteractorStyleFactory* ins)
 {
   if (vtkVRInteractorStyleFactory::Instance)
-    {
+  {
     vtkVRInteractorStyleFactory::Instance->UnRegister(NULL);
-    }
+  }
 
   if (ins)
-    {
+  {
     ins->Register(NULL);
-    }
+  }
 
   vtkVRInteractorStyleFactory::Instance = ins;
 }
 
-
 //-----------------------------------------------------------------------------
-vtkVRInteractorStyleFactory *vtkVRInteractorStyleFactory::GetInstance()
+vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::GetInstance()
 {
   return vtkVRInteractorStyleFactory::Instance;
 }
 
 //-----------------------------------------------------------------------------
-std::vector<std::string>
-vtkVRInteractorStyleFactory::GetInteractorStyleClassNames()
+std::vector<std::string> vtkVRInteractorStyleFactory::GetInteractorStyleClassNames()
 {
   return this->InteractorStyleClassNames;
 }
 
 //-----------------------------------------------------------------------------
-std::vector<std::string>
-vtkVRInteractorStyleFactory::GetInteractorStyleDescriptions()
+std::vector<std::string> vtkVRInteractorStyleFactory::GetInteractorStyleDescriptions()
 {
   return this->InteractorStyleDescriptions;
 }
 
 //-----------------------------------------------------------------------------
-std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(
-    const std::string &className)
+std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(const std::string& className)
 {
   for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
-    {
+  {
     if (this->InteractorStyleClassNames[i] == className)
-      {
+    {
       return this->InteractorStyleDescriptions[i];
-      }
     }
+  }
   return std::string("Unknown");
 }
 
 //-----------------------------------------------------------------------------
-vtkVRInteractorStyle *
-vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
-    const std::string &name)
+vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
+  const std::string& name)
 {
   if (name == "vtkVRTrackStyle")
-    {
+  {
     return vtkVRTrackStyle::New();
-    }
+  }
   else if (name == "vtkVRGrabWorldStyle")
-    {
+  {
     return vtkVRGrabWorldStyle::New();
-    }
+  }
   else if (name == "vtkVRControlSlicePositionStyle")
-    {
+  {
     return vtkVRControlSlicePositionStyle::New();
-    }
+  }
   else if (name == "vtkVRControlSliceOrientationStyle")
-    {
+  {
     return vtkVRControlSliceOrientationStyle::New();
-    }
+  }
   else if (name == "vtkVRSpaceNavigatorGrabWorldStyle")
-    {
+  {
     return vtkVRSpaceNavigatorGrabWorldStyle::New();
-    }
+  }
   else if (name == "vtkVRVirtualHandStyle")
-    {
+  {
     return vtkVRVirtualHandStyle::New();
-    } 
+  }
 
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-vtkVRInteractorStyle *
-vtkVRInteractorStyleFactory::NewInteractorStyleFromDescription(
-    const std::string &desc)
+vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromDescription(
+  const std::string& desc)
 {
   for (size_t i = 0; i < this->InteractorStyleDescriptions.size(); ++i)
-    {
+  {
     if (this->InteractorStyleDescriptions[i] == desc)
-      {
-      return this->NewInteractorStyleFromClassName(
-            this->InteractorStyleClassNames[i]);
-      }
+    {
+      return this->NewInteractorStyleFromClassName(this->InteractorStyleClassNames[i]);
     }
+  }
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-void vtkVRInteractorStyleFactory::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRInteractorStyleFactory::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  if (this->InteractorStyleClassNames.size() !=
-      this->InteractorStyleDescriptions.size())
-    {
+  if (this->InteractorStyleClassNames.size() != this->InteractorStyleDescriptions.size())
+  {
     os << indent << "Internal state invalid!\n";
     return;
-    }
+  }
   os << indent << "Known interactor styles:" << endl;
   vtkIndent iindent = indent.GetNextIndent();
   for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
-    {
-    os << iindent << "\"" << this->InteractorStyleDescriptions[i]
-       << "\" (" << this->InteractorStyleClassNames[i] << ")\n";
-    }
+  {
+    os << iindent << "\"" << this->InteractorStyleDescriptions[i] << "\" ("
+       << this->InteractorStyleClassNames[i] << ")\n";
+  }
 }

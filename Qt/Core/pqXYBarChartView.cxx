@@ -34,12 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMContextViewProxy.h"
 
 //-----------------------------------------------------------------------------
-pqXYBarChartView::pqXYBarChartView(const QString& group,
-                             const QString& name,
-                             vtkSMContextViewProxy* viewModule,
-                             pqServer* server,
-                             QObject* p/*=NULL*/):
-  Superclass(XYBarChartViewType(), group, name, viewModule, server, p)
+pqXYBarChartView::pqXYBarChartView(const QString& group, const QString& name,
+  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  : Superclass(XYBarChartViewType(), group, name, viewModule, server, p)
 {
 }
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <cmath>
 
-
-
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarAddRangeDialog::pqImplementation
 
@@ -52,44 +50,32 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarAddRangeDialog
 
-pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(
-    double default_from,
-    double default_to,
-    unsigned long default_steps,
-    bool default_logarithmic,
-    QWidget* Parent) :
-  Superclass(Parent),
-  Implementation(new pqImplementation())
+pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(double default_from, double default_to,
+  unsigned long default_steps, bool default_logarithmic, QWidget* Parent)
+  : Superclass(Parent)
+  , Implementation(new pqImplementation())
 {
   this->Implementation->StrictLog = false;
   this->Implementation->Ui.setupUi(this);
-  
-  this->Implementation->Ui.from->setValidator(
-    new QDoubleValidator(this->Implementation->Ui.from));
+
+  this->Implementation->Ui.from->setValidator(new QDoubleValidator(this->Implementation->Ui.from));
   this->setFrom(default_from);
-    
-  this->Implementation->Ui.to->setValidator(
-    new QDoubleValidator(this->Implementation->Ui.to));
+
+  this->Implementation->Ui.to->setValidator(new QDoubleValidator(this->Implementation->Ui.to));
   this->setTo(default_to);
-  
+
   this->Implementation->Ui.steps->setValidator(
     new QIntValidator(2, 9999, this->Implementation->Ui.steps));
   this->setSteps(default_steps);
-  
+
   this->setLogarithmic(default_logarithmic);
-  
-  QObject::connect(
-    this->Implementation->Ui.from,
-    SIGNAL(textChanged(const QString&)),
-    this,
+
+  QObject::connect(this->Implementation->Ui.from, SIGNAL(textChanged(const QString&)), this,
     SLOT(onRangeChanged()));
-  
+
   QObject::connect(
-    this->Implementation->Ui.to,
-    SIGNAL(textChanged(const QString&)),
-    this,
-    SLOT(onRangeChanged()));
-  
+    this->Implementation->Ui.to, SIGNAL(textChanged(const QString&)), this, SLOT(onRangeChanged()));
+
   this->onRangeChanged();
 }
 
@@ -140,20 +126,20 @@ void pqSampleScalarAddRangeDialog::setLogarithmic(bool useLog)
 
 void pqSampleScalarAddRangeDialog::setLogRangeStrict(bool on)
 {
-  if(on != this->Implementation->StrictLog)
-    {
+  if (on != this->Implementation->StrictLog)
+  {
     this->Implementation->StrictLog = on;
-    if(this->Implementation->StrictLog)
-      {
+    if (this->Implementation->StrictLog)
+    {
       this->Implementation->Ui.logWarning->setText(
-          "The range must be greater than zero to use logarithmic scale.");
-      }
-    else
-      {
-      this->Implementation->Ui.logWarning->setText(
-          "Can't use logarithmic scale when zero is in the range.");
-      }
+        "The range must be greater than zero to use logarithmic scale.");
     }
+    else
+    {
+      this->Implementation->Ui.logWarning->setText(
+        "Can't use logarithmic scale when zero is in the range.");
+    }
+  }
 }
 
 bool pqSampleScalarAddRangeDialog::isLogRangeStrict() const
@@ -166,25 +152,25 @@ void pqSampleScalarAddRangeDialog::onRangeChanged()
   double from_value = this->from();
   double to_value = this->to();
   bool logOk = false;
-  if(this->Implementation->StrictLog)
-    {
+  if (this->Implementation->StrictLog)
+  {
     logOk = from_value > 0.0 && to_value > 0.0;
-    }
+  }
   else
+  {
+    if (to_value < from_value)
     {
-    if(to_value < from_value)
-      {
       std::swap(from_value, to_value);
-      }
+    }
 
     logOk = !(from_value < 0.0 && to_value > 0.0);
-    }
-  
-  if(!logOk)
-    {
+  }
+
+  if (!logOk)
+  {
     this->Implementation->Ui.log->setChecked(false);
-    }
-    
+  }
+
   this->Implementation->Ui.log->setEnabled(logOk);
   this->Implementation->Ui.logWarning->setVisible(!logOk);
 }
@@ -197,32 +183,29 @@ QVariantList pqSampleScalarAddRangeDialog::getRange() const
   const int _steps = this->steps();
 
   if (_steps < 2 || _from == _to)
-    {
+  {
     return value;
-    }
+  }
 
   if (this->logarithmic())
-    {
+  {
     const double sign = _from < 0 ? -1.0 : 1.0;
-    const double log_from =
-      std::log10(std::abs(_from ? _from : 1.0e-6 * (_from - _to)));
+    const double log_from = std::log10(std::abs(_from ? _from : 1.0e-6 * (_from - _to)));
     const double log_to = std::log10(std::abs(_to ? _to : 1.0e-6 * (_to - _from)));
 
     for (int i = 0; i != _steps; i++)
-      {
-      const double mix = static_cast<double>(i) / static_cast<double>(_steps - 1);
-      value.push_back(
-        sign * pow(10.0, (1.0 - mix) * log_from + (mix) * log_to));
-      }
-    }
-  else
     {
-    for (int i = 0; i != _steps; i++)
-      {
-      const double mix = 
-        static_cast<double>(i) / static_cast<double>(_steps - 1);
-      value.push_back((1.0 - mix) * _from + (mix) * _to);
-      }
+      const double mix = static_cast<double>(i) / static_cast<double>(_steps - 1);
+      value.push_back(sign * pow(10.0, (1.0 - mix) * log_from + (mix)*log_to));
     }
+  }
+  else
+  {
+    for (int i = 0; i != _steps; i++)
+    {
+      const double mix = static_cast<double>(i) / static_cast<double>(_steps - 1);
+      value.push_back((1.0 - mix) * _from + (mix)*_to);
+    }
+  }
   return value;
 }

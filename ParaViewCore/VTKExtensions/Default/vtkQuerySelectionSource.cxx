@@ -57,23 +57,18 @@ vtkQuerySelectionSource::~vtkQuerySelectionSource()
 }
 
 //----------------------------------------------------------------------------
-int vtkQuerySelectionSource::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector),
-  vtkInformationVector* outputVector)
+int vtkQuerySelectionSource::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   // We can handle multiple piece request.
   vtkInformation* info = outputVector->GetInformationObject(0);
-  info->Set(
-    CAN_HANDLE_PIECE_REQUEST(), 1);
+  info->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkQuerySelectionSource::RequestData(
-  vtkInformation* vtkNotUsed( request ),
-  vtkInformationVector** vtkNotUsed( inputVector ),
-  vtkInformationVector* outputVector)
+int vtkQuerySelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   vtkSelection* output = vtkSelection::GetData(outputVector);
   vtkSelectionNode* selNode = vtkSelectionNode::New();
@@ -82,35 +77,33 @@ int vtkQuerySelectionSource::RequestData(
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   int piece = 0;
-  if (outInfo->Has(
-      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
-    {
-    piece = outInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-    }
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+  {
+    piece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+  }
 
   if (this->ProcessID >= 0 && piece != this->ProcessID)
-    {
+  {
     return 1;
-    }
+  }
 
   vtkInformation* props = selNode->GetProperties();
 
   // Add qualifiers.
   if (this->CompositeIndex >= 0)
-    {
+  {
     props->Set(vtkSelectionNode::COMPOSITE_INDEX(), this->CompositeIndex);
-    }
+  }
 
   if (this->HierarchicalLevel >= 0)
-    {
+  {
     props->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(), this->HierarchicalLevel);
-    }
+  }
 
   if (this->HierarchicalIndex >= 0)
-    {
+  {
     props->Set(vtkSelectionNode::HIERARCHICAL_INDEX(), this->HierarchicalIndex);
-    }
+  }
 
   props->Set(vtkSelectionNode::FIELD_TYPE(), this->FieldType);
   props->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::QUERY);

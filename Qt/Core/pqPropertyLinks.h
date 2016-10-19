@@ -41,104 +41,116 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProperty;
 class vtkSMProxy;
 
-/// pqPropertyLinks is used to connect vtkSMProperty and subclasses to
-/// properties on QObject instances. pqPropertyLinks enables setting up a link
-/// between QWidgets and vtkSMProperty's so that whenever one of them changes,
-/// the other is updated as well.
-///
-/// vtkSMProperty has two types of values, checked and unchecked. This class by
-/// default uses checked values, but it can be told to use unchecked values using
-/// setUseUncheckedProperties(). When setUseUncheckedProperties() is set to
-/// true, one can use accept()/reset() to accept or discard any changes
-/// to the vtkSMProperty.
-///
-/// When setUseUncheckedProperties() is set to false (default), one can set
-/// setAutoUpdateVTKObjects() to true (default false) to ensure that
-/// vtkSMProxy::UpdateVTKObjects() is called whenever the property changes.
-///
-/// This class uses weak-references to both the Qt and ServerManager objects
-/// hence it's safe to destroy either of those without updating the
-/// pqPropertyLinks instance.
-///
-/// Also, pqPropertyLinks never uses any delayed timers or connections.
+/**
+* pqPropertyLinks is used to connect vtkSMProperty and subclasses to
+* properties on QObject instances. pqPropertyLinks enables setting up a link
+* between QWidgets and vtkSMProperty's so that whenever one of them changes,
+* the other is updated as well.
+*
+* vtkSMProperty has two types of values, checked and unchecked. This class by
+* default uses checked values, but it can be told to use unchecked values using
+* setUseUncheckedProperties(). When setUseUncheckedProperties() is set to
+* true, one can use accept()/reset() to accept or discard any changes
+* to the vtkSMProperty.
+*
+* When setUseUncheckedProperties() is set to false (default), one can set
+* setAutoUpdateVTKObjects() to true (default false) to ensure that
+* vtkSMProxy::UpdateVTKObjects() is called whenever the property changes.
+*
+* This class uses weak-references to both the Qt and ServerManager objects
+* hence it's safe to destroy either of those without updating the
+* pqPropertyLinks instance.
+*
+* Also, pqPropertyLinks never uses any delayed timers or connections.
+*/
 class PQCORE_EXPORT pqPropertyLinks : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqPropertyLinks(QObject* parent=0);
+  pqPropertyLinks(QObject* parent = 0);
   virtual ~pqPropertyLinks();
 
-  /// Setup a link between a Qt property and vtkSMProperty on a vtkSMProxy
-  /// instance. The QObject is updated using the vtkSMProperty's current value
-  /// immediately.
-  /// Arguments:
-  /// \li \c qobject :- the Qt object
-  /// \li \c qproperty :- the Qt property name on \c qobject that can be used to
-  ///                     get/set the object's value(s).
-  /// \li \c qsignal :- signal fired by the \c qobject whenever it's property
-  ///                   value changes.
-  /// \li \c smproxy :- the vtkSMProxy instance.
-  /// \li \c smproperty :- the vtkSMProperty from the \c proxy.
-  /// \li \c smindex :- for multi-element properties, specify a non-negative
-  ///                 value to link to a particular element of the
-  ///                 vtkSMProperty..
-  /// Returns false if link adding fails for some reason.
-  bool addPropertyLink(
-    QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1)
-    {
+  /**
+  * Setup a link between a Qt property and vtkSMProperty on a vtkSMProxy
+  * instance. The QObject is updated using the vtkSMProperty's current value
+  * immediately.
+  * Arguments:
+  * \li \c qobject :- the Qt object
+  * \li \c qproperty :- the Qt property name on \c qobject that can be used to
+  *                     get/set the object's value(s).
+  * \li \c qsignal :- signal fired by the \c qobject whenever it's property
+  *                   value changes.
+  * \li \c smproxy :- the vtkSMProxy instance.
+  * \li \c smproperty :- the vtkSMProperty from the \c proxy.
+  * \li \c smindex :- for multi-element properties, specify a non-negative
+  *                 value to link to a particular element of the
+  *                 vtkSMProperty..
+  * Returns false if link adding fails for some reason.
+  */
+  bool addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1)
+  {
     return this->addPropertyLink<pqPropertyLinksConnection>(
       qobject, qproperty, qsignal, smproxy, smproperty, smindex);
-    }
+  }
 
   template <class ConnectionType>
-  bool addPropertyLink(
-    QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1,
-    ConnectionType* notused=NULL);
+  bool addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1,
+    ConnectionType* notused = NULL);
 
-  /// Remove a particular link.
-  bool removePropertyLink(
-    QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1);
+  /**
+  * Remove a particular link.
+  */
+  bool removePropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
 
-  bool autoUpdateVTKObjects() const
-    { return this->AutoUpdateVTKObjects; }
-  bool useUncheckedProperties() const
-    { return this->UseUncheckedProperties; }
+  bool autoUpdateVTKObjects() const { return this->AutoUpdateVTKObjects; }
+  bool useUncheckedProperties() const { return this->UseUncheckedProperties; }
 
 public slots:
-  /// Remove all links.
+  /**
+  * Remove all links.
+  */
   void removeAllPropertyLinks() { this->clear(); }
   void clear();
 
-  /// When UseUncheckedProperties == true, the smproperty values are not changed
-  /// whenever the qobject is modified. Use this method to change the smproperty
-  /// values using the current qobject values.
+  /**
+  * When UseUncheckedProperties == true, the smproperty values are not changed
+  * whenever the qobject is modified. Use this method to change the smproperty
+  * values using the current qobject values.
+  */
   void accept();
 
-  /// Set the qobject values using the smproperty values. This also clears any
-  /// unchecked values that may be set on the smproperty.
+  /**
+  * Set the qobject values using the smproperty values. This also clears any
+  * unchecked values that may be set on the smproperty.
+  */
   void reset();
 
-  /// set whether to use unchecked properties on the server manager
-  /// one may get/set unchecked properties to get domain updates before an
-  /// accept is done
+  /**
+  * set whether to use unchecked properties on the server manager
+  * one may get/set unchecked properties to get domain updates before an
+  * accept is done
+  */
   void setUseUncheckedProperties(bool val);
 
-  /// set whether UpdateVTKObjects is called automatically when needed
-  void setAutoUpdateVTKObjects(bool val)
-    { this->AutoUpdateVTKObjects = val; }
+  /**
+  * set whether UpdateVTKObjects is called automatically when needed
+  */
+  void setAutoUpdateVTKObjects(bool val) { this->AutoUpdateVTKObjects = val; }
 
 signals:
   void qtWidgetChanged();
   void smPropertyChanged();
 
-
 private slots:
-  /// slots called when pqPropertyLinksConnection indicates that a Qt or SM
-  /// property was changed.
+  /**
+  * slots called when pqPropertyLinksConnection indicates that a Qt or SM
+  * property was changed.
+  */
   void onQtPropertyModified();
   void onSMPropertyModified();
 
@@ -156,26 +168,20 @@ private:
 
 //-----------------------------------------------------------------------------
 template <class ConnectionType>
-bool pqPropertyLinks::addPropertyLink(
-  QObject* qobject, const char* qproperty, const char* qsignal,
-  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
-  ConnectionType*)
+bool pqPropertyLinks::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, ConnectionType*)
 {
   if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
-    {
+  {
     qCritical() << "Invalid parameters to pqPropertyLinks::addPropertyLink";
-    qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal
-      << ") <==> ("
-      << (smproxy? smproxy->GetXMLName() : "(none)")
-      << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
-      << smindex << ")";
+    qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal << ") <==> ("
+             << (smproxy ? smproxy->GetXMLName() : "(none)") << ","
+             << (smproperty ? smproperty->GetXMLLabel() : "(none)") << smindex << ")";
     return false;
-    }
-  pqPropertyLinksConnection* connection = new ConnectionType(
-    qobject, qproperty, qsignal, smproxy, smproperty, smindex,
-    this->useUncheckedProperties(), this);
+  }
+  pqPropertyLinksConnection* connection = new ConnectionType(qobject, qproperty, qsignal, smproxy,
+    smproperty, smindex, this->useUncheckedProperties(), this);
   return this->addNewConnection(connection);
 }
-
 
 #endif

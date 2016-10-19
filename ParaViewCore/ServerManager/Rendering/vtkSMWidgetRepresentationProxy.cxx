@@ -55,15 +55,7 @@ void vtkSMWidgetRepresentationProxy::SendRepresentation()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMWidgetRepresentationProxy::PrintSelf(
-  ostream& os, vtkIndent indent)
+void vtkSMWidgetRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
-
-
-
-
-

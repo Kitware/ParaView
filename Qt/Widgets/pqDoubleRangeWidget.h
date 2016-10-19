@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,45 +38,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QSlider;
 class pqLineEdit;
 
-/// a widget with a tied slider and line edit for editing a double property
+/**
+* a widget with a tied slider and line edit for editing a double property
+*/
 class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(double value READ value WRITE setValue USER true)
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
-  Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)
+  Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
 public:
-  /// constructor requires the proxy, property
+  /**
+  * constructor requires the proxy, property
+  */
   pqDoubleRangeWidget(QWidget* parent = NULL);
   ~pqDoubleRangeWidget();
 
-  /// get the value
+  /**
+  * get the value
+  */
   double value() const;
-  
+
   // get the min range value
   double minimum() const;
   // get the max range value
   double maximum() const;
- 
-  // returns whether the line edit is also limited 
+
+  // returns whether the line edit is also limited
   bool strictRange() const;
 
   // returns the resolution.
   int resolution() const;
-  
+
 signals:
-  /// signal the value changed
+  /**
+  * signal the value changed
+  */
   void valueChanged(double);
 
-  /// signal the value was edited
-  /// this means the user is done changing text
-  /// or the slider was moved
+  /**
+  * signal the value was edited
+  * this means the user is done changing text
+  * or the slider was moved
+  */
   void valueEdited(double);
 
 public slots:
-  /// set the value
+  /**
+  * set the value
+  */
   void setValue(double);
 
   // set the min range value
@@ -110,4 +122,3 @@ private:
 };
 
 #endif
-

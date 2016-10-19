@@ -34,17 +34,17 @@
 
 namespace
 {
-  bool vtkIsEmpty(vtkDataObject* dobj)
+bool vtkIsEmpty(vtkDataObject* dobj)
+{
+  for (int cc = 0; (dobj != NULL) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
+  {
+    if (dobj->GetNumberOfElements(cc) > 0)
     {
-    for (int cc=0; (dobj != NULL) && (cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS); ++cc)
-      {
-      if (dobj->GetNumberOfElements(cc) > 0)
-        {
-        return false;
-        }
-      }
-    return true;
+      return false;
     }
+  }
+  return true;
+}
 }
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
@@ -92,10 +92,10 @@ int vtkParallelSerialWriter::Write()
 {
   // Make sure we have input.
   if (this->GetNumberOfInputConnections(0) < 1)
-    {
+  {
     vtkErrorMacro("No input provided!");
     return 0;
-    }
+  }
 
   // always write even if the data hasn't changed
   this->Modified();
@@ -105,95 +105,82 @@ int vtkParallelSerialWriter::Write()
 }
 
 //----------------------------------------------------------------------------
-int vtkParallelSerialWriter::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* vtkNotUsed(outputVector))
+int vtkParallelSerialWriter::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  if ( inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) )
-    {
-    this->NumberOfTimeSteps =
-      inInfo->Length( vtkStreamingDemandDrivenPipeline::TIME_STEPS() );
-    }
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    this->NumberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  }
   else
-    {
+  {
     this->NumberOfTimeSteps = 0;
-    }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkParallelSerialWriter::RequestUpdateExtent(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* vtkNotUsed(outputVector))
+int vtkParallelSerialWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
-  inInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
-    this->NumberOfPieces);
-  inInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), this->Piece);
-  inInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-    this->GhostLevel);
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), this->NumberOfPieces);
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), this->Piece);
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), this->GhostLevel);
 
-  double *inTimes = inputVector[0]->GetInformationObject(0)->Get(
-      vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  double* inTimes =
+    inputVector[0]->GetInformationObject(0)->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   if (inTimes && this->WriteAllTimeSteps)
-    {
+  {
     double timeReq = inTimes[this->CurrentTimeIndex];
     inputVector[0]->GetInformationObject(0)->Set(
-        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
-        timeReq);
-    }
+      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkParallelSerialWriter::RequestData(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* vtkNotUsed(outputVector))
+int vtkParallelSerialWriter::RequestData(vtkInformation* request,
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
   if (!this->Writer)
-    {
+  {
     vtkErrorMacro("No internal writer specified. Cannot write.");
     return 0;
-    }
+  }
 
   bool write_all = (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 0);
 
   if (write_all)
-    {
+  {
     if (this->CurrentTimeIndex == 0)
-      {
+    {
       // Tell the pipeline to start looping.
       request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
-      }
     }
+  }
   else
-    {
+  {
     request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
     this->CurrentTimeIndex = 0;
-    }
+  }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   this->WriteATimestep(input);
 
   if (write_all)
-    {
+  {
     this->CurrentTimeIndex++;
     if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
-      {
+    {
       // Tell the pipeline to stop looping.
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
       this->CurrentTimeIndex = 0;
-      }
     }
+  }
 
   return 1;
 }
@@ -203,42 +190,35 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
 {
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input);
   if (cds)
-    {
+  {
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cds->NewIterator());
     iter->SetSkipEmptyNodes(0);
     int idx;
-    for(idx=0, iter->InitTraversal();
-        !iter->IsDoneWithTraversal();
-        iter->GoToNextItem(), idx++)
-      {
+    for (idx = 0, iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), idx++)
+    {
       vtkDataObject* curObj = iter->GetCurrentDataObject();
-      std::string path =
-        vtksys::SystemTools::GetFilenamePath(this->FileName);
-      std::string fnamenoext =
-        vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-      std::string ext =
-        vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+      std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+      std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
       std::ostringstream fname;
       fname << path << "/" << fnamenoext << idx << ext;
       this->WriteAFile(fname.str().c_str(), curObj);
-      }
     }
+  }
   else if (input)
-    {
+  {
     vtkSmartPointer<vtkDataObject> inputCopy;
     inputCopy.TakeReference(input->NewInstance());
     inputCopy->ShallowCopy(input);
     this->WriteAFile(this->FileName, inputCopy);
-    }
-
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* input)
 {
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
 
   vtkSmartPointer<vtkReductionFilter> reductionFilter = vtkSmartPointer<vtkReductionFilter>::New();
   reductionFilter->SetController(controller);
@@ -247,43 +227,34 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   reductionFilter->SetInputDataObject(input);
   reductionFilter->UpdateInformation();
   vtkInformation* outInfo = reductionFilter->GetExecutive()->GetOutputInformation(0);
-  outInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
-    this->Piece);
-  outInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
-    this->NumberOfPieces);
-  outInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-    this->GhostLevel);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), this->Piece);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), this->NumberOfPieces);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), this->GhostLevel);
   reductionFilter->Update();
 
   if (controller->GetLocalProcessId() == 0)
-    {
+  {
     vtkDataObject* output = reductionFilter->GetOutputDataObject(0);
     if (vtkIsEmpty(output) == false)
-      {
+    {
       std::ostringstream fname;
       if (this->WriteAllTimeSteps)
-        {
-        std::string path =
-          vtksys::SystemTools::GetFilenamePath(filename);
-        std::string fnamenoext =
-          vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
-        std::string ext =
-          vtksys::SystemTools::GetFilenameLastExtension(filename);
+      {
+        std::string path = vtksys::SystemTools::GetFilenamePath(filename);
+        std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
+        std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
         fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
-        }
+      }
       else
-        {
+      {
         fname << filename;
-        }
+      }
       this->Writer->SetInputDataObject(output);
       this->SetWriterFileName(fname.str().c_str());
       this->WriteInternal();
       this->Writer->SetInputConnection(0);
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -291,14 +262,14 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
 // modified, then this object is modified as well.
 vtkMTimeType vtkParallelSerialWriter::GetMTime()
 {
-  vtkMTimeType mTime=this->vtkObject::GetMTime();
+  vtkMTimeType mTime = this->vtkObject::GetMTime();
   vtkMTimeType readerMTime;
 
-  if ( this->Writer )
-    {
+  if (this->Writer)
+  {
     readerMTime = this->Writer->GetMTime();
-    mTime = ( readerMTime > mTime ? readerMTime : mTime );
-    }
+    mTime = (readerMTime > mTime ? readerMTime : mTime);
+  }
 
   return mTime;
 }
@@ -307,28 +278,26 @@ vtkMTimeType vtkParallelSerialWriter::GetMTime()
 void vtkParallelSerialWriter::WriteInternal()
 {
   if (this->Writer && this->FileNameMethod)
-    {
+  {
     // Get the local process interpreter.
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->Writer << "Write"
+    stream << vtkClientServerStream::Invoke << this->Writer << "Write"
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void vtkParallelSerialWriter::SetWriterFileName(const char* fname)
 {
   if (this->Writer && this->FileName && this->FileNameMethod)
-    {
+  {
     // Get the local process interpreter.
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->Writer << this->FileNameMethod << fname
+    stream << vtkClientServerStream::Invoke << this->Writer << this->FileNameMethod << fname
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

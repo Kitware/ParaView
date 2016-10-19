@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,10 +49,10 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->getUndoStack())
-    {
+  {
     qCritical() << "Application wide undo-stack has already been initialized.";
     return;
-    }
+  }
 
   // setup Undo Stack.
   pqUndoStackBuilder* builder = pqUndoStackBuilder::New();
@@ -62,30 +62,24 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   core->setUndoStack(stack);
 
   // clear undo stack when state is loaded.
-  QObject::connect(core,
-    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
-    stack, SLOT(clear()));
+  QObject::connect(
+    core, SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)), stack, SLOT(clear()));
 
   // clear stack when server connects/disconnects.
-  QObject::connect(core->getServerManagerModel(),
-    SIGNAL(serverAdded(pqServer*)),
-    stack, SLOT(clear()));
-  QObject::connect(core->getServerManagerModel(),
-    SIGNAL(finishedRemovingServer()),
-    stack, SLOT(clear()));
+  QObject::connect(
+    core->getServerManagerModel(), SIGNAL(serverAdded(pqServer*)), stack, SLOT(clear()));
+  QObject::connect(
+    core->getServerManagerModel(), SIGNAL(finishedRemovingServer()), stack, SLOT(clear()));
 
   // As the undo-stack is properly setup now, record the current ProxyManager state
-//  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-//  pxm->GetActiveSessionProxyManager()->TriggerStateUpdate();
+  //  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  //  pxm->GetActiveSessionProxyManager()->TriggerStateUpdate();
 
   // FIXME disable undo when VCR is used
-//  QObject::connect(
-//      &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
-//      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-//  QObject::connect(
-//      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
-//      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+  //  QObject::connect(
+  //      &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
+  //      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+  //  QObject::connect(
+  //      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
+  //      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 }
-
-
-

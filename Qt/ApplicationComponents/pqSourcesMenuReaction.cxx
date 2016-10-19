@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,22 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCollaborationManager.h"
 
 //-----------------------------------------------------------------------------
-pqSourcesMenuReaction::pqSourcesMenuReaction(
-  pqProxyGroupMenuManager* menuManager)
-: Superclass(menuManager)
+pqSourcesMenuReaction::pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager)
+  : Superclass(menuManager)
 {
-  QObject::connect(
-    menuManager, SIGNAL(triggered(const QString&, const QString&)),
-    this, SLOT(onTriggered(const QString&, const QString&)));
+  QObject::connect(menuManager, SIGNAL(triggered(const QString&, const QString&)), this,
+    SLOT(onTriggered(const QString&, const QString&)));
 
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
-  QObject::connect(menuManager, SIGNAL(menuPopulated()),
-    this, SLOT(updateEnableState()));
-  QObject::connect(pqApplicationCore::instance(),
-                   SIGNAL(updateMasterEnableState(bool)),
-                   this, SLOT(updateEnableState()));
+  QObject::connect(
+    activeObjects, SIGNAL(serverChanged(pqServer*)), this, SLOT(updateEnableState()));
+  QObject::connect(menuManager, SIGNAL(menuPopulated()), this, SLOT(updateEnableState()));
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(updateMasterEnableState(bool)), this,
+    SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -65,32 +61,29 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(
 void pqSourcesMenuReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  this->updateEnableState( activeObjects->activeServer() != NULL &&
-                           activeObjects->activeServer()->isMaster());
+  this->updateEnableState(
+    activeObjects->activeServer() != NULL && activeObjects->activeServer()->isMaster());
 }
 //-----------------------------------------------------------------------------
 void pqSourcesMenuReaction::updateEnableState(bool enabled)
 {
-  pqProxyGroupMenuManager* mgr =
-    static_cast<pqProxyGroupMenuManager*>(this->parent());
+  pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
   mgr->setEnabled(enabled);
   foreach (QAction* action, mgr->actions())
-    {
+  {
     action->setEnabled(enabled);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqSourcesMenuReaction::createSource(
-  const QString& group, const QString& name)
+pqPipelineSource* pqSourcesMenuReaction::createSource(const QString& group, const QString& name)
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();  
+  pqObjectBuilder* builder = core->getObjectBuilder();
 
   BEGIN_UNDO_SET(QString("Create '%1'").arg(name));
-  pqPipelineSource* source =
-    builder->createSource(group, name, activeObjects->activeServer());
+  pqPipelineSource* source = builder->createSource(group, name, activeObjects->activeServer());
   END_UNDO_SET();
   return source;
 }

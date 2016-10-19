@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeDataPipeline - executive to add support for
-// vtkPVPostFilter in ParaView data pipelines.
-// .SECTION Description
-// vtkPVCompositeDataPipeline extends vtkCompositeDataPipeline to add ParaView
-// specific extensions to the pipeline.
-// \li Post Filter :- it adds support to ensure that array requests made on
-//     algorithms are passed along to the input vtkPVPostFilter, if one exists.
-//     vtkPVPostFilter is used to automatically extract components or generated
-//     derived arrays such as magnitude array for vectors.
+/**
+ * @class   vtkPVCompositeDataPipeline
+ * @brief   executive to add support for
+ * vtkPVPostFilter in ParaView data pipelines.
+ *
+ * vtkPVCompositeDataPipeline extends vtkCompositeDataPipeline to add ParaView
+ * specific extensions to the pipeline.
+ * \li Post Filter :- it adds support to ensure that array requests made on
+ *     algorithms are passed along to the input vtkPVPostFilter, if one exists.
+ *     vtkPVPostFilter is used to automatically extract components or generated
+ *     derived arrays such as magnitude array for vectors.
+*/
 
 #ifndef vtkPVCompositeDataPipeline_h
 #define vtkPVCompositeDataPipeline_h
@@ -32,7 +35,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVCompositeDataPipeline : public vtkCompo
 {
 public:
   static vtkPVCompositeDataPipeline* New();
-  vtkTypeMacro(vtkPVCompositeDataPipeline,vtkCompositeDataPipeline);
+  vtkTypeMacro(vtkPVCompositeDataPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
@@ -41,8 +44,7 @@ protected:
 
   // Copy information for the given request.
   virtual void CopyDefaultInformation(vtkInformation* request, int direction,
-                                      vtkInformationVector** inInfoVec,
-                                      vtkInformationVector* outInfoVec);
+    vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
   // Remove update/whole extent when resetting pipeline information.
   virtual void ResetPipelineInformation(int port, vtkInformation*);

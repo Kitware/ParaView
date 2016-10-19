@@ -24,7 +24,8 @@
 // Helper class for obtaining information about Mac OS X directories and
 // volumes. This is a simply utility class used only by vtkPVFileInformation
 // and so does not need to be wrapped.
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVMacFileInformationHelper : public vtkObject {
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVMacFileInformationHelper : public vtkObject
+{
 public:
   static vtkPVMacFileInformationHelper* New();
   vtkTypeMacro(vtkPVMacFileInformationHelper, vtkObject);
@@ -37,8 +38,8 @@ public:
   // Description:
   // Get the list of mounted volumes on the Mac.
   // Returns a list of name/path pairs.
-  typedef std::pair< std::string, std::string > NamePath;
-  std::vector< NamePath > GetMountedVolumes();
+  typedef std::pair<std::string, std::string> NamePath;
+  std::vector<NamePath> GetMountedVolumes();
 
   // Description:
   // Get the location of the application bundle.
@@ -56,7 +57,7 @@ public:
 
   // Description:
   // Get the location of the current user's Downloads directory.
- // Empty return string means the directory does not exist.
+  // Empty return string means the directory does not exist.
   std::string GetDownloadsDirectory();
 
 protected:

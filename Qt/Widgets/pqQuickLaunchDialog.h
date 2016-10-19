@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,46 +35,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QDialog>
 
-/// A borderless pop-up dialog used to show actions that the user can launch.
-/// Provides search capabilities.
+/**
+* A borderless pop-up dialog used to show actions that the user can launch.
+* Provides search capabilities.
+*/
 class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqQuickLaunchDialog(QWidget *parent=0);
+  pqQuickLaunchDialog(QWidget* parent = 0);
   virtual ~pqQuickLaunchDialog();
 
-  /// Set the actions to be launched using this dialog.
-  /// This clears all already added actions.
+  /**
+  * Set the actions to be launched using this dialog.
+  * This clears all already added actions.
+  */
   void setActions(const QList<QAction*>& actions);
 
-  /// Add actions to be launched using this dialog.
-  /// This adds to already added actions.
+  /**
+  * Add actions to be launched using this dialog.
+  * This adds to already added actions.
+  */
   void addActions(const QList<QAction*>& actions);
 
 public slots:
-  /// Overridden to trigger the user selected action.
+  /**
+  * Overridden to trigger the user selected action.
+  */
   virtual void accept();
 
 protected slots:
-  /// Called when the user chooses an item from available choices shown in the
-  /// options list.
+  /**
+  * Called when the user chooses an item from available choices shown in the
+  * options list.
+  */
   void currentRowChanged(int);
 
 protected:
-  /// Overridden to capture key presses.
-  virtual bool eventFilter(QObject *watched, QEvent *event);
+  /**
+  * Overridden to capture key presses.
+  */
+  virtual bool eventFilter(QObject* watched, QEvent* event);
 
-  /// Given the user entered text, update the GUI.
+  /**
+  * Given the user entered text, update the GUI.
+  */
   void updateSearch();
+
 private:
   Q_DISABLE_COPY(pqQuickLaunchDialog)
 
   class pqInternal;
-  pqInternal *Internal;
+  pqInternal* Internal;
 };
 
 #endif
-
-

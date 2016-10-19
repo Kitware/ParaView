@@ -47,35 +47,32 @@ class vtkAdiosPixieReader::Internals
 {
 public:
   Internals(vtkAdiosPixieReader* owner)
-    {
+  {
     this->Owner = owner;
     this->MeshFile = NULL;
 
     // Manage piece information
-    vtkMultiProcessController *ctrl = vtkMultiProcessController::GetGlobalController();
+    vtkMultiProcessController* ctrl = vtkMultiProcessController::GetGlobalController();
     this->ExtentTranslator->SetPiece(ctrl->GetLocalProcessId());
     this->ExtentTranslator->SetNumberOfPieces(ctrl->GetNumberOfProcesses());
     this->ExtentTranslator->SetGhostLevel(0); // FIXME ???
   }
   // --------------------------------------------------------------------------
   virtual ~Internals()
+  {
+    if (this->MeshFile)
     {
-    if(this->MeshFile)
-      {
       delete this->MeshFile;
       this->MeshFile = NULL;
-      }
     }
-  // --------------------------------------------------------------------------
-  void SetMethod(ADIOS_READ_METHOD method)
-  {
-    this->Method = method;
   }
+  // --------------------------------------------------------------------------
+  void SetMethod(ADIOS_READ_METHOD method) { this->Method = method; }
   // --------------------------------------------------------------------------
   bool NextStep()
   {
     return this->MeshFile->NextStep();
-  }  // --------------------------------------------------------------------------
+  } // --------------------------------------------------------------------------
   bool Reset()
   {
     this->MeshFile->Close();
@@ -85,50 +82,46 @@ public:
   void FillOutput(vtkDataObject* output)
   {
     vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::SafeDownCast(output);
-    if(multiBlock)
+    if (multiBlock)
+    {
+      vtkImageData* grid =
+        AdiosPixie::NewPixieImageData(this->ExtentTranslator.GetPointer(), this->MeshFile, true);
+      if (grid)
       {
-      vtkImageData* grid = AdiosPixie::NewPixieImageData(
-            this->ExtentTranslator.GetPointer(), this->MeshFile, true);
-      if(grid)
-        {
         multiBlock->SetBlock(0, grid);
         grid->FastDelete();
-        }
       }
+    }
   }
 
   // --------------------------------------------------------------------------
   void UpdateFileName(const char* currentFileName)
-    {
-    if(!currentFileName)
+  {
+    if (!currentFileName)
       return;
 
-    if(!this->MeshFile)
-      {
-      this->MeshFile = new AdiosStream(
-            currentFileName, this->Method, this->Owner->GetParameters());
+    if (!this->MeshFile)
+    {
+      this->MeshFile = new AdiosStream(currentFileName, this->Method, this->Owner->GetParameters());
 
       // Make sure that file is open and metadata loaded
       this->MeshFile->Open();
-      }
+    }
     else // Check if the filename has changed
+    {
+      if (strcmp(currentFileName, this->MeshFile->GetFileName()) != 0)
       {
-      if(strcmp( currentFileName, this->MeshFile->GetFileName()) != 0)
-        {
         delete this->MeshFile; // not NULL because we are in the else
-        this->MeshFile = new AdiosStream(
-              currentFileName, this->Method, this->Owner->GetParameters());
+        this->MeshFile =
+          new AdiosStream(currentFileName, this->Method, this->Owner->GetParameters());
 
         // Make sure that file is open and metadata loaded
         this->MeshFile->Open();
-        }
       }
     }
+  }
   // --------------------------------------------------------------------------
-  bool Open()
-    {
-    return this->MeshFile->Open();
-    }
+  bool Open() { return this->MeshFile->Open(); }
 
 private:
   AdiosStream* MeshFile;
@@ -155,21 +148,19 @@ vtkAdiosPixieReader::~vtkAdiosPixieReader()
 {
   this->SetFileName(NULL);
   this->SetParameters(NULL);
-  if(this->Internal)
-    {
+  if (this->Internal)
+  {
     delete this->Internal;
     this->Internal = NULL;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkAdiosPixieReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: "
-     << (this->FileName ? this->FileName : "(none)") << "\n";
-  os << indent << "Parameters: "
-     << (this->Parameters ? this->Parameters : "(none)") << "\n";
+  os << indent << "FileName: " << (this->FileName ? this->FileName : "(none)") << "\n";
+  os << indent << "Parameters: " << (this->Parameters ? this->Parameters : "(none)") << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -178,18 +169,18 @@ int vtkAdiosPixieReader::CanReadFile(const char* name)
   // First make sure the file exists.  This prevents an empty file
   // from being created on older compilers.
   struct stat fs;
-  if(stat(name, &fs) != 0)
-    {
+  if (stat(name, &fs) != 0)
+  {
     return 0;
-    }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkAdiosPixieReader::RequestData(vtkInformation *, vtkInformationVector** vtkNotUsed( inputVector ),
-    vtkInformationVector* outputVector)
+int vtkAdiosPixieReader::RequestData(vtkInformation*,
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkInformation *info = outputVector->GetInformationObject(0);
+  vtkInformation* info = outputVector->GetInformationObject(0);
   vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
 
   this->Internal->UpdateFileName(this->GetFileName());
@@ -207,17 +198,17 @@ void vtkAdiosPixieReader::SetReadMethod(int methodEnum)
 //----------------------------------------------------------------------------
 void vtkAdiosPixieReader::NextStep()
 {
-  if(this->Internal->NextStep())
-    {
+  if (this->Internal->NextStep())
+  {
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkAdiosPixieReader::Reset()
 {
-  if(this->Internal->Reset())
-    {
+  if (this->Internal->Reset())
+  {
     this->Modified();
-    }
+  }
 }

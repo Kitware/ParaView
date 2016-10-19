@@ -16,8 +16,8 @@
 
 #include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
-#include "vtkPartitionOrdering.h"
 #include "vtkPKdTree.h"
+#include "vtkPartitionOrdering.h"
 
 #include <map>
 
@@ -33,105 +33,106 @@ vtkPartitionOrderingInterface::~vtkPartitionOrderingInterface()
 
 int vtkPartitionOrderingInterface::GetNumberOfRegions()
 {
-  if(!this->Implementation)
-    {
+  if (!this->Implementation)
+  {
     vtkErrorMacro("Must set Implementation");
     return 0;
-    }
+  }
 
-  if(vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
-    {
+  if (vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
+  {
     return tree->GetNumberOfRegions();
-    }
-  else if(vtkPartitionOrdering* ordering =
-          vtkPartitionOrdering::SafeDownCast(this->Implementation))
-    {
+  }
+  else if (vtkPartitionOrdering* ordering =
+             vtkPartitionOrdering::SafeDownCast(this->Implementation))
+  {
     return ordering->GetNumberOfRegions();
-    }
+  }
   return 0;
-}int vtkPartitionOrderingInterface::ViewOrderAllProcessesInDirection(
-  const double dop[3], vtkIntArray *orderedList)
+}
+int vtkPartitionOrderingInterface::ViewOrderAllProcessesInDirection(
+  const double dop[3], vtkIntArray* orderedList)
 {
-  if(!this->Implementation)
-    {
+  if (!this->Implementation)
+  {
     vtkErrorMacro("Must set Implementation");
     return 0;
-    }
+  }
 
-  if(vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
-    {
+  if (vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
+  {
     return tree->ViewOrderAllProcessesInDirection(dop, orderedList);
-    }
-  else if(vtkPartitionOrdering* ordering =
-          vtkPartitionOrdering::SafeDownCast(this->Implementation))
-    {
+  }
+  else if (vtkPartitionOrdering* ordering =
+             vtkPartitionOrdering::SafeDownCast(this->Implementation))
+  {
     return ordering->ViewOrderAllProcessesInDirection(dop, orderedList);
-    }
+  }
   return 0;
 }
 
 int vtkPartitionOrderingInterface::ViewOrderAllProcessesFromPosition(
-  const double pos[3], vtkIntArray *orderedList)
+  const double pos[3], vtkIntArray* orderedList)
 {
-  if(!this->Implementation)
-    {
+  if (!this->Implementation)
+  {
     vtkErrorMacro("Must set Implementation");
     return 0;
-    }
+  }
 
-  if(vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
-    {
+  if (vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
+  {
     return tree->ViewOrderAllProcessesFromPosition(pos, orderedList);
-    }
-  else if(vtkPartitionOrdering* ordering =
-          vtkPartitionOrdering::SafeDownCast(this->Implementation))
-    {
+  }
+  else if (vtkPartitionOrdering* ordering =
+             vtkPartitionOrdering::SafeDownCast(this->Implementation))
+  {
     return ordering->ViewOrderAllProcessesFromPosition(pos, orderedList);
-    }
+  }
   return 0;
 }
 
 void vtkPartitionOrderingInterface::SetImplementation(vtkObject* implementation)
 {
-  if(implementation == NULL)
-    {
+  if (implementation == NULL)
+  {
     this->Implementation = NULL;
     return;
-    }
-  if(implementation != this->Implementation)
+  }
+  if (implementation != this->Implementation)
+  {
+    if (implementation->IsA("vtkPKdTree") || implementation->IsA("vtkPartitionOrdering"))
     {
-    if(implementation->IsA("vtkPKdTree") || implementation->IsA("vtkPartitionOrdering"))
-      {
       this->Implementation = implementation;
       return;
-      }
-    vtkErrorMacro("Implementation must be a vtkPKdTree or a vtkPartitionOrdering but is a "
-                  << implementation->GetClassName());
     }
+    vtkErrorMacro("Implementation must be a vtkPKdTree or a vtkPartitionOrdering but is a "
+      << implementation->GetClassName());
+  }
 }
 
 vtkMTimeType vtkPartitionOrderingInterface::GetMTime()
 {
-  if(!this->Implementation)
-    {
+  if (!this->Implementation)
+  {
     vtkErrorMacro("Must set Implementation");
     return 0;
-    }
+  }
 
-  if(vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
-    {
+  if (vtkPKdTree* tree = vtkPKdTree::SafeDownCast(this->Implementation))
+  {
     return tree->GetMTime();
-    }
-  else if(vtkPartitionOrdering* ordering =
-          vtkPartitionOrdering::SafeDownCast(this->Implementation))
-    {
+  }
+  else if (vtkPartitionOrdering* ordering =
+             vtkPartitionOrdering::SafeDownCast(this->Implementation))
+  {
     return ordering->GetMTime();
-    }
+  }
   return 0;
 }
 
 void vtkPartitionOrderingInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "Implementation: " << this->Implementation << endl;
 }

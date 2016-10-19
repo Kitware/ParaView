@@ -39,7 +39,8 @@
 #define SUBJECT_H
 #include <vector>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // Forward declaration
 class SimpleObserver;
 
@@ -63,16 +64,17 @@ class SimpleObserver;
 class Subject
 {
 public:
-    virtual ~Subject();
+  virtual ~Subject();
 
-    virtual void Attach(SimpleObserver *);
-    virtual void Detach(SimpleObserver *);
-    virtual void Notify();
+  virtual void Attach(SimpleObserver*);
+  virtual void Detach(SimpleObserver*);
+  virtual void Notify();
+
 protected:
-    Subject();
-private:
-    std::vector<SimpleObserver *> observers;
-};
+  Subject();
 
+private:
+  std::vector<SimpleObserver*> observers;
+};
 }
 #endif

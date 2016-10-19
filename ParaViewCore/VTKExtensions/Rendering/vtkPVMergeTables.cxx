@@ -36,8 +36,7 @@ vtkPVMergeTables::~vtkPVMergeTables()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTables::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkPVMergeTables::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
@@ -55,39 +54,36 @@ vtkExecutive* vtkPVMergeTables::CreateDefaultExecutive()
 static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
 {
   for (int idx = 0; idx < num_inputs; ++idx)
-    {
+  {
     vtkTable* curTable = inputs[idx];
-    if (!curTable || curTable->GetNumberOfRows() == 0 ||
-      curTable->GetNumberOfColumns() == 0)
-      {
+    if (!curTable || curTable->GetNumberOfRows() == 0 || curTable->GetNumberOfColumns() == 0)
+    {
       continue;
-      }
+    }
 
     if (output->GetNumberOfRows() == 0)
-      {
+    {
       // Copy output structure from the first non-empty input.
       output->DeepCopy(curTable);
       continue;
-      }
+    }
 
     vtkIdType numRows = curTable->GetNumberOfRows();
     vtkIdType numCols = curTable->GetNumberOfColumns();
     for (vtkIdType i = 0; i < numRows; i++)
-      {
+    {
       vtkIdType curRow = output->InsertNextBlankRow();
       for (vtkIdType j = 0; j < numCols; j++)
-        {
+      {
         output->SetValue(curRow, j, curTable->GetValue(i, j));
-        }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVMergeTables::RequestData(
-  vtkInformation*,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   int num_connections = this->GetNumberOfInputConnections(0);
 
@@ -95,46 +91,46 @@ int vtkPVMergeTables::RequestData(
   vtkTable* outputTable = vtkTable::GetData(outputVector, 0);
 
   if (vtkTable::GetData(inputVector[0], 0))
-    {
+  {
     vtkTable** inputs = new vtkTable*[num_connections];
     for (int idx = 0; idx < num_connections; ++idx)
-      {
+    {
       inputs[idx] = vtkTable::GetData(inputVector[0], idx);
-      }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
-    delete [] inputs;
-    return 1;
     }
+    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
+    delete[] inputs;
+    return 1;
+  }
 
   vtkCompositeDataSet* input0 = vtkCompositeDataSet::GetData(inputVector[0], 0);
   vtkCompositeDataIterator* iter = input0->NewIterator();
   iter->SkipEmptyNodesOff();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
+  {
     vtkTable** inputs = new vtkTable*[num_connections];
     for (int idx = 0; idx < num_connections; ++idx)
-      {
+    {
       vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
       if (!inputCD)
-        {
+      {
         continue;
-        }
+      }
       vtkSmartPointer<vtkCompositeDataIterator> iter2;
       iter2.TakeReference(inputCD->NewIterator());
       if (iter2->IsDoneWithTraversal())
-        {
+      {
         // trivial case, the composite dataset being merged is empty, simply
         // ignore it.
         inputs[idx] = NULL;
-        }
-      else
-        {
-        inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
-        }
       }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
-    delete [] inputs;
+      else
+      {
+        inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+      }
     }
+    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
+    delete[] inputs;
+  }
   iter->Delete();
   return 1;
 }

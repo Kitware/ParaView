@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMAnimationSceneWriter - helper class used
-// to write animations.
-// .SECTION Description
-// vtkSMAnimationSceneWriter is an abstract superclass for writers
-// that can write animations out.
+/**
+ * @class   vtkSMAnimationSceneWriter
+ * @brief   helper class used
+ * to write animations.
+ *
+ * vtkSMAnimationSceneWriter is an abstract superclass for writers
+ * that can write animations out.
+*/
 
 #ifndef vtkSMAnimationSceneWriter_h
 #define vtkSMAnimationSceneWriter_h
@@ -33,36 +36,50 @@ public:
   vtkTypeMacro(vtkSMAnimationSceneWriter, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Convenience method to set the proxy.
+  /**
+   * Convenience method to set the proxy.
+   */
   virtual void SetAnimationScene(vtkSMProxy*);
 
-  // Description:
-  // Get/Set the animation scene that this writer will write.
+  //@{
+  /**
+   * Get/Set the animation scene that this writer will write.
+   */
   virtual void SetAnimationScene(vtkSMAnimationScene*);
   vtkGetObjectMacro(AnimationScene, vtkSMAnimationScene);
+  //@}
 
-  // Description:
-  // Begin the saving. This will result in playing of the animation.
-  // Returns the status of the save.
+  /**
+   * Begin the saving. This will result in playing of the animation.
+   * Returns the status of the save.
+   */
   bool Save();
 
-  // Description:
-  // Get/Set the filename.
+  //@{
+  /**
+   * Get/Set the filename.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Get/Set the start file count.
+  //@{
+  /**
+   * Get/Set the start file count.
+   */
   vtkSetMacro(StartFileCount, int);
   vtkGetMacro(StartFileCount, int);
+  //@}
 
-  // Description:
-  // Get/Set time window that we want to write
-  // If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
-  // want to export the full time range available.
+  //@{
+  /**
+   * Get/Set time window that we want to write
+   * If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
+   * want to export the full time range available.
+   */
   vtkSetVector2Macro(PlaybackTimeWindow, double);
   vtkGetVector2Macro(PlaybackTimeWindow, double);
+  //@}
 
 protected:
   vtkSMAnimationSceneWriter();
@@ -71,19 +88,22 @@ protected:
   unsigned long ObserverID;
   vtkSMAnimationScene* AnimationScene;
 
-  // Description:
-  // Subclasses should override this method.
-  // Called to initialize saving.
+  /**
+   * Subclasses should override this method.
+   * Called to initialize saving.
+   */
   virtual bool SaveInitialize(int countStart) = 0;
 
-  // Description:
-  // Subclasses should override this method.
-  // Called to save a particular frame.
+  /**
+   * Subclasses should override this method.
+   * Called to save a particular frame.
+   */
   virtual bool SaveFrame(double time) = 0;
 
- // Description:
-  // Subclasses should override this method.
-  // Called to finalize saving.
+  /**
+   * Subclasses should override this method.
+   * Called to finalize saving.
+   */
   virtual bool SaveFinalize() = 0;
 
   void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* calldata);
@@ -94,7 +114,8 @@ protected:
   bool SaveFailed;
   char* FileName;
   double PlaybackTimeWindow[2];
-  int    StartFileCount;
+  int StartFileCount;
+
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;

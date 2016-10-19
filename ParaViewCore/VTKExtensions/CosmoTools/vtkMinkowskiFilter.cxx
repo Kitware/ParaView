@@ -21,10 +21,8 @@
 #include <vtkUnstructuredGrid.h>
 
 #include <vtkSmartPointer.h>
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-#define VTK_NEW(type, name) \
-  name = vtkSmartPointer<type>::New()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_NEW(type, name) name = vtkSmartPointer<type>::New()
 
 vtkStandardNewMacro(vtkMinkowskiFilter);
 
@@ -40,23 +38,22 @@ vtkMinkowskiFilter::~vtkMinkowskiFilter()
 
 void vtkMinkowskiFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "vtkMinkowskiFilter\n";
 }
 
-int vtkMinkowskiFilter::RequestData(vtkInformation *vtkNotUsed(request),
-    vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector)
+int vtkMinkowskiFilter::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Get the input and ouptut
-  vtkUnstructuredGrid *input = vtkUnstructuredGrid::SafeDownCast(
-      inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid* input =
+    vtkUnstructuredGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid* output =
+    vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   VTK_CREATE(vtkDoubleArray, S);
   VTK_CREATE(vtkDoubleArray, V);
@@ -88,11 +85,11 @@ int vtkMinkowskiFilter::RequestData(vtkInformation *vtkNotUsed(request),
   return 1;
 }
 
-int vtkMinkowskiFilter::FillOutputPortInformation(int port, vtkInformation* info )
+int vtkMinkowskiFilter::FillOutputPortInformation(int port, vtkInformation* info)
 {
-  if ( port == 0 )
+  if (port == 0)
   {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid" );
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
 
     return 1;
   }
@@ -100,16 +97,14 @@ int vtkMinkowskiFilter::FillOutputPortInformation(int port, vtkInformation* info
   return 0;
 }
 
-void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
-    vtkDoubleArray *S, vtkDoubleArray *V, vtkDoubleArray *C,
-    vtkDoubleArray *X, vtkDoubleArray *G, vtkDoubleArray *T,
-    vtkDoubleArray *B, vtkDoubleArray *L, vtkDoubleArray *P,
-    vtkDoubleArray *F)
+void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid* ugrid, vtkDoubleArray* S,
+  vtkDoubleArray* V, vtkDoubleArray* C, vtkDoubleArray* X, vtkDoubleArray* G, vtkDoubleArray* T,
+  vtkDoubleArray* B, vtkDoubleArray* L, vtkDoubleArray* P, vtkDoubleArray* F)
 {
   int i;
   int num_cells = ugrid->GetNumberOfCells();
-  double *S_array, *V_array, *C_array, *X_array, *G_array,
-         *T_array, *B_array, *L_array, *P_array, *F_array;
+  double *S_array, *V_array, *C_array, *X_array, *G_array, *T_array, *B_array, *L_array, *P_array,
+    *F_array;
 
   S_array = new double[num_cells];
   V_array = new double[num_cells];
@@ -122,9 +117,9 @@ void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
   P_array = new double[num_cells];
   F_array = new double[num_cells];
 
-  for (i=0; i<num_cells; i++)
+  for (i = 0; i < num_cells; i++)
   {
-    vtkPolyhedron *cell = vtkPolyhedron::SafeDownCast(ugrid->GetCell(i));
+    vtkPolyhedron* cell = vtkPolyhedron::SafeDownCast(ugrid->GetCell(i));
 
     S_array[i] = compute_S(cell);
     V_array[i] = compute_V(ugrid, i);
@@ -189,14 +184,14 @@ void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
   F->SetVoidArray(F_array, num_cells, 0);
 }
 
-double vtkMinkowskiFilter::compute_S(vtkPolyhedron *cell)
+double vtkMinkowskiFilter::compute_S(vtkPolyhedron* cell)
 {
   int i;
   int num_faces = cell->GetNumberOfFaces();
   double area = 0.0;
 
-  vtkCell *face;
-  for (i=0; i<num_faces; i++)
+  vtkCell* face;
+  for (i = 0; i < num_faces; i++)
   {
     face = cell->GetFace(i);
     area += compute_face_area(face);
@@ -211,13 +206,13 @@ double vtkMinkowskiFilter::compute_V(vtkPolyhedron* vtkNotUsed(cell))
   return 0; // doing nothing now
 }
 
-double vtkMinkowskiFilter::compute_V(vtkUnstructuredGrid *ugrid, int cid)
+double vtkMinkowskiFilter::compute_V(vtkUnstructuredGrid* ugrid, int cid)
 {
   // for precomputed cell volume
   return ugrid->GetCellData()->GetArray("Volumes")->GetTuple1(cid);
 }
 
-double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
+double vtkMinkowskiFilter::compute_C(vtkPolyhedron* cell)
 {
   int i, j;
   int num_edges = cell->GetNumberOfEdges();
@@ -226,39 +221,40 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
   double face_normals[num_faces][3];
 
   int edge_faces[num_edges][2];
-  for (i=0; i<num_edges; i++)
+  for (i = 0; i < num_edges; i++)
   {
     edge_faces[i][0] = -1;
     edge_faces[i][1] = -1;
   }
 
-  std::map<std::string,int> edge_map;
+  std::map<std::string, int> edge_map;
 
   char key[100];
-  for (i=0; i<num_edges; i++)
+  for (i = 0; i < num_edges; i++)
   {
-    vtkCell *e = cell->GetEdge(i);
+    vtkCell* e = cell->GetEdge(i);
 
     sprintf(key, "%d_%d", (int)e->GetPointId(0), (int)e->GetPointId(1));
     std::string key_str = std::string(key);
     edge_map[key_str] = i;
   }
 
-  for (i=0; i<num_faces; i++)
+  for (i = 0; i < num_faces; i++)
   {
-    vtkCell *f = cell->GetFace(i);
-    vtkIdList *verts = f->GetPointIds();
+    vtkCell* f = cell->GetFace(i);
+    vtkIdList* verts = f->GetPointIds();
     int num_verts = verts->GetNumberOfIds();
 
-    for (j=0; j<num_verts; j++)
+    for (j = 0; j < num_verts; j++)
     {
-      sprintf(key, "%d_%d", (int)verts->GetId(j % num_verts),
-          (int)verts->GetId((j+1) % num_verts));
+      sprintf(
+        key, "%d_%d", (int)verts->GetId(j % num_verts), (int)verts->GetId((j + 1) % num_verts));
       std::string key_str = std::string(key);
       std::map<std::string, int>::iterator it = edge_map.find(key_str);
       if (it == edge_map.end())
       {
-        sprintf(key, "%d_%d", (int)verts->GetId((j+1) % num_verts), (int)verts->GetId(j % num_verts));
+        sprintf(
+          key, "%d_%d", (int)verts->GetId((j + 1) % num_verts), (int)verts->GetId(j % num_verts));
         key_str = std::string(key);
         it = edge_map.find(key_str);
       }
@@ -280,13 +276,13 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
 
   double C = 0;
   double l, phi, epsilon;
-  VTK_CREATE(vtkPolygon, f1); //hack, vtkPolyhedron::GetFace keeps returning
-  VTK_CREATE(vtkPolygon, f2); //the same pointer but different content
-  for (i=0; i<num_edges; i++)
+  VTK_CREATE(vtkPolygon, f1); // hack, vtkPolyhedron::GetFace keeps returning
+  VTK_CREATE(vtkPolygon, f2); // the same pointer but different content
+  for (i = 0; i < num_edges; i++)
   {
     f1->DeepCopy(cell->GetFace(edge_faces[i][0]));
     f2->DeepCopy(cell->GetFace(edge_faces[i][1]));
-    vtkCell *e  = cell->GetEdge(i);
+    vtkCell* e = cell->GetEdge(i);
 
     l = compute_edge_length(e);
     phi = compute_face_angle(f1, f2);
@@ -299,7 +295,7 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
   return C;
 }
 
-double vtkMinkowskiFilter::compute_X(vtkPolyhedron *cell)
+double vtkMinkowskiFilter::compute_X(vtkPolyhedron* cell)
 {
   int nfaces = cell->GetNumberOfFaces();
   int nedges = cell->GetNumberOfEdges();
@@ -340,7 +336,7 @@ double vtkMinkowskiFilter::compute_F(double B, double L)
   return (L - B) / (L + B);
 }
 
-double vtkMinkowskiFilter::compute_face_area(vtkCell *face)
+double vtkMinkowskiFilter::compute_face_area(vtkCell* face)
 {
   int i, j, k;
   int coord; // coord to ignore: 1=x, 2=y, 3=z
@@ -348,7 +344,7 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell *face)
   double an, ax, ay, az, N[3];
 
   int num_verts = face->GetNumberOfPoints();
-  vtkPoints *verts = face->GetPoints();
+  vtkPoints* verts = face->GetPoints();
   compute_normal(face, N);
 
   ax = fabs(N[0]);
@@ -366,7 +362,7 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell *face)
 
   // compute area of the 2D projection
   double v1[3], v2[3], v3[3];
-  for (i=1, j=2, k=0; i<=num_verts; i++, j++, k++)
+  for (i = 1, j = 2, k = 0; i <= num_verts; i++, j++, k++)
   {
     verts->GetPoint(i % num_verts, v1);
     verts->GetPoint(j % num_verts, v2);
@@ -389,10 +385,10 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell *face)
   else if (coord == 3)
     area *= an / (2 * az);
 
-  return fabs(area); //area is alway positive
+  return fabs(area); // area is alway positive
 }
 
-double vtkMinkowskiFilter::compute_edge_length(vtkCell *edge)
+double vtkMinkowskiFilter::compute_edge_length(vtkCell* edge)
 {
   double v[3], v1[3], v2[3];
   edge->GetPoints()->GetPoint(0, v1);
@@ -405,7 +401,7 @@ double vtkMinkowskiFilter::compute_edge_length(vtkCell *edge)
   return sqrt(vtkMath::Dot(v, v));
 }
 
-int vtkMinkowskiFilter::compute_epsilon(vtkCell *f1, vtkCell *f2, vtkCell *e)
+int vtkMinkowskiFilter::compute_epsilon(vtkCell* f1, vtkCell* f2, vtkCell* e)
 {
   int i;
   vtkIdType pe1, pe2, pf1 = -1, pf2 = -1;
@@ -413,9 +409,9 @@ int vtkMinkowskiFilter::compute_epsilon(vtkCell *f1, vtkCell *f2, vtkCell *e)
   pe1 = e->GetPointId(0);
   pe2 = e->GetPointId(1);
 
-  vtkIdList *vs1 = f1->GetPointIds();
-  vtkIdList *vs2 = f2->GetPointIds();
-  for (i=0; i<vs1->GetNumberOfIds(); i++)
+  vtkIdList* vs1 = f1->GetPointIds();
+  vtkIdList* vs2 = f2->GetPointIds();
+  for (i = 0; i < vs1->GetNumberOfIds(); i++)
   {
     if (vs1->GetId(i) != pe1 && vs1->GetId(i) != pe2)
     {
@@ -423,7 +419,7 @@ int vtkMinkowskiFilter::compute_epsilon(vtkCell *f1, vtkCell *f2, vtkCell *e)
       break;
     }
   }
-  for (i=0; i<vs2->GetNumberOfIds(); i++)
+  for (i = 0; i < vs2->GetNumberOfIds(); i++)
   {
     if (vs2->GetId(i) != pe1 && vs2->GetId(i) != pe2)
     {
@@ -459,7 +455,7 @@ int vtkMinkowskiFilter::compute_epsilon(vtkCell *f1, vtkCell *f2, vtkCell *e)
     return 1;
 }
 
-double vtkMinkowskiFilter::compute_face_angle(vtkCell *f1, vtkCell *f2)
+double vtkMinkowskiFilter::compute_face_angle(vtkCell* f1, vtkCell* f2)
 {
   double n1[3], n2[3];
 
@@ -469,12 +465,12 @@ double vtkMinkowskiFilter::compute_face_angle(vtkCell *f1, vtkCell *f2)
   return acos(vtkMath::Dot(n1, n2));
 }
 
-//compute normal of a face using Newell's method
-void vtkMinkowskiFilter::compute_normal(vtkCell *face, double normal[3])
+// compute normal of a face using Newell's method
+void vtkMinkowskiFilter::compute_normal(vtkCell* face, double normal[3])
 {
   int i;
   int num_verts = face->GetNumberOfPoints();
-  vtkPoints *verts = face->GetPoints();
+  vtkPoints* verts = face->GetPoints();
   double vcurr[3], vnext[3];
 
   normal[0] = 0.0;

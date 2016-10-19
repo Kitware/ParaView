@@ -25,8 +25,7 @@
 
 #include "vtkPVDataInformationHelper.h"
 
-class VTK_EXPORT vtkPistonInformationHelper :
-  public vtkPVDataInformationHelper
+class VTK_EXPORT vtkPistonInformationHelper : public vtkPVDataInformationHelper
 {
 public:
   static vtkPistonInformationHelper* New();
@@ -39,10 +38,10 @@ protected:
   vtkPistonInformationHelper();
   ~vtkPistonInformationHelper();
 
-  bool ValidateType(vtkDataObject *data);
+  bool ValidateType(vtkDataObject* data);
 
-  //API to access information I fill the PVDataInformation I am friend of with
-  double *GetBounds();
+  // API to access information I fill the PVDataInformation I am friend of with
+  double* GetBounds();
   int GetNumberOfDataSets();
   vtkTypeInt64 GetNumberOfCells();
   vtkTypeInt64 GetNumberOfPoints();

@@ -70,8 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkMantaModule.h"
 
-class VTKMANTA_EXPORT vtkPVMantaRepresentation :
-  public vtkGeometryRepresentationWithFaces
+class VTKMANTA_EXPORT vtkPVMantaRepresentation : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkPVMantaRepresentation* New();
@@ -84,11 +83,11 @@ public:
 
   // Description:
   // control that ray traced rendering characteristics of this object
-  void SetMaterialType(char *);
-  char *GetMaterialType();
-  void SetReflectance(double );
+  void SetMaterialType(char*);
+  char* GetMaterialType();
+  void SetReflectance(double);
   double GetReflectance();
-  void SetThickness(double );
+  void SetThickness(double);
   double GetThickness();
   void SetEta(double);
   double GetEta();
@@ -104,11 +103,8 @@ protected:
   ~vtkPVMantaRepresentation();
 
 private:
-
   vtkPVMantaRepresentation(const vtkPVMantaRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVMantaRepresentation&) VTK_DELETE_FUNCTION;
-
 };
-
 
 #endif

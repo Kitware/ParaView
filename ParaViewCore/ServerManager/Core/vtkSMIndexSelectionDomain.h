@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 ==============================================================================*/
-// .NAME vtkSMIndexSelectionDomain - Select names from an indexed string list.
-//
-// .SECTION Description
-// See the vtkMPASReader proxy in readers.xml for how the properties should be
-// set up for this domain.
+/**
+ * @class   vtkSMIndexSelectionDomain
+ * @brief   Select names from an indexed string list.
+ *
+ *
+ * See the vtkMPASReader proxy in readers.xml for how the properties should be
+ * set up for this domain.
+*/
 
 #ifndef vtkSMIndexSelectionDomain_h
 #define vtkSMIndexSelectionDomain_h
@@ -24,17 +27,16 @@
 #include "vtkPVServerManagerCoreModule.h" // For export macro
 #include "vtkSMDomain.h"
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIndexSelectionDomain
-    : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIndexSelectionDomain : public vtkSMDomain
 {
 public:
-  vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain)
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
-  static vtkSMIndexSelectionDomain *New();
+  vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain) virtual void PrintSelf(
+    ostream& os, vtkIndent indent);
+  static vtkSMIndexSelectionDomain* New();
 
-  virtual int IsInDomain(vtkSMProperty *property);
+  virtual int IsInDomain(vtkSMProperty* property);
 
-  virtual int SetDefaultValues(vtkSMProperty *prop, bool use_unchecked_values);
+  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values);
 
   vtkSMProperty* GetInfoProperty() { return this->GetRequiredProperty("Info"); }
 
@@ -43,8 +45,8 @@ protected:
   ~vtkSMIndexSelectionDomain();
 
 private:
-  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMIndexSelectionDomain &) VTK_DELETE_FUNCTION;
+  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
 };
 
 #endif // vtkSMIndexSelectionDomain_h

@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMObject - superclass for most server manager classes
-// .SECTION Description
-// vtkSMObject is mostly to tag a class hierarchy that it belong to the
-// servermanager.
+/**
+ * @class   vtkSMObject
+ * @brief   superclass for most server manager classes
+ *
+ * vtkSMObject is mostly to tag a class hierarchy that it belong to the
+ * servermanager.
+*/
 
 #ifndef vtkSMObject_h
 #define vtkSMObject_h

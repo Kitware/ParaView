@@ -38,14 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QComboBox;
 
-/// pqColorPaletteSelectorWidget is used on a ColorPalette proxy to load a
-/// specific color palette.
+/**
+* pqColorPaletteSelectorWidget is used on a ColorPalette proxy to load a
+* specific color palette.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorPaletteSelectorWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent=0);
+  pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqColorPaletteSelectorWidget();
 
 private slots:

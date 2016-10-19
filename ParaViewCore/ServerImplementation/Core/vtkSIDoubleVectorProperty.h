@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIDoubleVectorProperty
-// .SECTION Description
-// Vector property that manage double value to be set through a method
-// on a vtkObject.
+/**
+ * @class   vtkSIDoubleVectorProperty
+ *
+ * Vector property that manage double value to be set through a method
+ * on a vtkObject.
+*/
 
 #ifndef vtkSIDoubleVectorProperty_h
 #define vtkSIDoubleVectorProperty_h
@@ -44,7 +46,6 @@ protected:
 private:
   vtkSIDoubleVectorProperty(const vtkSIDoubleVectorProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIDoubleVectorProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

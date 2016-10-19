@@ -28,9 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 int TestXMLSaveLoadState(int argc, char* argv[])
 {
   vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule::PROCESS_CLIENT,
-                                       options );
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
 
   //---------------------------------------------------------------------------
   int return_value = EXIT_SUCCESS;
@@ -40,7 +38,7 @@ int TestXMLSaveLoadState(int argc, char* argv[])
   vtkSMSession* session = vtkSMSession::New();
   cout << "==== Starting ====" << endl;
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
 
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
   vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
@@ -48,14 +46,13 @@ int TestXMLSaveLoadState(int argc, char* argv[])
   proxy->UpdateVTKObjects();
 
   vtkSMSourceProxy* shrink =
-      vtkSMSourceProxy::SafeDownCast(
-          pxm->NewProxy("filters", "ShrinkFilter"));
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ShrinkFilter"));
 
   vtkSMPropertyHelper(shrink, "Input").Set(proxy);
   shrink->UpdateVTKObjects();
   shrink->UpdatePipeline();
 
-  //shrink->GetDataInformation(0)->Print(cout);
+  // shrink->GetDataInformation(0)->Print(cout);
 
   pxm->RegisterProxy("sources", "sphere", proxy);
   pxm->RegisterProxy("filters", "shrink", shrink);
@@ -67,22 +64,23 @@ int TestXMLSaveLoadState(int argc, char* argv[])
   cout << "==== End of State creation ===" << endl;
 
   cout << "==== Clear proxyManager state ===" << endl;
-  pxm->UnRegisterProxies();;
+  pxm->UnRegisterProxies();
+  ;
   proxy->Delete();
   shrink->Delete();
 
   cout << "==== Make sure that the state is empty ===" << endl;
   xmlRootNodeLoaded.TakeReference(pxm->SaveXMLState());
-  //xmlRootNodeLoaded->PrintXML();
-  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") )
-    {
+  // xmlRootNodeLoaded->PrintXML();
+  if (pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink"))
+  {
     cout << " - Error in clearing" << endl;
     return_value = EXIT_FAILURE;
-    }
+  }
   else
-    {
+  {
     cout << " - Clearing done" << endl;
-    }
+  }
 
   cout << "==== Loading previous state ====" << endl;
   pxm->LoadXMLState(xmlRootNodeOrigin);
@@ -91,16 +89,16 @@ int TestXMLSaveLoadState(int argc, char* argv[])
   cout << "==== End of state loading ====" << endl;
 
   //---------------------------------------------------------------------------
-  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink")
-      && return_value == EXIT_SUCCESS )
-    {
+  if (pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") &&
+    return_value == EXIT_SUCCESS)
+  {
     cout << endl << " ### SUCESS: States are equals ###" << endl;
-    }
+  }
   else
-    {
+  {
     cout << endl << " ### FAILED: States are NOT equals ###" << endl;
     return_value = EXIT_FAILURE;
-    }
+  }
   session->Delete();
 
   //---------------------------------------------------------------------------

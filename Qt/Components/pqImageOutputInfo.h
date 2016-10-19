@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QWidget>
 
-
 class pqView;
-namespace Ui { class ImageOutputInfo; }
+namespace Ui
+{
+class ImageOutputInfo;
+}
 
 class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 {
@@ -48,8 +50,8 @@ class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 
 public:
   pqImageOutputInfo(QWidget* parent_ = NULL);
-  pqImageOutputInfo(QWidget* parentObject, Qt::WindowFlags parentFlags,
-    pqView* view, QString& viewName);
+  pqImageOutputInfo(
+    QWidget* parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
 
   ~pqImageOutputInfo();
 
@@ -67,7 +69,9 @@ public:
   bool getComposite();
   bool getUseFloatValues();
 
-  /// Remove or add options depending on whether cinema is visible.
+  /**
+  * Remove or add options depending on whether cinema is visible.
+  */
   void setCinemaVisible(bool status);
   const QString getCameraType();
   double getPhi();
@@ -83,9 +87,7 @@ public slots:
   void updateComposite(int);
 
 private:
-
-  void initialize(Qt::WindowFlags parentFlags, pqView* view,
-    QString const & viewName);
+  void initialize(Qt::WindowFlags parentFlags, pqView* view, QString const& viewName);
 
   void updateSpherical();
 

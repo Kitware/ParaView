@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,23 +53,24 @@ public:
   QPointer<pqProxyWidget> ProxyWidget;
   bool ShowingAdvancedProperties;
   bool HideProxyWidgetsInDefaultView;
-  pqInternal(pqProxySelectionWidget* self) : ShowingAdvancedProperties(false),
-    HideProxyWidgetsInDefaultView(false)
-    {
+  pqInternal(pqProxySelectionWidget* self)
+    : ShowingAdvancedProperties(false)
+    , HideProxyWidgetsInDefaultView(false)
+  {
     this->Ui.setupUi(self);
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
     this->Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.frameLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    }
+  }
 
   void setChosenProxy(vtkSMProxy* proxy, pqProxySelectionWidget* self)
-    {
+  {
     delete this->ProxyWidget;
     this->ChosenProxy = proxy;
     if (proxy)
-      {
+    {
       this->ProxyWidget = new pqProxyWidget(proxy, this->Ui.frame);
       this->ProxyWidget->setObjectName("ChosenProxyWidget");
       this->ProxyWidget->setApplyChangesImmediately(false);
@@ -80,53 +81,52 @@ public:
       // Propagate signals from the internal ProxyWidget out from `self`.
       self->connect(this->ProxyWidget, SIGNAL(changeAvailable()), SIGNAL(changeAvailable()));
       self->connect(this->ProxyWidget, SIGNAL(changeFinished()), SIGNAL(changeFinished()));
-      }
     }
+  }
 
   void updateWidget(bool showing_advanced_properties)
-    {
+  {
     this->ShowingAdvancedProperties = showing_advanced_properties;
     if (this->ProxyWidget)
-      {
+    {
       if (!showing_advanced_properties && this->HideProxyWidgetsInDefaultView)
-        {
+      {
         this->ProxyWidget->hide();
-        }
+      }
       else
-        {
+      {
         this->ProxyWidget->show();
         this->ProxyWidget->filterWidgets(showing_advanced_properties);
-        }
       }
     }
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqProxySelectionWidget::pqProxySelectionWidget(
-  vtkSMProperty *smproperty, vtkSMProxy *smproxy, QWidget *parentObject)
-  : Superclass(smproxy, parentObject),
-  Internal(new pqProxySelectionWidget::pqInternal(this))
+  vtkSMProperty* smproperty, vtkSMProxy* smproxy, QWidget* parentObject)
+  : Superclass(smproxy, parentObject)
+  , Internal(new pqProxySelectionWidget::pqInternal(this))
 {
   this->Internal->Ui.label->setText(smproperty->GetXMLLabel());
-  this->Internal->Domain = vtkSMProxyListDomain::SafeDownCast(
-    smproperty->FindDomain("vtkSMProxyListDomain"));
+  this->Internal->Domain =
+    vtkSMProxyListDomain::SafeDownCast(smproperty->FindDomain("vtkSMProxyListDomain"));
 
   // This widget is intended to be used for properties with ProxyListDomains
   // alone.
   Q_ASSERT(this->Internal->Domain);
-  this->connect(this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)),
-    SLOT(currentIndexChanged(int)));
+  this->connect(
+    this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
   new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, "proxy_list");
-  this->addPropertyLink(
-    this, "chosenProxy", SIGNAL(chosenProxyChanged()),
-    smproperty);
+  this->addPropertyLink(this, "chosenProxy", SIGNAL(chosenProxyChanged()), smproperty);
 
-    // If selected_proxy_panel_visibility="advanced" hint is specified, we
-    // only show the widgets for the selected proxy in advanced mode.
-    vtkPVXMLElement* hints = smproperty->GetHints()?
-      smproperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget") : NULL;
-    this->Internal->HideProxyWidgetsInDefaultView = (hints &&
-      strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
+  // If selected_proxy_panel_visibility="advanced" hint is specified, we
+  // only show the widgets for the selected proxy in advanced mode.
+  vtkPVXMLElement* hints = smproperty->GetHints()
+    ? smproperty->GetHints()->FindNestedElementByName("ProxyPropertyWidget")
+    : NULL;
+  this->Internal->HideProxyWidgetsInDefaultView = (hints &&
+    strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -144,19 +144,19 @@ vtkSMProxy* pqProxySelectionWidget::chosenProxy() const
 void pqProxySelectionWidget::setChosenProxy(vtkSMProxy* cproxy)
 {
   if (this->Internal->ChosenProxy != cproxy)
-    {
+  {
     this->Internal->setChosenProxy(cproxy, this);
 
     // Update the QComboBox.
-    for (unsigned int cc=0; cc < this->Internal->Domain->GetNumberOfProxies(); ++cc)
-      {
+    for (unsigned int cc = 0; cc < this->Internal->Domain->GetNumberOfProxies(); ++cc)
+    {
       if (this->Internal->Domain->GetProxy(cc) == cproxy)
-        {
+      {
         this->Internal->Ui.comboBox->setCurrentIndex(cc);
-        }
       }
-    emit this->chosenProxyChanged();
     }
+    emit this->chosenProxyChanged();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -169,9 +169,9 @@ void pqProxySelectionWidget::currentIndexChanged(int idx)
 void pqProxySelectionWidget::apply()
 {
   if (this->Internal->ProxyWidget)
-    {
+  {
     this->Internal->ProxyWidget->apply();
-    }
+  }
   this->Superclass::apply();
 }
 
@@ -179,9 +179,9 @@ void pqProxySelectionWidget::apply()
 void pqProxySelectionWidget::reset()
 {
   if (this->Internal->ProxyWidget)
-    {
+  {
     this->Internal->ProxyWidget->reset();
-    }
+  }
   this->Superclass::reset();
 }
 
@@ -214,8 +214,8 @@ void pqProxySelectionWidget::setPanelVisibility(const char* vis)
 void pqProxySelectionWidget::setView(pqView* aview)
 {
   if (this->Internal->ProxyWidget)
-    {
+  {
     this->Internal->ProxyWidget->setView(aview);
-    }
+  }
   this->Superclass::setView(aview);
 }

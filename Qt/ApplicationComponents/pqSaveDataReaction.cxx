@@ -55,8 +55,8 @@ pqSaveDataReaction::pqSaveDataReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(
+    activeObjects, SIGNAL(portChanged(pqOutputPort*)), this, SLOT(updateEnableState()));
 
   this->updateEnableState();
 }
@@ -69,27 +69,24 @@ void pqSaveDataReaction::updateEnableState()
   pqOutputPort* port = activeObjects.activePort();
   bool enable_state = (port != NULL);
   if (enable_state)
-    {
+  {
     vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
     enable_state = writerFactory->CanWrite(
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
-      port->getPortNumber());
+      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber());
 
-    if(!enable_state)
-      {
-      QObject::connect(port->getSource(),
-                       SIGNAL(dataUpdated(pqPipelineSource*)),
-                       this, SLOT(dataUpdated(pqPipelineSource*)));
-      }
-
+    if (!enable_state)
+    {
+      QObject::connect(port->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)), this,
+        SLOT(dataUpdated(pqPipelineSource*)));
     }
+  }
   this->parentAction()->setEnabled(enable_state);
 }
 //-----------------------------------------------------------------------------
 void pqSaveDataReaction::dataUpdated(pqPipelineSource* source)
 {
-  QObject::disconnect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
-                      this, SLOT(dataUpdated(pqPipelineSource*)));
+  QObject::disconnect(
+    source, SIGNAL(dataUpdated(pqPipelineSource*)), this, SLOT(dataUpdated(pqPipelineSource*)));
   updateEnableState();
 }
 
@@ -100,31 +97,29 @@ bool pqSaveDataReaction::saveActiveData()
   // TODO: also is there's a pending accept.
   pqOutputPort* port = pqActiveObjects::instance().activePort();
   if (!server || !port)
-    {
+  {
     qCritical("No active source located.");
     return false;
-    }
+  }
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
   QString filters = writerFactory->GetSupportedFileTypes(
-    vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
-    port->getPortNumber());
+    vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber());
   if (filters.isEmpty())
-    {
+  {
     qCritical("Cannot determine writer to use.");
     return false;
-    }
+  }
 
-  pqFileDialog fileDialog(server,
-    pqCoreUtilities::mainWidget(),
-    tr("Save File:"), QString(), filters);
+  pqFileDialog fileDialog(
+    server, pqCoreUtilities::mainWidget(), tr("Save File:"), QString(), filters);
   // FIXME: fileDialog.setRecentlyUsedExtension(this->DataExtension);
   fileDialog.setObjectName("FileSaveDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)
-    {
+  {
     return pqSaveDataReaction::saveActiveData(fileDialog.getSelectedFiles()[0]);
-    }
+  }
   return false;
 }
 
@@ -135,62 +130,57 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
   // TODO: also is there's a pending accept.
   pqOutputPort* port = pqActiveObjects::instance().activePort();
   if (!server || !port)
-    {
+  {
     qCritical("No active source located.");
     return false;
-    }
+  }
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(writerFactory->CreateWriter(filename.toLatin1().data(),
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
-      port->getPortNumber()));
+    vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
-    {
+  {
     qCritical() << "Failed to create writer for: " << filename;
     return false;
-    }
+  }
 
   if (writer->IsA("vtkSMPSWriterProxy") && port->getServer()->getNumberOfPartitions() > 1)
-    {
-    bool result =
-      pqCoreUtilities::promptUser(
-        // Let's try to warn separately for each type of writer.
-        QString("SerialWriterWarning_%1").arg(writer->GetXMLName()),
-        QMessageBox::Warning,
-        tr("Serial Writer Warning"),
-        QString(
-          tr("This writer (%1) will collect all of the data to the first node before "
-          "writing because it does not support parallel IO. This may cause the "
-          "first node to run out of memory if the data is large.\n"
-          "Are you sure you want to continue?")).arg(writer->GetXMLLabel()),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Save,
-        pqCoreUtilities::mainWidget());
+  {
+    bool result = pqCoreUtilities::promptUser(
+      // Let's try to warn separately for each type of writer.
+      QString("SerialWriterWarning_%1").arg(writer->GetXMLName()), QMessageBox::Warning,
+      tr("Serial Writer Warning"),
+      QString(tr("This writer (%1) will collect all of the data to the first node before "
+                 "writing because it does not support parallel IO. This may cause the "
+                 "first node to run out of memory if the data is large.\n"
+                 "Are you sure you want to continue?"))
+        .arg(writer->GetXMLLabel()),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Save, pqCoreUtilities::mainWidget());
     if (!result)
-      {
+    {
       return false;
-      }
     }
+  }
 
   pqProxyWidgetDialog dialog(writer, pqCoreUtilities::mainWidget());
   dialog.setObjectName("WriterSettingsDialog");
   dialog.setEnableSearchBar(dialog.hasAdvancedProperties());
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle(
-    QString("Configure Writer (%1)").arg(writer->GetXMLLabel()));
+  dialog.setWindowTitle(QString("Configure Writer (%1)").arg(writer->GetXMLLabel()));
 
   // Check to see if this writer has any properties that can be configured by
   // the user. If it does, display the dialog.
   if (dialog.hasVisibleWidgets())
-    {
+  {
     dialog.exec();
-    if(dialog.result() == QDialog::Rejected)
-      {
+    if (dialog.result() == QDialog::Rejected)
+    {
       // The user pressed Cancel so don't write
       return false;
-      }
     }
+  }
   writer->UpdateVTKObjects();
   writer->UpdatePipeline();
 

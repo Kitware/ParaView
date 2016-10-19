@@ -33,5 +33,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 vtkPVGUIPluginInterface::~vtkPVGUIPluginInterface()
 {
-
 }

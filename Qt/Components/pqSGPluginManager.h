@@ -35,26 +35,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QObject>
 
-/// pqSGPluginManager is the central class that orchestrates the behaviour of
-/// this co-processing plugin.
+/**
+* pqSGPluginManager is the central class that orchestrates the behaviour of
+* this co-processing plugin.
+*/
 class PQCOMPONENTS_EXPORT pqSGPluginManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqSGPluginManager(QObject* parent=0);
+  pqSGPluginManager(QObject* parent = 0);
   ~pqSGPluginManager();
 
-  /// Methods used to shartup and shutdown the plugin.
+  /**
+  * Methods used to shartup and shutdown the plugin.
+  */
   void startup();
 
-  /// Methods used to shartup and shutdown the plugin.
+  /**
+  * Methods used to shartup and shutdown the plugin.
+  */
   void shutdown();
 
-  /// Get the name of the writers menu from the concrete subclass.
+  /**
+  * Get the name of the writers menu from the concrete subclass.
+  */
   virtual const char* getWritersMenuName() = 0;
 
-  /// Get the Qt name of the writers menu from the concrete subclass.
+  /**
+  * Get the Qt name of the writers menu from the concrete subclass.
+  */
   virtual const char* getObjectMenuName() = 0;
 
 private:

@@ -56,18 +56,18 @@ void vtkSIObject::Initialize(vtkPVSessionCore* session)
 vtkSIObject* vtkSIObject::GetSIObject(vtkTypeUInt32 globalid) const
 {
   if (this->SessionCore)
-    {
+  {
     return this->SessionCore->GetSIObject(globalid);
-    }
+  }
   return NULL;
 }
 //----------------------------------------------------------------------------
 vtkObject* vtkSIObject::GetRemoteObject(vtkTypeUInt32 globalid)
 {
   if (this->SessionCore)
-    {
+  {
     return this->SessionCore->GetRemoteObject(globalid);
-    }
+  }
   return NULL;
 }
 

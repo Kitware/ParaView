@@ -35,30 +35,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 class vtkSMSourceProxy;
 
-/// @ingroup Reactions
-///
-/// pqReloadFilesReaction adds handler code to reload the active reader.
-/// It calls the "reload" property, identified by hints, if present, or calls
-/// vtkSMProxy::RecreateVTKObjects().
+/**
+* @ingroup Reactions
+*
+* pqReloadFilesReaction adds handler code to reload the active reader.
+* It calls the "reload" property, identified by hints, if present, or calls
+* vtkSMProxy::RecreateVTKObjects().
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqReloadFilesReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqReloadFilesReaction(QAction* parent=0);
+  pqReloadFilesReaction(QAction* parent = 0);
   virtual ~pqReloadFilesReaction();
 
-  /// reload the active proxy if it supports reload. Returns true on success.
+  /**
+  * reload the active proxy if it supports reload. Returns true on success.
+  */
   static bool reload();
 
-  /// reload the \c proxy if it supports reload. Returns true on success.
+  /**
+  * reload the \c proxy if it supports reload. Returns true on success.
+  */
   static bool reload(vtkSMSourceProxy* proxy);
 
 protected:
-  virtual void onTriggered()
-    {
-    this->reload();
-    }
+  virtual void onTriggered() { this->reload(); }
   virtual void updateEnableState();
 
 private:

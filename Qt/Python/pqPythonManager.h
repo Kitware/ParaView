@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,24 +40,26 @@ class QToolBar;
 class pqServer;
 class pqPythonDialog;
 
-/// pqPythonManager is a class to facilitate the use of a python interpreter
-/// by various paraview GUI components.  The manager has a single instance 
-/// of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
-/// python interpreter.  Anyone who wants to execute python code should call
-/// pythonShellDialog() to get a pointer to the pqPythonDialog instance.  This
-/// manager class provides global access to the python dialog and methods to
-/// ensure the python dialog's interpreter stays in sync with the current active
-/// server.
-///
-/// Note: because the interpreter is initialized lazily, a number of the member
-/// functions on this class have the side effect of initializing the python
-/// interpreter first.
+/**
+* pqPythonManager is a class to facilitate the use of a python interpreter
+* by various paraview GUI components.  The manager has a single instance
+* of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
+* python interpreter.  Anyone who wants to execute python code should call
+* pythonShellDialog() to get a pointer to the pqPythonDialog instance.  This
+* manager class provides global access to the python dialog and methods to
+* ensure the python dialog's interpreter stays in sync with the current active
+* server.
+*
+* Note: because the interpreter is initialized lazily, a number of the member
+* functions on this class have the side effect of initializing the python
+* interpreter first.
+*/
 class PQPYTHON_EXPORT pqPythonManager : public QObject
 {
   Q_OBJECT
 
 public:
-  pqPythonManager(QObject* parent=NULL);
+  pqPythonManager(QObject* parent = NULL);
   virtual ~pqPythonManager();
 
   // Description:
@@ -81,7 +83,7 @@ public:
   // Show the python editor with the trace in it.
   // If txt is empty, the editor will obtain the state from active vtkSMTrace
   // instance, if any.
-  void editTrace(const QString& txt=QString(), bool update=false);
+  void editTrace(const QString& txt = QString(), bool update = false);
 
   // Description:
   // Save the macro in ParaView configuration and update widget automatically
@@ -94,7 +96,6 @@ public:
 
 signals:
   void paraviewPythonModulesImported();
-
 
 public slots:
   // Description:
@@ -123,6 +124,5 @@ protected:
 private:
   class pqInternal;
   pqInternal* Internal;
-
 };
 #endif

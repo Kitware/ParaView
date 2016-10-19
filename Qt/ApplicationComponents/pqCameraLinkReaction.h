@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,26 +38,30 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraLinkReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqCameraLinkReaction(QAction* parent);
 
-  /// Adds camera link with the active view.
+  /**
+  * Adds camera link with the active view.
+  */
   static void addCameraLink();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqCameraLinkReaction::addCameraLink(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqCameraLinkReaction::addCameraLink(); }
 
 private:
   Q_DISABLE_COPY(pqCameraLinkReaction)
 };
 
 #endif
-
-

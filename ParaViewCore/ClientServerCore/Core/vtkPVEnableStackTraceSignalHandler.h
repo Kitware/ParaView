@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVEnableStackTraceSignalHandler
-// .SECTION Description
-// When run on the process it enables a stacktrace signal handler for
-// common errors.
+/**
+ * @class   vtkPVEnableStackTraceSignalHandler
+ *
+ * When run on the process it enables a stacktrace signal handler for
+ * common errors.
+*/
 
 #ifndef vtkPVEnableStackTraceSignalHandler_h
 #define vtkPVEnableStackTraceSignalHandler_h
@@ -31,22 +33,25 @@ public:
   vtkTypeMacro(vtkPVEnableStackTraceSignalHandler, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object.
-  virtual void AddInformation(vtkPVInformation*){}
+  /**
+   * Merge another information object.
+   */
+  virtual void AddInformation(vtkPVInformation*) {}
 
-  // Description:
-  // Manage a serialized version of the information.
-  virtual void CopyToStream(vtkClientServerStream*){}
-  virtual void CopyFromStream(const vtkClientServerStream*){}
+  /**
+   * Manage a serialized version of the information.
+   */
+  virtual void CopyToStream(vtkClientServerStream*) {}
+  virtual void CopyFromStream(const vtkClientServerStream*) {}
 
 protected:
-  vtkPVEnableStackTraceSignalHandler(){}
-  ~vtkPVEnableStackTraceSignalHandler(){}
+  vtkPVEnableStackTraceSignalHandler() {}
+  ~vtkPVEnableStackTraceSignalHandler() {}
 
 private:
   vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;

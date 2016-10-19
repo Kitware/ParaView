@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentationToolbar.h"
 #include "pqSetName.h"
 
-
 class myMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 };
@@ -70,16 +69,15 @@ myMainWindow::myMainWindow()
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget,
-    SIGNAL(helpRequested(QString)),
-    this, SLOT(showHelpForProxy(const QString&)));
+  QObject::connect(this->Internals->proxyTabWidget, SIGNAL(helpRequested(QString)), this,
+    SLOT(showHelpForProxy(const QString&)));
 
-  // Populate application menus with actions.
+// Populate application menus with actions.
 #if 0
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
 #else
-  QList<QAction *> qa= this->Internals->menu_File->actions();
-  QAction *mqa = qa.at(0);
+  QList<QAction*> qa = this->Internals->menu_File->actions();
+  QAction* mqa = qa.at(0);
   new pqLoadDataReaction(mqa);
 #endif
 
@@ -94,23 +92,19 @@ myMainWindow::myMainWindow()
   // Populate Tools menu.
   pqParaViewMenuBuilders::buildToolsMenu(*this->Internals->menuTools);
 
-
-  // Populate toolbars
+// Populate toolbars
 #if 0
   pqParaViewMenuBuilders::buildToolbars(*this);
 #else
-  QToolBar* mainToolBar = new pqMainControlsToolbar(this)
-    << pqSetName("MainControlsToolbar");
+  QToolBar* mainToolBar = new pqMainControlsToolbar(this) << pqSetName("MainControlsToolbar");
   mainToolBar->layout()->setSpacing(0);
   this->addToolBar(Qt::TopToolBarArea, mainToolBar);
 
-  QToolBar* reprToolbar = new pqRepresentationToolbar(this)
-    << pqSetName("representationToolbar");
+  QToolBar* reprToolbar = new pqRepresentationToolbar(this) << pqSetName("representationToolbar");
   reprToolbar->layout()->setSpacing(0);
   this->addToolBar(Qt::TopToolBarArea, reprToolbar);
 
-  QToolBar* axesToolbar = new pqAxesToolbar(this)
-    << pqSetName("axesToolbar");
+  QToolBar* axesToolbar = new pqAxesToolbar(this) << pqSetName("axesToolbar");
   axesToolbar->layout()->setSpacing(0);
   this->addToolBar(Qt::TopToolBarArea, axesToolbar);
 #endif
@@ -122,15 +116,15 @@ myMainWindow::myMainWindow()
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
 
-  // Final step, define application behaviors. Since we want all ParaView
-  // behaviors, we use this convenience method.
+// Final step, define application behaviors. Since we want all ParaView
+// behaviors, we use this convenience method.
 #if 0
   new pqParaViewBehaviors(this, this);
 #else
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
-//  new pqPVNewSourceBehavior(this);
-//  new pqDeleteBehavior(this);
+  //  new pqPVNewSourceBehavior(this);
+  //  new pqDeleteBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
 #endif
 }
@@ -141,10 +135,8 @@ myMainWindow::~myMainWindow()
   delete this->Internals;
 }
 
-
 //-----------------------------------------------------------------------------
 void myMainWindow::showHelpForProxy(const QString& proxyname)
 {
-  pqHelpReaction::showHelp(
-    QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
+  pqHelpReaction::showHelp(QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
 }

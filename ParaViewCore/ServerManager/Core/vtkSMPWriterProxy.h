@@ -12,12 +12,15 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPWriterProxy - proxy for a VTK writer that supports parallel 
-// writing.
-// .SECTION Description
-// vtkSMPWriterProxy is the proxy for all writers that can write in parallel.
-// The only extra functionality provided by this class is that it sets up the
-// piece information on the writer.
+/**
+ * @class   vtkSMPWriterProxy
+ * @brief   proxy for a VTK writer that supports parallel
+ * writing.
+ *
+ * vtkSMPWriterProxy is the proxy for all writers that can write in parallel.
+ * The only extra functionality provided by this class is that it sets up the
+ * piece information on the writer.
+*/
 
 #ifndef vtkSMPWriterProxy_h
 #define vtkSMPWriterProxy_h
@@ -41,6 +44,4 @@ private:
   void operator=(const vtkSMPWriterProxy&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

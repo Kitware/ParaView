@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTimeStepIndexDomain - int range domain based on data set time-steps
-// .SECTION Description
-// vtkSMTimeStepIndexDomain is a subclass of vtkSMIntRangeDomain. In its Update
-// method, it determines the number of time steps in the associated data.
-// It requires a vtkSMSourceProxy to do this.
-// .SECTION See Also
-// vtkSMIntRangeDomain
+/**
+ * @class   vtkSMTimeStepIndexDomain
+ * @brief   int range domain based on data set time-steps
+ *
+ * vtkSMTimeStepIndexDomain is a subclass of vtkSMIntRangeDomain. In its Update
+ * method, it determines the number of time steps in the associated data.
+ * It requires a vtkSMSourceProxy to do this.
+ * @sa
+ * vtkSMIntRangeDomain
+*/
 
 #ifndef vtkSMTimeStepIndexDomain_h
 #define vtkSMTimeStepIndexDomain_h
@@ -35,16 +38,17 @@ public:
   vtkTypeMacro(vtkSMTimeStepIndexDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Update self checking the "unchecked" values of all required
-  // properties. Overwritten by sub-classes.
+  /**
+   * Update self checking the "unchecked" values of all required
+   * properties. Overwritten by sub-classes.
+   */
   virtual void Update(vtkSMProperty*);
 
 protected:
   vtkSMTimeStepIndexDomain();
   ~vtkSMTimeStepIndexDomain();
 
-  void Update(vtkSMProxyProperty *pp);
+  void Update(vtkSMProxyProperty* pp);
 
 private:
   vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;

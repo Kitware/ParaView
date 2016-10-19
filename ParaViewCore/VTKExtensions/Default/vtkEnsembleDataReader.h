@@ -12,12 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkEnsembleDataReader - reader for ensemble data sets
-// .SECTION Description
-// vtkEnsembleDataReader reads a collection of data sources from a metadata
-// file (of extension .pve).
-// 'pve' a simply CSV file with the last column being the relative filename and
-// other columns for each of the variables in the ensemble.
+/**
+ * @class   vtkEnsembleDataReader
+ * @brief   reader for ensemble data sets
+ *
+ * vtkEnsembleDataReader reads a collection of data sources from a metadata
+ * file (of extension .pve).
+ * 'pve' a simply CSV file with the last column being the relative filename and
+ * other columns for each of the variables in the ensemble.
+*/
+
 #ifndef vtkEnsembleDataReader_h
 #define vtkEnsembleDataReader_h
 
@@ -27,57 +31,69 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkEnsembleDataReader *New();
+  static vtkEnsembleDataReader* New();
   vtkTypeMacro(vtkEnsembleDataReader, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream &os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/Get the filename of the ensemble (.pve extension).
+  //@{
+  /**
+   * Set/Get the filename of the ensemble (.pve extension).
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Set/Get the current ensemble member to process.
+  //@{
+  /**
+   * Set/Get the current ensemble member to process.
+   */
   vtkSetMacro(CurrentMember, unsigned int);
   vtkGetMacro(CurrentMember, unsigned int);
+  //@}
 
-  // Description:
-  // Returns the number of ensemble members
+  //@{
+  /**
+   * Returns the number of ensemble members
+   */
   unsigned int GetNumberOfMembers() const;
   vtkGetVector2Macro(CurrentMemberRange, unsigned int);
+  //@}
 
-  // Description:
-  // Get the file path associated with the specified row of the meta data
+  /**
+   * Get the file path associated with the specified row of the meta data
+   */
   vtkStdString GetFilePath(unsigned int rowIndex) const;
 
-  // Description:
-  // Set the file reader for the specified row of data
-  void SetReader(unsigned int rowIndex, vtkAlgorithm *reader);
+  /**
+   * Set the file reader for the specified row of data
+   */
+  void SetReader(unsigned int rowIndex, vtkAlgorithm* reader);
 
-  // Description:
-  // Removes all readers set using SetReader().
+  /**
+   * Removes all readers set using SetReader().
+   */
   void ResetReaders();
 
-  // Description:
-  // Use this method to update the meta data, if needed. This will only read the
-  // file again if cache is obsolete.
+  /**
+   * Use this method to update the meta data, if needed. This will only read the
+   * file again if cache is obsolete.
+   */
   bool UpdateMetaData();
 
 protected:
   vtkEnsembleDataReader();
   ~vtkEnsembleDataReader();
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  vtkAlgorithm *GetCurrentReader();
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  vtkAlgorithm* GetCurrentReader();
 
 private:
-  char *FileName;
+  char* FileName;
   unsigned int CurrentMember;
   unsigned int CurrentMemberRange[2];
 
   class vtkInternal;
-  vtkInternal *Internal;
+  vtkInternal* Internal;
 
   vtkEnsembleDataReader(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;

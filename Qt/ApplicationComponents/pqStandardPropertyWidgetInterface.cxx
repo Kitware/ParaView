@@ -81,7 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
+pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject* p)
   : QObject(p)
 {
 }
@@ -92,227 +92,224 @@ pqStandardPropertyWidgetInterface::~pqStandardPropertyWidgetInterface()
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget*
-pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
-                                                           vtkSMProperty *smProperty)
+pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
+  vtkSMProxy* smProxy, vtkSMProperty* smProperty)
 {
   // handle properties that specify custom panel widgets
-  const char *custom_widget = smProperty->GetPanelWidget();
+  const char* custom_widget = smProperty->GetPanelWidget();
   if (!custom_widget)
-    {
+  {
     return NULL;
-    }
+  }
 
   std::string name = custom_widget;
 
   // *** NOTE: When adding new types, please update the header documentation ***
   if (name == "color_palette_selector")
-    {
+  {
     return new pqColorPaletteSelectorWidget(smProxy, smProperty);
-    }
-  else if(name == "color_selector")
-    {
+  }
+  else if (name == "color_selector")
+  {
     bool withPalette = false;
     return new pqColorSelectorPropertyWidget(smProxy, smProperty, withPalette);
-    }
-  else if(name == "color_selector_with_palette")
-    {
+  }
+  else if (name == "color_selector_with_palette")
+  {
     bool withPalette = true;
     return new pqColorSelectorPropertyWidget(smProxy, smProperty, withPalette);
-    }
-  else if(name == "display_representation_selector")
-    {
+  }
+  else if (name == "display_representation_selector")
+  {
     return new pqDisplayRepresentationPropertyWidget(smProxy);
-    }
-  else if(name == "texture_selector")
-    {
+  }
+  else if (name == "texture_selector")
+  {
     return new pqTextureSelectorPropertyWidget(smProxy);
-    }
+  }
   else if (name == "calculator")
-    {
+  {
     return new pqCalculatorWidget(smProxy, smProperty);
-    }
-  else if(name == "command_button")
-    {
+  }
+  else if (name == "command_button")
+  {
     return new pqCommandButtonPropertyWidget(smProxy, smProperty);
-    }
-  else if(name == "transfer_function_editor")
-    {
+  }
+  else if (name == "transfer_function_editor")
+  {
     return new pqTransferFunctionWidgetPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "list")
-    {
+  {
     return new pqListPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "double_range")
-    {
+  {
     return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "image_compressor_config")
-    {
+  {
     return new pqImageCompressorWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "index_selection")
-    {
+  {
     return new pqIndexSelectionWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "camera_manipulator")
-    {
+  {
     return new pqCameraManipulatorWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "viewtype_selector")
-    {
+  {
     return new pqViewTypePropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "glyph_scale_factor")
-    {
+  {
     return new pqGlyphScaleFactorPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "proxy_editor")
-    {
+  {
     return new pqProxyEditorPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "int_mask")
-    {
+  {
     return new pqIntMaskPropertyWidget(smProxy, smProperty);
-    }
+  }
   else if (name == "filename_widget")
-    {
+  {
     return new pqFileNamePropertyWidget(smProxy, smProperty);
-    }
+  }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget*
-pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
-  vtkSMProxy *proxy,
-  vtkSMPropertyGroup *group)
+pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
+  vtkSMProxy* proxy, vtkSMPropertyGroup* group)
 {
   QString panelWidget(group->GetPanelWidget());
   // *** NOTE: When adding new types, please update the header documentation ***
   if (panelWidget == "ColorEditor")
-    {
+  {
     return new pqColorEditorPropertyWidget(proxy);
-    }
-  else if(panelWidget == "CubeAxes")
-    {
-    qWarning("`CubeAxes` is no longer supported. Please update your ServerManager XML configuration.");
-    }
-  else if(panelWidget == "BackgroundEditor")
-    {
+  }
+  else if (panelWidget == "CubeAxes")
+  {
+    qWarning(
+      "`CubeAxes` is no longer supported. Please update your ServerManager XML configuration.");
+  }
+  else if (panelWidget == "BackgroundEditor")
+  {
     return new pqBackgroundEditorWidget(proxy, group);
-    }
-  else if(panelWidget == "LightsEditor")
-    {
-    pqPropertyGroupButton * pgb = new pqPropertyGroupButton(proxy, group);
-    pgb->SetEditor (new pqLightsEditor(pgb));
+  }
+  else if (panelWidget == "LightsEditor")
+  {
+    pqPropertyGroupButton* pgb = new pqPropertyGroupButton(proxy, group);
+    pgb->SetEditor(new pqLightsEditor(pgb));
     return pgb;
-    }
+  }
   else if (panelWidget == "ArrayStatus")
-    {
+  {
     return new pqArrayStatusPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "ColorOpacityEditor")
-    {
+  {
     return new pqColorOpacityEditorWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "AnnotationsEditor")
-    {
+  {
     return new pqColorAnnotationsPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "FontEditor")
-    {
+  {
     return new pqFontPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "SeriesEditor")
-    {
+  {
     return new pqSeriesEditorPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "TextLocationEditor")
-    {
+  {
     return new pqTextLocationWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractivePlane")
-    {
+  {
     return new pqImplicitPlanePropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveBox")
-    {
+  {
     return new pqBoxPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveHandle")
-    {
+  {
     return new pqHandlePropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveLine")
-    {
+  {
     return new pqLinePropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveSpline")
-    {
+  {
     return new pqSplinePropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveSphere")
-    {
+  {
     return new pqSpherePropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractivePolyLine")
-    {
+  {
     return new pqSplinePropertyWidget(proxy, group, pqSplinePropertyWidget::POLYLINE);
-    }
+  }
   else if (panelWidget == "YoungsMaterial")
-    {
+  {
     return new pqYoungsMaterialPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "InteractiveCylinder")
-    {
+  {
     return new pqCylinderPropertyWidget(proxy, group);
-    }
+  }
   else if (panelWidget == "cinema_export_selector")
-    {
+  {
 #ifdef PARAVIEW_ENABLE_PYTHON
     return new pqCinemaConfiguration(proxy, group);
 #else
     return NULL;
 #endif
-    }
+  }
   // *** NOTE: When adding new types, please update the header documentation ***
 
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidgetDecorator*
-pqStandardPropertyWidgetInterface::createWidgetDecorator(
+pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecorator(
   const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
 {
   // *** NOTE: When adding new types, please update the header documentation ***
   if (type == "CTHArraySelectionDecorator")
-    {
+  {
     return new pqCTHArraySelectionDecorator(config, widget);
-    }
+  }
   if (type == "InputDataTypeDecorator")
-    {
+  {
     return new pqInputDataTypeDecorator(config, widget);
-    }
+  }
   if (type == "EnableWidgetDecorator")
-    {
+  {
     return new pqEnableWidgetDecorator(config, widget);
-    }
+  }
   if (type == "ShowWidgetDecorator")
-    {
+  {
     return new pqShowWidgetDecorator(config, widget);
-    }
+  }
   if (type == "GenericDecorator")
-    {
+  {
     return new pqGenericPropertyWidgetDecorator(config, widget);
-    }
+  }
   if (type == "OSPRayHidingDecorator")
-    {
+  {
     return new pqOSPRayHidingDecorator(config, widget);
-    }
+  }
 
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

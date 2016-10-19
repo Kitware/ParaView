@@ -29,44 +29,59 @@ class PQCORE_EXPORT pqMultiSliceView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
+
 public:
   static QString multiSliceViewType() { return "MultiSlice"; }
 
-  /// constructor takes a bunch of init stuff and must have this signature to
-  /// satisfy pqView
-  pqMultiSliceView( const QString& viewtype,
-                    const QString& group,
-                    const QString& name,
-                    vtkSMViewProxy* viewmodule,
-                    pqServer* server,
-                    QObject* p);
+  /**
+  * constructor takes a bunch of init stuff and must have this signature to
+  * satisfy pqView
+  */
+  pqMultiSliceView(const QString& viewtype, const QString& group, const QString& name,
+    vtkSMViewProxy* viewmodule, pqServer* server, QObject* p);
   virtual ~pqMultiSliceView();
 
-  /// Provide access to visible slices positions for any axis.
-  /// Precondition: 0 <= axisIndex <= 2
-  const double* GetVisibleSlices(int axisIndex, int &numberOfSlices);
+  /**
+  * Provide access to visible slices positions for any axis.
+  * Precondition: 0 <= axisIndex <= 2
+  */
+  const double* GetVisibleSlices(int axisIndex, int& numberOfSlices);
 
-  /// @deprecated. Use GetVisibleSlices() or GetAllSlices(). This method simply
-  /// calls GetVisibleSlices().
-  const double* GetSlices(int axisIndex, int &numberOfSlices)
-    { return this->GetVisibleSlices(axisIndex, numberOfSlices); }
+  /**
+  * @deprecated. Use GetVisibleSlices() or GetAllSlices(). This method simply
+  * calls GetVisibleSlices().
+  */
+  const double* GetSlices(int axisIndex, int& numberOfSlices)
+  {
+    return this->GetVisibleSlices(axisIndex, numberOfSlices);
+  }
 
-  /// Provides access to all (visible and invisible) slice positions for any
-  /// Precondition: 0 <= axisIndex <= 2
-  const double* GetAllSlices(int axisIndex, int &numberOfSlices);
+  /**
+  * Provides access to all (visible and invisible) slice positions for any
+  * Precondition: 0 <= axisIndex <= 2
+  */
+  const double* GetAllSlices(int axisIndex, int& numberOfSlices);
 
-  /// Provide access to slices normal for any axis.
-  /// 0 <= axisIndex <= 2
+  /**
+  * Provide access to slices normal for any axis.
+  * 0 <= axisIndex <= 2
+  */
   const double* GetSliceNormal(int axisIndex);
 
-  /// Provide access to slices origin for any axis.
-  /// 0 <= axisIndex <= 2
+  /**
+  * Provide access to slices origin for any axis.
+  * 0 <= axisIndex <= 2
+  */
   const double* GetSliceOrigin(int axisIndex);
 
-  /// Override for custom management
-  virtual void setCursor(const QCursor &);
+  /**
+  * Override for custom management
+  */
+  virtual void setCursor(const QCursor&);
 
-  /// Update Outline visibility
+  /**
+  * Update Outline visibility
+  */
   bool getOutlineVisibility();
   void setOutlineVisibility(bool visible);
 
@@ -93,15 +108,21 @@ private slots:
   void onSliceModified(int activeSliceIndex);
 
 protected:
-  void updateViewModelCallBack(vtkObject*,unsigned long, void*);
+  void updateViewModelCallBack(vtkObject*, unsigned long, void*);
 
-  /// Override to decorate the QVTKWidget
+  /**
+  * Override to decorate the QVTKWidget
+  */
   virtual QWidget* createWidget();
 
-  /// Helper method to get the concreate 3D widget
+  /**
+  * Helper method to get the concreate 3D widget
+  */
   QVTKWidget* getInternalWidget();
 
-  /// Get axis index.
+  /**
+  * Get axis index.
+  */
   int getAxisIndex(QObject*);
 
   QPointer<QVTKWidget> InternalWidget;

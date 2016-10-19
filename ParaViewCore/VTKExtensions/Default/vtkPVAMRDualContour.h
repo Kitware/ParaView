@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAMRDualContour - Generates a contour surface given one or
-// more cell arrays and a volume fraction value.
-//
-// .SECTION Description
-//
-// .SEE vtkAMRDualContour
-//
+/**
+ * @class   vtkPVAMRDualContour
+ * @brief   Generates a contour surface given one or
+ * more cell arrays and a volume fraction value.
+ *
+ *
+ *
+ * .SEE vtkAMRDualContour
+ *
+*/
 
 #ifndef vtkPVAMRDualContour_h
 #define vtkPVAMRDualContour_h
@@ -33,24 +36,29 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRDualContour : public vtkAMRDualCo
 {
 public:
   static vtkPVAMRDualContour* New();
-  vtkTypeMacro(vtkPVAMRDualContour,vtkAMRDualContour);
+  vtkTypeMacro(vtkPVAMRDualContour, vtkAMRDualContour);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkPVAMRDualContour();
   virtual ~vtkPVAMRDualContour();
 
-  // Description:
-  // Add to list of cell arrays which are used for generating contours.
+  //@{
+  /**
+   * Add to list of cell arrays which are used for generating contours.
+   */
   void AddInputCellArrayToProcess(const char* name);
   void ClearInputCellArrayToProcess();
+  //@}
 
-  // Description:
-  // Get / Set volume fraction value.
+  //@{
+  /**
+   * Get / Set volume fraction value.
+   */
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
+  //@}
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkPVAMRDualContour(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;

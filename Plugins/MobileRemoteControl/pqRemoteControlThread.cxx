@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRemoteControlThread::pqInternal
 {
 public:
-
   pqInternal()
   {
     this->ShouldQuit = false;
@@ -105,15 +104,15 @@ bool pqRemoteControlThread::clientIsConnected()
 bool pqRemoteControlThread::checkForConnection()
 {
   if (!this->Internal->ServerSocket)
-    {
+  {
     return false;
-    }
+  }
 
   vtkClientSocket* socket = this->Internal->ServerSocket->WaitForConnection(1);
   if (!socket)
-    {
+  {
     return false;
-    }
+  }
 
   this->Internal->ServerSocket = NULL;
   this->Internal->Socket = socket;
@@ -155,35 +154,36 @@ void pqRemoteControlThread::exportSceneOnMainThread()
 void pqRemoteControlThread::exportScene(vtkRenderWindow* renderWindow)
 {
   if (renderWindow)
-    {
+  {
     if (!this->Internal->Exporter)
-      {
-      this->Internal->Exporter = vtkSmartPointer<vtkWebGLExporter>::New();
-      }
-    this->Internal->Exporter->parseScene(renderWindow->GetRenderers(), "\"view\"", VTK_PARSEALL);
-    }
-  else
     {
-    this->Internal->Exporter = 0;
+      this->Internal->Exporter = vtkSmartPointer<vtkWebGLExporter>::New();
     }
+    this->Internal->Exporter->parseScene(renderWindow->GetRenderers(), "\"view\"", VTK_PARSEALL);
+  }
+  else
+  {
+    this->Internal->Exporter = 0;
+  }
   this->Internal->WaitCondition.wakeOne();
 }
 
 //-----------------------------------------------------------------------------
 bool pqRemoteControlThread::sendSceneInfo()
 {
-  const char* metadata = this->Internal->Exporter ? this->Internal->Exporter->GenerateMetadata() : 0;
+  const char* metadata =
+    this->Internal->Exporter ? this->Internal->Exporter->GenerateMetadata() : 0;
   unsigned long long length = metadata ? strlen(metadata) : 0;
 
   if (this->Internal->Socket->Send(&length, sizeof(length)) == 0)
-    {
+  {
     return false;
-    }
+  }
 
   if (this->Internal->Socket->Send(metadata, length) == 0)
-    {
+  {
     return false;
-    }
+  }
 
   return (this->Internal->ShouldQuit != true);
 }
@@ -192,43 +192,43 @@ bool pqRemoteControlThread::sendSceneInfo()
 bool pqRemoteControlThread::sendObjects()
 {
   if (!this->Internal->Exporter)
-   {
+  {
     return (this->Internal->ShouldQuit != true);
-    }
+  }
 
   for (int i = 0; i < this->Internal->Exporter->GetNumberOfObjects(); ++i)
-    {
+  {
     vtkWebGLObject* obj = this->Internal->Exporter->GetWebGLObject(i);
 
-    for(int partIndex = 0; partIndex < obj->GetNumberOfParts(); ++partIndex)
-      {
+    for (int partIndex = 0; partIndex < obj->GetNumberOfParts(); ++partIndex)
+    {
 
       bool skip = false;
       if (this->Internal->Socket->Receive(&skip, 1) == 0)
-        {
+      {
         return false;
-        }
+      }
 
       if (skip)
-        {
+      {
         continue;
-        }
+      }
 
       unsigned long long length = obj->GetBinarySize(partIndex);
       if (this->Internal->Socket->Send(&length, sizeof(length)) == 0)
-        {
+      {
         return false;
-        }
+      }
       if (this->Internal->Socket->Send(obj->GetBinaryData(partIndex), length) == 0)
-        {
+      {
         return false;
-        }
+      }
       if (this->Internal->ShouldQuit)
-        {
+      {
         return false;
-        }
       }
     }
+  }
 
   return (this->Internal->ShouldQuit != true);
 }
@@ -239,10 +239,10 @@ bool pqRemoteControlThread::receiveCameraState()
 
   CameraStateStruct camState;
   if (this->Internal->Socket->Receive(&camState, sizeof(CameraStateStruct)) == 0)
-    {
+  {
     this->close();
     return false;
-    }
+  }
 
   QMutexLocker locker(&this->Internal->Lock);
   this->Internal->CameraState = camState;
@@ -270,9 +270,11 @@ bool pqRemoteControlThread::hasNewCameraState()
 bool pqRemoteControlThread::waitForSocketActivity()
 {
   int selectResult = 0;
-  while (!selectResult && !this->Internal->ShouldQuit) {
+  while (!selectResult && !this->Internal->ShouldQuit)
+  {
     selectResult = this->Internal->SocketCollection->SelectSockets(300);
-    if (selectResult == -1) {
+    if (selectResult == -1)
+    {
       this->close();
       return false;
     }
@@ -285,10 +287,10 @@ bool pqRemoteControlThread::waitForSocketActivity()
 bool pqRemoteControlThread::sendCommand(int command)
 {
   if (this->Internal->Socket->Send(&command, sizeof(command)) == 0)
-    {
+  {
     this->close();
     return false;
-    }
+  }
 
   return (this->Internal->ShouldQuit != true);
 }
@@ -297,10 +299,10 @@ bool pqRemoteControlThread::sendCommand(int command)
 bool pqRemoteControlThread::receiveCommand(int& command)
 {
   if (this->Internal->Socket->Receive(&command, sizeof(command)) == 0)
-    {
+  {
     this->close();
     return false;
-    }
+  }
 
   return (this->Internal->ShouldQuit != true);
 }
@@ -309,27 +311,27 @@ bool pqRemoteControlThread::receiveCommand(int& command)
 bool pqRemoteControlThread::handleCommand(int command)
 {
   if (command == SEND_METADATA_COMMAND)
-    {
+  {
     this->exportSceneOnMainThread();
     return this->sendSceneInfo();
-    }
+  }
   else if (command == SEND_OBJECTS_COMMAND)
-    {
+  {
     return this->sendObjects();
-    }
+  }
   else if (command == RECEIVE_CAMERA_STATE_COMMAND)
-    {
+  {
     return this->receiveCameraState();
-    }
+  }
   else if (command == HEARTBEAT_COMMAND)
-    {
+  {
     return true;
-    }
+  }
   else
-    {
+  {
     this->close();
     return false;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -337,28 +339,29 @@ void pqRemoteControlThread::run()
 {
   this->Internal->ShouldQuit = false;
 
-  while (!this->Internal->ShouldQuit) {
+  while (!this->Internal->ShouldQuit)
+  {
 
     if (!this->sendCommand(READY_COMMAND))
-      {
+    {
       break;
-      }
+    }
 
     if (!this->waitForSocketActivity())
-      {
+    {
       break;
-      }
+    }
 
     int command = 0;
     if (!this->receiveCommand(command))
-      {
+    {
       break;
-      }
+    }
 
     if (!this->handleCommand(command))
-      {
+    {
       break;
-      }
+    }
   }
 
   this->close();

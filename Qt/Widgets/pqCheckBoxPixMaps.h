@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,44 +38,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QWidget;
 
-/// pqCheckBoxPixMaps is a helper class that can used to create pixmaps for
-/// checkboxs in various states. This is useful for showing checkboxes in qt-views.
+/**
+* pqCheckBoxPixMaps is a helper class that can used to create pixmaps for
+* checkboxs in various states. This is useful for showing checkboxes in qt-views.
+*/
 class PQWIDGETS_EXPORT pqCheckBoxPixMaps : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 
 public:
-  /// parent cannot be NULL.
+  /**
+  * parent cannot be NULL.
+  */
   pqCheckBoxPixMaps(QWidget* parent);
 
-  /// Returns a pixmap for the given state .
+  /**
+  * Returns a pixmap for the given state .
+  */
   QPixmap getPixmap(Qt::CheckState state, bool active) const;
   QPixmap getPixmap(int state, bool active) const
-    {
+  {
     return this->getPixmap(static_cast<Qt::CheckState>(state), active);
-    }
-
+  }
 
 private:
   Q_DISABLE_COPY(pqCheckBoxPixMaps)
 
   enum PixmapStateIndex
-    {
-    Checked                 = 0,
-    PartiallyChecked        = 1,
-    UnChecked               = 2,
-    
+  {
+    Checked = 0,
+    PartiallyChecked = 1,
+    UnChecked = 2,
+
     // All active states in lower half
-    Checked_Active          = 3,
+    Checked_Active = 3,
     PartiallyChecked_Active = 4,
-    UnChecked_Active        = 5,
-   
-    PixmapCount             = 6
-    };
+    UnChecked_Active = 5,
+
+    PixmapCount = 6
+  };
   QPixmap Pixmaps[6];
 };
 
 #endif
-
-

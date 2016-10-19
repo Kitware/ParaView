@@ -44,22 +44,20 @@ void vtkPVSILInformation::CopyFromObject(vtkObject* obj)
 {
   this->SetSIL(0);
 
-
   vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(obj);
   if (!algOutput)
-    {
+  {
     vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(obj);
     if (alg)
-      {
-      algOutput = alg->GetOutputPort(0);
-      }
-
-    }
-  if (!algOutput)
     {
+      algOutput = alg->GetOutputPort(0);
+    }
+  }
+  if (!algOutput)
+  {
     vtkErrorMacro("Information can only be gathered from a vtkAlgorithmOutput.");
     return;
-    }
+  }
 
   vtkAlgorithm* reader = algOutput->GetProducer();
   // Since vtkPVSILInformation is RootOnly information object, calling
@@ -68,17 +66,16 @@ void vtkPVSILInformation::CopyFromObject(vtkObject* obj)
   // cause deadlocks (e.g. pvcs.GridConnectivity). Since information objects are
   // only expected to gather information currently available, we shouldn't be
   // calling this UpdateInformation() in the first place.
-  // 
+  //
   // reader->UpdateInformation();
 
-  vtkInformation* info = reader->GetExecutive()->GetOutputInformation(
-    algOutput->GetIndex());
+  vtkInformation* info = reader->GetExecutive()->GetOutputInformation(algOutput->GetIndex());
 
   if (info && info->Has(vtkDataObject::SIL()))
-    {
+  {
     vtkGraph* sil = vtkGraph::SafeDownCast(info->Get(vtkDataObject::SIL()));
     this->SetSIL(sil);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -86,13 +83,12 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   if (!this->SIL)
-    {
-    *css << vtkClientServerStream::Reply 
-         << vtkClientServerStream::InsertArray(
-           static_cast<unsigned char*>(NULL), 0)
+  {
+    *css << vtkClientServerStream::Reply
+         << vtkClientServerStream::InsertArray(static_cast<unsigned char*>(NULL), 0)
          << vtkClientServerStream::End;
     return;
-    }
+  }
 
   vtkGraph* clone = this->SIL->NewInstance();
   clone->ShallowCopy(this->SIL);
@@ -105,8 +101,7 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
 
   *css << vtkClientServerStream::Reply
        << vtkClientServerStream::InsertArray(
-         writer->GetBinaryOutputString(),
-         writer->GetOutputStringLength())
+            writer->GetBinaryOutputString(), writer->GetOutputStringLength())
        << vtkClientServerStream::End;
   writer->RemoveAllInputs();
   writer->Delete();
@@ -119,24 +114,22 @@ void vtkPVSILInformation::CopyFromStream(const vtkClientServerStream* css)
   this->SetSIL(0);
   vtkTypeUInt32 length;
   if (css->GetArgumentLength(0, 0, &length) && length > 0)
-    {
+  {
     unsigned char* raw_data = new unsigned char[length];
     css->GetArgument(0, 0, raw_data, length);
     vtkGraphReader* reader = vtkGraphReader::New();
     reader->SetBinaryInputString(reinterpret_cast<const char*>(raw_data), length);
     reader->ReadFromInputStringOn();
-    delete []raw_data;
+    delete[] raw_data;
     reader->Update();
     this->SetSIL(reader->GetOutput());
     reader->Delete();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSILInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SIL: " <<  this->SIL << endl;
+  os << indent << "SIL: " << this->SIL << endl;
 }
-
-

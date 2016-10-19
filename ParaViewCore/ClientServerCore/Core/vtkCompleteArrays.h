@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompleteArrays - Filter adds arrays to empty partitions.
-// .SECTION Description
-// This is a temporary solution for fixing a writer bug.  When partition 0
-// has no cells or points, it does not have arrays either.  The writers
-// get confused.  This filter creates empty arrays on node zero if there
-// are no cells or points in that partition.
+/**
+ * @class   vtkCompleteArrays
+ * @brief   Filter adds arrays to empty partitions.
+ *
+ * This is a temporary solution for fixing a writer bug.  When partition 0
+ * has no cells or points, it does not have arrays either.  The writers
+ * get confused.  This filter creates empty arrays on node zero if there
+ * are no cells or points in that partition.
+*/
 
 #ifndef vtkCompleteArrays_h
 #define vtkCompleteArrays_h
@@ -30,23 +33,26 @@ class vtkMultiProcessController;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkCompleteArrays, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkCompleteArrays *New();
+  static vtkCompleteArrays* New();
 
-  // Description:
-  // The user can set the controller used for inter-process communication.
-  void SetController(vtkMultiProcessController *controller);
+  //@{
+  /**
+   * The user can set the controller used for inter-process communication.
+   */
+  void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
 protected:
   vtkCompleteArrays();
   ~vtkCompleteArrays();
 
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
   vtkMultiProcessController* Controller;
+
 private:
   vtkCompleteArrays(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;

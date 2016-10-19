@@ -36,7 +36,6 @@ public:
     this->ExtractCells->SetExtractOnlyBoundaryCells(1);
     this->ExtractCells->SetExtractBoundaryCells(1);
   }
-
 };
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMetaSliceDataSet);
@@ -57,13 +56,14 @@ vtkPVMetaSliceDataSet::vtkPVMetaSliceDataSet()
 //----------------------------------------------------------------------------
 vtkPVMetaSliceDataSet::~vtkPVMetaSliceDataSet()
 {
-  delete this->Internal; this->Internal = NULL;
+  delete this->Internal;
+  this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVMetaSliceDataSet::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ void vtkPVMetaSliceDataSet::SetValue(int index, double value)
 //----------------------------------------------------------------------------
 vtkAlgorithm* vtkPVMetaSliceDataSet::SetActiveFilter(int index)
 {
-  this->SetOutputType( (index == 0) ? VTK_POLY_DATA : VTK_UNSTRUCTURED_GRID);
+  this->SetOutputType((index == 0) ? VTK_POLY_DATA : VTK_UNSTRUCTURED_GRID);
   return this->Superclass::SetActiveFilter(index);
 }
 //----------------------------------------------------------------------------

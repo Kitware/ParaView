@@ -36,10 +36,10 @@
 struct SubProxyInfo
 {
   SubProxyInfo(std::string name, vtkTypeUInt32 id)
-    {
+  {
     this->Name = name;
     this->GlobalID = id;
-    }
+  }
 
   std::string Name;
   vtkTypeUInt32 GlobalID;
@@ -48,19 +48,16 @@ struct SubProxyInfo
 class vtkSIProxy::vtkInternals
 {
 public:
-
   void ClearDependencies()
-    {
+  {
     this->SIProperties.clear();
     this->SubSIProxies.clear();
-    }
+  }
 
-  typedef std::map<std::string, vtkSmartPointer<vtkSIProperty> >
-    SIPropertiesMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProperty> > SIPropertiesMapType;
   SIPropertiesMapType SIProperties;
 
-  typedef std::map<std::string, vtkSmartPointer<vtkSIProxy> >
-    SubSIProxiesMapType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProxy> > SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
 
   typedef std::vector<SubProxyInfo> SubProxiesVectorType;
@@ -116,138 +113,131 @@ void vtkSIProxy::Push(vtkSMMessage* message)
   // Push() is the trigger to get the SIProxy initialized. Let's ensure that
   // it's properly initialized before proceeding further.
   if (!this->InitializeAndCreateVTKObjects(message))
-    {
+  {
     return;
-    }
+  }
 
   // Handle properties
   int cc = 0;
   int size = message->ExtensionSize(ProxyState::property);
-  for (;cc < size; cc++)
-    {
-    const ProxyState_Property &propMsg =
-      message->GetExtension(ProxyState::property, cc);
+  for (; cc < size; cc++)
+  {
+    const ProxyState_Property& propMsg = message->GetExtension(ProxyState::property, cc);
 
     // Convert state to interpretor stream
     vtkSIProperty* prop = this->GetSIProperty(propMsg.name().c_str());
     if (prop)
-      {
+    {
       if (prop->Push(message, cc) == false)
-        {
+      {
         vtkErrorMacro("Error pushing property state: " << propMsg.name());
         message->PrintDebugString();
         return;
-        }
       }
     }
+  }
 
   // Execute post_push if any
-  if(this->PostPush != NULL)
-    {
+  if (this->PostPush != NULL)
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << this->PostPush
+    stream << vtkClientServerStream::Invoke << this->GetVTKObject() << this->PostPush
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSIProxy::Pull(vtkSMMessage* message)
 {
   if (!this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
   // Return a set of Pull only property (information_only props)
   // In fact Pushed Property can not be fetch at the same time as Pull
   // property with the current implementation
   std::set<std::string> prop_names;
   if (message->ExtensionSize(PullRequest::arguments) > 0)
+  {
+    const Variant* propList = &message->GetExtension(PullRequest::arguments, 0);
+    for (int i = 0; i < propList->txt_size(); ++i)
     {
-    const Variant *propList = &message->GetExtension(PullRequest::arguments, 0);
-    for(int i=0; i < propList->txt_size(); ++i)
-      {
       const char* propertyName = propList->txt(i).c_str();
       prop_names.insert(propertyName);
-      }
     }
+  }
 
   message->ClearExtension(PullRequest::arguments);
 
   vtkInternals::SIPropertiesMapType::iterator iter;
-  for (iter = this->Internals->SIProperties.begin(); iter !=
-    this->Internals->SIProperties.end(); ++iter)
+  for (iter = this->Internals->SIProperties.begin(); iter != this->Internals->SIProperties.end();
+       ++iter)
+  {
+    if (prop_names.size() == 0 || prop_names.find(iter->first) != prop_names.end())
     {
-    if (prop_names.size() == 0 ||
-      prop_names.find(iter->first) != prop_names.end())
+      if (!iter->second->GetIsInternal())
       {
-      if(!iter->second->GetIsInternal())
+        if (message->req_def())
         {
-        if(message->req_def())
-          {
           // We just want the cached push property
-          if( !iter->second->GetInformationOnly() &&
-              !iter->second->Pull(message))
-            {
+          if (!iter->second->GetInformationOnly() && !iter->second->Pull(message))
+          {
             vtkErrorMacro("Error pulling property state: " << iter->first);
             return;
-            }
           }
+        }
         else if (!iter->second->Pull(message))
-          {
+        {
           vtkErrorMacro("Error pulling property state: " << iter->first);
           return;
-          }
         }
       }
     }
+  }
 
-  if(message->req_def())
-    {
+  if (message->req_def())
+  {
     // Add definition
     message->SetExtension(ProxyState::xml_group, this->XMLGroup);
     message->SetExtension(ProxyState::xml_name, this->XMLName);
-    if(this->XMLSubProxyName)
-      {
+    if (this->XMLSubProxyName)
+    {
       message->SetExtension(ProxyState::xml_sub_proxy_name, this->XMLSubProxyName);
-      }
+    }
 
     // Add subproxy information to the message.
-    vtkInternals::SubProxiesVectorType::iterator it2 =
-        this->Internals->SubProxyInfoVector.begin();
-    for( ; it2 != this->Internals->SubProxyInfoVector.end(); it2++)
-      {
-      ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
+    vtkInternals::SubProxiesVectorType::iterator it2 = this->Internals->SubProxyInfoVector.begin();
+    for (; it2 != this->Internals->SubProxyInfoVector.end(); it2++)
+    {
+      ProxyState_SubProxy* subproxy = message->AddExtension(ProxyState::subproxy);
       subproxy->set_name(it2->Name.c_str());
       subproxy->set_global_id(it2->GlobalID);
-      }
     }
+  }
 }
 //----------------------------------------------------------------------------
 vtkSIProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 {
   if (this->SessionCore)
-    {
+  {
     return this->SessionCore->GetProxyDefinitionManager();
-    }
+  }
 
   vtkWarningMacro("No valid session provided. "
-    "This class may not have been initialized yet.");
+                  "This class may not have been initialized yet.");
   return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSIProperty* vtkSIProxy::GetSIProperty(const char* name)
 {
-  vtkInternals::SIPropertiesMapType::iterator iter =
-    this->Internals->SIProperties.find(name);
+  vtkInternals::SIPropertiesMapType::iterator iter = this->Internals->SIProperties.find(name);
   if (iter != this->Internals->SIProperties.end())
-    {
+  {
     return iter->second.GetPointer();
-    }
+  }
   return NULL;
 }
 
@@ -261,59 +251,55 @@ void vtkSIProxy::AddSIProperty(const char* name, vtkSIProperty* property)
 bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 {
   if (this->ObjectsCreated)
-    {
+  {
     return true;
-    }
+  }
 
-  if (!message->HasExtension(ProxyState::xml_group) ||
-    !message->HasExtension(ProxyState::xml_name))
-    {
+  if (!message->HasExtension(ProxyState::xml_group) || !message->HasExtension(ProxyState::xml_name))
+  {
     vtkErrorMacro("Incorrect message received. "
-                  << "Missing xml_group and xml_name information." << endl
-                  << message->DebugString().c_str() << endl);
+      << "Missing xml_group and xml_name information." << endl
+      << message->DebugString().c_str() << endl);
     return false;
-    }
+  }
 
   // Store definition informations
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
-  this->SetXMLSubProxyName(
-      message->HasExtension(ProxyState::xml_sub_proxy_name) ?
-      message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() : NULL);
+  this->SetXMLSubProxyName(message->HasExtension(ProxyState::xml_sub_proxy_name)
+      ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
+      : NULL);
 
   vtkSIProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
   vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
     message->GetExtension(ProxyState::xml_group).c_str(),
     message->GetExtension(ProxyState::xml_name).c_str(),
-    (message->HasExtension(ProxyState::xml_sub_proxy_name) ?
-     message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() :
-     NULL));
+    (message->HasExtension(ProxyState::xml_sub_proxy_name)
+        ? message->GetExtension(ProxyState::xml_sub_proxy_name).c_str()
+        : NULL));
 
   if (!element)
-    {
+  {
     vtkErrorMacro("Definition not found for xml_group: "
-                  << message->GetExtension(ProxyState::xml_group).c_str()
-                  << " and xml_name: "
-                  << message->GetExtension(ProxyState::xml_name).c_str()
-                  << endl << message->DebugString().c_str() << endl );
+      << message->GetExtension(ProxyState::xml_group).c_str()
+      << " and xml_name: " << message->GetExtension(ProxyState::xml_name).c_str() << endl
+      << message->DebugString().c_str() << endl);
     return false;
-    }
+  }
 
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
   this->SetVTKClassName(element->GetAttribute("class"));
 
   // Locate sub-proxies.
-  for (int cc=0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)
-    {
-    const ProxyState_SubProxy& subproxyMsg =
-      message->GetExtension(ProxyState::subproxy, cc);
-    vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(
-      this->GetSIObject(subproxyMsg.global_id()));
+  for (int cc = 0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)
+  {
+    const ProxyState_SubProxy& subproxyMsg = message->GetExtension(ProxyState::subproxy, cc);
+    vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(this->GetSIObject(subproxyMsg.global_id()));
     this->Internals->SubProxyInfoVector.push_back(
-        SubProxyInfo(subproxyMsg.name(), subproxyMsg.global_id()));
+      SubProxyInfo(subproxyMsg.name(), subproxyMsg.global_id()));
     if (subproxy == NULL)
-      {
+    {
       // This code has been commented to support ImplicitPlaneWidgetRepresentation
       // which as a widget as SubProxy which stay on the client side.
       // Therefore, when ParaView is running on Client/Server mode, that SubProxy
@@ -324,37 +310,37 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
       //                << subproxyMsg.global_id() << endl
       //                << message->DebugString().c_str());
       // return false;
-      }
-    else
-      {
-      this->Internals->SubSIProxies[subproxyMsg.name()] = subproxy;
-      }
     }
+    else
+    {
+      this->Internals->SubSIProxies[subproxyMsg.name()] = subproxy;
+    }
+  }
 
   // Add hook for post_push and post_creation. This is processed before
   // ReadXMLAttributes() is even called.
   this->SetPostPush(element->GetAttribute("post_push"));
   this->SetPostCreation(element->GetAttribute("post_creation"));
   if (!element->GetScalarAttribute("input_ports", &this->NumberOfInputPorts))
-    {
+  {
     this->NumberOfInputPorts = -1;
-    }
+  }
 
   // Create the VTK object(s) for this SIProxy.
   if (!this->CreateVTKObjects())
-    {
+  {
     return false;
-    }
+  }
 
   // Process the XML and update properties etc.
   // This needs be called after the VTK ojects have been created since the default values
   // for all properties are read (and pushed) from when reading the XML attributes
   // themselves.
   if (!this->ReadXMLAttributes(element))
-    {
+  {
     this->DeleteVTKObjects();
     return false;
-    }
+  }
 
   // Handle post-creation actions.
   this->OnCreateVTKObjects();
@@ -366,7 +352,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSIProxy::DeleteVTKObjects()
 {
-  this->VTKObject =  NULL;
+  this->VTKObject = NULL;
   this->ObjectsCreated = false;
 }
 
@@ -375,68 +361,60 @@ bool vtkSIProxy::CreateVTKObjects()
 {
   assert(this->ObjectsCreated == false);
   if (this->VTKClassName && this->VTKClassName[0])
-    {
+  {
     vtkObjectBase* obj = this->Interpreter->NewInstance(this->VTKClassName);
     if (!obj)
-      {
-      vtkErrorMacro("Failed to create '" << this->VTKClassName << "'. "
-        "This typically means that ParaView does not know about the request class "
-        "to create an instance of if. Ensure that it has been correctly wrapped "
-        "using the client-server wrappers and the wrapping has been initialized. "
-        "Note class names are case-sensitive. Check for typos. "
-        "Aborting for debugging purposes.");
-      abort();
-      }
-    this->VTKObject.TakeReference(obj);
-    }
-  else
     {
-    return true;
+      vtkErrorMacro("Failed to create '"
+        << this->VTKClassName
+        << "'. "
+           "This typically means that ParaView does not know about the request class "
+           "to create an instance of if. Ensure that it has been correctly wrapped "
+           "using the client-server wrappers and the wrapping has been initialized. "
+           "Note class names are case-sensitive. Check for typos. "
+           "Aborting for debugging purposes.");
+      abort();
     }
+    this->VTKObject.TakeReference(obj);
+  }
+  else
+  {
+    return true;
+  }
 
   assert(this->VTKObject != NULL);
 
   // Setup progress handler
-    {
+  {
     vtkClientServerStream substream;
-    substream << vtkClientServerStream::Invoke
-              << vtkClientServerID(1)
-              << "GetActiveProgressHandler"
+    substream << vtkClientServerStream::Invoke << vtkClientServerID(1) << "GetActiveProgressHandler"
               << vtkClientServerStream::End;
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << substream
-           << "RegisterProgressEvent"
-           << this->VTKObject
-           << static_cast<int>(this->GetGlobalID())
+    stream << vtkClientServerStream::Invoke << substream << "RegisterProgressEvent"
+           << this->VTKObject << static_cast<int>(this->GetGlobalID())
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 
   // Set the number of input ports
   // This will only work for vtkAlgorithm subclasses that explicitly expose the
   // otherwise protected method SetNumberOfInputPorts
   if (this->NumberOfInputPorts != -1)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << "SetNumberOfInputPorts"
-           << this->NumberOfInputPorts
-           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "SetNumberOfInputPorts"
+           << this->NumberOfInputPorts << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 
   // Handle any PostCreation method invocation request.
   if (this->PostCreation != NULL)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->VTKObject
-           << this->PostCreation
+    stream << vtkClientServerStream::Invoke << this->VTKObject << this->PostCreation
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 
   return true;
 }
@@ -450,15 +428,15 @@ void vtkSIProxy::OnCreateVTKObjects()
 void vtkSIProxy::RecreateVTKObjects()
 {
   if (this->ObjectsCreated)
-    {
+  {
     this->DeleteVTKObjects();
     if (!this->CreateVTKObjects())
-      {
-      vtkErrorMacro("Recreation failed!!"); //TODO: better error!
-      }
+    {
+      vtkErrorMacro("Recreation failed!!"); // TODO: better error!
+    }
     this->OnCreateVTKObjects();
     this->ObjectsCreated = true;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -470,53 +448,51 @@ vtkObjectBase* vtkSIProxy::GetVTKObject()
 //----------------------------------------------------------------------------
 bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
-  for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
-    {
+  for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
+  {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);
 
     if (strcmp(propElement->GetName(), "SubProxy") == 0)
-      {
+    {
       // read subproxy xml.
       if (!this->ReadXMLSubProxy(propElement))
-        {
+      {
         return false;
-        }
       }
     }
+  }
 
   // Process sub-proxy commands.
-  for (vtkInternals::SubProxyCommandMapType::iterator iter=this->Internals->SubProxyCommands.begin();
-    iter != this->Internals->SubProxyCommands.end(); ++iter)
-    {
+  for (vtkInternals::SubProxyCommandMapType::iterator iter =
+         this->Internals->SubProxyCommands.begin();
+       iter != this->Internals->SubProxyCommands.end(); ++iter)
+  {
     if (vtkSIProxy* subProxy = this->GetSubSIProxy(iter->first.c_str()))
-      {
+    {
       vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-             << this->GetVTKObject()
-             << iter->second.c_str()
-             << subProxy->GetVTKObject()
-             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->GetVTKObject() << iter->second.c_str()
+             << subProxy->GetVTKObject() << vtkClientServerStream::End;
       this->Interpreter->ProcessStream(stream);
-      }
     }
+  }
 
   if (this->Internals->SIProperties.size() == 0)
+  {
+    for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
     {
-    for (unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
-      {
       vtkPVXMLElement* propElement = element->GetNestedElement(i);
       // read property xml
       const char* name = propElement->GetAttribute("name");
       std::string tagName = propElement->GetName();
-      if (name && tagName.find("Property") == (tagName.size()-8))
-        {
+      if (name && tagName.find("Property") == (tagName.size() - 8))
+      {
         if (!this->ReadXMLProperty(propElement))
-          {
+        {
           return false;
-          }
         }
       }
     }
+  }
 
   return true;
 }
@@ -527,16 +503,16 @@ bool vtkSIProxy::ReadXMLSubProxy(vtkPVXMLElement* subproxyElement)
   // Process "command" for the sub proxy, if any. These are used in
   // CreateVTKObjects() to pass the sub proxy's VTK object to this proxy's VTK
   // object.
-  const char* command = subproxyElement? subproxyElement->GetAttribute("command") : NULL;
+  const char* command = subproxyElement ? subproxyElement->GetAttribute("command") : NULL;
   if (command)
-    {
+  {
     vtkPVXMLElement* proxyElement = subproxyElement->GetNestedElement(0);
-    const char* name = proxyElement? proxyElement->GetAttribute("name") : NULL;
+    const char* name = proxyElement ? proxyElement->GetAttribute("name") : NULL;
     if (name)
-      {
+    {
       this->Internals->SubProxyCommands[name] = command;
-      }
     }
+  }
   return true;
 }
 
@@ -554,34 +530,34 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   vtkSmartPointer<vtkObject> object;
   std::string classname;
   if (propElement->GetAttribute("si_class"))
-    {
+  {
     classname = propElement->GetAttribute("si_class");
-    }
+  }
   else
-    {
+  {
     std::ostringstream cname;
     cname << "vtkSI" << propElement->GetName() << ends;
     classname = cname.str();
-    }
+  }
 
   object.TakeReference(vtkPVInstantiator::CreateInstance(classname.c_str()));
   if (!object)
-    {
+  {
     vtkErrorMacro("Failed to create helper for property: " << classname);
     return false;
-    }
+  }
   vtkSIProperty* property = vtkSIProperty::SafeDownCast(object);
   if (!property)
-    {
+  {
     vtkErrorMacro(<< classname << " must be a vtkSIProperty subclass.");
     return false;
-    }
+  }
 
   if (!property->ReadXMLAttributes(this, propElement))
-    {
+  {
     vtkErrorMacro("Could not parse property: " << name.c_str());
     return false;
-    }
+  }
 
   this->AddSIProperty(name.c_str(), property);
   return true;
@@ -602,36 +578,32 @@ unsigned int vtkSIProxy::GetNumberOfSubSIProxys()
 vtkSIProxy* vtkSIProxy::GetSubSIProxy(unsigned int cc)
 {
   if (cc >= this->GetNumberOfSubSIProxys())
-    {
+  {
     return NULL;
-    }
+  }
 
-  unsigned int index=0;
+  unsigned int index = 0;
   vtkInternals::SubSIProxiesMapType::iterator iter;
-  for (iter = this->Internals->SubSIProxies.begin();
-    iter != this->Internals->SubSIProxies.end();
-    ++iter, ++index)
-    {
+  for (iter = this->Internals->SubSIProxies.begin(); iter != this->Internals->SubSIProxies.end();
+       ++iter, ++index)
+  {
     if (index == cc)
-      {
+    {
       return iter->second;
-      }
     }
+  }
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkSIProxy::AddInput(
-  int inputPort, vtkAlgorithmOutput* connection, const char* method)
+void vtkSIProxy::AddInput(int inputPort, vtkAlgorithmOutput* connection, const char* method)
 {
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetVTKObject()
-         << method;
+  stream << vtkClientServerStream::Invoke << this->GetVTKObject() << method;
   if (inputPort > 0)
-    {
+  {
     stream << inputPort;
-    }
+  }
   stream << connection << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
 }
@@ -640,9 +612,7 @@ void vtkSIProxy::AddInput(
 void vtkSIProxy::CleanInputs(const char* method)
 {
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetVTKObject()
-         << method
+  stream << vtkClientServerStream::Invoke << this->GetVTKObject() << method
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
 }

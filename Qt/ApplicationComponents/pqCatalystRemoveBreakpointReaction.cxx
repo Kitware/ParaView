@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,17 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 
-
 #include <QInputDialog>
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
-pqCatalystRemoveBreakpointReaction::pqCatalystRemoveBreakpointReaction(
-  QAction* parentObject)
+pqCatalystRemoveBreakpointReaction::pqCatalystRemoveBreakpointReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()),
-                   this, SLOT(updateEnableState()));
+  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()), this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +64,6 @@ void pqCatalystRemoveBreakpointReaction::updateEnableState()
 {
   pqLiveInsituManager* server = pqLiveInsituManager::instance();
   this->parentAction()->setEnabled(
-    (server->linkProxy() &&
-     server->breakpointTime() != pqLiveInsituManager::INVALID_TIME) ? 
-    true : false);
+    (server->linkProxy() && server->breakpointTime() != pqLiveInsituManager::INVALID_TIME) ? true
+                                                                                           : false);
 }

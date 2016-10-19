@@ -33,36 +33,31 @@ vtkSMCameraProxy::~vtkSMCameraProxy()
 void vtkSMCameraProxy::UpdatePropertyInformation()
 {
   if (this->InUpdateVTKObjects)
-    {
+  {
     return;
-    }
+  }
 
   vtkCamera* camera = vtkCamera::SafeDownCast(this->GetClientSideObject());
   if (!camera)
-    {
+  {
     this->Superclass::UpdatePropertyInformation();
     return;
-    }
+  }
 
   vtkSMDoubleVectorProperty* dvp;
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("CameraPositionInfo"));
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraPositionInfo"));
   dvp->SetElements(camera->GetPosition());
 
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("CameraFocalPointInfo"));
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraFocalPointInfo"));
   dvp->SetElements(camera->GetFocalPoint());
 
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("CameraViewUpInfo"));
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraViewUpInfo"));
   dvp->SetElements(camera->GetViewUp());
 
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("CameraParallelScaleInfo"));
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraParallelScaleInfo"));
   dvp->SetElement(0, camera->GetParallelScale());
 
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GetProperty("CameraViewAngleInfo"));
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraViewAngleInfo"));
   dvp->SetElement(0, camera->GetViewAngle());
 }
 

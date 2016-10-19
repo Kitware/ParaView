@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,12 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqViewContextMenuManager.h
-/// \date 9/19/2007
+/**
+* \file pqViewContextMenuManager.h
+* \date 9/19/2007
+*/
 
 #ifndef _pqViewContextMenuManager_h
 #define _pqViewContextMenuManager_h
-
 
 #include "pqComponentsModule.h"
 #include <QObject>
@@ -45,67 +46,83 @@ class pqViewContextMenuHandler;
 class pqViewContextMenuManagerInternal;
 class QString;
 
-
-/// \class pqViewContextMenuManager
-/// \brief
-///   The pqViewContextMenuManager class manages the setup and cleanup
-///   of view context menus.
+/**
+* \class pqViewContextMenuManager
+* \brief
+*   The pqViewContextMenuManager class manages the setup and cleanup
+*   of view context menus.
+*/
 class PQCOMPONENTS_EXPORT pqViewContextMenuManager : public QObject
 {
   Q_OBJECT
 
 public:
-  /// \brief
-  ///   Creates a view context menu manager.
-  /// \param parent The parent object.
-  pqViewContextMenuManager(QObject *parent=0);
+  /**
+  * \brief
+  *   Creates a view context menu manager.
+  * \param parent The parent object.
+  */
+  pqViewContextMenuManager(QObject* parent = 0);
   virtual ~pqViewContextMenuManager();
 
-  /// \brief
-  ///   Registers a context menu handler with a view type.
-  /// \param viewType The name of the view type.
-  /// \param handler The context menu handler.
-  /// \return
-  ///   True if the registration was successful.
-  bool registerHandler(const QString &viewType,
-      pqViewContextMenuHandler *handler);
+  /**
+  * \brief
+  *   Registers a context menu handler with a view type.
+  * \param viewType The name of the view type.
+  * \param handler The context menu handler.
+  * \return
+  *   True if the registration was successful.
+  */
+  bool registerHandler(const QString& viewType, pqViewContextMenuHandler* handler);
 
-  /// \brief
-  ///   Removes the context menu from the name mapping.
-  /// \param handler The context menu handler.
-  void unregisterHandler(pqViewContextMenuHandler *handler);
+  /**
+  * \brief
+  *   Removes the context menu from the name mapping.
+  * \param handler The context menu handler.
+  */
+  void unregisterHandler(pqViewContextMenuHandler* handler);
 
-  /// \brief
-  ///   Gets whether or not the context menu handler is registered.
-  /// \return
-  ///   True if the context menu handler is associated with a view type.
-  bool isRegistered(pqViewContextMenuHandler *handler) const;
+  /**
+  * \brief
+  *   Gets whether or not the context menu handler is registered.
+  * \return
+  *   True if the context menu handler is associated with a view type.
+  */
+  bool isRegistered(pqViewContextMenuHandler* handler) const;
 
-  /// \brief
-  ///   Gets the context menu handler for the specified view type.
-  /// \param viewType The name of the view type.
-  /// \return
-  ///   A pointer to the context menu handler.
-  pqViewContextMenuHandler *getHandler(const QString &viewType) const;
+  /**
+  * \brief
+  *   Gets the context menu handler for the specified view type.
+  * \param viewType The name of the view type.
+  * \return
+  *   A pointer to the context menu handler.
+  */
+  pqViewContextMenuHandler* getHandler(const QString& viewType) const;
 
 public slots:
-  /// \brief
-  ///   Sets up the context menu for the given view.
-  ///
-  /// The context menu is only set up for the view if there is a
-  /// registered handler for the view type.
-  ///
-  /// \param view The view to initialize.
-  void setupContextMenu(pqView *view);
+  /**
+  * \brief
+  *   Sets up the context menu for the given view.
+  *
+  * The context menu is only set up for the view if there is a
+  * registered handler for the view type.
+  *
+  * \param view The view to initialize.
+  */
+  void setupContextMenu(pqView* view);
 
-  /// \brief
-  ///   Cleans up the context menu for the given view.
-  /// \param view The view to clean up.
-  void cleanupContextMenu(pqView *view);
+  /**
+  * \brief
+  *   Cleans up the context menu for the given view.
+  * \param view The view to clean up.
+  */
+  void cleanupContextMenu(pqView* view);
 
 private:
-  /// Stores the registered context menu handlers.
-  pqViewContextMenuManagerInternal *Internal;
+  /**
+  * Stores the registered context menu handlers.
+  */
+  pqViewContextMenuManagerInternal* Internal;
 };
 
 #endif

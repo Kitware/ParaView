@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -39,20 +39,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationScene;
 class pqAnimationCue;
 
-/// editor for editing pipeline time key frames
+/**
+* editor for editing pipeline time key frames
+*/
 class PQCOMPONENTS_EXPORT pqPipelineTimeKeyFrameEditor : public QDialog
 {
   typedef QDialog Superclass;
   Q_OBJECT
 public:
-  pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
-                               QWidget* p);
+  pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
   ~pqPipelineTimeKeyFrameEditor();
 
 public slots:
-  /// read the key frame data and display it
+  /**
+  * read the key frame data and display it
+  */
   void readKeyFrameData();
-  /// write the key frame data as edited by the user to the server manager
+  /**
+  * write the key frame data as edited by the user to the server manager
+  */
   void writeKeyFrameData();
 
 protected slots:
@@ -63,6 +68,4 @@ private:
   pqInternal* Internal;
 };
 
-
 #endif
-

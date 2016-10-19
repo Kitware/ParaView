@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkUndoStackInternal.h"
 
-
 vtkStandardNewMacro(vtkUndoStack);
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
@@ -49,14 +48,13 @@ void vtkUndoStack::Push(const char* label, vtkUndoSet* changeSet)
 {
   this->Internal->RedoStack.clear();
 
-  while (this->Internal->UndoStack.size() >= 
-    static_cast<unsigned int>(this->StackDepth) && this->StackDepth > 0)
-    {
+  while (this->Internal->UndoStack.size() >= static_cast<unsigned int>(this->StackDepth) &&
+    this->StackDepth > 0)
+  {
     this->Internal->UndoStack.erase(this->Internal->UndoStack.begin());
     this->InvokeEvent(vtkUndoStack::UndoSetRemovedEvent);
-    }
-  this->Internal->UndoStack.push_back(
-    vtkUndoStackInternal::Element(label, changeSet));
+  }
+  this->Internal->UndoStack.push_back(vtkUndoStackInternal::Element(label, changeSet));
   this->Modified();
 }
 
@@ -76,11 +74,10 @@ unsigned int vtkUndoStack::GetNumberOfRedoSets()
 const char* vtkUndoStack::GetUndoSetLabel(unsigned int position)
 {
   if (position >= this->Internal->UndoStack.size())
-    {
+  {
     return NULL;
-    }
-  position = (static_cast<unsigned int>(
-      this->Internal->UndoStack.size()) - position) -1;
+  }
+  position = (static_cast<unsigned int>(this->Internal->UndoStack.size()) - position) - 1;
   return this->Internal->UndoStack[position].Label.c_str();
 }
 
@@ -88,11 +85,10 @@ const char* vtkUndoStack::GetUndoSetLabel(unsigned int position)
 const char* vtkUndoStack::GetRedoSetLabel(unsigned int position)
 {
   if (position >= this->Internal->RedoStack.size())
-    {
+  {
     return NULL;
-    }
-  position = (static_cast<unsigned int>(
-      this->Internal->RedoStack.size()) - position) -1;
+  }
+  position = (static_cast<unsigned int>(this->Internal->RedoStack.size()) - position) - 1;
   return this->Internal->RedoStack[position].Label.c_str();
 }
 
@@ -100,16 +96,16 @@ const char* vtkUndoStack::GetRedoSetLabel(unsigned int position)
 int vtkUndoStack::Undo()
 {
   if (this->Internal->UndoStack.empty())
-    {
+  {
     return 0;
-    }
+  }
   this->InUndo = true;
   this->InvokeEvent(vtkCommand::StartEvent);
   int status = this->Internal->UndoStack.back().UndoSet.GetPointer()->Undo();
   if (status)
-    {
+  {
     this->PopUndoStack();
-    }
+  }
   this->InvokeEvent(vtkCommand::EndEvent);
   this->InUndo = false;
   return status;
@@ -119,16 +115,16 @@ int vtkUndoStack::Undo()
 int vtkUndoStack::Redo()
 {
   if (this->Internal->RedoStack.empty())
-    {
+  {
     return 0;
-    }
+  }
   this->InRedo = true;
   this->InvokeEvent(vtkCommand::StartEvent);
   int status = this->Internal->RedoStack.back().UndoSet.GetPointer()->Redo();
   if (status)
-    {
+  {
     this->PopRedoStack();
-    }
+  }
   this->InvokeEvent(vtkCommand::EndEvent);
   this->InRedo = false;
   return status;
@@ -138,9 +134,9 @@ int vtkUndoStack::Redo()
 void vtkUndoStack::PopUndoStack()
 {
   if (this->Internal->UndoStack.empty())
-    {
+  {
     return;
-    }
+  }
   this->Internal->RedoStack.push_back(this->Internal->UndoStack.back());
   this->Internal->UndoStack.pop_back();
   this->Modified();
@@ -150,9 +146,9 @@ void vtkUndoStack::PopUndoStack()
 void vtkUndoStack::PopRedoStack()
 {
   if (this->Internal->RedoStack.empty())
-    {
+  {
     return;
-    }
+  }
   this->Internal->UndoStack.push_back(this->Internal->RedoStack.back());
   this->Internal->RedoStack.pop_back();
   this->Modified();
@@ -162,9 +158,9 @@ void vtkUndoStack::PopRedoStack()
 vtkUndoSet* vtkUndoStack::GetNextUndoSet()
 {
   if (!this->CanUndo())
-    {
+  {
     return NULL;
-    }
+  }
   return this->Internal->UndoStack.back().UndoSet.GetPointer();
 }
 
@@ -172,9 +168,9 @@ vtkUndoSet* vtkUndoStack::GetNextUndoSet()
 vtkUndoSet* vtkUndoStack::GetNextRedoSet()
 {
   if (!this->CanRedo())
-    {
+  {
     return NULL;
-    }
+  }
   return this->Internal->RedoStack.back().UndoSet.GetPointer();
 }
 

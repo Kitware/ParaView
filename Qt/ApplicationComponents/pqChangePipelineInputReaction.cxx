@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,31 +47,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqChangePipelineInputReaction::pqChangePipelineInputReaction(
-  QAction* parentObject)
-: Superclass(parentObject)
+pqChangePipelineInputReaction::pqChangePipelineInputReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnableState()));
 
   // nameChanged() is fired even when modified state is changed ;).
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-    this, SLOT(updateEnableState()));
+    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqChangePipelineInputReaction::updateEnableState()
 {
-  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
-    pqActiveObjects::instance().activeSource());
+  pqPipelineFilter* filter =
+    qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
   if (filter == NULL || filter->modifiedState() == pqProxy::UNINITIALIZED)
-    {
+  {
     this->parentAction()->setEnabled(false);
     return;
-    }
+  }
 
   this->parentAction()->setEnabled(true);
 }
@@ -79,57 +76,49 @@ void pqChangePipelineInputReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqChangePipelineInputReaction::changeInput()
 {
-  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
-    pqActiveObjects::instance().activeSource());
+  pqPipelineFilter* filter =
+    qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
 
   if (!filter)
-    {
+  {
     qCritical() << "No active filter.";
     return;
-    }
+  }
 
-  pqChangeInputDialog dialog(filter->getProxy(),
-    pqCoreUtilities::mainWidget());
+  pqChangeInputDialog dialog(filter->getProxy(), pqCoreUtilities::mainWidget());
   dialog.setObjectName("ChangeInputDialog");
   if (dialog.exec() != QDialog::Accepted)
-    {
+  {
     return;
-    }
+  }
 
-  BEGIN_UNDO_SET(QString("Change Input for %1").arg(
-      filter->getSMName()));
-  SM_SCOPED_TRACE(PropertiesModified)
-    .arg("proxy", filter->getProxy());
+  BEGIN_UNDO_SET(QString("Change Input for %1").arg(filter->getSMName()));
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", filter->getProxy());
 
-  const QMap<QString, QList<pqOutputPort*> > input_map =
-    dialog.selectedInputs();
-  QMap<QString, QList<pqOutputPort*> >::const_iterator iter; 
+  const QMap<QString, QList<pqOutputPort*> > input_map = dialog.selectedInputs();
+  QMap<QString, QList<pqOutputPort*> >::const_iterator iter;
 
   for (iter = input_map.begin(); iter != input_map.end(); iter++)
-    {
+  {
     QString inputPortName = iter.key();
-    const QList<pqOutputPort*> &inputs = iter.value();
+    const QList<pqOutputPort*>& inputs = iter.value();
 
     std::vector<vtkSMProxy*> inputPtrs;
     std::vector<unsigned int> inputPorts;
 
     foreach (pqOutputPort* opport, inputs)
-      {
+    {
       inputPtrs.push_back(opport->getSource()->getProxy());
       inputPorts.push_back(opport->getPortNumber());
-      }
-
-    vtkSMInputProperty* ip =vtkSMInputProperty::SafeDownCast(
-      filter->getProxy()->GetProperty(
-        inputPortName.toLatin1().data()));
-    ip->SetProxies(
-      static_cast<unsigned int>(inputPtrs.size()),
-      &inputPtrs[0], &inputPorts[0]);
     }
+
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+      filter->getProxy()->GetProperty(inputPortName.toLatin1().data()));
+    ip->SetProxies(static_cast<unsigned int>(inputPtrs.size()), &inputPtrs[0], &inputPorts[0]);
+  }
   filter->getProxy()->UpdateVTKObjects();
   END_UNDO_SET();
 
   // render all views
   pqApplicationCore::instance()->render();
 }
-

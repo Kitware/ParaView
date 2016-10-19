@@ -11,7 +11,7 @@ class vtkCPVTKPipeline : public vtkCPPipeline
 {
 public:
   static vtkCPVTKPipeline* New();
-  vtkTypeMacro(vtkCPVTKPipeline,vtkCPPipeline);
+  vtkTypeMacro(vtkCPVTKPipeline, vtkCPPipeline);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Initialize(int outputFrequency, std::string& fileName);

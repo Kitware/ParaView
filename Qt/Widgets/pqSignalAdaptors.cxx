@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,11 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
   : QObject(p)
 {
-  QObject::connect(p, SIGNAL(currentIndexChanged(const QString&)), 
-                   this, SIGNAL(currentTextChanged(const QString&)));
+  QObject::connect(p, SIGNAL(currentIndexChanged(const QString&)), this,
+    SIGNAL(currentTextChanged(const QString&)));
 
-  QObject::connect(p, SIGNAL(currentIndexChanged(int)), 
-                   this, SIGNAL(currentIndexChanged(int)));
+  QObject::connect(p, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentIndexChanged(int)));
 }
 
 //----------------------------------------------------------------------------
@@ -63,10 +62,10 @@ void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
   int idx = combo->findText(text);
   combo->setCurrentIndex(idx);
-  if(idx == -1 && combo->count() > 0)
-    {
+  if (idx == -1 && combo->count() > 0)
+  {
     combo->setCurrentIndex(0);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -88,10 +87,10 @@ void pqSignalAdaptorComboBox::setCurrentData(const QVariant& data)
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
   int idx = combo->findData(data);
   combo->setCurrentIndex(idx);
-  if(idx == -1 && combo->count() > 0)
-    {
+  if (idx == -1 && combo->count() > 0)
+  {
     combo->setCurrentIndex(0);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -103,16 +102,16 @@ QVariant pqSignalAdaptorComboBox::currentData() const
 }
 
 //----------------------------------------------------------------------------
-pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p, 
-              const char* colorProperty, const char* signal, bool enableAlpha)
-  : QObject(p), PropertyName(colorProperty), EnableAlpha(enableAlpha)
+pqSignalAdaptorColor::pqSignalAdaptorColor(
+  QObject* p, const char* colorProperty, const char* signal, bool enableAlpha)
+  : QObject(p)
+  , PropertyName(colorProperty)
+  , EnableAlpha(enableAlpha)
 {
-  // assumes signal named after property 
-  QObject::connect(p, signal,
-                   this, SLOT(handleColorChanged()));
-  qDebug(
-    "Changes in pqColorChooserButton API have made pqSignalAdaptorColor unnecessary. "
-    "Please update the code. pqSignalAdaptorColor will soon be deprecated.");
+  // assumes signal named after property
+  QObject::connect(p, signal, this, SLOT(handleColorChanged()));
+  qDebug("Changes in pqColorChooserButton API have made pqSignalAdaptorColor unnecessary. "
+         "Please update the code. pqSignalAdaptorColor will soon be deprecated.");
 }
 
 //----------------------------------------------------------------------------
@@ -120,16 +119,16 @@ QVariant pqSignalAdaptorColor::color() const
 {
   QColor col = this->parent()->property(this->PropertyName).value<QColor>();
   QList<QVariant> rgba;
-  if(col.isValid())
-    {
+  if (col.isValid())
+  {
     rgba.append(col.red() / 255.0);
     rgba.append(col.green() / 255.0);
     rgba.append(col.blue() / 255.0);
     if (this->EnableAlpha)
-      {
+    {
       rgba.append(col.alpha() / 255.0);
-      }
     }
+  }
   return rgba;
 }
 
@@ -138,22 +137,22 @@ void pqSignalAdaptorColor::setColor(const QVariant& var)
 {
   QColor col;
   QList<QVariant> rgba = var.toList();
-  if(rgba.size() >= 3)
-    {
+  if (rgba.size() >= 3)
+  {
     int r = qRound(rgba[0].toDouble() * 255.0);
     int g = qRound(rgba[1].toDouble() * 255.0);
     int b = qRound(rgba[2].toDouble() * 255.0);
     int a = 255;
-    if(rgba.size() == 4 && this->EnableAlpha)
-      {
+    if (rgba.size() == 4 && this->EnableAlpha)
+    {
       a = qRound(rgba[3].toDouble() * 255.0);
-      }
-    QColor newColor(r,g,b,a);
-    if(this->parent()->property(this->PropertyName) != newColor)
-      {
-      this->parent()->setProperty(this->PropertyName, QColor(r,g,b,a));
-      }
     }
+    QColor newColor(r, g, b, a);
+    if (this->parent()->property(this->PropertyName) != newColor)
+    {
+      this->parent()->setProperty(this->PropertyName, QColor(r, g, b, a));
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -167,8 +166,7 @@ void pqSignalAdaptorColor::handleColorChanged()
 pqSignalAdaptorSliderRange::pqSignalAdaptorSliderRange(QSlider* p)
   : QObject(p)
 {
-  QObject::connect(p, SIGNAL(valueChanged(int)), 
-                   this, SLOT(handleValueChanged()));
+  QObject::connect(p, SIGNAL(valueChanged(int)), this, SLOT(handleValueChanged()));
 }
 
 //----------------------------------------------------------------------------
@@ -197,8 +195,7 @@ void pqSignalAdaptorSliderRange::handleValueChanged()
 pqSignalAdaptorTextEdit::pqSignalAdaptorTextEdit(QTextEdit* p)
   : QObject(p)
 {
-  QObject::connect(p, SIGNAL(textChanged()), 
-                   this, SIGNAL(textChanged()));
+  QObject::connect(p, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
 }
 
 QString pqSignalAdaptorTextEdit::text() const
@@ -212,13 +209,11 @@ void pqSignalAdaptorTextEdit::setText(const QString& ptext)
   combo->setPlainText(ptext);
 }
 
-
 //----------------------------------------------------------------------------
 pqSignalAdaptorSpinBox::pqSignalAdaptorSpinBox(QSpinBox* p)
   : QObject(p)
 {
-  QObject::connect(p, SIGNAL(valueChanged(int)), 
-                   this, SIGNAL(valueChanged(int)));
+  QObject::connect(p, SIGNAL(valueChanged(int)), this, SIGNAL(valueChanged(int)));
 }
 
 int pqSignalAdaptorSpinBox::value() const
@@ -231,4 +226,3 @@ void pqSignalAdaptorSpinBox::setValue(int val)
   QSpinBox* widget = static_cast<QSpinBox*>(this->parent());
   widget->setValue(val);
 }
-

@@ -20,7 +20,7 @@
 #include "vtkPolyData.h"
 
 // This will be called by all processes
-void MyMain( vtkMultiProcessController *controller, void * )
+void MyMain(vtkMultiProcessController* controller, void*)
 {
   int myid, numProcs;
 
@@ -28,37 +28,36 @@ void MyMain( vtkMultiProcessController *controller, void * )
   // number of processes
   myid = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
-  
-  vtkConeSource *cone = vtkConeSource::New();
-  
+
+  vtkConeSource* cone = vtkConeSource::New();
+
   if (myid != 0)
-    {
+  {
     // If I am not the root process
-    //don't need to do anything
-    }
+    // don't need to do anything
+  }
   else
-    {
+  {
     // If I am the root process
 
-    vtkCompleteArrays *arrays = vtkCompleteArrays::New();
-    arrays->SetController( controller );
-    arrays->SetInput( cone->GetOutput() );
-    
-    if( !arrays->GetOutput() )
-      {
+    vtkCompleteArrays* arrays = vtkCompleteArrays::New();
+    arrays->SetController(controller);
+    arrays->SetInput(cone->GetOutput());
+
+    if (!arrays->GetOutput())
+    {
       cerr << "Error: Output was not constructed" << endl;
-      }
+    }
 
     arrays->Delete();
-    }
+  }
 
   cone->Delete();
 }
 
-
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
-  vtkMultiProcessController *controller;
+  vtkMultiProcessController* controller;
 
   // Note that this will create a vtkMPIController if MPI
   // is configured, vtkThreadedController otherwise.
@@ -66,16 +65,16 @@ int main( int argc, char* argv[] )
 
   controller->Initialize(&argc, &argv);
 
-  controller->SetSingleMethod(MyMain, NULL );
+  controller->SetSingleMethod(MyMain, NULL);
 
   // When using MPI, the number of processes is determined
   // by the external program which launches this application.
   // However, when using threads, we need to set it ourselves.
   if (controller->IsA("vtkThreadedController"))
-    {
+  {
     // Set the number of processes to 2 for this example.
     controller->SetNumberOfProcesses(2);
-    } 
+  }
   controller->SingleMethodExecute();
 
   controller->Finalize();

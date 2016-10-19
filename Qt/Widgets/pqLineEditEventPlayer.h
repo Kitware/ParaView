@@ -35,15 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractStringEventPlayer.h"
 #include "pqWidgetsModule.h"
 
-/// pqLineEditEventPlayer extends pqAbstractStringEventPlayer to ensure that
-/// pqLineEdit fires textChangedAndEditingFinished() signals in
-/// playback when "set_string" is handled.
+/**
+* pqLineEditEventPlayer extends pqAbstractStringEventPlayer to ensure that
+* pqLineEdit fires textChangedAndEditingFinished() signals in
+* playback when "set_string" is handled.
+*/
 class PQWIDGETS_EXPORT pqLineEditEventPlayer : public pqAbstractStringEventPlayer
 {
   Q_OBJECT
   typedef pqAbstractStringEventPlayer Superclass;
+
 public:
-  pqLineEditEventPlayer(QObject* parent=0);
+  pqLineEditEventPlayer(QObject* parent = 0);
   virtual ~pqLineEditEventPlayer();
 
   using Superclass::playEvent;

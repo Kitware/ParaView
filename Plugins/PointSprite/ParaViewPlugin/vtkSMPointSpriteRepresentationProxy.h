@@ -51,7 +51,7 @@ public:
   static void InitializeDefaultValues(vtkSMProxy*);
 
 protected:
-   vtkSMPointSpriteRepresentationProxy();
+  vtkSMPointSpriteRepresentationProxy();
   ~vtkSMPointSpriteRepresentationProxy();
 
   // Description:
@@ -61,9 +61,9 @@ protected:
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
 private:
-  vtkSMPointSpriteRepresentationProxy(const vtkSMPointSpriteRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPointSpriteRepresentationProxy(
+    const vtkSMPointSpriteRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPointSpriteRepresentationProxy&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

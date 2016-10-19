@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeAnimationPlayer
-// .SECTION Description
-// This is composite animation player that can me made to play an animation
-// using the active player. It provides API to add animation players and then
-// set one of them as the active one.
+/**
+ * @class   vtkCompositeAnimationPlayer
+ *
+ * This is composite animation player that can me made to play an animation
+ * using the active player. It provides API to add animation players and then
+ * set one of them as the active one.
+*/
 
 #ifndef vtkCompositeAnimationPlayer_h
 #define vtkCompositeAnimationPlayer_h
@@ -36,40 +38,51 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum Modes
-    {
-    SEQUENCE=0,
-    REAL_TIME=1,
-    SNAP_TO_TIMESTEPS=2
-    };
+  {
+    SEQUENCE = 0,
+    REAL_TIME = 1,
+    SNAP_TO_TIMESTEPS = 2
+  };
 
-  // Description:
-  // Get/Set the play mode
+  //@{
+  /**
+   * Get/Set the play mode
+   */
   vtkSetMacro(PlayMode, int);
   vtkGetMacro(PlayMode, int);
+  //@}
 
-  // Description:
-  // Forwarded to vtkSequenceAnimationPlayer
+  /**
+   * Forwarded to vtkSequenceAnimationPlayer
+   */
   void SetNumberOfFrames(int val);
 
-  // Description:
-  // Forwarded to vtkRealtimeAnimationPlayer.
+  /**
+   * Forwarded to vtkRealtimeAnimationPlayer.
+   */
   void SetDuration(int val);
 
-  // Description:
-  // Forwarded to vtkTimestepsAnimationPlayer.
+  //@{
+  /**
+   * Forwarded to vtkTimestepsAnimationPlayer.
+   */
   void AddTimeStep(double val);
   void RemoveAllTimeSteps();
   void SetFramesPerTimestep(int val);
+  //@}
 
 protected:
   vtkCompositeAnimationPlayer();
   ~vtkCompositeAnimationPlayer();
 
-  // Description:
-  // Delegated to the active animation player.
+  //@{
+  /**
+   * Delegated to the active animation player.
+   */
   virtual void StartLoop(double starttime, double endtime, double* playbackWindow);
   virtual void EndLoop();
   virtual double GetNextTime(double currentime);
+  //@}
 
   virtual double GoToNext(double start, double end, double currenttime);
   virtual double GoToPrevious(double start, double end, double currenttime);
@@ -88,7 +101,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif

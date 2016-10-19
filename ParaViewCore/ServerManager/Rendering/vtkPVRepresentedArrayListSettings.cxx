@@ -22,9 +22,10 @@
 
 vtkSmartPointer<vtkPVRepresentedArrayListSettings> vtkPVRepresentedArrayListSettings::Instance;
 
-class vtkPVRepresentedArrayListSettings::vtkInternals {
+class vtkPVRepresentedArrayListSettings::vtkInternals
+{
 public:
-  std::vector< std::string > FilterExpressions;
+  std::vector<std::string> FilterExpressions;
 };
 
 vtkInstantiatorNewMacro(vtkPVRepresentedArrayListSettings);
@@ -41,11 +42,11 @@ vtkPVRepresentedArrayListSettings* vtkPVRepresentedArrayListSettings::New()
 vtkPVRepresentedArrayListSettings* vtkPVRepresentedArrayListSettings::GetInstance()
 {
   if (!vtkPVRepresentedArrayListSettings::Instance)
-    {
+  {
     vtkPVRepresentedArrayListSettings* instance = new vtkPVRepresentedArrayListSettings();
     instance->InitializeObjectBase();
     vtkPVRepresentedArrayListSettings::Instance.TakeReference(instance);
-    }
+  }
   return vtkPVRepresentedArrayListSettings::Instance;
 }
 
@@ -65,10 +66,10 @@ vtkPVRepresentedArrayListSettings::~vtkPVRepresentedArrayListSettings()
 void vtkPVRepresentedArrayListSettings::SetNumberOfFilterExpressions(int n)
 {
   if (n != this->GetNumberOfFilterExpressions())
-    {
+  {
     this->Internals->FilterExpressions.resize(n);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -78,33 +79,33 @@ int vtkPVRepresentedArrayListSettings::GetNumberOfFilterExpressions()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRepresentedArrayListSettings::SetFilterExpression(int i, const char *expression)
+void vtkPVRepresentedArrayListSettings::SetFilterExpression(int i, const char* expression)
 {
   if (i >= 0 && i < this->GetNumberOfFilterExpressions())
-    {
+  {
     if (strcmp(this->Internals->FilterExpressions[i].c_str(), expression) != 0)
-      {
+    {
       this->Internals->FilterExpressions[i] = expression;
       this->Modified();
-      }
     }
+  }
   else
-    {
+  {
     vtkErrorMacro("Index out of range: " << i);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVRepresentedArrayListSettings::GetFilterExpression(int i)
 {
   if (i >= 0 && i < this->GetNumberOfFilterExpressions())
-    {
+  {
     return this->Internals->FilterExpressions[i].c_str();
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("Index out of range: " << i);
-    }
+  }
 
   return NULL;
 }

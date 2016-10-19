@@ -37,7 +37,7 @@ vtkPVKeyFrameCueManipulator* vtkPVKeyFrameAnimationCue::GetKeyFrameManipulator()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVKeyFrameAnimationCue::AddKeyFrame (vtkPVKeyFrame* keyframe)
+int vtkPVKeyFrameAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
 {
   return this->GetKeyFrameManipulator()->AddKeyFrame(keyframe);
 }

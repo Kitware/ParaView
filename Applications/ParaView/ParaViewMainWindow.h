@@ -39,14 +39,15 @@ class ParaViewMainWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
+
 public:
   ParaViewMainWindow();
   ~ParaViewMainWindow();
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *evt);
-  void dropEvent(QDropEvent *evt);
-  void showEvent(QShowEvent * evt);
+  void dragEnterEvent(QDragEnterEvent* evt);
+  void dropEvent(QDropEvent* evt);
+  void showEvent(QShowEvent* evt);
 
 protected slots:
   void showHelpForProxy(const QString& proxyname, const QString& groupname);
@@ -60,5 +61,3 @@ private:
 };
 
 #endif
-
-

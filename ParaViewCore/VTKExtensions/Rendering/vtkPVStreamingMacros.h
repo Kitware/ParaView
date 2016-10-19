@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVStreamingMacros
-// .SECTION Description
-// This file simple consolidates arbitrary macros used to debugging/logging for
-// streaming.
+/**
+ * @class   vtkPVStreamingMacros
+ *
+ * This file simple consolidates arbitrary macros used to debugging/logging for
+ * streaming.
+*/
 
 #ifndef vtkPVStreamingMacros_h
 #define vtkPVStreamingMacros_h
@@ -29,11 +31,10 @@
 //#endif
 
 #ifndef PV_DEBUG_STREAMING
-# define vtkStreamingStatusMacro(x)
+#define vtkStreamingStatusMacro(x)
 #else
-# define vtkStreamingStatusMacro(x) cout << "streaming: " x << endl;
+#define vtkStreamingStatusMacro(x) cout << "streaming: " x << endl;
 #endif
-
 
 #endif
 // VTK-HeaderTest-Exclude: vtkPVStreamingMacros.h

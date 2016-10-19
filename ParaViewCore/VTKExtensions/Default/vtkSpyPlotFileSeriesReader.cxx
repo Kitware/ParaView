@@ -31,13 +31,12 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include "vtkSmartPointer.h"
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 //=============================================================================
 vtkStandardNewMacro(vtkSpyPlotFileSeriesReader);
 
-vtkSpyPlotFileSeriesReader::vtkSpyPlotFileSeriesReader () 
+vtkSpyPlotFileSeriesReader::vtkSpyPlotFileSeriesReader()
 {
   this->SetNumberOfOutputPorts(2);
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
@@ -45,11 +44,11 @@ vtkSpyPlotFileSeriesReader::vtkSpyPlotFileSeriesReader ()
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 }
 
-vtkSpyPlotFileSeriesReader::~vtkSpyPlotFileSeriesReader () 
+vtkSpyPlotFileSeriesReader::~vtkSpyPlotFileSeriesReader()
 {
 }
 
-void vtkSpyPlotFileSeriesReader::PrintSelf (ostream& os, vtkIndent indent)
+void vtkSpyPlotFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

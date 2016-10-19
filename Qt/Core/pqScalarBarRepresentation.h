@@ -38,19 +38,21 @@ class pqPipelineRepresentation;
 class pqScalarsToColors;
 class vtkUndoElement;
 
-/// pqScalarBarRepresentation is created for "ScalarBarWidgetRepresentation"
-/// proxies. The only reason why pqScalarBarRepresentation is used is to keep
-/// create undo elements to aid with undo/redo for scalar bar interaction i.e.
-/// if user drags the scalar-bar widget, we capture the entire operation in a
-/// single undo-able action.
+/**
+* pqScalarBarRepresentation is created for "ScalarBarWidgetRepresentation"
+* proxies. The only reason why pqScalarBarRepresentation is used is to keep
+* create undo elements to aid with undo/redo for scalar bar interaction i.e.
+* if user drags the scalar-bar widget, we capture the entire operation in a
+* single undo-able action.
+*/
 class PQCORE_EXPORT pqScalarBarRepresentation : public pqRepresentation
 {
   Q_OBJECT
   typedef pqRepresentation Superclass;
+
 public:
-  pqScalarBarRepresentation(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* parent=0);
+  pqScalarBarRepresentation(const QString& group, const QString& name, vtkSMProxy* scalarbar,
+    pqServer* server, QObject* parent = 0);
   virtual ~pqScalarBarRepresentation();
 
 protected slots:

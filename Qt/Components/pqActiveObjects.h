@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
-/// needed for inline get-methods.
+/**
+* needed for inline get-methods.
+*/
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -48,65 +50,84 @@ class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
 class vtkSMSessionProxyManager;
 
-/// pqActiveObjects is a singleton that keeps track of "active objects"
-/// including active view, active source, active representation etc.
-/// pqActiveObjects also keeps track of selected sources (known as 'selection').
-/// setActiveSource/setActivePort will affect the selection but not vice-versa
-/// (unless dealing with multiple server sessions).
+/**
+* pqActiveObjects is a singleton that keeps track of "active objects"
+* including active view, active source, active representation etc.
+* pqActiveObjects also keeps track of selected sources (known as 'selection').
+* setActiveSource/setActivePort will affect the selection but not vice-versa
+* (unless dealing with multiple server sessions).
+*/
 class PQCOMPONENTS_EXPORT pqActiveObjects : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  /// Provides access to the singleton.
+  /**
+  * Provides access to the singleton.
+  */
   static pqActiveObjects& instance();
 
-  /// Returns the active view.
+  /**
+  * Returns the active view.
+  */
   pqView* activeView() const { return this->ActiveView; }
 
-  /// Returns the active source
+  /**
+  * Returns the active source
+  */
   pqPipelineSource* activeSource() const { return this->ActiveSource; }
 
-  /// Returns the active port.
+  /**
+  * Returns the active port.
+  */
   pqOutputPort* activePort() const { return this->ActivePort; }
 
-  /// Returns the active server.
+  /**
+  * Returns the active server.
+  */
   pqServer* activeServer() const { return this->ActiveServer; }
 
-  /// Returns the active representation.
-  pqDataRepresentation* activeRepresentation() const
-    { return this->ActiveRepresentation; }
+  /**
+  * Returns the active representation.
+  */
+  pqDataRepresentation* activeRepresentation() const { return this->ActiveRepresentation; }
 
   vtkSMProxySelectionModel* activeSourcesSelectionModel() const
-    {
-    return this->activeServer()?
-      this->activeServer()->activeSourcesSelectionModel() : NULL;
-    }
+  {
+    return this->activeServer() ? this->activeServer()->activeSourcesSelectionModel() : NULL;
+  }
 
-  /// Returns the current source selection.
-  const pqProxySelection& selection() const
-    { return this->Selection; }
+  /**
+  * Returns the current source selection.
+  */
+  const pqProxySelection& selection() const { return this->Selection; }
 
-  /// Returns the proxyManager() from the active server, if any.
-  /// Equivalent to calling this->activeServer()->proxyManager();
+  /**
+  * Returns the proxyManager() from the active server, if any.
+  * Equivalent to calling this->activeServer()->proxyManager();
+  */
   vtkSMSessionProxyManager* proxyManager() const;
 
 public slots:
-  void setActiveView(pqView * view);
-  void setActiveSource(pqPipelineSource * source);
-  void setActivePort(pqOutputPort * port);
+  void setActiveView(pqView* view);
+  void setActiveSource(pqPipelineSource* source);
+  void setActivePort(pqOutputPort* port);
   void setActiveServer(pqServer*);
   void onActiveServerChanged();
 
-  /// Sets the selected set of proxies. All proxies in the selection must be on
-  /// the same server/session. This generally doesn't affect the activeSource
-  /// etc. unless the server is different from the active server. In which case,
-  /// the active server is changed before the selection is updated.
-  void setSelection(const pqProxySelection& selection,
-    pqServerManagerModelItem* current);
+  /**
+  * Sets the selected set of proxies. All proxies in the selection must be on
+  * the same server/session. This generally doesn't affect the activeSource
+  * etc. unless the server is different from the active server. In which case,
+  * the active server is changed before the selection is updated.
+  */
+  void setSelection(const pqProxySelection& selection, pqServerManagerModelItem* current);
 
 signals:
-  /// These signals are fired when any of the corresponding active items change.
+  /**
+  * These signals are fired when any of the corresponding active items change.
+  */
   void serverChanged(pqServer*);
   void viewChanged(pqView* view);
   void sourceChanged(pqPipelineSource*);
@@ -115,25 +136,35 @@ signals:
   void representationChanged(pqRepresentation*);
   void selectionChanged(const pqProxySelection&);
 
-  /// this signal is fired when the active source fires the dataUpdated()
-  /// signal. This is used by components in the GUI that need to be updated when
-  /// the active source's pipeline updates.
+  /**
+  * this signal is fired when the active source fires the dataUpdated()
+  * signal. This is used by components in the GUI that need to be updated when
+  * the active source's pipeline updates.
+  */
   void dataUpdated();
 
 private slots:
-  /// if a new server connection was established, and no active server is set,
-  /// this makes the new server active by default. This helps with single-session
-  /// clients.
+  /**
+  * if a new server connection was established, and no active server is set,
+  * this makes the new server active by default. This helps with single-session
+  * clients.
+  */
   void serverAdded(pqServer*);
 
-  /// if the active server connection was closed, this ensures that the
-  /// application is notified.
+  /**
+  * if the active server connection was closed, this ensures that the
+  * application is notified.
+  */
   void serverRemoved(pqServer*);
 
-  /// if any of the active proxies is removed, we fire appropriate signals.
+  /**
+  * if any of the active proxies is removed, we fire appropriate signals.
+  */
   void proxyRemoved(pqServerManagerModelItem*);
 
-  /// called to update representation
+  /**
+  * called to update representation
+  */
   void updateRepresentation();
 
   void sourceSelectionChanged();
@@ -143,14 +174,18 @@ protected:
   pqActiveObjects();
   ~pqActiveObjects();
 
-  /// single method that fires appropriate signals based on state changes. This
-  /// also ensures that the Cached* variables are updated correctly.
+  /**
+  * single method that fires appropriate signals based on state changes. This
+  * also ensures that the Cached* variables are updated correctly.
+  */
   void triggerSignals();
 
 private:
   Q_DISABLE_COPY(pqActiveObjects)
 
-  /// method used to reset all active items.
+  /**
+  * method used to reset all active items.
+  */
   void resetActives();
 
   QPointer<pqServer> ActiveServer;
@@ -172,5 +207,3 @@ private:
 };
 
 #endif
-
-

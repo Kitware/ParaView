@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,25 +35,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 
-/// Base class for Widget which provides an editor for editing properties
-/// of a proxy where child widgets are named after the property they
-/// represent
+/**
+* Base class for Widget which provides an editor for editing properties
+* of a proxy where child widgets are named after the property they
+* represent
+*/
 class PQCOMPONENTS_EXPORT pqNamedObjectPanel : public pqObjectPanel
 {
   typedef pqObjectPanel Superclass;
-  
+
   Q_OBJECT
-  
+
 public:
-  /// constructor
+  /**
+  * constructor
+  */
   pqNamedObjectPanel(pqProxy* proxy, QWidget* p);
-  /// destructor
+  /**
+  * destructor
+  */
   ~pqNamedObjectPanel();
 
 protected:
-  /// populate widgets with properties from the server manager
+  /**
+  * populate widgets with properties from the server manager
+  */
   virtual void linkServerManagerProperties();
 };
 
 #endif
-

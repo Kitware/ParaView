@@ -34,7 +34,7 @@ vtkPVBox::~vtkPVBox()
 //----------------------------------------------------------------------------
 void vtkPVBox::SetPosition(const double pos[3])
 {
-  memcpy(this->Position, pos, sizeof(double)*3);
+  memcpy(this->Position, pos, sizeof(double) * 3);
   this->UpdateTransform();
   this->Modified();
 }
@@ -42,7 +42,7 @@ void vtkPVBox::SetPosition(const double pos[3])
 //----------------------------------------------------------------------------
 void vtkPVBox::SetRotation(const double pos[3])
 {
-  memcpy(this->Rotation, pos, sizeof(double)*3);
+  memcpy(this->Rotation, pos, sizeof(double) * 3);
   this->UpdateTransform();
   this->Modified();
 }
@@ -50,7 +50,7 @@ void vtkPVBox::SetRotation(const double pos[3])
 //----------------------------------------------------------------------------
 void vtkPVBox::SetScale(const double pos[3])
 {
-  memcpy(this->Scale, pos, sizeof(double)*3);
+  memcpy(this->Scale, pos, sizeof(double) * 3);
   this->UpdateTransform();
   this->Modified();
 }
@@ -74,13 +74,10 @@ void vtkPVBox::UpdateTransform()
 void vtkPVBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Position: " << this->Position[0] << ","
-                               << this->Position[1] << ","
-                               << this->Position[2] << endl;
-  os << indent << "Rotation: " << this->Rotation[0] << ","
-                               << this->Rotation[1] << ","
-                               << this->Rotation[2] << endl;
-  os << indent << "Scale: " << this->Scale[0] << ","
-                            << this->Scale[1] << ","
-                            << this->Scale[2] << endl;
+  os << indent << "Position: " << this->Position[0] << "," << this->Position[1] << ","
+     << this->Position[2] << endl;
+  os << indent << "Rotation: " << this->Rotation[0] << "," << this->Rotation[1] << ","
+     << this->Rotation[2] << endl;
+  os << indent << "Scale: " << this->Scale[0] << "," << this->Scale[1] << "," << this->Scale[2]
+     << endl;
 }

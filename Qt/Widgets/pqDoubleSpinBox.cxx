@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleSpinBox.h"
 
 //-----------------------------------------------------------------------------
-pqDoubleSpinBox::pqDoubleSpinBox(QWidget* _parent) : QDoubleSpinBox(_parent)
+pqDoubleSpinBox::pqDoubleSpinBox(QWidget* _parent)
+  : QDoubleSpinBox(_parent)
 {
 }
 
@@ -43,7 +44,7 @@ void pqDoubleSpinBox::stepBy(int steps)
   this->Superclass::stepBy(steps);
 
   if (this->value() != old_value)
-    {
+  {
     emit this->editingFinished();
-    }
+  }
 }

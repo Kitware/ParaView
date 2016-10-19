@@ -37,7 +37,8 @@
 
 #include <AttributeSubject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // *******************************************************************
 // Method: AttributeSubject::AttributeSubject
@@ -56,10 +57,11 @@ namespace pointsprite {
 //
 // *******************************************************************
 
-AttributeSubject::AttributeSubject(const char *formatString) :
-    AttributeGroup(formatString), Subject()
+AttributeSubject::AttributeSubject(const char* formatString)
+  : AttributeGroup(formatString)
+  , Subject()
 {
-    // nothing special here.
+  // nothing special here.
 }
 
 // *******************************************************************
@@ -77,7 +79,7 @@ AttributeSubject::AttributeSubject(const char *formatString) :
 
 AttributeSubject::~AttributeSubject()
 {
-    // nothing special here either.
+  // nothing special here either.
 }
 
 // *******************************************************************
@@ -93,15 +95,14 @@ AttributeSubject::~AttributeSubject()
 //
 // *******************************************************************
 
-void
-AttributeSubject::Notify()
+void AttributeSubject::Notify()
 {
-    // Call the base class's Notify method.
-    Subject::Notify();
+  // Call the base class's Notify method.
+  Subject::Notify();
 
-    // Now that all the Obsevrers have been called, unselect all the
-    // attributes.
-    UnSelectAll();
+  // Now that all the Obsevrers have been called, unselect all the
+  // attributes.
+  UnSelectAll();
 }
 
 // ****************************************************************************
@@ -117,10 +118,9 @@ AttributeSubject::Notify()
 //
 // ****************************************************************************
 
-AttributeSubject *
-AttributeSubject::CreateCompatible(const std::string &) const
+AttributeSubject* AttributeSubject::CreateCompatible(const std::string&) const
 {
-    return 0;
+  return 0;
 }
 
 // ****************************************************************************
@@ -138,10 +138,8 @@ AttributeSubject::CreateCompatible(const std::string &) const
 //
 // ****************************************************************************
 
-const std::string
-AttributeSubject::TypeName() const
+const std::string AttributeSubject::TypeName() const
 {
-    return "AttributeSubject";
+  return "AttributeSubject";
 }
-
 }

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -34,36 +34,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction to save animation geometry.
+/**
+* @ingroup Reactions
+* Reaction to save animation geometry.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationGeometryReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqSaveAnimationGeometryReaction(QAction* parent);
 
-  /// Saves the animation from the active scene.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Saves the animation from the active scene.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void saveAnimationGeometry();
   static void saveAnimationGeometry(const QString& filename);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
 
 private:
   Q_DISABLE_COPY(pqSaveAnimationGeometryReaction)
 };
 
 #endif
-
-

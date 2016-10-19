@@ -29,26 +29,26 @@ vtkMantaCompositeMapper::~vtkMantaCompositeMapper()
 {
 }
 
-vtkPolyDataMapper * vtkMantaCompositeMapper::MakeAMapper()
+vtkPolyDataMapper* vtkMantaCompositeMapper::MakeAMapper()
 {
   return vtkMantaPolyDataMapper::New();
 }
 
 void vtkMantaCompositeMapper::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 unsigned long vtkMantaCompositeMapper::GetInputTime()
 {
   if (this->GetNumberOfInputConnections(0) < 1)
-    {
+  {
     return 0;
-    }
-  vtkDataObject *dobj = this->GetExecutive()->GetInputData(0, 0);
+  }
+  vtkDataObject* dobj = this->GetExecutive()->GetInputData(0, 0);
   if (!dobj)
-    {
+  {
     return 0;
-    }
+  }
   return dobj->GetMTime();
 }

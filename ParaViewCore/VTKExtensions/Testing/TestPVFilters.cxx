@@ -38,98 +38,97 @@
 
 int TestPVFilters(int argc, char* argv[])
 {
-  char* fname = 
-    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/blow.vtk");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/blow.vtk");
 
-  vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName( fname );
+  vtkUnstructuredGridReader* reader = vtkUnstructuredGridReader::New();
+  reader->SetFileName(fname);
   reader->SetScalarsName("thickness9");
   reader->SetVectorsName("displacement9");
 
-  delete [] fname;
-  
+  delete[] fname;
+
   vtkCleanUnstructuredGrid* clean = vtkCleanUnstructuredGrid::New();
-  clean->SetInputConnection( reader->GetOutputPort() );
-  
-  vtkGlyphSource2D *gs = vtkGlyphSource2D::New();
+  clean->SetInputConnection(reader->GetOutputPort());
+
+  vtkGlyphSource2D* gs = vtkGlyphSource2D::New();
   gs->SetGlyphTypeToThickArrow();
-  gs->SetScale( 1 );
+  gs->SetScale(1);
   gs->FilledOff();
   gs->CrossOff();
 
-  vtkPVLegacyGlyphFilter *glyph = vtkPVLegacyGlyphFilter::New();
-  glyph->SetInputConnection( clean->GetOutputPort() );
-  glyph->SetSourceConnection( gs->GetOutputPort());
-  glyph->SetScaleFactor( 0.75 );
+  vtkPVLegacyGlyphFilter* glyph = vtkPVLegacyGlyphFilter::New();
+  glyph->SetInputConnection(clean->GetOutputPort());
+  glyph->SetSourceConnection(gs->GetOutputPort());
+  glyph->SetScaleFactor(0.75);
 
-  vtkContourFilter *contour = vtkContourFilter::New();
-  contour->SetInputConnection( clean->GetOutputPort() );
-  contour->SetValue( 0, 0.5 );
-  
-  vtkPlane *plane = vtkPlane::New();
+  vtkContourFilter* contour = vtkContourFilter::New();
+  contour->SetInputConnection(clean->GetOutputPort());
+  contour->SetValue(0, 0.5);
+
+  vtkPlane* plane = vtkPlane::New();
   plane->SetOrigin(0.25, 0, 0);
   plane->SetNormal(-1, -1, 0);
 
-  vtkClipDataSet *clip = vtkClipDataSet::New();
-  clip->SetInputConnection( clean->GetOutputPort() );
-  clip->SetClipFunction( plane );
+  vtkClipDataSet* clip = vtkClipDataSet::New();
+  clip->SetInputConnection(clean->GetOutputPort());
+  clip->SetClipFunction(plane);
   clip->GenerateClipScalarsOn();
-  clip->SetValue( 0.5 );
-  
-  vtkPVGeometryFilter *geometry = vtkPVGeometryFilter::New();
-  geometry->SetInputConnection( contour->GetOutputPort() );
-  
-  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection( geometry->GetOutputPort() );
-  
-  vtkPVLODActor *actor = vtkPVLODActor::New();
-  actor->SetMapper( mapper );
-  
-  //Now for the PVPolyData part:
-  vtkRibbonFilter *ribbon = vtkRibbonFilter::New();
-  ribbon->SetInputConnection( contour->GetOutputPort() );
-  ribbon->SetWidth( 0.1 );
+  clip->SetValue(0.5);
+
+  vtkPVGeometryFilter* geometry = vtkPVGeometryFilter::New();
+  geometry->SetInputConnection(contour->GetOutputPort());
+
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(geometry->GetOutputPort());
+
+  vtkPVLODActor* actor = vtkPVLODActor::New();
+  actor->SetMapper(mapper);
+
+  // Now for the PVPolyData part:
+  vtkRibbonFilter* ribbon = vtkRibbonFilter::New();
+  ribbon->SetInputConnection(contour->GetOutputPort());
+  ribbon->SetWidth(0.1);
   ribbon->SetWidthFactor(5);
 
-  vtkPVArrowSource *arrow = vtkPVArrowSource::New();
+  vtkPVArrowSource* arrow = vtkPVArrowSource::New();
 
-  vtkPVLinearExtrusionFilter *extrude = vtkPVLinearExtrusionFilter::New();
-  extrude->SetInputConnection( arrow->GetOutputPort() );
+  vtkPVLinearExtrusionFilter* extrude = vtkPVLinearExtrusionFilter::New();
+  extrude->SetInputConnection(arrow->GetOutputPort());
   extrude->SetScaleFactor(1);
   extrude->SetExtrusionTypeToNormalExtrusion();
   extrude->SetVector(1, 0, 0);
-  
-  vtkThreshold *threshold = vtkThreshold::New();
-  threshold->SetInputConnection( ribbon->GetOutputPort() );
+
+  vtkThreshold* threshold = vtkThreshold::New();
+  threshold->SetInputConnection(ribbon->GetOutputPort());
   threshold->ThresholdBetween(0.25, 0.75);
 
-  vtkWarpScalar *warp = vtkWarpScalar::New();
-  warp->SetInputConnection( threshold->GetOutputPort() );
+  vtkWarpScalar* warp = vtkWarpScalar::New();
+  warp->SetInputConnection(threshold->GetOutputPort());
   warp->XYPlaneOn();
   warp->SetScaleFactor(0.5);
 
-  vtkMergeArrays *merge = vtkMergeArrays::New();
-  merge->AddInputConnection( warp->GetOutputPort() );
-  merge->AddInputConnection( extrude->GetOutputPort() );
-  merge->AddInputConnection( clip->GetOutputPort() );
-  merge->AddInputConnection( glyph->GetOutputPort() );
-  merge->Update();  //discard
+  vtkMergeArrays* merge = vtkMergeArrays::New();
+  merge->AddInputConnection(warp->GetOutputPort());
+  merge->AddInputConnection(extrude->GetOutputPort());
+  merge->AddInputConnection(clip->GetOutputPort());
+  merge->AddInputConnection(glyph->GetOutputPort());
+  merge->Update(); // discard
 
-  vtkDataSetMapper *warpMapper = vtkDataSetMapper::New();
-  warpMapper->SetInputConnection( warp->GetOutputPort() );
-  
-  vtkActor *warpActor = vtkActor::New();
-  warpActor->SetMapper( warpMapper );
+  vtkDataSetMapper* warpMapper = vtkDataSetMapper::New();
+  warpMapper->SetInputConnection(warp->GetOutputPort());
 
-  vtkRenderer *ren = vtkRenderer::New();
-  ren->AddActor( actor );
-  ren->AddActor( warpActor );
+  vtkActor* warpActor = vtkActor::New();
+  warpActor->SetMapper(warpMapper);
 
-  vtkRenderWindow *renWin = vtkRenderWindow::New();
-  renWin->AddRenderer( ren );
-  
+  vtkRenderer* ren = vtkRenderer::New();
+  ren->AddActor(actor);
+  ren->AddActor(warpActor);
+
+  vtkRenderWindow* renWin = vtkRenderWindow::New();
+  renWin->AddRenderer(ren);
+
   renWin->Render();
-  
+
   reader->Delete();
   clean->Delete();
   gs->Delete();

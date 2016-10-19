@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -37,18 +37,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 
-/// @ingroup Behaviors
-/// pqDataTimeStepBehavior ensures that whenever a file is opened with more
-/// than 1 timestep, the application time >= the time for the last timestep.
+/**
+* @ingroup Behaviors
+* pqDataTimeStepBehavior ensures that whenever a file is opened with more
+* than 1 timestep, the application time >= the time for the last timestep.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataTimeStepBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqDataTimeStepBehavior(QObject* parent=0);
+  pqDataTimeStepBehavior(QObject* parent = 0);
 
 protected slots:
-  /// called when a reader is created.
+  /**
+  * called when a reader is created.
+  */
   void onReaderCreated(pqPipelineSource* reader);
 
 private:
@@ -56,5 +61,3 @@ private:
 };
 
 #endif
-
-

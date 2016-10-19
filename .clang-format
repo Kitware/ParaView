@@ -1,0 +1,11 @@
+---
+# This configuration requires clang-format 3.8 or higher.
+BasedOnStyle: Mozilla
+AlignAfterOpenBracket: DontAlign
+AlignOperands: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+Standard: Cpp03
+...

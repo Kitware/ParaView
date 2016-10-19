@@ -34,7 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComparativeContextView.h"
 
-/// The comparative bar chart subclass.
+/**
+* The comparative bar chart subclass.
+*/
 class PQCORE_EXPORT pqComparativeXYBarChartView : public pqComparativeContextView
 {
   Q_OBJECT
@@ -42,7 +44,7 @@ class PQCORE_EXPORT pqComparativeXYBarChartView : public pqComparativeContextVie
 
 public:
   pqComparativeXYBarChartView(const QString& group, const QString& name,
-    vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent=NULL);
+    vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent = NULL);
   ~pqComparativeXYBarChartView();
 
   static QString chartViewType() { return "ComparativeXYBarChartView"; }

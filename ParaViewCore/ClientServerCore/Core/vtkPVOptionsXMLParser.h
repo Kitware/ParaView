@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkPVOptionsXMLParser.h
 
@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVOptionsXMLParser - ParaView options storage
-// .SECTION Description
-// An object of this class represents a storage for ParaView options
-// 
-// These options can be retrieved during run-time, set using configuration file
-// or using Command Line Arguments.
+/**
+ * @class   vtkPVOptionsXMLParser
+ * @brief   ParaView options storage
+ *
+ * An object of this class represents a storage for ParaView options
+ *
+ * These options can be retrieved during run-time, set using configuration file
+ * or using Command Line Arguments.
+*/
 
 #ifndef vtkPVOptionsXMLParser_h
 #define vtkPVOptionsXMLParser_h
@@ -30,7 +33,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptionsXMLParser : public vtkCommand
 {
 public:
   static vtkPVOptionsXMLParser* New();
-  vtkTypeMacro(vtkPVOptionsXMLParser,vtkCommandOptionsXMLParser);
+  vtkTypeMacro(vtkPVOptionsXMLParser, vtkCommandOptionsXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
@@ -45,4 +48,3 @@ private:
 };
 
 #endif // #ifndef vtkPVOptionsXMLParser_h
-

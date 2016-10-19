@@ -36,21 +36,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QScopedPointer>
 
-/// pqHighlightablePushButton extents QPushButton to add support for
-/// highlighting the button.
+/**
+* pqHighlightablePushButton extents QPushButton to add support for
+* highlighting the button.
+*/
 class PQWIDGETS_EXPORT pqHighlightablePushButton : public QPushButton
 {
   Q_OBJECT
   typedef QPushButton Superclass;
+
 public:
-  pqHighlightablePushButton(QWidget *parent=0);
-  pqHighlightablePushButton(const QString &text, QWidget *parent=0);
-  pqHighlightablePushButton(const QIcon &icon, const QString &text, QWidget *parent=0);
+  pqHighlightablePushButton(QWidget* parent = 0);
+  pqHighlightablePushButton(const QString& text, QWidget* parent = 0);
+  pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
   virtual ~pqHighlightablePushButton();
 
 public slots:
-  /// Slots to highlight (or clear the highlight).
-  void highlight(bool clear=false);
+  /**
+  * Slots to highlight (or clear the highlight).
+  */
+  void highlight(bool clear = false);
   void clear() { this->highlight(true); }
 
 private:

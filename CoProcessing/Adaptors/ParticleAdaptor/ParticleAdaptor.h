@@ -7,7 +7,7 @@
   All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C" {
 #endif
-        
-void coprocessorinitialize (void* handle);
+
+void coprocessorinitialize(void* handle);
 
 // Description:
 // creates an image based on particle positions passed in xyz.
@@ -46,22 +46,20 @@ void coprocessorinitialize (void* handle);
 //             leave as null if there are no bounds
 // r is the radius of the particles as rendered
 // attr the attribute to color by, should be of length n
-// min and max are the minimum and maximum value of the attributes 
+// min and max are the minimum and maximum value of the attributes
 //             used to specify the linear mapping to color
-// theta and phi represent the camera position angles around 
+// theta and phi represent the camera position angles around
 //             the perimeter
-//             camera always look at the center of the xyz, 
-//             camera's up will always be positive or zero 
+//             camera always look at the center of the xyz,
+//             camera's up will always be positive or zero
 //             in y (depending on phi)
-// z represents distance from the center, setting this to zero will 
+// z represents distance from the center, setting this to zero will
 //             place the camera so that it can see all particles
-void coprocessorcreateimage (
-                int timestep, double time, char *filename_base, 
-                int n, double *xyz, double *bounds, double r, 
-                double *attr, double min, double max,
-                double theta, double phi, double z);
+void coprocessorcreateimage(int timestep, double time, char* filename_base, int n, double* xyz,
+  double* bounds, double r, double* attr, double min, double max, double theta, double phi,
+  double z);
 
-void coprocessorfinalize ();
+void coprocessorfinalize();
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -37,18 +37,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
-/// A property widget with a push button for invoking a command on a proxy.
-///
-/// To use this widget for a property add the 'panel_widget="command_button"'
-/// to the property's XML.
+/**
+* A property widget with a push button for invoking a command on a proxy.
+*
+* To use this widget for a property add the 'panel_widget="command_button"'
+* to the property's XML.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandButtonPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  explicit pqCommandButtonPropertyWidget(vtkSMProxy *proxy,
-                                         vtkSMProperty *property,
-                                         QWidget *parent = 0);
+  explicit pqCommandButtonPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqCommandButtonPropertyWidget();
 
 private slots:

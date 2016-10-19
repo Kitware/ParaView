@@ -56,39 +56,31 @@ class pqScalarsToColorsInternal
 public:
   vtkEventQtSlotConnect* VTKConnect;
 
-  pqScalarsToColorsInternal()
-    {
-    this->VTKConnect = vtkEventQtSlotConnect::New();
-    }
-  ~pqScalarsToColorsInternal()
-    {
-    this->VTKConnect->Delete();
-    }
+  pqScalarsToColorsInternal() { this->VTKConnect = vtkEventQtSlotConnect::New(); }
+  ~pqScalarsToColorsInternal() { this->VTKConnect->Delete(); }
 };
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
-    vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/)
-: pqProxy(group, name, proxy, server, _parent)
+pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name, vtkSMProxy* proxy,
+  pqServer* server, QObject* _parent /*=NULL*/)
+  : pqProxy(group, name, proxy, server, _parent)
 {
   this->Internal = new pqScalarsToColorsInternal;
 
-  this->Internal->VTKConnect->Connect(proxy->GetProperty("RGBPoints"),
-                                      vtkCommand::ModifiedEvent,
-                                      this, SLOT(checkRange()));
-  this->Internal->VTKConnect->Connect(proxy->GetProperty("UseLogScale"),
-                                      vtkCommand::ModifiedEvent,
-                                      this, SLOT(checkRange()));
+  this->Internal->VTKConnect->Connect(
+    proxy->GetProperty("RGBPoints"), vtkCommand::ModifiedEvent, this, SLOT(checkRange()));
+  this->Internal->VTKConnect->Connect(
+    proxy->GetProperty("UseLogScale"), vtkCommand::ModifiedEvent, this, SLOT(checkRange()));
   if (vtkSMProperty* prop = proxy->GetProperty("VectorComponent"))
-    {
-    this->Internal->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
-      this, SIGNAL(componentOrModeChanged()));
-    }
+  {
+    this->Internal->VTKConnect->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(componentOrModeChanged()));
+  }
   if (vtkSMProperty* prop = proxy->GetProperty("VectorMode"))
-    {
-    this->Internal->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
-      this, SIGNAL(componentOrModeChanged()));
-    }
+  {
+    this->Internal->VTKConnect->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SIGNAL(componentOrModeChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -101,10 +93,9 @@ pqScalarsToColors::~pqScalarsToColors()
 pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderViewBase* ren) const
 {
   vtkSMProxy* proxy =
-    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
-      this->getProxy(), ren->getProxy());
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(this->getProxy(), ren->getProxy());
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  return proxy? smmodel->findItem<pqScalarBarRepresentation*>(proxy) : NULL;
+  return proxy ? smmodel->findItem<pqScalarBarRepresentation*>(proxy) : NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,9 +103,9 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
 {
   vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
   if (prop)
-    {
-    pqSMAdaptor::setElementProperty(prop, (lock? 1: 0));
-    }
+  {
+    pqSMAdaptor::setElementProperty(prop, (lock ? 1 : 0));
+  }
   this->getProxy()->UpdateVTKObjects();
 }
 
@@ -123,9 +114,9 @@ bool pqScalarsToColors::getScalarRangeLock() const
 {
   vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
   if (prop && pqSMAdaptor::getElementProperty(prop).toInt() != 0)
-    {
+  {
     return true;
-    }
+  }
   // we may keep some GUI only state for vtkLookupTable proxies.
   return false;
 }
@@ -134,14 +125,14 @@ bool pqScalarsToColors::getScalarRangeLock() const
 void pqScalarsToColors::hideUnusedScalarBars()
 {
   // FIXME:
-  //pqApplicationCore* core = pqApplicationCore::instance();
-  //pqServerManagerModel* smmodel = core->getServerManagerModel();
+  // pqApplicationCore* core = pqApplicationCore::instance();
+  // pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  //QList<pqPipelineRepresentation*> displays =
+  // QList<pqPipelineRepresentation*> displays =
   //  smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
-  //bool used_at_all = false;
-  //foreach(pqPipelineRepresentation* display, displays)
+  // bool used_at_all = false;
+  // foreach(pqPipelineRepresentation* display, displays)
   //  {
   //  if (display->isVisible() &&
   //    display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
@@ -151,7 +142,7 @@ void pqScalarsToColors::hideUnusedScalarBars()
   //    break;
   //    }
   //  }
-  //if (!used_at_all)
+  // if (!used_at_all)
   //  {
   //  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
   //    {
@@ -164,55 +155,52 @@ void pqScalarsToColors::hideUnusedScalarBars()
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRange(double min, double max)
 {
-  pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
   if (min > max)
-    {
+  {
     double t = min;
     min = max;
     max = t;
-    }
+  }
 
-  QPair <double, double> current_range = this->getScalarRange();
+  QPair<double, double> current_range = this->getScalarRange();
   if (current_range.first == min && current_range.second == max)
-    {
+  {
     // Nothing to do.
     return;
-    }
+  }
 
   // Adjust vtkColorTransferFunction points to the new range.
   double dold = (current_range.second - current_range.first);
   dold = (dold > 0) ? dold : 1;
 
-  double dnew = (max -min);
+  double dnew = (max - min);
   dnew = (dnew >= 0) ? dnew : 1;
 
-  double scale = dnew/dold;
-  pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("AllowDuplicateScalars"), 1);
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->getProxy()->GetProperty("RGBPoints"));
+  double scale = dnew / dold;
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("AllowDuplicateScalars"), 1);
+  vtkSMDoubleVectorProperty* dvp =
+    vtkSMDoubleVectorProperty::SafeDownCast(this->getProxy()->GetProperty("RGBPoints"));
   QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
 
   int num_elems_per_command = dvp->GetNumberOfElementsPerCommand();
-  for (int cc=0; cc < controlPoints.size();  cc += num_elems_per_command)
-    {
+  for (int cc = 0; cc < controlPoints.size(); cc += num_elems_per_command)
+  {
     // These checks ensure that the first and last control points match the
     // min and max values exactly.
-    if (cc==0)
-      {
+    if (cc == 0)
+    {
       controlPoints[cc] = min;
-      }
-    else if ((cc+num_elems_per_command) >= controlPoints.size())
-      {
-      controlPoints[cc] = max;
-      }
-    else
-      {
-      controlPoints[cc] =
-        scale * (controlPoints[cc].toDouble()-current_range.first) + min;
-      }
     }
+    else if ((cc + num_elems_per_command) >= controlPoints.size())
+    {
+      controlPoints[cc] = max;
+    }
+    else
+    {
+      controlPoints[cc] = scale * (controlPoints[cc].toDouble() - current_range.first) + min;
+    }
+  }
   pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
   this->getProxy()->UpdateVTKObjects();
 }
@@ -220,26 +208,25 @@ void pqScalarsToColors::setScalarRange(double min, double max)
 //-----------------------------------------------------------------------------
 QPair<double, double> pqScalarsToColors::getScalarRange() const
 {
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->getProxy()->GetProperty("RGBPoints"));
+  vtkSMDoubleVectorProperty* dvp =
+    vtkSMDoubleVectorProperty::SafeDownCast(this->getProxy()->GetProperty("RGBPoints"));
   QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
 
   if (controlPoints.size() == 0)
-    {
+  {
     return QPair<double, double>(0, 0);
-    }
+  }
 
-  int max_index = dvp->GetNumberOfElementsPerCommand() * (
-    (controlPoints.size()-1)/ dvp->GetNumberOfElementsPerCommand());
-  return QPair<double, double>(controlPoints[0].toDouble(),
-    controlPoints[max_index].toDouble());
+  int max_index = dvp->GetNumberOfElementsPerCommand() *
+    ((controlPoints.size() - 1) / dvp->GetNumberOfElementsPerCommand());
+  return QPair<double, double>(controlPoints[0].toDouble(), controlPoints[max_index].toDouble());
 }
 
 //-----------------------------------------------------------------------------
 bool pqScalarsToColors::getUseLogScale() const
 {
-  vtkSMProxy *proxy = this->getProxy();
-  vtkSMProperty *prop = proxy->GetProperty("UseLogScale");
+  vtkSMProxy* proxy = this->getProxy();
+  vtkSMProperty* prop = proxy->GetProperty("UseLogScale");
   return (pqSMAdaptor::getElementProperty(prop).toInt() != 0);
 }
 
@@ -247,31 +234,33 @@ bool pqScalarsToColors::getUseLogScale() const
 void pqScalarsToColors::checkRange()
 {
   // Only need to adjust range if using log scale.
-  if (!this->getUseLogScale()) return;
+  if (!this->getUseLogScale())
+    return;
 
   QPair<double, double> range = this->getScalarRange();
-  if (range.first > 0.0) return;
+  if (range.first > 0.0)
+    return;
 
   // If we are here, we need to adjust the range to be all positive.
   QPair<double, double> newRange;
   if (range.second > 1.0)
-    {
+  {
     newRange.first = 1.0;
     newRange.second = range.second;
-    }
+  }
   else if (range.second > 0.0)
-    {
-    newRange.first = range.second/10.0;
+  {
+    newRange.first = range.second / 10.0;
     newRange.second = range.second;
-    }
+  }
   else
-    {
+  {
     range.first = 1.0;
     range.second = 10.0;
-    }
+  }
 
-  qWarning("Warning: Range [%g,%g] invalid for log scaling.  Changing to [%g,%g].",
-           range.first, range.second, newRange.first, newRange.second);
+  qWarning("Warning: Range [%g,%g] invalid for log scaling.  Changing to [%g,%g].", range.first,
+    range.second, newRange.first, newRange.second);
   this->setScalarRange(newRange.first, newRange.second);
 }
 
@@ -279,19 +268,19 @@ void pqScalarsToColors::checkRange()
 void pqScalarsToColors::setVectorMode(Mode mode, int comp)
 {
   vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setEnumerationProperty(proxy->GetProperty("VectorMode"),
-    (mode == MAGNITUDE)? "Magnitude" : "Component");
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("VectorComponent"),
-    (mode == COMPONENT)? comp: 0);
+  pqSMAdaptor::setEnumerationProperty(
+    proxy->GetProperty("VectorMode"), (mode == MAGNITUDE) ? "Magnitude" : "Component");
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("VectorComponent"), (mode == COMPONENT) ? comp : 0);
   proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
-  (void) component;
+  (void)component;
   // FIXME:
-  //foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  // foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
   //  {
   //  sb->setTitle(sb->getTitle().first, component);
   //  }
@@ -300,19 +289,18 @@ void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 //-----------------------------------------------------------------------------
 pqScalarsToColors::Mode pqScalarsToColors::getVectorMode() const
 {
-  if (pqSMAdaptor::getEnumerationProperty(
-      this->getProxy()->GetProperty("VectorMode")) == "Magnitude")
-    {
+  if (pqSMAdaptor::getEnumerationProperty(this->getProxy()->GetProperty("VectorMode")) ==
+    "Magnitude")
+  {
     return MAGNITUDE;
-    }
+  }
   return COMPONENT;
 }
 
 //-----------------------------------------------------------------------------
 int pqScalarsToColors::getVectorComponent() const
 {
-  return pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("VectorComponent")).toInt();
+  return pqSMAdaptor::getElementProperty(this->getProxy()->GetProperty("VectorComponent")).toInt();
 }
 
 //-----------------------------------------------------------------------------
@@ -329,10 +317,8 @@ void pqScalarsToColors::setColorRangeScalingMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int pqScalarsToColors::colorRangeScalingMode(
-  int default_value/*=GROW_ON_MODIFIED*/)
+int pqScalarsToColors::colorRangeScalingMode(int default_value /*=GROW_ON_MODIFIED*/)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  return settings->value(
-    "pqScalarsToColors/COLOR_RANGE_SCALING_MODE", default_value).toInt();
+  return settings->value("pqScalarsToColors/COLOR_RANGE_SCALING_MODE", default_value).toInt();
 }

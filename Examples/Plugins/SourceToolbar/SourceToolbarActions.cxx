@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
-SourceToolbarActions::SourceToolbarActions(QObject* p) : QActionGroup(p)
+SourceToolbarActions::SourceToolbarActions(QObject* p)
+  : QActionGroup(p)
 {
   // let's use a Qt icon (we could make our own)
   QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
@@ -64,20 +65,19 @@ void SourceToolbarActions::onAction(QAction* a)
 
   /// Check that we are connect to some server (either builtin or remote).
   if (sm->getNumberOfItems<pqServer*>())
-    {
+  {
     // just create it on the first server connection
     pqServer* s = sm->getItemAtIndex<pqServer*>(0);
     QString source_type = a->data().toString();
     // make this operation undo-able if undo is enabled
-    if(stack)
-      {
+    if (stack)
+    {
       stack->beginUndoSet(QString("Create %1").arg(source_type));
-      }
-    builder->createSource("sources", source_type.toLatin1().data(), s);
-    if(stack)
-      {
-      stack->endUndoSet();
-      }
     }
+    builder->createSource("sources", source_type.toLatin1().data(), s);
+    if (stack)
+    {
+      stack->endUndoSet();
+    }
+  }
 }
-

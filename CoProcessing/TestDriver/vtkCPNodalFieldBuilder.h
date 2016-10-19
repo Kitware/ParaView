@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPNodalFieldBuilder - Class for specifying nodal fields over grids.
-// .SECTION Description
-// Class for specifying nodal fields over grids for a test driver.  
+/**
+ * @class   vtkCPNodalFieldBuilder
+ * @brief   Class for specifying nodal fields over grids.
+ *
+ * Class for specifying nodal fields over grids for a test driver.
+*/
 
 #ifndef vtkCPNodalFieldBuilder_h
 #define vtkCPNodalFieldBuilder_h
@@ -25,14 +28,14 @@
 class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPNodalFieldBuilder : public vtkCPFieldBuilder
 {
 public:
-  static vtkCPNodalFieldBuilder * New();
+  static vtkCPNodalFieldBuilder* New();
   vtkTypeMacro(vtkCPNodalFieldBuilder, vtkCPFieldBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a field on Grid. 
-  virtual void BuildField(unsigned long timeStep, double time,
-                          vtkDataSet* grid);
+  /**
+   * Return a field on Grid.
+   */
+  virtual void BuildField(unsigned long timeStep, double time, vtkDataSet* grid);
 
 protected:
   vtkCPNodalFieldBuilder();

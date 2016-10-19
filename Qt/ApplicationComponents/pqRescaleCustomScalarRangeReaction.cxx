@@ -49,46 +49,45 @@ pqRescaleCustomScalarRangeReaction::pqRescaleCustomScalarRangeReaction(QAction* 
   : Superclass(parentObject)
 {
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    SIGNAL(representationChanged(pqDataRepresentation*)), this, SLOT(updateEnableState()),
+    Qt::QueuedConnection);
   this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 void pqRescaleCustomScalarRangeReaction::updateEnableState()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+  pqPipelineRepresentation* repr =
+    qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
   this->parentAction()->setEnabled(repr != NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange()
 {
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+  pqPipelineRepresentation* repr =
+    qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
   if (!repr)
-    {
+  {
     qCritical() << "No active representation.";
     return;
-    }
+  }
 
   vtkSMProxy* rproxy = repr->getProxy();
   if (!rproxy || !vtkSMPVRepresentationProxy::GetUsingScalarColoring(rproxy))
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProperty* lutProperty = rproxy->GetProperty("LookupTable");
   if (!lutProperty)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProxy* lutProxy = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkDiscretizableColorTransferFunction* stc =
-    vtkDiscretizableColorTransferFunction::SafeDownCast(
-      lutProxy->GetClientSideObject());
+    vtkDiscretizableColorTransferFunction::SafeDownCast(lutProxy->GetClientSideObject());
 
   double range[2];
   stc->GetRange(range);
@@ -96,15 +95,14 @@ void pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange()
   pqRescaleRange dialog;
   dialog.setRange(range[0], range[1]);
   if (dialog.exec() == QDialog::Accepted)
-    {
+  {
     range[0] = dialog.getMinimum();
     range[1] = dialog.getMaximum();
 
     BEGIN_UNDO_SET("Rescale Custom Range");
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(lutProxy, range[0],range[1]);
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(lutProxy, range[0], range[1]);
     vtkSMTransferFunctionProxy::RescaleTransferFunction(
-      vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy(),
-      range[0],range[1]);
+      vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy(), range[0], range[1]);
 
     // disable auto-rescale of transfer function since the user has set on
     // explicitly.
@@ -113,5 +111,5 @@ void pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange()
     lut->UpdateVTKObjects();
     repr->renderViewEventually();
     END_UNDO_SET();
-    }
+  }
 }

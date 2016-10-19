@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSliceAlongPolyPlane - slice a dataset along a polyplane
-// .SECTION Description
-
-// vtkSliceAlongPolyPlane is a filter that slices its first input dataset
-// along the surface defined by sliding the poly line in the second input
-// dataset along a line parallel to the Z-axis.
-
-// .SECTION See Also
-// vtkCutter vtkPolyPlane
+/**
+ * @class   vtkSliceAlongPolyPlane
+ * @brief   slice a dataset along a polyplane
+ *
+ *
+ * vtkSliceAlongPolyPlane is a filter that slices its first input dataset
+ * along the surface defined by sliding the poly line in the second input
+ * dataset along a line parallel to the Z-axis.
+ *
+ * @sa
+ * vtkCutter vtkPolyPlane
+*/
 
 #ifndef vtkSliceAlongPolyPlane_h
 #define vtkSliceAlongPolyPlane_h
@@ -35,28 +38,29 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkSliceAlongPolyPlane : public vtkDat
 {
 public:
   static vtkSliceAlongPolyPlane* New();
-  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
-  // Description
-  vtkSetMacro(Tolerance, double)
-  vtkGetMacro(Tolerance, double)
+  //@{
+  vtkSetMacro(Tolerance, double) vtkGetMacro(Tolerance, double)
+    //@}
 
-protected:
-  vtkSliceAlongPolyPlane();
+    protected : vtkSliceAlongPolyPlane();
   virtual ~vtkSliceAlongPolyPlane();
 
   virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector** inputVector , vtkInformationVector* outputVector);
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation( int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  // Description:
-  // The actual algorithm for slice a dataset along a polyline.
+  /**
+   * The actual algorithm for slice a dataset along a polyline.
+   */
   virtual bool Execute(vtkDataSet* inputDataset, vtkPolyData* lineDataSet, vtkPolyData* output);
 
-  // Description:
-  // Cleans up input polydata.
+  /**
+   * Cleans up input polydata.
+   */
   void CleanPolyLine(vtkPolyData* input, vtkPolyData* output);
 
 private:
@@ -64,7 +68,6 @@ private:
   void operator=(const vtkSliceAlongPolyPlane&) VTK_DELETE_FUNCTION;
 
   double Tolerance;
-
 };
 
 #endif

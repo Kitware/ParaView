@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModelInterface.h"
 #include <QObject>
 
-/// This is standard implementation used by ParaView for creating different
-/// pqProxy subclassess for every proxy registered.
+/**
+* This is standard implementation used by ParaView for creating different
+* pqProxy subclassess for every proxy registered.
+*/
 class PQCORE_EXPORT pqStandardServerManagerModelInterface : public QObject,
                                                             public pqServerManagerModelInterface
 {
@@ -47,13 +49,12 @@ public:
   pqStandardServerManagerModelInterface(QObject* parent);
   virtual ~pqStandardServerManagerModelInterface();
 
-  /// Creates a pqProxy subclass for the vtkSMProxy given the details for its
-  /// registration with the proxy manager.
-  virtual pqProxy* createPQProxy(const QString& group,
-    const QString& name, vtkSMProxy* proxy, pqServer* server) const;
-
+  /**
+  * Creates a pqProxy subclass for the vtkSMProxy given the details for its
+  * registration with the proxy manager.
+  */
+  virtual pqProxy* createPQProxy(
+    const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server) const;
 };
 
 #endif
-
-

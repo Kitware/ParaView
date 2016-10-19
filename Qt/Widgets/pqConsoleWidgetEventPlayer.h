@@ -35,20 +35,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetEventPlayer.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-/// pqConsoleWidgetEventPlayer is used to play back test commands recorded by
-/// pqConsoleWidgetEventTranslator for pqConsoleWidget.
+/**
+* pqConsoleWidgetEventPlayer is used to play back test commands recorded by
+* pqConsoleWidgetEventTranslator for pqConsoleWidget.
+*/
 class PQWIDGETS_EXPORT pqConsoleWidgetEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqConsoleWidgetEventPlayer(QObject* parent=0);
+  pqConsoleWidgetEventPlayer(QObject* parent = 0);
   virtual ~pqConsoleWidgetEventPlayer();
 
-  /// Callback to play a command.
+  /**
+  * Callback to play a command.
+  */
   using Superclass::playEvent;
-  virtual bool playEvent(QObject* target,
-    const QString& cmd, const QString& args, bool& errorFlag);
+  virtual bool playEvent(QObject* target, const QString& cmd, const QString& args, bool& errorFlag);
 
 private:
   Q_DISABLE_COPY(pqConsoleWidgetEventPlayer)

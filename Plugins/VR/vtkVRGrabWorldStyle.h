@@ -45,16 +45,15 @@ struct vtkVREventData;
 class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
 public:
-  static vtkVRGrabWorldStyle *New();
-  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle)
-  void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkVRGrabWorldStyle* New();
+  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle) void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkVRGrabWorldStyle();
   ~vtkVRGrabWorldStyle();
 
-  virtual void HandleButton( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
+  virtual void HandleButton(const vtkVREventData& data);
+  virtual void HandleTracker(const vtkVREventData& data);
 
   bool EnableTranslate;
   bool EnableRotate;
@@ -72,7 +71,7 @@ private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVRGrabWorldStyle&) VTK_DELETE_FUNCTION;
 
-  float GetSpeedFactor(vtkCamera *cam);
+  float GetSpeedFactor(vtkCamera* cam);
 };
 
-#endif //vtkVRGrabWorldStyle.h_
+#endif // vtkVRGrabWorldStyle.h_

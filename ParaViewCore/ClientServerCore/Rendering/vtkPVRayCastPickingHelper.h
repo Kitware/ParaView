@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRayCastPickingHelper - helper class that used selection and ray
-// casting to find the intersection point between the user picking point
-// and the concreate cell underneath.
+/**
+ * @class   vtkPVRayCastPickingHelper
+ * @brief   helper class that used selection and ray
+ * casting to find the intersection point between the user picking point
+ * and the concreate cell underneath.
+*/
 
 #ifndef vtkPVRayCastPickingHelper_h
 #define vtkPVRayCastPickingHelper_h
@@ -27,35 +30,47 @@ class vtkDataSet;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRayCastPickingHelper : public vtkObject
 {
 public:
-  static vtkPVRayCastPickingHelper *New();
-  vtkTypeMacro(vtkPVRayCastPickingHelper,vtkObject);
+  static vtkPVRayCastPickingHelper* New();
+  vtkTypeMacro(vtkPVRayCastPickingHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set input on which the selection apply
+  /**
+   * Set input on which the selection apply
+   */
   void SetInput(vtkAlgorithm*);
 
-  // Description:
-  // Set the selection that extract the cell that intersect the ray
+  /**
+   * Set the selection that extract the cell that intersect the ray
+   */
   void SetSelection(vtkAlgorithm*);
 
-  // Description:
-  // Set the point 1 that compose the ray
+  //@{
+  /**
+   * Set the point 1 that compose the ray
+   */
   vtkSetVector3Macro(PointA, double);
   vtkGetVector3Macro(PointA, double);
+  //@}
 
-  // Description:
-  // Set the point 2 that compose the ray
+  //@{
+  /**
+   * Set the point 2 that compose the ray
+   */
   vtkSetVector3Macro(PointB, double);
   vtkGetVector3Macro(PointB, double);
+  //@}
 
-  // Description:
-  // Set the flag to use directly selected points on mesh as intersection
+  //@{
+  /**
+   * Set the flag to use directly selected points on mesh as intersection
+   */
   vtkSetMacro(SnapOnMeshPoint, bool);
   vtkGetMacro(SnapOnMeshPoint, bool);
+  //@}
 
-  // Description:
-  // Compute the intersection
+  /**
+   * Compute the intersection
+   */
   void ComputeIntersection();
 
   // Descritpion:
@@ -66,8 +81,9 @@ protected:
   vtkPVRayCastPickingHelper();
   ~vtkPVRayCastPickingHelper();
 
-  // Description:
-  // Compute the intersection using provided dataset
+  /**
+   * Compute the intersection using provided dataset
+   */
   void ComputeIntersectionFromDataSet(vtkDataSet* ds);
 
   double Intersection[3];

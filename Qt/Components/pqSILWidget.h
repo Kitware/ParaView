@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -41,26 +41,33 @@ class pqSILModel;
 class pqTreeView;
 class pqProxySILModel;
 
-/// pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
-/// showing the top-level categories from the SIL.
+/**
+* pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
+* showing the top-level categories from the SIL.
+*/
 class PQCOMPONENTS_EXPORT pqSILWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// activeCategory is used to mark one of the top-level categories as the
-  /// first one to show. This is typically the sub-tree that you want to set on
-  /// the property.
-  pqSILWidget(const QString& activeCategory, QWidget* parent=0);
+  /**
+  * activeCategory is used to mark one of the top-level categories as the
+  * first one to show. This is typically the sub-tree that you want to set on
+  * the property.
+  */
+  pqSILWidget(const QString& activeCategory, QWidget* parent = 0);
   virtual ~pqSILWidget();
 
-  /// Get/Set the SIL model. This is typically a pqSILModel instance.
+  /**
+  * Get/Set the SIL model. This is typically a pqSILModel instance.
+  */
   void setModel(pqSILModel* silModel);
   pqSILModel* model() const;
 
-  /// Returns the proxy model for the active category.
-  pqProxySILModel* activeModel()
-    { return this->ActiveModel; }
+  /**
+  * Returns the proxy model for the active category.
+  */
+  pqProxySILModel* activeModel() { return this->ActiveModel; }
 
 protected slots:
   void onModelReset();
@@ -69,7 +76,7 @@ protected slots:
   void toggleSelectedBlocks(bool checked = false);
 
 protected:
-  QTabWidget *TabWidget;
+  QTabWidget* TabWidget;
   QPointer<pqSILModel> Model;
   QList<pqTreeView*> Trees;
   pqProxySILModel* ActiveModel;
@@ -80,5 +87,3 @@ private:
 };
 
 #endif
-
-

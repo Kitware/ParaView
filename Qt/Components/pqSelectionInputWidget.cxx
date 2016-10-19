@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,14 +54,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "ui_pqSelectionInputWidget.h"
-class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget { };
+class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget
+{
+};
 
-namespace {
-  /// given vtkSelectionNode::SelectionField, returns a string for it.
-  const char* getSelectionFieldTypeAsString(int fieldType)
-    {
-    switch (fieldType)
-      {
+namespace
+{
+/// given vtkSelectionNode::SelectionField, returns a string for it.
+const char* getSelectionFieldTypeAsString(int fieldType)
+{
+  switch (fieldType)
+  {
     case vtkSelectionNode::CELL:
       return "Cells";
     case vtkSelectionNode::POINT:
@@ -76,8 +79,8 @@ namespace {
       return "Rows";
     default:
       return "Unknown (not supported)";
-      }
-    }
+  }
+}
 }
 //-----------------------------------------------------------------------------
 pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
@@ -86,17 +89,17 @@ pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
   this->ui = new pqSelectionInputWidget::UI();
   this->ui->setupUi(this);
 
-  QObject::connect(this->ui->pushButtonCopySelection, SIGNAL(clicked()),
-                   this, SLOT(copyActiveSelection()));
+  QObject::connect(
+    this->ui->pushButtonCopySelection, SIGNAL(clicked()), this, SLOT(copyActiveSelection()));
 
-  pqSelectionManager* selMan = qobject_cast<pqSelectionManager*>(
-                    pqApplicationCore::instance()->manager("SelectionManager"));
+  pqSelectionManager* selMan =
+    qobject_cast<pqSelectionManager*>(pqApplicationCore::instance()->manager("SelectionManager"));
 
   if (selMan)
-    {
-    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
-                     this, SLOT(onActiveSelectionChanged()));
-    }
+  {
+    QObject::connect(
+      selMan, SIGNAL(selectionChanged(pqOutputPort*)), this, SLOT(onActiveSelectionChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -109,163 +112,180 @@ pqSelectionInputWidget::~pqSelectionInputWidget()
 void pqSelectionInputWidget::updateLabels()
 {
   if (!this->SelectionSource)
-    {
+  {
     this->ui->label->setText("No selection");
     this->ui->textBrowser->setText("");
     return;
-    }
+  }
 
   this->ui->label->setText("Copied Selection");
 
-  int fieldType = pqSMAdaptor::getElementProperty(
-                       this->SelectionSource->GetProperty("FieldType")).toInt();
+  int fieldType =
+    pqSMAdaptor::getElementProperty(this->SelectionSource->GetProperty("FieldType")).toInt();
 
   const char* fieldTypeAsString = getSelectionFieldTypeAsString(fieldType);
 
   const char* xmlname = this->SelectionSource->GetXMLName();
   QString text = QString("Type: ");
   QTextStream columnValues(&text, QIODevice::ReadWrite);
-  if(strcmp(xmlname, "FrustumSelectionSource") == 0)
-    {
+  if (strcmp(xmlname, "FrustumSelectionSource") == 0)
+  {
     columnValues << "Frustum Selection" << endl
-      << "Elements: " << fieldTypeAsString << endl
-      << endl << "Values:" << endl ;
+                 << "Elements: " << fieldTypeAsString << endl
+                 << endl
+                 << "Values:" << endl;
     vtkSMProperty* dvp = this->SelectionSource->GetProperty("Frustum");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(dvp);
-    for (int cc=0; cc <value.size(); cc++)
-      {
-      if((cc%4) == 0)
-        {
-        columnValues << endl;
-        }
-      columnValues << value[cc].toDouble() << "\t";
-      }
-    }
-  else if (strcmp(xmlname, "GlobalIDSelectionSource") == 0)
+    for (int cc = 0; cc < value.size(); cc++)
     {
+      if ((cc % 4) == 0)
+      {
+        columnValues << endl;
+      }
+      columnValues << value[cc].toDouble() << "\t";
+    }
+  }
+  else if (strcmp(xmlname, "GlobalIDSelectionSource") == 0)
+  {
     columnValues << "Global ID Selection" << endl
-      << "Elements: " << fieldTypeAsString << endl
-      << endl << endl;
-    QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(
-      this->SelectionSource->GetProperty("IDs"));
+                 << "Elements: " << fieldTypeAsString << endl
+                 << endl
+                 << endl;
+    QList<QVariant> value =
+      pqSMAdaptor::getMultipleElementProperty(this->SelectionSource->GetProperty("IDs"));
     columnValues << "Global ID" << endl;
     foreach (QVariant val, value)
-      {
+    {
       columnValues << val.toString() << endl;
-      }
     }
-  else if(strcmp(xmlname, "IDSelectionSource") == 0)
-    {
+  }
+  else if (strcmp(xmlname, "IDSelectionSource") == 0)
+  {
     columnValues << QString("ID Selection") << endl
-      << "Elements: " << fieldTypeAsString << endl << endl << endl;
-    columnValues << "Process ID" << "\t\t" << "Index" << endl;
+                 << "Elements: " << fieldTypeAsString << endl
+                 << endl
+                 << endl;
+    columnValues << "Process ID"
+                 << "\t\t"
+                 << "Index" << endl;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
-    for (int cc=0; cc <value.size(); cc++)
-      {
-      if((cc%2) == 0)
-        {
-        columnValues << endl;
-        }
-      columnValues << value[cc].toString() << "\t\t";
-      }
-    }
-  else if(strcmp(xmlname, "CompositeDataIDSelectionSource") == 0)
+    for (int cc = 0; cc < value.size(); cc++)
     {
+      if ((cc % 2) == 0)
+      {
+        columnValues << endl;
+      }
+      columnValues << value[cc].toString() << "\t\t";
+    }
+  }
+  else if (strcmp(xmlname, "CompositeDataIDSelectionSource") == 0)
+  {
     columnValues << QString("ID Selection") << endl
-      << "Elements: " << fieldTypeAsString << endl << endl << endl;
-    columnValues  << "Composite ID"
-      << "\t" << "Process ID" << "\t\t" << "Index" << endl;
+                 << "Elements: " << fieldTypeAsString << endl
+                 << endl
+                 << endl;
+    columnValues << "Composite ID"
+                 << "\t"
+                 << "Process ID"
+                 << "\t\t"
+                 << "Index" << endl;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
-    for (int cc=0; cc <value.size(); cc++)
-      {
-      if((cc%3) == 0)
-        {
-        columnValues << endl;
-        }
-      columnValues << value[cc].toString() << "\t\t";
-      }
-    }
-  else if(strcmp(xmlname, "HierarchicalDataIDSelectionSource") == 0)
+    for (int cc = 0; cc < value.size(); cc++)
     {
+      if ((cc % 3) == 0)
+      {
+        columnValues << endl;
+      }
+      columnValues << value[cc].toString() << "\t\t";
+    }
+  }
+  else if (strcmp(xmlname, "HierarchicalDataIDSelectionSource") == 0)
+  {
     columnValues << QString("ID Selection") << endl
-      << "Elements: " << fieldTypeAsString << endl << endl << endl;
-    columnValues  << "Level" << "\t\t" << "Dataset" << "\t\t" 
-      << "Index" << endl;
+                 << "Elements: " << fieldTypeAsString << endl
+                 << endl
+                 << endl;
+    columnValues << "Level"
+                 << "\t\t"
+                 << "Dataset"
+                 << "\t\t"
+                 << "Index" << endl;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
-    for (int cc=0; cc <value.size(); cc++)
+    for (int cc = 0; cc < value.size(); cc++)
+    {
+      if ((cc % 3) == 0)
       {
-      if((cc%3) == 0)
-        {
         columnValues << endl;
-        }
-      columnValues << value[cc].toString() << "\t\t";
       }
+      columnValues << value[cc].toString() << "\t\t";
     }
+  }
   else if (strcmp(xmlname, "LocationSelectionSource") == 0)
-    {
+  {
     columnValues << "Location-based Selection" << endl << endl << endl;
     columnValues << "Probe Locations" << endl;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("Locations");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
-    for (int cc=0; cc <value.size(); cc++)
-      {
-      if((cc%3) == 0)
-        {
-        columnValues << endl;
-        }
-      columnValues << value[cc].toString() << "\t\t";
-      }
-    }
-  else if (strcmp(xmlname, "BlockSelectionSource") == 0)
+    for (int cc = 0; cc < value.size(); cc++)
     {
+      if ((cc % 3) == 0)
+      {
+        columnValues << endl;
+      }
+      columnValues << value[cc].toString() << "\t\t";
+    }
+  }
+  else if (strcmp(xmlname, "BlockSelectionSource") == 0)
+  {
     columnValues << "Block Selection" << endl << endl << endl;
     columnValues << "Blocks" << endl;
     vtkSMProperty* prop = this->SelectionSource->GetProperty("Blocks");
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
     foreach (const QVariant& value, values)
-      {
-      columnValues << value.toString() << endl;
-      }
-    }
-  else if (strcmp(xmlname, "ThresholdSelectionSource") == 0)
     {
+      columnValues << value.toString() << endl;
+    }
+  }
+  else if (strcmp(xmlname, "ThresholdSelectionSource") == 0)
+  {
     columnValues << "Threshold Selection" << endl;
     columnValues << "Elements: " << fieldTypeAsString << endl;
-    columnValues << "Array: " 
-      << pqSMAdaptor::getElementProperty(
-        this->SelectionSource->GetProperty("ArrayName")).toString() 
-      << endl << endl;
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->SelectionSource->GetProperty("Thresholds"));
-    for (int cc=0; cc <values.size(); cc++)
-      {
+    columnValues
+      << "Array: "
+      << pqSMAdaptor::getElementProperty(this->SelectionSource->GetProperty("ArrayName")).toString()
+      << endl
+      << endl;
+    QList<QVariant> values =
+      pqSMAdaptor::getMultipleElementProperty(this->SelectionSource->GetProperty("Thresholds"));
+    for (int cc = 0; cc < values.size(); cc++)
+    {
       const QVariant& value = values[cc];
       columnValues << value.toString();
-      if (cc%2)
-        {
+      if (cc % 2)
+      {
         columnValues << endl;
-        }
+      }
       else
-        {
-        columnValues << "\t\t" ;
-        }
+      {
+        columnValues << "\t\t";
       }
     }
+  }
   else if (strcmp(xmlname, "SelectionQuerySource") == 0)
-    {
+  {
     columnValues << "Query" << endl;
     this->SelectionSource->UpdatePropertyInformation();
-    columnValues << vtkSMPropertyHelper(
-      this->SelectionSource, "UserFriendlyText").GetAsString() << endl
-      << "Elements: " << fieldTypeAsString;
-    }
+    columnValues << vtkSMPropertyHelper(this->SelectionSource, "UserFriendlyText").GetAsString()
+                 << endl
+                 << "Elements: " << fieldTypeAsString;
+  }
   else
-    {
+  {
     columnValues << "None" << endl;
-    }
+  }
 
   this->ui->textBrowser->setText(text);
   columnValues.flush();
@@ -275,9 +295,9 @@ void pqSelectionInputWidget::updateLabels()
 void pqSelectionInputWidget::initializeDefaultValueIfNeeded()
 {
   if (!this->SelectionSource)
-    {
+  {
     this->copyActiveSelection();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -285,31 +305,31 @@ void pqSelectionInputWidget::initializeDefaultValueIfNeeded()
 // active selection proxy. The filter proxy is not modified yet.
 void pqSelectionInputWidget::copyActiveSelection()
 {
-  pqSelectionManager* selMan = (pqSelectionManager*)(
-                    pqApplicationCore::instance()->manager("SelectionManager"));
+  pqSelectionManager* selMan =
+    (pqSelectionManager*)(pqApplicationCore::instance()->manager("SelectionManager"));
 
   if (!selMan)
-    {
+  {
     qDebug() << "No selection manager was detected. "
-      "Don't know where to get the active selection from.";
+                "Don't know where to get the active selection from.";
     return;
-    }
+  }
 
   pqOutputPort* port = selMan->getSelectedPort();
   if (!port)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProxy* activeSelection = port->getSelectionInput();
   if (!activeSelection)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = activeSelection->GetSessionProxyManager();
-  vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
-                                        activeSelection->GetXMLName());
+  vtkSMProxy* newSource =
+    pxm->NewProxy(activeSelection->GetXMLGroup(), activeSelection->GetXMLName());
   newSource->Copy(activeSelection);
   newSource->UpdateVTKObjects();
   this->setSelection(newSource);
@@ -319,7 +339,8 @@ void pqSelectionInputWidget::copyActiveSelection()
 //-----------------------------------------------------------------------------
 void pqSelectionInputWidget::setSelection(pqSMProxy newSelection)
 {
-  if (this->SelectionSource == newSelection) return;
+  if (this->SelectionSource == newSelection)
+    return;
 
   this->SelectionSource = newSelection;
 
@@ -340,32 +361,31 @@ void pqSelectionInputWidget::postAccept()
 {
   // Select proper ProxyManager
   vtkSMProxy* sel_source = this->selection();
-  vtkSMSessionProxyManager* pxm = sel_source ?
-                                  sel_source->GetSessionProxyManager() : NULL;
+  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : NULL;
 
   if (!sel_source)
-    {
+  {
     return;
-    }
+  }
 
   // Unregister any de-referenced proxy sources.
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetSession(sel_source->GetSession());
   iter->SetModeToOneGroup();
   for (iter->Begin("selection_sources"); !iter->IsAtEnd();)
-    {
+  {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy->GetNumberOfConsumers() == 0)
-      {
+    {
       std::string key = iter->GetKey();
       iter->Next();
       pxm->UnRegisterProxy("selection_sources", key.c_str(), proxy);
-      }
-    else
-      {
-      iter->Next();
-      }
     }
+    else
+    {
+      iter->Next();
+    }
+  }
   iter->Delete();
 }
 
@@ -374,17 +394,15 @@ void pqSelectionInputWidget::preAccept()
 {
   // Select proper ProxyManager
   vtkSMProxy* sel_source = this->selection();
-  vtkSMSessionProxyManager* pxm = sel_source ?
-                                  sel_source->GetSessionProxyManager() : NULL;
+  vtkSMSessionProxyManager* pxm = sel_source ? sel_source->GetSessionProxyManager() : NULL;
 
   // Register the new selection proxy.
   if (sel_source && pxm)
-    {
+  {
     if (!pxm->GetProxyName("selection_sources", sel_source))
-      {
-      std::string key = std::string("selection_source.") +
-        sel_source->GetGlobalIDAsString();
+    {
+      std::string key = std::string("selection_source.") + sel_source->GetGlobalIDAsString();
       pxm->RegisterProxy("selection_sources", key.c_str(), sel_source);
-      }
     }
+  }
 }

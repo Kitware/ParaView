@@ -38,7 +38,8 @@
 #include <SimpleObserver.h>
 #include <Subject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // *******************************************************************
 // Method: Subject::Subject
@@ -75,14 +76,14 @@ Subject::Subject()
 
 Subject::~Subject()
 {
-    // If there are still observers around it means that this
-    // object is being destroyed first. Tell the remaining observers
-    // that they should not try to detach.
-    std::vector<SimpleObserver *>::iterator pos;
-    for(pos = observers.begin(); pos != observers.end(); ++pos)
-    {
-        (*pos)->SubjectRemoved(this);
-    }
+  // If there are still observers around it means that this
+  // object is being destroyed first. Tell the remaining observers
+  // that they should not try to detach.
+  std::vector<SimpleObserver*>::iterator pos;
+  for (pos = observers.begin(); pos != observers.end(); ++pos)
+  {
+    (*pos)->SubjectRemoved(this);
+  }
 }
 
 // *******************************************************************
@@ -103,10 +104,9 @@ Subject::~Subject()
 //
 // *******************************************************************
 
-void
-Subject::Attach(SimpleObserver *o)
+void Subject::Attach(SimpleObserver* o)
 {
-    observers.push_back(o);
+  observers.push_back(o);
 }
 
 // *******************************************************************
@@ -127,19 +127,18 @@ Subject::Attach(SimpleObserver *o)
 //
 // *******************************************************************
 
-void
-Subject::Detach(SimpleObserver *o)
+void Subject::Detach(SimpleObserver* o)
 {
-    std::vector<SimpleObserver *>::iterator pos;
+  std::vector<SimpleObserver*>::iterator pos;
 
-    // Erase all references to observer o.
-    for(pos = observers.begin(); pos != observers.end(); )
-    {
-       if(*pos == o)
-           pos = observers.erase(pos);
-       else
-           ++pos;
-    }
+  // Erase all references to observer o.
+  for (pos = observers.begin(); pos != observers.end();)
+  {
+    if (*pos == o)
+      pos = observers.erase(pos);
+    else
+      ++pos;
+  }
 }
 
 // *******************************************************************
@@ -161,20 +160,19 @@ Subject::Detach(SimpleObserver *o)
 //
 // *******************************************************************
 
-void
-Subject::Notify()
+void Subject::Notify()
 {
-    std::vector<SimpleObserver *>::iterator pos;
+  std::vector<SimpleObserver*>::iterator pos;
 
-    for(pos = observers.begin(); pos != observers.end(); ++pos)
-    {
-        // Update the observer if it wants to be updated. If it didn't
-        // want to be updated, set its update to true so it will be
-        // updated next time.
-        if((*pos)->GetUpdate())
-           (*pos)->Update(this);
-        else
-           (*pos)->SetUpdate(true);
-    }
+  for (pos = observers.begin(); pos != observers.end(); ++pos)
+  {
+    // Update the observer if it wants to be updated. If it didn't
+    // want to be updated, set its update to true so it will be
+    // updated next time.
+    if ((*pos)->GetUpdate())
+      (*pos)->Update(this);
+    else
+      (*pos)->SetUpdate(true);
+  }
 }
 }

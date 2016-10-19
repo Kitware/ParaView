@@ -41,10 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqPointPickingHelper::pqPointPickingHelper(
   const QKeySequence& keySequence, bool pick_on_mesh, QObject* parentObject)
-  : Superclass(parentObject),
-  KeySequence(keySequence),
-  PickOnMesh(pick_on_mesh),
-  ShortcutEnabled(true)
+  : Superclass(parentObject)
+  , KeySequence(keySequence)
+  , PickOnMesh(pick_on_mesh)
+  , ShortcutEnabled(true)
 {
 }
 
@@ -58,13 +58,13 @@ pqPointPickingHelper::~pqPointPickingHelper()
 void pqPointPickingHelper::setShortcutEnabled(bool val)
 {
   if (this->ShortcutEnabled != val)
-    {
+  {
     this->ShortcutEnabled = val;
     if (this->Shortcut)
-      {
+    {
       this->Shortcut->setEnabled(val);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -72,17 +72,17 @@ void pqPointPickingHelper::setView(pqView* view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
   if (rview == this->View)
-    {
+  {
     return;
-    }
+  }
   delete this->Shortcut;
   this->View = rview;
   if (rview)
-    {
+  {
     this->Shortcut = new QShortcut(this->KeySequence, view->widget());
     this->Shortcut->setEnabled(this->ShortcutEnabled);
     this->connect(this->Shortcut, SIGNAL(activated()), SLOT(pickPoint()));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -90,20 +90,20 @@ void pqPointPickingHelper::pickPoint()
 {
   pqRenderView* rview = this->View;
   if (rview && rview->getRenderViewProxy())
-    {
+  {
     vtkRenderWindowInteractor* rwi = rview->getRenderViewProxy()->GetInteractor();
     if (!rwi)
-      {
+    {
       return;
-      }
+    }
 
     // Get region
     const int* eventpos = rwi->GetEventPosition();
     double position[3];
     if (rview->getRenderViewProxy()->ConvertDisplayToPointOnSurface(
-        eventpos, position, this->PickOnMesh))
-      {
+          eventpos, position, this->PickOnMesh))
+    {
       emit this->pick(position[0], position[1], position[2]);
-      }
     }
+  }
 }

@@ -26,21 +26,18 @@
 #include <fstream>
 #include <iostream>
 
-#define safeio(a) ((a)?(a):"NULL")
-
+#define safeio(a) ((a) ? (a) : "NULL")
 
 vtkStandardNewMacro(vtkSMProxyConfigurationWriter);
 
-
 //---------------------------------------------------------------------------
 vtkSMProxyConfigurationWriter::vtkSMProxyConfigurationWriter()
-        :
-    FileName(0),
-    Proxy(0),
-    PropertyIterator(0),
-    FileIdentifier(0),
-    FileDescription(0),
-    FileExtension(0)
+  : FileName(0)
+  , Proxy(0)
+  , PropertyIterator(0)
+  , FileIdentifier(0)
+  , FileDescription(0)
+  , FileExtension(0)
 {
   vtkSMProxyConfigurationFileInfo info;
   this->SetFileIdentifier(info.FileIdentifier);
@@ -60,30 +57,30 @@ vtkSMProxyConfigurationWriter::~vtkSMProxyConfigurationWriter()
 }
 
 //---------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter,PropertyIterator,vtkSMPropertyIterator);
+vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter, PropertyIterator, vtkSMPropertyIterator);
 
 //---------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter,Proxy,vtkSMProxy);
+vtkCxxSetObjectMacro(vtkSMProxyConfigurationWriter, Proxy, vtkSMProxy);
 
 //---------------------------------------------------------------------------
-int vtkSMProxyConfigurationWriter::WriteConfiguration(std::ostream &os)
+int vtkSMProxyConfigurationWriter::WriteConfiguration(std::ostream& os)
 {
   // The user didn't set a iterator, assume he wants all
   // of the properties saved, use the default iterator.
-  int deleteIter=0;
-  vtkSMPropertyIterator *iter=this->PropertyIterator;
+  int deleteIter = 0;
+  vtkSMPropertyIterator* iter = this->PropertyIterator;
   if (!iter)
-    {
-    iter=this->Proxy->NewPropertyIterator();
-    deleteIter=1;
-    }
+  {
+    iter = this->Proxy->NewPropertyIterator();
+    deleteIter = 1;
+  }
 
   os << "<?xml version=\"1.0\"?>" << endl;
 
-  vtkPVXMLElement* state=vtkPVXMLElement::New();
+  vtkPVXMLElement* state = vtkPVXMLElement::New();
   state->SetName(this->GetFileIdentifier());
-  state->AddAttribute("description",this->GetFileDescription());
-  state->AddAttribute("version",this->GetWriterVersion());
+  state->AddAttribute("description", this->GetFileDescription());
+  state->AddAttribute("version", this->GetWriterVersion());
 
   // We don't want Sub-proxy
   this->Proxy->SaveXMLState(state, iter);
@@ -93,41 +90,40 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(std::ostream &os)
 
   // clean up the default iterator
   if (deleteIter)
-    {
+  {
     iter->Delete();
-    }
+  }
 
   return 1;
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyConfigurationWriter::WriteConfiguration(const char *cFilename)
+int vtkSMProxyConfigurationWriter::WriteConfiguration(const char* cFilename)
 {
-  if (cFilename==0)
-    {
+  if (cFilename == 0)
+  {
     vtkErrorMacro("Cannot write filename NULL.");
     return 0;
-    }
+  }
 
   // If there client has set an extension then we add it if it's not
   // present. To save with out th eextension, set it NULL.
-  const char *cExt=this->GetFileExtension();
-  cExt=(cExt==NULL?"":cExt);
+  const char* cExt = this->GetFileExtension();
+  cExt = (cExt == NULL ? "" : cExt);
   std::string filename(cFilename);
   std::string ext(cExt);
-  if (!ext.empty()
-    && (filename.size()<=ext.size()
-    || filename.find(ext,filename.size()-ext.size())==std::string::npos))
-    {
-    filename+=ext;
-    }
+  if (!ext.empty() && (filename.size() <= ext.size() ||
+                        filename.find(ext, filename.size() - ext.size()) == std::string::npos))
+  {
+    filename += ext;
+  }
 
   std::ofstream os(filename.c_str(), ios::out);
   if (!os.good())
-    {
+  {
     vtkErrorMacro("Failed to open " << filename.c_str() << " for writing.");
     return 0;
-    }
+  }
   this->WriteConfiguration(os);
   os.close();
 
@@ -141,10 +137,9 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyConfigurationWriter::PrintSelf(std::ostream &os,
-                                              vtkIndent indent)
+void vtkSMProxyConfigurationWriter::PrintSelf(std::ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "FileName: " << safeio(this->FileName) << endl
      << indent << "Proxy: " << this->Proxy << endl
@@ -155,4 +150,3 @@ void vtkSMProxyConfigurationWriter::PrintSelf(std::ostream &os,
      << indent << "FileExtension: " << safeio(this->GetFileExtension()) << endl
      << indent << "WriterVersion: " << safeio(this->GetWriterVersion()) << endl;
 }
-

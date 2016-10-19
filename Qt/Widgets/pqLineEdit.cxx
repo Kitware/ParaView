@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,25 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------
-pqLineEdit::pqLineEdit(QWidget *_parent) :Superclass(_parent),
-  EditingFinishedPending(false), ResetCursorPositionOnEditingFinished(true)
+pqLineEdit::pqLineEdit(QWidget* _parent)
+  : Superclass(_parent)
+  , EditingFinishedPending(false)
+  , ResetCursorPositionOnEditingFinished(true)
 {
-  this->connect(this, SIGNAL(editingFinished()),
-    this, SLOT(onEditingFinished()));
-  this->connect(this, SIGNAL(textEdited(const QString&)),
-    this, SLOT(onTextEdited()));
+  this->connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  this->connect(this, SIGNAL(textEdited(const QString&)), this, SLOT(onTextEdited()));
 }
 
 //-----------------------------------------------------------------------------
-pqLineEdit::pqLineEdit(const QString &_contents, QWidget *_parent):
-  Superclass(_contents, _parent),
-  EditingFinishedPending(false),
-  ResetCursorPositionOnEditingFinished(true)
+pqLineEdit::pqLineEdit(const QString& _contents, QWidget* _parent)
+  : Superclass(_contents, _parent)
+  , EditingFinishedPending(false)
+  , ResetCursorPositionOnEditingFinished(true)
 {
-  this->connect(this, SIGNAL(editingFinished()),
-    this, SLOT(onEditingFinished()));
-  this->connect(this, SIGNAL(textEdited(const QString&)),
-    this, SLOT(onTextEdited()));
+  this->connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  this->connect(this, SIGNAL(textEdited(const QString&)), this, SLOT(onTextEdited()));
 }
 
 //-----------------------------------------------------------------------------
@@ -74,24 +72,24 @@ void pqLineEdit::onTextEdited()
 void pqLineEdit::onEditingFinished()
 {
   if (this->EditingFinishedPending)
-    {
+  {
     emit this->textChangedAndEditingFinished();
     this->EditingFinishedPending = false;
-    }
+  }
   if (this->ResetCursorPositionOnEditingFinished)
-    {
+  {
     this->setCursorPosition(0);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqLineEdit::setTextAndResetCursor(const QString& val)
 {
   if (this->text() != val)
-    {
+  {
     this->Superclass::setText(val);
     this->setCursorPosition(0);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

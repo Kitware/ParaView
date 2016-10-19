@@ -31,7 +31,6 @@
 // by a Gaussian. The alpha values can be produced to either be a gaussian
 // or create a circular mask.
 
-
 #ifndef vtkImageSpriteSource_h
 #define vtkImageSpriteSource_h
 
@@ -41,14 +40,13 @@
 class VTKPOINTSPRITERENDERING_EXPORT vtkImageSpriteSource : public vtkImageAlgorithm
 {
 public:
-  static vtkImageSpriteSource *New();
-  vtkTypeMacro(vtkImageSpriteSource,vtkImageAlgorithm);
+  static vtkImageSpriteSource* New();
+  vtkTypeMacro(vtkImageSpriteSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set/Get the extent of the whole output image.
-  void SetWholeExtent(int xMinx, int xMax, int yMin, int yMax,
-                      int zMin, int zMax);
+  void SetWholeExtent(int xMinx, int xMax, int yMin, int yMax, int zMin, int zMax);
 
   // Description:
   // Set/Get the Maximum value of the gaussian
@@ -69,7 +67,12 @@ public:
   vtkSetMacro(AlphaMethod, int);
   vtkGetMacro(AlphaMethod, int);
 
-  enum {NONE = 0, PROPORTIONAL=1, CLAMP=2};
+  enum
+  {
+    NONE = 0,
+    PROPORTIONAL = 1,
+    CLAMP = 2
+  };
 
   // Description:
   // Set/Get the alpha threshold used if the AlphaMethod is CLAMP.
@@ -78,7 +81,7 @@ public:
 
 protected:
   vtkImageSpriteSource();
-  ~vtkImageSpriteSource() {};
+  ~vtkImageSpriteSource(){};
 
   double StandardDeviation;
   int WholeExtent[6];
@@ -86,12 +89,12 @@ protected:
   int AlphaMethod;
   unsigned char AlphaThreshold;
 
-  virtual int RequestInformation (vtkInformation *, vtkInformationVector**, vtkInformationVector *);
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
 private:
   vtkImageSpriteSource(const vtkImageSpriteSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkImageSpriteSource&) VTK_DELETE_FUNCTION;
 };
-
 
 #endif

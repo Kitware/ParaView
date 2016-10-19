@@ -29,26 +29,25 @@ vtkSMInsituStateLoader::~vtkSMInsituStateLoader()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMInsituStateLoader::NewProxy(
-  vtkTypeUInt32 id, vtkSMProxyLocator* locator)
+vtkSMProxy* vtkSMInsituStateLoader::NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator)
 {
   vtkPVXMLElement* elem = this->LocateProxyElement(id);
   if (elem)
-    {
+  {
     vtkSMProxy* proxy = this->LocateExistingProxyUsingRegistrationName(id);
     if (proxy)
-      {
+    {
       proxy->Register(this);
       if (!this->LoadProxyState(elem, proxy, locator))
-        {
+      {
         vtkErrorMacro("Failed to load state correctly.");
         proxy->Delete();
         return 0;
-        }
+      }
       this->CreatedNewProxy(id, proxy);
       return proxy;
-      }
     }
+  }
 
   return this->Superclass::NewProxy(id, locator);
 }

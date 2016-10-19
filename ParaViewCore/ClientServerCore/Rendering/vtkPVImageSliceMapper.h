@@ -12,18 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImageSliceMapper - Mapper for vtkImageData that renders the image
-// using a texture applied to a quad.
-// .SECTION Description
-// vtkPVImageSliceMapper is a mapper for vtkImageData that renders the image by
-// loading the image as a texture and then applying it to a quad. For 3D images,
-// this mapper only shows a single Z slice which can be choosen using SetZSlice.
-// By default, the image data scalars are rendering, however, this mapper
-// provides API to select another point or cell data array. Internally, this
-// mapper uses painters similar to those employed by vtkPainterPolyDataMapper.
-// .SECTION See Also
-// vtkPainterPolyDataMapper
-
+/**
+ * @class   vtkPVImageSliceMapper
+ * @brief   Mapper for vtkImageData that renders the image
+ * using a texture applied to a quad.
+ *
+ * vtkPVImageSliceMapper is a mapper for vtkImageData that renders the image by
+ * loading the image as a texture and then applying it to a quad. For 3D images,
+ * this mapper only shows a single Z slice which can be choosen using SetZSlice.
+ * By default, the image data scalars are rendering, however, this mapper
+ * provides API to select another point or cell data array. Internally, this
+ * mapper uses painters similar to those employed by vtkPainterPolyDataMapper.
+ * @sa
+ * vtkPainterPolyDataMapper
+*/
 
 #ifndef vtkPVImageSliceMapper_h
 #define vtkPVImageSliceMapper_h
@@ -48,85 +50,104 @@ public:
   vtkTypeMacro(vtkPVImageSliceMapper, vtkMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // This calls RenderPiece (in a for loop is streaming is necessary).
-  virtual void Render(vtkRenderer *ren, vtkActor *act);
+  /**
+   * This calls RenderPiece (in a for loop is streaming is necessary).
+   */
+  virtual void Render(vtkRenderer* ren, vtkActor* act);
 
-  virtual void ReleaseGraphicsResources (vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
-  // Description:
-  // Get/Set the painter that does the actual rendering.
+  //@{
+  /**
+   * Get/Set the painter that does the actual rendering.
+   */
   void SetPainter(vtkPainter*);
   vtkGetObjectMacro(Painter, vtkPainter);
+  //@}
 
-  // Description:
-  // Specify the input data to map.
-  void SetInputData(vtkImageData *in);
-  virtual vtkImageData *GetInput();
+  //@{
+  /**
+   * Specify the input data to map.
+   */
+  void SetInputData(vtkImageData* in);
+  virtual vtkImageData* GetInput();
+  //@}
 
-  // Description:
-  // Set/Get the current X/Y or Z slice number.
-  vtkSetMacro(Slice,int);
-  vtkGetMacro(Slice,int);
+  //@{
+  /**
+   * Set/Get the current X/Y or Z slice number.
+   */
+  vtkSetMacro(Slice, int);
+  vtkGetMacro(Slice, int);
+  //@}
 
   enum
-    {
+  {
     XY_PLANE = VTK_XY_PLANE,
     YZ_PLANE = VTK_YZ_PLANE,
     XZ_PLANE = VTK_XZ_PLANE,
-    };
+  };
 
   vtkSetClampMacro(SliceMode, int, XY_PLANE, XZ_PLANE);
   vtkGetMacro(SliceMode, int);
-  void SetSliceModeToYZPlane()
-    { this->SetSliceMode(YZ_PLANE); }
-  void SetSliceModeToXZPlane()
-    { this->SetSliceMode(XZ_PLANE); }
-  void SetSliceModeToXYPlane()
-    { this->SetSliceMode(XY_PLANE); }
+  void SetSliceModeToYZPlane() { this->SetSliceMode(YZ_PLANE); }
+  void SetSliceModeToXZPlane() { this->SetSliceMode(XZ_PLANE); }
+  void SetSliceModeToXYPlane() { this->SetSliceMode(XY_PLANE); }
 
-  // Description:
-  // When set, the image slice is always rendered in the XY plane (Z==0)
-  // irrespective of the image bounds. Default is Off.
+  //@{
+  /**
+   * When set, the image slice is always rendered in the XY plane (Z==0)
+   * irrespective of the image bounds. Default is Off.
+   */
   vtkSetClampMacro(UseXYPlane, int, 0, 1);
   vtkBooleanMacro(UseXYPlane, int);
   vtkGetMacro(UseXYPlane, int);
+  //@}
 
-  // Description:
-  // Update that sets the update piece first.
+  /**
+   * Update that sets the update piece first.
+   */
   virtual void Update(int port);
-  virtual void Update()
-    { this->Superclass::Update(); }
+  virtual void Update() { this->Superclass::Update(); }
   virtual int Update(int port, vtkInformationVector* requests)
-    { return this->Superclass::Update(port, requests); }
-  virtual int Update(vtkInformation* requests)
-    { return this->Superclass::Update(requests); }
+  {
+    return this->Superclass::Update(port, requests);
+  }
+  virtual int Update(vtkInformation* requests) { return this->Superclass::Update(requests); }
 
-  // Description:
-  // If you want only a part of the data, specify by setting the piece.
+  //@{
+  /**
+   * If you want only a part of the data, specify by setting the piece.
+   */
   vtkSetMacro(Piece, int);
   vtkGetMacro(Piece, int);
   vtkSetMacro(NumberOfPieces, int);
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfSubPieces, int);
   vtkGetMacro(NumberOfSubPieces, int);
+  //@}
 
-  // Description:
-  // Set the number of ghost cells to return.
+  //@{
+  /**
+   * Set the number of ghost cells to return.
+   */
   vtkSetMacro(GhostLevel, int);
   vtkGetMacro(GhostLevel, int);
+  //@}
 
-  // Description:
-  // Return bounding box (array of six doubles) of data expressed as
-  // (xmin,xmax, ymin,ymax, zmin,zmax).
-  virtual double *GetBounds();
-  virtual void GetBounds(double bounds[6])
-    {this->Superclass::GetBounds(bounds);};
+  //@{
+  /**
+   * Return bounding box (array of six doubles) of data expressed as
+   * (xmin,xmax, ymin,ymax, zmin,zmax).
+   */
+  virtual double* GetBounds();
+  virtual void GetBounds(double bounds[6]) { this->Superclass::GetBounds(bounds); };
+  //@}
 
-  // Description:
-  // Make a shallow copy of this mapper.
-  virtual void ShallowCopy(vtkAbstractMapper *m);
-
+  /**
+   * Make a shallow copy of this mapper.
+   */
+  virtual void ShallowCopy(vtkAbstractMapper* m);
 
 protected:
   vtkPVImageSliceMapper();
@@ -135,20 +156,22 @@ protected:
   // Tell the executive that we accept vtkImageData.
   virtual int FillInputPortInformation(int, vtkInformation*);
 
-  // Description:
-  // Perform the actual rendering.
-  virtual void RenderPiece(vtkRenderer *ren, vtkActor *act);
+  /**
+   * Perform the actual rendering.
+   */
+  virtual void RenderPiece(vtkRenderer* ren, vtkActor* act);
 
 #ifdef VTKGL2
-  vtkOpenGLTexture *Texture;
+  vtkOpenGLTexture* Texture;
   int SetupScalars(vtkImageData*);
-  void RenderInternal(vtkRenderer *ren, vtkActor *act);
+  void RenderInternal(vtkRenderer* ren, vtkActor* act);
   vtkTimeStamp UpdateTime;
-  vtkActor *PolyDataActor;
+  vtkActor* PolyDataActor;
 #else
-  // Description:
-  // Called when the PainterInformation becomes obsolete. It is called before
-  // Render request is propogated to the painter.
+  /**
+   * Called when the PainterInformation becomes obsolete. It is called before
+   * Render request is propogated to the painter.
+   */
   void UpdatePainterInformation();
 
   vtkInformation* PainterInformation;
@@ -172,7 +195,6 @@ protected:
 private:
   vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

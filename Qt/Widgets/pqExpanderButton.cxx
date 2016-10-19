@@ -37,12 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqExpanderButton::pqInternals : public Ui::pqExpanderButton
 {
 public:
-  pqInternals() :
-    Pressed (false),
-    CheckedPixmap(":/QtWidgets/Icons/pqMinus16.png"),
-    UncheckedPixmap(":/QtWidgets/Icons/pqPlus16.png")
-    {
-    }
+  pqInternals()
+    : Pressed(false)
+    , CheckedPixmap(":/QtWidgets/Icons/pqMinus16.png")
+    , UncheckedPixmap(":/QtWidgets/Icons/pqPlus16.png")
+  {
+  }
 
   bool Pressed;
   QPixmap CheckedPixmap;
@@ -51,9 +51,9 @@ public:
 
 //-----------------------------------------------------------------------------
 pqExpanderButton::pqExpanderButton(QWidget* parentObject)
-  : Superclass(parentObject),
-  Internals(new pqExpanderButton::pqInternals()),
-  Checked(false)
+  : Superclass(parentObject)
+  , Internals(new pqExpanderButton::pqInternals())
+  , Checked(false)
 {
   this->Internals->setupUi(this);
   this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
@@ -79,19 +79,19 @@ void pqExpanderButton::toggle()
 void pqExpanderButton::setChecked(bool val)
 {
   if (this->checked() == val)
-    {
+  {
     return;
-    }
+  }
 
   this->Checked = val;
   if (this->Checked)
-    {
+  {
     this->Internals->icon->setPixmap(this->Internals->CheckedPixmap);
-    }
+  }
   else
-    {
+  {
     this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
-    }
+  }
   emit this->toggled(this->Checked);
 }
 
@@ -110,20 +110,18 @@ QString pqExpanderButton::text() const
 //-----------------------------------------------------------------------------
 void pqExpanderButton::mousePressEvent(QMouseEvent* evt)
 {
-  if (evt->button() == Qt::LeftButton &&
-    evt->buttons() == Qt::LeftButton)
-    {
+  if (evt->button() == Qt::LeftButton && evt->buttons() == Qt::LeftButton)
+  {
     this->Internals->Pressed = true;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqExpanderButton::mouseReleaseEvent(QMouseEvent* evt)
 {
-  if (this->Internals->Pressed &&
-    evt->button() == Qt::LeftButton)
-    {
+  if (this->Internals->Pressed && evt->button() == Qt::LeftButton)
+  {
     this->Internals->Pressed = false;
     this->toggle();
-    }
+  }
 }

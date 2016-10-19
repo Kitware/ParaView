@@ -50,29 +50,26 @@ pqColorButtonEventPlayer::~pqColorButtonEventPlayer()
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventPlayer::playEvent(
-  QObject* object, const QString& command,
-  const QString& arguments, bool& /*error*/)
+  QObject* object, const QString& command, const QString& arguments, bool& /*error*/)
 {
   pqColorChooserButton* button = qobject_cast<pqColorChooserButton*>(object);
   if (!button)
-    {
+  {
     return false;
-    }
+  }
 
   QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
-  if (   (command == pqColorButtonEventPlayer::EVENT_NAME())
-      && (regExp.indexIn(arguments) != -1) )
-    {
-    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(),
-      regExp.cap(3).toInt());
+  if ((command == pqColorButtonEventPlayer::EVENT_NAME()) && (regExp.indexIn(arguments) != -1))
+  {
+    QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(), regExp.cap(3).toInt());
     button->setChosenColor(rgb);
     return true;
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-const QString &pqColorButtonEventPlayer::EVENT_NAME()
+const QString& pqColorButtonEventPlayer::EVENT_NAME()
 {
   static const QString eventName("setChosenColor");
   return eventName;

@@ -38,21 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqPropertyLinksConnection::pqPropertyLinksConnection(
-QObject* qobject, const char* qproperty, const char* qsignal,
-  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
-  bool use_unchecked_modified_event,
-  QObject* parentObject): Superclass(parentObject),
-  ObjectQt(qobject), PropertyQt(qproperty), SignalQt(qsignal),
-  ProxySM(smproxy), PropertySM(smproperty), IndexSM(smindex)
+pqPropertyLinksConnection::pqPropertyLinksConnection(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+  bool use_unchecked_modified_event, QObject* parentObject)
+  : Superclass(parentObject)
+  , ObjectQt(qobject)
+  , PropertyQt(qproperty)
+  , SignalQt(qsignal)
+  , ProxySM(smproxy)
+  , PropertySM(smproperty)
+  , IndexSM(smindex)
 {
   setUseUncheckedProperties(use_unchecked_modified_event);
 
   if (this->ObjectQt && !this->SignalQt.isEmpty())
-    {
-    QObject::connect(this->ObjectQt, this->SignalQt.toLatin1().data(),
-      this, SIGNAL(qtpropertyModified()));
-    }
+  {
+    QObject::connect(
+      this->ObjectQt, this->SignalQt.toLatin1().data(), this, SIGNAL(qtpropertyModified()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -65,32 +68,27 @@ void pqPropertyLinksConnection::setUseUncheckedProperties(bool useUnchecked)
 {
   this->VTKConnector->Disconnect();
 
-  if(this->PropertySM)
-    {
+  if (this->PropertySM)
+  {
     if (useUnchecked)
-      {
-      this->VTKConnector->Connect(
-        this->PropertySM, vtkCommand::UncheckedPropertyModifiedEvent,
+    {
+      this->VTKConnector->Connect(this->PropertySM, vtkCommand::UncheckedPropertyModifiedEvent,
         this, SIGNAL(smpropertyModified()));
-      }
-    else
-      {
-      this->VTKConnector->Connect(
-        this->PropertySM, vtkCommand::ModifiedEvent,
-        this, SIGNAL(smpropertyModified()));
-      }
     }
+    else
+    {
+      this->VTKConnector->Connect(
+        this->PropertySM, vtkCommand::ModifiedEvent, this, SIGNAL(smpropertyModified()));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool pqPropertyLinksConnection::operator==(const pqPropertyLinksConnection& other) const
 {
-  return this->ObjectQt == other.ObjectQt &&
-    this->PropertyQt == other.PropertyQt &&
-    this->SignalQt == other.SignalQt &&
-    this->ProxySM == other.ProxySM &&
-    this->PropertySM == other.PropertySM &&
-    this->IndexSM == other.IndexSM;
+  return this->ObjectQt == other.ObjectQt && this->PropertyQt == other.PropertyQt &&
+    this->SignalQt == other.SignalQt && this->ProxySM == other.ProxySM &&
+    this->PropertySM == other.PropertySM && this->IndexSM == other.IndexSM;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,68 +108,67 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
   pqSMAdaptor::PropertyValueType value_type =
     use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED;
   switch (pqSMAdaptor::getPropertyType(this->PropertySM))
+  {
+    case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXYSELECTION:
+    case pqSMAdaptor::PROXYLIST:
     {
-  case pqSMAdaptor::PROXY:
-  case pqSMAdaptor::PROXYSELECTION:
-  case pqSMAdaptor::PROXYLIST:
-      {
       pqSMProxy smproxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
       currentSMValue.setValue(smproxy);
-      }
+    }
     break;
 
-  case pqSMAdaptor::ENUMERATION:
-    currentSMValue = pqSMAdaptor::getEnumerationProperty(this->PropertySM, value_type);
-    break;
+    case pqSMAdaptor::ENUMERATION:
+      currentSMValue = pqSMAdaptor::getEnumerationProperty(this->PropertySM, value_type);
+      break;
 
-  case pqSMAdaptor::SINGLE_ELEMENT:
-    currentSMValue = pqSMAdaptor::getElementProperty(this->PropertySM, value_type);
-    break;
+    case pqSMAdaptor::SINGLE_ELEMENT:
+      currentSMValue = pqSMAdaptor::getElementProperty(this->PropertySM, value_type);
+      break;
 
-  case pqSMAdaptor::FILE_LIST:
-    currentSMValue = pqSMAdaptor::getFileListProperty(this->PropertySM, value_type);
-    break;
+    case pqSMAdaptor::FILE_LIST:
+      currentSMValue = pqSMAdaptor::getFileListProperty(this->PropertySM, value_type);
+      break;
 
-  case pqSMAdaptor::SELECTION:
-    if (this->IndexSM == -1)
+    case pqSMAdaptor::SELECTION:
+      if (this->IndexSM == -1)
       {
-      QList<QList<QVariant> > newVal =
-        pqSMAdaptor::getSelectionProperty(this->PropertySM, value_type);
-      currentSMValue.setValue(newVal);
+        QList<QList<QVariant> > newVal =
+          pqSMAdaptor::getSelectionProperty(this->PropertySM, value_type);
+        currentSMValue.setValue(newVal);
       }
-    else
+      else
       {
-      QList<QVariant> sel;
-      sel = pqSMAdaptor::getSelectionProperty(this->PropertySM, this->IndexSM, value_type);
-      if (sel.size() == 2)
+        QList<QVariant> sel;
+        sel = pqSMAdaptor::getSelectionProperty(this->PropertySM, this->IndexSM, value_type);
+        if (sel.size() == 2)
         {
-        currentSMValue = sel[1];
+          currentSMValue = sel[1];
         }
       }
-    break;
+      break;
 
-  case pqSMAdaptor::MULTIPLE_ELEMENTS:
-  case pqSMAdaptor::COMPOSITE_TREE:
-  case pqSMAdaptor::SIL:
-    if (this->IndexSM == -1)
+    case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::COMPOSITE_TREE:
+    case pqSMAdaptor::SIL:
+      if (this->IndexSM == -1)
       {
-      currentSMValue = pqSMAdaptor::getMultipleElementProperty(
-        this->PropertySM, value_type);
+        currentSMValue = pqSMAdaptor::getMultipleElementProperty(this->PropertySM, value_type);
       }
-    else
+      else
       {
-      currentSMValue = pqSMAdaptor::getMultipleElementProperty(
-        this->PropertySM, this->IndexSM, value_type);
+        currentSMValue =
+          pqSMAdaptor::getMultipleElementProperty(this->PropertySM, this->IndexSM, value_type);
       }
-    break;
+      break;
 
-  case pqSMAdaptor::FIELD_SELECTION:
-    currentSMValue = pqSMAdaptor::getFieldSelection(this->PropertySM, value_type);
-    break;
+    case pqSMAdaptor::FIELD_SELECTION:
+      currentSMValue = pqSMAdaptor::getFieldSelection(this->PropertySM, value_type);
+      break;
 
-  case pqSMAdaptor::UNKNOWN:
-    break;
-    }
+    case pqSMAdaptor::UNKNOWN:
+      break;
+  }
 
   return currentSMValue;
 }
@@ -183,8 +180,7 @@ void pqPropertyLinksConnection::setQtValue(const QVariant& value)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyLinksConnection::setServerManagerValue(
-  bool use_unchecked, const QVariant& value)
+void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const QVariant& value)
 {
   // FIXME: I'd like to directly use vtkSMPropertyHelper here. But we'll have to
   // figure things out before making that change. So we use the same code that
@@ -193,104 +189,94 @@ void pqPropertyLinksConnection::setServerManagerValue(
   pqSMAdaptor::PropertyValueType value_type =
     use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED;
   switch (pqSMAdaptor::getPropertyType(this->PropertySM))
-    {
-  case pqSMAdaptor::PROXY:
-  case pqSMAdaptor::PROXYSELECTION:
-    if (use_unchecked)
+  {
+    case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXYSELECTION:
+      if (use_unchecked)
       {
-      pqSMAdaptor::setUncheckedProxyProperty(
-        this->PropertySM, value.value<pqSMProxy>());
+        pqSMAdaptor::setUncheckedProxyProperty(this->PropertySM, value.value<pqSMProxy>());
       }
-    else
+      else
       {
-      pqSMAdaptor::setProxyProperty(
-        this->PropertySM, value.value<pqSMProxy>());
+        pqSMAdaptor::setProxyProperty(this->PropertySM, value.value<pqSMProxy>());
       }
-    break;
+      break;
 
-  case pqSMAdaptor::ENUMERATION:
-    pqSMAdaptor::setEnumerationProperty(
-      this->PropertySM, value, value_type);
-    break;
+    case pqSMAdaptor::ENUMERATION:
+      pqSMAdaptor::setEnumerationProperty(this->PropertySM, value, value_type);
+      break;
 
-  case pqSMAdaptor::SINGLE_ELEMENT:
-    pqSMAdaptor::setElementProperty(
-      this->PropertySM, value, value_type);
-    break;
+    case pqSMAdaptor::SINGLE_ELEMENT:
+      pqSMAdaptor::setElementProperty(this->PropertySM, value, value_type);
+      break;
 
-  case pqSMAdaptor::FILE_LIST:
-    if (!value.canConvert<QStringList>())
+    case pqSMAdaptor::FILE_LIST:
+      if (!value.canConvert<QStringList>())
       {
-      qWarning() << "File list is not a list.";
+        qWarning() << "File list is not a list.";
       }
-    else
+      else
       {
-      pqSMAdaptor::setFileListProperty(
-        this->PropertySM, value.value<QStringList>(), value_type);
+        pqSMAdaptor::setFileListProperty(this->PropertySM, value.value<QStringList>(), value_type);
       }
-    break;
+      break;
 
-  case pqSMAdaptor::SELECTION:
-    if (this->IndexSM == -1)
+    case pqSMAdaptor::SELECTION:
+      if (this->IndexSM == -1)
       {
-      QList<QList<QVariant> > theProp = value.value<QList<QList<QVariant> > >();
-      pqSMAdaptor::setSelectionProperty(
-        this->PropertySM, theProp, value_type);
+        QList<QList<QVariant> > theProp = value.value<QList<QList<QVariant> > >();
+        pqSMAdaptor::setSelectionProperty(this->PropertySM, theProp, value_type);
       }
-    else
+      else
       {
-      QList<QVariant> domain;
-      domain = pqSMAdaptor::getSelectionPropertyDomain(this->PropertySM);
-      QList<QVariant> selection;
-      selection.append(domain[this->IndexSM]);
-      selection.append(value);
+        QList<QVariant> domain;
+        domain = pqSMAdaptor::getSelectionPropertyDomain(this->PropertySM);
+        QList<QVariant> selection;
+        selection.append(domain[this->IndexSM]);
+        selection.append(value);
 
-      pqSMAdaptor::setSelectionProperty(
-        this->PropertySM, selection, value_type);
+        pqSMAdaptor::setSelectionProperty(this->PropertySM, selection, value_type);
       }
-    break;
+      break;
 
-  case pqSMAdaptor::SIL:
-  case pqSMAdaptor::MULTIPLE_ELEMENTS:
-  case pqSMAdaptor::COMPOSITE_TREE:
-    if (this->IndexSM == -1)
+    case pqSMAdaptor::SIL:
+    case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::COMPOSITE_TREE:
+      if (this->IndexSM == -1)
       {
-      pqSMAdaptor::setMultipleElementProperty(
-        this->PropertySM, value.toList(), value_type);
+        pqSMAdaptor::setMultipleElementProperty(this->PropertySM, value.toList(), value_type);
       }
-    else
+      else
       {
-      pqSMAdaptor::setMultipleElementProperty(
-        this->PropertySM, this->IndexSM, value, value_type);
+        pqSMAdaptor::setMultipleElementProperty(this->PropertySM, this->IndexSM, value, value_type);
       }
-    break;
+      break;
 
-  case pqSMAdaptor::FIELD_SELECTION:
-    pqSMAdaptor::setFieldSelection(
-      this->PropertySM, value.toStringList(), value_type);
-    break;
+    case pqSMAdaptor::FIELD_SELECTION:
+      pqSMAdaptor::setFieldSelection(this->PropertySM, value.toStringList(), value_type);
+      break;
 
-  case pqSMAdaptor::UNKNOWN:
-  case pqSMAdaptor::PROXYLIST:
-    break;
-    }
+    case pqSMAdaptor::UNKNOWN:
+    case pqSMAdaptor::PROXYLIST:
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_unchecked)
 {
   if (!this->ObjectQt || !this->ProxySM || !this->PropertySM)
-    {
+  {
     return;
-    }
+  }
 
   bool prev = this->blockSignals(true);
   QVariant qtValue = this->currentQtValue();
   QVariant smValue = this->currentServerManagerValue(use_unchecked);
   if (qtValue != smValue)
-    {
+  {
     this->setQtValue(smValue);
-    }
+  }
   this->blockSignals(prev);
 }
 
@@ -298,9 +284,9 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
 void pqPropertyLinksConnection::copyValuesFromQtToServerManager(bool use_unchecked)
 {
   if (!this->ObjectQt || !this->ProxySM || !this->PropertySM)
-    {
+  {
     return;
-    }
+  }
 
   bool prev = this->blockSignals(true);
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,30 +42,28 @@ void pqTreeWidgetItem::setData(int column, int role, const QVariant& v)
 {
   QVariant curValue = this->data(column, role);
   if (this->CallbackHandler)
-    {
+  {
     if (!this->CallbackHandler->acceptChange(this, curValue, v, column, role))
-      {
+    {
       // reject the change.
       return;
-      }
     }
+  }
   if (this->CallbackHandler)
-    {
+  {
     this->CallbackHandler->dataAboutToChange(this, column, role);
     if (Qt::CheckStateRole == role)
-      {
+    {
       this->CallbackHandler->checkStateAboutToChange(this, column);
-      }
     }
+  }
   this->Superclass::setData(column, role, v);
   if (this->CallbackHandler)
-    {
+  {
     if (Qt::CheckStateRole == role)
-      {
+    {
       this->CallbackHandler->checkStateChanged(this, column);
-      }
-    this->CallbackHandler->dataChanged(this, column, role);
     }
+    this->CallbackHandler->dataChanged(this, column, role);
+  }
 }
-
-

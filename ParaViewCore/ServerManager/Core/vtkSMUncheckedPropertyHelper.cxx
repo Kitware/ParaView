@@ -16,19 +16,18 @@
 
 #include "vtkObjectFactory.h"
 
-
 //----------------------------------------------------------------------------
 vtkSMUncheckedPropertyHelper::vtkSMUncheckedPropertyHelper(
-  vtkSMProxy *proxy, const char *name, bool quiet/* = false*/)
-: vtkSMPropertyHelper(proxy, name, quiet)
+  vtkSMProxy* proxy, const char* name, bool quiet /* = false*/)
+  : vtkSMPropertyHelper(proxy, name, quiet)
 {
   this->setUseUnchecked(true);
 }
 
 //----------------------------------------------------------------------------
 vtkSMUncheckedPropertyHelper::vtkSMUncheckedPropertyHelper(
-  vtkSMProperty *property, bool quiet/* = false*/)
-: vtkSMPropertyHelper(property, quiet)
+  vtkSMProperty* property, bool quiet /* = false*/)
+  : vtkSMPropertyHelper(property, quiet)
 {
   this->setUseUnchecked(true);
 }

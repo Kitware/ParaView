@@ -41,7 +41,8 @@
 
 #include <VisItException.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // ****************************************************************************
 //  Method:  VisItException constructor
@@ -57,11 +58,11 @@ namespace pointsprite {
 
 VisItException::VisItException()
 {
-    filename = "Unknown";
-    msg      = "Not set";
-    type     = "VisItException";
-    line     = -1;
-    log      = NULL; //&debug1_real;
+  filename = "Unknown";
+  msg = "Not set";
+  type = "VisItException";
+  line = -1;
+  log = NULL; //&debug1_real;
 }
 
 // ****************************************************************************
@@ -80,30 +81,25 @@ VisItException::VisItException()
 //
 // ****************************************************************************
 
-VisItException::VisItException(const std::string &m)
+VisItException::VisItException(const std::string& m)
 {
-    filename = "Unknown";
-    std::string mtmp = std::string(m,0,16);
-    if (mtmp.find(':') == std::string::npos)
-        msg = /*std::string(Init::GetComponentName())*/ + ": " + m;
-    else
-    {
-        if (mtmp.find("avtprep:") == 0 ||
-            mtmp.find("cli:") == 0 ||
-            mtmp.find("engine:") == 0 ||
-      mtmp.find("gui:") == 0 ||
-            mtmp.find("launcher:") == 0 ||
-            mtmp.find("mdserver:") == 0 ||
+  filename = "Unknown";
+  std::string mtmp = std::string(m, 0, 16);
+  if (mtmp.find(':') == std::string::npos)
+    msg = /*std::string(Init::GetComponentName())*/ +": " + m;
+  else
+  {
+    if (mtmp.find("avtprep:") == 0 || mtmp.find("cli:") == 0 || mtmp.find("engine:") == 0 ||
+      mtmp.find("gui:") == 0 || mtmp.find("launcher:") == 0 || mtmp.find("mdserver:") == 0 ||
       mtmp.find("viewer:") == 0)
-            msg = m;
-        else
-            msg = /*std::string(Init::GetComponentName())*/ + ": " + m;
-    }
-    type     = "VisItException";
-    line     = -1;
-    log      = NULL; //&debug1_real;
+      msg = m;
+    else
+      msg = /*std::string(Init::GetComponentName())*/ +": " + m;
+  }
+  type = "VisItException";
+  line = -1;
+  log = NULL; //&debug1_real;
 }
-
 
 // ****************************************************************************
 //  Method: VisItException::SetThrowLocation
@@ -121,13 +117,11 @@ VisItException::VisItException(const std::string &m)
 //
 // ****************************************************************************
 
-void
-VisItException::SetThrowLocation(int l, const char *f)
+void VisItException::SetThrowLocation(int l, const char* f)
 {
-    line     = l;
-    filename = f;
+  line = l;
+  filename = f;
 }
-
 
 // ****************************************************************************
 //  Method: VisItException::Log
@@ -140,31 +134,29 @@ VisItException::SetThrowLocation(int l, const char *f)
 //
 // ****************************************************************************
 
-void
-VisItException::Log(void)
+void VisItException::Log(void)
 {
-    if (log == NULL)
-    {
-        return;
-    }
+  if (log == NULL)
+  {
+    return;
+  }
 
-    //
-    // Don't want something funny to happen when trying to log an exception,
-    // so wrap this around a try and catch any exception it might throw.
-    //
+//
+// Don't want something funny to happen when trying to log an exception,
+// so wrap this around a try and catch any exception it might throw.
+//
 #ifdef FAKE_EXCEPTIONS
-    (*log) << "(" << type << ") " << filename << ", line " << line << ": "
-           << msg << endl;
+  (*log) << "(" << type << ") " << filename << ", line " << line << ": " << msg << endl;
 #else
-    try
-    {
-        (*log) << "(" << type.c_str() << ") " << filename.c_str() << ", line " << line << ": "
-               << msg.c_str() << endl;
-    }
-    catch(...)
-    {
-        ;
-    }
+  try
+  {
+    (*log) << "(" << type.c_str() << ") " << filename.c_str() << ", line " << line << ": "
+           << msg.c_str() << endl;
+  }
+  catch (...)
+  {
+    ;
+  }
 #endif
 }
 
@@ -186,32 +178,31 @@ VisItException::Log(void)
 //
 // ****************************************************************************
 
-void
-VisItException::LogCatch(
+void VisItException::LogCatch(
   const char* /*exceptionName*/, const char* /*srcFile*/, int /*srcLine*/)
 {
-//    debug1_real << "catch(" << exceptionName << ") " << srcFile << ":" << srcLine << endl;
+  //    debug1_real << "catch(" << exceptionName << ") " << srcFile << ":" << srcLine << endl;
 }
-
 }
 
 #ifdef FAKE_EXCEPTIONS
-namespace pointsprite {
+namespace pointsprite
+{
 // ****************************************************************************
 //          Fake C++ exception code that gets us by on sucky platforms.
 // ****************************************************************************
 
 // Exception state variables.
-int             jump_stack_top = -1;
-jmp_buf         jump_stack[100];
-int             jump_retval;
-bool            exception_caught = false;
-VisItException *exception_object;
+int jump_stack_top = -1;
+jmp_buf jump_stack[100];
+int jump_retval;
+bool exception_caught = false;
+VisItException* exception_object;
 
 typedef struct
 {
-    const char *name;
-    const char *parent_name;
+  const char* name;
+  const char* parent_name;
 } exception_info;
 
 //
@@ -274,73 +265,56 @@ typedef struct
 //   Mark C. Miller, Sun Dec  3 12:20:11 PST 2006
 //   Added PointerNotInCacheException for transform manager
 
-static const exception_info exception_tree[] =
-{
-    // Exception name                      Parent Exception name
-    {"AbortException",                     "PipelineException"},
-    {"BadCellException",                   "PipelineException"},
-    {"BadColleagueException",              "VisWindowException"},
-    {"BadDomainException",                 "PipelineException"},
-    {"BadHostException",                   "VisItException"},
-    {"BadIndexException",                  "PipelineException"},
-    {"BadInteractorException",             "VisWindowException"},
-    {"BadNodeException",                   "PipelineException"},
-    {"BadPermissionException",             "DatabaseException"},
-    {"BadPlotException",                   "VisWindowException"},
-    {"BadWindowModeException",             "VisWindowException"},
-    {"BadVectorException",                 "PipelineException"},
-    {"CancelledConnectException",          "VisItException"},
-    {"ChangeDirectoryException",           "VisItException"},
-    {"CouldNotConnectException",           "VisItException"},
-    {"DatabaseException",                  "VisItException"},
-    {"ExpressionException",                "PipelineException"},
-    {"FileDoesNotExistException",          "DatabaseException"},
-    {"GetFileListException",               "VisItException"},
-    {"GetMetaDataException",               "VisItException"},
-    {"GhostCellException",                 "PipelineException"},
-    {"ImproperUseException",               "PipelineException"},
-    {"IncompatibleDomainListsException",   "PipelineException"},
-    {"IncompatibleSecurityTokenException", "VisItException"},
-    {"IncompatibleVersionException",       "VisItException"},
-    {"IntervalTreeNotCalculatedException", "PipelineException"},
-    {"InvalidCategoryException",           "PipelineException"},
-    {"InvalidCellTypeException",           "PipelineException"},
-    {"InvalidColortableException",         "PlotterException"},
-    {"InvalidDBTypeException",             "DatabaseException"},
-    {"InvalidDimensionsException",         "PipelineException"},
-    {"InvalidDirectoryException",          "VisItException"},
-    {"InvalidExpressionException",         "VisItException"},
-    {"InvalidFilesException",              "DatabaseException"},
-    {"InvalidLimitsException",             "PipelineException"},
-    {"InvalidMergeException",              "PipelineException"},
-    {"InvalidPluginException",             "VisItException"},
-    {"InvalidSetException",                "PipelineException"},
-    {"InvalidSourceException",             "DatabaseException"},
-    {"InvalidTimeStepException",           "DatabaseException"},
-    {"InvalidVariableException",           "DatabaseException"},
-    {"InvalidZoneTypeException",           "DatabaseException"},
-    {"LogicalIndexException",              "PipelineException"},
-    {"LostConnectionException",            "VisItException"},
-    {"NoCurveException",                   "PipelineException"},
-    {"NoDefaultVariableException",         "PipelineException"},
-    {"NoEngineException",                  "VisItException"},
-    {"NoInputException",                   "PipelineException"},
-    {"NonQueryableInputException",         "PipelineException"},
-    {"PipelineException",                  "VisItException"},
-    {"PlotDimensionalityException",        "VisWindowException"},
-    {"RecursiveExpressionException",       "VisItException"},
-    {"SiloException",                      "DatabaseException"},
-    {"StubReferencedException",            "PipelineException"},
-    {"UnexpectedValueException",           "PipelineException"},
-    {"VisItException",                     NULL},
-    {"VisWindowException",                 "VisItException"},
-    {"PointerNotInCacheException",         "DatabaseException"}
+static const exception_info exception_tree[] = {
+  // Exception name                      Parent Exception name
+  { "AbortException", "PipelineException" }, { "BadCellException", "PipelineException" },
+  { "BadColleagueException", "VisWindowException" }, { "BadDomainException", "PipelineException" },
+  { "BadHostException", "VisItException" }, { "BadIndexException", "PipelineException" },
+  { "BadInteractorException", "VisWindowException" }, { "BadNodeException", "PipelineException" },
+  { "BadPermissionException", "DatabaseException" }, { "BadPlotException", "VisWindowException" },
+  { "BadWindowModeException", "VisWindowException" }, { "BadVectorException", "PipelineException" },
+  { "CancelledConnectException", "VisItException" },
+  { "ChangeDirectoryException", "VisItException" },
+  { "CouldNotConnectException", "VisItException" }, { "DatabaseException", "VisItException" },
+  { "ExpressionException", "PipelineException" },
+  { "FileDoesNotExistException", "DatabaseException" },
+  { "GetFileListException", "VisItException" }, { "GetMetaDataException", "VisItException" },
+  { "GhostCellException", "PipelineException" }, { "ImproperUseException", "PipelineException" },
+  { "IncompatibleDomainListsException", "PipelineException" },
+  { "IncompatibleSecurityTokenException", "VisItException" },
+  { "IncompatibleVersionException", "VisItException" },
+  { "IntervalTreeNotCalculatedException", "PipelineException" },
+  { "InvalidCategoryException", "PipelineException" },
+  { "InvalidCellTypeException", "PipelineException" },
+  { "InvalidColortableException", "PlotterException" },
+  { "InvalidDBTypeException", "DatabaseException" },
+  { "InvalidDimensionsException", "PipelineException" },
+  { "InvalidDirectoryException", "VisItException" },
+  { "InvalidExpressionException", "VisItException" },
+  { "InvalidFilesException", "DatabaseException" },
+  { "InvalidLimitsException", "PipelineException" },
+  { "InvalidMergeException", "PipelineException" }, { "InvalidPluginException", "VisItException" },
+  { "InvalidSetException", "PipelineException" }, { "InvalidSourceException", "DatabaseException" },
+  { "InvalidTimeStepException", "DatabaseException" },
+  { "InvalidVariableException", "DatabaseException" },
+  { "InvalidZoneTypeException", "DatabaseException" },
+  { "LogicalIndexException", "PipelineException" }, { "LostConnectionException", "VisItException" },
+  { "NoCurveException", "PipelineException" },
+  { "NoDefaultVariableException", "PipelineException" }, { "NoEngineException", "VisItException" },
+  { "NoInputException", "PipelineException" },
+  { "NonQueryableInputException", "PipelineException" }, { "PipelineException", "VisItException" },
+  { "PlotDimensionalityException", "VisWindowException" },
+  { "RecursiveExpressionException", "VisItException" }, { "SiloException", "DatabaseException" },
+  { "StubReferencedException", "PipelineException" },
+  { "UnexpectedValueException", "PipelineException" }, { "VisItException", NULL },
+  { "VisWindowException", "VisItException" },
+  { "PointerNotInCacheException", "DatabaseException" }
 };
 
 //
 // The number of exceptions in the table.
 //
-static const int num_exception_names = sizeof(exception_tree)/(2*sizeof(const char *));
+static const int num_exception_names = sizeof(exception_tree) / (2 * sizeof(const char*));
 
 // ****************************************************************************
 // Function: recursive_exception_lookup
@@ -358,25 +332,24 @@ static const int num_exception_names = sizeof(exception_tree)/(2*sizeof(const ch
 //
 // ****************************************************************************
 
-static int
-recursive_exception_lookup(const char *name, int start, int end)
+static int recursive_exception_lookup(const char* name, int start, int end)
 {
-    int retval = start;
+  int retval = start;
 
-    int delta = (end - start) >> 1;
-    int pivot = start + delta;
-    int comp = strcmp(name, exception_tree[pivot].name);
+  int delta = (end - start) >> 1;
+  int pivot = start + delta;
+  int comp = strcmp(name, exception_tree[pivot].name);
 
-    if(delta == 0)
-        retval = (comp == 0) ? pivot : -1;
-    else if(comp < 0)
-        retval = recursive_exception_lookup(name, start, pivot);
-    else if(comp == 0)
-        retval = (comp == 0) ? pivot : -1;
-    else
-        retval = recursive_exception_lookup(name, pivot, end);
+  if (delta == 0)
+    retval = (comp == 0) ? pivot : -1;
+  else if (comp < 0)
+    retval = recursive_exception_lookup(name, start, pivot);
+  else if (comp == 0)
+    retval = (comp == 0) ? pivot : -1;
+  else
+    retval = recursive_exception_lookup(name, pivot, end);
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -395,21 +368,20 @@ recursive_exception_lookup(const char *name, int start, int end)
 //
 // ****************************************************************************
 
-int
-exception_lookup(const char *name)
+int exception_lookup(const char* name)
 {
-    int retval = recursive_exception_lookup(name, 0, num_exception_names);
+  int retval = recursive_exception_lookup(name, 0, num_exception_names);
 
-    if(retval < 0)
-    {
-        debug1 << "exception_lookup: index < 0. This means that the fake "
-                  "exception table contains errors! Exception name = "
-               << name << endl;
-        abort();
-    }
+  if (retval < 0)
+  {
+    debug1 << "exception_lookup: index < 0. This means that the fake "
+              "exception table contains errors! Exception name = "
+           << name << endl;
+    abort();
+  }
 
-    // Make the minimum value returned 100.
-    return retval + 100;
+  // Make the minimum value returned 100.
+  return retval + 100;
 }
 
 // ****************************************************************************
@@ -427,10 +399,9 @@ exception_lookup(const char *name)
 //
 // ****************************************************************************
 
-int
-exception_default_id()
+int exception_default_id()
 {
-    return exception_lookup("VisItException");
+  return exception_lookup("VisItException");
 }
 
 // ****************************************************************************
@@ -451,47 +422,46 @@ exception_default_id()
 //
 // ****************************************************************************
 
-bool
-exception_compatible(const char *name)
+bool exception_compatible(const char* name)
 {
-    bool compatible = false;
-    bool noErrors = true;
+  bool compatible = false;
+  bool noErrors = true;
 
-    // If the jump_retval variable is zero then we do not have an exception.
-    if(jump_retval != 0)
+  // If the jump_retval variable is zero then we do not have an exception.
+  if (jump_retval != 0)
+  {
+    int index = jump_retval - 100;
+    const char* exeception_name = exception_tree[index].name;
+
+    if (strcmp(exeception_name, name) == 0)
+      compatible = true;
+    else
     {
-        int index = jump_retval - 100;
-        const char *exeception_name = exception_tree[index].name;
+      // We have to traverse up the inheritance hierarchy to find a
+      // compatible exception type.
+      do
+      {
+        const char* eptr = exception_tree[index].parent_name;
 
-        if(strcmp(exeception_name, name) == 0)
-            compatible = true;
+        if (eptr == NULL)
+        {
+          // There is no parent for this exception, say that
+          // it is compatible to get out of the loop, but set the
+          // error flag.
+          compatible = true;
+          noErrors = false;
+        }
         else
         {
-            // We have to traverse up the inheritance hierarchy to find a
-            // compatible exception type.
-            do
-            {
-                const char *eptr = exception_tree[index].parent_name;
-
-                if(eptr == NULL)
-                {
-                    // There is no parent for this exception, say that
-                    // it is compatible to get out of the loop, but set the
-                    // error flag.
-                    compatible = true;
-                    noErrors = false;
-                }
-                else
-                {
-                    compatible = (strcmp(eptr, name) == 0);
-                    if(!compatible)
-                        index = exception_lookup(eptr) - 100;
-                }
-            } while(!compatible);
+          compatible = (strcmp(eptr, name) == 0);
+          if (!compatible)
+            index = exception_lookup(eptr) - 100;
         }
+      } while (!compatible);
     }
+  }
 
-    return (compatible && noErrors);
+  return (compatible && noErrors);
 }
 
 // ****************************************************************************
@@ -512,27 +482,24 @@ exception_compatible(const char *name)
 //
 // ****************************************************************************
 
-void
-exception_throw(int backup)
+void exception_throw(int backup)
 {
-    EXPRINT(debug1 << "throw(" << exception_object->GetExceptionType() << ") at "
-                   << exception_object->GetFilename() << ":"
-                   << exception_object->GetLine()
-                   << ", backup = " << backup << endl;)
+  EXPRINT(debug1 << "throw(" << exception_object->GetExceptionType() << ") at "
+                 << exception_object->GetFilename() << ":" << exception_object->GetLine()
+                 << ", backup = " << backup << endl;)
 
-    if(jump_stack_top < backup)
-    {
-        EXPRINT(debug1 << "There are no more TRY's on the exception stack! Aborting." << endl;)
-        abort();
-    }
-    else
-    {
-        jump_stack_top -= backup;
-        EXPRINT(debug1 << "exception_throw: Throwing exception "
-                       << exception_object->GetExceptionType()
-                       << " by jumping to TRY[" << jump_stack_top << "]" << endl;)
-        longjmp(jump_stack[jump_stack_top], jump_retval);
-    }
+  if (jump_stack_top < backup)
+  {
+    EXPRINT(debug1 << "There are no more TRY's on the exception stack! Aborting." << endl;)
+    abort();
+  }
+  else
+  {
+    jump_stack_top -= backup;
+    EXPRINT(debug1 << "exception_throw: Throwing exception " << exception_object->GetExceptionType()
+                   << " by jumping to TRY[" << jump_stack_top << "]" << endl;)
+    longjmp(jump_stack[jump_stack_top], jump_retval);
+  }
 }
 
 // ****************************************************************************
@@ -553,16 +520,14 @@ exception_throw(int backup)
 //
 // ****************************************************************************
 
-void
-exception_delete(bool condition)
+void exception_delete(bool condition)
 {
-    if(condition && exception_object != 0)
-    {
-        EXPRINT(debug1 << "exception_delete()" << endl;)
-        delete exception_object;
-        exception_object = 0;
-    }
+  if (condition && exception_object != 0)
+  {
+    EXPRINT(debug1 << "exception_delete()" << endl;)
+    delete exception_object;
+    exception_object = 0;
+  }
 }
-
 }
 #endif

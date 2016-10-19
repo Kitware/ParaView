@@ -16,5 +16,4 @@
 
 vtkPVPythonPluginInterface::~vtkPVPythonPluginInterface()
 {
-
 }

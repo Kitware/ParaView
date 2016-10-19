@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExampleVisualizationsDialog.h"
 
 //-----------------------------------------------------------------------------
-pqExampleVisualizationsDialogReaction::pqExampleVisualizationsDialogReaction(
-  QAction* parentObject) : Superclass(parentObject)
+pqExampleVisualizationsDialogReaction::pqExampleVisualizationsDialogReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
 }
 

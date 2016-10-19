@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,9 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p)
-  : QObject(p), QGraphicsItem(p),
-  NormalizedStartTime(0), NormalizedEndTime(1),
-  Rect(0,0,1,1)
+  : QObject(p)
+  , QGraphicsItem(p)
+  , NormalizedStartTime(0)
+  , NormalizedEndTime(1)
+  , Rect(0, 0, 1, 1)
 {
 }
 
@@ -121,13 +123,13 @@ void pqAnimationKeyFrame::setIcon(const QIcon& i)
   this->Icon = i;
   this->update();
 }
-  
+
 //-----------------------------------------------------------------------------
 QRectF pqAnimationKeyFrame::boundingRect() const
-{ 
+{
   return this->Rect;
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
 {
@@ -148,52 +150,46 @@ void pqAnimationKeyFrame::adjustRect()
   double left = trackRect.left() + w * this->normalizedStartTime();
   double right = trackRect.left() + w * this->normalizedEndTime();
 
-  this->setBoundingRect(QRectF(left, trackRect.top(), right-left, trackRect.height()));
+  this->setBoundingRect(QRectF(left, trackRect.top(), right - left, trackRect.height()));
 }
 
-
 //-----------------------------------------------------------------------------
-void pqAnimationKeyFrame::paint(QPainter* painter,
-                   const QStyleOptionGraphicsItem *,
-                   QWidget * widget)
+void pqAnimationKeyFrame::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget* widget)
 {
   painter->save();
   if (this->parentTrack()->isEnabled())
-    {
+  {
     // change brush only when parent track is enabled.
-    painter->setBrush(QBrush(QColor(255,255,255)));
-    }
-  QPen pen(QColor(0,0,0));
+    painter->setBrush(QBrush(QColor(255, 255, 255)));
+  }
+  QPen pen(QColor(0, 0, 0));
   pen.setWidth(0);
   painter->setPen(pen);
   QRectF keyFrameRect(this->boundingRect());
   painter->drawRect(keyFrameRect);
 
   QFontMetrics metrics(widget->font());
-  double halfWidth = keyFrameRect.width()/2.0 - 5;
+  double halfWidth = keyFrameRect.width() / 2.0 - 5;
 
   double iconWidth = keyFrameRect.width();
-  
-  QString label = metrics.elidedText(startValue().toString(), Qt::ElideRight,
-    qRound(halfWidth));
-  QPointF pt(keyFrameRect.left()+3.0, 
-            keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
-  painter->drawText(pt, label);
-  iconWidth -= metrics.width(label);
-  
-  label = metrics.elidedText(endValue().toString(), Qt::ElideRight,
-    qRound(halfWidth));
-  pt = QPointF(keyFrameRect.right() - metrics.width(label) - 3.0, 
-            keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
+
+  QString label = metrics.elidedText(startValue().toString(), Qt::ElideRight, qRound(halfWidth));
+  QPointF pt(keyFrameRect.left() + 3.0,
+    keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   painter->drawText(pt, label);
   iconWidth -= metrics.width(label);
 
-  if(iconWidth >= 16)
-    {
+  label = metrics.elidedText(endValue().toString(), Qt::ElideRight, qRound(halfWidth));
+  pt = QPointF(keyFrameRect.right() - metrics.width(label) - 3.0,
+    keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
+  painter->drawText(pt, label);
+  iconWidth -= metrics.width(label);
+
+  if (iconWidth >= 16)
+  {
     QPixmap pix = this->Icon.pixmap(16);
-    painter->drawPixmap(keyFrameRect.center() - QPointF(8.0,8.0), pix);
-    }
+    painter->drawPixmap(keyFrameRect.center() - QPointF(8.0, 8.0), pix);
+  }
 
   painter->restore();
 }
-

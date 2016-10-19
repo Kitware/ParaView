@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVMetaSliceDataSet -
-// Meta class for slice filter that will allow the user to switch between
-// a regular cutter filter or an extract cell by region filter.
+/**
+ * @class   vtkPVMetaSliceDataSet
+ * Meta class for slice filter that will allow the user to switch between
+ * a regular cutter filter or an extract cell by region filter.
+*/
 
 #ifndef vtkPVMetaSliceDataSet_h
 #define vtkPVMetaSliceDataSet_h
@@ -24,43 +26,48 @@
 
 class vtkImplicitFunction;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet : public vtkPVDataSetAlgorithmSelectorFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet
+  : public vtkPVDataSetAlgorithmSelectorFilter
 {
 public:
-  vtkTypeMacro(vtkPVMetaSliceDataSet,vtkPVDataSetAlgorithmSelectorFilter);
+  vtkTypeMacro(vtkPVMetaSliceDataSet, vtkPVDataSetAlgorithmSelectorFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPVMetaSliceDataSet *New();
+  static vtkPVMetaSliceDataSet* New();
 
-  // Description:
-  // Enable or disable the Extract Cells By Regions.
+  /**
+   * Enable or disable the Extract Cells By Regions.
+   */
   void PreserveInputCells(int keepCellAsIs);
 
-  // Description:
-  // Override it so we can change the output type of the filter
+  /**
+   * Override it so we can change the output type of the filter
+   */
   virtual vtkAlgorithm* SetActiveFilter(int index);
 
   void SetImplicitFunction(vtkImplicitFunction* func);
 
   // Only available for cut -------------
 
-  // Description:
-  // Expose method from vtkCutter
-  void SetCutFunction(vtkImplicitFunction* func)
-  { this->SetImplicitFunction(func); };
+  /**
+   * Expose method from vtkCutter
+   */
+  void SetCutFunction(vtkImplicitFunction* func) { this->SetImplicitFunction(func); };
 
-  // Description:
-  // Expose method from vtkCutter
+  /**
+   * Expose method from vtkCutter
+   */
   void SetNumberOfContours(int nbContours);
 
-  // Description:
-  // Expose method from vtkCutter
+  /**
+   * Expose method from vtkCutter
+   */
   void SetValue(int index, double value);
 
-  // Description:
-  // Expose method from vtkCutter
+  /**
+   * Expose method from vtkCutter
+   */
   void SetGenerateTriangles(int status);
-
 
 protected:
   vtkPVMetaSliceDataSet();
@@ -71,7 +78,7 @@ private:
   void operator=(const vtkPVMetaSliceDataSet&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
-  vtkInternals *Internal;
+  vtkInternals* Internal;
 };
 
 #endif

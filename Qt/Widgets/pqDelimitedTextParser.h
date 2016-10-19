@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,44 +39,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QIODevice;
 
 /**
-  Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent data series from the file.
+  Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent
+  data series from the file.
 
-  To use it, create an instance of pqDelimitedTextParser, passing the delimiter character in the constructor.
-  Then, connect the startParsing(), parseSeries(), and finishParsing() signals to slots.  Call parse() with the
-  filename of the file to be parsed, and the parseSeries() signal will be emitted for each series of values
+  To use it, create an instance of pqDelimitedTextParser, passing the delimiter character in the
+  constructor.
+  Then, connect the startParsing(), parseSeries(), and finishParsing() signals to slots.  Call
+  parse() with the
+  filename of the file to be parsed, and the parseSeries() signal will be emitted for each series of
+  values
   contained within the file.
 */
 
-class PQWIDGETS_EXPORT pqDelimitedTextParser :
-  public QObject
+class PQWIDGETS_EXPORT pqDelimitedTextParser : public QObject
 {
   Q_OBJECT
-  
+
 public:
   enum SeriesT
   {
-    /// Data series are organized in columns
+    /**
+    * Data series are organized in columns
+    */
     COLUMN_SERIES
   };
-  
-  /// Initializes the parser with the delimiter that will be used to separate fields on the same line within parsed files.
+
+  /**
+  * Initializes the parser with the delimiter that will be used to separate fields on the same line
+  * within parsed files.
+  */
   pqDelimitedTextParser(SeriesT series, char delimiter);
-  
-  /// Call this to parse a filesystem file.
+
+  /**
+  * Call this to parse a filesystem file.
+  */
   void parse(const QString& path);
-  
+
 signals:
-  /// Signal emitted when parsing begins.
+  /**
+  * Signal emitted when parsing begins.
+  */
   void startParsing();
-  /// Signal that will be emitted once for each data series contained in the parsed file.
+  /**
+  * Signal that will be emitted once for each data series contained in the parsed file.
+  */
   void parseSeries(const QStringList&);
-  /// Signal emitted when parsing ends.
+  /**
+  * Signal emitted when parsing ends.
+  */
   void finishParsing();
 
 private:
   const SeriesT Series;
   const char Delimiter;
-  
+
   void parseColumns(QIODevice& stream);
 };
 

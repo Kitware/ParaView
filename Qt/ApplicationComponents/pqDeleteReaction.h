@@ -36,57 +36,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 
-/// @ingroup Reactions
-/// Reaction for delete sources (all or selected only).
+/**
+* @ingroup Reactions
+* Reaction for delete sources (all or selected only).
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// if delete_all is false, then only selected items will be deleted if
-  /// possible.
-  pqDeleteReaction(QAction* parent, bool delete_all=false);
+  /**
+  * if delete_all is false, then only selected items will be deleted if
+  * possible.
+  */
+  pqDeleteReaction(QAction* parent, bool delete_all = false);
 
   static void deleteAll();
   static void deleteSelected();
   static bool canDeleteSelected();
 
-  /// Deletes all sources in the set, if possible.
-  /// All variants of public methods on this class basically call this method
-  /// with the sources set built up appropriately.
-  /// The sources set is
-  /// modified to remove all deleted sources. Any undeleted sources will remain
-  /// in the set.
-  static void deleteSources(QSet<pqPipelineSource*> &sources);
+  /**
+  * Deletes all sources in the set, if possible.
+  * All variants of public methods on this class basically call this method
+  * with the sources set built up appropriately.
+  * The sources set is
+  * modified to remove all deleted sources. Any undeleted sources will remain
+  * in the set.
+  */
+  static void deleteSources(QSet<pqPipelineSource*>& sources);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
-  /// Request deletion of a particular source.
+  /**
+  * Request deletion of a particular source.
+  */
   void deleteSource(pqPipelineSource* source);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
-    {
+  {
     if (this->DeleteAll)
-      {
+    {
       pqDeleteReaction::deleteAll();
-      }
-    else
-      {
-      pqDeleteReaction::deleteSelected();
-      }
     }
+    else
+    {
+      pqDeleteReaction::deleteSelected();
+    }
+  }
 
 private:
   Q_DISABLE_COPY(pqDeleteReaction)
   bool DeleteAll;
 
-  /// Method called just before deleting a source.
-  /// Updates to the UI before deletion are done here.
+  /**
+  * Method called just before deleting a source.
+  * Updates to the UI before deletion are done here.
+  */
   static void aboutToDelete(pqPipelineSource* source);
 };
 

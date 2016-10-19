@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDirectoryProxy
-// .SECTION Description
-// Is a utility proxy to create/delete/rename directories.
+/**
+ * @class   vtkSMDirectoryProxy
+ *
+ * Is a utility proxy to create/delete/rename directories.
+*/
 
 #ifndef vtkSMDirectoryProxy_h
 #define vtkSMDirectoryProxy_h
@@ -29,20 +31,24 @@ public:
   vtkTypeMacro(vtkSMDirectoryProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create directory.
+  /**
+   * Create directory.
+   */
   bool MakeDirectory(const char* dir, vtkTypeUInt32 processes);
 
-  // Description:
-  // Remove a directory.
+  /**
+   * Remove a directory.
+   */
   bool DeleteDirectory(const char* dir, vtkTypeUInt32 processes);
 
-  // Description:
-  // Rename a file or directory.
+  /**
+   * Rename a file or directory.
+   */
   bool Rename(const char* oldname, const char* newname, vtkTypeUInt32 processes);
 
-  // Description:
-  // List server side directory
+  /**
+   * List server side directory
+   */
   void List(const char* dir);
 
 protected:
@@ -52,7 +58,6 @@ protected:
 private:
   vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -79,7 +79,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-
 // C/C++ includes
 #include <algorithm>
 #include <cassert>
@@ -110,14 +109,13 @@ vtkStandardNewMacro(vtkACosmoReader);
 #define NUMBER_OF_INTS 1
 
 // Data-structure to store information about individual blocks
-struct vtkACosmoReader::block_t {
-  int Level; // starts from 1
+struct vtkACosmoReader::block_t
+{
+  int Level;            // starts from 1
   int IndexWithinLevel; // starts from 0
   size_t FileOffSet;
   double Bounds[6];
 };
-
-
 
 //----------------------------------------------------------------------------
 vtkACosmoReader::vtkACosmoReader()
@@ -127,10 +125,10 @@ vtkACosmoReader::vtkACosmoReader()
 
   this->BaseFileName = "";
 
-  this->ByteSwap  = 0;
-  this->BoxSize   = 90.140846;
-  this->TagSize   = TAG_SIZE_32_BIT;
-  this->Level     = 1;
+  this->ByteSwap = 0;
+  this->BoxSize = 90.140846;
+  this->TagSize = TAG_SIZE_32_BIT;
+  this->Level = 1;
   this->TotalNumberOfLevels = 0;
 
   this->MetaData = NULL;
@@ -140,10 +138,10 @@ vtkACosmoReader::vtkACosmoReader()
 //----------------------------------------------------------------------------
 vtkACosmoReader::~vtkACosmoReader()
 {
-  if( this->MetaData != NULL )
-    {
+  if (this->MetaData != NULL)
+  {
     this->MetaData->Delete();
-    }
+  }
 
   this->NBlocks.clear();
   this->ParticleBlocks.clear();
@@ -154,16 +152,16 @@ vtkACosmoReader::~vtkACosmoReader()
 void vtkACosmoReader::AddFileName(const char* name)
 {
   if (!name)
-    {
+  {
     vtkErrorMacro("FileName cannot be empty.");
     return;
-    }
+  }
 
   if (this->FileNames.find(name) == this->FileNames.end())
-    {
+  {
     this->FileNames.insert(name);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -176,20 +174,17 @@ void vtkACosmoReader::RemoveAllFileNames()
 //----------------------------------------------------------------------------
 void vtkACosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "Byte Swap: "
-     << (this->ByteSwap ? "ON" : "OFF") << endl;
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Byte Swap: " << (this->ByteSwap ? "ON" : "OFF") << endl;
   os << indent << "BoxSize: " << this->BoxSize << endl;
-  os << indent << "TagSize: " << (this->TagSize ? "64-bit" : "32-bit")
-     << endl;
+  os << indent << "TagSize: " << (this->TagSize ? "64-bit" : "32-bit") << endl;
 }
 
 //----------------------------------------------------------------------------
-void vtkACosmoReader::ReadMetaDataFile(
-    const int levelIdx, std::string file)
+void vtkACosmoReader::ReadMetaDataFile(const int levelIdx, std::string file)
 {
-  assert("pre: level index out-of-bounds" &&
-          (levelIdx > 0) && (levelIdx <= this->TotalNumberOfLevels) );
+  assert(
+    "pre: level index out-of-bounds" && (levelIdx > 0) && (levelIdx <= this->TotalNumberOfLevels));
 #ifdef DEBUG
   std::cout << "\t[INFO]: Loading metadata `" << file << "`...";
   std::cout.flush();
@@ -199,25 +194,24 @@ void vtkACosmoReader::ReadMetaDataFile(
   int blockCount = 0;
   std::ifstream ifs;
   ifs.open(file.c_str());
-  if( !ifs.is_open() )
-    {
+  if (!ifs.is_open())
+  {
     throw std::runtime_error("Cannot open metadata file!\n");
     return;
-    }
+  }
 
   // STEP 2: Parse information
   std::string line = "";
   std::vector<std::string> tokens;
-  while(std::getline(ifs,line))
-    {
+  while (std::getline(ifs, line))
+  {
     // Tokenize line
     tokens.clear();
     std::istringstream iss(line);
-    std::copy(std::istream_iterator<std::string>(iss),
-              std::istream_iterator<std::string>(),
-              std::back_inserter< std::vector<std::string> >(tokens));
+    std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+      std::back_inserter<std::vector<std::string> >(tokens));
 
-    assert("pre: encountered invalid line" && (tokens.size()==7) );
+    assert("pre: encountered invalid line" && (tokens.size() == 7));
 
     // Construct block
     block_t block;
@@ -232,16 +226,16 @@ void vtkACosmoReader::ReadMetaDataFile(
     block.Bounds[5] = atof(tokens[6].c_str()); // z-max
 
     // Push to list of blocks
-    this->ParticleBlocks.push_back( block );
+    this->ParticleBlocks.push_back(block);
 
     ++blockCount;
-    } // END parse file
+  } // END parse file
 
   // STEP 3: Close metadata file
   ifs.close();
 
   // STEP 4: Update NBlocks at this level
-  this->NBlocks[ levelIdx ] = blockCount;
+  this->NBlocks[levelIdx] = blockCount;
 
 #ifdef DEBUG
   std::cout << "[DONE]\n";
@@ -255,25 +249,24 @@ void vtkACosmoReader::LoadMetaData()
   this->ExtractInfoFromFileNames();
 
   // Note we start numbering levels from 1, level 0 has no blocks
-  this->NBlocks.resize( this->TotalNumberOfLevels+1 );
+  this->NBlocks.resize(this->TotalNumberOfLevels + 1);
   this->NBlocks[0] = 0;
 
   std::ostringstream metaFile;
-  for(int i=1; i <= this->TotalNumberOfLevels; ++i)
-    {
+  for (int i = 1; i <= this->TotalNumberOfLevels; ++i)
+  {
     metaFile.clear();
     metaFile.str("");
     metaFile << this->BaseFileName << ".0." << i << ".cosmo.meta";
-    this->ReadMetaDataFile(i,metaFile.str());
-    } // END for all levels
+    this->ReadMetaDataFile(i, metaFile.str());
+  } // END for all levels
 
 #ifdef DEBUG
-  for( int i=0; i < this->NBlocks.size(); ++i)
-    {
-    std::cout << "\t[INFO]: LEVEL=" << i
-          << " NBLOCKS=" << this->NBlocks[i] << "\n";
+  for (int i = 0; i < this->NBlocks.size(); ++i)
+  {
+    std::cout << "\t[INFO]: LEVEL=" << i << " NBLOCKS=" << this->NBlocks[i] << "\n";
     std::cout.flush();
-    }
+  }
   std::cout << "\t[INFO]: NBLOCKS: " << this->ParticleBlocks.size() << "\n";
   std::cout.flush();
 #endif
@@ -284,123 +277,115 @@ void vtkACosmoReader::LoadMetaData()
 namespace
 {
 bool ExtractFileNameComponents(
-  std::string& basename, int &process, int &number_of_levels,
-  const std::string& filename)
-  {
+  std::string& basename, int& process, int& number_of_levels, const std::string& filename)
+{
   std::vector<std::string> tokens;
   std::string tmpFileName = filename;
   std::string delimiter = ".";
   size_t pos = tmpFileName.find(delimiter);
-  for( ;pos != std::string::npos; pos=tmpFileName.find(delimiter) )
-    {
-    tokens.push_back( tmpFileName.substr(0,pos) );
-    tmpFileName.erase(0,pos+delimiter.length());
-    }
-  if (tokens.size() != 3 )
-    {
+  for (; pos != std::string::npos; pos = tmpFileName.find(delimiter))
+  {
+    tokens.push_back(tmpFileName.substr(0, pos));
+    tmpFileName.erase(0, pos + delimiter.length());
+  }
+  if (tokens.size() != 3)
+  {
     return false;
-    }
+  }
 
   basename = tokens[0];
   process = atoi(tokens[1].c_str());
   number_of_levels = atoi(tokens[2].c_str());
   return true;
-  }
+}
 }
 //----------------------------------------------------------------------------
 void vtkACosmoReader::ExtractInfoFromFileNames()
 {
   if (this->FileNames.size() == 0)
-    {
+  {
     // unspecified or empty filename
     return;
-    }
+  }
 
   this->TotalNumberOfLevels = 0;
 
   // pick the filename that tells us there are max number of levels.
   for (std::set<std::string>::iterator iter = this->FileNames.begin();
-    iter != this->FileNames.end(); ++iter)
-    {
-    int cur_levels = 0, process=0;
+       iter != this->FileNames.end(); ++iter)
+  {
+    int cur_levels = 0, process = 0;
     std::string basefile;
     if (ExtractFileNameComponents(basefile, process, cur_levels, *iter) &&
-        cur_levels > this->TotalNumberOfLevels)
-      {
+      cur_levels > this->TotalNumberOfLevels)
+    {
       if (process > 0)
-        {
-        vtkErrorMacro(
-          "Data was sampled in parallel, this is currently not supported");
+      {
+        vtkErrorMacro("Data was sampled in parallel, this is currently not supported");
         continue;
-        }
+      }
       this->TotalNumberOfLevels = cur_levels;
       this->BaseFileName = basefile;
-      }
     }
+  }
 
 #ifdef DEBUG
-  std::cout << "\t[INFO]: BASEFILE: " << this->BaseFileName  << std::endl;
-  std::cout << "\t[INFO]: NLEVELS: "  << this->TotalNumberOfLevels << std::endl;
+  std::cout << "\t[INFO]: BASEFILE: " << this->BaseFileName << std::endl;
+  std::cout << "\t[INFO]: NLEVELS: " << this->TotalNumberOfLevels << std::endl;
   std::cout.flush();
 #endif
-
 }
 
 //----------------------------------------------------------------------------
 int vtkACosmoReader::GetBlockIndex(const int level, const int idx)
 {
-//  std::cout << "LEVEL=" << level << " IDX=" << idx << " NBLOCKS="
-//            << this->NBlocks[level] << std::endl;
-//  std::cout.flush();
+  //  std::cout << "LEVEL=" << level << " IDX=" << idx << " NBLOCKS="
+  //            << this->NBlocks[level] << std::endl;
+  //  std::cout.flush();
 
-  assert("pre: level is out-of-bounds!" &&
-          (level >= 0) && (level <= this->TotalNumberOfLevels) );
-  assert("pre: idx is out-of-bounds!" &&
-          (idx >= 0) && (idx < this->NBlocks[level]) );
-  if( level==0 )
-    {
-    return( idx );
-    }
+  assert("pre: level is out-of-bounds!" && (level >= 0) && (level <= this->TotalNumberOfLevels));
+  assert("pre: idx is out-of-bounds!" && (idx >= 0) && (idx < this->NBlocks[level]));
+  if (level == 0)
+  {
+    return (idx);
+  }
   else
-    {
+  {
     int sumBlocks = 0;
-    for(int i=0; i < level; ++ i)
-      {
+    for (int i = 0; i < level; ++i)
+    {
       sumBlocks += this->NBlocks[i];
-      }
-    return( sumBlocks+idx );
     }
+    return (sumBlocks + idx);
+  }
 }
 
 //----------------------------------------------------------------------------
 int vtkACosmoReader::RequestInformation(
-  vtkInformation* rqst,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
 #ifdef DEBUG
-    std::cout << "[INFO]: REQUEST_INFORMATION...\n";
-    std::cout.flush();
+  std::cout << "[INFO]: REQUEST_INFORMATION...\n";
+  std::cout.flush();
 #endif
 
   // STEP 0: Return immediately if the metadata has already been loaded
-  if( this->MetadataIsLoaded )
-    {
+  if (this->MetadataIsLoaded)
+  {
 #ifdef DEBUG
     std::cout << "\t[INFO]: metadata has been already loaded...\n";
     std::cout.flush();
 #endif
-    return( 1 );
-    }
-
+    return (1);
+  }
 
 #ifdef DEBUG
-    std::cout << "\t[INFO]: Loading metadata...\n";
-    std::cout.flush();
+  std::cout << "\t[INFO]: Loading metadata...\n";
+  std::cout.flush();
 #endif
 
   // STEP 1: Propagate request to super-class
-  this->Superclass::RequestInformation(rqst,inputVector,outputVector);
+  this->Superclass::RequestInformation(rqst, inputVector, outputVector);
 
   // STEP 2: Load the raw metadata from the file
   this->LoadMetaData();
@@ -408,199 +393,186 @@ int vtkACosmoReader::RequestInformation(
   // STEP 3: Construct VTK metadata object to put on the pipeline
   // NOTE: level numbering starts from 1, hence, level 0, has no blocks!
   this->MetaData = vtkMultiBlockDataSet::New();
-  this->MetaData->SetNumberOfBlocks( this->TotalNumberOfLevels+1 );
-  for(int i=0; i <= this->TotalNumberOfLevels; ++i)
+  this->MetaData->SetNumberOfBlocks(this->TotalNumberOfLevels + 1);
+  for (int i = 0; i <= this->TotalNumberOfLevels; ++i)
+  {
+    vtkMultiBlockDataSet* levelBlocks = vtkMultiBlockDataSet::New();
+    levelBlocks->SetNumberOfBlocks(this->NBlocks[i]);
+    for (int j = 0; j < this->NBlocks[i]; ++j)
     {
-    vtkMultiBlockDataSet *levelBlocks = vtkMultiBlockDataSet::New();
-    levelBlocks->SetNumberOfBlocks( this->NBlocks[i] );
-    for(int j=0; j < this->NBlocks[i]; ++j)
-      {
-      int blockIdx = this->GetBlockIndex(i,j);
+      int blockIdx = this->GetBlockIndex(i, j);
 
       // NOTE: we just store metadata in the information object of each block
-      levelBlocks->SetBlock(j,NULL);
+      levelBlocks->SetBlock(j, NULL);
 
       // Set the bounds on the block metadata
-      vtkInformation *blockMetadata = levelBlocks->GetMetaData( j );
-      assert("pre: block metadata is NULL!" && (blockMetadata != NULL) );
+      vtkInformation* blockMetadata = levelBlocks->GetMetaData(j);
+      assert("pre: block metadata is NULL!" && (blockMetadata != NULL));
       blockMetadata->Set(
-             vtkStreamingDemandDrivenPipeline::BOUNDS(),
-             this->ParticleBlocks[blockIdx].Bounds,6
-             );
+        vtkStreamingDemandDrivenPipeline::BOUNDS(), this->ParticleBlocks[blockIdx].Bounds, 6);
 
-      } // END for all blocks within level `i`
+    } // END for all blocks within level `i`
 
-    this->MetaData->SetBlock( i, levelBlocks );
+    this->MetaData->SetBlock(i, levelBlocks);
     levelBlocks->Delete();
-    } // END for all levels
+  } // END for all levels
 
   // STEP 4: Push the metadata on the pipeline
   vtkInformation* info = outputVector->GetInformationObject(0);
-  assert( "pre: output information object is NULL" && (info != NULL) );
-  info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),
-             this->MetaData );
+  assert("pre: output information object is NULL" && (info != NULL));
+  info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(), this->MetaData);
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkACosmoReader::SetupBlockRequest(vtkInformation *outInfo)
+void vtkACosmoReader::SetupBlockRequest(vtkInformation* outInfo)
 {
   assert("pre: output information should not be NULL!" && (outInfo != NULL));
 
 #ifdef DEBUG
-    std::cout << "\t[INFO]: Setting up block request...\n";
-    std::cout.flush();
+  std::cout << "\t[INFO]: Setting up block request...\n";
+  std::cout.flush();
 #endif
 
   this->RequestedBlocks.clear();
 
-  if(outInfo->Has(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES()))
-    {
+  if (outInfo->Has(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES()))
+  {
 #ifdef DEBUG
     std::cout << "\t[INFO]: Getting request from downstream!!!\n";
     std::cout.flush();
 #endif
 
-    int size = outInfo->Length(
-        vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
-    int *ids = outInfo->Get(
-        vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
-    this->RequestedBlocks.resize( size );
-    std::copy(ids,ids+size,this->RequestedBlocks.begin());
-    } // END if
+    int size = outInfo->Length(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
+    int* ids = outInfo->Get(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
+    this->RequestedBlocks.resize(size);
+    std::copy(ids, ids + size, this->RequestedBlocks.begin());
+  } // END if
   else
-    {
-    int loadLevel = (this->Level > this->TotalNumberOfLevels)?
-          this->TotalNumberOfLevels : this->Level;
+  {
+    int loadLevel =
+      (this->Level > this->TotalNumberOfLevels) ? this->TotalNumberOfLevels : this->Level;
 
 #ifdef DEBUG
     std::cout << "\t[INFO]: LOAD LEVEL=" << loadLevel << std::endl;
     std::cout.flush();
 #endif
 
-    this->RequestedBlocks.resize(this->NBlocks[ loadLevel ]);
-    for(int i=0; i < this->NBlocks[ loadLevel ]; ++i )
-      {
-      this->RequestedBlocks[ i ] = this->GetBlockIndex(loadLevel,i);
-      } // END for all blocks at the load level
+    this->RequestedBlocks.resize(this->NBlocks[loadLevel]);
+    for (int i = 0; i < this->NBlocks[loadLevel]; ++i)
+    {
+      this->RequestedBlocks[i] = this->GetBlockIndex(loadLevel, i);
+    } // END for all blocks at the load level
 
-    } // END else
+  } // END else
 
 #ifdef DEBUG
-    std::cout << "\t[INFO]: Setting up block request...[DONE]\n";
-    std::cout.flush();
+  std::cout << "\t[INFO]: Setting up block request...[DONE]\n";
+  std::cout.flush();
 #endif
 }
 
 //----------------------------------------------------------------------------
-int vtkACosmoReader::GetBlockStartOffSetInFile(
-    const int level,const int index)
+int vtkACosmoReader::GetBlockStartOffSetInFile(const int level, const int index)
 {
-  if(index == 0)
-    {
+  if (index == 0)
+  {
     return 0;
-    }
+  }
   else
-    {
-    int prevBlockIdx = this->GetBlockIndex(level,index-1);
-    return static_cast<int>(this->ParticleBlocks[ prevBlockIdx ].FileOffSet);
-    }
+  {
+    int prevBlockIdx = this->GetBlockIndex(level, index - 1);
+    return static_cast<int>(this->ParticleBlocks[prevBlockIdx].FileOffSet);
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkACosmoReader::ReadBlock(
-    const int blockIdx, vtkMultiBlockDataSet *mbds)
+void vtkACosmoReader::ReadBlock(const int blockIdx, vtkMultiBlockDataSet* mbds)
 {
-  assert("pre: blockIdx is out-of-bounds!" &&
-         (blockIdx >= 0) &&
-         (blockIdx < static_cast<int>(this->ParticleBlocks.size())));
+  assert("pre: blockIdx is out-of-bounds!" && (blockIdx >= 0) &&
+    (blockIdx < static_cast<int>(this->ParticleBlocks.size())));
 
-  assert("pre: multiblock output dataset is NULL!" && (mbds != NULL) );
+  assert("pre: multiblock output dataset is NULL!" && (mbds != NULL));
 
   // STEP 0: Get block and level/index information
   block_t* blockPtr = &this->ParticleBlocks[blockIdx];
-  assert("pre: blockPtr is NULL!" && (blockPtr != NULL) );
+  assert("pre: blockPtr is NULL!" && (blockPtr != NULL));
   int level = blockPtr->Level;
   int index = blockPtr->IndexWithinLevel;
 
   // STEP 1: Get block offsets within file
-  int startOffSet = this->GetBlockStartOffSetInFile(level,index);
+  int startOffSet = this->GetBlockStartOffSetInFile(level, index);
   int endOffSet = static_cast<int>(blockPtr->FileOffSet);
 #ifdef DEBUG
-  std::cout << "\t[INFO]: BLOCK: "        << blockIdx    << std::endl;
-  std::cout << "\t[INFO]: LEVEL: "        << level       << std::endl;
-  std::cout << "\t[INFO]: INDEX: "        << index       << std::endl;
+  std::cout << "\t[INFO]: BLOCK: " << blockIdx << std::endl;
+  std::cout << "\t[INFO]: LEVEL: " << level << std::endl;
+  std::cout << "\t[INFO]: INDEX: " << index << std::endl;
   std::cout << "\t[INFO]: START OFFSET: " << startOffSet << std::endl;
-  std::cout << "\t[INFO]: END OFFSET: "   << endOffSet   << std::endl;
+  std::cout << "\t[INFO]: END OFFSET: " << endOffSet << std::endl;
   std::cout.flush();
 #endif
-  assert("pre: bogus start/end offset" && (startOffSet < endOffSet) );
+  assert("pre: bogus start/end offset" && (startOffSet < endOffSet));
 
   // STEP 2: Construct cosmo filename
   std::ostringstream cosmoFile;
   cosmoFile << this->BaseFileName << ".0." << level << ".cosmo";
 
   // STEP 3: Read block from the file
-  vtkUnstructuredGrid *particles = vtkUnstructuredGrid::New();
-  this->ReadBlockFromFile(cosmoFile.str(),startOffSet,endOffSet,particles);
+  vtkUnstructuredGrid* particles = vtkUnstructuredGrid::New();
+  this->ReadBlockFromFile(cosmoFile.str(), startOffSet, endOffSet, particles);
 
   // STEP 4: Store the block in the output multi-block data-structure
-  vtkMultiBlockDataSet *levelDS =
-      vtkMultiBlockDataSet::SafeDownCast(mbds->GetBlock(level));
-  assert("pre: level data-structure is NULL!" && (levelDS!=NULL) );
-  levelDS->SetBlock(index,particles);
+  vtkMultiBlockDataSet* levelDS = vtkMultiBlockDataSet::SafeDownCast(mbds->GetBlock(level));
+  assert("pre: level data-structure is NULL!" && (levelDS != NULL));
+  levelDS->SetBlock(index, particles);
   particles->Delete();
 }
 
 //----------------------------------------------------------------------------
-int vtkACosmoReader::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+int vtkACosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
 #ifdef DEBUG
-    std::cout << "[INFO]: REQUEST_DATA" << std::endl;
-    std::cout.flush();
+  std::cout << "[INFO]: REQUEST_DATA" << std::endl;
+  std::cout.flush();
 #endif
 
   // STEP 0: Get output and output info objects
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkMultiBlockDataSet *output =
-      vtkMultiBlockDataSet::SafeDownCast(
-          outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkMultiBlockDataSet* output =
+    vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   assert("pre: output information object is NULL!" && (outInfo != NULL));
-  assert("pre: output object is NULL!" && (output != NULL) );
+  assert("pre: output object is NULL!" && (output != NULL));
 
   // STEP 1: Setup the block request
   this->SetupBlockRequest(outInfo);
 
   // STEP 2: Initialize output, NOTE: level 0 is empty
-  output->SetNumberOfBlocks( this->TotalNumberOfLevels+1 );
-  for(int i=0; i <= this->TotalNumberOfLevels; ++i)
-    {
-    vtkMultiBlockDataSet *levelDS = vtkMultiBlockDataSet::New();
-    levelDS->SetNumberOfBlocks( this->NBlocks[i] );
-    output->SetBlock( i, levelDS );
+  output->SetNumberOfBlocks(this->TotalNumberOfLevels + 1);
+  for (int i = 0; i <= this->TotalNumberOfLevels; ++i)
+  {
+    vtkMultiBlockDataSet* levelDS = vtkMultiBlockDataSet::New();
+    levelDS->SetNumberOfBlocks(this->NBlocks[i]);
+    output->SetBlock(i, levelDS);
     levelDS->Delete();
-    } // END for all levels
+  } // END for all levels
 
   // STEP 3: Load requested blocks
-  for(unsigned int block=0; block < this->RequestedBlocks.size(); ++block)
-    {
-    int blockIdx = this->RequestedBlocks[ block ];
+  for (unsigned int block = 0; block < this->RequestedBlocks.size(); ++block)
+  {
+    int blockIdx = this->RequestedBlocks[block];
     this->ReadBlock(blockIdx, output);
-    } // END for all requested blocks
+  } // END for all requested blocks
 
   outInfo = NULL;
-  output  = NULL;
+  output = NULL;
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkACosmoReader::ReadBlockFromFile(
-    std::string file, const int start, const int end,
-    vtkUnstructuredGrid *particles)
+  std::string file, const int start, const int end, vtkUnstructuredGrid* particles)
 {
   assert("pre: input particles grid is NULL!" && (particles != NULL));
 
@@ -613,13 +585,13 @@ void vtkACosmoReader::ReadBlockFromFile(
   // STEP 0: Open file
   std::ifstream ifs;
   ifs.open(file.c_str(), std::ios::in | std::ios::binary);
-  if( !ifs.is_open() )
-    {
+  if (!ifs.is_open())
+  {
     throw std::runtime_error("Cannot open cosmo file!\n");
-    }
+  }
 
   // STEP 1: Get file length
-  ifs.seekg(0L,ios::end);
+  ifs.seekg(0L, ios::end);
   size_t fileLength = ifs.tellg();
   (void)fileLength;
 #ifdef DEBUG
@@ -627,116 +599,113 @@ void vtkACosmoReader::ReadBlockFromFile(
   std::cout.flush();
 #endif
 
-  assert("pre: end offset out of file bounds!" &&
-         (end <= static_cast<int>(fileLength)) );
+  assert("pre: end offset out of file bounds!" && (end <= static_cast<int>(fileLength)));
 
   // STEP 2: Compute number of particles to be read
-  size_t tagSize = (this->TagSize==TAG_SIZE_32_BIT)?
-      sizeof(int) : sizeof(vtkTypeInt64);
-  vtkIdType numParticles = ( (end-start)/(BYTES_PER_DATA_MINUS_TAG+tagSize) );
+  size_t tagSize = (this->TagSize == TAG_SIZE_32_BIT) ? sizeof(int) : sizeof(vtkTypeInt64);
+  vtkIdType numParticles = ((end - start) / (BYTES_PER_DATA_MINUS_TAG + tagSize));
 #ifdef DEBUG
   std::cout << "\t[INFO]: NumParticles=" << numParticles << std::endl;
   std::cout.flush();
 #endif
 
   // STEP 3: Allocate VTK data-structures
-  vtkPoints *points = vtkPoints::New();
+  vtkPoints* points = vtkPoints::New();
   points->SetDataTypeToFloat();
-  points->SetNumberOfPoints( numParticles );
+  points->SetNumberOfPoints(numParticles);
 
-  vtkCellArray *cells = vtkCellArray::New();
-  cells->Allocate(cells->EstimateSize(numParticles,1));
+  vtkCellArray* cells = vtkCellArray::New();
+  cells->Allocate(cells->EstimateSize(numParticles, 1));
 
-  vtkFloatArray *velocity = vtkFloatArray::New();
+  vtkFloatArray* velocity = vtkFloatArray::New();
   velocity->SetNumberOfComponents(3);
-  velocity->SetNumberOfTuples( numParticles );
+  velocity->SetNumberOfTuples(numParticles);
   velocity->SetName("velocity");
   float* velPtr = static_cast<float*>(velocity->GetVoidPointer(0));
 
-  vtkFloatArray *mass = vtkFloatArray::New();
+  vtkFloatArray* mass = vtkFloatArray::New();
   mass->SetNumberOfComponents(1);
-  mass->SetNumberOfTuples( numParticles );
+  mass->SetNumberOfTuples(numParticles);
   mass->SetName("mass");
   float* massPtr = static_cast<float*>(mass->GetVoidPointer(0));
 
-  vtkIdTypeArray *tag = vtkIdTypeArray::New();
+  vtkIdTypeArray* tag = vtkIdTypeArray::New();
   tag->SetNumberOfComponents(1);
-  tag->SetNumberOfTuples( numParticles );
+  tag->SetNumberOfTuples(numParticles);
   tag->SetName("tag");
   vtkIdType* tagPtr = static_cast<vtkIdType*>(tag->GetVoidPointer(0));
-
 
   // STEP 4: Read the data
 
   // record elements
   vtkTypeFloat32 fBlock[NUMBER_OF_FLOATS]; // x,xvel,y,yvel,z,zvel,mass
-  char *iBlock = new char[NUMBER_OF_INTS*tagSize];
+  char* iBlock = new char[NUMBER_OF_INTS * tagSize];
   size_t numBytesRead = 0;
-  for(vtkIdType idx=0; idx < numParticles; ++idx)
-    {
-    cells->InsertNextCell(1,&idx);
+  for (vtkIdType idx = 0; idx < numParticles; ++idx)
+  {
+    cells->InsertNextCell(1, &idx);
 
-    size_t position = start + idx*(BYTES_PER_DATA_MINUS_TAG+tagSize);
-    assert("pre: file position out of bounds!" &&
-            (static_cast<int>(position) >= start) &&
-            (static_cast<int>(position) < end) );
+    size_t position = start + idx * (BYTES_PER_DATA_MINUS_TAG + tagSize);
+    assert("pre: file position out of bounds!" && (static_cast<int>(position) >= start) &&
+      (static_cast<int>(position) < end));
 
     ifs.seekg(position, ios::beg);
 
     // Read the floating point part of the data
-    ifs.read((char*)fBlock, NUMBER_OF_FLOATS*sizeof(vtkTypeFloat32));
+    ifs.read((char*)fBlock, NUMBER_OF_FLOATS * sizeof(vtkTypeFloat32));
     numBytesRead = ifs.gcount();
-    if( numBytesRead != NUMBER_OF_FLOATS*sizeof(vtkTypeFloat32))
-      {
+    if (numBytesRead != NUMBER_OF_FLOATS * sizeof(vtkTypeFloat32))
+    {
       std::cout << "ERROR: cannor read fBlock!\n";
       std::cout.flush();
       continue;
-      }
+    }
 
     // Read the tag
-    ifs.read(iBlock,NUMBER_OF_INTS*tagSize);
+    ifs.read(iBlock, NUMBER_OF_INTS * tagSize);
     numBytesRead = ifs.gcount();
-    if( numBytesRead != NUMBER_OF_INTS*tagSize)
-      {
+    if (numBytesRead != NUMBER_OF_INTS * tagSize)
+    {
       std::cout << "ERROR: cannot read iBlock!\n";
       std::cout.flush();
       continue;
-      }
+    }
 
-    if(this->ByteSwap)
-      {
-      vtkByteSwap::SwapVoidRange(
-          fBlock,NUMBER_OF_FLOATS,(int)sizeof(vtkTypeFloat32));
+    if (this->ByteSwap)
+    {
+      vtkByteSwap::SwapVoidRange(fBlock, NUMBER_OF_FLOATS, (int)sizeof(vtkTypeFloat32));
       vtkByteSwap::SwapVoidRange(iBlock, NUMBER_OF_INTS, (int)tagSize);
-      }
+    }
 
     // Handle wrapping of particles across periodic boundaries
-    fBlock[X] = fBlock[X] < 0.0 ? this->BoxSize + fBlock[X] :
-      (fBlock[X] > this->BoxSize ? fBlock[X] - this->BoxSize : fBlock[X]);
-    fBlock[Y] = fBlock[Y] < 0.0 ? this->BoxSize + fBlock[Y] :
-      (fBlock[Y] > this->BoxSize ? fBlock[Y] - this->BoxSize : fBlock[Y]);
-    fBlock[Z] = fBlock[Z] < 0.0 ? this->BoxSize + fBlock[Z] :
-      (fBlock[Z] > this->BoxSize ? fBlock[Z] - this->BoxSize : fBlock[Z]);
+    fBlock[X] = fBlock[X] < 0.0
+      ? this->BoxSize + fBlock[X]
+      : (fBlock[X] > this->BoxSize ? fBlock[X] - this->BoxSize : fBlock[X]);
+    fBlock[Y] = fBlock[Y] < 0.0
+      ? this->BoxSize + fBlock[Y]
+      : (fBlock[Y] > this->BoxSize ? fBlock[Y] - this->BoxSize : fBlock[Y]);
+    fBlock[Z] = fBlock[Z] < 0.0
+      ? this->BoxSize + fBlock[Z]
+      : (fBlock[Z] > this->BoxSize ? fBlock[Z] - this->BoxSize : fBlock[Z]);
 
-    points->SetPoint(idx,fBlock[X],fBlock[Y],fBlock[Z]);
+    points->SetPoint(idx, fBlock[X], fBlock[Y], fBlock[Z]);
 
-    velPtr[idx*3]   = fBlock[VX];
-    velPtr[idx*3+1] = fBlock[VY];
-    velPtr[idx*3+2] = fBlock[VZ];
+    velPtr[idx * 3] = fBlock[VX];
+    velPtr[idx * 3 + 1] = fBlock[VY];
+    velPtr[idx * 3 + 2] = fBlock[VZ];
 
     massPtr[idx] = fBlock[MASS];
 
     tagPtr[idx] = *((vtkIdType*)iBlock);
-    } // END for all particles
+  } // END for all particles
 
-  delete [] iBlock;
-
+  delete[] iBlock;
 
   // STEP 5: set output particles
-  particles->SetPoints( points );
+  particles->SetPoints(points);
   points->Delete();
 
-  particles->SetCells(VTK_VERTEX,cells);
+  particles->SetCells(VTK_VERTEX, cells);
   cells->Delete();
 
   particles->GetPointData()->AddArray(velocity);
@@ -751,9 +720,9 @@ void vtkACosmoReader::ReadBlockFromFile(
   particles->Squeeze();
 
   // STEP 6: cleanup and close the file
-  velPtr  = NULL;
+  velPtr = NULL;
   massPtr = NULL;
-  tagPtr  = NULL;
+  tagPtr = NULL;
 
   ifs.close();
 }

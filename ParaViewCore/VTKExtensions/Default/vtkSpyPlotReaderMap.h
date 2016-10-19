@@ -12,11 +12,15 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSpyPlotReaderMap - Maps strings to vtkSpyPlotUniReaders
-// .SECTION Description
-// Extracted from vtkSpyPlotReader
-//-----------------------------------------------------------------------------
-//=============================================================================
+/**
+ * @class   vtkSpyPlotReaderMap
+ * @brief   Maps strings to vtkSpyPlotUniReaders
+ *
+ * Extracted from vtkSpyPlotReader
+ *-----------------------------------------------------------------------------
+ *=============================================================================
+*/
+
 #ifndef vtkSpyPlotReaderMap_h
 #define vtkSpyPlotReaderMap_h
 
@@ -42,30 +46,32 @@ public:
   // file. In case of later, we detect fileseries automatically.
   // This method should ideally be called only on the 0th node to avoid reading
   // reads for meta-data on all the nodes.
-  bool Initialize(const char *filename);
+  bool Initialize(const char* filename);
 
   void Clean(vtkSpyPlotUniReader* save);
-  vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, 
-                                 vtkSpyPlotReader* parent);
-  void TellReadersToCheck(vtkSpyPlotReader *parent);
+  vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, vtkSpyPlotReader* parent);
+  void TellReadersToCheck(vtkSpyPlotReader* parent);
 
   bool Save(vtkMultiProcessStream& stream);
   bool Load(vtkMultiProcessStream& stream);
 
 private:
-  // Description:
-  // This does the updating of the meta data of the case file. Similar to
-  // InitializeFromCaseFile, this method builds the vtkSpyPlotReaderMap using the
-  // case file.
+  /**
+   * This does the updating of the meta data of the case file. Similar to
+   * InitializeFromCaseFile, this method builds the vtkSpyPlotReaderMap using the
+   * case file.
+   */
   bool InitializeFromSpyFile(const char*);
- 
-  // Description:
-  // This does the updating of the meta data for a series, when no case file
-  // provided. The main role of this method is to build the vtkSpyPlotReaderMap
-  // based on the files.
+
+  //@{
+  /**
+   * This does the updating of the meta data for a series, when no case file
+   * provided. The main role of this method is to build the vtkSpyPlotReaderMap
+   * based on the files.
+   */
   bool InitializeFromCaseFile(const char*);
 };
-
+//@}
 
 #endif
 

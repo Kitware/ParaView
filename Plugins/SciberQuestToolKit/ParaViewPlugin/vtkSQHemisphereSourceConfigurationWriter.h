@@ -49,20 +49,21 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSQHemisphereSourceConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeMacro(vtkSQHemisphereSourceConfigurationWriter,vtkObject);
+  vtkTypeMacro(vtkSQHemisphereSourceConfigurationWriter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSQHemisphereSourceConfigurationWriter *New();
+  static vtkSQHemisphereSourceConfigurationWriter* New();
 
   // Description:
   // Override sets iterator proxy.
-  virtual void SetProxy(vtkSMProxy *proxy);
+  virtual void SetProxy(vtkSMProxy* proxy);
 
 protected:
   vtkSQHemisphereSourceConfigurationWriter();
   ~vtkSQHemisphereSourceConfigurationWriter();
 
 private:
-  vtkSQHemisphereSourceConfigurationWriter(const vtkSQHemisphereSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  vtkSQHemisphereSourceConfigurationWriter(
+    const vtkSQHemisphereSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSQHemisphereSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -34,34 +34,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction to save animation.
+/**
+* @ingroup Reactions
+* Reaction to save animation.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveAnimationReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqSaveAnimationReaction(QAction* parent);
 
-  /// Saves the animation from the active scene.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+  /**
+  * Saves the animation from the active scene.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   void saveAnimation();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqSaveAnimationReaction::saveAnimation(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqSaveAnimationReaction::saveAnimation(); }
 
 private:
   Q_DISABLE_COPY(pqSaveAnimationReaction)
 };
 
 #endif
-

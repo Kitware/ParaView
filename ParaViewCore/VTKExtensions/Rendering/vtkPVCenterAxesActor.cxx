@@ -30,7 +30,7 @@ vtkPVCenterAxesActor::vtkPVCenterAxesActor()
   // We disable this, since it results in the center axes being skipped when
   // IceT is rendering.
   // this->SetUseBounds(0); // don't use bounds of this actor in renderer bounds
-                         // computations.
+  // computations.
 }
 
 //----------------------------------------------------------------------------

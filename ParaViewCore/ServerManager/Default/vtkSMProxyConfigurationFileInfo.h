@@ -12,17 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyConfigurationFileInfo - Proxy configuration file meta data.
-//
-// .SECTION Description
-// Organizes meta-data that is used by both reader and writer in a single
-// location.
-//
-// .SECTION See Also
-// vtkSMProxyConfigurationReader, vtkSMProxyConfigurationWriter
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
+/**
+ * @class   vtkSMProxyConfigurationFileInfo
+ * @brief   Proxy configuration file meta data.
+ *
+ *
+ * Organizes meta-data that is used by both reader and writer in a single
+ * location.
+ *
+ * @sa
+ * vtkSMProxyConfigurationReader, vtkSMProxyConfigurationWriter
+ *
+ * @par Thanks:
+ * This class was contributed by SciberQuest Inc.
+*/
+
 #ifndef vtkSMConfigurationFileInfo_h
 #define vtkSMConfigurationFileInfo_h
 
@@ -32,23 +36,22 @@ class vtkSMProxyConfigurationFileInfo
 {
 public:
   vtkSMProxyConfigurationFileInfo()
-        :
-    FileIdentifier("SMProxyConfiguration"),
-    FileDescription("ParaView server manager proxy configuration"),
-    FileExtension(".pvpc")
-      { }
+    : FileIdentifier("SMProxyConfiguration")
+    , FileDescription("ParaView server manager proxy configuration")
+    , FileExtension(".pvpc")
+  {
+  }
 
-  void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << endl
-      << indent << "FileDescription: " << this->FileDescription << endl
-      << indent << "FileExtension: " << this->FileExtension << endl;
-    }
+  void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << endl
+       << indent << "FileDescription: " << this->FileDescription << endl
+       << indent << "FileExtension: " << this->FileExtension << endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

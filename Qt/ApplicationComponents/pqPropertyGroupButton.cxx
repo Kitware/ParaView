@@ -41,16 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 pqPropertyGroupButton::pqPropertyGroupButton(
-  vtkSMProxy *smProxy, vtkSMPropertyGroup* smGroup,
-  QWidget*parentObject)
-  : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
-    Editor (NULL)
+  vtkSMProxy* smProxy, vtkSMPropertyGroup* smGroup, QWidget* parentObject)
+  : pqPropertyGroupWidget(smProxy, smGroup, parentObject)
+  , Editor(NULL)
 {
-  QHBoxLayout *layoutLocal = new QHBoxLayout(this);
+  QHBoxLayout* layoutLocal = new QHBoxLayout(this);
   layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
-  QPushButton *button = new QPushButton("Edit");
+  QPushButton* button = new QPushButton("Edit");
   layoutLocal->addWidget(button);
   layoutLocal->addStretch();
 

@@ -24,8 +24,8 @@
 #include "vtkMultiPieceDataSet.h"
 #include "vtkTable.h"
 
-#include <string>  // STL required.
-#include <vector>  // STL required.
+#include <string> // STL required.
+#include <vector> // STL required.
 
 vtkStandardNewMacro(vtkPVAMRFragmentIntegration);
 
@@ -40,7 +40,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-vtkPVAMRFragmentIntegration::vtkPVAMRFragmentIntegration() 
+vtkPVAMRFragmentIntegration::vtkPVAMRFragmentIntegration()
 {
   this->Implementation = new vtkPVAMRFragmentIntegrationInternal();
 }
@@ -48,51 +48,46 @@ vtkPVAMRFragmentIntegration::vtkPVAMRFragmentIntegration()
 //-----------------------------------------------------------------------------
 vtkPVAMRFragmentIntegration::~vtkPVAMRFragmentIntegration()
 {
-  if(this->Implementation)
-    {
+  if (this->Implementation)
+  {
     delete this->Implementation;
     this->Implementation = 0;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAMRFragmentIntegration::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVAMRFragmentIntegration::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request),
-                                  vtkInformationVector** inputVector,
-                                  vtkInformationVector* outputVector)
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkNonOverlappingAMR* amrInput=vtkNonOverlappingAMR::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkNonOverlappingAMR* amrInput =
+    vtkNonOverlappingAMR::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkInformation *outInfo;
+  vtkInformation* outInfo;
   outInfo = outputVector->GetInformationObject(0);
-  vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
+  vtkMultiBlockDataSet* mbdsOutput0 =
+    vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   unsigned int noOfArrays = static_cast<unsigned int>(this->Implementation->VolumeArrays.size());
-  for(unsigned int i = 0; i < noOfArrays; i++)
-    {
-    vtkTable* out = this->DoRequestData(
-      amrInput, 
-      this->Implementation->VolumeArrays[i].c_str(),
-      this->Implementation->MassArrays[i].c_str(),
-      this->Implementation->VolumeWeightedArrays,
+  for (unsigned int i = 0; i < noOfArrays; i++)
+  {
+    vtkTable* out = this->DoRequestData(amrInput, this->Implementation->VolumeArrays[i].c_str(),
+      this->Implementation->MassArrays[i].c_str(), this->Implementation->VolumeWeightedArrays,
       this->Implementation->MassWeightedArrays);
 
-    if(out)
-      {
+    if (out)
+    {
       /// Assign the name to the block by the array name.
       mbdsOutput0->SetBlock(i, out);
       out->Delete();
-      }
     }
+  }
 
   return 1;
 }
@@ -154,7 +149,7 @@ void vtkPVAMRFragmentIntegration::ClearInputMassWeightedArrayToProcess()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAMRFragmentIntegration::SetContourConnection (vtkAlgorithmOutput* output)
+void vtkPVAMRFragmentIntegration::SetContourConnection(vtkAlgorithmOutput* output)
 {
-  this->SetInputConnection (1, output);
+  this->SetInputConnection(1, output);
 }

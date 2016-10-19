@@ -32,6 +32,5 @@ attribute float Radius;
 
 float GetRadius()
 {
-  return RadiusSpan.x + Radius*RadiusSpan.y;
+  return RadiusSpan.x + Radius * RadiusSpan.y;
 }
-

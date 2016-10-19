@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCameraInterpolator2
-// .SECTION Description
-//
+/**
+ * @class   vtkCameraInterpolator2
+ *
+ *
+*/
 
 #ifndef vtkCameraInterpolator2_h
 #define vtkCameraInterpolator2_h
@@ -41,33 +43,39 @@ public:
   void AddFocalPathPoint(double x, double y, double z);
   void ClearFocalPath();
 
-  enum Modes 
-    {
+  enum Modes
+  {
     PATH,
     FIXED_DIRECTION,
     LOOK_AHEAD,
     ORTHOGONAL
-    };
+  };
 
-  // Description:
-  // Mode for managing the focal point.
-  // At least one of the two modes FocalPointMode or PositionMode must be PATH
-  // for the animation to have any effect.
+  //@{
+  /**
+   * Mode for managing the focal point.
+   * At least one of the two modes FocalPointMode or PositionMode must be PATH
+   * for the animation to have any effect.
+   */
   vtkSetClampMacro(FocalPointMode, int, PATH, ORTHOGONAL);
   vtkGetMacro(FocalPointMode, int);
+  //@}
 
-  // Description:
-  // Mode for managing the camera position.
-  // At least one of the two modes FocalPointMode or PositionMode must be PATH
-  // for the animation to have any effect.
+  //@{
+  /**
+   * Mode for managing the camera position.
+   * At least one of the two modes FocalPointMode or PositionMode must be PATH
+   * for the animation to have any effect.
+   */
   vtkSetClampMacro(PositionMode, int, PATH, ORTHOGONAL);
   vtkGetMacro(PositionMode, int);
+  //@}
 
   enum PathInterpolationModes
-    {
+  {
     LINEAR,
     SPLINE
-    };
+  };
 
   // Support for interpolation modes hasn't been implemented yet.
   vtkSetClampMacro(PositionPathInterpolationMode, int, LINEAR, SPLINE);
@@ -77,20 +85,27 @@ public:
   vtkSetClampMacro(FocalPathInterpolationMode, int, LINEAR, SPLINE);
   vtkGetMacro(FocalPathInterpolationMode, int);
 
-  // Description:
-  // When set, the FocalPointPath is treated as a closed path.
+  //@{
+  /**
+   * When set, the FocalPointPath is treated as a closed path.
+   */
   vtkSetMacro(ClosedFocalPath, bool);
   vtkGetMacro(ClosedFocalPath, bool);
   vtkBooleanMacro(ClosedFocalPath, bool);
+  //@}
 
-  // Description:
-  // When set, the PositionPath is treated as a closed path.
+  //@{
+  /**
+   * When set, the PositionPath is treated as a closed path.
+   */
   vtkSetMacro(ClosedPositionPath, bool);
   vtkGetMacro(ClosedPositionPath, bool);
   vtkBooleanMacro(ClosedPositionPath, bool);
+  //@}
 
-  // Description:
-  // \c u has to be in the range [0, 1].
+  /**
+   * \c u has to be in the range [0, 1].
+   */
   void InterpolateCamera(double u, vtkCamera*);
 
 protected:
@@ -115,8 +130,6 @@ protected:
 private:
   vtkCameraInterpolator2(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

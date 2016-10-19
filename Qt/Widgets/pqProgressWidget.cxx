@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,12 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include <QToolButton>
 
-
 //-----------------------------------------------------------------------------
-pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
-  : QWidget(_parent,Qt::FramelessWindowHint)
+pqProgressWidget::pqProgressWidget(QWidget* _parent /*=0*/)
+  : QWidget(_parent, Qt::FramelessWindowHint)
 {
-  QGridLayout *gridLayout = new QGridLayout(this);
+  QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setSpacing(0);
   gridLayout->setMargin(0);
   gridLayout->setObjectName("gridLayout");
@@ -52,15 +51,12 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
 
   this->AbortButton = new QToolButton(this);
   this->AbortButton->setObjectName("AbortButton");
-  this->AbortButton->setIcon(
-    QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete16.png")));
+  this->AbortButton->setIcon(QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete16.png")));
   this->AbortButton->setIconSize(QSize(12, 12));
-  this->AbortButton->setToolTip(
-    QApplication::translate("Form", "Abort", 0));
+  this->AbortButton->setToolTip(QApplication::translate("Form", "Abort", 0));
 
   this->AbortButton->setEnabled(false);
-  QObject::connect(this->AbortButton, SIGNAL(pressed()),
-    this, SIGNAL(abortPressed()));
+  QObject::connect(this->AbortButton, SIGNAL(pressed()), this, SIGNAL(abortPressed()));
 
   gridLayout->addWidget(this->AbortButton, 0, 0, 1, 1);
 
@@ -77,36 +73,34 @@ pqProgressWidget::~pqProgressWidget()
 //-----------------------------------------------------------------------------
 void pqProgressWidget::setProgress(const QString& message, int value)
 {
-  if (this->PendingEnableProgress &&
-    this->EnableTime.elapsed() >= 100)
-    {
-    this->PendingEnableProgress = false;    
-    }
+  if (this->PendingEnableProgress && this->EnableTime.elapsed() >= 100)
+  {
+    this->PendingEnableProgress = false;
+  }
   if (!this->PendingEnableProgress && value > 0)
-    {
+  {
     this->ProgressBar->setEnabled((value < 100));
-    this->ProgressBar->setProgress(message,value);
-
-    }
+    this->ProgressBar->setProgress(message, value);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressWidget::enableProgress(bool enabled)
 {
   if (enabled)
-    {
+  {
     if (!this->PendingEnableProgress)
-      {
-      this->PendingEnableProgress = true;      
-      this->EnableTime.start();
-      }
-    }
-  else
     {
+      this->PendingEnableProgress = true;
+      this->EnableTime.start();
+    }
+  }
+  else
+  {
     this->ProgressBar->setEnabled(false);
     this->ProgressBar->reset();
     this->PendingEnableProgress = false;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

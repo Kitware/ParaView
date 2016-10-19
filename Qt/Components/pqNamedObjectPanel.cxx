@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 
-pqNamedObjectPanel::pqNamedObjectPanel(pqProxy* object_proxy, QWidget* p) :
-  pqObjectPanel(object_proxy, p)
+pqNamedObjectPanel::pqNamedObjectPanel(pqProxy* object_proxy, QWidget* p)
+  : pqObjectPanel(object_proxy, p)
 {
 }
 
@@ -53,24 +53,23 @@ void pqNamedObjectPanel::linkServerManagerProperties()
 {
   // Don't link properties that form a property group (Look at BUG #7175).
   QStringList exceptions;
-//  QList<pq3DWidget*> widgets = this->findChildren<pq3DWidget*>();
-//  foreach (pq3DWidget* widget, widgets)
-//    {
-//    vtkCollection* elements = vtkCollection::New();
-//    vtkPVXMLElement* widgetHints = widget->getHints();
-//    widgetHints->GetElementsByName("Property", elements);
-//    for (int cc=0; cc < elements->GetNumberOfItems(); ++cc)
-//      {
-//      vtkPVXMLElement* child = vtkPVXMLElement::SafeDownCast(
-//        elements->GetItemAsObject(cc));
-//      if (!child)
-//        {
-//        continue;
-//        }
-//      exceptions.push_back(child->GetAttribute("name"));
-//      }
-//    elements->Delete();
-//    }
+  //  QList<pq3DWidget*> widgets = this->findChildren<pq3DWidget*>();
+  //  foreach (pq3DWidget* widget, widgets)
+  //    {
+  //    vtkCollection* elements = vtkCollection::New();
+  //    vtkPVXMLElement* widgetHints = widget->getHints();
+  //    widgetHints->GetElementsByName("Property", elements);
+  //    for (int cc=0; cc < elements->GetNumberOfItems(); ++cc)
+  //      {
+  //      vtkPVXMLElement* child = vtkPVXMLElement::SafeDownCast(
+  //        elements->GetItemAsObject(cc));
+  //      if (!child)
+  //        {
+  //        continue;
+  //        }
+  //      exceptions.push_back(child->GetAttribute("name"));
+  //      }
+  //    elements->Delete();
+  //    }
   pqNamedWidgets::link(this, this->proxy(), this->propertyManager(), &exceptions);
 }
-

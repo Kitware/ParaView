@@ -35,11 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& group,
-                             const QString& name,
-                             vtkSMContextViewProxy* viewModule,
-                             pqServer* server,
-                             QObject* p/*=NULL*/):
-  Superclass(chartViewType(), group, name, viewModule, server, p)
+  const QString& name, vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  : Superclass(chartViewType(), group, name, viewModule, server, p)
 {
 }
 

@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// pqContextView subclass for "Line Chart View". Doesn't do much expect adds
-/// the API to get the chartview type and name.
+/**
+* pqContextView subclass for "Line Chart View". Doesn't do much expect adds
+* the API to get the chartview type and name.
+*/
 class PQCORE_EXPORT pqXYChartView : public pqContextView
 {
   Q_OBJECT
@@ -48,11 +50,8 @@ public:
   static QString XYChartViewType() { return "XYChartView"; }
 
 public:
-  pqXYChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
+    pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYChartView();
 

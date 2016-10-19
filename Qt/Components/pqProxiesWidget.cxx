@@ -47,10 +47,10 @@ class pqProxiesWidget::pqInternals
 {
 public:
   struct ProxyInfo
-    {
+  {
     vtkWeakPointer<vtkSMProxy> Proxy;
     QPointer<pqProxyWidget> ProxyWidget;
-    };
+  };
 
   /// Key == "ComponentName", Value == List of "ProxyInfo".
   typedef QMap<QString, QList<ProxyInfo> > MapOfProxyList;
@@ -60,32 +60,32 @@ public:
   QStringList OrderedComponentNames;
 
   void clear()
-    {
+  {
     foreach (const QList<ProxyInfo>& proxies, this->ComponentProxies)
+    {
+      for (int cc = 0, max = proxies.size(); cc < max; cc++)
       {
-      for (int cc=0, max=proxies.size(); cc < max; cc++)
-        {
         delete proxies[cc].ProxyWidget;
-        }
       }
+    }
     this->OrderedComponentNames.clear();
     this->ComponentProxies.clear();
     this->clearExpanders();
-    }
+  }
   void clearExpanders()
-    {
+  {
     foreach (pqExpanderButton* expander, this->Expanders)
-      {
+    {
       delete expander;
-      }
-    this->Expanders.clear();
     }
+    this->Expanders.clear();
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqProxiesWidget::pqProxiesWidget(QWidget* parentObject, Qt::WindowFlags wflags)
-  : Superclass(parentObject, wflags),
-  Internals(new pqInternals())
+  : Superclass(parentObject, wflags)
+  , Internals(new pqInternals())
 {
 }
 
@@ -102,11 +102,8 @@ void pqProxiesWidget::clear()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxiesWidget::addProxy(
-  vtkSMProxy* proxy,
-  const QString& componentName/*=QString()*/,
-  const QStringList& properties/*=QStringList()*/,
-  bool applyChangesImmediately/*=false*/)
+void pqProxiesWidget::addProxy(vtkSMProxy* proxy, const QString& componentName /*=QString()*/,
+  const QStringList& properties /*=QStringList()*/, bool applyChangesImmediately /*=false*/)
 {
   // TODO: add check to avoid duplicate insertions.
 
@@ -121,9 +118,9 @@ void pqProxiesWidget::addProxy(
   this->connect(info.ProxyWidget, SIGNAL(restartRequired()), SLOT(triggerRestartRequired()));
 
   if (!this->Internals->OrderedComponentNames.contains(componentName))
-    {
+  {
     this->Internals->OrderedComponentNames.push_back(componentName);
-    }
+  }
 
   proxies.push_back(info);
 }
@@ -140,32 +137,32 @@ void pqProxiesWidget::updateLayout()
 
   // Don't add expander buttons if there's only 1 component and that components
   // name is empty.
-  const QList<QString> &keys = internals.OrderedComponentNames;
+  const QList<QString>& keys = internals.OrderedComponentNames;
   bool add_expanders = (keys.size() > 1) || ((keys.size() == 1) && (!keys[0].isEmpty()));
-  for (int cc=0, max=keys.size(); cc < max; cc++)
-   {
-   const QString& key = keys[cc];
-   pqExpanderButton* expander = NULL;
-   if (add_expanders)
-     {
-     expander = new pqExpanderButton(this);
-     expander->setObjectName(QString("Expander%1").arg(key));
-     expander->setText(key);
-     expander->setChecked(true);
-     vbox->addWidget(expander);
-     internals.Expanders.push_back(expander);
-     }
+  for (int cc = 0, max = keys.size(); cc < max; cc++)
+  {
+    const QString& key = keys[cc];
+    pqExpanderButton* expander = NULL;
+    if (add_expanders)
+    {
+      expander = new pqExpanderButton(this);
+      expander->setObjectName(QString("Expander%1").arg(key));
+      expander->setText(key);
+      expander->setChecked(true);
+      vbox->addWidget(expander);
+      internals.Expanders.push_back(expander);
+    }
 
-   const QList<pqInternals::ProxyInfo>& proxies = internals.ComponentProxies[key];
-   foreach (const pqInternals::ProxyInfo& info, proxies)
-     {
-     if (expander)
-       {
-       info.ProxyWidget->connect(expander, SIGNAL(toggled(bool)), SLOT(setVisible(bool)));
-       }
-     vbox->addWidget(info.ProxyWidget);
-     }
-   }
+    const QList<pqInternals::ProxyInfo>& proxies = internals.ComponentProxies[key];
+    foreach (const pqInternals::ProxyInfo& info, proxies)
+    {
+      if (expander)
+      {
+        info.ProxyWidget->connect(expander, SIGNAL(toggled(bool)), SLOT(setVisible(bool)));
+      }
+      vbox->addWidget(info.ProxyWidget);
+    }
+  }
   vbox->addStretch(1);
 }
 
@@ -173,27 +170,27 @@ void pqProxiesWidget::updateLayout()
 void pqProxiesWidget::triggerChangeFinished()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
-    {
+  {
     emit this->changeFinished(pwSender->proxy());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqProxiesWidget::triggerChangeAvailable()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
-    {
+  {
     emit this->changeAvailable(pwSender->proxy());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqProxiesWidget::triggerRestartRequired()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
-    {
+  {
     emit this->restartRequired(pwSender->proxy());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -203,15 +200,14 @@ bool pqProxiesWidget::filterWidgets(bool show_advanced, const QString& filterTex
   // forward to internal pqProxyWidget instances.
   pqInternals& internals = *this->Internals;
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
-    iter != internals.ComponentProxies.constEnd();
-    ++iter)
-    {
+       iter != internals.ComponentProxies.constEnd(); ++iter)
+  {
     foreach (const pqInternals::ProxyInfo& info, iter.value())
-      {
+    {
       bool val = info.ProxyWidget->filterWidgets(show_advanced, filterText);
       retval |= val;
-      }
     }
+  }
   return retval;
 }
 
@@ -221,14 +217,13 @@ void pqProxiesWidget::apply() const
   // forward to internal pqProxyWidget instances.
   pqInternals& internals = *this->Internals;
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
-    iter != internals.ComponentProxies.constEnd();
-    ++iter)
-    {
+       iter != internals.ComponentProxies.constEnd(); ++iter)
+  {
     foreach (const pqInternals::ProxyInfo& info, iter.value())
-      {
+    {
       info.ProxyWidget->apply();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -237,14 +232,13 @@ void pqProxiesWidget::reset() const
   // forward to internal pqProxyWidget instances.
   pqInternals& internals = *this->Internals;
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
-    iter != internals.ComponentProxies.constEnd();
-    ++iter)
-    {
+       iter != internals.ComponentProxies.constEnd(); ++iter)
+  {
     foreach (const pqInternals::ProxyInfo& info, iter.value())
-      {
+    {
       info.ProxyWidget->reset();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -254,14 +248,13 @@ void pqProxiesWidget::setView(pqView* pqview)
   pqInternals& internals = *this->Internals;
   internals.View = pqview;
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
-    iter != internals.ComponentProxies.constEnd();
-    ++iter)
-    {
+       iter != internals.ComponentProxies.constEnd(); ++iter)
+  {
     foreach (const pqInternals::ProxyInfo& info, iter.value())
-      {
+    {
       info.ProxyWidget->setView(pqview);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -270,12 +263,11 @@ void pqProxiesWidget::updatePanel()
   // forward to internal pqProxyWidget instances.
   pqInternals& internals = *this->Internals;
   for (pqInternals::MapOfProxyList::const_iterator iter = internals.ComponentProxies.constBegin();
-    iter != internals.ComponentProxies.constEnd();
-    ++iter)
-    {
+       iter != internals.ComponentProxies.constEnd(); ++iter)
+  {
     foreach (const pqInternals::ProxyInfo& info, iter.value())
-      {
+    {
       info.ProxyWidget->updatePanel();
-      }
     }
+  }
 }

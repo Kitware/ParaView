@@ -38,23 +38,19 @@ vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
 class vtkPVAxesWidgetObserver : public vtkCommand
 {
 public:
-  static vtkPVAxesWidgetObserver *New()
-    {return new vtkPVAxesWidgetObserver;};
+  static vtkPVAxesWidgetObserver* New() { return new vtkPVAxesWidgetObserver; };
 
-  vtkPVAxesWidgetObserver()
+  vtkPVAxesWidgetObserver() { this->AxesWidget = 0; }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event, void* calldata)
+  {
+    if (this->AxesWidget)
     {
-      this->AxesWidget = 0;
+      this->AxesWidget->ExecuteEvent(wdg, event, calldata);
     }
+  }
 
-  virtual void Execute(vtkObject* wdg, unsigned long event, void *calldata)
-    {
-      if (this->AxesWidget)
-        {
-        this->AxesWidget->ExecuteEvent(wdg, event, calldata);
-        }
-    }
-
-  vtkPVAxesWidget *AxesWidget;
+  vtkPVAxesWidget* AxesWidget;
 };
 
 //----------------------------------------------------------------------------
@@ -92,7 +88,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 
   this->Outline = vtkPolyData::New();
   this->Outline->Allocate();
-  vtkPoints *points = vtkPoints::New();
+  vtkPoints* points = vtkPoints::New();
   vtkIdType ptIds[5];
   ptIds[4] = ptIds[0] = points->InsertNextPoint(1, 1, 0);
   ptIds[1] = points->InsertNextPoint(2, 1, 0);
@@ -100,9 +96,9 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   ptIds[3] = points->InsertNextPoint(1, 2, 0);
   this->Outline->SetPoints(points);
   this->Outline->InsertNextCell(VTK_POLY_LINE, 5, ptIds);
-  vtkCoordinate *tcoord = vtkCoordinate::New();
+  vtkCoordinate* tcoord = vtkCoordinate::New();
   tcoord->SetCoordinateSystemToDisplay();
-  vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
+  vtkPolyDataMapper2D* mapper = vtkPolyDataMapper2D::New();
   mapper->SetInputData(this->Outline);
   mapper->SetTransformCoordinate(tcoord);
   this->OutlineActor = vtkActor2D::New();
@@ -130,95 +126,92 @@ vtkPVAxesWidget::~vtkPVAxesWidget()
 void vtkPVAxesWidget::SetEnabled(int enabling)
 {
   if (!this->Interactor)
-    {
-    //vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
+  {
+    // vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
     return;
-    }
+  }
 
   if (enabling)
-    {
+  {
     if (this->Enabled)
-      {
+    {
       return;
-      }
+    }
     if (!this->ParentRenderer)
-      {
+    {
       vtkErrorMacro("The parent renderer must be set prior to enabling this widget");
       return;
-      }
+    }
 
     this->Enabled = 1;
 
-    if ( this->EventCallbackCommand )
-      {
-      vtkRenderWindowInteractor *i = this->Interactor;
-      i->AddObserver(vtkCommand::MouseMoveEvent,
-        this->EventCallbackCommand, this->Priority);
-      i->AddObserver(vtkCommand::LeftButtonPressEvent,
-        this->EventCallbackCommand, this->Priority);
-      i->AddObserver(vtkCommand::LeftButtonReleaseEvent,
-        this->EventCallbackCommand, this->Priority);
-      }
+    if (this->EventCallbackCommand)
+    {
+      vtkRenderWindowInteractor* i = this->Interactor;
+      i->AddObserver(vtkCommand::MouseMoveEvent, this->EventCallbackCommand, this->Priority);
+      i->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, this->Priority);
+      i->AddObserver(
+        vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, this->Priority);
+    }
 
     this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
     if (this->ParentRenderer->GetRenderWindow()->GetNumberOfLayers() < 2)
-      {
+    {
       this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
-      }
+    }
     this->AxesActor->SetVisibility(1);
     // We need to copy the camera before the compositing observer is called.
     // Compositing temporarily changes the camera to display an image.
     this->StartEventObserverId =
-      this->ParentRenderer->AddObserver(vtkCommand::StartEvent,this->Observer,1);
+      this->ParentRenderer->AddObserver(vtkCommand::StartEvent, this->Observer, 1);
     this->InvokeEvent(vtkCommand::EnableEvent, NULL);
-    }
+  }
   else
-    {
+  {
     if (!this->Enabled)
-      {
+    {
       return;
-      }
+    }
 
     this->Enabled = 0;
     this->Interactor->RemoveObserver(this->EventCallbackCommand);
 
     this->AxesActor->SetVisibility(0);
     if (this->ParentRenderer)
-      {
+    {
       // release the resources of the renderer we own
       this->Renderer->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
       if (this->ParentRenderer->GetRenderWindow())
-        {
+      {
         this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
         this->AxesActor->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
-        }
+      }
       if (this->StartEventObserverId != 0)
-        {
-        this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
-        }
-      }
-    else
       {
-      vtkErrorMacro("Widget disabled without parent window, this should never happen.");
+        this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
       }
+    }
+    else
+    {
+      vtkErrorMacro("Widget disabled without parent window, this should never happen.");
+    }
 
     this->InvokeEvent(vtkCommand::DisableEvent, NULL);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
-                                   unsigned long vtkNotUsed(event),
-                                   void *vtkNotUsed(calldata))
+void vtkPVAxesWidget::ExecuteEvent(
+  vtkObject* vtkNotUsed(o), unsigned long vtkNotUsed(event), void* vtkNotUsed(calldata))
 {
   if (!this->ParentRenderer)
-    {
+  {
     return;
-    }
+  }
 
   this->SquareRenderer();
 
-  vtkCamera *cam = this->ParentRenderer->GetActiveCamera();
+  vtkCamera* cam = this->ParentRenderer->GetActiveCamera();
   double pos[3], fp[3], viewup[3];
   cam->GetPosition(pos);
   cam->GetFocalPoint(fp);
@@ -234,17 +227,17 @@ void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
 void vtkPVAxesWidget::UpdateCursorIcon()
 {
   if (!this->Enabled)
-    {
+  {
     this->SetMouseCursor(vtkPVAxesWidget::Outside);
     return;
-    }
+  }
 
   if (this->Moving)
-    {
+  {
     return;
-    }
+  }
 
-  int *parentSize = this->ParentRenderer->GetSize();
+  int* parentSize = this->ParentRenderer->GetSize();
 
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
@@ -257,43 +250,43 @@ void vtkPVAxesWidget::UpdateCursorIcon()
   int pState = this->MouseCursorState;
 
   if (xNorm > pos[0] && xNorm < pos[2] && yNorm > pos[1] && yNorm < pos[3])
-    {
+  {
     this->MouseCursorState = vtkPVAxesWidget::Inside;
-    }
-  else if (fabs(xNorm-pos[0]) < .02 && fabs(yNorm-pos[3]) < .02)
-    {
+  }
+  else if (fabs(xNorm - pos[0]) < .02 && fabs(yNorm - pos[3]) < .02)
+  {
     this->MouseCursorState = vtkPVAxesWidget::TopLeft;
-    }
-  else if (fabs(xNorm-pos[2]) < .02 && fabs(yNorm-pos[3]) < .02)
-    {
+  }
+  else if (fabs(xNorm - pos[2]) < .02 && fabs(yNorm - pos[3]) < .02)
+  {
     this->MouseCursorState = vtkPVAxesWidget::TopRight;
-    }
-  else if (fabs(xNorm-pos[0]) < .02 && fabs(yNorm-pos[1]) < .02)
-    {
+  }
+  else if (fabs(xNorm - pos[0]) < .02 && fabs(yNorm - pos[1]) < .02)
+  {
     this->MouseCursorState = vtkPVAxesWidget::BottomLeft;
-    }
-  else if (fabs(xNorm-pos[2]) < .02 && fabs(yNorm-pos[1]) < .02)
-    {
+  }
+  else if (fabs(xNorm - pos[2]) < .02 && fabs(yNorm - pos[1]) < .02)
+  {
     this->MouseCursorState = vtkPVAxesWidget::BottomRight;
-    }
+  }
   else
-    {
+  {
     this->MouseCursorState = vtkPVAxesWidget::Outside;
-    }
+  }
 
   if (pState == this->MouseCursorState)
-    {
+  {
     return;
-    }
+  }
 
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
-    {
+  {
     this->Renderer->RemoveActor(this->OutlineActor);
-    }
+  }
   else
-    {
+  {
     this->Renderer->AddActor(this->OutlineActor);
-    }
+  }
   this->Interactor->Render();
 
   this->SetMouseCursor(this->MouseCursorState);
@@ -303,7 +296,7 @@ void vtkPVAxesWidget::UpdateCursorIcon()
 void vtkPVAxesWidget::SetMouseCursor(int cursorState)
 {
   switch (cursorState)
-    {
+  {
     case vtkPVAxesWidget::Outside:
       this->Interactor->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
       break;
@@ -322,25 +315,22 @@ void vtkPVAxesWidget::SetMouseCursor(int cursorState)
     case vtkPVAxesWidget::BottomRight:
       this->Interactor->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_SIZESE);
       break;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::ProcessEvents(vtkObject* vtkNotUsed(object),
-                                    unsigned long event,
-                                    void *clientdata,
-                                    void* vtkNotUsed(calldata))
+void vtkPVAxesWidget::ProcessEvents(
+  vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata, void* vtkNotUsed(calldata))
 {
-  vtkPVAxesWidget *self =
-    reinterpret_cast<vtkPVAxesWidget*>(clientdata);
+  vtkPVAxesWidget* self = reinterpret_cast<vtkPVAxesWidget*>(clientdata);
 
   if (!self->GetInteractive())
-    {
+  {
     return;
-    }
+  }
 
   switch (event)
-    {
+  {
     case vtkCommand::LeftButtonPressEvent:
       self->OnButtonPress();
       break;
@@ -350,16 +340,16 @@ void vtkPVAxesWidget::ProcessEvents(vtkObject* vtkNotUsed(object),
     case vtkCommand::LeftButtonReleaseEvent:
       self->OnButtonRelease();
       break;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAxesWidget::OnButtonPress()
 {
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
-    {
+  {
     return;
-    }
+  }
 
   this->SetMouseCursor(this->MouseCursorState);
 
@@ -376,9 +366,9 @@ void vtkPVAxesWidget::OnButtonPress()
 void vtkPVAxesWidget::OnButtonRelease()
 {
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
-    {
+  {
     return;
-    }
+  }
 
   this->Moving = 0;
   this->EndInteraction();
@@ -389,9 +379,9 @@ void vtkPVAxesWidget::OnButtonRelease()
 void vtkPVAxesWidget::OnMouseMove()
 {
   if (this->Moving)
-    {
+  {
     switch (this->MouseCursorState)
-      {
+    {
       case vtkPVAxesWidget::Inside:
         this->MoveWidget();
         break;
@@ -407,16 +397,16 @@ void vtkPVAxesWidget::OnMouseMove()
       case vtkPVAxesWidget::BottomRight:
         this->ResizeBottomRight();
         break;
-      }
+    }
 
     this->UpdateCursorIcon();
     this->EventCallbackCommand->SetAbortFlag(1);
     this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
-    }
+  }
   else
-    {
+  {
     this->UpdateCursorIcon();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -431,11 +421,11 @@ void vtkPVAxesWidget::MoveWidget()
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
 
-  int *size = this->ParentRenderer->GetSize();
+  int* size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
 
-  double *vp = this->Renderer->GetViewport();
+  double* vp = this->Renderer->GetViewport();
 
   double newPos[4];
   newPos[0] = vp[0] + dxNorm;
@@ -444,29 +434,29 @@ void vtkPVAxesWidget::MoveWidget()
   newPos[3] = vp[3] + dyNorm;
 
   if (newPos[0] < 0)
-    {
+  {
     this->StartPosition[0] = 0;
     newPos[0] = 0;
     newPos[2] = vp[2] - vp[0];
-    }
+  }
   if (newPos[1] < 0)
-    {
+  {
     this->StartPosition[1] = 0;
     newPos[1] = 0;
     newPos[3] = vp[3] - vp[1];
-    }
+  }
   if (newPos[2] > 1)
-    {
-    this->StartPosition[0] = (int)(size[0] - size[0] * (vp[2]-vp[0]));
-    newPos[0] = 1 - (vp[2]-vp[0]);
+  {
+    this->StartPosition[0] = (int)(size[0] - size[0] * (vp[2] - vp[0]));
+    newPos[0] = 1 - (vp[2] - vp[0]);
     newPos[2] = 1;
-    }
+  }
   if (newPos[3] > 1)
-    {
-    this->StartPosition[1] = (int)(size[1] - size[1]*(vp[3]-vp[1]));
-    newPos[1] = 1 - (vp[3]-vp[1]);
+  {
+    this->StartPosition[1] = (int)(size[1] - size[1] * (vp[3] - vp[1]));
+    newPos[1] = 1 - (vp[3] - vp[1]);
     newPos[3] = 1;
-    }
+  }
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -481,7 +471,7 @@ void vtkPVAxesWidget::ResizeTopLeft()
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
 
-  int *size = this->ParentRenderer->GetSize();
+  int* size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
 
@@ -491,17 +481,17 @@ void vtkPVAxesWidget::ResizeTopLeft()
   double absDy = fabs(dyNorm);
 
   if (absDx > absDy)
-    {
+  {
     change = dxNorm;
     useX = 1;
-    }
+  }
   else
-    {
+  {
     change = dyNorm;
     useX = 0;
-    }
+  }
 
-  double *vp = this->Renderer->GetViewport();
+  double* vp = this->Renderer->GetViewport();
 
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
@@ -513,23 +503,23 @@ void vtkPVAxesWidget::ResizeTopLeft()
   newPos[3] = useX ? vp[3] - change : vp[3] + change;
 
   if (newPos[0] < 0)
-    {
+  {
     this->StartPosition[0] = 0;
     newPos[0] = 0;
-    }
-  if (newPos[0] >= newPos[2]-0.01)
-    {
+  }
+  if (newPos[0] >= newPos[2] - 0.01)
+  {
     newPos[0] = newPos[2] - 0.01;
-    }
+  }
   if (newPos[3] > 1)
-    {
+  {
     this->StartPosition[1] = size[1];
     newPos[3] = 1;
-    }
-  if (newPos[3] <= newPos[1]+0.01)
-    {
+  }
+  if (newPos[3] <= newPos[1] + 0.01)
+  {
     newPos[3] = newPos[1] + 0.01;
-    }
+  }
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -544,7 +534,7 @@ void vtkPVAxesWidget::ResizeTopRight()
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
 
-  int *size = this->ParentRenderer->GetSize();
+  int* size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
 
@@ -553,15 +543,15 @@ void vtkPVAxesWidget::ResizeTopRight()
   double absDy = fabs(dyNorm);
 
   if (absDx > absDy)
-    {
+  {
     change = dxNorm;
-    }
+  }
   else
-    {
+  {
     change = dyNorm;
-    }
+  }
 
-  double *vp = this->Renderer->GetViewport();
+  double* vp = this->Renderer->GetViewport();
 
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
@@ -573,23 +563,23 @@ void vtkPVAxesWidget::ResizeTopRight()
   newPos[3] = vp[3] + change;
 
   if (newPos[2] > 1)
-    {
+  {
     this->StartPosition[0] = size[0];
     newPos[2] = 1;
-    }
-  if (newPos[2] <= newPos[0]+0.01)
-    {
+  }
+  if (newPos[2] <= newPos[0] + 0.01)
+  {
     newPos[2] = newPos[0] + 0.01;
-    }
+  }
   if (newPos[3] > 1)
-    {
+  {
     this->StartPosition[1] = size[1];
     newPos[3] = 1;
-    }
-  if (newPos[3] <= newPos[1]+0.01)
-    {
+  }
+  if (newPos[3] <= newPos[1] + 0.01)
+  {
     newPos[3] = newPos[1] + 0.01;
-    }
+  }
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -604,23 +594,23 @@ void vtkPVAxesWidget::ResizeBottomLeft()
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
 
-  int *size = this->ParentRenderer->GetSize();
+  int* size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
-  double *vp = this->Renderer->GetViewport();
+  double* vp = this->Renderer->GetViewport();
 
   double change;
   double absDx = fabs(dxNorm);
   double absDy = fabs(dyNorm);
 
   if (absDx > absDy)
-    {
+  {
     change = dxNorm;
-    }
+  }
   else
-    {
+  {
     change = dyNorm;
-    }
+  }
 
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
@@ -632,23 +622,23 @@ void vtkPVAxesWidget::ResizeBottomLeft()
   newPos[3] = vp[3];
 
   if (newPos[0] < 0)
-    {
+  {
     this->StartPosition[0] = 0;
     newPos[0] = 0;
-    }
-  if (newPos[0] >= newPos[2]-0.01)
-    {
+  }
+  if (newPos[0] >= newPos[2] - 0.01)
+  {
     newPos[0] = newPos[2] - 0.01;
-    }
+  }
   if (newPos[1] < 0)
-    {
+  {
     this->StartPosition[1] = 0;
     newPos[1] = 0;
-    }
-  if (newPos[1] >= newPos[3]-0.01)
-    {
+  }
+  if (newPos[1] >= newPos[3] - 0.01)
+  {
     newPos[1] = newPos[3] - 0.01;
-    }
+  }
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -663,11 +653,11 @@ void vtkPVAxesWidget::ResizeBottomRight()
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
 
-  int *size = this->ParentRenderer->GetSize();
+  int* size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
 
-  double *vp = this->Renderer->GetViewport();
+  double* vp = this->Renderer->GetViewport();
 
   int useX;
   double change;
@@ -675,15 +665,15 @@ void vtkPVAxesWidget::ResizeBottomRight()
   double absDy = fabs(dyNorm);
 
   if (absDx > absDy)
-    {
+  {
     change = dxNorm;
     useX = 1;
-    }
+  }
   else
-    {
+  {
     change = dyNorm;
     useX = 0;
-    }
+  }
 
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
@@ -695,23 +685,23 @@ void vtkPVAxesWidget::ResizeBottomRight()
   newPos[3] = vp[3];
 
   if (newPos[2] > 1)
-    {
+  {
     this->StartPosition[0] = size[0];
     newPos[2] = 1;
-    }
-  if (newPos[2] <= newPos[0]+0.01)
-    {
+  }
+  if (newPos[2] <= newPos[0] + 0.01)
+  {
     newPos[2] = newPos[0] + 0.01;
-    }
+  }
   if (newPos[1] < 0)
-    {
+  {
     this->StartPosition[1] = 0;
     newPos[1] = 0;
-    }
-  if (newPos[1] >= newPos[3]-0.01)
-    {
-    newPos[1] = newPos[3]-0.01;
-    }
+  }
+  if (newPos[1] >= newPos[3] - 0.01)
+  {
+    newPos[1] = newPos[3] - 0.01;
+  }
 
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
@@ -720,11 +710,11 @@ void vtkPVAxesWidget::ResizeBottomRight()
 //----------------------------------------------------------------------------
 void vtkPVAxesWidget::SquareRenderer()
 {
-  int *size = this->Renderer->GetSize();
+  int* size = this->Renderer->GetSize();
   if (size[0] == 0 || size[1] == 0)
-    {
+  {
     return;
-    }
+  }
 
   double vp[4];
   this->Renderer->GetViewport(vp);
@@ -735,75 +725,74 @@ void vtkPVAxesWidget::SquareRenderer()
   double newDeltaY = size[0] * deltaY / (double)size[1];
 
   if (newDeltaX > 1)
-    {
+  {
     if (newDeltaY > 1)
-      {
+    {
       if (size[0] > size[1])
-        {
+      {
         newDeltaX = size[1] / (double)size[0];
         newDeltaY = 1;
-        }
+      }
       else
-        {
+      {
         newDeltaX = 1;
         newDeltaY = size[0] / (double)size[1];
-        }
+      }
       vp[0] = vp[1] = 0;
       vp[2] = newDeltaX;
       vp[3] = newDeltaY;
-      }
+    }
     else
-      {
+    {
       vp[3] = vp[1] + newDeltaY;
       if (vp[3] > 1)
-        {
+      {
         vp[3] = 1;
         vp[1] = vp[3] - newDeltaY;
-        }
       }
     }
+  }
   else
-    {
+  {
     vp[2] = vp[0] + newDeltaX;
     if (vp[2] > 1)
-      {
+    {
       vp[2] = 1;
       vp[0] = vp[2] - newDeltaX;
-      }
     }
+  }
 
   this->Renderer->SetViewport(vp);
 
   this->Renderer->NormalizedDisplayToDisplay(vp[0], vp[1]);
   this->Renderer->NormalizedDisplayToDisplay(vp[2], vp[3]);
 
-  vtkPoints *points = this->Outline->GetPoints();
-  points->SetPoint(0, vp[0]+1, vp[1]+1, 0);
-  points->SetPoint(1, vp[2]-1, vp[1]+1, 0);
-  points->SetPoint(2, vp[2]-1, vp[3]-1, 0);
-  points->SetPoint(3, vp[0]+1, vp[3]-1, 0);
+  vtkPoints* points = this->Outline->GetPoints();
+  points->SetPoint(0, vp[0] + 1, vp[1] + 1, 0);
+  points->SetPoint(1, vp[2] - 1, vp[1] + 1, 0);
+  points->SetPoint(2, vp[2] - 1, vp[3] - 1, 0);
+  points->SetPoint(3, vp[0] + 1, vp[3] - 1, 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAxesWidget::SetInteractive(int state)
 {
   if (this->Interactive != state)
-    {
+  {
     this->Interactive = state;
-    }
+  }
 
   if (!state)
-    {
+  {
     this->OnButtonRelease();
     this->Renderer->RemoveActor(this->OutlineActor);
-    if (this->Interactor &&
-      this->MouseCursorState != vtkPVAxesWidget::Outside)
-      {
+    if (this->Interactor && this->MouseCursorState != vtkPVAxesWidget::Outside)
+    {
       this->MouseCursorState = vtkPVAxesWidget::Outside;
       this->SetMouseCursor(this->MouseCursorState);
       // this->Interactor->Render();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -811,9 +800,9 @@ void vtkPVAxesWidget::SetOutlineColor(double r, double g, double b)
 {
   this->OutlineActor->GetProperty()->SetColor(r, g, b);
   if (this->Interactor)
-    {
-//    this->Interactor->Render();
-    }
+  {
+    //    this->Interactor->Render();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -843,8 +832,7 @@ vtkRenderer* vtkPVAxesWidget::GetParentRenderer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::SetViewport(double minX, double minY,
-                                  double maxX, double maxY)
+void vtkPVAxesWidget::SetViewport(double minX, double minY, double maxX, double maxY)
 {
   this->Renderer->SetViewport(minX, minY, maxX, maxY);
 }

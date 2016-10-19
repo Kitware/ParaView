@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,48 +36,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidgetItem>
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetCheckHelper::pqTreeWidgetCheckHelper(
-  QTreeWidget* tree, int checkableColumn,
-  QObject* p):
-  QObject(p)
+pqTreeWidgetCheckHelper::pqTreeWidgetCheckHelper(QTreeWidget* tree, int checkableColumn, QObject* p)
+  : QObject(p)
 {
   this->Mode = CLICK_IN_ROW;
   this->Tree = tree;
   this->CheckableColumn = checkableColumn;
   this->PressState = -1;
-  QObject::connect(this->Tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-    this, SLOT(onItemClicked(QTreeWidgetItem*, int)));
-  QObject::connect(this->Tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
-    this, SLOT(onItemPressed(QTreeWidgetItem*, int)));
+  QObject::connect(this->Tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this,
+    SLOT(onItemClicked(QTreeWidgetItem*, int)));
+  QObject::connect(this->Tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,
+    SLOT(onItemPressed(QTreeWidgetItem*, int)));
 }
 
 //-----------------------------------------------------------------------------
 void pqTreeWidgetCheckHelper::onItemPressed(QTreeWidgetItem* item, int /*column*/)
 {
-  this->PressState = item->checkState(this->CheckableColumn); 
+  this->PressState = item->checkState(this->CheckableColumn);
 }
 
 //-----------------------------------------------------------------------------
 void pqTreeWidgetCheckHelper::onItemClicked(QTreeWidgetItem* item, int column)
 {
   if (this->Mode == CLICK_IN_COLUMN && column != this->CheckableColumn)
-    {
+  {
     return;
-    }
-  Qt::CheckState state = item->checkState(this->CheckableColumn); 
+  }
+  Qt::CheckState state = item->checkState(this->CheckableColumn);
   if (this->PressState != state)
-    {
+  {
     // the click was on the check box itself, hence the state is already toggled.
     return;
-    }
+  }
   if (state == Qt::Unchecked)
-    {
+  {
     state = Qt::Checked;
-    }
+  }
   else if (state == Qt::Checked)
-    {
+  {
     state = Qt::Unchecked;
-    }
+  }
   item->setCheckState(this->CheckableColumn, state);
   this->PressState = -1;
 }

@@ -46,23 +46,22 @@ pqConsoleWidgetEventPlayer::~pqConsoleWidgetEventPlayer()
 }
 
 //-----------------------------------------------------------------------------
-bool pqConsoleWidgetEventPlayer::playEvent(QObject* target,
-    const QString& cmd, const QString& args, bool& errorFlag)
+bool pqConsoleWidgetEventPlayer::playEvent(
+  QObject* target, const QString& cmd, const QString& args, bool& errorFlag)
 {
   pqConsoleWidget* widget = qobject_cast<pqConsoleWidget*>(target);
   if (!widget)
-    {
+  {
     return false;
-    }
+  }
 
   if (cmd == "executeCommand")
-    {
+  {
     widget->printAndExecuteCommand(args);
     return true;
-    }
+  }
 
-  qCritical() << "Unknown command for pqConsoleWidget : "
-    << target << " " << cmd << " " << args;
+  qCritical() << "Unknown command for pqConsoleWidget : " << target << " " << cmd << " " << args;
   errorFlag = true;
   return true;
 }

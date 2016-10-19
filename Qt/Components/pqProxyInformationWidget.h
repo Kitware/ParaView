@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,34 +41,48 @@ class QTreeWidgetItem;
 class vtkEventQtSlotConnect;
 class vtkPVDataInformation;
 
-/// Widget which provides information about an output port of a source proxy
+/**
+* Widget which provides information about an output port of a source proxy
+*/
 class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor
-  pqProxyInformationWidget(QWidget* p=0);
-  /// destructor
+  /**
+  * constructor
+  */
+  pqProxyInformationWidget(QWidget* p = 0);
+  /**
+  * destructor
+  */
   ~pqProxyInformationWidget();
 
-  /// get the proxy for which properties are displayed
+  /**
+  * get the proxy for which properties are displayed
+  */
   pqOutputPort* getOutputPort();
 
 public slots:
-  /// TODO: have this become automatic instead of relying on 
-  /// the accept button in case another client modifies the pipeline.
+  /**
+  * TODO: have this become automatic instead of relying on
+  * the accept button in case another client modifies the pipeline.
+  */
   void updateInformation();
 
-  /// Set the display whose properties we want to edit.
+  /**
+  * Set the display whose properties we want to edit.
+  */
   void setOutputPort(pqOutputPort* outputport);
 
 private slots:
   void onCurrentItemChanged(QTreeWidgetItem* item);
 
 private:
-  /// builds the composite tree structure.
-  QTreeWidgetItem* fillCompositeInformation(vtkPVDataInformation* info,
-    QTreeWidgetItem* parent=0);
+  /**
+  * builds the composite tree structure.
+  */
+  QTreeWidgetItem* fillCompositeInformation(
+    vtkPVDataInformation* info, QTreeWidgetItem* parent = 0);
 
   void fillDataInformation(vtkPVDataInformation* info);
 
@@ -80,4 +94,3 @@ private:
 };
 
 #endif
-

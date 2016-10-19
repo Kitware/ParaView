@@ -26,22 +26,13 @@ vtkPVTransform::vtkPVTransform()
   this->AbsoluteTransform = vtkTransform::New();
 
   // Set position to 0
-  this->AbsolutePosition[0]
-      = this->AbsolutePosition[1]
-        = this->AbsolutePosition[2]
-          = 0;
+  this->AbsolutePosition[0] = this->AbsolutePosition[1] = this->AbsolutePosition[2] = 0;
 
   // Set rotation to 0
-  this->AbsoluteRotation[0]
-      = this->AbsoluteRotation[1]
-        = this->AbsoluteRotation[2]
-          = 0;
+  this->AbsoluteRotation[0] = this->AbsoluteRotation[1] = this->AbsoluteRotation[2] = 0;
 
   // Set scale to 1
-  this->AbsoluteScale[0]
-      = this->AbsoluteScale[1]
-        = this->AbsoluteScale[2]
-          = 1;
+  this->AbsoluteScale[0] = this->AbsoluteScale[1] = this->AbsoluteScale[2] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -51,7 +42,7 @@ vtkPVTransform::~vtkPVTransform()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTransform::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVTransform::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

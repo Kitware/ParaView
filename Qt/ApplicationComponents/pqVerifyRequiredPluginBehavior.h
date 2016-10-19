@@ -36,18 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QSet>
 
-/// @ingroup Behaviors
-///
-/// ParaView plugins can be loaded on the client or server before a connection is made.
-/// This class makes sure if a plugin that needs both client and server components
-/// is not correctly located we can inform the user.
+/**
+* @ingroup Behaviors
+*
+* ParaView plugins can be loaded on the client or server before a connection is made.
+* This class makes sure if a plugin that needs both client and server components
+* is not correctly located we can inform the user.
+*/
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqVerifyRequiredPluginBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqVerifyRequiredPluginBehavior(QObject* parent=0);
+  pqVerifyRequiredPluginBehavior(QObject* parent = 0);
 
 protected slots:
   void requiredPluginsNotLoaded();

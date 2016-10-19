@@ -22,13 +22,12 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkUncertaintySurfaceDefaultPainter)
 
-//----------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkUncertaintySurfaceDefaultPainter,
-                     UncertaintySurfacePainter,
-                     vtkUncertaintySurfacePainter)
+  //----------------------------------------------------------------------------
+  vtkCxxSetObjectMacro(
+    vtkUncertaintySurfaceDefaultPainter, UncertaintySurfacePainter, vtkUncertaintySurfacePainter)
 
-//----------------------------------------------------------------------------
-vtkUncertaintySurfaceDefaultPainter::vtkUncertaintySurfaceDefaultPainter()
+  //----------------------------------------------------------------------------
+  vtkUncertaintySurfaceDefaultPainter::vtkUncertaintySurfaceDefaultPainter()
 {
   this->UncertaintySurfacePainter = vtkUncertaintySurfacePainter::New();
 }
@@ -46,14 +45,12 @@ void vtkUncertaintySurfaceDefaultPainter::BuildPainterChain()
 
   // Now insert the UncertaintySurfacePainter after the clip planes painter.
   vtkPainter* prevPainter = this->GetClipPlanesPainter();
-  this->UncertaintySurfacePainter->SetDelegatePainter(
-    prevPainter->GetDelegatePainter());
+  this->UncertaintySurfacePainter->SetDelegatePainter(prevPainter->GetDelegatePainter());
   prevPainter->SetDelegatePainter(this->UncertaintySurfacePainter);
 }
 
 //----------------------------------------------------------------------------
-void vtkUncertaintySurfaceDefaultPainter::PrintSelf(ostream& os,
-                                                    vtkIndent indent)
+void vtkUncertaintySurfaceDefaultPainter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UncertaintySurfacePainter: " << this->UncertaintySurfacePainter << endl;

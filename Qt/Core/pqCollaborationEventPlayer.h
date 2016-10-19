@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -35,30 +35,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include "pqWidgetEventPlayer.h"
 
-/// pqCollaborationEventPlayer is used to playback events that make
-/// collaborative-testing possible. These events cannot be recorded by the
-/// test-recorder, but are manually added. But once added, they enable the
-/// playback to wait for appropriate actions to happen.
+/**
+* pqCollaborationEventPlayer is used to playback events that make
+* collaborative-testing possible. These events cannot be recorded by the
+* test-recorder, but are manually added. But once added, they enable the
+* playback to wait for appropriate actions to happen.
+*/
 class PQCORE_EXPORT pqCollaborationEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqCollaborationEventPlayer(QObject *parent=NULL);
+  pqCollaborationEventPlayer(QObject* parent = NULL);
   virtual ~pqCollaborationEventPlayer();
 
   using Superclass::playEvent;
-  virtual bool playEvent(QObject* object,
-    const QString& command,
-    const QString& arguments, bool& error);
+  virtual bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error);
 
-  /// used to wait till the process becomes a master.
+  /**
+  * used to wait till the process becomes a master.
+  */
   static void waitForMaster();
 
-  /// used to wait until there are num_connection connections.
+  /**
+  * used to wait until there are num_connection connections.
+  */
   static void waitForConnections(int num_connections);
 
   static void wait(int milli_seconds);
+
 private:
   Q_DISABLE_COPY(pqCollaborationEventPlayer)
 };

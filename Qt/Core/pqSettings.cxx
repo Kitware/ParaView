@@ -42,39 +42,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  class pqSettingsCleaner : public QObject
-  {
+class pqSettingsCleaner : public QObject
+{
   QString Filename;
+
 public:
-  pqSettingsCleaner(const QString& filename, QObject* parentObject):
-    QObject(parentObject), Filename(filename)
+  pqSettingsCleaner(const QString& filename, QObject* parentObject)
+    : QObject(parentObject)
+    , Filename(filename)
   {
   }
 
-  virtual ~pqSettingsCleaner()
-    {
-    QFile::remove(this->Filename);
-    }
-  };
+  virtual ~pqSettingsCleaner() { QFile::remove(this->Filename); }
+};
 }
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(
-    const QString& organization,
-    const QString& application,
-    QObject* p) :
-QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
+pqSettings::pqSettings(const QString& organization, const QString& application, QObject* p)
+  : QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
 {
 }
 
 //-----------------------------------------------------------------------------
 pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentObject)
-: QSettings(filename, QSettings::IniFormat, parentObject)
+  : QSettings(filename, QSettings::IniFormat, parentObject)
 {
   if (temporary)
-    {
+  {
     new pqSettingsCleaner(filename, this);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -113,68 +109,66 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
 {
   this->beginGroup(key);
 
-  if(this->contains("Size"))
-    {
+  if (this->contains("Size"))
+  {
     window.resize(this->value("Size").toSize());
-    }
+  }
 
-  if(this->contains("Position"))
-    {
+  if (this->contains("Position"))
+  {
     QPoint windowTopLeft = this->value("Position").toPoint();
     QRect mwRect(windowTopLeft, window.size());
 
     QDesktopWidget desktop;
-    QRect desktopRect = desktop.availableGeometry( desktop.primaryScreen() );
+    QRect desktopRect = desktop.availableGeometry(desktop.primaryScreen());
     // try moving it to keep size
-    if(!desktopRect.contains(mwRect))
-      {
+    if (!desktopRect.contains(mwRect))
+    {
       mwRect = QRect(desktopRect.topLeft(), window.size());
-      }
+    }
     // still doesn't fit, resize it
-    if(!desktopRect.contains(mwRect))
-      {
+    if (!desktopRect.contains(mwRect))
+    {
       mwRect = QRect(desktopRect.topLeft(), window.size());
       window.resize(desktopRect.size());
-      }
-    window.move(mwRect.topLeft());
     }
+    window.move(mwRect.topLeft());
+  }
 
-  if(this->contains("Layout"))
-    {
+  if (this->contains("Layout"))
+  {
     window.restoreState(this->value("Layout").toByteArray());
 
     QList<QDockWidget*> dockWidgets = window.findChildren<QDockWidget*>();
-    foreach(QDockWidget* dock_widget, dockWidgets)
+    foreach (QDockWidget* dock_widget, dockWidgets)
+    {
+      if (dock_widget->isFloating() == true)
       {
-      if (dock_widget->isFloating() == true )
-        {
         sanityCheckDock(dock_widget);
-        }
       }
-   }
+    }
+  }
 
   this->endGroup();
 }
 
 //-----------------------------------------------------------------------------
-void pqSettings::saveInQSettings(
-  const char* key, vtkSMProperty* smproperty)
+void pqSettings::saveInQSettings(const char* key, vtkSMProperty* smproperty)
 {
   // FIXME: handle all property types. This will only work for single value
   // properties.
-  if (smproperty->IsA("vtkSMIntVectorProperty") ||
-    smproperty->IsA("vtkSMIdTypeVectorProperty"))
-    {
+  if (smproperty->IsA("vtkSMIntVectorProperty") || smproperty->IsA("vtkSMIdTypeVectorProperty"))
+  {
     this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsInt());
-    }
+  }
   else if (smproperty->IsA("vtkSMDoubleVectorProperty"))
-    {
+  {
     this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsDouble());
-    }
+  }
   else if (smproperty->IsA("vtkSMStringVectorProperty"))
-    {
+  {
     this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsString());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -182,15 +176,15 @@ void pqSettings::restoreState(const QString& key, QDialog& dialog)
 {
   this->beginGroup(key);
 
-  if(this->contains("Size"))
-    {
+  if (this->contains("Size"))
+  {
     dialog.resize(this->value("Size").toSize());
-    }
+  }
 
-  if(this->contains("Position"))
-    {
+  if (this->contains("Position"))
+  {
     dialog.move(this->value("Position").toPoint());
-    }
+  }
 
   this->endGroup();
 }
@@ -223,57 +217,61 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
   if (!screenRect.contains(dockTopLeft))
   {
     // Are we High?
-    if (dockTopLeft.y() < screenRect.y()) {
+    if (dockTopLeft.y() < screenRect.y())
+    {
       dock_widget->move(dockRect.x(), screenRect.y());
       dockTopLeft = dock_widget->pos();
       dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-   }
+    }
     // Are we low
-    if (dockTopLeft.y() > screenRect.y() + screenRect.height()) {
+    if (dockTopLeft.y() > screenRect.y() + screenRect.height())
+    {
       dock_widget->move(dockRect.x(), screenRect.y() + screenRect.height() - 20);
       dockTopLeft = dock_widget->pos();
       dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-      }
+    }
     // Are we left
-    if (dockTopLeft.x() < screenRect.x()) {
+    if (dockTopLeft.x() < screenRect.x())
+    {
       dock_widget->move(screenRect.x(), dockRect.y());
       dockTopLeft = dock_widget->pos();
       dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-      }
+    }
     // Are we right
-    if (dockTopLeft.x() > screenRect.x() + screenRect.width()) {
-        dock_widget->move(screenRect.x() + screenRect.width() - dockRect.width(), dockRect.y());
-        dockTopLeft = dock_widget->pos();
-        dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-     }
+    if (dockTopLeft.x() > screenRect.x() + screenRect.width())
+    {
+      dock_widget->move(screenRect.x() + screenRect.width() - dockRect.width(), dockRect.y());
+      dockTopLeft = dock_widget->pos();
+      dockRect = QRect(dockTopLeft, dock_widget->frameSize());
+    }
 
     dockTopLeft = dock_widget->pos();
     dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-    }
+  }
 
-  if ( !desktopRect.contains(dockRect))
+  if (!desktopRect.contains(dockRect))
   {
-    //Are we too wide
+    // Are we too wide
     if (dockRect.x() + dockRect.width() > screenRect.x() + screenRect.width())
     {
-      if (screenRect.x() + screenRect.width() - dockRect.width() > screenRect.x() )
+      if (screenRect.x() + screenRect.width() - dockRect.width() > screenRect.x())
       {
         // Move dock side to side
-        dockRect.setX(screenRect.x() + screenRect.width() - dockRect.width() );
+        dockRect.setX(screenRect.x() + screenRect.width() - dockRect.width());
         dock_widget->move(dockRect.x(), dockRect.y());
         dockTopLeft = dock_widget->pos();
         dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-     }
+      }
       else
       {
         // Move dock side to side + resize to fit
-        dockRect.setX(screenRect.x() + screenRect.width() - dockRect.width() );
+        dockRect.setX(screenRect.x() + screenRect.width() - dockRect.width());
         dockRect.setWidth(screenRect.width());
         dock_widget->resize(dockRect.width(), dockRect.height());
         dock_widget->move(dockRect.x(), dockRect.y());
         dockTopLeft = dock_widget->pos();
         dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-         }
+      }
     }
 
     dockTopLeft = dock_widget->pos();
@@ -282,10 +280,10 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
     if (dockRect.y() + dockRect.height() > screenRect.y() + screenRect.height())
     {
       // See if we can move it more on screen so that the entire dock is on screen
-      if (screenRect.y() + screenRect.height() - dockRect.height() > screenRect.y() )
+      if (screenRect.y() + screenRect.height() - dockRect.height() > screenRect.y())
       {
         // Move dock up
-        dockRect.setY(screenRect.y() + screenRect.height() - dockRect.height() );
+        dockRect.setY(screenRect.y() + screenRect.height() - dockRect.height());
         dock_widget->move(dockRect.x(), dockRect.y());
         dockTopLeft = dock_widget->pos();
         dockRect = QRect(dockTopLeft, dock_widget->frameSize());
@@ -297,7 +295,7 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
         dock_widget->move(dockRect.x(), screenRect.y());
         dockTopLeft = dock_widget->pos();
         dockRect = QRect(dockTopLeft, dock_widget->frameSize());
-       }
+      }
     }
   }
 }

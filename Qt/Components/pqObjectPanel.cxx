@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 //-----------------------------------------------------------------------------
-pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
-  pqProxyPanel(object_proxy->getProxy(), p), ReferenceProxy(object_proxy)
+pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p)
+  : pqProxyPanel(object_proxy->getProxy(), p)
+  , ReferenceProxy(object_proxy)
 {
 }
 
@@ -62,13 +63,13 @@ void pqObjectPanel::accept()
   // this is hacky, but if we are used within a property widget we let
   // our parent handle the proxy modified state. this should be removed
   // when we get rid of the old properties panel
-  if(!qobject_cast<pqObjectPanelPropertyWidget *>(this->parent()))
+  if (!qobject_cast<pqObjectPanelPropertyWidget*>(this->parent()))
+  {
+    if (this->ReferenceProxy)
     {
-    if(this->ReferenceProxy)
-      {
       this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -79,24 +80,22 @@ void pqObjectPanel::reset()
   // this is hacky, but if we are used within a property widget we let
   // our parent handle the proxy modified state. this should be removed
   // when we get rid of the old properties panel
-  if(!qobject_cast<pqObjectPanelPropertyWidget *>(this->parent()))
+  if (!qobject_cast<pqObjectPanelPropertyWidget*>(this->parent()))
+  {
+    if (this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
     {
-    if (this->ReferenceProxy &&
-        this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
-      {
       this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqObjectPanel::setModified()
 {
   // don't change from UNINITIALIZED to MODIFIED
-  if(this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
-    {
+  if (this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
+  {
     this->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
     pqProxyPanel::setModified();
-    }
+  }
 }
-

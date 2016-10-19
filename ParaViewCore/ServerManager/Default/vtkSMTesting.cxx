@@ -49,25 +49,25 @@ int vtkSMTesting::RegressionTest(float thresh)
   int res = vtkTesting::FAILED;
 
   if (this->ViewProxy)
-    {
+  {
     vtkImageData* image = this->ViewProxy->CaptureWindow(1);
 
     // We do the local partition id checks to make sure that testing works with
     // pvsynchronousbatch. The image comparison are done only on root node.
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     if (pm->GetPartitionId() == 0)
-      {
+    {
       vtkTrivialProducer* producer = vtkTrivialProducer::New();
       producer->SetOutput(image);
       res = this->Testing->RegressionTest(producer, thresh);
       producer->Delete();
-      }
-    else
-      {
-      res = vtkTesting::PASSED;
-      }
-    image->Delete();
     }
+    else
+    {
+      res = vtkTesting::PASSED;
+    }
+    image->Delete();
+  }
   return res;
 }
 

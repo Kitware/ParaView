@@ -49,68 +49,64 @@ vtkPGenericEnSightReader::vtkPGenericEnSightReader()
 //----------------------------------------------------------------------------
 vtkPGenericEnSightReader::~vtkPGenericEnSightReader()
 {
-
 }
 
 //----------------------------------------------------------------------------
 int vtkPGenericEnSightReader::RequestInformation(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   int version = this->DetermineEnSightVersion();
   int createReader = 1;
-  if( this->GetMultiProcessNumberOfProcesses() < 2
-    || (version == vtkPGenericEnSightReader::ENSIGHT_6)
-    || (version == vtkPGenericEnSightReader::ENSIGHT_6_BINARY))
+  if (this->GetMultiProcessNumberOfProcesses() < 2 ||
+    (version == vtkPGenericEnSightReader::ENSIGHT_6) ||
+    (version == vtkPGenericEnSightReader::ENSIGHT_6_BINARY))
+  {
+    // single process mode, so use parents request information
+    // or we can't handle this data format in parallel
+    return vtkGenericEnSightReader::RequestInformation(request, inputVector, outputVector);
+  }
+  else if (version == vtkPGenericEnSightReader::ENSIGHT_GOLD)
+  {
+    if (this->Reader)
     {
-    //single process mode, so use parents request information
-    //or we can't handle this data format in parallel
-    return vtkGenericEnSightReader::RequestInformation(request,inputVector,outputVector);
-    }
-  else if (version == vtkPGenericEnSightReader::ENSIGHT_GOLD )
-    {
-    if ( this->Reader )
-      {
       if (strcmp(this->Reader->GetClassName(), "vtkPEnSightGoldReader") == 0)
-        {
-        createReader = 0;
-        }
-      else
-        {
-        this->Reader->Delete();
-        }
-      }
-    if (createReader)
       {
+        createReader = 0;
+      }
+      else
+      {
+        this->Reader->Delete();
+      }
+    }
+    if (createReader)
+    {
       this->Reader = vtkPEnSightGoldReader::New();
-      }
     }
-  else if(version == vtkPGenericEnSightReader::ENSIGHT_GOLD_BINARY)
+  }
+  else if (version == vtkPGenericEnSightReader::ENSIGHT_GOLD_BINARY)
+  {
+    if (this->Reader)
     {
-    if ( this->Reader )
+      if (strcmp(this->Reader->GetClassName(), "vtkPEnSightGoldBinaryReader") == 0)
       {
-      if (strcmp(this->Reader->GetClassName(),"vtkPEnSightGoldBinaryReader")== 0)
-        {
         createReader = 0;
-        }
+      }
       else
-        {
-        this->Reader->Delete();
-        }
-      }
-    if (createReader)
       {
-      this->Reader = vtkPEnSightGoldBinaryReader::New();
+        this->Reader->Delete();
       }
-
     }
-  else
+    if (createReader)
     {
+      this->Reader = vtkPEnSightGoldBinaryReader::New();
+    }
+  }
+  else
+  {
     vtkErrorMacro("Error determining EnSightVersion");
     this->EnSightVersion = -1;
     return 0;
-    }
+  }
 
   this->EnSightVersion = version;
 
@@ -140,18 +136,18 @@ int vtkPGenericEnSightReader::RequestInformation(
 
   this->Reader->SetByteOrder(this->ByteOrder);
   vtkPGenericEnSightReader* reader = dynamic_cast<vtkPGenericEnSightReader*>(this->Reader);
-  if ( reader )
-    {
-    //this dynamic cast never should fail
+  if (reader)
+  {
+    // this dynamic cast never should fail
     reader->RequestInformation(request, inputVector, outputVector);
-    }
+  }
   this->Reader->SetParticleCoordinatesByIndex(this->ParticleCoordinatesByIndex);
 
   this->SetTimeSets(this->Reader->GetTimeSets());
-  if(!this->TimeValueInitialized)
-    {
+  if (!this->TimeValueInitialized)
+  {
     this->SetTimeValue(this->Reader->GetTimeValue());
-    }
+  }
   this->MinimumTimeValue = this->Reader->GetMinimumTimeValue();
   this->MaximumTimeValue = this->Reader->GetMaximumTimeValue();
 
@@ -168,16 +164,17 @@ int vtkPGenericEnSightReader::RequestInformation(
 // X: Number of processes
 int vtkPGenericEnSightReader::GetMultiProcessNumberOfProcesses()
 {
-    if( this->MultiProcessNumberOfProcesses == -2 )
+  if (this->MultiProcessNumberOfProcesses == -2)
   {
-  // Initialize
-  if( vtkMultiProcessController::GetGlobalController() == NULL )
+    // Initialize
+    if (vtkMultiProcessController::GetGlobalController() == NULL)
       this->MultiProcessNumberOfProcesses = 0;
-  else
-      this->MultiProcessNumberOfProcesses = vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+    else
+      this->MultiProcessNumberOfProcesses =
+        vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
   }
 
-    return this->MultiProcessNumberOfProcesses;
+  return this->MultiProcessNumberOfProcesses;
 }
 
 //----------------------------------------------------------------------------
@@ -187,16 +184,17 @@ int vtkPGenericEnSightReader::GetMultiProcessNumberOfProcesses()
 // X: Local Process Id
 int vtkPGenericEnSightReader::GetMultiProcessLocalProcessId()
 {
-    if( this->MultiProcessLocalProcessId == -2 )
+  if (this->MultiProcessLocalProcessId == -2)
   {
-  // Initialize
-  if( vtkMultiProcessController::GetGlobalController() == NULL )
+    // Initialize
+    if (vtkMultiProcessController::GetGlobalController() == NULL)
       this->MultiProcessLocalProcessId = -1;
-  else
-      this->MultiProcessLocalProcessId = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+    else
+      this->MultiProcessLocalProcessId =
+        vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
   }
 
-    return this->MultiProcessLocalProcessId;
+  return this->MultiProcessLocalProcessId;
 }
 
 //----------------------------------------------------------------------------

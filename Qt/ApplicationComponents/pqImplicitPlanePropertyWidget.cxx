@@ -44,39 +44,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  // Implicit plane widget does not like it when any of the dimensions is 0. So
-  // we ensure that each dimension has some thickness. Then we scale the bounds
-  // by the given factor
-  static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+// Implicit plane widget does not like it when any of the dimensions is 0. So
+// we ensure that each dimension has some thickness. Then we scale the bounds
+// by the given factor
+static void pqAdjustBounds(vtkBoundingBox& bbox, double scaleFactor)
+{
+  double max_length = bbox.GetMaxLength();
+  max_length = max_length > 0 ? max_length * 0.05 : 1;
+  double min_point[3], max_point[3];
+  bbox.GetMinPoint(min_point[0], min_point[1], min_point[2]);
+  bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
+  for (int cc = 0; cc < 3; cc++)
+  {
+    if (bbox.GetLength(cc) == 0)
     {
-    double max_length = bbox.GetMaxLength();
-    max_length = max_length > 0? max_length * 0.05 : 1;
-    double min_point[3], max_point[3];
-    bbox.GetMinPoint(min_point[0], min_point[1], min_point[2]);
-    bbox.GetMaxPoint(max_point[0], max_point[1], max_point[2]);
-    for (int cc=0; cc < 3; cc++)
-      {
-      if (bbox.GetLength(cc) == 0)
-        {
-        min_point[cc] -= max_length;
-        max_point[cc] += max_length;
-        }
-
-      double mid = (min_point[cc] + max_point[cc])/2.0;
-      min_point[cc] = mid + scaleFactor * (min_point[cc] - mid);
-      max_point[cc] = mid + scaleFactor * (max_point[cc] - mid);
-      }
-    bbox.SetMinPoint(min_point);
-    bbox.SetMaxPoint(max_point);
+      min_point[cc] -= max_length;
+      max_point[cc] += max_length;
     }
+
+    double mid = (min_point[cc] + max_point[cc]) / 2.0;
+    min_point[cc] = mid + scaleFactor * (min_point[cc] - mid);
+    max_point[cc] = mid + scaleFactor * (max_point[cc] - mid);
+  }
+  bbox.SetMinPoint(min_point);
+  bbox.SetMaxPoint(max_point);
+}
 }
 
 //-----------------------------------------------------------------------------
 pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(
-    "representations", "ImplicitPlaneWidgetRepresentation",
-    smproxy, smgroup, parentObject)
+      "representations", "ImplicitPlaneWidgetRepresentation", smproxy, smgroup, parentObject)
 {
   Ui::ImplicitPlanePropertyWidget ui;
   ui.setupUi(this);
@@ -88,36 +87,30 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   new QDoubleValidator(ui.normalZ);
 
   if (vtkSMProperty* origin = smgroup->GetProperty("Origin"))
-    {
-    this->addPropertyLink(
-      ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);
-    this->addPropertyLink(
-      ui.originY, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 1);
-    this->addPropertyLink(
-      ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 2);
+  {
+    this->addPropertyLink(ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);
+    this->addPropertyLink(ui.originY, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 1);
+    this->addPropertyLink(ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 2);
     ui.labelOrigin->setText(origin->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
-    }
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'Origin'.");
-    }
+  }
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
-    {
-    this->addPropertyLink(
-      ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
-    this->addPropertyLink(
-      ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
-    this->addPropertyLink(
-      ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
+  {
+    this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
+    this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
+    this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
     ui.labelNormal->setText(normal->GetXMLLabel());
-    }
+  }
   else
-    {
+  {
     qCritical("Missing required property for function 'Normal'.");
-    }
+  }
 
   // link a few buttons
   this->connect(ui.useXNormal, SIGNAL(clicked()), SLOT(useXNormal()));
@@ -138,12 +131,15 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
   pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
-  this->connect(pickHelper, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
+  this->connect(
+    pickHelper, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
 
-  pqPointPickingHelper* pickHelper2 = new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
+  pqPointPickingHelper* pickHelper2 =
+    new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
   pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
   pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
-  this->connect(pickHelper2, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
+  this->connect(
+    pickHelper2, SIGNAL(pick(double, double, double)), SLOT(setOrigin(double, double, double)));
 
   this->placeWidget();
 }
@@ -158,9 +154,9 @@ void pqImplicitPlanePropertyWidget::placeWidget()
 {
   vtkBoundingBox bbox = this->dataBounds();
   if (!bbox.IsValid())
-    {
+  {
     return;
-    }
+  }
 
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
@@ -171,12 +167,11 @@ void pqImplicitPlanePropertyWidget::placeWidget()
   wdgProxy->UpdateVTKObjects();
 }
 
-
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::setDrawPlane(bool val)
 {
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-  vtkSMPropertyHelper(wdgProxy, "DrawPlane").Set(val? 1 : 0);
+  vtkSMPropertyHelper(wdgProxy, "DrawPlane").Set(val ? 1 : 0);
   wdgProxy->UpdateVTKObjects();
   this->render();
 }
@@ -201,7 +196,7 @@ void pqImplicitPlanePropertyWidget::resetToDataBounds()
   vtkBoundingBox bbox = this->dataBounds();
 
   if (bbox.IsValid())
-    {
+  {
     vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
     double scaleFactor = vtkSMPropertyHelper(wdgProxy, "PlaceFactor").GetAsDouble();
     pqAdjustBounds(bbox, scaleFactor);
@@ -214,14 +209,14 @@ void pqImplicitPlanePropertyWidget::resetToDataBounds()
     wdgProxy->UpdateVTKObjects();
     emit this->changeAvailable();
     this->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::resetCameraToNormal()
 {
   if (pqRenderView* renView = qobject_cast<pqRenderView*>(this->view()))
-    {
+  {
     vtkCamera* camera = renView->getRenderViewProxy()->GetActiveCamera();
     vtkSMProxy* wdgProxy = this->widgetProxy();
     double up[3], forward[3];
@@ -229,19 +224,18 @@ void pqImplicitPlanePropertyWidget::resetCameraToNormal()
     vtkSMPropertyHelper(wdgProxy, "Normal").Get(forward, 3);
     vtkMath::Cross(up, forward, up);
     vtkMath::Cross(forward, up, up);
-    renView->resetViewDirection(
-      forward[0], forward[1], forward[2], up[0], up[1], up[2]);
+    renView->resetViewDirection(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
     renView->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::useCameraNormal()
 {
-  vtkSMRenderViewProxy* viewProxy = this->view()?
-    vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
+  vtkSMRenderViewProxy* viewProxy =
+    this->view() ? vtkSMRenderViewProxy::SafeDownCast(this->view()->getProxy()) : NULL;
   if (viewProxy)
-    {
+  {
     vtkCamera* camera = viewProxy->GetActiveCamera();
 
     double camera_normal[3];
@@ -250,14 +244,14 @@ void pqImplicitPlanePropertyWidget::useCameraNormal()
     camera_normal[1] = -camera_normal[1];
     camera_normal[2] = -camera_normal[2];
     this->setNormal(camera_normal[0], camera_normal[1], camera_normal[2]);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlanePropertyWidget::setNormal(double wx, double wy, double wz)
 {
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  double n[3] = {wx, wy, wz};
+  double n[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Normal").Set(n, 3);
   wdgProxy->UpdateVTKObjects();
   emit this->changeAvailable();
@@ -268,7 +262,7 @@ void pqImplicitPlanePropertyWidget::setNormal(double wx, double wy, double wz)
 void pqImplicitPlanePropertyWidget::setOrigin(double wx, double wy, double wz)
 {
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  double o[3] = {wx, wy, wz};
+  double o[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Origin").Set(o, 3);
   wdgProxy->UpdateVTKObjects();
   emit this->changeAvailable();

@@ -26,7 +26,7 @@
 
 //
 // This class provides a scroll area that can resize (to a point) as widgets are
-// added to the contents 
+// added to the contents
 //
 
 class pqResizingScrollArea : public QScrollArea
@@ -34,9 +34,9 @@ class pqResizingScrollArea : public QScrollArea
   Q_OBJECT;
 
 public:
-  pqResizingScrollArea(QWidget *parent = 0);
+  pqResizingScrollArea(QWidget* parent = 0);
 
   QSize sizeHint() const;
 };
 
-#endif //pqResizingScrollArea_h
+#endif // pqResizingScrollArea_h

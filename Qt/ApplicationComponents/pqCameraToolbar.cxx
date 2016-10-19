@@ -52,22 +52,22 @@ void pqCameraToolbar::constructor()
   new pqCameraReaction(ui.actionRotate90degCW, pqCameraReaction::ROTATE_CAMERA_CCW);
   new pqCameraReaction(ui.actionRotate90degCCW, pqCameraReaction::ROTATE_CAMERA_CW);
 
-  new pqRenderViewSelectionReaction(ui.actionZoomToBox, NULL,
-    pqRenderViewSelectionReaction::ZOOM_TO_BOX);
+  new pqRenderViewSelectionReaction(
+    ui.actionZoomToBox, NULL, pqRenderViewSelectionReaction::ZOOM_TO_BOX);
 
   this->ZoomToDataAction = ui.actionZoomToData;
   this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
 
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(updateEnabledState()));
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(updateEnabledState()));
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnabledState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
+    SLOT(updateEnabledState()));
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraToolbar::updateEnabledState()
 {
-  pqView* view  = pqActiveObjects::instance().activeView();
+  pqView* view = pqActiveObjects::instance().activeView();
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   this->ZoomToDataAction->setEnabled(source && view);
 }

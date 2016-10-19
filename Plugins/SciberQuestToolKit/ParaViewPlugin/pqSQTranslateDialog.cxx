@@ -38,18 +38,14 @@
 
 // User interface
 //=============================================================================
-class pqSQTranslateDialogUI
-    :
-  public Ui::pqSQTranslateDialogForm
-    {};
+class pqSQTranslateDialogUI : public Ui::pqSQTranslateDialogForm
+{
+};
 
 //------------------------------------------------------------------------------
-pqSQTranslateDialog::pqSQTranslateDialog(
-    QWidget *Parent,
-    Qt::WindowFlags flags)
-            :
-    QDialog(Parent,flags),
-    Ui(0)
+pqSQTranslateDialog::pqSQTranslateDialog(QWidget* Parent, Qt::WindowFlags flags)
+  : QDialog(Parent, flags)
+  , Ui(0)
 {
   this->Ui = new pqSQTranslateDialogUI;
   this->Ui->setupUi(this);
@@ -66,7 +62,7 @@ pqSQTranslateDialog::~pqSQTranslateDialog()
 }
 
 //------------------------------------------------------------------------------
-void pqSQTranslateDialog::GetTranslation(double *t)
+void pqSQTranslateDialog::GetTranslation(double* t)
 {
   t[0] = this->GetTranslateX();
   t[1] = this->GetTranslateY();

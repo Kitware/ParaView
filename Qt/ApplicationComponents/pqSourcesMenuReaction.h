@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,33 +38,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineSource;
 class pqProxyGroupMenuManager;
 
-/// @ingroup Reactions
-/// Reaction to handle creation of sources from the sources menu.
+/**
+* @ingroup Reactions
+* Reaction to handle creation of sources from the sources menu.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSourcesMenuReaction : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager);
 
-  static pqPipelineSource* createSource(
-    const QString& group, const QString& name);
+  static pqPipelineSource* createSource(const QString& group, const QString& name);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   virtual void updateEnableState();
   void updateEnableState(bool);
 
 protected slots:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered(const QString& group, const QString& name)
-    { pqSourcesMenuReaction::createSource(group, name); } 
+  {
+    pqSourcesMenuReaction::createSource(group, name);
+  }
 
 private:
   Q_DISABLE_COPY(pqSourcesMenuReaction)
 };
 
 #endif
-
-

@@ -30,19 +30,17 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkUncertaintySurfaceRepresentation)
 
-//----------------------------------------------------------------------------
-vtkUncertaintySurfaceRepresentation::vtkUncertaintySurfaceRepresentation()
+  //----------------------------------------------------------------------------
+  vtkUncertaintySurfaceRepresentation::vtkUncertaintySurfaceRepresentation()
 {
   this->Painter = vtkUncertaintySurfacePainter::New();
 
   // setup default painter
-  vtkUncertaintySurfaceDefaultPainter *defaultPainter =
-    vtkUncertaintySurfaceDefaultPainter::New();
+  vtkUncertaintySurfaceDefaultPainter* defaultPainter = vtkUncertaintySurfaceDefaultPainter::New();
   defaultPainter->SetUncertaintySurfacePainter(this->Painter);
   vtkCompositePolyDataMapper2* compositeMapper =
     vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  defaultPainter->SetDelegatePainter(
-    compositeMapper->GetPainter()->GetDelegatePainter());
+  defaultPainter->SetDelegatePainter(compositeMapper->GetPainter()->GetDelegatePainter());
   compositeMapper->SetPainter(defaultPainter);
   defaultPainter->Delete();
 }
@@ -54,14 +52,13 @@ vtkUncertaintySurfaceRepresentation::~vtkUncertaintySurfaceRepresentation()
 }
 
 //----------------------------------------------------------------------------
-void vtkUncertaintySurfaceRepresentation::PrintSelf(ostream& os,
-                                                    vtkIndent indent)
+void vtkUncertaintySurfaceRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-void vtkUncertaintySurfaceRepresentation::SetUncertaintyArray(const char *name)
+void vtkUncertaintySurfaceRepresentation::SetUncertaintyArray(const char* name)
 {
   this->Painter->SetUncertaintyArrayName(name);
 
@@ -78,7 +75,8 @@ const char* vtkUncertaintySurfaceRepresentation::GetUncertaintyArray() const
 }
 
 //----------------------------------------------------------------------------
-void vtkUncertaintySurfaceRepresentation::SetUncertaintyTransferFunction(vtkPiecewiseFunction *function)
+void vtkUncertaintySurfaceRepresentation::SetUncertaintyTransferFunction(
+  vtkPiecewiseFunction* function)
 {
   this->Painter->SetTransferFunction(function);
   this->Modified();
@@ -93,30 +91,29 @@ vtkPiecewiseFunction* vtkUncertaintySurfaceRepresentation::GetUncertaintyTransfe
 //----------------------------------------------------------------------------
 void vtkUncertaintySurfaceRepresentation::RescaleUncertaintyTransferFunctionToDataRange()
 {
-  const char *uncertaintyArrayName = this->GetUncertaintyArray();
-  vtkPiecewiseFunction *transferFunction = this->GetUncertaintyTransferFunction();
+  const char* uncertaintyArrayName = this->GetUncertaintyArray();
+  vtkPiecewiseFunction* transferFunction = this->GetUncertaintyTransferFunction();
 
   double range[2] = { 0.0, 1.0 };
 
-  vtkDataObject *input = this->GetInput();
-  vtkDataSet *inputDS = vtkDataSet::SafeDownCast(input);
-  if(inputDS)
+  vtkDataObject* input = this->GetInput();
+  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
+  if (inputDS)
+  {
+    vtkAbstractArray* array = inputDS->GetPointData()->GetAbstractArray(uncertaintyArrayName);
+    if (vtkIntArray* intArray = vtkIntArray::SafeDownCast(array))
     {
-    vtkAbstractArray *array =
-      inputDS->GetPointData()->GetAbstractArray(uncertaintyArrayName);
-    if(vtkIntArray *intArray = vtkIntArray::SafeDownCast(array))
-      {
       intArray->GetRange(range);
-      }
-    else if(vtkFloatArray *floatArray = vtkFloatArray::SafeDownCast(array))
-      {
-      floatArray->GetRange(range);
-      }
-    else if(vtkDoubleArray *doubleArray = vtkDoubleArray::SafeDownCast(array))
-      {
-      doubleArray->GetRange(range);
-      }
     }
+    else if (vtkFloatArray* floatArray = vtkFloatArray::SafeDownCast(array))
+    {
+      floatArray->GetRange(range);
+    }
+    else if (vtkDoubleArray* doubleArray = vtkDoubleArray::SafeDownCast(array))
+    {
+      doubleArray->GetRange(range);
+    }
+  }
 
   // set range
   transferFunction->RemoveAllPoints();

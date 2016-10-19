@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QtDebug>
 
-
 //-----------------------------------------------------------------------------
 pqColorDialogEventTranslator::pqColorDialogEventTranslator(QObject* parentObject)
   : Superclass(parentObject)
@@ -57,25 +56,23 @@ bool pqColorDialogEventTranslator::translateEvent(
 
   QColorDialog* color_dialog = 0;
   while (object && !color_dialog)
-    {
+  {
     color_dialog = qobject_cast<QColorDialog*>(object);
     object = object->parent();
-    }
+  }
 
   if (!color_dialog)
-    {
+  {
     return false;
-    }
+  }
 
   if (tr_event->type() == QEvent::FocusIn)
-    {
+  {
+    QObject::connect(color_dialog, SIGNAL(currentColorChanged(const QColor&)), this,
+      SLOT(onColorChosen(const QColor&)), Qt::UniqueConnection);
     QObject::connect(
-      color_dialog, SIGNAL(currentColorChanged(const QColor&)),
-      this, SLOT(onColorChosen(const QColor&)), Qt::UniqueConnection);
-    QObject::connect(
-      color_dialog, SIGNAL(finished(int)),
-      this, SLOT(onFinished(int)), Qt::UniqueConnection);
-    }
+      color_dialog, SIGNAL(finished(int)), this, SLOT(onFinished(int)), Qt::UniqueConnection);
+  }
 
   return true;
 }
@@ -85,11 +82,9 @@ void pqColorDialogEventTranslator::onColorChosen(const QColor& color)
 {
   QColorDialog* color_dialog = qobject_cast<QColorDialog*>(this->sender());
 
-  QString colorvalue = QString("%1,%2,%3").arg(
-    color.red()).arg(color.green()).arg(color.blue());
+  QString colorvalue = QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue());
 
-  emit this->recordEvent(color_dialog, pqColorDialogEventPlayer::EVENT_NAME(),
-                         colorvalue);
+  emit this->recordEvent(color_dialog, pqColorDialogEventPlayer::EVENT_NAME(), colorvalue);
 }
 
 //-----------------------------------------------------------------------------

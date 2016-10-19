@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -36,15 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 
-/// pqStatusBar extends QStatusBar to support showing paraview progress.
-/// It uses pqProgressManager provided by pqApplicationCore to show the
-/// progress values. Internally uses pqProgressWidget to show the progress.
+/**
+* pqStatusBar extends QStatusBar to support showing paraview progress.
+* It uses pqProgressManager provided by pqApplicationCore to show the
+* progress values. Internally uses pqProgressWidget to show the progress.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
 {
   Q_OBJECT
   typedef QStatusBar Superclass;
+
 public:
-  pqStatusBar(QWidget* parent=0);
+  pqStatusBar(QWidget* parent = 0);
   virtual ~pqStatusBar();
 
 private:
@@ -52,5 +55,3 @@ private:
 };
 
 #endif
-
-

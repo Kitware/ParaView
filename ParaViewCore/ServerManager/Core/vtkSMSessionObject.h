@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSessionObject - superclass for any server manager classes
-//                            that are related to a session
-// .SECTION Description
-// vtkSMSessionObject provides methods to set and get the relative session
+/**
+ * @class   vtkSMSessionObject
+ * @brief   superclass for any server manager classes
+ *                            that are related to a session
+ *
+ * vtkSMSessionObject provides methods to set and get the relative session
+*/
 
 #ifndef vtkSMSessionObject_h
 #define vtkSMSessionObject_h
@@ -34,14 +37,18 @@ public:
   vtkTypeMacro(vtkSMSessionObject, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the session on wihch this object exists.
-  // Note that session is not reference counted.
+  //@{
+  /**
+   * Get/Set the session on wihch this object exists.
+   * Note that session is not reference counted.
+   */
   virtual void SetSession(vtkSMSession*);
   virtual vtkSMSession* GetSession();
+  //@}
 
-  // Description:
-  // Return the corresponding ProxyManager if any.
+  /**
+   * Return the corresponding ProxyManager if any.
+   */
   virtual vtkSMSessionProxyManager* GetSessionProxyManager();
 
 protected:

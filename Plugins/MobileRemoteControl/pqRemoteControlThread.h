@@ -46,7 +46,6 @@ class pqRemoteControlThread : public QThread
   Q_OBJECT
 
 public:
-
   /// Stores camera state information. Bytes read from the socket will be written
   /// directly into an instance of this struct.
   struct CameraStateStruct
@@ -102,7 +101,6 @@ public:
     HEARTBEAT_COMMAND = 5
   };
 
-
 signals:
 
   /// Send a signal to the main GUI thread. The main GUI thread will
@@ -110,7 +108,6 @@ signals:
   void requestExportScene();
 
 protected:
-
   /// Main entry point for the thread loop.
   void run();
 
@@ -146,10 +143,8 @@ protected:
   bool sendObjects();
 
 private:
-
   class pqInternal;
   pqInternal* Internal;
-
 };
 
 #endif

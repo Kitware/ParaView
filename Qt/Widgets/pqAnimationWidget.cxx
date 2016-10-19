@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 
-pqAnimationWidget::pqAnimationWidget(QWidget* p) 
-  : QAbstractScrollArea(p) 
+pqAnimationWidget::pqAnimationWidget(QWidget* p)
+  : QAbstractScrollArea(p)
 {
   this->View = new QGraphicsView(this->viewport());
   this->viewport()->setBackgroundRole(QPalette::Window);
@@ -59,8 +59,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->CreateDeleteHeader = new QHeaderView(Qt::Vertical, this);
   this->CreateDeleteHeader->viewport()->setBackgroundRole(QPalette::Window);
 
-  this->CreateDeleteHeader->setSizePolicy(QSizePolicy::Minimum,
-                              QSizePolicy::MinimumExpanding);
+  this->CreateDeleteHeader->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
 #if QT_VERSION >= 0x050000
   this->CreateDeleteHeader->setSectionResizeMode(QHeaderView::Fixed);
   this->CreateDeleteHeader->setSectionsClickable(true);
@@ -73,8 +72,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->EnabledHeader = new QHeaderView(Qt::Vertical, this);
   this->EnabledHeader->setObjectName("EnabledHeader");
   this->EnabledHeader->viewport()->setBackgroundRole(QPalette::Window);
-  this->EnabledHeader->setSizePolicy(QSizePolicy::Preferred,
-    QSizePolicy::MinimumExpanding);
+  this->EnabledHeader->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 #if QT_VERSION >= 0x050000
   this->EnabledHeader->setSectionResizeMode(QHeaderView::Fixed);
   this->EnabledHeader->setSectionsClickable(true);
@@ -87,10 +85,8 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->Header = new QHeaderView(Qt::Vertical, this);
   this->Header->viewport()->setBackgroundRole(QPalette::Window);
   this->Header->setObjectName("TrackHeader");
-  this->Header->setSizePolicy(QSizePolicy::Preferred,
-                              QSizePolicy::MinimumExpanding);
-  this->View->setSizePolicy(QSizePolicy::Preferred,
-                              QSizePolicy::MinimumExpanding);
+  this->Header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+  this->View->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 #if QT_VERSION >= 0x050000
   this->Header->setSectionResizeMode(QHeaderView::Fixed);
 #else
@@ -103,27 +99,20 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->CreateDeleteWidget = new QWidget(this);
   this->CreateDeleteWidget->setObjectName("CreateDeleteWidget");
 
-  QObject::connect(this->Header->model(),
-                   SIGNAL(rowsInserted(QModelIndex,int,int)),
-                   this, SLOT(updateSizes()));
-  QObject::connect(this->Header->model(),
-                   SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
-                   this, SLOT(updateSizes()));
-  QObject::connect(this->Header->model(),
-                   SIGNAL(rowsRemoved(QModelIndex,int,int)),
-                   this, SLOT(updateSizes()));
-  QObject::connect(this->Header,
-                   SIGNAL(sectionDoubleClicked(int)),
-                   this, SLOT(headerDblClicked(int)));
-  QObject::connect(this->Model,
-                   SIGNAL(trackSelected(pqAnimationTrack*)),
-                   this, SIGNAL(trackSelected(pqAnimationTrack*)));
-  QObject::connect(this->CreateDeleteHeader,
-                   SIGNAL(sectionClicked(int)),
-                   this, SLOT(headerDeleteClicked(int)));
-  QObject::connect(this->EnabledHeader,
-                   SIGNAL(sectionClicked(int)),
-                   this, SLOT(headerEnabledClicked(int)));
+  QObject::connect(
+    this->Header->model(), SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(updateSizes()));
+  QObject::connect(this->Header->model(), SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
+    this, SLOT(updateSizes()));
+  QObject::connect(
+    this->Header->model(), SIGNAL(rowsRemoved(QModelIndex, int, int)), this, SLOT(updateSizes()));
+  QObject::connect(
+    this->Header, SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerDblClicked(int)));
+  QObject::connect(this->Model, SIGNAL(trackSelected(pqAnimationTrack*)), this,
+    SIGNAL(trackSelected(pqAnimationTrack*)));
+  QObject::connect(
+    this->CreateDeleteHeader, SIGNAL(sectionClicked(int)), this, SLOT(headerDeleteClicked(int)));
+  QObject::connect(
+    this->EnabledHeader, SIGNAL(sectionClicked(int)), this, SLOT(headerEnabledClicked(int)));
 }
 
 pqAnimationWidget::~pqAnimationWidget()
@@ -158,30 +147,29 @@ void pqAnimationWidget::updateSizes()
 
   int num = this->Model->count();
 
-  for(int i=0; i<num; i++)
+  for (int i = 0; i < num; i++)
+  {
+    this->CreateDeleteModel.insertRow(i + 1);
+    if (this->Model->track(i)->isDeletable())
     {
-    this->CreateDeleteModel.insertRow(i+1);
-    if(this->Model->track(i)->isDeletable())
-      {
-      this->CreateDeleteModel.setHeaderData(i+1, Qt::Vertical,
-        QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
-      }
-    this->CreateDeleteModel.setHeaderData(i+1, Qt::Vertical, QVariant(), Qt::DisplayRole);
+      this->CreateDeleteModel.setHeaderData(
+        i + 1, Qt::Vertical, QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
     }
+    this->CreateDeleteModel.setHeaderData(i + 1, Qt::Vertical, QVariant(), Qt::DisplayRole);
+  }
   this->CreateDeleteModel.insertRow(this->Header->count());
   this->CreateDeleteModel.setHeaderData(this->Header->count(), Qt::Vertical,
     QPixmap(":/QtWidgets/Icons/pqPlus16.png"), Qt::DecorationRole);
-  
+
   this->updateGeometries();
 }
 
-  
 void pqAnimationWidget::headerDblClicked(int which)
 {
-  if(which > 0)
-    {
-    emit this->trackSelected(this->Model->track(which-1));
-    }
+  if (which > 0)
+  {
+    emit this->trackSelected(this->Model->track(which - 1));
+  }
 }
 
 void pqAnimationWidget::updateGeometries()
@@ -189,34 +177,32 @@ void pqAnimationWidget::updateGeometries()
   int width1 = 0;
   int width2 = 0;
   int width3 = 0;
-  
-  if(!this->CreateDeleteHeader->isHidden())
-    {
-    int tmp = qMax(this->CreateDeleteHeader->minimumWidth(),
-                 this->CreateDeleteHeader->sizeHint().width());
+
+  if (!this->CreateDeleteHeader->isHidden())
+  {
+    int tmp =
+      qMax(this->CreateDeleteHeader->minimumWidth(), this->CreateDeleteHeader->sizeHint().width());
     width1 = qMin(tmp, this->CreateDeleteHeader->maximumWidth());
-    }
-  if(!this->Header->isHidden())
-    {
-    int tmp = qMax(this->Header->minimumWidth(),
-                 this->Header->sizeHint().width());
+  }
+  if (!this->Header->isHidden())
+  {
+    int tmp = qMax(this->Header->minimumWidth(), this->Header->sizeHint().width());
     width2 = qMin(tmp, this->Header->maximumWidth());
-    }
+  }
   if (!this->EnabledHeader->isHidden())
-    {
-    // get the size of a checkbox in pixels. That's the width we want 
+  {
+    // get the size of a checkbox in pixels. That's the width we want
     // (+ padding) for the EnabledHeader.
     QStyleOptionButton option;
-    QRect r = this->style()->subElementRect(
-      QStyle::SE_CheckBoxIndicator, &option, this);
-    width3 = r.width()+8;
-    }
+    QRect r = this->style()->subElementRect(QStyle::SE_CheckBoxIndicator, &option, this);
+    width3 = r.width() + 8;
+  }
 
   this->setViewportMargins(width1 + width2 + width3, 0, 0, 0);
 
   QRect vg = this->contentsRect();
   this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
-  this->EnabledHeader->setGeometry(vg.left()+width1, vg.top(), width3, vg.height());
+  this->EnabledHeader->setGeometry(vg.left() + width1, vg.top(), width3, vg.height());
   this->Header->setGeometry(vg.left() + width1 + width3, vg.top(), width2, vg.height());
 
   this->updateScrollBars();
@@ -224,12 +210,12 @@ void pqAnimationWidget::updateGeometries()
 
 void pqAnimationWidget::scrollContentsBy(int dx, int dy)
 {
-  if(dy)
-    {
+  if (dy)
+  {
     this->CreateDeleteHeader->setOffset(this->verticalScrollBar()->value());
     this->Header->setOffset(this->verticalScrollBar()->value());
     this->EnabledHeader->setOffset(this->verticalScrollBar()->value());
-    }
+  }
   this->updateWidgetPosition();
   QAbstractScrollArea::scrollContentsBy(dx, dy);
 }
@@ -239,61 +225,60 @@ void pqAnimationWidget::updateScrollBars()
   int h = this->View->sizeHint().height();
   int extraw = 0;
   int viewh = h;
-  if(this->CreateDeleteHeader->isVisible())
-    {
+  if (this->CreateDeleteHeader->isVisible())
+  {
     h = qMax(h, this->CreateDeleteHeader->length());
-    }
+  }
   if (this->EnabledHeader->isVisible())
-    {
+  {
     h = qMax(h, this->EnabledHeader->length());
-    }
-  if(this->Header->isVisible())
-    {
+  }
+  if (this->Header->isVisible())
+  {
     h = qMax(h, this->Header->length());
     extraw = this->Header->width();
     viewh = h;
-    }
-  
+  }
+
   QSize vsize = this->viewport()->size();
   this->View->resize(vsize.width(), viewh);
-  this->CreateDeleteWidget->resize(vsize.width()+extraw,
-                                   this->Header->defaultSectionSize());
+  this->CreateDeleteWidget->resize(vsize.width() + extraw, this->Header->defaultSectionSize());
 
   this->updateWidgetPosition();
 
   this->verticalScrollBar()->setPageStep(vsize.height());
-  this->verticalScrollBar()->setRange(0, h-vsize.height());
+  this->verticalScrollBar()->setRange(0, h - vsize.height());
 }
 
 void pqAnimationWidget::updateWidgetPosition()
 {
   int s = this->verticalScrollBar()->value();
   this->View->move(0, -s);
-  if(this->CreateDeleteHeader->isVisible())
-    {
-    int xpos = this->CreateDeleteHeader->frameGeometry().right()+1;
-    int ypos = 2+(this->CreateDeleteHeader->count()-1)*
-               this->CreateDeleteHeader->defaultSectionSize() -
-               this->CreateDeleteHeader->offset();
+  if (this->CreateDeleteHeader->isVisible())
+  {
+    int xpos = this->CreateDeleteHeader->frameGeometry().right() + 1;
+    int ypos = 2 +
+      (this->CreateDeleteHeader->count() - 1) * this->CreateDeleteHeader->defaultSectionSize() -
+      this->CreateDeleteHeader->offset();
     this->CreateDeleteWidget->raise();
     this->CreateDeleteWidget->move(xpos, ypos);
-    }
+  }
   else
-    {
+  {
     this->CreateDeleteWidget->lower();
-    }
+  }
 }
 
 bool pqAnimationWidget::event(QEvent* e)
 {
-  if(e->type() == QEvent::FontChange)
-    {
+  if (e->type() == QEvent::FontChange)
+  {
     this->Model->setRowHeight(this->Header->defaultSectionSize());
-    }
-  if(e->type() == QEvent::Show)
-    {
+  }
+  if (e->type() == QEvent::Show)
+  {
     this->updateGeometries();
-    }
+  }
   return QAbstractScrollArea::event(e);
 }
 
@@ -302,35 +287,34 @@ void pqAnimationWidget::resizeEvent(QResizeEvent* e)
   this->updateScrollBars();
   QAbstractScrollArea::resizeEvent(e);
 }
-  
+
 void pqAnimationWidget::headerDeleteClicked(int which)
 {
-  if(which > 0)
+  if (which > 0)
+  {
+    if (which == this->CreateDeleteHeader->count() - 1)
     {
-    if(which == this->CreateDeleteHeader->count() - 1)
-      {
       emit this->createTrackClicked();
-      }
+    }
     else
+    {
+      pqAnimationTrack* t = this->Model->track(which - 1);
+      if (t && t->isDeletable())
       {
-      pqAnimationTrack* t = this->Model->track(which-1);
-      if(t && t->isDeletable())
-        {
         emit this->deleteTrackClicked(t);
-        }
       }
     }
+  }
 }
 
 void pqAnimationWidget::headerEnabledClicked(int which)
 {
   if (which > 0)
-    {
-    pqAnimationTrack* track = this->Model->track(which-1);
+  {
+    pqAnimationTrack* track = this->Model->track(which - 1);
     if (track)
-      {
+    {
       emit this->enableTrackClicked(track);
-      }
     }
+  }
 }
-

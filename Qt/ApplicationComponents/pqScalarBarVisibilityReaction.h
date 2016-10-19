@@ -39,43 +39,56 @@ class pqDataRepresentation;
 class pqTimer;
 class vtkSMProxy;
 
-/// @ingroup Reactions
-/// Reaction to toggle scalar bar visibility.
+/**
+* @ingroup Reactions
+* Reaction to toggle scalar bar visibility.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// if \c track_active_objects is false, then the reaction will not track
-  /// pqActiveObjects automatically.
-  pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects=true);
+  /**
+  * if \c track_active_objects is false, then the reaction will not track
+  * pqActiveObjects automatically.
+  */
+  pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects = true);
   virtual ~pqScalarBarVisibilityReaction();
 
-  /// Returns the representation currently being used by the reaction.
+  /**
+  * Returns the representation currently being used by the reaction.
+  */
   pqDataRepresentation* representation() const;
 
-  /// Returns the scalar bar for the current representation, if any.
+  /**
+  * Returns the scalar bar for the current representation, if any.
+  */
   vtkSMProxy* scalarBarProxy() const;
 
 public slots:
-  /// Set the active representation.
+  /**
+  * Set the active representation.
+  */
   void setRepresentation(pqDataRepresentation*);
 
-  /// set scalar bar visibility.
+  /**
+  * set scalar bar visibility.
+  */
   void setScalarBarVisibility(bool visible);
 
 protected slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   virtual void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    {
-    this->setScalarBarVisibility(
-      this->parentAction()->isChecked());
-    }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { this->setScalarBarVisibility(this->parentAction()->isChecked()); }
 
 private:
   Q_DISABLE_COPY(pqScalarBarVisibilityReaction)

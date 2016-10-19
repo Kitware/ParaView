@@ -58,37 +58,37 @@ class QPixmap;
 
 class VTKQVIS_EXPORT QvisScribbleOpacityBar : public QvisAbstractOpacityBar
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    QvisScribbleOpacityBar(QWidget *parent=NULL, const char *name=NULL);
-    ~QvisScribbleOpacityBar();
-    void   getRawOpacities(int,float*);
-    void   setRawOpacities(int,float*);
+  QvisScribbleOpacityBar(QWidget* parent = NULL, const char* name = NULL);
+  ~QvisScribbleOpacityBar();
+  void getRawOpacities(int, float*);
+  void setRawOpacities(int, float*);
 
 signals:
-    void opacitiesChanged();
+  void opacitiesChanged();
 
 public slots:
-    void makeTotallyZero();
-    void makeLinearRamp();
-    void makeInverseLinearRamp();
-    void makeTotallyOne();
-    void smoothCurve();
+  void makeTotallyZero();
+  void makeLinearRamp();
+  void makeInverseLinearRamp();
+  void makeTotallyOne();
+  void smoothCurve();
 
 protected:
-    void mouseMoveEvent(QMouseEvent*);
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
-    void setValue(float,float);
-    void setValues(int,int,int,int);
-    void paintToPixmap(int,int);
+  void mouseMoveEvent(QMouseEvent*);
+  void mousePressEvent(QMouseEvent*);
+  void mouseReleaseEvent(QMouseEvent*);
+  void setValue(float, float);
+  void setValues(int, int, int, int);
+  void paintToPixmap(int, int);
 
 private:
-    int nvalues;
-    float *values;
-    bool mousedown;
-    int lastx;
-    int lasty;
+  int nvalues;
+  float* values;
+  bool mousedown;
+  int lastx;
+  int lasty;
 };
 
 #endif

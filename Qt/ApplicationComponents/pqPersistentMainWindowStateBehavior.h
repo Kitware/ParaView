@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -37,16 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QMainWindow;
 
-/// @ingroup Behaviors
-/// pqPersistentMainWindowStateBehavior saves and restores the MainWindow state
-/// on shutdown and restart. Simply instantiate this behavior if you want your
-/// main window layout to be persistent. 
+/**
+* @ingroup Behaviors
+* pqPersistentMainWindowStateBehavior saves and restores the MainWindow state
+* on shutdown and restart. Simply instantiate this behavior if you want your
+* main window layout to be persistent.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPersistentMainWindowStateBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  /// Parent cannot be NULL.
+  /**
+  * Parent cannot be NULL.
+  */
   pqPersistentMainWindowStateBehavior(QMainWindow* parent);
   virtual ~pqPersistentMainWindowStateBehavior();
 
@@ -62,5 +67,3 @@ private:
 };
 
 #endif
-
-

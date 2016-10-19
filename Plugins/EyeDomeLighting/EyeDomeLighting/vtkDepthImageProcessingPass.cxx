@@ -59,7 +59,7 @@ Ph.D. thesis of Christian BOUCHENY.
 #include "vtkPixelBufferObject.h"
 #include "vtkPixelBufferObject.h"
 
-vtkCxxSetObjectMacro(vtkDepthImageProcessingPass,DelegatePass,vtkRenderPass);
+vtkCxxSetObjectMacro(vtkDepthImageProcessingPass, DelegatePass, vtkRenderPass);
 
 // ----------------------------------------------------------------------------
 vtkDepthImageProcessingPass::vtkDepthImageProcessingPass()
@@ -75,27 +75,27 @@ vtkDepthImageProcessingPass::vtkDepthImageProcessingPass()
 // ----------------------------------------------------------------------------
 vtkDepthImageProcessingPass::~vtkDepthImageProcessingPass()
 {
-  if(this->DelegatePass!=0)
-    {
+  if (this->DelegatePass != 0)
+  {
     this->DelegatePass->Delete();
-    this->DelegatePass=0;
-    }
+    this->DelegatePass = 0;
+  }
 }
 
 // ----------------------------------------------------------------------------
 void vtkDepthImageProcessingPass::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "DelegatePass:";
-  if(this->DelegatePass!=0)
-    {
-    this->DelegatePass->PrintSelf(os,indent);
-    }
+  if (this->DelegatePass != 0)
+  {
+    this->DelegatePass->PrintSelf(os, indent);
+  }
   else
-    {
-    os << "(none)" <<endl;
-    }
+  {
+    os << "(none)" << endl;
+  }
 }
 // ----------------------------------------------------------------------------
 // Description:
@@ -106,60 +106,54 @@ void vtkDepthImageProcessingPass::PrintSelf(ostream& os, vtkIndent indent)
 // \pre fbo_has_context: fbo->GetContext()!=0
 // \pre target_exists: target!=0
 // \pre target_has_context: target->GetContext()!=0
-void vtkDepthImageProcessingPass::RenderDelegate(const vtkRenderState *s,
-                                            int width,
-                                            int height,
-                                            int newWidth,
-                                            int newHeight,
-                                            vtkFrameBufferObject *fbo,
-                                            vtkTextureObject *colortarget,
-                                            vtkTextureObject *depthtarget)
+void vtkDepthImageProcessingPass::RenderDelegate(const vtkRenderState* s, int width, int height,
+  int newWidth, int newHeight, vtkFrameBufferObject* fbo, vtkTextureObject* colortarget,
+  vtkTextureObject* depthtarget)
 {
-  assert("pre: s_exists" && s!=0);
-  assert("pre: fbo_exists" && fbo!=0);
-  assert("pre: fbo_has_context" && fbo->GetContext()!=0);
-  assert("pre: colortarget_exists" && colortarget!=0);
-  assert("pre: colortarget_has_context" && colortarget->GetContext()!=0);
-  assert("pre: depthtarget_exists" && depthtarget!=0);
-  assert("pre: depthtarget_has_context" && depthtarget->GetContext()!=0);
+  assert("pre: s_exists" && s != 0);
+  assert("pre: fbo_exists" && fbo != 0);
+  assert("pre: fbo_has_context" && fbo->GetContext() != 0);
+  assert("pre: colortarget_exists" && colortarget != 0);
+  assert("pre: colortarget_has_context" && colortarget->GetContext() != 0);
+  assert("pre: depthtarget_exists" && depthtarget != 0);
+  assert("pre: depthtarget_has_context" && depthtarget->GetContext() != 0);
 
-  vtkRenderer *r=s->GetRenderer();
+  vtkRenderer* r = s->GetRenderer();
   vtkRenderState s2(r);
-  s2.SetPropArrayAndCount(s->GetPropArray(),s->GetPropArrayCount());
+  s2.SetPropArrayAndCount(s->GetPropArray(), s->GetPropArrayCount());
 
   // Adapt camera to new window size
-  vtkCamera *savedCamera=r->GetActiveCamera();
+  vtkCamera* savedCamera = r->GetActiveCamera();
   savedCamera->Register(this);
-  vtkCamera *newCamera=vtkCamera::New();
+  vtkCamera* newCamera = vtkCamera::New();
   newCamera->DeepCopy(savedCamera);
 
   r->SetActiveCamera(newCamera);
 
-  if(newCamera->GetParallelProjection())
-    {
+  if (newCamera->GetParallelProjection())
+  {
     newCamera->SetParallelScale(
-      newCamera->GetParallelScale()*newHeight/static_cast<double>(height));
-    }
+      newCamera->GetParallelScale() * newHeight / static_cast<double>(height));
+  }
   else
-    {
+  {
     double large;
     double small;
-    if(newCamera->GetUseHorizontalViewAngle())
-      {
-      large=newWidth;
-      small=width;
-      }
+    if (newCamera->GetUseHorizontalViewAngle())
+    {
+      large = newWidth;
+      small = width;
+    }
     else
-      {
-      large=newHeight;
-      small=height;
-
-      }
-    double angle=vtkMath::RadiansFromDegrees(newCamera->GetViewAngle());
-    angle=atan(tan(angle)*large/static_cast<double>(small));
+    {
+      large = newHeight;
+      small = height;
+    }
+    double angle = vtkMath::RadiansFromDegrees(newCamera->GetViewAngle());
+    angle = atan(tan(angle) * large / static_cast<double>(small));
 
     newCamera->SetViewAngle(vtkMath::DegreesFromRadians(angle));
-    }
+  }
 
   s2.SetFrameBuffer(fbo);
 
@@ -170,14 +164,14 @@ void vtkDepthImageProcessingPass::RenderDelegate(const vtkRenderState *s,
   //        --> The point is that doing it here prevents from control on
   //            Texture Format!!!
   //
-  //if(colortarget->GetWidth()!=static_cast<unsigned int>(newWidth) ||
+  // if(colortarget->GetWidth()!=static_cast<unsigned int>(newWidth) ||
   //     colortarget->GetHeight()!=static_cast<unsigned int>(newHeight))
   //    {
   //    colortarget->Create2D(newWidth,newHeight,4,VTK_UNSIGNED_CHAR,false);
   //    }
 
   fbo->SetNumberOfRenderTargets(1);
-  fbo->SetColorBuffer(0,colortarget);
+  fbo->SetColorBuffer(0, colortarget);
 
   // because the same FBO can be used in another pass but with several color
   // buffers, force this pass to use 1, to avoid side effects from the
@@ -185,13 +179,12 @@ void vtkDepthImageProcessingPass::RenderDelegate(const vtkRenderState *s,
   fbo->SetActiveBuffer(0);
 
   fbo->SetDepthBuffer(depthtarget);
-  fbo->StartNonOrtho(newWidth,newHeight,false);
+  fbo->StartNonOrtho(newWidth, newHeight, false);
 
   // 2. Delegate render in FBO
-  //glEnable(GL_DEPTH_TEST);
+  // glEnable(GL_DEPTH_TEST);
   this->DelegatePass->Render(&s2);
-  this->NumberOfRenderedProps+=
-    this->DelegatePass->GetNumberOfRenderedProps();
+  this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
 
   newCamera->Delete();
   r->SetActiveCamera(savedCamera);
@@ -205,22 +198,21 @@ void vtkDepthImageProcessingPass::RenderDelegate(const vtkRenderState *s,
 //
 void vtkDepthImageProcessingPass::ReadWindowSize(const vtkRenderState* s)
 {
-    assert("pre: s_exists" && s!=0);
+  assert("pre: s_exists" && s != 0);
 
-    vtkFrameBufferObject *fbo=vtkFrameBufferObject::SafeDownCast
-      (s->GetFrameBuffer());
-    vtkRenderer *r = s->GetRenderer();
-    if(fbo==0)
-    {
-      r->GetTiledSize(&this->Width,&this->Height);
-    }
-    else
-    {
-      int size[2];
-      fbo->GetLastSize(size);
-      this->Width=size[0];
-      this->Height=size[1];
-    }
+  vtkFrameBufferObject* fbo = vtkFrameBufferObject::SafeDownCast(s->GetFrameBuffer());
+  vtkRenderer* r = s->GetRenderer();
+  if (fbo == 0)
+  {
+    r->GetTiledSize(&this->Width, &this->Height);
+  }
+  else
+  {
+    int size[2];
+    fbo->GetLastSize(size);
+    this->Width = size[0];
+    this->Height = size[1];
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -228,40 +220,40 @@ void vtkDepthImageProcessingPass::ReadWindowSize(const vtkRenderState* s)
 // Test support for use of FBO ,Texture objects, GLSL shaders
 // \pre s_exists: s!=0
 //
-bool vtkDepthImageProcessingPass::TestHardwareSupport(const vtkRenderState *s)
+bool vtkDepthImageProcessingPass::TestHardwareSupport(const vtkRenderState* s)
 {
-    assert("pre: s_exists" && s!=0);
+  assert("pre: s_exists" && s != 0);
 
-    vtkRenderer *r = s->GetRenderer();
+  vtkRenderer* r = s->GetRenderer();
 
-    bool supported = vtkFrameBufferObject::IsSupported(r->GetRenderWindow());
-    if(!supported)
+  bool supported = vtkFrameBufferObject::IsSupported(r->GetRenderWindow());
+  if (!supported)
+  {
+    vtkErrorMacro(<< "FBOs are not supported by the context. "
+                  << "Cannot shade the image.");
+  }
+  if (supported)
+  {
+    supported = vtkTextureObject::IsSupported(r->GetRenderWindow());
+    if (!supported)
     {
-      vtkErrorMacro(<<"FBOs are not supported by the context. "
-                    <<"Cannot shade the image.");
+      vtkErrorMacro(<< "Texture Objects are not supported by the context. "
+                    << "Cannot shade the image.");
     }
-    if(supported)
-    {
-      supported=vtkTextureObject::IsSupported(r->GetRenderWindow());
-      if(!supported)
-      {
-        vtkErrorMacro(<<"Texture Objects are not supported by the context. "
-                      <<"Cannot shade the image.");
-      }
-    }
+  }
 
-    if(supported)
+  if (supported)
+  {
+    supported =
+      vtkShaderProgram2::IsSupported(static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow()));
+    if (!supported)
     {
-      supported = vtkShaderProgram2::IsSupported(
-                  static_cast<vtkOpenGLRenderWindow *>(r->GetRenderWindow()));
-      if(!supported)
-      {
-        vtkErrorMacro(<<"GLSL is not supported by the context. "
-                      <<"Cannot shade the image.");
-      }
+      vtkErrorMacro(<< "GLSL is not supported by the context. "
+                    << "Cannot shade the image.");
     }
+  }
 
-    return supported;
+  return supported;
 }
 
 // ----------------------------------------------------------------------------
@@ -269,11 +261,11 @@ bool vtkDepthImageProcessingPass::TestHardwareSupport(const vtkRenderState *s)
 // Release graphics resources and ask components to release their own
 // resources.
 // \pre w_exists: w!=0
-void vtkDepthImageProcessingPass::ReleaseGraphicsResources(vtkWindow *w)
+void vtkDepthImageProcessingPass::ReleaseGraphicsResources(vtkWindow* w)
 {
-  assert("pre: w_exists" && w!=0);
-  if(this->DelegatePass!=0)
-    {
+  assert("pre: w_exists" && w != 0);
+  if (this->DelegatePass != 0)
+  {
     this->DelegatePass->ReleaseGraphicsResources(w);
-    }
+  }
 }

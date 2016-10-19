@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,24 +37,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 class QActionGroup;
 
-/// interface class for plugins that create QActionGroups
-/// for adding actions to menus and toolbars
+/**
+* interface class for plugins that create QActionGroups
+* for adding actions to menus and toolbars
+*/
 class PQCOMPONENTS_EXPORT pqActionGroupInterface
 {
 public:
   pqActionGroupInterface();
   virtual ~pqActionGroupInterface();
 
-  /// the identifier for this action group
-  ///  return "ToolBar/MyTools to put them in a toolbar called MyTools
-  ///  return "MenuBar/MyMenu to put the actions under MyMenu
+  /**
+  * the identifier for this action group
+  *  return "ToolBar/MyTools to put them in a toolbar called MyTools
+  *  return "MenuBar/MyMenu to put the actions under MyMenu
+  */
   virtual QString groupName() = 0;
 
-  /// the instance of the QActionGroup that defines the actions
+  /**
+  * the instance of the QActionGroup that defines the actions
+  */
   virtual QActionGroup* actionGroup() = 0;
 };
 
 Q_DECLARE_INTERFACE(pqActionGroupInterface, "com.kitware/paraview/actiongroup")
 
 #endif
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -55,13 +55,13 @@ void pqPythonShellReaction::showPythonShell()
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
-    {
+  {
     pqPythonDialog* dialog = manager->pythonShellDialog();
     dialog->show();
     dialog->raise();
     dialog->activateWindow();
     return;
-    }
+  }
 #endif
 
   qCritical("Python support not enabled.");
@@ -73,13 +73,12 @@ void pqPythonShellReaction::executeScript(const char* filename)
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
-    {
+  {
     manager->executeScript(filename);
     return;
-    }
+  }
 #endif
 
   (void)filename;
   qCritical("Python support not enabled.");
 }
-

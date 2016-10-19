@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,9 +45,11 @@ class vtkCommand;
 class vtkEventQtSlotConnect;
 #include "pqComponentsModule.h"
 
-/// adaptor to which combines cell & point arrays into one selection
-/// this adaptor also takes care of the domain, so there's no need to
-/// use the pqComboBoxDomain
+/**
+* adaptor to which combines cell & point arrays into one selection
+* this adaptor also takes care of the domain, so there's no need to
+* use the pqComboBoxDomain
+*/
 class PQCOMPONENTS_EXPORT pqFieldSelectionAdaptor : public QObject
 {
   Q_OBJECT
@@ -56,26 +58,38 @@ class PQCOMPONENTS_EXPORT pqFieldSelectionAdaptor : public QObject
   Q_PROPERTY(QStringList selection READ selection WRITE setSelection)
 
 public:
-  /// constructor requires a QComboBox, 
+  /**
+  * constructor requires a QComboBox,
+  */
   pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* prop);
   ~pqFieldSelectionAdaptor();
-  
-  /// get the attribute mode
+
+  /**
+  * get the attribute mode
+  */
   QString attributeMode() const;
-  /// get the scalar
+  /**
+  * get the scalar
+  */
   QString scalar() const;
 
-  void setSelection(const QStringList &selection);
+  void setSelection(const QStringList& selection);
   QStringList selection() const;
 
 signals:
-  /// signal the attributeMode and/or scalar changed
+  /**
+  * signal the attributeMode and/or scalar changed
+  */
   void selectionChanged();
 
 public slots:
-  /// set the attribute mode
+  /**
+  * set the attribute mode
+  */
   void setAttributeMode(const QString&);
-  /// set the scalar mode
+  /**
+  * set the scalar mode
+  */
   void setScalar(const QString&);
 
   // set the attribute mode and scalar
@@ -84,12 +98,11 @@ public slots:
 protected slots:
   void updateGUI();
   void indexChanged(int index);
-  
+
   void domainChanged();
 private slots:
   void internalDomainChanged();
-  void blockDomainModified(vtkObject* caller, unsigned long, 
-                           void*, void*, vtkCommand*);
+  void blockDomainModified(vtkObject* caller, unsigned long, void*, void*, vtkCommand*);
 
 protected:
   QStringList Selection;
@@ -102,4 +115,3 @@ protected:
 };
 
 #endif // pq_FieldSelectionAdaptor_h
-

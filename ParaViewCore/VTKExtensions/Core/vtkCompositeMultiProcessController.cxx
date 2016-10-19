@@ -36,115 +36,116 @@ public:
 #if GENERATE_DEBUG_LOG
   ofstream LogFile;
 #endif
-struct RMICallbackInfo
-{
-  RMICallbackInfo(unsigned long observerTagID, vtkRMIFunctionType function, void* arg, int tag)
+  struct RMICallbackInfo
+  {
+    RMICallbackInfo(unsigned long observerTagID, vtkRMIFunctionType function, void* arg, int tag)
     {
-    this->RMIObserverID = observerTagID;
-    this->Function = function;
-    this->Arg = arg;
-    this->Tag = tag;
+      this->RMIObserverID = observerTagID;
+      this->Function = function;
+      this->Arg = arg;
+      this->Tag = tag;
     }
 
-  vtkRMIFunctionType Function;
-  void* Arg;
-  int Tag;
-  unsigned long RMIObserverID;
-};
+    vtkRMIFunctionType Function;
+    void* Arg;
+    int Tag;
+    unsigned long RMIObserverID;
+  };
 
-struct Controller
-{
-  Controller(int id, vtkMultiProcessController* controller)
+  struct Controller
+  {
+    Controller(int id, vtkMultiProcessController* controller)
     {
-    this->Id = id;
-    this->MultiProcessController = controller;
-    this->ActivateObserverId = 0;
-    this->IsMaster = false;
+      this->Id = id;
+      this->MultiProcessController = controller;
+      this->ActivateObserverId = 0;
+      this->IsMaster = false;
     }
 
-  void AddRMICallbacks(std::vector<RMICallbackInfo>& callbacks)
+    void AddRMICallbacks(std::vector<RMICallbackInfo>& callbacks)
     {
-    std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
-    while(iter != callbacks.end())
+      std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+      while (iter != callbacks.end())
       {
-      this->AddRMICallback(iter->RMIObserverID, iter->Function, iter->Arg , iter->Tag);
-      iter++;
+        this->AddRMICallback(iter->RMIObserverID, iter->Function, iter->Arg, iter->Tag);
+        iter++;
       }
     }
 
-  void DetachCallBacks(std::vector<RMICallbackInfo>& callbacks)
+    void DetachCallBacks(std::vector<RMICallbackInfo>& callbacks)
     {
-    // Remove activate observer
-    this->MultiProcessController->RemoveObserver(this->ActivateObserverId);
-    this->ActivateObserverId = 0;
+      // Remove activate observer
+      this->MultiProcessController->RemoveObserver(this->ActivateObserverId);
+      this->ActivateObserverId = 0;
 
-    // Remove all registered RMICallbacks
-    std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
-    while(iter != callbacks.end())
+      // Remove all registered RMICallbacks
+      std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+      while (iter != callbacks.end())
       {
-      unsigned long rmiObserverID = iter->RMIObserverID;
-      std::vector<unsigned long>::iterator observerIdIter =
+        unsigned long rmiObserverID = iter->RMIObserverID;
+        std::vector<unsigned long>::iterator observerIdIter =
           this->RMICallbackIdMapping[rmiObserverID].begin();
-      while(observerIdIter != this->RMICallbackIdMapping[rmiObserverID].end())
+        while (observerIdIter != this->RMICallbackIdMapping[rmiObserverID].end())
         {
-        this->RemoveRMICallback(*observerIdIter);
-        observerIdIter++;
+          this->RemoveRMICallback(*observerIdIter);
+          observerIdIter++;
         }
-      iter++;
+        iter++;
       }
     }
 
-  void AddRMICallback(unsigned long observerTagId, vtkRMIFunctionType function, void *arg, int tag)
+    void AddRMICallback(
+      unsigned long observerTagId, vtkRMIFunctionType function, void* arg, int tag)
     {
-    this->RMICallbackIdMapping[observerTagId].push_back(
+      this->RMICallbackIdMapping[observerTagId].push_back(
         this->MultiProcessController->AddRMICallback(function, arg, tag));
     }
 
-  bool RemoveRMICallback(unsigned long observerTagId)
+    bool RemoveRMICallback(unsigned long observerTagId)
     {
-    int size = static_cast<int>(this->RMICallbackIdMapping[observerTagId].size());
-    bool result = false;
-    for(int i=0;i<size;i++)
+      int size = static_cast<int>(this->RMICallbackIdMapping[observerTagId].size());
+      bool result = false;
+      for (int i = 0; i < size; i++)
       {
-      result = this->MultiProcessController->RemoveRMICallback(
-          this->RMICallbackIdMapping[observerTagId][i]) || result;
-
+        result = this->MultiProcessController->RemoveRMICallback(
+                   this->RMICallbackIdMapping[observerTagId][i]) ||
+          result;
       }
-    return result;
+      return result;
     }
 
-  unsigned long ActivateObserverId;
-  int Id;
-  bool IsMaster;
-  vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
-  std::map<unsigned long, std::vector<unsigned long> > RMICallbackIdMapping;
-};
+    unsigned long ActivateObserverId;
+    int Id;
+    bool IsMaster;
+    vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
+    std::map<unsigned long, std::vector<unsigned long> > RMICallbackIdMapping;
+  };
 
 public:
   vtkCompositeInternals(vtkCompositeMultiProcessController* owner)
-    {
+  {
     this->ControllerID = 1;
     this->RMICallbackIdCounter = 1;
     this->Owner = owner;
     this->NeedToInitializeControllers = false;
-    }
+  }
   //-----------------------------------------------------------------
   void RegisterController(vtkMultiProcessController* ctrl)
-    {
+  {
     assert(ctrl->IsA("vtkSocketController"));
-    if(this->NeedToInitializeControllers)
-      {
+    if (this->NeedToInitializeControllers)
+    {
       // CAUTION: This initialization is only correct for vtkSocketController
-      ctrl->Initialize(0,0);
-      }
+      ctrl->Initialize(0, 0);
+    }
     this->Controllers.push_back(Controller(this->ControllerID++, ctrl));
     this->ActiveController = &this->Controllers.back();
 #if GENERATE_DEBUG_LOG
     this->LogFile << endl << "---- Making Active: " << ctrl << endl;
 #endif
 
-    this->ActiveController->ActivateObserverId = ctrl->AddObserver(
-        vtkCommand::StartEvent, this, &vtkCompositeInternals::ActivateController);
+    this->ActiveController->ActivateObserverId =
+      ctrl->AddObserver(vtkCommand::StartEvent, this, &vtkCompositeInternals::ActivateController);
 
     // Attach RMICallbacks
     this->ActiveController->AddRMICallbacks(this->RMICallbacks);
@@ -152,314 +153,300 @@ public:
     this->UpdateActiveCommunicator();
 
     this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
-    }
+  }
   //-----------------------------------------------------------------
   void UnRegisterController(vtkMultiProcessController* ctrl)
-    {
+  {
     std::vector<Controller>::iterator iter, iterToDel;
     bool found = false;
-    for(iter = this->Controllers.begin(); iter != this->Controllers.end(); iter++)
+    for (iter = this->Controllers.begin(); iter != this->Controllers.end(); iter++)
+    {
+      if (iter->MultiProcessController.GetPointer() == ctrl)
       {
-      if(iter->MultiProcessController.GetPointer() == ctrl)
+        if (this->GetActiveController() == ctrl)
         {
-        if(this->GetActiveController() == ctrl)
-          {
           this->ActiveController = NULL;
           this->UpdateActiveCommunicator();
-          }
+        }
         iterToDel = iter;
         found = true;
         break;
-        }
       }
-    if(found)
-      {
+    }
+    if (found)
+    {
       iterToDel->DetachCallBacks(this->RMICallbacks);
       this->Controllers.erase(iterToDel);
-      }
     }
+  }
   //-----------------------------------------------------------------
   Controller* FindController(vtkMultiProcessController* ctrl)
-    {
+  {
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
+    while (iter != this->Controllers.end())
+    {
+      if (iter->MultiProcessController.GetPointer() == ctrl)
       {
-      if(iter->MultiProcessController.GetPointer() == ctrl)
-        {
         return &(*iter);
-        }
-      iter++;
       }
-    return NULL;
+      iter++;
     }
+    return NULL;
+  }
   //-----------------------------------------------------------------
   vtkMultiProcessController* GetActiveController()
+  {
+    if (this->ActiveController)
     {
-    if(this->ActiveController)
-      {
       return this->ActiveController->MultiProcessController;
-      }
-    return NULL;
     }
+    return NULL;
+  }
   //-----------------------------------------------------------------
   int GetActiveControllerID()
+  {
+    if (this->ActiveController)
     {
-    if(this->ActiveController)
-      {
       return this->ActiveController->Id;
-      }
-    return 0;
     }
+    return 0;
+  }
 
   //-----------------------------------------------------------------
-  void ActivateController(vtkObject* src,
-    unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+  void ActivateController(vtkObject* src, unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+  {
+    if (this->GetActiveController() != src)
     {
-    if(this->GetActiveController() != src)
-      {
 #if GENERATE_DEBUG_LOG
       this->LogFile << endl << "---- Making Active: " << src << endl;
 #endif
-      this->ActiveController =
-          this->FindController(vtkMultiProcessController::SafeDownCast(src));
+      this->ActiveController = this->FindController(vtkMultiProcessController::SafeDownCast(src));
       this->UpdateActiveCommunicator();
-      }
     }
+  }
   //-----------------------------------------------------------------
   void InitializeControllers()
-    {
+  {
     this->NeedToInitializeControllers = true;
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
-      {
+    while (iter != this->Controllers.end())
+    {
       // CAUTION: This initialization only correct for vtkSocketController
-      iter->MultiProcessController->Initialize(0,0);
+      iter->MultiProcessController->Initialize(0, 0);
       iter++;
-      }
     }
+  }
   //-----------------------------------------------------------------
   unsigned long AddRMICallback(vtkRMIFunctionType function, void* arg, int tag)
-    {
+  {
     // Save call back for new vtkMultiProcessController
     this->RMICallbackIdCounter++;
     this->RMICallbacks.push_back(RMICallbackInfo(this->RMICallbackIdCounter, function, arg, tag));
 
     // Register it to the previously registered controllers
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
-      {
+    while (iter != this->Controllers.end())
+    {
       iter->AddRMICallback(this->RMICallbackIdCounter, function, arg, tag);
       iter++;
-      }
-    return this->RMICallbackIdCounter;
     }
+    return this->RMICallbackIdCounter;
+  }
   //-----------------------------------------------------------------
   void RemoveAllRMICallbacks(int tag)
-    {
+  {
     // Clear registered RMICallbacks
     std::vector<int> callbackToRemove;
     std::vector<RMICallbackInfo> callbackToKeep;
     std::vector<RMICallbackInfo>::iterator iter = this->RMICallbacks.begin();
-    while(iter != this->RMICallbacks.end())
+    while (iter != this->RMICallbacks.end())
+    {
+      if (tag == iter->Tag)
       {
-      if(tag == iter->Tag)
-        {
         callbackToRemove.push_back(tag);
-        }
-      else
-        {
-        callbackToKeep.push_back(*iter);
-        }
-      iter++;
       }
+      else
+      {
+        callbackToKeep.push_back(*iter);
+      }
+      iter++;
+    }
     this->RMICallbacks = callbackToKeep;
 
     // Remove RMICallbacks on controllers
     std::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
     std::vector<int>::iterator tagIter;
-    while(ctrlIter != this->Controllers.end())
-      {
+    while (ctrlIter != this->Controllers.end())
+    {
       tagIter = callbackToRemove.begin();
-      while(tagIter != callbackToRemove.end())
-        {
+      while (tagIter != callbackToRemove.end())
+      {
         ctrlIter->MultiProcessController->RemoveAllRMICallbacks(*tagIter);
         tagIter++;
-        }
-      ctrlIter++;
       }
+      ctrlIter++;
     }
+  }
 
   //-----------------------------------------------------------------
   bool RemoveRMICallback(unsigned long observerTagId)
-    {
+  {
     // Remove RMICallback on controllers
     bool result = false;
     std::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
-    while(ctrlIter != this->Controllers.end())
-      {
-      result = ctrlIter->RemoveRMICallback(observerTagId)
-               || result;
+    while (ctrlIter != this->Controllers.end())
+    {
+      result = ctrlIter->RemoveRMICallback(observerTagId) || result;
       ctrlIter++;
-      }
-    return result;
     }
+    return result;
+  }
 
   //-----------------------------------------------------------------
-  int GetNumberOfRegisteredControllers()
-    {
-    return static_cast<int>(this->Controllers.size());
-    }
+  int GetNumberOfRegisteredControllers() { return static_cast<int>(this->Controllers.size()); }
   //-----------------------------------------------------------------
   vtkCommunicator* GetActiveCommunicator()
+  {
+    if (this->GetActiveController())
     {
-    if(this->GetActiveController())
-      {
       return this->GetActiveController()->GetCommunicator();
-      }
-    return NULL;
     }
+    return NULL;
+  }
   //-----------------------------------------------------------------
   void UpdateActiveCommunicator()
-    {
+  {
     this->Owner->Communicator = this->GetActiveCommunicator();
     this->Owner->RMICommunicator = this->GetActiveCommunicator();
-    }
+  }
   //-----------------------------------------------------------------
   void CleanNonConnectedControllers()
-    {
+  {
     std::vector<vtkMultiProcessController*> controllersToDelete;
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
+    while (iter != this->Controllers.end())
+    {
+      vtkSocketCommunicator* comm =
+        vtkSocketCommunicator::SafeDownCast(iter->MultiProcessController->GetCommunicator());
+      if (!comm->GetIsConnected())
       {
-      vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-          iter->MultiProcessController->GetCommunicator());
-      if(!comm->GetIsConnected())
-        {
         controllersToDelete.push_back(iter->MultiProcessController.GetPointer());
-        }
-      iter++;
       }
+      iter++;
+    }
 
     // Clean up the invalid controllers
-    std::vector<vtkMultiProcessController*>::iterator iter2 =
-        controllersToDelete.begin();
-    while(iter2 != controllersToDelete.end())
-      {
+    std::vector<vtkMultiProcessController*>::iterator iter2 = controllersToDelete.begin();
+    while (iter2 != controllersToDelete.end())
+    {
       this->UnRegisterController(*iter2);
       iter2++;
-      }
-
-    if(controllersToDelete.size() > 0)
-      {
-      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
-      }
     }
-  //-----------------------------------------------------------------
-  void TriggerRMI2All(int remoteProcessId, void* data, int argLength,
-                      int tag, bool sendToActiveController)
+
+    if (controllersToDelete.size() > 0)
     {
+      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
+    }
+  }
+  //-----------------------------------------------------------------
+  void TriggerRMI2All(
+    int remoteProcessId, void* data, int argLength, int tag, bool sendToActiveController)
+  {
     std::vector<vtkMultiProcessController*> controllersToNotify;
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
+    while (iter != this->Controllers.end())
+    {
+      if (sendToActiveController ||
+        iter->MultiProcessController.GetPointer() !=
+          this->ActiveController->MultiProcessController.GetPointer())
       {
-      if( sendToActiveController ||
-          iter->MultiProcessController.GetPointer() !=
-          this->ActiveController->MultiProcessController.GetPointer() )
+        vtkSocketCommunicator* comm =
+          vtkSocketCommunicator::SafeDownCast(iter->MultiProcessController->GetCommunicator());
+        if (comm->GetIsConnected())
         {
-        vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-            iter->MultiProcessController->GetCommunicator());
-        if(comm->GetIsConnected())
-          {
           controllersToNotify.push_back(iter->MultiProcessController.GetPointer());
-          }
         }
-      iter++;
       }
+      iter++;
+    }
 
     // Do the notification now...
-    std::vector<vtkMultiProcessController*>::iterator iter2 =
-        controllersToNotify.begin();
-    while(iter2 != controllersToNotify.end())
-      {
+    std::vector<vtkMultiProcessController*>::iterator iter2 = controllersToNotify.begin();
+    while (iter2 != controllersToNotify.end())
+    {
       vtkMultiProcessController* ctrl = (*iter2);
-      //cout << "Notify: " << ctrl->GetCommunicator() << endl;
+      // cout << "Notify: " << ctrl->GetCommunicator() << endl;
       ctrl->TriggerRMI(remoteProcessId, data, argLength, tag);
       iter2++;
-      }
     }
+  }
   //-----------------------------------------------------------------
-  int GetNumberOfControllers()
-    {
-    return static_cast<int>(this->Controllers.size());
-    }
+  int GetNumberOfControllers() { return static_cast<int>(this->Controllers.size()); }
   //-----------------------------------------------------------------
-  int GetControllerId(int idx)
-    {
-    return this->Controllers.at(idx).Id;
-    }
+  int GetControllerId(int idx) { return this->Controllers.at(idx).Id; }
 
   //-----------------------------------------------------------------
   void SetMasterController(int controllerId)
-    {
+  {
     bool found = false;
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
-      {
+    while (iter != this->Controllers.end())
+    {
       iter->IsMaster = (iter->Id == controllerId);
       found = found || iter->IsMaster;
       iter++;
-      }
+    }
 
     // If not found try to elect a new master
-    if(!found)
-      {
+    if (!found)
+    {
       int newMaster = this->ElectNewMaster();
-      if(newMaster != -1)
-        {
-        this->SetMasterController(newMaster);
-        }
-      }
-
-    if(found)
+      if (newMaster != -1)
       {
-      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
+        this->SetMasterController(newMaster);
       }
     }
+
+    if (found)
+    {
+      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
+    }
+  }
   //-----------------------------------------------------------------
   int GetMasterController()
-    {
+  {
     std::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
+    while (iter != this->Controllers.end())
+    {
+      if (iter->IsMaster)
       {
-      if(iter->IsMaster)
-        {
         return iter->Id;
-        }
+      }
       iter++;
-      }
-    int electedMaster = this->ElectNewMaster();
-    if(electedMaster != -1)
-      {
-      this->SetMasterController(electedMaster);
-      }
-    return electedMaster;
     }
+    int electedMaster = this->ElectNewMaster();
+    if (electedMaster != -1)
+    {
+      this->SetMasterController(electedMaster);
+    }
+    return electedMaster;
+  }
   //-----------------------------------------------------------------
   int ElectNewMaster()
+  {
+    if (this->ActiveController)
     {
-    if(this->ActiveController)
-      {
       return this->ActiveController->Id;
-      }
-    else if(this->Controllers.begin() != this->Controllers.end())
-      {
-      return this->Controllers.begin()->Id;
-      }
-    else
-      {
-      return -1;
-      }
     }
+    else if (this->Controllers.begin() != this->Controllers.end())
+    {
+      return this->Controllers.begin()->Id;
+    }
+    else
+    {
+      return -1;
+    }
+  }
 
 private:
   int ControllerID;
@@ -484,7 +471,8 @@ vtkCompositeMultiProcessController::vtkCompositeMultiProcessController()
 //----------------------------------------------------------------------------
 vtkCompositeMultiProcessController::~vtkCompositeMultiProcessController()
 {
-  delete this->Internal; this->Internal = NULL;
+  delete this->Internal;
+  this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -506,8 +494,8 @@ void vtkCompositeMultiProcessController::RegisterController(vtkMultiProcessContr
   assert(controller->IsA("vtkSocketController"));
   this->Internal->RegisterController(controller);
 #if GENERATE_DEBUG_LOG
-  vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator())->SetLogStream(
-    &this->Internal->LogFile);
+  vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator())
+    ->SetLogStream(&this->Internal->LogFile);
 #endif
 }
 //----------------------------------------------------------------------------
@@ -520,7 +508,7 @@ void vtkCompositeMultiProcessController::UnRegisterController(vtkMultiProcessCon
 //                       RMI Callback management API
 //----------------------------------------------------------------------------
 unsigned long vtkCompositeMultiProcessController::AddRMICallback(
-    vtkRMIFunctionType func, void* localArg, int tag)
+  vtkRMIFunctionType func, void* localArg, int tag)
 {
   return this->Internal->AddRMICallback(func, localArg, tag);
 }
@@ -555,11 +543,8 @@ vtkCommunicator* vtkCompositeMultiProcessController::GetCommunicator()
   return this->Internal->GetActiveCommunicator();
 }
 //----------------------------------------------------------------------------
-void vtkCompositeMultiProcessController::TriggerRMI2All(int vtkNotUsed(remote),
-                                                               void* data,
-                                                               int length,
-                                                               int tag,
-                                                               bool sendToActiveToo)
+void vtkCompositeMultiProcessController::TriggerRMI2All(
+  int vtkNotUsed(remote), void* data, int length, int tag, bool sendToActiveToo)
 {
   this->Internal->CleanNonConnectedControllers();
   this->Internal->TriggerRMI2All(1, data, length, tag, sendToActiveToo);

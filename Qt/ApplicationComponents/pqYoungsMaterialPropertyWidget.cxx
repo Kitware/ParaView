@@ -44,38 +44,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  class pqYoungsMaterialPropertyLinksConnection : public pqPropertyLinksConnection
-  {
+class pqYoungsMaterialPropertyLinksConnection : public pqPropertyLinksConnection
+{
   typedef pqPropertyLinksConnection Superclass;
+
 public:
-  pqYoungsMaterialPropertyLinksConnection(
-    QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
-    bool use_unchecked_modified_event,
-    QObject* parentObject=0)
-    : Superclass(qobject, qproperty, qsignal,
-      smproxy, smproperty, smindex,
-      use_unchecked_modified_event, parentObject)
-    {
-    }
-  virtual ~pqYoungsMaterialPropertyLinksConnection()
-    {
-    }
+  pqYoungsMaterialPropertyLinksConnection(QObject* qobject, const char* qproperty,
+    const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+    bool use_unchecked_modified_event, QObject* parentObject = 0)
+    : Superclass(qobject, qproperty, qsignal, smproxy, smproperty, smindex,
+        use_unchecked_modified_event, parentObject)
+  {
+  }
+  virtual ~pqYoungsMaterialPropertyLinksConnection() {}
 
 protected:
   virtual QVariant currentServerManagerValue(bool use_unchecked) const
-    {
+  {
     return pqSMAdaptor::getMultipleElementProperty(
-      this->propertySM(), (use_unchecked? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
-    }
+      this->propertySM(), (use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
+  }
   virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      this->propertySM(), value.value<QList<QVariant> >(),
-      (use_unchecked? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
-    }
+  {
+    pqSMAdaptor::setMultipleElementProperty(this->propertySM(), value.value<QList<QVariant> >(),
+      (use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
+  }
   Q_DISABLE_COPY(pqYoungsMaterialPropertyLinksConnection)
-  };
+};
 }
 
 class pqYoungsMaterialPropertyWidget::pqInternals
@@ -90,13 +85,13 @@ public:
 //-----------------------------------------------------------------------------
 pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
-  : Superclass(smgroup->GetProperty("VolumeFractionArrays"), smproxy, parentObject),
-  Internals(new pqYoungsMaterialPropertyWidget::pqInternals())
+  : Superclass(smgroup->GetProperty("VolumeFractionArrays"), smproxy, parentObject)
+  , Internals(new pqYoungsMaterialPropertyWidget::pqInternals())
 {
   pqInternals& internals = (*this->Internals);
 
-  QWidget *frame = new QWidget(this);
-  Ui::YoungsMaterialPropertyWidget &ui = internals.Ui;
+  QWidget* frame = new QWidget(this);
+  Ui::YoungsMaterialPropertyWidget& ui = internals.Ui;
   ui.setupUi(frame);
   this->layout()->addWidget(frame);
 
@@ -110,32 +105,27 @@ pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
   internals.VolumeFractionArrays = volumeFractionArraysWidget;
 
   QObject::connect(volumeFractionArraysWidget,
-    SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-    this, SLOT(updateComboBoxes()));
+    SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateComboBoxes()));
 
-  pqComboBoxDomain* domain1 = new pqComboBoxDomain(
-    ui.OrderingArrays, smgroup->GetProperty("OrderingArrays"), "array_list");
+  pqComboBoxDomain* domain1 =
+    new pqComboBoxDomain(ui.OrderingArrays, smgroup->GetProperty("OrderingArrays"), "array_list");
   domain1->setObjectName("OrderingArraysDomain");
   domain1->addString("None");
 
-  pqComboBoxDomain* domain2 = new pqComboBoxDomain(
-    ui.NormalArrays, smproxy->GetProperty("NormalArrays"), "array_list");
+  pqComboBoxDomain* domain2 =
+    new pqComboBoxDomain(ui.NormalArrays, smproxy->GetProperty("NormalArrays"), "array_list");
   domain2->setObjectName("NormalArraysDomain");
   domain2->addString("None");
 
-  this->connect(
-    ui.OrderingArrays, SIGNAL(currentIndexChanged(const QString&)),
+  this->connect(ui.OrderingArrays, SIGNAL(currentIndexChanged(const QString&)),
     SLOT(orderingArraysChanged(const QString&)));
-  this->connect(
-    ui.NormalArrays, SIGNAL(currentIndexChanged(const QString&)),
+  this->connect(ui.NormalArrays, SIGNAL(currentIndexChanged(const QString&)),
     SLOT(normalArraysChanged(const QString&)));
 
-  this->links().addPropertyLink<pqYoungsMaterialPropertyLinksConnection>(
-    this, "normalArrays", SIGNAL(normalArraysChanged()),
-    smproxy, smgroup->GetProperty("NormalArrays"));
-  this->links().addPropertyLink<pqYoungsMaterialPropertyLinksConnection>(
-    this, "orderingArrays", SIGNAL(orderingArraysChanged()),
-    smproxy, smgroup->GetProperty("OrderingArrays"));
+  this->links().addPropertyLink<pqYoungsMaterialPropertyLinksConnection>(this, "normalArrays",
+    SIGNAL(normalArraysChanged()), smproxy, smgroup->GetProperty("NormalArrays"));
+  this->links().addPropertyLink<pqYoungsMaterialPropertyLinksConnection>(this, "orderingArrays",
+    SIGNAL(orderingArraysChanged()), smproxy, smgroup->GetProperty("OrderingArrays"));
 
   this->updateComboBoxes();
 }
@@ -150,10 +140,10 @@ void pqYoungsMaterialPropertyWidget::setOrderingArrays(const QList<QVariant>& va
 {
   pqInternals& internals = (*this->Internals);
   internals.OrderingArraysMap.clear();
-  for (int cc=0, max=values.size(); (cc+1) < max; cc+=2)
-    {
-    internals.OrderingArraysMap[values[cc].toString()] = values[cc+1].toString();
-    }
+  for (int cc = 0, max = values.size(); (cc + 1) < max; cc += 2)
+  {
+    internals.OrderingArraysMap[values[cc].toString()] = values[cc + 1].toString();
+  }
   this->updateComboBoxes();
 }
 
@@ -163,11 +153,11 @@ QList<QVariant> pqYoungsMaterialPropertyWidget::orderingArrays() const
   pqInternals& internals = (*this->Internals);
   QList<QVariant> values;
   for (QMap<QString, QString>::const_iterator iter = internals.OrderingArraysMap.constBegin();
-    iter != internals.OrderingArraysMap.constEnd(); ++iter)
-    {
+       iter != internals.OrderingArraysMap.constEnd(); ++iter)
+  {
     values.push_back(iter.key());
     values.push_back(iter.value());
-    }
+  }
   return values;
 }
 
@@ -176,10 +166,10 @@ void pqYoungsMaterialPropertyWidget::setNormalArrays(const QList<QVariant>& valu
 {
   pqInternals& internals = (*this->Internals);
   internals.NormalArraysMap.clear();
-  for (int cc=0, max=values.size(); (cc+1) < max; cc+=2)
-    {
-    internals.NormalArraysMap[values[cc].toString()] = values[cc+1].toString();
-    }
+  for (int cc = 0, max = values.size(); (cc + 1) < max; cc += 2)
+  {
+    internals.NormalArraysMap[values[cc].toString()] = values[cc + 1].toString();
+  }
   this->updateComboBoxes();
 }
 
@@ -189,11 +179,11 @@ QList<QVariant> pqYoungsMaterialPropertyWidget::normalArrays() const
   pqInternals& internals = (*this->Internals);
   QList<QVariant> values;
   for (QMap<QString, QString>::const_iterator iter = internals.NormalArraysMap.constBegin();
-    iter != internals.NormalArraysMap.constEnd(); ++iter)
-    {
+       iter != internals.NormalArraysMap.constEnd(); ++iter)
+  {
     values.push_back(iter.key());
     values.push_back(iter.value());
-    }
+  }
   return values;
 }
 
@@ -201,52 +191,52 @@ QList<QVariant> pqYoungsMaterialPropertyWidget::normalArrays() const
 void pqYoungsMaterialPropertyWidget::normalArraysChanged(const QString& val)
 {
   pqInternals& internals = (*this->Internals);
-  const QString value = (val == "None")? "" : val;
+  const QString value = (val == "None") ? "" : val;
 
   QTreeWidgetItem* currentItem = internals.VolumeFractionArrays->currentItem();
   if (currentItem)
-    {
+  {
     QString key = currentItem->text(0);
     if (internals.NormalArraysMap.value(key, "__NO_VALUE__") != value)
-      {
+    {
       internals.NormalArraysMap[key] = value;
       emit this->normalArraysChanged();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqYoungsMaterialPropertyWidget::orderingArraysChanged(const QString& val)
 {
   pqInternals& internals = (*this->Internals);
-  const QString value = (val == "None")? "" : val;
+  const QString value = (val == "None") ? "" : val;
 
   QTreeWidgetItem* currentItem = internals.VolumeFractionArrays->currentItem();
   if (currentItem)
-    {
+  {
     QString key = currentItem->text(0);
     if (internals.OrderingArraysMap.value(key, "__NO_VALUE__") != value)
-      {
+    {
       internals.OrderingArraysMap[key] = value;
       emit this->orderingArraysChanged();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqYoungsMaterialPropertyWidget::updateComboBoxes()
 {
   pqInternals& internals = (*this->Internals);
-  Ui::YoungsMaterialPropertyWidget &ui = internals.Ui;
+  Ui::YoungsMaterialPropertyWidget& ui = internals.Ui;
 
   // determine the volume fraction array currently selected.
   QTreeWidgetItem* currentItem = internals.VolumeFractionArrays->currentItem();
   if (!currentItem)
-    {
+  {
     ui.OrderingArrays->setEnabled(false);
     ui.NormalArrays->setEnabled(false);
     return;
-    }
+  }
 
   ui.OrderingArrays->setEnabled(true);
   ui.NormalArrays->setEnabled(true);
@@ -255,28 +245,26 @@ void pqYoungsMaterialPropertyWidget::updateComboBoxes()
 
   // check if there's a normal and ordering array already defined for this
   // volume-fraction array. If so, show it.
-  const char* ordering_array = vtkSMUncheckedPropertyHelper(
-    this->proxy(), "OrderingArrays").GetStatus(label.toLatin1().data(), "");
+  const char* ordering_array = vtkSMUncheckedPropertyHelper(this->proxy(), "OrderingArrays")
+                                 .GetStatus(label.toLatin1().data(), "");
 
-  const char* normal_array = vtkSMUncheckedPropertyHelper(
-    this->proxy(), "NormalArrays").GetStatus(label.toLatin1().data(), "");
+  const char* normal_array = vtkSMUncheckedPropertyHelper(this->proxy(), "NormalArrays")
+                               .GetStatus(label.toLatin1().data(), "");
 
   if (ordering_array == NULL || strlen(ordering_array) == 0)
-    {
+  {
     ordering_array = "None";
-    }
+  }
   if (normal_array == NULL || strlen(normal_array) == 0)
-    {
+  {
     normal_array = "None";
-    }
+  }
 
   bool prev = ui.OrderingArrays->blockSignals(true);
-  ui.OrderingArrays->setCurrentIndex(
-    ui.OrderingArrays->findText(ordering_array));
+  ui.OrderingArrays->setCurrentIndex(ui.OrderingArrays->findText(ordering_array));
   ui.OrderingArrays->blockSignals(prev);
 
   prev = ui.NormalArrays->blockSignals(true);
-  ui.NormalArrays->setCurrentIndex(
-    ui.NormalArrays->findText(normal_array));
+  ui.NormalArrays->setCurrentIndex(ui.NormalArrays->findText(normal_array));
   ui.NormalArrays->blockSignals(prev);
 }

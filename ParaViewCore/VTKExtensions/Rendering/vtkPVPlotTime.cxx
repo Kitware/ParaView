@@ -24,7 +24,7 @@ vtkStandardNewMacro(vtkPVPlotTime);
 vtkPVPlotTime::vtkPVPlotTime()
 {
   // paraview green.
-  this->GetPen()->SetColor(143,216,109);
+  this->GetPen()->SetColor(143, 216, 109);
   this->TimeAxisMode = NONE;
   this->Time = 0.0;
 }
@@ -35,32 +35,32 @@ vtkPVPlotTime::~vtkPVPlotTime()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPlotTime::Paint(vtkContext2D *painter)
+bool vtkPVPlotTime::Paint(vtkContext2D* painter)
 {
   if (this->TimeAxisMode == NONE)
-    {
+  {
     return true;
-    }
+  }
 
   painter->ApplyPen(this->GetPen());
   if (this->TimeAxisMode == X_AXIS)
-    {
+  {
     if (vtkAxis* axis = this->GetYAxis())
-      {
+    {
       double range[2];
       axis->GetRange(range);
       painter->DrawLine(this->Time, range[0], this->Time, range[1]);
-      }
     }
+  }
   else
-    {
+  {
     if (vtkAxis* axis = this->GetXAxis())
-      {
+    {
       double range[2];
       axis->GetRange(range);
       painter->DrawLine(range[0], this->Time, range[1], this->Time);
-      }
     }
+  }
   return true;
 }
 

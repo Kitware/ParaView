@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIMetaReaderProxy
-// .SECTION Description
-// vtkSISourceProxy is the server-side helper for a vtkSMSourceProxy.
-// It adds support to handle various vtkAlgorithm specific Invoke requests
-// coming from the client. vtkSISourceProxy also inserts post-processing filters
-// for each output port from the vtkAlgorithm. These post-processing filters
-// deal with things like parallelizing the data etc.
+/**
+ * @class   vtkSIMetaReaderProxy
+ *
+ * vtkSISourceProxy is the server-side helper for a vtkSMSourceProxy.
+ * It adds support to handle various vtkAlgorithm specific Invoke requests
+ * coming from the client. vtkSISourceProxy also inserts post-processing filters
+ * for each output port from the vtkAlgorithm. These post-processing filters
+ * deal with things like parallelizing the data etc.
+*/
 
 #ifndef vtkSIMetaReaderProxy_h
 #define vtkSIMetaReaderProxy_h
@@ -41,8 +43,9 @@ protected:
 
   void OnCreateVTKObjects() VTK_OVERRIDE;
 
-  // Description:
-  // Read xml-attributes.
+  /**
+   * Read xml-attributes.
+   */
   virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
 
   // This is the name of the method used to set the file name on the
@@ -55,7 +58,6 @@ protected:
 private:
   vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

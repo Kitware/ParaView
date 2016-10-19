@@ -64,13 +64,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 MantaView::MantaView(
-  const QString& group,
-  const QString& name,
-  vtkSMProxy* viewProxy,
-  pqServer* server,
-  QObject* p)
-  : pqRenderView(MantaView::mantaViewType(), group, name,
-    vtkSMViewProxy::SafeDownCast(viewProxy), server, p)
+  const QString& group, const QString& name, vtkSMProxy* viewProxy, pqServer* server, QObject* p)
+  : pqRenderView(
+      MantaView::mantaViewType(), group, name, vtkSMViewProxy::SafeDownCast(viewProxy), server, p)
 {
 }
 

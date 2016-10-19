@@ -34,22 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventTranslator.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
-#include <QPointer> // needed for QPointer
+#include <QPointer>          // needed for QPointer
 
 class pqConsoleWidget;
 
-/// pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
-/// testing. 
-class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator :
-  public pqWidgetEventTranslator
+/**
+* pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
+* testing.
+*/
+class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
   typedef pqWidgetEventTranslator Superclass;
+
 public:
-  pqConsoleWidgetEventTranslator(QObject* parent=0);
+  pqConsoleWidgetEventTranslator(QObject* parent = 0);
   virtual ~pqConsoleWidgetEventTranslator();
 
-  /// Translate the event, if possible.
+  /**
+  * Translate the event, if possible.
+  */
   using Superclass::translateEvent;
   virtual bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag);
 

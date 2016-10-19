@@ -24,7 +24,7 @@
 using std::map;
 #include <string>
 using std::string;
-#include  <vector>
+#include <vector>
 using std::vector;
 
 class pqMemoryInspectorPanelUI;
@@ -38,17 +38,17 @@ class PQCOMPONENTS_EXPORT pqMemoryInspectorPanel : public QWidget
 {
   Q_OBJECT
 public:
-  pqMemoryInspectorPanel(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqMemoryInspectorPanel(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~pqMemoryInspectorPanel();
 
   // Description:
   // Test for successful initialization.
-  int Initialized(){ return this->ClientHost!=NULL; }
+  int Initialized() { return this->ClientHost != NULL; }
 
 protected:
   // Description:
   // Update when the panel is made visible.
-  virtual void showEvent(QShowEvent *event);
+  virtual void showEvent(QShowEvent* event);
 
 protected slots:
 
@@ -62,7 +62,7 @@ protected slots:
   // used because they occur only after all server side action is complete
   // and rendering initself can use significant resources. The update is
   // enabled only after pqView::dataUpdatedEvent.
-  void ConnectToView(pqView *view);
+  void ConnectToView(pqView* view);
   void RenderCompleted();
   void EnableUpdate();
 
@@ -76,7 +76,7 @@ protected slots:
 
   // Description:
   // Enable auto update.
-  void SetAutoUpdate(bool state){ this->AutoUpdate=state; }
+  void SetAutoUpdate(bool state) { this->AutoUpdate = state; }
 
   // Description:
   // enable/disable stack trace.
@@ -96,7 +96,7 @@ protected slots:
 
   // Description:
   // Create a context menu for the config view.
-  void ConfigViewContextMenu(const QPoint &pos);
+  void ConfigViewContextMenu(const QPoint& pos);
 
   // Description:
   // Collapse or expand the view for easier navigation
@@ -107,49 +107,41 @@ protected slots:
 private:
   void ClearClient();
   void ClearServers();
-  void ClearServer(
-      map<string,HostData *> &hosts,
-      vector<RankData *> &ranks);
+  void ClearServer(map<string, HostData*>& hosts, vector<RankData*>& ranks);
 
   void UpdateRanks();
   void UpdateHosts();
-  void UpdateHosts(map<string,HostData*> &hosts);
+  void UpdateHosts(map<string, HostData*>& hosts);
 
-  void InitializeServerGroup(
-      long long clientPid,
-      vtkPVSystemConfigInformation *configs,
-      int validProcessType,
-      QTreeWidgetItem *group,
-      string groupName,
-      map<string,HostData*> &hosts,
-      vector<RankData*> &ranks,
-      int &systemType);
+  void InitializeServerGroup(long long clientPid, vtkPVSystemConfigInformation* configs,
+    int validProcessType, QTreeWidgetItem* group, string groupName, map<string, HostData*>& hosts,
+    vector<RankData*>& ranks, int& systemType);
 
-  void EnableStackTrace(bool enable,int group);
-  void AddEnableStackTraceMenuAction(int serverType, QMenu &context);
+  void EnableStackTrace(bool enable, int group);
+  void AddEnableStackTraceMenuAction(int serverType, QMenu& context);
 
-  QWidget *NewGroupWidget(string name, string icon);
+  QWidget* NewGroupWidget(string name, string icon);
 
 private:
-  pqMemoryInspectorPanelUI *Ui;
+  pqMemoryInspectorPanelUI* Ui;
 
   int ClientOnly;
-  HostData *ClientHost;
+  HostData* ClientHost;
   int ClientSystemType;
   bool StackTraceOnClient;
 
-  map<string,HostData *> ServerHosts;
-  vector<RankData *> ServerRanks;
+  map<string, HostData*> ServerHosts;
+  vector<RankData*> ServerRanks;
   int ServerSystemType;
   bool StackTraceOnServer;
 
-  map<string,HostData *> DataServerHosts;
-  vector<RankData *> DataServerRanks;
+  map<string, HostData*> DataServerHosts;
+  vector<RankData*> DataServerRanks;
   int DataServerSystemType;
   bool StackTraceOnDataServer;
 
-  map<string,HostData *> RenderServerHosts;
-  vector<RankData *> RenderServerRanks;
+  map<string, HostData*> RenderServerHosts;
+  vector<RankData*> RenderServerRanks;
   int RenderServerSystemType;
   bool StackTraceOnRenderServer;
 

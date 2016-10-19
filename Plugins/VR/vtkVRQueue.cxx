@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkVRQueue);
 
 //----------------------------------------------------------------------------
-vtkVRQueue::vtkVRQueue() : Superclass()
+vtkVRQueue::vtkVRQueue()
+  : Superclass()
 {
 }
 
@@ -72,11 +73,11 @@ bool vtkVRQueue::TryDequeue(vtkVREventData& data)
   this->Mutex->Lock();
   bool result = false;
   if (!this->Queue.empty())
-    {
+  {
     result = true;
     data = this->Queue.front();
     this->Queue.pop();
-    }
+  }
   this->Mutex->Unlock();
 
   return result;
@@ -87,9 +88,9 @@ void vtkVRQueue::Dequeue(vtkVREventData& data)
 {
   this->Mutex->Lock();
   while (this->Queue.empty())
-    {
+  {
     this->CondVar->Wait(this->Mutex.GetPointer());
-    }
+  }
 
   data = this->Queue.front();
   this->Queue.pop();
@@ -97,23 +98,23 @@ void vtkVRQueue::Dequeue(vtkVREventData& data)
 }
 
 //----------------------------------------------------------------------------
-bool vtkVRQueue::TryDequeue(std::queue<vtkVREventData> &data)
+bool vtkVRQueue::TryDequeue(std::queue<vtkVREventData>& data)
 {
   this->Mutex->Lock();
   if (!this->Queue.empty())
-    {
+  {
     data = this->Queue;
     while (!this->Queue.empty())
-      {
+    {
       this->Queue.pop();
-      }
     }
+  }
   this->Mutex->Unlock();
   return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueue::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRQueue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 

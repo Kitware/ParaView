@@ -35,16 +35,14 @@ vtkCPLinearScalarFieldFunction::~vtkCPLinearScalarFieldFunction()
 
 //----------------------------------------------------------------------------
 double vtkCPLinearScalarFieldFunction::ComputeComponenentAtPoint(
-  unsigned int component, double point[3], 
-  unsigned long vtkNotUsed(timeStep), double time)
+  unsigned int component, double point[3], unsigned long vtkNotUsed(timeStep), double time)
 {
-  if(component != 0)
-    {
+  if (component != 0)
+  {
     vtkWarningMacro("Bad component value");
-    }
-  double value = this->Constant + point[0]*this->XMultiplier + 
-    point[1]*this->YMultiplier + point[2]*this->ZMultiplier +
-    time*this->TimeMultiplier;
+  }
+  double value = this->Constant + point[0] * this->XMultiplier + point[1] * this->YMultiplier +
+    point[2] * this->ZMultiplier + time * this->TimeMultiplier;
   return value;
 }
 

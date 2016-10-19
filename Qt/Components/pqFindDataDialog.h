@@ -37,25 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqOutputPort;
 
-/// pqFindDataDialog encapsulates the logic for the "Find Data" dialog in
-/// ParaView. This class puts together components provided by other
-/// classes e.g. pqFindDataCreateSelectionFrame and
-/// pqFindDataCurrentSelectionFrame. 
+/**
+* pqFindDataDialog encapsulates the logic for the "Find Data" dialog in
+* ParaView. This class puts together components provided by other
+* classes e.g. pqFindDataCreateSelectionFrame and
+* pqFindDataCurrentSelectionFrame.
+*/
 class PQCOMPONENTS_EXPORT pqFindDataDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqFindDataDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   virtual ~pqFindDataDialog();
 
 signals:
-  /// triggered to request help about the pqFindDataDialog.
+  /**
+  * triggered to request help about the pqFindDataDialog.
+  */
   void helpRequested();
 
 private slots:
-  /// called when pqFindDataCurrentSelectionFrame notifies the dialog that it's
-  /// showing a new selection. We update the UI accordingly.
+  /**
+  * called when pqFindDataCurrentSelectionFrame notifies the dialog that it's
+  * showing a new selection. We update the UI accordingly.
+  */
   void showing(pqOutputPort*);
 
   void freezeSelection();

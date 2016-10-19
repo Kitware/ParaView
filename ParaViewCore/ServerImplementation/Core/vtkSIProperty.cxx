@@ -27,37 +27,28 @@
 class vtkSIProperty::vtkInternals
 {
 public:
-  vtkInternals()
-    {
-    this->CacheValue = NULL;
-    }
-  ~vtkInternals()
-    {
-    this->ClearCache();
-    }
+  vtkInternals() { this->CacheValue = NULL; }
+  ~vtkInternals() { this->ClearCache(); }
 
   void ClearCache()
+  {
+    if (this->CacheValue)
     {
-    if(this->CacheValue)
-      {
       delete this->CacheValue;
       this->CacheValue = NULL;
-      }
     }
+  }
 
-  bool HasCache()
-    {
-    return this->CacheValue != NULL;
-    }
+  bool HasCache() { return this->CacheValue != NULL; }
 
-  void SaveToCache(const ProxyState_Property *newValue)
-    {
+  void SaveToCache(const ProxyState_Property* newValue)
+  {
     this->ClearCache();
     this->CacheValue = new ProxyState_Property();
     this->CacheValue->CopyFrom(*newValue);
-    }
+  }
 
-  ProxyState_Property *CacheValue;
+  ProxyState_Property* CacheValue;
 };
 
 //****************************************************************************/
@@ -83,47 +74,46 @@ vtkSIProperty::~vtkSIProperty()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIProperty::ReadXMLAttributes(
-  vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
+bool vtkSIProperty::ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
 {
   this->SIProxyObject = proxyhelper;
 
   const char* xmlname = element->GetAttribute("name");
-  if(xmlname)
-    {
+  if (xmlname)
+  {
     this->SetXMLName(xmlname);
-    }
+  }
 
   const char* command = element->GetAttribute("command");
   if (command)
-    {
+  {
     this->SetCommand(command);
-    }
+  }
 
   int repeatable;
   if (element->GetScalarAttribute("repeatable", &repeatable))
-    {
+  {
     this->Repeatable = (repeatable != 0);
-    }
+  }
 
   // Yup, both mean the same thing :).
   int repeat_command;
   if (element->GetScalarAttribute("repeat_command", &repeat_command))
-    {
+  {
     this->Repeatable = (repeat_command != 0);
-    }
+  }
 
   int information_only;
   if (element->GetScalarAttribute("information_only", &information_only))
-    {
+  {
     this->InformationOnly = (information_only != 0);
-    }
+  }
 
   int is_internal;
   if (element->GetScalarAttribute("is_internal", &is_internal))
-    {
+  {
     this->SetIsInternal(is_internal != 0);
-    }
+  }
 
   return true;
 }
@@ -132,9 +122,9 @@ bool vtkSIProperty::ReadXMLAttributes(
 vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
 {
   if (this->SIProxyObject)
-    {
+  {
     return this->SIProxyObject->GetSIObject(globalid);
-    }
+  }
   return NULL;
 }
 
@@ -142,9 +132,9 @@ vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
 bool vtkSIProperty::ProcessMessage(vtkClientServerStream& stream)
 {
   if (this->SIProxyObject && this->SIProxyObject->GetVTKObject())
-    {
+  {
     return this->SIProxyObject->GetInterpreter()->ProcessStream(stream) != 0;
-    }
+  }
   return this->SIProxyObject ? true : false;
 }
 
@@ -152,9 +142,9 @@ bool vtkSIProperty::ProcessMessage(vtkClientServerStream& stream)
 vtkObjectBase* vtkSIProperty::GetVTKObject()
 {
   if (this->SIProxyObject)
-    {
+  {
     return this->SIProxyObject->GetVTKObject();
-    }
+  }
   return NULL;
 }
 
@@ -162,9 +152,9 @@ vtkObjectBase* vtkSIProperty::GetVTKObject()
 const vtkClientServerStream& vtkSIProperty::GetLastResult()
 {
   if (this->SIProxyObject)
-    {
+  {
     return this->SIProxyObject->GetInterpreter()->GetLastResult();
-    }
+  }
 
   static vtkClientServerStream stream;
   return stream;
@@ -181,9 +171,9 @@ void vtkSIProperty::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSIProperty::Push(vtkSMMessage*, int)
 {
   if (this->InformationOnly || !this->Command || this->GetVTKObject() == NULL)
-    {
+  {
     return true;
-    }
+  }
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke;
@@ -196,18 +186,17 @@ bool vtkSIProperty::Push(vtkSMMessage*, int)
 //          property.
 bool vtkSIProperty::Pull(vtkSMMessage* msg)
 {
-  if(!this->InformationOnly && this->Internals->HasCache())
-    {
-    ProxyState_Property *newProp = msg->AddExtension(ProxyState::property);
+  if (!this->InformationOnly && this->Internals->HasCache())
+  {
+    ProxyState_Property* newProp = msg->AddExtension(ProxyState::property);
     newProp->CopyFrom(*this->Internals->CacheValue);
-    }
+  }
 
   return true;
 }
 //----------------------------------------------------------------------------
 void vtkSIProperty::SaveValueToCache(vtkSMMessage* message, int offset)
 {
-  const ProxyState_Property *prop =
-      &message->GetExtension(ProxyState::property, offset);
+  const ProxyState_Property* prop = &message->GetExtension(ProxyState::property, offset);
   this->Internals->SaveToCache(prop);
 }

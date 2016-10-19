@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 //-----------------------------------------------------------------------------
-pqRenameProxyReaction::pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy) :
-  Superclass(renameAction), Proxy(proxy)
+pqRenameProxyReaction::pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy)
+  : Superclass(renameAction)
+  , Proxy(proxy)
 {
 }
 
@@ -52,29 +53,27 @@ void pqRenameProxyReaction::onTriggered()
   bool ok;
   QString group = dynamic_cast<pqView*>(this->Proxy) ? "View" : "Proxy";
   QString oldName = this->Proxy->getSMName();
-  QString newName = QInputDialog::getText(
-    pqActiveObjects::instance().activeView()->widget(),
-    tr("Rename") + " " + group + "...", tr("New name:"), QLineEdit::Normal,
-    oldName, &ok);
+  QString newName = QInputDialog::getText(pqActiveObjects::instance().activeView()->widget(),
+    tr("Rename") + " " + group + "...", tr("New name:"), QLineEdit::Normal, oldName, &ok);
 
   if (ok && !newName.isEmpty() && newName != oldName)
-    {
+  {
     if (group == "View")
-      {
+    {
       SM_SCOPED_TRACE(CallFunction)
-       .arg("RenameView")
-       .arg(newName.toLatin1().data())
-       .arg((vtkObject*)this->Proxy->getProxy());
-      }
+        .arg("RenameView")
+        .arg(newName.toLatin1().data())
+        .arg((vtkObject*)this->Proxy->getProxy());
+    }
     else
-      {
+    {
       SM_SCOPED_TRACE(CallFunction)
-       .arg("RenameProxy")
-       .arg(newName.toLatin1().data())
-       .arg(this->Proxy->getSMGroup().toLatin1().data())
-       .arg((vtkObject*)this->Proxy->getProxy());
-      }
+        .arg("RenameProxy")
+        .arg(newName.toLatin1().data())
+        .arg(this->Proxy->getSMGroup().toLatin1().data())
+        .arg((vtkObject*)this->Proxy->getProxy());
+    }
 
     this->Proxy->rename(newName);
-    }
+  }
 }

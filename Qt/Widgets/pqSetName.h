@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,15 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 /**
-  Using pqSetName, you can create and initialize Qt objects without having to create a bunch of temporaries:
-  
+  Using pqSetName, you can create and initialize Qt objects without having to create a bunch of
+  temporaries:
+
   \code
   menu->addAction("Open") << pqSetName("FileOpenMenu");
   \endcode
- 
+
   \sa pqSetData, pqConnect
 */
-  
+
 struct PQWIDGETS_EXPORT pqSetName
 {
   pqSetName(const QString& Name);
@@ -55,8 +56,10 @@ private:
   void operator=(const pqSetName&);
 };
 
-/// Sets a Qt object's name
-template<typename T>
+/**
+* Sets a Qt object's name
+*/
+template <typename T>
 T* operator<<(T* LHS, const pqSetName& RHS)
 {
   LHS->setObjectName(RHS.Name);
@@ -64,4 +67,3 @@ T* operator<<(T* LHS, const pqSetName& RHS)
 }
 
 #endif // !_pqSetName_h
-

@@ -34,19 +34,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidgetDecorator.h"
 
-/// pqOSPRayHidingDecorator's purpose is to prevent the GUI from
-/// showing any of the OSPRay specific rendering controls when
-/// Paraview is not configured with PARAVIEW_USE_OSPRAY
+/**
+* pqOSPRayHidingDecorator's purpose is to prevent the GUI from
+* showing any of the OSPRay specific rendering controls when
+* Paraview is not configured with PARAVIEW_USE_OSPRAY
+*/
 class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
+
 public:
-  pqOSPRayHidingDecorator(
-    vtkPVXMLElement* config, pqPropertyWidget* parentObject);
+  pqOSPRayHidingDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
   virtual ~pqOSPRayHidingDecorator();
 
-  /// Overridden to hide the widget when OSPRay is not compiled in
+  /**
+  * Overridden to hide the widget when OSPRay is not compiled in
+  */
   virtual bool canShowWidget(bool show_advanced) const;
 
 private:

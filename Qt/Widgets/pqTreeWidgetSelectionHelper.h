@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,24 +38,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QTreeWidget;
 class QTreeWidgetItem;
-/// pqTreeWidgetSelectionHelper enables multiple element selection and the
-/// toggling on then changing the checked state of the selected elements.
-/// Hence, the user can do things like selecting a subset of nodes and then
-/// (un)checking all of them etc. This cannot work in parallel with
-/// pqTreeWidgetCheckHelper, hence only once of the two must be used on the same
-/// tree widget.
-/// CAVEATS: This helper currently assumes that the 0-th column is checkable (if
-/// at all). This can be fixed if needed.
+/**
+* pqTreeWidgetSelectionHelper enables multiple element selection and the
+* toggling on then changing the checked state of the selected elements.
+* Hence, the user can do things like selecting a subset of nodes and then
+* (un)checking all of them etc. This cannot work in parallel with
+* pqTreeWidgetCheckHelper, hence only once of the two must be used on the same
+* tree widget.
+* CAVEATS: This helper currently assumes that the 0-th column is checkable (if
+* at all). This can be fixed if needed.
+*/
 class PQWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   pqTreeWidgetSelectionHelper(QTreeWidget* treeWidget);
   ~pqTreeWidgetSelectionHelper();
 
 protected slots:
-  void onItemPressed (QTreeWidgetItem *item, int column);
+  void onItemPressed(QTreeWidgetItem* item, int column);
   void showContextMenu(const QPoint&);
 
 private:
@@ -69,5 +72,3 @@ private:
 };
 
 #endif
-
-

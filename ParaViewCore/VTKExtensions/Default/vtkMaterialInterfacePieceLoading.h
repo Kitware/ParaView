@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfacePieceLoading
-// .SECTION Description
-// Data structure that describes a fragment's loading.
-// Holds its id and its loading factor.
+/**
+ * @class   vtkMaterialInterfacePieceLoading
+ *
+ * Data structure that describes a fragment's loading.
+ * Holds its id and its loading factor.
+*/
 
 #ifndef vtkMaterialInterfacePieceLoading_h
 #define vtkMaterialInterfacePieceLoading_h
@@ -31,59 +33,76 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfacePieceLoading
 {
 public:
-  enum {ID=0,LOADING=1,SIZE=2};
-  vtkMaterialInterfacePieceLoading(){ this->Initialize(-1,0); }
-  ~vtkMaterialInterfacePieceLoading(){ this->Initialize(-1,0); }
+  enum
+  {
+    ID = 0,
+    LOADING = 1,
+    SIZE = 2
+  };
+  vtkMaterialInterfacePieceLoading() { this->Initialize(-1, 0); }
+  ~vtkMaterialInterfacePieceLoading() { this->Initialize(-1, 0); }
   void Initialize(int id, vtkIdType loading)
   {
-    this->Data[ID]=id;
-    this->Data[LOADING]=loading;
+    this->Data[ID] = id;
+    this->Data[LOADING] = loading;
   }
-  // Description:
-  // Place into a buffer (id, loading)
-  void Pack(vtkIdType *buf)
+  //@{
+  /**
+   * Place into a buffer (id, loading)
+   */
+  void Pack(vtkIdType* buf)
   {
-    buf[ID]=this->Data[ID];
-    buf[LOADING]=this->Data[LOADING];
+    buf[ID] = this->Data[ID];
+    buf[LOADING] = this->Data[LOADING];
   }
-  // Description:
-  // Initialize from a buffer (id, loading)
-  void UnPack(vtkIdType *buf)
+  //@}
+  //@{
+  /**
+   * Initialize from a buffer (id, loading)
+   */
+  void UnPack(vtkIdType* buf)
   {
-    this->Data[ID]=buf[ID];
-    this->Data[LOADING]=buf[LOADING];
+    this->Data[ID] = buf[ID];
+    this->Data[LOADING] = buf[LOADING];
   }
-  // Description:
-  // Set/Get
-  vtkIdType GetId() const{ return this->Data[ID]; }
-  vtkIdType GetLoading() const{ return this->Data[LOADING]; }
-  void SetLoading(vtkIdType loading){ this->Data[LOADING]=loading; }
-  // Description:
-  // Adds to laoding and returns the updated loading.
+  //@}
+  /**
+   * Set/Get
+   */
+  vtkIdType GetId() const { return this->Data[ID]; }
+  vtkIdType GetLoading() const { return this->Data[LOADING]; }
+  void SetLoading(vtkIdType loading) { this->Data[LOADING] = loading; }
+  //@{
+  /**
+   * Adds to laoding and returns the updated loading.
+   */
   vtkIdType UpdateLoading(vtkIdType update)
   {
-    assert("Update would make loading negative."
-            && (this->Data[LOADING]+update)>=0);
-    return this->Data[LOADING]+=update;
+    assert("Update would make loading negative." && (this->Data[LOADING] + update) >= 0);
+    return this->Data[LOADING] += update;
   }
-  // Description:
-  // Comparision are made by id.
-  bool operator<(const vtkMaterialInterfacePieceLoading &other) const
+  //@}
+  //@{
+  /**
+   * Comparision are made by id.
+   */
+  bool operator<(const vtkMaterialInterfacePieceLoading& other) const
   {
-    return this->Data[ID]<other.Data[ID];
+    return this->Data[ID] < other.Data[ID];
   }
-  bool operator==(const vtkMaterialInterfacePieceLoading &other) const
+  bool operator==(const vtkMaterialInterfacePieceLoading& other) const
   {
-    return this->Data[ID]==other.Data[ID];
+    return this->Data[ID] == other.Data[ID];
   }
+
 private:
   vtkIdType Data[SIZE];
 };
-VTKPVVTKEXTENSIONSDEFAULT_EXPORT 
-std::ostream &operator<<(std::ostream &sout, const vtkMaterialInterfacePieceLoading &fp);
-VTKPVVTKEXTENSIONSDEFAULT_EXPORT 
-void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> > &pla);
+VTKPVVTKEXTENSIONSDEFAULT_EXPORT
+std::ostream& operator<<(std::ostream& sout, const vtkMaterialInterfacePieceLoading& fp);
+VTKPVVTKEXTENSIONSDEFAULT_EXPORT
+void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> >& pla);
 #endif
-
+//@}
 
 // VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceLoading.h

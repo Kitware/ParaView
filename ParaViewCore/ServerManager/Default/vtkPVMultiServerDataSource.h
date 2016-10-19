@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVMultiServerDataSource
-// .SECTION Description
-// VTK class that handle the fetch of remote data
+/**
+ * @class   vtkPVMultiServerDataSource
+ *
+ * VTK class that handle the fetch of remote data
+*/
 
 #ifndef vtkPVMultiServerDataSource_h
 #define vtkPVMultiServerDataSource_h
@@ -29,16 +31,18 @@ class vtkInformationVector;
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVMultiServerDataSource : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkPVMultiServerDataSource *New();
-  vtkTypeMacro(vtkPVMultiServerDataSource,vtkDataObjectAlgorithm);
+  static vtkPVMultiServerDataSource* New();
+  vtkTypeMacro(vtkPVMultiServerDataSource, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Bind vtk object with a given external proxy
+  /**
+   * Bind vtk object with a given external proxy
+   */
   virtual void SetExternalProxy(vtkSMSourceProxy* proxyFromAnotherServer, int portNumber = 0);
 
-  // Description:
-  // Method that need to be called when the data has changed and need to be updated...
+  /**
+   * Method that need to be called when the data has changed and need to be updated...
+   */
   virtual void FetchData(vtkDataObject* dataObjectToFill);
 
 protected:
@@ -46,24 +50,19 @@ protected:
   ~vtkPVMultiServerDataSource();
 
   // call 1
-  virtual int RequestDataObject(vtkInformation *,
-                                vtkInformationVector** vtkNotUsed(inputVector),
-                                vtkInformationVector* outputVector);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector** vtkNotUsed(inputVector),
+    vtkInformationVector* outputVector);
 
   // call 2
-  virtual int RequestInformation(vtkInformation *,
-                                 vtkInformationVector **,
-                                 vtkInformationVector *outputVector);
+  virtual int RequestInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
 
   // call 3
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // call 4
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
 
 private:
   vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;
@@ -71,7 +70,6 @@ private:
 
   struct vtkInternal;
   vtkInternal* Internal;
-
 };
 
 #endif

@@ -25,18 +25,20 @@
 class vtkSMSettingsObserver : public vtkCommand
 {
 public:
-  static vtkSMSettingsObserver *New()
-  { return new vtkSMSettingsObserver; }
+  static vtkSMSettingsObserver* New() { return new vtkSMSettingsObserver; }
 
   virtual void Execute(vtkObject*, unsigned long eventId, void*)
   {
     if (this->Proxy)
-      {
+    {
       this->Proxy->ExecuteEvent(eventId);
-      }
+    }
   }
 
-  vtkSMSettingsObserver() : Proxy(NULL) {}
+  vtkSMSettingsObserver()
+    : Proxy(NULL)
+  {
+  }
 
   vtkSMSettingsProxy* Proxy;
 };
@@ -55,43 +57,42 @@ vtkSMSettingsProxy::vtkSMSettingsProxy()
 vtkSMSettingsProxy::~vtkSMSettingsProxy()
 {
   if (this->ObjectsCreated)
-    {
+  {
     vtkObject* object = vtkObject::SafeDownCast(this->GetClientSideObject());
     if (object)
-      {
+    {
       object->RemoveObserver(this->Observer);
-      }
     }
+  }
 
   this->Observer->Proxy = NULL;
   this->Observer->Delete();
 }
 
 //----------------------------------------------------------------------------
-int vtkSMSettingsProxy::ReadXMLAttributes(
-  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
+int vtkSMSettingsProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(pm, element))
-    {
+  {
     return 0;
-    }
+  }
 
   // Now link information properties that provide the current value of the VTK
   // object with the corresponding proxy property
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(this->NewPropertyIterator());
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next() )
-    {
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
     vtkSMProperty* property = iter->GetProperty();
     if (property)
-      {
+    {
       vtkSMProperty* infoProperty = property->GetInformationProperty();
       if (infoProperty)
-        {
+      {
         this->LinkProperty(infoProperty, property);
-        }
       }
     }
+  }
   return 1;
 }
 
@@ -99,17 +100,17 @@ int vtkSMSettingsProxy::ReadXMLAttributes(
 void vtkSMSettingsProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
   this->Superclass::CreateVTKObjects();
 
   vtkObject* object = vtkObject::SafeDownCast(this->GetClientSideObject());
   if (object)
-    {
+  {
     object->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

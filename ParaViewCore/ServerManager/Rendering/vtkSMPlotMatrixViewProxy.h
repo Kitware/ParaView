@@ -12,7 +12,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPlotMatrixViewProxy - Proxy class for plot matrix view
+/**
+ * @class   vtkSMPlotMatrixViewProxy
+ * @brief   Proxy class for plot matrix view
+*/
 
 #ifndef vtkSMPlotMatrixViewProxy_h
 #define vtkSMPlotMatrixViewProxy_h
@@ -30,8 +33,9 @@ public:
   vtkTypeMacro(vtkSMPlotMatrixViewProxy, vtkSMContextViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Provides access to the vtk plot matrix.
+  /**
+   * Provides access to the vtk plot matrix.
+   */
   virtual vtkAbstractContextItem* GetContextItem();
 
 protected:
@@ -50,7 +54,6 @@ protected:
 private:
   vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

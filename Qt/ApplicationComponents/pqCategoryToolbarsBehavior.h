@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -41,29 +41,35 @@ class pqProxyGroupMenuManager;
 class QMainWindow;
 class QAction;
 
-/// @ingroup Behaviors
-/// pqCategoryToolbarsBehavior is used when the application wants to enable
-/// categories from a pqProxyGroupMenuManager to show up in a toolbar.
-/// ex. One may want to have a toolbar listing all the filters in "Common"
-/// category. This behavior also ensures that as plugins are loaded, if new
-/// categories request that the be added as a toolbar, new toolbars for those
-/// are added and also if new items get added to a category already shown as a
-/// toolbar, then the toolbar is updated.
+/**
+* @ingroup Behaviors
+* pqCategoryToolbarsBehavior is used when the application wants to enable
+* categories from a pqProxyGroupMenuManager to show up in a toolbar.
+* ex. One may want to have a toolbar listing all the filters in "Common"
+* category. This behavior also ensures that as plugins are loaded, if new
+* categories request that the be added as a toolbar, new toolbars for those
+* are added and also if new items get added to a category already shown as a
+* toolbar, then the toolbar is updated.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCategoryToolbarsBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqCategoryToolbarsBehavior(pqProxyGroupMenuManager* menuManager,
-    QMainWindow* mainWindow);
+  pqCategoryToolbarsBehavior(pqProxyGroupMenuManager* menuManager, QMainWindow* mainWindow);
 
 protected slots:
-  /// Called when menuManager fires the menuPopulated() signal.
+  /**
+  * Called when menuManager fires the menuPopulated() signal.
+  */
   void updateToolbars();
 
-  /// This slot gets attached to a pqEventDispatcher so that some toolbars
-  /// can be hidden before each test starts (to prevent small test-image differences
-  /// due to layout differences between machines).
+  /**
+  * This slot gets attached to a pqEventDispatcher so that some toolbars
+  * can be hidden before each test starts (to prevent small test-image differences
+  * due to layout differences between machines).
+  */
   void prepareForTest();
 
 private:

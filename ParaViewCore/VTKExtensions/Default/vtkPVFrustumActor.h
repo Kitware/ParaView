@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVFrustumActor
-// .SECTION Description
-// vtkPVFrustumActor is an actor that renders a frustum. Used in ParaView to
-// show the frustum used for frustum selection extraction.
+/**
+ * @class   vtkPVFrustumActor
+ *
+ * vtkPVFrustumActor is an actor that renders a frustum. Used in ParaView to
+ * show the frustum used for frustum selection extraction.
+*/
 
 #ifndef vtkPVFrustumActor_h
 #define vtkPVFrustumActor_h
@@ -33,14 +35,18 @@ public:
   vtkTypeMacro(vtkPVFrustumActor, vtkOpenGLActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the frustum.
+  /**
+   * Get/Set the frustum.
+   */
   void SetFrustum(double corners[24]);
 
-  // Description:
-  // Convenience method to set the color.
+  //@{
+  /**
+   * Convenience method to set the color.
+   */
   void SetColor(double r, double g, double b);
   void SetLineWidth(double r);
+  //@}
 
 protected:
   vtkPVFrustumActor();
@@ -52,7 +58,6 @@ protected:
 private:
   vtkPVFrustumActor(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

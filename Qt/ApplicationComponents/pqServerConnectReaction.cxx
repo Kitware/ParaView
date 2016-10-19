@@ -56,10 +56,10 @@ pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
   // needed to disable server connection while an animation is playing
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
-                   SIGNAL(beginPlay()), this, SLOT(updateEnableState()));
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
-                   SIGNAL(endPlay()), this, SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(beginPlay()), this,
+    SLOT(updateEnableState()));
+  QObject::connect(pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this,
+    SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -70,22 +70,20 @@ void pqServerConnectReaction::connectToServerWithWarning()
 
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  if ( !vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport() &&
-       (smmodel->findItems<pqPipelineSource*>(server).size() > 0) )
-    {
-    int ret = QMessageBox::warning(
-      pqCoreUtilities::mainWidget(),
-      tr("Disconnect from current server?"),
-      tr("Before connecting to a new server, \n"
-        "the current connection will be closed and \n"
-        "the state will be discarded.\n\n"
-        "Are you sure you want to continue?"),
+  if (!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport() &&
+    (smmodel->findItems<pqPipelineSource*>(server).size() > 0))
+  {
+    int ret = QMessageBox::warning(pqCoreUtilities::mainWidget(),
+      tr("Disconnect from current server?"), tr("Before connecting to a new server, \n"
+                                                "the current connection will be closed and \n"
+                                                "the state will be discarded.\n\n"
+                                                "Are you sure you want to continue?"),
       QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
-      {
+    {
       return;
-      }
     }
+  }
 
   pqServerConnectReaction::connectToServer();
 }
@@ -95,22 +93,20 @@ void pqServerConnectReaction::connectToServer()
 {
   pqServerConnectDialog dialog(pqCoreUtilities::mainWidget());
   if (dialog.exec() == QDialog::Accepted)
-    {
-    pqServerConnectReaction::connectToServerUsingConfiguration(
-      dialog.configurationToConnect());
-    }
+  {
+    pqServerConnectReaction::connectToServerUsingConfiguration(dialog.configurationToConnect());
+  }
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConnectReaction::connectToServerUsingConfigurationName(
-  const char* config_name)
+bool pqServerConnectReaction::connectToServerUsingConfigurationName(const char* config_name)
 {
   const pqServerConfiguration* config =
     pqApplicationCore::instance()->serverConfigurations().configuration(config_name);
   if (config)
-    {
+  {
     return pqServerConnectReaction::connectToServerUsingConfiguration(*config);
-    }
+  }
   return false;
 }
 
@@ -123,8 +119,7 @@ bool pqServerConnectReaction::connectToServer(const pqServerResource& resource)
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConnectReaction::connectToServerUsingConfiguration(
-  const pqServerConfiguration& config)
+bool pqServerConnectReaction::connectToServerUsingConfiguration(const pqServerConfiguration& config)
 {
   QScopedPointer<pqServerLauncher> launcher(pqServerLauncher::newInstance(config));
   return launcher->connectToServer();
@@ -134,11 +129,11 @@ bool pqServerConnectReaction::connectToServerUsingConfiguration(
 void pqServerConnectReaction::updateEnableState()
 {
   if (pqPVApplicationCore::instance()->animationManager()->animationPlaying())
-    {
+  {
     this->parentAction()->setEnabled(false);
-    }
+  }
   else
-    {
+  {
     this->parentAction()->setEnabled(true);
-    }
+  }
 }

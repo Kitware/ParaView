@@ -56,88 +56,87 @@ vtkSMProxyProperty::~vtkSMProxyProperty()
 void vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy)
 {
   if (this->PPInternals->Add(proxy))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy)
 {
   if (this->PPInternals->Remove(proxy))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveAllProxies()
 {
   if (this->PPInternals->Clear())
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::SetProxy(unsigned int index, vtkSMProxy* proxy)
 {
   if (this->PPInternals->Set(index, proxy))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
-  vtkSMProxy* proxies[])
+void vtkSMProxyProperty::SetProxies(unsigned int numProxies, vtkSMProxy* proxies[])
 {
   if (this->PPInternals->Set(numProxies, proxies))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::SetNumberOfProxies(unsigned int count)
 {
   if (this->PPInternals->Resize(count))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 {
   if (this->PPInternals->AddUnchecked(proxy))
-    {
+  {
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
 {
   if (this->PPInternals->SetUnchecked(idx, proxy))
-    {
+  {
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 {
   if (this->PPInternals->ClearUnchecked())
-    {
+  {
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -156,14 +155,13 @@ unsigned int vtkSMProxyProperty::GetNumberOfProxies()
 unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 {
   if (this->PPInternals->GetUncheckedProxies().size() > 0)
-    {
-    return static_cast<unsigned int>(
-      this->PPInternals->GetUncheckedProxies().size());
-    }
+  {
+    return static_cast<unsigned int>(this->PPInternals->GetUncheckedProxies().size());
+  }
   else
-    {
+  {
     return this->GetNumberOfProxies();
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -181,15 +179,15 @@ vtkSMProxy* vtkSMProxyProperty::GetUncheckedProxy(unsigned int idx)
 void vtkSMProxyProperty::SetNumberOfUncheckedProxies(unsigned int count)
 {
   if (this->PPInternals->ResizeUnchecked(count))
-    {
+  {
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 {
-  ProxyState_Property *prop = message->AddExtension(ProxyState::property);
+  ProxyState_Property* prop = message->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
   this->PPInternals->WriteTo(prop->mutable_value());
 
@@ -197,58 +195,59 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
   // except in vtkSMProxyListDomain. That domain has a state that need to
   // serialized and preserved esp. for undo-redo and collaboration to work
   // correctly.
-  for (this->DomainIterator->Begin(); !this->DomainIterator->IsAtEnd(); this->DomainIterator->Next())
-    {
-    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      this->DomainIterator->GetDomain());
+  for (this->DomainIterator->Begin(); !this->DomainIterator->IsAtEnd();
+       this->DomainIterator->Next())
+  {
+    vtkSMProxyListDomain* pld =
+      vtkSMProxyListDomain::SafeDownCast(this->DomainIterator->GetDomain());
     if (pld)
-      {
+    {
       // for each vtkSMProxyListDomain, add all proxies in that domain to the
       // message.
-      ProxyState_UserData* user_data= prop->add_user_data();
+      ProxyState_UserData* user_data = prop->add_user_data();
       user_data->set_key("ProxyListDomain"); // fixme -- add domain name, maybe?
       Variant* variant = user_data->add_variant();
       variant->set_type(Variant::PROXY);
-      for (unsigned int cc=0, max=pld->GetNumberOfProxies(); cc < max; cc++)
-        {
-        variant->add_proxy_global_id(pld->GetProxy(cc)?
-          pld->GetProxy(cc)->GetGlobalID() : 0);
-        }
+      for (unsigned int cc = 0, max = pld->GetNumberOfProxies(); cc < max; cc++)
+      {
+        variant->add_proxy_global_id(pld->GetProxy(cc) ? pld->GetProxy(cc)->GetGlobalID() : 0);
       }
     }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
-                                  vtkSMProxyLocator* locator)
+void vtkSMProxyProperty::ReadFrom(
+  const vtkSMMessage* message, int msg_offset, vtkSMProxyLocator* locator)
 {
-  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, msg_offset);
+  const ProxyState_Property* prop = &message->GetExtension(ProxyState::property, msg_offset);
   if (strcmp(prop->name().c_str(), this->GetXMLName()) != 0)
-    {
+  {
     vtkErrorMacro("Invalid offset for this property. "
-      "Typically indicates that state being loaded is invalid/corrupted.");
+                  "Typically indicates that state being loaded is invalid/corrupted.");
     return;
-    }
+  }
 
   if (this->PPInternals->ReadFrom(prop->value(), locator))
-    {
+  {
     this->Modified();
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 
   // The EXCEPTION case: read proxy list domain state.
   int pld_index = 0;
-  for (this->DomainIterator->Begin(); !this->DomainIterator->IsAtEnd(); this->DomainIterator->Next())
-    {
-    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      this->DomainIterator->GetDomain());
+  for (this->DomainIterator->Begin(); !this->DomainIterator->IsAtEnd();
+       this->DomainIterator->Next())
+  {
+    vtkSMProxyListDomain* pld =
+      vtkSMProxyListDomain::SafeDownCast(this->DomainIterator->GetDomain());
     if (pld)
-      {
+    {
       if (pld_index >= prop->user_data_size())
-        {
+      {
         vtkWarningMacro("Missing matched in ProxyListDomain state.");
         continue;
-        }
+      }
 
       const ProxyState_UserData& user_data = prop->user_data(pld_index);
       pld_index++;
@@ -258,42 +257,40 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
       assert(user_data.key() == "ProxyListDomain");
       assert(user_data.variant_size() == 1);
 
-      for (int cc=0, max = user_data.variant(0).proxy_global_id_size(); cc < max; cc++)
-        {
+      for (int cc = 0, max = user_data.variant(0).proxy_global_id_size(); cc < max; cc++)
+      {
         vtkTypeUInt32 gid = user_data.variant(0).proxy_global_id(cc);
 
         // either ask the locator for the proxy, or find an existing one.
         vtkSMProxy* proxy = NULL;
         if (locator && vtkSMProxyProperty::CanCreateProxy())
-          {
+        {
           proxy = locator->LocateProxy(gid);
-          }
-        else
-          {
-          proxy = vtkSMProxy::SafeDownCast(
-            this->GetParent()->GetSession()->GetRemoteObject(gid));
-          }
-        if (proxy != NULL || gid == 0)
-          {
-          proxies.push_back(proxy);
-          }
         }
+        else
+        {
+          proxy = vtkSMProxy::SafeDownCast(this->GetParent()->GetSession()->GetRemoteObject(gid));
+        }
+        if (proxy != NULL || gid == 0)
+        {
+          proxies.push_back(proxy);
+        }
+      }
       proxies.push_back(NULL);
 
-      pld->SetProxies(&proxies[0], static_cast<unsigned int>(proxies.size()-1));
-      }
+      pld->SetProxies(&proxies[0], static_cast<unsigned int>(proxies.size() - 1));
     }
+  }
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
-                                          vtkPVXMLElement* element)
+int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)
 {
   int skip_dependency;
   if (element->GetScalarAttribute("skip_dependency", &skip_dependency))
-    {
+  {
     this->SkipDependency = (skip_dependency == 1);
-    }
+  }
   return this->Superclass::ReadXMLAttributes(parent, element);
 }
 
@@ -303,79 +300,74 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
   this->Superclass::Copy(src);
   vtkSMProxyProperty* psrc = vtkSMProxyProperty::SafeDownCast(src);
   if (!psrc)
-    {
+  {
     return;
-    }
+  }
 
-  bool modified = this->PPInternals->SetProxies(
-    psrc->PPInternals->GetProxies(),
-    psrc->PPInternals->GetPorts());
+  bool modified =
+    this->PPInternals->SetProxies(psrc->PPInternals->GetProxies(), psrc->PPInternals->GetPorts());
   bool unchecked_modified = this->PPInternals->SetUncheckedProxies(
-    psrc->PPInternals->GetUncheckedProxies(),
-    psrc->PPInternals->GetUncheckedPorts());
+    psrc->PPInternals->GetUncheckedProxies(), psrc->PPInternals->GetUncheckedPorts());
   if (modified)
-    {
+  {
     this->Modified();
-    }
+  }
   if (modified || unchecked_modified)
-    {
+  {
     this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SkipDependency: "<< this->SkipDependency << endl;
-  //os << indent << "Values: ";
-  //for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
+  os << indent << "SkipDependency: " << this->SkipDependency << endl;
+  // os << indent << "Values: ";
+  // for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
   //  {
   //  os << this->GetProxy(i) << " ";
   //  }
-  //os << endl;
+  // os << endl;
 }
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::SaveStateValues(vtkPVXMLElement* propertyElement)
 {
   unsigned int size = this->GetNumberOfProxies();
   if (size > 0)
-    {
+  {
     propertyElement->AddAttribute("number_of_elements", size);
-    }
-  for (unsigned int i=0; i<size; i++)
-    {
+  }
+  for (unsigned int i = 0; i < size; i++)
+  {
     this->AddProxyElementState(propertyElement, i);
-    }
+  }
 }
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyProperty::AddProxyElementState(vtkPVXMLElement *prop,
-                                                          unsigned int idx)
+vtkPVXMLElement* vtkSMProxyProperty::AddProxyElementState(vtkPVXMLElement* prop, unsigned int idx)
 {
   vtkSMProxy* proxy = this->GetProxy(idx);
   vtkPVXMLElement* proxyElement = 0;
   if (proxy)
-    {
+  {
     proxyElement = vtkPVXMLElement::New();
     proxyElement->SetName("Proxy");
-    proxyElement->AddAttribute("value",
-                               static_cast<unsigned int>(proxy->GetGlobalID()));
+    proxyElement->AddAttribute("value", static_cast<unsigned int>(proxy->GetGlobalID()));
     prop->AddNestedElement(proxyElement);
     proxyElement->FastDelete();
-    }
+  }
   return proxyElement;
 }
 //---------------------------------------------------------------------------
 // NOTE: This method is duplicated in some way in vtkSMInputProperty
 // Therefore, care must be taken to keep the two in sync.
-int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
-                                  vtkSMProxyLocator* loader)
+int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader)
 {
   if (!loader)
-    {
+  {
     // no loader specified, state remains unchanged.
     return 1;
-    }
+  }
 
   int prevImUpdate = this->ImmediateUpdate;
 
@@ -386,49 +378,48 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   // If "clear" is present and is 0, it implies that the proxy elements
   // currently in the property should not be cleared before loading
   // the new state.
-  int clear=1;
+  int clear = 1;
   element->GetScalarAttribute("clear", &clear);
   if (clear)
-    {
+  {
     this->PPInternals->Clear();
-    }
+  }
 
   unsigned int numElems = element->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
+  for (unsigned int i = 0; i < numElems; i++)
+  {
     vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        (strcmp(currentElement->GetName(), "Element") == 0 ||
-         strcmp(currentElement->GetName(), "Proxy") == 0) )
-      {
+    if (currentElement->GetName() && (strcmp(currentElement->GetName(), "Element") == 0 ||
+                                       strcmp(currentElement->GetName(), "Proxy") == 0))
+    {
       int id;
       if (currentElement->GetScalarAttribute("value", &id))
-        {
+      {
         if (id)
-          {
+        {
           int port = 0;
           // if output_port is not present, port remains 0.
           currentElement->GetScalarAttribute("output_port", &port);
           vtkSMProxy* proxy = loader->LocateProxy(id);
           if (proxy)
-            {
+          {
             this->PPInternals->Add(proxy, port);
-            }
+          }
           else
-            {
+          {
             // It is not an error to have missing proxies in a proxy property.
             // We simply ignore such proxies.
-            //vtkErrorMacro("Could not create proxy of id: " << id);
-            //return 0;
-            }
+            // vtkErrorMacro("Could not create proxy of id: " << id);
+            // return 0;
           }
+        }
         else
-          {
+        {
           this->PPInternals->Add(NULL);
-          }
         }
       }
     }
+  }
 
   // Do not immediately update. Leave it to the loader.
   this->Modified();
@@ -442,14 +433,14 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
 void vtkSMProxyProperty::UpdateAllInputs()
 {
   unsigned int numProxies = this->GetNumberOfProxies();
-  for (unsigned int idx=0; idx < numProxies; idx++)
-    {
+  for (unsigned int idx = 0; idx < numProxies; idx++)
+  {
     vtkSMProxy* proxy = this->GetProxy(idx);
     if (proxy)
-      {
+    {
       proxy->UpdateSelfAndAllInputs();
-      }
     }
+  }
 }
 
 //---------------------------------------------------------------------------

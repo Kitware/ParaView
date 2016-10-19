@@ -99,43 +99,42 @@ vtkPCosmoReader::vtkPCosmoReader()
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   if (!this->Controller)
-    {
-    vtkSmartPointer<vtkDummyController> controller =
-      vtkSmartPointer<vtkDummyController>::New();
+  {
+    vtkSmartPointer<vtkDummyController> controller = vtkSmartPointer<vtkDummyController>::New();
     this->SetController(controller);
-    }
+  }
 
   this->FileName = NULL;
   this->RL = 100;
   this->Overlap = 5;
   this->ReadMode = 1;
   this->CosmoFormat = 1;
-//  this->ByteSwap = 0;
+  //  this->ByteSwap = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPCosmoReader::~vtkPCosmoReader()
 {
   if (this->FileName)
-    {
-    delete [] this->FileName;
-    }
+  {
+    delete[] this->FileName;
+  }
   this->SetController(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   if (this->Controller)
-    {
+  {
     os << indent << "Controller: " << this->Controller << endl;
-    }
+  }
   else
-    {
+  {
     os << indent << "Controller: (null)\n";
-    }
+  }
 
   os << indent << "FileName: " << (this->FileName != NULL ? this->FileName : "") << endl;
   os << indent << "rL: " << this->RL << endl;
@@ -145,65 +144,56 @@ void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPCosmoReader::RequestInformation(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+int vtkPCosmoReader::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   // set the pieces as the number of processes
-  outputVector->GetInformationObject(0)->Set
-    (CAN_HANDLE_PIECE_REQUEST(),1);
+  outputVector->GetInformationObject(0)->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
-  outputVector->GetInformationObject(0)->Set
-    (vtkDataObject::DATA_NUMBER_OF_PIECES(),
-     this->Controller->GetNumberOfProcesses());
+  outputVector->GetInformationObject(0)->Set(
+    vtkDataObject::DATA_NUMBER_OF_PIECES(), this->Controller->GetNumberOfProcesses());
 
   // set the ghost levels
-  outputVector->GetInformationObject(0)->Set
-    (vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 1);
+  outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 1);
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPCosmoReader::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+int vtkPCosmoReader::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
   // get the info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // get the output
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid* output =
+    vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // check that the piece number is correct
   int updatePiece = 0;
   int updateTotal = 1;
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
-    {
-      updatePiece = outInfo->
-        Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-    }
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
-    {
-      updateTotal = outInfo->
-        Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-    }
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+  {
+    updatePiece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+  }
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
+  {
+    updateTotal = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+  }
 
-  if(updatePiece != this->Controller->GetLocalProcessId() ||
-     updateTotal != this->Controller->GetNumberOfProcesses())
-    {
-      vtkErrorMacro(<< "Piece number does not match process number.");
-      return 0;
-    }
+  if (updatePiece != this->Controller->GetLocalProcessId() ||
+    updateTotal != this->Controller->GetNumberOfProcesses())
+  {
+    vtkErrorMacro(<< "Piece number does not match process number.");
+    return 0;
+  }
 
-   if (this->FileName == NULL || this->FileName[0] == '\0')
-    {
+  if (this->FileName == NULL || this->FileName[0] == '\0')
+  {
     vtkErrorMacro(<< "No FileName specified!");
     return 0;
-    }
+  }
 
   // RRU code
   // Initialize the partitioner which uses MPI Cartesian Topology
@@ -214,23 +204,23 @@ int vtkPCosmoReader::RequestData(
   ParticleExchange exchange;
 
   // Initialize classes for reading, exchanging and calculating
-  if(this->CosmoFormat)
-    {
+  if (this->CosmoFormat)
+  {
     distribute.setParameters(this->FileName, this->RL, "RECORD");
-    }
+  }
   else
-    {
+  {
     distribute.setParameters(this->FileName, this->RL, "BLOCK");
-    }
+  }
 
-//  if( this->ByteSwap )
-//    {
-//    distribute.setByteSwap(true);
-//    }
-//  else
-//    {
-//    distribute.setByteSwap(false);
-//    }
+  //  if( this->ByteSwap )
+  //    {
+  //    distribute.setByteSwap(true);
+  //    }
+  //  else
+  //    {
+  //    distribute.setByteSwap(false);
+  //    }
 
   exchange.setParameters(this->RL, this->Overlap);
 
@@ -253,14 +243,14 @@ int vtkPCosmoReader::RequestData(
   vector<STATUS_T>* status = new vector<STATUS_T>;
 
   distribute.setParticles(xx, yy, zz, vx, vy, vz, mass, tag);
-  if(this->ReadMode)
-    {
+  if (this->ReadMode)
+  {
     distribute.readParticlesRoundRobin();
-    }
+  }
   else
-    {
+  {
     distribute.readParticlesOneToOne();
-    }
+  }
 
   // Create the mask and potential vectors which will be filled in elsewhere
   int numberOfParticles = (int)xx->size();
@@ -268,8 +258,7 @@ int vtkPCosmoReader::RequestData(
   vector<MASK_T>* mask = new vector<MASK_T>(numberOfParticles);
 
   // Exchange particles adds dead particles to all the vectors
-  exchange.setParticles(xx, yy, zz, vx, vy, vz, mass, potential, tag,
-                        mask, status);
+  exchange.setParticles(xx, yy, zz, vx, vy, vz, mass, potential, tag, mask, status);
   exchange.exchangeParticles();
 
   // create VTK structures
@@ -301,8 +290,8 @@ int vtkPCosmoReader::RequestData(
   ghost->Allocate(numberOfParticles);
 
   // put it into the correct VTK structure
-  for(vtkIdType i = 0; i < numberOfParticles; i = i + 1)
-    {
+  for (vtkIdType i = 0; i < numberOfParticles; i = i + 1)
+  {
     float pt[DIMENSION];
 
     // insert point and cell
@@ -345,7 +334,7 @@ int vtkPCosmoReader::RequestData(
 
     owner->InsertNextValue(neighbor);
     ghost->InsertNextValue((level > 0) ? vtkDataSetAttributes::DUPLICATEPOINT : 0);
-    }
+  }
 
   // cleanup
   output->SetPoints(points);

@@ -48,19 +48,20 @@ vtkPConvertSelection::~vtkPConvertSelection()
 static void vtkTrimTree(vtkSelection* input, int processId)
 {
   if (input)
-    {
+  {
     unsigned int numNodes = input->GetNumberOfNodes();
     for (unsigned int cc = 0; cc < numNodes; cc++)
-      {
+    {
       vtkSelectionNode* node = input->GetNode(cc);
-      int propId = (node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID()))?
-        node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID()): -1;
+      int propId = (node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID()))
+        ? node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID())
+        : -1;
       if (propId != -1 && processId != -1 && propId != processId)
-        {
+      {
         input->RemoveNode(node);
-        }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -68,25 +69,24 @@ static void vtkTrimTree(vtkSelection* input, int processId)
 static void vtkAddProcessID(vtkSelection* input, int myId)
 {
   if (input)
-    {
+  {
     unsigned int numNodes = input->GetNumberOfNodes();
     for (unsigned int cc = 0; cc < numNodes; cc++)
-      {
+    {
       input->GetNode(cc)->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
-int vtkPConvertSelection::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkPConvertSelection::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (!this->Controller || this->Controller->GetNumberOfProcesses()==1)
-    {
+  if (!this->Controller || this->Controller->GetNumberOfProcesses() == 1)
+  {
     // nothing much to do.
     return this->Superclass::RequestData(request, inputVector, outputVector);
-    }
+  }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkSelection* input = vtkSelection::GetData(inInfo);
@@ -99,8 +99,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
   // process.
   int myId = this->Controller->GetLocalProcessId();
 
-  vtkSmartPointer<vtkSelection> newInput =
-    vtkSmartPointer<vtkSelection>::New();
+  vtkSmartPointer<vtkSelection> newInput = vtkSmartPointer<vtkSelection>::New();
   newInput->ShallowCopy(input);
 
   ::vtkTrimTree(newInput, myId);
@@ -113,15 +112,14 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
   inInfo->Set(vtkDataObject::DATA_OBJECT(), input);
   input->UnRegister(this);
   if (!ret)
-    {
+  {
     return 0;
-    }
+  }
 
   // Now add process id to the generated output.
   ::vtkAddProcessID(output, myId);
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPConvertSelection::PrintSelf(ostream& os, vtkIndent indent)

@@ -46,72 +46,69 @@ void vtkSMComparativeAnimationCueUndoElement::PrintSelf(ostream& os, vtkIndent i
 //----------------------------------------------------------------------------
 int vtkSMComparativeAnimationCueUndoElement::Undo()
 {
-  if( this->ComparativeAnimationCueID &&
-      this->Session->GetRemoteObject(this->ComparativeAnimationCueID) &&
-      this->BeforeState && this->BeforeState->GetNestedElement(0) )
-    {
-    vtkSMComparativeAnimationCueProxy* proxy =
-        vtkSMComparativeAnimationCueProxy::SafeDownCast(
-            this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
+  if (this->ComparativeAnimationCueID &&
+    this->Session->GetRemoteObject(this->ComparativeAnimationCueID) && this->BeforeState &&
+    this->BeforeState->GetNestedElement(0))
+  {
+    vtkSMComparativeAnimationCueProxy* proxy = vtkSMComparativeAnimationCueProxy::SafeDownCast(
+      this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
     proxy->GetComparativeAnimationCue()->LoadCommandInfo(this->BeforeState->GetNestedElement(0));
     proxy->InvokeEvent(vtkCommand::ModifiedEvent); // Will update the UI
-    }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkSMComparativeAnimationCueUndoElement::Redo()
 {
-  if( this->ComparativeAnimationCueID &&
-      this->AfterState && this->AfterState->GetNestedElement(0))
-    {
+  if (this->ComparativeAnimationCueID && this->AfterState && this->AfterState->GetNestedElement(0))
+  {
     // Make sure the proxy exist.
     // In the current undostack vtkSMComparativeAnimationCueUndoElement will
     // always occurs before the actual proxy will get registered therefore
     // when we redo from nothing we have no other choice than recreating that
     // proxy HERE which should ONLY be done inside the ProxyManager at the
     // registration time.
-    if(!this->Session->GetRemoteObject(this->ComparativeAnimationCueID))
-      {
+    if (!this->Session->GetRemoteObject(this->ComparativeAnimationCueID))
+    {
       vtkSMProxy* proxy =
-          this->Session->GetProxyLocator()->LocateProxy(
-              this->ComparativeAnimationCueID);
+        this->Session->GetProxyLocator()->LocateProxy(this->ComparativeAnimationCueID);
       this->UndoSetWorkingContext->AddItem(proxy);
       proxy->LoadXMLState(this->AfterState->GetNestedElement(0), NULL);
       proxy->Delete();
-      }
+    }
     else
-      {
-      vtkSMComparativeAnimationCueProxy* proxy =
-          vtkSMComparativeAnimationCueProxy::SafeDownCast(
-              this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
+    {
+      vtkSMComparativeAnimationCueProxy* proxy = vtkSMComparativeAnimationCueProxy::SafeDownCast(
+        this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
       proxy->GetComparativeAnimationCue()->LoadCommandInfo(this->AfterState->GetNestedElement(0));
       proxy->InvokeEvent(vtkCommand::ModifiedEvent); // Will update the UI
-      }
     }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeAnimationCueUndoElement::SetXMLStates(vtkTypeUInt32 proxyID, vtkPVXMLElement* before, vtkPVXMLElement* after)
+void vtkSMComparativeAnimationCueUndoElement::SetXMLStates(
+  vtkTypeUInt32 proxyID, vtkPVXMLElement* before, vtkPVXMLElement* after)
 {
   this->ComparativeAnimationCueID = proxyID;
-  if(before)
-    {
+  if (before)
+  {
     this->BeforeState = vtkSmartPointer<vtkPVXMLElement>::New();
     before->CopyTo(this->BeforeState);
-    }
+  }
   else
-    {
+  {
     this->BeforeState = NULL;
-    }
-  if(after)
-    {
+  }
+  if (after)
+  {
     this->AfterState = vtkSmartPointer<vtkPVXMLElement>::New();
     after->CopyTo(this->AfterState);
-    }
+  }
   else
-    {
+  {
     this->AfterState = NULL;
-    }
+  }
 }

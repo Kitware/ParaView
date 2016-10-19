@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,16 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMimeData>
 #include <QScrollBar>
 
-pqTreeView::pqTreeView(QWidget *widgetParent)
-  : QTreeView(widgetParent),
-  ScrollPadding(0),
-  MaximumRowCountBeforeScrolling(10)
+pqTreeView::pqTreeView(QWidget* widgetParent)
+  : QTreeView(widgetParent)
+  , ScrollPadding(0)
+  , MaximumRowCountBeforeScrolling(10)
 {
   this->ScrollPadding = 0;
 
   // Change the default header view to a checkable one.
-  pqCheckableHeaderView *checkable =
-    new pqCheckableHeaderView(Qt::Horizontal,this);
+  pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
   this->setHeader(checkable);
   this->installEventFilter(checkable);
 #if QT_VERSION >= 0x050000
@@ -65,49 +64,47 @@ pqTreeView::pqTreeView(QWidget *widgetParent)
   this->horizontalScrollBar()->installEventFilter(this);
 }
 
-bool pqTreeView::eventFilter(QObject *object, QEvent *e)
+bool pqTreeView::eventFilter(QObject* object, QEvent* e)
 {
-  if(object == this->horizontalScrollBar())
+  if (object == this->horizontalScrollBar())
+  {
+    if (e->type() == QEvent::Show && this->ScrollPadding == 0)
     {
-    if(e->type() == QEvent::Show && this->ScrollPadding == 0)
-      {
       this->ScrollPadding = this->horizontalScrollBar()->height();
       this->invalidateLayout();
-      }
-    else if(e->type() == QEvent::Hide && this->ScrollPadding != 0)
-      {
+    }
+    else if (e->type() == QEvent::Hide && this->ScrollPadding != 0)
+    {
       this->ScrollPadding = 0;
       this->invalidateLayout();
-      }
     }
+  }
 
   return QTreeView::eventFilter(object, e);
 }
 
-void pqTreeView::setModel(QAbstractItemModel *newModel)
+void pqTreeView::setModel(QAbstractItemModel* newModel)
 {
-  QAbstractItemModel *current = this->model();
-  if(current)
-    {
+  QAbstractItemModel* current = this->model();
+  if (current)
+  {
     this->disconnect(current, 0, this, 0);
-    }
+  }
 
   QTreeView::setModel(newModel);
-  if(newModel)
-    {
+  if (newModel)
+  {
     this->connect(
-        newModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)),
-        this, SLOT(invalidateLayout()));
-    this->connect(newModel, SIGNAL(rowsRemoved(const QModelIndex &, int, int)),
-        this, SLOT(invalidateLayout()));
-    this->connect(newModel, SIGNAL(modelReset()),
-        this, SLOT(invalidateLayout()));
-    }
+      newModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this, SLOT(invalidateLayout()));
+    this->connect(
+      newModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this, SLOT(invalidateLayout()));
+    this->connect(newModel, SIGNAL(modelReset()), this, SLOT(invalidateLayout()));
+  }
 
   this->invalidateLayout();
 }
 
-void pqTreeView::setRootIndex(const QModelIndex &index)
+void pqTreeView::setRootIndex(const QModelIndex& index)
 {
   QTreeView::setRootIndex(index);
   this->invalidateLayout();
@@ -125,29 +122,29 @@ QSize pqTreeView::sizeHint() const
   int extra = this->ScrollPadding;
 
   int num = 0;
-  QAbstractItemModel *current = this->model();
-  if(current)
-    {
+  QAbstractItemModel* current = this->model();
+  if (current)
+  {
     num = current->rowCount(this->rootIndex());
-    }
+  }
 
-  if(num >= maxItemHint)
-    {
+  if (num >= maxItemHint)
+  {
     extra = 0;
     num = maxItemHint;
-    }
-  
+  }
+
   int pix = minItemHeight;
 
   if (num)
-    {
+  {
     num++; // leave an extra row padding.
            // the widget ends up appearing too crowded otherwise.
     pix = qMax(pix, this->sizeHintForRow(0) * num);
-    }
+  }
 
   int margin[4];
-  this->getContentsMargins(margin, margin+1, margin+2, margin+3);
+  this->getContentsMargins(margin, margin + 1, margin + 2, margin + 3);
   int h = pix + margin[1] + margin[3] + this->header()->frameSize().height();
   return QSize(this->Superclass::sizeHint().width(), h + extra);
 }
@@ -161,13 +158,11 @@ void pqTreeView::invalidateLayout()
 {
   // sizeHint is dynamic, so we need to invalidate parent layouts
   // when items are added or removed
-  for(QWidget* w = this->parentWidget();
-      w && w->layout();
-      w = w->parentWidget())
-    {
+  for (QWidget* w = this->parentWidget(); w && w->layout(); w = w->parentWidget())
+  {
     w->layout()->invalidate();
-    }
-  // invalidate() is not enough, we need to reset the cache of the 
+  }
+  // invalidate() is not enough, we need to reset the cache of the
   // QWidgetItemV2, so sizeHint() could be recomputed.
   this->updateGeometry();
 }

@@ -34,12 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMContextViewProxy.h"
 
 //-----------------------------------------------------------------------------
-pqXYHistogramChartView::pqXYHistogramChartView(const QString& group,
-                             const QString& name,
-                             vtkSMContextViewProxy* viewModule,
-                             pqServer* server,
-                             QObject* p/*=NULL*/):
-  Superclass(XYHistogramChartViewType(), group, name, viewModule, server, p)
+pqXYHistogramChartView::pqXYHistogramChartView(const QString& group, const QString& name,
+  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* p /*=NULL*/)
+  : Superclass(XYHistogramChartViewType(), group, name, viewModule, server, p)
 {
 }
 

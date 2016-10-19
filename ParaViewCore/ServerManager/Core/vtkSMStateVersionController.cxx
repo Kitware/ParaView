@@ -34,119 +34,117 @@ using namespace std;
 
 namespace
 {
-  string toString(int i)
+string toString(int i)
+{
+  ostringstream ostr;
+  ostr << i;
+  return ostr.str();
+}
+
+class vtkSMVersion
+{
+public:
+  int Major;
+  int Minor;
+  int Patch;
+
+  vtkSMVersion(int major, int minor, int patch)
+    : Major(major)
+    , Minor(minor)
+    , Patch(patch)
   {
-    ostringstream ostr;
-    ostr << i;
-    return ostr.str();
   }
 
-  class vtkSMVersion
+  bool operator<(const vtkSMVersion& other) const
+  {
+    if (this->Major == other.Major)
     {
-    public:
-      int Major;
-      int Minor;
-      int Patch;
-
-      vtkSMVersion(int major, int minor, int patch):
-        Major(major), Minor(minor), Patch(patch)
-        {
-        }
-
-      bool operator < (const vtkSMVersion& other) const
-        {
-        if (this->Major == other.Major)
-          {
-          if (this->Minor == other.Minor)
-            {
-            return this->Patch < other.Patch;
-            }
-          else
-            {
-            return this->Minor < other.Minor;
-            }
-          }
-        else
-          {
-          return this->Major < other.Major;
-          }
-        }
-    };
-
-  //===========================================================================
-  // Helper functions
-  //===========================================================================
-  void PurgeElements(const pugi::xpath_node_set &elements_of_interest)
-    {
-    for (pugi::xpath_node_set::const_iterator iter = elements_of_interest.begin();
-      iter != elements_of_interest.end(); ++iter)
+      if (this->Minor == other.Minor)
       {
-      pugi::xml_node node = iter->node();
-      node.parent().remove_child(node);
+        return this->Patch < other.Patch;
+      }
+      else
+      {
+        return this->Minor < other.Minor;
       }
     }
-  void PurgeElement(const pugi::xml_node& node)
+    else
     {
+      return this->Major < other.Major;
+    }
+  }
+};
+
+//===========================================================================
+// Helper functions
+//===========================================================================
+void PurgeElements(const pugi::xpath_node_set& elements_of_interest)
+{
+  for (pugi::xpath_node_set::const_iterator iter = elements_of_interest.begin();
+       iter != elements_of_interest.end(); ++iter)
+  {
+    pugi::xml_node node = iter->node();
     node.parent().remove_child(node);
-    }
+  }
+}
+void PurgeElement(const pugi::xml_node& node)
+{
+  node.parent().remove_child(node);
+}
 
-  //===========================================================================
-  bool Process_4_0_to_4_1(pugi::xml_document &document)
+//===========================================================================
+bool Process_4_0_to_4_1(pugi::xml_document& document)
+{
+  //-------------------------------------------------------------------------
+  // For CTHPart filter, we need to convert AddDoubleVolumeArrayName,
+  // AddUnsignedCharVolumeArrayName and AddFloatVolumeArrayName to a single
+  // VolumeArrays property. The type specific separation is no longer
+  // needed.
+  //-------------------------------------------------------------------------
+  pugi::xpath_node_set cthparts =
+    document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='CTHPart']");
+  for (pugi::xpath_node_set::const_iterator iter = cthparts.begin(); iter != cthparts.end(); ++iter)
+  {
+    std::set<std::string> selected_arrays;
+
+    pugi::xml_node cthpart_node = iter->node();
+    pugi::xpath_node_set elements_of_interest =
+      cthpart_node.select_nodes("//Property[@name='AddDoubleVolumeArrayName' "
+                                "or @name='AddFloatVolumeArrayName' "
+                                "or @name='AddUnsignedCharVolumeArrayName']"
+                                "/Element[@value]");
+
+    for (pugi::xpath_node_set::const_iterator iter2 = elements_of_interest.begin();
+         iter2 != elements_of_interest.end(); ++iter2)
     {
-    //-------------------------------------------------------------------------
-    // For CTHPart filter, we need to convert AddDoubleVolumeArrayName,
-    // AddUnsignedCharVolumeArrayName and AddFloatVolumeArrayName to a single
-    // VolumeArrays property. The type specific separation is no longer
-    // needed.
-    //-------------------------------------------------------------------------
-    pugi::xpath_node_set cthparts =
-      document.select_nodes(
-        "//ServerManagerState/Proxy[@group='filters' and @type='CTHPart']");
-    for (pugi::xpath_node_set::const_iterator iter = cthparts.begin();
-      iter != cthparts.end(); ++iter)
-      {
-      std::set<std::string> selected_arrays;
-
-      pugi::xml_node cthpart_node = iter->node();
-      pugi::xpath_node_set elements_of_interest = cthpart_node.select_nodes(
-        "//Property[@name='AddDoubleVolumeArrayName' "
-                "or @name='AddFloatVolumeArrayName' "
-                "or @name='AddUnsignedCharVolumeArrayName']"
-        "/Element[@value]");
-
-      for (pugi::xpath_node_set::const_iterator iter2 = elements_of_interest.begin();
-        iter2 != elements_of_interest.end(); ++iter2)
-        {
-        selected_arrays.insert(
-          iter2->node().attribute("value").value());
-        }
-
-      // Remove all of those old property elements.
-      PurgeElements(cthpart_node.select_nodes(
-          "//Property[@name='AddDoubleVolumeArrayName' "
-                "or @name='AddFloatVolumeArrayName' "
-                "or @name='AddUnsignedCharVolumeArrayName']"));
-
-      // Add new XML state for "VolumeArrays" property with the value as
-      // "selected_arrays".
-      std::ostringstream stream;
-      stream << "<Property name=\"VolumeArrays\" >\n";
-      int index=0;
-      for (std::set<std::string>::const_iterator it = selected_arrays.begin();
-        it != selected_arrays.end(); ++it, ++index)
-        {
-        stream << "  <Element index=\"" << index << "\" value=\"" << (*it).c_str() << "\"/>\n";
-        }
-      stream << "</Property>\n";
-      std::string buffer = stream.str();
-      if (!cthpart_node.append_buffer(buffer.c_str(), buffer.size()))
-        {
-        abort();
-        }
-      }
-    //-------------------------------------------------------------------------
-    return true;
+      selected_arrays.insert(iter2->node().attribute("value").value());
     }
+
+    // Remove all of those old property elements.
+    PurgeElements(cthpart_node.select_nodes("//Property[@name='AddDoubleVolumeArrayName' "
+                                            "or @name='AddFloatVolumeArrayName' "
+                                            "or @name='AddUnsignedCharVolumeArrayName']"));
+
+    // Add new XML state for "VolumeArrays" property with the value as
+    // "selected_arrays".
+    std::ostringstream stream;
+    stream << "<Property name=\"VolumeArrays\" >\n";
+    int index = 0;
+    for (std::set<std::string>::const_iterator it = selected_arrays.begin();
+         it != selected_arrays.end(); ++it, ++index)
+    {
+      stream << "  <Element index=\"" << index << "\" value=\"" << (*it).c_str() << "\"/>\n";
+    }
+    stream << "</Property>\n";
+    std::string buffer = stream.str();
+    if (!cthpart_node.append_buffer(buffer.c_str(), buffer.size()))
+    {
+      abort();
+    }
+  }
+  //-------------------------------------------------------------------------
+  return true;
+}
 
 //===========================================================================
 struct Process_4_1_to_4_2
@@ -154,16 +152,14 @@ struct Process_4_1_to_4_2
   static const char* const NAME;
   static const char* const VALUE;
 
-  bool operator()(xml_document &document)
+  bool operator()(xml_document& document)
   {
-    bool ret =
-      ConvertRepresentationColorArrayName(document) &&
-      ConvertChartNodes(document) &&
+    bool ret = ConvertRepresentationColorArrayName(document) && ConvertChartNodes(document) &&
       ConvertGlyphFilter(document);
     return ret;
   }
 
-  static bool ConvertRepresentationColorArrayName(xml_document &document)
+  static bool ConvertRepresentationColorArrayName(xml_document& document)
   {
     //-------------------------------------------------------------------------
     // Convert ColorArrayName and ColorAttributeType properties to new style.
@@ -175,47 +171,47 @@ struct Process_4_1_to_4_2
       document.select_nodes("//ServerManagerState/Proxy[@group='representations']");
     for (pugi::xpath_node_set::const_iterator iter = representation_elements.begin();
          iter != representation_elements.end(); ++iter)
-      {
+    {
       // select ColorAttributeType and ColorArrayName properties for each
       // representation.
       std::string colorArrayName;
       if (pugi::xpath_node nameElement = iter->node().select_single_node(
             "//Property[@name='ColorArrayName' and @number_of_elements='1']"
             "/Element[@index='0' and @value]"))
-        {
+      {
         colorArrayName = nameElement.node().attribute("value").value();
 
         // remove the "Property" xml-element
         PurgeElement(nameElement.node().parent());
-        }
+      }
 
       std::string attributeType("");
       if (pugi::xpath_node typeElement = iter->node().select_single_node(
             "//Property[@name='ColorAttributeType' and @number_of_elements='1']"
             "/Element[@index='0' and @value]"))
-        {
+      {
         attributeType = typeElement.node().attribute("value").value();
 
         // remove the "Property" xml-element
         PurgeElement(typeElement.node().parent());
-        }
+      }
       if (!colorArrayName.empty() || !attributeType.empty())
-        {
+      {
         std::ostringstream stream;
         stream << "<Property name=\"ColorArrayName\" number_of_elements=\"5\">\n"
                << "   <Element index=\"0\" value=\"\" />\n"
                << "   <Element index=\"1\" value=\"\" />\n"
                << "   <Element index=\"2\" value=\"\" />\n"
                << "   <Element index=\"3\" value=\"" << attributeType.c_str() << "\" />\n"
-               << "   <Element index=\"4\" value=\"" << colorArrayName.c_str()<< "\" />\n"
+               << "   <Element index=\"4\" value=\"" << colorArrayName.c_str() << "\" />\n"
                << "</Property>\n";
         std::string buffer = stream.str();
         if (!iter->node().append_buffer(buffer.c_str(), buffer.size()))
-          {
+        {
           abort();
-          }
         }
       }
+    }
 
     //-------------------------------------------------------------------------
     // remove camera manipulator proxies and interactorstyles proxies.
@@ -230,140 +226,113 @@ struct Process_4_1_to_4_2
     pugi::xml_node links = smstate.child("Links");
 
     if (!links)
-      {
+    {
       links = smstate.append_child("Links");
-      }
+    }
 
-    pugi::xpath_node_set global_property_links =
-      document.select_nodes("//ServerManagerState/GlobalPropertiesManagers/GlobalPropertiesManager/Link");
+    pugi::xpath_node_set global_property_links = document.select_nodes(
+      "//ServerManagerState/GlobalPropertiesManagers/GlobalPropertiesManager/Link");
     for (pugi::xpath_node_set::const_iterator iter = global_property_links.begin();
-      iter != global_property_links.end(); ++iter)
-      {
+         iter != global_property_links.end(); ++iter)
+    {
       pugi::xml_node linkNode = iter->node();
       linkNode.set_name("GlobalPropertyLink");
 
       links.append_copy(linkNode);
-      }
+    }
 
     //-------------------------------------------------------------------------
     return true;
   }
 
-  static bool ConvertChartNodes(xml_document &document)
+  static bool ConvertChartNodes(xml_document& document)
   {
-    const char* axisProperties3[] = {"AxisColor",
-                                     "AxisGridColor",
-                                     "AxisLabelColor",
-                                     "AxisTitleColor"};
-    const char* rangeProperties1[] = {"LeftAxisRange",
-                                      "BottomAxisRange",
-                                      "RightAxisRange",
-                                      "TopAxisRange"};
-    const char* axisProperties4[] = {"AxisLabelFont",
-                                     "AxisTitleFont"};
-    const char* fontProperties1[] = {"ChartTitleFont",
-                                     // next properties are generated from the
-                                     // previous array axisProperties4[]
-                                     "LeftAxisLabelFont",
-                                     "BottomAxisLabelFont",
-                                     "RightAxisLabelFont",
-                                     "TopAxisLabelFont",
-                                     "LeftAxisTitleFont",
-                                     "BottomAxisTitleFont",
-                                     "RightAxisTitleFont",
-                                     "TopAxisTitleFont"};
-    const char* axisProperties1[] = {"AxisLabelNotation",
-                                     "AxisLabelPrecision",
-                                     "AxisLogScale",
-                                     "AxisTitle",
-                                     "AxisUseCustomLabels",
-                                     "AxisUseCustomRange",
-                                     "ShowAxisGrid",
-                                     "ShowAxisLabels"};
-    return
-      ConvertChartNode(document, axisProperties3,
-                       sizeof(axisProperties3)/sizeof(axisProperties3[0]), 3,
-                       4, validOutputForXYChart, axisNodeName) &&
+    const char* axisProperties3[] = { "AxisColor", "AxisGridColor", "AxisLabelColor",
+      "AxisTitleColor" };
+    const char* rangeProperties1[] = { "LeftAxisRange", "BottomAxisRange", "RightAxisRange",
+      "TopAxisRange" };
+    const char* axisProperties4[] = { "AxisLabelFont", "AxisTitleFont" };
+    const char* fontProperties1[] = { "ChartTitleFont",
+      // next properties are generated from the
+      // previous array axisProperties4[]
+      "LeftAxisLabelFont", "BottomAxisLabelFont", "RightAxisLabelFont", "TopAxisLabelFont",
+      "LeftAxisTitleFont", "BottomAxisTitleFont", "RightAxisTitleFont", "TopAxisTitleFont" };
+    const char* axisProperties1[] = { "AxisLabelNotation", "AxisLabelPrecision", "AxisLogScale",
+      "AxisTitle", "AxisUseCustomLabels", "AxisUseCustomRange", "ShowAxisGrid", "ShowAxisLabels" };
+    return ConvertChartNode(document, axisProperties3,
+             sizeof(axisProperties3) / sizeof(axisProperties3[0]), 3, 4, validOutputForXYChart,
+             axisNodeName) &&
       ConvertChartNode(document, rangeProperties1,
-                       sizeof(rangeProperties1)/sizeof(rangeProperties1[0]), 1,
-                       2, validOutputTrue, rangeNodeName) &&
+             sizeof(rangeProperties1) / sizeof(rangeProperties1[0]), 1, 2, validOutputTrue,
+             rangeNodeName) &&
       // the order of execution of the next two functions is important
       ConvertChartNode(document, axisProperties4,
-                       sizeof(axisProperties4)/sizeof(axisProperties4[0]), 4,
-                       4, validOutputForXYChart, axisNodeName) &&
+             sizeof(axisProperties4) / sizeof(axisProperties4[0]), 4, 4, validOutputForXYChart,
+             axisNodeName) &&
       ConvertChartNode(document, fontProperties1,
-                       sizeof(fontProperties1)/sizeof(fontProperties1[0]), 1,
-                       4, validOutputTrue, fontNodeName) &&
+             sizeof(fontProperties1) / sizeof(fontProperties1[0]), 1, 4, validOutputTrue,
+             fontNodeName) &&
       ConvertChartNode(document, axisProperties1,
-                       sizeof(axisProperties1)/sizeof(axisProperties1[0]), 1,
-                       4, validOutputForXYChart, axisNodeName);
+             sizeof(axisProperties1) / sizeof(axisProperties1[0]), 1, 4, validOutputForXYChart,
+             axisNodeName);
   }
 
-
   //---------------------------------------------------------------------------
-  static bool ConvertChartNode(
-    xml_document &document, const char* property[], int numberOfProperties,
-    int numberOfComponents,
-    int numberOfOutputs,
+  static bool ConvertChartNode(xml_document& document, const char* property[],
+    int numberOfProperties, int numberOfComponents, int numberOfOutputs,
     bool (*validOutput)(xml_node viewNode, int outputIndex),
-    string (*nodeName) (xml_node oldNode, int outputIndex))
+    string (*nodeName)(xml_node oldNode, int outputIndex))
   {
     if (numberOfProperties <= 0)
-      {
+    {
       return true;
-      }
+    }
     string query("//ServerManagerState/Proxy[@group='views']/"
                  "Property[@name='");
-    query = query + property[0] + "'";;
+    query = query + property[0] + "'";
+    ;
     for (int i = 1; i < numberOfProperties; ++i)
-      {
+    {
       query = query + "or @name='" + property[i] + "'";
-      }
+    }
     query += "]";
-    xpath_node_set nodes =
-      document.select_nodes(query.c_str());
-    for (xpath_node_set::const_iterator it = nodes.begin();
-         it != nodes.end(); ++it)
-      {
+    xpath_node_set nodes = document.select_nodes(query.c_str());
+    for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it)
+    {
       xml_node oldNode = it->node();
       xml_node viewNode = oldNode.parent();
       for (int i = 0; i < numberOfOutputs; ++i)
+      {
+        if (validOutput(viewNode, i))
         {
-        if (validOutput (viewNode, i))
-          {
-          CreateChartPropertyNode(viewNode, oldNode, numberOfComponents, i,
-                                  nodeName);
-          }
+          CreateChartPropertyNode(viewNode, oldNode, numberOfComponents, i, nodeName);
         }
-      viewNode.remove_child(oldNode);
       }
+      viewNode.remove_child(oldNode);
+    }
     return true;
   }
 
-  static void CreateChartPropertyNode(
-    xml_node& viewNode, const xml_node& oldNode,
-    int numberOfComponents, int outputIndex,
-    string (*nodeName) (xml_node oldNode, int outputIndex))
+  static void CreateChartPropertyNode(xml_node& viewNode, const xml_node& oldNode,
+    int numberOfComponents, int outputIndex, string (*nodeName)(xml_node oldNode, int outputIndex))
   {
     string newNameAttr = nodeName(oldNode, outputIndex);
-    xml_node newNode = CreatePropertyNode (
-      viewNode, oldNode, newNameAttr, numberOfComponents);
+    xml_node newNode = CreatePropertyNode(viewNode, oldNode, newNameAttr, numberOfComponents);
     for (int i = 0; i < numberOfComponents; ++i)
-      {
-      CreateChartElementNode(newNode, oldNode,
-                            numberOfComponents, outputIndex, i);
-      }
+    {
+      CreateChartElementNode(newNode, oldNode, numberOfComponents, outputIndex, i);
+    }
   }
 
-  static void CreateChartElementNode(
-    xml_node& newNode,
-    const xml_node& oldNode, int numberOfComponents,
-    int outputIndex, int componentIndex)
+  static void CreateChartElementNode(xml_node& newNode, const xml_node& oldNode,
+    int numberOfComponents, int outputIndex, int componentIndex)
   {
-    xml_node oldElement = oldNode.select_single_node(
-      (string("Element[@index='") +
-       toString(outputIndex * numberOfComponents + componentIndex) +
-       "']").c_str()).node();
+    xml_node oldElement =
+      oldNode
+        .select_single_node((string("Element[@index='") +
+                              toString(outputIndex * numberOfComponents + componentIndex) + "']")
+                              .c_str())
+        .node();
     const char* value = oldElement.attribute(VALUE).value();
     CreateElementNode(newNode, componentIndex, value);
   }
@@ -384,7 +353,7 @@ struct Process_4_1_to_4_2
   {
     string oldNodeName = oldNode.attribute(NAME).value();
     switch (i)
-      {
+    {
       case 0:
         return oldNodeName + "Family";
       case 1:
@@ -395,48 +364,47 @@ struct Process_4_1_to_4_2
         return replaceFont(&oldNodeName, "Italic");
       default:
         return oldNodeName;
-      }
+    }
   }
 
-  static string replaceFont(string* oldNodeName, const char*modifier)
+  static string replaceFont(string* oldNodeName, const char* modifier)
   {
     const char* FONT = "Font";
     const size_t FONT_LENGTH = 4;
     size_t pos = oldNodeName->find(FONT);
     if (pos != string::npos)
-      {
+    {
       return oldNodeName->replace(pos, FONT_LENGTH, modifier);
-      }
+    }
     else
       return *oldNodeName;
   }
 
-  static const char* rangeString (int index)
+  static const char* rangeString(int index)
   {
     switch (index)
-      {
+    {
       case 0:
         return "Minimum";
       case 1:
         return "Maximum";
-      }
+    }
     return "";
   }
 
-
-  static const char* axisString (int axis)
+  static const char* axisString(int axis)
   {
     switch (axis)
-      {
-    case 0:  // case vtkAxis::LEFT:
-      return "Left";
-    case 1: // case vtkAxis::BOTTOM:
-      return "Bottom";
-    case 2: // case vtkAxis::RIGHT:
-      return "Right";
-    case 3: // case vtkAxis::TOP:
-      return "Top";
-      }
+    {
+      case 0: // case vtkAxis::LEFT:
+        return "Left";
+      case 1: // case vtkAxis::BOTTOM:
+        return "Bottom";
+      case 2: // case vtkAxis::RIGHT:
+        return "Right";
+      case 3: // case vtkAxis::TOP:
+        return "Top";
+    }
     return "";
   }
 
@@ -452,23 +420,23 @@ struct Process_4_1_to_4_2
     const char* const TYPE = "type";
     const char* const XY_CHART_VIEW = "XYChartView";
     if (i < 0 || i >= 4)
-      {
+    {
       return false;
-      }
+    }
     if (i < 2)
-      {
+    {
       // left, bottom
       return true;
-      }
+    }
     else if (string(viewNode.attribute(TYPE).value()) == string(XY_CHART_VIEW))
-      {
+    {
       //
       return true;
-      }
+    }
     else
-      {
+    {
       return false;
-      }
+    }
   }
 
   static void CreateElementNode(xml_node& node, int index, const string& value)
@@ -478,24 +446,22 @@ struct Process_4_1_to_4_2
     xml_node newElement = node.append_child();
     newElement.set_name(ELEMENT);
     xml_attribute a = newElement.append_attribute(INDEX);
-    a.set_value (index);
+    a.set_value(index);
     a = newElement.append_attribute(VALUE);
     a.set_value(value.c_str());
   }
 
-  static xml_node CreatePropertyNode(xml_node& viewNode,
-                                     const xml_node& oldNode,
-                                     const string& name, int numberOfElements)
+  static xml_node CreatePropertyNode(
+    xml_node& viewNode, const xml_node& oldNode, const string& name, int numberOfElements)
   {
     const char* const PROPERTY = "Property";
     const char* const NUMBER_OF_ELEMENTS = "number_of_elements";
     const char* const ID = "id";
     xml_node newNode = viewNode.insert_child_before(node_element, oldNode);
-    newNode.set_name (PROPERTY);
+    newNode.set_name(PROPERTY);
     xml_attribute a = newNode.append_attribute(NAME);
     a.set_value(name.c_str());
-    string newNodeId = string(viewNode.attribute(ID).value()) +
-      "." + name;
+    string newNodeId = string(viewNode.attribute(ID).value()) + "." + name;
     a = newNode.append_attribute(ID);
     a.set_value(newNodeId.c_str());
     a = newNode.append_attribute(NUMBER_OF_ELEMENTS);
@@ -504,7 +470,7 @@ struct Process_4_1_to_4_2
   }
 
   static bool ConvertGlyphFilter(xml_document& document)
-    {
+  {
     bool warn = false;
     //-------------------------------------------------------------------------
     // Convert "Glyph" and "ArbitrarySourceGlyph" to "LegacyGlyph" and
@@ -512,37 +478,37 @@ struct Process_4_1_to_4_2
     // new ones, we just create the old proxies for now.
     //-------------------------------------------------------------------------
     pugi::xpath_node_set glyph_elements =
-      document.select_nodes(
-        "//ServerManagerState/Proxy[@group='filters' and @type='Glyph']");
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and @type='Glyph']");
     for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-      iter != glyph_elements.end(); ++iter)
-      {
+         iter != glyph_elements.end(); ++iter)
+    {
       // It's possible that we are using a development version's state file in
       // which case we don't want to change it.
       if (iter->node().select_single_node("//Property[@name='GlyphMode']"))
-        {
+      {
         continue;
-        }
+      }
       iter->node().attribute("type").set_value("LegacyGlyph");
       warn = true;
-      }
+    }
     glyph_elements = document.select_nodes(
       "//ServerManagerState/Proxy[@group='filters' and @type='ArbitrarySourceGlyph']");
     for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
-      iter != glyph_elements.end(); ++iter)
-      {
+         iter != glyph_elements.end(); ++iter)
+    {
       iter->node().attribute("type").set_value("LegacyArbitrarySourceGlyph");
       warn = true;
-      }
+    }
     if (warn)
-      {
-      vtkGenericWarningMacro("The state file uses the old 'Glyph' filter implementation."
+    {
+      vtkGenericWarningMacro(
+        "The state file uses the old 'Glyph' filter implementation."
         "The implementation has changed considerably in ParaView 4.2. "
         "Consider replacing the Glyph filter with a new Glyph filter. The old implementation "
         "is still available as 'Legacy Glyph' and will be used for loading this state file.");
-      }
-    return true;
     }
+    return true;
+  }
 };
 const char* const Process_4_1_to_4_2::NAME = "name";
 const char* const Process_4_1_to_4_2::VALUE = "value";
@@ -550,20 +516,16 @@ const char* const Process_4_1_to_4_2::VALUE = "value";
 //===========================================================================
 struct Process_4_2_to_5_1
 {
-  bool operator()(xml_document &document)
-    {
-    return RemoveCubeAxesColorLinks(document);
-    }
+  bool operator()(xml_document& document) { return RemoveCubeAxesColorLinks(document); }
 
   // Remove global property link state for "CubeAxesColor"
   bool RemoveCubeAxesColorLinks(xml_document& document)
-    {
+  {
     pugi::xpath_node_set links =
-      document.select_nodes(
-        "//GlobalPropertyLink[@property=\"CubeAxesColor\"]");
+      document.select_nodes("//GlobalPropertyLink[@property=\"CubeAxesColor\"]");
     PurgeElements(links);
     return true;
-    }
+  }
 };
 
 } // end of namespace
@@ -584,36 +546,36 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = parent;
   if (parent && strcmp(parent->GetName(), "ServerManagerState") != 0)
-    {
+  {
     root = root->FindNestedElementByName("ServerManagerState");
-    }
+  }
 
   if (!root || strcmp(root->GetName(), "ServerManagerState") != 0)
-    {
+  {
     vtkErrorMacro("Invalid root element. Expected \"ServerManagerState\"");
     return false;
-    }
+  }
 
   vtkSMVersion version(0, 0, 0);
   if (const char* str_version = root->GetAttribute("version"))
-    {
+  {
     int v[3];
     sscanf(str_version, "%d.%d.%d", &v[0], &v[1], &v[2]);
     version = vtkSMVersion(v[0], v[1], v[2]);
-    }
+  }
 
   bool status = true;
   if (version < vtkSMVersion(4, 0, 1))
-    {
+  {
     vtkWarningMacro("State file version is less than 4.0."
-      "We will try to load the state file. It's recommended, however, "
-      "that you load the state in ParaView 4.0.1 (or 4.1.0) and save a newer version "
-      "so that it can be loaded more faithfully. "
-      "Loading state files generated from ParaView versions older than 4.0.1 "
-      "is no longer supported.");
+                    "We will try to load the state file. It's recommended, however, "
+                    "that you load the state in ParaView 4.0.1 (or 4.1.0) and save a newer version "
+                    "so that it can be loaded more faithfully. "
+                    "Loading state files generated from ParaView versions older than 4.0.1 "
+                    "is no longer supported.");
 
     version = vtkSMVersion(4, 0, 1);
-    }
+  }
 
   // A little hackish for now, convert vtkPVXMLElement to string.
   std::ostringstream stream;
@@ -623,51 +585,51 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
   pugi::xml_document document;
 
   if (!document.load(stream.str().c_str()))
-    {
+  {
     vtkErrorMacro("Failed to convert from vtkPVXMLElement to pugi::xml_document");
     return false;
-    }
+  }
 
   if (status && version < vtkSMVersion(4, 1, 0))
-    {
+  {
     status = Process_4_0_to_4_1(document);
     version = vtkSMVersion(4, 1, 0);
-    }
+  }
 
   if (status && version < vtkSMVersion(4, 2, 0))
-    {
+  {
     status = Process_4_1_to_4_2()(document);
     version = vtkSMVersion(4, 2, 0);
-    }
+  }
 
   if (status && (version < vtkSMVersion(5, 1, 0)))
-    {
+  {
     status = Process_4_2_to_5_1()(document);
     version = vtkSMVersion(5, 1, 0);
-    }
+  }
 
   if (status)
-    {
+  {
     std::ostringstream stream2;
     document.save(stream2, "  ");
 
     vtkNew<vtkPVXMLParser> parser;
     if (parser->Parse(stream2.str().c_str()))
-      {
+    {
       root->RemoveAllNestedElements();
       vtkPVXMLElement* newRoot = parser->GetRootElement();
 
       newRoot->CopyAttributesTo(root);
-      for (unsigned int cc=0, max=newRoot->GetNumberOfNestedElements(); cc <max;cc++)
-        {
-        root->AddNestedElement(newRoot->GetNestedElement(cc));
-        }
-      }
-    else
+      for (unsigned int cc = 0, max = newRoot->GetNumberOfNestedElements(); cc < max; cc++)
       {
-      vtkErrorMacro("Internal error: Error parsing converted XML state file.");
+        root->AddNestedElement(newRoot->GetNestedElement(cc));
       }
     }
+    else
+    {
+      vtkErrorMacro("Internal error: Error parsing converted XML state file.");
+    }
+  }
   return status;
 }
 

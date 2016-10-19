@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIDoubleMapProperty
-// .SECTION Description
-// Map property that manage double value to be set through a method
-// on a vtkObject.
+/**
+ * @class   vtkSIDoubleMapProperty
+ *
+ * Map property that manage double value to be set through a method
+ * on a vtkObject.
+*/
 
 #ifndef vtkSIDoubleMapProperty_h
 #define vtkSIDoubleMapProperty_h
@@ -30,18 +32,16 @@ public:
   vtkTypeMacro(vtkSIDoubleMapProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkGetStringMacro(CleanCommand)
-  vtkSetStringMacro(CleanCommand)
+  vtkGetStringMacro(CleanCommand) vtkSetStringMacro(CleanCommand)
 
-protected:
-  vtkSIDoubleMapProperty();
+    protected : vtkSIDoubleMapProperty();
   ~vtkSIDoubleMapProperty();
 
   virtual bool Push(vtkSMMessage*, int);
   virtual bool ReadXMLAttributes(vtkSIProxy* parent, vtkPVXMLElement* element);
 
   unsigned int NumberOfComponents;
-  char *CleanCommand;
+  char* CleanCommand;
 
 private:
   vtkSIDoubleMapProperty(const vtkSIDoubleMapProperty&) VTK_DELETE_FUNCTION;

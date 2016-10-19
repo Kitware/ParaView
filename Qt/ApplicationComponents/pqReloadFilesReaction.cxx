@@ -46,23 +46,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  bool PromptForNewFiles()
-    {
-    QMessageBox mbox(QMessageBox::Question,
-      QObject::tr("Reload Options"),
-      QObject::tr("This reader supports file series. Do you want to look for new files "
-      "in the series and load those, or reload the existing files?"),
-      QMessageBox::Yes	| QMessageBox::No,
-      pqCoreUtilities::mainWidget());
-    mbox.setObjectName("reloadOptionsMessageBox");
-    mbox.button(QMessageBox::Yes)->setObjectName("findNewFilesButton");
-    mbox.button(QMessageBox::Yes)->setText(QObject::tr("Find new files"));
+bool PromptForNewFiles()
+{
+  QMessageBox mbox(QMessageBox::Question, QObject::tr("Reload Options"),
+    QObject::tr("This reader supports file series. Do you want to look for new files "
+                "in the series and load those, or reload the existing files?"),
+    QMessageBox::Yes | QMessageBox::No, pqCoreUtilities::mainWidget());
+  mbox.setObjectName("reloadOptionsMessageBox");
+  mbox.button(QMessageBox::Yes)->setObjectName("findNewFilesButton");
+  mbox.button(QMessageBox::Yes)->setText(QObject::tr("Find new files"));
 
-    mbox.button(QMessageBox::No)->setObjectName("reloadExistingButton");
-    mbox.button(QMessageBox::No)->setText(QObject::tr("Reload existing file(s)"));
-    mbox.exec();
-    return mbox.clickedButton() == mbox.button(QMessageBox::Yes);
-    }
+  mbox.button(QMessageBox::No)->setObjectName("reloadExistingButton");
+  mbox.button(QMessageBox::No)->setText(QObject::tr("Reload existing file(s)"));
+  mbox.exec();
+  return mbox.clickedButton() == mbox.button(QMessageBox::Yes);
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -82,19 +80,20 @@ pqReloadFilesReaction::~pqReloadFilesReaction()
 //-----------------------------------------------------------------------------
 void pqReloadFilesReaction::updateEnableState()
 {
-  vtkSMProxy* source = pqActiveObjects::instance().activeSource() ?
-    pqActiveObjects::instance().activeSource()->getProxy() : NULL;
+  vtkSMProxy* source = pqActiveObjects::instance().activeSource()
+    ? pqActiveObjects::instance().activeSource()->getProxy()
+    : NULL;
 
   vtkNew<vtkSMReaderReloadHelper> helper;
-  this->parentAction()->setEnabled(
-    helper->SupportsReload(vtkSMSourceProxy::SafeDownCast(source)));
+  this->parentAction()->setEnabled(helper->SupportsReload(vtkSMSourceProxy::SafeDownCast(source)));
 }
 
 //-----------------------------------------------------------------------------
 bool pqReloadFilesReaction::reload()
 {
-  vtkSMProxy* source = pqActiveObjects::instance().activeSource() ?
-    pqActiveObjects::instance().activeSource()->getProxy() : NULL;
+  vtkSMProxy* source = pqActiveObjects::instance().activeSource()
+    ? pqActiveObjects::instance().activeSource()->getProxy()
+    : NULL;
   return pqReloadFilesReaction::reload(vtkSMSourceProxy::SafeDownCast(source));
 }
 
@@ -103,19 +102,19 @@ bool pqReloadFilesReaction::reload(vtkSMSourceProxy* proxy)
 {
   vtkNew<vtkSMReaderReloadHelper> helper;
   if (!helper->SupportsReload(proxy))
-    {
+  {
     return false;
-    }
+  }
 
   BEGIN_UNDO_EXCLUDE();
   if (helper->SupportsFileSeries(proxy) && PromptForNewFiles())
-    {
+  {
     helper->ExtendFileSeries(proxy);
-    }
+  }
   else
-    {
+  {
     helper->ReloadFiles(proxy);
-    }
+  }
   pqApplicationCore::instance()->render();
   END_UNDO_EXCLUDE();
   return true;

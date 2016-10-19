@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,7 +52,9 @@ public:
 
   pqAnimationModel* animationModel() const;
 
-  /// Enabled header is used to show if the track is enabled.
+  /**
+  * Enabled header is used to show if the track is enabled.
+  */
   QHeaderView* enabledHeader() const;
 
   QHeaderView* createDeleteHeader() const;
@@ -64,7 +66,9 @@ signals:
   void deleteTrackClicked(pqAnimationTrack*);
   void createTrackClicked();
 
-  /// request enable/disabling of the track.
+  /**
+  * request enable/disabling of the track.
+  */
   void enableTrackClicked(pqAnimationTrack*);
 
 protected slots:
@@ -89,8 +93,6 @@ private:
   QHeaderView* Header;
   QWidget* CreateDeleteWidget;
   pqAnimationModel* Model;
-
 };
 
-#endif //pqAnimationWidget_h
-
+#endif // pqAnimationWidget_h

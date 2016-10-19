@@ -12,18 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMaterialInterfaceFilter - Extract particles and analyse them.
-// .SECTION Description
-// This filter takes a cell data volume fraction and generates a polydata
-// surface.  It also performs connectivity on the particles and generates
-// a particle index as part of the cell data of the output.  It computes
-// the volume of each particle from the volume fraction.
-
-// This will turn on validation and debug i/o of the filter.
-//#define vtkMaterialInterfaceFilterDEBUG
-
-// This will turn on profiling of how long each part of the filter takes
-//#define vtkMaterialInterfaceFilterPROFILE
+/**
+ * @class   vtkMaterialInterfaceFilter
+ * @brief   Extract particles and analyse them.
+ *
+ * This filter takes a cell data volume fraction and generates a polydata
+ * surface.  It also performs connectivity on the particles and generates
+ * a particle index as part of the cell data of the output.  It computes
+ * the volume of each particle from the volume fraction.
+ *
+ * This will turn on validation and debug i/o of the filter.
+ *#define vtkMaterialInterfaceFilterDEBUG
+ *
+ * This will turn on profiling of how long each part of the filter takes
+ *#define vtkMaterialInterfaceFilterPROFILE
+*/
 
 #ifndef vtkMaterialInterfaceFilter_h
 #define vtkMaterialInterfaceFilter_h
@@ -34,7 +37,7 @@
 #include <vector>                            // needed for vector
 
 #include "vtkSmartPointer.h" // needed for smart pointer
-#include "vtkTimerLog.h" // needed for vtkTimerLog.
+#include "vtkTimerLog.h"     // needed for vtkTimerLog.
 
 class vtkDataSet;
 class vtkImageData;
@@ -59,303 +62,336 @@ class vtkMaterialInterfaceFilterRingBuffer;
 class vtkMaterialInterfacePieceLoading;
 class vtkMaterialInterfaceCommBuffer;
 
-
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceFilter : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceFilter
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkMaterialInterfaceFilter *New();
-  vtkTypeMacro(vtkMaterialInterfaceFilter,vtkMultiBlockDataSetAlgorithm);
+  static vtkMaterialInterfaceFilter* New();
+  vtkTypeMacro(vtkMaterialInterfaceFilter, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // PARAVIEW interface stuff
 
   /// Material sellection
-  // Description:
-  // Add a single array
-  void SelectMaterialArray(const char *name);
-  // Description:
-  // remove a single array
-  void UnselectMaterialArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * Add a single array
+   */
+  void SelectMaterialArray(const char* name);
+  /**
+   * remove a single array
+   */
+  void UnselectMaterialArray(const char* name);
+  /**
+   * remove all arrays
+   */
   void UnselectAllMaterialArrays();
-  // Description:
-  // Enable/disable processing on an array
-  void SetMaterialArrayStatus( const char* name,
-                               int status );
-  // Description:
-  // Get enable./disable status for a given array
+  /**
+   * Enable/disable processing on an array
+   */
+  void SetMaterialArrayStatus(const char* name, int status);
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMaterialArrayStatus(const char* name);
   int GetMaterialArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMaterialArrays();
-  // Description:
-  // Get the name of a specific array
-  const char *GetMaterialArrayName(int index);
+  /**
+   * Get the name of a specific array
+   */
+  const char* GetMaterialArrayName(int index);
 
   /// Mass sellection
-  // Description:
-  // Add a single array
-  void SelectMassArray(const char *name);
-  // Description:
-  // remove a single array
-  void UnselectMassArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * Add a single array
+   */
+  void SelectMassArray(const char* name);
+  /**
+   * remove a single array
+   */
+  void UnselectMassArray(const char* name);
+  /**
+   * remove all arrays
+   */
   void UnselectAllMassArrays();
-  // Description:
-  // Enable/disable processing on an array
-  void SetMassArrayStatus( const char* name,
-                               int status );
-  // Description:
-  // Get enable./disable status for a given array
+  /**
+   * Enable/disable processing on an array
+   */
+  void SetMassArrayStatus(const char* name, int status);
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMassArrayStatus(const char* name);
   int GetMassArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMassArrays();
-  // Description:
-  // Get the name of a specific array
-  const char *GetMassArrayName(int index);
+  /**
+   * Get the name of a specific array
+   */
+  const char* GetMassArrayName(int index);
 
   /// Volume weighted average attribute sellection
-  // Description:
-  // Add a single array
-  void SelectVolumeWtdAvgArray(const char *name);
-  // Description:
-  // remove a single array
-  void UnselectVolumeWtdAvgArray(const char *name);
-  // Description:
-  // remove all arrays
+  /**
+   * Add a single array
+   */
+  void SelectVolumeWtdAvgArray(const char* name);
+  /**
+   * remove a single array
+   */
+  void UnselectVolumeWtdAvgArray(const char* name);
+  /**
+   * remove all arrays
+   */
   void UnselectAllVolumeWtdAvgArrays();
 
-  // Description:
-  // Enable/disable processing on an array
-  void SetVolumeWtdAvgArrayStatus(const char* name,
-                                  int status );
-  // Description:
-  // Get enable./disable status for a given array
+  /**
+   * Enable/disable processing on an array
+   */
+  void SetVolumeWtdAvgArrayStatus(const char* name, int status);
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetVolumeWtdAvgArrayStatus(const char* name);
   int GetVolumeWtdAvgArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfVolumeWtdAvgArrays();
-  // Description:
-  // Get the name of a specific array
-  const char *GetVolumeWtdAvgArrayName(int index);
+  /**
+   * Get the name of a specific array
+   */
+  const char* GetVolumeWtdAvgArrayName(int index);
 
   /// Mass weighted average attribute sellection
-  // Description:
-  // Add a single array
-  void SelectMassWtdAvgArray(const char *name);
-  // Description:
-  // remove a single array
-  void UnselectMassWtdAvgArray(const char *name);
-  // Description:
-  // remove all arrays
+  /**
+   * Add a single array
+   */
+  void SelectMassWtdAvgArray(const char* name);
+  /**
+   * remove a single array
+   */
+  void UnselectMassWtdAvgArray(const char* name);
+  /**
+   * remove all arrays
+   */
   void UnselectAllMassWtdAvgArrays();
 
-  // Description:
-  // Enable/disable processing on an array
-  void SetMassWtdAvgArrayStatus(const char* name,
-                                  int status );
-  // Description:
-  // Get enable./disable status for a given array
+  /**
+   * Enable/disable processing on an array
+   */
+  void SetMassWtdAvgArrayStatus(const char* name, int status);
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetMassWtdAvgArrayStatus(const char* name);
   int GetMassWtdAvgArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfMassWtdAvgArrays();
-  // Description:
-  // Get the name of a specific array
-  const char *GetMassWtdAvgArrayName(int index);
+  /**
+   * Get the name of a specific array
+   */
+  const char* GetMassWtdAvgArrayName(int index);
 
   /// Summation attribute sellection
-  // Description:
-  // Add a single array
-  void SelectSummationArray(const char *name);
-  // Description:
-  // remove a single array
-  void UnselectSummationArray( const char *name );
-  // Description:
-  // remove all arrays
+  /**
+   * Add a single array
+   */
+  void SelectSummationArray(const char* name);
+  /**
+   * remove a single array
+   */
+  void UnselectSummationArray(const char* name);
+  /**
+   * remove all arrays
+   */
   void UnselectAllSummationArrays();
-  // Description:
-  // Enable/disable processing on an array
-  void SetSummationArrayStatus( const char* name,
-                                  int status );
-  // Description:
-  // Get enable./disable status for a given array
+  /**
+   * Enable/disable processing on an array
+   */
+  void SetSummationArrayStatus(const char* name, int status);
+  //@{
+  /**
+   * Get enable./disable status for a given array
+   */
   int GetSummationArrayStatus(const char* name);
   int GetSummationArrayStatus(int index);
-  // Description:
-  // Query the number of available arrays
+  //@}
+  /**
+   * Query the number of available arrays
+   */
   int GetNumberOfSummationArrays();
-  // Description:
-  // Get the name of a specific array
-  const char *GetSummationArrayName(int index);
+  /**
+   * Get the name of a specific array
+   */
+  const char* GetSummationArrayName(int index);
 
   /// Volume Fraction
-  // Description:
-  // Volume fraction which volxels are included in a frgament.
+  //@{
+  /**
+   * Volume fraction which volxels are included in a frgament.
+   */
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
+  //@}
 
   /// OBB
-  // Description:
-  // Turn on/off OBB calculations
-  vtkSetMacro(ComputeOBB,bool);
-  vtkGetMacro(ComputeOBB,bool);
+  //@{
+  /**
+   * Turn on/off OBB calculations
+   */
+  vtkSetMacro(ComputeOBB, bool);
+  vtkGetMacro(ComputeOBB, bool);
+  //@}
 
   /// Loading
-  //Description:
-  // Set the upper bound(in number of polygons) that will
-  // be used to exclude processes from work sharing
-  // during memory intensive portions of the algorithm.
-  // acceptable values are [1 INF), however the default
-  // is 1,000,000 polys. Increasing increases parallelism
-  // while decresing reduces parallelism. Setting too low
-  // can cause problems. For instance if it's set so low
-  // that all processes are excluded.
+  //@{
+  /**
+   * Set the upper bound(in number of polygons) that will
+   * be used to exclude processes from work sharing
+   * during memory intensive portions of the algorithm.
+   * acceptable values are [1 INF), however the default
+   * is 1,000,000 polys. Increasing increases parallelism
+   * while decresing reduces parallelism. Setting too low
+   * can cause problems. For instance if it's set so low
+   * that all processes are excluded.
+   */
   void SetUpperLoadingBound(int nPolys);
-  vtkGetMacro(UpperLoadingBound,int);
+  vtkGetMacro(UpperLoadingBound, int);
+  //@}
 
   /// Output file
-  // Description:
-  // Name the file to save a table of fragment attributes to.
+  //@{
+  /**
+   * Name the file to save a table of fragment attributes to.
+   */
   vtkSetStringMacro(OutputBaseName);
   vtkGetStringMacro(OutputBaseName);
-  // Description:
-  // If true, save the results of the filter in a text file
-  vtkSetMacro(WriteGeometryOutput,bool);
-  vtkGetMacro(WriteGeometryOutput,bool);
-  vtkSetMacro(WriteStatisticsOutput,bool);
-  vtkGetMacro(WriteStatisticsOutput,bool);
+  //@}
+  //@{
+  /**
+   * If true, save the results of the filter in a text file
+   */
+  vtkSetMacro(WriteGeometryOutput, bool);
+  vtkGetMacro(WriteGeometryOutput, bool);
+  vtkSetMacro(WriteStatisticsOutput, bool);
+  vtkGetMacro(WriteStatisticsOutput, bool);
+  //@}
 
-  // Description:
-  // Variable used to specify the number of ghost level
-  // is available in each block.
-  // By Default set to 1 which is what the scth reader provides
+  //@{
+  /**
+   * Variable used to specify the number of ghost level
+   * is available in each block.
+   * By Default set to 1 which is what the scth reader provides
+   */
   vtkSetMacro(BlockGhostLevel, unsigned char);
   vtkGetMacro(BlockGhostLevel, unsigned char);
+  //@}
 
-  // Description:
-  // Sets modified if array selection changes.
-  static void SelectionModifiedCallback( vtkObject*,
-                                         unsigned long,
-                                         void* clientdata,
-                                         void* );
+  /**
+   * Sets modified if array selection changes.
+   */
+  static void SelectionModifiedCallback(vtkObject*, unsigned long, void* clientdata, void*);
 
-  // Description:
-  // Set the clip function which can be a plane or a sphere
-  void SetClipFunction(vtkImplicitFunction *clipFunction);
-  vtkGetObjectMacro(ClipFunction,vtkImplicitFunction);
+  //@{
+  /**
+   * Set the clip function which can be a plane or a sphere
+   */
+  void SetClipFunction(vtkImplicitFunction* clipFunction);
+  vtkGetObjectMacro(ClipFunction, vtkImplicitFunction);
+  //@}
 
-  // Description:
-  // Invert the volume fraction to extract the negative space.
-  // This is useful for extracting a crater.
-  vtkSetMacro(InvertVolumeFraction,int);
-  vtkGetMacro(InvertVolumeFraction,int);
+  //@{
+  /**
+   * Invert the volume fraction to extract the negative space.
+   * This is useful for extracting a crater.
+   */
+  vtkSetMacro(InvertVolumeFraction, int);
+  vtkGetMacro(InvertVolumeFraction, int);
+  //@}
 
-  // Description:
-  // Return the mtime also considering the locator and clip function.
+  /**
+   * Return the mtime also considering the locator and clip function.
+   */
   vtkMTimeType GetMTime();
 
 protected:
   vtkMaterialInterfaceFilter();
   ~vtkMaterialInterfaceFilter();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
   // Set up the result arrays for the calculations we are about to
   // make.
-  void PrepareForPass(vtkNonOverlappingAMR *hbdsInput,
-                      std::vector<std::string> &volumeWtdAvgArrayNames,
-                      std::vector<std::string> &massWtdAvgArrayNames,
-                      std::vector<std::string> &summedArrayNames,
-                      std::vector<std::string> &integratedArrayNames);
+  void PrepareForPass(vtkNonOverlappingAMR* hbdsInput,
+    std::vector<std::string>& volumeWtdAvgArrayNames,
+    std::vector<std::string>& massWtdAvgArrayNames, std::vector<std::string>& summedArrayNames,
+    std::vector<std::string>& integratedArrayNames);
   // Craete a new fragment/piece.
-  vtkPolyData *NewFragmentMesh();
+  vtkPolyData* NewFragmentMesh();
   // Process each cell, looking for fragments.
   int ProcessBlock(int blockId);
   // Cell has been identified as inside the fragment. Integrate, and
   // generate fragement surface etc...
   void ConnectFragment(vtkMaterialInterfaceFilterRingBuffer* iterator);
-  void GetNeighborIterator(
-        vtkMaterialInterfaceFilterIterator* next,
-        vtkMaterialInterfaceFilterIterator* iterator,
-        int axis0, int maxFlag0,
-        int axis1, int maxFlag1,
-        int axis2, int maxFlag2);
-  void GetNeighborIteratorPad(
-        vtkMaterialInterfaceFilterIterator* next,
-        vtkMaterialInterfaceFilterIterator* iterator,
-        int axis0, int maxFlag0,
-        int axis1, int maxFlag1,
-        int axis2, int maxFlag2);
-  void CreateFace(
-        vtkMaterialInterfaceFilterIterator* in,
-        vtkMaterialInterfaceFilterIterator* out,
-        int axis, int outMaxFlag);
-  int ComputeDisplacementFactors(
-        vtkMaterialInterfaceFilterIterator* pointNeighborIterators[8],
-        double displacmentFactors[3],
-        int rootNeighborIdx, int faceAxis);
-  int SubVoxelPositionCorner(
-        double* point,
-        vtkMaterialInterfaceFilterIterator* pointNeighborIterators[8],
-        int rootNeighborIdx, int faceAxis);
-  void FindPointNeighbors(
-        vtkMaterialInterfaceFilterIterator* iteratorMin0,
-        vtkMaterialInterfaceFilterIterator* iteratorMax0,
-        int axis0, int maxFlag1, int maxFlag2,
-        vtkMaterialInterfaceFilterIterator pointNeighborIterators[8],
-        double pt[3]);
+  void GetNeighborIterator(vtkMaterialInterfaceFilterIterator* next,
+    vtkMaterialInterfaceFilterIterator* iterator, int axis0, int maxFlag0, int axis1, int maxFlag1,
+    int axis2, int maxFlag2);
+  void GetNeighborIteratorPad(vtkMaterialInterfaceFilterIterator* next,
+    vtkMaterialInterfaceFilterIterator* iterator, int axis0, int maxFlag0, int axis1, int maxFlag1,
+    int axis2, int maxFlag2);
+  void CreateFace(vtkMaterialInterfaceFilterIterator* in, vtkMaterialInterfaceFilterIterator* out,
+    int axis, int outMaxFlag);
+  int ComputeDisplacementFactors(vtkMaterialInterfaceFilterIterator* pointNeighborIterators[8],
+    double displacmentFactors[3], int rootNeighborIdx, int faceAxis);
+  int SubVoxelPositionCorner(double* point,
+    vtkMaterialInterfaceFilterIterator* pointNeighborIterators[8], int rootNeighborIdx,
+    int faceAxis);
+  void FindPointNeighbors(vtkMaterialInterfaceFilterIterator* iteratorMin0,
+    vtkMaterialInterfaceFilterIterator* iteratorMax0, int axis0, int maxFlag1, int maxFlag2,
+    vtkMaterialInterfaceFilterIterator pointNeighborIterators[8], double pt[3]);
   // Finds a global origin for the data set, and level 0 dx
-  int  ComputeOriginAndRootSpacingOld(
-        vtkNonOverlappingAMR* input);
-  void  ComputeOriginAndRootSpacing(
-        vtkNonOverlappingAMR* input);
+  int ComputeOriginAndRootSpacingOld(vtkNonOverlappingAMR* input);
+  void ComputeOriginAndRootSpacing(vtkNonOverlappingAMR* input);
   // Returns the total number of local(wrt this proc) blocks.
-  int GetNumberOfLocalBlocks(
-        vtkNonOverlappingAMR* input);
+  int GetNumberOfLocalBlocks(vtkNonOverlappingAMR* input);
   // Complex ghost layer Handling.
   std::vector<vtkMaterialInterfaceFilterBlock*> GhostBlocks;
   void ShareGhostBlocks();
   void HandleGhostBlockRequests();
-  int ComputeRequiredGhostExtent(
-    int level,
-    int inExt[6],
-    int outExt[6]);
+  int ComputeRequiredGhostExtent(int level, int inExt[6], int outExt[6]);
 
   void ComputeAndDistributeGhostBlocks(
-    int *numBlocksInProc,
-    int* blockMetaData,
-    int myProc,
-    int numProcs);
+    int* numBlocksInProc, int* blockMetaData, int myProc, int numProcs);
 
   vtkMultiProcessController* Controller;
 
   vtkMaterialInterfaceEquivalenceSet* EquivalenceSet;
   void AddEquivalence(
-    vtkMaterialInterfaceFilterIterator *neighbor1,
-    vtkMaterialInterfaceFilterIterator *neighbor2);
+    vtkMaterialInterfaceFilterIterator* neighbor1, vtkMaterialInterfaceFilterIterator* neighbor2);
   //
   void PrepareForResolveEquivalences();
   //
   void ResolveEquivalences();
   void GatherEquivalenceSets(vtkMaterialInterfaceEquivalenceSet* set);
-  void ShareGhostEquivalences(
-    vtkMaterialInterfaceEquivalenceSet* globalSet,
-    int*  procOffsets);
-  void ReceiveGhostFragmentIds(
-    vtkMaterialInterfaceEquivalenceSet* globalSet,
-    int* procOffset);
-  void MergeGhostEquivalenceSets(
-    vtkMaterialInterfaceEquivalenceSet* globalSet);
+  void ShareGhostEquivalences(vtkMaterialInterfaceEquivalenceSet* globalSet, int* procOffsets);
+  void ReceiveGhostFragmentIds(vtkMaterialInterfaceEquivalenceSet* globalSet, int* procOffset);
+  void MergeGhostEquivalenceSets(vtkMaterialInterfaceEquivalenceSet* globalSet);
 
   // Sum/finalize attribute's contribution for those
   // which are split over multiple processes.
@@ -368,59 +404,44 @@ protected:
   // Receive integrated attributes from another process.
   int ReceiveIntegratedAttributes(const int sourceProcId);
   // Size buffers etc...
-  int PrepareToCollectIntegratedAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&volumes,
-          std::vector<vtkDoubleArray *>&clipDepthMaxs,
-          std::vector<vtkDoubleArray *>&clipDepthMins,
-          std::vector<vtkDoubleArray *>&moments,
-          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&sums);
+  int PrepareToCollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
+    std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
+    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& sums);
   // Free resources.
-  int CleanUpAfterCollectIntegratedAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&volumes,
-          std::vector<vtkDoubleArray *>&clipDepthMaxs,
-          std::vector<vtkDoubleArray *>&clipDepthMins,
-          std::vector<vtkDoubleArray *>&moments,
-          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&sums);
+  int CleanUpAfterCollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
+    std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
+    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& sums);
   // Receive all integrated attribute arrays from all other
   // processes.
-  int CollectIntegratedAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&volumes,
-          std::vector<vtkDoubleArray *>&clipDepthMaxs,
-          std::vector<vtkDoubleArray *>&clipDepthMins,
-          std::vector<vtkDoubleArray *>&moments,
-          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
-          std::vector<std::vector<vtkDoubleArray *> >&sums);
+  int CollectIntegratedAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& volumes, std::vector<vtkDoubleArray*>& clipDepthMaxs,
+    std::vector<vtkDoubleArray*>& clipDepthMins, std::vector<vtkDoubleArray*>& moments,
+    std::vector<std::vector<vtkDoubleArray*> >& volumeWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& massWtdAvgs,
+    std::vector<std::vector<vtkDoubleArray*> >& sums);
   // Send my integrated attributes to all other processes.
   int BroadcastIntegratedAttributes(const int sourceProcessId);
   // Send my geometric attribuites to a controler.
   int SendGeometricAttributes(const int controllingProcId);
   // size buffers & new containers
-  int PrepareToCollectGeometricAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&coaabb,
-          std::vector<vtkDoubleArray *>&obb,
-          std::vector<int *> &ids);
+  int PrepareToCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
+    std::vector<int*>& ids);
   // Free resources.
-  int CleanUpAfterCollectGeometricAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&coaabb,
-          std::vector<vtkDoubleArray *>&obb,
-          std::vector<int *> &ids);
+  int CleanUpAfterCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
+    std::vector<int*>& ids);
   // Recieve all geometric attributes from all other
   // processes.
-  int CollectGeometricAttributes(
-          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          std::vector<vtkDoubleArray *>&coaabb,
-          std::vector<vtkDoubleArray *>&obb,
-          std::vector<int *> &ids);
+  int CollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
+    std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
+    std::vector<int*>& ids);
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes();
   // Gather geometric attributes on a single process.
@@ -432,12 +453,9 @@ protected:
   // Clean duplicate points from fragment geometry.
   void CleanLocalFragmentGeometry();
   //
-  void BuildLoadingArray(
-          std::vector<vtkIdType> &loadingArray);
-  int PackLoadingArray(vtkIdType *&buffer);
-  int UnPackLoadingArray(
-          vtkIdType *buffer, int bufSize,
-          std::vector<vtkIdType> &loadingArray);
+  void BuildLoadingArray(std::vector<vtkIdType>& loadingArray);
+  int PackLoadingArray(vtkIdType*& buffer);
+  int UnPackLoadingArray(vtkIdType* buffer, int bufSize, std::vector<vtkIdType>& loadingArray);
 
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data sets.
@@ -448,23 +466,20 @@ protected:
   int WriteGeometryOutputToTextFile();
   int WriteStatisticsOutputToTextFile();
   // Build the output data
-  int BuildOutputs(vtkMultiBlockDataSet *mbdsOutput0,
-                  vtkMultiBlockDataSet *mbdsOutput1,
-                  vtkMultiBlockDataSet *mbdsOutput2,
-                  int materialId);
+  int BuildOutputs(vtkMultiBlockDataSet* mbdsOutput0, vtkMultiBlockDataSet* mbdsOutput1,
+    vtkMultiBlockDataSet* mbdsOutput2, int materialId);
 
   // integration helper, returns 0 if the source array
   // type is unsupported.
-  int Accumulate(double *dest,         // scalar/vector result
-                 vtkDataArray *src,    // array to accumulate from
-                 int nComps,           //
-                 int srcCellIndex,     // which cell
-                 double weight);       // weight of contribution
-  int AccumulateMoments(
-               double *moments,        // =(Myz, Mxz, Mxy, m)
-               vtkDataArray *massArray,//
-               int srcCellIndex,       // from which cell in mass
-               double *X);
+  int Accumulate(double* dest,           // scalar/vector result
+    vtkDataArray* src,                   // array to accumulate from
+    int nComps,                          //
+    int srcCellIndex,                    // which cell
+    double weight);                      // weight of contribution
+  int AccumulateMoments(double* moments, // =(Myz, Mxz, Mxy, m)
+    vtkDataArray* massArray,             //
+    int srcCellIndex,                    // from which cell in mass
+    double* X);
   // Compute the geomteric attributes that have been requested.
   void ComputeGeometricAttributes();
   int ComputeLocalFragmentOBB();
@@ -476,35 +491,24 @@ protected:
   int NumberOfInputBlocks;
   vtkMaterialInterfaceFilterBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks(vtkNonOverlappingAMR* input,
-                       std::string &materialFractionArrayName,
-                       std::string &massArrayName,
-                       std::vector<std::string> &volumeWtdAvgArrayNames,
-                       std::vector<std::string> &massWtdAvgArrayNames,
-                       std::vector<std::string> &summedArrayNames,
-                       std::vector<std::string> &integratedArrayNames);
+  int InitializeBlocks(vtkNonOverlappingAMR* input, std::string& materialFractionArrayName,
+    std::string& massArrayName, std::vector<std::string>& volumeWtdAvgArrayNames,
+    std::vector<std::string>& massWtdAvgArrayNames, std::vector<std::string>& summedArrayNames,
+    std::vector<std::string>& integratedArrayNames);
   void AddBlock(vtkMaterialInterfaceFilterBlock* block, unsigned char levelOfGhostLayer);
 
   // New methods for connecting neighbors.
-  void CheckLevelsForNeighbors(
-    vtkMaterialInterfaceFilterBlock* block);
+  void CheckLevelsForNeighbors(vtkMaterialInterfaceFilterBlock* block);
   // Returns 1 if there we neighbors found, 0 if not.
-  int FindFaceNeighbors(
-    unsigned int blockLevel,
-    int blockIndex[3],
-    int faceAxis,
-    int faceMaxFlag,
-    std::vector<vtkMaterialInterfaceFilterBlock*> *result);
+  int FindFaceNeighbors(unsigned int blockLevel, int blockIndex[3], int faceAxis, int faceMaxFlag,
+    std::vector<vtkMaterialInterfaceFilterBlock*>* result);
 
   // We need ghost cells for edges and corners as well as faces.
   // neighborDirection is used to specify a face, edge or corner.
   // Using a 2x2x2 cube center at origin: (-1,-1,-1), (-1,-1,1) ... are corners.
   // (1,1,0) is an edge, and (-1,0,0) is a face.
   // Returns 1 if the neighbor exists.
-  int HasNeighbor(
-    unsigned int blockLevel,
-    int blockIndex[3],
-    int neighborDirection[3]);
+  int HasNeighbor(unsigned int blockLevel, int blockIndex[3], int neighborDirection[3]);
 
   // Threshold value used to select a cell
   // as being iniside some fragment, PV uses
@@ -514,21 +518,21 @@ protected:
   // in the range of 0 to 255
   double scaledMaterialFractionThreshold;
   //
-  char *MaterialFractionArrayName;
+  char* MaterialFractionArrayName;
   vtkSetStringMacro(MaterialFractionArrayName);
 
   // while processing a material array this holds
   // a pointer to the output poly data
   // data set
-  vtkPolyData *CurrentFragmentMesh;
+  vtkPolyData* CurrentFragmentMesh;
   // As peices/fragments are found they are stored here
   // until resolution.
-  std::vector<vtkPolyData *> FragmentMeshes;
+  std::vector<vtkPolyData*> FragmentMeshes;
 
   // TODO? this could be cleaned up (somewhat) by
   // addding an integration class which encapsulates
   // all of the supported operations.
-  ///class vtkMaterialInterfaceFilterIntegrator
+  /// class vtkMaterialInterfaceFilterIntegrator
   ///{
   // Local id of current fragment
   int FragmentId;
@@ -548,9 +552,9 @@ protected:
   // Accumulator for moments of the current fragment
   std::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
   // Moments indexed by fragment id
-  vtkDoubleArray *FragmentMoments;
+  vtkDoubleArray* FragmentMoments;
   // Centers of fragment AABBs, only computed if moments are not
-  vtkDoubleArray *FragmentAABBCenters;
+  vtkDoubleArray* FragmentAABBCenters;
   // let us know if the user has specified a mass array
   bool ComputeMoments;
 
@@ -558,7 +562,7 @@ protected:
   // Accumulators one for each array to average, scalar or vector
   std::vector<std::vector<double> > FragmentVolumeWtdAvg;
   // weighted averages indexed by fragment id.
-  std::vector<vtkDoubleArray *>FragmentVolumeWtdAvgs;
+  std::vector<vtkDoubleArray*> FragmentVolumeWtdAvgs;
   // number of arrays for which to compute the weighted average
   int NVolumeWtdAvgs;
   // Names of the arrays to average.
@@ -568,7 +572,7 @@ protected:
   // Accumulators one for each array to average, scalar or vector
   std::vector<std::vector<double> > FragmentMassWtdAvg;
   // weighted averages indexed by fragment id.
-  std::vector<vtkDoubleArray *>FragmentMassWtdAvgs;
+  std::vector<vtkDoubleArray*> FragmentMassWtdAvgs;
   // number of arrays for which to compute the weighted average
   int NMassWtdAvgs;
   // Names of the arrays to average.
@@ -586,13 +590,13 @@ protected:
   // Accumulators, one for each array to sum
   std::vector<std::vector<double> > FragmentSum;
   // sums indexed by fragment id.
-  std::vector<vtkDoubleArray *>FragmentSums;
+  std::vector<vtkDoubleArray*> FragmentSums;
   // number of arrays for which to compute the weighted average
   int NToSum;
   ///};
 
   // OBB indexed by fragment id
-  vtkDoubleArray *FragmentOBBs;
+  vtkDoubleArray* FragmentOBBs;
   // turn on/off OBB calculation
   bool ComputeOBB;
 
@@ -606,10 +610,10 @@ protected:
   // This array give an offset into the global array for each process.
   // The array is computed when we resolve ids, and is used
   // when resoving other attributes like volume
-  int *NumberOfRawFragmentsInProcess;  // in each process by proc id for a single material
-  int *LocalToGlobalOffsets;     // indexes into a gathered array of local ids by proc id
-  int TotalNumberOfRawFragments; // over all processes for a single material
-  int NumberOfResolvedFragments; // over all processes for a single material
+  int* NumberOfRawFragmentsInProcess; // in each process by proc id for a single material
+  int* LocalToGlobalOffsets;          // indexes into a gathered array of local ids by proc id
+  int TotalNumberOfRawFragments;      // over all processes for a single material
+  int NumberOfResolvedFragments;      // over all processes for a single material
   // Total number of fragments over all materials, used to
   // generate a unique id for each fragment.
   int ResolvedFragmentCount;
@@ -620,22 +624,22 @@ protected:
   // For each material an array of resolved fragments. Blocks are multi piece
   // of poly data. The multipiece is much like a std vector of poly data *.
   // multi block is indexed by material.
-  vtkMultiBlockDataSet *ResolvedFragments;
+  vtkMultiBlockDataSet* ResolvedFragments;
   // for each material a list of global ids of pieces we own.
   std::vector<std::vector<int> > ResolvedFragmentIds;
   // List of split fragments
-  std::vector<std::vector<int> >FragmentSplitMarker;
-  vtkIntArray *FragmentSplitGeometry;
+  std::vector<std::vector<int> > FragmentSplitMarker;
+  vtkIntArray* FragmentSplitGeometry;
 
   // A polydata with points at fragment centers, same structure
   // as the resolved fragments.
-  vtkMultiBlockDataSet *ResolvedFragmentCenters;
+  vtkMultiBlockDataSet* ResolvedFragmentCenters;
   //
-  std::vector<vtkPoints *> ResolvedFragmentPoints;
+  std::vector<vtkPoints*> ResolvedFragmentPoints;
 
   // A polydata representing OBB, same structure as the resolved
   // fragments.
-  vtkMultiBlockDataSet *ResolvedFragmentOBBs;
+  vtkMultiBlockDataSet* ResolvedFragmentOBBs;
 
   double GlobalOrigin[3];
   double RootSpacing[3];
@@ -656,32 +660,26 @@ protected:
   int faceAxis2;
   double FaceCornerPoints[12];
   double FaceEdgePoints[12];
-  int    FaceEdgeFlags[4];
+  int FaceEdgeFlags[4];
   // outMaxFlag implies out is positive direction of axis.
   void ComputeFacePoints(vtkMaterialInterfaceFilterIterator* in,
-                        vtkMaterialInterfaceFilterIterator* out,
-                        int axis, int outMaxFlag);
+    vtkMaterialInterfaceFilterIterator* out, int axis, int outMaxFlag);
   void ComputeFaceNeighbors(vtkMaterialInterfaceFilterIterator* in,
-                            vtkMaterialInterfaceFilterIterator* out,
-                            int axis, int  outMaxFlag);
+    vtkMaterialInterfaceFilterIterator* out, int axis, int outMaxFlag);
 
-  long ComputeProximity(const int faceIdx[3], int faceLevel,
-                        const int ext[6], int refLevel);
+  long ComputeProximity(const int faceIdx[3], int faceLevel, const int ext[6], int refLevel);
 
-  void FindNeighbor(
-    int faceIndex[3], int faceLevel,
-    vtkMaterialInterfaceFilterIterator* neighbor,
+  void FindNeighbor(int faceIndex[3], int faceLevel, vtkMaterialInterfaceFilterIterator* neighbor,
     vtkMaterialInterfaceFilterIterator* reference);
 
-
   // PARAVIEW interface data
-  vtkDataArraySelection *MaterialArraySelection;
-  vtkDataArraySelection *MassArraySelection;
-  vtkDataArraySelection *VolumeWtdAvgArraySelection;
-  vtkDataArraySelection *MassWtdAvgArraySelection;
-  vtkDataArraySelection *SummationArraySelection;
-  vtkCallbackCommand *SelectionObserver;
-  char *OutputBaseName;
+  vtkDataArraySelection* MaterialArraySelection;
+  vtkDataArraySelection* MassArraySelection;
+  vtkDataArraySelection* VolumeWtdAvgArraySelection;
+  vtkDataArraySelection* MassWtdAvgArraySelection;
+  vtkDataArraySelection* SummationArraySelection;
+  vtkCallbackCommand* SelectionObserver;
+  char* OutputBaseName;
   bool WriteGeometryOutput;
   bool WriteStatisticsOutput;
   int DrawOBB;
@@ -689,18 +687,18 @@ protected:
   double ProgressMaterialInc;
   double ProgressBlockInc;
   double ProgressResolutionInc;
-  // Debug
-  #ifdef vtkMaterialInterfaceFilterDEBUG
+// Debug
+#ifdef vtkMaterialInterfaceFilterDEBUG
   int MyPid;
-  #endif
+#endif
 
-  vtkImplicitFunction *ClipFunction;
+  vtkImplicitFunction* ClipFunction;
 
   // Variables that setup clipping with a sphere and a plane.
   double ClipCenter[3];
-  int    ClipWithSphere;
+  int ClipWithSphere;
   double ClipRadius;
-  int    ClipWithPlane;
+  int ClipWithPlane;
   double ClipPlaneVector[3];
   double ClipPlaneNormal[3];
 
@@ -711,9 +709,8 @@ protected:
   // By default set to 1
   unsigned char BlockGhostLevel;
 
-
 #ifdef vtkMaterialInterfaceFilterPROFILE
-// Lets profile to see what takes the most time for large number of processes.
+  // Lets profile to see what takes the most time for large number of processes.
   vtkSmartPointer<vtkTimerLog> InitializeBlocksTimer;
   vtkSmartPointer<vtkTimerLog> ShareGhostBlocksTimer;
   long NumberOfBlocks;
@@ -725,7 +722,6 @@ protected:
 private:
   vtkMaterialInterfaceFilter(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

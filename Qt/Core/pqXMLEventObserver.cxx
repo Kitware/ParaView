@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const QString textToXML(const QString& string)
 {
   QString result = string;
-  result.replace("&", "&amp;");  // keep first
+  result.replace("&", "&amp;"); // keep first
   result.replace("<", "&lt;");
   result.replace(">", "&gt;");
   result.replace("'", "&apos;");
@@ -52,7 +52,7 @@ static const QString textToXML(const QString& string)
 ////////////////////////////////////////////////////////////////////////////////////
 // pqXMLEventObserver
 
-pqXMLEventObserver::pqXMLEventObserver(QObject* p) 
+pqXMLEventObserver::pqXMLEventObserver(QObject* p)
   : pqEventObserver(p)
 {
 }
@@ -63,62 +63,56 @@ pqXMLEventObserver::~pqXMLEventObserver()
 
 void pqXMLEventObserver::setStream(QTextStream* stream)
 {
-  if(this->Stream)
-    {
+  if (this->Stream)
+  {
     *this->Stream << "</pqevents>\n";
-    }
+  }
   pqEventObserver::setStream(stream);
-  if(this->Stream)
-    {
+  if (this->Stream)
+  {
     *this->Stream << "<?xml version=\"1.0\" ?>\n";
     *this->Stream << "<pqevents>\n";
-    }
+  }
 }
 
-
 void pqXMLEventObserver::onRecordEvent(
-  const QString& widget,
-  const QString& command,
-  const QString& arguments,
-  const int& eventType)                                   
+  const QString& widget, const QString& command, const QString& arguments, const int& eventType)
 {
   // Check Event
   if (eventType == pqEventTypes::CHECK_EVENT)
+  {
+    if (this->Stream)
     {
-    if(this->Stream)
-      {
-      // save a pqcompareview event when command is PQ_COMPAREVIEW_PROPERTY_NAME, is it too sketchy ?
+      // save a pqcompareview event when command is PQ_COMPAREVIEW_PROPERTY_NAME, is it too sketchy
+      // ?
       if (command == pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME)
-        {
-        *this->Stream
-          << "  <pqcompareview "
-          << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-          << "baseline=\"" << textToXML(arguments).toLatin1().data() << "\" "
-          << "threshold=\"5\" "
-          << "/>\n";
-        }
+      {
+        *this->Stream << "  <pqcompareview "
+                      << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+                      << "baseline=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                      << "threshold=\"5\" "
+                      << "/>\n";
+      }
       else
-        {
-      *this->Stream
-        << "  <pqcheck "
-        << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-        << "property=\"" << textToXML(command).toLatin1().data() << "\" "
-        << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
-        << "/>\n";
-        }
+      {
+        *this->Stream << "  <pqcheck "
+                      << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+                      << "property=\"" << textToXML(command).toLatin1().data() << "\" "
+                      << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                      << "/>\n";
       }
     }
+  }
   // Event
   else
+  {
+    if (this->Stream)
     {
-    if(this->Stream)
-      {
-      *this->Stream
-        << "  <pqevent "
-        << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
-        << "command=\"" << textToXML(command).toLatin1().data() << "\" "
-        << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
-        << "/>\n";
-      }
+      *this->Stream << "  <pqevent "
+                    << "object=\"" << textToXML(widget).toLatin1().data() << "\" "
+                    << "command=\"" << textToXML(command).toLatin1().data() << "\" "
+                    << "arguments=\"" << textToXML(arguments).toLatin1().data() << "\" "
+                    << "/>\n";
     }
+  }
 }

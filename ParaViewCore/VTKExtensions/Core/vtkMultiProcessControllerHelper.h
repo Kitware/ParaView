@@ -12,18 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkMultiProcessControllerHelper - collection of assorted helper
-// routines dealing with communication.
-// .SECTION Description
-// vtkMultiProcessControllerHelper is collection of assorted helper
-// routines dealing with communication.
+/**
+ * @class   vtkMultiProcessControllerHelper
+ * @brief   collection of assorted helper
+ * routines dealing with communication.
+ *
+ * vtkMultiProcessControllerHelper is collection of assorted helper
+ * routines dealing with communication.
+*/
 
 #ifndef vtkMultiProcessControllerHelper_h
 #define vtkMultiProcessControllerHelper_h
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
-#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkSmartPointer.h"              // needed for vtkSmartPointer.
 
 #include <vector> // needed for std::vector
 
@@ -38,29 +41,27 @@ public:
   vtkTypeMacro(vtkMultiProcessControllerHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Reduce the stream to all processes calling the (*operation) for reduction.
-  // The operation is assumed to be commutative.
-  static int ReduceToAll(
-    vtkMultiProcessController* controller,
-    vtkMultiProcessStream& data, 
-    void (*operation)(vtkMultiProcessStream& A, vtkMultiProcessStream& B),
-    int tag);
+  /**
+   * Reduce the stream to all processes calling the (*operation) for reduction.
+   * The operation is assumed to be commutative.
+   */
+  static int ReduceToAll(vtkMultiProcessController* controller, vtkMultiProcessStream& data,
+    void (*operation)(vtkMultiProcessStream& A, vtkMultiProcessStream& B), int tag);
 
-  // Description:
-  // Utility method to merge pieces received from several processes. It does not
-  // handle all data types, and hence not meant for non-paraview specific use.
-  // Returns a new instance of data object containing the merged result on
-  // success, else returns NULL. The caller is expected to release the memory
-  // from the returned data-object.
-  static vtkDataObject* MergePieces(
-    vtkDataObject** pieces, unsigned int num_pieces);
+  /**
+   * Utility method to merge pieces received from several processes. It does not
+   * handle all data types, and hence not meant for non-paraview specific use.
+   * Returns a new instance of data object containing the merged result on
+   * success, else returns NULL. The caller is expected to release the memory
+   * from the returned data-object.
+   */
+  static vtkDataObject* MergePieces(vtkDataObject** pieces, unsigned int num_pieces);
 
-  // Description:
-  // Overload where the merged pieces are combined into result.
+  /**
+   * Overload where the merged pieces are combined into result.
+   */
   static bool MergePieces(
-    std::vector<vtkSmartPointer<vtkDataObject> >& pieces,
-    vtkDataObject* result);
+    std::vector<vtkSmartPointer<vtkDataObject> >& pieces, vtkDataObject* result);
 
 protected:
   vtkMultiProcessControllerHelper();
@@ -69,7 +70,6 @@ protected:
 private:
   vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

@@ -18,17 +18,17 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-int TestMPI(int , char* [])
+int TestMPI(int, char* [])
 {
-  vtkConeSource *cone = vtkConeSource::New();
-//   cone->Update(); //For GetCenter
-  
-  vtkPVConnectivityFilter *connect = vtkPVConnectivityFilter::New();
-  connect->SetInputConnection( cone->GetOutputPort() );
-  
-  vtkMPIMoveData *move = vtkMPIMoveData::New();
-  move->SetInputConnection( connect->GetOutputPort() );
-  move->SetMoveModeToPassThrough ();
+  vtkConeSource* cone = vtkConeSource::New();
+  //   cone->Update(); //For GetCenter
+
+  vtkPVConnectivityFilter* connect = vtkPVConnectivityFilter::New();
+  connect->SetInputConnection(cone->GetOutputPort());
+
+  vtkMPIMoveData* move = vtkMPIMoveData::New();
+  move->SetInputConnection(connect->GetOutputPort());
+  move->SetMoveModeToPassThrough();
   move->Update();
 
   cone->Delete();

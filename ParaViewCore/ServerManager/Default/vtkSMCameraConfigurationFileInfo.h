@@ -12,17 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCameraConfigurationFileInfo - Camera configuration file meta data.
-//
-// .SECTION Description
-// Organizes meta-data that is used by both reader and writer in a single
-// location.
-//
-// .SECTION See Also
-// vtkSMCameraConfigurationReader, vtkSMCameraConfigurationWriter
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
+/**
+ * @class   vtkSMCameraConfigurationFileInfo
+ * @brief   Camera configuration file meta data.
+ *
+ *
+ * Organizes meta-data that is used by both reader and writer in a single
+ * location.
+ *
+ * @sa
+ * vtkSMCameraConfigurationReader, vtkSMCameraConfigurationWriter
+ *
+ * @par Thanks:
+ * This class was contributed by SciberQuest Inc.
+*/
+
 #ifndef vtkSMCameraConfigurationFileInfo_h
 #define vtkSMCameraConfigurationFileInfo_h
 
@@ -32,23 +36,22 @@ class vtkSMCameraConfigurationFileInfo
 {
 public:
   vtkSMCameraConfigurationFileInfo()
-        :
-    FileIdentifier("PVCameraConfiguration"),
-    FileDescription("ParaView camera configuration"),
-    FileExtension(".pvcc")
-      { }
+    : FileIdentifier("PVCameraConfiguration")
+    , FileDescription("ParaView camera configuration")
+    , FileExtension(".pvcc")
+  {
+  }
 
-  void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << endl
-      << indent << "FileDescription: " << this->FileDescription << endl
-      << indent << "FileExtension: " << this->FileExtension << endl;
-    }
+  void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << endl
+       << indent << "FileDescription: " << this->FileDescription << endl
+       << indent << "FileExtension: " << this->FileExtension << endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

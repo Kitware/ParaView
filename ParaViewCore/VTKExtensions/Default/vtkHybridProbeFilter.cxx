@@ -57,28 +57,25 @@ int vtkHybridProbeFilter::FillOutputPortInformation(int, vtkInformation* info)
 
 //----------------------------------------------------------------------------
 int vtkHybridProbeFilter::RequestData(
-  vtkInformation*,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector, 0);
 
   switch (this->Mode)
-    {
-  case INTERPOLATE_AT_LOCATION:
-    return this->InterpolateAtLocation(input, output)? 1 : 0;
+  {
+    case INTERPOLATE_AT_LOCATION:
+      return this->InterpolateAtLocation(input, output) ? 1 : 0;
 
-  case EXTRACT_CELL_CONTAINING_LOCATION:
-    return this->ExtractCellContainingLocation(input, output)? 1 : 0;
-    }
+    case EXTRACT_CELL_CONTAINING_LOCATION:
+      return this->ExtractCellContainingLocation(input, output) ? 1 : 0;
+  }
 
   return 0;
 }
 
 //----------------------------------------------------------------------------
-bool vtkHybridProbeFilter::InterpolateAtLocation(
-  vtkDataObject* input, vtkUnstructuredGrid* output)
+bool vtkHybridProbeFilter::InterpolateAtLocation(vtkDataObject* input, vtkUnstructuredGrid* output)
 {
   vtkNew<vtkPointSource> pointSource;
   pointSource->SetNumberOfPoints(1);
@@ -111,16 +108,16 @@ bool vtkHybridProbeFilter::ExtractCellContainingLocation(
   extractor->Update();
 
   if (vtkCompositeDataSet::SafeDownCast(input))
-    {
+  {
     vtkNew<vtkCompositeDataToUnstructuredGridFilter> merger;
     merger->SetInputDataObject(extractor->GetOutputDataObject(0));
     merger->Update();
     output->ShallowCopy(merger->GetOutputDataObject(0));
-    }
+  }
   else
-    {
+  {
     output->ShallowCopy(extractor->GetOutputDataObject(0));
-    }
+  }
   return true;
 }
 
@@ -129,8 +126,6 @@ void vtkHybridProbeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Mode: " << this->Mode << endl;
-  os << indent << "Location: "
-     << this->Location[0] << ", "
-     << this->Location[1] << ", "
+  os << indent << "Location: " << this->Location[0] << ", " << this->Location[1] << ", "
      << this->Location[2] << endl;
 }

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,21 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
-/// A property widget with a tool button for selecting a single color.
-///
-/// To use this widget for a property add the 'panel_widget="color_selector"' attribute
-/// to the property's XML. To use this widget for a property whose color might possibly
-/// come from the global color palette, add the 'panel_widget="color_selector_with_palette"'
-/// attribute to the property's XML.
+/**
+* A property widget with a tool button for selecting a single color.
+*
+* To use this widget for a property add the 'panel_widget="color_selector"' attribute
+* to the property's XML. To use this widget for a property whose color might possibly
+* come from the global color palette, add the 'panel_widget="color_selector_with_palette"'
+* attribute to the property's XML.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  pqColorSelectorPropertyWidget(vtkSMProxy *proxy,
-                                vtkSMProperty *property,
-                                bool withPalette,
-                                QWidget *parent = 0);
+  pqColorSelectorPropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* property, bool withPalette, QWidget* parent = 0);
   ~pqColorSelectorPropertyWidget();
 };
 

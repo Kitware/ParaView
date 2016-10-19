@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkQuerySelectionSource - a selection source that uses a "query" to
-// generate the selection.
-// .SECTION Description
-// vtkQuerySelectionSource is a selection source that uses a "query" to generate
-// the vtkSelection object.
-// A query has the following form: "TERM OPERATOR VALUE(s)"
-// eg. "GLOBALID is_in_range (0, 10)" here GLOBALID is the TERM, is_in_range is
-// the operator and (0,10) are the values. A query can have additional
-// qualifiers such as the process id, block id, amr level, amr block.
+/**
+ * @class   vtkQuerySelectionSource
+ * @brief   a selection source that uses a "query" to
+ * generate the selection.
+ *
+ * vtkQuerySelectionSource is a selection source that uses a "query" to generate
+ * the vtkSelection object.
+ * A query has the following form: "TERM OPERATOR VALUE(s)"
+ * eg. "GLOBALID is_in_range (0, 10)" here GLOBALID is the TERM, is_in_range is
+ * the operator and (0,10) are the values. A query can have additional
+ * qualifiers such as the process id, block id, amr level, amr block.
+*/
 
 #ifndef vtkQuerySelectionSource_h
 #define vtkQuerySelectionSource_h
@@ -37,14 +40,18 @@ public:
   vtkTypeMacro(vtkQuerySelectionSource, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/get the query expression string.
+  //@{
+  /**
+   * Set/get the query expression string.
+   */
   vtkSetStringMacro(QueryString);
   vtkGetStringMacro(QueryString);
+  //@}
 
-  // Description:
+  //@{
   vtkSetMacro(CompositeIndex, int);
   vtkGetMacro(CompositeIndex, int);
+  //@}
 
   vtkSetMacro(HierarchicalLevel, int);
   vtkGetMacro(HierarchicalLevel, int);
@@ -60,27 +67,29 @@ public:
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
 
-  // Description:
-  // This merely reconstructs the query as a user friendly text eg. "IDs >= 12".
-  // ( Makes you want to wonder if we should support parsing input query text as
-  // well ;) )
+  /**
+   * This merely reconstructs the query as a user friendly text eg. "IDs >= 12".
+   * ( Makes you want to wonder if we should support parsing input query text as
+   * well ;) )
+   */
   const char* GetUserFriendlyText();
 
-  // Description:
-  // Set/get the invert selection flag.
+  //@{
+  /**
+   * Set/get the invert selection flag.
+   */
   vtkSetMacro(Inverse, int);
   vtkGetMacro(Inverse, int);
+  //@}
 
 protected:
   vtkQuerySelectionSource();
   ~vtkQuerySelectionSource();
 
-  virtual int RequestInformation(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int RequestData(vtkInformation* request,
-    vtkInformationVector** inputVector,
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   int FieldType;
@@ -100,8 +109,6 @@ private:
   vtkInternals* Internals;
 
   int Inverse;
-
 };
 
 #endif
-

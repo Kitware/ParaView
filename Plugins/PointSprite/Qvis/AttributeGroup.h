@@ -43,10 +43,11 @@
 #include <vector>
 #include <visitstream.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // Forward declaration
 class AttributeGroup;
-//class Connection;
+// class Connection;
 class DataNode;
 
 // ****************************************************************************
@@ -110,151 +111,154 @@ class DataNode;
 class AttributeGroup
 {
 public:
-    enum FieldType {
-        FieldType_unknown,
-        FieldType_int,
-        FieldType_intArray,
-        FieldType_intVector,
-        FieldType_bool,
-        FieldType_boolVector,
-        FieldType_float,
-        FieldType_floatArray,
-        FieldType_double,
-        FieldType_doubleArray,
-        FieldType_doubleVector,
-        FieldType_uchar,
-        FieldType_ucharArray,
-        FieldType_ucharVector,
-        FieldType_string,
-        FieldType_stringVector,
-        FieldType_colortable,
-        FieldType_color,
-        FieldType_opacity,
-        FieldType_linestyle,
-        FieldType_linewidth,
-        FieldType_variablename,
-        FieldType_att,
-        FieldType_attVector,
-        FieldType_enum,
-        FieldType_scalemode
-    };
+  enum FieldType
+  {
+    FieldType_unknown,
+    FieldType_int,
+    FieldType_intArray,
+    FieldType_intVector,
+    FieldType_bool,
+    FieldType_boolVector,
+    FieldType_float,
+    FieldType_floatArray,
+    FieldType_double,
+    FieldType_doubleArray,
+    FieldType_doubleVector,
+    FieldType_uchar,
+    FieldType_ucharArray,
+    FieldType_ucharVector,
+    FieldType_string,
+    FieldType_stringVector,
+    FieldType_colortable,
+    FieldType_color,
+    FieldType_opacity,
+    FieldType_linestyle,
+    FieldType_linewidth,
+    FieldType_variablename,
+    FieldType_att,
+    FieldType_attVector,
+    FieldType_enum,
+    FieldType_scalemode
+  };
 
 public:
-    AttributeGroup(const char *formatString);
-    virtual ~AttributeGroup();
+  AttributeGroup(const char* formatString);
+  virtual ~AttributeGroup();
 
-//    void Write(Connection &conn);
-//    void Read(Connection &conn);
-//    int  CalculateMessageSize(Connection &conn);
+  //    void Write(Connection &conn);
+  //    void Read(Connection &conn);
+  //    int  CalculateMessageSize(Connection &conn);
 
-    int  NumAttributes() const;
-    int  NumAttributesSelected() const;
-    bool IsSelected(int i) const;
+  int NumAttributes() const;
+  int NumAttributesSelected() const;
+  bool IsSelected(int i) const;
 
-    void SetGuido(int);
-    int  GetGuido();
+  void SetGuido(int);
+  int GetGuido();
 
-    // Selects all of the attributes in the AttributeGroup
-    virtual void SelectAll() = 0;
-    void SelectField(int);
-    void SelectFields(const std::vector<int> &);
-    void UnSelectAll();
+  // Selects all of the attributes in the AttributeGroup
+  virtual void SelectAll() = 0;
+  void SelectField(int);
+  void SelectFields(const std::vector<int>&);
+  void UnSelectAll();
 
-    virtual bool CreateNode(DataNode *node, bool, bool);
-    virtual void SetFromNode(DataNode *node);
-    virtual void ProcessOldVersions(DataNode *node, const char *configVersion);
+  virtual bool CreateNode(DataNode* node, bool, bool);
+  virtual void SetFromNode(DataNode* node);
+  virtual void ProcessOldVersions(DataNode* node, const char* configVersion);
 
-    friend ostream& operator<<(ostream& os, const AttributeGroup&);
+  friend ostream& operator<<(ostream& os, const AttributeGroup&);
 
-    virtual bool CopyAttributes(const AttributeGroup *atts);
-    virtual void InterpolateConst(const AttributeGroup *atts1,
-                                  const AttributeGroup *atts2, double f);
-    virtual void InterpolateLinear(const AttributeGroup *atts1,
-                                   const AttributeGroup *atts2, double f);
-    virtual bool EqualTo(const AttributeGroup *atts) const;
-    virtual const std::string TypeName() const;
+  virtual bool CopyAttributes(const AttributeGroup* atts);
+  virtual void InterpolateConst(const AttributeGroup* atts1, const AttributeGroup* atts2, double f);
+  virtual void InterpolateLinear(
+    const AttributeGroup* atts1, const AttributeGroup* atts2, double f);
+  virtual bool EqualTo(const AttributeGroup* atts) const;
+  virtual const std::string TypeName() const;
 
-    virtual std::string GetFieldName(int index) const;
-    virtual FieldType   GetFieldType(int index) const;
-    virtual std::string GetFieldTypeName(int index) const;
-    virtual bool        FieldsEqual(int index, const AttributeGroup*) const;
+  virtual std::string GetFieldName(int index) const;
+  virtual FieldType GetFieldType(int index) const;
+  virtual std::string GetFieldTypeName(int index) const;
+  virtual bool FieldsEqual(int index, const AttributeGroup*) const;
 
-    static bool VersionLessThan(const char *configVersion, const char *version);
+  static bool VersionLessThan(const char* configVersion, const char* version);
+
 protected:
-    void Select(int index, void *address, int length = 0);
+  void Select(int index, void* address, int length = 0);
 
-    // Used to instantiate a new sub attribute.
-    virtual AttributeGroup *CreateSubAttributeGroup(int attrId);
+  // Used to instantiate a new sub attribute.
+  virtual AttributeGroup* CreateSubAttributeGroup(int attrId);
 
-    // These are used to declare the AttributeGroup's component types.
-    void DeclareChar();
-    void DeclareUnsignedChar();
-    void DeclareInt();
-    void DeclareLong();
-    void DeclareFloat();
-    void DeclareDouble();
-    void DeclareString();
-    void DeclareAttributeGroup();
-    void DeclareBool();
+  // These are used to declare the AttributeGroup's component types.
+  void DeclareChar();
+  void DeclareUnsignedChar();
+  void DeclareInt();
+  void DeclareLong();
+  void DeclareFloat();
+  void DeclareDouble();
+  void DeclareString();
+  void DeclareAttributeGroup();
+  void DeclareBool();
 
-    void DeclareListChar();
-    void DeclareListUnsignedChar();
-    void DeclareListInt();
-    void DeclareListLong();
-    void DeclareListFloat();
-    void DeclareListDouble();
-    void DeclareListString();
-    void DeclareListAttributeGroup();
-    void DeclareListBool();
+  void DeclareListChar();
+  void DeclareListUnsignedChar();
+  void DeclareListInt();
+  void DeclareListLong();
+  void DeclareListFloat();
+  void DeclareListDouble();
+  void DeclareListString();
+  void DeclareListAttributeGroup();
+  void DeclareListBool();
 
-    void DeclareVectorChar();
-    void DeclareVectorUnsignedChar();
-    void DeclareVectorInt();
-    void DeclareVectorLong();
-    void DeclareVectorFloat();
-    void DeclareVectorDouble();
-    void DeclareVectorString();
-    void DeclareVectorAttributeGroup();
-    void DeclareVectorBool();
+  void DeclareVectorChar();
+  void DeclareVectorUnsignedChar();
+  void DeclareVectorInt();
+  void DeclareVectorLong();
+  void DeclareVectorFloat();
+  void DeclareVectorDouble();
+  void DeclareVectorString();
+  void DeclareVectorAttributeGroup();
+  void DeclareVectorBool();
+
 private:
-    class typeInfo
-    {
-    public:
-        typeInfo();
-        typeInfo(const typeInfo &);
-        typeInfo(unsigned char tcode);
-        virtual ~typeInfo();
-        void operator = (const typeInfo &);
+  class typeInfo
+  {
+  public:
+    typeInfo();
+    typeInfo(const typeInfo&);
+    typeInfo(unsigned char tcode);
+    virtual ~typeInfo();
+    void operator=(const typeInfo&);
 
-        unsigned char typeCode;
-        bool selected;
-        void *address;
-        int  length;
-    };
+    unsigned char typeCode;
+    bool selected;
+    void* address;
+    int length;
+  };
 
-    typedef std::vector<typeInfo> typeInfoVector;
+  typedef std::vector<typeInfo> typeInfoVector;
 
-    // Support methods
-    void CreateTypeMap(const char *formatString);
-//    void WriteType(Connection &conn, typeInfo &info);
-//    void ReadType(Connection &conn, int attrId, typeInfo &info);
+  // Support methods
+  void CreateTypeMap(const char* formatString);
+  //    void WriteType(Connection &conn, typeInfo &info);
+  //    void ReadType(Connection &conn, int attrId, typeInfo &info);
 private:
-    typeInfoVector typeMap;  // Holds typemap for the whole class
-    int guido;
+  typeInfoVector typeMap; // Holds typemap for the whole class
+  int guido;
 };
 
 ostream& operator<<(ostream& os, const AttributeGroup&);
-
 }
 // Some vector typedefs.
 #include <vectortypes.h>
 
 namespace pointsprite
 {
-typedef std::vector<AttributeGroup *> AttributeGroupVector;
+typedef std::vector<AttributeGroup*> AttributeGroupVector;
 
 // An exception class
-class BadDeclareFormatString : public VisItException { };
+class BadDeclareFormatString : public VisItException
+{
+};
 }
 
 #endif

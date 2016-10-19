@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRepresentedDataInformation
-// .SECTION Description
-// vtkPVRepresentedDataInformation is a vtkPVDataInformation subclass that knows
-// how to gather rendered data-information from a vtkPVDataRepresentation.
+/**
+ * @class   vtkPVRepresentedDataInformation
+ *
+ * vtkPVRepresentedDataInformation is a vtkPVDataInformation subclass that knows
+ * how to gather rendered data-information from a vtkPVDataRepresentation.
+*/
 
 #ifndef vtkPVRepresentedDataInformation_h
 #define vtkPVRepresentedDataInformation_h
@@ -23,15 +25,17 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataInformation.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation : public vtkPVDataInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation
+  : public vtkPVDataInformation
 {
 public:
   static vtkPVRepresentedDataInformation* New();
   vtkTypeMacro(vtkPVRepresentedDataInformation, vtkPVDataInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
 protected:
@@ -41,7 +45,6 @@ protected:
 private:
   vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

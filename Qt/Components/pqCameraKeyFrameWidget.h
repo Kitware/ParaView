@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,38 +38,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProxy;
 class vtkCamera;
 
-/// pqCameraKeyFrameWidget is the widget that is shown to edit the value of a
-/// single camera key frame. This class is based on pqCameraWidget and hence has
-/// sections of code borrowed from there.
+/**
+* pqCameraKeyFrameWidget is the widget that is shown to edit the value of a
+* single camera key frame. This class is based on pqCameraWidget and hence has
+* sections of code borrowed from there.
+*/
 class PQCOMPONENTS_EXPORT pqCameraKeyFrameWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqCameraKeyFrameWidget(QWidget* parent=0);
+  pqCameraKeyFrameWidget(QWidget* parent = 0);
   virtual ~pqCameraKeyFrameWidget();
 
   bool usePathBasedMode() const;
 
 signals:
-  /// Fired when user requests the use of the current camera as the value for
-  /// the key frame.
+  /**
+  * Fired when user requests the use of the current camera as the value for
+  * the key frame.
+  */
   void useCurrentCamera();
- 
+
 public slots:
-  /// Initialize the widget using the values from the key frame proxy.
+  /**
+  * Initialize the widget using the values from the key frame proxy.
+  */
   void initializeUsingKeyFrame(vtkSMProxy* keyframeProxy);
 
-  /// Initialize the widget using the camera.
+  /**
+  * Initialize the widget using the camera.
+  */
   void initializeUsingCamera(vtkCamera* camera);
 
-  /// The camera keyframes have 2 modes either interpolate vtkCamera's using the
-  /// camera interpolator or use path-based. This mode is not defined on
-  /// per-keyframe basis, but on the entire animation track. Hence, we provide
-  /// this slot to choose which mode should the widget operate in.
+  /**
+  * The camera keyframes have 2 modes either interpolate vtkCamera's using the
+  * camera interpolator or use path-based. This mode is not defined on
+  * per-keyframe basis, but on the entire animation track. Hence, we provide
+  * this slot to choose which mode should the widget operate in.
+  */
   void setUsePathBasedMode(bool);
 
-  /// Write the user chosen values for this key frame to the proxy.
+  /**
+  * Write the user chosen values for this key frame to the proxy.
+  */
   void saveToKeyFrame(vtkSMProxy* keyframeProxy);
 
 protected:
@@ -78,7 +91,9 @@ protected:
   virtual void hideEvent(QHideEvent*);
 
 private slots:
-  /// called when the user clicks on an item in the left pane.
+  /**
+  * called when the user clicks on an item in the left pane.
+  */
   void changeCurrentPage();
 
 private:

@@ -36,8 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarVisibilityReaction.h"
 
 //-----------------------------------------------------------------------------
-pqEditScalarBarReaction::pqEditScalarBarReaction(
-  QAction* parentObject, bool track_active_objects)
+pqEditScalarBarReaction::pqEditScalarBarReaction(QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
 {
   QAction* tmp = new QAction(this);
@@ -61,8 +60,7 @@ void pqEditScalarBarReaction::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqEditScalarBarReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(
-    this->SBVReaction->parentAction()->isEnabled() &&
+  this->parentAction()->setEnabled(this->SBVReaction->parentAction()->isEnabled() &&
     this->SBVReaction->parentAction()->isChecked());
 }
 
@@ -76,7 +74,7 @@ void pqEditScalarBarReaction::onTriggered()
 bool pqEditScalarBarReaction::editScalarBar()
 {
   if (vtkSMProxy* sbProxy = this->SBVReaction->scalarBarProxy())
-    {
+  {
     pqRepresentation* repr = this->SBVReaction->representation();
 
     pqProxyWidgetDialog dialog(sbProxy);
@@ -87,6 +85,6 @@ bool pqEditScalarBarReaction::editScalarBar()
 
     repr->connect(&dialog, SIGNAL(accepted()), SLOT(renderViewEventually()));
     return dialog.exec() == QDialog::Accepted;
-    }
+  }
   return false;
 }

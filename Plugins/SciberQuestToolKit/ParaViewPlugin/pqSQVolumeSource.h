@@ -43,32 +43,32 @@ class pqSQVolumeSource : public pqNamedObjectPanel
 {
   Q_OBJECT
 public:
-  pqSQVolumeSource(pqProxy* proxy, QWidget* p=NULL);
+  pqSQVolumeSource(pqProxy* proxy, QWidget* p = NULL);
   ~pqSQVolumeSource();
 
   // Description:
   // Set/Get values to/from the UI.
-  void GetOrigin(double *o);
-  void SetOrigin(double *o);
+  void GetOrigin(double* o);
+  void SetOrigin(double* o);
 
-  void GetPoint1(double *p1);
-  void SetPoint1(double *p1);
+  void GetPoint1(double* p1);
+  void SetPoint1(double* p1);
 
-  void GetPoint2(double *p2);
-  void SetPoint2(double *p2);
+  void GetPoint2(double* p2);
+  void SetPoint2(double* p2);
 
-  void GetPoint3(double *p3);
-  void SetPoint3(double *p3);
+  void GetPoint3(double* p3);
+  void SetPoint3(double* p3);
 
-  void GetResolution(int *res);
-  void SetResolution(int *res);
+  void GetResolution(int* res);
+  void SetResolution(int* res);
 
-  void GetSpacing(double *dx);
-  void SetSpacing(double *dx);
+  void GetSpacing(double* dx);
+  void SetSpacing(double* dx);
 
   // Description:
   // dispatch context menu events.
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent* event);
 
 protected slots:
   // Description:
@@ -114,8 +114,8 @@ private:
   int Nx[3];
 
 private:
-  pqSQVolumeSourceForm *Form;
-  pqPropertyLinks *Links;
+  pqSQVolumeSourceForm* Form;
+  pqPropertyLinks* Links;
 };
 
 #endif

@@ -34,7 +34,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 
-
 vtkStandardNewMacro(vtkSQVolumeSourceConfigurationReader);
 
 //-----------------------------------------------------------------------------
@@ -52,16 +51,17 @@ vtkSQVolumeSourceConfigurationReader::vtkSQVolumeSourceConfigurationReader()
 
 //-----------------------------------------------------------------------------
 vtkSQVolumeSourceConfigurationReader::~vtkSQVolumeSourceConfigurationReader()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(const char *filename)
+int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(const char* filename)
 {
-  int ok=this->Superclass::ReadConfiguration(filename);
+  int ok = this->Superclass::ReadConfiguration(filename);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -69,13 +69,13 @@ int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(const char *filename
 }
 
 //-----------------------------------------------------------------------------
-int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
+int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement* x)
 {
-  int ok=this->Superclass::ReadConfiguration(x);
+  int ok = this->Superclass::ReadConfiguration(x);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -85,5 +85,5 @@ int vtkSQVolumeSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
 //-----------------------------------------------------------------------------
 void vtkSQVolumeSourceConfigurationReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

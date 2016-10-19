@@ -23,12 +23,11 @@
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
 
-class vtkSMIntVectorProperty::vtkInternals :
-  public vtkSMVectorPropertyTemplate<int>
+class vtkSMIntVectorProperty::vtkInternals : public vtkSMVectorPropertyTemplate<int>
 {
 public:
-  vtkInternals(vtkSMIntVectorProperty* ivp):
-    vtkSMVectorPropertyTemplate<int>(ivp)
+  vtkInternals(vtkSMIntVectorProperty* ivp)
+    : vtkSMVectorPropertyTemplate<int>(ivp)
   {
   }
 };
@@ -49,40 +48,37 @@ vtkSMIntVectorProperty::~vtkSMIntVectorProperty()
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 {
-  ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+  ProxyState_Property* prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *variant = prop->mutable_value();
+  Variant* variant = prop->mutable_value();
   variant->set_type(Variant::INT);
 
   std::vector<int>::iterator iter;
-  for (iter = this->Internals->Values.begin(); iter!=
-    this->Internals->Values.end(); ++iter)
-    {
+  for (iter = this->Internals->Values.begin(); iter != this->Internals->Values.end(); ++iter)
+  {
     variant->add_integer(*iter);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
-                                      vtkSMProxyLocator*)
+void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset, vtkSMProxyLocator*)
 {
-  //cout << ">>>>>>>>>>>>" << endl;
-  //msg->PrintDebugString();
-  //cout << "<<<<<<<<<<<<" << endl;
+  // cout << ">>>>>>>>>>>>" << endl;
+  // msg->PrintDebugString();
+  // cout << "<<<<<<<<<<<<" << endl;
 
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
-  const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,
-    offset);
+  const ProxyState_Property* prop = &msg->GetExtension(ProxyState::property, offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value();
+  const Variant* variant = &prop->value();
   int num_elems = variant->integer_size();
-  int *values = new int[num_elems+1];
-  for (int cc=0; cc < num_elems; cc++)
-    {
+  int* values = new int[num_elems + 1];
+  for (int cc = 0; cc < num_elems; cc++)
+  {
     values[cc] = variant->integer(cc);
-    }
+  }
   this->SetElements(values, num_elems);
   delete[] values;
 }
@@ -130,7 +126,7 @@ void vtkSMIntVectorProperty::ClearUncheckedElements()
 }
 
 //---------------------------------------------------------------------------
-int *vtkSMIntVectorProperty::GetElements()
+int* vtkSMIntVectorProperty::GetElements()
 {
   return this->Internals->GetElements();
 }
@@ -168,9 +164,7 @@ int vtkSMIntVectorProperty::SetElements2(int value0, int value1)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::SetElements3(int value0, 
-                                          int value1, 
-                                          int value2)
+int vtkSMIntVectorProperty::SetElements3(int value0, int value1, int value2)
 {
   int retVal1 = this->SetElement(0, value0);
   int retVal2 = this->SetElement(1, value1);
@@ -203,60 +197,56 @@ int vtkSMIntVectorProperty::SetUncheckedElements(const int* values, unsigned int
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
-                                              vtkPVXMLElement* element)
+int vtkSMIntVectorProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)
 {
   int retVal;
 
   retVal = this->Superclass::ReadXMLAttributes(parent, element);
   if (!retVal)
-    {
+  {
     return retVal;
-    }
+  }
 
   int arg_is_array;
   retVal = element->GetScalarAttribute("argument_is_array", &arg_is_array);
-  if(retVal) 
-    { 
-    this->SetArgumentIsArray(arg_is_array); 
-    }
+  if (retVal)
+  {
+    this->SetArgumentIsArray(arg_is_array);
+  }
 
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
-    {
+  {
     if (element->GetAttribute("default_values") &&
-        strcmp("none", element->GetAttribute("default_values")) == 0 )
-      {
+      strcmp("none", element->GetAttribute("default_values")) == 0)
+    {
       this->Internals->Initialized = false;
-      }
+    }
     else
-      {
+    {
       int* initVal = new int[numElems];
-      int numRead = element->GetVectorAttribute("default_values",
-                                                numElems,
-                                                initVal);
-      
+      int numRead = element->GetVectorAttribute("default_values", numElems, initVal);
+
       if (numRead > 0)
-        {
+      {
         if (numRead != numElems)
-          {
+        {
           vtkErrorMacro("The number of default values does not match the "
                         "number of elements. Initialization failed.");
           delete[] initVal;
           return 0;
-          }
+        }
         this->SetElements(initVal);
         this->Internals->UpdateDefaultValues();
-        }
-      else if (!this->Internals->Initialized)
-        {
-        vtkErrorMacro("No default value is specified for property: "
-                      << this->GetXMLName()
-                      << ". This might lead to stability problems");
-        }
-      delete[] initVal;
       }
+      else if (!this->Internals->Initialized)
+      {
+        vtkErrorMacro("No default value is specified for property: "
+          << this->GetXMLName() << ". This might lead to stability problems");
+      }
+      delete[] initVal;
     }
+  }
 
   return 1;
 }
@@ -266,12 +256,11 @@ void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
 
-  vtkSMIntVectorProperty* dsrc = vtkSMIntVectorProperty::SafeDownCast(
-    src);
+  vtkSMIntVectorProperty* dsrc = vtkSMIntVectorProperty::SafeDownCast(src);
   if (dsrc)
-    {
+  {
     this->Internals->Copy(dsrc->Internals);
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -287,16 +276,15 @@ void vtkSMIntVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
   os << indent << "Values: ";
-  for (unsigned int i=0; i<this->GetNumberOfElements(); i++)
-    {
+  for (unsigned int i = 0; i < this->GetNumberOfElements(); i++)
+  {
     os << this->GetElement(i) << " ";
-    }
+  }
   os << endl;
 }
 
 //---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::LoadState(
-  vtkPVXMLElement* element, vtkSMProxyLocator* loader)
+int vtkSMIntVectorProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader)
 {
   int prevImUpdate = this->ImmediateUpdate;
 
@@ -304,9 +292,9 @@ int vtkSMIntVectorProperty::LoadState(
   this->ImmediateUpdate = 0;
   int retVal = this->Superclass::LoadState(element, loader);
   if (retVal != 0)
-    {
+  {
     retVal = this->Internals->LoadStateValues(element) ? 1 : 0;
-    }
+  }
   this->ImmediateUpdate = prevImUpdate;
   return retVal;
 }

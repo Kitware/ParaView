@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,21 +39,31 @@ class pqRenderView;
 class QCheckBox;
 class QLineEdit;
 
-/// a popup window that helps the user select another view
-/// to link with
+/**
+* a popup window that helps the user select another view
+* to link with
+*/
 class PQCORE_EXPORT pqLinkViewWidget : public QWidget
 {
   Q_OBJECT
 public:
-  /// constructor takes the first view
+  /**
+  * constructor takes the first view
+  */
   pqLinkViewWidget(pqRenderView* firstLink);
-  /// destructor
+  /**
+  * destructor
+  */
   virtual ~pqLinkViewWidget();
 
 protected:
-  /// event filter to monitor user's selection
+  /**
+  * event filter to monitor user's selection
+  */
   bool eventFilter(QObject* watched, QEvent* e);
-  /// watch internal events
+  /**
+  * watch internal events
+  */
   bool event(QEvent* e);
 
 private:
@@ -63,4 +73,3 @@ private:
 };
 
 #endif
-

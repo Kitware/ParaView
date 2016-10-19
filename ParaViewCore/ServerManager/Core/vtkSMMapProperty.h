@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMMapProperty - abstract superclass for all map properties
-// .SECTION Description
-// vtkSMMapProperty defines an interface common for all map properties.
-// A map property stores a set of keys and values.
+/**
+ * @class   vtkSMMapProperty
+ * @brief   abstract superclass for all map properties
+ *
+ * vtkSMMapProperty defines an interface common for all map properties.
+ * A map property stores a set of keys and values.
+*/
 
 #ifndef vtkSMMapProperty_h
 #define vtkSMMapProperty_h
@@ -29,16 +32,19 @@ public:
   vtkTypeMacro(vtkSMMapProperty, vtkSMProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the number of elements for the value type.
+  /**
+   * Returns the number of elements for the value type.
+   */
   virtual vtkIdType GetNumberOfElements();
 
-  // Description:
-  // Returns true if the current value is the same as the default value.
+  /**
+   * Returns true if the current value is the same as the default value.
+   */
   virtual bool IsValueDefault();
 
-  // Description:
-  // Copy all property values.
+  /**
+   * Copy all property values.
+   */
   virtual void Copy(vtkSMProperty* src);
 
 protected:
@@ -46,7 +52,7 @@ protected:
   ~vtkSMMapProperty();
 
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-  virtual int ReadXMLAttributes(vtkSMProxy *parent, vtkPVXMLElement *element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
 private:
   vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;

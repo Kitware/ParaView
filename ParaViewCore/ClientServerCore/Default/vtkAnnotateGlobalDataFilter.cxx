@@ -28,11 +28,11 @@ static std::string vtkGetReferenceAsString(void* ref)
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", ref);
-  char *aplus = addrofthis;
+  char* aplus = addrofthis;
   if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-    {
-    aplus += 2; //skip over "0x"
-    }
+  {
+    aplus += 2; // skip over "0x"
+  }
   return std::string(aplus);
 }
 
@@ -58,15 +58,16 @@ vtkAnnotateGlobalDataFilter::~vtkAnnotateGlobalDataFilter()
 void vtkAnnotateGlobalDataFilter::EvaluateExpression()
 {
   std::ostringstream stream;
-  stream
-    << "def vtkAnnotateGlobalDataFilter_EvaluateExpression():" << endl
-    << "    from paraview import annotation as pv_ann" << endl
-    << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateGlobalDataFilter" << endl
-    << "    me = vtkAnnotateGlobalDataFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
-    << "    pv_ann.execute_on_global_data(me)" << endl
-    << "    del me" << endl
-    << "vtkAnnotateGlobalDataFilter_EvaluateExpression()" << endl
-    << "del vtkAnnotateGlobalDataFilter_EvaluateExpression" << endl;
+  stream << "def vtkAnnotateGlobalDataFilter_EvaluateExpression():" << endl
+         << "    from paraview import annotation as pv_ann" << endl
+         << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateGlobalDataFilter"
+         << endl
+         << "    me = vtkAnnotateGlobalDataFilter('" << vtkGetReferenceAsString(this) << " ')"
+         << endl
+         << "    pv_ann.execute_on_global_data(me)" << endl
+         << "    del me" << endl
+         << "vtkAnnotateGlobalDataFilter_EvaluateExpression()" << endl
+         << "del vtkAnnotateGlobalDataFilter_EvaluateExpression" << endl;
 
   // ensure Python is initialized.
   vtkPythonInterpreter::Initialize();
@@ -77,8 +78,8 @@ void vtkAnnotateGlobalDataFilter::EvaluateExpression()
 void vtkAnnotateGlobalDataFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FieldArrayName: " << (this->FieldArrayName?
-    this->FieldArrayName : "(none)") << endl;
-  os << indent << "Prefix: " << (this->Prefix? this->Prefix : "(none)") << endl;
-  os << indent << "Postfix: " << (this->Postfix? this->Postfix : "(none)") << endl;
+  os << indent << "FieldArrayName: " << (this->FieldArrayName ? this->FieldArrayName : "(none)")
+     << endl;
+  os << indent << "Prefix: " << (this->Prefix ? this->Prefix : "(none)") << endl;
+  os << indent << "Postfix: " << (this->Postfix ? this->Postfix : "(none)") << endl;
 }

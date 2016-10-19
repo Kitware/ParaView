@@ -24,7 +24,6 @@ vtkOutlineRepresentation::vtkOutlineRepresentation()
   this->SetUseOutline(1);
   this->SetRepresentation(WIREFRAME);
 
-
   this->SetAmbient(1);
   this->SetDiffuse(0);
   this->SetSpecular(0);

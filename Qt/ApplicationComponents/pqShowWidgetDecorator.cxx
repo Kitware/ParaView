@@ -36,6 +36,5 @@ pqShowWidgetDecorator::pqShowWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(visibilityChanged()));
+  QObject::connect(this, SIGNAL(boolPropertyChanged()), this, SIGNAL(visibilityChanged()));
 }

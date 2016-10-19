@@ -44,7 +44,8 @@
 
 #include <PipelineException.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // ****************************************************************************
 //  Class: ImproperUseException
 //
@@ -61,10 +62,9 @@ namespace pointsprite {
 
 class ImproperUseException : public PipelineException
 {
-  public:
-                          ImproperUseException(std::string = "");
-    virtual              ~ImproperUseException() VISIT_THROW_NOTHING {;};
+public:
+  ImproperUseException(std::string = "");
+  virtual ~ImproperUseException() VISIT_THROW_NOTHING { ; };
 };
-
 }
 #endif

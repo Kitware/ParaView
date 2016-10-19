@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,34 +48,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  // get path to user-servers
-  static QString userServers()
-    {
-    return  pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
-    }
+// get path to user-servers
+static QString userServers()
+{
+  return pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
+}
 
-  // get path to shared system servers.
-  static QString systemServers()
-    {
-    QString settingsRoot;
+// get path to shared system servers.
+static QString systemServers()
+{
+  QString settingsRoot;
 #if defined(Q_OS_WIN)
-    settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
+  settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
 #else
-    settingsRoot = QString::fromLocal8Bit("/usr/share");
+  settingsRoot = QString::fromLocal8Bit("/usr/share");
 #endif
-    QString settingsPath = QString("%2%1%3%1%4");
-    settingsPath = settingsPath.arg(QDir::separator());
-    settingsPath = settingsPath.arg(settingsRoot);
-    settingsPath = settingsPath.arg(QApplication::organizationName());
-    settingsPath = settingsPath.arg("servers.pvsc");
-    return settingsPath;
-    }
+  QString settingsPath = QString("%2%1%3%1%4");
+  settingsPath = settingsPath.arg(QDir::separator());
+  settingsPath = settingsPath.arg(settingsRoot);
+  settingsPath = settingsPath.arg(QApplication::organizationName());
+  settingsPath = settingsPath.arg("servers.pvsc");
+  return settingsPath;
+}
 
-  static QString defaultServers()
-    {
-    return (QApplication::applicationDirPath() + QDir::separator() +
-      "default_servers.pvsc");
-    }
+static QString defaultServers()
+{
+  return (QApplication::applicationDirPath() + QDir::separator() + "default_servers.pvsc");
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -90,36 +89,33 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
   config.setMutable(false);
   this->Configurations["builtin"] = config;
 
-  pqOptions* options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
-  if(!options || !options->GetDisableRegistry())
-    {
+  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  if (!options || !options->GetDisableRegistry())
+  {
     this->load(defaultServers(), false);
     this->load(systemServers(), false);
     this->load(userServers(), true);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqServerConfigurationCollection::~pqServerConfigurationCollection()
 {
-  pqOptions* options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   if (!options || !options->GetDisableRegistry())
-    {
-    this->save(userServers(),true);
-    }
+  {
+    this->save(userServers(), true);
+  }
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConfigurationCollection::load(
-  const QString& filename, bool mutable_configs)
+bool pqServerConfigurationCollection::load(const QString& filename, bool mutable_configs)
 {
   QFile file(filename);
   if (file.open(QIODevice::ReadOnly))
-    {
+  {
     return this->loadContents(file.readAll().data(), mutable_configs);
-    }
+  }
   return false;
 }
 
@@ -135,42 +131,40 @@ bool pqServerConfigurationCollection::save(const QString& filename, bool only_mu
   QString contents = this->saveContents(only_mutable);
   QFile file(filename);
   if (!contents.isEmpty() && file.open(QIODevice::WriteOnly))
-    {
+  {
     file.write(contents.toLatin1().data());
     file.close();
     return true;
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerConfigurationCollection::loadContents(
-  const QString& contents, bool mutable_configs)
+bool pqServerConfigurationCollection::loadContents(const QString& contents, bool mutable_configs)
 {
   vtkNew<vtkPVXMLParser> parser;
   if (!parser->Parse(contents.toLatin1().data()))
-    {
+  {
     qWarning() << "Configuration not a valid xml.";
     return false;
-    }
+  }
 
   vtkPVXMLElement* root = parser->GetRootElement();
   if (QString(root->GetName()) != "Servers")
-    {
-    qWarning() << 
-      "Not a ParaView server configuration file. Missing <Servers /> root.";
+  {
+    qWarning() << "Not a ParaView server configuration file. Missing <Servers /> root.";
     return false;
-    }
+  }
 
   bool prev = this->blockSignals(true);
-  for (unsigned int cc=0; cc < root->GetNumberOfNestedElements(); cc++)
-    {
+  for (unsigned int cc = 0; cc < root->GetNumberOfNestedElements(); cc++)
+  {
     vtkPVXMLElement* child = root->GetNestedElement(cc);
     if (child->GetName() && strcmp(child->GetName(), "Server") == 0)
-      {
+    {
       this->addConfiguration(child, mutable_configs);
-      }
     }
+  }
 
   this->blockSignals(prev);
   emit this->changed();
@@ -184,12 +178,12 @@ QString pqServerConfigurationCollection::saveContents(bool only_mutable) const
   QTextStream stream(&xml);
   stream << "<Servers>\n";
   foreach (const pqServerConfiguration& config, this->Configurations)
-    {
+  {
     if (only_mutable == false || config.isMutable())
-      {
+    {
       stream << config.toString(vtkIndent().GetNextIndent());
-      }
     }
+  }
   stream << "</Servers>";
   return xml;
 }
@@ -204,40 +198,37 @@ void pqServerConfigurationCollection::addConfiguration(
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfigurationCollection::addConfiguration(
-  const pqServerConfiguration& config)
+void pqServerConfigurationCollection::addConfiguration(const pqServerConfiguration& config)
 {
   if (config.resource().scheme() == "builtin")
-    {
+  {
     // skip configs with "builtin" resource. Only 1 such config is present and
     // we add that during constructor time.
     return;
-    }
+  }
 
   if (this->Configurations.contains(config.name()))
-    {
-    qWarning() << "Replacing existing server configuration named : "
-      << config.name();
-    }
+  {
+    qWarning() << "Replacing existing server configuration named : " << config.name();
+  }
 
   this->Configurations[config.name()] = config;
   emit this->changed();
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfigurationCollection::removeConfiguration(
-  const QString& toremove)
+void pqServerConfigurationCollection::removeConfiguration(const QString& toremove)
 {
   if (toremove == "builtin")
-    {
+  {
     // don't accidentally remove the only builtin config.
     return;
-    }
+  }
 
   if (this->Configurations.remove(toremove) > 0)
-    {
+  {
     emit this->changed();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -245,13 +236,13 @@ QList<pqServerConfiguration> pqServerConfigurationCollection::configurations() c
 {
   QList<pqServerConfiguration> reply;
   foreach (const pqServerConfiguration& config, this->Configurations)
-    {
+  {
     // skip builtin from this list.
     if (config.name() != "builtin")
-      {
+    {
       reply.append(config);
-      }
     }
+  }
   return reply;
 }
 
@@ -261,12 +252,12 @@ QList<pqServerConfiguration> pqServerConfigurationCollection::configurations(
 {
   QList<pqServerConfiguration> reply;
   foreach (const pqServerConfiguration& config, this->Configurations)
-    {
+  {
     if (config.resource().schemeHosts() == selector.schemeHosts())
-      {
+    {
       reply.append(config);
-      }
     }
+  }
   return reply;
 }
 
@@ -277,9 +268,9 @@ const pqServerConfiguration* pqServerConfigurationCollection::configuration(
   QMap<QString, pqServerConfiguration>::const_iterator iter =
     this->Configurations.find(configuration_name);
   if (iter != this->Configurations.constEnd())
-    {
+  {
     return &iter.value();
-    }
+  }
 
   return NULL;
 }

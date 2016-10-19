@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVExtractComponent - Extract a component of an attribute.
-// .SECTION Description
-// vtkPVExtractComponent Extract a component of an attribute.
+/**
+ * @class   vtkPVExtractComponent
+ * @brief   Extract a component of an attribute.
+ *
+ * vtkPVExtractComponent Extract a component of an attribute.
+*/
 
 #ifndef vtkPVExtractComponent_h
 #define vtkPVExtractComponent_h
@@ -27,8 +30,8 @@ class vtkDataSet;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractComponent : public vtkDataSetAlgorithm
 {
 public:
-  static vtkPVExtractComponent *New();
-  vtkTypeMacro(vtkPVExtractComponent,vtkDataSetAlgorithm);
+  static vtkPVExtractComponent* New();
+  vtkTypeMacro(vtkPVExtractComponent, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(InputArrayComponent, int);
@@ -41,9 +44,7 @@ protected:
   vtkPVExtractComponent();
   ~vtkPVExtractComponent();
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 

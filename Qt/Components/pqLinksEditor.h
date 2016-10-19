@@ -41,41 +41,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqLinksModel.h"
 
-namespace Ui { class pqLinksEditor; }
+namespace Ui
+{
+class pqLinksEditor;
+}
 
-/// a Qt dialog for editing a property/proxy/camera link
-/// two proxies can be selected, and if property type is
-/// selected, then two properties can be selected as well.
-class PQCOMPONENTS_EXPORT pqLinksEditor :
-  public QDialog
+/**
+* a Qt dialog for editing a property/proxy/camera link
+* two proxies can be selected, and if property type is
+* selected, then two properties can be selected as well.
+*/
+class PQCOMPONENTS_EXPORT pqLinksEditor : public QDialog
 {
   Q_OBJECT
   typedef QDialog base;
-public:
 
-  /// create a link editor to create/edit a link
-  /// initial values are retrieved from the provided vtkSMLink
-  pqLinksEditor(vtkSMLink* link, QWidget* p=0);
-  /// destroy this dialog
+public:
+  /**
+  * create a link editor to create/edit a link
+  * initial values are retrieved from the provided vtkSMLink
+  */
+  pqLinksEditor(vtkSMLink* link, QWidget* p = 0);
+  /**
+  * destroy this dialog
+  */
   ~pqLinksEditor();
 
-  /// get the name of the link
+  /**
+  * get the name of the link
+  */
   QString linkName();
 
-  /// get the type of link
+  /**
+  * get the type of link
+  */
   pqLinksModel::ItemType linkType();
 
-  /// get the first selected proxy
+  /**
+  * get the first selected proxy
+  */
   vtkSMProxy* selectedProxy1();
-  /// get the second selected proxy;
+  /**
+  * get the second selected proxy;
+  */
   vtkSMProxy* selectedProxy2();
 
-  /// get the first selected property
+  /**
+  * get the first selected property
+  */
   QString selectedProperty1();
-  /// get the second selected property
+  /**
+  * get the second selected property
+  */
   QString selectedProperty2();
 
-  /// Get the check state of interactive view link check box
+  /**
+  * Get the check state of interactive view link check box
+  */
   bool interactiveViewLinkChecked();
 
 private slots:
@@ -89,7 +111,6 @@ private slots:
   void updateEnabledState();
 
 private:
-
   class pqLinksEditorProxyModel;
   void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
 
@@ -102,8 +123,6 @@ private:
   vtkSMProxy* SelectedProxy2;
   QString SelectedProperty1;
   QString SelectedProperty2;
-
 };
 
 #endif
-

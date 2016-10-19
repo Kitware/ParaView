@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPGenericEnSightReader - class to read any type of EnSight files
-// .SECTION Description
-// The class vtkPGenericEnSightReader allows the user to read an EnSight data
-// set without a priori knowledge of what type of EnSight data set it is.
+/**
+ * @class   vtkPGenericEnSightReader
+ * @brief   class to read any type of EnSight files
+ *
+ * The class vtkPGenericEnSightReader allows the user to read an EnSight data
+ * set without a priori knowledge of what type of EnSight data set it is.
+*/
 
 #ifndef vtkPGenericEnSightReader_h
 #define vtkPGenericEnSightReader_h
@@ -31,7 +34,7 @@ class vtkIdListCollection;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPGenericEnSightReader : public vtkGenericEnSightReader
 {
 public:
-  static vtkPGenericEnSightReader *New();
+  static vtkPGenericEnSightReader* New();
   vtkTypeMacro(vtkPGenericEnSightReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -39,15 +42,15 @@ protected:
   vtkPGenericEnSightReader();
   ~vtkPGenericEnSightReader();
 
-  virtual int RequestInformation(vtkInformation*,
-                                 vtkInformationVector**,
-                                 vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  // Description:
-  // Multi Process cache. Will be read a lot of times.
+  /**
+   * Multi Process cache. Will be read a lot of times.
+   */
   int GetMultiProcessLocalProcessId();
-  // Description:
-  // Multi Process cache. Will be read a lot of times.
+  /**
+   * Multi Process cache. Will be read a lot of times.
+   */
   int GetMultiProcessNumberOfProcesses();
 
   int MultiProcessLocalProcessId;

@@ -34,7 +34,7 @@ vtkPVSessionBase::vtkPVSessionBase()
   this->SessionCore->UnRegister(NULL);
 }
 //----------------------------------------------------------------------------
-vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse )
+vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse)
 {
   this->InitSessionBase(coreToUse);
 }
@@ -43,10 +43,10 @@ void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
 {
   this->ProcessingRemoteNotification = false;
   this->SessionCore = coreToUse;
-  if(this->SessionCore)
-    {
+  if (this->SessionCore)
+  {
     this->SessionCore->Register(NULL);
-    }
+  }
 
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
@@ -58,16 +58,16 @@ void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   this->ActivateObserverTag = this->DesactivateObserverTag = 0;
 
-  if(!controller)
-    {
+  if (!controller)
+  {
     vtkWarningMacro("No vtkMultiProcessController for Session. The session won't work correctly.");
     return;
-    }
+  }
 
-  this->ActivateObserverTag = controller->AddObserver(vtkCommand::StartEvent,
-    this, &vtkPVSessionBase::Activate);
-  this->DesactivateObserverTag = controller->AddObserver(vtkCommand::EndEvent,
-    this, &vtkPVSessionBase::DeActivate);
+  this->ActivateObserverTag =
+    controller->AddObserver(vtkCommand::StartEvent, this, &vtkPVSessionBase::Activate);
+  this->DesactivateObserverTag =
+    controller->AddObserver(vtkCommand::EndEvent, this, &vtkPVSessionBase::DeActivate);
 }
 
 //----------------------------------------------------------------------------
@@ -75,17 +75,17 @@ vtkPVSessionBase::~vtkPVSessionBase()
 {
   // Make sure we disable Activate/Desactivate observer
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  if(controller && this->ActivateObserverTag && this->DesactivateObserverTag)
-    {
+  if (controller && this->ActivateObserverTag && this->DesactivateObserverTag)
+  {
     controller->RemoveObserver(this->ActivateObserverTag);
     controller->RemoveObserver(this->DesactivateObserverTag);
-    }
+  }
 
   if (this->SessionCore)
-    {
+  {
     this->SessionCore->Delete();
     this->SessionCore = NULL;
-    }
+  }
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = NULL;
@@ -105,24 +105,22 @@ vtkPVSessionBase::ServerFlags vtkPVSessionBase::GetProcessRoles()
 
   int process_id = pm->GetPartitionId();
   switch (pm->GetProcessType())
-    {
-  case vtkProcessModule::PROCESS_SERVER:
-    return vtkPVSession::SERVERS;
+  {
+    case vtkProcessModule::PROCESS_SERVER:
+      return vtkPVSession::SERVERS;
 
-  case vtkProcessModule::PROCESS_DATA_SERVER:
-    return vtkPVSession::DATA_SERVER;
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+      return vtkPVSession::DATA_SERVER;
 
-  case vtkProcessModule::PROCESS_RENDER_SERVER:
-    return vtkPVSession::RENDER_SERVER;
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+      return vtkPVSession::RENDER_SERVER;
 
-  case vtkProcessModule::PROCESS_BATCH:
-    return (process_id == 0)?
-      vtkPVSession::CLIENT_AND_SERVERS :
-      vtkPVSession::SERVERS;
+    case vtkProcessModule::PROCESS_BATCH:
+      return (process_id == 0) ? vtkPVSession::CLIENT_AND_SERVERS : vtkPVSession::SERVERS;
 
-  default:
-    break;
-    }
+    default:
+      break;
+  }
   return this->Superclass::GetProcessRoles();
 }
 
@@ -158,8 +156,7 @@ void vtkPVSessionBase::PullState(vtkSMMessage* msg)
 
 //----------------------------------------------------------------------------
 void vtkPVSessionBase::ExecuteStream(
-  vtkTypeUInt32 location, const vtkClientServerStream& stream,
-  bool ignore_errors/*=false*/)
+  vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors /*=false*/)
 {
   this->Activate();
 
@@ -171,8 +168,7 @@ void vtkPVSessionBase::ExecuteStream(
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkPVSessionBase::GetLastResult(
-  vtkTypeUInt32 vtkNotUsed(location))
+const vtkClientServerStream& vtkPVSessionBase::GetLastResult(vtkTypeUInt32 vtkNotUsed(location))
 {
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
@@ -206,7 +202,7 @@ void vtkPVSessionBase::RegisterSIObject(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 vtkSIObject* vtkPVSessionBase::GetSIObject(vtkTypeUInt32 globalid)
 {
-  return this->SessionCore? this->SessionCore->GetSIObject(globalid) : NULL;
+  return this->SessionCore ? this->SessionCore->GetSIObject(globalid) : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -215,17 +211,14 @@ void vtkPVSessionBase::PrepareProgressInternal()
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke
             << vtkClientServerID(1) // ID for vtkPVSessionCore helper.
-            << "GetActiveProgressHandler"
-            << vtkClientServerStream::End;
+            << "GetActiveProgressHandler" << vtkClientServerStream::End;
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << substream
-         << "PrepareProgress"
+  stream << vtkClientServerStream::Invoke << substream << "PrepareProgress"
          << vtkClientServerStream::End;
   this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, stream, false);
-  //this->Superclass::PrepareProgressInternal();
-  //FIXME_COLLABORATION - I don't like code that skips superclass implentations.
-  //Rethink this.
+  // this->Superclass::PrepareProgressInternal();
+  // FIXME_COLLABORATION - I don't like code that skips superclass implentations.
+  // Rethink this.
 }
 
 //----------------------------------------------------------------------------
@@ -234,21 +227,18 @@ void vtkPVSessionBase::CleanupPendingProgressInternal()
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke
             << vtkClientServerID(1) // ID for vtkPVSessionCore helper.
-            << "GetActiveProgressHandler"
-            << vtkClientServerStream::End;
+            << "GetActiveProgressHandler" << vtkClientServerStream::End;
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << substream
-         << "CleanupPendingProgress"
+  stream << vtkClientServerStream::Invoke << substream << "CleanupPendingProgress"
          << vtkClientServerStream::End;
   this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, stream, false);
-  //this->Superclass::CleanupPendingProgressInternal();
-  //FIXME_COLLABORATION
+  // this->Superclass::CleanupPendingProgressInternal();
+  // FIXME_COLLABORATION
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVSessionBase::GatherInformation(vtkTypeUInt32 location,
-    vtkPVInformation* information, vtkTypeUInt32 globalid)
+bool vtkPVSessionBase::GatherInformation(
+  vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
   return this->SessionCore->GatherInformation(location, information, globalid);
 }
@@ -260,8 +250,8 @@ vtkObject* vtkPVSessionBase::GetRemoteObject(vtkTypeUInt32 globalid)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionBase::RegisterRemoteObject(vtkTypeUInt32 gid,
-                                            vtkTypeUInt32 location, vtkObject* obj)
+void vtkPVSessionBase::RegisterRemoteObject(
+  vtkTypeUInt32 gid, vtkTypeUInt32 location, vtkObject* obj)
 {
   this->SessionCore->RegisterRemoteObject(gid, obj);
 
@@ -317,15 +307,13 @@ vtkTypeUInt32 vtkPVSessionBase::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32
 {
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-      << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
-      << "GetNextGlobalIdChunk"
-      << chunkSize
-      << vtkClientServerStream::End;
+         << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
+         << "GetNextGlobalIdChunk" << chunkSize << vtkClientServerStream::End;
   this->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream);
 
   // Extract the first id of the new chunk
   vtkTypeUInt32 id;
-  this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT).GetArgument(0,0, &id);
+  this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT).GetArgument(0, 0, &id);
   return id;
 }
 //----------------------------------------------------------------------------
@@ -339,10 +327,10 @@ bool vtkPVSessionBase::StartProcessingRemoteNotification()
 void vtkPVSessionBase::StopProcessingRemoteNotification(bool previousValue)
 {
   this->ProcessingRemoteNotification = previousValue;
-  if(!previousValue)
-    {
+  if (!previousValue)
+  {
     this->InvokeEvent(vtkPVSessionBase::ProcessingRemoteEnd);
-    }
+  }
 }
 //----------------------------------------------------------------------------
 bool vtkPVSessionBase::IsProcessingRemoteNotification()
@@ -352,14 +340,14 @@ bool vtkPVSessionBase::IsProcessingRemoteNotification()
 //----------------------------------------------------------------------------
 void vtkPVSessionBase::UseSessionCoreOf(vtkPVSessionBase* other)
 {
-  if(other)
-    {
+  if (other)
+  {
     this->SetSessionCore(other->GetSessionCore());
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("No vtkPVSessionBase provided");
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -370,13 +358,13 @@ vtkPVSessionCore* vtkPVSessionBase::GetSessionCore() const
 //----------------------------------------------------------------------------
 void vtkPVSessionBase::SetSessionCore(vtkPVSessionCore* other)
 {
-  if(this->SessionCore)
-    {
+  if (this->SessionCore)
+  {
     this->SessionCore->Delete();
-    }
+  }
   this->SessionCore = other;
-  if(this->SessionCore)
-    {
+  if (this->SessionCore)
+  {
     this->SessionCore->Register(this);
-    }
+  }
 }

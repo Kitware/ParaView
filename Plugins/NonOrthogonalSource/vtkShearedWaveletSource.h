@@ -61,17 +61,13 @@ public:
   // Specify custom Time label
   vtkSetStringMacro(TimeLabel);
   vtkGetStringMacro(TimeLabel);
-  const char* GetTimeLabelAnnotation()
-    {
-    return this->EnableTimeLabel? this->TimeLabel : "Time";
-    }
+  const char* GetTimeLabelAnnotation() { return this->EnableTimeLabel ? this->TimeLabel : "Time"; }
 
 protected:
   vtkShearedWaveletSource();
   ~vtkShearedWaveletSource();
 
-  virtual int RequestData(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   bool EnableAxisTitles;
   bool EnableTimeLabel;
@@ -85,10 +81,10 @@ protected:
   double BasisU[3];
   double BasisV[3];
   double BasisW[3];
+
 private:
   vtkShearedWaveletSource(const vtkShearedWaveletSource&) VTK_DELETE_FUNCTION;
   void operator=(const vtkShearedWaveletSource&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

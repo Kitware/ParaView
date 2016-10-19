@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpinBox.h"
 
 //-----------------------------------------------------------------------------
-pqSpinBox::pqSpinBox(QWidget* _parent) : Superclass(_parent),
-  EditingFinishedPending(false)
+pqSpinBox::pqSpinBox(QWidget* _parent)
+  : Superclass(_parent)
+  , EditingFinishedPending(false)
 {
   this->connect(this, SIGNAL(editingFinished()), SLOT(onEditingFinished()));
   this->connect(this, SIGNAL(valueChanged(int)), SLOT(onValueEdited()));
@@ -46,9 +47,9 @@ void pqSpinBox::stepBy(int steps)
   this->Superclass::stepBy(steps);
 
   if (this->value() != old_value)
-    {
+  {
     emit this->editingFinished();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -61,8 +62,8 @@ void pqSpinBox::onValueEdited()
 void pqSpinBox::onEditingFinished()
 {
   if (this->EditingFinishedPending)
-    {
+  {
     emit this->valueChangedAndEditingFinished();
     this->EditingFinishedPending = false;
-    }
+  }
 }

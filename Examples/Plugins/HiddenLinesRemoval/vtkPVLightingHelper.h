@@ -39,12 +39,11 @@ public:
   // mode = VTK_SHADER_TYPE_VERTEX or VTK_SHADER_TYPE_FRAGMENT
   // depending on whether the vertex lighting or fragment lighting is to be
   // used.
-  void Initialize(vtkShaderProgram2 *shader, 
-                  vtkShader2Type mode);
+  void Initialize(vtkShaderProgram2* shader, vtkShader2Type mode);
   vtkGetObjectMacro(Shader, vtkShaderProgram2);
 
   // Description:
-  // Updates any lighting specific information needed. 
+  // Updates any lighting specific information needed.
   // This must be called before the shader program is bound.
   void PrepareForRendering();
 
@@ -52,15 +51,12 @@ protected:
   vtkPVLightingHelper();
   ~vtkPVLightingHelper();
 
-  void SetShader(vtkShaderProgram2 *shader);
-  vtkShaderProgram2 *Shader;
+  void SetShader(vtkShaderProgram2* shader);
+  vtkShaderProgram2* Shader;
 
 private:
   vtkPVLightingHelper(const vtkPVLightingHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVLightingHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-
-

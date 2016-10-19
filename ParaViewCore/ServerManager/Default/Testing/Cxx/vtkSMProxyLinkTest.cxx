@@ -24,18 +24,18 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMProxyLinkTest::AddLinkedProxy()
 {
-  vtkSMSession *session = vtkSMSession::New();
-  vtkSMSessionProxyManager *pxm = session->GetSessionProxyManager();
+  vtkSMSession* session = vtkSMSession::New();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
 
-  vtkSMProxy *sphere1 = pxm->NewProxy("sources", "SphereSource");
+  vtkSMProxy* sphere1 = pxm->NewProxy("sources", "SphereSource");
   QVERIFY(sphere1 != NULL);
   QCOMPARE(vtkSMPropertyHelper(sphere1, "Radius").GetAsDouble(), 0.5);
 
-  vtkSMProxy *sphere2 = pxm->NewProxy("sources", "SphereSource");
+  vtkSMProxy* sphere2 = pxm->NewProxy("sources", "SphereSource");
   QVERIFY(sphere1 != NULL);
   QCOMPARE(vtkSMPropertyHelper(sphere2, "Radius").GetAsDouble(), 0.5);
 
-  vtkSMProxyLink *link = vtkSMProxyLink::New();
+  vtkSMProxyLink* link = vtkSMProxyLink::New();
   QCOMPARE(link->GetNumberOfLinkedObjects(), 0U);
 
   link->AddLinkedProxy(sphere1, vtkSMLink::INPUT);
@@ -65,13 +65,13 @@ void vtkSMProxyLinkTest::AddLinkedProxy()
 
 void vtkSMProxyLinkTest::AddException()
 {
-  vtkSMSession *session = vtkSMSession::New();
-  vtkSMSessionProxyManager *pxm = session->GetSessionProxyManager();
+  vtkSMSession* session = vtkSMSession::New();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
 
-  vtkSMProxy *sphere1 = pxm->NewProxy("sources", "SphereSource");
-  vtkSMProxy *sphere2 = pxm->NewProxy("sources", "SphereSource");
+  vtkSMProxy* sphere1 = pxm->NewProxy("sources", "SphereSource");
+  vtkSMProxy* sphere2 = pxm->NewProxy("sources", "SphereSource");
 
-  vtkSMProxyLink *link = vtkSMProxyLink::New();
+  vtkSMProxyLink* link = vtkSMProxyLink::New();
   link->AddLinkedProxy(sphere1, vtkSMLink::INPUT);
   link->AddLinkedProxy(sphere2, vtkSMLink::OUTPUT);
   QCOMPARE(vtkSMPropertyHelper(sphere1, "ThetaResolution").GetAsInt(), 8);

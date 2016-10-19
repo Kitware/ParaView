@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,27 +37,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QListWidgetItem>
 #include <QObject>
 
-/// QListWidgetItem subclass with additional signals, slots, and properties
+/**
+* QListWidgetItem subclass with additional signals, slots, and properties
+*/
 class PQWIDGETS_EXPORT pqListWidgetItemObject : public QObject, public QListWidgetItem
 {
   Q_OBJECT
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
 public:
-  /// construct list widget item to for QListWidget with a string
+  /**
+  * construct list widget item to for QListWidget with a string
+  */
   pqListWidgetItemObject(const QString& t, QListWidget* p);
-  /// overload setData() to emit changed signal
+  /**
+  * overload setData() to emit changed signal
+  */
   void setData(int role, const QVariant& v);
 
 public slots:
-  /// get the check true/false
+  /**
+  * get the check true/false
+  */
   bool isChecked() const;
-  /// set the check state true/false
+  /**
+  * set the check state true/false
+  */
   void setChecked(bool v);
 
 signals:
-  /// signal check state changed
+  /**
+  * signal check state changed
+  */
   void checkedStateChanged(bool);
-
 };
 
 #endif

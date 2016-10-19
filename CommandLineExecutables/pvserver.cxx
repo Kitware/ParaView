@@ -24,5 +24,5 @@ int main(int argc, char* argv[])
   paraview_static_plugins_init();
 #endif
   // Init current process type
-  return RealMain(argc, argv, vtkProcessModule::PROCESS_SERVER)? 0 : 1;
+  return RealMain(argc, argv, vtkProcessModule::PROCESS_SERVER) ? 0 : 1;
 }

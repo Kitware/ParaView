@@ -13,11 +13,11 @@
 
 =========================================================================*/
 #ifdef VTKGL2
-  #include "vtk_glew.h"
+#include "vtk_glew.h"
 #else
-  #include "vtkOpenGLExtensionManager.h"
-  #include "vtkOpenGLExtensionManagerConfigure.h"
-  #include "vtkgl.h"
+#include "vtkOpenGLExtensionManager.h"
+#include "vtkOpenGLExtensionManagerConfigure.h"
+#include "vtkgl.h"
 #endif
 
 #include "vtkPVConfig.h"
@@ -41,7 +41,7 @@
 #include <vector>
 #include <vtksys/SystemTools.hxx>
 
-#define safes(arg) (arg?((const char *)arg):"")
+#define safes(arg) (arg ? ((const char*)arg) : "")
 
 vtkStandardNewMacro(vtkPVOpenGLInformation);
 
@@ -65,13 +65,13 @@ void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
 {
   vtkSmartPointer<vtkRenderWindow> renWin = vtkRenderWindow::SafeDownCast(obj);
   if (!renWin)
-    {
+  {
     renWin = vtkSmartPointer<vtkRenderWindow>::New();
     renWin->SetOffScreenRendering(1);
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
     renWin->SetDeviceIndex(options->GetEGLDeviceIndex());
     renWin->Render();
-    }
+  }
   this->SetLocalDisplay(vtkPVDisplayInformation::CanOpenDisplayLocally());
   if (this->LocalDisplay)
   {
@@ -85,17 +85,16 @@ void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
 void vtkPVOpenGLInformation::AddInformation(vtkPVInformation* pvinfo)
 {
   if (!pvinfo)
-    {
+  {
     return;
-    }
+  }
 
-  vtkPVOpenGLInformation* info = 
-    vtkPVOpenGLInformation::SafeDownCast(pvinfo);
+  vtkPVOpenGLInformation* info = vtkPVOpenGLInformation::SafeDownCast(pvinfo);
   if (!info)
-    {
+  {
     vtkErrorMacro("Could not downcast to vtkPVOpenGLInformation.");
     return;
-    }
+  }
   this->Vendor = info->Vendor;
   this->Version = info->Version;
   this->Renderer = info->Renderer;
@@ -106,38 +105,33 @@ void vtkPVOpenGLInformation::AddInformation(vtkPVInformation* pvinfo)
 void vtkPVOpenGLInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply
-    << this->Vendor
-    << this->Version
-    << this->Renderer
-    << vtkClientServerStream::End;
+  *css << vtkClientServerStream::Reply << this->Vendor << this->Version << this->Renderer
+       << vtkClientServerStream::End;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVOpenGLInformation::CopyFromStream(
-  const vtkClientServerStream* css)
+void vtkPVOpenGLInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  #define PARSE_NEXT_VALUE(_ivarName) \
-  if (!css->GetArgument(0, i++, &this->_ivarName)) \
-    { \
-    vtkErrorMacro("Error parsing " #_ivarName " from message."); \
-    return; \
-    }
+#define PARSE_NEXT_VALUE(_ivarName)                                                                \
+  if (!css->GetArgument(0, i++, &this->_ivarName))                                                 \
+  {                                                                                                \
+    vtkErrorMacro("Error parsing " #_ivarName " from message.");                                   \
+    return;                                                                                        \
+  }
 
+  int i = 0;
+  PARSE_NEXT_VALUE(Vendor);
+  PARSE_NEXT_VALUE(Version);
+  PARSE_NEXT_VALUE(Renderer);
 
-    int i = 0;
-    PARSE_NEXT_VALUE(Vendor);
-    PARSE_NEXT_VALUE(Version);
-    PARSE_NEXT_VALUE(Renderer);
-
-    this->Modified();
-  #undef PARSE_NEXT_VALUE
+  this->Modified();
+#undef PARSE_NEXT_VALUE
 }
 
 //----------------------------------------------------------------------------
 void vtkPVOpenGLInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------

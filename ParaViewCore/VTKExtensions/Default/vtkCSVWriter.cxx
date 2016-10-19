@@ -56,8 +56,7 @@ vtkCSVWriter::~vtkCSVWriter()
 }
 
 //-----------------------------------------------------------------------------
-int vtkCSVWriter::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkCSVWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
   return 1;
@@ -66,24 +65,24 @@ int vtkCSVWriter::FillInputPortInformation(
 //-----------------------------------------------------------------------------
 bool vtkCSVWriter::OpenFile()
 {
-  if ( !this->FileName )
-    {
+  if (!this->FileName)
+  {
     vtkErrorMacro(<< "No FileName specified! Can't write!");
     this->SetErrorCode(vtkErrorCode::NoFileNameError);
     return false;
-    }
+  }
 
-  vtkDebugMacro(<<"Opening file for writing...");
+  vtkDebugMacro(<< "Opening file for writing...");
 
-  ofstream *fptr = new ofstream(this->FileName, ios::out);
+  ofstream* fptr = new ofstream(this->FileName, ios::out);
 
   if (fptr->fail())
-    {
-    vtkErrorMacro(<< "Unable to open file: "<< this->FileName);
+  {
+    vtkErrorMacro(<< "Unable to open file: " << this->FileName);
     this->SetErrorCode(vtkErrorCode::CannotOpenFileError);
     delete fptr;
     return false;
-    }
+  }
 
   this->Stream = fptr;
   return true;
@@ -92,133 +91,128 @@ bool vtkCSVWriter::OpenFile()
 //-----------------------------------------------------------------------------
 template <class iterT>
 void vtkCSVWriterGetDataString(
-  iterT* iter, vtkIdType tupleIndex, ofstream* stream, vtkCSVWriter* writer,
-  bool* first)
+  iterT* iter, vtkIdType tupleIndex, ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex* numComps;
-  for (int cc=0; cc < numComps; cc++)
+  vtkIdType index = tupleIndex * numComps;
+  for (int cc = 0; cc < numComps; cc++)
+  {
+    if ((index + cc) < iter->GetNumberOfValues())
     {
-    if ((index+cc) < iter->GetNumberOfValues())
-      {
       if (*first == false)
-        {
-        (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
-      (*stream) << iter->GetValue(index+cc);
-      }
-    else
       {
-      if (*first == false)
-        {
         (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
       }
+      *first = false;
+      (*stream) << iter->GetValue(index + cc);
     }
+    else
+    {
+      if (*first == false)
+      {
+        (*stream) << writer->GetFieldDelimiter();
+      }
+      *first = false;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-template<>
-void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
+template <>
+void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex* numComps;
-  for (int cc=0; cc < numComps; cc++)
+  vtkIdType index = tupleIndex * numComps;
+  for (int cc = 0; cc < numComps; cc++)
+  {
+    if ((index + cc) < iter->GetNumberOfValues())
     {
-    if ((index+cc) < iter->GetNumberOfValues())
-      {
       if (*first == false)
-        {
-        (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
-      (*stream) << writer->GetString(iter->GetValue(index+cc));
-      }
-    else
       {
-      if (*first == false)
-        {
         (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
       }
+      *first = false;
+      (*stream) << writer->GetString(iter->GetValue(index + cc));
     }
+    else
+    {
+      if (*first == false)
+      {
+        (*stream) << writer->GetFieldDelimiter();
+      }
+      *first = false;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-template<>
-void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
+template <>
+void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex* numComps;
-  for (int cc=0; cc < numComps; cc++)
+  vtkIdType index = tupleIndex * numComps;
+  for (int cc = 0; cc < numComps; cc++)
+  {
+    if ((index + cc) < iter->GetNumberOfValues())
     {
-    if ((index+cc) < iter->GetNumberOfValues())
-      {
       if (*first == false)
-        {
-        (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
-      (*stream) << static_cast<int>( iter->GetValue(index+cc) );
-      }
-    else
       {
-      if (*first == false)
-        {
         (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
       }
+      *first = false;
+      (*stream) << static_cast<int>(iter->GetValue(index + cc));
     }
+    else
+    {
+      if (*first == false)
+      {
+        (*stream) << writer->GetFieldDelimiter();
+      }
+      *first = false;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-template<>
-void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
+template <>
+void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
-  vtkIdType index = tupleIndex* numComps;
-  for (int cc=0; cc < numComps; cc++)
+  vtkIdType index = tupleIndex * numComps;
+  for (int cc = 0; cc < numComps; cc++)
+  {
+    if ((index + cc) < iter->GetNumberOfValues())
     {
-    if ((index+cc) < iter->GetNumberOfValues())
-      {
       if (*first == false)
-        {
-        (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
-      (*stream) << static_cast<int>( iter->GetValue(index+cc) );
-      }
-    else
       {
-      if (*first == false)
-        {
         (*stream) << writer->GetFieldDelimiter();
-        }
-      *first = false;
       }
+      *first = false;
+      (*stream) << static_cast<int>(iter->GetValue(index + cc));
     }
+    else
+    {
+      if (*first == false)
+      {
+        (*stream) << writer->GetFieldDelimiter();
+      }
+      *first = false;
+    }
+  }
 }
-
 
 //-----------------------------------------------------------------------------
 vtkStdString vtkCSVWriter::GetString(vtkStdString string)
 {
   if (this->UseStringDelimiter && this->StringDelimiter)
-    {
+  {
     vtkStdString temp = this->StringDelimiter;
     temp += string + this->StringDelimiter;
     return temp;
-    }
+  }
   return string;
 }
 
@@ -227,13 +221,13 @@ void vtkCSVWriter::WriteData()
 {
   vtkTable* rg = vtkTable::SafeDownCast(this->GetInput());
   if (rg)
-    {
+  {
     this->WriteTable(rg);
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro(<< "CSVWriter can only write vtkTable.");
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -242,9 +236,9 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
   vtkIdType numRows = table->GetNumberOfRows();
   vtkDataSetAttributes* dsa = table->GetRowData();
   if (!this->OpenFile())
-    {
+  {
     return;
-    }
+  }
 
   std::vector<vtkSmartPointer<vtkArrayIterator> > columnsIters;
 
@@ -252,54 +246,53 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
   int numArrays = dsa->GetNumberOfArrays();
   bool first = true;
   // Write headers:
-  for (cc=0; cc < numArrays; cc++)
-    {
+  for (cc = 0; cc < numArrays; cc++)
+  {
     vtkAbstractArray* array = dsa->GetAbstractArray(cc);
-    for (int comp=0; comp < array->GetNumberOfComponents(); comp++)
-      {
+    for (int comp = 0; comp < array->GetNumberOfComponents(); comp++)
+    {
       if (!first)
-        {
+      {
         (*this->Stream) << this->FieldDelimiter;
-        }
+      }
       first = false;
 
       std::ostringstream array_name;
       array_name << array->GetName();
       if (array->GetNumberOfComponents() > 1)
-        {
+      {
         array_name << ":" << comp;
-        }
-      (*this->Stream) << this->GetString(array_name.str());
       }
+      (*this->Stream) << this->GetString(array_name.str());
+    }
     vtkArrayIterator* iter = array->NewIterator();
     columnsIters.push_back(iter);
     iter->Delete();
-    }
+  }
   (*this->Stream) << "\n";
 
   // push the floating point precision/notation type.
   if (this->UseScientificNotation)
-    {
+  {
     (*this->Stream) << std::scientific;
-    }
-  
+  }
+
   (*this->Stream) << std::setprecision(this->Precision);
 
-  for (vtkIdType index=0; index < numRows; index++)
-    {
+  for (vtkIdType index = 0; index < numRows; index++)
+  {
     first = true;
     std::vector<vtkSmartPointer<vtkArrayIterator> >::iterator iter;
     for (iter = columnsIters.begin(); iter != columnsIters.end(); ++iter)
-      {
+    {
       switch ((*iter)->GetDataType())
-        {
-        vtkArrayIteratorTemplateMacro(
-          vtkCSVWriterGetDataString(static_cast<VTK_TT*>(iter->GetPointer()),
-            index, this->Stream, this, &first));
-        }
+      {
+        vtkArrayIteratorTemplateMacro(vtkCSVWriterGetDataString(
+          static_cast<VTK_TT*>(iter->GetPointer()), index, this->Stream, this, &first));
       }
-    (*this->Stream) << "\n";
     }
+    (*this->Stream) << "\n";
+  }
 
   this->Stream->close();
 }
@@ -308,13 +301,12 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
 void vtkCSVWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FieldDelimiter: " << (this->FieldDelimiter ?
-    this->FieldDelimiter : "(none)") << endl;
-  os << indent << "StringDelimiter: " << (this->StringDelimiter ?
-    this->StringDelimiter : "(none)") << endl;
+  os << indent << "FieldDelimiter: " << (this->FieldDelimiter ? this->FieldDelimiter : "(none)")
+     << endl;
+  os << indent << "StringDelimiter: " << (this->StringDelimiter ? this->StringDelimiter : "(none)")
+     << endl;
   os << indent << "UseStringDelimiter: " << this->UseStringDelimiter << endl;
-  os << indent << "FileName: " << (this->FileName? this->FileName : "none")
-    << endl;
+  os << indent << "FileName: " << (this->FileName ? this->FileName : "none") << endl;
   os << indent << "UseScientificNotation: " << this->UseScientificNotation << endl;
   os << indent << "Precision: " << this->Precision << endl;
 }

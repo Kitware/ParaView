@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,17 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 
-
 #include <QInputDialog>
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
-pqCatalystPauseSimulationReaction::pqCatalystPauseSimulationReaction(
-  QAction* parentObject)
+pqCatalystPauseSimulationReaction::pqCatalystPauseSimulationReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()),
-                   this, SLOT(updateEnableState()));
+  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()), this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -61,14 +58,14 @@ void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 {
   vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::instance()->linkProxy();
   if (proxy)
-    {
+  {
     vtkSMPropertyHelper(proxy, "SimulationPaused").Set(pause);
     proxy->UpdateVTKObjects();
-    if (! pause)
-      {
+    if (!pause)
+    {
       proxy->InvokeCommand("LiveChanged");
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -77,10 +74,9 @@ void pqCatalystPauseSimulationReaction::updateEnableState(Type type)
   bool enabled = false;
   vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::instance()->linkProxy();
   if (proxy &&
-      ((type == PAUSE) !=
-       (vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)))
-    {
+    ((type == PAUSE) != (vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)))
+  {
     enabled = true;
-    }
+  }
   this->parentAction()->setEnabled(enabled);
 }

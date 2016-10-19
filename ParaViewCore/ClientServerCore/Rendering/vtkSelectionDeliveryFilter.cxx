@@ -28,8 +28,7 @@ vtkStandardNewMacro(vtkSelectionDeliveryFilter);
 vtkSelectionDeliveryFilter::vtkSelectionDeliveryFilter()
 {
   this->ReductionFilter = vtkReductionFilter::New();
-  this->ReductionFilter->SetController(
-    vtkMultiProcessController::GetGlobalController());
+  this->ReductionFilter->SetController(vtkMultiProcessController::GetGlobalController());
 
   vtkAppendSelection* post_gather_algo = vtkAppendSelection::New();
   post_gather_algo->SetAppendByUnion(0);
@@ -48,8 +47,7 @@ vtkSelectionDeliveryFilter::~vtkSelectionDeliveryFilter()
 }
 
 //----------------------------------------------------------------------------
-int vtkSelectionDeliveryFilter::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkSelectionDeliveryFilter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
@@ -57,25 +55,26 @@ int vtkSelectionDeliveryFilter::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkSelectionDeliveryFilter::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkSelectionDeliveryFilter::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkSelection* input = (inputVector[0]->GetNumberOfInformationObjects()==1)?
-    vtkSelection::GetData(inputVector[0], 0) : NULL;
+  vtkSelection* input = (inputVector[0]->GetNumberOfInformationObjects() == 1)
+    ? vtkSelection::GetData(inputVector[0], 0)
+    : NULL;
   vtkSelection* output = vtkSelection::GetData(outputVector, 0);
 
   if (input)
-    {
+  {
     vtkSelection* clone = vtkSelection::New();
     clone->ShallowCopy(input);
     this->ReductionFilter->SetInputData(clone);
     this->DeliveryFilter->SetInputConnection(this->ReductionFilter->GetOutputPort());
     clone->FastDelete();
-    }
+  }
   else
-    {
+  {
     this->DeliveryFilter->RemoveAllInputs();
-    }
+  }
   this->DeliveryFilter->Modified();
   this->DeliveryFilter->Update();
   output->ShallowCopy(this->DeliveryFilter->GetOutputDataObject(0));

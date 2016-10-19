@@ -35,10 +35,11 @@
 
 vtkStandardNewMacro(vtk1DTransferFunctionChooser)
 
-vtkCxxSetObjectMacro(vtk1DTransferFunctionChooser, LookupTableTransferFunction, vtk1DLookupTableTransferFunction)
-vtkCxxSetObjectMacro(vtk1DTransferFunctionChooser, GaussianTransferFunction, vtk1DGaussianTransferFunction)
+  vtkCxxSetObjectMacro(vtk1DTransferFunctionChooser, LookupTableTransferFunction,
+    vtk1DLookupTableTransferFunction) vtkCxxSetObjectMacro(vtk1DTransferFunctionChooser,
+    GaussianTransferFunction, vtk1DGaussianTransferFunction)
 
-vtk1DTransferFunctionChooser::vtk1DTransferFunctionChooser()
+    vtk1DTransferFunctionChooser::vtk1DTransferFunctionChooser()
 {
   this->TransferFunctionMode = LookupTable;
   this->LookupTableTransferFunction = vtk1DLookupTableTransferFunction::New();
@@ -53,70 +54,60 @@ vtk1DTransferFunctionChooser::~vtk1DTransferFunctionChooser()
     this->GaussianTransferFunction->Delete();
 }
 
-void vtk1DTransferFunctionChooser::MapArray(vtkDataArray* input,
-    vtkDataArray* output)
+void vtk1DTransferFunctionChooser::MapArray(vtkDataArray* input, vtkDataArray* output)
 {
   switch (this->TransferFunctionMode)
-    {
+  {
     case LookupTable:
       if (this->LookupTableTransferFunction)
-        {
+      {
         this->LookupTableTransferFunction->SetInputRange(this->GetInputRange());
-        this->LookupTableTransferFunction->SetUseScalarRange(
-            this->GetUseScalarRange());
-        this->LookupTableTransferFunction->SetVectorComponent(
-            this->GetVectorComponent());
+        this->LookupTableTransferFunction->SetUseScalarRange(this->GetUseScalarRange());
+        this->LookupTableTransferFunction->SetVectorComponent(this->GetVectorComponent());
         this->LookupTableTransferFunction->MapArray(input, output);
-        }
+      }
       break;
     case Gaussian:
       if (this->GaussianTransferFunction)
-        {
+      {
         this->GaussianTransferFunction->SetInputRange(this->GetInputRange());
-        this->GaussianTransferFunction->SetUseScalarRange(
-            this->GetUseScalarRange());
-        this->GaussianTransferFunction->SetVectorComponent(
-            this->GetVectorComponent());
+        this->GaussianTransferFunction->SetUseScalarRange(this->GetUseScalarRange());
+        this->GaussianTransferFunction->SetVectorComponent(this->GetVectorComponent());
         this->GaussianTransferFunction->MapArray(input, output);
-        }
+      }
       break;
     default:
-      vtkWarningMacro("Unknown Transfert Function Mode, aborting")
-      return;
-    }
+      vtkWarningMacro("Unknown Transfert Function Mode, aborting") return;
+  }
 }
 
 double vtk1DTransferFunctionChooser::MapValue(double value, double* range)
 {
   switch (this->TransferFunctionMode)
-    {
+  {
     case LookupTable:
       if (this->LookupTableTransferFunction)
-        {
+      {
         this->LookupTableTransferFunction->SetInputRange(this->GetInputRange());
-        this->LookupTableTransferFunction->SetUseScalarRange(
-            this->GetUseScalarRange());
-        this->LookupTableTransferFunction->SetVectorComponent(
-            this->GetVectorComponent());
+        this->LookupTableTransferFunction->SetUseScalarRange(this->GetUseScalarRange());
+        this->LookupTableTransferFunction->SetVectorComponent(this->GetVectorComponent());
         return this->LookupTableTransferFunction->MapValue(value, range);
-        }
+      }
       break;
 
     case Gaussian:
       if (this->GaussianTransferFunction)
-        {
+      {
         this->GaussianTransferFunction->SetInputRange(this->GetInputRange());
-        this->GaussianTransferFunction->SetUseScalarRange(
-            this->GetUseScalarRange());
-        this->GaussianTransferFunction->SetVectorComponent(
-            this->GetVectorComponent());
+        this->GaussianTransferFunction->SetUseScalarRange(this->GetUseScalarRange());
+        this->GaussianTransferFunction->SetVectorComponent(this->GetVectorComponent());
         return this->GaussianTransferFunction->MapValue(value, range);
-        }
+      }
       break;
 
     default:
       vtkWarningMacro("Unknown Transfert Function Mode, returning 0")
-    }
+  }
   return 0.0;
 }
 
@@ -130,12 +121,10 @@ vtkMTimeType vtk1DTransferFunctionChooser::GetMTime()
 {
   vtkMTimeType mtime = this->Superclass::GetMTime();
 
-  if (this->LookupTableTransferFunction && mtime
-      < this->LookupTableTransferFunction->GetMTime())
+  if (this->LookupTableTransferFunction && mtime < this->LookupTableTransferFunction->GetMTime())
     mtime = this->LookupTableTransferFunction->GetMTime();
 
-  if (this->GaussianTransferFunction && mtime
-      < this->GaussianTransferFunction->GetMTime())
+  if (this->GaussianTransferFunction && mtime < this->GaussianTransferFunction->GetMTime())
     mtime = this->GaussianTransferFunction->GetMTime();
 
   return mtime;

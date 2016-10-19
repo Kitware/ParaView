@@ -36,40 +36,35 @@ vtkMergeArrays::~vtkMergeArrays()
 }
 
 //----------------------------------------------------------------------------
-int vtkMergeArrays::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkMergeArrays::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
   return 1;
 }
 
-
 //----------------------------------------------------------------------------
 // Append data sets into single unstructured grid
-int vtkMergeArrays::RequestData(vtkInformation *vtkNotUsed(request),
-                                vtkInformationVector **inputVector,
-                                vtkInformationVector *outputVector)
+int vtkMergeArrays::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   int idx;
   int numCells, numPoints;
   int numArrays, arrayIdx;
-  vtkDataSet *input;
-  vtkDataArray *array;
+  vtkDataSet* input;
+  vtkDataArray* array;
   int num = inputVector[0]->GetNumberOfInformationObjects();
   if (num < 1)
-    {
+  {
     return 0;
-    }
+  }
 
   // get the output info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet *output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkDataSet* output = vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   numCells = input->GetNumberOfCells();
   numPoints = input->GetNumberOfPoints();
@@ -79,37 +74,35 @@ int vtkMergeArrays::RequestData(vtkInformation *vtkNotUsed(request),
   output->GetFieldData()->PassData(input->GetFieldData());
 
   for (idx = 1; idx < num; ++idx)
-    {
+  {
     inInfo = inputVector[0]->GetInformationObject(idx);
-    input = vtkDataSet::SafeDownCast(
-      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    if (output->GetNumberOfPoints() == numPoints &&
-        output->GetNumberOfCells() == numCells)
-      {
+    if (output->GetNumberOfPoints() == numPoints && output->GetNumberOfCells() == numCells)
+    {
       numArrays = input->GetPointData()->GetNumberOfArrays();
       for (arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
-        {
+      {
         array = input->GetPointData()->GetArray(arrayIdx);
         // What should we do about arrays with the same name?
         output->GetPointData()->AddArray(array);
-        }
+      }
       numArrays = input->GetCellData()->GetNumberOfArrays();
       for (arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
-        {
+      {
         array = input->GetCellData()->GetArray(arrayIdx);
         // What should we do about arrays with the same name?
         output->GetCellData()->AddArray(array);
-        }
+      }
       numArrays = input->GetFieldData()->GetNumberOfArrays();
       for (arrayIdx = 0; arrayIdx < numArrays; ++arrayIdx)
-        {
+      {
         array = input->GetFieldData()->GetArray(arrayIdx);
         // What should we do about arrays with the same name?
         output->GetFieldData()->AddArray(array);
-        }
       }
-    } 
+    }
+  }
 
   return 1;
 }
@@ -117,5 +110,5 @@ int vtkMergeArrays::RequestData(vtkInformation *vtkNotUsed(request),
 //----------------------------------------------------------------------------
 void vtkMergeArrays::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

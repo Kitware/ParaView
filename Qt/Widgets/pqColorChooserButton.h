@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,81 +38,109 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QVariant>
 
-/// pqColorChooserButton is a QToolButton subclass suitable for showing a
-/// a button that allows the use to select/change color. It renders a color
-/// swatch next to the button text matching the chosen color.
+/**
+* pqColorChooserButton is a QToolButton subclass suitable for showing a
+* a button that allows the use to select/change color. It renders a color
+* swatch next to the button text matching the chosen color.
+*/
 class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
 {
   Q_OBJECT
   Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor);
-  Q_PROPERTY(QVariantList chosenColorRgbF
-             READ chosenColorRgbF
-             WRITE setChosenColorRgbF);
-  Q_PROPERTY(QVariantList chosenColorRgbaF
-             READ chosenColorRgbaF
-             WRITE setChosenColorRgbaF);
+  Q_PROPERTY(QVariantList chosenColorRgbF READ chosenColorRgbF WRITE setChosenColorRgbF);
+  Q_PROPERTY(QVariantList chosenColorRgbaF READ chosenColorRgbaF WRITE setChosenColorRgbaF);
   Q_PROPERTY(bool showAlphaChannel READ showAlphaChannel WRITE setShowAlphaChannel);
+
 public:
-  /// constructor requires a QComboBox
+  /**
+  * constructor requires a QComboBox
+  */
   pqColorChooserButton(QWidget* p);
 
-  /// get the color
+  /**
+  * get the color
+  */
   QColor chosenColor() const;
 
-  /// Returns the chosen color as a QVariantList with exatctly 3 QVariants with
-  /// values in the range [0, 1] for each of the 3 color components.
+  /**
+  * Returns the chosen color as a QVariantList with exatctly 3 QVariants with
+  * values in the range [0, 1] for each of the 3 color components.
+  */
   QVariantList chosenColorRgbF() const;
 
-  /// Returns the chosen color as a QVariantList with exatctly 4 QVariants with
-  /// values in the range [0, 1] for each of the 4 color components.
+  /**
+  * Returns the chosen color as a QVariantList with exatctly 4 QVariants with
+  * values in the range [0, 1] for each of the 4 color components.
+  */
   QVariantList chosenColorRgbaF() const;
 
-  /// Set/Get the ratio of icon radius to button height
-  void setIconRadiusHeightRatio(double val)
-    { this->IconRadiusHeightRatio = val; }
-  double iconRadiusHeightRatio() const
-    { return this->IconRadiusHeightRatio; }
+  /**
+  * Set/Get the ratio of icon radius to button height
+  */
+  void setIconRadiusHeightRatio(double val) { this->IconRadiusHeightRatio = val; }
+  double iconRadiusHeightRatio() const { return this->IconRadiusHeightRatio; }
 
-  /// When true, the widget will allow users to choose the alpha channel.
+  /**
+  * When true, the widget will allow users to choose the alpha channel.
+  */
   bool showAlphaChannel() const { return this->ShowAlphaChannel; }
-  void setShowAlphaChannel(bool val)
-    { this->ShowAlphaChannel = val; }
+  void setShowAlphaChannel(bool val) { this->ShowAlphaChannel = val; }
 
 signals:
-  /// signal color changed. This is fired in setChosenColor() only
-  /// when the color is indeed different.
+  /**
+  * signal color changed. This is fired in setChosenColor() only
+  * when the color is indeed different.
+  */
   void chosenColorChanged(const QColor&);
 
-  /// signal color selected. Unlike chosenColorChanged() this is fired
-  /// even if the color hasn't changed.
+  /**
+  * signal color selected. Unlike chosenColorChanged() this is fired
+  * even if the color hasn't changed.
+  */
   void validColorChosen(const QColor&);
 
 public slots:
-  /// set the color
+  /**
+  * set the color
+  */
   virtual void setChosenColor(const QColor&);
 
-  /// set the color as a QVariantList with exactly 3 QVariants with
-  /// values in the range [0, 1] for each of the 3 color components.
+  /**
+  * set the color as a QVariantList with exactly 3 QVariants with
+  * values in the range [0, 1] for each of the 3 color components.
+  */
   void setChosenColorRgbF(const QVariantList&);
 
-  /// set the color as a QVariantList with exactly 4 QVariants with
-  /// values in the range [0, 1] for each of the 4 color components.
+  /**
+  * set the color as a QVariantList with exactly 4 QVariants with
+  * values in the range [0, 1] for each of the 4 color components.
+  */
   void setChosenColorRgbaF(const QVariantList&);
 
-  /// show a dialog to choose the color
+  /**
+  * show a dialog to choose the color
+  */
   virtual void chooseColor();
 
 protected:
-  /// overridden to resize the color icon.
-  virtual void resizeEvent(QResizeEvent *rEvent);
+  /**
+  * overridden to resize the color icon.
+  */
+  virtual void resizeEvent(QResizeEvent* rEvent);
 
-  /// renders an icon for the color.
+  /**
+  * renders an icon for the color.
+  */
   QIcon renderColorSwatch(const QColor&);
 
-  /// RGBA values representing the chosen color
+  /**
+  * RGBA values representing the chosen color
+  */
   double Color[4];
 
-  /// the ratio of icon radius to button height
+  /**
+  * the ratio of icon radius to button height
+  */
   double IconRadiusHeightRatio;
 
   bool ShowAlphaChannel;

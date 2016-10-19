@@ -14,9 +14,9 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVConfig.h"
 
-# ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
 extern "C" {
-  void vtkPVInitializePythonModules();
+void vtkPVInitializePythonModules();
 }
 #endif
 
@@ -28,29 +28,25 @@ extern "C" {
 #include "vtkProcessModule.h"
 
 #ifndef BUILD_SHARED_LIBS
-# include "pvStaticPluginsInit.h"
+#include "pvStaticPluginsInit.h"
 #endif
 
-static bool RealMain(int argc, char* argv[],
-  vtkProcessModule::ProcessTypes type)
+static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
   // Marking this static avoids the false leak messages from vtkDebugLeaks when
   // using mpich. It appears that the root process which spawns all the
   // main processes waits in MPI_Init() and calls exit() when
   // the others are done, causing apparent memory leaks for any non-static objects
   // created before MPI_Init().
-  static vtkSmartPointer<vtkPVServerOptions> options =
-    vtkSmartPointer<vtkPVServerOptions>::New();
+  static vtkSmartPointer<vtkPVServerOptions> options = vtkSmartPointer<vtkPVServerOptions>::New();
 
   // Init current process type
-  vtkInitializationHelper::Initialize( argc, argv, type, options );
-  if (options->GetTellVersion() || options->GetHelpSelected() ||
-      options->GetPrintMonitors())
-    {
+  vtkInitializationHelper::Initialize(argc, argv, type, options);
+  if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
+  {
     vtkInitializationHelper::Finalize();
     return 1;
-    }
-
+  }
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   // register callback to initialize modules statically. The callback is
@@ -70,34 +66,34 @@ static bool RealMain(int argc, char* argv[],
   session->SetMultipleConnection(options->GetMultiClientMode() != 0);
   int process_id = controller->GetLocalProcessId();
   if (process_id == 0)
-    {
+  {
     // Report status:
     if (options->GetReverseConnection())
-      {
+    {
       cout << "Connecting to client (reverse connection requested)..." << endl;
-      }
-    else
-      {
-      cout << "Waiting for client..." << endl;
-      }
     }
+    else
+    {
+      cout << "Waiting for client..." << endl;
+    }
+  }
   bool success = false;
   if (session->Connect())
-    {
+  {
     success = true;
     pm->RegisterSession(session);
     if (controller->GetLocalProcessId() == 0)
-      {
+    {
       while (pm->GetNetworkAccessManager()->ProcessEvents(0) != -1)
-        {
-        }
-      }
-    else
       {
-      controller->ProcessRMIs();
       }
-    pm->UnRegisterSession(session);
     }
+    else
+    {
+      controller->ProcessRMIs();
+    }
+    pm->UnRegisterSession(session);
+  }
 
   cout << "Exiting..." << endl;
   session->Delete();

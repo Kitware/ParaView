@@ -42,8 +42,8 @@ class vtkSamplePlaneSource : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
-  static vtkSamplePlaneSource *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkSamplePlaneSource* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The location of the center of the plane.  A point is guaranteed to be here.
@@ -65,7 +65,7 @@ public:
   // The controller used to determine the actual bounds of the input.  Use
   // a dummy controller if not running in parallel.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkSamplePlaneSource();
@@ -75,18 +75,17 @@ protected:
   double Normal[3];
   int Resolution;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation *request,
-                          vtkInformationVector **inputVector,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   // Description:
   // Finds the bounds of a data object (can be either a vtkDataSet or
   // a vtkCompositeDataSet containing vtkDataSets).
-  virtual void ComputeLocalBounds(vtkDataObject *input, double bounds[6]);
+  virtual void ComputeLocalBounds(vtkDataObject* input, double bounds[6]);
 
   // Description:
   // Resolves the bounds of all parallel processes.
@@ -94,11 +93,11 @@ protected:
 
   // Description:
   // Creates the output poly data based on the bounds and ivars.
-  virtual void CreatePlane(const double bounds[6], vtkPolyData *output);
+  virtual void CreatePlane(const double bounds[6], vtkPolyData* output);
 
 private:
-  vtkSamplePlaneSource(const vtkSamplePlaneSource &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSamplePlaneSource &) VTK_DELETE_FUNCTION;
+  vtkSamplePlaneSource(const vtkSamplePlaneSource&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSamplePlaneSource&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkSamplePlaneSource_h
+#endif // vtkSamplePlaneSource_h

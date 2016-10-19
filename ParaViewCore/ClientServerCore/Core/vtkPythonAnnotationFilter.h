@@ -12,25 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPythonAnnotationFilter - filter used to generate text annotation
-// from Python expressions.
-// .SECTION Description
-// vtkPythonAnnotationFilter is designed to generate vtkTableAlgorithm with a
-// single string in it. The goal is that user will write a Python expression,
-// similar to an expression in Python Calculator (vtkPythonCalculator). The
-// generated result is converted to string and placed in the output.
-//
-// The variables available in the expression evaluation scope are as follows:
-// \li sanitized array names for all arrays in the chosen ArrayAssociation.
-// \li input: refers to the input dataset (wrapped as
-// vtk.numpy_interface.dataset_adapter.DataObject or subclass).
-// \li time_value: vtkDataObject::DATA_TIME_STEP() from input.
-// \li time_steps: vtkDataObject::TIME_STEPS() from the input, if any
-// \li time_range: vtkDataObject::TIME_RANGE() from the input, if any
-//
-// Examples of valid expressions are:
-// \li "Max temp is %s" % max(Temp)
-
+/**
+ * @class   vtkPythonAnnotationFilter
+ * @brief   filter used to generate text annotation
+ * from Python expressions.
+ *
+ * vtkPythonAnnotationFilter is designed to generate vtkTableAlgorithm with a
+ * single string in it. The goal is that user will write a Python expression,
+ * similar to an expression in Python Calculator (vtkPythonCalculator). The
+ * generated result is converted to string and placed in the output.
+ *
+ * The variables available in the expression evaluation scope are as follows:
+ * \li sanitized array names for all arrays in the chosen ArrayAssociation.
+ * \li input: refers to the input dataset (wrapped as
+ * vtk.numpy_interface.dataset_adapter.DataObject or subclass).
+ * \li time_value: vtkDataObject::DATA_TIME_STEP() from input.
+ * \li time_steps: vtkDataObject::TIME_STEPS() from the input, if any
+ * \li time_range: vtkDataObject::TIME_RANGE() from the input, if any
+ *
+ * Examples of valid expressions are:
+ * \li "Max temp is %s" % max(Temp)
+*/
 
 #ifndef vtkPythonAnnotationFilter_h
 #define vtkPythonAnnotationFilter_h
@@ -45,37 +47,49 @@ public:
   vtkTypeMacro(vtkPythonAnnotationFilter, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the expression to evaluate.
-  // Here is a set of common expressions:
-  //  - "Momentum %s" % str(Momentum[available_timesteps.index(provided_time)])
+  //@{
+  /**
+   * Set the expression to evaluate.
+   * Here is a set of common expressions:
+   * - "Momentum %s" % str(Momentum[available_timesteps.index(provided_time)])
+   */
   vtkSetStringMacro(Expression);
   vtkGetStringMacro(Expression);
+  //@}
 
-  // Description:
-  // Set the input array association. This dictates which array names are made
-  // available in the namespace by default. You can still use
-  // input.PointData['foo'] or input.CellData['bar'] explicitly to pick a
-  // specific array in your expression.
+  //@{
+  /**
+   * Set the input array association. This dictates which array names are made
+   * available in the namespace by default. You can still use
+   * input.PointData['foo'] or input.CellData['bar'] explicitly to pick a
+   * specific array in your expression.
+   */
   vtkSetMacro(ArrayAssociation, int);
   vtkGetMacro(ArrayAssociation, int);
+  //@}
 
-  // Description:
-  // Get the value that is going to be printed to the output.
+  //@{
+  /**
+   * Get the value that is going to be printed to the output.
+   */
   vtkGetStringMacro(ComputedAnnotationValue);
+  //@}
 
   //------------------------------------------------------------------------------
-  // Description:
-  // Get methods for use in annotation.py.
-  // The values are only valid during RequestData().
+  //@{
+  /**
+   * Get methods for use in annotation.py.
+   * The values are only valid during RequestData().
+   */
   vtkGetMacro(DataTimeValid, bool);
   vtkGetMacro(DataTime, double);
+  //@}
 
   vtkGetMacro(NumberOfTimeSteps, int);
   double GetTimeStep(int index)
-    {
-    return (index < this->NumberOfTimeSteps? this->TimeSteps[index] : 0.0);
-    }
+  {
+    return (index < this->NumberOfTimeSteps ? this->TimeSteps[index] : 0.0);
+  }
 
   vtkGetMacro(TimeRangeValid, bool);
   vtkGetVector2Macro(TimeRange, double);
@@ -87,11 +101,9 @@ protected:
   ~vtkPythonAnnotationFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  // Description:
   virtual void EvaluateExpression();
 
   char* Expression;
@@ -109,7 +121,6 @@ private:
   bool TimeRangeValid;
   double TimeRange[2];
   vtkDataObject* CurrentInputDataObject;
-
 };
 
 #endif

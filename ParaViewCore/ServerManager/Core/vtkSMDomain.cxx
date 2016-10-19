@@ -32,8 +32,7 @@ struct vtkSMDomainInternals
   // There's no reason why a domain should have a hard reference to the required
   // property since both the domain and the required property belong to the same
   // proxy, so they will be deleted only when the proxy disappears.
-  typedef 
-  std::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
+  typedef std::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
   PropertyMap RequiredProperties;
 
   // This is the property that has this domain.
@@ -61,26 +60,25 @@ vtkSMProperty* vtkSMDomain::GetRequiredProperty(const char* function)
   vtkSMDomainInternals::PropertyMap::iterator iter =
     this->Internals->RequiredProperties.find(function);
   if (iter != this->Internals->RequiredProperties.end())
-    {
+  {
     return iter->second.GetPointer();
-    }
+  }
   return 0;
 }
 
 //---------------------------------------------------------------------------
 void vtkSMDomain::RemoveRequiredProperty(vtkSMProperty* prop)
 {
-  vtkSMDomainInternals::PropertyMap::iterator iter = 
-    this->Internals->RequiredProperties.begin();
+  vtkSMDomainInternals::PropertyMap::iterator iter = this->Internals->RequiredProperties.begin();
 
-  for(; iter != this->Internals->RequiredProperties.end(); iter++)
+  for (; iter != this->Internals->RequiredProperties.end(); iter++)
+  {
+    if (iter->second.GetPointer() == prop)
     {
-    if ( iter->second.GetPointer() == prop )
-      {
       this->Internals->RequiredProperties.erase(iter);
       break;
-      }
     }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -91,93 +89,90 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
 
   int isOptional;
   int retVal = element->GetScalarAttribute("optional", &isOptional);
-  if(retVal) 
-    { 
-    this->SetIsOptional(isOptional!=0); 
-    }
+  if (retVal)
+  {
+    this->SetIsOptional(isOptional != 0);
+  }
 
-  for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
-    {
+  for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
+  {
     vtkPVXMLElement* domainEl = element->GetNestedElement(i);
-    if ( strcmp(domainEl->GetName(), "RequiredProperties" ) == 0 )
+    if (strcmp(domainEl->GetName(), "RequiredProperties") == 0)
+    {
+      for (unsigned int j = 0; j < domainEl->GetNumberOfNestedElements(); ++j)
       {
-      for(unsigned int j=0; j < domainEl->GetNumberOfNestedElements(); ++j)
-        {
         vtkPVXMLElement* reqEl = domainEl->GetNestedElement(j);
         const char* name = reqEl->GetAttribute("name");
         if (name)
+        {
+          if (prop->GetXMLName() && strcmp(name, prop->GetXMLName()) == 0)
           {
-          if ( prop->GetXMLName() && strcmp(name, prop->GetXMLName()) == 0 )
-            {
             vtkErrorMacro("A domain can not depend on it's property");
-            }
+          }
           else
-            {
+          {
             const char* function = reqEl->GetAttribute("function");
             if (!function)
-              {
+            {
               vtkErrorMacro("Missing required attribute: function");
-              }
+            }
             else
-              {
+            {
               vtkSMProperty* req = prop->NewProperty(name);
               if (req)
-                {
+              {
                 this->AddRequiredProperty(req, function);
-                }
+              }
               else
-                {
-                vtkWarningMacro(
-                  "You have added a domain dependency to a property named '"
+              {
+                vtkWarningMacro("You have added a domain dependency to a property named '"
                   << name << "' which does not exist.");
-                }
               }
             }
           }
         }
       }
     }
+  }
   return 1;
 }
 
 //---------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(
-  const char* function, int /*index=0*/)
+vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function, int /*index=0*/)
 {
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)
-    {
+  {
     return NULL;
-    }
+  }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
   if (helper.GetNumberOfElements() > 0)
-    {
+  {
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
     if (sp)
-      {
+    {
       return sp->GetDataInformation(helper.GetOutputPort());
-      }
     }
+  }
 
   return NULL;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
-                                      const char *function)
+void vtkSMDomain::AddRequiredProperty(vtkSMProperty* prop, const char* function)
 {
   if (!prop)
-    {
+  {
     return;
-    }
-  
+  }
+
   if (!function)
-    {
+  {
     vtkErrorMacro("Missing name of function for new required property.");
     return;
-    }
-  
+  }
+
   prop->AddDependent(this);
   this->Internals->RequiredProperties[function] = prop;
 }
@@ -229,8 +224,7 @@ void vtkSMDomain::SetProperty(vtkSMProperty* prop)
 void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") 
-     << endl;
+  os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") << endl;
   os << indent << "IsOptional: " << this->IsOptional << endl;
   os << indent << "Property: " << this->Internals->DomainProperty.GetPointer() << endl;
 }

@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExtentDomain - int range domain based on data set extent
-// .SECTION Description
-// vtkSMExtentDomain is a subclass of vtkSMIntRangeDomain. In its Update
-// method, it determines the minimum and maximum extent in each dimension of
-// the structured data set with which it is associated. It requires a
-// vtkSMSourceProxy to do this.
-// .SECTION See Also
-// vtkSMIntRangeDomain
+/**
+ * @class   vtkSMExtentDomain
+ * @brief   int range domain based on data set extent
+ *
+ * vtkSMExtentDomain is a subclass of vtkSMIntRangeDomain. In its Update
+ * method, it determines the minimum and maximum extent in each dimension of
+ * the structured data set with which it is associated. It requires a
+ * vtkSMSourceProxy to do this.
+ * @sa
+ * vtkSMIntRangeDomain
+*/
 
 #ifndef vtkSMExtentDomain_h
 #define vtkSMExtentDomain_h
@@ -35,31 +38,36 @@ public:
   static vtkSMExtentDomain* New();
   vtkTypeMacro(vtkSMExtentDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  // Description:
-  // Update self checking the "unchecked" values of all required
-  // properties. Overwritten by sub-classes.
-  virtual void Update(vtkSMProperty*);
-  
-  // Description:
-  // Set the value of an element of a property from the animation editor.
-  virtual void SetAnimationValue(vtkSMProperty *property, int idx,
-                                 double value);
 
-  // Description:
-  // A vtkSMProperty is often defined with a default value in the
-  // XML itself. However, many times, the default value must be determined
-  // at run time. To facilitate this, domains can override this method
-  // to compute and set the default value for the property.
-  // Note that unlike the compile-time default values, the
-  // application must explicitly call this method to initialize the
-  // property.
+  /**
+   * Update self checking the "unchecked" values of all required
+   * properties. Overwritten by sub-classes.
+   */
+  virtual void Update(vtkSMProperty*);
+
+  /**
+   * Set the value of an element of a property from the animation editor.
+   */
+  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
+
+  //@{
+  /**
+   * A vtkSMProperty is often defined with a default value in the
+   * XML itself. However, many times, the default value must be determined
+   * at run time. To facilitate this, domains can override this method
+   * to compute and set the default value for the property.
+   * Note that unlike the compile-time default values, the
+   * application must explicitly call this method to initialize the
+   * property.
+   */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+
 protected:
   vtkSMExtentDomain();
   ~vtkSMExtentDomain();
-  
-  void Update(vtkSMProxyProperty *pp);
+  //@}
+
+  void Update(vtkSMProxyProperty* pp);
 
 private:
   vtkSMExtentDomain(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;

@@ -28,7 +28,7 @@
 
 #include "mpi.h"
 
-int main(int argc, char**argv)
+int main(int argc, char** argv)
 {
   //---------------------------------------------------------------------------
   // Initialize MPI.
@@ -40,8 +40,7 @@ int main(int argc, char**argv)
   // created before MPI_Init().
   MPI_Init(&argc, &argv);
 
-  vtkSmartPointer<vtkMPIController> controller =
-    vtkSmartPointer<vtkMPIController>::New();
+  vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
   controller->Initialize(&argc, &argv, 1);
 
   // Get information about the group of processes involved.
@@ -52,7 +51,7 @@ int main(int argc, char**argv)
   // This block ensures that controller is released by all filters before we
   // reach the end to avoid leaks
   if (true)
-    {
+  {
     //---------------------------------------------------------------------------
     // Create Visualization Pipeline.
     // This code is common to all processes.
@@ -62,8 +61,7 @@ int main(int argc, char**argv)
 
     // Gives separate colors for each process. Just makes it easier to see how the
     // data is distributed among processes.
-    vtkSmartPointer<vtkPieceScalars> piecescalars =
-      vtkSmartPointer<vtkPieceScalars>::New();
+    vtkSmartPointer<vtkPieceScalars> piecescalars = vtkSmartPointer<vtkPieceScalars>::New();
     piecescalars->SetInputConnection(sphere->GetOutputPort());
     piecescalars->SetScalarModeToCellData();
 
@@ -71,7 +69,7 @@ int main(int argc, char**argv)
     mapper->SetInputConnection(piecescalars->GetOutputPort());
     mapper->SetScalarModeToUseCellFieldData();
     mapper->SelectColorArray("Piece");
-    mapper->SetScalarRange(0, num_procs-1);
+    mapper->SetScalarRange(0, num_procs - 1);
     // This sets up the piece-request. This tells vtkPSphereSource to only
     // generate part of the data on this processes.
     mapper->SetPiece(my_id);
@@ -107,8 +105,7 @@ int main(int argc, char**argv)
     // part of the data. To ensure that root node gets a composited result (or in
     // case of tile-display mode all nodes show part of tile), we use
     // vtkIceTCompositePass.
-    vtkSmartPointer<vtkIceTCompositePass> iceTPass =
-      vtkSmartPointer<vtkIceTCompositePass>::New();
+    vtkSmartPointer<vtkIceTCompositePass> iceTPass = vtkSmartPointer<vtkIceTCompositePass>::New();
     iceTPass->SetController(controller);
 
     // this is the pass IceT is going to use to render the geometry.
@@ -117,7 +114,7 @@ int main(int argc, char**argv)
     // insert the iceT pass into the pipeline.
     cameraP->SetDelegatePass(iceTPass);
 
-    vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
+    vtkOpenGLRenderer* glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
     glrenderer->SetPass(cameraP);
 
     //---------------------------------------------------------------------------
@@ -150,8 +147,8 @@ int main(int argc, char**argv)
     // vtkMultiProcessController::ProcessRMIs() so those processes start listening
     // to commands from the root-node.
 
-    if (my_id==0)
-      {
+    if (my_id == 0)
+    {
       vtkSmartPointer<vtkRenderWindowInteractor> iren =
         vtkSmartPointer<vtkRenderWindowInteractor>::New();
       iren->SetRenderWindow(renWin);
@@ -160,19 +157,19 @@ int main(int argc, char**argv)
       renWin->Render();
       retVal = vtkTesting::Test(argc, argv, renWin, 10);
       if (retVal == vtkRegressionTester::DO_INTERACTOR)
-        {
+      {
         iren->Start();
-        }
+      }
 
       controller->TriggerBreakRMIs();
       controller->Barrier();
-      }
+    }
     else
-      {
+    {
       controller->ProcessRMIs();
       controller->Barrier();
-      }
     }
+  }
   controller->Finalize();
   return !retVal;
 }

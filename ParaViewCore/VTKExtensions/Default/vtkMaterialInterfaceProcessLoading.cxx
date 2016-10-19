@@ -19,22 +19,22 @@ using std::endl;
 using std::vector;
 
 //
-ostream &operator<<(ostream &sout, const vtkMaterialInterfaceProcessLoading &fp)
+ostream& operator<<(ostream& sout, const vtkMaterialInterfaceProcessLoading& fp)
 {
   sout << "(" << fp.GetId() << "," << fp.GetLoadFactor() << ")";
 
   return sout;
 }
 //
-ostream &operator<<(ostream &sout, const vector<vtkMaterialInterfaceProcessLoading> &vfp)
+ostream& operator<<(ostream& sout, const vector<vtkMaterialInterfaceProcessLoading>& vfp)
 {
   size_t n = vfp.size();
-  vtkIdType total=0;
-  for (size_t i=0; i<n; ++i)
-    {
-    total+=vfp[i].GetLoadFactor();
+  vtkIdType total = 0;
+  for (size_t i = 0; i < n; ++i)
+  {
+    total += vfp[i].GetLoadFactor();
     sout << "(" << vfp[i].GetId() << "," << vfp[i].GetLoadFactor() << ")" << endl;
-    }
+  }
   sout << "Total loading:" << total << endl;
   return sout;
 }

@@ -38,91 +38,86 @@ vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain()
 //----------------------------------------------------------------------------
 void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
 {
-  vtkSMProxyProperty* ip = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GetRequiredProperty("ArraySelection"));
+  vtkSMProxyProperty* ip = vtkSMProxyProperty::SafeDownCast(this->GetRequiredProperty("Input"));
+  vtkSMStringVectorProperty* svp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetRequiredProperty("ArraySelection"));
   if (!ip || !svp)
-    {
+  {
     // Missing required properties.
     this->RemoveAllEntries();
     return;
-    }
+  }
 
-  if (svp->GetNumberOfUncheckedElements() != 5 &&
-      svp->GetNumberOfUncheckedElements() != 2 && 
-      svp->GetNumberOfUncheckedElements() != 1)
-    {
+  if (svp->GetNumberOfUncheckedElements() != 5 && svp->GetNumberOfUncheckedElements() != 2 &&
+    svp->GetNumberOfUncheckedElements() != 1)
+  {
     // We can only handle array selection properties with 5, 2 or 1 elements.
     // For 5 elements the array name is at indices [4]; for 2
     // elements it's at [1], while for 1 elements, it's at [0].
     this->RemoveAllEntries();
     return;
-    }
+  }
 
-  int index = svp->GetNumberOfUncheckedElements()-1;
+  int index = svp->GetNumberOfUncheckedElements() - 1;
   const char* arrayName = svp->GetUncheckedElement(index);
   if (!arrayName || arrayName[0] == 0)
-    {
+  {
     // No array choosen.
     this->RemoveAllEntries();
     return;
-    }
+  }
 
   vtkSMInputArrayDomain* iad = 0;
   vtkSMDomainIterator* di = ip->NewDomainIterator();
   di->Begin();
   while (!di->IsAtEnd())
-    {
+  {
     // We have to figure out whether we are working with cell data,
     // point data or both.
     iad = vtkSMInputArrayDomain::SafeDownCast(di->GetDomain());
     if (iad)
-      {
+    {
       break;
-      }
-    di->Next();
     }
+    di->Next();
+  }
   di->Delete();
   if (!iad)
-    {
+  {
     // Failed to locate a vtkSMInputArrayDomain on the input property, which is
     // required.
     this->RemoveAllEntries();
     return;
-    }
+  }
 
   vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(ip);
   unsigned int i;
   unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
-  for (i=0; i<numProxs; i++)
-    {
+  for (i = 0; i < numProxs; i++)
+  {
     // Use the first input
-    vtkSMSourceProxy* source = 
-      vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
     if (source)
-      {
+    {
       this->Update(arrayName, source, iad,
-        (inputProp? inputProp->GetUncheckedOutputPortForConnection(i): 0));
+        (inputProp ? inputProp->GetUncheckedOutputPortForConnection(i) : 0));
       return;
-      }
     }
+  }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
-                                   vtkSMSourceProxy* sp,
-                                   vtkSMInputArrayDomain* iad,
-                                   int outputport)
+void vtkSMNumberOfComponentsDomain::Update(
+  const char* arrayName, vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport)
 {
   // Make sure the outputs are created.
   sp->CreateOutputPorts();
   vtkPVDataInformation* info = sp->GetDataInformation(outputport);
   if (!info)
-    {
+  {
     this->RemoveAllEntries();
     return;
-    }
+  }
 
   int iadAttributeType = iad->GetAttributeType();
   vtkPVArrayInformation* ai = 0;
@@ -130,44 +125,48 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
   if (iadAttributeType == vtkSMInputArrayDomain::POINT ||
     iadAttributeType == vtkSMInputArrayDomain::ANY ||
     iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD)
-    {
+  {
     ai = info->GetPointDataInformation()->GetArrayInformation(arrayName);
-    }
-  else if (iadAttributeType == vtkSMInputArrayDomain::CELL || 
-    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
-      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
-    {
+  }
+  else if (iadAttributeType == vtkSMInputArrayDomain::CELL ||
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
+       iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
+             !ai))
+  {
     ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
-    }
+  }
   else if (iadAttributeType == vtkSMInputArrayDomain::VERTEX ||
-    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
-      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
-    {
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
+       iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
+             !ai))
+  {
     ai = info->GetVertexDataInformation()->GetArrayInformation(arrayName);
-    }
+  }
   else if (iadAttributeType == vtkSMInputArrayDomain::EDGE ||
-    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
-      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
-    {
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
+       iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
+             !ai))
+  {
     ai = info->GetEdgeDataInformation()->GetArrayInformation(arrayName);
-    }
+  }
   else if (iadAttributeType == vtkSMInputArrayDomain::ROW ||
-    ((iadAttributeType == vtkSMInputArrayDomain::ANY || 
-      iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) && !ai))
-    {
+    ((iadAttributeType == vtkSMInputArrayDomain::ANY ||
+       iadAttributeType == vtkSMInputArrayDomain::ANY_EXCEPT_FIELD) &&
+             !ai))
+  {
     ai = info->GetRowDataInformation()->GetArrayInformation(arrayName);
-    }
+  }
 
   if (ai)
-    {
+  {
     this->RemoveAllEntries();
     for (int i = 0; i < ai->GetNumberOfComponents(); i++)
-      {
+    {
       const char* name = ai->GetComponentName(i);
       this->AddEntry(name, i);
-      }
-    this->DomainModified();
     }
+    this->DomainModified();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -175,5 +174,3 @@ void vtkSMNumberOfComponentsDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

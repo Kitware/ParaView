@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,14 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProxy;
 class vtkSMPropertyGroup;
 
-
-class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget :
-  public pqPropertyGroupWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget : public pqPropertyGroupWidget
 {
 public:
   pqBackgroundEditorWidget(
-    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
-    QWidget* parentObject = 0);
+    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
   ~pqBackgroundEditorWidget();
 
   bool gradientBackground() const;
@@ -54,13 +51,12 @@ public:
   bool imageBackground() const;
   void setImageBackground(bool imageBackground);
 
-
 signals:
   void gradientBackgroundChanged();
   void imageBackgroundChanged();
 
 public slots:
-  void setView (pqView *newView);
+  void setView(pqView* newView);
 
 protected slots:
   void currentIndexChangedBackgroundType(int type);
@@ -76,10 +72,8 @@ private:
 
 private:
   Q_OBJECT
-  Q_PROPERTY(bool gradientBackground READ gradientBackground
-             WRITE setGradientBackground)
-  Q_PROPERTY(bool imageBackground READ imageBackground
-             WRITE setImageBackground)
+  Q_PROPERTY(bool gradientBackground READ gradientBackground WRITE setGradientBackground)
+  Q_PROPERTY(bool imageBackground READ imageBackground WRITE setImageBackground)
 
   class pqInternal;
   pqInternal* Internal;

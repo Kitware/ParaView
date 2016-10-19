@@ -49,9 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
-  : Superclass(parentObject, f), SizePropertyName("ViewSize")
+  : Superclass(parentObject, f)
+  , SizePropertyName("ViewSize")
 {
-  this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
+  this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST") == NULL);
 
   // Tmp objects
   QPixmap mousePixmap(":/pqWidgets/Icons/pqMousePick15.png");
@@ -59,13 +60,12 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   int h = mousePixmap.height();
   QImage image(w, h, QImage::Format_ARGB32);
   QPainter painter(&image);
-  painter.drawPixmap(0,0,mousePixmap);
+  painter.drawPixmap(0, 0, mousePixmap);
   painter.end();
   image = image.rgbSwapped();
 
   // Save the loaded image
   this->MousePointerToDraw = image.mirrored();
-  
 }
 
 //----------------------------------------------------------------------------
@@ -84,17 +84,16 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 void pqQVTKWidget::updateSizeProperties()
 {
   if (this->ViewProxy)
-    {
+  {
     BEGIN_UNDO_EXCLUDE();
     int view_size[2];
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
-    vtkSMPropertyHelper(
-      this->ViewProxy, this->SizePropertyName.toLatin1().data()).Set(view_size, 2);
-    this->ViewProxy->UpdateProperty(
-      this->SizePropertyName.toLatin1().data());
+    vtkSMPropertyHelper(this->ViewProxy, this->SizePropertyName.toLatin1().data())
+      .Set(view_size, 2);
+    this->ViewProxy->UpdateProperty(this->SizePropertyName.toLatin1().data());
     END_UNDO_EXCLUDE();
-    }
+  }
 
   this->markCachedImageAsDirty();
 
@@ -130,9 +129,9 @@ bool pqQVTKWidget::paintCachedImage()
   // execute when not resizing.
 
   if (this->Superclass::paintCachedImage())
-    {
+  {
     return true;
-    }
+  }
 
   // despite our best efforts, it's possible that the paint event happens while
   // the server manager is busy processing some other request that yields
@@ -140,23 +139,23 @@ bool pqQVTKWidget::paintCachedImage()
   // Triggering renders in that case is hazardous. So we skip calling
   // rendering in those cases.
   if (this->ViewProxy && this->ViewProxy->GetSession()->GetPendingProgress())
-    {
+  {
     return true;
-    }
+  }
 
   if (this->Session && this->Session->GetPendingProgress())
-    {
+  {
     return true;
-    }
+  }
   return false;
 }
 //----------------------------------------------------------------------------
 vtkTypeUInt32 pqQVTKWidget::getProxyId()
 {
-  if(this->ViewProxy)
-    {
+  if (this->ViewProxy)
+  {
     return this->ViewProxy->GetGlobalID();
-    }
+  }
   return 0;
 }
 
@@ -168,10 +167,9 @@ void pqQVTKWidget::paintMousePointer(int xLocation, int yLocation)
 
   // Paint mouse pointer image on top of it
   int imagePointingDelta = 10;
-  this->mRenWin->SetRGBACharPixelData(
-      xLocation - imagePointingDelta,
-      this->height() - yLocation + imagePointingDelta,
-      this->MousePointerToDraw.width()+xLocation-1 - imagePointingDelta,
-      this->height() - (this->MousePointerToDraw.height() + yLocation + 1) + imagePointingDelta,
-      this->MousePointerToDraw.bits(), 1, 1);
+  this->mRenWin->SetRGBACharPixelData(xLocation - imagePointingDelta,
+    this->height() - yLocation + imagePointingDelta,
+    this->MousePointerToDraw.width() + xLocation - 1 - imagePointingDelta,
+    this->height() - (this->MousePointerToDraw.height() + yLocation + 1) + imagePointingDelta,
+    this->MousePointerToDraw.bits(), 1, 1);
 }

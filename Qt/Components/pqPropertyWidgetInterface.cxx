@@ -37,8 +37,8 @@ pqPropertyWidgetInterface::~pqPropertyWidgetInterface()
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *proxy,
-                                                                     vtkSMProperty *property)
+pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(
+  vtkSMProxy* proxy, vtkSMProperty* property)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(property);
@@ -46,8 +46,8 @@ pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy 
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
-                                                                          vtkSMPropertyGroup *group)
+pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(
+  vtkSMProxy* proxy, vtkSMPropertyGroup* group)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(group);
@@ -56,7 +56,7 @@ pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMP
 
 //-----------------------------------------------------------------------------
 pqPropertyWidgetDecorator* pqPropertyWidgetInterface::createWidgetDecorator(
-    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
+  const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
 {
   Q_UNUSED(type);
   Q_UNUSED(config);

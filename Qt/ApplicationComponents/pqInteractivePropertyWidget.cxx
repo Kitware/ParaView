@@ -62,17 +62,19 @@ public:
   bool WidgetVisibility;
   unsigned long UserEventObserverId;
 
-  pqInternals(): WidgetVisibility(false), UserEventObserverId(0)
-    {
-    }
+  pqInternals()
+    : WidgetVisibility(false)
+    , UserEventObserverId(0)
+  {
+  }
 };
 
 //-----------------------------------------------------------------------------
-pqInteractivePropertyWidget::pqInteractivePropertyWidget(
-    const char* widget_smgroup, const char* widget_smname,
-    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
-  : Superclass(smproxy, parentObject),
-  Internals(new pqInteractivePropertyWidget::pqInternals())
+pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgroup,
+  const char* widget_smname, vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
+  QWidget* parentObject)
+  : Superclass(smproxy, parentObject)
+  , Internals(new pqInteractivePropertyWidget::pqInternals())
 {
   Q_ASSERT(widget_smgroup);
   Q_ASSERT(widget_smname);
@@ -83,8 +85,8 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(
 
   pqInternals& internals = (*this->Internals);
 
-  pqServer* server = pqApplicationCore::instance()->getServerManagerModel()->findServer(
-    smproxy->GetSession());
+  pqServer* server =
+    pqApplicationCore::instance()->getServerManagerModel()->findServer(smproxy->GetSession());
 
   // Check is server is a Catalyst session. If so, we need to create the widget
   // proxies on the "display-session".
@@ -93,19 +95,21 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> aProxy;
   aProxy.TakeReference(pxm->NewProxy(widget_smgroup, widget_smname));
-  vtkSMNewWidgetRepresentationProxy* wdgProxy = vtkSMNewWidgetRepresentationProxy::SafeDownCast(aProxy);
+  vtkSMNewWidgetRepresentationProxy* wdgProxy =
+    vtkSMNewWidgetRepresentationProxy::SafeDownCast(aProxy);
   if (aProxy == NULL)
-    {
+  {
     qCritical("Failed to create proxy for 3D Widget. Aborting for debugging purposes.");
     abort();
-    }
+  }
   if (wdgProxy == NULL)
-    {
-    qCritical() << "Proxy (" <<widget_smgroup <<", " << widget_smname << ") must be a "
-      "vtkSMNewWidgetRepresentationProxy instance. It however is a '" << aProxy->GetClassName()
-      << "'. Aborting for debugging purposes.";
+  {
+    qCritical() << "Proxy (" << widget_smgroup << ", " << widget_smname
+                << ") must be a "
+                   "vtkSMNewWidgetRepresentationProxy instance. It however is a '"
+                << aProxy->GetClassName() << "'. Aborting for debugging purposes.";
     abort();
-    }
+  }
   Q_ASSERT(wdgProxy);
 
   internals.WidgetProxy = wdgProxy;
@@ -122,26 +126,24 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(
   // changes to the widget.
   wdgProxy->PrototypeOn();
 
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent,
-    this, SIGNAL(changeAvailable()));
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::EndInteractionEvent,
-    this, SIGNAL(changeFinished()));
+  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent, this, SIGNAL(changeAvailable()));
+  pqCoreUtilities::connect(
+    wdgProxy, vtkCommand::EndInteractionEvent, this, SIGNAL(changeFinished()));
 
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::StartInteractionEvent,
-    this, SIGNAL(startInteraction()));
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent,
-    this, SIGNAL(interaction()));
-  pqCoreUtilities::connect(wdgProxy, vtkCommand::EndInteractionEvent,
-    this, SIGNAL(endInteraction()));
+  pqCoreUtilities::connect(
+    wdgProxy, vtkCommand::StartInteractionEvent, this, SIGNAL(startInteraction()));
+  pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent, this, SIGNAL(interaction()));
+  pqCoreUtilities::connect(
+    wdgProxy, vtkCommand::EndInteractionEvent, this, SIGNAL(endInteraction()));
 
   if (vtkSMProperty* input = smgroup->GetProperty("Input"))
-    {
+  {
     this->addPropertyLink(this, "dataSource", SIGNAL(dummySignal()), input);
-    }
+  }
   else
-    {
+  {
     this->setDataSource(NULL);
-    }
+  }
 
   // This ensures that when the user changes the Qt widget, we re-render to show
   // the update widget.
@@ -150,7 +152,7 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(
   END_UNDO_EXCLUDE();
 
   internals.UserEventObserverId = smproxy->AddObserver(
-      vtkCommand::UserEvent, this, &pqInteractivePropertyWidget::handleUserEvent);
+    vtkCommand::UserEvent, this, &pqInteractivePropertyWidget::handleUserEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -158,10 +160,10 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
 {
   pqInternals& internals = (*this->Internals);
   if (internals.UserEventObserverId > 0 && this->proxy())
-    {
+  {
     this->proxy()->RemoveObserver(internals.UserEventObserverId);
     internals.UserEventObserverId = 0;
-    }
+  }
 
   // ensures that the widget proxy is removed from the active view, if any.
   this->setView(NULL);
@@ -176,30 +178,29 @@ vtkSMNewWidgetRepresentationProxy* pqInteractivePropertyWidget::widgetProxy() co
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidget::setView(pqView* pqview)
 {
-  if (pqview != NULL &&
-    pqview->getServer()->session() != this->widgetProxy()->GetSession())
-    {
+  if (pqview != NULL && pqview->getServer()->session() != this->widgetProxy()->GetSession())
+  {
     pqview = NULL;
-    }
+  }
 
   pqView* rview = qobject_cast<pqRenderViewBase*>(pqview);
   pqView* oldview = this->view();
   if (oldview == rview)
-    {
+  {
     return;
-    }
+  }
 
   if (oldview)
-    {
+  {
     vtkSMPropertyHelper(oldview->getProxy(), "HiddenRepresentations").Remove(this->widgetProxy());
     oldview->getProxy()->UpdateVTKObjects();
-    }
+  }
   this->Superclass::setView(rview);
   if (rview)
-    {
+  {
     vtkSMPropertyHelper(rview->getProxy(), "HiddenRepresentations").Add(this->widgetProxy());
     rview->getProxy()->UpdateVTKObjects();
-    }
+  }
   this->updateWidgetVisibility();
 }
 
@@ -229,16 +230,16 @@ void pqInteractivePropertyWidget::setWidgetVisible(bool val)
 {
   pqInternals& internals = (*this->Internals);
   if (internals.WidgetVisibility != val)
-    {
+  {
     SM_SCOPED_TRACE(CallFunction)
-        .arg(val? "Show3DWidgets" : "Hide3DWidgets")
-        .arg("proxy", this->proxy())
-        .arg("comment", "toggle 3D widget visibility (only when running from the GUI)");
+      .arg(val ? "Show3DWidgets" : "Hide3DWidgets")
+      .arg("proxy", this->proxy())
+      .arg("comment", "toggle 3D widget visibility (only when running from the GUI)");
 
     internals.WidgetVisibility = val;
     this->updateWidgetVisibility();
     emit this->widgetVisibilityToggled(val);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -271,27 +272,27 @@ vtkSMProxy* pqInteractivePropertyWidget::dataSource() const
 vtkBoundingBox pqInteractivePropertyWidget::dataBounds() const
 {
   if (vtkSMSourceProxy* dsrc = vtkSMSourceProxy::SafeDownCast(this->dataSource()))
-    {
+  {
     // FIXME: we need to get the output port number correctly. For now, just use
     // 0.
     vtkPVDataInformation* dataInfo = dsrc->GetDataInformation(0);
     vtkBoundingBox bbox(dataInfo->GetBounds());
     return bbox;
-    }
+  }
   else
-    {
+  {
     vtkBoundingBox bbox;
     return bbox;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqInteractivePropertyWidget::render()
 {
   if (pqView* pqview = this->view())
-    {
+  {
     pqview->render();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -313,11 +314,11 @@ void pqInteractivePropertyWidget::handleUserEvent(
 
   const char* message = reinterpret_cast<const char*>(calldata);
   if (message != NULL && strcmp("HideWidget", message) == 0)
-    {
+  {
     this->setWidgetVisible(false);
-    }
+  }
   else if (message != NULL && strcmp("ShowWidget", message) == 0)
-    {
+  {
     this->setWidgetVisible(true);
-    }
+  }
 }

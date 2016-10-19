@@ -27,7 +27,6 @@
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 
-
 ///////////////////////////////////////////////////////////////////////////////
 pqSierraPlotToolsUtils::pqSierraPlotToolsUtils()
 {
@@ -39,18 +38,18 @@ pqSierraPlotToolsUtils::~pqSierraPlotToolsUtils()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-QString pqSierraPlotToolsUtils::removeAllWhiteSpace(const QString & inString)
+QString pqSierraPlotToolsUtils::removeAllWhiteSpace(const QString& inString)
 {
   QString retString;
 
-  int i=0;
+  int i = 0;
   for (i = 0; i < inString.length(); i++)
+  {
+    if (!QChar(inString[i]).isSpace())
     {
-    if (! QChar(inString[i]).isSpace())
-      {
       retString.append(inString[i]);
-      }
     }
+  }
 
   return retString;
 }
@@ -58,13 +57,15 @@ QString pqSierraPlotToolsUtils::removeAllWhiteSpace(const QString & inString)
 ///////////////////////////////////////////////////////////////////////////////
 bool pqSierraPlotToolsUtils::validChar(char inChar)
 {
-  if (inChar == ',' || inChar == '-') return true;
-  if (inChar < '0' ) return false;
-  if (inChar > '9' ) return false;
+  if (inChar == ',' || inChar == '-')
+    return true;
+  if (inChar < '0')
+    return false;
+  if (inChar > '9')
+    return false;
 
   return true;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 int pqSierraPlotToolsUtils::getNumber(int begIndex, int endIndex, QString lineEditText)
@@ -75,11 +76,11 @@ int pqSierraPlotToolsUtils::getNumber(int begIndex, int endIndex, QString lineEd
 
   int attemptRetVal;
   bool ok;
-  attemptRetVal = numStr.toInt(& ok);
+  attemptRetVal = numStr.toInt(&ok);
   if (ok)
-    {
+  {
     retVal = attemptRetVal;
-    }
+  }
 
   return retVal;
 }

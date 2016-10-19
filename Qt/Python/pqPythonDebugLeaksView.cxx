@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Windows debug builds.
 #include "vtkPython.h"
 
-#include "pqPythonDebugLeaksView.h"
 #include "pqApplicationCore.h"
+#include "pqPythonDebugLeaksView.h"
 #include "pqPythonDialog.h"
 #include "pqPythonManager.h"
 #include "pqPythonShell.h"
@@ -44,27 +44,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPyObject.h"
 
 //-----------------------------------------------------------------------------
-namespace {
+namespace
+{
 
-  PyObject* consoleContext()
-  {
-    pqPythonManager* pythonManager = qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-    pqPythonShell* shell = pythonManager->pythonShellDialog()->shell();
-    return static_cast<PyObject*>(shell->consoleLocals());
-  }
-
+PyObject* consoleContext()
+{
+  pqPythonManager* pythonManager =
+    qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  pqPythonShell* shell = pythonManager->pythonShellDialog()->shell();
+  return static_cast<PyObject*>(shell->consoleLocals());
+}
 };
 
 //-----------------------------------------------------------------------------
-pqPythonDebugLeaksView::pqPythonDebugLeaksView(QWidget* p) : vtkQtDebugLeaksView(p)
+pqPythonDebugLeaksView::pqPythonDebugLeaksView(QWidget* p)
+  : vtkQtDebugLeaksView(p)
 {
-
 }
 
 //-----------------------------------------------------------------------------
 pqPythonDebugLeaksView::~pqPythonDebugLeaksView()
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -93,10 +93,10 @@ void pqPythonDebugLeaksView::addObjectsToPython(const QList<vtkObjectBase*>& obj
   vtkSmartPyObject pyListObj(PyList_New(objects.size()));
 
   for (int i = 0; i < objects.size(); ++i)
-    {
+  {
     PyObject* pyObj = vtkPythonUtil::GetObjectFromPointer(objects[i]);
     PyList_SET_ITEM(pyListObj.GetPointer(), i, pyObj);
-    }
+  }
 
   PyDict_SetItemString(consoleContext(), "objs", pyListObj);
 }

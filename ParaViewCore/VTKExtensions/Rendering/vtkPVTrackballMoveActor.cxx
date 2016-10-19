@@ -34,45 +34,41 @@ vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer *,
-                                           vtkRenderWindowInteractor *)
-{
-}
-
-
-//-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer *,
-                                         vtkRenderWindowInteractor *)
+void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
-                                          vtkRenderWindowInteractor *rwi)
+void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
+{
+}
+
+//-------------------------------------------------------------------------
+void vtkPVTrackballMoveActor::OnMouseMove(
+  int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   if (ren == NULL || !this->GetGUIHelper())
-    {
+  {
     return;
-    }
+  }
 
   // These are different because y is flipped.
 
   double bounds[6];
   // Get bounds
   if (this->GetGUIHelper()->GetActiveSourceBounds(bounds))
-    {
+  {
     double center[4];
     double dpoint1[3];
     double startpoint[4];
     double endpoint[4];
     int cc;
 
-
     // Calculate center of bounds.
-    for ( cc = 0; cc < 3; cc ++ )
-      {
-      center[cc] = (bounds[cc *2] + bounds[cc *2 + 1])/2;
-      }
+    for (cc = 0; cc < 3; cc++)
+    {
+      center[cc] = (bounds[cc * 2] + bounds[cc * 2 + 1]) / 2;
+    }
     center[3] = 1;
 
     // Convert the center of bounds to display coordinate
@@ -81,36 +77,36 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
     ren->GetDisplayPoint(dpoint1);
 
     // Convert start point to world coordinate
-    ren->SetDisplayPoint(rwi->GetLastEventPosition()[0],
-                         rwi->GetLastEventPosition()[1], dpoint1[2]);
+    ren->SetDisplayPoint(
+      rwi->GetLastEventPosition()[0], rwi->GetLastEventPosition()[1], dpoint1[2]);
     ren->DisplayToWorld();
     ren->GetWorldPoint(startpoint);
-    
+
     // Convert end point to world coordinate
     ren->SetDisplayPoint(x, y, dpoint1[2]);
     ren->DisplayToWorld();
     ren->GetWorldPoint(endpoint);
 
-    for ( cc = 0; cc < 3; cc ++ )
-      {
+    for (cc = 0; cc < 3; cc++)
+    {
       startpoint[cc] /= startpoint[3];
-      endpoint[cc]   /= endpoint[3];
-      }
+      endpoint[cc] /= endpoint[3];
+    }
 
     double move[3];
     if (this->GetGUIHelper()->GetActiveActorTranslate(move))
-      {    
-      for ( cc = 0; cc < 3; cc ++ )
-        {
+    {
+      for (cc = 0; cc < 3; cc++)
+      {
         move[cc] += endpoint[cc] - startpoint[cc];
-        }
+      }
 
       this->GetGUIHelper()->SetActiveActorTranslate(move);
-      }
+    }
 
     ren->ResetCameraClippingRange();
     rwi->Render();
-    }
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -118,9 +114,3 @@ void vtkPVTrackballMoveActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
-
-
-
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -59,39 +59,36 @@ void pqHelpReaction::showHelp(const QString& url)
 {
   static QPointer<pqHelpWindow> helpWindow;
   if (helpWindow)
-    {
+  {
     // raise assistant window;
     helpWindow->show();
     helpWindow->raise();
     if (!url.isEmpty())
-      {
+    {
       helpWindow->showPage(url);
-      }
-    return;
     }
+    return;
+  }
 
   QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
   new pqPluginDocumentationBehavior(engine);
 
-
   helpWindow = new pqHelpWindow(engine, pqCoreUtilities::mainWidget());
-  helpWindow->setWindowTitle(
-    QString("%1 Online Help").arg(QApplication::applicationName()));
-
+  helpWindow->setWindowTitle(QString("%1 Online Help").arg(QApplication::applicationName()));
 
   // show some home page. Pick the first registered documentation and show its
   // home page.
   QStringList registeredDocumentations = engine->registeredDocumentations();
   if (registeredDocumentations.size() > 0)
-    {
+  {
     helpWindow->showHomePage(registeredDocumentations[0]);
-    }
+  }
   helpWindow->show();
   helpWindow->raise();
   if (!url.isEmpty())
-    {
+  {
     helpWindow->showPage(url);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -104,13 +101,13 @@ void pqHelpReaction::showProxyHelp(const QString& group, const QString& name)
 
   // now determine the url for this proxy.
   foreach (const QString& doc_namespace, engine->registeredDocumentations())
-    {
+  {
     QString basename = QFileInfo(doc_namespace).baseName();
-    QString url = QString("qthelp://%1/%2/%3.%4.html").arg(doc_namespace).arg(basename).arg(
-      group).arg(name);
+    QString url =
+      QString("qthelp://%1/%2/%3.%4.html").arg(doc_namespace).arg(basename).arg(group).arg(name);
     if (engine->findFile(url).isValid())
-      {
+    {
       pqHelpReaction::showHelp(url);
-      }
     }
+  }
 }

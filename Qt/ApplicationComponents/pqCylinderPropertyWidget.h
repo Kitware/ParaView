@@ -34,50 +34,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqInteractivePropertyWidget.h"
 
-
 class QWidget;
 
-/// pqCylinderPropertyWidget is a custom property widget that uses
-/// "ImplicitCylinderWidgetRepresentation" to help users interactively set the center, radius
-/// and axis for a cylinder. To use this widget for a property group
-/// (vtkSMPropertyGroup), use "InteractiveCylinder" as the "panel_widget" in the
-/// XML configuration for the proxy. The property group should have properties for
-/// following functions:
-/// \li \c Center : a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-/// center of the cylinder
-/// \li \c Axis : a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
-/// axis for the cylinder
-/// \li \c Radius: a 1-tuple vtkSMDoubleVectorProperty that will be linked to the
-/// radius for the cylinder
-/// \li \c Input: (optional) a vtkSMInputProperty that is used to get data
-/// information for bounds when placing/resetting the widget.
+/**
+* pqCylinderPropertyWidget is a custom property widget that uses
+* "ImplicitCylinderWidgetRepresentation" to help users interactively set the center, radius
+* and axis for a cylinder. To use this widget for a property group
+* (vtkSMPropertyGroup), use "InteractiveCylinder" as the "panel_widget" in the
+* XML configuration for the proxy. The property group should have properties for
+* following functions:
+* \li \c Center : a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+* center of the cylinder
+* \li \c Axis : a 3-tuple vtkSMDoubleVectorProperty that will be linked to the
+* axis for the cylinder
+* \li \c Radius: a 1-tuple vtkSMDoubleVectorProperty that will be linked to the
+* radius for the cylinder
+* \li \c Input: (optional) a vtkSMInputProperty that is used to get data
+* information for bounds when placing/resetting the widget.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCylinderPropertyWidget : public pqInteractivePropertyWidget
 {
   Q_OBJECT
   typedef pqInteractivePropertyWidget Superclass;
+
 public:
-  pqCylinderPropertyWidget(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  pqCylinderPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   virtual ~pqCylinderPropertyWidget();
 
 public slots:
-  /// Set the cylinder axis to be along the X axis.
+  /**
+  * Set the cylinder axis to be along the X axis.
+  */
   void useXAxis() { this->setAxis(1, 0, 0); }
 
-  /// Set the cylinder axis to be along the Y axis.
+  /**
+  * Set the cylinder axis to be along the Y axis.
+  */
   void useYAxis() { this->setAxis(0, 1, 0); }
 
-  /// Set the cylinder axis to be along the Z axis.
+  /**
+  * Set the cylinder axis to be along the Z axis.
+  */
   void useZAxis() { this->setAxis(0, 0, 1); }
 
-  /// Reset the camera to be down the cylinder axis.
+  /**
+  * Reset the camera to be down the cylinder axis.
+  */
   void resetCameraToAxis();
 
-  /// Set the cylinder axis to be along the camera view direction.
+  /**
+  * Set the cylinder axis to be along the camera view direction.
+  */
   void useCameraAxis();
 
 protected slots:
-  /// Places the interactive widget using current data source information.
+  /**
+  * Places the interactive widget using current data source information.
+  */
   virtual void placeWidget();
 
   void resetBounds();
@@ -89,7 +102,7 @@ private:
   void updateWidget(bool showing_advanced_properties);
 
   pqPropertyLinks WidgetLinks;
-  QWidget *AdvancedPropertyWidgets[2];
+  QWidget* AdvancedPropertyWidgets[2];
 };
 
 #endif

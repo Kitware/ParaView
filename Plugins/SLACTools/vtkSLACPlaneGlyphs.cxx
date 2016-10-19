@@ -30,8 +30,7 @@
 #include "vtkThresholdPoints.h"
 
 #include "vtkSmartPointer.h"
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 //=============================================================================
 vtkStandardNewMacro(vtkSLACPlaneGlyphs);
@@ -50,41 +49,38 @@ vtkSLACPlaneGlyphs::~vtkSLACPlaneGlyphs()
 {
 }
 
-void vtkSLACPlaneGlyphs::PrintSelf(ostream &os, vtkIndent indent)
+void vtkSLACPlaneGlyphs::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Center: (" << this->Center[0] << ", "
-                              << this->Center[1] << ", "
-                              << this->Center[2] << ")" << endl;
-  os << indent << "Normal: (" << this->Normal[0] << ", "
-                              << this->Normal[1] << ", "
-                              << this->Normal[2] << ")" << endl;;
+  os << indent << "Center: (" << this->Center[0] << ", " << this->Center[1] << ", "
+     << this->Center[2] << ")" << endl;
+  os << indent << "Normal: (" << this->Normal[0] << ", " << this->Normal[1] << ", "
+     << this->Normal[2] << ")" << endl;
+  ;
   os << indent << "Resolution: " << this->Resolution << endl;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSLACPlaneGlyphs::FillInputPortInformation(int port,
-                                                 vtkInformation *info)
+int vtkSLACPlaneGlyphs::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (port == 0)
-    {
+  {
     info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
     return 1;
-    }
+  }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSLACPlaneGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
-                                    vtkInformationVector **inputVector,
-                                    vtkInformationVector *outputVector)
+int vtkSLACPlaneGlyphs::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Get the input and output objects.
-  vtkDataObject *input = vtkDataObject::GetData(inputVector[0]);
-  vtkPolyData *output = vtkPolyData::GetData(outputVector);
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
+  vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
   // Make a shallow copy of the input so that we can give it to internal
   // filters.  It is NOT a good idea to feed the input directly into internal
@@ -110,9 +106,8 @@ int vtkSLACPlaneGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
   threshold->SetExecutive(vtkSmartPointer<vtkCompositeDataPipeline>::New());
   threshold->SetInputConnection(probe->GetOutputPort());
   threshold->ThresholdByUpper(0.5);
-  threshold->SetInputArrayToProcess(0, 0, 0,
-                                    vtkDataObject::FIELD_ASSOCIATION_POINTS,
-                                    "vtkValidPointMask");
+  threshold->SetInputArrayToProcess(
+    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "vtkValidPointMask");
 
   // TODO: Run the output of the threshold filter through the glyph filter.  It
   // would look something like this.

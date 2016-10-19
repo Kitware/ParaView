@@ -41,14 +41,14 @@ vtkPVPythonOptions::~vtkPVPythonOptions()
 //----------------------------------------------------------------------------
 int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
 {
-  if ( this->PythonScriptName && 
+  if (this->PythonScriptName &&
     vtksys::SystemTools::GetFilenameLastExtension(this->PythonScriptName) != ".py")
-    {
+  {
     std::ostringstream str;
     str << "Wrong batch script name: " << this->PythonScriptName;
     this->SetErrorMessage(str.str().c_str());
     return 0;
-    }
+  }
 
   this->Synchronize();
 
@@ -58,12 +58,12 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
 //----------------------------------------------------------------------------
 int vtkPVPythonOptions::WrongArgument(const char* argument)
 {
-  if ( vtkPSystemTools::FileExists(argument) &&
+  if (vtkPSystemTools::FileExists(argument) &&
     vtksys::SystemTools::GetFilenameLastExtension(argument) == ".py")
-    {
+  {
     this->SetPythonScriptName(argument);
     return 1;
-    }
+  }
 
   // All arguments are simply passed to the python interpretor.
   // Returning 0 tells CommandLineArguments that the "argument" was not a
@@ -77,42 +77,41 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
 void vtkPVPythonOptions::Synchronize()
 {
   // TODO: Need to synchronize all options, for now just the script name.
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
 
   if (controller && controller->GetNumberOfProcesses() > 1)
-    {
+  {
     vtkMultiProcessStream stream;
     if (controller->GetLocalProcessId() == 0)
+    {
+      if (this->PythonScriptName)
       {
-      if(this->PythonScriptName)
-        {
         stream << (int)1 << this->PythonScriptName << this->GetSymmetricMPIMode();
-        }
-      else
-        {
-        stream << (int)0 << this->GetSymmetricMPIMode();
-        }
-      controller->Broadcast(stream, 0);
       }
-    else
+      else
       {
+        stream << (int)0 << this->GetSymmetricMPIMode();
+      }
+      controller->Broadcast(stream, 0);
+    }
+    else
+    {
       controller->Broadcast(stream, 0);
       int hasScriptName;
       stream >> hasScriptName;
-      if(hasScriptName == 0)
-        {
+      if (hasScriptName == 0)
+      {
         this->SetPythonScriptName(NULL);
-        }
+      }
       else
-        {
+      {
         std::string name;
         stream >> name;
         this->SetPythonScriptName(name.c_str());
-        }
-      stream >> this->SymmetricMPIMode;
       }
+      stream >> this->SymmetricMPIMode;
     }
+  }
 }
 
 //----------------------------------------------------------------------------

@@ -17,9 +17,7 @@
 using std::ostream;
 
 //
-ostream &operator<<(
-        ostream &sout,
-        const vtkMaterialInterfacePieceTransaction &ta)
+ostream& operator<<(ostream& sout, const vtkMaterialInterfacePieceTransaction& ta)
 {
   sout << "(" << ta.GetType() << "," << ta.GetRemoteProc() << ")";
 

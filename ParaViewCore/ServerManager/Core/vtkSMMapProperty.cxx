@@ -38,8 +38,7 @@ bool vtkSMMapProperty::IsValueDefault()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMMapProperty::LoadState(vtkPVXMLElement* element,
-                                vtkSMProxyLocator* loader)
+int vtkSMMapProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader)
 {
   this->Superclass::LoadState(element, loader);
 
@@ -47,8 +46,7 @@ int vtkSMMapProperty::LoadState(vtkPVXMLElement* element,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMMapProperty::ReadXMLAttributes(vtkSMProxy *parent,
-                                        vtkPVXMLElement *element)
+int vtkSMMapProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(parent, element);
 

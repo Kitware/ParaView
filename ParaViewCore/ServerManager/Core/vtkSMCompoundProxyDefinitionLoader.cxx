@@ -38,34 +38,32 @@ vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeUInt32 id_)
 {
   if (!this->RootElement)
-    {
-    vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-                  << id_);
+  {
+    vtkErrorMacro("No root is defined. Cannot locate proxy element with id " << id_);
     return 0;
-    }
+  }
   vtkIdType id = static_cast<vtkIdType>(id_);
 
   vtkPVXMLElement* root = this->RootElement;
   unsigned int numElems = root->GetNumberOfNestedElements();
-  unsigned int i=0;
-  for (i=0; i<numElems; i++)
-    {
+  unsigned int i = 0;
+  for (i = 0; i < numElems; i++)
+  {
     vtkPVXMLElement* currentElement = root->GetNestedElement(i);
-    if (currentElement->GetName() &&
-      strcmp(currentElement->GetName(), "Proxy") == 0)
-      {
+    if (currentElement->GetName() && strcmp(currentElement->GetName(), "Proxy") == 0)
+    {
       vtkIdType currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
-        {
+      {
         continue;
-        }
-      if (id != currentId)
-        {
-        continue;
-        }
-      return currentElement;
       }
+      if (id != currentId)
+      {
+        continue;
+      }
+      return currentElement;
     }
+  }
   return 0;
 }
 

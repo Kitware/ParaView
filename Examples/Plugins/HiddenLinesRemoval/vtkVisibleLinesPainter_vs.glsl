@@ -21,19 +21,18 @@ varying vec4 vColor;
 gl_MaterialParameters getMaterialParameters();
 
 // from vtkPVLightingHelper
-vec4 singleColor(gl_MaterialParameters m,
-  vec3 surfacePosEyeCoords, vec3 n);
+vec4 singleColor(gl_MaterialParameters m, vec3 surfacePosEyeCoords, vec3 n);
 
 vec4 colorFrontFace()
 {
- vec4 heyeCoords = gl_ModelViewMatrix*gl_Vertex;
- vec3 eyeCoords = heyeCoords.xyz/heyeCoords.w;
- vec3 n = normalize(gl_NormalMatrix*gl_Normal);
- return singleColor(getMaterialParameters(),eyeCoords,n);
+  vec4 heyeCoords = gl_ModelViewMatrix * gl_Vertex;
+  vec3 eyeCoords = heyeCoords.xyz / heyeCoords.w;
+  vec3 n = normalize(gl_NormalMatrix * gl_Normal);
+  return singleColor(getMaterialParameters(), eyeCoords, n);
 }
 
-void main (void)
+void main(void)
 {
   gl_Position = ftransform();
-  vColor = colorFrontFace(); 
+  vColor = colorFrontFace();
 }

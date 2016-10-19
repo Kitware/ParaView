@@ -52,7 +52,7 @@ class pqVRStarter : public QObject
   typedef QObject Superclass;
 
 public:
-  pqVRStarter(QObject* p=0);
+  pqVRStarter(QObject* p = 0);
   ~pqVRStarter();
 
   /// Creates and initiates the vtkVRConnectionManager thread the vtkVRQueue and

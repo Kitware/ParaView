@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,11 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMComparativeViewProxy;
 
-/// RenderView used for comparative visualization (or film-strip visualization).
+/**
+* RenderView used for comparative visualization (or film-strip visualization).
+*/
 class PQCORE_EXPORT pqComparativeRenderView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
+
 public:
   static QString comparativeRenderViewType() { return "ComparativeRenderView"; }
 
@@ -50,26 +53,31 @@ public:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqComparativeRenderView( const QString& group,
-                const QString& name, 
-                vtkSMViewProxy* renModule, 
-                pqServer* server, 
-                QObject* parent=NULL);
+  pqComparativeRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
+    pqServer* server, QObject* parent = NULL);
   virtual ~pqComparativeRenderView();
 
-  /// Returns the comparative view proxy.
+  /**
+  * Returns the comparative view proxy.
+  */
   vtkSMComparativeViewProxy* getComparativeRenderViewProxy() const;
 
-  /// Returns the root render view in the comparative view.
+  /**
+  * Returns the root render view in the comparative view.
+  */
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
 protected slots:
-  /// Called when the layout on the comparative vis changes.
-  void updateViewWidgets(QWidget* container=NULL);
+  /**
+  * Called when the layout on the comparative vis changes.
+  */
+  void updateViewWidgets(QWidget* container = NULL);
 
 protected:
-  /// Creates a new instance of the QWidget subclass to be used to show this
-  /// view. Default implementation creates a QVTKWidget.
+  /**
+  * Creates a new instance of the QWidget subclass to be used to show this
+  * view. Default implementation creates a QVTKWidget.
+  */
   virtual QWidget* createWidget();
 
 private:

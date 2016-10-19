@@ -20,7 +20,8 @@
 
 =========================================================================*/
 
-// .NAME vtkFastMarchingGeodesicDistance - Computes geodesic path using gradient descent of a distance function
+// .NAME vtkFastMarchingGeodesicDistance - Computes geodesic path using gradient descent of a
+// distance function
 // .SECTION Description
 // This class computes geodesic paths between a destination and one or more
 // sources on the mesh. To compute the path, a geodesic distance map to one
@@ -66,25 +67,24 @@ class vtkFastMarchingGeodesicDistance;
 class VTK_EXPORT vtkFastMarchingGeodesicPath : public vtkGeodesicPath
 {
 public:
-
-  static vtkFastMarchingGeodesicPath *New();
+  static vtkFastMarchingGeodesicPath* New();
 
   // Description:
   // Standard methids for printing and determining type information.
-  vtkTypeMacro(vtkFastMarchingGeodesicPath,vtkGeodesicPath);
+  vtkTypeMacro(vtkFastMarchingGeodesicPath, vtkGeodesicPath);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The instance of the geodesic filter.
-  vtkGetObjectMacro( Geodesic, vtkFastMarchingGeodesicDistance );
+  vtkGetObjectMacro(Geodesic, vtkFastMarchingGeodesicDistance);
 
   // Description:
   // Interpolation order of the path traced through the surface mesh. A zeroth
   // order path passes through vertices of the mesh. A first order path passes
   // in between vertices. Each point in the first order path is guarenteed to
   // lie on an edge. Default is first order.
-  vtkSetClampMacro( InterpolationOrder, int, 0, 1 );
-  vtkGetMacro( InterpolationOrder, int );
+  vtkSetClampMacro(InterpolationOrder, int, 0, 1);
+  vtkGetMacro(InterpolationOrder, int);
 
   // Description:
   // Get the point ids corresponding to the path points. These are point ids
@@ -96,48 +96,47 @@ public:
   // many as the number of points in the path, organized in pairs comprising
   // the point ids of the  edge. These ids are populated only when the
   // InterpolationOrder is 1.
-  vtkGetObjectMacro( ZerothOrderPathPointIds, vtkIdList );
-  vtkGetObjectMacro( FirstOrderPathPointIds, vtkIdList );
+  vtkGetObjectMacro(ZerothOrderPathPointIds, vtkIdList);
+  vtkGetObjectMacro(FirstOrderPathPointIds, vtkIdList);
 
   // Description:
   // A maximum path length may be specified, in which case, the gradient based
   // back-tracking from 'Begin' to 'seeds' may stop prematurely once it
   // exceeds the specified length. The default is infinite.
-  vtkSetMacro( MaximumPathPoints, float );
-  vtkGetMacro( MaximumPathPoints, float );
+  vtkSetMacro(MaximumPathPoints, float);
+  vtkGetMacro(MaximumPathPoints, float);
 
   // Description:
   // Add termination point ids. These are troughs towards which the
   // path will traverse and at which it terminates.
-  virtual void SetSeeds( vtkIdList * );
-  virtual vtkIdList *GetSeeds();
+  virtual void SetSeeds(vtkIdList*);
+  virtual vtkIdList* GetSeeds();
 
   // Description:
   // The point id from which the path begins
-  vtkSetMacro( BeginPointId, vtkIdType );
-  vtkGetMacro( BeginPointId, vtkIdType );
+  vtkSetMacro(BeginPointId, vtkIdType);
+  vtkGetMacro(BeginPointId, vtkIdType);
 
   // Description:
   // Get the length of the traced path
-  vtkGetMacro( GeodesicLength, double );
+  vtkGetMacro(GeodesicLength, double);
 
 protected:
   vtkFastMarchingGeodesicPath();
   ~vtkFastMarchingGeodesicPath();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Do the fast marching and gradient backtracking
-  virtual void ComputePath(vtkPolyData *);
+  virtual void ComputePath(vtkPolyData*);
 
-  float                            MaximumPathPoints;
-  double                           GeodesicLength;
-  int                              InterpolationOrder;
-  vtkIdList                       *ZerothOrderPathPointIds;
-  vtkIdList                       *FirstOrderPathPointIds;
-  vtkIdType                        BeginPointId;
-  vtkFastMarchingGeodesicDistance *Geodesic;
+  float MaximumPathPoints;
+  double GeodesicLength;
+  int InterpolationOrder;
+  vtkIdList* ZerothOrderPathPointIds;
+  vtkIdList* FirstOrderPathPointIds;
+  vtkIdType BeginPointId;
+  vtkFastMarchingGeodesicDistance* Geodesic;
 
 private:
   vtkFastMarchingGeodesicPath(const vtkFastMarchingGeodesicPath&) VTK_DELETE_FUNCTION;

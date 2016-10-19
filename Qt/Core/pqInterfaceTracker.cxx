@@ -45,8 +45,8 @@ pqInterfaceTracker::pqInterfaceTracker(QObject* parentObject)
 
   // Register with vtkPVPluginTracker so that when new plugin is loaded, we can
   // locate and load any Qt-interface implementations provided by the plugin.
-  this->ObserverID = tracker->AddObserver(
-    vtkCommand::RegisterEvent, this, &pqInterfaceTracker::onPluginLoaded);
+  this->ObserverID =
+    tracker->AddObserver(vtkCommand::RegisterEvent, this, &pqInterfaceTracker::onPluginLoaded);
 }
 
 //-----------------------------------------------------------------------------
@@ -54,22 +54,22 @@ pqInterfaceTracker::~pqInterfaceTracker()
 {
   // Shutdown all autostart interfaces.
   foreach (QObject* iface, this->Interfaces)
-    {
+  {
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
-      {
+    {
       asi->shutdown();
-      }
     }
+  }
 
   foreach (QObject* iface, this->RegisteredInterfaces)
-    {
+  {
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
-      {
+    {
       asi->shutdown();
-      }
     }
+  }
 
   vtkPVPluginTracker::GetInstance()->RemoveObserver(this->ObserverID);
 }
@@ -81,51 +81,48 @@ void pqInterfaceTracker::initialize()
 
   // Process any already loaded plugins. These are typically the plugins that
   // got autoloaded when the application started.
-  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
-    {
+  for (unsigned int cc = 0; cc < tracker->GetNumberOfPlugins(); cc++)
+  {
     this->onPluginLoaded(NULL, 0, tracker->GetPlugin(cc));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqInterfaceTracker::onPluginLoaded(
-  vtkObject*, unsigned long, void* calldata)
+void pqInterfaceTracker::onPluginLoaded(vtkObject*, unsigned long, void* calldata)
 {
   vtkPVPlugin* plugin = reinterpret_cast<vtkPVPlugin*>(calldata);
-  vtkPVGUIPluginInterface* guiplugin =
-    dynamic_cast<vtkPVGUIPluginInterface*>(plugin);
+  vtkPVGUIPluginInterface* guiplugin = dynamic_cast<vtkPVGUIPluginInterface*>(plugin);
   if (guiplugin != NULL)
-    {
+  {
     QObjectList ifaces = guiplugin->interfaces();
     foreach (QObject* iface, ifaces)
-      {
+    {
       this->Interfaces.append(iface);
       emit this->interfaceRegistered(iface);
 
       pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
       if (asi)
-        {
+      {
         asi->startup();
-        }
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqInterfaceTracker::addInterface(QObject* iface)
 {
-  if (!this->Interfaces.contains(iface) &&
-    !this->RegisteredInterfaces.contains(iface))
-    {
+  if (!this->Interfaces.contains(iface) && !this->RegisteredInterfaces.contains(iface))
+  {
     this->RegisteredInterfaces.push_back(iface);
     emit this->interfaceRegistered(iface);
 
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
-      {
+    {
       asi->startup();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -133,12 +130,12 @@ void pqInterfaceTracker::removeInterface(QObject* iface)
 {
   int idx = this->RegisteredInterfaces.indexOf(iface);
   if (idx != -1)
-    {
+  {
     this->RegisteredInterfaces.removeAt(idx);
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)
-      {
+    {
       asi->shutdown();
-      }
     }
+  }
 }

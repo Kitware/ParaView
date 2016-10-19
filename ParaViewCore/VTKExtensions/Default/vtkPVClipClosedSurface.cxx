@@ -18,72 +18,71 @@
 #include "vtkPlane.h"
 #include "vtkPlaneCollection.h"
 
-vtkStandardNewMacro( vtkPVClipClosedSurface );
+vtkStandardNewMacro(vtkPVClipClosedSurface);
 
 //-----------------------------------------------------------------------------
 vtkPVClipClosedSurface::vtkPVClipClosedSurface()
 {
   this->InsideOut = 0;
-  this->ClippingPlane  = NULL;
+  this->ClippingPlane = NULL;
   this->ClippingPlanes = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVClipClosedSurface::~vtkPVClipClosedSurface()
 {
-  this->ClippingPlane  = NULL;
+  this->ClippingPlane = NULL;
 
   // leave the plane collection to be deleted by the parent class
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVClipClosedSurface::SetClippingPlane( vtkPlane * plane )
+void vtkPVClipClosedSurface::SetClippingPlane(vtkPlane* plane)
 {
   this->ClippingPlane = plane;
 
-  if ( this->ClippingPlanes )
-    {
+  if (this->ClippingPlanes)
+  {
     this->ClippingPlanes->Delete();
     this->ClippingPlanes = NULL;
-    }
+  }
 
   this->ClippingPlanes = vtkPlaneCollection::New();
-  this->ClippingPlanes->AddItem( plane );
+  this->ClippingPlanes->AddItem(plane);
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVClipClosedSurface::RequestData( vtkInformation        * request,
-                                         vtkInformationVector ** inputVector,
-                                         vtkInformationVector  * outputVector )
+int vtkPVClipClosedSurface::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if ( this->InsideOut )
-    {
+  if (this->InsideOut)
+  {
     // the normal vector of the plane specified by the user
     double normalVec[3];
-    this->ClippingPlane->GetNormal( normalVec );
+    this->ClippingPlane->GetNormal(normalVec);
 
     // the actual normal vector (of the plane) employed by the clipper
     double actualVec[3] = { -normalVec[0], -normalVec[1], -normalVec[2] };
-    this->ClippingPlane->SetNormal( actualVec );
+    this->ClippingPlane->SetNormal(actualVec);
 
-    int  retVal = Superclass::RequestData( request, inputVector, outputVector );
+    int retVal = Superclass::RequestData(request, inputVector, outputVector);
 
     // restore the clipping plane with the normal vector specified by the user
-    this->ClippingPlane->SetNormal( normalVec );
+    this->ClippingPlane->SetNormal(normalVec);
 
     return retVal;
-    }
+  }
   else
-    {
-    return Superclass::RequestData( request, inputVector, outputVector );
-    }
+  {
+    return Superclass::RequestData(request, inputVector, outputVector);
+  }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVClipClosedSurface::PrintSelf( ostream & os, vtkIndent indent )
+void vtkPVClipClosedSurface::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf( os, indent );
+  this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Insideout: "      << this->InsideOut     << endl;
+  os << indent << "Insideout: " << this->InsideOut << endl;
   os << indent << "Clipping Plane: " << this->ClippingPlane << endl;
 }

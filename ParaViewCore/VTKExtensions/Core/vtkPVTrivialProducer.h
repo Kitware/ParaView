@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrivialProducer - specialized subclass of vtkTrivialProducer that
-// preserves the information about the whole extent of the data object.
-// .SECTION Description
-// vtkPVTrivialProducer is specialized subclass of vtkTrivialProducer that
-// can manage time requests.
+/**
+ * @class   vtkPVTrivialProducer
+ * @brief   specialized subclass of vtkTrivialProducer that
+ * preserves the information about the whole extent of the data object.
+ *
+ * vtkPVTrivialProducer is specialized subclass of vtkTrivialProducer that
+ * can manage time requests.
+*/
 
 #ifndef vtkPVTrivialProducer_h
 #define vtkPVTrivialProducer_h
@@ -33,37 +36,38 @@ public:
   vtkTypeMacro(vtkPVTrivialProducer, vtkTrivialProducer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the data object that is "produced" by this producer.  It is
-  // never really modified.
+  /**
+   * Set the data object that is "produced" by this producer.  It is
+   * never really modified.
+   */
   virtual void SetOutput(vtkDataObject* output);
 
-  // Description:
-  // Set the output data object as well as time information
-  // for the requests.
+  /**
+   * Set the output data object as well as time information
+   * for the requests.
+   */
   virtual void SetOutput(vtkDataObject* output, double time);
 
-  // Description:
-  // Process upstream/downstream requests trivially.  The associated
-  // output data object is never modified, but it is queried to
-  // fulfill requests.
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
+  /**
+   * Process upstream/downstream requests trivially.  The associated
+   * output data object is never modified, but it is queried to
+   * fulfill requests.
+   */
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 protected:
   vtkPVTrivialProducer();
   ~vtkPVTrivialProducer();
 
-  // Description:
-  // Used to store any time step information. It assumes that the
-  // time steps are ordered oldest to most recent.
+  /**
+   * Used to store any time step information. It assumes that the
+   * time steps are ordered oldest to most recent.
+   */
   vtkPVTrivialProducerInternal* Internals;
 
 private:
   vtkPVTrivialProducer(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

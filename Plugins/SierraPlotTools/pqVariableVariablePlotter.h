@@ -30,14 +30,9 @@ class pqVariableVariablePlotter : public pqPlotter
   Q_OBJECT;
 
 public:
+  pqVariableVariablePlotter() {}
 
-  pqVariableVariablePlotter()
-  {
-  }
-
-  virtual ~pqVariableVariablePlotter()
-  {
-  }
+  virtual ~pqVariableVariablePlotter() {}
 };
 
 #endif // pqVariableVariablePlotter_h

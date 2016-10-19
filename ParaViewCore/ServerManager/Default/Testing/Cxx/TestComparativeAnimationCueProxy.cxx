@@ -28,27 +28,24 @@
 #include "vtkSmartPointer.h"
 #include <assert.h>
 
-#define ERROR(msg)\
-  cerr << "ERROR: " msg << endl;  \
+#define ERROR(msg)                                                                                 \
+  cerr << "ERROR: " msg << endl;                                                                   \
   return 1;
-
 
 int TestComparativeAnimationCueProxy(int argc, char* argv[])
 {
   // Initialization
   vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
+  vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
   vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   //---------------------------------------------------------------------------
 
   vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy;
   cueProxy.TakeReference(vtkSMComparativeAnimationCueProxy::SafeDownCast(
-      pxm->NewProxy("animation", "ComparativeAnimationCue")));
+    pxm->NewProxy("animation", "ComparativeAnimationCue")));
   cueProxy->UpdateVTKObjects();
 
   // When no values are added to the cueProxy, we still expect it to work.

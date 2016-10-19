@@ -26,10 +26,11 @@
 
 vtkStandardNewMacro(vtkPVPLYWriter);
 //----------------------------------------------------------------------------
-vtkPVPLYWriter::vtkPVPLYWriter() : EnableColoring(false)
+vtkPVPLYWriter::vtkPVPLYWriter()
+  : EnableColoring(false)
 {
-  this->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-    static_cast<const char*>(NULL));
+  this->SetInputArrayToProcess(
+    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, static_cast<const char*>(NULL));
 }
 
 //----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ vtkPVPLYWriter::~vtkPVPLYWriter()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVPLYWriter::FillInputPortInformation(int, vtkInformation *info)
+int vtkPVPLYWriter::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
   return 1;
@@ -60,7 +61,8 @@ void vtkPVPLYWriter::SetFileType(int ftype)
 
 //----------------------------------------------------------------------------
 void vtkPVPLYWriter::SetFileName(const char* fname)
-{ this->Writer->SetFileName(fname);
+{
+  this->Writer->SetFileName(fname);
   this->Modified();
 }
 
@@ -68,10 +70,10 @@ void vtkPVPLYWriter::SetFileName(const char* fname)
 void vtkPVPLYWriter::SetLookupTable(vtkScalarsToColors* lut)
 {
   if (this->LookupTable != lut)
-    {
+  {
     this->LookupTable = lut;
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -79,13 +81,14 @@ void vtkPVPLYWriter::WriteData()
 {
   int fieldAssociation = 0;
   vtkPolyData* input = vtkPolyData::SafeDownCast(this->GetInputDataObject(0, 0));
-  if (vtkAbstractArray* scalars = (this->EnableColoring && this->LookupTable != NULL)?
-    this->GetInputAbstractArrayToProcess(0, input, fieldAssociation) : NULL)
-    {
+  if (vtkAbstractArray* scalars = (this->EnableColoring && this->LookupTable != NULL)
+      ? this->GetInputAbstractArrayToProcess(0, input, fieldAssociation)
+      : NULL)
+  {
     this->Writer->SetColorModeToDefault();
     this->Writer->SetArrayName("vtkPVPLYWriterColors");
-    vtkUnsignedCharArray* rgba = this->LookupTable->MapScalars(
-      scalars, VTK_COLOR_MODE_MAP_SCALARS, -1);
+    vtkUnsignedCharArray* rgba =
+      this->LookupTable->MapScalars(scalars, VTK_COLOR_MODE_MAP_SCALARS, -1);
     rgba->SetName("vtkPVPLYWriterColors");
 
     vtkSmartPointer<vtkPolyData> clone;
@@ -95,12 +98,12 @@ void vtkPVPLYWriter::WriteData()
     rgba->FastDelete();
 
     this->Writer->SetInputDataObject(0, clone.GetPointer());
-    }
+  }
   else
-    {
+  {
     this->Writer->SetInputDataObject(0, input);
     this->Writer->SetColorModeToOff();
-    }
+  }
   this->Writer->Write();
   this->Writer->SetInputDataObject(0, NULL);
 }

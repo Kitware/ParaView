@@ -41,9 +41,8 @@ MainPipelineWindow::MainPipelineWindow()
   // Set Filter selector
   this->FilterSelector = new QComboBox();
   this->FilterSelector->addItems(this->FilterNames);
-  QObject::connect( this->FilterSelector, SIGNAL(currentIndexChanged(int)),
-                    this, SLOT(updateSelectedFilter(int)),
-                    Qt::QueuedConnection);
+  QObject::connect(this->FilterSelector, SIGNAL(currentIndexChanged(int)), this,
+    SLOT(updateSelectedFilter(int)), Qt::QueuedConnection);
 
   // Set Pipeline Widget
   this->PipelineWidget = new pqPipelineBrowserWidget(NULL);
@@ -52,8 +51,8 @@ MainPipelineWindow::MainPipelineWindow()
   pqServer* server = ob->createServer(pqServerResource("builtin:"));
 
   // Init and layout the UI
-  QWidget *container = new QWidget(this);
-  QVBoxLayout *internalLayout = new QVBoxLayout();
+  QWidget* container = new QWidget(this);
+  QVBoxLayout* internalLayout = new QVBoxLayout();
   internalLayout->addWidget(this->FilterSelector);
   internalLayout->addWidget(this->PipelineWidget);
   container->setLayout(internalLayout);
@@ -64,7 +63,7 @@ MainPipelineWindow::MainPipelineWindow()
 
   QTimer::singleShot(100, this, SLOT(processTest()));
 
-  QToolBar *tb = new QToolBar("Options", this);
+  QToolBar* tb = new QToolBar("Options", this);
   this->addToolBar(tb);
 
   QAction* actn = tb->addAction("Settings");
@@ -74,22 +73,21 @@ MainPipelineWindow::MainPipelineWindow()
 //-----------------------------------------------------------------------------
 void MainPipelineWindow::updateSelectedFilter(int filterIndex)
 {
-  if(filterIndex == 0)
-    {
+  if (filterIndex == 0)
+  {
     this->PipelineWidget->disableAnnotationFilter();
-    }
+  }
   else
-    {
-    this->PipelineWidget->enableAnnotationFilter(
-        this->FilterNames.at(filterIndex));
-    }
+  {
+    this->PipelineWidget->enableAnnotationFilter(this->FilterNames.at(filterIndex));
+  }
 }
 
 //-----------------------------------------------------------------------------
 void MainPipelineWindow::processTest()
 {
   if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
-    {
+  {
     bool test_succeeded = true;
 
     // ---- Do the testing here ----
@@ -97,10 +95,10 @@ void MainPipelineWindow::processTest()
     // ---- Do the testing here ----
 
     if (options->GetExitAppWhenTestsDone())
-      {
+    {
       QApplication::instance()->exit(test_succeeded ? 0 : 1);
-      }
     }
+  }
 }
 //-----------------------------------------------------------------------------
 void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)

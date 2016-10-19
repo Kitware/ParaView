@@ -39,10 +39,10 @@ inline void vtkShallowCopy(vtkDataObject* output, vtkDataObject* input)
 {
   vtkCompositeDataSet* cdout = vtkCompositeDataSet::SafeDownCast(output);
   if (cdout == NULL)
-    {
+  {
     output->ShallowCopy(input);
     return;
-    }
+  }
 
   // We can't use vtkCompositeDataSet::ShallowCopy() since that simply passes
   // the leaf datasets without actually shallowcopying them. That doesn't work
@@ -52,13 +52,13 @@ inline void vtkShallowCopy(vtkDataObject* output, vtkDataObject* input)
   vtkSmartPointer<vtkCompositeDataIterator> initer;
   initer.TakeReference(cdin->NewIterator());
   for (initer->InitTraversal(); !initer->IsDoneWithTraversal(); initer->GoToNextItem())
-    {
+  {
     vtkDataObject* in = initer->GetCurrentDataObject();
     vtkDataObject* clone = in->NewInstance();
     clone->ShallowCopy(in);
     cdout->SetDataSet(initer, clone);
     clone->FastDelete();
-    }
+  }
 }
 
 vtkStandardNewMacro(vtkCleanArrays);
@@ -68,8 +68,7 @@ vtkCleanArrays::vtkCleanArrays()
 {
   this->FillPartialArrays = false;
   this->Controller = 0;
-  this->SetController(
-    vtkMultiProcessController::GetGlobalController());
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
@@ -85,210 +84,198 @@ public:
   std::string Name;
   int NumberOfComponents;
   int Type;
-  vtkArrayData() 
-    {
+  vtkArrayData()
+  {
     this->NumberOfComponents = 0;
     this->Type = 0;
-    }
+  }
   vtkArrayData(const vtkArrayData& other)
-    {
+  {
     this->Name = other.Name;
     this->NumberOfComponents = other.NumberOfComponents;
     this->Type = other.Type;
-    }
+  }
 
-  bool operator < (const vtkArrayData& b) const
-    {
+  bool operator<(const vtkArrayData& b) const
+  {
     if (this->Name != b.Name)
-      {
+    {
       return this->Name < b.Name;
-      }
-    if (this->NumberOfComponents != b.NumberOfComponents)
-      {
-      return this->NumberOfComponents < b.NumberOfComponents;
-      }
-    return this->Type < b.Type;
     }
+    if (this->NumberOfComponents != b.NumberOfComponents)
+    {
+      return this->NumberOfComponents < b.NumberOfComponents;
+    }
+    return this->Type < b.Type;
+  }
 
   void Set(vtkAbstractArray* array)
-    {
+  {
     this->Name = array->GetName();
     this->NumberOfComponents = array->GetNumberOfComponents();
     this->Type = array->GetDataType();
-    }
+  }
 
-  vtkAbstractArray* NewArray(vtkIdType numTuples)const
-    {
+  vtkAbstractArray* NewArray(vtkIdType numTuples) const
+  {
     vtkAbstractArray* array = vtkAbstractArray::CreateArray(this->Type);
     if (array)
-      {
+    {
       array->SetName(this->Name.c_str());
       array->SetNumberOfComponents(this->NumberOfComponents);
       array->SetNumberOfTuples(numTuples);
       vtkDataArray* data_array = vtkDataArray::SafeDownCast(array);
-      for (int cc=0; data_array && cc < this->NumberOfComponents; cc++)
-        {
+      for (int cc = 0; data_array && cc < this->NumberOfComponents; cc++)
+      {
         data_array->FillComponent(cc, 0.0);
-        }
       }
-    return array;
     }
-
+    return array;
+  }
 };
 
 class vtkCleanArrays::vtkArraySet : public std::set<vtkCleanArrays::vtkArrayData>
 {
   int Valid;
+
 public:
-  vtkArraySet():Valid(0) { }
-  bool IsValid() const
-    {
-    return this->Valid != 0;
-    }
-  void MarkValid() 
-    {
-    this->Valid = 1;
-    }
+  vtkArraySet()
+    : Valid(0)
+  {
+  }
+  bool IsValid() const { return this->Valid != 0; }
+  void MarkValid() { this->Valid = 1; }
 
   void Intersection(const vtkArraySet& other)
-    {
+  {
     if (this->Valid && other.Valid)
-      {
+    {
       vtkCleanArrays::vtkArraySet setC;
-      std::set_intersection(this->begin(), this->end(),
-        other.begin(), other.end(),
-        std::inserter(setC, setC.begin()));
+      std::set_intersection(
+        this->begin(), this->end(), other.begin(), other.end(), std::inserter(setC, setC.begin()));
       setC.MarkValid();
       this->swap(setC);
-      }
-    else if (other.Valid)
-      {
-      *this = other;
-      }
     }
+    else if (other.Valid)
+    {
+      *this = other;
+    }
+  }
   void Union(const vtkArraySet& other)
-    {
+  {
     if (this->Valid && other.Valid)
-      {
+    {
       vtkCleanArrays::vtkArraySet setC;
-      std::set_union(this->begin(), this->end(),
-        other.begin(), other.end(),
-        std::inserter(setC, setC.begin()));
+      std::set_union(
+        this->begin(), this->end(), other.begin(), other.end(), std::inserter(setC, setC.begin()));
       setC.MarkValid();
       this->swap(setC);
-      }
-    else if (other.Valid)
-      {
-      *this = other;
-      }
     }
+    else if (other.Valid)
+    {
+      *this = other;
+    }
+  }
 
   // Fill up \c this with arrays from \c dsa
   void Initialize(vtkFieldData* dsa)
-    {
+  {
     this->Valid = true;
     int numArrays = dsa->GetNumberOfArrays();
     if (dsa->GetNumberOfTuples() == 0)
-      {
+    {
       numArrays = 0;
-      }
-    for (int cc=0; cc < numArrays; cc++)
-      {
+    }
+    for (int cc = 0; cc < numArrays; cc++)
+    {
       vtkAbstractArray* array = dsa->GetAbstractArray(cc);
       if (array && array->GetName())
-        {
+      {
         vtkCleanArrays::vtkArrayData mda;
         mda.Set(array);
         this->insert(mda);
-        }
       }
     }
+  }
 
   // Remove arrays from \c dsa not present in \c this.
   void UpdateFieldData(vtkFieldData* dsa) const
-    {
+  {
     if (this->Valid == 0)
-      {
+    {
       return;
-      }
+    }
     vtkArraySet myself = (*this);
     int numArrays = dsa->GetNumberOfArrays();
-    for (int cc=numArrays-1; cc >= 0; cc--)
-      {
+    for (int cc = numArrays - 1; cc >= 0; cc--)
+    {
       vtkAbstractArray* array = dsa->GetAbstractArray(cc);
       if (array && array->GetName())
-        {
+      {
         vtkCleanArrays::vtkArrayData mda;
         mda.Set(array);
         if (myself.find(mda) == myself.end())
-          {
-          //cout << "Removing: " << array->GetName() << endl;
-          dsa->RemoveArray(array->GetName());
-          }
-        else
-          {
-          myself.erase(mda);
-          }
-        }
-      }
-    // Now fill any missing arrays.
-    for (iterator iter = myself.begin(); iter != myself.end(); ++iter)
-      {
-      vtkAbstractArray* array = iter->NewArray(dsa->GetNumberOfTuples());
-      if (array)
         {
-        dsa->AddArray(array);
-        array->Delete();
+          // cout << "Removing: " << array->GetName() << endl;
+          dsa->RemoveArray(array->GetName());
+        }
+        else
+        {
+          myself.erase(mda);
         }
       }
     }
+    // Now fill any missing arrays.
+    for (iterator iter = myself.begin(); iter != myself.end(); ++iter)
+    {
+      vtkAbstractArray* array = iter->NewArray(dsa->GetNumberOfTuples());
+      if (array)
+      {
+        dsa->AddArray(array);
+        array->Delete();
+      }
+    }
+  }
 
   void Save(vtkMultiProcessStream& stream)
-    {
+  {
     stream.Reset();
     stream << this->Valid;
     stream << static_cast<unsigned int>(this->size());
     vtkCleanArrays::vtkArraySet::iterator iter;
     for (iter = this->begin(); iter != this->end(); ++iter)
-      {
-      stream << iter->Name
-        << iter->NumberOfComponents
-        << iter->Type;
-      }
+    {
+      stream << iter->Name << iter->NumberOfComponents << iter->Type;
     }
+  }
 
   void Load(vtkMultiProcessStream& stream)
-    {
+  {
     this->clear();
     unsigned int numvalues;
     stream >> this->Valid;
     stream >> numvalues;
-    for (unsigned int cc=0; cc < numvalues; cc++)
-      {
-      vtkCleanArrays::vtkArrayData mda;
-      stream >> mda.Name
-        >> mda.NumberOfComponents
-        >> mda.Type;
-      this->insert(mda);
-      }
-    }
-  void Print()
+    for (unsigned int cc = 0; cc < numvalues; cc++)
     {
+      vtkCleanArrays::vtkArrayData mda;
+      stream >> mda.Name >> mda.NumberOfComponents >> mda.Type;
+      this->insert(mda);
+    }
+  }
+  void Print()
+  {
     vtkCleanArrays::vtkArraySet::iterator iter;
     cout << "Valid: " << this->Valid << endl;
     for (iter = this->begin(); iter != this->end(); ++iter)
-      {
-      cout << iter->Name << ", "
-        << iter->NumberOfComponents << ", "
-        << iter->Type << endl;
-      }
-    cout << "-----------------------------------" << endl << endl;
+    {
+      cout << iter->Name << ", " << iter->NumberOfComponents << ", " << iter->Type << endl;
     }
+    cout << "-----------------------------------" << endl << endl;
+  }
 };
 
 //----------------------------------------------------------------------------
-static void IntersectStreams(
-  vtkMultiProcessStream& A, vtkMultiProcessStream& B)
+static void IntersectStreams(vtkMultiProcessStream& A, vtkMultiProcessStream& B)
 {
   vtkCleanArrays::vtkArraySet setA;
   vtkCleanArrays::vtkArraySet setB;
@@ -300,8 +287,7 @@ static void IntersectStreams(
 }
 
 //----------------------------------------------------------------------------
-static void UnionStreams(
-  vtkMultiProcessStream& A, vtkMultiProcessStream& B)
+static void UnionStreams(vtkMultiProcessStream& A, vtkMultiProcessStream& B)
 {
   vtkCleanArrays::vtkArraySet setA;
   vtkCleanArrays::vtkArraySet setB;
@@ -314,9 +300,7 @@ static void UnionStreams(
 
 //----------------------------------------------------------------------------
 int vtkCleanArrays::RequestData(
-  vtkInformation*,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
@@ -324,90 +308,102 @@ int vtkCleanArrays::RequestData(
   vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
 
   vtkMultiProcessController* controller = this->Controller;
-  if ( (!controller || controller->GetNumberOfProcesses() <= 1) && outputCD == NULL)
-    {
+  if ((!controller || controller->GetNumberOfProcesses() <= 1) && outputCD == NULL)
+  {
     // Nothing to do since not running in parallel or on composite datasets.
     return 1;
-    }
+  }
 
   // Build the array sets for all attribute types across all blocks (if any).
   vtkCleanArrays::vtkArraySet arraySets[vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES];
   if (outputCD)
-    {
+  {
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(outputCD->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
+    {
       vtkDataObject* dobj = iter->GetCurrentDataObject();
-      for (int attr=0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+      for (int attr = 0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+      {
+        if (vtkSkipAttributeType(attr))
         {
-        if (vtkSkipAttributeType(attr)) { continue; }
+          continue;
+        }
         if (dobj->GetNumberOfElements(attr) > 0)
-          {
+        {
           vtkCleanArrays::vtkArraySet myset;
           myset.Initialize(dobj->GetAttributesAsFieldData(attr));
           if (this->FillPartialArrays)
-            {
+          {
             arraySets[attr].Union(myset);
-            }
+          }
           else
-            {
+          {
             arraySets[attr].Intersection(myset);
-            }
           }
         }
       }
     }
+  }
   else
+  {
+    for (int attr = 0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
     {
-    for (int attr=0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+      if (vtkSkipAttributeType(attr))
       {
-      if (vtkSkipAttributeType(attr)) { continue; }
+        continue;
+      }
       if (outputDO->GetNumberOfElements(attr) > 0)
-        {
+      {
         arraySets[attr].Initialize(outputDO->GetAttributesAsFieldData(attr));
-        }
       }
     }
+  }
 
   if (controller && controller->GetNumberOfProcesses() > 1)
+  {
+    for (int attr = 0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
     {
-    for (int attr=0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+      if (vtkSkipAttributeType(attr))
       {
-      if (vtkSkipAttributeType(attr)) { continue; }
+        continue;
+      }
       vtkMultiProcessStream mstream;
       arraySets[attr].Save(mstream);
-      vtkMultiProcessControllerHelper::ReduceToAll(
-        controller,
-        mstream,
-        this->FillPartialArrays ? ::UnionStreams : ::IntersectStreams,
-        1278392 + attr);
+      vtkMultiProcessControllerHelper::ReduceToAll(controller, mstream,
+        this->FillPartialArrays ? ::UnionStreams : ::IntersectStreams, 1278392 + attr);
       arraySets[attr].Load(mstream);
-      }
     }
+  }
 
   if (outputCD)
-    {
+  {
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(outputCD->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-      vtkDataObject* dobj = iter->GetCurrentDataObject();
-      for (int attr=0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
-        {
-        if (vtkSkipAttributeType(attr)) { continue; }
-        arraySets[attr].UpdateFieldData(dobj->GetAttributesAsFieldData(attr));
-        }
-      }
-    }
-  else
     {
-    for (int attr=0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+      vtkDataObject* dobj = iter->GetCurrentDataObject();
+      for (int attr = 0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
       {
-      if (vtkSkipAttributeType(attr)) { continue; }
-      arraySets[attr].UpdateFieldData(outputDO->GetAttributesAsFieldData(attr));
+        if (vtkSkipAttributeType(attr))
+        {
+          continue;
+        }
+        arraySets[attr].UpdateFieldData(dobj->GetAttributesAsFieldData(attr));
       }
     }
+  }
+  else
+  {
+    for (int attr = 0; attr < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; attr++)
+    {
+      if (vtkSkipAttributeType(attr))
+      {
+        continue;
+      }
+      arraySets[attr].UpdateFieldData(outputDO->GetAttributesAsFieldData(attr));
+    }
+  }
   return 1;
 }
 

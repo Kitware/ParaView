@@ -36,20 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h" // needed for EXPORT macro.
 #include "pqWidgetEventPlayer.h"
 
-/// pqItemViewSearchWidgetEventPlayer is the player for pqItemViewSearchWidget.
+/**
+* pqItemViewSearchWidgetEventPlayer is the player for pqItemViewSearchWidget.
+*/
 class PQCOMPONENTS_EXPORT pqItemViewSearchWidgetEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqItemViewSearchWidgetEventPlayer(QObject* parent=0);
+  pqItemViewSearchWidgetEventPlayer(QObject* parent = 0);
   ~pqItemViewSearchWidgetEventPlayer();
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString&
-    arguments, bool& error);
+  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
 
-  static const QString &EVENT_NAME();
+  static const QString& EVENT_NAME();
+
 private:
   Q_DISABLE_COPY(pqItemViewSearchWidgetEventPlayer)
 };

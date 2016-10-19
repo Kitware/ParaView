@@ -23,7 +23,7 @@
 vtkStandardNewMacro(vtkPVEnableStackTraceSignalHandler);
 
 //----------------------------------------------------------------------------
-void vtkPVEnableStackTraceSignalHandler::CopyFromObject(vtkObject *obj)
+void vtkPVEnableStackTraceSignalHandler::CopyFromObject(vtkObject* obj)
 {
   (void)obj;
   vtksys::SystemInformation::SetStackTraceOnError(1);

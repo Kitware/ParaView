@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,29 +45,25 @@ pqCheckBoxPixMaps::pqCheckBoxPixMaps(QWidget* parentWidget)
 
   // Initialize the pixmaps. The following style array should
   // correspond to the PixmapStateIndex enum.
-  const QStyle::State PixmapStyle[] =
-    {
-    QStyle::State_On | QStyle::State_Enabled,
-    QStyle::State_NoChange | QStyle::State_Enabled,
-    QStyle::State_Off | QStyle::State_Enabled,
+  const QStyle::State PixmapStyle[] = { QStyle::State_On | QStyle::State_Enabled,
+    QStyle::State_NoChange | QStyle::State_Enabled, QStyle::State_Off | QStyle::State_Enabled,
     QStyle::State_On | QStyle::State_Enabled | QStyle::State_Active,
     QStyle::State_NoChange | QStyle::State_Enabled | QStyle::State_Active,
-    QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
-    };
+    QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active };
 
   QStyleOptionButton option;
-  QRect r = parentWidget->style()->subElementRect(
-      QStyle::SE_CheckBoxIndicator, &option, parentWidget);
-  option.rect = QRect(QPoint(0,0), r.size());
-  for(int i = 0; i < pqCheckBoxPixMaps::PixmapCount; i++)
-    {
+  QRect r =
+    parentWidget->style()->subElementRect(QStyle::SE_CheckBoxIndicator, &option, parentWidget);
+  option.rect = QRect(QPoint(0, 0), r.size());
+  for (int i = 0; i < pqCheckBoxPixMaps::PixmapCount; i++)
+  {
     this->Pixmaps[i] = QPixmap(r.size());
     this->Pixmaps[i].fill(QColor(0, 0, 0, 0));
     QPainter painter(&this->Pixmaps[i]);
     option.state = PixmapStyle[i];
     parentWidget->style()->drawPrimitive(
-        QStyle::PE_IndicatorCheckBox, &option, &painter, parentWidget);
-    }
+      QStyle::PE_IndicatorCheckBox, &option, &painter, parentWidget);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -75,18 +71,16 @@ QPixmap pqCheckBoxPixMaps::getPixmap(Qt::CheckState state, bool active) const
 {
   int offset = active ? 3 : 0;
   switch (state)
-    {
-  case Qt::Checked:
-    return this->Pixmaps[offset + Checked];
+  {
+    case Qt::Checked:
+      return this->Pixmaps[offset + Checked];
 
-  case Qt::Unchecked:
-    return this->Pixmaps[offset + UnChecked];
+    case Qt::Unchecked:
+      return this->Pixmaps[offset + UnChecked];
 
-  case Qt::PartiallyChecked:
-    return this->Pixmaps[offset + PartiallyChecked];
-    }
+    case Qt::PartiallyChecked:
+      return this->Pixmaps[offset + PartiallyChecked];
+  }
 
   return QPixmap();
 }
-
-

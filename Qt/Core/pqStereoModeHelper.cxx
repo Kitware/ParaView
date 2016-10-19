@@ -42,57 +42,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqStereoModeHelper::pqInternals
 {
   struct MData
-    {
+  {
     vtkWeakPointer<vtkSMProxy> Proxy;
     int StereoType;
     int StereoRender;
-    MData(vtkSMProxy* proxy, int newType) : Proxy(proxy)
-      {
+    MData(vtkSMProxy* proxy, int newType)
+      : Proxy(proxy)
+    {
       if (proxy)
-        {
+      {
         vtkSMPropertyHelper sr(proxy, "StereoRender", true);
         vtkSMPropertyHelper st(proxy, "StereoType", true);
         this->StereoRender = sr.GetAsInt();
         this->StereoType = st.GetAsInt();
         if ((newType == 0 && this->StereoRender != 0) ||
-            (newType !=0 && (this->StereoType != newType || this->StereoRender == 0)))
-          {
-          sr.Set(newType==0? 0 : 1);
-          st.Set(newType==0? this->StereoType : newType);
+          (newType != 0 && (this->StereoType != newType || this->StereoRender == 0)))
+        {
+          sr.Set(newType == 0 ? 0 : 1);
+          st.Set(newType == 0 ? this->StereoType : newType);
           this->Proxy->UpdateVTKObjects();
-          }
+        }
         else
-          {
+        {
           this->Proxy = NULL;
-          }
         }
       }
+    }
     void Restore() const
-      {
+    {
       if (this->Proxy)
-        {
+      {
         vtkSMPropertyHelper(this->Proxy, "StereoType", true).Set(this->StereoType);
         vtkSMPropertyHelper(this->Proxy, "StereoRender", true).Set(this->StereoRender);
         this->Proxy->UpdateVTKObjects();
-        }
       }
-    };
-  QList<MData> Items;
-public:
-  void PushStereoMode(vtkSMProxy* view, int type)
-    {
-    this->Items.push_back(MData(view, type));
     }
+  };
+  QList<MData> Items;
+
+public:
+  void PushStereoMode(vtkSMProxy* view, int type) { this->Items.push_back(MData(view, type)); }
 
   ~pqInternals()
-    {
+  {
     BEGIN_UNDO_EXCLUDE();
     foreach (const MData& mdata, this->Items)
-      {
+    {
       mdata.Restore();
-      }
-    END_UNDO_EXCLUDE();
     }
+    END_UNDO_EXCLUDE();
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -103,9 +102,9 @@ pqStereoModeHelper::pqStereoModeHelper(int paramStereoMode, pqServer* server)
   QList<pqView*> views =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>(server);
   foreach (pqView* view, views)
-    {
+  {
     this->Internals->PushStereoMode(view->getProxy(), paramStereoMode);
-    }
+  }
   END_UNDO_EXCLUDE();
 }
 
@@ -115,9 +114,9 @@ pqStereoModeHelper::pqStereoModeHelper(int paramStereoMode, pqView* view)
 {
   BEGIN_UNDO_EXCLUDE();
   if (view)
-    {
+  {
     this->Internals->PushStereoMode(view->getProxy(), paramStereoMode);
-    }
+  }
   END_UNDO_EXCLUDE();
 }
 
@@ -131,7 +130,7 @@ const QStringList& pqStereoModeHelper::availableStereoModes()
 {
   static QStringList list;
   if (list.size() == 0)
-    {
+  {
     list << "No Stereo"
          << "Red-Blue"
          << "Interlaced"
@@ -141,7 +140,7 @@ const QStringList& pqStereoModeHelper::availableStereoModes()
          << "Anaglyph"
          << "Checkerboard"
          << "Split Viewport Horizontal";
-    }
+  }
   return list;
 }
 
@@ -149,5 +148,5 @@ const QStringList& pqStereoModeHelper::availableStereoModes()
 int pqStereoModeHelper::stereoMode(const QString& val)
 {
   int idx = pqStereoModeHelper::availableStereoModes().indexOf(val);
-  return idx <=0? 0 : (idx + 1); // See the order of stereo types in vtkRenderWindow.h
+  return idx <= 0 ? 0 : (idx + 1); // See the order of stereo types in vtkRenderWindow.h
 }

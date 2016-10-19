@@ -31,23 +31,23 @@ vtkPVMantaView::vtkPVMantaView()
 {
   this->SynchronizedRenderers->SetDisableIceT(true);
 
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::New();
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::New();
   this->RenderView->SetRenderer(mantaRenderer);
   mantaRenderer->Delete();
 
-  vtkMantaCamera *mantaCamera = vtkMantaCamera::New();
+  vtkMantaCamera* mantaCamera = vtkMantaCamera::New();
   mantaRenderer->SetActiveCamera(mantaCamera);
   mantaCamera->ParallelProjectionOff();
   mantaCamera->Delete();
 
-/*
-  vtkMemberFunctionCommand<vtkPVRenderView>* observer =
-    vtkMemberFunctionCommand<vtkPVRenderView>::New();
-  observer->SetCallback(*this, &vtkPVRenderView::ResetCameraClippingRange);
-  this->GetRenderer()->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,
-    observer);
-  observer->FastDelete();
-*/
+  /*
+    vtkMemberFunctionCommand<vtkPVRenderView>* observer =
+      vtkMemberFunctionCommand<vtkPVRenderView>::New();
+    observer->SetCallback(*this, &vtkPVRenderView::ResetCameraClippingRange);
+    this->GetRenderer()->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,
+      observer);
+    observer->FastDelete();
+  */
   mantaRenderer->SetUseDepthPeeling(0);
 
   this->Light->Delete();
@@ -61,14 +61,13 @@ vtkPVMantaView::vtkPVMantaView()
 
   mantaRenderer->SetAutomaticLightCreation(0);
 
-//  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
+  //  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
 
   this->OrientationWidget->SetParentRenderer(mantaRenderer);
 
-  //this->GetRenderer()->AddActor(this->CenterAxes);
+  // this->GetRenderer()->AddActor(this->CenterAxes);
 
   this->SetInteractionMode(INTERACTION_MODE_3D);
-
 }
 
 //----------------------------------------------------------------------------
@@ -80,7 +79,7 @@ vtkPVMantaView::~vtkPVMantaView()
 void vtkPVMantaView::SetActiveCamera(vtkCamera* camera)
 {
   this->GetRenderer()->SetActiveCamera(camera);
-//  this->GetNonCompositedRenderer()->SetActiveCamera(camera);
+  //  this->GetNonCompositedRenderer()->SetActiveCamera(camera);
 }
 
 //----------------------------------------------------------------------------
@@ -88,14 +87,13 @@ void vtkPVMantaView::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
 
-  //disable multipass rendering so mantarenderer will do old school
-  //rendering ( for OpenGL renderer )
-  vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
-  if(glrenderer)
-    {
+  // disable multipass rendering so mantarenderer will do old school
+  // rendering ( for OpenGL renderer )
+  vtkOpenGLRenderer* glrenderer = vtkOpenGLRenderer::SafeDownCast(this->RenderView->GetRenderer());
+  if (glrenderer)
+  {
     glrenderer->SetPass(NULL);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -108,12 +106,11 @@ void vtkPVMantaView::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVMantaView::SetThreads(int newval)
 {
   if (newval == this->Threads)
-    {
+  {
     return;
-    }
+  }
   this->Threads = newval;
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
   mantaRenderer->SetNumberOfWorkers(this->Threads);
 }
 
@@ -121,12 +118,11 @@ void vtkPVMantaView::SetThreads(int newval)
 void vtkPVMantaView::SetEnableShadows(int newval)
 {
   if (newval == this->EnableShadows)
-    {
+  {
     return;
-    }
+  }
   this->EnableShadows = newval;
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
   mantaRenderer->SetEnableShadows(this->EnableShadows);
 }
 
@@ -134,12 +130,11 @@ void vtkPVMantaView::SetEnableShadows(int newval)
 void vtkPVMantaView::SetSamples(int newval)
 {
   if (newval == this->Samples)
-    {
+  {
     return;
-    }
+  }
   this->Samples = newval;
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
   mantaRenderer->SetSamples(this->Samples);
 }
 
@@ -147,37 +142,34 @@ void vtkPVMantaView::SetSamples(int newval)
 void vtkPVMantaView::SetMaxDepth(int newval)
 {
   if (newval == this->EnableShadows)
-    {
+  {
     return;
-    }
+  }
   this->MaxDepth = newval;
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
   mantaRenderer->SetMaxDepth(this->MaxDepth);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVMantaView::SetBackgroundUp(double x, double y, double z)
 {
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
-  mantaRenderer->SetBackgroundUp(x,y,z);
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundUp(x, y, z);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVMantaView::SetBackgroundRight(double x, double y, double z)
 {
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
-    (this->RenderView->GetRenderer());
-  mantaRenderer->SetBackgroundRight(x,y,z);
+  vtkMantaRenderer* mantaRenderer = vtkMantaRenderer::SafeDownCast(this->RenderView->GetRenderer());
+  mantaRenderer->SetBackgroundRight(x, y, z);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVMantaView::SetCurrentLight(vtkMantaLight *light)
+void vtkPVMantaView::SetCurrentLight(vtkMantaLight* light)
 {
-  vtkLightCollection *lc = this->GetRenderer()->GetLights();
+  vtkLightCollection* lc = this->GetRenderer()->GetLights();
   if (!lc->IsItemPresent(light))
-    {
+  {
     this->GetRenderer()->AddLight(light);
-    }
+  }
 }

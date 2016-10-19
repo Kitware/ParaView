@@ -24,40 +24,40 @@ vtkStandardNewMacro(vtkPVOptionsXMLParser);
 //----------------------------------------------------------------------------
 void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
 {
-  if(!ptype)
-    {
+  if (!ptype)
+  {
     this->SetProcessTypeInt(vtkCommandOptions::EVERYBODY);
     return;
-    }
+  }
 
-  std::string type = vtksys::SystemTools::LowerCase((ptype? ptype : ""));
-  if(type == "client")
-    {
+  std::string type = vtksys::SystemTools::LowerCase((ptype ? ptype : ""));
+  if (type == "client")
+  {
     this->SetProcessTypeInt(vtkPVOptions::PVCLIENT);
     return;
-    }
-  if(type == "server")
-    {
+  }
+  if (type == "server")
+  {
     this->SetProcessTypeInt(vtkPVOptions::PVSERVER);
     return;
-    }
-  if(type == "render-server" || type == "renderserver")
-    {
+  }
+  if (type == "render-server" || type == "renderserver")
+  {
     this->SetProcessTypeInt(vtkPVOptions::PVRENDER_SERVER);
     return;
-    }
+  }
 
-  if(type == "data-server" || type == "dataserver")
-    {
+  if (type == "data-server" || type == "dataserver")
+  {
     this->SetProcessTypeInt(vtkPVOptions::PVDATA_SERVER);
     return;
-    }
+  }
 
-  if(type == "paraview")
-    {
+  if (type == "paraview")
+  {
     this->SetProcessTypeInt(vtkPVOptions::PARAVIEW);
     return;
-    }
+  }
 
   this->Superclass::SetProcessType(ptype);
 }

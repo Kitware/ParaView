@@ -39,11 +39,9 @@ class vtkSMProxyManager::vtkPXMInternal
 public:
   vtkPXMInternal()
     : ActiveSessionID(0)
-    {
-    }
-  ~vtkPXMInternal()
-    {
-    }
+  {
+  }
+  ~vtkPXMInternal() {}
   vtkIdType ActiveSessionID;
 };
 
@@ -51,17 +49,16 @@ public:
 // Statics...
 vtkSmartPointer<vtkSMProxyManager> vtkSMProxyManager::Singleton;
 
-vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStackBuilder,
-  vtkSMUndoStackBuilder);
+vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStackBuilder, vtkSMUndoStackBuilder);
 //***************************************************************************
 vtkSMProxyManager* vtkSMProxyManager::New()
 {
   vtkObject* ret = vtkObjectFactory::CreateInstance("vtkSMProxyManager");
   if (ret)
-    {
+  {
     return static_cast<vtkSMProxyManager*>(ret);
-    }
-  vtkSMProxyManager *o = new vtkSMProxyManager;
+  }
+  vtkSMProxyManager* o = new vtkSMProxyManager;
   o->InitializeObjectBase();
   return o;
 }
@@ -76,33 +73,29 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->ReaderFactory = vtkSMReaderFactory::New();
   // Keep track of when proxy definitions change and then if it's a new
   // reader we add it to ReaderFactory.
-  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
-                    this->ReaderFactory,
-                    &vtkSMReaderFactory::UpdateAvailableReaders);
+  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated, this->ReaderFactory,
+    &vtkSMReaderFactory::UpdateAvailableReaders);
   this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
-                    this->ReaderFactory,
-                    &vtkSMReaderFactory::UpdateAvailableReaders);
+    this->ReaderFactory, &vtkSMReaderFactory::UpdateAvailableReaders);
 
   this->WriterFactory = vtkSMWriterFactory::New();
   // Keep track of when proxy definitions change and then if it's a new
   // writer we add it to WriterFactory.
-  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
-                    this->WriterFactory,
-                    &vtkSMWriterFactory::UpdateAvailableWriters);
+  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated, this->WriterFactory,
+    &vtkSMWriterFactory::UpdateAvailableWriters);
   this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
-                    this->WriterFactory,
-                    &vtkSMWriterFactory::UpdateAvailableWriters);
+    this->WriterFactory, &vtkSMWriterFactory::UpdateAvailableWriters);
 
   // Monitor session creations. If a new session is created and we don't have an
   // active one, we make that new session active.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm)
-    {
-    pm->AddObserver(vtkCommand::ConnectionCreatedEvent,
-      this, &vtkSMProxyManager::ConnectionsUpdated);
-    pm->AddObserver(vtkCommand::ConnectionClosedEvent,
-      this, &vtkSMProxyManager::ConnectionsUpdated);
-    }
+  {
+    pm->AddObserver(
+      vtkCommand::ConnectionCreatedEvent, this, &vtkSMProxyManager::ConnectionsUpdated);
+    pm->AddObserver(
+      vtkCommand::ConnectionClosedEvent, this, &vtkSMProxyManager::ConnectionsUpdated);
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -126,11 +119,11 @@ vtkSMProxyManager::~vtkSMProxyManager()
 //----------------------------------------------------------------------------
 vtkSMProxyManager* vtkSMProxyManager::GetProxyManager()
 {
-  if(!vtkSMProxyManager::Singleton)
-    {
+  if (!vtkSMProxyManager::Singleton)
+  {
     vtkSMProxyManager* pxm = vtkSMProxyManager::New();
     vtkSMProxyManager::Singleton.TakeReference(pxm);
-    }
+  }
   return vtkSMProxyManager::Singleton.GetPointer();
 }
 
@@ -174,65 +167,61 @@ int vtkSMProxyManager::GetVersionPatch()
 vtkSMSession* vtkSMProxyManager::GetActiveSession()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm?  vtkSMSession::SafeDownCast(
-    pm->GetSession(this->PXMStorage->ActiveSessionID)) : NULL;
+  return pm ? vtkSMSession::SafeDownCast(pm->GetSession(this->PXMStorage->ActiveSessionID)) : NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMProxyManager::ConnectionsUpdated(
-  vtkObject*, unsigned long eventid, void* calldata)
+void vtkSMProxyManager::ConnectionsUpdated(vtkObject*, unsigned long eventid, void* calldata)
 {
   // Callback called when a new session is registered. Update active session
   // accordingly.
   if (eventid == vtkCommand::ConnectionCreatedEvent)
-    {
+  {
     // A new session always becomes active.
     vtkIdType sid = *(reinterpret_cast<vtkIdType*>(calldata));
     this->SetActiveSession(sid);
-    }
+  }
   else if (eventid == vtkCommand::ConnectionClosedEvent)
-    {
+  {
     vtkIdType sid = *(reinterpret_cast<vtkIdType*>(calldata));
     if (this->PXMStorage->ActiveSessionID == sid)
-      {
+    {
       vtkIdType newSID = 0;
 
       // Find another session, if available, and make that active.
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       vtkSessionIterator* iter = pm->NewSessionIterator();
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-        iter->GoToNextItem())
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+        if (iter->GetCurrentSession() != NULL && iter->GetCurrentSessionId() != sid)
         {
-        if (iter->GetCurrentSession() != NULL &&
-          iter->GetCurrentSessionId() != sid)
-          {
           newSID = iter->GetCurrentSessionId();
           break;
-          }
         }
+      }
       iter->Delete();
 
       this->SetActiveSession(newSID);
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkIdType sid)
 {
   if (this->PXMStorage->ActiveSessionID != sid)
-    {
+  {
     this->PXMStorage->ActiveSessionID = sid;
     vtkSMSession* session = this->GetActiveSession();
     this->InvokeEvent(vtkSMProxyManager::ActiveSessionChanged, session);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkSMSession* session)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType sid = session? pm->GetSessionID(session) : 0;
+  vtkIdType sid = session ? pm->GetSessionID(session) : 0;
   this->SetActiveSession(sid);
 }
 
@@ -245,7 +234,7 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetActiveSessionProxyManager()
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession* session)
 {
-  return session? session->GetSessionProxyManager() : NULL;
+  return session ? session->GetSessionProxyManager() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -256,81 +245,78 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy(const char* groupName,
-  const char* proxyName, const char* subProxyName)
+vtkSMProxy* vtkSMProxyManager::NewProxy(
+  const char* groupName, const char* proxyName, const char* subProxyName)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     return pxm->NewProxy(groupName, proxyName, subProxyName);
-    }
+  }
   vtkErrorMacro("No active session found.");
   return NULL;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterProxy(
-  const char* groupname, const char* name, vtkSMProxy* proxy)
+void vtkSMProxyManager::RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     pxm->RegisterProxy(groupname, name, proxy);
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("No active session found.");
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, const char* name)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     return pxm->GetProxy(groupname, name);
-    }
+  }
   vtkErrorMacro("No active session found.");
   return NULL;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy(
-  const char* groupname, const char* name, vtkSMProxy* proxy)
+void vtkSMProxyManager::UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     pxm->UnRegisterProxy(groupname, name, proxy);
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("No active session found.");
-    }
+  }
 }
 
 //---------------------------------------------------------------------------
 const char* vtkSMProxyManager::GetProxyName(const char* groupname, unsigned int idx)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     return pxm->GetProxyName(groupname, idx);
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("No active session found.");
-    }
+  }
   return NULL;
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetProxyName(
-  const char* groupname, vtkSMProxy* pxy)
+const char* vtkSMProxyManager::GetProxyName(const char* groupname, vtkSMProxy* pxy)
 {
   if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
-    {
+  {
     return pxm->GetProxyName(groupname, pxy);
-    }
+  }
   else
-    {
+  {
     vtkErrorMacro("No active session found.");
-    }
+  }
   return NULL;
 }

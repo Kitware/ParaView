@@ -31,21 +31,19 @@ vtkCPCellFieldBuilder::vtkCPCellFieldBuilder()
 }
 
 //----------------------------------------------------------------------------
-void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time,
-                                        vtkDataSet* grid)
+void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time, vtkDataSet* grid)
 {
-  vtkCPTensorFieldFunction* tensorFieldFunction =
-    this->GetTensorFieldFunction();
-  if(tensorFieldFunction == 0)
-    {
+  vtkCPTensorFieldFunction* tensorFieldFunction = this->GetTensorFieldFunction();
+  if (tensorFieldFunction == 0)
+  {
     vtkErrorMacro("Must set TensorFieldFunction.");
     return;
-    }
-  if(this->GetArrayName() == 0)
-    {
+  }
+  if (this->GetArrayName() == 0)
+  {
     vtkErrorMacro("Must set ArrayName.");
     return;
-    }
+  }
   vtkIdType numberOfCells = grid->GetNumberOfCells();
   unsigned int numberOfComponents = tensorFieldFunction->GetNumberOfComponents();
   vtkDoubleArray* array = vtkDoubleArray::New();
@@ -53,19 +51,18 @@ void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time,
   array->SetNumberOfTuples(numberOfCells);
   std::vector<double> tupleValues(numberOfComponents);
   double point[3], parametricCenter[3], weights[100];
-  for(vtkIdType i=0;i<numberOfCells;i++)
-    {
+  for (vtkIdType i = 0; i < numberOfCells; i++)
+  {
     vtkCell* cell = grid->GetCell(i);
     cell->GetParametricCenter(parametricCenter);
     int subId = 0;
     cell->EvaluateLocation(subId, parametricCenter, point, weights);
-    for(unsigned int uj=0;uj<numberOfComponents;uj++)
-      {
-      tupleValues[uj] = 
-        tensorFieldFunction->ComputeComponenentAtPoint(uj, point, timeStep, time);
-      }
-    array->SetTypedTuple(i, &tupleValues[0]);
+    for (unsigned int uj = 0; uj < numberOfComponents; uj++)
+    {
+      tupleValues[uj] = tensorFieldFunction->ComputeComponenentAtPoint(uj, point, timeStep, time);
     }
+    array->SetTypedTuple(i, &tupleValues[0]);
+  }
   grid->GetCellData()->AddArray(array);
   array->Delete();
 }

@@ -42,8 +42,7 @@ pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
   export_action->setToolTip("Export state for co-processing");
   export_action->setStatusTip("Export state for co-processing");
 
-  QObject::connect(export_action, SIGNAL(triggered()),
-                   this, SLOT(exportState()));
+  QObject::connect(export_action, SIGNAL(triggered()), this, SLOT(exportState()));
 }
 
 //-----------------------------------------------------------------------------

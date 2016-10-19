@@ -58,39 +58,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSpreadSheetView::pqInternal
 {
 public:
-  pqInternal(pqSpreadSheetViewModel* model):
-    Model(model),
-    SelectionModel(model),
-    EmptySelectionModel(model)
+  pqInternal(pqSpreadSheetViewModel* model)
+    : Model(model)
+    , SelectionModel(model)
+    , EmptySelectionModel(model)
   {
-  pqSpreadSheetViewWidget* table = new pqSpreadSheetViewWidget();
-  table->setAlternatingRowColors(true);
+    pqSpreadSheetViewWidget* table = new pqSpreadSheetViewWidget();
+    table->setAlternatingRowColors(true);
 
-  this->Table= table;
-  this->Table->setModel(this->Model);
-  this->Table->setAlternatingRowColors(true);
-  this->Table->setCornerButtonEnabled(false);
-  this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Table->setSelectionModel(&this->SelectionModel);
+    this->Table = table;
+    this->Table->setModel(this->Model);
+    this->Table->setAlternatingRowColors(true);
+    this->Table->setCornerButtonEnabled(false);
+    this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    this->Table->setSelectionModel(&this->SelectionModel);
 #if QT_VERSION >= 0x050000
-  this->Table->horizontalHeader()->setSectionsMovable(true);
+    this->Table->horizontalHeader()->setSectionsMovable(true);
 #else
-  this->Table->horizontalHeader()->setMovable(true);
+    this->Table->horizontalHeader()->setMovable(true);
 #endif
-  this->SingleColumnMode = false;
+    this->SingleColumnMode = false;
 
-  // Do not show the sorting arrow as default
-  this->Table->setSortingEnabled(false);
+    // Do not show the sorting arrow as default
+    this->Table->setSortingEnabled(false);
   }
 
-  ~pqInternal()
-    {
-    delete this->Table;
-    }
+  ~pqInternal() { delete this->Table; }
 
   QPointer<QWidget> Container;
   QPointer<QTableView> Table;
-  pqSpreadSheetViewModel *Model;
+  pqSpreadSheetViewModel* Model;
   pqSpreadSheetViewSelectionModel SelectionModel;
 
   // We use EmptySelectionModel as the selection model for the view when in
@@ -100,53 +97,41 @@ public:
   bool SingleColumnMode;
 };
 
-
 //-----------------------------------------------------------------------------
-pqSpreadSheetView::pqSpreadSheetView(
- const QString& group, const QString& name,
-    vtkSMViewProxy* viewModule, pqServer* server,
-    QObject* _parent/*=NULL*/):
-   pqView(spreadsheetViewType(), group, name, viewModule, server, _parent)
+pqSpreadSheetView::pqSpreadSheetView(const QString& group, const QString& name,
+  vtkSMViewProxy* viewModule, pqServer* server, QObject* _parent /*=NULL*/)
+  : pqView(spreadsheetViewType(), group, name, viewModule, server, _parent)
 {
   this->Internal = new pqInternal(new pqSpreadSheetViewModel(viewModule, this));
-  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
-    this, SLOT(onAddRepresentation(pqRepresentation*)));
-  QObject::connect(
-    this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
-    this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
+  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)), this,
+    SLOT(onAddRepresentation(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), this,
+    SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
   QObject::connect(this, SIGNAL(beginRender()), this, SLOT(onBeginRender()));
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(onEndRender()));
 
-  QObject::connect(
-    &this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)),
-    this, SLOT(onCreateSelection(vtkSMSourceProxy*)));
+  QObject::connect(&this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)), this,
+    SLOT(onCreateSelection(vtkSMSourceProxy*)));
 
-  this->getConnector()->Connect(
-    viewModule->GetProperty("SelectionOnly"),
-    vtkCommand::ModifiedEvent,
+  this->getConnector()->Connect(viewModule->GetProperty("SelectionOnly"), vtkCommand::ModifiedEvent,
     this, SLOT(onSelectionOnly()));
   this->onSelectionOnly();
 
-  this->getConnector()->Connect(
-    viewModule->GetProperty("CellFontSize"),
-    vtkCommand::ModifiedEvent,
+  this->getConnector()->Connect(viewModule->GetProperty("CellFontSize"), vtkCommand::ModifiedEvent,
     this, SLOT(onFontSizeChanged()));
 
-  this->getConnector()->Connect(
-    viewModule->GetProperty("HeaderFontSize"),
-    vtkCommand::ModifiedEvent,
-    this, SLOT(onFontSizeChanged()));
+  this->getConnector()->Connect(viewModule->GetProperty("HeaderFontSize"),
+    vtkCommand::ModifiedEvent, this, SLOT(onFontSizeChanged()));
 
   this->onFontSizeChanged();
 
-
-  foreach(pqRepresentation* rep, this->getRepresentations())
-    {
+  foreach (pqRepresentation* rep, this->getRepresentations())
+  {
     this->onAddRepresentation(rep);
-    }
+  }
 
   this->Internal->Container = new QWidget();
-  QVBoxLayout *layout = new QVBoxLayout(this->Internal->Container);
+  QVBoxLayout* layout = new QVBoxLayout(this->Internal->Container);
   layout->setSpacing(2);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(this->Internal->Table);
@@ -172,26 +157,24 @@ void pqSpreadSheetView::onAddRepresentation(pqRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetView::updateRepresentationVisibility(
-  pqRepresentation* repr, bool visible)
+void pqSpreadSheetView::updateRepresentationVisibility(pqRepresentation* repr, bool visible)
 {
   static bool updating_visibility__ = false;
   if (updating_visibility__)
-    {
+  {
     return;
-    }
+  }
 
-  if (!visible && repr &&
-    this->Internal->Model->activeRepresentation() == repr)
-    {
+  if (!visible && repr && this->Internal->Model->activeRepresentation() == repr)
+  {
     this->Internal->Model->setActiveRepresentation(NULL);
     emit this->showing(0);
-    }
+  }
 
   if (!visible || !repr)
-    {
+  {
     return;
-    }
+  }
 
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
   this->Internal->Model->setActiveRepresentation(dataRepr);
@@ -203,18 +186,18 @@ void pqSpreadSheetView::onBeginRender()
 {
   // If in "selection-only" mode, and showing composite dataset, we want to make
   // sure that we are shown a block with non-empty cells/points (if possible).
-  if (vtkSMPropertyHelper(this->getProxy(),"SelectionOnly").GetAsInt() != 0)
-    {
+  if (vtkSMPropertyHelper(this->getProxy(), "SelectionOnly").GetAsInt() != 0)
+  {
     this->Internal->Model->resetCompositeDataSetIndex();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetView::onEndRender()
 {
   // cout << "Render" << endl;
-  //this->Internal->Model.forceUpdate();
-  //this->Internal->Model->update();
+  // this->Internal->Model.forceUpdate();
+  // this->Internal->Model->update();
   this->Internal->Table->viewport()->update();
   emit this->viewportUpdated();
 }
@@ -222,48 +205,43 @@ void pqSpreadSheetView::onEndRender()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
 {
-  if(this->Internal->Table->selectionMode() == QAbstractItemView::NoSelection)
+  if (this->Internal->Table->selectionMode() == QAbstractItemView::NoSelection)
     return;
 
   pqDataRepresentation* repr = this->Internal->Model->activeRepresentation();
   if (repr)
-    {
+  {
     pqOutputPort* opport = repr->getOutputPortFromInput();
-    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
-      opport->getSource()->getProxy());
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(opport->getSource()->getProxy());
     input->CleanSelectionInputs(opport->getPortNumber());
     if (selSource)
-      {
-      input->SetSelectionInput(
-        opport->getPortNumber(), selSource, 0);
-      }
-    emit this->selected(opport);
-    }
-  else
     {
-    emit this->selected(0);
+      input->SetSelectionInput(opport->getPortNumber(), selSource, 0);
     }
+    emit this->selected(opport);
+  }
+  else
+  {
+    emit this->selected(0);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetView::onSelectionOnly()
 {
   if (vtkSMPropertyHelper(this->getProxy(), "SelectionOnly").GetAsInt() != 0)
-    {
+  {
     // The user is disallowed to make further (embedded / recursive) selection
     // once checkbox "Show Only Selected Elements" is checked.
     this->Internal->Table->setSelectionMode(QAbstractItemView::NoSelection);
-    this->Internal->Table->setSelectionModel(
-      &this->Internal->EmptySelectionModel);
-    }
+    this->Internal->Table->setSelectionModel(&this->Internal->EmptySelectionModel);
+  }
   else
-    {
+  {
     // Once the checkbox is un-checked, the user to allowed to make selections.
-    this->Internal->Table->setSelectionMode(
-      QAbstractItemView::ExtendedSelection);
-    this->Internal->Table->setSelectionModel(
-      &this->Internal->SelectionModel);
-    }
+    this->Internal->Table->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    this->Internal->Table->setSelectionModel(&this->Internal->SelectionModel);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -277,7 +255,8 @@ void pqSpreadSheetView::onFontSizeChanged()
   QString style;
   style = QString("QTableView { font-size: %2pt; }\n"
                   "QHeaderView { font-size: %1pt; }")
-    .arg(headerFontSize).arg(cellFontSize);
+            .arg(headerFontSize)
+            .arg(cellFontSize);
   this->Internal->Table->setStyleSheet(style);
 }
 

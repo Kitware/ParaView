@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPGenericIOMultiBlockWriter 
-// .SECTION Description
+/**
+ * @class   vtkPGenericIOMultiBlockWriter
+ *
+*/
 
 #ifndef vtkPGenericIOMultiBlockWriter_h
 #define vtkPGenericIOMultiBlockWriter_h
@@ -37,7 +39,7 @@ protected:
   vtkPGenericIOMultiBlockWriter();
   ~vtkPGenericIOMultiBlockWriter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual void WriteData();
 
 private:
@@ -47,7 +49,6 @@ private:
   vtkMultiProcessController* Controller;
   vtkPGenericIOMultiBlockWriter(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPGenericIOMultiBlockWriter&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

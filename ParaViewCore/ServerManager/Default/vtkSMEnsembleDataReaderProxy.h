@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMEnsembleDataReaderProxy
-// .SECTION Description
-// Examines file paths found in ensemble data files (.pve) and creates readers
-// that can read those files. Sets the correct reader for each file on the
-// corresponding VTK object.
+/**
+ * @class   vtkSMEnsembleDataReaderProxy
+ *
+ * Examines file paths found in ensemble data files (.pve) and creates readers
+ * that can read those files. Sets the correct reader for each file on the
+ * corresponding VTK object.
+*/
+
 #ifndef vtkSMEnsembleDataReaderProxy_h
 #define vtkSMEnsembleDataReaderProxy_h
 
@@ -27,8 +30,8 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMEnsembleDataReaderProxy : public vtk
 {
 public:
   vtkTypeMacro(vtkSMEnsembleDataReaderProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream &os, vtkIndent indent);
-  static vtkSMEnsembleDataReaderProxy *New();
+  void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkSMEnsembleDataReaderProxy* New();
 
   virtual void UpdateVTKObjects();
 
@@ -36,9 +39,10 @@ protected:
   vtkSMEnsembleDataReaderProxy();
   virtual ~vtkSMEnsembleDataReaderProxy();
 
-  virtual void SetPropertyModifiedFlag(const char *name, int flag);
+  virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
   bool FileNamePotentiallyModified;
+
 private:
   bool FetchFileNames();
 

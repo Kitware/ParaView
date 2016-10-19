@@ -43,8 +43,8 @@ public:
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
   // Description:
   // Indicates whether LIC should be used when doing LOD rendering.
@@ -73,8 +73,12 @@ public:
 
   void SetMaskOnSurface(int val);
   void SetMaskThreshold(double val);
-  void SetMaskColor(double *val);
-  void SetMaskColor(double r, double g, double b){ double rgb[3]={r,g,b}; this->SetMaskColor(rgb); }
+  void SetMaskColor(double* val);
+  void SetMaskColor(double r, double g, double b)
+  {
+    double rgb[3] = { r, g, b };
+    this->SetMaskColor(rgb);
+  }
   void SetMaskIntensity(double val);
 
   void SetGenerateNoiseTexture(int val);
@@ -90,7 +94,7 @@ public:
 
   void SetCompositeStrategy(int val);
 
-  void WriteTimerLog(const char *fileName);
+  void WriteTimerLog(const char* fileName);
 
   void SelectInputVectors(int, int, int, int attributeMode, const char* name);
 
@@ -111,10 +115,10 @@ protected:
 #endif
 
   bool UseLICForLOD;
+
 private:
   vtkSurfaceLICRepresentation(const vtkSurfaceLICRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSurfaceLICRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

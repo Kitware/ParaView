@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -73,10 +73,10 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   this->setSelectionMode(pqFlatTreeView::ExtendedSelection);
 
   // Connect internal handlers
-  QObject::connect(this, SIGNAL(clicked(const QModelIndex &)),
-    this, SLOT(handleIndexClicked(const QModelIndex &)));
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(setActiveView(pqView*)));
+  QObject::connect(
+    this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(handleIndexClicked(const QModelIndex&)));
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setActiveView(pqView*)));
 
   new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
 }
@@ -92,8 +92,7 @@ void pqPipelineBrowserWidget::configureModel()
   this->FilteredPipelineModel->setSourceModel(this->PipelineModel);
 
   // Connect the model to the ServerManager model.
-  pqServerManagerModel *smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
   // We connect to `preServerAdded` instead of `serverAdded` signal.
   // This makes it possible for the pqPipelineModel to become aware of a new
@@ -101,22 +100,18 @@ void pqPipelineBrowserWidget::configureModel()
   // vtkSMParaViewPipelineController::InitializeSession is called by
   // pqServerManagerModel. Thus if any proxies are created during that call, the
   // pqPipelineModel knows which session they belong to.
-  QObject::connect(smModel, SIGNAL(preServerAdded(pqServer*)),
-    this->PipelineModel, SLOT(addServer(pqServer*)));
-  QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
-    this->PipelineModel, SLOT(removeServer(pqServer*)));
-  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this->PipelineModel, SLOT(addSource(pqPipelineSource*)));
-  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
-    this->PipelineModel, SLOT(removeSource(pqPipelineSource*)));
-  QObject::connect(smModel,
-    SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
-    this->PipelineModel,
-    SLOT(addConnection(pqPipelineSource*, pqPipelineSource*, int)));
-  QObject::connect(smModel,
-    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
-    this->PipelineModel,
-    SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
+  QObject::connect(
+    smModel, SIGNAL(preServerAdded(pqServer*)), this->PipelineModel, SLOT(addServer(pqServer*)));
+  QObject::connect(
+    smModel, SIGNAL(serverRemoved(pqServer*)), this->PipelineModel, SLOT(removeServer(pqServer*)));
+  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)), this->PipelineModel,
+    SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)), this->PipelineModel,
+    SLOT(removeSource(pqPipelineSource*)));
+  QObject::connect(smModel, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
+    this->PipelineModel, SLOT(addConnection(pqPipelineSource*, pqPipelineSource*, int)));
+  QObject::connect(smModel, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+    this->PipelineModel, SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
 
   // Use the tree view's font as the base for the model's modified
   // font.
@@ -126,8 +121,8 @@ void pqPipelineBrowserWidget::configureModel()
 
   // Make sure the tree items get expanded when new descendents
   // are added.
-  QObject::connect(this->PipelineModel, SIGNAL(firstChildAdded(const QModelIndex &)),
-      this, SLOT(expandWithModelIndexTranslation(const QModelIndex &)));
+  QObject::connect(this->PipelineModel, SIGNAL(firstChildAdded(const QModelIndex&)), this,
+    SLOT(expandWithModelIndexTranslation(const QModelIndex&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -137,27 +132,26 @@ void pqPipelineBrowserWidget::setActiveView(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPipelineBrowserWidget::eventFilter(QObject *object, QEvent *eventArg)
+bool pqPipelineBrowserWidget::eventFilter(QObject* object, QEvent* eventArg)
 {
   if (object == this && eventArg->type() == QEvent::KeyPress)
+  {
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(eventArg);
+    if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace)
     {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(eventArg);
-    if (keyEvent->key() == Qt::Key_Delete ||
-        keyEvent->key() == Qt::Key_Backspace)
-      {
       emit this->deleteKey();
-      }
     }
+  }
 
   return this->Superclass::eventFilter(object, eventArg);
 }
 
 //----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
+void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex& index_)
 {
   // we make sure we are only clicking on an eye
   if (index_.column() == 1)
-    {
+  {
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
     // Get object relative to pqPipelineModel
@@ -166,37 +160,37 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
 
     // We need to obtain the source to give the undo element some sensible name.
     pqServerManagerModelItem* smModelItem = model->getItemFor(index);
-    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
-    pqOutputPort* port = source? source->getOutputPort(0) :
-      qobject_cast<pqOutputPort*>(smModelItem);
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(smModelItem);
+    pqOutputPort* port =
+      source ? source->getOutputPort(0) : qobject_cast<pqOutputPort*>(smModelItem);
     if (port)
-      {
+    {
       pqView* activeView = pqActiveObjects::instance().activeView();
-      vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
-      bool cur_state = (viewProxy == NULL? false :
-        (controller->GetVisibility(port->getSourceProxy(), port->getPortNumber(),
-                                   viewProxy)));
+      vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
+      bool cur_state = (viewProxy == NULL
+          ? false
+          : (controller->GetVisibility(port->getSourceProxy(), port->getPortNumber(), viewProxy)));
 
       bool new_visibility_state = !cur_state;
       bool is_selected = false;
       QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
       foreach (QModelIndex selIndex_, indexes)
-        {
+      {
         // Convert index to pqPipelineModel
         QModelIndex selIndex = this->pipelineModelIndex(selIndex_);
 
         if (selIndex.row() == index.row() && selIndex.parent() == index.parent())
-          {
+        {
           is_selected = true;
           break;
-          }
         }
+      }
       if (is_selected)
-        {
+      {
         this->setVisibility(new_visibility_state, indexes);
-        }
+      }
       else
-        {
+      {
         // although there's a selected group of objects, the user clicked on the
         // eye for some other item. In that case, we only affect the clicked
         // item.
@@ -205,15 +199,14 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
         this->setVisibility(new_visibility_state, indexes2);
         // change the selection to the item, if we just made it visible.
         if (new_visibility_state)
-          {
-          QModelIndex itemIndex = this->getModel()->index(index_.row(), 0,
-            index_.parent());
-          this->getSelectionModel()->setCurrentIndex(itemIndex,
-            QItemSelectionModel::ClearAndSelect);
-          }
+        {
+          QModelIndex itemIndex = this->getModel()->index(index_.row(), 0, index_.parent());
+          this->getSelectionModel()->setCurrentIndex(
+            itemIndex, QItemSelectionModel::ClearAndSelect);
         }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -224,101 +217,97 @@ void pqPipelineBrowserWidget::setSelectionVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::setVisibility(bool visible,
-  const QModelIndexList& indexes)
+void pqPipelineBrowserWidget::setVisibility(bool visible, const QModelIndexList& indexes)
 {
   bool begun_undo_set = false;
 
   foreach (QModelIndex index_, indexes)
-    {
+  {
     // Get object relative to pqPipelineModel
     const pqPipelineModel* model = this->getPipelineModel(index_);
     QModelIndex index = this->pipelineModelIndex(index_);
 
     pqServerManagerModelItem* smModelItem = model->getItemFor(index);
-    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
-    pqOutputPort* port = source? source->getOutputPort(0) :
-      qobject_cast<pqOutputPort*>(smModelItem);
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(smModelItem);
+    pqOutputPort* port =
+      source ? source->getOutputPort(0) : qobject_cast<pqOutputPort*>(smModelItem);
 
     if (port)
-      {
+    {
       if (!begun_undo_set)
-        {
+      {
         begun_undo_set = true;
         if (indexes.size() == 1)
-          {
+        {
           source = port->getSource();
-          BEGIN_UNDO_SET(QString("%1 %2").arg(visible? "Show" : "Hide").
-            arg(source->getSMName()));
-          }
-        else
-          {
-          BEGIN_UNDO_SET(QString("%1 Selected").arg(visible? "Show" : "Hide"));
-          }
+          BEGIN_UNDO_SET(QString("%1 %2").arg(visible ? "Show" : "Hide").arg(source->getSMName()));
         }
+        else
+        {
+          BEGIN_UNDO_SET(QString("%1 Selected").arg(visible ? "Show" : "Hide"));
+        }
+      }
       pqPipelineBrowserWidget::setVisibility(visible, port);
-      }
     }
+  }
   if (begun_undo_set)
-    {
+  {
     END_UNDO_SET();
-    }
+  }
   if (pqView* view = pqActiveObjects::instance().activeView())
-    {
+  {
     if (view->getNumberOfVisibleDataRepresentations() == 1 && visible)
-      {
+    {
       view->resetDisplay();
-      }
-    pqActiveObjects::instance().activeView()->render();
     }
+    pqActiveObjects::instance().activeView()->render();
+  }
 }
 
 //----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
 {
   if (port)
-    {
+  {
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
     pqView* activeView = pqActiveObjects::instance().activeView();
-    vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
+    vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
     int scalarBarMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
 
     if (pqLiveInsituManager::isInsituServer(port->getServer()))
-      {
+    {
       // we don't need to add an extract for writer parameters proxies.
-      if (! pqLiveInsituManager::isWriterParametersProxy(
-        port->getSourceProxy()))
-        {
+      if (!pqLiveInsituManager::isWriterParametersProxy(port->getSourceProxy()))
+      {
         pqLiveInsituVisualizationManager* mgr =
           pqLiveInsituManager::managerFromInsitu(port->getServer());
         if (mgr && mgr->addExtract(port))
-          {
+        {
           // refresh the pipeline browser icon.
-          }
         }
       }
+    }
     else
+    {
+      if (visible)
       {
-      if(visible)
-        {
         // Make sure the given port is selected specially if we are in
         // multi-server / catalyst configuration type
         pqActiveObjects::instance().setActivePort(port);
-        }
+      }
       vtkSMProxy* repr = controller->SetVisibility(
-        port->getSourceProxy(), port->getPortNumber(),
-        viewProxy, visible);
+        port->getSourceProxy(), port->getPortNumber(), viewProxy, visible);
       // update scalar bars: show new ones if needed. Hiding of scalar bars is
       // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
       // wonder if that's the best thing to do).
       if (repr && visible &&
         scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
         vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
-        {
+      {
         vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
-        }
       }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -347,11 +336,12 @@ void pqPipelineBrowserWidget::disableSessionFilter()
 //----------------------------------------------------------------------------
 const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
 {
-  if(qobject_cast<const pqPipelineModel*>(index.model()))
-    {
+  if (qobject_cast<const pqPipelineModel*>(index.model()))
+  {
     return index;
-    }
-  const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+  }
+  const QSortFilterProxyModel* filterModel =
+    qobject_cast<const QSortFilterProxyModel*>(index.model());
   assert("Invalid model used inside index" && filterModel);
 
   // Make a recursive call to support unknown filter depth
@@ -361,12 +351,13 @@ const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex&
 //----------------------------------------------------------------------------
 const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelIndex& index) const
 {
-  if(const pqPipelineModel* model = qobject_cast<const pqPipelineModel*>(index.model()))
-    {
+  if (const pqPipelineModel* model = qobject_cast<const pqPipelineModel*>(index.model()))
+  {
     return model;
-    }
+  }
 
-  const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+  const QSortFilterProxyModel* filterModel =
+    qobject_cast<const QSortFilterProxyModel*>(index.model());
   assert("Invalid model used inside index" && filterModel);
 
   // Make a recusrive call to support unknown filter depth
@@ -374,7 +365,7 @@ const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelInd
 }
 
 //----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex &index)
+void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex& index)
 {
   this->expand(this->FilteredPipelineModel->mapFromSource(index));
 }

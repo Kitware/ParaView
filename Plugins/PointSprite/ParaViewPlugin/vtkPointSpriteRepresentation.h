@@ -45,7 +45,6 @@ public:
   // Overridden to preserve the texture.
   virtual void SetTexture(vtkTexture*);
 
-
   //***************************************************************************
   // Forwarded to ArrayToRadiusFilter and LODArrayToRadiusFilter
   void SetRadiusTransferFunctionEnabled(int val);
@@ -96,22 +95,22 @@ public:
 
   //***************************************************************************
   // Forwarded to RadiusGaussianTransferFunction
-  void SetRadiusGaussianControlPoints(int index, double, double, double, double,
-    double);
+  void SetRadiusGaussianControlPoints(int index, double, double, double, double, double);
   void SetNumberOfRadiusGaussianControlPoints(int val);
   void RemoveAllRadiusGaussianControlPoints();
 
   //***************************************************************************
   // Forwarded to OpacityGaussianTransferFunction
-  void SetOpacityGaussianControlPoints(int index, double, double, double,
-    double, double);
+  void SetOpacityGaussianControlPoints(int index, double, double, double, double, double);
   void SetNumberOfOpacityGaussianControlPoints(int val);
   void RemoveAllOpacityGaussianControlPoints();
 
   // Description:
   // InterpolateScalarsBeforeMapping is not supported by this representation.
   virtual void SetInterpolateScalarsBeforeMapping(int)
-    {this->Superclass::SetInterpolateScalarsBeforeMapping(0); }
+  {
+    this->Superclass::SetInterpolateScalarsBeforeMapping(0);
+  }
 
 protected:
   vtkPointSpriteRepresentation();
@@ -154,7 +153,6 @@ private:
   vtkTexture* TextureInternal;
   void SetTextureInternal(vtkTexture*);
   int RenderMode;
-
 };
 
 #endif

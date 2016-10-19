@@ -43,40 +43,39 @@ void vtkSITimeLabelProperty::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSITimeLabelProperty::Pull(vtkSMMessage* msgToFill)
 {
   if (!this->InformationOnly)
-    {
+  {
     return false;
-    }
+  }
 
   // Get reference to the algorithm
-  vtkAlgorithm *algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
 
-  if(!algo)
-    {
+  if (!algo)
+  {
     return false;
-    }
+  }
 
   vtkInformation* outInfo = algo->GetExecutive()->GetOutputInformation(0);
 
   // If no information just exit
   if (!outInfo)
-    {
+  {
     return false;
-    }
+  }
 
   // Create property and add it to the message
-  ProxyState_Property *prop = msgToFill->AddExtension(ProxyState::property);
+  ProxyState_Property* prop = msgToFill->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *var = prop->mutable_value();
+  Variant* var = prop->mutable_value();
   var->set_type(Variant::STRING);
 
   // Else find out
   if (outInfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
-    {
-    const char* label =
-        outInfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION());
+  {
+    const char* label = outInfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION());
     var->add_txt(label);
     return true;
-    }
+  }
 
   // No value does not mean failure. So just return true
   return true;

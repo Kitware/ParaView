@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,23 +53,23 @@ void pqRecentlyUsedResourcesList::add(const pqServerResource& resource)
   // Remove any existing resources that match the resource we're about to add ...
   // Note: we consider a resource a "match" if it has the same host(s) and path;
   // we ignore scheme and port(s)
-  for (int cc=0; cc < this->ResourceList.size(); cc++)
-    {
+  for (int cc = 0; cc < this->ResourceList.size(); cc++)
+  {
     if (this->ResourceList[cc].hostPath() == resource.hostPath())
-      {
+    {
       this->ResourceList.removeAt(cc);
       cc--;
-      }
     }
+  }
 
   this->ResourceList.prepend(resource);
 
   const int max_length = 10;
   while (this->ResourceList.size() > max_length)
-    {
+  {
     this->ResourceList.removeAt(max_length);
-    }
-  
+  }
+
   emit this->changed();
 }
 
@@ -79,9 +79,9 @@ void pqRecentlyUsedResourcesList::load(pqSettings& settings)
   const QStringList resources = settings.value("RecentlyUsedResourcesList").toStringList();
   this->ResourceList.clear();
   for (int i = resources.size() - 1; i >= 0; --i)
-    {
+  {
     this->add(pqServerResource(resources[i]));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -89,10 +89,9 @@ void pqRecentlyUsedResourcesList::save(pqSettings& settings) const
 {
   QStringList resources;
   QList<pqServerResource>::const_iterator iter;
-  for (iter = this->ResourceList.begin(); iter != this->ResourceList.end();
-    ++iter)
-    {
+  for (iter = this->ResourceList.begin(); iter != this->ResourceList.end(); ++iter)
+  {
     resources.push_back(iter->serializeString());
-    }
+  }
   settings.setValue("RecentlyUsedResourcesList", resources);
 }

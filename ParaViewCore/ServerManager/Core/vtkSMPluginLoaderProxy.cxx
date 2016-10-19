@@ -35,10 +35,7 @@ bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
   this->CreateVTKObjects();
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "LoadPlugin"
-         << filename
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LoadPlugin" << filename
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   this->UpdatePropertyInformation();
@@ -46,17 +43,13 @@ bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(
-  const char* xmlcontents)
+void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(const char* xmlcontents)
 {
   this->CreateVTKObjects();
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "LoadPluginConfigurationXMLFromString"
-         << xmlcontents
-         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this)
+         << "LoadPluginConfigurationXMLFromString" << xmlcontents << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   this->UpdatePropertyInformation();
 }

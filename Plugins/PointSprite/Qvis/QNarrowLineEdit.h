@@ -49,18 +49,17 @@
 // ****************************************************************************
 class QNarrowLineEdit : public QLineEdit
 {
-  public:
-    QNarrowLineEdit(const QString &c, QWidget *p)
-        : QLineEdit(c, p)
-    {
-    }
-    QSize sizeHint() const
-    {
-        QSize size = QLineEdit::sizeHint();
-        QFontMetrics fm(font());
-        int w = fm.width('x') * 4; // 4 characters
-        size.setWidth(w);
-        return size;
-    }
+public:
+  QNarrowLineEdit(const QString& c, QWidget* p)
+    : QLineEdit(c, p)
+  {
+  }
+  QSize sizeHint() const
+  {
+    QSize size = QLineEdit::sizeHint();
+    QFontMetrics fm(font());
+    int w = fm.width('x') * 4; // 4 characters
+    size.setWidth(w);
+    return size;
+  }
 };
-

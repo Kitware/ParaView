@@ -59,18 +59,15 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
   pqEventDispatcher* testPlayer = testUtil ? testUtil->dispatcher() : NULL;
   pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : NULL;
   if (testPlayer)
-    {
-    QObject::connect(testPlayer, SIGNAL(restarted()),
-      this, SLOT(prepareForTest()));
-    }
+  {
+    QObject::connect(testPlayer, SIGNAL(restarted()), this, SLOT(prepareForTest()));
+  }
   if (testRecorder)
-    {
-    QObject::connect(testRecorder, SIGNAL(started()),
-      this, SLOT(prepareForTest()));
-    }
+  {
+    QObject::connect(testRecorder, SIGNAL(started()), this, SLOT(prepareForTest()));
+  }
 
-  QObject::connect(menuManager, SIGNAL(menuPopulated()),
-    this, SLOT(updateToolbars()));
+  QObject::connect(menuManager, SIGNAL(menuPopulated()), this, SLOT(updateToolbars()));
   this->updateToolbars();
 }
 
@@ -79,45 +76,45 @@ void pqCategoryToolbarsBehavior::updateToolbars()
 {
   QStringList toolbarCategories = this->MenuManager->getToolbarCategories();
   foreach (QString category, toolbarCategories)
-    {
+  {
     QToolBar* toolbar = this->MainWindow->findChild<QToolBar*>(category);
     if (!toolbar)
+    {
+      if (category == "Common")
       {
-      if ( category == "Common" )
-        {
         this->MainWindow->addToolBarBreak();
-        }
+      }
       toolbar = new QToolBar(this->MainWindow);
       toolbar->setObjectName(category);
       toolbar->setOrientation(Qt::Horizontal);
       toolbar->setWindowTitle(category); // TODO: Get label from MenuManager.
       this->MainWindow->addToolBar(toolbar);
       if (this->MenuManager->hideForTests(category))
-        {
-        this->ToolbarsToHide << toolbar->toggleViewAction();
-        }
-      }
-    QList<QAction*> toolbarActions = this->MenuManager->actions(category);
-    toolbar->clear();
-    for (int cc=0; cc < toolbarActions.size(); cc++)
       {
-      QVariant omitList = toolbarActions[cc]->property("OmitFromToolbar");
-      if (omitList.isValid() && omitList.toStringList().contains(category))
-        {
-        continue;
-        }
-      toolbar->addAction(toolbarActions[cc]);
+        this->ToolbarsToHide << toolbar->toggleViewAction();
       }
     }
+    QList<QAction*> toolbarActions = this->MenuManager->actions(category);
+    toolbar->clear();
+    for (int cc = 0; cc < toolbarActions.size(); cc++)
+    {
+      QVariant omitList = toolbarActions[cc]->property("OmitFromToolbar");
+      if (omitList.isValid() && omitList.toStringList().contains(category))
+      {
+        continue;
+      }
+      toolbar->addAction(toolbarActions[cc]);
+    }
+  }
 }
 
 void pqCategoryToolbarsBehavior::prepareForTest()
 {
-  foreach(QAction* toolbar, this->ToolbarsToHide)
-    {
+  foreach (QAction* toolbar, this->ToolbarsToHide)
+  {
     if (toolbar && toolbar->isChecked())
-      {
+    {
       toolbar->trigger();
-      }
     }
+  }
 }

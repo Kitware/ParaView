@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
-pqSQToolbarActions::pqSQToolbarActions(QObject* p) : QActionGroup(p)
+pqSQToolbarActions::pqSQToolbarActions(QObject* p)
+  : QActionGroup(p)
 {
   // let's use a Qt icon (we could make our own)
   QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxCritical);
@@ -63,19 +64,19 @@ void pqSQToolbarActions::onAction(QAction* a)
 
   /// Check that we are connect to some server (either builtin or remote).
   if (sm->getNumberOfItems<pqServer*>())
-    {
+  {
     // just create it on the first server connection
     pqServer* s = sm->getItemAtIndex<pqServer*>(0);
     QString source_type = a->data().toString();
     // make this operation undo-able if undo is enabled
-    if(stack)
-      {
+    if (stack)
+    {
       stack->beginUndoSet(QString("Create %1").arg(source_type));
-      }
-    builder->createFilter("sources", source_type.toLatin1().data(), s);
-    if(stack)
-      {
-      stack->endUndoSet();
-      }
     }
+    builder->createFilter("sources", source_type.toLatin1().data(), s);
+    if (stack)
+    {
+      stack->endUndoSet();
+    }
+  }
 }

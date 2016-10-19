@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,34 +43,31 @@ pqUndoRedoReaction::pqUndoRedoReaction(QAction* parentObject, bool _undo)
 
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
-    {
-    QObject::connect(pqApplicationCore::instance(),
-      SIGNAL(undoStackChanged(pqUndoStack*)),
-      this, SLOT(setUndoStack(pqUndoStack*)));
-    }
+  {
+    QObject::connect(pqApplicationCore::instance(), SIGNAL(undoStackChanged(pqUndoStack*)), this,
+      SLOT(setUndoStack(pqUndoStack*)));
+  }
   else
-    {
+  {
     this->setUndoStack(stack);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoRedoReaction::setUndoStack(pqUndoStack* stack)
 {
   if (this->Undo)
-    {
-    QObject::connect(stack, SIGNAL(canUndoChanged(bool)),
-      this, SLOT(enable(bool)));
-    QObject::connect(stack, SIGNAL(undoLabelChanged(const QString&)),
-      this, SLOT(setLabel(const QString&)));
-    }
+  {
+    QObject::connect(stack, SIGNAL(canUndoChanged(bool)), this, SLOT(enable(bool)));
+    QObject::connect(
+      stack, SIGNAL(undoLabelChanged(const QString&)), this, SLOT(setLabel(const QString&)));
+  }
   else
-    {
-    QObject::connect(stack, SIGNAL(canRedoChanged(bool)),
-      this, SLOT(enable(bool)));
-    QObject::connect(stack, SIGNAL(redoLabelChanged(const QString&)),
-      this, SLOT(setLabel(const QString&)));
-    }
+  {
+    QObject::connect(stack, SIGNAL(canRedoChanged(bool)), this, SLOT(enable(bool)));
+    QObject::connect(
+      stack, SIGNAL(redoLabelChanged(const QString&)), this, SLOT(setLabel(const QString&)));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -78,10 +75,10 @@ void pqUndoRedoReaction::undo()
 {
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
-    {
+  {
     qCritical("No application wide undo stack.");
     return;
-    }
+  }
   stack->undo();
 }
 
@@ -90,10 +87,10 @@ void pqUndoRedoReaction::redo()
 {
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
-    {
+  {
     qCritical("No application wide undo stack.");
     return;
-    }
+  }
   stack->redo();
 }
 //-----------------------------------------------------------------------------
@@ -101,10 +98,10 @@ void pqUndoRedoReaction::clear()
 {
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
-    {
+  {
     qCritical("No application wide undo stack.");
     return;
-    }
+  }
   stack->clear();
 }
 
@@ -118,22 +115,17 @@ void pqUndoRedoReaction::enable(bool can_undo)
 void pqUndoRedoReaction::setLabel(const QString& label)
 {
   if (this->Undo)
-    {
+  {
     this->parentAction()->setText(
       label.isEmpty() ? tr("Can't Undo") : QString(tr("&Undo %1")).arg(label));
     this->parentAction()->setStatusTip(
       label.isEmpty() ? tr("Can't Undo") : QString(tr("Undo %1")).arg(label));
-    }
+  }
   else
-    {
+  {
     this->parentAction()->setText(
       label.isEmpty() ? tr("Can't Redo") : QString(tr("&Redo %1")).arg(label));
     this->parentAction()->setStatusTip(
       label.isEmpty() ? tr("Can't Redo") : QString(tr("Redo %1")).arg(label));
-    }
+  }
 }
-
-
-
-
-

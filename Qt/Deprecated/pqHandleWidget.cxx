@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -53,16 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqHandleWidget::pqImplementation
 {
 public:
-  pqImplementation() :
-    UI(new Ui::pqHandleWidget())
+  pqImplementation()
+    : UI(new Ui::pqHandleWidget())
   {
   }
-  
-  ~pqImplementation()
-  {
-    delete this->UI;
-  }
-  
+
+  ~pqImplementation() { delete this->UI; }
+
   /// Stores the Qt widgets
   Ui::pqHandleWidget* const UI;
   pqPropertyLinks Links;
@@ -71,9 +68,9 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget
 
-pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(_smproxy, pxy, p),
-  Implementation(new pqImplementation())
+pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p)
+  : Superclass(_smproxy, pxy, p)
+  , Implementation(new pqImplementation())
 {
   // enable picking.
   this->pickingSupported(QKeySequence(tr("P")));
@@ -87,31 +84,27 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
   this->Implementation->UI->worldPositionY->setValidator(validator);
   this->Implementation->UI->worldPositionZ->setValidator(validator);
 
-  QObject::connect(this->Implementation->UI->show3DWidget,
-    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+  QObject::connect(this->Implementation->UI->show3DWidget, SIGNAL(toggled(bool)), this,
+    SLOT(setWidgetVisible(bool)));
 
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this, SLOT(onWidgetVisibilityChanged(bool)));
+  QObject::connect(
+    this, SIGNAL(widgetVisibilityChanged(bool)), this, SLOT(onWidgetVisibilityChanged(bool)));
 
-  QObject::connect(this->Implementation->UI->useCenterBounds,
-    SIGNAL(clicked()), this, SLOT(resetBounds()));
+  QObject::connect(
+    this->Implementation->UI->useCenterBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 
   // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI->worldPositionX, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->worldPositionY, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->worldPositionZ,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(this->Implementation->UI->worldPositionX, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->worldPositionY, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI->worldPositionZ, SIGNAL(editingFinished()), this,
+    SLOT(render()), Qt::QueuedConnection);
+
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(_smproxy->GetSession()));
 }
 
@@ -137,27 +130,21 @@ void pqHandleWidget::pick(double dx, double dy, double dz)
 void pqHandleWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PointSourceWidgetRepresentation", server, this->getReferenceProxy());
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      "PointSourceWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
-  
+
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionX, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("WorldPosition"), 0);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->worldPositionX, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("WorldPosition"), 0);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionY, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("WorldPosition"), 1);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->worldPositionY, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("WorldPosition"), 1);
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionZ, "text2",
-    SIGNAL(textChanged(const QString&)),
-    widget, widget->GetProperty("WorldPosition"), 2);
+  this->Implementation->Links.addPropertyLink(this->Implementation->UI->worldPositionZ, "text2",
+    SIGNAL(textChanged(const QString&)), widget, widget->GetProperty("WorldPosition"), 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,11 +164,10 @@ void pqHandleWidget::resetBounds(double input_bounds[6])
   input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
   input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-  if(vtkSMDoubleVectorProperty* const widget_position =
-    vtkSMDoubleVectorProperty::SafeDownCast(
-      widget->GetProperty("WorldPosition")))
-    {
+  if (vtkSMDoubleVectorProperty* const widget_position =
+        vtkSMDoubleVectorProperty::SafeDownCast(widget->GetProperty("WorldPosition")))
+  {
     widget_position->SetElements(input_origin);
     widget->UpdateVTKObjects();
-    }
+  }
 }

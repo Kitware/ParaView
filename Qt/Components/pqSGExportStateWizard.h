@@ -45,9 +45,9 @@ class PQCOMPONENTS_EXPORT pqSGExportStateWizard : public QWizard
 {
   Q_OBJECT
   typedef QWizard Superclass;
+
 public:
-  pqSGExportStateWizard(
-    QWidget *parentObject=0, Qt::WindowFlags parentFlags=0);
+  pqSGExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
   virtual ~pqSGExportStateWizard();
 
   virtual bool validateCurrentPage();
@@ -78,27 +78,26 @@ private:
 class pqSGExportStateWizardPage2 : public QWizardPage
 {
   pqSGExportStateWizard::pqInternals* Internals;
+
 public:
-  pqSGExportStateWizardPage2(QWidget* _parent=0);
+  pqSGExportStateWizardPage2(QWidget* _parent = 0);
 
   virtual void initializePage();
 
   virtual bool isComplete() const;
 
-  void emitCompleteChanged()
-  { emit this->completeChanged(); }
+  void emitCompleteChanged() { emit this->completeChanged(); }
 };
 
-class pqSGExportStateWizardPage3: public QWizardPage
+class pqSGExportStateWizardPage3 : public QWizardPage
 {
   pqSGExportStateWizard::pqInternals* Internals;
+
 public:
-  pqSGExportStateWizardPage3(QWidget* _parent=0);
+  pqSGExportStateWizardPage3(QWidget* _parent = 0);
 
   virtual void initializePage();
 };
-
-
 
 #include "ui_pqExportStateWizard.h"
 

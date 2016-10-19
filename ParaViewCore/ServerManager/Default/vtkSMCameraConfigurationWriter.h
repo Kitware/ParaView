@@ -12,17 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCameraConfigurationWriter - A writer for XML camera configuration.
-//
-// .SECTION Description
-// A writer for XML camera configuration. Writes camera configuration files
-// using ParaView state file machinery.
-//
-// .SECTION See Also
-// vtkSMCameraConfigurationReader, vtkSMProxyConfigurationWriter
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
+/**
+ * @class   vtkSMCameraConfigurationWriter
+ * @brief   A writer for XML camera configuration.
+ *
+ *
+ * A writer for XML camera configuration. Writes camera configuration files
+ * using ParaView state file machinery.
+ *
+ * @sa
+ * vtkSMCameraConfigurationReader, vtkSMProxyConfigurationWriter
+ *
+ * @par Thanks:
+ * This class was contributed by SciberQuest Inc.
+*/
+
 #ifndef vtkSMCameraConfigurationWriter_h
 #define vtkSMCameraConfigurationWriter_h
 
@@ -31,16 +35,18 @@
 
 class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter
+  : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);
+  vtkTypeMacro(vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMCameraConfigurationWriter *New();
+  static vtkSMCameraConfigurationWriter* New();
 
-  // Description:
-  // Set the render view proxy to extract camera properties from.
-  void SetRenderViewProxy(vtkSMProxy *rvProxy);
+  /**
+   * Set the render view proxy to extract camera properties from.
+   */
+  void SetRenderViewProxy(vtkSMProxy* rvProxy);
 
 protected:
   vtkSMCameraConfigurationWriter();
@@ -48,7 +54,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy*) { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&) VTK_DELETE_FUNCTION;
@@ -56,4 +62,3 @@ private:
 };
 
 #endif
-

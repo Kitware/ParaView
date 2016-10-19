@@ -14,15 +14,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPostFilterExecutive - Executive supporting post filters.
-// .SECTION Description
-// vtkPVPostFilterExecutive is an executive that supports the creation of
-// post filters for the following uses cases:
-// Provide the ability to automatically use a vector component as a scalar
-// input property.
-//
-// Interpolate cell centered data to point data, and the inverse if needed
-// by the filter.
+/**
+ * @class   vtkPVPostFilterExecutive
+ * @brief   Executive supporting post filters.
+ *
+ * vtkPVPostFilterExecutive is an executive that supports the creation of
+ * post filters for the following uses cases:
+ * Provide the ability to automatically use a vector component as a scalar
+ * input property.
+ *
+ * Interpolate cell centered data to point data, and the inverse if needed
+ * by the filter.
+*/
 
 #ifndef vtkPVPostFilterExecutive_h
 #define vtkPVPostFilterExecutive_h
@@ -36,31 +39,31 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilterExecutive : public vtkPVCompo
 {
 public:
   static vtkPVPostFilterExecutive* New();
-  vtkTypeMacro(vtkPVPostFilterExecutive,vtkPVCompositeDataPipeline);
+  vtkTypeMacro(vtkPVPostFilterExecutive, vtkPVCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();
   static vtkInformationStringVectorKey* POST_ARRAY_COMPONENT_KEY();
 
-  // Description:
-  // Returns the data object stored with the DATA_OBJECT() in the
-  // input port
-  vtkDataObject* GetCompositeInputData(
-    int port, int index, vtkInformationVector **inInfoVec);
+  /**
+   * Returns the data object stored with the DATA_OBJECT() in the
+   * input port
+   */
+  vtkDataObject* GetCompositeInputData(int port, int index, vtkInformationVector** inInfoVec);
 
   vtkInformation* GetPostArrayToProcessInformation(int idx);
-  void SetPostArrayToProcessInformation(int idx, vtkInformation *inInfo);
+  void SetPostArrayToProcessInformation(int idx, vtkInformation* inInfo);
 
 protected:
   vtkPVPostFilterExecutive();
   ~vtkPVPostFilterExecutive();
 
   // Overriden to always return true
-  virtual int NeedToExecuteData(int outputPort,
-                                vtkInformationVector** inInfoVec,
-                                vtkInformationVector* outInfoVec);
+  virtual int NeedToExecuteData(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
 
-  bool MatchingPropertyInformation(vtkInformation* inputArrayInfo,vtkInformation* postArrayInfo);
+  bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
+
 private:
   vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;

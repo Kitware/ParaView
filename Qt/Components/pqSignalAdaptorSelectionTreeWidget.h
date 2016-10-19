@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,62 +41,73 @@ class QTreeWidget;
 class vtkSMProperty;
 class QTreeWidgetItem;
 
-/// pqSignalAdaptorSelectionTreeWidget has two roles.
-/// \li It is used to connect a selection property with a
-/// QTreeWidget (typically pqTreeWidget)
-/// It also updates the list of available values every time
-/// the domain changes.
-/// Example use of this adaptor is to connect :
-/// \li "AddVolumeArrayName" property of a CTHPart filter to a 
-///     pqTreeWidget widget.
-/// \li "Functions" property of "P3DReader" with a pqTreeWidget.
-
+/**
+* pqSignalAdaptorSelectionTreeWidget has two roles.
+* \li It is used to connect a selection property with a
+* QTreeWidget (typically pqTreeWidget)
+* It also updates the list of available values every time
+* the domain changes.
+* Example use of this adaptor is to connect :
+* \li "AddVolumeArrayName" property of a CTHPart filter to a
+*     pqTreeWidget widget.
+* \li "Functions" property of "P3DReader" with a pqTreeWidget.
+*/
 
 class PQCOMPONENTS_EXPORT pqSignalAdaptorSelectionTreeWidget : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QList<QList<QVariant> > values READ values WRITE setValues)
 public:
-  /// Constructor.
-  /// \param domain The StringListDomain from which the adaptor
-  ///        can obtain the list of possible values for this widget.
-  /// \param treeWidget The QTreeWidget controlled by this adaptor.
-  pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget,
-                                     vtkSMProperty* property);
+  /**
+  * Constructor.
+  * \param domain The StringListDomain from which the adaptor
+  *        can obtain the list of possible values for this widget.
+  * \param treeWidget The QTreeWidget controlled by this adaptor.
+  */
+  pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget, vtkSMProperty* property);
 
   virtual ~pqSignalAdaptorSelectionTreeWidget();
 
-  /// Returns a list of strings which  correspond to the currently
-  /// selected values. i.e. only the strings for items currently
-  /// selected by the user are returned.
+  /**
+  * Returns a list of strings which  correspond to the currently
+  * selected values. i.e. only the strings for items currently
+  * selected by the user are returned.
+  */
   QList<QList<QVariant> > values() const;
 
-  /// This adaptor create QTreeWidgetItem instances by default when new
-  /// entries are to be shown in the widget. To change the type of
-  /// QTreeWidgetItem subclass created, simply set a function pointer to
-  /// a callback which will be called every time a new item is needed.
-  /// The signature for the callback is:
-  /// QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
-  void setItemCreatorFunction(
-    QTreeWidgetItem* (fptr)(QTreeWidget*, const QStringList&))
-    {
+  /**
+  * This adaptor create QTreeWidgetItem instances by default when new
+  * entries are to be shown in the widget. To change the type of
+  * QTreeWidgetItem subclass created, simply set a function pointer to
+  * a callback which will be called every time a new item is needed.
+  * The signature for the callback is:
+  * QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
+  */
+  void setItemCreatorFunction(QTreeWidgetItem*(fptr)(QTreeWidget*, const QStringList&))
+  {
     this->ItemCreatorFunctionPtr = fptr;
-    }
+  }
 
 signals:
-  /// Fired whenever the values change.
+  /**
+  * Fired whenever the values change.
+  */
   void valuesChanged();
 
 public slots:
-  /// Set the selected value on the widget. All the strings in the 
-  /// \values are set as selected in the tree widget.
-  /// If a string is present that is not in the domain, it will
-  /// be ignored.
+  /**
+  * Set the selected value on the widget. All the strings in the
+  * \values are set as selected in the tree widget.
+  * If a string is present that is not in the domain, it will
+  * be ignored.
+  */
   void setValues(const QList<QList<QVariant> >& values);
 
 private slots:
-  /// Called when vtkSMStringListDomain changes. We update the
-  /// tree widget to show the user the new set of strings he can choose.
+  /**
+  * Called when vtkSMStringListDomain changes. We update the
+  * tree widget to show the user the new set of strings he can choose.
+  */
   void domainChanged();
 
 private:
@@ -109,4 +120,3 @@ private:
 };
 
 #endif
-

@@ -34,13 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqTabbedMultiViewWidget.h"
 
-/// pqViewManager is deprecated. Use pqTabbedMultiViewWidget.
+/**
+* pqViewManager is deprecated. Use pqTabbedMultiViewWidget.
+*/
 class PQCOMPONENTS_EXPORT pqViewManager : public pqTabbedMultiViewWidget
 {
   Q_OBJECT
   typedef pqTabbedMultiViewWidget Superclass;
+
 public:
-  pqViewManager(QWidget* parentW=0);
+  pqViewManager(QWidget* parentW = 0);
   virtual ~pqViewManager();
 
 private:

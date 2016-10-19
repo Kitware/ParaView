@@ -38,9 +38,10 @@ class pqMyPropertyWidgetForProperty : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
+
 public:
   pqMyPropertyWidgetForProperty(
-    vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget *parentObject=0);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
   virtual ~pqMyPropertyWidgetForProperty();
 
 private:

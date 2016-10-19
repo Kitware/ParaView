@@ -34,37 +34,33 @@ vtkTrackballPan::~vtkTrackballPan()
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer *,
-                                     vtkRenderWindowInteractor *)
-{
-}
-
-
-//-------------------------------------------------------------------------
-void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer *,
-                                    vtkRenderWindowInteractor *)
+void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
-                                     vtkRenderWindowInteractor *rwi)
+void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
+{
+}
+
+//-------------------------------------------------------------------------
+void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   if (ren == NULL)
-    {
+  {
     return;
-    }
+  }
 
-  vtkCamera *camera = ren->GetActiveCamera();
+  vtkCamera* camera = ren->GetActiveCamera();
   double pos[3], fp[3];
   camera->GetPosition(pos);
   camera->GetFocalPoint(fp);
 
   if (camera->GetParallelProjection())
-    {
+  {
     camera->OrthogonalizeViewUp();
-    double *up = camera->GetViewUp();
-    double *vpn = camera->GetViewPlaneNormal();
+    double* up = camera->GetViewUp();
+    double* vpn = camera->GetViewPlaneNormal();
     double right[3];
     double scale, tmp;
     camera->GetViewUp(up);
@@ -72,7 +68,7 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     vtkMath::Cross(vpn, up, right);
 
     // These are different because y is flipped.
-    int *size = ren->GetSize();
+    int* size = ren->GetSize();
     double dx = (double)(x - rwi->GetLastEventPosition()[0]) / (double)(size[1]);
     double dy = (double)(rwi->GetLastEventPosition()[1] - y) / (double)(size[1]);
 
@@ -80,52 +76,50 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     dx *= scale * 2.0;
     dy *= scale * 2.0;
 
-    tmp = (right[0]*dx + up[0]*dy);
+    tmp = (right[0] * dx + up[0] * dy);
     pos[0] += tmp;
-    fp[0] += tmp; 
-    tmp = (right[1]*dx + up[1]*dy); 
+    fp[0] += tmp;
+    tmp = (right[1] * dx + up[1] * dy);
     pos[1] += tmp;
-    fp[1] += tmp; 
-    tmp = (right[2]*dx + up[2]*dy); 
+    fp[1] += tmp;
+    tmp = (right[2] * dx + up[2] * dy);
     pos[2] += tmp;
-    fp[2] += tmp; 
+    fp[2] += tmp;
     camera->SetPosition(pos);
     camera->SetFocalPoint(fp);
-    }
+  }
   else
-    {
+  {
     double depth, worldPt[4], lastWorldPt[4];
-    
+
     double center[3];
     this->GetCenter(center);
     ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
-    
+
     ren->WorldToDisplay();
     depth = ren->GetDisplayPoint()[2];
-    
+
     ren->SetDisplayPoint(x, y, depth);
     ren->DisplayToWorld();
     ren->GetWorldPoint(worldPt);
     if (worldPt[3])
-      {
+    {
       worldPt[0] /= worldPt[3];
       worldPt[1] /= worldPt[3];
       worldPt[2] /= worldPt[3];
       worldPt[3] = 1.0;
-      }
-    
-    ren->SetDisplayPoint(rwi->GetLastEventPosition()[0],
-                         rwi->GetLastEventPosition()[1],
-                         depth);
+    }
+
+    ren->SetDisplayPoint(rwi->GetLastEventPosition()[0], rwi->GetLastEventPosition()[1], depth);
     ren->DisplayToWorld();
     ren->GetWorldPoint(lastWorldPt);
     if (lastWorldPt[3])
-      {
+    {
       lastWorldPt[0] /= lastWorldPt[3];
       lastWorldPt[1] /= lastWorldPt[3];
       lastWorldPt[2] /= lastWorldPt[3];
       lastWorldPt[3] = 1.0;
-      }
+    }
 
     pos[0] += lastWorldPt[0] - worldPt[0];
     pos[1] += lastWorldPt[1] - worldPt[1];
@@ -137,7 +131,7 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
 
     camera->SetPosition(pos);
     camera->SetFocalPoint(fp);
-    }
+  }
   ren->ResetCameraClippingRange();
   rwi->Render();
 }
@@ -147,9 +141,3 @@ void vtkTrackballPan::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
-
-
-
-

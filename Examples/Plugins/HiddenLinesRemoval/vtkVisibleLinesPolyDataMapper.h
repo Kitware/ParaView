@@ -35,8 +35,6 @@ protected:
 private:
   vtkVisibleLinesPolyDataMapper(const vtkVisibleLinesPolyDataMapper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVisibleLinesPolyDataMapper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

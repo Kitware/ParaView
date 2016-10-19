@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRDualContour - Extract particles and analyse them.
-// .SECTION Description
-// This filter takes a cell data volume fraction and generates a polydata
-// surface.  It also performs connectivity on the particles and generates
-// a particle index as part of the cell data of the output.  It computes
-// the volume of each particle from the volume fraction.
-
-// This will turn on validation and debug i/o of the filter.
-//#define vtkAMRDualContourDEBUG
-//#define vtkAMRDualContourPROFILE
+/**
+ * @class   vtkAMRDualContour
+ * @brief   Extract particles and analyse them.
+ *
+ * This filter takes a cell data volume fraction and generates a polydata
+ * surface.  It also performs connectivity on the particles and generates
+ * a particle index as part of the cell data of the output.  It computes
+ * the volume of each particle from the volume fraction.
+ *
+ * This will turn on validation and debug i/o of the filter.
+ *#define vtkAMRDualContourDEBUG
+ *#define vtkAMRDualContourPROFILE
+*/
 
 #ifndef vtkAMRDualContour_h
 #define vtkAMRDualContour_h
@@ -50,56 +53,67 @@ class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperFace;
 class vtkAMRDualContourEdgeLocator;
 
-
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  static vtkAMRDualContour *New();
-  vtkTypeMacro(vtkAMRDualContour,vtkMultiBlockDataSetAlgorithm);
+  static vtkAMRDualContour* New();
+  vtkTypeMacro(vtkAMRDualContour, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
 
-  // Description:
-  // These are to evaluate performances. You can turn off capping, degenerate cells
-  // and multiprocess comunication to see how they affect speed of execution.
-  // Degenerate cells is the meshing between levels in the grid.
-  vtkSetMacro(EnableCapping,int);
-  vtkGetMacro(EnableCapping,int);
-  vtkBooleanMacro(EnableCapping,int);
-  vtkSetMacro(EnableDegenerateCells,int);
-  vtkGetMacro(EnableDegenerateCells,int);
-  vtkBooleanMacro(EnableDegenerateCells,int);
-  vtkSetMacro(EnableMultiProcessCommunication,int);
-  vtkGetMacro(EnableMultiProcessCommunication,int);
-  vtkBooleanMacro(EnableMultiProcessCommunication,int);
+  //@{
+  /**
+   * These are to evaluate performances. You can turn off capping, degenerate cells
+   * and multiprocess comunication to see how they affect speed of execution.
+   * Degenerate cells is the meshing between levels in the grid.
+   */
+  vtkSetMacro(EnableCapping, int);
+  vtkGetMacro(EnableCapping, int);
+  vtkBooleanMacro(EnableCapping, int);
+  vtkSetMacro(EnableDegenerateCells, int);
+  vtkGetMacro(EnableDegenerateCells, int);
+  vtkBooleanMacro(EnableDegenerateCells, int);
+  vtkSetMacro(EnableMultiProcessCommunication, int);
+  vtkGetMacro(EnableMultiProcessCommunication, int);
+  vtkBooleanMacro(EnableMultiProcessCommunication, int);
+  //@}
 
-  // Description:
-  // This flag causes blocks to share locators so there are no
-  // boundary edges between blocks. It does not eliminate
-  // boundary edges between processes.
-  vtkSetMacro(EnableMergePoints,int);
-  vtkGetMacro(EnableMergePoints,int);
-  vtkBooleanMacro(EnableMergePoints,int);
+  //@{
+  /**
+   * This flag causes blocks to share locators so there are no
+   * boundary edges between blocks. It does not eliminate
+   * boundary edges between processes.
+   */
+  vtkSetMacro(EnableMergePoints, int);
+  vtkGetMacro(EnableMergePoints, int);
+  vtkBooleanMacro(EnableMergePoints, int);
+  //@}
 
-  // Description:
-  // A flag that causes the polygons on the capping surfaces to be triagulated.
-  vtkSetMacro(TriangulateCap,int);
-  vtkGetMacro(TriangulateCap,int);
-  vtkBooleanMacro(TriangulateCap,int);
+  //@{
+  /**
+   * A flag that causes the polygons on the capping surfaces to be triagulated.
+   */
+  vtkSetMacro(TriangulateCap, int);
+  vtkGetMacro(TriangulateCap, int);
+  vtkBooleanMacro(TriangulateCap, int);
+  //@}
 
-  // Description:
-  // An option to turn off copying ghost values across process boundaries.
-  // If the ghost values are already correct, then the extra communication is
-  // not necessary.  If this assumption is wrong, this option will produce
-  // cracks / seams.
-  vtkSetMacro(SkipGhostCopy,int);
-  vtkGetMacro(SkipGhostCopy,int);
-  vtkBooleanMacro(SkipGhostCopy,int);
+  //@{
+  /**
+   * An option to turn off copying ghost values across process boundaries.
+   * If the ghost values are already correct, then the extra communication is
+   * not necessary.  If this assumption is wrong, this option will produce
+   * cracks / seams.
+   */
+  vtkSetMacro(SkipGhostCopy, int);
+  vtkGetMacro(SkipGhostCopy, int);
+  vtkBooleanMacro(SkipGhostCopy, int);
+  //@}
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkAMRDualContour();
@@ -115,44 +129,39 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  // Description:
-  // This should be called before any number of calls to DoRequestData 
-  void InitializeRequest (vtkNonOverlappingAMR* input);
+  /**
+   * This should be called before any number of calls to DoRequestData
+   */
+  void InitializeRequest(vtkNonOverlappingAMR* input);
 
-  // Description:
-  // This should be called after any number of calls to DoRequestData
-  void FinalizeRequest ();
+  /**
+   * This should be called after any number of calls to DoRequestData
+   */
+  void FinalizeRequest();
 
-  // Description:
-  // Not a pipeline function. This is a helper function that
-  // allows creating a new data set given a input and a cell array name.
-  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
-                                          const char* arrayNameToProcess);
+  /**
+   * Not a pipeline function. This is a helper function that
+   * allows creating a new data set given a input and a cell array name.
+   */
+  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  void ShareBlockLocatorWithNeighbors(
-    vtkAMRDualGridHelperBlock* block);
+  void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 
-  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId,
-                    const char* arrayName);
+  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId, const char* arrayName);
 
-
-  void ProcessDualCell(
-    vtkAMRDualGridHelperBlock* block, int blockId,
-    int x, int y, int z,
-    vtkIdType cornerOffsets[8],
-    vtkDataArray *volumeFractionArray);
+  void ProcessDualCell(vtkAMRDualGridHelperBlock* block, int blockId, int x, int y, int z,
+    vtkIdType cornerOffsets[8], vtkDataArray* volumeFractionArray);
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
   // This method is getting too many arguements!
   // Capping was an after thought...
-  void CapCell(
-    int cellX, int cellY, int cellZ,  // block coordinates
+  void CapCell(int cellX, int cellY, int cellZ, // block coordinates
     // Which cell faces need to be capped.
     unsigned char cubeBoundaryBits,
     // Marching cubes case for this cell
@@ -178,7 +187,7 @@ protected:
   vtkPoints* Points;
   vtkCellArray* Faces;
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
   // I made these ivars to avoid allocating multiple times.
   // The buffer is not used too many times, but ...
@@ -188,21 +197,15 @@ protected:
   vtkAMRDualContourEdgeLocator* BlockLocator;
 
   // Stuff for passing cell attributes to point attributes.
-  void InitializeCopyAttributes(
-    vtkNonOverlappingAMR *hbdsInput,
-    vtkDataSet* mesh);
-  void InterpolateAttributes(
-    vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
+  void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
+  void InterpolateAttributes(vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
     vtkDataSet* mesh, vtkIdType outId);
-  void CopyAttributes(
-    vtkDataSet* uGrid, vtkIdType inId,
-    vtkDataSet* mesh, vtkIdType outId);
+  void CopyAttributes(vtkDataSet* uGrid, vtkIdType inId, vtkDataSet* mesh, vtkIdType outId);
   void FinalizeCopyAttributes(vtkDataSet* mesh);
 
 private:
   vtkAMRDualContour(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

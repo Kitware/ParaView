@@ -43,40 +43,41 @@
 #include <EqualVal.h>
 #include <Interpolator.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 //
 // These constants represent the types of attributes.
 //
-static const unsigned char msgTypeNone           = 0x00;
-static const unsigned char msgTypeChar           = 0x01;
-static const unsigned char msgTypeUnsignedChar   = 0x02;
-static const unsigned char msgTypeInt            = 0x03;
-static const unsigned char msgTypeLong           = 0x04;
-static const unsigned char msgTypeFloat          = 0x05;
-static const unsigned char msgTypeDouble         = 0x06;
-static const unsigned char msgTypeString         = 0x07;
+static const unsigned char msgTypeNone = 0x00;
+static const unsigned char msgTypeChar = 0x01;
+static const unsigned char msgTypeUnsignedChar = 0x02;
+static const unsigned char msgTypeInt = 0x03;
+static const unsigned char msgTypeLong = 0x04;
+static const unsigned char msgTypeFloat = 0x05;
+static const unsigned char msgTypeDouble = 0x06;
+static const unsigned char msgTypeString = 0x07;
 static const unsigned char msgTypeAttributeGroup = 0x08;
-static const unsigned char msgTypeBool           = 0x09;
+static const unsigned char msgTypeBool = 0x09;
 
-static const unsigned char msgTypeListChar           = 0x0a;
-static const unsigned char msgTypeListUnsignedChar   = 0x0b;
-static const unsigned char msgTypeListInt            = 0x0c;
-static const unsigned char msgTypeListLong           = 0x0d;
-static const unsigned char msgTypeListFloat          = 0x0e;
-static const unsigned char msgTypeListDouble         = 0x0f;
-static const unsigned char msgTypeListString         = 0x10;
+static const unsigned char msgTypeListChar = 0x0a;
+static const unsigned char msgTypeListUnsignedChar = 0x0b;
+static const unsigned char msgTypeListInt = 0x0c;
+static const unsigned char msgTypeListLong = 0x0d;
+static const unsigned char msgTypeListFloat = 0x0e;
+static const unsigned char msgTypeListDouble = 0x0f;
+static const unsigned char msgTypeListString = 0x10;
 static const unsigned char msgTypeListAttributeGroup = 0x11;
-static const unsigned char msgTypeListBool           = 0x12;
+static const unsigned char msgTypeListBool = 0x12;
 
-static const unsigned char msgTypeVectorChar           = 0x13;
-static const unsigned char msgTypeVectorUnsignedChar   = 0x14;
-static const unsigned char msgTypeVectorInt            = 0x15;
-static const unsigned char msgTypeVectorLong           = 0x16;
-static const unsigned char msgTypeVectorFloat          = 0x17;
-static const unsigned char msgTypeVectorDouble         = 0x18;
-static const unsigned char msgTypeVectorString         = 0x19;
+static const unsigned char msgTypeVectorChar = 0x13;
+static const unsigned char msgTypeVectorUnsignedChar = 0x14;
+static const unsigned char msgTypeVectorInt = 0x15;
+static const unsigned char msgTypeVectorLong = 0x16;
+static const unsigned char msgTypeVectorFloat = 0x17;
+static const unsigned char msgTypeVectorDouble = 0x18;
+static const unsigned char msgTypeVectorString = 0x19;
 static const unsigned char msgTypeVectorAttributeGroup = 0x1a;
-static const unsigned char msgTypeVectorBool           = 0x1b;
+static const unsigned char msgTypeVectorBool = 0x1b;
 
 #if 0
 // These are uesful for creating debugging output. Ordinarily, these
@@ -126,10 +127,11 @@ static const char *typeNames[] = {
 //
 // ****************************************************************************
 
-AttributeGroup::AttributeGroup(const char *formatString) : typeMap()
+AttributeGroup::AttributeGroup(const char* formatString)
+  : typeMap()
 {
-    guido = -1;
-    CreateTypeMap(formatString);
+  guido = -1;
+  CreateTypeMap(formatString);
 }
 
 // ****************************************************************************
@@ -147,7 +149,6 @@ AttributeGroup::AttributeGroup(const char *formatString) : typeMap()
 
 AttributeGroup::~AttributeGroup()
 {
-
 }
 
 // ****************************************************************************
@@ -164,10 +165,9 @@ AttributeGroup::~AttributeGroup()
 //
 // ****************************************************************************
 
-int
-AttributeGroup::NumAttributes() const
+int AttributeGroup::NumAttributes() const
 {
-    return static_cast<int>(typeMap.size());
+  return static_cast<int>(typeMap.size());
 }
 
 // ****************************************************************************
@@ -195,18 +195,17 @@ AttributeGroup::NumAttributes() const
 //
 // ****************************************************************************
 
-bool
-AttributeGroup::IsSelected(int i) const
+bool AttributeGroup::IsSelected(int i) const
 {
-    bool retval = false;
+  bool retval = false;
 
-    // If the index is valid, check the selected flag.
-    if(i >= 0 && i < static_cast<int>(typeMap.size()))
-    {
-         retval = typeMap[i].selected;
-    }
+  // If the index is valid, check the selected flag.
+  if (i >= 0 && i < static_cast<int>(typeMap.size()))
+  {
+    retval = typeMap[i].selected;
+  }
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -226,10 +225,9 @@ AttributeGroup::IsSelected(int i) const
 //
 // ****************************************************************************
 
-bool
-AttributeGroup::CopyAttributes(const AttributeGroup * /*atts*/)
+bool AttributeGroup::CopyAttributes(const AttributeGroup* /*atts*/)
 {
-    return false;
+  return false;
 }
 
 // ****************************************************************************
@@ -264,122 +262,120 @@ AttributeGroup::CopyAttributes(const AttributeGroup * /*atts*/)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::InterpolateConst(const AttributeGroup *atts1,
-                                 const AttributeGroup *atts2, double f)
+void AttributeGroup::InterpolateConst(
+  const AttributeGroup* atts1, const AttributeGroup* atts2, double f)
 {
-    SelectAll();
-    int n = NumAttributes();
+  SelectAll();
+  int n = NumAttributes();
 
-    for (int i=0; i<n; i++)
+  for (int i = 0; i < n; i++)
+  {
+    if (!typeMap[i].selected)
+      continue;
+
+    void* addrOut = typeMap[i].address;
+    void* addr1 = atts1->typeMap[i].address;
+    void* addr2 = atts2->typeMap[i].address;
+    int length = typeMap[i].length;
+
+    switch (GetFieldType(i))
     {
-        if (!typeMap[i].selected)
-            continue;
-
-        void *addrOut = typeMap[i].address;
-        void *addr1   = atts1->typeMap[i].address;
-        void *addr2   = atts2->typeMap[i].address;
-        int   length  = typeMap[i].length;
-
-        switch (GetFieldType(i))
+      case FieldType_int:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_intArray:
+        ConstInterp<int>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_intVector:
+        ConstInterp<int>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_bool:
+        ConstInterp<bool>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_boolVector:
+        ConstInterp<bool>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_float:
+        ConstInterp<float>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_floatArray:
+        ConstInterp<float>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_double:
+        ConstInterp<double>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_doubleArray:
+        ConstInterp<double>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_doubleVector:
+        ConstInterp<double>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_uchar:
+        ConstInterp<unsigned char>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_ucharArray:
+        ConstInterp<unsigned char>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_ucharVector:
+        ConstInterp<unsigned char>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_string:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_stringVector:
+        ConstInterp<std::string>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_colortable:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_opacity:
+        ConstInterp<double>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_linestyle:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_linewidth:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_variablename:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_color:
+      case FieldType_att:
+        ((AttributeGroup*)addrOut)
+          ->InterpolateConst((AttributeGroup*)addr1, (AttributeGroup*)addr2, f);
+        break;
+      case FieldType_attVector:
+      {
+        AttributeGroupVector& out = *(AttributeGroupVector*)addrOut;
+        AttributeGroupVector& a1 = *(AttributeGroupVector*)addr1;
+        AttributeGroupVector& a2 = *(AttributeGroupVector*)addr2;
+        int l0 = static_cast<int>(out.size());
+        int l1 = static_cast<int>(a1.size());
+        int l2 = static_cast<int>(a2.size());
+        int lmax = (l1 > l2) ? l1 : l2;
+        out.resize(lmax);
+        if (lmax > l0)
         {
-          case FieldType_int:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_intArray:
-            ConstInterp<int>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_intVector:
-            ConstInterp<int>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_bool:
-            ConstInterp<bool>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_boolVector:
-            ConstInterp<bool>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_float:
-            ConstInterp<float>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_floatArray:
-            ConstInterp<float>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_double:
-            ConstInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_doubleArray:
-            ConstInterp<double>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_doubleVector:
-            ConstInterp<double>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_uchar:
-            ConstInterp<unsigned char>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_ucharArray:
-            ConstInterp<unsigned char>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_ucharVector:
-            ConstInterp<unsigned char>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_string:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_stringVector:
-            ConstInterp<std::string>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_colortable:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_opacity:
-            ConstInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_linestyle:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_linewidth:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_variablename:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_color:
-          case FieldType_att:
-            ((AttributeGroup*)addrOut)->
-                                   InterpolateConst((AttributeGroup*)addr1,
-                                                    (AttributeGroup*)addr2, f);
-            break;
-          case FieldType_attVector:
-            {
-                AttributeGroupVector &out=*(AttributeGroupVector*)addrOut;
-                AttributeGroupVector &a1 =*(AttributeGroupVector*)addr1;
-                AttributeGroupVector &a2 =*(AttributeGroupVector*)addr2;
-                int l0 = static_cast<int>(out.size());
-                int l1 = static_cast<int>(a1.size());
-                int l2 = static_cast<int>(a2.size());
-                int lmax = (l1 > l2) ? l1 : l2;
-                out.resize(lmax);
-                if (lmax > l0)
-                {
-                    for (int j=l0; j<lmax; j++)
-                    {
-                        out[j] = CreateSubAttributeGroup(i);
-                    }
-                }
-                ConstInterp<AttributeGroup*>::InterpVector(&out, &a1, &a2, f);
-            }
-            break;
-          case FieldType_enum:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_scalemode:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          default:
-            cerr << "UNKNOWN TYPE IN AttributeGroup::InterpolateConst\n";
-            break;
+          for (int j = l0; j < lmax; j++)
+          {
+            out[j] = CreateSubAttributeGroup(i);
+          }
         }
+        ConstInterp<AttributeGroup*>::InterpVector(&out, &a1, &a2, f);
+      }
+      break;
+      case FieldType_enum:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_scalemode:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      default:
+        cerr << "UNKNOWN TYPE IN AttributeGroup::InterpolateConst\n";
+        break;
     }
+  }
 }
 
 // ****************************************************************************
@@ -418,125 +414,123 @@ AttributeGroup::InterpolateConst(const AttributeGroup *atts1,
 //
 // ****************************************************************************
 
-void
-AttributeGroup::InterpolateLinear(const AttributeGroup *atts1,
-                                  const AttributeGroup *atts2, double f)
+void AttributeGroup::InterpolateLinear(
+  const AttributeGroup* atts1, const AttributeGroup* atts2, double f)
 {
-    SelectAll();
-    int n = NumAttributes();
+  SelectAll();
+  int n = NumAttributes();
 
-    for (int i=0; i<n; i++)
+  for (int i = 0; i < n; i++)
+  {
+    if (!typeMap[i].selected)
+      continue;
+
+    void* addrOut = typeMap[i].address;
+    void* addr1 = atts1->typeMap[i].address;
+    void* addr2 = atts2->typeMap[i].address;
+    int length = typeMap[i].length;
+
+    if (addrOut == NULL || addr1 == NULL || addr2 == NULL)
+      continue;
+
+    switch (GetFieldType(i))
     {
-        if (!typeMap[i].selected)
-            continue;
-
-        void *addrOut = typeMap[i].address;
-        void *addr1   = atts1->typeMap[i].address;
-        void *addr2   = atts2->typeMap[i].address;
-        int   length  = typeMap[i].length;
-
-        if (addrOut == NULL || addr1 == NULL || addr2 == NULL)
-            continue;
-
-        switch (GetFieldType(i))
+      case FieldType_int:
+        LinInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_intArray:
+        LinInterp<int>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_intVector:
+        LinInterp<int>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_bool:
+        ConstInterp<bool>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_boolVector:
+        ConstInterp<bool>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_float:
+        LinInterp<float>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_floatArray:
+        LinInterp<float>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_double:
+        LinInterp<double>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_doubleArray:
+        LinInterp<double>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_doubleVector:
+        LinInterp<double>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_uchar:
+        LinInterp<unsigned char>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_ucharArray:
+        LinInterp<unsigned char>::InterpArray(addrOut, addr1, addr2, length, f);
+        break;
+      case FieldType_ucharVector:
+        LinInterp<unsigned char>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_string:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_stringVector:
+        ConstInterp<std::string>::InterpVector(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_colortable:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_opacity:
+        LinInterp<double>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_linestyle:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_linewidth:
+        LinInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_variablename:
+        ConstInterp<std::string>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_color:
+      case FieldType_att:
+        ((AttributeGroup*)addrOut)
+          ->InterpolateLinear((AttributeGroup*)addr1, (AttributeGroup*)addr2, f);
+        break;
+      case FieldType_attVector:
+      {
+        AttributeGroupVector& out = *(AttributeGroupVector*)addrOut;
+        AttributeGroupVector& a1 = *(AttributeGroupVector*)addr1;
+        AttributeGroupVector& a2 = *(AttributeGroupVector*)addr2;
+        int l0 = static_cast<int>(out.size());
+        int l1 = static_cast<int>(a1.size());
+        int l2 = static_cast<int>(a2.size());
+        int lmax = (l1 > l2) ? l1 : l2;
+        out.resize(lmax);
+        if (lmax > l0)
         {
-          case FieldType_int:
-            LinInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_intArray:
-            LinInterp<int>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_intVector:
-            LinInterp<int>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_bool:
-            ConstInterp<bool>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_boolVector:
-            ConstInterp<bool>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_float:
-            LinInterp<float>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_floatArray:
-            LinInterp<float>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_double:
-            LinInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_doubleArray:
-            LinInterp<double>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_doubleVector:
-            LinInterp<double>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_uchar:
-            LinInterp<unsigned char>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_ucharArray:
-            LinInterp<unsigned char>::InterpArray(addrOut,addr1,addr2,length, f);
-            break;
-          case FieldType_ucharVector:
-            LinInterp<unsigned char>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_string:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_stringVector:
-            ConstInterp<std::string>::InterpVector(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_colortable:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_opacity:
-            LinInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_linestyle:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_linewidth:
-            LinInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_variablename:
-            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_color:
-          case FieldType_att:
-            ((AttributeGroup*)addrOut)->
-                                  InterpolateLinear((AttributeGroup*)addr1,
-                                                    (AttributeGroup*)addr2, f);
-            break;
-          case FieldType_attVector:
-            {
-                AttributeGroupVector &out=*(AttributeGroupVector*)addrOut;
-                AttributeGroupVector &a1 =*(AttributeGroupVector*)addr1;
-                AttributeGroupVector &a2 =*(AttributeGroupVector*)addr2;
-                int l0 = static_cast<int>(out.size());
-                int l1 = static_cast<int>(a1.size());
-                int l2 = static_cast<int>(a2.size());
-                int lmax = (l1 > l2) ? l1 : l2;
-                out.resize(lmax);
-                if (lmax > l0)
-                {
-                    for (int j=l0; j<lmax; j++)
-                    {
-                        out[j] = CreateSubAttributeGroup(i);
-                    }
-                }
-                LinInterp<AttributeGroup*>::InterpVector(&out, &a1, &a2, f);
-            }
-            break;
-          case FieldType_enum:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          case FieldType_scalemode:
-            ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
-            break;
-          default:
-            cerr << "UNKNOWN TYPE IN AttributeGroup::InterpolateLinear\n";
-            break;
+          for (int j = l0; j < lmax; j++)
+          {
+            out[j] = CreateSubAttributeGroup(i);
+          }
         }
+        LinInterp<AttributeGroup*>::InterpVector(&out, &a1, &a2, f);
+      }
+      break;
+      case FieldType_enum:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      case FieldType_scalemode:
+        ConstInterp<int>::InterpScalar(addrOut, addr1, addr2, f);
+        break;
+      default:
+        cerr << "UNKNOWN TYPE IN AttributeGroup::InterpolateLinear\n";
+        break;
     }
+  }
 }
 
 // ****************************************************************************
@@ -562,134 +556,133 @@ AttributeGroup::InterpolateLinear(const AttributeGroup *atts1,
 //
 // ****************************************************************************
 
-bool
-AttributeGroup::EqualTo(const AttributeGroup *atts) const
+bool AttributeGroup::EqualTo(const AttributeGroup* atts) const
 {
-    // return immediately if its the same object
-    if (this == atts)
-       return true;
-
-    // return immediately if it's a different type of object
-    if (TypeName() != atts->TypeName())
-        return false;
-
-    int n = NumAttributes();
-
-    for (int i=0; i<n; i++)
-    {
-        void *addr1   =       typeMap[i].address;
-        void *addr2   = atts->typeMap[i].address;
-        int   length  = typeMap[i].length;
-
-        switch (GetFieldType(i))
-        {
-          case FieldType_int:
-            if (!(EqualVal<int>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_intArray:
-            if (!(EqualVal<int>::EqualArray(addr1,addr2,length)))
-               return false;
-            break;
-          case FieldType_intVector:
-            if (!(EqualVal<int>::EqualVector(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_bool:
-            if (!(EqualVal<bool>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_boolVector:
-            if (!(EqualVal<bool>::EqualVector(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_float:
-            if (!(EqualVal<float>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_floatArray:
-            if (!(EqualVal<float>::EqualArray(addr1,addr2,length)))
-               return false;
-            break;
-          case FieldType_double:
-            if (!(EqualVal<double>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_doubleArray:
-            if (!(EqualVal<double>::EqualArray(addr1,addr2,length)))
-               return false;
-            break;
-          case FieldType_doubleVector:
-            if (!(EqualVal<double>::EqualVector(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_uchar:
-            if (!(EqualVal<unsigned char>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_ucharArray:
-            if (!(EqualVal<unsigned char>::EqualArray(addr1,addr2,length)))
-               return false;
-            break;
-          case FieldType_ucharVector:
-            if (!(EqualVal<unsigned char>::EqualVector(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_string:
-            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_stringVector:
-            if (!(EqualVal<std::string>::EqualVector(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_colortable:
-            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_opacity:
-            if (!(EqualVal<double>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_linestyle:
-            if (!(EqualVal<int>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_linewidth:
-            if (!(EqualVal<int>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_variablename:
-            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_color:
-          case FieldType_att:
-            if (!(((AttributeGroup*)addr1)->EqualTo((AttributeGroup*)addr2)))
-               return false;
-            break;
-          case FieldType_attVector:
-            {
-                AttributeGroupVector &a1 =*(AttributeGroupVector*)addr1;
-                AttributeGroupVector &a2 =*(AttributeGroupVector*)addr2;
-                if (!(EqualVal<AttributeGroup*>::EqualVector(&a1, &a2)))
-                    return false;
-            }
-            break;
-          case FieldType_enum:
-            if (!(EqualVal<int>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          case FieldType_scalemode:
-            if (!(EqualVal<int>::EqualScalar(addr1,addr2)))
-               return false;
-            break;
-          default:
-            cerr << "UNKNOWN TYPE IN AttributeGroup::EqualTo\n";
-            return false;
-        }
-    }
+  // return immediately if its the same object
+  if (this == atts)
     return true;
+
+  // return immediately if it's a different type of object
+  if (TypeName() != atts->TypeName())
+    return false;
+
+  int n = NumAttributes();
+
+  for (int i = 0; i < n; i++)
+  {
+    void* addr1 = typeMap[i].address;
+    void* addr2 = atts->typeMap[i].address;
+    int length = typeMap[i].length;
+
+    switch (GetFieldType(i))
+    {
+      case FieldType_int:
+        if (!(EqualVal<int>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_intArray:
+        if (!(EqualVal<int>::EqualArray(addr1, addr2, length)))
+          return false;
+        break;
+      case FieldType_intVector:
+        if (!(EqualVal<int>::EqualVector(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_bool:
+        if (!(EqualVal<bool>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_boolVector:
+        if (!(EqualVal<bool>::EqualVector(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_float:
+        if (!(EqualVal<float>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_floatArray:
+        if (!(EqualVal<float>::EqualArray(addr1, addr2, length)))
+          return false;
+        break;
+      case FieldType_double:
+        if (!(EqualVal<double>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_doubleArray:
+        if (!(EqualVal<double>::EqualArray(addr1, addr2, length)))
+          return false;
+        break;
+      case FieldType_doubleVector:
+        if (!(EqualVal<double>::EqualVector(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_uchar:
+        if (!(EqualVal<unsigned char>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_ucharArray:
+        if (!(EqualVal<unsigned char>::EqualArray(addr1, addr2, length)))
+          return false;
+        break;
+      case FieldType_ucharVector:
+        if (!(EqualVal<unsigned char>::EqualVector(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_string:
+        if (!(EqualVal<std::string>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_stringVector:
+        if (!(EqualVal<std::string>::EqualVector(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_colortable:
+        if (!(EqualVal<std::string>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_opacity:
+        if (!(EqualVal<double>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_linestyle:
+        if (!(EqualVal<int>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_linewidth:
+        if (!(EqualVal<int>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_variablename:
+        if (!(EqualVal<std::string>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_color:
+      case FieldType_att:
+        if (!(((AttributeGroup*)addr1)->EqualTo((AttributeGroup*)addr2)))
+          return false;
+        break;
+      case FieldType_attVector:
+      {
+        AttributeGroupVector& a1 = *(AttributeGroupVector*)addr1;
+        AttributeGroupVector& a2 = *(AttributeGroupVector*)addr2;
+        if (!(EqualVal<AttributeGroup*>::EqualVector(&a1, &a2)))
+          return false;
+      }
+      break;
+      case FieldType_enum:
+        if (!(EqualVal<int>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      case FieldType_scalemode:
+        if (!(EqualVal<int>::EqualScalar(addr1, addr2)))
+          return false;
+        break;
+      default:
+        cerr << "UNKNOWN TYPE IN AttributeGroup::EqualTo\n";
+        return false;
+    }
+  }
+  return true;
 }
 
 // ****************************************************************************
@@ -707,10 +700,9 @@ AttributeGroup::EqualTo(const AttributeGroup *atts) const
 //
 // ****************************************************************************
 
-const std::string
-AttributeGroup::TypeName() const
+const std::string AttributeGroup::TypeName() const
 {
-    return "AttributeGroup";
+  return "AttributeGroup";
 }
 
 // ****************************************************************************
@@ -1398,10 +1390,9 @@ AttributeGroup::ReadType(Connection &conn, int attrId, AttributeGroup::typeInfo 
 //
 // ****************************************************************************
 
-AttributeGroup *
-AttributeGroup::CreateSubAttributeGroup(int)
+AttributeGroup* AttributeGroup::CreateSubAttributeGroup(int)
 {
-    return 0;
+  return 0;
 }
 
 // ****************************************************************************
@@ -1425,15 +1416,14 @@ AttributeGroup::CreateSubAttributeGroup(int)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::Select(int index, void *address, int length)
+void AttributeGroup::Select(int index, void* address, int length)
 {
-    if(index < static_cast<int>(typeMap.size()))
-    {
-        typeMap[index].address = address;
-        typeMap[index].selected = true;
-        typeMap[index].length = length;
-    }
+  if (index < static_cast<int>(typeMap.size()))
+  {
+    typeMap[index].address = address;
+    typeMap[index].selected = true;
+    typeMap[index].length = length;
+  }
 }
 
 // ****************************************************************************
@@ -1452,14 +1442,13 @@ AttributeGroup::Select(int index, void *address, int length)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::SelectField(int index)
+void AttributeGroup::SelectField(int index)
 {
-    if(index >= 0 && index < static_cast<int>(typeMap.size()))
-    {
-        if(typeMap[index].address != 0)
-            typeMap[index].selected = true;
-    }
+  if (index >= 0 && index < static_cast<int>(typeMap.size()))
+  {
+    if (typeMap[index].address != 0)
+      typeMap[index].selected = true;
+  }
 }
 
 // ****************************************************************************
@@ -1478,22 +1467,21 @@ AttributeGroup::SelectField(int index)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::SelectFields(const std::vector<int> &indices)
+void AttributeGroup::SelectFields(const std::vector<int>& indices)
 {
-    // Select and unselect to make sure that the addresses are all okay.
-    SelectAll();
-    if(indices.size() > 0)
-    {
-        UnSelectAll();
+  // Select and unselect to make sure that the addresses are all okay.
+  SelectAll();
+  if (indices.size() > 0)
+  {
+    UnSelectAll();
 
-        for(unsigned int i = 0; i < indices.size(); ++i)
-        {
-            int index = indices[i];
-            if(index >= 0 && index < static_cast<int>(typeMap.size()))
-                typeMap[index].selected = true;
-        }
+    for (unsigned int i = 0; i < indices.size(); ++i)
+    {
+      int index = indices[i];
+      if (index >= 0 && index < static_cast<int>(typeMap.size()))
+        typeMap[index].selected = true;
     }
+  }
 }
 
 // ****************************************************************************
@@ -1510,15 +1498,14 @@ AttributeGroup::SelectFields(const std::vector<int> &indices)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::UnSelectAll()
+void AttributeGroup::UnSelectAll()
 {
-    // Unselect all the components in the typeMap.
-    typeInfoVector::iterator pos;
-    for(pos = typeMap.begin(); pos != typeMap.end(); ++pos)
-    {
-        pos->selected = false;
-    }
+  // Unselect all the components in the typeMap.
+  typeInfoVector::iterator pos;
+  for (pos = typeMap.begin(); pos != typeMap.end(); ++pos)
+  {
+    pos->selected = false;
+  }
 }
 
 // ****************************************************************************
@@ -1544,10 +1531,9 @@ AttributeGroup::UnSelectAll()
 //
 // ****************************************************************************
 
-bool
-AttributeGroup::CreateNode(DataNode *, bool, bool)
+bool AttributeGroup::CreateNode(DataNode*, bool, bool)
 {
-    return false;
+  return false;
 }
 
 // ****************************************************************************
@@ -1565,10 +1551,9 @@ AttributeGroup::CreateNode(DataNode *, bool, bool)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::SetFromNode(DataNode *)
+void AttributeGroup::SetFromNode(DataNode*)
 {
-    // nothing.
+  // nothing.
 }
 
 // ****************************************************************************
@@ -1589,10 +1574,9 @@ AttributeGroup::SetFromNode(DataNode *)
 //
 // ****************************************************************************
 
-void
-AttributeGroup::ProcessOldVersions(DataNode *, const char *)
+void AttributeGroup::ProcessOldVersions(DataNode*, const char*)
 {
-    // nothing
+  // nothing
 }
 
 // ****************************************************************************
@@ -1618,56 +1602,55 @@ AttributeGroup::ProcessOldVersions(DataNode *, const char *)
 //
 // ****************************************************************************
 
-#define VERSION_3_TO_NUM(m,n,p,b)    ((m)+(n)/100.0+(p)/10000.0+(b)/100000.0)
+#define VERSION_3_TO_NUM(m, n, p, b) ((m) + (n) / 100.0 + (p) / 10000.0 + (b) / 100000.0)
 
-bool
-AttributeGroup::VersionLessThan(const char *configVersion, const char *version)
+bool AttributeGroup::VersionLessThan(const char* configVersion, const char* version)
 {
-    int versions[2][3] = {{0,0,0}, {0,0,0}};
-    int betas[2] = {0, 0};
-    const char *versionStrings[] = {configVersion, version};
-    char storage[30];
+  int versions[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } };
+  int betas[2] = { 0, 0 };
+  const char* versionStrings[] = { configVersion, version };
+  char storage[30];
 
-    if(configVersion == 0 && version != 0)
-        return true;
-    if(configVersion != 0 && version == 0)
-        return false;
-    if(configVersion == 0 && version == 0)
-        return false;
+  if (configVersion == 0 && version != 0)
+    return true;
+  if (configVersion != 0 && version == 0)
+    return false;
+  if (configVersion == 0 && version == 0)
+    return false;
 
-    for(int i = 0; i < 2; ++i)
+  for (int i = 0; i < 2; ++i)
+  {
+    // Go to the first space and copy the version number string into
+    // the buffer.
+    char* buf = storage;
+    strncpy(buf, versionStrings[i], 30);
+
+    // Indicate whether the version number has a beta in it.
+    int len = static_cast<int>(strlen(buf));
+    if (len > 0)
+      betas[i] = (buf[len - 1] == 'b') ? 0 : 1;
+    else
+      betas[i] = 1;
+
+    // Use strtok to get all of the version numbers.  Note that atoi()
+    // returns 0 if given a NULL string, which is what we want.
+    char* p = strtok(buf, ".");
+    if (p)
     {
-        // Go to the first space and copy the version number string into
-        // the buffer.
-        char *buf = storage;
-        strncpy(buf, versionStrings[i], 30);
-
-        // Indicate whether the version number has a beta in it.
-        int len = static_cast<int>(strlen(buf));
-        if(len > 0)
-            betas[i] = (buf[len-1] == 'b') ? 0 : 1;
-        else
-            betas[i] = 1;
-
-        // Use strtok to get all of the version numbers.  Note that atoi()
-        // returns 0 if given a NULL string, which is what we want.
-        char *p = strtok(buf, ".");
-        if(p)
-        {
-            versions[i][0] = atoi(p);
-            p = strtok(NULL, ".");
-            if(p)
-            {
-                versions[i][1] = atoi(p);
-                p = strtok(NULL, ".");
-                if(p)
-                    versions[i][2] = atoi(p);
-            }
-        }
+      versions[i][0] = atoi(p);
+      p = strtok(NULL, ".");
+      if (p)
+      {
+        versions[i][1] = atoi(p);
+        p = strtok(NULL, ".");
+        if (p)
+          versions[i][2] = atoi(p);
+      }
     }
+  }
 
-    return VERSION_3_TO_NUM(versions[0][0], versions[0][1], versions[0][2], betas[0]) <
-           VERSION_3_TO_NUM(versions[1][0], versions[1][1], versions[1][2], betas[1]);
+  return VERSION_3_TO_NUM(versions[0][0], versions[0][1], versions[0][2], betas[0]) <
+    VERSION_3_TO_NUM(versions[1][0], versions[1][1], versions[1][2], betas[1]);
 }
 
 // ****************************************************************************
@@ -1803,21 +1786,20 @@ AttributeGroup::Read(Connection &conn)
 //
 // ****************************************************************************
 
-int
-AttributeGroup::NumAttributesSelected() const
+int AttributeGroup::NumAttributesSelected() const
 {
-    // See if any fields are selected. If none are selected
-    // then we will assume that we want to write all of them since
-    // it makes no sense to write none.
-    int selectCount = 0;
-    typeInfoVector::const_iterator pos;
-    for(pos = typeMap.begin(); pos != typeMap.end(); ++pos)
-    {
-        if(pos->selected)
-            ++selectCount;
-    }
+  // See if any fields are selected. If none are selected
+  // then we will assume that we want to write all of them since
+  // it makes no sense to write none.
+  int selectCount = 0;
+  typeInfoVector::const_iterator pos;
+  for (pos = typeMap.begin(); pos != typeMap.end(); ++pos)
+  {
+    if (pos->selected)
+      ++selectCount;
+  }
 
-    return selectCount;
+  return selectCount;
 }
 
 // ****************************************************************************
@@ -2038,161 +2020,137 @@ AttributeGroup::CalculateMessageSize(Connection &conn)
 //
 void AttributeGroup::DeclareChar()
 {
-    typeMap.push_back(msgTypeChar);
+  typeMap.push_back(msgTypeChar);
 }
 
 void AttributeGroup::DeclareUnsignedChar()
 {
-    typeMap.push_back(msgTypeUnsignedChar);
+  typeMap.push_back(msgTypeUnsignedChar);
 }
 
 void AttributeGroup::DeclareInt()
 {
-    typeMap.push_back(msgTypeInt);
+  typeMap.push_back(msgTypeInt);
 }
 
-void
-AttributeGroup::DeclareLong()
+void AttributeGroup::DeclareLong()
 {
-    typeMap.push_back(msgTypeLong);
+  typeMap.push_back(msgTypeLong);
 }
 
-void
-AttributeGroup::DeclareFloat()
+void AttributeGroup::DeclareFloat()
 {
-    typeMap.push_back(msgTypeFloat);
+  typeMap.push_back(msgTypeFloat);
 }
 
-void
-AttributeGroup::DeclareDouble()
+void AttributeGroup::DeclareDouble()
 {
-    typeMap.push_back(msgTypeDouble);
+  typeMap.push_back(msgTypeDouble);
 }
 
-void
-AttributeGroup::DeclareString()
+void AttributeGroup::DeclareString()
 {
-    typeMap.push_back(msgTypeString);
+  typeMap.push_back(msgTypeString);
 }
 
-void
-AttributeGroup::DeclareAttributeGroup()
+void AttributeGroup::DeclareAttributeGroup()
 {
-    typeMap.push_back(msgTypeAttributeGroup);
+  typeMap.push_back(msgTypeAttributeGroup);
 }
 
-void
-AttributeGroup::DeclareBool()
+void AttributeGroup::DeclareBool()
 {
-    typeMap.push_back(msgTypeBool);
+  typeMap.push_back(msgTypeBool);
 }
 
-void
-AttributeGroup::DeclareListChar()
+void AttributeGroup::DeclareListChar()
 {
-    typeMap.push_back(msgTypeListChar);
+  typeMap.push_back(msgTypeListChar);
 }
 
-void
-AttributeGroup::DeclareListUnsignedChar()
+void AttributeGroup::DeclareListUnsignedChar()
 {
-    typeMap.push_back(msgTypeListUnsignedChar);
+  typeMap.push_back(msgTypeListUnsignedChar);
 }
 
-void
-AttributeGroup::DeclareListInt()
+void AttributeGroup::DeclareListInt()
 {
-    typeMap.push_back(msgTypeListInt);
+  typeMap.push_back(msgTypeListInt);
 }
 
-void
-AttributeGroup::DeclareListLong()
+void AttributeGroup::DeclareListLong()
 {
-    typeMap.push_back(msgTypeListLong);
+  typeMap.push_back(msgTypeListLong);
 }
 
-void
-AttributeGroup::DeclareListFloat()
+void AttributeGroup::DeclareListFloat()
 {
-    typeMap.push_back(msgTypeListFloat);
+  typeMap.push_back(msgTypeListFloat);
 }
 
-void
-AttributeGroup::DeclareListDouble()
+void AttributeGroup::DeclareListDouble()
 {
-    typeMap.push_back(msgTypeListDouble);
+  typeMap.push_back(msgTypeListDouble);
 }
 
-void
-AttributeGroup::DeclareListString()
+void AttributeGroup::DeclareListString()
 {
-    typeMap.push_back(msgTypeListString);
+  typeMap.push_back(msgTypeListString);
 }
 
-void
-AttributeGroup::DeclareListAttributeGroup()
+void AttributeGroup::DeclareListAttributeGroup()
 {
-    typeMap.push_back(msgTypeListAttributeGroup);
+  typeMap.push_back(msgTypeListAttributeGroup);
 }
 
-void
-AttributeGroup::DeclareListBool()
+void AttributeGroup::DeclareListBool()
 {
-    typeMap.push_back(msgTypeListBool);
+  typeMap.push_back(msgTypeListBool);
 }
 
-void
-AttributeGroup::DeclareVectorBool()
+void AttributeGroup::DeclareVectorBool()
 {
-    typeMap.push_back(msgTypeVectorBool);
+  typeMap.push_back(msgTypeVectorBool);
 }
 
-void
-AttributeGroup::DeclareVectorChar()
+void AttributeGroup::DeclareVectorChar()
 {
-    typeMap.push_back(msgTypeVectorChar);
+  typeMap.push_back(msgTypeVectorChar);
 }
 
-void
-AttributeGroup::DeclareVectorUnsignedChar()
+void AttributeGroup::DeclareVectorUnsignedChar()
 {
-    typeMap.push_back(msgTypeVectorUnsignedChar);
+  typeMap.push_back(msgTypeVectorUnsignedChar);
 }
 
-void
-AttributeGroup::DeclareVectorInt()
+void AttributeGroup::DeclareVectorInt()
 {
-    typeMap.push_back(msgTypeVectorInt);
+  typeMap.push_back(msgTypeVectorInt);
 }
 
-void
-AttributeGroup::DeclareVectorLong()
+void AttributeGroup::DeclareVectorLong()
 {
-    typeMap.push_back(msgTypeVectorLong);
+  typeMap.push_back(msgTypeVectorLong);
 }
 
-void
-AttributeGroup::DeclareVectorFloat()
+void AttributeGroup::DeclareVectorFloat()
 {
-    typeMap.push_back(msgTypeVectorFloat);
+  typeMap.push_back(msgTypeVectorFloat);
 }
 
-void
-AttributeGroup::DeclareVectorDouble()
+void AttributeGroup::DeclareVectorDouble()
 {
-    typeMap.push_back(msgTypeVectorDouble);
+  typeMap.push_back(msgTypeVectorDouble);
 }
 
-void
-AttributeGroup::DeclareVectorAttributeGroup()
+void AttributeGroup::DeclareVectorAttributeGroup()
 {
-    typeMap.push_back(msgTypeVectorAttributeGroup);
+  typeMap.push_back(msgTypeVectorAttributeGroup);
 }
 
-void
-AttributeGroup::DeclareVectorString()
+void AttributeGroup::DeclareVectorString()
 {
-    typeMap.push_back(msgTypeVectorString);
+  typeMap.push_back(msgTypeVectorString);
 }
 
 // ****************************************************************************
@@ -2218,207 +2176,198 @@ AttributeGroup::DeclareVectorString()
 //
 // ****************************************************************************
 
-void
-AttributeGroup::CreateTypeMap(const char *formatString)
+void AttributeGroup::CreateTypeMap(const char* formatString)
 {
-    // Clear the typeMap.
-    typeMap.clear();
+  // Clear the typeMap.
+  typeMap.clear();
 
-    // If the format string is NULL, return.
-    if(formatString == NULL)
-        return;
+  // If the format string is NULL, return.
+  if (formatString == NULL)
+    return;
 
-    // If the formatString was empty, get out of here.
-    int nDeclares = static_cast<int>(strlen(formatString));
-    if(nDeclares < 1)
-        return;
+  // If the formatString was empty, get out of here.
+  int nDeclares = static_cast<int>(strlen(formatString));
+  if (nDeclares < 1)
+    return;
 
-    // Go through the format string and add the types.
-    typeMap.reserve(nDeclares);
-    for(int i = 0; i < nDeclares; ++i)
+  // Go through the format string and add the types.
+  typeMap.reserve(nDeclares);
+  for (int i = 0; i < nDeclares; ++i)
+  {
+    char baseFormat = formatString[i];
+
+    // If the next character is a '*' then it is a vector.
+    bool isVector = (i < nDeclares - 1) ? (formatString[i + 1] == '*') : false;
+
+    if (isVector)
     {
-        char baseFormat = formatString[i];
+      // Advance one character
+      ++i;
 
-        // If the next character is a '*' then it is a vector.
-        bool isVector = (i < nDeclares - 1) ? (formatString[i + 1] == '*') :
-                        false;
-
-        if(isVector)
-        {
-            // Advance one character
-            ++i;
-
-            // Declare vectors
-            switch(baseFormat)
-            {
-            case 'b':
-                DeclareVectorBool();
-                break;
-            case 'c':
-                DeclareVectorChar();
-                break;
-            case 'u':
-                DeclareVectorUnsignedChar();
-                break;
-            case 'i':
-                DeclareVectorInt();
-                break;
-            case 'l':
-                DeclareVectorLong();
-                break;
-            case 'f':
-                DeclareVectorFloat();
-                break;
-            case 'd':
-                DeclareVectorDouble();
-                break;
-            case 's':
-                DeclareVectorString();
-                break;
-            case 'a':
-                DeclareVectorAttributeGroup();
-                break;
-            default:
-                EXCEPTION0(BadDeclareFormatString);
-            }
-        }
-        else
-        {
-            // Declare simple types, fixed length, attributegroups
-            switch(baseFormat)
-            {
-            case 'c':
-                DeclareChar();
-                break;
-            case 'u':
-                DeclareUnsignedChar();
-                break;
-            case 'i':
-                DeclareInt();
-                break;
-            case 'l':
-                DeclareLong();
-                break;
-            case 'f':
-                DeclareFloat();
-                break;
-            case 'd':
-                DeclareDouble();
-                break;
-            case 's':
-                DeclareString();
-                break;
-            case 'a':
-                DeclareAttributeGroup();
-                break;
-            case 'b':
-                DeclareBool();
-                break;
-            case 'C':
-                DeclareListChar();
-                break;
-            case 'U':
-                DeclareListUnsignedChar();
-                break;
-            case 'I':
-                DeclareListInt();
-                break;
-            case 'L':
-                DeclareListLong();
-                break;
-            case 'F':
-                DeclareListFloat();
-                break;
-            case 'D':
-                DeclareListDouble();
-                break;
-            case 'S':
-                DeclareListString();
-                break;
-            case 'A':
-                DeclareListAttributeGroup();
-                break;
-            case 'B':
-                DeclareListBool();
-                break;
-            default:
-                EXCEPTION0(BadDeclareFormatString);
-            }
-        }
+      // Declare vectors
+      switch (baseFormat)
+      {
+        case 'b':
+          DeclareVectorBool();
+          break;
+        case 'c':
+          DeclareVectorChar();
+          break;
+        case 'u':
+          DeclareVectorUnsignedChar();
+          break;
+        case 'i':
+          DeclareVectorInt();
+          break;
+        case 'l':
+          DeclareVectorLong();
+          break;
+        case 'f':
+          DeclareVectorFloat();
+          break;
+        case 'd':
+          DeclareVectorDouble();
+          break;
+        case 's':
+          DeclareVectorString();
+          break;
+        case 'a':
+          DeclareVectorAttributeGroup();
+          break;
+        default:
+          EXCEPTION0(BadDeclareFormatString);
+      }
     }
+    else
+    {
+      // Declare simple types, fixed length, attributegroups
+      switch (baseFormat)
+      {
+        case 'c':
+          DeclareChar();
+          break;
+        case 'u':
+          DeclareUnsignedChar();
+          break;
+        case 'i':
+          DeclareInt();
+          break;
+        case 'l':
+          DeclareLong();
+          break;
+        case 'f':
+          DeclareFloat();
+          break;
+        case 'd':
+          DeclareDouble();
+          break;
+        case 's':
+          DeclareString();
+          break;
+        case 'a':
+          DeclareAttributeGroup();
+          break;
+        case 'b':
+          DeclareBool();
+          break;
+        case 'C':
+          DeclareListChar();
+          break;
+        case 'U':
+          DeclareListUnsignedChar();
+          break;
+        case 'I':
+          DeclareListInt();
+          break;
+        case 'L':
+          DeclareListLong();
+          break;
+        case 'F':
+          DeclareListFloat();
+          break;
+        case 'D':
+          DeclareListDouble();
+          break;
+        case 'S':
+          DeclareListString();
+          break;
+        case 'A':
+          DeclareListAttributeGroup();
+          break;
+        case 'B':
+          DeclareListBool();
+          break;
+        default:
+          EXCEPTION0(BadDeclareFormatString);
+      }
+    }
+  }
 }
 
-void
-AttributeGroup::SetGuido(int _guido)
+void AttributeGroup::SetGuido(int _guido)
 {
-    guido = _guido;
+  guido = _guido;
 }
 
-int
-AttributeGroup::GetGuido()
+int AttributeGroup::GetGuido()
 {
-    return guido;
+  return guido;
 }
 
 AttributeGroup::typeInfo::typeInfo()
 {
-    typeCode = msgTypeNone;
-    selected = false;
-    address = NULL;
-    length = 0;
+  typeCode = msgTypeNone;
+  selected = false;
+  address = NULL;
+  length = 0;
 }
 
-AttributeGroup::typeInfo::typeInfo(const AttributeGroup::typeInfo &obj)
+AttributeGroup::typeInfo::typeInfo(const AttributeGroup::typeInfo& obj)
 {
-    typeCode = obj.typeCode;
-    selected = obj.selected;
-    address = obj.address;
-    length = obj.length;
+  typeCode = obj.typeCode;
+  selected = obj.selected;
+  address = obj.address;
+  length = obj.length;
 }
 
 AttributeGroup::typeInfo::typeInfo(unsigned char tcode)
 {
-    typeCode = tcode;
-    selected = false;
-    address = NULL;
-    length = 0;
+  typeCode = tcode;
+  selected = false;
+  address = NULL;
+  length = 0;
 }
 
 AttributeGroup::typeInfo::~typeInfo()
 {
 }
 
-void
-AttributeGroup::typeInfo::operator =(const AttributeGroup::typeInfo &obj)
+void AttributeGroup::typeInfo::operator=(const AttributeGroup::typeInfo& obj)
 {
-    typeCode = obj.typeCode;
-    selected = obj.selected;
-    address = obj.address;
-    length = obj.length;
+  typeCode = obj.typeCode;
+  selected = obj.selected;
+  address = obj.address;
+  length = obj.length;
 }
 
-std::string
-AttributeGroup::GetFieldName(int /*index*/) const
+std::string AttributeGroup::GetFieldName(int /*index*/) const
 {
-    return "<UNKNOWN name>";
+  return "<UNKNOWN name>";
 }
 
-AttributeGroup::FieldType
-AttributeGroup::GetFieldType(int /*index*/) const
+AttributeGroup::FieldType AttributeGroup::GetFieldType(int /*index*/) const
 {
-    return FieldType_unknown;
+  return FieldType_unknown;
 }
 
-std::string
-AttributeGroup::GetFieldTypeName(int /*index*/) const
+std::string AttributeGroup::GetFieldTypeName(int /*index*/) const
 {
-    return "<UNKNOWN type>";
+  return "<UNKNOWN type>";
 }
 
-bool
-AttributeGroup::FieldsEqual(int /*index*/, const AttributeGroup * /*rhs*/) const
+bool AttributeGroup::FieldsEqual(int /*index*/, const AttributeGroup* /*rhs*/) const
 {
-    return false;
+  return false;
 }
 
 static int indentLevel = 0;
@@ -2448,255 +2397,269 @@ static int indentLevel = 0;
 //
 // ****************************************************************************
 
-ostream &
-operator << (ostream& os, const AttributeGroup& atts)
+ostream& operator<<(ostream& os, const AttributeGroup& atts)
 {
-    static const char* indentSpace[] = {"",
-                                        "",
-                                        "   ",
-                                        "      ",
-                                        "         ",
-                                        "            ",
-                                        "               ",
-                                        "                  ",
-                                        "                     ",
-                                        "                        "};
-    bool isRecursive = false;
-    int i,k;
+  static const char* indentSpace[] = { "", "", "   ", "      ", "         ", "            ",
+    "               ", "                  ", "                     ", "                        " };
+  bool isRecursive = false;
+  int i, k;
 
-    indentLevel++;
+  indentLevel++;
 
-    // handle indentation for recursion
+  // handle indentation for recursion
+  os << indentSpace[indentLevel];
+
+  // output a header
+  os << atts.TypeName().c_str() << " has " << atts.NumAttributesSelected() << " of "
+     << atts.NumAttributes() << " fields selected" << endl;
+
+  // output a line for each field. We use low-level typeInfoVector
+  // stuff because we need to get at actual values too. But, we need
+  // high-level GetFieldType|Name API, too. So, we're using both here
+  AttributeGroup::typeInfoVector::const_iterator pos;
+  k = 0;
+  for (pos = atts.typeMap.begin(); pos != atts.typeMap.end(); ++pos)
+  {
+
+    // output beginning of line for this field
     os << indentSpace[indentLevel];
 
-    // output a header
-    os << atts.TypeName().c_str() << " has " << atts.NumAttributesSelected() <<
-       " of " << atts.NumAttributes() << " fields selected" << endl;
+    // output selection status too
+    if (pos->selected && !isRecursive)
+      os << "    +" << '(' << k << ')';
+    else
+      os << "     " << '(' << k << ')';
 
-    // output a line for each field. We use low-level typeInfoVector
-    // stuff because we need to get at actual values too. But, we need
-    // high-level GetFieldType|Name API, too. So, we're using both here
-    AttributeGroup::typeInfoVector::const_iterator pos;
-    k = 0;
-    for(pos = atts.typeMap.begin(); pos != atts.typeMap.end(); ++pos)
+    os << atts.GetFieldTypeName(k).c_str() << " " << atts.GetFieldName(k).c_str() << " = ";
+
+    // output the "value" for this field
+    switch (pos->typeCode)
     {
 
-        // output beginning of line for this field
-        os << indentSpace[indentLevel];
-
-        // output selection status too
-        if (pos->selected && !isRecursive)
-            os << "    +" << '(' << k << ')';
+      // primitive types
+      case msgTypeChar:
+      {
+        char* cptr = (char*)(pos->address);
+        if (cptr)
+          os << *cptr;
+      }
+      break;
+      case msgTypeUnsignedChar:
+      {
+        unsigned char* ucptr = (unsigned char*)(pos->address);
+        if (ucptr)
+          os << *ucptr;
+      }
+      break;
+      case msgTypeInt:
+      {
+        int* iptr = (int*)(pos->address);
+        if (iptr)
+          os << *iptr;
+      }
+      break;
+      case msgTypeLong:
+      {
+        long* lptr = (long*)(pos->address);
+        if (lptr)
+          os << *lptr;
+      }
+      break;
+      case msgTypeFloat:
+      {
+        float* fptr = (float*)(pos->address);
+        if (fptr)
+          os << *fptr;
+      }
+      break;
+      case msgTypeDouble:
+      {
+        double* dptr = (double*)(pos->address);
+        if (dptr)
+          os << *dptr;
+      }
+      break;
+      case msgTypeString:
+      {
+        std::string* sptr = (std::string*)(pos->address);
+        if (sptr)
+          os << sptr->c_str();
+      }
+      break;
+      case msgTypeAttributeGroup:
+        // Note: recursive call to << operator
+        isRecursive = true;
+        if (pos->selected)
+          os << " <Attr> is selected" << endl;
         else
-            os << "     " << '(' << k << ')';
+          os << " <Attr> is NOT selected" << endl;
+        os << *((AttributeGroup*)(pos->address));
+        break;
+      case msgTypeBool:
+        os << (*((bool*)(pos->address)) ? "true" : "false");
+        break;
 
-        os << atts.GetFieldTypeName(k).c_str() << " "
-           << atts.GetFieldName(k).c_str() << " = ";
-
-        // output the "value" for this field
-        switch(pos->typeCode)
+      // lists of primitive types
+      case msgTypeListChar:
+      {
+        char* cptr = (char*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", '" << cptr[i] << "'";
+      }
+      break;
+      case msgTypeListUnsignedChar:
+      {
+        unsigned char* ucptr = (unsigned char*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << int(ucptr[i]);
+      }
+      break;
+      case msgTypeListInt:
+      {
+        int* iptr = (int*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << iptr[i];
+      }
+      break;
+      case msgTypeListLong:
+      {
+        long* lptr = (long*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << lptr[i];
+      }
+      break;
+      case msgTypeListFloat:
+      {
+        float* fptr = (float*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << fptr[i];
+      }
+      break;
+      case msgTypeListDouble:
+      {
+        double* dptr = (double*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << dptr[i];
+      }
+      break;
+      case msgTypeListString:
+      {
+        std::string* sptr = (std::string*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << sptr[i].c_str();
+      }
+      break;
+      case msgTypeListAttributeGroup:
+        // Note: recursive call to << operator
+        isRecursive = true;
+        if (pos->selected)
+          os << " <Attr> is selected" << endl;
+        else
+          os << " <Attr> is NOT selected" << endl;
         {
-
-        // primitive types
-        case msgTypeChar:
-            {   char *cptr = (char *)(pos->address);
-                if (cptr)
-                    os << *cptr;
-            }
-            break;
-        case msgTypeUnsignedChar:
-            {   unsigned char *ucptr = (unsigned char *)(pos->address);
-                if (ucptr)
-                    os << *ucptr;
-            }
-            break;
-        case msgTypeInt:
-            {   int *iptr = (int *)(pos->address);
-                if (iptr)
-                    os << *iptr;
-            }
-            break;
-        case msgTypeLong:
-            {   long *lptr = (long *)(pos->address);
-                if (lptr)
-                    os << *lptr;
-            }
-            break;
-        case msgTypeFloat:
-            {   float *fptr = (float *)(pos->address);
-                if (fptr)
-                    os << *fptr;
-            }
-            break;
-        case msgTypeDouble:
-            {   double *dptr = (double *)(pos->address);
-                if (dptr)
-                    os << *dptr;
-            }
-            break;
-        case msgTypeString:
-            {   std::string *sptr = (std::string *)(pos->address);
-                if (sptr)
-                    os << sptr->c_str();
-            }
-            break;
-        case msgTypeAttributeGroup:
-            // Note: recursive call to << operator
-            isRecursive = true;
-            if(pos->selected)
-                os << " <Attr> is selected" << endl;
-            else
-                os << " <Attr> is NOT selected" << endl;
-            os << *((AttributeGroup *)(pos->address));
-            break;
-        case msgTypeBool:
-            os << (*((bool *)(pos->address)) ? "true" : "false");
-            break;
-
-        // lists of primitive types
-        case msgTypeListChar:
-            {   char *cptr = (char *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", '" << cptr[i] << "'";
-            }
-            break;
-        case msgTypeListUnsignedChar:
-            {   unsigned char *ucptr = (unsigned char *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << int(ucptr[i]);
-            }
-            break;
-        case msgTypeListInt:
-            {   int *iptr = (int *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << iptr[i];
-            }
-            break;
-        case msgTypeListLong:
-            {   long *lptr = (long *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << lptr[i];
-            }
-            break;
-        case msgTypeListFloat:
-            {   float *fptr = (float *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << fptr[i];
-            }
-            break;
-        case msgTypeListDouble:
-            {   double *dptr = (double *) (pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << dptr[i];
-            }
-            break;
-        case msgTypeListString:
-            {   std::string *sptr = (std::string *)(pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << sptr[i].c_str();
-            }
-            break;
-        case msgTypeListAttributeGroup:
-            // Note: recursive call to << operator
-            isRecursive = true;
-            if(pos->selected)
-                os << " <Attr> is selected" << endl;
-            else
-                os << " <Attr> is NOT selected" << endl;
-            {   AttributeGroup **aptr = (AttributeGroup **)(pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << *(aptr[i]);
-            }
-            break;
-        case msgTypeListBool:
-            {   bool *bptr = (bool *)(pos->address);
-                for(i = 0; i < pos->length; ++i)
-                    os << ", " << bptr[i];
-            }
-            break;
-
-        // vectors of primitive types
-        case msgTypeVectorBool:
-            {   boolVector *vb = (boolVector *)(pos->address);
-                boolVector::iterator bpos;
-                for(bpos = vb->begin(); bpos != vb->end(); ++bpos)
-                    os << ", '" << (*bpos==1?"true":"false") << "'";
-            }
-            break;
-        case msgTypeVectorChar:
-            {   charVector *vc = (charVector *)(pos->address);
-                charVector::iterator cpos;
-                for(cpos = vc->begin(); cpos != vc->end(); ++cpos)
-                    os << ", '" << *cpos << "'";
-            }
-            break;
-        case msgTypeVectorUnsignedChar:
-            {   unsignedCharVector *vc = (unsignedCharVector *)(pos->address);
-                unsignedCharVector::iterator cpos;
-                for(cpos = vc->begin(); cpos != vc->end(); ++cpos)
-                    os << ", " << int(*cpos);
-            }
-            break;
-        case msgTypeVectorInt:
-            {   intVector *vi = (intVector *)(pos->address);
-                intVector::iterator ipos;
-                for(ipos = vi->begin(); ipos != vi->end(); ++ipos)
-                    os << ", " << *ipos;
-            }
-            break;
-        case msgTypeVectorLong:
-            {   longVector *vl = (longVector *)(pos->address);
-                longVector::iterator lpos;
-                for(lpos = vl->begin(); lpos != vl->end(); ++lpos)
-                    os << ", " << *lpos;
-            }
-            break;
-        case msgTypeVectorFloat:
-            {   floatVector *vf = (floatVector *)(pos->address);
-                floatVector::iterator fpos;
-                for(fpos = vf->begin(); fpos != vf->end(); ++fpos)
-                    os << ", " << *fpos;
-            }
-            break;
-        case msgTypeVectorDouble:
-            {   doubleVector *vd = (doubleVector *)(pos->address);
-                doubleVector::iterator dpos;
-                for(dpos = vd->begin(); dpos != vd->end(); ++dpos)
-                    os << ", " << *dpos;
-            }
-            break;
-        case msgTypeVectorString:
-            {   stringVector *vs = (stringVector *)(pos->address);
-                stringVector::iterator spos;
-                for(spos = vs->begin(); spos != vs->end(); ++spos)
-                    os << ", " << spos->c_str();
-            }
-            break;
-        case msgTypeVectorAttributeGroup:
-            // Note: recursive call to << operator
-            isRecursive = true;
-            if(pos->selected)
-                os << " <Attr> is selected" << endl;
-            else
-                os << " <Attr> is NOT selected" << endl;
-            {   AttributeGroupVector *va = (AttributeGroupVector *)(pos->address);
-                AttributeGroupVector::iterator apos;
-                for(apos = va->begin(); apos != va->end(); ++apos)
-                    os << *apos;
-            }
-            break;
-        case msgTypeNone:
-        default:
-            ; // nothing.
+          AttributeGroup** aptr = (AttributeGroup**)(pos->address);
+          for (i = 0; i < pos->length; ++i)
+            os << *(aptr[i]);
         }
+        break;
+      case msgTypeListBool:
+      {
+        bool* bptr = (bool*)(pos->address);
+        for (i = 0; i < pos->length; ++i)
+          os << ", " << bptr[i];
+      }
+      break;
 
-        os << endl;
-
-        k++;
+      // vectors of primitive types
+      case msgTypeVectorBool:
+      {
+        boolVector* vb = (boolVector*)(pos->address);
+        boolVector::iterator bpos;
+        for (bpos = vb->begin(); bpos != vb->end(); ++bpos)
+          os << ", '" << (*bpos == 1 ? "true" : "false") << "'";
+      }
+      break;
+      case msgTypeVectorChar:
+      {
+        charVector* vc = (charVector*)(pos->address);
+        charVector::iterator cpos;
+        for (cpos = vc->begin(); cpos != vc->end(); ++cpos)
+          os << ", '" << *cpos << "'";
+      }
+      break;
+      case msgTypeVectorUnsignedChar:
+      {
+        unsignedCharVector* vc = (unsignedCharVector*)(pos->address);
+        unsignedCharVector::iterator cpos;
+        for (cpos = vc->begin(); cpos != vc->end(); ++cpos)
+          os << ", " << int(*cpos);
+      }
+      break;
+      case msgTypeVectorInt:
+      {
+        intVector* vi = (intVector*)(pos->address);
+        intVector::iterator ipos;
+        for (ipos = vi->begin(); ipos != vi->end(); ++ipos)
+          os << ", " << *ipos;
+      }
+      break;
+      case msgTypeVectorLong:
+      {
+        longVector* vl = (longVector*)(pos->address);
+        longVector::iterator lpos;
+        for (lpos = vl->begin(); lpos != vl->end(); ++lpos)
+          os << ", " << *lpos;
+      }
+      break;
+      case msgTypeVectorFloat:
+      {
+        floatVector* vf = (floatVector*)(pos->address);
+        floatVector::iterator fpos;
+        for (fpos = vf->begin(); fpos != vf->end(); ++fpos)
+          os << ", " << *fpos;
+      }
+      break;
+      case msgTypeVectorDouble:
+      {
+        doubleVector* vd = (doubleVector*)(pos->address);
+        doubleVector::iterator dpos;
+        for (dpos = vd->begin(); dpos != vd->end(); ++dpos)
+          os << ", " << *dpos;
+      }
+      break;
+      case msgTypeVectorString:
+      {
+        stringVector* vs = (stringVector*)(pos->address);
+        stringVector::iterator spos;
+        for (spos = vs->begin(); spos != vs->end(); ++spos)
+          os << ", " << spos->c_str();
+      }
+      break;
+      case msgTypeVectorAttributeGroup:
+        // Note: recursive call to << operator
+        isRecursive = true;
+        if (pos->selected)
+          os << " <Attr> is selected" << endl;
+        else
+          os << " <Attr> is NOT selected" << endl;
+        {
+          AttributeGroupVector* va = (AttributeGroupVector*)(pos->address);
+          AttributeGroupVector::iterator apos;
+          for (apos = va->begin(); apos != va->end(); ++apos)
+            os << *apos;
+        }
+        break;
+      case msgTypeNone:
+      default:; // nothing.
     }
 
-    indentLevel--;
+    os << endl;
 
-    return os;
+    k++;
+  }
+
+  indentLevel--;
+
+  return os;
 }
 }

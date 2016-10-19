@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,35 +39,47 @@ class PQDEPRECATED_EXPORT pqSphereWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
+
 public:
   pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   virtual ~pqSphereWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
-  virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
+  virtual void resetBounds() { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
-  /// accept the changes. Overridden to hide handles.
+  /**
+  * accept the changes. Overridden to hide handles.
+  */
   virtual void accept();
 
-  /// reset the changes. Overridden to hide handles.
+  /**
+  * reset the changes. Overridden to hide handles.
+  */
   virtual void reset();
 
-  /// When set, the widget can also be used to setup a direction vector.
+  /**
+  * When set, the widget can also be used to setup a direction vector.
+  */
   void enableDirection(bool);
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   void createWidget(pqServer*);
 
 private slots:
-  /// Called when the user changes widget visibility
+  /**
+  * Called when the user changes widget visibility
+  */
   void onWidgetVisibilityChanged(bool visible);
 
 private:

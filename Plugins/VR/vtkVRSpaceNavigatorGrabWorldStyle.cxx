@@ -49,11 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRSpaceNavigatorGrabWorldStyle)
 
-// ----------------------------------------------------------------------------
-vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle() :
-  Superclass()
+  // ----------------------------------------------------------------------------
+  vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
+  : Superclass()
 {
-  this->AddAnalogRole( "Move" );
+  this->AddAnalogRole("Move");
 }
 
 // ----------------------------------------------------------------------------
@@ -62,64 +62,64 @@ vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog ( const vtkVREventData& data )
+void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREventData& data)
 {
   vtkStdString role = this->GetAnalogRole(data.name);
   if (role == "Move")
-    {
+  {
     // Values for Space Navigator
-    if ( data.data.analog.num_channel != 6 )
-      {
+    if (data.data.analog.num_channel != 6)
+    {
       return;
-      }
+    }
 
-    vtkSMRenderViewProxy * viewProxy = vtkSMRenderViewProxy::SafeDownCast( this->ControlledProxy );
-    if ( viewProxy )
-      {
+    vtkSMRenderViewProxy* viewProxy = vtkSMRenderViewProxy::SafeDownCast(this->ControlledProxy);
+    if (viewProxy)
+    {
       vtkCamera* camera;
       double pos[3], fp[3], up[3], dir[3];
       double orient[3];
-      const double *channel = data.data.analog.channel;
+      const double* channel = data.data.analog.channel;
 
       camera = viewProxy->GetActiveCamera();
 
-      camera->GetPosition( pos );
-      camera->GetFocalPoint( fp );
-      camera->GetDirectionOfProjection( dir );
+      camera->GetPosition(pos);
+      camera->GetFocalPoint(fp);
+      camera->GetDirectionOfProjection(dir);
       camera->OrthogonalizeViewUp();
-      camera->GetViewUp( up );
+      camera->GetViewUp(up);
 
       // Apply up-down motion
       for (int i = 0; i < 3; i++)
-        {
-        double dx = 0.05*channel[2]*up[i];
+      {
+        double dx = 0.05 * channel[2] * up[i];
         pos[i] += dx;
-        fp[i]  += dx;
-        }
+        fp[i] += dx;
+      }
 
       // Apply right-left motion
       double r[3];
       vtkMath::Cross(dir, up, r);
 
       for (int i = 0; i < 3; i++)
-        {
-        double dx = -0.05*channel[0]*r[i];
+      {
+        double dx = -0.05 * channel[0] * r[i];
         pos[i] += dx;
-        fp[i]  += dx;
-        }
+        fp[i] += dx;
+      }
 
       camera->SetPosition(pos);
       camera->SetFocalPoint(fp);
 
       camera->Dolly(pow(1.01, channel[1]));
-      camera->Elevation(  1.0*channel[3]);
-      camera->Azimuth(    1.0*channel[5]);
-      camera->Roll(       1.0*channel[4]);
-      }
+      camera->Elevation(1.0 * channel[3]);
+      camera->Azimuth(1.0 * channel[5]);
+      camera->Roll(1.0 * channel[4]);
     }
+  }
 }
 
-void vtkVRSpaceNavigatorGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRSpaceNavigatorGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

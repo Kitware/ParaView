@@ -35,51 +35,61 @@ public:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqPythonView(const QString& type,
-               const QString& group,
-               const QString& name, 
-               vtkSMViewProxy* renModule, 
-               pqServer* server, 
-               QObject* parent=NULL);
+  pqPythonView(const QString& type, const QString& group, const QString& name,
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
   // Destructor.
   virtual ~pqPythonView();
 
-  /// Set/get the Python script
-  void setPythonScript(QString & script);
+  /**
+  * Set/get the Python script
+  */
+  void setPythonScript(QString& script);
   QString getPythonScript();
 
-  /// Get the view proxy as a vtkSMPythonViewProxy
+  /**
+  * Get the view proxy as a vtkSMPythonViewProxy
+  */
   vtkSMPythonViewProxy* getPythonViewProxy();
 
 protected slots:
   virtual void initializeAfterObjectsCreated();
 
-  /// Setups up RenderModule and QVTKWidget binding.
-  /// This method is called for all pqRenderView objects irrespective
-  /// of whether it is created from state/undo-redo/python or by the GUI. Hence
-  /// don't change any render module properties here.
+  /**
+  * Setups up RenderModule and QVTKWidget binding.
+  * This method is called for all pqRenderView objects irrespective
+  * of whether it is created from state/undo-redo/python or by the GUI. Hence
+  * don't change any render module properties here.
+  */
   virtual void initializeWidgets();
 
 protected:
-  /// Overridden to popup the context menu, if some actions have been added
-  /// using addMenuAction.
+  /**
+  * Overridden to popup the context menu, if some actions have been added
+  * using addMenuAction.
+  */
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
-  /// Creates a new instance of the QWidget subclass to be used to show this
-  /// view.
+  /**
+  * Creates a new instance of the QWidget subclass to be used to show this
+  * view.
+  */
   virtual QWidget* createWidget();
 
-  /// Use this method to initialize the pqObject state using the
-  /// underlying vtkSMProxy. This needs to be done only once,
-  /// after the object has been created. 
+  /**
+  * Use this method to initialize the pqObject state using the
+  * underlying vtkSMProxy. This needs to be done only once,
+  * after the object has been created.
+  */
   virtual void initialize();
 
-  /// On Mac, we usually try to cache the front buffer to avoid unecessary
+  /**
+  * On Mac, we usually try to cache the front buffer to avoid unecessary
+  */
   //  updates.
   bool AllowCaching;
 
-private: 
+private:
   Q_DISABLE_COPY(pqPythonView)
 
   class pqInternal;

@@ -40,17 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 
-/// pqAnimationTimeWidget is a widget that can be used to show/set the current
-/// animation time.
-/// The widget allow the user to do the following:
-/// \li View and/or change the current time value (in seq/realtime modes), or
-///     current time step value (in snap-to-timesteps mode).
-/// \li View and/or change the play mode (from seq to snap-to-timesteps). While
-///     the widget behaves acceptably if the application externally changes the
-///     animation play mode to realtime, the widget itself doesn't allow the
-///     user to do that. This mode is optional. You can disabling allowing the
-///     user to change the play mode by setting playModeReadOnly to true
-///     (default is false).
+/**
+* pqAnimationTimeWidget is a widget that can be used to show/set the current
+* animation time.
+* The widget allow the user to do the following:
+* \li View and/or change the current time value (in seq/realtime modes), or
+*     current time step value (in snap-to-timesteps mode).
+* \li View and/or change the play mode (from seq to snap-to-timesteps). While
+*     the widget behaves acceptably if the application externally changes the
+*     animation play mode to realtime, the widget itself doesn't allow the
+*     user to do that. This mode is optional. You can disabling allowing the
+*     user to change the play mode by setting playModeReadOnly to true
+*     (default is false).
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
@@ -61,36 +63,51 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
   Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
 
   typedef QWidget Superclass;
+
 public:
-  pqAnimationTimeWidget(QWidget* parent=0);
+  pqAnimationTimeWidget(QWidget* parent = 0);
   virtual ~pqAnimationTimeWidget();
 
-  /// Provides access to the animation scene proxy currently
-  /// controlled/reflected by this widget.
+  /**
+  * Provides access to the animation scene proxy currently
+  * controlled/reflected by this widget.
+  */
   vtkSMProxy* animationScene() const;
 
-  /// Get/set the current time value.
+  /**
+  * Get/set the current time value.
+  */
   void setTimeValue(double time);
   double timeValue() const;
 
-  /// Get/set the precision with which time is reported.
+  /**
+  * Get/set the precision with which time is reported.
+  */
   void setTimePrecision(int val);
   int timePrecision() const;
 
-  /// Get/set the number of timesteps.
+  /**
+  * Get/set the number of timesteps.
+  */
   void setTimeStepCount(int count);
   int timeStepCount() const;
 
-  /// Get/set the playmode.
+  /**
+  * Get/set the playmode.
+  */
   void setPlayMode(const QString& mode);
   QString playMode() const;
 
-  /// Get/set whether the user should be able to change the animation
-  /// play mode using this widget.
+  /**
+  * Get/set whether the user should be able to change the animation
+  * play mode using this widget.
+  */
   void setPlayModeReadOnly(bool val);
   bool playModeReadOnly() const;
 
-  /// Get/set the label text to use for the "time" parameter.
+  /**
+  * Get/set the label text to use for the "time" parameter.
+  */
   void setTimeLabel(const QString& val);
   QString timeLabel() const;
 signals:
@@ -99,16 +116,20 @@ signals:
   void dummySignal();
 
 public slots:
-  /// Set the animation scene proxy which is reflected/controlled by this
-  /// widget.
+  /**
+  * Set the animation scene proxy which is reflected/controlled by this
+  * widget.
+  */
   void setAnimationScene(vtkSMProxy* animationScene);
 
 private slots:
   void updateTimestepCountLabelVisibility();
 
-  /// called when the user changes the timestepValue spinbox manually
-  /// to change the current timestep. We will update the current time and
-  /// result in triggering  timeValueChanged() if time indeed changed.
+  /**
+  * called when the user changes the timestepValue spinbox manually
+  * to change the current timestep. We will update the current time and
+  * result in triggering  timeValueChanged() if time indeed changed.
+  */
   void timestepValueChanged();
 
 private:

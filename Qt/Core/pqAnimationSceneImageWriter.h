@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include "vtkSMAnimationSceneImageWriter.h"
 
-/// pqAnimationSceneImageWriter is a subclass of vtkSMAnimationSceneImageWriter
-/// which knows how to generate images from a plot view modules.
+/**
+* pqAnimationSceneImageWriter is a subclass of vtkSMAnimationSceneImageWriter
+* which knows how to generate images from a plot view modules.
+*/
 class PQCORE_EXPORT pqAnimationSceneImageWriter : public vtkSMAnimationSceneImageWriter
 {
 public:
@@ -53,14 +55,11 @@ protected:
   // returns a new Image data object. May return NULL.
   // Default implementation can only handle vtkSMViewProxy subclasses.
   // Subclassess must override to handle other types of view modules.
-  virtual vtkImageData* CaptureViewImage(
-    vtkSMViewProxy*, int magnification);
+  virtual vtkImageData* CaptureViewImage(vtkSMViewProxy*, int magnification);
 
 private:
   pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
   void operator=(const pqAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

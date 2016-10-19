@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAMRDualGridHelper - Tools for processing AMR as a dual grid.
-// .SECTION Description
-// This helper object was developed to help the AMR dual grid connectivity
-// and integration filter but I also want a dual grid iso surface filter
-// so I mad it a separate class.  The API needs to be improved to make
-// it more generally useful.
-// This class will take advantage of some meta information, if available
-// from a coprocessing adaptor.  If not available, it will compute the 
-// information.
+/**
+ * @class   vtkAMRDualGridHelper
+ * @brief   Tools for processing AMR as a dual grid.
+ *
+ * This helper object was developed to help the AMR dual grid connectivity
+ * and integration filter but I also want a dual grid iso surface filter
+ * so I mad it a separate class.  The API needs to be improved to make
+ * it more generally useful.
+ * This class will take advantage of some meta information, if available
+ * from a coprocessing adaptor.  If not available, it will compute the
+ * information.
+*/
 
 #ifndef vtkAMRDualGridHelper_h
 #define vtkAMRDualGridHelper_h
@@ -46,83 +49,98 @@ class vtkAMRDualGridHelperCommRequestList;
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelper : public vtkObject
 {
 public:
-  static vtkAMRDualGridHelper *New();
-  vtkTypeMacro(vtkAMRDualGridHelper,vtkObject);
+  static vtkAMRDualGridHelper* New();
+  vtkTypeMacro(vtkAMRDualGridHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  // Description:
-  // An option to turn off copying ghost values across process boundaries.
-  // If the ghost values are already correct, then the extra communication is 
-  // not necessary.  If this assumption is wrong, this option will produce
-  // cracks / seams.  This is off by default.
+
+  //@{
+  /**
+   * An option to turn off copying ghost values across process boundaries.
+   * If the ghost values are already correct, then the extra communication is
+   * not necessary.  If this assumption is wrong, this option will produce
+   * cracks / seams.  This is off by default.
+   */
   vtkGetMacro(SkipGhostCopy, int);
   vtkSetMacro(SkipGhostCopy, int);
   vtkBooleanMacro(SkipGhostCopy, int);
+  //@}
 
-  // Description:
-  // Turn on/off the ability to create meshing between levels in the grid.  This
-  // is on by default.  Set this before you call initialize.
+  //@{
+  /**
+   * Turn on/off the ability to create meshing between levels in the grid.  This
+   * is on by default.  Set this before you call initialize.
+   */
   vtkGetMacro(EnableDegenerateCells, int);
   vtkSetMacro(EnableDegenerateCells, int);
   vtkBooleanMacro(EnableDegenerateCells, int);
+  //@}
 
-  // Description:
-  // When this option is on (the default) and a controller that supports
-  // asynchronous communication (like MPI) is detected, use asynchronous
-  // communication where appropriate.  This can prevent processes from blocking
-  // while waiting for communication in other processes to finish.
+  //@{
+  /**
+   * When this option is on (the default) and a controller that supports
+   * asynchronous communication (like MPI) is detected, use asynchronous
+   * communication where appropriate.  This can prevent processes from blocking
+   * while waiting for communication in other processes to finish.
+   */
   vtkGetMacro(EnableAsynchronousCommunication, int);
   vtkSetMacro(EnableAsynchronousCommunication, int);
   vtkBooleanMacro(EnableAsynchronousCommunication, int);
+  //@}
 
-  // Description:
-  // The controller to use for communication.
+  //@{
+  /**
+   * The controller to use for communication.
+   */
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
+  //@}
 
-  int                       Initialize(vtkNonOverlappingAMR* input);
-  int                       SetupData(vtkNonOverlappingAMR* input,
-                                       const char* arrayName);
-  const double*             GetGlobalOrigin() { return this->GlobalOrigin;}
-  const double*             GetRootSpacing() { return this->RootSpacing;}
-  int                       GetNumberOfBlocks() { return this->NumberOfBlocksInThisProcess;}
-  int                       GetNumberOfLevels() { return (int)(this->Levels.size());}
-  int                       GetNumberOfBlocksInLevel(int level);
+  int Initialize(vtkNonOverlappingAMR* input);
+  int SetupData(vtkNonOverlappingAMR* input, const char* arrayName);
+  const double* GetGlobalOrigin() { return this->GlobalOrigin; }
+  const double* GetRootSpacing() { return this->RootSpacing; }
+  int GetNumberOfBlocks() { return this->NumberOfBlocksInThisProcess; }
+  int GetNumberOfLevels() { return (int)(this->Levels.size()); }
+  int GetNumberOfBlocksInLevel(int level);
   vtkAMRDualGridHelperBlock* GetBlock(int level, int blockIdx);
   vtkAMRDualGridHelperBlock* GetBlock(int level, int xGrid, int yGrid, int zGrid);
 
+  /**
+   * I am generalizing the code that copies lowres blocks to highres ghost regions.
+   * I need to do this for the clip filter (level mask).
 
-  // Description:
-  // I am generalizing the code that copies lowres blocks to highres ghost regions.
-  // I need to do this for the clip filter (level mask).
-  //
-  // For transitions between levels, degeneracy works well to create
-  // and contour wedges and pyramids, but the volume fraction values
-  // in the high-level blocks ghost cells need to be the same
-  // as the closest cell in the low resolution block.  These methods
-  // copy low values to high.
-  void CopyDegenerateRegionBlockToBlock(
-    int regionX, int regionY, int regionZ,
+   * For transitions between levels, degeneracy works well to create
+   * and contour wedges and pyramids, but the volume fraction values
+   * in the high-level blocks ghost cells need to be the same
+   * as the closest cell in the low resolution block.  These methods
+   * copy low values to high.
+   */
+  void CopyDegenerateRegionBlockToBlock(int regionX, int regionY, int regionZ,
     vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
     vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
-  // Description:
-  // This queues up either a copy from a remote process to this process
-  // or a copy from this process to a remote process.
-  // Only the local block needs an array.  LowRes block is the source.
-  void QueueRegionRemoteCopy(
-    int regionX, int regionY, int regionZ,
+  /**
+   * This queues up either a copy from a remote process to this process
+   * or a copy from this process to a remote process.
+   * Only the local block needs an array.  LowRes block is the source.
+   */
+  void QueueRegionRemoteCopy(int regionX, int regionY, int regionZ,
     vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
     vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
-  // Description:
-  // This should be called on every process.  It processes the queue of region copies.
-  // It sends and copies the regions into blocks.
+  /**
+   * This should be called on every process.  It processes the queue of region copies.
+   * It sends and copies the regions into blocks.
+   */
   void ProcessRegionRemoteCopyQueue(bool hackLevelFlag);
-  // Description:
-  // Call this before adding regions to the queue.  It clears the queue.
+  /**
+   * Call this before adding regions to the queue.  It clears the queue.
+   */
   void ClearRegionRemoteCopyQueue();
-  // Description:
-  // It is convenient to get this here.
+  //@{
+  /**
+   * It is convenient to get this here.
+   */
   vtkGetStringMacro(ArrayName);
+  //@}
 
 private:
   vtkAMRDualGridHelper();
@@ -131,36 +149,31 @@ private:
   char* ArrayName;
   int DataTypeSize;
   vtkSetStringMacro(ArrayName);
-  
+
   // Distributed execution
   void ShareMetaData();
   void ShareBlocks();
-  void ShareBlocksWithNeighbors(vtkIntArray *neighbors);
-  void ShareBlocksWithNeighborsAsynchronous(vtkIntArray *neighbors);
-  void ShareBlocksWithNeighborsSynchronous(vtkIntArray *neighbors);
+  void ShareBlocksWithNeighbors(vtkIntArray* neighbors);
+  void ShareBlocksWithNeighborsAsynchronous(vtkIntArray* neighbors);
+  void ShareBlocksWithNeighborsSynchronous(vtkIntArray* neighbors);
   void MarshalBlocks(vtkIntArray* buffer);
-  void UnmarshalBlocks(vtkIntArray *buffer);
-  void UnmarshalBlocksFromOne(vtkIntArray *buffer, int blockProc);
+  void UnmarshalBlocks(vtkIntArray* buffer);
+  void UnmarshalBlocksFromOne(vtkIntArray* buffer, int blockProc);
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
   void ComputeGlobalMetaData(vtkNonOverlappingAMR* input);
   void AddBlock(int level, int id, vtkImageData* volume);
 
   // Manage connectivity seeds between blocks.
   void CreateFaces();
-  void FindExistingFaces(
-    vtkAMRDualGridHelperBlock* block,
-    int level, int x, int y, int z);
+  void FindExistingFaces(vtkAMRDualGridHelperBlock* block, int level, int x, int y, int z);
 
   // Assign shared cells between blocks and meshing
   // changes in level.
   void AssignSharedRegions();
   void AssignBlockSharedRegions(
-    vtkAMRDualGridHelperBlock* block, int blockLevel,
-    int blockX, int blockY, int blockZ);
-  int ClaimBlockSharedRegion(
-    vtkAMRDualGridHelperBlock* block,
-    int blockX,  int blockY,  int blockZ,
+    vtkAMRDualGridHelperBlock* block, int blockLevel, int blockX, int blockY, int blockZ);
+  int ClaimBlockSharedRegion(vtkAMRDualGridHelperBlock* block, int blockX, int blockY, int blockZ,
     int regionX, int regionY, int regionZ);
 
   int NumberOfBlocksInThisProcess;
@@ -168,13 +181,13 @@ private:
   // Cell dimension of block without ghost layers.
   int StandardBlockDimensions[3];
   double RootSpacing[3];
-  
+
   // Global origin is chosen by ignoring ghost layers.
   // All indexes will be positive.
   // If we complete the ghost layer on boundary blocks,
   // the ghost layer will still be positive.
   double GlobalOrigin[3];
-  
+
   // Each level will have a grid to help find neighbors.
   std::vector<vtkAMRDualGridHelperLevel*> Levels;
 
@@ -182,36 +195,30 @@ private:
 
   void ProcessRegionRemoteCopyQueueSynchronous(bool hackLevelFlag);
   void SendDegenerateRegionsFromQueueSynchronous(int destProc, vtkIdType messageLength);
-  void ReceiveDegenerateRegionsFromQueueSynchronous(int srcProc, vtkIdType messageLength,
-                                                    bool hackLevelFlag);
+  void ReceiveDegenerateRegionsFromQueueSynchronous(
+    int srcProc, vtkIdType messageLength, bool hackLevelFlag);
 
   // NOTE: These methods are NOT DEFINED if not compiled with MPI.
   void ProcessRegionRemoteCopyQueueMPIAsynchronous(bool hackLevelFlag);
   void SendDegenerateRegionsFromQueueMPIAsynchronous(
-                                 int recvProc, vtkIdType messageLength,
-                                 vtkAMRDualGridHelperCommRequestList &sendList);
+    int recvProc, vtkIdType messageLength, vtkAMRDualGridHelperCommRequestList& sendList);
   void ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
-                              int sendProc, vtkIdType messageLength,
-                              vtkAMRDualGridHelperCommRequestList &receiveList);
-  void FinishDegenerateRegionsCommMPIAsynchronous(
-                              bool hackLevelFlag,
-                              vtkAMRDualGridHelperCommRequestList &sendList,
-                              vtkAMRDualGridHelperCommRequestList &receiveList);
+    int sendProc, vtkIdType messageLength, vtkAMRDualGridHelperCommRequestList& receiveList);
+  void FinishDegenerateRegionsCommMPIAsynchronous(bool hackLevelFlag,
+    vtkAMRDualGridHelperCommRequestList& sendList,
+    vtkAMRDualGridHelperCommRequestList& receiveList);
 
   // Degenerate regions that span processes.  We keep them in a queue
   // to communicate and process all at once.
   std::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
   void DegenerateRegionMessageSize(vtkIdTypeArray* srcProcs, vtkIdTypeArray* destProc);
   void* CopyDegenerateRegionBlockToMessage(
-    const vtkAMRDualGridHelperDegenerateRegion &region,
-    void* messagePtr);
+    const vtkAMRDualGridHelperDegenerateRegion& region, void* messagePtr);
   const void* CopyDegenerateRegionMessageToBlock(
-    const vtkAMRDualGridHelperDegenerateRegion &region,
-    const void* messagePtr,
-    bool hackLevelFlag);
-  void MarshalDegenerateRegionMessage(void *messagePtr, int destProc);
-  void UnmarshalDegenerateRegionMessage(const void *messagePtr, int messageLength, int srcProc,
-                                        bool hackLevelFlag);
+    const vtkAMRDualGridHelperDegenerateRegion& region, const void* messagePtr, bool hackLevelFlag);
+  void MarshalDegenerateRegionMessage(void* messagePtr, int destProc);
+  void UnmarshalDegenerateRegionMessage(
+    const void* messagePtr, int messageLength, int srcProc, bool hackLevelFlag);
 
   int SkipGhostCopy;
 
@@ -220,7 +227,6 @@ private:
 private:
   vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 // I need to define this small object in the namespace of this class.
@@ -236,7 +242,7 @@ public:
   vtkAMRDualGridHelperBlock();
   ~vtkAMRDualGridHelperBlock();
 
-  void ResetRegionBits ();
+  void ResetRegionBits();
   // We assume that all blocks have ghost levels and are the same
   // dimension.  The vtk spy reader strips the ghost cells on
   // boundary blocks (on the outer surface of the data set).
@@ -245,16 +251,16 @@ public:
 
   int Level;
   int BlockId;
-  
+
   // I am sick of looping over the grid to find the grid index
   // of the blocks.
   int GridIndex[3];
-  
+
   // This is the global index of the origin of the image.
   // This is important since not all blocks have ghost layers on minimum side.
   // It appears that this is the origin of the ghost pixel if the image has a ghost pixel.
   int OriginIndex[3];
-  
+
   // The process that has the actual data (image).
   int ProcessId;
 
@@ -287,7 +293,7 @@ public:
   unsigned char BoundaryBits;
 
   // Different algorithms need to store differnt information
-  // with the blocks.  I could make this a vtkObject so the desctructor 
+  // with the blocks.  I could make this a vtkObject so the desctructor
   // would delete it.
   void* UserData;
 
@@ -295,7 +301,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// Material surface point in the face.  The point lies on an edge of the 
+// Material surface point in the face.  The point lies on an edge of the
 // dual grid and has a material fraction array.
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelperSeed
 {

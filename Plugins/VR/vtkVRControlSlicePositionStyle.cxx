@@ -54,8 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRControlSlicePositionStyle)
 
-// ----------------------------------------------------------------------------
-vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
+  // ----------------------------------------------------------------------------
+  vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
 {
   this->Enabled = false;
   this->InitialPositionRecorded = false;
@@ -64,16 +64,14 @@ vtkVRControlSlicePositionStyle::vtkVRControlSlicePositionStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRControlSlicePositionStyle::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRControlSlicePositionStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Enabled: " << this->Enabled << endl;
-  os << indent << "InitialPositionRecorded: " << this->InitialPositionRecorded
-     << endl;
-  os << indent << "Origin: " << this->Origin[0] << " "
-     << this->Origin[1] << " " << this->Origin[2] << " " << this->Origin[3]
-     << endl;
+  os << indent << "InitialPositionRecorded: " << this->InitialPositionRecorded << endl;
+  os << indent << "Origin: " << this->Origin[0] << " " << this->Origin[1] << " " << this->Origin[2]
+     << " " << this->Origin[3] << endl;
   os << indent << "InitialInvertedPose:" << endl;
   this->InitialInvertedPose->PrintSelf(os, indent.GetNextIndent());
 }
@@ -87,9 +85,9 @@ vtkVRControlSlicePositionStyle::~vtkVRControlSlicePositionStyle()
 bool vtkVRControlSlicePositionStyle::Update()
 {
   if (!this->ControlledProxy)
-    {
+  {
     return false;
-    }
+  }
 
   return true;
 }
@@ -99,46 +97,45 @@ void vtkVRControlSlicePositionStyle::HandleButton(const vtkVREventData& data)
 {
   vtkStdString role = this->GetButtonRole(data.name);
   if (role == "Grab slice")
-    {
+  {
     if (this->Enabled && data.data.button.state == 0)
-      {
+    {
       this->ControlledProxy->UpdateVTKObjects();
       this->InitialPositionRecorded = false;
-      }
+    }
 
     this->Enabled = data.data.button.state;
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
+void vtkVRControlSlicePositionStyle::HandleTracker(const vtkVREventData& data)
 {
   vtkStdString role = this->GetTrackerRole(data.name);
   if (role != "Slice position")
-    {
+  {
     return;
-    }
+  }
 
   if (!this->Enabled)
-    {
+  {
     this->InitialPositionRecorded = false;
     return;
-    }
+  }
 
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  pqView *view = pqActiveObjects::instance().activeView();
+  vtkSMRenderViewProxy* proxy = 0;
+  vtkSMDoubleVectorProperty* prop = 0;
+  pqView* view = pqActiveObjects::instance().activeView();
   if (view)
-    {
+  {
     proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
     if (proxy)
-      {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(
-            proxy->GetProperty("ModelTransformMatrix"));
+    {
+      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty("ModelTransformMatrix"));
       if (prop)
-        {
+      {
         if (!this->InitialPositionRecorded)
-          {
+        {
           // Copy the data into matrix
           this->InitialInvertedPose->Identity();
           this->InitialInvertedPose->SetElement(0, 3, data.data.tracker.matrix[3]);
@@ -148,13 +145,14 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
           // invert the matrix
           this->InitialInvertedPose->Invert();
 
-      vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName).Get(this->Origin,3);
+          vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
+            .Get(this->Origin, 3);
 
           this->Origin[3] = 1;
           this->InitialPositionRecorded = true;
-          }
+        }
         else
-          {
+        {
           double origin[4];
           vtkNew<vtkMatrix4x4> transformMatrix;
           transformMatrix->Identity();
@@ -163,14 +161,12 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
           transformMatrix->SetElement(2, 3, data.data.tracker.matrix[11]);
 
           vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
-                                    this->InitialInvertedPose.GetPointer(),
-                                    transformMatrix.GetPointer());
+            this->InitialInvertedPose.GetPointer(), transformMatrix.GetPointer());
 
           // Get the current model transform matrix to get the orientation
           double matrix[16];
           vtkNew<vtkMatrix4x4> modelTransformMatrix;
-          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(
-                matrix, 16);
+          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(matrix, 16);
           modelTransformMatrix->DeepCopy(matrix);
 
           // We need only the rotation component
@@ -180,9 +176,8 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
 
           // Now put the transform in new coordinate frame
           modelTransformMatrix->Invert();
-          vtkMatrix4x4::Multiply4x4(modelTransformMatrix.GetPointer(),
-                                    transformMatrix.GetPointer(),
-                                    transformMatrix.GetPointer());
+          vtkMatrix4x4::Multiply4x4(modelTransformMatrix.GetPointer(), transformMatrix.GetPointer(),
+            transformMatrix.GetPointer());
 
           double* transformedPoints = transformMatrix->MultiplyDoublePoint(this->Origin);
           origin[0] = transformedPoints[0] / transformedPoints[3];
@@ -190,17 +185,15 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
           origin[2] = transformedPoints[2] / transformedPoints[3];
           origin[3] = 1;
 
-          vtkSMPropertyHelper(this->ControlledProxy,
-                              this->ControlledPropertyName).Set(origin, 3);
-          //this->ControlledProxy->UpdateVTKObjects();
-          }
+          vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName).Set(origin, 3);
+          // this->ControlledProxy->UpdateVTKObjects();
         }
       }
     }
+  }
   else
-    {
+  {
     // If the button is released then
     this->InitialPositionRecorded = false;
-    }
-
+  }
 }

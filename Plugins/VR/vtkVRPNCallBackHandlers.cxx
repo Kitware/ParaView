@@ -37,20 +37,20 @@
 // ----------------------------------------------------------------------------
 void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b)
 {
-  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
-  self->newAnalogValue( b );
+  pqVRPNConnection* self = static_cast<pqVRPNConnection*>(userdata);
+  self->newAnalogValue(b);
 }
 
 // ----------------------------------------------------------------------------
 void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b)
 {
-  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
-  self->newButtonValue( b );
+  pqVRPNConnection* self = static_cast<pqVRPNConnection*>(userdata);
+  self->newButtonValue(b);
 }
 
 // ----------------------------------------------------------------------------
-void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t)
+void VRPN_CALLBACK handleTrackerChange(void* userdata, const vrpn_TRACKERCB t)
 {
-  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
-  self->newTrackerValue( t );
+  pqVRPNConnection* self = static_cast<pqVRPNConnection*>(userdata);
+  self->newTrackerValue(t);
 }

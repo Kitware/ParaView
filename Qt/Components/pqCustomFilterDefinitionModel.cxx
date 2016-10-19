@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,61 +47,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QString>
 
-
-
 /// \class pqCustomFilterDefinitionModelItem
 class pqCustomFilterDefinitionModelItem
 {
 public:
-  pqCustomFilterDefinitionModelItem(
-      pqCustomFilterDefinitionModelItem *parent=0);
+  pqCustomFilterDefinitionModelItem(pqCustomFilterDefinitionModelItem* parent = 0);
   virtual ~pqCustomFilterDefinitionModelItem();
 
   virtual QString GetName() const;
-  virtual pqPipelineSource *GetPipelineSource() const {return 0;}
+  virtual pqPipelineSource* GetPipelineSource() const { return 0; }
 
   pqCustomFilterDefinitionModel::ItemType Type;
-  pqCustomFilterDefinitionModelItem *Parent;
-  QList<pqCustomFilterDefinitionModelItem *> Children;
+  pqCustomFilterDefinitionModelItem* Parent;
+  QList<pqCustomFilterDefinitionModelItem*> Children;
 };
 
-
 /// \class pqCustomFilterDefinitionModelSource
-class pqCustomFilterDefinitionModelSource :
-    public pqCustomFilterDefinitionModelItem
+class pqCustomFilterDefinitionModelSource : public pqCustomFilterDefinitionModelItem
 {
 public:
   pqCustomFilterDefinitionModelSource(
-      pqCustomFilterDefinitionModelItem *parent=0, pqPipelineSource *source=0);
+    pqCustomFilterDefinitionModelItem* parent = 0, pqPipelineSource* source = 0);
   virtual ~pqCustomFilterDefinitionModelSource() {}
 
   virtual QString GetName() const;
-  virtual pqPipelineSource *GetPipelineSource() const;
+  virtual pqPipelineSource* GetPipelineSource() const;
 
-  pqPipelineSource *Source;
+  pqPipelineSource* Source;
 };
 
-
 /// \class pqCustomFilterDefinitionModelLink
-class pqCustomFilterDefinitionModelLink :
-    public pqCustomFilterDefinitionModelItem
+class pqCustomFilterDefinitionModelLink : public pqCustomFilterDefinitionModelItem
 {
 public:
   pqCustomFilterDefinitionModelLink(
-      pqCustomFilterDefinitionModelItem *parent=0,
-      pqCustomFilterDefinitionModelSource *link=0);
+    pqCustomFilterDefinitionModelItem* parent = 0, pqCustomFilterDefinitionModelSource* link = 0);
   virtual ~pqCustomFilterDefinitionModelLink() {}
 
   virtual QString GetName() const;
-  virtual pqPipelineSource *GetPipelineSource() const;
+  virtual pqPipelineSource* GetPipelineSource() const;
 
-  pqCustomFilterDefinitionModelSource *Link;
+  pqCustomFilterDefinitionModelSource* Link;
 };
-
 
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionModelItem::pqCustomFilterDefinitionModelItem(
-    pqCustomFilterDefinitionModelItem *parent)
+  pqCustomFilterDefinitionModelItem* parent)
   : Children()
 {
   this->Type = pqCustomFilterDefinitionModel::Invalid;
@@ -110,11 +101,11 @@ pqCustomFilterDefinitionModelItem::pqCustomFilterDefinitionModelItem(
 
 pqCustomFilterDefinitionModelItem::~pqCustomFilterDefinitionModelItem()
 {
-  QList<pqCustomFilterDefinitionModelItem *>::Iterator iter;
-  for(iter = this->Children.begin(); iter != this->Children.end(); ++iter)
-    {
+  QList<pqCustomFilterDefinitionModelItem*>::Iterator iter;
+  for (iter = this->Children.begin(); iter != this->Children.end(); ++iter)
+  {
     delete *iter;
-    }
+  }
 
   this->Children.clear();
 }
@@ -124,50 +115,47 @@ QString pqCustomFilterDefinitionModelItem::GetName() const
   return QString();
 }
 
-
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionModelSource::pqCustomFilterDefinitionModelSource(
-    pqCustomFilterDefinitionModelItem *parent, pqPipelineSource *source)
+  pqCustomFilterDefinitionModelItem* parent, pqPipelineSource* source)
   : pqCustomFilterDefinitionModelItem(parent)
 {
   this->Source = source;
 
   // Set the type for the source.
-  vtkSMProxy *proxy = source->getProxy();
-  if(proxy->IsA("vtkSMCompoundSourceProxy"))
-    {
+  vtkSMProxy* proxy = source->getProxy();
+  if (proxy->IsA("vtkSMCompoundSourceProxy"))
+  {
     this->Type = pqCustomFilterDefinitionModel::CustomFilter;
-    }
-  else if(strcmp(proxy->GetXMLGroup(), "filters") == 0)
-    {
+  }
+  else if (strcmp(proxy->GetXMLGroup(), "filters") == 0)
+  {
     this->Type = pqCustomFilterDefinitionModel::Filter;
-    }
-  else if(strcmp(proxy->GetXMLGroup(), "sources") == 0)
-    {
+  }
+  else if (strcmp(proxy->GetXMLGroup(), "sources") == 0)
+  {
     this->Type = pqCustomFilterDefinitionModel::Source;
-    }
+  }
 }
 
 QString pqCustomFilterDefinitionModelSource::GetName() const
 {
-  if(this->Source)
-    {
+  if (this->Source)
+  {
     return this->Source->getSMName();
-    }
+  }
 
   return QString();
 }
 
-pqPipelineSource *pqCustomFilterDefinitionModelSource::GetPipelineSource() const
+pqPipelineSource* pqCustomFilterDefinitionModelSource::GetPipelineSource() const
 {
   return this->Source;
 }
 
-
 //-----------------------------------------------------------------------------
 pqCustomFilterDefinitionModelLink::pqCustomFilterDefinitionModelLink(
-    pqCustomFilterDefinitionModelItem *parent,
-    pqCustomFilterDefinitionModelSource *link)
+  pqCustomFilterDefinitionModelItem* parent, pqCustomFilterDefinitionModelSource* link)
   : pqCustomFilterDefinitionModelItem(parent)
 {
   this->Link = link;
@@ -176,217 +164,210 @@ pqCustomFilterDefinitionModelLink::pqCustomFilterDefinitionModelLink(
 
 QString pqCustomFilterDefinitionModelLink::GetName() const
 {
-  if(this->Link)
-    {
+  if (this->Link)
+  {
     return this->Link->GetName();
-    }
+  }
 
   return QString();
 }
 
-pqPipelineSource *pqCustomFilterDefinitionModelLink::GetPipelineSource() const
+pqPipelineSource* pqCustomFilterDefinitionModelLink::GetPipelineSource() const
 {
-  if(this->Link)
-    {
+  if (this->Link)
+  {
     return this->Link->GetPipelineSource();
-    }
+  }
 
   return 0;
 }
 
-
 //-----------------------------------------------------------------------------
-pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(
-    QObject *parentObject)
+pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(QObject* parentObject)
   : QAbstractItemModel(parentObject)
 {
   this->Root = new pqCustomFilterDefinitionModelItem();
 
   // Initialize the pixmap list.
   this->PixmapList = new QPixmap[pqCustomFilterDefinitionModel::LastType + 1];
-  if(this->PixmapList)
-    {
+  if (this->PixmapList)
+  {
     this->PixmapList[pqCustomFilterDefinitionModel::Source].load(
-        ":/pqWidgets/Icons/pqSource16.png");
+      ":/pqWidgets/Icons/pqSource16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::Filter].load(
-        ":/pqWidgets/Icons/pqFilter16.png");
+      ":/pqWidgets/Icons/pqFilter16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::CustomFilter].load(
-        ":/pqWidgets/Icons/pqBundle16.png");
+      ":/pqWidgets/Icons/pqBundle16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::Link].load(
-        ":/pqWidgets/Icons/pqLinkBack16.png");
-    }
+      ":/pqWidgets/Icons/pqLinkBack16.png");
+  }
 }
 
 pqCustomFilterDefinitionModel::~pqCustomFilterDefinitionModel()
 {
   delete this->Root;
-  delete [] this->PixmapList;
+  delete[] this->PixmapList;
 }
 
-int pqCustomFilterDefinitionModel::rowCount(
-    const QModelIndex &parentIndex) const
+int pqCustomFilterDefinitionModel::rowCount(const QModelIndex& parentIndex) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(parentIndex);
-  if(item)
-    {
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(parentIndex);
+  if (item)
+  {
     return item->Children.size();
-    }
+  }
 
   return 0;
 }
 
-int pqCustomFilterDefinitionModel::columnCount(const QModelIndex &) const
+int pqCustomFilterDefinitionModel::columnCount(const QModelIndex&) const
 {
   return 1;
 }
 
-bool pqCustomFilterDefinitionModel::hasChildren(
-    const QModelIndex &parentIndex) const
+bool pqCustomFilterDefinitionModel::hasChildren(const QModelIndex& parentIndex) const
 {
   return this->rowCount(parentIndex) > 0;
 }
 
-QModelIndex pqCustomFilterDefinitionModel::index(int row, int column,
-    const QModelIndex &parentIndex) const
+QModelIndex pqCustomFilterDefinitionModel::index(
+  int row, int column, const QModelIndex& parentIndex) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(parentIndex);
-  if(item && row >= 0 && row < item->Children.size() && column >= 0 &&
-      column < this->columnCount(parentIndex))
-    {
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(parentIndex);
+  if (item && row >= 0 && row < item->Children.size() && column >= 0 &&
+    column < this->columnCount(parentIndex))
+  {
     return this->createIndex(row, column, item->Children[row]);
-    }
+  }
 
   return QModelIndex();
 }
 
-QModelIndex pqCustomFilterDefinitionModel::parent(const QModelIndex &idx) const
+QModelIndex pqCustomFilterDefinitionModel::parent(const QModelIndex& idx) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
-  if(item && item->Parent && item->Parent != this->Root)
-    {
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(idx);
+  if (item && item->Parent && item->Parent != this->Root)
+  {
     int row = item->Parent->Parent->Children.indexOf(item->Parent);
     return this->createIndex(row, 0, item->Parent);
-    }
+  }
 
   return QModelIndex();
 }
 
-QVariant pqCustomFilterDefinitionModel::data(const QModelIndex &idx,
-    int role) const
+QVariant pqCustomFilterDefinitionModel::data(const QModelIndex& idx, int role) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
-  if(item && item != this->Root)
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(idx);
+  if (item && item != this->Root)
+  {
+    switch (role)
     {
-    switch(role)
-      {
       case Qt::DisplayRole:
       case Qt::ToolTipRole:
       case Qt::EditRole:
+      {
+        if (idx.column() == 0)
         {
-        if(idx.column() == 0)
-          {
           return QVariant(item->GetName());
-          }
+        }
 
         break;
-        }
+      }
       case Qt::DecorationRole:
+      {
+        if (idx.column() == 0 && this->PixmapList &&
+          item->Type != pqCustomFilterDefinitionModel::Invalid)
         {
-        if(idx.column() == 0 && this->PixmapList &&
-            item->Type != pqCustomFilterDefinitionModel::Invalid)
-          {
           return QVariant(this->PixmapList[item->Type]);
-          }
+        }
 
         break;
-        }
       }
     }
+  }
 
   return QVariant();
 }
 
-Qt::ItemFlags pqCustomFilterDefinitionModel::flags(const QModelIndex &) const
+Qt::ItemFlags pqCustomFilterDefinitionModel::flags(const QModelIndex&) const
 {
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-void pqCustomFilterDefinitionModel::setContents(
-  const pqProxySelection& items)
+void pqCustomFilterDefinitionModel::setContents(const pqProxySelection& items)
 {
   this->beginResetModel();
   delete this->Root;
   this->Root = new pqCustomFilterDefinitionModelItem();
   if (items.size() == 0)
-    {
+  {
     this->endResetModel();
     return;
-    }
+  }
 
   // locate pqPipelineSource instances for all the proxies in items.
   QSet<pqPipelineSource*> selectedSources;
   foreach (pqServerManagerModelItem* item, items)
-    {
+  {
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource *source = port? port->getSource() :
-      qobject_cast<pqPipelineSource*>(item);
+    pqPipelineSource* source = port ? port->getSource() : qobject_cast<pqPipelineSource*>(item);
     if (source)
-      {
+    {
       selectedSources.insert(source);
-      }
     }
+  }
 
   // Add all the items to the model.
   // TODO: Make sure the sources are from the same server.
-  QMap<pqPipelineSource *, pqCustomFilterDefinitionModelSource *> itemMap;
+  QMap<pqPipelineSource*, pqCustomFilterDefinitionModelSource*> itemMap;
   foreach (pqPipelineSource* source, selectedSources)
-    {
-    pqCustomFilterDefinitionModelSource *item = 
+  {
+    pqCustomFilterDefinitionModelSource* item =
       new pqCustomFilterDefinitionModelSource(this->Root, source);
     this->Root->Children.append(item);
     itemMap.insert(source, item);
-    }
+  }
 
   // Connect the items based on inputs.
   int i = 0;
-  pqCustomFilterDefinitionModelLink *link = 0;
-  pqCustomFilterDefinitionModelSource *output = 0;
-  pqCustomFilterDefinitionModelItem *otherItem = 0;
-  QList<pqCustomFilterDefinitionModelItem *> fanInList;
-  QMap<pqPipelineSource *, pqCustomFilterDefinitionModelSource *>::Iterator jter;
+  pqCustomFilterDefinitionModelLink* link = 0;
+  pqCustomFilterDefinitionModelSource* output = 0;
+  pqCustomFilterDefinitionModelItem* otherItem = 0;
+  QList<pqCustomFilterDefinitionModelItem*> fanInList;
+  QMap<pqPipelineSource*, pqCustomFilterDefinitionModelSource*>::Iterator jter;
   foreach (pqPipelineSource* source, selectedSources)
-    {
+  {
     jter = itemMap.find(source);
-    if(jter != itemMap.end())
-      {
+    if (jter != itemMap.end())
+    {
       // Loop through the outputs of the source. If the output is in
       // the item map, move it to the correct place.
-      pqCustomFilterDefinitionModelSource *item = *jter;
+      pqCustomFilterDefinitionModelSource* item = *jter;
       QList<pqPipelineSource*> consumers = item->Source->getAllConsumers();
-      for(i = 0; i < consumers.size(); i++)
-        {
+      for (i = 0; i < consumers.size(); i++)
+      {
         jter = itemMap.find(consumers[i]);
-        if(jter != itemMap.end())
-          {
+        if (jter != itemMap.end())
+        {
           output = *jter;
-          if(output->Parent == this->Root)
+          if (output->Parent == this->Root)
+          {
+            if (fanInList.contains(output))
             {
-            if(fanInList.contains(output))
-              {
               // Add a link item for the connection.
               link = new pqCustomFilterDefinitionModelLink(item, output);
               item->Children.append(link);
-              }
+            }
             else
-              {
+            {
               // Move the output to the item's list of children.
               this->Root->Children.removeAll(output);
               output->Parent = item;
               item->Children.append(output);
-              }
             }
+          }
           else
-            {
+          {
             // Move the output from the other item's list of children
             // to the root. Add the output to the fan-in list.
             otherItem = output->Parent;
@@ -398,91 +379,86 @@ void pqCustomFilterDefinitionModel::setContents(
             item->Children.append(link);
             link = new pqCustomFilterDefinitionModelLink(otherItem, output);
             otherItem->Children.append(link);
-            }
           }
         }
       }
     }
+  }
 
   this->endResetModel();
 }
 
-QModelIndex pqCustomFilterDefinitionModel::getNextIndex(
-    const QModelIndex &idx) const
+QModelIndex pqCustomFilterDefinitionModel::getNextIndex(const QModelIndex& idx) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(idx);
   item = this->getNextItem(item);
-  if(item && item->Parent)
-    {
+  if (item && item->Parent)
+  {
     int row = item->Parent->Children.indexOf(item);
     return this->createIndex(row, 0, item);
-    }
+  }
 
   return QModelIndex();
 }
 
-pqPipelineSource *pqCustomFilterDefinitionModel::getSourceFor(
-    const QModelIndex &idx) const
+pqPipelineSource* pqCustomFilterDefinitionModel::getSourceFor(const QModelIndex& idx) const
 {
-  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
-  if(item)
-    {
+  pqCustomFilterDefinitionModelItem* item = this->getModelItemFor(idx);
+  if (item)
+  {
     return item->GetPipelineSource();
-    }
+  }
 
   return 0;
 }
 
-pqCustomFilterDefinitionModelItem *pqCustomFilterDefinitionModel::getModelItemFor(
-    const QModelIndex &idx) const
+pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getModelItemFor(
+  const QModelIndex& idx) const
 {
-  if(!idx.isValid())
-    {
+  if (!idx.isValid())
+  {
     return this->Root;
-    }
+  }
 
-  if(idx.model() == this)
-    {
-    return reinterpret_cast<pqCustomFilterDefinitionModelItem *>(
-        idx.internalPointer());
-    }
+  if (idx.model() == this)
+  {
+    return reinterpret_cast<pqCustomFilterDefinitionModelItem*>(idx.internalPointer());
+  }
 
   return 0;
 }
 
-pqCustomFilterDefinitionModelItem *pqCustomFilterDefinitionModel::getNextItem(
-    pqCustomFilterDefinitionModelItem *item) const
+pqCustomFilterDefinitionModelItem* pqCustomFilterDefinitionModel::getNextItem(
+  pqCustomFilterDefinitionModelItem* item) const
 {
-  if(!item)
-    {
+  if (!item)
+  {
     return 0;
-    }
+  }
 
-  if(item->Children.size() > 0)
-    {
+  if (item->Children.size() > 0)
+  {
     return item->Children.first();
-    }
+  }
 
   // Search up the ancestors for an item with multiple children.
   // The next item will be the next child.
   int row = 0;
   int count = 0;
-  while(item->Parent)
-    {
+  while (item->Parent)
+  {
     count = item->Parent->Children.size();
-    if(count > 1)
-      {
+    if (count > 1)
+    {
       row = item->Parent->Children.indexOf(item) + 1;
-      if(row < count)
-        {
+      if (row < count)
+      {
         return item->Parent->Children[row];
-        }
       }
+    }
 
     item = item->Parent;
-    }
+  }
 
   return 0;
 }
-
-

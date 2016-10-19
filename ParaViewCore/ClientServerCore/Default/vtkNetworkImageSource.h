@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkNetworkImageSource - an image source that can read an image file on
-// one process and ensure that it's available on some other group of processes.
-// .SECTION Description
-// vtkNetworkImageSource is a vtkImageAlgorithm that can read an image file on
-// on the client process and produce the output image data on a client and
-// render-server processes.
+/**
+ * @class   vtkNetworkImageSource
+ * @brief   an image source that can read an image file on
+ * one process and ensure that it's available on some other group of processes.
+ *
+ * vtkNetworkImageSource is a vtkImageAlgorithm that can read an image file on
+ * on the client process and produce the output image data on a client and
+ * render-server processes.
+*/
 
 #ifndef vtkNetworkImageSource_h
 #define vtkNetworkImageSource_h
@@ -35,13 +38,17 @@ public:
   vtkTypeMacro(vtkNetworkImageSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the filename.
+  //@{
+  /**
+   * Get/Set the filename.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Needs to be called to perform the actual image migration.
+  /**
+   * Needs to be called to perform the actual image migration.
+   */
   void UpdateImage();
 
 protected:
@@ -54,12 +61,10 @@ protected:
 
   vtkImageData* Buffer;
   int ReadImageFromFile(const char* filename);
-  int RequestData(vtkInformation *request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector);
-  int RequestInformation(vtkInformation *request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkNetworkImageSource(const vtkNetworkImageSource&) VTK_DELETE_FUNCTION;

@@ -12,16 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVArrowSource - A quick fix for a bug.
-// .SECTION Description
-// This class does nothing but tell the pipeline it can generate pieces.
-// This is a quick fix for a bug with glyphs and multidisplay with
-// the zero empty option.  Zero does not update arrow when created.
-// Glyph updates zero but not others.  Transmit poly data hangs.
-// The correct solution is to not connect the pipeline
-// on this seudo client.  I can get rid of this class then.
-
-
+/**
+ * @class   vtkPVArrowSource
+ * @brief   A quick fix for a bug.
+ *
+ * This class does nothing but tell the pipeline it can generate pieces.
+ * This is a quick fix for a bug with glyphs and multidisplay with
+ * the zero empty option.  Zero does not update arrow when created.
+ * Glyph updates zero but not others.  Transmit poly data hangs.
+ * The correct solution is to not connect the pipeline
+ * on this seudo client.  I can get rid of this class then.
+*/
 
 #ifndef vtkPVArrowSource_h
 #define vtkPVArrowSource_h
@@ -32,16 +33,17 @@
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVArrowSource : public vtkArrowSource
 {
 public:
-  // Description
-  // Construct cone with angle of 45 degrees.
-  static vtkPVArrowSource *New();
+  /**
+   * Construct cone with angle of 45 degrees.
+   */
+  static vtkPVArrowSource* New();
 
-  vtkTypeMacro(vtkPVArrowSource,vtkArrowSource);
+  vtkTypeMacro(vtkPVArrowSource, vtkArrowSource);
   void PrintSelf(ostream& os, vtkIndent indent);
-    
+
 protected:
-  vtkPVArrowSource() {};
-  ~vtkPVArrowSource() {};
+  vtkPVArrowSource(){};
+  ~vtkPVArrowSource(){};
 
   void ExecuteInformation();
 
@@ -51,5 +53,3 @@ private:
 };
 
 #endif
-
-

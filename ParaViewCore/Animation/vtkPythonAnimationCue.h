@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPythonAnimationCue
-// .SECTION Description
-// vtkPythonAnimationCue is an animation cue that can execute arbitrary Python
-// scripts.
+/**
+ * @class   vtkPythonAnimationCue
+ *
+ * vtkPythonAnimationCue is an animation cue that can execute arbitrary Python
+ * scripts.
+*/
 
 #ifndef vtkPythonAnimationCue_h
 #define vtkPythonAnimationCue_h
@@ -30,33 +32,43 @@ public:
   vtkTypeMacro(vtkPythonAnimationCue, vtkAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Enable/Disable this cue.
+  //@{
+  /**
+   * Enable/Disable this cue.
+   */
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
   vtkBooleanMacro(Enabled, bool);
+  //@}
 
-  // Description:
-  // Get/Set the python script to execute. The script must have the following
-  // functions:
-  // \li start_cue(cue): (optional) if present, called when the cue starts.
-  // \li tick(cue) : (required) called on every tick.
-  // \li end_cue(cue): (optional) if present, called when the cue ends.
+  //@{
+  /**
+   * Get/Set the python script to execute. The script must have the following
+   * functions:
+   * \li start_cue(cue): (optional) if present, called when the cue starts.
+   * \li tick(cue) : (required) called on every tick.
+   * \li end_cue(cue): (optional) if present, called when the cue ends.
+   */
   vtkSetStringMacro(Script);
   vtkGetStringMacro(Script);
+  //@}
 
 protected:
   vtkPythonAnimationCue();
   ~vtkPythonAnimationCue();
 
-  // Description:
-  // Callbacks that forward the call to corresponding Python function.
+  //@{
+  /**
+   * Callbacks that forward the call to corresponding Python function.
+   */
   virtual void HandleStartCueEvent();
   virtual void HandleTickEvent();
   virtual void HandleEndCueEvent();
+  //@}
 
-  // Description:
-  // Cleans the interpretor.
+  /**
+   * Cleans the interpretor.
+   */
   void DeleteInterpretor();
 
   bool Enabled;
@@ -65,7 +77,6 @@ protected:
 private:
   vtkPythonAnimationCue(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

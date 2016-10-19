@@ -53,12 +53,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // -----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRVirtualHandStyle)
 
-// -----------------------------------------------------------------------------
-vtkVRVirtualHandStyle::vtkVRVirtualHandStyle() :
-  Superclass()
+  // -----------------------------------------------------------------------------
+  vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
+  : Superclass()
 {
-  this->AddButtonRole("Grab world"); 
- 
+  this->AddButtonRole("Grab world");
+
   this->CurrentButton = false;
   this->PrevButton = false;
 
@@ -76,38 +76,37 @@ vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::HandleButton( const vtkVREventData& data )
+void vtkVRVirtualHandStyle::HandleButton(const vtkVREventData& data)
 {
   vtkStdString role = this->GetButtonRole(data.name);
   if (role == "Grab world")
-    {
+  {
 
     this->CurrentButton = data.data.button.state;
 
     if (this->CurrentButton == true && this->PrevButton == false)
-      {
+    {
       this->EventPress = true;
-      }
+    }
     if (this->CurrentButton == false && this->PrevButton == true)
-      {
+    {
       this->EventRelease = true;
-      }
+    }
 
     this->PrevButton = this->CurrentButton;
-
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::HandleTracker( const vtkVREventData& data )
+void vtkVRVirtualHandStyle::HandleTracker(const vtkVREventData& data)
 {
   vtkStdString role = this->GetTrackerRole(data.name);
   if (role == "Tracker")
-    {
+  {
     this->CurrentTrackerMatrix->DeepCopy(data.data.tracker.matrix);
 
     if (this->EventPress)
-      {
+    {
       double matrix_vals[16];
       vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName).Get(matrix_vals, 16);
       this->CachedModelMatrix->DeepCopy(matrix_vals);
@@ -116,30 +115,33 @@ void vtkVRVirtualHandStyle::HandleTracker( const vtkVREventData& data )
       this->InverseTrackerMatrix->Invert();
 
       this->EventPress = false;
-      }
+    }
 
-    if (CurrentButton || EventRelease) //if grabbing or if we just let go
-      {
+    if (CurrentButton || EventRelease) // if grabbing or if we just let go
+    {
       // Goal is:
       // result = tracker * tracker_inverse_at_start * original_model
 
       vtkNew<vtkMatrix4x4> tempMatrix;
 
-      //TODO: could reduce to 1 matrix multiplication (pre-calc inv*model)        
-      vtkMatrix4x4::Multiply4x4(this->CurrentTrackerMatrix.GetPointer(), this->InverseTrackerMatrix.GetPointer(), tempMatrix.GetPointer());
-      vtkMatrix4x4::Multiply4x4(tempMatrix.GetPointer(), this->CachedModelMatrix.GetPointer(), this->NewModelMatrix.GetPointer()); 
-        
+      // TODO: could reduce to 1 matrix multiplication (pre-calc inv*model)
+      vtkMatrix4x4::Multiply4x4(this->CurrentTrackerMatrix.GetPointer(),
+        this->InverseTrackerMatrix.GetPointer(), tempMatrix.GetPointer());
+      vtkMatrix4x4::Multiply4x4(tempMatrix.GetPointer(), this->CachedModelMatrix.GetPointer(),
+        this->NewModelMatrix.GetPointer());
+
       // Set the new matrix for the proxy.
-      vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName).Set(&this->NewModelMatrix->Element[0][0], 16);
+      vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
+        .Set(&this->NewModelMatrix->Element[0][0], 16);
       this->ControlledProxy->UpdateVTKObjects();
 
       this->EventRelease = false;
-      }
     }
+  }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::PrintSelf(ostream &os, vtkIndent indent)
+void vtkVRVirtualHandStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -147,7 +149,7 @@ void vtkVRVirtualHandStyle::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "PrevButton: " << this->PrevButton << endl;
   os << indent << "EventPress: " << this->EventPress << endl;
   os << indent << "EventRelease: " << this->EventPress << endl;
-  
+
   os << indent << "CurrentTrackerMatrix:" << endl;
   this->CurrentTrackerMatrix->PrintSelf(os, indent.GetNextIndent());
 

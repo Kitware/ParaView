@@ -43,11 +43,9 @@
 class vtkTCPNetworkAccessManager::vtkInternals
 {
 public:
-  typedef std::vector<vtkWeakPointer<vtkSocketController> >
-    VectorOfControllers;
+  typedef std::vector<vtkWeakPointer<vtkSocketController> > VectorOfControllers;
   VectorOfControllers Controllers;
-  typedef std::map<int, vtkSmartPointer<vtkServerSocket> >
-    MapToServerSockets;
+  typedef std::map<int, vtkSmartPointer<vtkServerSocket> > MapToServerSockets;
   MapToServerSockets ServerSockets;
 };
 
@@ -60,7 +58,7 @@ vtkTCPNetworkAccessManager::vtkTCPNetworkAccessManager()
 
   // It's essential to initialize the socket controller to initialize sockets on
   // Windows.
-  vtkSocketController* controller =  vtkSocketController::New();
+  vtkSocketController* controller = vtkSocketController::New();
   controller->Initialize();
   controller->Delete();
 }
@@ -74,13 +72,12 @@ vtkTCPNetworkAccessManager::~vtkTCPNetworkAccessManager()
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char* url)
 {
-  vtksys::RegularExpression
-    re_connect("^tcp://([^:]+)?:([0-9]+)\\?\?((&?[a-zA-Z0-9%]+=[^&]+)*)");
+  vtksys::RegularExpression re_connect("^tcp://([^:]+)?:([0-9]+)\\?\?((&?[a-zA-Z0-9%]+=[^&]+)*)");
   vtksys::RegularExpression key_val("([a-zA-Z0-9%]+)=([^&]+)");
 
   std::map<std::string, std::string> parameters;
   if (re_connect.find(url))
-    {
+  {
     std::string hostname = re_connect.match(1);
     int port = atoi(re_connect.match(2).c_str());
 
@@ -88,52 +85,48 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     // hence we do this:
     std::vector<vtksys::String> param_vals =
       vtksys::SystemTools::SplitString(re_connect.match(3).c_str(), '&');
-    for (size_t cc=0; cc < param_vals.size(); cc++)
-      {
+    for (size_t cc = 0; cc < param_vals.size(); cc++)
+    {
       if (key_val.find(param_vals[cc]))
-        {
+      {
         std::string key = key_val.match(1);
         std::string value = key_val.match(2);
         parameters[key] = value;
-        }
       }
+    }
 
     const char* handshake = NULL;
     if (parameters.find("handshake") != parameters.end())
-      {
+    {
       handshake = parameters["handshake"].c_str();
-      }
+    }
     int timeout_in_seconds = 60;
     if (parameters.find("timeout") != parameters.end())
-      {
+    {
       timeout_in_seconds = atoi(parameters["timeout"].c_str());
       if (timeout_in_seconds < 0)
-        {
-        timeout_in_seconds=0;
-        }
+      {
+        timeout_in_seconds = 0;
       }
+    }
 
-    if (parameters["listen"] == "true" &&
-        parameters["multiple"] == "true")
-      {
-      return this->WaitForConnection(port, false, handshake,
-        parameters["nonblocking"] == "true");
-      }
-    else if (parameters["listen"] == "true")
-      {
-      return this->WaitForConnection(port, true, handshake,
-        parameters["nonblocking"] == "true");
-      }
-    else
-      {
-      return this->ConnectToRemote(hostname.c_str(), port, handshake,
-        timeout_in_seconds);
-      }
-    }
-  else
+    if (parameters["listen"] == "true" && parameters["multiple"] == "true")
     {
-    vtkErrorMacro("Malformed URL: " << (url? url : "(empty)"));
+      return this->WaitForConnection(port, false, handshake, parameters["nonblocking"] == "true");
     }
+    else if (parameters["listen"] == "true")
+    {
+      return this->WaitForConnection(port, true, handshake, parameters["nonblocking"] == "true");
+    }
+    else
+    {
+      return this->ConnectToRemote(hostname.c_str(), port, handshake, timeout_in_seconds);
+    }
+  }
+  else
+  {
+    vtkErrorMacro("Malformed URL: " << (url ? url : "(empty)"));
+  }
 
   return NULL;
 }
@@ -143,7 +136,6 @@ void vtkTCPNetworkAccessManager::AbortPendingConnection()
 {
   this->AbortPendingConnectionFlag = true;
 }
-
 
 //----------------------------------------------------------------------------
 bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
@@ -173,37 +165,37 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
   vtkObject* controller_or_server_socket[MAX_SOCKETS];
 
   vtkSocketController* ctrlWithBufferToEmpty = NULL;
-  int size=0;
+  int size = 0;
   vtkInternals::VectorOfControllers::iterator iter1;
-  for (iter1 = this->Internals->Controllers.begin();
-    iter1 != this->Internals->Controllers.end(); ++iter1)
-    {
+  for (iter1 = this->Internals->Controllers.begin(); iter1 != this->Internals->Controllers.end();
+       ++iter1)
+  {
     vtkSocketController* controller = iter1->GetPointer();
     if (!controller)
-      {
+    {
       // skip null controllers.
       continue;
-      }
-    vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-      controller->GetCommunicator());
+    }
+    vtkSocketCommunicator* comm =
+      vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
     vtkSocket* socket = comm->GetSocket();
     if (socket && socket->GetConnected())
-      {
+    {
       sockets_to_select[size] = socket->GetSocketDescriptor();
       controller_or_server_socket[size] = controller;
-      if(comm->HasBufferredMessages())
-        {
+      if (comm->HasBufferredMessages())
+      {
         ctrlWithBufferToEmpty = controller;
         if (!do_processing)
-          {
+        {
           // we do have events to process, but we were told not to process them,
           // so just return and say we have something to process here.
           return 1;
-          }
         }
-      size++;
       }
+      size++;
     }
+  }
 
   // Only one client connected, so if it fails, just quit...
   bool can_quit_if_error = (size == 1);
@@ -211,85 +203,80 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
   // Now add server sockets.
   vtkInternals::MapToServerSockets::iterator iter2;
   for (iter2 = this->Internals->ServerSockets.begin();
-    iter2 != this->Internals->ServerSockets.end(); ++iter2)
+       iter2 != this->Internals->ServerSockets.end(); ++iter2)
+  {
+    if (iter2->second.GetPointer() && iter2->second.GetPointer()->GetConnected())
     {
-    if (iter2->second.GetPointer() &&
-      iter2->second.GetPointer()->GetConnected())
-      {
-      sockets_to_select[size] =
-        iter2->second.GetPointer()->GetSocketDescriptor();
+      sockets_to_select[size] = iter2->second.GetPointer()->GetSocketDescriptor();
       controller_or_server_socket[size] = iter2->second.GetPointer();
       size++;
-      }
     }
+  }
 
   if (size == 0 || this->AbortPendingConnectionFlag)
-    {
+  {
     return -1;
-    }
+  }
 
   // Try to empty RMI buffered messages if any
-  if(ctrlWithBufferToEmpty && (ctrlWithBufferToEmpty->ProcessRMIs(0,1) ==
-                               vtkMultiProcessController::RMI_NO_ERROR))
-    {
+  if (ctrlWithBufferToEmpty &&
+    (ctrlWithBufferToEmpty->ProcessRMIs(0, 1) == vtkMultiProcessController::RMI_NO_ERROR))
+  {
     return 1;
-    }
+  }
 
   int selected_index = -1;
-  int result = vtkSocket::SelectSockets(sockets_to_select, size,
-                                        timeout_msecs, &selected_index);
+  int result = vtkSocket::SelectSockets(sockets_to_select, size, timeout_msecs, &selected_index);
   if (result <= 0)
-    {
+  {
     return result;
-    }
+  }
   if (result > 0 && !do_processing)
-    {
+  {
     // we were told not to do any processing, so just let the caller know that
     // we have events to process.
     return 1;
-    }
+  }
 
   if (controller_or_server_socket[selected_index]->IsA("vtkServerSocket"))
-    {
+  {
     vtkServerSocket* ss =
       static_cast<vtkServerSocket*>(controller_or_server_socket[selected_index]);
-    int port= ss->GetServerPort();
+    int port = ss->GetServerPort();
     this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &port);
     return 1;
-    }
+  }
   else
-    {
+  {
     // We use smart pointer here to make sure the controller will live
     // during the whole ProcessRMIs call. As that call can release
     // the controller while executing.
     vtkSmartPointer<vtkMultiProcessController> controller =
-      vtkMultiProcessController::SafeDownCast(
-        controller_or_server_socket[selected_index]);
+      vtkMultiProcessController::SafeDownCast(controller_or_server_socket[selected_index]);
     result = controller->ProcessRMIs(0, 1);
     if (result == vtkMultiProcessController::RMI_NO_ERROR)
-      {
+    {
       // all's well.
       return 1;
-      }
+    }
 
     // Close cleanly the socket in error
-    vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-        controller->GetCommunicator());
+    vtkSocketCommunicator* comm =
+      vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
     comm->CloseConnection();
 
     // Fire an event letting the world know that the connection was closed.
     this->InvokeEvent(vtkCommand::ConnectionClosedEvent, controller);
 
-    return can_quit_if_error ? -1 /* Quit */ :
-                                1 /* Pretend it's OK */;
-    }
+    return can_quit_if_error ? -1 /* Quit */ : 1 /* Pretend it's OK */;
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   const char* hostname, int port, const char* handshake, int timeout_in_seconds)
 {
-  
+
   // Create client socket.
   // Create a RemoteConnection (Server/Client)
   // Set the client socket on its controller.
@@ -298,48 +285,49 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   vtkSmartPointer<vtkTimerLog> timer = vtkSmartPointer<vtkTimerLog>::New();
   timer->StartTimer();
   while (1)
-    {
+  {
     if (cs->ConnectToServer(hostname, port) != -1)
-      {
+    {
       break;
-      }
+    }
     timer->StopTimer();
     if (timeout_in_seconds <= 0 || timer->GetElapsedTime() > timeout_in_seconds)
-      {
+    {
       vtkErrorMacro(<< "Connect timeout.");
       return NULL;
-      }
-    vtkWarningMacro(<< "Connect failed.  Retrying for "
-      << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
-    vtksys::SystemTools::Delay(1000);
     }
+    vtkWarningMacro(<< "Connect failed.  Retrying for "
+                    << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
+    vtksys::SystemTools::Delay(1000);
+  }
 
   vtkSocketController* controller = vtkSocketController::New();
-  vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-    controller->GetCommunicator());
+  vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
 #if GENERATE_DEBUG_LOG
   std::ostringstream mystr;
-  mystr << "/tmp/client."<< getpid() << ".log";
+  mystr << "/tmp/client." << getpid() << ".log";
   comm->LogToFile(mystr.str().c_str());
 #endif
   comm->SetSocket(cs);
-  if (!comm->Handshake() ||
-    !this->ParaViewHandshake(controller, false, handshake))
-    {
+  if (!comm->Handshake() || !this->ParaViewHandshake(controller, false, handshake))
+  {
     controller->Delete();
     vtkErrorMacro("Failed to connect to " << hostname << ":" << port);
     vtkErrorMacro("\n"
-      "**********************************************************************\n"
-      "Connection failed during handshake. This can happen for the following reasons:\n"
-      " 1. Connection dropped during the handshake.\n"
-      " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
-      "    two connecting processes (Current value: "
-      << vtkSocketCommunicator::GetVersion() << ").\n"
-      " 3. ParaView handshake strings are different on the two connecting\n"
-      "    processes (Current value: " << (handshake? handshake : "<empty>") << ").\n"
-      "**********************************************************************\n");
+                  "**********************************************************************\n"
+                  "Connection failed during handshake. This can happen for the following reasons:\n"
+                  " 1. Connection dropped during the handshake.\n"
+                  " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
+                  "    two connecting processes (Current value: "
+      << vtkSocketCommunicator::GetVersion()
+      << ").\n"
+         " 3. ParaView handshake strings are different on the two connecting\n"
+         "    processes (Current value: "
+      << (handshake ? handshake : "<empty>")
+      << ").\n"
+         "**********************************************************************\n");
     return NULL;
-    }
+  }
   this->Internals->Controllers.push_back(controller);
   return controller;
 }
@@ -349,130 +337,130 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
   int port, bool once, const char* handshake, bool nonblocking)
 {
   vtkServerSocket* server_socket = NULL;
-  if (this->Internals->ServerSockets.find(port) !=
-    this->Internals->ServerSockets.end())
-    {
+  if (this->Internals->ServerSockets.find(port) != this->Internals->ServerSockets.end())
+  {
     server_socket = this->Internals->ServerSockets[port];
-    }
+  }
   else
-    {
+  {
     server_socket = vtkServerSocket::New();
     if (server_socket->CreateServer(port) != 0)
-      {
+    {
       vtkErrorMacro("Failed to set up server socket.");
       server_socket->Delete();
       return NULL;
-      }
+    }
     this->Internals->ServerSockets[port] = server_socket;
     server_socket->FastDelete();
-    }
+  }
 
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
-  const char* sys_hostname = sys_info.GetHostname()?
-    sys_info.GetHostname() : "localhost";
+  const char* sys_hostname = sys_info.GetHostname() ? sys_info.GetHostname() : "localhost";
 
   // print out a status message.
-  cout << "Accepting connection(s): " << sys_hostname << ":"
-      << server_socket->GetServerPort() << endl;
+  cout << "Accepting connection(s): " << sys_hostname << ":" << server_socket->GetServerPort()
+       << endl;
 
   this->AbortPendingConnectionFlag = false;
   vtkSocketController* controller = NULL;
 
   while (this->AbortPendingConnectionFlag == false && controller == NULL)
-    {
+  {
     vtkClientSocket* client_socket = NULL;
     if (nonblocking)
-      {
+    {
       client_socket = server_socket->WaitForConnection(100);
-      }
+    }
     else
-      {
+    {
       while (this->AbortPendingConnectionFlag == false &&
         ((client_socket = server_socket->WaitForConnection(1000)) == NULL))
-        {
-        double progress=0.5;
-        this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
-        }
-      }
-    if (!client_socket)
       {
-      return NULL;
+        double progress = 0.5;
+        this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
       }
+    }
+    if (!client_socket)
+    {
+      return NULL;
+    }
 
     controller = vtkSocketController::New();
-    vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-      controller->GetCommunicator());
+    vtkSocketCommunicator* comm =
+      vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
     comm->SetSocket(client_socket);
     client_socket->FastDelete();
-    if (comm->Handshake()==0 ||
-      !this->ParaViewHandshake(controller, true, handshake))
-      {
+    if (comm->Handshake() == 0 || !this->ParaViewHandshake(controller, true, handshake))
+    {
       controller->Delete();
       controller = NULL;
       // handshake failed, must be bogus client, continue waiting (unless
       // this->AbortPendingConnectionFlag == true).
-      vtkErrorMacro("\n"
+      vtkErrorMacro(
+        "\n"
         "**********************************************************************\n"
         "Connection failed during handshake. This can happen for the following reasons:\n"
         " 1. Connection dropped during the handshake.\n"
         " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
         "    two connecting processes (Current value: "
-        << vtkSocketCommunicator::GetVersion() << ").\n"
-        " 3. ParaView handshake strings are different on the two connecting\n"
-        "    processes (Current value: " << (handshake? handshake : "<empty>") << ").\n"
-        "**********************************************************************\n");
-      }
+        << vtkSocketCommunicator::GetVersion()
+        << ").\n"
+           " 3. ParaView handshake strings are different on the two connecting\n"
+           "    processes (Current value: "
+        << (handshake ? handshake : "<empty>")
+        << ").\n"
+           "**********************************************************************\n");
     }
+  }
 
   if (controller)
-    {
+  {
     this->Internals->Controllers.push_back(controller);
-    }
+  }
 
   if (once)
-    {
+  {
     server_socket->CloseSocket();
     this->Internals->ServerSockets.erase(port);
-    }
+  }
 
   return controller;
 }
-
 
 //----------------------------------------------------------------------------
 bool vtkTCPNetworkAccessManager::ParaViewHandshake(
   vtkMultiProcessController* controller, bool server_side, const char* _handshake)
 {
-  const std::string handshake = _handshake? _handshake : "";
+  const std::string handshake = _handshake ? _handshake : "";
   int size = static_cast<int>(handshake.size() + 1);
   if (server_side)
-    {
+  {
     std::string other_handshake;
     int othersize;
     controller->Receive(&othersize, 1, 1, 99991);
     if (othersize > 0)
-      {
+    {
       char* _other_handshake = new char[othersize];
       controller->Receive(_other_handshake, othersize, 1, 99991);
       other_handshake = _other_handshake;
-      delete [] _other_handshake;
-      }
-    int accept = (handshake == other_handshake)? 1 : 0;
+      delete[] _other_handshake;
+    }
+    int accept = (handshake == other_handshake) ? 1 : 0;
     controller->Send(&accept, 1, 1, 99990);
     return (accept == 1);
-    }
+  }
   else
-    {
+  {
     controller->Send(&size, 1, 1, 99991);
     if (size > 0)
-      {
+    {
       controller->Send(handshake.c_str(), size, 1, 99991);
-      }
+    }
     int accept;
     controller->Receive(&accept, 1, 1, 99990);
     return (accept == 1);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

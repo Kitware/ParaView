@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPTensorFieldFunction.h"
 
-
 //----------------------------------------------------------------------------
 vtkCPTensorFieldFunction::vtkCPTensorFieldFunction()
 {

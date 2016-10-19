@@ -41,50 +41,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject),
-    Index(0),
-    ObserverId(0),
-    BoolProperty(true)
+  : Superclass(config, parentObject)
+  , Index(0)
+  , ObserverId(0)
+  , BoolProperty(true)
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
   Q_ASSERT(proxy != NULL);
 
-  for (unsigned int cc=0; cc < config->GetNumberOfNestedElements(); cc++)
-    {
+  for (unsigned int cc = 0; cc < config->GetNumberOfNestedElements(); cc++)
+  {
     vtkPVXMLElement* child = config->GetNestedElement(cc);
-    if (child && child->GetName() &&
-      strcmp(child->GetName(), "Property") == 0 &&
+    if (child && child->GetName() && strcmp(child->GetName(), "Property") == 0 &&
       child->GetAttribute("name"))
-      {
+    {
       const char* name = child->GetAttribute("name");
-      const char* function = child->GetAttributeOrDefault("function",
-        "boolean");
+      const char* function = child->GetAttributeOrDefault("function", "boolean");
       int index = atoi(child->GetAttributeOrDefault("index", "0"));
-      if (strcmp(function, "boolean") != 0 &&
-          strcmp(function, "boolean_invert") != 0)
-        {
+      if (strcmp(function, "boolean") != 0 && strcmp(function, "boolean_invert") != 0)
+      {
         qDebug("pqBoolPropertyWidgetDecorator currently only "
                "supports 'boolean' and 'boolean_invert'.");
-        }
+      }
 
       this->Property = proxy->GetProperty(name);
       this->Index = index;
       this->Function = function;
 
       if (!this->Property)
-        {
+      {
         qDebug() << "Property '" << (name ? name : "(null)")
                  << "' specified in pqBoolPropertyWidgetDecorator not found in proxy '"
                  << proxy->GetXMLName() << "'.";
         break;
-        }
+      }
 
-      this->ObserverId = this->Property->AddObserver(
-        vtkCommand::UncheckedPropertyModifiedEvent,
+      this->ObserverId = this->Property->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent,
         this, &pqBoolPropertyWidgetDecorator::updateBoolPropertyState);
       break;
-      }
     }
+  }
 
   this->updateBoolPropertyState();
 }
@@ -93,35 +89,33 @@ pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
 pqBoolPropertyWidgetDecorator::~pqBoolPropertyWidgetDecorator()
 {
   if (this->Property && this->ObserverId)
-    {
+  {
     this->Property->RemoveObserver(this->ObserverId);
     this->ObserverId = 0;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqBoolPropertyWidgetDecorator::updateBoolPropertyState()
 {
   if (this->Property && this->Function == "boolean")
-    {
-    bool enabled = vtkSMUncheckedPropertyHelper(
-      this->Property).GetAsInt(this->Index) != 0;
+  {
+    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsInt(this->Index) != 0;
     this->setBoolProperty(enabled);
-    }
+  }
   if (this->Property && this->Function == "boolean_invert")
-    {
-    bool enabled = vtkSMUncheckedPropertyHelper(
-      this->Property).GetAsInt(this->Index) != 0;
+  {
+    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsInt(this->Index) != 0;
     this->setBoolProperty(!enabled);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqBoolPropertyWidgetDecorator::setBoolProperty(bool val)
 {
   if (this->BoolProperty != val)
-    {
+  {
     this->BoolProperty = val;
     emit this->boolPropertyChanged();
-    }
+  }
 }

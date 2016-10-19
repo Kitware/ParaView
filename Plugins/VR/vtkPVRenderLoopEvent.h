@@ -34,21 +34,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static void Handle();
+
 protected:
   // ...........................................................protected-ivars
 
 protected:
-
   vtkPVRenderLoopEvent();
   ~vtkPVRenderLoopEvent();
 
 private:
-  vtkPVRenderLoopEventInternal *Internal;
+  vtkPVRenderLoopEventInternal* Internal;
   vtkPVRenderLoopEvent(const vtkPVRenderLoopEvent&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRenderLoopEvent&) VTK_DELETE_FUNCTION;
-
-
-
 };
 
 #endif // vtkPVRenderLoopEvent_h

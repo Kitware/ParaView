@@ -51,73 +51,65 @@ public:
   bool UseDepthBuffer;
 
   virtual void Render(const vtkRenderState* render_state)
-    {
+  {
     vtkOpenGLClearErrorMacro();
     if (this->DelegatePass)
-      {
+    {
       this->DelegatePass->Render(render_state);
       vtkOpenGLCheckErrorMacro("failed after delegate pass render");
-      }
+    }
     if (this->IceTCompositePass)
-      {
+    {
       this->IceTCompositePass->GetLastRenderedTile(this->Image);
-      }
+    }
     if (this->Image.IsValid())
-      {
+    {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->Image.PushToFrameBuffer(render_state->GetRenderer());
       if (this->UseDepthBuffer)
-        {
+      {
         this->IceTCompositePass->PushIceTDepthBufferToScreen(render_state);
-        }
       }
+    }
     glFinish();
     vtkOpenGLCheckErrorMacro("failed after push depth buffer");
-    }
+  }
 
-  void SetImage(const vtkSynchronizedRenderers::vtkRawImage& image)
-    {
-    this->Image = image;
-    }
+  void SetImage(const vtkSynchronizedRenderers::vtkRawImage& image) { this->Image = image; }
 
-  void SetUseDepthBuffer(bool useDB)
-    {
-    this->UseDepthBuffer = useDB;
-    }
+  void SetUseDepthBuffer(bool useDB) { this->UseDepthBuffer = useDB; }
 
-  virtual void ReleaseGraphicsResources(vtkWindow *window)
-    {
+  virtual void ReleaseGraphicsResources(vtkWindow* window)
+  {
     if (this->DelegatePass)
-      {
+    {
       this->DelegatePass->ReleaseGraphicsResources(window);
-      }
-    if (this->IceTCompositePass)
-      {
-      this->IceTCompositePass->ReleaseGraphicsResources(window);
-      }
-    this->Superclass::ReleaseGraphicsResources(window);
     }
-
+    if (this->IceTCompositePass)
+    {
+      this->IceTCompositePass->ReleaseGraphicsResources(window);
+    }
+    this->Superclass::ReleaseGraphicsResources(window);
+  }
 
 protected:
   vtkMyImagePasterPass()
-    {
+  {
     this->DelegatePass = NULL;
     this->IceTCompositePass = NULL;
     this->UseDepthBuffer = false;
-    }
-  ~vtkMyImagePasterPass()
-    {
-    }
+  }
+  ~vtkMyImagePasterPass() {}
   vtkSynchronizedRenderers::vtkRawImage Image;
 };
 vtkStandardNewMacro(vtkMyImagePasterPass);
 
 namespace
 {
-  class vtkMyCameraPass : public vtkCameraPass
-  {
+class vtkMyCameraPass : public vtkCameraPass
+{
   vtkIceTCompositePass* IceTCompositePass;
+
 public:
   vtkTypeMacro(vtkMyCameraPass, vtkCameraPass);
   static vtkMyCameraPass* New();
@@ -127,15 +119,13 @@ public:
   vtkSetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 
   virtual void GetTiledSizeAndOrigin(
-    const vtkRenderState* render_state,
-    int* width, int* height, int *originX,
-    int* originY)
-    {
-    assert (this->IceTCompositePass != NULL);
+    const vtkRenderState* render_state, int* width, int* height, int* originX, int* originY)
+  {
+    assert(this->IceTCompositePass != NULL);
     int tile_dims[2];
     this->IceTCompositePass->GetTileDimensions(tile_dims);
-    if (tile_dims[0] > 1 || tile_dims[1]  > 1)
-      {
+    if (tile_dims[0] > 1 || tile_dims[1] > 1)
+    {
       // we have a complicated relationship with tile-scale when we are in
       // tile-display mode :).
       // vtkPVSynchronizedRenderWindows sets up the tile-scale and origin on the
@@ -149,7 +139,7 @@ public:
       render_state->GetRenderer()->GetRenderWindow()->GetTileScale(tile_scale);
       render_state->GetRenderer()->GetRenderWindow()->GetTileViewport(tile_viewport);
       render_state->GetRenderer()->GetRenderWindow()->SetTileScale(1, 1);
-      render_state->GetRenderer()->GetRenderWindow()->SetTileViewport(0,0,1,1);
+      render_state->GetRenderer()->GetRenderWindow()->SetTileViewport(0, 0, 1, 1);
       this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
       render_state->GetRenderer()->GetRenderWindow()->SetTileScale(tile_scale);
       render_state->GetRenderer()->GetRenderWindow()->SetTileViewport(tile_viewport);
@@ -158,33 +148,34 @@ public:
       *originY *= this->IceTCompositePass->GetTileDimensions()[1];
       *width *= this->IceTCompositePass->GetTileDimensions()[0];
       *height *= this->IceTCompositePass->GetTileDimensions()[1];
-      }
+    }
     else
-      {
-      this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
-      }
-    }
-
-  virtual void ReleaseGraphicsResources(vtkWindow *window)
     {
-    if (this->IceTCompositePass)
-      {
-      this->IceTCompositePass->ReleaseGraphicsResources(window);
-      }
-    this->Superclass::ReleaseGraphicsResources(window);
+      this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
     }
-protected:
-  vtkMyCameraPass() {this->IceTCompositePass = NULL; }
-  ~vtkMyCameraPass() { this->SetIceTCompositePass(0); }
-  };
-  vtkStandardNewMacro(vtkMyCameraPass);
+  }
 
-  // vtkPVIceTCompositePass extends vtkIceTCompositePass to add some ParaView
-  // specific rendering tweaks eg.
-  // * render to full viewport
-  // * don't let IceT paste back rendered images to the active frame buffer.
-  class vtkPVIceTCompositePass : public vtkIceTCompositePass
+  virtual void ReleaseGraphicsResources(vtkWindow* window)
   {
+    if (this->IceTCompositePass)
+    {
+      this->IceTCompositePass->ReleaseGraphicsResources(window);
+    }
+    this->Superclass::ReleaseGraphicsResources(window);
+  }
+
+protected:
+  vtkMyCameraPass() { this->IceTCompositePass = NULL; }
+  ~vtkMyCameraPass() { this->SetIceTCompositePass(0); }
+};
+vtkStandardNewMacro(vtkMyCameraPass);
+
+// vtkPVIceTCompositePass extends vtkIceTCompositePass to add some ParaView
+// specific rendering tweaks eg.
+// * render to full viewport
+// * don't let IceT paste back rendered images to the active frame buffer.
+class vtkPVIceTCompositePass : public vtkIceTCompositePass
+{
 public:
   vtkTypeMacro(vtkPVIceTCompositePass, vtkIceTCompositePass);
   static vtkPVIceTCompositePass* New();
@@ -193,7 +184,7 @@ public:
   // Updates some IceT context parameters to suit ParaView's need esp. in
   // multi-view configuration.
   virtual void SetupContext(const vtkRenderState* render_state)
-    {
+  {
     vtkOpenGLClearErrorMacro();
     this->Superclass::SetupContext(render_state);
 
@@ -205,11 +196,11 @@ public:
     icetDisable(ICET_GL_DISPLAY_INFLATE);
 
     if (render_state->GetFrameBuffer() == NULL)
-      {
+    {
       vtkRenderWindow* window = render_state->GetRenderer()->GetRenderWindow();
-      int *size = window->GetActualSize();
+      int* size = window->GetActualSize();
       glViewport(0, 0, size[0], size[1]);
-      }
+    }
     glDisable(GL_SCISSOR_TEST);
     double background[3];
     render_state->GetRenderer()->GetBackground(background);
@@ -217,29 +208,26 @@ public:
     // rendering or translucent geometry, but otherwise if should work fine. We
     // set the background color so that solid background works correctly for
     // these two cases.
-    glClearColor((GLclampf)background[0], (GLclampf)background[1],
-      (GLclampf)background[2], 0.0f);
+    glClearColor((GLclampf)background[0], (GLclampf)background[1], (GLclampf)background[2], 0.0f);
     icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
     vtkOpenGLCheckErrorMacro("failed after setup context");
-    }
-protected:
+  }
 
+protected:
   vtkPVIceTCompositePass()
-    {
+  {
     vtkPVDefaultPass* defaultPass = vtkPVDefaultPass::New();
     this->SetRenderPass(defaultPass);
     defaultPass->Delete();
-    }
+  }
 
-  ~vtkPVIceTCompositePass()
-    {
-    }
-  };
-  vtkStandardNewMacro(vtkPVIceTCompositePass);
+  ~vtkPVIceTCompositePass() {}
+};
+vtkStandardNewMacro(vtkPVIceTCompositePass);
 };
 
 vtkStandardNewMacro(vtkIceTSynchronizedRenderers);
-//vtkCxxSetObjectMacro(vtkIceTSynchronizedRenderers, ImageProcessingPass, vtkImageProcessingPass);
+// vtkCxxSetObjectMacro(vtkIceTSynchronizedRenderers, ImageProcessingPass, vtkImageProcessingPass);
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
 {
@@ -277,28 +265,27 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::SetImageProcessingPass(
-  vtkImageProcessingPass* pass)
+void vtkIceTSynchronizedRenderers::SetImageProcessingPass(vtkImageProcessingPass* pass)
 {
   vtkSetObjectBodyMacro(ImageProcessingPass, vtkImageProcessingPass, pass);
   if (pass && this->Renderer)
-    {
+  {
     int tile_dims[2];
     this->IceTCompositePass->GetTileDimensions(tile_dims);
     if (tile_dims[0] >= 1 && tile_dims[1] >= 1)
-      {
-      this->CameraRenderPass->SetAspectRatioOverride(tile_dims[0]*1.0/tile_dims[1]);
-      }
+    {
+      this->CameraRenderPass->SetAspectRatioOverride(tile_dims[0] * 1.0 / tile_dims[1]);
+    }
     this->ImagePastingPass->DelegatePass = this->CameraRenderPass;
     this->ImagePastingPass->IceTCompositePass = this->IceTCompositePass;
     pass->SetDelegatePass(this->ImagePastingPass);
     this->Renderer->SetPass(pass);
-    }
+  }
   else if (this->Renderer && this->CameraRenderPass)
-    {
+  {
     this->CameraRenderPass->SetAspectRatioOverride(1.0);
     this->Renderer->SetPass(this->CameraRenderPass);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -308,79 +295,76 @@ void vtkIceTSynchronizedRenderers::SetUseDepthBuffer(bool useDB)
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::SetRenderPass(vtkRenderPass *pass)
+void vtkIceTSynchronizedRenderers::SetRenderPass(vtkRenderPass* pass)
 {
   vtkSetObjectBodyMacro(RenderPass, vtkRenderPass, pass);
   if (this->IceTCompositePass)
-    {
+  {
     if (pass)
-      {
+    {
       this->IceTCompositePass->SetRenderPass(pass);
-      }
+    }
     else
-      {
+    {
       vtkPVDefaultPass* defaultPass = vtkPVDefaultPass::New();
       this->IceTCompositePass->SetRenderPass(defaultPass);
       defaultPass->Delete();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::HandleEndRender()
 {
   if (this->WriteBackImages)
-    {
+  {
     this->WriteBackImages = false;
     this->Superclass::HandleEndRender();
     this->WriteBackImages = true;
-    }
+  }
   else
-    {
+  {
     this->Superclass::HandleEndRender();
-    }
+  }
 
   if (this->WriteBackImages)
-    {
-    vtkSynchronizedRenderers::vtkRawImage lastRenderedImage =
-      this->CaptureRenderedImage();
+  {
+    vtkSynchronizedRenderers::vtkRawImage lastRenderedImage = this->CaptureRenderedImage();
     if (lastRenderedImage.IsValid())
-      {
+    {
       double viewport[4];
       this->IceTCompositePass->GetPhysicalViewport(viewport);
-      vtkTileDisplayHelper::GetInstance()->SetTile(this->Identifier,
-        viewport, this->Renderer,
-        lastRenderedImage);
-      }
+      vtkTileDisplayHelper::GetInstance()->SetTile(
+        this->Identifier, viewport, this->Renderer, lastRenderedImage);
+    }
     else
-      {
+    {
       vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier);
-      }
-
+    }
 
     // Write-back either the freshly rendered tile or what was most recently
     // rendered.
-    vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
-      this->Renderer->GetActiveCamera()->GetLeftEye());
-    }
+    vtkTileDisplayHelper::GetInstance()->FlushTiles(
+      this->Identifier, this->Renderer->GetActiveCamera()->GetLeftEye());
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
 {
   if (this->Renderer && this->Renderer->GetPass() == this->CameraRenderPass)
-    {
+  {
     this->Renderer->SetPass(NULL);
-    }
+  }
   this->Superclass::SetRenderer(ren);
   if (ren)
-    {
+  {
     this->Renderer->SetPass(this->CameraRenderPass);
     // icet cannot work correctly in tile-display mode is software culling is
     // applied in vtkRenderer inself. vtkPVIceTCompositePass will cull out-of-frustum
     // props using icet-model-view matrix later.
     ren->GetCullers()->RemoveAllItems();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -400,26 +384,24 @@ void vtkIceTSynchronizedRenderers::SetImageReductionFactor(int val)
 }
 
 //----------------------------------------------------------------------------
-vtkSynchronizedRenderers::vtkRawImage&
-vtkIceTSynchronizedRenderers::CaptureRenderedImage()
+vtkSynchronizedRenderers::vtkRawImage& vtkIceTSynchronizedRenderers::CaptureRenderedImage()
 {
   // We capture the image from IceTCompositePass. This avoids the capture of
   // buffer from screen when not necessary.
   vtkRawImage& rawImage =
-    (this->GetImageReductionFactor() == 1)?
-    this->FullImage : this->ReducedImage;
+    (this->GetImageReductionFactor() == 1) ? this->FullImage : this->ReducedImage;
 
   if (!rawImage.IsValid())
-    {
+  {
     this->IceTCompositePass->GetLastRenderedTile(rawImage);
     if (rawImage.IsValid() && this->ImageProcessingPass)
-      {
+    {
       // When using an image processing pass, we simply capture the result from
       // the active buffer. However, we do that, only when IceT produced some
       // valid result on this process.
       rawImage.Capture(this->Renderer);
-      }
     }
+  }
   return rawImage;
 }
 
@@ -435,17 +417,17 @@ void vtkIceTSynchronizedRenderers::SlaveStartRender()
   this->Superclass::SlaveStartRender();
 
 #ifdef VTKGL2
-  int x,y;
-  this->IceTCompositePass->GetTileDimensions(x,y);
-  if (!(x==1 && y==1))
-    {
-    //Don't mess with tile mode behavior.
+  int x, y;
+  this->IceTCompositePass->GetTileDimensions(x, y);
+  if (!(x == 1 && y == 1))
+  {
+    // Don't mess with tile mode behavior.
     return;
-    }
-  //Otherwise ensure that every node starts with a black background
-  //to blend onto. This is somewhat redundant, we do the same elsewhere
-  //with a glClear call, but OSPRay can't see that one.
-  //see also vtkPVClientServerSynchronizedRenderers
+  }
+  // Otherwise ensure that every node starts with a black background
+  // to blend onto. This is somewhat redundant, we do the same elsewhere
+  // with a glClear call, but OSPRay can't see that one.
+  // see also vtkPVClientServerSynchronizedRenderers
   this->Renderer->SetBackground(0, 0, 0);
   this->Renderer->SetGradientBackground(false);
   this->Renderer->SetTexturedBackground(false);

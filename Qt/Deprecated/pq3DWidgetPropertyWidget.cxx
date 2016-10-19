@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,18 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidget.h"
 
-pq3DWidgetPropertyWidget::pq3DWidgetPropertyWidget(pq3DWidget *widget,
-                                                   QWidget *parent_)
+pq3DWidgetPropertyWidget::pq3DWidgetPropertyWidget(pq3DWidget* widget, QWidget* parent_)
   : pqPropertyWidget(widget->proxy(), parent_)
 {
   this->Widget = widget;
   this->connect(this->Widget, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
   this->connect(this->Widget, SIGNAL(modified()), this, SIGNAL(changeFinished()));
-  this->connect(this, SIGNAL(viewChanged(pqView*)),
-                this->Widget, SLOT(setView(pqView*)));
+  this->connect(this, SIGNAL(viewChanged(pqView*)), this->Widget, SLOT(setView(pqView*)));
   this->Widget->setView(this->view());
 
-  QVBoxLayout *layout_ = new QVBoxLayout;
+  QVBoxLayout* layout_ = new QVBoxLayout;
   layout_->setMargin(0);
   layout_->addWidget(widget);
   this->setLayout(layout_);

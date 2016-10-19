@@ -37,8 +37,8 @@ class vtkFieldData;
 class vtkNIfTIReader : public vtkImageReader
 {
 public:
-  static vtkNIfTIReader *New();
-  vtkTypeMacro(vtkNIfTIReader,vtkImageReader);
+  static vtkNIfTIReader* New();
+  vtkTypeMacro(vtkNIfTIReader, vtkImageReader);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description: is the given file name a png file?
@@ -48,27 +48,21 @@ public:
   // Get the file extensions for this format.
   // Returns a string with a space separated list of extensions in
   // the format .extension
-  virtual const char* GetFileExtensions()
-  {
-    return ".nii .img .hdr";
-  }
+  virtual const char* GetFileExtensions() { return ".nii .img .hdr"; }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
-  virtual const char* GetDescriptiveName()
-  {
-    return "NIfTI";
-  }
+  virtual const char* GetDescriptiveName() { return "NIfTI"; }
 
-  char * GetFileName(){return(FileName);};
-  unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
-  
+  char* GetFileName() { return (FileName); };
+  unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
+
 protected:
   vtkNIfTIReader();
   ~vtkNIfTIReader();
 
   virtual void ExecuteInformation();
-  virtual void ExecuteDataWithInformation(vtkDataObject *output, vtkInformation* outInfo);
+  virtual void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo);
 
 private:
   vtkNIfTIReader(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;
@@ -80,16 +74,16 @@ private:
   int width;
   int height;
   int depth;
-  
+
   double dataTypeSize;
-  double **q;
-  double **s;
+  double** q;
+  double** s;
   int sform_code;
   int qform_code;
   int niftiType;
 
-  vtkUnsignedCharArray *niftiHeader;
-  unsigned char * niftiHeaderUnsignedCharArray;
+  vtkUnsignedCharArray* niftiHeader;
+  unsigned char* niftiHeaderUnsignedCharArray;
   int niftiHeaderSize;
 };
 #endif

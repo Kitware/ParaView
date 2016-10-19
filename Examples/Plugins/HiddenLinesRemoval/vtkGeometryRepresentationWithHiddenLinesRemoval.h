@@ -21,8 +21,8 @@
 
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class VTK_EXPORT vtkGeometryRepresentationWithHiddenLinesRemoval :
-  public vtkGeometryRepresentationWithFaces
+class VTK_EXPORT vtkGeometryRepresentationWithHiddenLinesRemoval
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkGeometryRepresentationWithHiddenLinesRemoval* New();
@@ -34,9 +34,9 @@ protected:
   ~vtkGeometryRepresentationWithHiddenLinesRemoval();
 
 private:
-  vtkGeometryRepresentationWithHiddenLinesRemoval(const vtkGeometryRepresentationWithHiddenLinesRemoval&) VTK_DELETE_FUNCTION;
+  vtkGeometryRepresentationWithHiddenLinesRemoval(
+    const vtkGeometryRepresentationWithHiddenLinesRemoval&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGeometryRepresentationWithHiddenLinesRemoval&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

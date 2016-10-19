@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMNullProxy - proxy with stands for NULL object on the server.
-// .SECTION Description
-// vtkSMNullProxy stands for a 0 on the server side.
+/**
+ * @class   vtkSMNullProxy
+ * @brief   proxy with stands for NULL object on the server.
+ *
+ * vtkSMNullProxy stands for a 0 on the server side.
+*/
 
 #ifndef vtkSMNullProxy_h
 #define vtkSMNullProxy_h

@@ -37,14 +37,15 @@
 #include <QtDebug>
 
 #include "ui_pqSLACDataLoadManager.h"
-class pqSLACDataLoadManager::pqUI : public Ui::pqSLACDataLoadManager {};
+class pqSLACDataLoadManager::pqUI : public Ui::pqSLACDataLoadManager
+{
+};
 
 //=============================================================================
-pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget *p,
-                                             Qt::WindowFlags f/*=0*/)
+pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f /*=0*/)
   : QDialog(p, f)
 {
-  pqSLACManager *manager = pqSLACManager::instance();
+  pqSLACManager* manager = pqSLACManager::instance();
   this->Server = manager->getActiveServer();
 
   this->ui = new pqSLACDataLoadManager::pqUI;
@@ -62,32 +63,27 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget *p,
   this->ui->modeFile->setExtension("SLAC Mode Files (*.mod *.m?)");
   this->ui->particlesFile->setExtension("SLAC Particle Files (*.ncdf *.netcdf)");
 
-  pqPipelineSource *meshReader = manager->getMeshReader();
-  pqPipelineSource *particlesReader = manager->getParticlesReader();
+  pqPipelineSource* meshReader = manager->getMeshReader();
+  pqPipelineSource* particlesReader = manager->getParticlesReader();
   if (meshReader)
-    {
-    vtkSMProxy *meshReaderProxy = meshReader->getProxy();
-    vtkSMProperty *meshFileName = meshReaderProxy->GetProperty("MeshFileName");
-    vtkSMProperty *modeFileName = meshReaderProxy->GetProperty("ModeFileName");
-    this->ui->meshFile->setFilenames(
-                                pqSMAdaptor::getFileListProperty(meshFileName));
-    this->ui->modeFile->setFilenames(
-                                pqSMAdaptor::getFileListProperty(modeFileName));
-    }
+  {
+    vtkSMProxy* meshReaderProxy = meshReader->getProxy();
+    vtkSMProperty* meshFileName = meshReaderProxy->GetProperty("MeshFileName");
+    vtkSMProperty* modeFileName = meshReaderProxy->GetProperty("ModeFileName");
+    this->ui->meshFile->setFilenames(pqSMAdaptor::getFileListProperty(meshFileName));
+    this->ui->modeFile->setFilenames(pqSMAdaptor::getFileListProperty(modeFileName));
+  }
   if (particlesReader)
-    {
-    vtkSMProxy *particlesReaderProxy = particlesReader->getProxy();
-    vtkSMProperty *fileName = particlesReaderProxy->GetProperty("FileName");
-    this->ui->particlesFile->setFilenames(
-                                    pqSMAdaptor::getFileListProperty(fileName));
-    }
+  {
+    vtkSMProxy* particlesReaderProxy = particlesReader->getProxy();
+    vtkSMProperty* fileName = particlesReaderProxy->GetProperty("FileName");
+    this->ui->particlesFile->setFilenames(pqSMAdaptor::getFileListProperty(fileName));
+  }
 
-  QObject::connect(
-              this->ui->meshFile, SIGNAL(filenamesChanged(const QStringList &)),
-              this, SLOT(checkInputValid()));
+  QObject::connect(this->ui->meshFile, SIGNAL(filenamesChanged(const QStringList&)), this,
+    SLOT(checkInputValid()));
 
-  QObject::connect(this, SIGNAL(accepted()),
-                   this, SLOT(setupPipeline()));
+  QObject::connect(this, SIGNAL(accepted()), this, SLOT(setupPipeline()));
 
   this->checkInputValid();
 }
@@ -102,7 +98,8 @@ void pqSLACDataLoadManager::checkInputValid()
 {
   bool valid = true;
 
-  if (this->ui->meshFile->filenames().isEmpty()) valid = false;
+  if (this->ui->meshFile->filenames().isEmpty())
+    valid = false;
 
   this->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(valid);
 }
@@ -110,16 +107,16 @@ void pqSLACDataLoadManager::checkInputValid()
 //-----------------------------------------------------------------------------
 void pqSLACDataLoadManager::setupPipeline()
 {
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqObjectBuilder *builder = core->getObjectBuilder();
-  pqDisplayPolicy *displayPolicy = core->getDisplayPolicy();
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqDisplayPolicy* displayPolicy = core->getDisplayPolicy();
 
-  pqSLACManager *manager = pqSLACManager::instance();
+  pqSLACManager* manager = pqSLACManager::instance();
 
   BEGIN_UNDO_SET("SLAC Data Load");
 
   // Determine the views.  Do this before deleting existing pipeline objects.
-  pqView *meshView = manager->getMeshView();
+  pqView* meshView = manager->getMeshView();
 
   // Delete existing pipeline objects.  We will replace them.
   manager->destroyPipelineSourceAndConsumers(manager->getMeshReader());
@@ -128,17 +125,15 @@ void pqSLACDataLoadManager::setupPipeline()
   QStringList meshFiles = this->ui->meshFile->filenames();
   // This should never really be not empty.
   if (!meshFiles.isEmpty())
-    {
-    pqPipelineSource *meshReader
-      = builder->createReader("sources", "SLACReader", meshFiles, this->Server);
+  {
+    pqPipelineSource* meshReader =
+      builder->createReader("sources", "SLACReader", meshFiles, this->Server);
 
-    vtkSMSourceProxy* meshReaderProxy =
-      vtkSMSourceProxy::SafeDownCast(meshReader->getProxy());
+    vtkSMSourceProxy* meshReaderProxy = vtkSMSourceProxy::SafeDownCast(meshReader->getProxy());
 
     // Set up mode (if any).
     QStringList modeFiles = this->ui->modeFile->filenames();
-    pqSMAdaptor::setFileListProperty(
-                       meshReaderProxy->GetProperty("ModeFileName"), modeFiles);
+    pqSMAdaptor::setFileListProperty(meshReaderProxy->GetProperty("ModeFileName"), modeFiles);
 
     // Push changes to server so that when the representation gets updated,
     // it uses the property values we set.
@@ -149,41 +144,38 @@ void pqSLACDataLoadManager::setupPipeline()
 
     // ensures that the FrequencyScale and PhaseShift have correct default
     // values.
-    meshReaderProxy->GetProperty("FrequencyScale")->Copy(
-      meshReaderProxy->GetProperty("FrequencyScaleInfo"));
-    meshReaderProxy->GetProperty("PhaseShift")->Copy(
-      meshReaderProxy->GetProperty("PhaseShiftInfo"));
+    meshReaderProxy->GetProperty("FrequencyScale")
+      ->Copy(meshReaderProxy->GetProperty("FrequencyScaleInfo"));
+    meshReaderProxy->GetProperty("PhaseShift")
+      ->Copy(meshReaderProxy->GetProperty("PhaseShiftInfo"));
 
     // Make representations.
-    pqDataRepresentation *repr;
-    repr = displayPolicy->setRepresentationVisibility(
-      meshReader->getOutputPort(0), meshView, true);
+    pqDataRepresentation* repr;
+    repr = displayPolicy->setRepresentationVisibility(meshReader->getOutputPort(0), meshView, true);
     repr->setVisible(true);
-    repr = displayPolicy->setRepresentationVisibility(
-      meshReader->getOutputPort(1), meshView, true);
+    repr = displayPolicy->setRepresentationVisibility(meshReader->getOutputPort(1), meshView, true);
     repr->setVisible(false);
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.
     meshReader->setModifiedState(pqProxy::UNMODIFIED);
-    }
+  }
 
   QStringList particlesFiles = this->ui->particlesFile->filenames();
   if (!particlesFiles.isEmpty())
-    {
-    pqPipelineSource *particlesReader
-      = builder->createReader("sources", "SLACParticleReader",
-                              particlesFiles, this->Server);
+  {
+    pqPipelineSource* particlesReader =
+      builder->createReader("sources", "SLACParticleReader", particlesFiles, this->Server);
 
     // Make representations.
-    pqDataRepresentation *repr = displayPolicy->setRepresentationVisibility(
-        particlesReader->getOutputPort(0), meshView, true);
+    pqDataRepresentation* repr =
+      displayPolicy->setRepresentationVisibility(particlesReader->getOutputPort(0), meshView, true);
     repr->setVisible(manager->actionShowParticles()->isChecked());
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.
     particlesReader->setModifiedState(pqProxy::UNMODIFIED);
-    }
+  }
 
   END_UNDO_SET();
   emit this->createdPipeline();

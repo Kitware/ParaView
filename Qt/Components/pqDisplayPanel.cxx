@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,22 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 pqDisplayPanel::pqDisplayPanel(pqRepresentation* display, QWidget* p)
-  : QWidget(p), Representation(display)
+  : QWidget(p)
+  , Representation(display)
 {
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(display);
   if (dataRepr)
-    {
+  {
     pqPipelineSource* input = dataRepr->getInput();
-    QObject::connect(input, SIGNAL(dataUpdated(pqPipelineSource*)), 
-      this, SLOT(dataUpdated()));
+    QObject::connect(input, SIGNAL(dataUpdated(pqPipelineSource*)), this, SLOT(dataUpdated()));
     this->dataUpdated();
-    }
+  }
 }
 
 pqDisplayPanel::~pqDisplayPanel()
 {
 }
-  
+
 pqRepresentation* pqDisplayPanel::getRepresentation()
 {
   return this->Representation;
@@ -69,8 +69,7 @@ void pqDisplayPanel::dataUpdated()
 void pqDisplayPanel::updateAllViews()
 {
   if (this->Representation)
-    {
+  {
     this->Representation->renderViewEventually();
-    }
+  }
 }
-

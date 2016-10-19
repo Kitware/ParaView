@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCylinder - extends vtkCylinder to add ParaView specific API.
-// .SECTION Description
-// vtkPVCylinder extends vtkCylinder to add ParaView specific API.
+/**
+ * @class   vtkPVCylinder
+ * @brief   extends vtkCylinder to add ParaView specific API.
+ *
+ * vtkPVCylinder extends vtkCylinder to add ParaView specific API.
+*/
 
 #ifndef vtkPVCylinder_h
 #define vtkPVCylinder_h
@@ -26,17 +29,19 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVCylinder : public vtkCylinder
 {
 public:
   static vtkPVCylinder* New();
-  vtkTypeMacro(vtkPVCylinder, vtkCylinder)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkPVCylinder, vtkCylinder) void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the vector defining the direction of the cylinder.
+  //@{
+  /**
+   * Get/Set the vector defining the direction of the cylinder.
+   */
   void SetAxis(double x, double y, double z);
   void SetAxis(const double axis[3]);
   vtkGetVector3Macro(Axis, double)
+    //@}
 
-  // Reimplemented to update transform on change:
-  virtual void SetCenter(double x, double y, double z);
+    // Reimplemented to update transform on change:
+    virtual void SetCenter(double x, double y, double z);
   virtual void SetCenter(double xyz[3]);
 
 protected:
@@ -54,7 +59,7 @@ private:
 
 inline void vtkPVCylinder::SetAxis(double x, double y, double z)
 {
-  double axis[3] = {x, y, z};
+  double axis[3] = { x, y, z };
   this->SetAxis(axis);
 }
 

@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -34,33 +34,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// pqCreateCustomFilterReaction popups the create-custom-filter wizard for the
-/// active selection.
+/**
+* pqCreateCustomFilterReaction popups the create-custom-filter wizard for the
+* active selection.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCreateCustomFilterReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqCreateCustomFilterReaction(QAction* parent);
 
-  /// Create custom filter.
+  /**
+  * Create custom filter.
+  */
   static void createCustomFilter();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqCreateCustomFilterReaction::createCustomFilter(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqCreateCustomFilterReaction::createCustomFilter(); }
 
 private:
   Q_DISABLE_COPY(pqCreateCustomFilterReaction)
 };
 
 #endif
-
-

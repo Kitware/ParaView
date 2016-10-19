@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
 extern "C" {
-  void vtkPVInitializePythonModules();
+void vtkPVInitializePythonModules();
 }
 #endif
 
@@ -56,7 +56,7 @@ extern "C" {
 #include "vtkSMSettings.h"
 
 #ifndef BUILD_SHARED_LIBS
-# include "pvStaticPluginsInit.h"
+#include "pvStaticPluginsInit.h"
 #endif
 
 #include <QDragEnterEvent>
@@ -68,20 +68,20 @@ extern "C" {
 #include "ParaViewDocumentationInitializer.h"
 #endif
 
-
 #ifdef PARAVIEW_ENABLE_PYTHON
-# include "pqPythonDebugLeaksView.h"
-  typedef pqPythonDebugLeaksView DebugLeaksViewType;
+#include "pqPythonDebugLeaksView.h"
+typedef pqPythonDebugLeaksView DebugLeaksViewType;
 #else
-# include "vtkQtDebugLeaksView.h"
-  typedef vtkQtDebugLeaksView DebugLeaksViewType;
+#include "vtkQtDebugLeaksView.h"
+typedef vtkQtDebugLeaksView DebugLeaksViewType;
 #endif
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 public:
   bool FirstShow;
-  pqInternals() : FirstShow(true)
+  pqInternals()
+    : FirstShow(true)
   {
   }
 };
@@ -92,11 +92,11 @@ ParaViewMainWindow::ParaViewMainWindow()
   // the debug leaks view should be constructed as early as possible
   // so that it can monitor vtk objects created at application startup.
   if (getenv("PV_DEBUG_LEAKS_VIEW"))
-    {
+  {
     vtkQtDebugLeaksView* leaksView = new DebugLeaksViewType(this);
     leaksView->setWindowFlags(Qt::Window);
     leaksView->show();
-    }
+  }
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   vtkPVInitializePythonModules();
@@ -117,19 +117,12 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-
+  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->memoryInspectorDock);
+  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->timeInspectorDock);
   this->tabifyDockWidget(
-    this->Internals->colorMapEditorDock,
-    this->Internals->memoryInspectorDock);
+    this->Internals->colorMapEditorDock, this->Internals->comparativePanelDock);
   this->tabifyDockWidget(
-    this->Internals->colorMapEditorDock,
-    this->Internals->timeInspectorDock);
-  this->tabifyDockWidget(
-    this->Internals->colorMapEditorDock,
-    this->Internals->comparativePanelDock);
-  this->tabifyDockWidget(
-    this->Internals->colorMapEditorDock,
-    this->Internals->collaborationPanelDock);
+    this->Internals->colorMapEditorDock, this->Internals->collaborationPanelDock);
 
   this->Internals->selectionDisplayDock->hide();
   this->Internals->animationViewDock->hide();
@@ -141,77 +134,69 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->colorMapEditorDock->hide();
   this->Internals->timeInspectorDock->hide();
 
-  this->tabifyDockWidget(this->Internals->animationViewDock,
-    this->Internals->statisticsDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
 
   // setup properties dock
-  this->tabifyDockWidget(
-    this->Internals->propertiesDock,
-    this->Internals->viewPropertiesDock);
-  this->tabifyDockWidget(
-    this->Internals->propertiesDock,
-    this->Internals->displayPropertiesDock);
-  this->tabifyDockWidget(this->Internals->propertiesDock,
-    this->Internals->informationDock);
+  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
+  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->displayPropertiesDock);
+  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   int propertiesPanelMode = settings->GetSettingAsInt(
     ".settings.GeneralSettings.PropertiesPanelMode", vtkPVGeneralSettings::ALL_IN_ONE);
   switch (propertiesPanelMode)
-    {
-  case vtkPVGeneralSettings::SEPARATE_DISPLAY_PROPERTIES:
-    delete this->Internals->viewPropertiesPanel;
-    delete this->Internals->viewPropertiesDock;
-    this->Internals->viewPropertiesPanel = NULL;
-    this->Internals->viewPropertiesDock = NULL;
+  {
+    case vtkPVGeneralSettings::SEPARATE_DISPLAY_PROPERTIES:
+      delete this->Internals->viewPropertiesPanel;
+      delete this->Internals->viewPropertiesDock;
+      this->Internals->viewPropertiesPanel = NULL;
+      this->Internals->viewPropertiesDock = NULL;
 
-    this->Internals->propertiesPanel->setPanelMode(
-      pqPropertiesPanel::SOURCE_PROPERTIES|pqPropertiesPanel::VIEW_PROPERTIES);
-    break;
+      this->Internals->propertiesPanel->setPanelMode(
+        pqPropertiesPanel::SOURCE_PROPERTIES | pqPropertiesPanel::VIEW_PROPERTIES);
+      break;
 
-  case vtkPVGeneralSettings::SEPARATE_VIEW_PROPERTIES:
-    delete this->Internals->displayPropertiesPanel;
-    delete this->Internals->displayPropertiesDock;
-    this->Internals->displayPropertiesPanel = NULL;
-    this->Internals->displayPropertiesDock = NULL;
+    case vtkPVGeneralSettings::SEPARATE_VIEW_PROPERTIES:
+      delete this->Internals->displayPropertiesPanel;
+      delete this->Internals->displayPropertiesDock;
+      this->Internals->displayPropertiesPanel = NULL;
+      this->Internals->displayPropertiesDock = NULL;
 
-    this->Internals->propertiesPanel->setPanelMode(
-      pqPropertiesPanel::SOURCE_PROPERTIES|pqPropertiesPanel::DISPLAY_PROPERTIES);
-    break;
+      this->Internals->propertiesPanel->setPanelMode(
+        pqPropertiesPanel::SOURCE_PROPERTIES | pqPropertiesPanel::DISPLAY_PROPERTIES);
+      break;
 
-  case vtkPVGeneralSettings::ALL_SEPARATE:
-    this->Internals->propertiesPanel->setPanelMode(
-      pqPropertiesPanel::SOURCE_PROPERTIES);
-    break;
+    case vtkPVGeneralSettings::ALL_SEPARATE:
+      this->Internals->propertiesPanel->setPanelMode(pqPropertiesPanel::SOURCE_PROPERTIES);
+      break;
 
-  case vtkPVGeneralSettings::ALL_IN_ONE:
-  default:
-    delete this->Internals->viewPropertiesPanel;
-    delete this->Internals->viewPropertiesDock;
-    this->Internals->viewPropertiesPanel = NULL;
-    this->Internals->viewPropertiesDock = NULL;
+    case vtkPVGeneralSettings::ALL_IN_ONE:
+    default:
+      delete this->Internals->viewPropertiesPanel;
+      delete this->Internals->viewPropertiesDock;
+      this->Internals->viewPropertiesPanel = NULL;
+      this->Internals->viewPropertiesDock = NULL;
 
-    delete this->Internals->displayPropertiesPanel;
-    delete this->Internals->displayPropertiesDock;
-    this->Internals->displayPropertiesPanel = NULL;
-    this->Internals->displayPropertiesDock = NULL;
-    break;
-    }
+      delete this->Internals->displayPropertiesPanel;
+      delete this->Internals->displayPropertiesDock;
+      this->Internals->displayPropertiesPanel = NULL;
+      this->Internals->displayPropertiesDock = NULL;
+      break;
+  }
 
   this->Internals->propertiesDock->show();
   this->Internals->propertiesDock->raise();
 
   // Enable help from the properties panel.
   QObject::connect(this->Internals->propertiesPanel,
-    SIGNAL(helpRequested(const QString&, const QString&)),
-    this, SLOT(showHelpForProxy(const QString&, const QString&)));
+    SIGNAL(helpRequested(const QString&, const QString&)), this,
+    SLOT(showHelpForProxy(const QString&, const QString&)));
 
   /// hook delete to pqDeleteReaction.
   QAction* tempDeleteAction = new QAction(this);
   pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
-  handler->connect(this->Internals->propertiesPanel,
-    SIGNAL(deleteRequested(pqPipelineSource*)),
+  handler->connect(this->Internals->propertiesPanel, SIGNAL(deleteRequested(pqPipelineSource*)),
     SLOT(deleteSource(pqPipelineSource*)));
 
   // setup color editor
@@ -236,8 +221,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   pqParaViewMenuBuilders::buildCatalystMenu(*this->Internals->menu_Catalyst);
 
   // setup the context menu for the pipeline browser.
-  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
-    *this->Internals->pipelineBrowser);
+  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(*this->Internals->pipelineBrowser);
 
   pqParaViewMenuBuilders::buildToolbars(*this);
 
@@ -263,61 +247,60 @@ ParaViewMainWindow::~ParaViewMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
-  QString& proxyname)
+void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
 {
   pqHelpReaction::showProxyHelp(groupname, proxyname);
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent *evt)
+void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent* evt)
 {
   evt->acceptProposedAction();
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::dropEvent(QDropEvent *evt)
+void ParaViewMainWindow::dropEvent(QDropEvent* evt)
 {
   QList<QUrl> urls = evt->mimeData()->urls();
   if (urls.isEmpty())
-    {
+  {
     return;
-    }
+  }
 
   QList<QString> files;
 
-  foreach(QUrl url,urls)
+  foreach (QUrl url, urls)
+  {
+    if (!url.toLocalFile().isEmpty())
     {
-    if(!url.toLocalFile().isEmpty())
-      {
       files.append(url.toLocalFile());
-      }
     }
+  }
 
   // If we have no file we return
-  if(files.empty() || files.first().isEmpty())
-    {
+  if (files.empty() || files.first().isEmpty())
+  {
     return;
-    }
+  }
   pqLoadDataReaction::loadData(files);
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::showEvent(QShowEvent * evt)
+void ParaViewMainWindow::showEvent(QShowEvent* evt)
 {
   this->Superclass::showEvent(evt);
   if (this->Internals->FirstShow)
-    {
+  {
     this->Internals->FirstShow = false;
     pqApplicationCore* core = pqApplicationCore::instance();
     if (!core->getOptions()->GetDisableRegistry())
-      {
+    {
       if (core->settings()->value("GeneralSettings.ShowWelcomeDialog", true).toBool())
-        {
+      {
         pqTimer::singleShot(1000, this, SLOT(showWelcomeDialog()));
-        }
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------

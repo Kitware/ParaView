@@ -63,21 +63,21 @@
 //
 // ****************************************************************************
 
-QvisScribbleOpacityBar::QvisScribbleOpacityBar(QWidget *parentObject, const char *name)
-    : QvisAbstractOpacityBar(parentObject, name)
+QvisScribbleOpacityBar::QvisScribbleOpacityBar(QWidget* parentObject, const char* name)
+  : QvisAbstractOpacityBar(parentObject, name)
 {
-    setFrameStyle( QFrame::Panel | QFrame::Sunken );
-    setLineWidth( 2 );
-    setMinimumHeight(50);
-    setMinimumWidth(128);
+  setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  setLineWidth(2);
+  setMinimumHeight(50);
+  setMinimumWidth(128);
 
-    nvalues = 256; //contentsRect().width();
-    values = new float[nvalues];
-    for (int i=0; i<nvalues; ++i)
-    {
-        values[i] = float(i)/float(nvalues-1);
-    }
-    mousedown = false;
+  nvalues = 256; // contentsRect().width();
+  values = new float[nvalues];
+  for (int i = 0; i < nvalues; ++i)
+  {
+    values[i] = float(i) / float(nvalues - 1);
+  }
+  mousedown = false;
 }
 
 // ****************************************************************************
@@ -97,9 +97,8 @@ QvisScribbleOpacityBar::QvisScribbleOpacityBar(QWidget *parentObject, const char
 
 QvisScribbleOpacityBar::~QvisScribbleOpacityBar()
 {
-    delete [] values;
+  delete[] values;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::paintToPixmap
@@ -111,43 +110,40 @@ QvisScribbleOpacityBar::~QvisScribbleOpacityBar()
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::paintToPixmap(int w, int h)
+void QvisScribbleOpacityBar::paintToPixmap(int w, int h)
 {
-    if (w != nvalues)
+  if (w != nvalues)
+  {
+    int nvalues2 = w;
+    float* values2 = new float[nvalues2];
+    if (nvalues2 > nvalues)
     {
-        int nvalues2 = w;
-        float *values2 = new float[nvalues2];
-        if (nvalues2 > nvalues)
-        {
-            for (int i=0; i<nvalues2; i++)
-                values2[i] = values[(i * nvalues) / nvalues2];
-        }
-        else
-        {
-            for (int i=0; i<nvalues; i++)
-                values2[(i * nvalues2) / nvalues] = values[i];
-        }
-        delete[] values;
-        values = values2;
-        nvalues = nvalues2;
+      for (int i = 0; i < nvalues2; i++)
+        values2[i] = values[(i * nvalues) / nvalues2];
     }
+    else
+    {
+      for (int i = 0; i < nvalues; i++)
+        values2[(i * nvalues2) / nvalues] = values[i];
+    }
+    delete[] values;
+    values = values2;
+    nvalues = nvalues2;
+  }
 
-
-  QColor white(255, 255, 255 );
-  QColor black(0,   0,   0 );
-  QPen   whitepen(Qt::white, 2);
+  QColor white(255, 255, 255);
+  QColor black(0, 0, 0);
+  QPen whitepen(Qt::white, 2);
   QPainter painter(pix);
-  this->paintBackground(painter,w,h);
+  this->paintBackground(painter, w, h);
 
   painter.setPen(whitepen);
-  for (int _x=0; _x<w; _x++)
+  for (int _x = 0; _x < w; _x++)
   {
-      float yval = values[_x];
-      painter.drawLine(_x, h-1, _x, int((h-1) - float(yval)*(h-1)));
+    float yval = values[_x];
+    painter.drawLine(_x, h - 1, _x, int((h - 1) - float(yval) * (h - 1)));
   }
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::mousePressEvent
@@ -159,19 +155,17 @@ QvisScribbleOpacityBar::paintToPixmap(int w, int h)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::mousePressEvent(QMouseEvent *e)
+void QvisScribbleOpacityBar::mousePressEvent(QMouseEvent* e)
 {
-    int _x = e->x();
-    int _y = e->y();
-    setValue(x2val(_x), y2val(_y));
-    lastx = _x;
-    lasty = _y;
-    mousedown = true;
+  int _x = e->x();
+  int _y = e->y();
+  setValue(x2val(_x), y2val(_y));
+  lastx = _x;
+  lasty = _y;
+  mousedown = true;
 
-    this->repaint();
+  this->repaint();
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::mouseMoveEvent
@@ -183,22 +177,20 @@ QvisScribbleOpacityBar::mousePressEvent(QMouseEvent *e)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::mouseMoveEvent(QMouseEvent *e)
+void QvisScribbleOpacityBar::mouseMoveEvent(QMouseEvent* e)
 {
-    if (!mousedown)
-        return;
+  if (!mousedown)
+    return;
 
-    int _x = e->x();
-    int _y = e->y();
-    setValues(lastx, lasty, _x, _y);
-    lastx = _x;
-    lasty = _y;
+  int _x = e->x();
+  int _y = e->y();
+  setValues(lastx, lasty, _x, _y);
+  lastx = _x;
+  lasty = _y;
 
-    this->repaint();
-    emit mouseMoved();
+  this->repaint();
+  emit mouseMoved();
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::mouseReleaseEvent
@@ -210,18 +202,16 @@ QvisScribbleOpacityBar::mouseMoveEvent(QMouseEvent *e)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::mouseReleaseEvent(QMouseEvent *e)
+void QvisScribbleOpacityBar::mouseReleaseEvent(QMouseEvent* e)
 {
-    int _x = e->x();
-    int _y = e->y();
-    setValues(lastx, lasty, _x, _y);
-    mousedown = false;
+  int _x = e->x();
+  int _y = e->y();
+  setValues(lastx, lasty, _x, _y);
+  mousedown = false;
 
-    this->repaint();
-    emit mouseReleased();
+  this->repaint();
+  emit mouseReleased();
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::setValues
@@ -233,24 +223,20 @@ QvisScribbleOpacityBar::mouseReleaseEvent(QMouseEvent *e)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::setValues(int x1, int y1, int x2, int y2)
+void QvisScribbleOpacityBar::setValues(int x1, int y1, int x2, int y2)
 {
-    if (x1==x2)
-    {
-        setValue(x2val(x2), y2val(y2));
-        return;
-    }
+  if (x1 == x2)
+  {
+    setValue(x2val(x2), y2val(y2));
+    return;
+  }
 
-    int   xdiff = abs(x2 - x1) + 1;
-    int   step  = (x1 < x2) ? 1 : -1;
-    float slope = float(y2 - y1) / float (x2 - x1);
-    for (int i=0; i<xdiff; i++)
-        setValue(x2val(x1 + i*step),
-                 y2val(y1 + int(float(i)*slope*step)));
-
+  int xdiff = abs(x2 - x1) + 1;
+  int step = (x1 < x2) ? 1 : -1;
+  float slope = float(y2 - y1) / float(x2 - x1);
+  for (int i = 0; i < xdiff; i++)
+    setValue(x2val(x1 + i * step), y2val(y1 + int(float(i) * slope * step)));
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::setValue
@@ -262,13 +248,11 @@ QvisScribbleOpacityBar::setValues(int x1, int y1, int x2, int y2)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::setValue(float xval, float yval)
+void QvisScribbleOpacityBar::setValue(float xval, float yval)
 {
-    int _x = int(xval * float(nvalues-1));
-    values[_x] = yval;
+  int _x = int(xval * float(nvalues - 1));
+  values[_x] = yval;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::getRawOpacities
@@ -280,22 +264,20 @@ QvisScribbleOpacityBar::setValue(float xval, float yval)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::getRawOpacities(int n, float *opacity)
+void QvisScribbleOpacityBar::getRawOpacities(int n, float* opacity)
 {
-    int nvalues2 = n;
-    if (nvalues2 > nvalues)
-    {
-        for (int i=0; i<nvalues2; i++)
-            opacity[i] = values[(i * nvalues) / nvalues2];
-    }
-    else
-    {
-        for (int i=0; i<nvalues; i++)
-            opacity[(i * nvalues2) / nvalues] = values[i];
-    }
+  int nvalues2 = n;
+  if (nvalues2 > nvalues)
+  {
+    for (int i = 0; i < nvalues2; i++)
+      opacity[i] = values[(i * nvalues) / nvalues2];
+  }
+  else
+  {
+    for (int i = 0; i < nvalues; i++)
+      opacity[(i * nvalues2) / nvalues] = values[i];
+  }
 }
-
 
 // ****************************************************************************
 //  Method:  QvisScribbleOpacityBar::setRawOpacities
@@ -311,23 +293,22 @@ QvisScribbleOpacityBar::getRawOpacities(int n, float *opacity)
 //    I added code to emit a valueChanged signal.
 //
 // ****************************************************************************
-void
-QvisScribbleOpacityBar::setRawOpacities(int n, float *v)
+void QvisScribbleOpacityBar::setRawOpacities(int n, float* v)
 {
-    if (n < nvalues)
-    {
-        for (int i=0; i<nvalues; i++)
-            values[i] = v[(i * n) / nvalues];
-    }
-    else
-    {
-        for (int i=0; i<n; i++)
-            values[(i * nvalues) / n] = v[i];
-    }
-    this->update();
+  if (n < nvalues)
+  {
+    for (int i = 0; i < nvalues; i++)
+      values[i] = v[(i * n) / nvalues];
+  }
+  else
+  {
+    for (int i = 0; i < n; i++)
+      values[(i * nvalues) / n] = v[i];
+  }
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }
 
 // ****************************************************************************
@@ -344,18 +325,17 @@ QvisScribbleOpacityBar::setRawOpacities(int n, float *v)
 //
 // ****************************************************************************
 
-void
-QvisScribbleOpacityBar::makeTotallyZero()
+void QvisScribbleOpacityBar::makeTotallyZero()
 {
-    // Set all the alphas to zero.
-    for(int i = 0; i < nvalues; ++i)
-        values[i] = 0.;
+  // Set all the alphas to zero.
+  for (int i = 0; i < nvalues; ++i)
+    values[i] = 0.;
 
-    //this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    this->update();
+  // this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }
 
 // ****************************************************************************
@@ -371,32 +351,30 @@ QvisScribbleOpacityBar::makeTotallyZero()
 //
 // ****************************************************************************
 
-void
-QvisScribbleOpacityBar::makeLinearRamp()
+void QvisScribbleOpacityBar::makeLinearRamp()
 {
-    // Make a ramp.
-    for(int i = 0; i < nvalues; ++i)
-        values[i] = float(i) * float(1. / nvalues);
+  // Make a ramp.
+  for (int i = 0; i < nvalues; ++i)
+    values[i] = float(i) * float(1. / nvalues);
 
-    //this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    this->update();
+  // this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }
 
-void
-QvisScribbleOpacityBar::makeInverseLinearRamp()
+void QvisScribbleOpacityBar::makeInverseLinearRamp()
 {
-    // Make a ramp.
-    for(int i = 0; i < nvalues; ++i)
-        values[nvalues-i-1] = float(i) * float(1. / nvalues);
+  // Make a ramp.
+  for (int i = 0; i < nvalues; ++i)
+    values[nvalues - i - 1] = float(i) * float(1. / nvalues);
 
-    //this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    this->update();
+  // this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }
 
 // ****************************************************************************
@@ -413,18 +391,17 @@ QvisScribbleOpacityBar::makeInverseLinearRamp()
 //
 // ****************************************************************************
 
-void
-QvisScribbleOpacityBar::makeTotallyOne()
+void QvisScribbleOpacityBar::makeTotallyOne()
 {
-    // Set all the alphas to 255.
-    for(int i = 0; i < nvalues; ++i)
-        values[i] = 1.;
+  // Set all the alphas to 255.
+  for (int i = 0; i < nvalues; ++i)
+    values[i] = 1.;
 
-    //this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    this->update();
+  // this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }
 
 // ****************************************************************************
@@ -443,22 +420,19 @@ QvisScribbleOpacityBar::makeTotallyOne()
 //
 // ****************************************************************************
 
-void
-QvisScribbleOpacityBar::smoothCurve()
+void QvisScribbleOpacityBar::smoothCurve()
 {
-    // Smooth the curve
-    for(int i = 1; i < nvalues - 1; ++i)
-    {
-        // 1 3 1 filter.
-        float smooth = (0.2 * values[i - 1]) +
-                       (0.6 * values[i]) +
-                       (0.2 * values[i + 1]);
-        values[i] = (smooth > 1.) ? 1. : smooth;
-    }
+  // Smooth the curve
+  for (int i = 1; i < nvalues - 1; ++i)
+  {
+    // 1 3 1 filter.
+    float smooth = (0.2 * values[i - 1]) + (0.6 * values[i]) + (0.2 * values[i + 1]);
+    values[i] = (smooth > 1.) ? 1. : smooth;
+  }
 
-    //this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    this->update();
+  // this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  this->update();
 
-    // Emit a signal indicating that the values changed.
-    emit opacitiesChanged();
+  // Emit a signal indicating that the values changed.
+  emit opacitiesChanged();
 }

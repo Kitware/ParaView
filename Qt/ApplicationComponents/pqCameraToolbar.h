@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -35,23 +35,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QToolBar>
 
-/// pqCameraToolbar is the toolbar that has icons for resetting camera
-/// orientations as well as zoom-to-data and zoom-to-box.
+/**
+* pqCameraToolbar is the toolbar that has icons for resetting camera
+* orientations as well as zoom-to-data and zoom-to-box.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraToolbar : public QToolBar
 {
   Q_OBJECT
   typedef QToolBar Superclass;
+
 public:
-  pqCameraToolbar(const QString& title, QWidget* parentObject=0)
+  pqCameraToolbar(const QString& title, QWidget* parentObject = 0)
     : Superclass(title, parentObject)
-    {
+  {
     this->constructor();
-    }
-  pqCameraToolbar(QWidget* parentObject=0)
+  }
+  pqCameraToolbar(QWidget* parentObject = 0)
     : Superclass(parentObject)
-    {
+  {
     this->constructor();
-    }
+  }
 
 private slots:
   void updateEnabledState();

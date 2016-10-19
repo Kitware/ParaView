@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-
 #include "pqLinkViewWidget.h"
 
 #include <QApplication>
@@ -50,9 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
-  : QWidget(firstLink->widget(), 
-            Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
-    RenderView(firstLink)
+  : QWidget(firstLink->widget(), Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
+  , RenderView(firstLink)
 {
   QVBoxLayout* l = new QVBoxLayout(this);
   QLabel* label = new QLabel(this);
@@ -71,14 +69,14 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   l->addWidget(button);
   button->setText("Cancel");
   QObject::connect(button, SIGNAL(clicked(bool)), this, SLOT(close()));
-  
+
   int index = 0;
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
   QString name = QString("CameraLink%1").arg(index);
-  while(model->getLink(name))
-    {
+  while (model->getLink(name))
+  {
     name = QString("CameraLink%1").arg(++index);
-    }
+  }
   this->LineEdit->setText(name);
   this->LineEdit->selectAll();
 }
@@ -87,32 +85,30 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
 pqLinkViewWidget::~pqLinkViewWidget()
 {
 }
-  
+
 //-----------------------------------------------------------------------------
 bool pqLinkViewWidget::event(QEvent* e)
 {
-  if(e->type() == QEvent::Show)
-    {
+  if (e->type() == QEvent::Show)
+  {
     // window shown, watch events
     QApplication::instance()->installEventFilter(this);
     this->LineEdit->setFocus(Qt::OtherFocusReason);
-    }
-  else if(e->type() == QEvent::Hide)
-    {
+  }
+  else if (e->type() == QEvent::Hide)
+  {
     // window hidden, done watching events
     QApplication::instance()->removeEventFilter(this);
-    }
+  }
   return QWidget::event(e);
 }
 
 //-----------------------------------------------------------------------------
 bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
 {
-  if(e->type() == QEvent::MouseButtonPress ||
-     e->type() == QEvent::MouseButtonDblClick )
-    {
-    pqServerManagerModel* smModel =
-      pqApplicationCore::instance()->getServerManagerModel();
+  if (e->type() == QEvent::MouseButtonPress || e->type() == QEvent::MouseButtonDblClick)
+  {
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
     QPoint globalpos(me->globalX(), me->globalY());
@@ -121,39 +117,36 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
 
     QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
     foreach (pqRenderView* view, views)
-      {
+    {
       if (view && view->widget() == wid)
-        {
+      {
         otherView = view;
         break;
-        }
       }
-    
+    }
+
     // if the user clicked on another view
-    if(otherView && otherView != this->RenderView)
-      {
+    if (otherView && otherView != this->RenderView)
+    {
       QString name = this->LineEdit->text();
       pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
       vtkSMLink* link = model->getLink(name);
-      if(link)
-        {
+      if (link)
+      {
         model->removeLink(name);
-        }
+      }
 
-      model->addCameraLink(name, 
-        this->RenderView->getProxy(), otherView->getProxy(), 
+      model->addCameraLink(name, this->RenderView->getProxy(), otherView->getProxy(),
         this->InteractiveViewLinkCheckBox->isChecked());
 
       this->close();
-      }
+    }
     // if the user didn't click in this window
-    else if(!this->geometry().contains(globalpos))
-      {
+    else if (!this->geometry().contains(globalpos))
+    {
       // consume invalid mouse events
       return true;
-      }
     }
+  }
   return QObject::eventFilter(watched, e);
 }
-
-

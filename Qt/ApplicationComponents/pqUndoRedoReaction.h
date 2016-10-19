@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -36,24 +36,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqUndoStack;
 
-/// @ingroup Reactions
-/// Reaction for application undo-redo.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoReaction : public pqReaction 
+/**
+* @ingroup Reactions
+* Reaction for application undo-redo.
+*/
+class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// if \c undo is set to true, then this behaves as an undo-reaction otherwise
-  /// as a redo-reaction.
+  /**
+  * if \c undo is set to true, then this behaves as an undo-reaction otherwise
+  * as a redo-reaction.
+  */
   pqUndoRedoReaction(QAction* parent, bool undo);
 
-  /// undo.
+  /**
+  * undo.
+  */
   static void undo();
 
-  /// redo.
+  /**
+  * redo.
+  */
   static void redo();
 
-  /// Clear stack
+  /**
+  * Clear stack
+  */
   static void clear();
 
 protected slots:
@@ -62,18 +73,20 @@ protected slots:
   void setUndoStack(pqUndoStack*);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered()
-    {
+  {
     if (this->Undo)
-      {
+    {
       pqUndoRedoReaction::undo();
-      }
-    else
-      {
-      pqUndoRedoReaction::redo();
-      }
     }
+    else
+    {
+      pqUndoRedoReaction::redo();
+    }
+  }
 
 private:
   Q_DISABLE_COPY(pqUndoRedoReaction)
@@ -82,5 +95,3 @@ private:
 };
 
 #endif
-
-

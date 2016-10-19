@@ -34,7 +34,7 @@ void vtkPVRenderViewWithSobel::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
 
-  vtkSobelGradientMagnitudePass* sobel =vtkSobelGradientMagnitudePass::New();
+  vtkSobelGradientMagnitudePass* sobel = vtkSobelGradientMagnitudePass::New();
   this->SynchronizedRenderers->SetImageProcessingPass(sobel);
   sobel->Delete();
 }

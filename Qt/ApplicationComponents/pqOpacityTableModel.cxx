@@ -37,56 +37,56 @@
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
-pqOpacityTableModel::pqOpacityTableModel(pqColorOpacityEditorWidget * widget,
-                                         QObject* parentObject) :
-  Superclass(parentObject), Widget(widget)
+pqOpacityTableModel::pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject)
+  : Superclass(parentObject)
+  , Widget(widget)
 {
   this->NumberOfRowsCache = this->rowCount();
 }
 
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqOpacityTableModel::flags(const QModelIndex &idx) const
+Qt::ItemFlags pqOpacityTableModel::flags(const QModelIndex& idx) const
 {
   Qt::ItemFlags parentFlags = this->Superclass::flags(idx);
-  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount()-1))
-    {
+  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount() - 1))
+  {
     return parentFlags;
-    }
+  }
   return parentFlags | Qt::ItemIsEditable;
 }
 
 //-----------------------------------------------------------------------------
-bool pqOpacityTableModel::setData(const QModelIndex &idx, const QVariant &value, int role)
+bool pqOpacityTableModel::setData(const QModelIndex& idx, const QVariant& value, int role)
 {
   Q_UNUSED(role);
 
   // Do not edit first and last control point scalar values
-  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount()-1))
-    {
+  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount() - 1))
+  {
     return false;
-    }
+  }
 
   if (this->Widget && this->Widget->proxy())
-    {
+  {
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->proxy()->GetClientSideObject());
     if (stc)
-      {
-      vtkPiecewiseFunction* pwf = stc? stc->GetScalarOpacityFunction() : NULL;
+    {
+      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
       if (pwf)
-        {
+      {
         double range[2];
         pwf->GetRange(range);
         double newValue = value.toDouble();
         if (idx.column() == 0 && (newValue < range[0] || newValue > range[1]))
-          {
+        {
           return false;
-          }
+        }
         else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
-          {
+        {
           return false;
-          }
+        }
 
         double xvms[4];
         pwf->GetNodeValue(idx.row(), xvms);
@@ -95,39 +95,39 @@ bool pqOpacityTableModel::setData(const QModelIndex &idx, const QVariant &value,
 
         emit this->dataChanged(idx, idx);
         return true;
-        }
       }
     }
+  }
 
   return false;
 }
 
 //-----------------------------------------------------------------------------
-int pqOpacityTableModel::rowCount(const QModelIndex & parentIndex) const
+int pqOpacityTableModel::rowCount(const QModelIndex& parentIndex) const
 {
   Q_UNUSED(parentIndex);
 
   int size = 0;
   if (this->Widget && this->Widget->proxy())
-    {
+  {
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->proxy()->GetClientSideObject());
     if (stc)
-      {
-      vtkPiecewiseFunction* pwf = stc? stc->GetScalarOpacityFunction() : NULL;
+    {
+      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
       if (pwf)
-        {
+      {
         size = pwf->GetSize();
-        }
       }
     }
+  }
 
   return size;
 }
 
 //-----------------------------------------------------------------------------
-int pqOpacityTableModel::columnCount(const QModelIndex & parentIndex) const
+int pqOpacityTableModel::columnCount(const QModelIndex& parentIndex) const
 {
   Q_UNUSED(parentIndex);
 
@@ -138,34 +138,34 @@ int pqOpacityTableModel::columnCount(const QModelIndex & parentIndex) const
 QVariant pqOpacityTableModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DisplayRole || role == Qt::EditRole)
-    {
+  {
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->proxy()->GetClientSideObject());
     if (stc)
-      {
-      vtkPiecewiseFunction* pwf = stc? stc->GetScalarOpacityFunction() : NULL;
+    {
+      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
       if (pwf)
-        {
+      {
         double xvms[4];
         pwf->GetNodeValue(idx.row(), xvms);
         if (idx.column() >= 0 && idx.column() <= 1)
-          {
+        {
           return QString::number(xvms[idx.column()]);
-          }
         }
       }
     }
+  }
   else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
-    {
+  {
     switch (idx.column())
-      {
+    {
       case 0:
         return "Data Value";
       case 1:
         return "Opacity";
-      }
     }
+  }
 
   return QVariant();
 }
@@ -174,15 +174,15 @@ QVariant pqOpacityTableModel::data(const QModelIndex& idx, int role) const
 QVariant pqOpacityTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    {
+  {
     switch (section)
-      {
+    {
       case 0:
         return "Value";
       case 1:
         return "Opacity";
-      }
     }
+  }
   return this->Superclass::headerData(section, orientation, role);
 }
 
@@ -194,19 +194,19 @@ void pqOpacityTableModel::refresh()
   // way to do this.
   int currentNumberOfRows = this->rowCount();
   if (this->NumberOfRowsCache < currentNumberOfRows)
-    {
-    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows-1);
+  {
+    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows - 1);
     this->endInsertRows();
-    }
+  }
   else if (this->NumberOfRowsCache > currentNumberOfRows)
-    {
-    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache-1);
+  {
+    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache - 1);
     this->endRemoveRows();
-    }
+  }
   this->NumberOfRowsCache = currentNumberOfRows;
 
   QModelIndex topLeft = this->createIndex(0, 0);
-  QModelIndex bottomRight = this->createIndex(this->rowCount()-1, this->columnCount()-1);
+  QModelIndex bottomRight = this->createIndex(this->rowCount() - 1, this->columnCount() - 1);
 
   emit dataChanged(topLeft, bottomRight);
 }

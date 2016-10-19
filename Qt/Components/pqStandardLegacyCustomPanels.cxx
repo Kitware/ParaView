@@ -53,27 +53,26 @@ pqStandardLegacyCustomPanels::~pqStandardLegacyCustomPanels()
 pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget* p)
 {
   if (QString("filters") == proxy->getProxy()->GetXMLGroup())
-    {
+  {
     if (QString("LegacyArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
       QString("LegacyGlyph") == proxy->getProxy()->GetXMLName())
-      {
+    {
       return new pqGlyphPanel(proxy, p);
-      }
     }
+  }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
 {
-  if(QString("filters") == proxy->getProxy()->GetXMLGroup())
-    {
-    if (
-      QString("LegacyArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
+  if (QString("filters") == proxy->getProxy()->GetXMLGroup())
+  {
+    if (QString("LegacyArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
       QString("LegacyGlyph") == proxy->getProxy()->GetXMLName())
-      {
+    {
       return true;
-      }
     }
+  }
   return false;
 }

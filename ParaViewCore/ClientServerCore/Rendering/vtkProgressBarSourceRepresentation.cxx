@@ -32,22 +32,22 @@
 
 namespace
 {
-  double vtkExtractDouble(vtkDataObject* data)
-    {
-    double progressRate = 0;
-    vtkFieldData* fieldData = data->GetFieldData();
-    vtkAbstractArray* array = fieldData->GetAbstractArray(0);
-    if (array && array->GetNumberOfTuples() > 0)
-      {
-      progressRate = array->GetVariantValue(0).ToDouble();
-      }
-    return progressRate;
-    }
+double vtkExtractDouble(vtkDataObject* data)
+{
+  double progressRate = 0;
+  vtkFieldData* fieldData = data->GetFieldData();
+  vtkAbstractArray* array = fieldData->GetAbstractArray(0);
+  if (array && array->GetNumberOfTuples() > 0)
+  {
+    progressRate = array->GetVariantValue(0).ToDouble();
+  }
+  return progressRate;
+}
 }
 
 vtkStandardNewMacro(vtkProgressBarSourceRepresentation);
-vtkCxxSetObjectMacro(vtkProgressBarSourceRepresentation, ProgressBarWidgetRepresentation,
-  vtk3DWidgetRepresentation);
+vtkCxxSetObjectMacro(
+  vtkProgressBarSourceRepresentation, ProgressBarWidgetRepresentation, vtk3DWidgetRepresentation);
 //----------------------------------------------------------------------------
 vtkProgressBarSourceRepresentation::vtkProgressBarSourceRepresentation()
 {
@@ -77,20 +77,19 @@ void vtkProgressBarSourceRepresentation::SetVisibility(bool val)
   this->Superclass::SetVisibility(val);
   if (this->ProgressBarWidgetRepresentation &&
     this->ProgressBarWidgetRepresentation->GetRepresentation())
-    {
+  {
     this->ProgressBarWidgetRepresentation->GetRepresentation()->SetVisibility(val);
     this->ProgressBarWidgetRepresentation->SetEnabled(val);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkProgressBarSourceRepresentation::SetInteractivity(bool val)
 {
-  if (this->ProgressBarWidgetRepresentation &&
-    this->ProgressBarWidgetRepresentation->GetWidget())
-    {
+  if (this->ProgressBarWidgetRepresentation && this->ProgressBarWidgetRepresentation->GetWidget())
+  {
     this->ProgressBarWidgetRepresentation->GetWidget()->SetProcessEvents(val);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -105,9 +104,9 @@ int vtkProgressBarSourceRepresentation::FillInputPortInformation(int, vtkInforma
 bool vtkProgressBarSourceRepresentation::AddToView(vtkView* view)
 {
   if (this->ProgressBarWidgetRepresentation)
-    {
+  {
     view->AddRepresentation(this->ProgressBarWidgetRepresentation);
-    }
+  }
   return this->Superclass::AddToView(view);
 }
 
@@ -115,9 +114,9 @@ bool vtkProgressBarSourceRepresentation::AddToView(vtkView* view)
 bool vtkProgressBarSourceRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->ProgressBarWidgetRepresentation)
-    {
+  {
     view->RemoveRepresentation(this->ProgressBarWidgetRepresentation);
-    }
+  }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -125,10 +124,10 @@ bool vtkProgressBarSourceRepresentation::RemoveFromView(vtkView* view)
 void vtkProgressBarSourceRepresentation::MarkModified()
 {
   if (!this->GetUseCache())
-    {
+  {
     // Cleanup caches when not using cache.
     this->CacheKeeper->RemoveAllCaches();
-    }
+  }
   this->Superclass::MarkModified();
 }
 
@@ -140,21 +139,20 @@ bool vtkProgressBarSourceRepresentation::IsCached(double cache_key)
 
 //----------------------------------------------------------------------------
 int vtkProgressBarSourceRepresentation::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+  {
     vtkTable* input = vtkTable::GetData(inputVector[0], 0);
     if (input->GetNumberOfRows() > 0 && input->GetNumberOfColumns() > 0)
-      {
+    {
       this->DummyPolyData->GetFieldData()->ShallowCopy(input->GetRowData());
-      }
     }
+  }
   this->DummyPolyData->Modified();
   this->CacheKeeper->Update();
 
@@ -168,44 +166,41 @@ int vtkProgressBarSourceRepresentation::RequestData(
 
 //----------------------------------------------------------------------------
 int vtkProgressBarSourceRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type,
-  vtkInformation* inInfo, vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     // i.e. this->GetVisibility() == false, hence nothing to do.
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
-    vtkPVRenderView::SetPiece(inInfo, this, 
-      this->CacheKeeper->GetOutputDataObject(0));
+  {
+    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
-      /*deliver_to_client=*/ true, /*gather_before_delivery=*/ false);
-    }
+      /*deliver_to_client=*/true, /*gather_before_delivery=*/false);
+  }
   else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
 
     // since there's no direct connection between the mapper and the collector,
     // we don't put an update-suppressor in the pipeline.
 
-    double progressRate = vtkExtractDouble(
-      producerPort->GetProducer()->GetOutputDataObject(
-        producerPort->GetIndex()));
-    vtkProgressBarRepresentation* repr = vtkProgressBarRepresentation::SafeDownCast(
-      this->ProgressBarWidgetRepresentation?
-      this->ProgressBarWidgetRepresentation->GetRepresentation() : NULL);
+    double progressRate =
+      vtkExtractDouble(producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
+    vtkProgressBarRepresentation* repr =
+      vtkProgressBarRepresentation::SafeDownCast(this->ProgressBarWidgetRepresentation
+          ? this->ProgressBarWidgetRepresentation->GetRepresentation()
+          : NULL);
     if (repr)
-      {
+    {
       repr->SetProgressRate(progressRate);
       repr->SetVisibility(true);
-      }
     }
+  }
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkProgressBarSourceRepresentation::PrintSelf(ostream& os, vtkIndent indent)

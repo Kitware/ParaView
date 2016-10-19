@@ -62,40 +62,32 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPolyLineWidget::pqPolyLineWidget(
-  vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(_smproxy, pxy, p)
+pqPolyLineWidget::pqPolyLineWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p)
+  : Superclass(_smproxy, pxy, p)
 {
   // enable picking.
   this->pickingSupported(QKeySequence(tr("P")));
 
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
-  this->Internals->PointsAdaptor = new pqSignalAdaptorTreeWidget(
-    this->Internals->HandlePositions, true);
+  this->Internals->PointsAdaptor =
+    new pqSignalAdaptorTreeWidget(this->Internals->HandlePositions, true);
 
   this->Internals->Visibility->setChecked(this->widgetVisible());
-  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
-    this->Internals->Visibility, SLOT(setChecked(bool)));
+  QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)), this->Internals->Visibility,
+    SLOT(setChecked(bool)));
 
-  QObject::connect(this->Internals->Visibility,
-    SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
+  QObject::connect(
+    this->Internals->Visibility, SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
-  QObject::connect(&this->Internals->Links,
-    SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(&this->Internals->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 
-  QObject::connect(&this->Internals->Links,
-    SIGNAL(qtWidgetChanged()),
-    this, SLOT(render()));
+  QObject::connect(&this->Internals->Links, SIGNAL(qtWidgetChanged()), this, SLOT(render()));
 
-  QObject::connect(this->Internals->AddPoint, SIGNAL(clicked()),
-    this, SLOT(addPoint()));
-  QObject::connect(this->Internals->Delete, SIGNAL(clicked()),
-    this, SLOT(removePoints()));
+  QObject::connect(this->Internals->AddPoint, SIGNAL(clicked()), this, SLOT(addPoint()));
+  QObject::connect(this->Internals->Delete, SIGNAL(clicked()), this, SLOT(removePoints()));
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(_smproxy->GetSession()));
 }
 
@@ -109,34 +101,27 @@ pqPolyLineWidget::~pqPolyLineWidget()
 void pqPolyLineWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PolyLineWidgetRepresentation", server, this->getReferenceProxy());
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      "PolyLineWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
-  
+
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
 
-  this->Internals->Links.addPropertyLink(
-    this->Internals->Closed, "checked",
-    SIGNAL(toggled(bool)),
+  this->Internals->Links.addPropertyLink(this->Internals->Closed, "checked", SIGNAL(toggled(bool)),
     widget, widget->GetProperty("Closed"));
-  this->Internals->Links.addPropertyLink(
-    this->Internals->PointsAdaptor, "values",
-    SIGNAL(valuesChanged()),
-    widget, widget->GetProperty("HandlePositions"));
+  this->Internals->Links.addPropertyLink(this->Internals->PointsAdaptor, "values",
+    SIGNAL(valuesChanged()), widget, widget->GetProperty("HandlePositions"));
 }
 
 //-----------------------------------------------------------------------------
 void pqPolyLineWidget::setLineColor(const QColor& color)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
-  vtkSMPropertyHelper(widget,
-    "LineColor").Set(0, color.redF());
- vtkSMPropertyHelper(widget,
-    "LineColor").Set(1,color.greenF());
- vtkSMPropertyHelper(widget,
-    "LineColor").Set(2 , color.blueF());
-  widget->UpdateVTKObjects(); 
+  vtkSMPropertyHelper(widget, "LineColor").Set(0, color.redF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(1, color.greenF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(2, color.blueF());
+  widget->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -152,19 +137,17 @@ void pqPolyLineWidget::addPoint()
 //-----------------------------------------------------------------------------
 void pqPolyLineWidget::removePoints()
 {
-  QList<QTreeWidgetItem*> items =
-    this->Internals->HandlePositions->selectedItems(); 
+  QList<QTreeWidgetItem*> items = this->Internals->HandlePositions->selectedItems();
   foreach (QTreeWidgetItem* item, items)
-    {
+  {
     if (this->Internals->HandlePositions->topLevelItemCount() <= 2)
-      {
-      qDebug() <<
-        "At least two point locations are required. Deletion request ignored.";
+    {
+      qDebug() << "At least two point locations are required. Deletion request ignored.";
       // don't allow deletion of the last two points.
       break;
-      }
-    delete item;
     }
+    delete item;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -172,15 +155,14 @@ void pqPolyLineWidget::pick(double argx, double argy, double argz)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
 
-  QList<QTreeWidgetItem*> items =
-    this->Internals->HandlePositions->selectedItems(); 
+  QList<QTreeWidgetItem*> items = this->Internals->HandlePositions->selectedItems();
   if (items.size() > 0)
-    {
+  {
     QTreeWidgetItem* item = items.front();
     item->setText(0, QString("%1").arg(argx));
     item->setText(1, QString("%1").arg(argy));
     item->setText(2, QString("%1").arg(argz));
-    }
+  }
 
   widget->UpdateVTKObjects();
   this->setModified();

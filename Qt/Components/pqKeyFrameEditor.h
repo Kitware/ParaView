@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationCue;
 class pqAnimationScene;
 
-/// editor for editing animation key frames
+/**
+* editor for editing animation key frames
+*/
 class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
 {
   typedef QWidget Superclass;
@@ -48,21 +50,26 @@ class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
   Q_OBJECT
 
 public:
-  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
-                   const QString& label, QWidget* p);
+  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, const QString& label, QWidget* p);
   ~pqKeyFrameEditor();
 
-  /// The keyframe editor can be set in a mode where the user can only edit the
-  /// key frame values or keyframe interpolation and not add/delete keyframes
-  /// or change key time. To enable this mode, set this to true (false by
-  /// default).
+  /**
+  * The keyframe editor can be set in a mode where the user can only edit the
+  * key frame values or keyframe interpolation and not add/delete keyframes
+  * or change key time. To enable this mode, set this to true (false by
+  * default).
+  */
   void setValuesOnly(bool);
   bool valuesOnly() const;
 
 public slots:
-  /// read the key frame data and display it
+  /**
+  * read the key frame data and display it
+  */
   void readKeyFrameData();
-  /// write the key frame data as edited by the user to the server manager
+  /**
+  * write the key frame data as edited by the user to the server manager
+  */
   void writeKeyFrameData();
 
 private slots:
@@ -76,7 +83,6 @@ private:
   pqInternal* Internal;
 };
 
-
 // internal class
 class pqKeyFrameEditorDialog : public QDialog
 {
@@ -88,4 +94,3 @@ public:
 };
 
 #endif
-

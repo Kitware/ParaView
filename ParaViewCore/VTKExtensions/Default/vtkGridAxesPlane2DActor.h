@@ -12,11 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGridAxesPlane2DActor - renders a 2D grid for vtkGridAxes2DActor.
-// .SECTION Description
-// vtkGridAxesPlane2DActor is designed for use by vtkGridAxes2DActor to render
-// the wireframe for the grid plane. It can also be used directly to render such
-// a wireframe in a renderer.
+/**
+ * @class   vtkGridAxesPlane2DActor
+ * @brief   renders a 2D grid for vtkGridAxes2DActor.
+ *
+ * vtkGridAxesPlane2DActor is designed for use by vtkGridAxes2DActor to render
+ * the wireframe for the grid plane. It can also be used directly to render such
+ * a wireframe in a renderer.
+*/
+
 #ifndef vtkGridAxesPlane2DActor_h
 #define vtkGridAxesPlane2DActor_h
 
@@ -24,9 +28,9 @@
 #include "vtkProp3D.h"
 
 #include "vtkGridAxesHelper.h" // For face enumeration
-#include "vtkNew.h" // For member variables
-#include "vtkSmartPointer.h" // For member variables
-#include <deque> // For keeping track of tick marks
+#include "vtkNew.h"            // For member variables
+#include "vtkSmartPointer.h"   // For member variables
+#include <deque>               // For keeping track of tick marks
 
 class vtkActor;
 class vtkCellArray;
@@ -43,138 +47,177 @@ public:
   vtkTypeMacro(vtkGridAxesPlane2DActor, vtkProp3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the bounding box defining the grid space. This, together with the
-  // \c Face identify which planar surface this class is interested in. This
-  // class is designed to work with a single planar surface.
-  // Note: this is only needed/used when the vtkGridAxesHelper is not provided
-  // when calling New(), otherwise the vtkGridAxesHelper is assumed to be
-  // initialized externally.
+  //@{
+  /**
+   * Set the bounding box defining the grid space. This, together with the
+   * \c Face identify which planar surface this class is interested in. This
+   * class is designed to work with a single planar surface.
+   * Note: this is only needed/used when the vtkGridAxesHelper is not provided
+   * when calling New(), otherwise the vtkGridAxesHelper is assumed to be
+   * initialized externally.
+   */
   vtkSetVector6Macro(GridBounds, double);
   vtkGetVector6Macro(GridBounds, double);
+  //@}
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
-    {
+  {
     MIN_YZ = vtkGridAxesHelper::MIN_YZ,
     MIN_ZX = vtkGridAxesHelper::MIN_ZX,
     MIN_XY = vtkGridAxesHelper::MIN_XY,
     MAX_YZ = vtkGridAxesHelper::MAX_YZ,
     MAX_ZX = vtkGridAxesHelper::MAX_ZX,
     MAX_XY = vtkGridAxesHelper::MAX_XY
-    };
+  };
 
-  // Description:
-  // Indicate which face of the specified bounds is this class operating with.
-  // Note: this is only needed/used when the vtkGridAxesHelper is not provided
-  // when calling New(), otherwise the vtkGridAxesHelper is assumed to be
-  // initialized externally.
+  //@{
+  /**
+   * Indicate which face of the specified bounds is this class operating with.
+   * Note: this is only needed/used when the vtkGridAxesHelper is not provided
+   * when calling New(), otherwise the vtkGridAxesHelper is assumed to be
+   * initialized externally.
+   */
   vtkSetClampMacro(Face, int, MIN_YZ, MAX_XY);
   vtkGetMacro(Face, int);
+  //@}
 
-  // Description:
-  // Get/Set whether to generate lines for the plane's grid. Default is true.
+  //@{
+  /**
+   * Get/Set whether to generate lines for the plane's grid. Default is true.
+   */
   vtkSetMacro(GenerateGrid, bool);
   vtkGetMacro(GenerateGrid, bool);
   vtkBooleanMacro(GenerateGrid, bool);
+  //@}
 
-  // Description:
-  // Get/Set whether to generate the polydata for the plane's edges. Default is
-  // true.
+  //@{
+  /**
+   * Get/Set whether to generate the polydata for the plane's edges. Default is
+   * true.
+   */
   vtkSetMacro(GenerateEdges, bool);
   vtkGetMacro(GenerateEdges, bool);
   vtkBooleanMacro(GenerateEdges, bool);
+  //@}
 
-  // Description:
-  // Get/Set whether to generate tick markers for the tick positions. Default is
-  // true.
+  //@{
+  /**
+   * Get/Set whether to generate tick markers for the tick positions. Default is
+   * true.
+   */
   vtkSetMacro(GenerateTicks, bool);
   vtkGetMacro(GenerateTicks, bool);
   vtkBooleanMacro(GenerateTicks, bool);
+  //@}
 
   enum
-    {
-    TICK_DIRECTION_INWARDS=0x1,
-    TICK_DIRECTION_OUTWARDS=0x2,
-    TICK_DIRECTION_BOTH=TICK_DIRECTION_INWARDS|TICK_DIRECTION_OUTWARDS,
-    };
+  {
+    TICK_DIRECTION_INWARDS = 0x1,
+    TICK_DIRECTION_OUTWARDS = 0x2,
+    TICK_DIRECTION_BOTH = TICK_DIRECTION_INWARDS | TICK_DIRECTION_OUTWARDS,
+  };
 
-  // Description:
-  // Get/Set the tick direction.
-  vtkSetClampMacro(TickDirection, unsigned int,
-    static_cast<unsigned int>(TICK_DIRECTION_INWARDS),
+  //@{
+  /**
+   * Get/Set the tick direction.
+   */
+  vtkSetClampMacro(TickDirection, unsigned int, static_cast<unsigned int>(TICK_DIRECTION_INWARDS),
     static_cast<unsigned int>(TICK_DIRECTION_BOTH));
   vtkGetMacro(TickDirection, unsigned int);
+  //@}
 
-  // Description:
-  // Set the tick positions for each of the coordinate axis. Which tick
-  // positions get used depended on the face being rendered e.g. if Face is
-  // MIN_XY, then the tick positions for Z-axis i.e. axis=2 will not be used
-  // and hence need not be specified. Pass NULL for data will clear the ticks
-  // positions for that axis.
-  // Note: This creates a deep-copy of the values in \c data and stores that.
+  /**
+   * Set the tick positions for each of the coordinate axis. Which tick
+   * positions get used depended on the face being rendered e.g. if Face is
+   * MIN_XY, then the tick positions for Z-axis i.e. axis=2 will not be used
+   * and hence need not be specified. Pass NULL for data will clear the ticks
+   * positions for that axis.
+   * Note: This creates a deep-copy of the values in \c data and stores that.
+   */
   void SetTickPositions(int axis, vtkDoubleArray* data);
   const std::deque<double>& GetTickPositions(int axis)
-    { return (axis>=0 && axis<3)? this->TickPositions[axis] : this->EmptyVector; }
+  {
+    return (axis >= 0 && axis < 3) ? this->TickPositions[axis] : this->EmptyVector;
+  }
 
-  // Description:
-  // Enable/Disable layer support. Default is off. When enabled, the prop will
-  // only render when the viewport's layer matches the Layer set on this prop.
+  //@{
+  /**
+   * Enable/Disable layer support. Default is off. When enabled, the prop will
+   * only render when the viewport's layer matches the Layer set on this prop.
+   */
   vtkSetMacro(EnableLayerSupport, bool);
   vtkGetMacro(EnableLayerSupport, bool);
   vtkBooleanMacro(EnableLayerSupport, bool);
+  //@}
 
-  // Description:
-  // Set the layer to render this prop under when EnableLayerSupport is true.
-  // Default is 0.
+  //@{
+  /**
+   * Set the layer to render this prop under when EnableLayerSupport is true.
+   * Default is 0.
+   */
   vtkSetMacro(Layer, int);
   vtkGetMacro(Layer, int);
+  //@}
 
-  // Description:
-  // Get/Set the property used to control the appearance of the rendered grid.
+  //@{
+  /**
+   * Get/Set the property used to control the appearance of the rendered grid.
+   */
   void SetProperty(vtkProperty*);
   vtkProperty* GetProperty();
+  //@}
 
   //--------------------------------------------------------------------------
   // Methods for vtkProp3D API.
   //--------------------------------------------------------------------------
 
-  // Description:
-  // Returns the prop bounds.
-  virtual double *GetBounds()
-    {
+  //@{
+  /**
+   * Returns the prop bounds.
+   */
+  virtual double* GetBounds()
+  {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
-    }
+  }
+  //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport *);
+  virtual int RenderOpaqueGeometry(vtkViewport*);
   virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
   virtual int RenderOverlay(vtkViewport* viewport);
   virtual int HasTranslucentPolygonalGeometry();
-  virtual void ReleaseGraphicsResources(vtkWindow *);
+  virtual void ReleaseGraphicsResources(vtkWindow*);
 
 protected:
-  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper=NULL);
+  vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = NULL);
   ~vtkGridAxesPlane2DActor();
 
-  // Description:
-  // vtkGridAxes2DActor uses this method to create vtkGridAxesPlane2DActor
-  // instance. In that case, vtkGridAxesPlane2DActor assumes that the
-  // vtkGridAxesHelper will be updated and initialized externally. That avoids
-  // unnecessary duplicate computations per render.
+  //@{
+  /**
+   * vtkGridAxes2DActor uses this method to create vtkGridAxesPlane2DActor
+   * instance. In that case, vtkGridAxesPlane2DActor assumes that the
+   * vtkGridAxesHelper will be updated and initialized externally. That avoids
+   * unnecessary duplicate computations per render.
+   */
   static vtkGridAxesPlane2DActor* New(vtkGridAxesHelper* helper);
   friend class vtkGridAxes2DActor;
+  //@}
 
-  // Description:
-  // Returns true if the actor must render in the viewport.
+  /**
+   * Returns true if the actor must render in the viewport.
+   */
   bool IsLayerActive(vtkViewport* viewport);
 
-  // Description:
-  // Update's the polydata.
+  //@{
+  /**
+   * Update's the polydata.
+   */
   void Update(vtkViewport* viewport);
   bool UpdateEdges(vtkViewport* viewport);
   bool UpdateGrid(vtkViewport* viewport);
   bool UpdateTicks(vtkViewport* viewport);
+  //@}
 
   double GridBounds[6];
   int Face;
@@ -204,7 +247,6 @@ private:
 
   typedef std::pair<vtkVector3d, vtkVector3d> LineSegmentType;
   std::deque<LineSegmentType> LineSegments;
-
 };
 
 #endif

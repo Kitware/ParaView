@@ -64,8 +64,8 @@ MainWindow::MainWindow()
   controller->RegisterPipelineProxy(elevation);
 
   // Show the result.
-  controller->Show(vtkSMSourceProxy::SafeDownCast(elevation), 0,
-    vtkSMViewProxy::SafeDownCast(viewProxy));
+  controller->Show(
+    vtkSMSourceProxy::SafeDownCast(elevation), 0, vtkSMViewProxy::SafeDownCast(viewProxy));
 
   // zoom to sphere
   this->RenderView->resetDisplay();
@@ -78,54 +78,52 @@ MainWindow::MainWindow()
 void MainWindow::processTest()
 {
   if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
-    {
+  {
     bool comparison_succeeded = true;
-    if ( (options->GetNumberOfTestScripts() > 0) &&
-      (options->GetTestBaseline(0) != NULL))
-      {
+    if ((options->GetNumberOfTestScripts() > 0) && (options->GetTestBaseline(0) != NULL))
+    {
       comparison_succeeded = this->compareView(options->GetTestBaseline(0),
         options->GetTestImageThreshold(0), cout, options->GetTestDirectory());
-      }
-    if (options->GetExitAppWhenTestsDone())
-      {
-      QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
-      }
     }
+    if (options->GetExitAppWhenTestsDone())
+    {
+      QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
+    }
+  }
 }
 
-bool MainWindow::compareView(const QString& referenceImage, double threshold,
-  ostream& output, const QString& tempDirectory)
+bool MainWindow::compareView(
+  const QString& referenceImage, double threshold, ostream& output, const QString& tempDirectory)
 {
   pqRenderView* renModule = this->RenderView;
 
   if (!renModule)
-    {
+  {
     output << "ERROR: Could not locate the render module." << endl;
     return false;
-    }
+  }
 
   QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->widget());
-  if(!widget)
-    {
+  if (!widget)
+  {
     output << "ERROR: Not a QVTKWidget." << endl;
     return false;
-    }
+  }
 
-  vtkRenderWindow* const render_window =
-    widget->GetRenderWindow();
+  vtkRenderWindow* const render_window = widget->GetRenderWindow();
 
-  if(!render_window)
-    {
+  if (!render_window)
+  {
     output << "ERROR: Could not locate the Render Window." << endl;
     return false;
-    }
+  }
 
-  bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
-    threshold, output, tempDirectory);
+  bool ret = pqCoreTestUtility::CompareImage(
+    render_window, referenceImage, threshold, output, tempDirectory);
   renModule->render();
   return ret;
 }
-  
+
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
@@ -135,5 +133,3 @@ int main(int argc, char** argv)
   window.show();
   return app.exec();
 }
-
-

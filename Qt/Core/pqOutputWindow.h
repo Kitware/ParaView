@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,10 +45,9 @@ to the corresponding pqOutputWindow slots.
 
 \sa pqOutputWindowAdapter
 */
-class PQCORE_EXPORT pqOutputWindow :
-  public QDialog
+class PQCORE_EXPORT pqOutputWindow : public QDialog
 {
-  typedef QDialog Superclass;  
+  typedef QDialog Superclass;
   Q_OBJECT
 
 public:
@@ -63,7 +62,9 @@ public:
   pqOutputWindow(QWidget* Parent);
   ~pqOutputWindow();
 
-  ///
+  /**
+  *
+  */
   static pqOutputWindow* instance();
 
 public slots:
@@ -72,53 +73,70 @@ public slots:
   void onDisplayWarningText(const QString&);
   void onDisplayGenericWarningText(const QString&);
 
-  /// These are same as onDisplayText() and onDisplayErrorText() except that
-  /// they don't pad the text with "\n" nor do they echo the text to the
-  /// terminal. Used in pqPythonManager to display Python text.
+  /**
+  * These are same as onDisplayText() and onDisplayErrorText() except that
+  * they don't pad the text with "\n" nor do they echo the text to the
+  * terminal. Used in pqPythonManager to display Python text.
+  */
   void onDisplayTextInWindow(const QString&);
   void onDisplayErrorTextInWindow(const QString&);
 
 private slots:
-  /// Standard methods for a QDialog. Both hide the dialog.
+  /**
+  * Standard methods for a QDialog. Both hide the dialog.
+  */
   void accept();
   void reject();
 
-  /// Clears all messages from the output window
+  /**
+  * Clears all messages from the output window
+  */
   void clear();
 
-  /// Sets the console view if 'on' is true or the table view if 'on' is false.
+  /**
+  * Sets the console view if 'on' is true or the table view if 'on' is false.
+  */
   void setConsoleView(int on);
 
-  /// Slots called to filter (on or off) errors, warnings or debug messages.
+  /**
+  * Slots called to filter (on or off) errors, warnings or debug messages.
+  */
   void errorToggled(bool checked);
   void warningToggled(bool checked);
   void debugToggled(bool checked);
 
-  /// Slots called on progress handlers' StartEvent
+  /**
+  * Slots called on progress handlers' StartEvent
+  */
   void onProgressStartEvent();
 
 private:
   pqOutputWindow(const pqOutputWindow&);
   pqOutputWindow& operator=(const pqOutputWindow&);
 
-  /// Set up list of expressions that determine which messages to suppress
+  /**
+  * Set up list of expressions that determine which messages to suppress
+  */
   void setupSuppressionExpressions();
 
-  /// Check to see if the message should be suppressed
+  /**
+  * Check to see if the message should be suppressed
+  */
   bool shouldMessageBeSuppressed(const QString& text);
 
   void addMessage(int messageType, const QString& text);
   void addPythonMessages(int messageType, const QString& text);
 
-  void addMessage(int messageType, const QString& location, 
-                  const QString& message);
-  
+  void addMessage(int messageType, const QString& location, const QString& message);
+
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
-  
+
   bool Show[MESSAGE_TYPE_COUNT];
 
-  /// One past the index of the last error
+  /**
+  * One past the index of the last error
+  */
   int StartEventIndex;
   struct pqImplementation;
   const QScopedPointer<pqImplementation> Implementation;

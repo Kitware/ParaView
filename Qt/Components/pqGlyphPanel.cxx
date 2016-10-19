@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -53,8 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
-  : Superclass(object_proxy, _parent), LockScaleFactor(0), ScaleFactorWidget(0),
-  ScaleModeWidget(0)
+  : Superclass(object_proxy, _parent)
+  , LockScaleFactor(0)
+  , ScaleFactorWidget(0)
+  , ScaleModeWidget(0)
 {
   // By now, superclass will have created the default panel correctly.
   // Now we tweak the panel a bit to add the "lock" button.
@@ -64,17 +66,17 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   // factor.
   QWidget* scaleFactor = this->findChild<QWidget*>("SetScaleFactor");
   if (!scaleFactor)
-    {
+  {
     this->findChild<QWidget*>("ScaleFactor");
-    }
+  }
 
   if (!scaleFactor)
-    {
+  {
     qWarning() << "Failed to locate ScaleFactor widget.";
     return;
-    }
+  }
 
-  this->ScaleFactorWidget = scaleFactor; 
+  this->ScaleFactorWidget = scaleFactor;
 
   int oldIndex = this->PanelLayout->indexOf(scaleFactor);
   int row, column, rowSpan, columnSpan;
@@ -86,26 +88,27 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   lockButton->setCheckable(true);
   lockButton->setTristate(false);
   lockButton->setText("Edit");
-  lockButton->setToolTip(tr("<html>Edit the scale factor. "
-      "Otherwise, the scale factor will be computed automatically when the scale mode "
-      "changes.</html>")); 
+  lockButton->setToolTip(
+    tr("<html>Edit the scale factor. "
+       "Otherwise, the scale factor will be computed automatically when the scale mode "
+       "changes.</html>"));
   this->LockScaleFactor = lockButton;
 
   QHBoxLayout* subLayout = new QHBoxLayout();
   subLayout->addWidget(scaleFactor, 1);
-  subLayout->addWidget(lockButton,0, Qt::AlignRight);
+  subLayout->addWidget(lockButton, 0, Qt::AlignRight);
   subLayout->setMargin(0);
   subLayout->setSpacing(4);
 
   this->PanelLayout->addLayout(subLayout, row, column, rowSpan, columnSpan);
 
-  QObject::connect(this->propertyManager(), SIGNAL(modified()),
-    this, SLOT(updateScaleFactor()), Qt::QueuedConnection);
+  QObject::connect(this->propertyManager(), SIGNAL(modified()), this, SLOT(updateScaleFactor()),
+    Qt::QueuedConnection);
 
   this->ScaleModeWidget = this->findChild<QComboBox*>("SetScaleMode");
 
-  QObject::connect(lockButton, SIGNAL(toggled(bool)),
-    this->ScaleFactorWidget, SLOT(setEnabled(bool)));
+  QObject::connect(
+    lockButton, SIGNAL(toggled(bool)), this->ScaleFactorWidget, SLOT(setEnabled(bool)));
   lockButton->toggle();
   lockButton->toggle();
 
@@ -113,29 +116,27 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   // set their enabled flags to reflect their usefulness.
   this->ScalarsWidget = this->findChild<QWidget*>("SelectInputScalars");
   if (!this->ScalarsWidget)
-    {
+  {
     qWarning() << "Failed to locate Scalars widget.";
     return;
-    }
+  }
 
   this->VectorsWidget = this->findChild<QWidget*>("SelectInputVectors");
   if (!this->VectorsWidget)
-    {
+  {
     qWarning() << "Failed to locate Vectors widget.";
     return;
-    }
+  }
 
   this->OrientWidget = this->findChild<QCheckBox*>("SetOrient");
   if (!this->OrientWidget)
-    {
+  {
     qWarning() << "Failed to locate Orient widget.";
     return;
-    }
+  }
 
-  QObject::connect(this->propertyManager(), SIGNAL(modified()),
-                   this, SLOT(updateScalarsVectorsEnable()),
-                   Qt::QueuedConnection);
-
+  QObject::connect(this->propertyManager(), SIGNAL(modified()), this,
+    SLOT(updateScalarsVectorsEnable()), Qt::QueuedConnection);
 
   // HACK: Oh we need to get rid of this panel!!!
   this->connect(object_proxy, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
@@ -152,84 +153,80 @@ pqGlyphPanel::~pqGlyphPanel()
 void pqGlyphPanel::updateScaleFactorIfNeeded()
 {
   if (this->referenceProxy()->modifiedState() == pqProxy::UNINITIALIZED)
-    {
+  {
     this->updateScaleFactor();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqGlyphPanel::updateScaleFactor()
 {
-  if (!this->LockScaleFactor  ||
-    this->LockScaleFactor->isChecked())
-    {
+  if (!this->LockScaleFactor || this->LockScaleFactor->isChecked())
+  {
     return;
-    }
+  }
 
   vtkSMProxy* filterProxy = this->proxy();
   vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
     filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
 
   int valid;
-  int scale_mode = enumDomain->GetEntryValue(
-    this->ScaleModeWidget->currentText().toLatin1().data(), valid);
+  int scale_mode =
+    enumDomain->GetEntryValue(this->ScaleModeWidget->currentText().toLatin1().data(), valid);
   if (!valid)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProperty* scaleFactorProperty = filterProxy->GetProperty("SetScaleFactor");
-  vtkSMArrayRangeDomain* domain=0;
-  vtkSMBoundsDomain* boundsDomain = vtkSMBoundsDomain::SafeDownCast(
-    scaleFactorProperty->GetDomain("bounds"));
+  vtkSMArrayRangeDomain* domain = 0;
+  vtkSMBoundsDomain* boundsDomain =
+    vtkSMBoundsDomain::SafeDownCast(scaleFactorProperty->GetDomain("bounds"));
 
-  double scaled_extent = boundsDomain->GetMaximumExists(0)?
-    boundsDomain->GetMaximum(0) : 1.0;
+  double scaled_extent = boundsDomain->GetMaximumExists(0) ? boundsDomain->GetMaximum(0) : 1.0;
 
   double scalefactor = scaled_extent;
   double divisor = 1.0;
   switch (scale_mode)
+  {
+    case VTK_SCALE_BY_SCALAR:
     {
-  case VTK_SCALE_BY_SCALAR:
-      {
-      domain = vtkSMArrayRangeDomain::SafeDownCast(
-        scaleFactorProperty->GetDomain("scalar_range"));
+      domain = vtkSMArrayRangeDomain::SafeDownCast(scaleFactorProperty->GetDomain("scalar_range"));
       if (domain->GetMaximumExists(0) /*&& domain->GetMinimumExists(0)*/)
-        {
-        divisor = domain->GetMaximum(0)/*-domain->GetMinimum(0)*/;
-        }
-      }
-    break;
-
-  case VTK_SCALE_BY_VECTOR:
-  case VTK_SCALE_BY_VECTORCOMPONENTS:
       {
-      domain = vtkSMArrayRangeDomain::SafeDownCast(
-        scaleFactorProperty->GetDomain("vector_range"));
-      if (domain->GetMaximumExists(3)/* && domain->GetMinimumExists(3)*/)
-        {
-        // we use the vector magnitude.
-        divisor = domain->GetMaximum(3)/*-domain->GetMinimum(3)*/;
-        }
+        divisor = domain->GetMaximum(0) /*-domain->GetMinimum(0)*/;
       }
+    }
     break;
 
-  case VTK_DATA_SCALING_OFF:
-  default:
-    break;
+    case VTK_SCALE_BY_VECTOR:
+    case VTK_SCALE_BY_VECTORCOMPONENTS:
+    {
+      domain = vtkSMArrayRangeDomain::SafeDownCast(scaleFactorProperty->GetDomain("vector_range"));
+      if (domain->GetMaximumExists(3) /* && domain->GetMinimumExists(3)*/)
+      {
+        // we use the vector magnitude.
+        divisor = domain->GetMaximum(3) /*-domain->GetMinimum(3)*/;
+      }
     }
+    break;
+
+    case VTK_DATA_SCALING_OFF:
+    default:
+      break;
+  }
 
   divisor = fabs(divisor);
   // the divisor can sometimes be very close to 0, which happens in case the
   // vectors indeed have same value but due to precision issues are not reported
   // as identical. In that case we just treat it as 0.
-  divisor = (divisor < 0.000000001)? 1 : divisor;
+  divisor = (divisor < 0.000000001) ? 1 : divisor;
   scalefactor /= divisor;
 
   if (this->ScaleFactorWidget->property("text").toDouble() != scalefactor)
-    {
+  {
     this->ScaleFactorWidget->setProperty("text", scalefactor);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -237,32 +234,32 @@ void pqGlyphPanel::updateScalarsVectorsEnable()
 {
   vtkSMProxy* filterProxy = this->proxy();
   vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
-                   filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
+    filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
 
   int valid;
-  int scale_mode = enumDomain->GetEntryValue(
-    this->ScaleModeWidget->currentText().toLatin1().data(), valid);
-  if (!valid) return;
+  int scale_mode =
+    enumDomain->GetEntryValue(this->ScaleModeWidget->currentText().toLatin1().data(), valid);
+  if (!valid)
+    return;
 
   bool orientGlyphs = this->OrientWidget->isChecked();
 
   if (scale_mode == VTK_SCALE_BY_SCALAR)
-    {
+  {
     this->ScalarsWidget->setEnabled(true);
-    }
+  }
   else
-    {
+  {
     this->ScalarsWidget->setEnabled(false);
-    }
+  }
 
-  if (   orientGlyphs
-      || (scale_mode == VTK_SCALE_BY_VECTOR)
-      || (scale_mode == VTK_SCALE_BY_VECTORCOMPONENTS) )
-    {
+  if (orientGlyphs || (scale_mode == VTK_SCALE_BY_VECTOR) ||
+    (scale_mode == VTK_SCALE_BY_VECTORCOMPONENTS))
+  {
     this->VectorsWidget->setEnabled(true);
-    }
+  }
   else
-    {
+  {
     this->VectorsWidget->setEnabled(false);
-    }
+  }
 }

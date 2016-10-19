@@ -41,8 +41,7 @@ vtkSMGlobalPropertiesLinkUndoElement::~vtkSMGlobalPropertiesLinkUndoElement()
 
 //-----------------------------------------------------------------------------
 void vtkSMGlobalPropertiesLinkUndoElement::SetLinkState(const char* mgrname,
-  const char* globalpropname,
-  vtkSMProxy* proxy, const char* propname, bool isRegisterAction)
+  const char* globalpropname, vtkSMProxy* proxy, const char* propname, bool isRegisterAction)
 {
   this->SetGlobalPropertyManagerName(mgrname);
   this->SetGlobalPropertyName(globalpropname);
@@ -66,32 +65,32 @@ int vtkSMGlobalPropertiesLinkUndoElement::Redo()
 //----------------------------------------------------------------------------
 int vtkSMGlobalPropertiesLinkUndoElement::UndoRedoInternal(bool undo)
 {
-  (void) undo;
-// FIXME:
-//  if (this->ProxyGlobalID == 0)
-//    {
-//    vtkErrorMacro("No State present to undo.");
-//    return 0;
-//    }
-//
-//  vtkSMSessionProxyManager* pxm =
-//      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->GetSession());
-//  vtkSMProxy* proxy =
-//      vtkSMProxy::SafeDownCast(
-//          this->GetSession()->GetRemoteObject(this->ProxyGlobalID));
-//  vtkSMGlobalPropertiesManager* propertyManager =
-//      pxm->GetGlobalPropertiesManager(this->GlobalPropertyManagerName);
-//
-//  if ( (undo && !this->IsLinkAdded) || (!undo && this->IsLinkAdded) )
-//    {
-//    propertyManager->SetGlobalPropertyLink( this->GlobalPropertyName,
-//                                            proxy, this->ProxyPropertyName);
-//    }
-//  else
-//    {
-//    propertyManager->RemoveGlobalPropertyLink( this->GlobalPropertyName,
-//                                               proxy, this->ProxyPropertyName);
-//    }
+  (void)undo;
+  // FIXME:
+  //  if (this->ProxyGlobalID == 0)
+  //    {
+  //    vtkErrorMacro("No State present to undo.");
+  //    return 0;
+  //    }
+  //
+  //  vtkSMSessionProxyManager* pxm =
+  //      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->GetSession());
+  //  vtkSMProxy* proxy =
+  //      vtkSMProxy::SafeDownCast(
+  //          this->GetSession()->GetRemoteObject(this->ProxyGlobalID));
+  //  vtkSMGlobalPropertiesManager* propertyManager =
+  //      pxm->GetGlobalPropertiesManager(this->GlobalPropertyManagerName);
+  //
+  //  if ( (undo && !this->IsLinkAdded) || (!undo && this->IsLinkAdded) )
+  //    {
+  //    propertyManager->SetGlobalPropertyLink( this->GlobalPropertyName,
+  //                                            proxy, this->ProxyPropertyName);
+  //    }
+  //  else
+  //    {
+  //    propertyManager->RemoveGlobalPropertyLink( this->GlobalPropertyName,
+  //                                               proxy, this->ProxyPropertyName);
+  //    }
   return 1;
 }
 

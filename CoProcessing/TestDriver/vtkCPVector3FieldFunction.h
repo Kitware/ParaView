@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPVector3FieldFunction - Abstract class for specifying vectors at points.
-// .SECTION Description
-// Abstract class for specifying vector values at specified points.  
+/**
+ * @class   vtkCPVector3FieldFunction
+ * @brief   Abstract class for specifying vectors at points.
+ *
+ * Abstract class for specifying vector values at specified points.
+*/
 
 #ifndef vtkCPVector3FieldFunction_h
 #define vtkCPVector3FieldFunction_h
@@ -28,14 +31,16 @@ public:
   vtkTypeMacro(vtkCPVector3FieldFunction, vtkCPTensorFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get the NumberOfComponents.  
-  virtual unsigned int GetNumberOfComponents() {return 3;};
+  /**
+   * Get the NumberOfComponents.
+   */
+  virtual unsigned int GetNumberOfComponents() { return 3; };
 
-  // Description:
-  // Compute the field value at Point.
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time) = 0;
+  /**
+   * Compute the field value at Point.
+   */
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
 
 protected:
   vtkCPVector3FieldFunction();

@@ -49,20 +49,21 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSQPlaneSourceConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeMacro(vtkSQPlaneSourceConfigurationWriter,vtkObject);
+  vtkTypeMacro(vtkSQPlaneSourceConfigurationWriter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSQPlaneSourceConfigurationWriter *New();
+  static vtkSQPlaneSourceConfigurationWriter* New();
 
   // Description:
   // Override sets iterator proxy.
-  virtual void SetProxy(vtkSMProxy *proxy);
+  virtual void SetProxy(vtkSMProxy* proxy);
 
 protected:
   vtkSQPlaneSourceConfigurationWriter();
   ~vtkSQPlaneSourceConfigurationWriter();
 
 private:
-  vtkSQPlaneSourceConfigurationWriter(const vtkSQPlaneSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
+  vtkSQPlaneSourceConfigurationWriter(
+    const vtkSQPlaneSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSQPlaneSourceConfigurationWriter&) VTK_DELETE_FUNCTION;
 };
 

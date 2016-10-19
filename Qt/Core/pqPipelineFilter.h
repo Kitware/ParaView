@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,8 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineFilter.h
-/// \date 4/17/2006
+/**
+* \file pqPipelineFilter.h
+* \date 4/17/2006
+*/
 
 #ifndef _pqPipelineFilter_h
 #define _pqPipelineFilter_h
@@ -46,78 +48,105 @@ class PQCORE_EXPORT pqPipelineFilter : public pqPipelineSource
 {
   Q_OBJECT
   typedef pqPipelineSource Superclass;
+
 public:
-  pqPipelineFilter(QString name, vtkSMProxy *proxy, pqServer* server, 
-    QObject* parent=NULL);
+  pqPipelineFilter(QString name, vtkSMProxy* proxy, pqServer* server, QObject* parent = NULL);
   virtual ~pqPipelineFilter();
 
-  /// Returns the inputs ports on any proxy.
+  /**
+  * Returns the inputs ports on any proxy.
+  */
   static QList<const char*> getInputPorts(vtkSMProxy*);
 
-  /// Returns the required inputs ports on any proxy.
-  /// This is generally same as getInputPorts() except if the property has a
-  /// "hint" saying it's optional.
+  /**
+  * Returns the required inputs ports on any proxy.
+  * This is generally same as getInputPorts() except if the property has a
+  * "hint" saying it's optional.
+  */
   static QList<const char*> getRequiredInputPorts(vtkSMProxy*);
 
-  /// Returns the number of input ports available on this filter.
+  /**
+  * Returns the number of input ports available on this filter.
+  */
   int getNumberOfInputPorts() const;
 
-  /// Returns the name of the input port at a given index.
+  /**
+  * Returns the name of the input port at a given index.
+  */
   QString getInputPortName(int index) const;
 
-  /// Returns the number of input proxies connected to given named input port.
+  /**
+  * Returns the number of input proxies connected to given named input port.
+  */
   int getNumberOfInputs(const QString& portname) const;
 
-  /// Returns the input proxies connected to the given named input port.
+  /**
+  * Returns the input proxies connected to the given named input port.
+  */
   QList<pqOutputPort*> getInputs(const QString& portname) const;
 
-  /// Returns inputs connected to all input ports connections. 
+  /**
+  * Returns inputs connected to all input ports connections.
+  */
   QList<pqOutputPort*> getAllInputs() const;
 
-  /// Returns a map of input port name to the list of output ports that are set
-  /// as the input to that port.
+  /**
+  * Returns a map of input port name to the list of output ports that are set
+  * as the input to that port.
+  */
   QMap<QString, QList<pqOutputPort*> > getNamedInputs() const;
 
-  /// Returns a pair (input, output port) at the given index on the given named 
-  /// input port.
+  /**
+  * Returns a pair (input, output port) at the given index on the given named
+  * input port.
+  */
   pqOutputPort* getInput(const QString& portname, int index) const;
 
-  /// Get number of inputs.
-  int getInputCount() const
-    { return this->getNumberOfInputs(this->getInputPortName(0)); }
+  /**
+  * Get number of inputs.
+  */
+  int getInputCount() const { return this->getNumberOfInputs(this->getInputPortName(0)); }
 
   // Get a list of all inputs.
-  QList<pqOutputPort*> getInputs() const
-    { return this->getInputs(this->getInputPortName(0)); }
+  QList<pqOutputPort*> getInputs() const { return this->getInputs(this->getInputPortName(0)); }
 
   // Get input at given index.
-  pqPipelineSource *getInput(int index) const;
+  pqPipelineSource* getInput(int index) const;
 
-  /// "Replace input" is a hint given to the GUI to turn off input visibility
-  /// when the filter is created.
-  /// Returns if this proxy replaces input on creation.
-  /// This checks the "Hints" for the proxy, if any. If a <Visibility>
-  /// element is present with replace_input="0", then this method
-  /// returns false, otherwise true.
+  /**
+  * "Replace input" is a hint given to the GUI to turn off input visibility
+  * when the filter is created.
+  * Returns if this proxy replaces input on creation.
+  * This checks the "Hints" for the proxy, if any. If a <Visibility>
+  * element is present with replace_input="0", then this method
+  * returns false, otherwise true.
+  */
   int replaceInput() const;
 
 signals:
-  /// fired whenever an input connection changes.
+  /**
+  * fired whenever an input connection changes.
+  */
   void producerChanged(const QString& inputportname);
 
 protected slots:
-  /// process some change in the input property for the proxy.
+  /**
+  * process some change in the input property for the proxy.
+  */
   void inputChanged(vtkObject*, unsigned long, void* client_data);
 
 protected:
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
+  // after the object has been created.
   virtual void initialize();
 
-  /// Called when a input property changes. \c portname is the name of the input
-  /// port represented by the property.
+  /**
+  * Called when a input property changes. \c portname is the name of the input
+  * port represented by the property.
+  */
   void inputChanged(const QString& portname);
+
 private:
   class pqInternal;
   pqInternal* Internal; ///< Stores the input connections.

@@ -16,24 +16,24 @@
 #include <QUrl>
 
 //-----------------------------------------------------------------------------
-pqWelcomeDialog::pqWelcomeDialog(QWidget *parentObject)
-  : Superclass(parentObject),
-    ui(new Ui::pqWelcomeDialog)
+pqWelcomeDialog::pqWelcomeDialog(QWidget* parentObject)
+  : Superclass(parentObject)
+  , ui(new Ui::pqWelcomeDialog)
 {
-    ui->setupUi(this);
+  ui->setupUi(this);
 
-    QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)),
-                     this, SLOT(onDoNotShowAgainStateChanged(int)));
-    QObject::connect(this->ui->GettingStartedGuideButton, SIGNAL(clicked(bool)),
-                     this, SLOT(onGettingStartedGuideClicked()));
-    QObject::connect(this->ui->ExampleVisualizationsButton, SIGNAL(clicked(bool)),
-                     this, SLOT(onExampleVisualizationsClicked()));
+  QObject::connect(this->ui->DoNotShowAgainButton, SIGNAL(stateChanged(int)), this,
+    SLOT(onDoNotShowAgainStateChanged(int)));
+  QObject::connect(this->ui->GettingStartedGuideButton, SIGNAL(clicked(bool)), this,
+    SLOT(onGettingStartedGuideClicked()));
+  QObject::connect(this->ui->ExampleVisualizationsButton, SIGNAL(clicked(bool)), this,
+    SLOT(onExampleVisualizationsClicked()));
 }
 
 //-----------------------------------------------------------------------------
 pqWelcomeDialog::~pqWelcomeDialog()
 {
-    delete ui;
+  delete ui;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,16 +43,18 @@ void pqWelcomeDialog::onGettingStartedGuideClicked()
   QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
   QString appdir = QCoreApplication::applicationDirPath();
-  QString documentationPath = QFileInfo(appdir).fileName() == "bin" ?
-    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"  :
+  QString documentationPath = QFileInfo(appdir).fileName() == "bin"
+    ?
+    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"
+    :
     /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
   QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
   if (pqDesktopServicesReaction::openUrl(gettingStartedURL))
-    {
+  {
     this->hide();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -74,21 +76,21 @@ void pqWelcomeDialog::onDoNotShowAgainStateChanged(int state)
 
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   if (!server)
-    {
+  {
     qCritical("No active server available!");
     return;
-    }
+  }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   if (!pxm)
-    {
+  {
     qCritical("No proxy manager!");
     return;
-    }
+  }
 
   vtkSMProxy* proxy = pxm->GetProxy("settings", "GeneralSettings");
   if (proxy)
-    {
+  {
     vtkSMPropertyHelper(proxy, "ShowWelcomeDialog").Set(showDialog ? 1 : 0);
-    }
+  }
 }

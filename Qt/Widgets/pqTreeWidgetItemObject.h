@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,31 +37,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QTreeWidgetItem>
 
-/// QTreeWidgetItem subclass with additional signals, slots, and properties
+/**
+* QTreeWidgetItem subclass with additional signals, slots, and properties
+*/
 class PQWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidgetItem
 {
   Q_OBJECT
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
 public:
-  /// construct list widget item to for QTreeWidget with a string
-  pqTreeWidgetItemObject(const QStringList& t, int type=QTreeWidgetItem::UserType);
-  pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t, int type=QTreeWidgetItem::UserType);
-  pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t, int type=QTreeWidgetItem::UserType);
+  /**
+  * construct list widget item to for QTreeWidget with a string
+  */
+  pqTreeWidgetItemObject(const QStringList& t, int type = QTreeWidgetItem::UserType);
+  pqTreeWidgetItemObject(
+    QTreeWidget* p, const QStringList& t, int type = QTreeWidgetItem::UserType);
+  pqTreeWidgetItemObject(
+    QTreeWidgetItem* p, const QStringList& t, int type = QTreeWidgetItem::UserType);
 
-  /// overload setData() to emit changed signal
+  /**
+  * overload setData() to emit changed signal
+  */
   virtual void setData(int column, int role, const QVariant& v);
 
 public slots:
-  /// get the check true/false
+  /**
+  * get the check true/false
+  */
   bool isChecked() const;
-  /// set the check state true/false
+  /**
+  * set the check state true/false
+  */
   void setChecked(bool v);
 
 signals:
-  /// signal check state changed
+  /**
+  * signal check state changed
+  */
   void checkedStateChanged(bool);
 
-  /// Fired every time setData is called.
+  /**
+  * Fired every time setData is called.
+  */
   void modified();
 };
 

@@ -40,68 +40,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QModelIndex;
 namespace Json
 {
-  class Value;
+class Value;
 }
 
-/// pqPresetDialog is the dialog used by to show the user with a choice of color
-/// maps/opacity maps/presets to choose from. The Dialog can be customized to
-/// show only indexed (or non-indexed) color maps using pqPresetDialog::Modes.
-/// Application code should observe the pqPresetDialog::applyPreset() signal to
-/// perform the applying of the preset to a specific transfer function proxy.
-/// This class works with vtkSMTransferFunctionPresets, which acts as the preset
-/// manager for the application with support to inspect existing presets as well
-/// as updating them.
+/**
+* pqPresetDialog is the dialog used by to show the user with a choice of color
+* maps/opacity maps/presets to choose from. The Dialog can be customized to
+* show only indexed (or non-indexed) color maps using pqPresetDialog::Modes.
+* Application code should observe the pqPresetDialog::applyPreset() signal to
+* perform the applying of the preset to a specific transfer function proxy.
+* This class works with vtkSMTransferFunctionPresets, which acts as the preset
+* manager for the application with support to inspect existing presets as well
+* as updating them.
+*/
 class PQCOMPONENTS_EXPORT pqPresetDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  /// Used to control what kinds of presets are shown in the dialog.
-  /// This merely affects the presets that are hidden from the view.
+  /**
+  * Used to control what kinds of presets are shown in the dialog.
+  * This merely affects the presets that are hidden from the view.
+  */
   enum Modes
-    {
+  {
     SHOW_ALL,
     SHOW_INDEXED_COLORS_ONLY,
     SHOW_NON_INDEXED_COLORS_ONLY
-    };
+  };
 
-  pqPresetDialog(QWidget* parent=0, Modes mode=SHOW_ALL);
+  pqPresetDialog(QWidget* parent = 0, Modes mode = SHOW_ALL);
   virtual ~pqPresetDialog();
 
-  /// Set the current preset using its name.
+  /**
+  * Set the current preset using its name.
+  */
   void setCurrentPreset(const char* presetName);
 
-  /// Return current preset, if any.
+  /**
+  * Return current preset, if any.
+  */
   const Json::Value& currentPreset();
 
-  /// Returns true if the user requested to load colors for the
-  /// current preset.
+  /**
+  * Returns true if the user requested to load colors for the
+  * current preset.
+  */
   bool loadColors() const;
 
-  /// Returns true if the user requested to load opacities for the current
-  /// preset.
+  /**
+  * Returns true if the user requested to load opacities for the current
+  * preset.
+  */
   bool loadOpacities() const;
 
-  /// Returns true if the user requested to load annotations for the current
-  /// preset.
+  /**
+  * Returns true if the user requested to load annotations for the current
+  * preset.
+  */
   bool loadAnnotations() const;
 
-  /// Returns true if the user requested to preserve/use the preset data range.
-  /// If false, the user is expecting the current transfer function range to be
-  /// maintained.
+  /**
+  * Returns true if the user requested to preserve/use the preset data range.
+  * If false, the user is expecting the current transfer function range to be
+  * maintained.
+  */
   bool usePresetRange() const;
 
-  /// Set when user can choose to load colors along with the default state.
-  void setCustomizableLoadColors(bool state, bool defaultValue=true);
+  /**
+  * Set when user can choose to load colors along with the default state.
+  */
+  void setCustomizableLoadColors(bool state, bool defaultValue = true);
 
-  /// Set when user can choose to load annotations along with the default state.
-  void setCustomizableLoadAnnotations(bool state, bool defaultValue=true);
+  /**
+  * Set when user can choose to load annotations along with the default state.
+  */
+  void setCustomizableLoadAnnotations(bool state, bool defaultValue = true);
 
-  /// Set when user can choose to load opacities along with the default state.
-  void setCustomizableLoadOpacities(bool state, bool defaultValue=true);
+  /**
+  * Set when user can choose to load opacities along with the default state.
+  */
+  void setCustomizableLoadOpacities(bool state, bool defaultValue = true);
 
-  /// Set when user can choose to load usePresetRange along with the default state.
-  void setCustomizableUsePresetRange(bool state, bool defaultValue=false);
+  /**
+  * Set when user can choose to load usePresetRange along with the default state.
+  */
+  void setCustomizableUsePresetRange(bool state, bool defaultValue = false);
 
 signals:
   void applyPreset(const Json::Value& preset);
@@ -109,8 +134,8 @@ signals:
 protected slots:
   void updateEnabledStateForSelection();
   void updateForSelectedIndex(const QModelIndex& proxyIndex);
-  void triggerApply(const QModelIndex& proxyIndex=QModelIndex());
-  void removePreset(const QModelIndex& idx=QModelIndex());
+  void triggerApply(const QModelIndex& proxyIndex = QModelIndex());
+  void removePreset(const QModelIndex& idx = QModelIndex());
   void importPresets();
   void exportPresets();
 

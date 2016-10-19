@@ -23,8 +23,12 @@
 #define TEST_SUCCESS 0
 #define TEST_FAILED 1
 
-#define vtk_assert(x)\
-  if (! (x) ) { cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;  return TEST_FAILED;}
+#define vtk_assert(x)                                                                              \
+  if (!(x))                                                                                        \
+  {                                                                                                \
+    cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;               \
+    return TEST_FAILED;                                                                            \
+  }
 
 int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type);
 
@@ -32,15 +36,16 @@ int TestOutputData(vtkMultiBlockDataSet* mb, int nCells, int nArrays)
 {
   int nBlocks = mb->GetNumberOfBlocks();
   vtk_assert(nBlocks > 0);
-  for(unsigned int i = 0; i < nBlocks; ++i)
-  {    
+  for (unsigned int i = 0; i < nBlocks; ++i)
+  {
     vtkMultiBlockDataSet* mb2 = vtkMultiBlockDataSet::SafeDownCast(mb->GetBlock(i));
-    for(unsigned int j = 0; j < mb2->GetNumberOfBlocks(); ++j)
+    for (unsigned int j = 0; j < mb2->GetNumberOfBlocks(); ++j)
     {
       vtkUnstructuredGrid* ug = vtkUnstructuredGrid::SafeDownCast(mb2->GetBlock(j));
       vtkCellData* cd = ug->GetCellData();
       int nArr = cd->GetNumberOfArrays();
-      if (nArr != nArrays) return 1;
+      if (nArr != nArrays)
+        return 1;
       for (int k = 0; k < nArr; ++k)
       {
         vtkDataArray* arr = cd->GetArray(k);
@@ -54,8 +59,9 @@ int TestOutputData(vtkMultiBlockDataSet* mb, int nCells, int nArrays)
 
 int TestReadCGNSSolution(int argc, char* argv[])
 {
-  if (argc < 3) return 0; // for some reason two tests are run, one without data file on cmd line
-  
+  if (argc < 3)
+    return 0; // for some reason two tests are run, one without data file on cmd line
+
   const char* solution = argv[2];
   vtkNew<vtkCGNSReader> reader;
   vtkInformation* inf = reader->GetInformation();
@@ -69,7 +75,7 @@ int TestReadCGNSSolution(int argc, char* argv[])
   reader->Update();
 
   vtkMultiBlockDataSet* mb = reader->GetOutput();
-  
+
   if (0 != TestOutput(mb, 19742, VTK_POLYHEDRON))
     return 1;
 

@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTextWidgetRepresentationProxy 
-// .SECTION Description
+/**
+ * @class   vtkSMTextWidgetRepresentationProxy
+ *
+*/
 
 #ifndef vtkSMTextWidgetRepresentationProxy_h
 #define vtkSMTextWidgetRepresentationProxy_h
@@ -23,18 +25,18 @@
 
 class vtkSMViewProxy;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTextWidgetRepresentationProxy : public vtkSMNewWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTextWidgetRepresentationProxy
+  : public vtkSMNewWidgetRepresentationProxy
 {
 public:
   static vtkSMTextWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMTextWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-protected:
 
+protected:
   vtkSMTextWidgetRepresentationProxy();
   ~vtkSMTextWidgetRepresentationProxy();
-  
+
   virtual void CreateVTKObjects();
 
   vtkSMProxy* TextActorProxy;
@@ -45,8 +47,6 @@ protected:
 private:
   vtkSMTextWidgetRepresentationProxy(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

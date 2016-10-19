@@ -42,45 +42,43 @@ vtkSMAnimationSceneGeometryWriter::~vtkSMAnimationSceneGeometryWriter()
 {
   this->SetViewModule(0);
   if (this->GeometryWriter)
-    {
+  {
     this->GeometryWriter->Delete();
     this->GeometryWriter = 0;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneGeometryWriter::SaveInitialize(int vtkNotUsed(startCount))
 {
   if (!this->ViewModule)
-    {
+  {
     vtkErrorMacro("No view from which to save the geometry is set.");
     return false;
-    }
+  }
 
   assert("The session should be set by now" && this->Session);
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  this->GeometryWriter = pxm->NewProxy("writers","XMLPVAnimationWriter");
+  this->GeometryWriter = pxm->NewProxy("writers", "XMLPVAnimationWriter");
 
-  vtkSMPropertyHelper(this->GeometryWriter,"FileName").Set(this->FileName);
+  vtkSMPropertyHelper(this->GeometryWriter, "FileName").Set(this->FileName);
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->ViewModule->GetProperty("Representations"));
+  vtkSMProxyProperty* pp =
+    vtkSMProxyProperty::SafeDownCast(this->ViewModule->GetProperty("Representations"));
 
-  vtkSMProxyProperty* gwInput = vtkSMProxyProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("Representations"));
+  vtkSMProxyProperty* gwInput =
+    vtkSMProxyProperty::SafeDownCast(this->GeometryWriter->GetProperty("Representations"));
   gwInput->RemoveAllProxies();
 
-  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
+  for (unsigned int cc = 0; cc < pp->GetNumberOfProxies(); ++cc)
+  {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(pp->GetProxy(cc));
+    if (repr && vtkSMPropertyHelper(repr, "Visibility", true).GetAsInt() != 0)
     {
-    vtkSMRepresentationProxy* repr =
-      vtkSMRepresentationProxy::SafeDownCast(
-        pp->GetProxy(cc));
-    if (repr && vtkSMPropertyHelper(repr,"Visibility", true).GetAsInt() != 0)
-      {
       gwInput->AddProxy(repr);
-      }
     }
+  }
   this->GeometryWriter->UpdateVTKObjects();
   this->GeometryWriter->InvokeCommand("Start");
   return true;
@@ -93,9 +91,9 @@ bool vtkSMAnimationSceneGeometryWriter::SaveFrame(double time)
   this->GeometryWriter->UpdateProperty("WriteTime", 1);
   this->GeometryWriter->UpdatePropertyInformation();
   if (vtkSMPropertyHelper(this->GeometryWriter, "ErrorCode").GetAsInt())
-    {
+  {
     return false;
-    }
+  }
 
   return true;
 }
@@ -104,9 +102,9 @@ bool vtkSMAnimationSceneGeometryWriter::SaveFrame(double time)
 bool vtkSMAnimationSceneGeometryWriter::SaveFinalize()
 {
   if (!this->GeometryWriter)
-    {
+  {
     return true;
-    }
+  }
 
   this->GeometryWriter->InvokeCommand("Finish");
   this->GeometryWriter->Delete();

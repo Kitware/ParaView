@@ -35,15 +35,15 @@ vtkAppendArcLength::~vtkAppendArcLength()
 }
 
 //----------------------------------------------------------------------------
-int vtkAppendArcLength::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkAppendArcLength::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0], 0);
   vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
   if (input->GetNumberOfPoints() == 0)
-    {
+  {
     return 1;
-    }
+  }
 
   output->ShallowCopy(input);
 
@@ -52,13 +52,13 @@ int vtkAppendArcLength::RequestData(vtkInformation*,
   vtkPoints* points = output->GetPoints();
   vtkIdType numPoints = points->GetNumberOfPoints();
   if (points->GetDataType() == VTK_DOUBLE)
-    {
+  {
     arc_length = vtkDoubleArray::New();
-    }
+  }
   else
-    {
+  {
     arc_length = vtkFloatArray::New();
-    }
+  }
   arc_length->SetName("arc_length");
   arc_length->SetNumberOfComponents(1);
   arc_length->SetNumberOfTuples(numPoints);
@@ -69,29 +69,27 @@ int vtkAppendArcLength::RequestData(vtkInformation*,
   vtkIdType* cellPoints;
   lines->InitTraversal();
   while (lines->GetNextCell(numCellPoints, cellPoints))
-    {
+  {
     if (numCellPoints == 0)
-      {
+    {
       continue;
-      }
+    }
     double arc_distance = 0.0;
     double prevPoint[3];
     points->GetPoint(cellPoints[0], prevPoint);
-    for (vtkIdType cc=1; cc < numCellPoints; cc++)
-      {
+    for (vtkIdType cc = 1; cc < numCellPoints; cc++)
+    {
       double curPoint[3];
       points->GetPoint(cellPoints[cc], curPoint);
-      double distance = sqrt(vtkMath::Distance2BetweenPoints(
-          curPoint, prevPoint));
+      double distance = sqrt(vtkMath::Distance2BetweenPoints(curPoint, prevPoint));
       arc_distance += distance;
       arc_length->SetTuple1(cellPoints[cc], arc_distance);
-      memcpy(prevPoint, curPoint, 3*sizeof(double));
-      }
+      memcpy(prevPoint, curPoint, 3 * sizeof(double));
     }
+  }
   output->GetPointData()->AddArray(arc_length);
   arc_length->Delete();
   return 1;
-
 }
 
 //----------------------------------------------------------------------------
@@ -99,5 +97,3 @@ void vtkAppendArcLength::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

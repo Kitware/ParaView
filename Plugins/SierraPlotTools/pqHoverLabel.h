@@ -33,15 +33,15 @@ class pqHoverLabel : public QLabel
   Q_OBJECT;
 
 public:
-  pqHoverLabel(QWidget *parent = 0);
+  pqHoverLabel(QWidget* parent = 0);
 
-  virtual void mouseMoveEvent ( QMouseEvent * theEvent );
+  virtual void mouseMoveEvent(QMouseEvent* theEvent);
 
-  void setPlotter(pqPlotter * thePlotter);
+  void setPlotter(pqPlotter* thePlotter);
 
-  bool event(QEvent * event);
+  bool event(QEvent* event);
 
-  pqPlotter * plotter;
+  pqPlotter* plotter;
 };
 
-#endif //pqHoverLabel_h
+#endif // pqHoverLabel_h

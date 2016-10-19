@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPythonViewProxy - Superclass for all view proxies
-// .SECTION Description
-// vtkSMPythonViewProxy is a view proxy for the vtkPythonView.
+/**
+ * @class   vtkSMPythonViewProxy
+ * @brief   Superclass for all view proxies
+ *
+ * vtkSMPythonViewProxy is a view proxy for the vtkPythonView.
+*/
 
 #ifndef vtkSMPythonViewProxy_h
 #define vtkSMPythonViewProxy_h
@@ -33,30 +36,33 @@ public:
   vtkTypeMacro(vtkSMPythonViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the client-side renderer.
+  /**
+   * Returns the client-side renderer.
+   */
   vtkRenderer* GetRenderer();
 
-  // Description:
-  // Returns the client-side render window.
+  /**
+   * Returns the client-side render window.
+   */
   vtkRenderWindow* GetRenderWindow();
 
-  // Description:
-  // Returns true if the most recent render indeed employed low-res rendering.
+  /**
+   * Returns true if the most recent render indeed employed low-res rendering.
+   */
   virtual bool LastRenderWasInteractive();
 
 protected:
   vtkSMPythonViewProxy();
   ~vtkSMPythonViewProxy();
 
-  // Description:
-  // Subclasses should override this method to do the actual image capture.
+  /**
+   * Subclasses should override this method to do the actual image capture.
+   */
   virtual vtkImageData* CaptureWindowInternal(int magnification);
 
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // vtkSMPythonViewProxy_h

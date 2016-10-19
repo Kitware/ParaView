@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,16 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
-/// This is a pqPropertyWidget subclass that presents a widget to edit the color
-/// of a representation and other related functionality. It's used as the
-/// "widget" for \c ColorEditor property group.
+/**
+* This is a pqPropertyWidget subclass that presents a widget to edit the color
+* of a representation and other related functionality. It's used as the
+* "widget" for \c ColorEditor property group.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 public:
   typedef pqPropertyWidget Superclass;
 
-  pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqColorEditorPropertyWidget();
 
 private slots:

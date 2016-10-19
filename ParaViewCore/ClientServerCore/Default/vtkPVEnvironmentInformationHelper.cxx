@@ -34,6 +34,5 @@ vtkPVEnvironmentInformationHelper::~vtkPVEnvironmentInformationHelper()
 void vtkPVEnvironmentInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Variable: " << (this->Variable? this->Variable : "(null)") << endl;
+  os << indent << "Variable: " << (this->Variable ? this->Variable : "(null)") << endl;
 }
-

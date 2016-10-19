@@ -43,20 +43,22 @@ class pqServer;
 class pqServerManagerModelItem;
 class vtkSMProxy;
 
-/// pqTimeInspectorWidget is a widget that allows the user to look at all sources that
-/// provide time. The animation timesteps as well as the timesteps provided by
-/// each of the sources can be seen in this widget. This widget allows the user
-/// to change 2 things: whether to suppress timesteps from a source, and the
-/// current time. Everything else is read-only.
-///
-/// The implementation relies on linking (using pqPropertyLinks) sm-properties on TimeKeeper
-/// and AnimationScene proxy for the active session to qt-properties on this
-/// widget.
-///
-/// To use this widget since set the animation scene using setAnimationScene().
-/// The widget takes care of the rest. One typically never needs to use any of
-/// the other public API which is internally "linked" to the properties on the
-/// animation scene proxy.
+/**
+* pqTimeInspectorWidget is a widget that allows the user to look at all sources that
+* provide time. The animation timesteps as well as the timesteps provided by
+* each of the sources can be seen in this widget. This widget allows the user
+* to change 2 things: whether to suppress timesteps from a source, and the
+* current time. Everything else is read-only.
+*
+* The implementation relies on linking (using pqPropertyLinks) sm-properties on TimeKeeper
+* and AnimationScene proxy for the active session to qt-properties on this
+* widget.
+*
+* To use this widget since set the animation scene using setAnimationScene().
+* The widget takes care of the rest. One typically never needs to use any of
+* the other public API which is internally "linked" to the properties on the
+* animation scene proxy.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
 {
   Q_OBJECT
@@ -66,71 +68,100 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
   Q_PROPERTY(QList<QVariant> sceneTimeSteps READ sceneTimeSteps WRITE setSceneTimeSteps)
   Q_PROPERTY(int sceneNumberOfFrames READ sceneNumberOfFrames WRITE setSceneNumberOfFrames)
   Q_PROPERTY(QList<QVariant> timeSources READ timeSources WRITE setTimeSources)
-  Q_PROPERTY(QList<QVariant> suppressedTimeSources READ suppressedTimeSources
-    WRITE setSuppressedTimeSources)
-  Q_PROPERTY(double sceneCurrentTime READ sceneCurrentTime WRITE setSceneCurrentTime
-    NOTIFY sceneCurrentTimeChanged)
+  Q_PROPERTY(
+    QList<QVariant> suppressedTimeSources READ suppressedTimeSources WRITE setSuppressedTimeSources)
+  Q_PROPERTY(double sceneCurrentTime READ sceneCurrentTime WRITE setSceneCurrentTime NOTIFY
+      sceneCurrentTimeChanged)
 
   typedef QWidget Superclass;
+
 public:
-  pqTimeInspectorWidget(QWidget* parent=0);
+  pqTimeInspectorWidget(QWidget* parent = 0);
   virtual ~pqTimeInspectorWidget();
 
-  /// access the server being reflected on the widget.
+  /**
+  * access the server being reflected on the widget.
+  */
   pqServer* server() const;
 
-  /// Get/set the start time for the scene.
+  /**
+  * Get/set the start time for the scene.
+  */
   double sceneStartTime() const;
   void setSceneStartTime(double);
 
-  /// Get/Set the end time for the scene.
+  /**
+  * Get/Set the end time for the scene.
+  */
   double sceneEndTime() const;
   void setSceneEndTime(double);
 
-  /// Get/set the play-mode. Used to control how the global ticks are shown
-  /// and how the current time slider snaps on interaction.
+  /**
+  * Get/set the play-mode. Used to control how the global ticks are shown
+  * and how the current time slider snaps on interaction.
+  */
   QString scenePlayMode() const;
   void setScenePlayMode(const QString&);
 
-  /// Get/Set the timesteps in the scene. This is timesteps known to the active
-  /// sessions TimeKeeper proxy.
+  /**
+  * Get/Set the timesteps in the scene. This is timesteps known to the active
+  * sessions TimeKeeper proxy.
+  */
   QList<QVariant> sceneTimeSteps() const;
   void setSceneTimeSteps(const QList<QVariant>& val);
 
-  /// Get/Set the number of frames. This is used when the playmode is set to
-  /// sequence.
+  /**
+  * Get/Set the number of frames. This is used when the playmode is set to
+  * sequence.
+  */
   int sceneNumberOfFrames() const;
   void setSceneNumberOfFrames(int val);
 
-  /// Get/Set the proxies that are registered with the TimeKeeper as the
-  /// time sources. Not all proxies in this list may have time. Hence,
-  /// setTimeSources() needs to cull the list appropriately.
+  /**
+  * Get/Set the proxies that are registered with the TimeKeeper as the
+  * time sources. Not all proxies in this list may have time. Hence,
+  * setTimeSources() needs to cull the list appropriately.
+  */
   QList<QVariant> timeSources() const;
   void setTimeSources(const QList<QVariant>& proxies);
 
-  /// Get/Set the list of proxies which are to be marked as "suppressed" i.e.
-  /// their timesteps are ignored by the animation playback.
+  /**
+  * Get/Set the list of proxies which are to be marked as "suppressed" i.e.
+  * their timesteps are ignored by the animation playback.
+  */
   QList<QVariant> suppressedTimeSources() const;
   void setSuppressedTimeSources(const QList<QVariant>& proxies);
 
-  /// Get the current time for the scene.
+  /**
+  * Get the current time for the scene.
+  */
   double sceneCurrentTime() const;
 
 public slots:
-  /// set the active server.
-  void setServer(pqServer*server);
+  /**
+  * set the active server.
+  */
+  void setServer(pqServer* server);
 
-  /// set the current time for the scene.
+  /**
+  * set the current time for the scene.
+  */
   void setSceneCurrentTime(double);
 
 private slots:
-  /// Updates the panel based on the scene on this->server().
+  /**
+  * Updates the panel based on the scene on this->server().
+  */
   void updateScene();
 
-  /// handle change in proxy names.
+  /**
+  * handle change in proxy names.
+  */
   void handleProxyNameChanged(pqServerManagerModelItem*);
 
-  /// toggle changing of proxies being suppressed from the animation.
+  /**
+  * toggle changing of proxies being suppressed from the animation.
+  */
   void toggleTrackSuppression(pqAnimationTrack*);
 
 signals:

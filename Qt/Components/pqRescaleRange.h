@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,12 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqRescaleRange.h
-/// \date 3/28/2007
+/**
+* \file pqRescaleRange.h
+* \date 3/28/2007
+*/
 
 #ifndef _pqRescaleRange_h
 #define _pqRescaleRange_h
-
 
 #include "pqComponentsModule.h"
 #include <QDialog>
@@ -47,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
   Q_OBJECT
 
 public:
-  pqRescaleRange(QWidget *parent=0);
+  pqRescaleRange(QWidget* parent = 0);
   virtual ~pqRescaleRange();
 
   double getMinimum() const;
@@ -58,7 +59,7 @@ protected slots:
   void validate();
 
 protected:
-  pqRescaleRangeForm *Form;
+  pqRescaleRangeForm* Form;
 };
 
 #endif

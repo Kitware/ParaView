@@ -43,21 +43,22 @@ pqGlobalPlotter::~pqGlobalPlotter()
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqGlobalPlotter::getTheVars(vtkSMProxy * meshReaderProxy)
+QStringList pqGlobalPlotter::getTheVars(vtkSMProxy* meshReaderProxy)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("GlobalVariablesInfo");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("GlobalVariablesInfo");
 
   return getStringsFromProperty(prop);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProperty * pqGlobalPlotter::getSMVariableProperty(vtkSMProxy *meshReaderProxy)
+vtkSMProperty* pqGlobalPlotter::getSMVariableProperty(vtkSMProxy* meshReaderProxy)
 {
   return this->getSMNamedVariableProperty(meshReaderProxy, QString("GlobalVariables"));
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation * pqGlobalPlotter::getDataSetAttributesInformation(vtkPVDataInformation * pvDataInfo)
+vtkPVDataSetAttributesInformation* pqGlobalPlotter::getDataSetAttributesInformation(
+  vtkPVDataInformation* pvDataInfo)
 {
   return pvDataInfo->GetFieldDataInformation();
 }
@@ -69,23 +70,23 @@ bool pqGlobalPlotter::amIAbleToSelectByNumber()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource * pqGlobalPlotter::getPlotFilter()
+pqPipelineSource* pqGlobalPlotter::getPlotFilter()
 {
   return this->findPipelineSource("ExtractFieldDataOverTime");
 }
 
 //-----------------------------------------------------------------------------
-void pqGlobalPlotter::setVarsStatus(vtkSMProxy * meshReaderProxy, bool flag)
+void pqGlobalPlotter::setVarsStatus(vtkSMProxy* meshReaderProxy, bool flag)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("GlobalVariables");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("GlobalVariables");
 
   setVarElementsStatus(prop, flag);
 }
 
 //-----------------------------------------------------------------------------
-void pqGlobalPlotter::setVarsActive(vtkSMProxy * meshReaderProxy, QString varName, bool activeFlag)
+void pqGlobalPlotter::setVarsActive(vtkSMProxy* meshReaderProxy, QString varName, bool activeFlag)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("GlobalVariables");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("GlobalVariables");
 
   setVarElementsActive(prop, varName, activeFlag);
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-
 class pqOrbitCreatorDialog::pqInternals : public Ui::OrbitCreatorDialog
 {
 };
@@ -65,8 +64,7 @@ pqOrbitCreatorDialog::pqOrbitCreatorDialog(QWidget* parentObject)
   this->Internals->origin1->setValidator(new QDoubleValidator(this));
   this->Internals->origin2->setValidator(new QDoubleValidator(this));
 
-  QObject::connect(this->Internals->resetBounds, SIGNAL(clicked()),
-    this, SLOT(resetBounds()));
+  QObject::connect(this->Internals->resetBounds, SIGNAL(clicked()), this, SLOT(resetBounds()));
 
   this->resetBounds();
 }
@@ -106,7 +104,7 @@ void pqOrbitCreatorDialog::resetBounds()
   vtkSMProxySelectionModel* selModel =
     pqActiveObjects::instance().activeServer()->activeSourcesSelectionModel();
   if (selModel->GetSelectionDataBounds(input_bounds))
-    {
+  {
     vtkBoundingBox box;
     box.SetBounds(input_bounds);
     double box_center[3];
@@ -121,7 +119,7 @@ void pqOrbitCreatorDialog::resetBounds()
     this->Internals->origin0->setText("0");
     this->Internals->origin1->setText("0");
     this->Internals->origin2->setText("10");
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -154,14 +152,13 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
   origin[2] = this->Internals->origin2->text().toDouble();
 
   QList<QVariant> points;
-  vtkPoints* pts = vtkSMUtilities::CreateOrbit(
-    box_center, normal, resolution, origin);
-  for (vtkIdType cc=0; cc < pts->GetNumberOfPoints(); cc++)
-    {
+  vtkPoints* pts = vtkSMUtilities::CreateOrbit(box_center, normal, resolution, origin);
+  for (vtkIdType cc = 0; cc < pts->GetNumberOfPoints(); cc++)
+  {
     double coords[3];
     pts->GetPoint(cc, coords);
     points << coords[0] << coords[1] << coords[2];
-    }
+  }
   pts->Delete();
   return points;
 }

@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVClientServerSynchronizedRenderers
-// .SECTION Description
-// vtkPVClientServerSynchronizedRenderers is similar to
-// vtkClientServerSynchronizedRenderers except that it optionally uses image
-// compressors to compress the image before transmitting.
+/**
+ * @class   vtkPVClientServerSynchronizedRenderers
+ *
+ * vtkPVClientServerSynchronizedRenderers is similar to
+ * vtkClientServerSynchronizedRenderers except that it optionally uses image
+ * compressors to compress the image before transmitting.
+*/
 
 #ifndef vtkPVClientServerSynchronizedRenderers_h
 #define vtkPVClientServerSynchronizedRenderers_h
@@ -27,7 +29,8 @@
 class vtkImageCompressor;
 class vtkUnsignedCharArray;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRenderers
+  : public vtkSynchronizedRenderers
 {
 public:
   static vtkPVClientServerSynchronizedRenderers* New();
@@ -41,26 +44,31 @@ public:
   vtkSetMacro(LossLessCompression, bool);
   vtkGetMacro(LossLessCompression, bool);
 
-  // Description:
-  // Set and configure a compressor from it's own configuration stream. This
-  // is used by ParaView to configure the compressor from application wide
-  // user settings.
-  virtual void ConfigureCompressor(const char *stream);
+  /**
+   * Set and configure a compressor from it's own configuration stream. This
+   * is used by ParaView to configure the compressor from application wide
+   * user settings.
+   */
+  virtual void ConfigureCompressor(const char* stream);
 
 protected:
   vtkPVClientServerSynchronizedRenderers();
   ~vtkPVClientServerSynchronizedRenderers();
 
-  // Description:
-  // Overridden to not clear the color buffer before pasting back image from
-  // the server. This ensures that any annotations rendered on the back of any
-  // 3D geometry will be preserved.
+  /**
+   * Overridden to not clear the color buffer before pasting back image from
+   * the server. This ensures that any annotations rendered on the back of any
+   * 3D geometry will be preserved.
+   */
   virtual void PushImageToScreen();
 
-  // Description:
-  // Set/Get the compressor object, it's setting can be manipulated directly.
-  void SetCompressor(vtkImageCompressor *comp);
-  vtkGetObjectMacro(Compressor,vtkImageCompressor);
+  //@{
+  /**
+   * Set/Get the compressor object, it's setting can be manipulated directly.
+   */
+  void SetCompressor(vtkImageCompressor* comp);
+  vtkGetObjectMacro(Compressor, vtkImageCompressor);
+  //@}
 
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);
@@ -71,10 +79,11 @@ protected:
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;
-private:
-  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 
+private:
+  vtkPVClientServerSynchronizedRenderers(
+    const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
 };
 
 #endif

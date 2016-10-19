@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDataSourceProxy - "data-centric" proxy for VTK source on a server
-// .SECTION Description
-// vtkSMDataSourceProxy adds a CopyData method to the vtkSMSourceProxy API
-// to give a "data-centric" behaviour; the output data of the input
-// vtkSMSourceProxy (to CopyData) is copied by the VTK object managed
-// by the vtkSMDataSourceProxy.
-// .SECTION See Also
-// vtkSMSourceProxy
+/**
+ * @class   vtkSMDataSourceProxy
+ * @brief   "data-centric" proxy for VTK source on a server
+ *
+ * vtkSMDataSourceProxy adds a CopyData method to the vtkSMSourceProxy API
+ * to give a "data-centric" behaviour; the output data of the input
+ * vtkSMSourceProxy (to CopyData) is copied by the VTK object managed
+ * by the vtkSMDataSourceProxy.
+ * @sa
+ * vtkSMSourceProxy
+*/
 
 #ifndef vtkSMDataSourceProxy_h
 #define vtkSMDataSourceProxy_h
@@ -34,10 +37,11 @@ public:
   vtkTypeMacro(vtkSMDataSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Copies data from source proxy object to object represented by this
-  // source proxy object.
-  void CopyData(vtkSMSourceProxy *sourceProxy);
+  /**
+   * Copies data from source proxy object to object represented by this
+   * source proxy object.
+   */
+  void CopyData(vtkSMSourceProxy* sourceProxy);
 
 protected:
   vtkSMDataSourceProxy();
@@ -46,8 +50,6 @@ protected:
 private:
   vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

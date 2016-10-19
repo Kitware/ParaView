@@ -27,19 +27,18 @@
 
 namespace
 {
-  inline vtkVector3d DoTransform(vtkMatrix4x4* matrix, const vtkVector3d& point)
-    {
-    vtkTuple<double, 4> pointH;
-    memcpy(pointH.GetData(), point.GetData(), sizeof(double)*3);
-    pointH[3] = 1.0;
+inline vtkVector3d DoTransform(vtkMatrix4x4* matrix, const vtkVector3d& point)
+{
+  vtkTuple<double, 4> pointH;
+  memcpy(pointH.GetData(), point.GetData(), sizeof(double) * 3);
+  pointH[3] = 1.0;
 
-    vtkTuple<double, 4> resultH;
-    vtkMatrix4x4::MultiplyPoint(
-      &matrix->Element[0][0], pointH.GetData(), resultH.GetData());
+  vtkTuple<double, 4> resultH;
+  vtkMatrix4x4::MultiplyPoint(&matrix->Element[0][0], pointH.GetData(), resultH.GetData());
 
-    vtkVector3d result(resultH.GetData());
-    return result / vtkVector3d(resultH[3]);
-    }
+  vtkVector3d result(resultH.GetData());
+  return result / vtkVector3d(resultH[3]);
+}
 }
 
 vtkStandardNewMacro(vtkGridAxesHelper);
@@ -70,9 +69,9 @@ vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetPoints()
 {
   vtkMTimeType mtime = this->GetMTime();
   if (mtime == this->GetPointsMTime)
-    {
+  {
     return this->Points;
-    }
+  }
   this->GetPointsMTime = mtime;
 
   assert(vtkMath::AreBoundsInitialized(this->GridBounds));
@@ -88,79 +87,79 @@ vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetPoints()
   const double minx = bds[0], miny = bds[2], minz = bds[4];
   const double maxx = bds[1], maxy = bds[3], maxz = bds[5];
   switch (this->Face)
-    {
-  case MIN_XY:
-    this->Points[0] = vtkVector3d(minx, maxy, minz);
-    this->Points[1] = vtkVector3d(maxx, maxy, minz);
-    this->Points[2] = vtkVector3d(maxx, miny, minz);
-    this->Points[3] = vtkVector3d(minx, miny, minz);
-    this->ActiveAxes = vtkVector2i(0, 1);
-    this->LabelVisibilities[0] = (labelMask & MAX_Y) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_X) != 0;
-    this->LabelVisibilities[2] = (labelMask & MIN_Y) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_X) != 0;
-    break;
+  {
+    case MIN_XY:
+      this->Points[0] = vtkVector3d(minx, maxy, minz);
+      this->Points[1] = vtkVector3d(maxx, maxy, minz);
+      this->Points[2] = vtkVector3d(maxx, miny, minz);
+      this->Points[3] = vtkVector3d(minx, miny, minz);
+      this->ActiveAxes = vtkVector2i(0, 1);
+      this->LabelVisibilities[0] = (labelMask & MAX_Y) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_X) != 0;
+      this->LabelVisibilities[2] = (labelMask & MIN_Y) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_X) != 0;
+      break;
 
-  case MIN_YZ:
-    this->Points[0] = vtkVector3d(minx, miny, maxz);
-    this->Points[1] = vtkVector3d(minx, maxy, maxz);
-    this->Points[2] = vtkVector3d(minx, maxy, minz);
-    this->Points[3] = vtkVector3d(minx, miny, minz);
-    this->ActiveAxes = vtkVector2i(1, 2);
-    this->LabelVisibilities[0] = (labelMask & MAX_Z) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_Y) != 0;
-    this->LabelVisibilities[2] = (labelMask & MIN_Z) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_Y) != 0;
-    break;
+    case MIN_YZ:
+      this->Points[0] = vtkVector3d(minx, miny, maxz);
+      this->Points[1] = vtkVector3d(minx, maxy, maxz);
+      this->Points[2] = vtkVector3d(minx, maxy, minz);
+      this->Points[3] = vtkVector3d(minx, miny, minz);
+      this->ActiveAxes = vtkVector2i(1, 2);
+      this->LabelVisibilities[0] = (labelMask & MAX_Z) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_Y) != 0;
+      this->LabelVisibilities[2] = (labelMask & MIN_Z) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_Y) != 0;
+      break;
 
-  case MIN_ZX:
-    this->Points[0] = vtkVector3d(maxx, miny, minz);
-    this->Points[1] = vtkVector3d(maxx, miny, maxz);
-    this->Points[2] = vtkVector3d(minx, miny, maxz);
-    this->Points[3] = vtkVector3d(minx, miny, minz);
-    this->ActiveAxes = vtkVector2i(2, 0);
-    this->LabelVisibilities[0] = (labelMask & MAX_X) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_Z) != 0;
-    this->LabelVisibilities[2] = (labelMask & MIN_X) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_Z) != 0;
-    break;
+    case MIN_ZX:
+      this->Points[0] = vtkVector3d(maxx, miny, minz);
+      this->Points[1] = vtkVector3d(maxx, miny, maxz);
+      this->Points[2] = vtkVector3d(minx, miny, maxz);
+      this->Points[3] = vtkVector3d(minx, miny, minz);
+      this->ActiveAxes = vtkVector2i(2, 0);
+      this->LabelVisibilities[0] = (labelMask & MAX_X) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_Z) != 0;
+      this->LabelVisibilities[2] = (labelMask & MIN_X) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_Z) != 0;
+      break;
 
-  case MAX_XY:
-    this->Points[0] = vtkVector3d(minx, miny, maxz);
-    this->Points[1] = vtkVector3d(maxx, miny, maxz);
-    this->Points[2] = vtkVector3d(maxx, maxy, maxz);
-    this->Points[3] = vtkVector3d(minx, maxy, maxz);
-    this->ActiveAxes = vtkVector2i(0, 1);
-    this->LabelVisibilities[0] = (labelMask & MIN_Y) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_X) != 0;
-    this->LabelVisibilities[2] = (labelMask & MAX_Y) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_X) != 0;
-    break;
+    case MAX_XY:
+      this->Points[0] = vtkVector3d(minx, miny, maxz);
+      this->Points[1] = vtkVector3d(maxx, miny, maxz);
+      this->Points[2] = vtkVector3d(maxx, maxy, maxz);
+      this->Points[3] = vtkVector3d(minx, maxy, maxz);
+      this->ActiveAxes = vtkVector2i(0, 1);
+      this->LabelVisibilities[0] = (labelMask & MIN_Y) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_X) != 0;
+      this->LabelVisibilities[2] = (labelMask & MAX_Y) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_X) != 0;
+      break;
 
-  case MAX_YZ:
-    this->Points[0] = vtkVector3d(maxx, miny, minz);
-    this->Points[1] = vtkVector3d(maxx, maxy, minz);
-    this->Points[2] = vtkVector3d(maxx, maxy, maxz);
-    this->Points[3] = vtkVector3d(maxx, miny, maxz);
-    this->ActiveAxes = vtkVector2i(1, 2);
-    this->LabelVisibilities[0] = (labelMask & MIN_Z) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_Y) != 0;
-    this->LabelVisibilities[2] = (labelMask & MAX_Z) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_Y) != 0;
-    break;
+    case MAX_YZ:
+      this->Points[0] = vtkVector3d(maxx, miny, minz);
+      this->Points[1] = vtkVector3d(maxx, maxy, minz);
+      this->Points[2] = vtkVector3d(maxx, maxy, maxz);
+      this->Points[3] = vtkVector3d(maxx, miny, maxz);
+      this->ActiveAxes = vtkVector2i(1, 2);
+      this->LabelVisibilities[0] = (labelMask & MIN_Z) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_Y) != 0;
+      this->LabelVisibilities[2] = (labelMask & MAX_Z) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_Y) != 0;
+      break;
 
-  case MAX_ZX:
-    this->Points[0] = vtkVector3d(minx, maxy, minz);
-    this->Points[1] = vtkVector3d(minx, maxy, maxz);
-    this->Points[2] = vtkVector3d(maxx, maxy, maxz);
-    this->Points[3] = vtkVector3d(maxx, maxy, minz);
-    this->ActiveAxes = vtkVector2i(2, 0);
-    this->LabelVisibilities[0] = (labelMask & MIN_X) != 0;
-    this->LabelVisibilities[1] = (labelMask & MAX_Z) != 0;
-    this->LabelVisibilities[2] = (labelMask & MAX_X) != 0;
-    this->LabelVisibilities[3] = (labelMask & MIN_Z) != 0;
-    break;
-    }
+    case MAX_ZX:
+      this->Points[0] = vtkVector3d(minx, maxy, minz);
+      this->Points[1] = vtkVector3d(minx, maxy, maxz);
+      this->Points[2] = vtkVector3d(maxx, maxy, maxz);
+      this->Points[3] = vtkVector3d(maxx, maxy, minz);
+      this->ActiveAxes = vtkVector2i(2, 0);
+      this->LabelVisibilities[0] = (labelMask & MIN_X) != 0;
+      this->LabelVisibilities[1] = (labelMask & MAX_Z) != 0;
+      this->LabelVisibilities[2] = (labelMask & MAX_X) != 0;
+      this->LabelVisibilities[3] = (labelMask & MIN_Z) != 0;
+      break;
+  }
 
   return this->Points;
 }
@@ -176,38 +175,38 @@ vtkTuple<bool, 4> vtkGridAxesHelper::GetLabelVisibilities()
 {
   this->GetPoints();
 
-  for (int cc=0; cc < 4; cc++)
-    {
-    this->ComputedLabelVisibilities[cc] = this->LabelVisibilities[cc] &&
-      this->LabelVisibilityOverrides[cc];
-    }
+  for (int cc = 0; cc < 4; cc++)
+  {
+    this->ComputedLabelVisibilities[cc] =
+      this->LabelVisibilities[cc] && this->LabelVisibilityOverrides[cc];
+  }
   return this->ComputedLabelVisibilities;
 }
 
 //----------------------------------------------------------------------------
 vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetTransformedPoints()
 {
-  const vtkTuple<vtkVector3d, 4> &points = this->GetPoints();
+  const vtkTuple<vtkVector3d, 4>& points = this->GetPoints();
   vtkMTimeType mtime =
-    std::max(this->GetPointsMTime, (this->Matrix? this->Matrix->GetMTime() : 0));
+    std::max(this->GetPointsMTime, (this->Matrix ? this->Matrix->GetMTime() : 0));
 
   if (mtime == this->GetTransformedPointsMTime)
-    {
+  {
     return this->TransformedPoints;
-    }
+  }
   this->GetTransformedPointsMTime = mtime;
 
   if (this->Matrix)
+  {
+    for (int cc = 0; cc < 4; cc++)
     {
-    for (int cc=0; cc < 4; cc++)
-      {
       this->TransformedPoints[cc] = DoTransform(this->Matrix, points[cc]);
-      }
     }
+  }
   else
-    {
+  {
     this->TransformedPoints = points;
-    }
+  }
 
   vtkVector3d v1 = this->TransformedPoints[1] - this->TransformedPoints[0];
   vtkVector3d v2 = this->TransformedPoints[2] - this->TransformedPoints[1];
@@ -219,7 +218,7 @@ vtkTuple<vtkVector3d, 4> vtkGridAxesHelper::GetTransformedPoints()
 //----------------------------------------------------------------------------
 vtkVector3d vtkGridAxesHelper::TransformPoint(const vtkVector3d& point)
 {
-  return this->Matrix? DoTransform(this->Matrix, point) : point;
+  return this->Matrix ? DoTransform(this->Matrix, point) : point;
 }
 
 //----------------------------------------------------------------------------
@@ -235,9 +234,9 @@ vtkVector3d vtkGridAxesHelper::GetTransformedFaceNormal()
 bool vtkGridAxesHelper::UpdateForViewport(vtkViewport* viewport)
 {
   if (!viewport || !vtkMath::AreBoundsInitialized(this->GridBounds))
-    {
+  {
     return false;
-    }
+  }
 
   const vtkTuple<vtkVector3d, 4>& transformedPoints = this->GetTransformedPoints();
 
@@ -245,41 +244,43 @@ bool vtkGridAxesHelper::UpdateForViewport(vtkViewport* viewport)
   // maps to.
   vtkNew<vtkCoordinate> coordinate;
   coordinate->SetCoordinateSystemToWorld();
-  for (int cc=0; cc < 4; cc++)
-    {
+  for (int cc = 0; cc < 4; cc++)
+  {
     coordinate->SetValue(const_cast<double*>(transformedPoints[cc].GetData()));
     const int* viewportValue = coordinate->GetComputedViewportValue(viewport);
     this->ViewportPoints[cc] = vtkVector2i(viewportValue[0], viewportValue[1]);
     this->ViewportPointsAsDouble[cc] = vtkVector2d(viewportValue[0], viewportValue[1]);
-    }
+  }
 
   // Compute axis vectors for each edge of the quadrilateral. Note that it's
   // not necessarily a parallelogram (due to perspective transformation).
-  for (int cc=0; cc < 4; cc++)
-    {
-    this->ViewportVectors[cc] = this->ViewportPointsAsDouble[(cc+1)%4] - this->ViewportPointsAsDouble[cc];
-    }
+  for (int cc = 0; cc < 4; cc++)
+  {
+    this->ViewportVectors[cc] =
+      this->ViewportPointsAsDouble[(cc + 1) % 4] - this->ViewportPointsAsDouble[cc];
+  }
 
   // Compute edge normals. In reality, we should compute a normal to the edge
   // in world coordinates and then project that to the viewport space. However,
   // due to perspective, the normal is doing to be different along the length
   // of the edge anyways. So we use this trick: use the normal using the prev
   // axis vector and the -'ve next axis vector and then use the average.
-  for (int cc=0; cc < 4; cc++)
-    {
-    int next = (cc+1)%4; int prev = (cc+3)%4;
+  for (int cc = 0; cc < 4; cc++)
+  {
+    int next = (cc + 1) % 4;
+    int prev = (cc + 3) % 4;
 
     vtkVector2d normal =
       this->ViewportVectors[prev].Normalized() - this->ViewportVectors[next].Normalized();
     this->ViewportNormals[cc] = normal.Normalized();
-    }
+  }
 
   // Determine if the face is facing backwards.
   // XXX: This is not robust. We should use vtkCoordinate instead.
   vtkCamera* camera = vtkRenderer::SafeDownCast(viewport)->GetActiveCamera();
-  vtkVector3d viewdirection = camera->GetParallelProjection()?
-    vtkVector3d(camera->GetFocalPoint()) - vtkVector3d(camera->GetPosition()) :
-    this->TransformedPoints[0] - vtkVector3d(camera->GetPosition());
+  vtkVector3d viewdirection = camera->GetParallelProjection()
+    ? vtkVector3d(camera->GetFocalPoint()) - vtkVector3d(camera->GetPosition())
+    : this->TransformedPoints[0] - vtkVector3d(camera->GetPosition());
   viewdirection.Normalize();
   this->Backface = (viewdirection.Dot(this->TransformedFaceNormal) >= 0);
   return true;

@@ -36,17 +36,16 @@ vtkPVTrackballZoomToMouse::~vtkPVTrackballZoomToMouse()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoomToMouse::OnButtonDown(int x, int y, vtkRenderer *ren,
-  vtkRenderWindowInteractor * rwi)
+void vtkPVTrackballZoomToMouse::OnButtonDown(
+  int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   this->Superclass::OnButtonDown(x, y, ren, rwi);
   rwi->GetEventPosition(this->ZoomPosition);
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoomToMouse::OnMouseMove(int vtkNotUsed(x), int y,
-  vtkRenderer *ren,
-  vtkRenderWindowInteractor *rwi)
+void vtkPVTrackballZoomToMouse::OnMouseMove(
+  int vtkNotUsed(x), int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi)
 {
   double dy = rwi->GetLastEventPosition()[1] - y;
   double k = dy * this->ZoomScale;
@@ -59,6 +58,5 @@ void vtkPVTrackballZoomToMouse::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ZoomPosition: "
-    << this->ZoomPosition[0] << " " << this->ZoomPosition[1] << endl;
+  os << indent << "ZoomPosition: " << this->ZoomPosition[0] << " " << this->ZoomPosition[1] << endl;
 }

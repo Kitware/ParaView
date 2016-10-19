@@ -35,32 +35,30 @@
 class vtkSMPluginManager::vtkInternals
 {
 public:
-  typedef std::map<vtkSMSession*,
-          vtkSmartPointer<vtkPVPluginsInformation> > RemoteInfoMapType;
+  typedef std::map<vtkSMSession*, vtkSmartPointer<vtkPVPluginsInformation> > RemoteInfoMapType;
   RemoteInfoMapType RemoteInformations;
 };
 
 namespace
 {
-  class vtkFlagStateUpdated
-    {
-    bool Prev;
-    bool &Flag;
+class vtkFlagStateUpdated
+{
+  bool Prev;
+  bool& Flag;
 
-  public:
-    vtkFlagStateUpdated(bool &flag, bool new_val=true) : Prev(flag), Flag(flag)
-      {
-      this->Flag = new_val;
-      }
-    ~vtkFlagStateUpdated()
-      {
-      this->Flag = this->Prev;
-      }
+public:
+  vtkFlagStateUpdated(bool& flag, bool new_val = true)
+    : Prev(flag)
+    , Flag(flag)
+  {
+    this->Flag = new_val;
+  }
+  ~vtkFlagStateUpdated() { this->Flag = this->Prev; }
 
-  private:
-    vtkFlagStateUpdated(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
-    void operator=(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
-  };
+private:
+  vtkFlagStateUpdated(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
+};
 }
 
 vtkStandardNewMacro(vtkSMPluginManager);
@@ -79,8 +77,7 @@ vtkSMPluginManager::vtkSMPluginManager()
   // at runtime, RegisterEvent is fired. We ensure that the PluginLoadedEvent
   // get fired, especially for plugins brought in a buildtime.
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
-  tracker->AddObserver(vtkCommand::RegisterEvent,
-    this, &vtkSMPluginManager::OnPluginRegistered);
+  tracker->AddObserver(vtkCommand::RegisterEvent, this, &vtkSMPluginManager::OnPluginRegistered);
 }
 
 //----------------------------------------------------------------------------
@@ -100,15 +97,15 @@ void vtkSMPluginManager::RegisterSession(vtkSMSession* session)
 
   if (this->Internals->RemoteInformations.find(session) !=
     this->Internals->RemoteInformations.end())
-    {
+  {
     vtkWarningMacro("Session already registered!!!");
-    }
+  }
   else
-    {
+  {
     vtkPVPluginsInformation* remoteInfo = vtkPVPluginsInformation::New();
     this->Internals->RemoteInformations[session].TakeReference(remoteInfo);
     session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, remoteInfo, 0);
-    }
+  }
 
   // Also update the local information. This is generally unnecessary, but for
   // statically linked in plugins, this provides a cleaner opportunity to bring
@@ -129,20 +126,16 @@ void vtkSMPluginManager::UnRegisterSession(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(
-  vtkSMSession* session)
+vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(vtkSMSession* session)
 {
-  return (session)? this->Internals->RemoteInformations[session] : NULL;
+  return (session) ? this->Internals->RemoteInformations[session] : NULL;
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
-  SM_SCOPED_TRACE(CallFunction)
-    .arg("LoadPlugin")
-    .arg(filename)
-    .arg("remote", false);
-//    .arg("ns=globals()"); <== FIXME
+  SM_SCOPED_TRACE(CallFunction).arg("LoadPlugin").arg(filename).arg("remote", false);
+  //    .arg("ns=globals()"); <== FIXME
 
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
@@ -150,7 +143,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
   bool ret_val = loader->LoadPlugin(filename);
   loader->Delete();
   if (ret_val)
-    {
+  {
     // Update local-plugin information.
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     temp->CopyFromObject(NULL);
@@ -160,8 +153,8 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     temp->Delete();
 
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
-    this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent,(void*) filename);
-    }
+    this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent, (void*)filename);
+  }
 
   // We don't report the error here if ret_val == false since vtkPVPluginLoader
   // already reports those errors using vtkErrorMacro.
@@ -169,45 +162,40 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
-  vtkSMSession* session)
+bool vtkSMPluginManager::LoadRemotePlugin(const char* filename, vtkSMSession* session)
 {
   assert("Session cannot be NULL" && session != NULL);
 
-  SM_SCOPED_TRACE(CallFunction)
-    .arg("LoadPlugin")
-    .arg(filename)
-    .arg("remote", true);
-//    .arg("ns=globals()"); <== FIXME
+  SM_SCOPED_TRACE(CallFunction).arg("LoadPlugin").arg(filename).arg("remote", true);
+  //    .arg("ns=globals()"); <== FIXME
 
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSMPluginLoaderProxy* proxy =
-      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
+    vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
   proxy->UpdateVTKObjects();
   bool status = proxy->LoadPlugin(filename);
   if (!status)
-    {
-    vtkErrorMacro("Plugin load failed: " <<
-      vtkSMPropertyHelper(proxy, "ErrorString").GetAsString());
-    }
+  {
+    vtkErrorMacro(
+      "Plugin load failed: " << vtkSMPropertyHelper(proxy, "ErrorString").GetAsString());
+  }
   proxy->Delete();
 
   // Refresh definitions since those may have changed.
   pxm->GetProxyDefinitionManager()->SynchronizeDefinitions();
 
   if (status)
-    {
+  {
     // Refresh the remote plugin information
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-    session->GatherInformation(
-      vtkPVSession::DATA_SERVER_ROOT, temp, 0);
+    session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, temp, 0);
     this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
-    this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent,(void*) filename);
-    }
+    this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent, (void*)filename);
+  }
   return status;
 }
 
@@ -217,11 +205,11 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
 {
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
   if (remote)
-    {
+  {
     assert("Session should already be set" && (session != NULL));
     vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
     vtkSMPluginLoaderProxy* proxy =
-        vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
+      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
     proxy->UpdateVTKObjects();
     proxy->LoadPluginConfigurationXMLFromString(xmlcontents);
     proxy->Delete();
@@ -233,17 +221,16 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
     session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, temp, 0);
     this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
-    }
+  }
   else
-    {
-    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-      xmlcontents);
+  {
+    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(xmlcontents);
 
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     temp->CopyFromObject(NULL);
     this->LocalInformation->Update(temp);
     temp->Delete();
-    }
+  }
 
   this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
 }
@@ -252,9 +239,9 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
 void vtkSMPluginManager::OnPluginRegistered()
 {
   if (this->InLoadPlugin)
-    {
+  {
     return;
-    }
+  }
   // Update local-plugin information.
   vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
   temp->CopyFromObject(NULL);

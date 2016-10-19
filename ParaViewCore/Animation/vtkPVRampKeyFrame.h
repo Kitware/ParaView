@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRampKeyFrame
-// .SECTION Description
-// Interplates lineraly between consequtive key frames.
+/**
+ * @class   vtkPVRampKeyFrame
+ *
+ * Interplates lineraly between consequtive key frames.
+*/
 
 #ifndef vtkPVRampKeyFrame_h
 #define vtkPVRampKeyFrame_h
@@ -28,12 +30,12 @@ public:
   vtkTypeMacro(vtkPVRampKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // This method will do the actual interpolation.
-  // currenttime is normalized to the time range between
-  // this key frame and the next key frame.
-  virtual void UpdateValue(double currenttime,
-                           vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
+  /**
+   * This method will do the actual interpolation.
+   * currenttime is normalized to the time range between
+   * this key frame and the next key frame.
+   */
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
 protected:
   vtkPVRampKeyFrame();
@@ -42,7 +44,6 @@ protected:
 private:
   vtkPVRampKeyFrame(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

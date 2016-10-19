@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCompoundProxyDefinitionLoader - Creates a compound proxy from an
-// XML definition.
-// .SECTION Description
-// vtkSMCompoundProxyDefinitionLoader can load a compound proxy definition
-// from a given vtkPVXMLElement. This element can be populated by a 
-// vtkPVXMLElement or obtained from the proxy manager.
-// .SECTION See Also
-// vtkPVXMLElement vtkPVXMLParser vtkSMProxyManager
+/**
+ * @class   vtkSMCompoundProxyDefinitionLoader
+ * @brief   Creates a compound proxy from an
+ * XML definition.
+ *
+ * vtkSMCompoundProxyDefinitionLoader can load a compound proxy definition
+ * from a given vtkPVXMLElement. This element can be populated by a
+ * vtkPVXMLElement or obtained from the proxy manager.
+ * @sa
+ * vtkPVXMLElement vtkPVXMLParser vtkSMProxyManager
+*/
 
 #ifndef vtkSMCompoundProxyDefinitionLoader_h
 #define vtkSMCompoundProxyDefinitionLoader_h
@@ -42,11 +45,13 @@ protected:
   vtkSMCompoundProxyDefinitionLoader();
   ~vtkSMCompoundProxyDefinitionLoader();
 
-  // Description:
-  // Locate the XML for the proxy with the given id.
+  /**
+   * Locate the XML for the proxy with the given id.
+   */
   virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
 
   vtkPVXMLElement* RootElement;
+
 private:
   vtkSMCompoundProxyDefinitionLoader(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCompoundProxyDefinitionLoader&) VTK_DELETE_FUNCTION;

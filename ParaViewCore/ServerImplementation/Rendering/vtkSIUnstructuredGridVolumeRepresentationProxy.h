@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIUnstructuredGridVolumeRepresentationProxy - representation that can be used to
-// show a unstructured grid volume in a render view.
-// .SECTION Description
-// vtkSIUnstructuredGridVolumeRepresentationProxy is a concrete representation that can be used
-// to render the unstructured grid volume in a vtkSIRenderViewProxy.
+/**
+ * @class   vtkSIUnstructuredGridVolumeRepresentationProxy
+ * @brief   representation that can be used to
+ * show a unstructured grid volume in a render view.
+ *
+ * vtkSIUnstructuredGridVolumeRepresentationProxy is a concrete representation that can be used
+ * to render the unstructured grid volume in a vtkSIRenderViewProxy.
+*/
 
 #ifndef vtkSIUnstructuredGridVolumeRepresentationProxy_h
 #define vtkSIUnstructuredGridVolumeRepresentationProxy_h
@@ -24,7 +27,8 @@
 #include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy
+  : public vtkSIProxy
 {
 public:
   static vtkSIUnstructuredGridVolumeRepresentationProxy* New();
@@ -35,15 +39,15 @@ protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();
   ~vtkSIUnstructuredGridVolumeRepresentationProxy();
 
-  // Description:
-  // Register the mappers
+  /**
+   * Register the mappers
+   */
   bool CreateVTKObjects() VTK_OVERRIDE;
 
-
 private:
-  vtkSIUnstructuredGridVolumeRepresentationProxy(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSIUnstructuredGridVolumeRepresentationProxy(
+    const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

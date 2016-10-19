@@ -8,10 +8,12 @@
 #include "vtkPVXMLParser.h"
 #include "vtkStringList.h"
 
-#define PRINT_SELF(classname)\
-  c = classname::New(); c->Print(cout); c->Delete();
+#define PRINT_SELF(classname)                                                                      \
+  c = classname::New();                                                                            \
+  c->Print(cout);                                                                                  \
+  c->Delete();
 
-int ParaViewCoreCommonPrintSelf(int, char*[])
+int ParaViewCoreCommonPrintSelf(int, char* [])
 {
   vtkObject* c;
   PRINT_SELF(vtkCommandOptions);

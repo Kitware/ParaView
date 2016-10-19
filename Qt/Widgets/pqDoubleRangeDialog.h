@@ -39,23 +39,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDoubleRangeWidget;
 
-/// Provides a dialog for specifying a double between two ranges
+/**
+* Provides a dialog for specifying a double between two ranges
+*/
 class PQWIDGETS_EXPORT pqDoubleRangeDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  pqDoubleRangeDialog(const QString &label,
-                      double minimum,
-                      double maximum,
-                      QWidget *parent = 0);
+  pqDoubleRangeDialog(const QString& label, double minimum, double maximum, QWidget* parent = 0);
   ~pqDoubleRangeDialog();
 
   void setValue(double value);
   double value() const;
 
 private:
-  pqDoubleRangeWidget *Widget;
+  pqDoubleRangeWidget* Widget;
 };
 
 #endif // !_pqDoubleRangeDialog_h

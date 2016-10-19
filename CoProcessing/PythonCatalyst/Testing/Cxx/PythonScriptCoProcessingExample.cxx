@@ -12,49 +12,49 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// Build the grid inside of vtkCustomTestDriver.  This also calls the 
+// Build the grid inside of vtkCustomTestDriver.  This also calls the
 // python coprocessor.
 
 #include "vtkPVCustomTestDriver.h"
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
-# define MPICH_SKIP_MPICXX
-# include "vtkMPI.h"
+#define MPICH_SKIP_MPICXX
+#include "vtkMPI.h"
 #endif
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
-  if(argc < 2)
-    {
+  if (argc < 2)
+  {
     cerr << "Wrong number of arguments.  Command is: <exe> <python script>\n";
     return 1;
-    }
+  }
 #ifdef PARAVIEW_USE_MPI
-  MPI_Init(&argc,&argv);
+  MPI_Init(&argc, &argv);
 #endif
   int errors = 0;
   vtkPVCustomTestDriver* testDriver = vtkPVCustomTestDriver::New();
-  if(testDriver->Initialize(argv[1]))
-    {
+  if (testDriver->Initialize(argv[1]))
+  {
     testDriver->SetNumberOfTimeSteps(1);
     testDriver->SetStartTime(0);
     testDriver->SetEndTime(.5);
 
-    if(testDriver->Run())
-      {
-      errors++;
-      }
-    testDriver->Finalize();
-    }
-  else
+    if (testDriver->Run())
     {
-    errors++;
+      errors++;
     }
+    testDriver->Finalize();
+  }
+  else
+  {
+    errors++;
+  }
   testDriver->Delete();
 
-#ifdef PARAVIEW_USE_MPI 
+#ifdef PARAVIEW_USE_MPI
   MPI_Finalize();
 #endif
 

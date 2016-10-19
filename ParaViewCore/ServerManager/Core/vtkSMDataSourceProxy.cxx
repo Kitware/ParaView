@@ -31,22 +31,19 @@ vtkSMDataSourceProxy::~vtkSMDataSourceProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
+void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy* sourceProxy)
 {
   if (!sourceProxy || this->Location != sourceProxy->GetLocation())
-    {
+  {
     return;
-    }
+  }
   vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << VTKOBJECT(sourceProxy) << "GetOutput"
-          << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(sourceProxy) << "GetOutput"
+         << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 
-  stream  << vtkClientServerStream::Invoke
-          << VTKOBJECT(this) << "CopyData" 
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "CopyData"
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 
   this->MarkModified(this);

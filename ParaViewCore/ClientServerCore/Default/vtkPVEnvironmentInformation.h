@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVEnvironmentInformation - Information object that can
-// be used to obtain values of environment variables.
-// .SECTION Description
-// vtkPVEnvironmentInformation can be used to get values of environment
-// variables.
+/**
+ * @class   vtkPVEnvironmentInformation
+ * @brief   Information object that can
+ * be used to obtain values of environment variables.
+ *
+ * vtkPVEnvironmentInformation can be used to get values of environment
+ * variables.
+*/
 
 #ifndef vtkPVEnvironmentInformation_h
 #define vtkPVEnvironmentInformation_h
@@ -31,25 +34,32 @@ public:
   vtkTypeMacro(vtkPVEnvironmentInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
-  // The object must be a vtkPVEnvironmentInformationHelper.
+  /**
+   * Transfer information about a single object into this object.
+   * The object must be a vtkPVEnvironmentInformationHelper.
+   */
   virtual void CopyFromObject(vtkObject* object);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Get the value of an environment variable
+  //@{
+  /**
+   * Get the value of an environment variable
+   */
   vtkGetStringMacro(Variable);
+  //@}
 
 protected:
   vtkPVEnvironmentInformation();
   ~vtkPVEnvironmentInformation();
 
-  char* Variable;     // value of an environment variable
+  char* Variable; // value of an environment variable
 
   vtkSetStringMacro(Variable);
 
@@ -58,6 +68,4 @@ private:
   void operator=(const vtkPVEnvironmentInformation&) VTK_DELETE_FUNCTION;
 };
 
-
 #endif
-

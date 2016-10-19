@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,26 +45,25 @@ class QMenu;
 
 /** Displays a collection of recently-used files (server resources)
 as a menu, sorted in most-recently-used order and grouped by server */
-class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
-  public QObject
+class PQCOMPONENTS_EXPORT pqRecentFilesMenu : public QObject
 {
   Q_OBJECT
 
 public:
-  /// Assigns the menu that will display the list of files
-  pqRecentFilesMenu(QMenu& menu, QObject* p=0);
+  /**
+  * Assigns the menu that will display the list of files
+  */
+  pqRecentFilesMenu(QMenu& menu, QObject* p = 0);
   virtual ~pqRecentFilesMenu();
 
-  /// Open a resource on the given server
-  virtual bool open(
-    pqServer* server, const pqServerResource& resource) const;
+  /**
+  * Open a resource on the given server
+  */
+  virtual bool open(pqServer* server, const pqServerResource& resource) const;
 
 protected:
-  virtual pqPipelineSource* createReader(
-    const QString& readerGroup,
-    const QString& readerName,
-    const QStringList& files,
-    pqServer* server) const;
+  virtual pqPipelineSource* createReader(const QString& readerGroup, const QString& readerName,
+    const QStringList& files, pqServer* server) const;
 
 private slots:
   void onResourcesChanged();
@@ -77,7 +76,7 @@ private:
   pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
 
   class pqImplementation;
-  pqImplementation* const Implementation;  
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqRecentFilesMenu_h

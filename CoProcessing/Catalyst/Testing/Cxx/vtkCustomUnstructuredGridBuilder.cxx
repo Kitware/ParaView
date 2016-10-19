@@ -40,15 +40,14 @@ vtkCustomUnstructuredGridBuilder::~vtkCustomUnstructuredGridBuilder()
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkCustomUnstructuredGridBuilder::GetGrid(
-  unsigned long vtkNotUsed(timeStep), double vtkNotUsed(time), 
-  int & builtNewGrid)
+  unsigned long vtkNotUsed(timeStep), double vtkNotUsed(time), int& builtNewGrid)
 {
   builtNewGrid = 0;
-  if(this->IsGridModified)
-    {
+  if (this->IsGridModified)
+  {
     this->BuildGrid();
     builtNewGrid = 1;
-    }
+  }
 
   this->IsGridModified = 0;
 
@@ -60,17 +59,16 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
 {
   // I don't want to create an unstructured grid by hand so I'll create
   // a vtkUniformGrid and then build an UnstructuredGrid from that.
-  vtkSmartPointer<vtkUniformGrid> uniformGrid = 
-    vtkSmartPointer<vtkUniformGrid>::New();
-  double spacing[3] = {.2, .2, .3};
+  vtkSmartPointer<vtkUniformGrid> uniformGrid = vtkSmartPointer<vtkUniformGrid>::New();
+  double spacing[3] = { .2, .2, .3 };
   uniformGrid->SetSpacing(spacing);
-  double origin[3] = {20, 30, 30};
+  double origin[3] = { 20, 30, 30 };
   uniformGrid->SetOrigin(origin);
-  int dimensions[3] = {30, 30, 30};
+  int dimensions[3] = { 30, 30, 30 };
   uniformGrid->SetDimensions(dimensions);
 
   // Now create the vtkUnstructuredGrid from NewGrid.
-  // First create the points/nodes of the grid.  I'll also 
+  // First create the points/nodes of the grid.  I'll also
   // add in the point data while I'm at it.
   vtkPoints* points = vtkPoints::New();
   vtkIdType numberOfPoints = uniformGrid->GetNumberOfPoints();
@@ -81,17 +79,17 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
   pointField->SetNumberOfTuples(numberOfPoints);
   pointField->SetName("Velocity");
   double velocity[3];
-  for(vtkIdType i=0;i<numberOfPoints;i++)
-    {
+  for (vtkIdType i = 0; i < numberOfPoints; i++)
+  {
     // Use this GetPoint method because it is thread-safe.
     uniformGrid->GetPoint(i, xyz);
     points->SetPoint(i, xyz);
     // Just make up numbers for now.
-    velocity[0] = xyz[0]*xyz[0];
+    velocity[0] = xyz[0] * xyz[0];
     velocity[1] = xyz[1];
-    velocity[2] = xyz[2]+5.;
+    velocity[2] = xyz[2] + 5.;
     pointField->SetTypedTuple(i, velocity);
-    }
+  }
   this->SetPoints(points);
   points->Delete();
   this->GetUnstructuredGrid()->GetPointData()->AddArray(pointField);
@@ -99,7 +97,7 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
 
   // Next add in the cells (assuming we don't know what type of cells).
   // I'll also add in cell data while I'm at this.  Note though that this
-  // can be tricky as the cells are added in an order based on type and 
+  // can be tricky as the cells are added in an order based on type and
   // not on calls to InsertNextCell.  Thus, I add the array to CellData
   // right away and let VTK take care of the details.
   vtkIdType numberOfCells = uniformGrid->GetNumberOfCells();
@@ -110,22 +108,20 @@ void vtkCustomUnstructuredGridBuilder::BuildGrid()
   cellField->SetName("Pressure");
   this->GetUnstructuredGrid()->GetCellData()->AddArray(cellField);
   cellField->Delete();
-  for(vtkIdType i=0;i<numberOfCells;i++)
-    {
+  for (vtkIdType i = 0; i < numberOfCells; i++)
+  {
     // Use this GetCell method because it is thread-safe.
     uniformGrid->GetCell(i, cell);
-    vtkIdType cellId = 
-      this->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
+    vtkIdType cellId = this->InsertNextCell(cell->GetCellType(), cell->GetPointIds());
     // Set the pressure to the X value of the cell centroid.
     this->ComputeCellCentroid(cell, xyz);
     cellField->InsertTypedTuple(cellId, xyz);
-    }
+  }
   cell->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkCustomUnstructuredGridBuilder::ComputeCellCentroid(
-  vtkGenericCell* cell, double xyz[3])
+void vtkCustomUnstructuredGridBuilder::ComputeCellCentroid(vtkGenericCell* cell, double xyz[3])
 {
   double pxyz[3];
   int subId = cell->GetParametricCenter(pxyz);

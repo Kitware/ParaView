@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,26 +35,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if QT_VERSION >= 0x050000
 
-static void QtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+static void QtMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
   QByteArray localMsg = msg.toLocal8Bit();
-  QString dispMsg = QString("%1 (%2:%3, %4)").arg(localMsg.constData()).
-    arg(context.file).arg(context.line).arg(context.function);
-  switch(type)
-    {
-  case QtDebugMsg:
-    vtkOutputWindow::GetInstance()->DisplayText(dispMsg.toLocal8Bit().constData());
-    break;
-  case QtWarningMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
-    break;
-  case QtCriticalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
-    break;
-  case QtFatalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
-    break;
-    }
+  QString dispMsg = QString("%1 (%2:%3, %4)")
+                      .arg(localMsg.constData())
+                      .arg(context.file)
+                      .arg(context.line)
+                      .arg(context.function);
+  switch (type)
+  {
+    case QtDebugMsg:
+      vtkOutputWindow::GetInstance()->DisplayText(dispMsg.toLocal8Bit().constData());
+      break;
+    case QtWarningMsg:
+      vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+      break;
+    case QtCriticalMsg:
+      vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+      break;
+    case QtFatalMsg:
+      vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -70,23 +73,23 @@ pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
 
 #else
 
-static void QtMessageOutput(QtMsgType type, const char *msg)
+static void QtMessageOutput(QtMsgType type, const char* msg)
 {
-  switch(type)
-    {
-  case QtDebugMsg:
-    vtkOutputWindow::GetInstance()->DisplayText(msg);
-    break;
-  case QtWarningMsg:
-    vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
-    break;
-  case QtCriticalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-    break;
-  case QtFatalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-    break;
-    }
+  switch (type)
+  {
+    case QtDebugMsg:
+      vtkOutputWindow::GetInstance()->DisplayText(msg);
+      break;
+    case QtWarningMsg:
+      vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
+      break;
+    case QtCriticalMsg:
+      vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+      break;
+    case QtFatalMsg:
+      vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------

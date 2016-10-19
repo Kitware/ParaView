@@ -47,29 +47,26 @@ void pqAnimationTimeToolbar::constructor()
   this->AnimationTimeWidget->setPlayModeReadOnly(true);
   this->addWidget(this->AnimationTimeWidget);
   this->connect(pqPVApplicationCore::instance()->animationManager(),
-    SIGNAL(activeSceneChanged(pqAnimationScene*)),
-    SLOT(setAnimationScene(pqAnimationScene*)));
-  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(),
-                           vtkCommand::ModifiedEvent,
-                           this, SLOT(updateTimePrecision()));
+    SIGNAL(activeSceneChanged(pqAnimationScene*)), SLOT(setAnimationScene(pqAnimationScene*)));
+  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
+    SLOT(updateTimePrecision()));
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 {
-  this->AnimationTimeWidget->setAnimationScene(
-    scene? scene->getProxy() : NULL);
+  this->AnimationTimeWidget->setAnimationScene(scene ? scene->getProxy() : NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::updateTimePrecision()
 {
   if (this->AnimationTimeWidget->timePrecision() !=
-      vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision())
-    {
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision())
+  {
     this->AnimationTimeWidget->setTimePrecision(
       vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------

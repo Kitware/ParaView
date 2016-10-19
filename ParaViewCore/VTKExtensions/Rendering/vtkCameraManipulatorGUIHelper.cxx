@@ -24,7 +24,6 @@ vtkCameraManipulatorGUIHelper::vtkCameraManipulatorGUIHelper()
 //-----------------------------------------------------------------------------
 vtkCameraManipulatorGUIHelper::~vtkCameraManipulatorGUIHelper()
 {
- 
 }
 
 //-----------------------------------------------------------------------------

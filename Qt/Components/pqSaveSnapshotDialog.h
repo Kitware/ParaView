@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,48 +35,69 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QDialog>
 
-/// Dialog used to ask the user for the resolution of the snapshot to save.
+/**
+* Dialog used to ask the user for the resolution of the snapshot to save.
+*/
 class PQCOMPONENTS_EXPORT pqSaveSnapshotDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  pqSaveSnapshotDialog(QWidget* parent, Qt::WindowFlags f=0);
+  pqSaveSnapshotDialog(QWidget* parent, Qt::WindowFlags f = 0);
   ~pqSaveSnapshotDialog();
 
-  /// Set the default size for the snapshot.
+  /**
+  * Set the default size for the snapshot.
+  */
   void setViewSize(const QSize& size);
 
-  /// Returns the user selected size.
+  /**
+  * Returns the user selected size.
+  */
   QSize viewSize() const;
 
-  /// Returns the quality [0, 100] choosen by the user.
+  /**
+  * Returns the quality [0, 100] choosen by the user.
+  */
   int quality() const;
 
-  /// Specifiy if the save all views option should be visible or not.
-  /// Default behaviour is to show it. It can be useful to disable the option
-  /// for some custom applications where there is just a single view.
+  /**
+  * Specifiy if the save all views option should be visible or not.
+  * Default behaviour is to show it. It can be useful to disable the option
+  * for some custom applications where there is just a single view.
+  */
   void setEnableSaveAllViews(bool enable);
 
-  /// Set the default all views size. viewSize is used when used when
-  /// saveAllViews is false, while all views size is used when saveAllViews is
-  /// true.
+  /**
+  * Set the default all views size. viewSize is used when used when
+  * saveAllViews is false, while all views size is used when saveAllViews is
+  * true.
+  */
   void setAllViewsSize(const QSize& size);
 
-  /// Returns if the user requested to save all views.
+  /**
+  * Returns if the user requested to save all views.
+  */
   bool saveAllViews() const;
 
-  /// Returns the color palette chosen. If none is chosen 
-  /// (i.e. "Current Palette" is selected, then an empty string is returned.
+  /**
+  * Returns the color palette chosen. If none is chosen
+  * (i.e. "Current Palette" is selected, then an empty string is returned.
+  */
   QString palette() const;
 
-  /// Returns one of the stereo mode constants defined in vtkRenderWindow.h if
-  /// user selected a stereo mode. 0 is no-stereo.
+  /**
+  * Returns one of the stereo mode constants defined in vtkRenderWindow.h if
+  * user selected a stereo mode. 0 is no-stereo.
+  */
   int getStereoMode() const;
 
 protected slots:
-  /// Called when the user has edited width. If aspect ratio is locked,
-  /// we will scale the height to maintain the aspect ration.
+  /**
+  * Called when the user has edited width. If aspect ratio is locked,
+  * we will scale the height to maintain the aspect ration.
+  */
   void onWidthEdited();
 
   void onHeightEdited();
@@ -93,5 +114,3 @@ private:
 };
 
 #endif
-
-

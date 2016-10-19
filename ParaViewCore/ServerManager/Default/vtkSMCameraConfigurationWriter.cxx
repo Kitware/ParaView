@@ -25,7 +25,7 @@ vtkStandardNewMacro(vtkSMCameraConfigurationWriter);
 //-----------------------------------------------------------------------------
 vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
 {
-  vtkStringList *propNames=vtkStringList::New();
+  vtkStringList* propNames = vtkStringList::New();
   propNames->AddString("CameraPosition");
   propNames->AddString("CameraFocalPoint");
   propNames->AddString("CameraViewUp");
@@ -34,7 +34,7 @@ vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
   propNames->AddString("CameraViewAngle");
   propNames->AddString("CameraParallelScale");
   propNames->AddString("CameraParallelProjection");
-  vtkSMNamedPropertyIterator *propIt=vtkSMNamedPropertyIterator::New();
+  vtkSMNamedPropertyIterator* propIt = vtkSMNamedPropertyIterator::New();
   propIt->SetPropertyNames(propNames);
   propNames->Delete();
   this->SetPropertyIterator(propIt);
@@ -48,11 +48,11 @@ vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
 
 //-----------------------------------------------------------------------------
 vtkSMCameraConfigurationWriter::~vtkSMCameraConfigurationWriter()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-void vtkSMCameraConfigurationWriter::SetRenderViewProxy(
-      vtkSMProxy *rvProxy)
+void vtkSMCameraConfigurationWriter::SetRenderViewProxy(vtkSMProxy* rvProxy)
 {
   this->vtkSMProxyConfigurationWriter::SetProxy(rvProxy);
   this->GetPropertyIterator()->SetProxy(rvProxy);
@@ -61,6 +61,5 @@ void vtkSMCameraConfigurationWriter::SetRenderViewProxy(
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
-

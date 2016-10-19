@@ -9,12 +9,12 @@ class Grid;
 
 namespace FEAdaptor
 {
-  void Initialize(std::vector<std::string>& scripts);
+void Initialize(std::vector<std::string>& scripts);
 
-  void Finalize();
+void Finalize();
 
-  void CoProcess(Grid& grid, Attributes& attributes, double time,
-                 unsigned int timeStep, bool lastTimeStep);
+void CoProcess(
+  Grid& grid, Attributes& attributes, double time, unsigned int timeStep, bool lastTimeStep);
 }
 
 #endif

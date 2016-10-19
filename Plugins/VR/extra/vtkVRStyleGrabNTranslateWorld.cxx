@@ -54,7 +54,7 @@ vtkVRStyleGrabNTranslateWorld::vtkVRStyleGrabNTranslateWorld(QObject* parentObje
 {
   this->Enabled = false;
   this->Old = vtkTransform::New();
-  this->Tx =  vtkTransform::New();
+  this->Tx = vtkTransform::New();
   this->Neo = vtkTransform::New();
 }
 
@@ -68,49 +68,44 @@ vtkVRStyleGrabNTranslateWorld::~vtkVRStyleGrabNTranslateWorld()
 }
 
 //-----------------------------------------------------------------------public
-bool vtkVRStyleGrabNTranslateWorld::configure(vtkPVXMLElement* child,
-                                   vtkSMProxyLocator* locator)
+bool vtkVRStyleGrabNTranslateWorld::configure(vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
-  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
-    strcmp(this->metaObject()->className(),
-      child->GetAttributeOrEmpty("class")) == 0)
+  if (child->GetName() && strcmp(child->GetName(), "Style") == 0 &&
+    strcmp(this->metaObject()->className(), child->GetAttributeOrEmpty("class")) == 0)
+  {
+    if (child->GetNumberOfNestedElements() != 2)
     {
-    if ( child->GetNumberOfNestedElements() !=2 )
-      {
       std::cerr << "vtkVRStyleGrabNTranslateWorld::configure(): "
                 << "There has to be only 2 elements present " << std::endl
                 << "<Button name=\"buttonEventName\"/>" << std::endl
-                << "<Tracker name=\"trackerEventName\"/>"
-                << std::endl;
-      }
+                << "<Tracker name=\"trackerEventName\"/>" << std::endl;
+    }
     vtkPVXMLElement* button = child->GetNestedElement(0);
-    if (button && button->GetName() && strcmp(button->GetName(), "Button")==0)
-      {
+    if (button && button->GetName() && strcmp(button->GetName(), "Button") == 0)
+    {
       this->Button = button->GetAttributeOrEmpty("name");
-      }
+    }
     else
-      {
+    {
       std::cerr << "vtkVRStyleGrabNTranslateWorld::configure(): "
                 << "Button event has to be specified" << std::endl
-                << "<Button name=\"buttonEventName\"/>"
-                << std::endl;
+                << "<Button name=\"buttonEventName\"/>" << std::endl;
       return false;
-      }
-    vtkPVXMLElement* tracker = child->GetNestedElement(1);
-    if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Tracker")==0)
-      {
-      this->Tracker = tracker->GetAttributeOrEmpty("name");
-      }
-    else
-      {
-      std::cerr << "vtkVRStyleGrabNTranslateWorld::configure(): "
-                << "Please Specify Tracker event" <<std::endl
-                << "<Tracker name=\"TrackerEventName\"/>"
-                << std::endl;
-      return false;
-      }
-    return true;
     }
+    vtkPVXMLElement* tracker = child->GetNestedElement(1);
+    if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Tracker") == 0)
+    {
+      this->Tracker = tracker->GetAttributeOrEmpty("name");
+    }
+    else
+    {
+      std::cerr << "vtkVRStyleGrabNTranslateWorld::configure(): "
+                << "Please Specify Tracker event" << std::endl
+                << "<Tracker name=\"TrackerEventName\"/>" << std::endl;
+      return false;
+    }
+    return true;
+  }
   return false;
 }
 
@@ -118,18 +113,18 @@ bool vtkVRStyleGrabNTranslateWorld::configure(vtkPVXMLElement* child,
 vtkPVXMLElement* vtkVRStyleGrabNTranslateWorld::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
-  child->SetName( "Style" );
+  child->SetName("Style");
   child->AddAttribute("class", this->metaObject()->className());
 
   vtkPVXMLElement* button = vtkPVXMLElement::New();
   button->SetName("Button");
-  button->AddAttribute("name", this->Button.c_str() );
+  button->AddAttribute("name", this->Button.c_str());
   child->AddNestedElement(button);
   button->FastDelete();
 
   vtkPVXMLElement* tracker = vtkPVXMLElement::New();
   tracker->SetName("Tracker");
-  tracker->AddAttribute("name",this->Tracker.c_str() );
+  tracker->AddAttribute("name", this->Tracker.c_str());
   child->AddNestedElement(tracker);
   tracker->FastDelete();
 
@@ -139,122 +134,121 @@ vtkPVXMLElement* vtkVRStyleGrabNTranslateWorld::saveConfiguration() const
 //-----------------------------------------------------------------------public
 bool vtkVRStyleGrabNTranslateWorld::handleEvent(const vtkVREventData& data)
 {
-  switch( data.eventType )
-    {
+  switch (data.eventType)
+  {
     case BUTTON_EVENT:
-      if ( this->Button == data.name )
-        {
-        this->HandleButton( data );
-        }
+      if (this->Button == data.name)
+      {
+        this->HandleButton(data);
+      }
       break;
     case ANALOG_EVENT:
-      this->HandleAnalog( data );
+      this->HandleAnalog(data);
       break;
     case TRACKER_EVENT:
-      if ( this->Tracker == data.name )
-        {
-        this->HandleTracker( data );
-        }
+      if (this->Tracker == data.name)
+      {
+        this->HandleTracker(data);
+      }
       break;
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------public
 bool vtkVRStyleGrabNTranslateWorld::update()
 {
-  pqView *view = 0;
-  vtkSMRenderViewProxy *proxy =0;
+  pqView* view = 0;
+  vtkSMRenderViewProxy* proxy = 0;
   view = pqActiveObjects::instance().activeView();
-  if ( view )
+  if (view)
+  {
+    proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+    if (proxy)
     {
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
-      {
       proxy->UpdateVTKObjects();
       proxy->StillRender();
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------private
-void vtkVRStyleGrabNTranslateWorld::HandleButton( const vtkVREventData& data )
+void vtkVRStyleGrabNTranslateWorld::HandleButton(const vtkVREventData& data)
 {
-    std::cout << data.name << std::endl;
-    this->Enabled = data.data.button.state;
+  std::cout << data.name << std::endl;
+  this->Enabled = data.data.button.state;
 }
 
 //----------------------------------------------------------------------private
-void vtkVRStyleGrabNTranslateWorld::HandleAnalog( const vtkVREventData& data )
+void vtkVRStyleGrabNTranslateWorld::HandleAnalog(const vtkVREventData& data)
 {
 }
 
 //----------------------------------------------------------------------private
-void vtkVRStyleGrabNTranslateWorld::HandleTracker( const vtkVREventData& data )
+void vtkVRStyleGrabNTranslateWorld::HandleTracker(const vtkVREventData& data)
 {
   // If the button is pressed then record the current position is tracking space
-  if ( this->Enabled )
+  if (this->Enabled)
+  {
+    if (!this->InitialPositionRecorded)
     {
-    if ( !this->InitialPositionRecorded )
-      {
-      this->RecordCurrentPosition( data );
+      this->RecordCurrentPosition(data);
       this->InitialPositionRecorded = true;
       return;
-      }
+    }
     std::cout << "its time to translate " << std::endl;
-    vtkSMRenderViewProxy *proxy =0;
-    vtkSMDoubleVectorProperty *prop =0;
+    vtkSMRenderViewProxy* proxy = 0;
+    vtkSMDoubleVectorProperty* prop = 0;
 
-    pqView *view = 0;
+    pqView* view = 0;
     view = pqActiveObjects::instance().activeView();
-    if ( view )
+    if (view)
+    {
+      proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+      if (proxy)
       {
-      proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-      if ( proxy )
+        prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty("ModelTransformMatrix"));
+        if (prop)
         {
-        prop =
-          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
-        if ( prop )
-          {
           // Calculate the delta between the old rcorded value and new value
           double deltaPos[3];
-          deltaPos[0] = data.data.tracker.matrix[3]  - InitialPos[0];
-          deltaPos[1] = data.data.tracker.matrix[7]  - InitialPos[1];
+          deltaPos[0] = data.data.tracker.matrix[3] - InitialPos[0];
+          deltaPos[1] = data.data.tracker.matrix[7] - InitialPos[1];
           deltaPos[2] = data.data.tracker.matrix[11] - InitialPos[2];
           this->RecordCurrentPosition(data);
 
           // Get the current transformation matrix
-          std::cout<< "Gettting the wand pose" <<std::endl;
+          std::cout << "Gettting the wand pose" << std::endl;
           double oldPose[16];
-          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").
-            Get(&oldPose[0], 16 );
+          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(&oldPose[0], 16);
 
-          prop->SetElement( 3,  oldPose[3]  + deltaPos[0]);
-          prop->SetElement( 7,  oldPose[7]  + deltaPos[1]);
-          prop->SetElement( 11, oldPose[11]  + deltaPos[2]);
-          }
+          prop->SetElement(3, oldPose[3] + deltaPos[0]);
+          prop->SetElement(7, oldPose[7] + deltaPos[1]);
+          prop->SetElement(11, oldPose[11] + deltaPos[2]);
         }
       }
     }
+  }
   else
-    {
+  {
     // If the button is released then
     this->InitialPositionRecorded = false;
-    }
+  }
 }
 
 //----------------------------------------------------------------------private
-std::vector<std::string> vtkVRStyleGrabNTranslateWorld::tokenize( std::string input)
+std::vector<std::string> vtkVRStyleGrabNTranslateWorld::tokenize(std::string input)
 {
-  std::replace( input.begin(), input.end(), '.', ' ' );
-  std::istringstream stm( input );
+  std::replace(input.begin(), input.end(), '.', ' ');
+  std::istringstream stm(input);
   std::vector<std::string> token;
   for (;;)
-    {
+  {
     std::string word;
-    if (!(stm >> word)) break;
+    if (!(stm >> word))
+      break;
     token.push_back(word);
-    }
+  }
   return token;
 }
 
@@ -264,9 +258,6 @@ void vtkVRStyleGrabNTranslateWorld::RecordCurrentPosition(const vtkVREventData& 
   this->InitialPos[0] = data.data.tracker.matrix[3];
   this->InitialPos[1] = data.data.tracker.matrix[7];
   this->InitialPos[2] = data.data.tracker.matrix[11];
-  std::cout << "InitialPos = ["
-            << this->InitialPos[0] << " "
-            << this->InitialPos[1] << " "
-            << this->InitialPos[2] << " ] "
-            << std::endl;
+  std::cout << "InitialPos = [" << this->InitialPos[0] << " " << this->InitialPos[1] << " "
+            << this->InitialPos[2] << " ] " << std::endl;
 }

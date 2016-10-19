@@ -44,15 +44,15 @@ vtkSIWriterProxy::~vtkSIWriterProxy()
 bool vtkSIWriterProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(element))
-    {
+  {
     return false;
-    }
+  }
 
   const char* setFileNameMethod = element->GetAttribute("file_name_method");
   if (setFileNameMethod)
-    {
+  {
     this->SetFileNameMethod(setFileNameMethod);
-    }
+  }
 
   return true;
 }
@@ -65,105 +65,79 @@ void vtkSIWriterProxy::OnCreateVTKObjects()
   vtkObjectBase* object = this->GetVTKObject();
   vtkSIProxy* writerProxy = this->GetSubSIProxy("Writer");
   if (writerProxy)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << object
-      << "SetWriter"
-      << writerProxy->GetVTKObject()
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << object << "SetWriter" << writerProxy->GetVTKObject()
+           << vtkClientServerStream::End;
     if (this->FileNameMethod)
-      {
-      stream << vtkClientServerStream::Invoke
-        << object
-        << "SetFileNameMethod"
-        << this->FileNameMethod
-        << vtkClientServerStream::End;
-      }
-    this->Interpreter->ProcessStream(stream);
+    {
+      stream << vtkClientServerStream::Invoke << object << "SetFileNameMethod"
+             << this->FileNameMethod << vtkClientServerStream::End;
     }
+    this->Interpreter->ProcessStream(stream);
+  }
 
   vtkSIProxy* helper = this->GetSubSIProxy("PreGatherHelper");
   if (helper)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << object
-      << "SetPreGatherHelper" << helper->GetVTKObject()
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << object << "SetPreGatherHelper"
+           << helper->GetVTKObject() << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 
   helper = this->GetSubSIProxy("PostGatherHelper");
   if (helper)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << object
-      << "SetPostGatherHelper" << helper->GetVTKObject()
-      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << object << "SetPostGatherHelper"
+           << helper->GetVTKObject() << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
-    }
+  }
 
   // Pass piece/process information to the writer if it needs it.
   vtkProcessModule::GetProcessModule()->ReportInterpreterErrorsOff();
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   int numProcs = controller->GetNumberOfProcesses();
   int procId = controller->GetLocalProcessId();
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << object
-    << "SetNumberOfPieces"
-    << numProcs
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << object << "SetNumberOfPieces" << numProcs
+         << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
   stream.Reset();
 
   // ALTERNATIVE: 1
-  stream << vtkClientServerStream::Invoke
-    << object
-    << "SetStartPiece"
-    << procId
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << object
-    << "SetEndPiece"
-    << procId
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << object << "SetStartPiece" << procId
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << object << "SetEndPiece" << procId
+         << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
   stream.Reset();
 
   // ALTERNATIVE: 2
-  stream << vtkClientServerStream::Invoke
-    << object
-    << "SetPiece"
-    << procId
-    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << object << "SetPiece" << procId
+         << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
   vtkProcessModule::GetProcessModule()->ReportInterpreterErrorsOn();
   stream.Reset();
 }
 
 //----------------------------------------------------------------------------
-void vtkSIWriterProxy::AddInput(
-  int input_port, vtkAlgorithmOutput* connection, const char* method)
+void vtkSIWriterProxy::AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method)
 {
   vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
-      completeArraysSI ?
-      vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
+    completeArraysSI ? vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
   if (completeArrays)
-    {
+  {
     completeArrays->SetInputConnection(connection);
-    this->Superclass::AddInput(input_port, completeArrays->GetOutputPort(),
-      method);
-    }
+    this->Superclass::AddInput(input_port, completeArrays->GetOutputPort(), method);
+  }
   else
-    {
+  {
     this->Superclass::AddInput(input_port, connection, method);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -171,12 +145,11 @@ void vtkSIWriterProxy::CleanInputs(const char* method)
 {
   vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
-      completeArraysSI ?
-      vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
+    completeArraysSI ? vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
   if (completeArrays)
-    {
+  {
     completeArrays->SetInputConnection(NULL);
-    }
+  }
   this->Superclass::CleanInputs(method);
 }
 
@@ -184,27 +157,26 @@ void vtkSIWriterProxy::CleanInputs(const char* method)
 void vtkSIWriterProxy::UpdatePipelineTime(double time)
 {
   vtkAlgorithm* writer = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-  if(!writer)
-    {
-    vtkErrorMacro("Unexpected VTK object " <<
-                  (this->GetVTKObject() ?
-                   this->GetVTKObject()->GetClassName() : "(NULL"));
+  if (!writer)
+  {
+    vtkErrorMacro("Unexpected VTK object "
+      << (this->GetVTKObject() ? this->GetVTKObject()->GetClassName() : "(NULL"));
     return;
-    }
-  for(int port=0;port<writer->GetNumberOfInputPorts();port++)
+  }
+  for (int port = 0; port < writer->GetNumberOfInputPorts(); port++)
+  {
+    for (int c = 0; c < writer->GetNumberOfInputConnections(port); c++)
     {
-    for(int c=0;c<writer->GetNumberOfInputConnections(port);c++)
-      {
       vtkInformation* info = writer->GetInputInformation(port, c);
-      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),time);
-      }
+      info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), time);
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSIWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileNameMethod: "
-     << (this->FileNameMethod ? this->FileNameMethod : "(none)") << endl;
+  os << indent << "FileNameMethod: " << (this->FileNameMethod ? this->FileNameMethod : "(none)")
+     << endl;
 }

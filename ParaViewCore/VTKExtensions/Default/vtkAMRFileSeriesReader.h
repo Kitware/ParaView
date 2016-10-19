@@ -27,19 +27,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual int RequestUpdateTime (vtkInformation*,
-                                  vtkInformationVector**,
-                                 vtkInformationVector*);
+  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-
-  virtual int RequestUpdateTimeDependentInformation (vtkInformation*,
-                                                     vtkInformationVector**,
-                                                     vtkInformationVector*);
-
+  virtual int RequestUpdateTimeDependentInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkAMRFileSeriesReader();

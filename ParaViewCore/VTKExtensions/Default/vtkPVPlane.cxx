@@ -41,11 +41,11 @@ void vtkPVPlane::SetTransform(vtkAbstractTransform* transform)
 double vtkPVPlane::EvaluateFunction(double x[3])
 {
   if (this->GetMTime() > this->Plane->GetMTime())
-    {
+  {
     this->Plane->SetNormal(this->Normal);
     this->Plane->SetOrigin(this->Origin);
     this->Plane->Push(this->Offset);
-    }
+  }
 
   return this->Plane->EvaluateFunction(x);
 }
@@ -54,11 +54,11 @@ double vtkPVPlane::EvaluateFunction(double x[3])
 void vtkPVPlane::EvaluateGradient(double x[3], double g[3])
 {
   if (this->GetMTime() > this->Plane->GetMTime())
-    {
+  {
     this->Plane->SetNormal(this->Normal);
     this->Plane->SetOrigin(this->Origin);
     this->Plane->Push(this->Offset);
-    }
+  }
 
   this->Plane->EvaluateGradient(x, g);
 }

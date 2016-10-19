@@ -35,20 +35,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetEventPlayer.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-/// pqColorButtonEventPlayer is the player for pqColorChooserButton.
+/**
+* pqColorButtonEventPlayer is the player for pqColorChooserButton.
+*/
 class PQWIDGETS_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqColorButtonEventPlayer(QObject* parent=0);
+  pqColorButtonEventPlayer(QObject* parent = 0);
   ~pqColorButtonEventPlayer();
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString&
-    arguments, bool& error);
+  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
 
-  static const QString &EVENT_NAME();
+  static const QString& EVENT_NAME();
+
 private:
   Q_DISABLE_COPY(pqColorButtonEventPlayer)
 };

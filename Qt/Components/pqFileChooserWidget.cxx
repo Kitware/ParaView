@@ -40,10 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView
 #include "pqFileDialog.h"
 
-
-
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
-  : QWidget(p), Server(NULL)
+  : QWidget(p)
+  , Server(NULL)
 {
   this->ForceSingleFile = false;
   this->UseDirectoryMode = false;
@@ -59,33 +58,29 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   QToolButton* tb = new QToolButton(this);
   tb->setObjectName("FileButton");
   tb->setText("...");
-  QObject::connect(tb, SIGNAL(clicked(bool)),
-                   this, SLOT(chooseFile()));
+  QObject::connect(tb, SIGNAL(clicked(bool)), this, SLOT(chooseFile()));
 
   l->addWidget(this->LineEdit);
   l->addWidget(tb);
 
-  QObject::connect(this->LineEdit,
-                   SIGNAL(textChanged(const QString&)),
-                   this, SLOT(handleFileLineEditChanged(const QString&)));
-
+  QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)), this,
+    SLOT(handleFileLineEditChanged(const QString&)));
 }
 
 pqFileChooserWidget::~pqFileChooserWidget()
 {
 }
 
-
 QStringList pqFileChooserWidget::filenames() const
 {
   if (this->UseFilenameList)
-    {
+  {
     return this->FilenameList;
-    }
+  }
   else
-    {
+  {
     return pqFileChooserWidget::splitFilenames(this->LineEdit->text());
-    }
+  }
 }
 
 void pqFileChooserWidget::setFilenames(const QStringList& files)
@@ -94,44 +89,44 @@ void pqFileChooserWidget::setFilenames(const QStringList& files)
   this->LineEdit->setEnabled(true);
 
   if (this->ForceSingleFile || this->UseDirectoryMode)
-    {
+  {
     if (!files.isEmpty())
-      {
-      this->LineEdit->setText(files[0]);
-      }
-    else
-      {
-      this->LineEdit->setText("");
-      }
-    }
-  else if (files.size() > 1)
     {
+      this->LineEdit->setText(files[0]);
+    }
+    else
+    {
+      this->LineEdit->setText("");
+    }
+  }
+  else if (files.size() > 1)
+  {
     this->UseFilenameList = true;
     this->LineEdit->setEnabled(false);
     this->LineEdit->setText(files[0] + ";...");
     this->FilenameList = files;
     this->emitFilenamesChanged(files);
-    }
+  }
   else
-    {
+  {
     this->LineEdit->setText(pqFileChooserWidget::joinFilenames(files));
-    }
+  }
 }
 
 QString pqFileChooserWidget::singleFilename() const
 {
   QStringList files = this->filenames();
   if (files.isEmpty())
-    {
+  {
     return "";
-    }
+  }
   else
-    {
+  {
     return files[0];
-    }
+  }
 }
 
-void pqFileChooserWidget::setSingleFilename(const QString &file)
+void pqFileChooserWidget::setSingleFilename(const QString& file)
 {
   this->setFilenames(QStringList(file));
 }
@@ -163,76 +158,75 @@ void pqFileChooserWidget::chooseFile()
 
   QString title;
 
-  if(this->UseDirectoryMode)
-    {
+  if (this->UseDirectoryMode)
+  {
     title = tr("Open Directory:");
-    }
+  }
   else if (this->AcceptAnyFile)
-    {
+  {
     title = tr("Save File:");
-    }
+  }
   else
-    {
+  {
     title = tr("Open File:");
-    }
+  }
 
-  pqFileDialog* dialog = new pqFileDialog(this->Server,
-    this, title, QString(), filters);
+  pqFileDialog* dialog = new pqFileDialog(this->Server, this, title, QString(), filters);
 
-  if(this->UseDirectoryMode)
-    {
+  if (this->UseDirectoryMode)
+  {
     dialog->setFileMode(pqFileDialog::Directory);
-    }
+  }
   else if (this->AcceptAnyFile)
-    {
+  {
     dialog->setFileMode(pqFileDialog::AnyFile);
-    }
+  }
   else if (this->forceSingleFile())
-    {
+  {
     dialog->setFileMode(pqFileDialog::ExistingFile);
-    }
+  }
   else
-    {
+  {
     dialog->setFileMode(pqFileDialog::ExistingFiles);
-    }
+  }
 
-  if(QDialog::Accepted == dialog->exec())
-    {
+  if (QDialog::Accepted == dialog->exec())
+  {
     QStringList files;
     // The file browser has a list of selected files, each of which could
     // be a group of files.  Condense them all into a single list.
     QStringList selectedFiles;
-    foreach(selectedFiles, dialog->getAllSelectedFiles())
-      {
+    foreach (selectedFiles, dialog->getAllSelectedFiles())
+    {
       files << selectedFiles;
-      }
-    if(files.size())
-      {
-      this->setFilenames(files);
-      }
     }
+    if (files.size())
+    {
+      this->setFilenames(files);
+    }
+  }
 }
 
-void pqFileChooserWidget::handleFileLineEditChanged(const QString &fileString)
+void pqFileChooserWidget::handleFileLineEditChanged(const QString& fileString)
 {
   if (this->UseFilenameList)
-    {
+  {
     // Ignoring string from line edit.  Ignore this signal.
     return;
-    }
+  }
   QStringList fileList = pqFileChooserWidget::splitFilenames(fileString);
   this->emitFilenamesChanged(fileList);
 }
 
-void pqFileChooserWidget::emitFilenamesChanged(const QStringList &fileList)
+void pqFileChooserWidget::emitFilenamesChanged(const QStringList& fileList)
 {
   emit this->filenamesChanged(fileList);
   if (!fileList.empty())
-    {
+  {
     emit this->filenameChanged(fileList[0]);
-    }
+  }
   else
-    {
+  {
     emit this->filenameChanged("");
-    }
+  }
 }

@@ -43,7 +43,6 @@ protected:
 private:
   vtkPVRenderViewWithSobel(const vtkPVRenderViewWithSobel&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVRenderViewWithSobel&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

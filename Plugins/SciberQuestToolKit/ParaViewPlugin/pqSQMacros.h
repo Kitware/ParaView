@@ -30,16 +30,10 @@
 #ifndef pqSQMacros_h
 #define pqSQMacros_h
 
-#define pqSQErrorMacro(os,estr)                    \
-    os                                             \
-      << "Error in:" << endl                       \
-      << __FILE__ << ", line " << __LINE__ << endl \
-      << "" estr;
+#define pqSQErrorMacro(os, estr)                                                                   \
+  os << "Error in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr;
 
-#define pqSQWarningMacro(os,estr)                   \
-    os                                              \
-      << "Warning in:" << endl                      \
-      << __FILE__ << ", line " << __LINE__ << endl  \
-      << "" estr;
+#define pqSQWarningMacro(os, estr)                                                                 \
+  os << "Warning in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr;
 
 #endif

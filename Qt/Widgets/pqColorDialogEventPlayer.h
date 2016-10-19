@@ -35,21 +35,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetEventPlayer.h"
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-/// pqColorDialogEventPlayer is the player for QColorDialog. Events are recorded
-/// using pqColorDialogEventTranslator.
+/**
+* pqColorDialogEventPlayer is the player for QColorDialog. Events are recorded
+* using pqColorDialogEventTranslator.
+*/
 class PQWIDGETS_EXPORT pqColorDialogEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
+
 public:
-  pqColorDialogEventPlayer(QObject* parent=0);
+  pqColorDialogEventPlayer(QObject* parent = 0);
   ~pqColorDialogEventPlayer();
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString&
-    arguments, bool& error);
+  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
 
-  static const QString &EVENT_NAME();
+  static const QString& EVENT_NAME();
+
 private:
   Q_DISABLE_COPY(pqColorDialogEventPlayer)
 };

@@ -26,7 +26,6 @@
 //
 // </verbatim>
 
-
 #ifndef _pqDisplayArrayWidget_h
 #define _pqDisplayArrayWidget_h
 
@@ -44,12 +43,12 @@ class vtkPVArrayInformation;
 
 /// Provides a standard user interface for selecting among a collection
 /// of dataset variables and .
-class pqDisplayArrayWidget: public QWidget
+class pqDisplayArrayWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqDisplayArrayWidget( QWidget *parent=0 );
+  pqDisplayArrayWidget(QWidget* parent = 0);
   ~pqDisplayArrayWidget();
 
   /// Removes all variables from the collection.
@@ -73,15 +72,14 @@ public:
   const QString& getConstantVariableName() const;
 
   // Set/Get the name of the property that controls the array name
-  void  setPropertyArrayName(const QString&);
+  void setPropertyArrayName(const QString&);
   const QString& propertyArrayName();
 
   // Set/Get the name of the property that controals the array component
-  void  setPropertyArrayComponent(const QString&);
+  void setPropertyArrayComponent(const QString&);
   const QString& propertyArrayComponent();
 
-
-  void  setToolTip(const QString&);
+  void setToolTip(const QString&);
 
 public slots:
   /// set the display to get possible arrays.
@@ -129,10 +127,10 @@ protected:
   /// Returns the array information for the selected array from the
   /// representation (or its input) if possible.
   vtkPVArrayInformation* getArrayInformation();
+
 private:
   class pqInternal;
   pqInternal* Internal;
-
 };
 
 #endif

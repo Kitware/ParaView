@@ -27,31 +27,29 @@ class vtkMoleculeMapper;
 class vtkPVCacheKeeper;
 class vtkScalarsToColors;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkMoleculeRepresentation* New();
-  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
-  virtual int ProcessViewRequest(vtkInformationRequestKey *requestType,
-                                 vtkInformation *inputInfo,
-                                 vtkInformation *outputInfo);
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* requestType, vtkInformation* inputInfo, vtkInformation* outputInfo);
 
   virtual void SetVisibility(bool value);
 
-  vtkGetMacro(MoleculeRenderMode, int)
-  void SetMoleculeRenderMode(int mode);
+  vtkGetMacro(MoleculeRenderMode, int) void SetMoleculeRenderMode(int mode);
 
-  vtkGetMacro(UseCustomRadii, bool)
-  void SetUseCustomRadii(bool val);
+  vtkGetMacro(UseCustomRadii, bool) void SetUseCustomRadii(bool val);
 
-  void SetLookupTable(vtkScalarsToColors *lut);
+  void SetLookupTable(vtkScalarsToColors* lut);
 
   // Description:
   // No-op. For compatibility with vtkPVCompositeRepresentation, which calls
   // SetRepresentation on it's subproxies.
-  void SetRepresentation(const char *) {}
+  void SetRepresentation(const char*) {}
 
   // Description:
   // Returns the data object that is rendered from the given input port.
@@ -65,16 +63,16 @@ protected:
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual bool AddToView(vtkView *view);
-  virtual bool RemoveFromView(vtkView *view);
+  virtual bool AddToView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view);
 
   bool IsCached(double cache_key);
 
   void SyncMapper();
   void UpdateColoringParameters();
 
-  vtkActor *Actor;
-  vtkMoleculeMapper *Mapper;
+  vtkActor* Actor;
+  vtkMoleculeMapper* Mapper;
 
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkMolecule> DummyMolecule;
@@ -87,7 +85,6 @@ protected:
 private:
   vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif // vtkMoleculeRepresentation_h

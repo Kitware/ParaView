@@ -13,11 +13,14 @@
 
 =========================================================================*/
 
-// .NAME vtkMetaReader - Common functionality for meta-readers.
-//
-// .SECTION Description: A meta-reader redirect most pipeline requests
-// to another Reader.  The Reader reads from a file selected from a
-// list of files using a FileIndex.
+/**
+ * @class   vtkMetaReader
+ * @brief   Common functionality for meta-readers.
+ *
+ *
+ * to another Reader.  The Reader reads from a file selected from a
+ * list of files using a FileIndex.
+*/
 
 #ifndef vtkMetaReader_h
 #define vtkMetaReader_h
@@ -27,8 +30,7 @@
 
 #include <string> // for std::string
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader :
-  public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkMetaReader* New();
@@ -37,52 +39,61 @@ public:
   vtkMetaReader();
   ~vtkMetaReader();
 
-  // Description:
-  // Set/get the internal reader.
+  //@{
+  /**
+   * Set/get the internal reader.
+   */
   vtkSetObjectMacro(Reader, vtkAlgorithm);
   vtkGetObjectMacro(Reader, vtkAlgorithm);
+  //@}
 
-
-  // Description:
-  // Get/set the filename for the meta-file.
-  // Description:
-  // Get/Set the meta-file name
-  void SetMetaFileName (const char* name)
+  //@{
+  /**
+   * Get/set the filename for the meta-file.
+   * Description:
+   * Get/Set the meta-file name
+   */
+  void SetMetaFileName(const char* name)
   {
-    Set_MetaFileName (name);
-    this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime ();
+    Set_MetaFileName(name);
+    this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime();
   }
-  char* GetMetaFileName ()
-  {
-    return Get_MetaFileName();
-  }
+  char* GetMetaFileName() { return Get_MetaFileName(); }
+  //@}
 
-  // Description:
-  // Returns the available range of file indexes. It is
-  // 0, ..., GetNumberOfFiles () - 1.
+  //@{
+  /**
+   * Returns the available range of file indexes. It is
+   * 0, ..., GetNumberOfFiles () - 1.
+   */
   vtkGetVector2Macro(FileIndexRange, vtkIdType);
+  //@}
 
-  // Description:
-  // Get/set the index of the file to read.
-  vtkIdType GetFileIndex ()
+  //@{
+  /**
+   * Get/set the index of the file to read.
+   */
+  vtkIdType GetFileIndex() { return this->Get_FileIndex(); }
+  void SetFileIndex(vtkIdType i)
   {
-    return this->Get_FileIndex();
-  }
-  void SetFileIndex (vtkIdType i)
-  {
-    this->Set_FileIndex (i);
+    this->Set_FileIndex(i);
     this->FileIndexMTime = this->vtkDataObjectAlgorithm::GetMTime();
   }
+  //@}
 
-  // Description:
-  // Return the MTime when also considering the internal reader.
+  /**
+   * Return the MTime when also considering the internal reader.
+   */
   virtual vtkMTimeType GetMTime();
 
-  // Description:
-  // Name of the method used to set the file name of the internal
-  // reader. By default, this is SetFileName.
+  //@{
+  /**
+   * Name of the method used to set the file name of the internal
+   * reader. By default, this is SetFileName.
+   */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
+  //@}
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -96,16 +107,15 @@ protected:
   vtkGetMacro(_FileIndex, vtkIdType);
 
   void ReaderSetFileName(const char* filename);
-  int ReaderCanReadFile(const char *filename);
+  int ReaderCanReadFile(const char* filename);
 
-  // Description: Convert 'fileName' that is relative to the
-  // 'metaFileName' to either a file path that is relative to the
-  // current working directory (CWD) or to an absolute file path.
-  // The choice is made based on if 'metaFileName' is relative or absolute.
-  // Return the original if 'fileName' is already absolute.
-  std::string FromRelativeToMetaFile(
-    const char* metaFileName, const char* fileName);
-
+  /**
+   * 'metaFileName' to either a file path that is relative to the
+   * current working directory (CWD) or to an absolute file path.
+   * The choice is made based on if 'metaFileName' is relative or absolute.
+   * Return the original if 'fileName' is already absolute.
+   */
+  std::string FromRelativeToMetaFile(const char* metaFileName, const char* fileName);
 
 protected:
   // Reader that handles requests for the meta-reader
@@ -124,17 +134,20 @@ protected:
   // Range for the file index
   vtkIdType FileIndexRange[2];
 
-
   // File name for the meta-reader
-  char *_MetaFileName;
+  char* _MetaFileName;
   // File name modification time
   vtkMTimeType MetaFileNameMTime;
-  // Description:
-  // Records the time when the meta-file was read.
+  //@{
+  /**
+   * Records the time when the meta-file was read.
+   */
   vtkTimeStamp MetaFileReadTime;
+
 private:
   vtkMetaReader(const vtkMetaReader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMetaReader&) VTK_DELETE_FUNCTION;
 };
+//@}
 
 #endif

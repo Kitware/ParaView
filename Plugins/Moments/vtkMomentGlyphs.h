@@ -33,21 +33,21 @@
 
 #include "vtkPolyDataAlgorithm.h"
 
-#include "vtkSmartPointer.h"    // For internal methods.
+#include "vtkSmartPointer.h" // For internal methods.
 
 class vtkMomentGlyphs : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);
-  static vtkMomentGlyphs *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkMomentGlyphs* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // These are basically a convenience method that calls SetInputArrayToProcess
   // to set the array used as the input flux or circulation.  The
   // fieldAttributeType comes from the vtkDataSetAttributes::AttributeTypes
   // enum.
-  virtual void SetInputMoment(const char *name);
+  virtual void SetInputMoment(const char* name);
   virtual void SetInputMoment(int fieldAttributeType);
 
   // Description:
@@ -73,23 +73,20 @@ protected:
   int InputMomentIsDensity;
   int ScaleByDensity;
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation *request,
-                          vtkInformationVector **inputVector,
-                          vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual void MakeMomentVectors(vtkSmartPointer<vtkDataSet> &input,
-                                 vtkSmartPointer<vtkDataArray> &inputArray);
+  virtual void MakeMomentVectors(
+    vtkSmartPointer<vtkDataSet>& input, vtkSmartPointer<vtkDataArray>& inputArray);
   virtual vtkSmartPointer<vtkDataArray> MakeGlyphScaleFactors(
-                                                      vtkDataSet *input,
-                                                      vtkDataArray *inputArray);
-  virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet *input,
-                                                  vtkDataArray *inputArray);
+    vtkDataSet* input, vtkDataArray* inputArray);
+  virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet* input, vtkDataArray* inputArray);
 
 private:
-  vtkMomentGlyphs(const vtkMomentGlyphs &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMomentGlyphs &) VTK_DELETE_FUNCTION;
+  vtkMomentGlyphs(const vtkMomentGlyphs&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkMomentGlyphs&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkMomentGlyphs_h
+#endif // vtkMomentGlyphs_h

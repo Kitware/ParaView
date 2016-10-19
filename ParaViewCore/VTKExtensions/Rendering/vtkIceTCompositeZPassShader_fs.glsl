@@ -21,6 +21,6 @@ uniform sampler2D depth;
 
 void main(void)
 {
-  vec2 tcoord=gl_TexCoord[0].st;
-  gl_FragDepth=texture2D(depth,tcoord).x;
+  vec2 tcoord = gl_TexCoord[0].st;
+  gl_FragDepth = texture2D(depth, tcoord).x;
 }

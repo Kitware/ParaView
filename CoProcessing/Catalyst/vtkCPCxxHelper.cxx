@@ -40,7 +40,6 @@ vtkInstantiatorNewMacro(vtkCPCxxHelper);
 
 vtkWeakPointer<vtkCPCxxHelper> vtkCPCxxHelper::Instance;
 
-
 //----------------------------------------------------------------------------
 vtkCPCxxHelper::vtkCPCxxHelper()
 {
@@ -50,11 +49,11 @@ vtkCPCxxHelper::vtkCPCxxHelper()
 //----------------------------------------------------------------------------
 vtkCPCxxHelper::~vtkCPCxxHelper()
 {
-  if(this->Options)
-    {
+  if (this->Options)
+  {
     this->Options->Delete();
     this->Options = 0;
-    }
+  }
   vtkInitializationHelper::Finalize();
 }
 
@@ -62,25 +61,24 @@ vtkCPCxxHelper::~vtkCPCxxHelper()
 vtkCPCxxHelper* vtkCPCxxHelper::New()
 {
   if (vtkCPCxxHelper::Instance.GetPointer() == 0)
-    {
+  {
     // Try the factory first
-    vtkCPCxxHelper* instance = (vtkCPCxxHelper*)
-      vtkObjectFactory::CreateInstance("vtkCPCxxHelper");
+    vtkCPCxxHelper* instance = (vtkCPCxxHelper*)vtkObjectFactory::CreateInstance("vtkCPCxxHelper");
     // if the factory did not provide one, then create it here
     if (!instance)
-      {
+    {
       instance = new vtkCPCxxHelper;
-      }
+    }
 
     vtkCPCxxHelper::Instance = instance;
 
-    // Since when coprocessing, we have no information about the executable, we
-    // make one up using the current working directory.
-    //std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+// Since when coprocessing, we have no information about the executable, we
+// make one up using the current working directory.
+// std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
 #if defined(_WIN32) && defined(CMAKE_INTDIR)
     std::string programname = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR "/unknown_exe";
-# else
-    std::string programname =  PARAVIEW_BINARY_DIR "/bin/unknown_exe";
+#else
+    std::string programname = PARAVIEW_BINARY_DIR "/bin/unknown_exe";
 #endif
 
     int argc = 1;
@@ -94,8 +92,7 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(false);
 
     vtkInitializationHelper::Initialize(
-        argc, argv, vtkProcessModule::PROCESS_BATCH,
-        vtkCPCxxHelper::Instance->Options);
+      argc, argv, vtkProcessModule::PROCESS_BATCH, vtkCPCxxHelper::Instance->Options);
 
     // Setup default session.
     vtkIdType connectionId = vtkSMSession::ConnectToSelf();
@@ -104,16 +101,15 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     // initialize the session for a ParaView session.
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    controller->InitializeSession(vtkSMSession::SafeDownCast(
-        pm->GetSession(connectionId)));
+    controller->InitializeSession(vtkSMSession::SafeDownCast(pm->GetSession(connectionId)));
 
-    delete []argv[0];
-    delete []argv;
-    }
+    delete[] argv[0];
+    delete[] argv;
+  }
   else
-    {
+  {
     vtkCPCxxHelper::Instance->Register(NULL);
-    }
+  }
 
   return vtkCPCxxHelper::Instance;
 }

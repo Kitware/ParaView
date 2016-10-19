@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,19 +35,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QDialog>
 
-namespace Ui { class pqSetBreakpointDialog; }
+namespace Ui
+{
+class pqSetBreakpointDialog;
+}
 
 class pqServer;
 class QTreeWidget;
 class pqPipelineSource;
 
-/// Sets a breakpoint for a remote simulation. It allows a user to
-/// specify a time in the future (using simulation time or time step)
-/// when a simulation linked with Catalyst should pause.
-/// 
-/// @ingroup LiveInsitu
-class PQCOMPONENTS_EXPORT pqSetBreakpointDialog :
-  public QDialog
+/**
+* Sets a breakpoint for a remote simulation. It allows a user to
+* specify a time in the future (using simulation time or time step)
+* when a simulation linked with Catalyst should pause.
+*
+* @ingroup LiveInsitu
+*/
+class PQCOMPONENTS_EXPORT pqSetBreakpointDialog : public QDialog
 {
   Q_OBJECT
 

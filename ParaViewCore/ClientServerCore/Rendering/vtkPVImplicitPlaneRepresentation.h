@@ -12,17 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImplicitPlaneRepresentation - extends vtkImplicitPlaneRepresentation
-// .SECTION Description
-// vtkPVImplicitPlaneRepresentation extends vtkImplicitPlaneRepresentation to
-// add ParaView proper initialisation values
+/**
+ * @class   vtkPVImplicitPlaneRepresentation
+ * @brief   extends vtkImplicitPlaneRepresentation
+ *
+ * vtkPVImplicitPlaneRepresentation extends vtkImplicitPlaneRepresentation to
+ * add ParaView proper initialisation values
+*/
 
 #ifndef vtkPVImplicitPlaneRepresentation_h
 #define vtkPVImplicitPlaneRepresentation_h
 
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitPlaneRepresentation
   : public vtkImplicitPlaneRepresentation

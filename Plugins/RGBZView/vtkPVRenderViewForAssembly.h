@@ -55,12 +55,8 @@ public:
   // Description:
   // Set the geometry bounds to use. If set to a valid value, these are the
   // bounds used to setup the clipping planes.
-  void SetClippingBounds( double b1, double b2, double b3,
-                          double b4, double b5, double b6 );
-  void SetClippingBounds(double bds[6])
-    {
-    this->ClippingBounds.SetBounds(bds);
-    }
+  void SetClippingBounds(double b1, double b2, double b3, double b4, double b5, double b6);
+  void SetClippingBounds(double bds[6]) { this->ClippingBounds.SetBounds(bds); }
   void ResetClippingBounds();
   void FreezeGeometryBounds();
 
@@ -76,12 +72,11 @@ public:
 
   // Description:
   // Set/Get directory used when dumping the RGB buffer as image on disk
-  vtkSetStringMacro(CompositeDirectory)
-  vtkGetStringMacro(CompositeDirectory)
+  vtkSetStringMacro(CompositeDirectory) vtkGetStringMacro(CompositeDirectory)
 
-  // Description:
-  // Dump RGB buffer to the disk using the CompositeDirectory (rgb.jpg)
-  void WriteImage();
+    // Description:
+    // Dump RGB buffer to the disk using the CompositeDirectory (rgb.jpg)
+    void WriteImage();
   // Description:
   // Set image format type. Can only be 'jpg', 'png', 'tiff' where 'jpg' is
   // the default format.
@@ -90,8 +85,8 @@ public:
 
   // Description:
   // Set/Get RGB image stack size
-  vtkGetMacro(RGBStackSize,int);
-  vtkSetMacro(RGBStackSize,int);
+  vtkGetMacro(RGBStackSize, int);
+  vtkSetMacro(RGBStackSize, int);
 
   // Description:
   // Reset active image stack to 0 so we can start capturing again
@@ -108,7 +103,7 @@ public:
   // to the screen such that the pixels can be read back and
   // decoded to obtain the values.
   void SetDrawCells(int choice);
-  void SetArrayNameToDraw(const char *name);
+  void SetArrayNameToDraw(const char* name);
   void SetArrayNumberToDraw(int fieldAttributeType);
   void SetArrayComponentToDraw(int comp);
   void SetScalarRange(double min, double max);
@@ -158,7 +153,6 @@ private:
 
   struct vtkInternals;
   vtkInternals* Internal;
-
 };
 
 #endif

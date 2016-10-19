@@ -128,7 +128,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   int WholeExtent[6];
-
 };
 
 #endif

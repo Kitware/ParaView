@@ -136,69 +136,65 @@
 
 #include "vtkImageAlgorithm.h"
 
-#include "vapor/DataMgr.h" //needed for vapor datastructures
+#include "vapor/DataMgr.h"                    //needed for vapor datastructures
 #include "vapor/WaveletBlock3DRegionReader.h" //needed for vapor datastructures
 
 #include <map>    //needed for protected ivars
 #include <string> //needed for protected ivars
 #include <vector> //needed for protected ivars
 
-//using namespace std;
+// using namespace std;
 using namespace VAPoR;
 
 class VTK_EXPORT vtkVDFReader : public vtkImageAlgorithm
 {
 public:
-  static vtkVDFReader *New();
-  vtkTypeMacro(vtkVDFReader,vtkImageAlgorithm);
+  static vtkVDFReader* New();
+  vtkTypeMacro(vtkVDFReader, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //Description:
-  //Choose file to read
+  // Description:
+  // Choose file to read
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
-  //Description:
-  //Check file for suitability to this reader
+  // Description:
+  // Check file for suitability to this reader
   int CanReadFile(const char* fname);
 
-  //Description:
-  //Set resolution within range provided by data.
+  // Description:
+  // Set resolution within range provided by data.
   void SetRefinement(int);
   vtkGetMacro(Refinement, int);
   vtkGetVector2Macro(RefinementRange, int);
 
-  //Description:
+  // Description:
   void SetVariableType(int);
   vtkGetMacro(VariableType, int);
 
-  //Description:
+  // Description:
   void SetCacheSize(int);
   vtkGetMacro(CacheSize, int);
 
-  //Description:
-  //Choose which arrays to load
+  // Description:
+  // Choose which arrays to load
   int GetPointArrayStatus(const char*);
   void SetPointArrayStatus(const char*, int);
   int GetNumberOfPointArrays();
-  const char *GetPointArrayName(int);
+  const char* GetPointArrayName(int);
 
 protected:
   vtkVDFReader();
   ~vtkVDFReader();
-  int RequestInformation(vtkInformation *,
-                         vtkInformationVector **,
-                         vtkInformationVector *);
-  int RequestData(vtkInformation *,
-                  vtkInformationVector **,
-                  vtkInformationVector *);
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   int FillTimeSteps();
 
-  char *FileName;
+  char* FileName;
 
-  Metadata *vdc_md;
-  DataMgr *data_mgr;
-  VDFIOBase *vdfiobase;
+  Metadata* vdc_md;
+  DataMgr* data_mgr;
+  VDFIOBase* vdfiobase;
 
   bool is_layered;
   int height_factor;
@@ -207,20 +203,20 @@ protected:
   int Refinement;
   int VariableType;
   int CacheSize;
-  double *TimeSteps;
+  double* TimeSteps;
   int nTimeSteps;
   int TimeStep;
   int RefinementRange[2];
 
-  std::map<std::string,int> data;
+  std::map<std::string, int> data;
   std::vector<double> uExt;
   std::vector<std::string> current_var_list;
 
 private:
   vtkVDFReader(const vtkVDFReader&);
-  void operator = (const vtkVDFReader&);
+  void operator=(const vtkVDFReader&);
   bool extentsMatch(int*, int*);
-  void GetVarDims(size_t *, size_t *);
-  void SetExtents(vtkInformation *);
+  void GetVarDims(size_t*, size_t*);
+  void SetExtents(vtkInformation*);
 };
 #endif

@@ -44,77 +44,113 @@ class pqServer;
 class pqView;
 class vtkSMProxy;
 
-//// pqAnimationManager manages the Animation sub-system.
-//// It encapsulates the initialization of animation scene per server
-//// connection i.e. this class basically keeps track of the active
-//// animation scene.
+/**
+* pqAnimationManager manages the Animation sub-system.
+* It encapsulates the initialization of animation scene per server
+* connection i.e. this class basically keeps track of the active
+* animation scene.
+*/
 class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
 public:
-  pqAnimationManager(QObject* parent=0);
+  pqAnimationManager(QObject* parent = 0);
   virtual ~pqAnimationManager();
 
-  /// Returns the scene for the active server connection, if any.
+  /**
+  * Returns the scene for the active server connection, if any.
+  */
   pqAnimationScene* getActiveScene() const;
 
-  /// Returns the scene on the server connection, if any.
+  /**
+  * Returns the scene on the server connection, if any.
+  */
   pqAnimationScene* getScene(pqServer* server) const;
 
-  /// In the given \c scene, returns the cue that animates the given
-  /// \c index of the given \c property on the \c proxy.
-  /// This method simply calls getCue() on the pqAnimationScene instance.
-  pqAnimationCue* getCue(pqAnimationScene* scene,
-    vtkSMProxy* proxy, const char* propertyname, int index) const;
+  /**
+  * In the given \c scene, returns the cue that animates the given
+  * \c index of the given \c property on the \c proxy.
+  * This method simply calls getCue() on the pqAnimationScene instance.
+  */
+  pqAnimationCue* getCue(
+    pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, int index) const;
 
-  /// Saves the animation from the active scene. The active scene
-  /// is determined using the active server.
-  /// Returns true if the save was successful.
+  /**
+  * Saves the animation from the active scene. The active scene
+  * is determined using the active server.
+  * Returns true if the save was successful.
+  */
   bool saveAnimation();
 
-  /// Saves the animation geometry from the active scene
-  /// as visible in the given view.
+  /**
+  * Saves the animation geometry from the active scene
+  * as visible in the given view.
+  */
   bool saveGeometry(const QString& filename, pqView* view);
 
-  /// Save the settings of "save animation" with QSettings.
+  /**
+  * Save the settings of "save animation" with QSettings.
+  */
   void saveSettings();
 
-  /// Apply the settings from QSettings to "save animation".
+  /**
+  * Apply the settings from QSettings to "save animation".
+  */
   void restoreSettings();
 
-  /// Query whether or not an animation is currently playing
+  /**
+  * Query whether or not an animation is currently playing
+  */
   bool animationPlaying() const;
 
 signals:
-  /// emitted when the active scene changes (\c scene may be NULL).
+  /**
+  * emitted when the active scene changes (\c scene may be NULL).
+  */
   void activeSceneChanged(pqAnimationScene* scene);
 
-  /// emitted when the active server changes and updated active scene.
+  /**
+  * emitted when the active server changes and updated active scene.
+  */
   void activeServerChanged(pqServer* scene);
 
-  /// emitted with the current save progress.
+  /**
+  * emitted with the current save progress.
+  */
   void saveProgress(const QString&, int);
 
-  /// emitted when the manager begins changes that should not get
-  /// recorded on the undo stack.
+  /**
+  * emitted when the manager begins changes that should not get
+  * recorded on the undo stack.
+  */
   void beginNonUndoableChanges();
 
-  /// emitted when the manager is done with changes that
-  /// should not get recorded on the undo stack.
+  /**
+  * emitted when the manager is done with changes that
+  * should not get recorded on the undo stack.
+  */
   void endNonUndoableChanges();
 
-  /// emitted to request the application to disconnect from the server
-  /// connection. This is done when the user requested to save animation after
-  /// disconnecting from the server.
+  /**
+  * emitted to request the application to disconnect from the server
+  * connection. This is done when the user requested to save animation after
+  * disconnecting from the server.
+  */
   void disconnectServer();
 
-  /// emitted to indicate an animation is being written out to a file.
+  /**
+  * emitted to indicate an animation is being written out to a file.
+  */
   void writeAnimation(const QString& filename, int magnification, double frameRate);
 
-  /// Emitted when the active animation scene begins playing.
+  /**
+  * Emitted when the active animation scene begins playing.
+  */
   void beginPlay();
 
-  /// Emitted when the active animation scene finishes playing.
+  /**
+  * Emitted when the active animation scene finishes playing.
+  */
   void endPlay();
 
 public slots:
@@ -127,20 +163,29 @@ protected slots:
 
   void updateGUI();
 
-  /// Update the ViewModules property in the active scene.
+  /**
+  * Update the ViewModules property in the active scene.
+  */
   void updateViewModules();
 
-  /// Called on every tick while saving animation.
+  /**
+  * Called on every tick while saving animation.
+  */
   void onTick(int);
 
-  /// Called to demarcate the start and end of an animation
+  /**
+  * Called to demarcate the start and end of an animation
+  */
   void onBeginPlay();
   void onEndPlay();
 
-  /// Manages locking the aspect ratio.
+  /**
+  * Manages locking the aspect ratio.
+  */
   void onWidthEdited();
   void onHeightEdited();
   void onLockAspectRatio(bool lock);
+
 private:
   Q_DISABLE_COPY(pqAnimationManager)
 
@@ -150,6 +195,5 @@ private:
   // the most recently used file extension
   QString AnimationExtension;
 };
-
 
 #endif

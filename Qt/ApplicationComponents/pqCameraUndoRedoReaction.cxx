@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,37 +31,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCameraUndoRedoReaction.h"
 
-
 #include "pqActiveObjects.h"
 #include "pqView.h"
 
 //-----------------------------------------------------------------------------
 pqCameraUndoRedoReaction::pqCameraUndoRedoReaction(
   QAction* parentObject, bool undo_mode, pqView* view)
-: Superclass(parentObject)
+  : Superclass(parentObject)
 {
   this->Undo = undo_mode;
 
   if (view)
-    {
+  {
     this->setActiveView(view);
-    }
+  }
   else
-    {
-    QObject::connect(&pqActiveObjects::instance(),
-      SIGNAL(viewChanged(pqView*)),
-      this, SLOT(setActiveView(pqView*)));
+  {
+    QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
+      SLOT(setActiveView(pqView*)));
     this->setActiveView(pqActiveObjects::instance().activeView());
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraUndoRedoReaction::undo(pqView* view)
 {
   if (!view)
-    {
+  {
     return;
-    }
+  }
   view->undo();
   view->render();
 }
@@ -70,9 +68,9 @@ void pqCameraUndoRedoReaction::undo(pqView* view)
 void pqCameraUndoRedoReaction::redo(pqView* view)
 {
   if (!view)
-    {
+  {
     return;
-    }
+  }
   view->redo();
   view->render();
 }
@@ -81,43 +79,40 @@ void pqCameraUndoRedoReaction::redo(pqView* view)
 void pqCameraUndoRedoReaction::setActiveView(pqView* view)
 {
   if (this->LastView)
-    {
+  {
     QObject::disconnect(this->LastView, 0, this, 0);
     this->LastView = NULL;
-    }
+  }
 
-  if (!view  || !view->supportsUndo())
-    {
+  if (!view || !view->supportsUndo())
+  {
     this->setEnabled(false);
     return;
-    }
+  }
 
   this->LastView = view;
 
   if (this->Undo)
-    {
+  {
     this->setEnabled(view->canUndo());
-    QObject::connect(view, SIGNAL(canUndoChanged(bool)),
-      this, SLOT(setEnabled(bool)));
-    }
+    QObject::connect(view, SIGNAL(canUndoChanged(bool)), this, SLOT(setEnabled(bool)));
+  }
   else
-    {
+  {
     this->setEnabled(view->canRedo());
-    QObject::connect(view, SIGNAL(canRedoChanged(bool)),
-      this, SLOT(setEnabled(bool)));
-    }
+    QObject::connect(view, SIGNAL(canRedoChanged(bool)), this, SLOT(setEnabled(bool)));
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraUndoRedoReaction::onTriggered()
-{ 
+{
   if (this->Undo)
-    {
+  {
     pqCameraUndoRedoReaction::undo(this->LastView);
-    }
+  }
   else
-    {
+  {
     pqCameraUndoRedoReaction::redo(this->LastView);
-    }
+  }
 }
-

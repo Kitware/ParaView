@@ -44,21 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
-namespace {
+namespace
+{
 
 //-----------------------------------------------------------------------------
 class vtkLockDockWidgetsCallback : public vtkCommand
 {
 public:
-  static vtkLockDockWidgetsCallback* New()
-    {
-    return new vtkLockDockWidgetsCallback();
-    }
+  static vtkLockDockWidgetsCallback* New() { return new vtkLockDockWidgetsCallback(); }
 
   virtual void Execute(vtkObject*, unsigned long, void*)
-    {
+  {
     this->Behavior->generalSettingsChanged();
-    }
+  }
 
   pqLockPanelsBehavior* Behavior;
 
@@ -70,11 +68,12 @@ protected:
 } // anonymous namespace
 
 //-----------------------------------------------------------------------------
-class pqLockPanelsBehavior::pqInternals {
+class pqLockPanelsBehavior::pqInternals
+{
 public:
-  pqInternals(pqLockPanelsBehavior* behavior) :
-    Callback(vtkLockDockWidgetsCallback::New()),
-    ObserverID(0)
+  pqInternals(pqLockPanelsBehavior* behavior)
+    : Callback(vtkLockDockWidgetsCallback::New())
+    , ObserverID(0)
   {
     this->Callback->Behavior = behavior;
   }
@@ -86,22 +85,23 @@ public:
   }
 
   vtkLockDockWidgetsCallback* Callback;
-  unsigned long               ObserverID;
+  unsigned long ObserverID;
 };
 
 //-----------------------------------------------------------------------------
-pqLockPanelsBehavior::pqLockPanelsBehavior(QObject* parentObject) :
-  Superclass(parentObject),
-  Internals(new pqInternals(this))
+pqLockPanelsBehavior::pqLockPanelsBehavior(QObject* parentObject)
+  : Superclass(parentObject)
+  , Internals(new pqInternals(this))
 {
-  vtkNew<vtkPVGeneralSettings> settings;;
+  vtkNew<vtkPVGeneralSettings> settings;
+  ;
 
   // Lock or unlock the panels as dictated by the settings
   this->lockPanels(settings->GetLockPanels());
 
   // Add observer for the settings
-  this->Internals->ObserverID = settings->AddObserver(vtkCommand::ModifiedEvent,
-                                                      this->Internals->Callback);
+  this->Internals->ObserverID =
+    settings->AddObserver(vtkCommand::ModifiedEvent, this->Internals->Callback);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,9 +123,9 @@ void pqLockPanelsBehavior::toggleLockPanels()
 {
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
   if (!pxm)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMProxy* lockPanelsProxy = pxm->GetProxy("settings", "GeneralSettings");
   vtkSMIntVectorProperty* lockPanelsProperty =
@@ -146,20 +146,20 @@ void pqLockPanelsBehavior::lockPanels(bool lock)
 {
   QDockWidget::DockWidgetFeatures features = QDockWidget::AllDockWidgetFeatures;
   if (lock)
-    {
+  {
     features = QDockWidget::DockWidgetClosable;
-    }
+  }
 
   // Note: iterate over the children of the parent of this object, which is
   // expected to be a QMainWindow or subclass.
-  QList<QDockWidget *> dockWidgets = this->parent()->findChildren<QDockWidget*>();
+  QList<QDockWidget*> dockWidgets = this->parent()->findChildren<QDockWidget*>();
 
   for (int i = 0; i < dockWidgets.size(); ++i)
-    {
+  {
     QDockWidget* widget = dockWidgets[i];
     if (widget)
-      {
+    {
       widget->setFeatures(features);
-      }
     }
+  }
 }

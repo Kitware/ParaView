@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,7 @@ class pqKeyFrameTypeWidget::pqInternal : public Ui::pqKeyFrameTypeWidget
 
 //-----------------------------------------------------------------------------
 pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
-: QWidget(p)
+  : QWidget(p)
 {
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
@@ -46,7 +46,7 @@ pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
   this->Internal->exponentialGroup->hide();
   this->Internal->sinusoidGroup->hide();
 
-  QDoubleValidator * validator = new QDoubleValidator(this);
+  QDoubleValidator* validator = new QDoubleValidator(this);
   this->Internal->Base->setValidator(validator);
   this->Internal->StartPower->setValidator(validator);
   this->Internal->EndPower->setValidator(validator);
@@ -54,28 +54,28 @@ pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
   this->Internal->Frequency->setValidator(validator);
 
   this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
-  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", 
-    "Exponential");
-  this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", 
-    "Sinusoid");
+  this->Internal->Type->addItem(
+    QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", "Exponential");
+  this->Internal->Type->addItem(
+    QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", "Sinusoid");
   this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
 
-  QObject::connect(this->Internal->Type, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(onTypeChanged()));
-  
-  QObject::connect(this->Internal->Base, SIGNAL(textChanged(const QString&)),
-    this, SIGNAL(baseChanged(const QString&)));
-  QObject::connect(this->Internal->StartPower, SIGNAL(textChanged(const QString&)),
-    this, SIGNAL(startPowerChanged(const QString&)));
-  QObject::connect(this->Internal->EndPower, SIGNAL(textChanged(const QString&)),
-    this, SIGNAL(endPowerChanged(const QString&)));
-  
-  QObject::connect(this->Internal->Offset, SIGNAL(textChanged(const QString&)),
-    this, SIGNAL(offsetChanged(const QString&)));
-  QObject::connect(this->Internal->Phase, SIGNAL(valueChanged(double)),
-    this, SIGNAL(phaseChanged(double)));
-  QObject::connect(this->Internal->Frequency, SIGNAL(textChanged(const QString&)),
-    this, SIGNAL(frequencyChanged(const QString&)));
+  QObject::connect(
+    this->Internal->Type, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged()));
+
+  QObject::connect(this->Internal->Base, SIGNAL(textChanged(const QString&)), this,
+    SIGNAL(baseChanged(const QString&)));
+  QObject::connect(this->Internal->StartPower, SIGNAL(textChanged(const QString&)), this,
+    SIGNAL(startPowerChanged(const QString&)));
+  QObject::connect(this->Internal->EndPower, SIGNAL(textChanged(const QString&)), this,
+    SIGNAL(endPowerChanged(const QString&)));
+
+  QObject::connect(this->Internal->Offset, SIGNAL(textChanged(const QString&)), this,
+    SIGNAL(offsetChanged(const QString&)));
+  QObject::connect(
+    this->Internal->Phase, SIGNAL(valueChanged(double)), this, SIGNAL(phaseChanged(double)));
+  QObject::connect(this->Internal->Frequency, SIGNAL(textChanged(const QString&)), this,
+    SIGNAL(frequencyChanged(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -119,7 +119,6 @@ void pqKeyFrameTypeWidget::setFrequency(const QString& text)
   this->Internal->Frequency->setText(text);
 }
 
-
 QString pqKeyFrameTypeWidget::type() const
 {
   int idx = this->Internal->Type->currentIndex();
@@ -162,7 +161,6 @@ QString pqKeyFrameTypeWidget::frequency() const
   return this->Internal->Frequency->text();
 }
 
-
 //-----------------------------------------------------------------------------
 void pqKeyFrameTypeWidget::onTypeChanged()
 {
@@ -173,14 +171,13 @@ void pqKeyFrameTypeWidget::onTypeChanged()
   this->Internal->sinusoidGroup->hide();
 
   if (text == "Exponential")
-    {
+  {
     this->Internal->exponentialGroup->show();
-    }
+  }
   else if (text == "Sinusoid")
-    {
+  {
     this->Internal->sinusoidGroup->show();
-    }
+  }
 
   emit this->typeChanged(text);
 }
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -52,17 +52,14 @@ public:
     this->Links.setUseUncheckedProperties(false);
     this->Links.setAutoUpdateVTKObjects(true);
   }
-  
-  ~pqImplementation()
-  {
-    this->Links.removeAllPropertyLinks();
-  }
+
+  ~pqImplementation() { this->Links.removeAllPropertyLinks(); }
 
   /// Contains the Qt widgets
   QWidget ControlsContainer;
   /// Stores the Qt widgets
   Ui::pqLineSourceControls UI;
-  
+
   /// Maps Qt widgets to the 3D widget
   pqPropertyLinks Links;
 };
@@ -70,20 +67,20 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget
 
-pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p, "LineSourceWidgetRepresentation"),
-  Implementation(new pqImplementation())
+pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
+  : Superclass(o, pxy, p, "LineSourceWidgetRepresentation")
+  , Implementation(new pqImplementation())
 {
-  this->Implementation->UI.setupUi(
-    &this->Implementation->ControlsContainer);
+  this->Implementation->UI.setupUi(&this->Implementation->ControlsContainer);
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
-  QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
+  QLabel* label =
+    new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
   label->setWordWrap(1);
   this->layout()->addWidget(label);
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
+  QObject::connect(
+    &this->Implementation->Links, SIGNAL(qtWidgetChanged()), this, SLOT(setModified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -93,24 +90,21 @@ pqLineSourceWidget::~pqLineSourceWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, 
-  vtkSMProperty* point2, vtkSMProperty* resolution)
+void pqLineSourceWidget::setControlledProperties(
+  vtkSMProperty* point1, vtkSMProperty* point2, vtkSMProperty* resolution)
 {
   this->Superclass::setControlledProperties(point1, point2);
   this->setControlledProperty("Resolution", resolution);
 }
 
 //-----------------------------------------------------------------------------
-void pqLineSourceWidget::setControlledProperty(const char* function,
-  vtkSMProperty* _property)
+void pqLineSourceWidget::setControlledProperty(const char* function, vtkSMProperty* _property)
 {
   if (strcmp(function, "Resolution") == 0)
-    {
-    this->Implementation->Links.addPropertyLink(
-      this->Implementation->UI.resolution, "value", 
-      SIGNAL(valueChanged(int)),
-      this->getWidgetProxy(), 
+  {
+    this->Implementation->Links.addPropertyLink(this->Implementation->UI.resolution, "value",
+      SIGNAL(valueChanged(int)), this->getWidgetProxy(),
       this->getWidgetProxy()->GetProperty("Resolution"));
-    }
+  }
   this->Superclass::setControlledProperty(function, _property);
 }

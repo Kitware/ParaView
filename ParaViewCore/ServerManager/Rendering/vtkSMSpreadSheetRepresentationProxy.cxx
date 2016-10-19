@@ -29,36 +29,32 @@ vtkSMSpreadSheetRepresentationProxy::~vtkSMSpreadSheetRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSpreadSheetRepresentationProxy::SetPropertyModifiedFlag(
-  const char* name, int flag)
+void vtkSMSpreadSheetRepresentationProxy::SetPropertyModifiedFlag(const char* name, int flag)
 {
   if (name && strcmp(name, "Input") == 0)
-    {
+  {
     vtkSMPropertyHelper helper(this, name);
-    for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
-      {
-      vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
-        helper.GetAsProxy(cc));
+    for (unsigned int cc = 0; cc < helper.GetNumberOfElements(); cc++)
+    {
+      vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(cc));
       if (input)
-        {
+      {
         input->CreateSelectionProxies();
-        vtkSMSourceProxy* esProxy = input->GetSelectionOutput(
-          helper.GetOutputPort(cc));
+        vtkSMSourceProxy* esProxy = input->GetSelectionOutput(helper.GetOutputPort(cc));
         if (!esProxy)
-          {
+        {
           vtkErrorMacro("Input proxy does not support selection extraction.");
-          }
+        }
         else
-          {
+        {
           // We use these internal properties since we need to add consumer dependecy
           // on this proxy so that MarkModified() is called correctly.
           vtkSMPropertyHelper(this, "InternalInput1").Set(esProxy, 0);
           this->UpdateProperty("InternalInput1");
-          }
         }
       }
-
     }
+  }
   this->Superclass::SetPropertyModifiedFlag(name, flag);
 }
 
@@ -67,5 +63,3 @@ void vtkSMSpreadSheetRepresentationProxy::PrintSelf(ostream& os, vtkIndent inden
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

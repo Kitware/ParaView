@@ -55,40 +55,40 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
   this->ComboBox->addItem("None", QVariant("None"));
 
   // fill combo-box.
-  vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().activeServer()?
-    pqActiveObjects::instance().activeServer()->proxyManager() : NULL;
+  vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().activeServer()
+    ? pqActiveObjects::instance().activeServer()->proxyManager()
+    : NULL;
 
   QMap<QString, QString> valuesMap; // <-- used to sort the entries.
   if (pxm)
-    {
+  {
     vtkPVProxyDefinitionIterator* iter =
       pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("views");
     for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
+    {
       // add label instead of proxy name to make this more user friendly.
       const char* proxyName = iter->GetProxyName();
       vtkSMProxy* prototype = pxm->GetPrototypeProxy("views", proxyName);
       if (prototype)
-        {
+      {
         valuesMap.insert(prototype->GetXMLLabel(), iter->GetProxyName());
-        }
       }
+    }
     iter->Delete();
 
-    for (QMap<QString, QString>::iterator viter = valuesMap.begin();
-      viter != valuesMap.end(); ++viter)
-      {
-      this->ComboBox->addItem(viter.key(), QVariant(viter.value()));
-      }
-
-    this->connect(this->ComboBox, SIGNAL(currentIndexChanged(int)),
-      SIGNAL(valueChanged()));
-    this->addPropertyLink(this, "value", SIGNAL(valueChanged()), smproperty);
-    }
-  else
+    for (QMap<QString, QString>::iterator viter = valuesMap.begin(); viter != valuesMap.end();
+         ++viter)
     {
-    this->ComboBox->setEnabled(false);
+      this->ComboBox->addItem(viter.key(), QVariant(viter.value()));
     }
+
+    this->connect(this->ComboBox, SIGNAL(currentIndexChanged(int)), SIGNAL(valueChanged()));
+    this->addPropertyLink(this, "value", SIGNAL(valueChanged()), smproperty);
+  }
+  else
+  {
+    this->ComboBox->setEnabled(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -105,12 +105,12 @@ QString pqViewTypePropertyWidget::value() const
 //-----------------------------------------------------------------------------
 void pqViewTypePropertyWidget::setValue(const QString& val)
 {
-  int index =this->ComboBox->findData(val);
+  int index = this->ComboBox->findData(val);
   if (index == -1)
-    {
+  {
     // add the value being specified to the combo-box.
     index = this->ComboBox->count();
     this->ComboBox->addItem(val, val);
-    }
+  }
   this->ComboBox->setCurrentIndex(index);
 }

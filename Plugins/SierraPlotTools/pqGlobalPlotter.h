@@ -30,23 +30,23 @@ class pqGlobalPlotter : public pqPlotter
   Q_OBJECT;
 
 public:
-
   pqGlobalPlotter();
   virtual ~pqGlobalPlotter();
 
-  virtual QStringList getTheVars(vtkSMProxy * meshReaderProxy);
+  virtual QStringList getTheVars(vtkSMProxy* meshReaderProxy);
 
-  virtual vtkSMProperty * getSMVariableProperty(vtkSMProxy *meshReaderProxy);
+  virtual vtkSMProperty* getSMVariableProperty(vtkSMProxy* meshReaderProxy);
 
-  virtual vtkPVDataSetAttributesInformation * getDataSetAttributesInformation(vtkPVDataInformation * pvDataInfo);
+  virtual vtkPVDataSetAttributesInformation* getDataSetAttributesInformation(
+    vtkPVDataInformation* pvDataInfo);
 
   virtual bool amIAbleToSelectByNumber();
 
-  virtual pqPipelineSource * getPlotFilter();
+  virtual pqPipelineSource* getPlotFilter();
 
-  virtual void setVarsStatus(vtkSMProxy * meshReaderProxy, bool flag);
+  virtual void setVarsStatus(vtkSMProxy* meshReaderProxy, bool flag);
 
-  virtual void setVarsActive(vtkSMProxy * meshReaderProxy, QString varName, bool activeFlag);
+  virtual void setVarsActive(vtkSMProxy* meshReaderProxy, QString varName, bool activeFlag);
 
   virtual QString getFilterName();
 

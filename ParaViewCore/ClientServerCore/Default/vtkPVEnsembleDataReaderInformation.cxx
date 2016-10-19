@@ -44,21 +44,20 @@ vtkPVEnsembleDataReaderInformation::~vtkPVEnsembleDataReaderInformation()
 //-----------------------------------------------------------------------------
 void vtkPVEnsembleDataReaderInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkEnsembleDataReader *reader = vtkEnsembleDataReader::SafeDownCast(obj);
+  vtkEnsembleDataReader* reader = vtkEnsembleDataReader::SafeDownCast(obj);
   if (!reader)
-    {
-    vtkErrorMacro(
-        "vtkPVEnsembleDataReaderInformation requires a valid "
-        "vtkEnsembleDataReader instance.");
+  {
+    vtkErrorMacro("vtkPVEnsembleDataReaderInformation requires a valid "
+                  "vtkEnsembleDataReader instance.");
     return;
-    }
+  }
   reader->UpdateMetaData();
   unsigned int count = reader->GetNumberOfMembers();
   this->Internal->FilePaths.resize(count);
   for (unsigned int rowIndex = 0; rowIndex < count; ++rowIndex)
-    {
+  {
     this->Internal->FilePaths[rowIndex] = reader->GetFilePath(rowIndex);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -67,9 +66,9 @@ void vtkPVEnsembleDataReaderInformation::CopyToStream(vtkClientServerStream* str
   *stream << vtkClientServerStream::Reply;
   *stream << static_cast<unsigned int>(this->Internal->FilePaths.size());
   for (size_t i = 0; i < this->Internal->FilePaths.size(); ++i)
-    {
+  {
     *stream << this->Internal->FilePaths[i];
-    }
+  }
   *stream << vtkClientServerStream::End;
 }
 
@@ -81,21 +80,21 @@ void vtkPVEnsembleDataReaderInformation::CopyFromStream(const vtkClientServerStr
   int offset = 0;
   unsigned int filePathCount = 0;
   if (!stream->GetArgument(0, offset++, &filePathCount))
-    {
+  {
     vtkErrorMacro("Error parsing file path count.");
     return;
-    }
+  }
 
   this->Internal->FilePaths.resize(filePathCount);
   vtkStdString filePath;
   for (unsigned int i = 0; i < filePathCount; ++i)
-    {
+  {
     if (!stream->GetArgument(0, offset++, &filePath))
-      {
+    {
       vtkErrorMacro("Error parsing file path.");
-      }
-    this->Internal->FilePaths[i] = filePath;
     }
+    this->Internal->FilePaths[i] = filePath;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -109,10 +108,10 @@ vtkStdString vtkPVEnsembleDataReaderInformation::GetFilePath(int unsigned i)
 {
   unsigned int count = static_cast<unsigned int>(this->Internal->FilePaths.size());
   if (i >= count)
-    {
+  {
     vtkErrorMacro("Bad index sent to GetFilePath.");
     return vtkStdString();
-    }
+  }
   return this->Internal->FilePaths[i];
 }
 
@@ -123,7 +122,7 @@ void vtkPVEnsembleDataReaderInformation::PrintSelf(ostream& os, vtkIndent indent
   // File paths
   os << indent << "File Paths: " << endl;
   for (size_t i = 0; i < this->Internal->FilePaths.size(); ++i)
-    {
+  {
     os << indent.GetNextIndent() << this->Internal->FilePaths[i].c_str() << endl;
-    }
+  }
 }

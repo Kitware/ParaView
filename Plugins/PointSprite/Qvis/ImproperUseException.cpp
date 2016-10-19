@@ -41,9 +41,9 @@
 
 #include <ImproperUseException.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 using std::string;
-
 
 // ****************************************************************************
 //  Method: ImproperUseException constructor
@@ -55,9 +55,9 @@ using std::string;
 
 ImproperUseException::ImproperUseException(std::string reason)
 {
-    if (reason == "")
-        msg = "The pipeline object is being used improperly.";
-    else
-        msg = "The pipeline object is being used improperly: " + reason;
+  if (reason == "")
+    msg = "The pipeline object is being used improperly.";
+  else
+    msg = "The pipeline object is being used improperly: " + reason;
 }
 }

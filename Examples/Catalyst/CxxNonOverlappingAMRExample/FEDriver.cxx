@@ -13,12 +13,12 @@ int main(int argc, char* argv[])
 {
   FEAdaptor::Initialize(argc, argv);
   unsigned int numberOfTimeSteps = 100;
-  for(unsigned int timeStep=0;timeStep<numberOfTimeSteps;timeStep++)
-    {
+  for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)
+  {
     // use a time step length of 0.1
     double time = timeStep * 0.1;
-    FEAdaptor::CoProcess(time, timeStep, timeStep == numberOfTimeSteps-1);
-    }
+    FEAdaptor::CoProcess(time, timeStep, timeStep == numberOfTimeSteps - 1);
+  }
   FEAdaptor::Finalize();
 
   return 0;

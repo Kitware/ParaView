@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCustomTestDriver - A custom test driver code that uses ParaView and python.
-// .SECTION Description
-// A custom test driver that creates a vtkUniformGrid with a single
-// scalar point field named "Pressure".  It runs a python script
-// using ParaView.
+/**
+ * @class   vtkPVCustomTestDriver
+ * @brief   A custom test driver code that uses ParaView and python.
+ *
+ * A custom test driver that creates a vtkUniformGrid with a single
+ * scalar point field named "Pressure".  It runs a python script
+ * using ParaView.
+*/
 
 #ifndef vtkPVCustomTestDriver_h
 #define vtkPVCustomTestDriver_h
@@ -28,22 +31,25 @@ class vtkCPProcessor;
 class VTK_EXPORT vtkPVCustomTestDriver : public vtkCPTestDriver
 {
 public:
-  static vtkPVCustomTestDriver * New();
+  static vtkPVCustomTestDriver* New();
   vtkTypeMacro(vtkPVCustomTestDriver, vtkCPTestDriver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Run the test driver with the coprocessor.  
-  // Returns 0 if there were no errors.
+  /**
+   * Run the test driver with the coprocessor.
+   * Returns 0 if there were no errors.
+   */
   virtual int Run();
 
-  // Description:
-  // Initialize the driver with the coprocessor.  fileName is the
-  // name of the python script.  Returns 0 on failure.
+  /**
+   * Initialize the driver with the coprocessor.  fileName is the
+   * name of the python script.  Returns 0 on failure.
+   */
   virtual int Initialize(const char* fileName);
 
-  // Description:
-  // Finalize the driver with the coprocessor.
+  /**
+   * Finalize the driver with the coprocessor.
+   */
   virtual int Finalize();
 
 protected:
@@ -54,9 +60,12 @@ private:
   vtkPVCustomTestDriver(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
 
-  // Description:
-  // The coprocessor to be called by this custom test.
+  //@{
+  /**
+   * The coprocessor to be called by this custom test.
+   */
   vtkCPProcessor* Processor;
 };
+//@}
 
 #endif

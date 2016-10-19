@@ -66,13 +66,13 @@ protected slots:
   // This is where we have to communicate our state to the server.
   void accept();
 
-  //Description:
+  // Description:
   // UI driven reset of widget to current server manager values.
   void reset();
 
 private:
-  pqSQHemisphereSourceForm *Form;
-  pqPropertyLinks *Links;
+  pqSQHemisphereSourceForm* Form;
+  pqPropertyLinks* Links;
 };
 
 #endif

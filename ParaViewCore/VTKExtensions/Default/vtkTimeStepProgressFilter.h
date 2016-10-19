@@ -12,12 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkTimeStepProgressFilter
-// .SECTION Description
-// This filter can be attached to any filter/source/reader that supports time.
-// vtkTimeStepProgressFilter will generate a 1x1 vtkTable with 
-// a progress rate between 0 and 1 that correspond to the actual time step/value
-// relatively to the number of timesteps/data time range.
+/**
+ * @class   vtkTimeStepProgressFilter
+ *
+ * This filter can be attached to any filter/source/reader that supports time.
+ * vtkTimeStepProgressFilter will generate a 1x1 vtkTable with
+ * a progress rate between 0 and 1 that correspond to the actual time step/value
+ * relatively to the number of timesteps/data time range.
+*/
 
 #ifndef vtkTimeStepProgressFilter_h
 #define vtkTimeStepProgressFilter_h
@@ -37,18 +39,16 @@ protected:
   ~vtkTimeStepProgressFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  virtual int RequestInformation(vtkInformation *request,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector);
+  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  double  TimeRange[2];
+  double TimeRange[2];
   double* TimeSteps;
-  int     NumTimeSteps;
-  bool    UseTimeRange;
+  int NumTimeSteps;
+  bool UseTimeRange;
 
 private:
   vtkTimeStepProgressFilter(const vtkTimeStepProgressFilter&) VTK_DELETE_FUNCTION;

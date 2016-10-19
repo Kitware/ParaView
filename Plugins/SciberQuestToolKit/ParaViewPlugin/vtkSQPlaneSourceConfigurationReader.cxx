@@ -50,16 +50,17 @@ vtkSQPlaneSourceConfigurationReader::vtkSQPlaneSourceConfigurationReader()
 
 //-----------------------------------------------------------------------------
 vtkSQPlaneSourceConfigurationReader::~vtkSQPlaneSourceConfigurationReader()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(const char *filename)
+int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(const char* filename)
 {
-  int ok=this->Superclass::ReadConfiguration(filename);
+  int ok = this->Superclass::ReadConfiguration(filename);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -67,13 +68,13 @@ int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(const char *filename)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
+int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement* x)
 {
-  int ok=this->Superclass::ReadConfiguration(x);
+  int ok = this->Superclass::ReadConfiguration(x);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -83,5 +84,5 @@ int vtkSQPlaneSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSourceConfigurationReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

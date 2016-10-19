@@ -12,18 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDoubleRangeDomain - type specific extension to
-// vtkSMRangeDomainTemplate for doubles.
-// .SECTION Description
-// vtkSMDoubleRangeDomain is a type-specific specialization for
-// vtkSMRangeDomainTemplate.
+/**
+ * @class   vtkSMDoubleRangeDomain
+ * @brief   type specific extension to
+ * vtkSMRangeDomainTemplate for doubles.
+ *
+ * vtkSMDoubleRangeDomain is a type-specific specialization for
+ * vtkSMRangeDomainTemplate.
+*/
 
 #ifndef vtkSMDoubleRangeDomain_h
 #define vtkSMDoubleRangeDomain_h
 
 // Tell the template header how to give our superclass a DLL interface.
 #if !defined(vtkSMDoubleRangeDomain_cxx)
-# define VTK_DATA_ARRAY_TEMPLATE_TYPE double
+#define VTK_DATA_ARRAY_TEMPLATE_TYPE double
 #endif
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
@@ -44,35 +47,45 @@ public:
   vtkTypeMacro(vtkSMDoubleRangeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a min. value if it exists. If the min. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified min. is equivalent to -inf
+  /**
+   * Return a min. value if it exists. If the min. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified min. is equivalent to -inf
+   */
   double GetMinimum(unsigned int idx, int& exists)
-    { return this->RealSuperclass::GetMinimum(idx, exists); }
+  {
+    return this->RealSuperclass::GetMinimum(idx, exists);
+  }
 
-  // Description:
-  // Return a max. value if it exists. If the max. exists
-  // exists is set to 1. Otherwise, it is set to 0.
-  // An unspecified max. is equivalent to +inf
+  /**
+   * Return a max. value if it exists. If the max. exists
+   * exists is set to 1. Otherwise, it is set to 0.
+   * An unspecified max. is equivalent to +inf
+   */
   double GetMaximum(unsigned int idx, int& exists)
-    { return this->RealSuperclass::GetMaximum(idx, exists); }
+  {
+    return this->RealSuperclass::GetMaximum(idx, exists);
+  }
 
-  // Description:
-  // Returns if minimum/maximum bound is set for the domain.
+  /**
+   * Returns if minimum/maximum bound is set for the domain.
+   */
   int GetMinimumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMinimumExists(idx)? 1 : 0; }
+  {
+    return this->RealSuperclass::GetMinimumExists(idx) ? 1 : 0;
+  }
   int GetMaximumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMaximumExists(idx)? 1 : 0; }
+  {
+    return this->RealSuperclass::GetMaximumExists(idx) ? 1 : 0;
+  }
 
-  // Description:
-  // Returns the minimum/maximum value, is exists, otherwise
-  // 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
-  // the bound is set.
-  double GetMinimum(unsigned int idx)
-    { return this->RealSuperclass::GetMinimum(idx); }
-  double GetMaximum(unsigned int idx)
-    { return this->RealSuperclass::GetMaximum(idx); }
+  /**
+   * Returns the minimum/maximum value, is exists, otherwise
+   * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
+   * the bound is set.
+   */
+  double GetMinimum(unsigned int idx) { return this->RealSuperclass::GetMinimum(idx); }
+  double GetMaximum(unsigned int idx) { return this->RealSuperclass::GetMaximum(idx); }
 
 protected:
   vtkSMDoubleRangeDomain();
@@ -86,7 +99,7 @@ private:
 };
 
 #if !defined(vtkSMDoubleRangeDomain_cxx)
-# undef VTK_DATA_ARRAY_TEMPLATE_TYPE
+#undef VTK_DATA_ARRAY_TEMPLATE_TYPE
 #endif
 
 #endif

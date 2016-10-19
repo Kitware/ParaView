@@ -42,46 +42,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProxy;
 class vtkSMSession;
 
-/// pqQVTKWidget extends QVTKWidget to add awareness for view proxies. The
-/// advantage of doing that is that pqQVTKWidget can automatically update the
-/// "ViewSize" propertu on the view proxy whenever the
-/// widget's size/position changes.
-///
-/// This class also enables image-caching by default (image caching support is
-/// provided by the superclass).
+/**
+* pqQVTKWidget extends QVTKWidget to add awareness for view proxies. The
+* advantage of doing that is that pqQVTKWidget can automatically update the
+* "ViewSize" propertu on the view proxy whenever the
+* widget's size/position changes.
+*
+* This class also enables image-caching by default (image caching support is
+* provided by the superclass).
+*/
 class PQCORE_EXPORT pqQVTKWidget : public QVTKWidget
 {
   Q_OBJECT
   typedef QVTKWidget Superclass;
+
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
   virtual ~pqQVTKWidget();
 
-  /// Set the view proxy.
+  /**
+  * Set the view proxy.
+  */
   void setViewProxy(vtkSMProxy*);
 
-  /// Set the session.
-  /// This is only used when ViewProxy is not set.
+  /**
+  * Set the session.
+  * This is only used when ViewProxy is not set.
+  */
   void setSession(vtkSMSession*);
 
-  /// Retrun the Proxy ID if any, otherwise return 0
+  /**
+  * Retrun the Proxy ID if any, otherwise return 0
+  */
   vtkTypeUInt32 getProxyId();
 
-  /// Set/Get the name of the property to use to update the size of the widget
-  /// on the proxy. By default "ViewSize" is used.
-  void setSizePropertyName(const QString& pname)
-    { this->SizePropertyName = pname; }
-  const QString& sizePropertyName() const
-    { return this->SizePropertyName; }
+  /**
+  * Set/Get the name of the property to use to update the size of the widget
+  * on the proxy. By default "ViewSize" is used.
+  */
+  void setSizePropertyName(const QString& pname) { this->SizePropertyName = pname; }
+  const QString& sizePropertyName() const { return this->SizePropertyName; }
 
 public slots:
   void paintMousePointer(int x, int y);
 
 protected:
-  /// overloaded resize handler
+  /**
+  * overloaded resize handler
+  */
   virtual void resizeEvent(QResizeEvent* event);
 
-  /// overloaded move handler
+  /**
+  * overloaded move handler
+  */
   virtual void moveEvent(QMoveEvent* event);
 
   // method called in paintEvent() to render the image cache on to the device.

@@ -39,9 +39,10 @@
 #include "vtkOpenGLScalarsToColorsPainter.h"
 #include "vtkPointSpriteRenderingModule.h" //needed for exports
 
-class VTKPOINTSPRITERENDERING_EXPORT vtkTwoScalarsToColorsPainter : public vtkOpenGLScalarsToColorsPainter
+class VTKPOINTSPRITERENDERING_EXPORT vtkTwoScalarsToColorsPainter
+  : public vtkOpenGLScalarsToColorsPainter
 {
-public :
+public:
   static vtkTwoScalarsToColorsPainter* New();
   vtkTypeMacro(vtkTwoScalarsToColorsPainter, vtkOpenGLScalarsToColorsPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -63,28 +64,24 @@ public :
   vtkSetMacro(OpacityScalarMode, int);
   vtkGetMacro(OpacityScalarMode, int);
 
-protected :
-  char *OpacityArrayName;
+protected:
+  char* OpacityArrayName;
   int EnableOpacity;
   int OpacityScalarMode;
-  vtkTimeStamp  BlendTime;
+  vtkTimeStamp BlendTime;
 
-  void PrepareForRendering(vtkRenderer* renderer,
-      vtkActor* actor);
+  void PrepareForRendering(vtkRenderer* renderer, vtkActor* actor);
 
-  void RenderInternals(vtkRenderer* renderer,
-      vtkActor* actor,
-      unsigned long typeflags,
-      bool forceCompileOnly);
+  void RenderInternals(
+    vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
-  virtual void MapScalars(vtkDataSet* output,
-    double alpha, int multiply_with_alpha,
-    vtkDataSet* input, vtkActor* actor);
-  virtual void MapScalars(vtkDataSet* output, double alpha,
-    int multiply_with_alpha, vtkDataSet* input)
-    {
+  virtual void MapScalars(
+    vtkDataSet* output, double alpha, int multiply_with_alpha, vtkDataSet* input, vtkActor* actor);
+  virtual void MapScalars(
+    vtkDataSet* output, double alpha, int multiply_with_alpha, vtkDataSet* input)
+  {
     this->Superclass::MapScalars(output, alpha, multiply_with_alpha, input);
-    }
+  }
   // Description:
   // Create a new shallow-copied clone for data with no scalars.
   virtual vtkDataObject* NewClone(vtkDataObject* data);

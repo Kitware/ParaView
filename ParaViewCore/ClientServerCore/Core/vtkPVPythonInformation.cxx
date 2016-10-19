@@ -32,10 +32,10 @@
 vtkStandardNewMacro(vtkPVPythonInformation);
 
 //----------------------------------------------------------------------------
-vtkPVPythonInformation::vtkPVPythonInformation() :
-  PythonSupport(false),
-  NumpySupport(false),
-  MatplotlibSupport(false)
+vtkPVPythonInformation::vtkPVPythonInformation()
+  : PythonSupport(false)
+  , NumpySupport(false)
+  , MatplotlibSupport(false)
 {
 }
 
@@ -47,39 +47,37 @@ vtkPVPythonInformation::~vtkPVPythonInformation()
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
-#define PRINT_IVAR(_ivarName) \
-  os << indent << #_ivarName ": " << this->_ivarName << endl
+#define PRINT_IVAR(_ivarName) os << indent << #_ivarName ": " << this->_ivarName << endl
 
   PRINT_IVAR(PythonSupport);
   if (this->PythonSupport)
-    {
+  {
     PRINT_IVAR(PythonPath);
     PRINT_IVAR(PythonVersion);
 
     PRINT_IVAR(NumpySupport);
     if (this->NumpySupport)
-      {
+    {
       PRINT_IVAR(NumpyPath);
       PRINT_IVAR(NumpyVersion);
-      }
+    }
 
     PRINT_IVAR(MatplotlibSupport);
     if (this->MatplotlibSupport)
-      {
+    {
       PRINT_IVAR(MatplotlibPath);
       PRINT_IVAR(MatplotlibVersion);
-      }
     }
+  }
 #undef PRINT_IVAR
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation *info)
+void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation* info)
 {
-#define COPY_IVAR_SETGET(_ivarName) \
-  this->Set##_ivarName(info->Get##_ivarName())
+#define COPY_IVAR_SETGET(_ivarName) this->Set##_ivarName(info->Get##_ivarName())
 
   COPY_IVAR_SETGET(PythonSupport);
   COPY_IVAR_SETGET(PythonPath);
@@ -97,8 +95,9 @@ void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation *info)
 }
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-namespace {
-bool hasModule(const char *module)
+namespace
+{
+bool hasModule(const char* module)
 {
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
@@ -107,40 +106,38 @@ bool hasModule(const char *module)
 }
 
 // Returns empty string on error.
-std::string getModuleAttrAsString(const char *module, const char *attribute)
+std::string getModuleAttrAsString(const char* module, const char* attribute)
 {
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
   if (!mod)
-    {
+  {
     std::ostringstream result;
     result << "(module '" << module << "' not found)";
     return result.str();
-    }
+  }
 
   vtkSmartPyObject attr(PyObject_GetAttrString(mod, attribute));
   if (!attr)
-    {
+  {
     std::ostringstream result;
-    result << "('" << module << "' module found, missing '" << attribute
-           << "' attribute)";
+    result << "('" << module << "' module found, missing '" << attribute << "' attribute)";
     return result.str();
-    }
+  }
 
   std::string result = PyBytes_AsString(attr);
   return result;
 }
 
-std::string chopFilename(const std::string &path)
+std::string chopFilename(const std::string& path)
 {
   std::string::size_type pos = path.find_last_of("/\\");
   if (pos != std::string::npos)
-    {
+  {
     return std::string(path.begin(), path.begin() + pos);
-    }
+  }
   return path;
 }
-
 }
 #endif // PARAVIEW_ENABLE_PYTHON
 
@@ -159,20 +156,17 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
 
   this->SetNumpySupport(hasModule("numpy"));
   if (this->NumpySupport)
-    {
-    this->SetNumpyPath(chopFilename(
-                         getModuleAttrAsString("numpy", "__file__")));
+  {
+    this->SetNumpyPath(chopFilename(getModuleAttrAsString("numpy", "__file__")));
     this->SetNumpyVersion(getModuleAttrAsString("numpy", "__version__"));
-    }
+  }
 
   this->SetMatplotlibSupport(hasModule("matplotlib"));
   if (this->MatplotlibSupport)
-    {
-    this->SetMatplotlibPath(
-          chopFilename(getModuleAttrAsString("matplotlib", "__file__")));
-    this->SetMatplotlibVersion(
-          getModuleAttrAsString("matplotlib", "__version__"));
-    }
+  {
+    this->SetMatplotlibPath(chopFilename(getModuleAttrAsString("matplotlib", "__file__")));
+    this->SetMatplotlibVersion(getModuleAttrAsString("matplotlib", "__version__"));
+  }
 #else
   this->PythonSupportOff();
   this->SetPythonPath("");
@@ -189,40 +183,33 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPythonInformation::AddInformation(vtkPVInformation *i)
+void vtkPVPythonInformation::AddInformation(vtkPVInformation* i)
 {
-  if (vtkPVPythonInformation *pyInfo = vtkPVPythonInformation::SafeDownCast(i))
-    {
+  if (vtkPVPythonInformation* pyInfo = vtkPVPythonInformation::SafeDownCast(i))
+  {
     this->DeepCopy(pyInfo);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply
-       << this->PythonSupport
-       << this->PythonPath
-       << this->PythonVersion
-       << this->NumpySupport
-       << this->NumpyPath
-       << this->NumpyVersion
-       << this->MatplotlibSupport
-       << this->MatplotlibPath
-       << this->MatplotlibVersion
+  *css << vtkClientServerStream::Reply << this->PythonSupport << this->PythonPath
+       << this->PythonVersion << this->NumpySupport << this->NumpyPath << this->NumpyVersion
+       << this->MatplotlibSupport << this->MatplotlibPath << this->MatplotlibVersion
        << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-#define PARSE_NEXT_VALUE(_ivarName) \
-  if (!css->GetArgument(0, i++, &this->_ivarName)) \
-    { \
-    vtkErrorMacro("Error parsing " #_ivarName " from message."); \
-    return; \
-    }
+#define PARSE_NEXT_VALUE(_ivarName)                                                                \
+  if (!css->GetArgument(0, i++, &this->_ivarName))                                                 \
+  {                                                                                                \
+    vtkErrorMacro("Error parsing " #_ivarName " from message.");                                   \
+    return;                                                                                        \
+  }
 
   int i = 0;
   PARSE_NEXT_VALUE(PythonSupport);

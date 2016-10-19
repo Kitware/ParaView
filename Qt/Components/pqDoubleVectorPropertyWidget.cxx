@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -60,51 +60,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QStyle>
 
-pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
-                                                           vtkSMProxy *smProxy,
-                                                           QWidget *parentObject)
+pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
+  vtkSMProperty* smProperty, vtkSMProxy* smProxy, QWidget* parentObject)
   : pqPropertyWidget(smProxy, parentObject)
 {
   this->setProperty(smProperty);
   this->setChangeAvailableAsChangeFinished(false);
 
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
-  if(!dvp)
-    {
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
+  if (!dvp)
+  {
     return;
-    }
-  
-  // find the domain
-  vtkSMDoubleRangeDomain *defaultDomain = NULL;
+  }
 
-  vtkSMDomain *domain = 0;
-  vtkSMDomainIterator *domainIter = dvp->NewDomainIterator();
-  for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
-    {
+  // find the domain
+  vtkSMDoubleRangeDomain* defaultDomain = NULL;
+
+  vtkSMDomain* domain = 0;
+  vtkSMDomainIterator* domainIter = dvp->NewDomainIterator();
+  for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
+  {
     domain = domainIter->GetDomain();
-    }
+  }
   domainIter->Delete();
 
-  if(!domain)
-    {
+  if (!domain)
+  {
     defaultDomain = vtkSMDoubleRangeDomain::New();
     domain = defaultDomain;
-    }
+  }
 
-  QHBoxLayout *layoutLocal = new QHBoxLayout;
+  QHBoxLayout* layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   this->setLayout(layoutLocal);
-  
+
   this->propertyDomainModified(domain);
-  pqCoreUtilities::connect(domain, vtkCommand::DomainModifiedEvent, 
-                           this, SLOT(propertyDomainModified(vtkObject*)));
-  
+  pqCoreUtilities::connect(
+    domain, vtkCommand::DomainModifiedEvent, this, SLOT(propertyDomainModified(vtkObject*)));
+
   if (defaultDomain)
-    {
+  {
     defaultDomain->Delete();
-    }
+  }
 }
 //-----------------------------------------------------------------------------
 pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
@@ -114,11 +113,11 @@ pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
 void pqDoubleVectorPropertyWidget::resetButtonClicked()
 {
   if (vtkSMProperty* smproperty = this->property())
-    {
-    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/true);
+  {
+    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/ true);
     emit this->changeAvailable();
     emit this->changeFinished();
-    }
+  }
   emit this->clearHighlight();
 }
 
@@ -152,15 +151,15 @@ void pqDoubleVectorPropertyWidget::scaleTwice()
 void pqDoubleVectorPropertyWidget::scale(double factor)
 {
   if (vtkSMProperty* smproperty = this->property())
-    {
+  {
     vtkSMUncheckedPropertyHelper helper(smproperty);
-    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
-      {
+    for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; cc++)
+    {
       helper.Set(cc, helper.GetAsDouble(cc) * factor);
-      }
+    }
     emit this->changeAvailable();
     emit this->changeFinished();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -170,57 +169,55 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
 
   // Clear layout
   QHBoxLayout* layoutLocal = qobject_cast<QHBoxLayout*>(this->layout());
-  while(layoutLocal->count() > 0)
-    {
-    QLayoutItem *item = layoutLocal->takeAt(0);
+  while (layoutLocal->count() > 0)
+  {
+    QLayoutItem* item = layoutLocal->takeAt(0);
     delete item->widget();
     delete item;
-    }
+  }
 
   // Fill Layout
   vtkSMProperty* smProperty = this->property();
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
 
-  vtkPVXMLElement *hints = dvp->GetHints();
-  vtkPVXMLElement *showLabels = NULL;
+  vtkPVXMLElement* hints = dvp->GetHints();
+  vtkPVXMLElement* showLabels = NULL;
   if (hints != NULL)
-    {
+  {
     showLabels = hints->FindNestedElementByName("ShowComponentLabels");
-    }
+  }
 
-  vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
-  if(this->property()->GetRepeatable())
-    {
-    pqScalarValueListPropertyWidget *widget =
+  vtkSMDoubleRangeDomain* range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
+  if (this->property()->GetRepeatable())
+  {
+    pqScalarValueListPropertyWidget* widget =
       new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
     widget->setObjectName("ScalarValueList");
     widget->setRangeDomain(range);
     this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
-    
+
     this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(widget);
     this->setShowLabel(false);
-    
+
     if (range)
-      {
+    {
       PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
                         << "DoubleVectorProperty with a BoundsDomain ("
                         << pqPropertyWidget::getXMLName(range) << ") ";
-      }
+    }
     else
-      {
+    {
       PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
                         << "DoubleVectorProperty without a BoundsDomain";
-      }
     }
+  }
   else if (range)
+  {
+    if (dvp->GetNumberOfElements() == 1 && range->GetMinimumExists(0) && range->GetMaximumExists(0))
     {
-    if(dvp->GetNumberOfElements() == 1 &&
-       range->GetMinimumExists(0) &&
-       range->GetMaximumExists(0))
-      {
       // bounded ranges are represented with a slider and a spin box
-      pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);
+      pqDoubleRangeWidget* widget = new pqDoubleRangeWidget(this);
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
@@ -229,18 +226,17 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
       new pqWidgetRangeDomain(widget, "minimum", "maximum", dvp, 0);
 
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
-      this->connect(widget, SIGNAL(valueEdited(double)),
-                    this, SIGNAL(changeFinished()));
+      this->connect(widget, SIGNAL(valueEdited(double)), this, SIGNAL(changeFinished()));
 
       layoutLocal->addWidget(widget, 1);
 
       PV_DEBUG_PANELS() << "pqDoubleRangeWidget for an DoubleVectorProperty "
-                    << "with a single element and a "
-                    << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                    << "with a minimum and a maximum";
-      }
+                        << "with a single element and a "
+                        << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                        << "with a minimum and a maximum";
+    }
     else
-      {
+    {
       // unbounded ranges are represented with a line edit
       int elementCount = dvp->GetNumberOfElements();
 
@@ -248,116 +244,114 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
       componentLabels.resize(elementCount);
 
       if (showLabels)
-        {
+      {
         vtkNew<vtkCollection> elements;
         showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
         for (int i = 0; i < elements->GetNumberOfItems(); ++i)
-          {
-          vtkPVXMLElement *labelElement =
+        {
+          vtkPVXMLElement* labelElement =
             vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
           if (!labelElement)
-            {
+          {
             continue;
-            }
+          }
           int component;
           if (labelElement->GetScalarAttribute("component", &component))
-            {
+          {
             componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
-            }
           }
         }
+      }
 
-      if(elementCount == 6)
-        {
-        QGridLayout *gridLayout = new QGridLayout;
+      if (elementCount == 6)
+      {
+        QGridLayout* gridLayout = new QGridLayout;
         gridLayout->setHorizontalSpacing(0);
         gridLayout->setVerticalSpacing(2);
 
-        for(int i = 0; i < 3; i++)
-          {
-          pqLineEdit *lineEdit = new pqLineEdit(this);
+        for (int i = 0; i < 3; i++)
+        {
+          pqLineEdit* lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(2*i));
+          lineEdit->setObjectName(QString("LineEdit%1").arg(2 * i));
           lineEdit->setTextAndResetCursor(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2*i)).toString());
+            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i)).toString());
           if (showLabels)
-            {
-            pqLabel *label = new pqLabel(componentLabels[2*i],this);
-            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+          {
+            pqLabel* label = new pqLabel(componentLabels[2 * i], this);
+            label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 0);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 0);
-            }
+          }
           else
-            {
+          {
             gridLayout->addWidget(lineEdit, i, 0);
-            }
-          this->addPropertyLink(lineEdit, "text2",
-                                SIGNAL(textChanged(const QString&)), dvp, 2*i);
-          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                        this, SIGNAL(changeFinished()));
+          }
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i);
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
 
           lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(2*i+1));
+          lineEdit->setObjectName(QString("LineEdit%1").arg(2 * i + 1));
           lineEdit->setTextAndResetCursor(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2*i + 1)).toString());
+            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i + 1)).toString());
           if (showLabels)
-            {
-            pqLabel *label = new pqLabel(componentLabels[2*i + 1],this);
-            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+          {
+            pqLabel* label = new pqLabel(componentLabels[2 * i + 1], this);
+            label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             gridLayout->addWidget(label, (i * 2), 1);
             gridLayout->addWidget(lineEdit, (i * 2) + 1, 1);
-            }
-          else
-            {
-            gridLayout->addWidget(lineEdit, i, 1);
-            }
-          this->addPropertyLink(lineEdit, "text2",
-                                SIGNAL(textChanged(const QString&)), dvp, 2*i + 1);
-          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                        this, SIGNAL(changeFinished()));
           }
+          else
+          {
+            gridLayout->addWidget(lineEdit, i, 1);
+          }
+          this->addPropertyLink(
+            lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i + 1);
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+        }
 
         layoutLocal->addLayout(gridLayout);
 
         PV_DEBUG_PANELS() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
-                      << "with an "
-                      << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                      << "and 6 elements";
-        }
+                          << "with an "
+                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                          << "and 6 elements";
+      }
       else
+      {
+        for (unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
         {
-        for(unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
-          {
           if (showLabels)
-            {
-            pqLabel *label = new pqLabel(componentLabels[i], this);
-            label->setAlignment(Qt::AlignTop|Qt::AlignHCenter);
+          {
+            pqLabel* label = new pqLabel(componentLabels[i], this);
+            label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             layoutLocal->addWidget(label);
-            }
-          pqLineEdit *lineEdit = new pqLineEdit(this);
+          }
+          pqLineEdit* lineEdit = new pqLineEdit(this);
           lineEdit->setValidator(new QDoubleValidator(lineEdit));
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
           lineEdit->setTextAndResetCursor(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
           layoutLocal->addWidget(lineEdit);
-          this->addPropertyLink(lineEdit, "text2",
-                                SIGNAL(textChanged(const QString&)), dvp, i);
-          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                        this, SIGNAL(changeFinished()));
-          }
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, i);
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+        }
 
         PV_DEBUG_PANELS() << "List of QLineEdit's for an DoubleVectorProperty "
-                      << "with an "
-                      << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                      << "and more than one element";
-        }
+                          << "with an "
+                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                          << "and more than one element";
       }
     }
+  }
 
   if (dvp->FindDomain("vtkSMArrayRangeDomain") != NULL ||
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
-    {
+  {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
     QPushButton* scaleButton = new QPushButton("X", this);
     scaleButton->setObjectName("ScaleBy");
@@ -383,15 +377,15 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
     resetButton->setFixedWidth(32);
 
-    pqCoreUtilities::connect(dvp, vtkCommand::DomainModifiedEvent,
-      this, SIGNAL(highlightResetButton()));
-    pqCoreUtilities::connect(dvp, vtkCommand::UncheckedPropertyModifiedEvent,
-      this, SIGNAL(highlightResetButton()));
+    pqCoreUtilities::connect(
+      dvp, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));
+    pqCoreUtilities::connect(
+      dvp, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(highlightResetButton()));
 
     this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
     resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
     resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
     layoutLocal->addWidget(resetButton, 0, Qt::AlignBottom);
-    }
+  }
 }

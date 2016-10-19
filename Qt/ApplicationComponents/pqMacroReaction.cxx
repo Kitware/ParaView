@@ -42,29 +42,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqMacroReaction::pqMacroReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
   this->enable(pythonManager);
 }
 
 //-----------------------------------------------------------------------------
 void pqMacroReaction::createMacro()
 {
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
-    {
+  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  if (!pythonManager)
+  {
     qCritical("No application wide python manager.");
     return;
-    }
+  }
 
-  pqFileDialog fileDialog( NULL,
-                           pqCoreUtilities::mainWidget(),
-                           tr("Open Python File to create a Macro:"), QString(), tr("Python script (*.py);;All Files (*)"));
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(),
+    tr("Open Python File to create a Macro:"), QString(),
+    tr("Python script (*.py);;All Files (*)"));
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
-    {
+  {
     pythonManager->addMacro(fileDialog.getSelectedFiles()[0]);
-    }
+  }
 }
 //-----------------------------------------------------------------------------
 void pqMacroReaction::enable(bool canDoAction)

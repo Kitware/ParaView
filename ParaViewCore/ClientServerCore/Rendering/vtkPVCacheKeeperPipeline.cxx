@@ -29,15 +29,14 @@ vtkPVCacheKeeperPipeline::~vtkPVCacheKeeperPipeline()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVCacheKeeperPipeline::ForwardUpstream(
-  int i, int j, vtkInformation* request)
+int vtkPVCacheKeeperPipeline::ForwardUpstream(int i, int j, vtkInformation* request)
 {
   vtkPVCacheKeeper* keeper = vtkPVCacheKeeper::SafeDownCast(this->Algorithm);
   if (keeper && keeper->GetCachingEnabled() && keeper->IsCached())
-    {
+  {
     // shunt upstream updates when using cache.
     return 1;
-    }
+  }
 
   return this->Superclass::ForwardUpstream(i, j, request);
 }
@@ -47,10 +46,10 @@ int vtkPVCacheKeeperPipeline::ForwardUpstream(vtkInformation* request)
 {
   vtkPVCacheKeeper* keeper = vtkPVCacheKeeper::SafeDownCast(this->Algorithm);
   if (keeper && keeper->GetCachingEnabled() && keeper->IsCached())
-    {
+  {
     // shunt upstream updates when using cache.
     return 1;
-    }
+  }
 
   return this->Superclass::ForwardUpstream(request);
 }
@@ -60,5 +59,3 @@ void vtkPVCacheKeeperPipeline::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

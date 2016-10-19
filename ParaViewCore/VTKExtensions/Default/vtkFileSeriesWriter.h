@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkFileSeriesWriter - meta-writer for writing a file series using writers
-// that are not time-aware.
-// .SECTION Description:
-// vtkFileSeriesWriter is a meta-writer that enables writing a file series using
-// writers that are not time-aware.
+/**
+ * @class   vtkFileSeriesWriter
+ * @brief   meta-writer for writing a file series using writers
+ * that are not time-aware.
+ *
+ * vtkFileSeriesWriter is a meta-writer that enables writing a file series using
+ * writers that are not time-aware.
+*/
 
 #ifndef vtkFileSeriesWriter_h
 #define vtkFileSeriesWriter_h
@@ -32,62 +35,71 @@ public:
   vtkTypeMacro(vtkFileSeriesWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/get the internal writer.
+  //@{
+  /**
+   * Set/get the internal writer.
+   */
   virtual void SetWriter(vtkAlgorithm*);
   vtkGetObjectMacro(Writer, vtkAlgorithm);
+  //@}
 
-  // Description:
-  // Return the MTime also considering the internal writer.
+  /**
+   * Return the MTime also considering the internal writer.
+   */
   virtual vtkMTimeType GetMTime();
 
-  // Description:
-  // Name of the method used to set the file name of the internal
-  // writer. By default, this is SetFileName.
+  //@{
+  /**
+   * Name of the method used to set the file name of the internal
+   * writer. By default, this is SetFileName.
+   */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
+  //@}
 
-  // Description:
-  // Get/Set the name of the output file.
+  //@{
+  /**
+   * Get/Set the name of the output file.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Invoke the writer.  Returns 1 for success, 0 for failure.
+  /**
+   * Invoke the writer.  Returns 1 for success, 0 for failure.
+   */
   int Write();
 
-  // Description:
-  // Must be set to true to write all timesteps, otherwise only the current
-  // timestep will be written out. Off by default.
+  //@{
+  /**
+   * Must be set to true to write all timesteps, otherwise only the current
+   * timestep will be written out. Off by default.
+   */
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
+  //@}
 
-  // Description:
-  // see vtkAlgorithm for details
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
+  /**
+   * see vtkAlgorithm for details
+   */
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  // Description:
-  // Get/Set the interpreter to use to call methods on the writer.
-  void SetInterpreter(vtkClientServerInterpreter* interp)
-    { this->Interpreter = interp; }
+  /**
+   * Get/Set the interpreter to use to call methods on the writer.
+   */
+  void SetInterpreter(vtkClientServerInterpreter* interp) { this->Interpreter = interp; }
 
 protected:
-
   vtkFileSeriesWriter();
   ~vtkFileSeriesWriter();
 
-  int RequestInformation(vtkInformation* request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
-  int RequestUpdateExtent(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  int RequestData(vtkInformation* request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkFileSeriesWriter(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
@@ -108,7 +120,6 @@ private:
   char* FileName;
 
   vtkClientServerInterpreter* Interpreter;
-
 };
 
 #endif

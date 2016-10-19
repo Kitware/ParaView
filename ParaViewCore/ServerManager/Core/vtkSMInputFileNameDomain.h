@@ -12,15 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInputFileNameDomain - a string domain that can be set automatically
-// with the source file name
-// .SECTION Description
-// vtkSMInputFileNameDomain does not really restrict the values of the property
-// that contains it. All string values are valid. Rather, it is used to
-// annotate a pipeline with the source name. This domain
-// works with only vtkSMStringVectorProperty.
-// .SECTION See Also
-// vtkSMDomain vtkSMStringVectorProperty
+/**
+ * @class   vtkSMInputFileNameDomain
+ * @brief   a string domain that can be set automatically
+ * with the source file name
+ *
+ * vtkSMInputFileNameDomain does not really restrict the values of the property
+ * that contains it. All string values are valid. Rather, it is used to
+ * annotate a pipeline with the source name. This domain
+ * works with only vtkSMStringVectorProperty.
+ * @sa
+ * vtkSMDomain vtkSMStringVectorProperty
+*/
 
 #ifndef vtkSMInputFileNameDomain_h
 #define vtkSMInputFileNameDomain_h
@@ -41,11 +44,12 @@ public:
 
   vtkGetMacro(FileName, std::string);
 
-  // Description:
-  // This method is over-written to automatically update the 
-  // default filename at run time. The default filename 
-  // depends on the filename of the source.
-  // Returns 1 if the domain updated the property.
+  /**
+   * This method is over-written to automatically update the
+   * default filename at run time. The default filename
+   * depends on the filename of the source.
+   * Returns 1 if the domain updated the property.
+   */
   virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 protected:
@@ -55,7 +59,7 @@ protected:
 private:
   vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
-  
+
   std::string FileName;
 };
 

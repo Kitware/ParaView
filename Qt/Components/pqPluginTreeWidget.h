@@ -43,8 +43,10 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidget : public QTreeWidget
   Q_OBJECT
 
 public:
-
-  pqPluginTreeWidget(QWidget* p = NULL) : Superclass(p) {}
+  pqPluginTreeWidget(QWidget* p = NULL)
+    : Superclass(p)
+  {
+  }
 };
 
 #endif // !_pqPluginTreeWidget_h

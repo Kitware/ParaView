@@ -31,42 +31,39 @@
 #include <assert.h>
 #include <map>
 
-
 class vtkPVView::vtkInternals
 {
 private:
-  typedef std::map<vtkPVSession*,
-    vtkWeakPointer<vtkPVSynchronizedRenderWindows> > MapOfSynchronizedWindows;
+  typedef std::map<vtkPVSession*, vtkWeakPointer<vtkPVSynchronizedRenderWindows> >
+    MapOfSynchronizedWindows;
   static MapOfSynchronizedWindows SynchronizedWindows;
+
 public:
-  static vtkPVSynchronizedRenderWindows* NewSynchronizedWindows(
-    vtkPVSession* session)
-    {
-    vtkPVSynchronizedRenderWindows* srw =
-      vtkInternals::SynchronizedWindows[session].GetPointer();
+  static vtkPVSynchronizedRenderWindows* NewSynchronizedWindows(vtkPVSession* session)
+  {
+    vtkPVSynchronizedRenderWindows* srw = vtkInternals::SynchronizedWindows[session].GetPointer();
     if (srw == NULL)
-      {
+    {
       srw = vtkPVSynchronizedRenderWindows::New(session);
       vtkInternals::SynchronizedWindows[session] = srw;
       return srw;
-      }
+    }
     else
-      {
+    {
       srw->Register(NULL);
       return srw;
-      }
     }
+  }
 };
 
-vtkPVView::vtkInternals::MapOfSynchronizedWindows
-vtkPVView::vtkInternals::SynchronizedWindows;
+vtkPVView::vtkInternals::MapOfSynchronizedWindows vtkPVView::vtkInternals::SynchronizedWindows;
 
 vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
 vtkInformationKeyRestrictedMacro(vtkPVView, VIEW, ObjectBase, "vtkPVView");
 
-bool vtkPVView::EnableStreaming = false; 
+bool vtkPVView::EnableStreaming = false;
 //----------------------------------------------------------------------------
 void vtkPVView::SetEnableStreaming(bool val)
 {
@@ -83,26 +80,24 @@ bool vtkPVView::GetEnableStreaming()
 //----------------------------------------------------------------------------
 vtkPVView::vtkPVView()
 {
-  vtkStreamingStatusMacro(
-    "View Streaming  Status: " << vtkPVView::GetEnableStreaming());
+  vtkStreamingStatusMacro("View Streaming  Status: " << vtkPVView::GetEnableStreaming());
 
   // Ensure vtkProcessModule is setup correctly.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
-    {
+  {
     vtkErrorMacro("vtkProcessModule not initialized. Aborting.");
     abort();
-    }
+  }
 
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   if (!activeSession)
-    {
+  {
     vtkErrorMacro("Could not find any active session. Aborting.");
     abort();
-    }
+  }
 
-  this->SynchronizedWindows =
-    vtkInternals::NewSynchronizedWindows(activeSession);
+  this->SynchronizedWindows = vtkInternals::NewSynchronizedWindows(activeSession);
   this->Identifier = 0;
   this->ViewTime = 0.0;
   this->CacheKey = 0.0;
@@ -134,10 +129,10 @@ vtkPVView::~vtkPVView()
 void vtkPVView::Initialize(unsigned int id)
 {
   if (this->Identifier == id)
-    {
+  {
     // already initialized
     return;
-    }
+  }
   assert(this->Identifier == 0 && id != 0);
 
   this->Identifier = id;
@@ -146,19 +141,19 @@ void vtkPVView::Initialize(unsigned int id)
 
   // enable/disable streaming. This doesn't need to done on every Initialize()
   // call, but no harm even if it is done.
-  if (vtkPVOptions *options = vtkProcessModule::GetProcessModule()->GetOptions())
-    {
+  if (vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions())
+  {
     vtkPVView::SetEnableStreaming(options->GetEnableStreaming() != 0);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::SetPosition(int x, int y)
 {
   if (this->Identifier != 0)
-    {
+  {
     this->SynchronizedWindows->SetWindowPosition(this->Identifier, x, y);
-    }
+  }
   this->Position[0] = x;
   this->Position[1] = y;
 }
@@ -167,9 +162,9 @@ void vtkPVView::SetPosition(int x, int y)
 void vtkPVView::SetSize(int x, int y)
 {
   if (this->Identifier != 0)
-    {
+  {
     this->SynchronizedWindows->SetWindowSize(this->Identifier, x, y);
-    }
+  }
   this->Size[0] = x;
   this->Size[1] = y;
 }
@@ -178,12 +173,12 @@ void vtkPVView::SetSize(int x, int y)
 void vtkPVView::SetViewTime(double time)
 {
   if (!this->ViewTimeValid || this->ViewTime != time)
-    {
+  {
     this->ViewTime = time;
     this->ViewTimeValid = true;
     this->InvokeEvent(ViewTimeChangedEvent);
     this->Modified();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -217,13 +212,13 @@ bool vtkPVView::SynchronizeBounds(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeSize(double &size)
+bool vtkPVView::SynchronizeSize(double& size)
 {
   return this->SynchronizedWindows->SynchronizeSize(size);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeSize(unsigned int &size)
+bool vtkPVView::SynchronizeSize(unsigned int& size)
 {
   return this->SynchronizedWindows->SynchronizeSize(size);
 }
@@ -242,22 +237,20 @@ void vtkPVView::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVView::PrepareForScreenshot()
 {
   if (!this->InTileDisplayMode())
-    {
-    this->LastRenderOneViewAtATime =
-      this->SynchronizedWindows->GetRenderOneViewAtATime();
+  {
+    this->LastRenderOneViewAtATime = this->SynchronizedWindows->GetRenderOneViewAtATime();
     this->SynchronizedWindows->RenderOneViewAtATimeOn();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::CleanupAfterScreenshot()
 {
   if (!this->InTileDisplayMode())
-    {
+  {
     this->SynchronizedWindows->RenderOneViewAtATimeOff();
-    this->SynchronizedWindows->SetRenderOneViewAtATime(
-      this->LastRenderOneViewAtATime);
-    }
+    this->SynchronizedWindows->SetRenderOneViewAtATime(this->LastRenderOneViewAtATime);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -266,19 +259,19 @@ void vtkPVView::Update()
   vtkTimerLog::MarkStartEvent("vtkPVView::Update");
   // Ensure that cache size if synchronized among the processes.
   if (this->GetUseCache())
-    {
+  {
     vtkCacheSizeKeeper* cacheSizeKeeper = vtkCacheSizeKeeper::GetInstance();
     unsigned int cache_full = 0;
     if (cacheSizeKeeper->GetCacheSize() > cacheSizeKeeper->GetCacheLimit())
-      {
+    {
       cache_full = 1;
-      }
+    }
     this->SynchronizedWindows->SynchronizeSize(cache_full);
     cacheSizeKeeper->SetCacheFull(cache_full > 0);
-    }
+  }
 
-  this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
-    this->RequestInformation, this->ReplyInformationVector);
+  this->CallProcessViewRequest(
+    vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPVView::Update");
 }
 
@@ -290,43 +283,43 @@ void vtkPVView::CallProcessViewRequest(
   outVec->SetNumberOfInformationObjects(num_reprs);
 
   if (type == REQUEST_UPDATE())
-    {
+  {
     // Pass the view time before updating the representations.
-    for (int cc=0; cc < num_reprs; cc++)
-      {
+    for (int cc = 0; cc < num_reprs; cc++)
+    {
       vtkDataRepresentation* repr = this->GetRepresentation(cc);
       vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
       if (pvrepr)
-        {
+      {
         // Pass the view time information to the representation
-        if(this->ViewTimeValid)
-          {
+        if (this->ViewTimeValid)
+        {
           pvrepr->SetUpdateTime(this->GetViewTime());
-          }
         }
       }
     }
+  }
 
   // NOTE: This will create a reference loop (depending on what inInfo is). If
   // it's this->RequestInformation, then we have a loop and hence it's
   // essential to call vtkInformation::Clear() before this method returns.
   inInfo->Set(VIEW(), this);
 
-  for (int cc=0; cc < num_reprs; cc++)
-    {
+  for (int cc = 0; cc < num_reprs; cc++)
+  {
     vtkInformation* outInfo = outVec->GetInformationObject(cc);
     outInfo->Clear();
     vtkDataRepresentation* repr = this->GetRepresentation(cc);
     vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
     if (pvrepr)
-      {
+    {
       pvrepr->ProcessViewRequest(type, inInfo, outInfo);
-      }
-    else if (repr && type == REQUEST_UPDATE())
-      {
-      repr->Update();
-      }
     }
+    else if (repr && type == REQUEST_UPDATE())
+    {
+      repr->Update();
+    }
+  }
 
   // Clear input information since we are done with the pass. This avoids any
   // need for garbage collection.
@@ -337,15 +330,14 @@ void vtkPVView::CallProcessViewRequest(
 void vtkPVView::AddRepresentationInternal(vtkDataRepresentation* rep)
 {
   if (vtkPVDataRepresentation* drep = vtkPVDataRepresentation::SafeDownCast(rep))
-    {
+  {
     if (drep->GetView() != this)
-      {
-      vtkErrorMacro(
-        << drep->GetClassName()
-        << " may not be calling this->Superclass::AddToView(...) in its "
-        << "AddToView implementation. Please fix that. "
-        << "Also check the same for RemoveFromView(..).");
-      }
+    {
+      vtkErrorMacro(<< drep->GetClassName()
+                    << " may not be calling this->Superclass::AddToView(...) in its "
+                    << "AddToView implementation. Please fix that. "
+                    << "Also check the same for RemoveFromView(..).");
     }
+  }
   this->Superclass::AddRepresentationInternal(rep);
 }

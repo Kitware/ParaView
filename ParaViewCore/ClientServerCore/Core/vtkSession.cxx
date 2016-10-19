@@ -30,19 +30,19 @@ vtkSession::~vtkSession()
 //----------------------------------------------------------------------------
 void vtkSession::Activate()
 {
-  if(vtkProcessModule* pm =  vtkProcessModule::GetProcessModule())
-    {
+  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+  {
     pm->PushActiveSession(this);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSession::DeActivate()
 {
-  if(vtkProcessModule* pm =  vtkProcessModule::GetProcessModule())
-    {
+  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+  {
     pm->PopActiveSession(this);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

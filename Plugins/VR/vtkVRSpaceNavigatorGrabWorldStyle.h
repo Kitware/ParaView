@@ -45,19 +45,19 @@ struct vtkVREventData;
 class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
 {
 public:
-  static vtkVRSpaceNavigatorGrabWorldStyle *New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle)
-  void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkVRSpaceNavigatorGrabWorldStyle* New();
+  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle) void PrintSelf(
+    ostream& os, vtkIndent indent);
 
 protected:
   vtkVRSpaceNavigatorGrabWorldStyle();
   ~vtkVRSpaceNavigatorGrabWorldStyle();
 
-  virtual void HandleAnalog ( const vtkVREventData& data );
+  virtual void HandleAnalog(const vtkVREventData& data);
 
 private:
   vtkVRSpaceNavigatorGrabWorldStyle(const vtkVRSpaceNavigatorGrabWorldStyle&) VTK_DELETE_FUNCTION;
   void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) VTK_DELETE_FUNCTION;
 };
 
-#endif //vtkVRSpaceNavigatorGrabWorldStyle.h_
+#endif // vtkVRSpaceNavigatorGrabWorldStyle.h_

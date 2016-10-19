@@ -32,7 +32,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 
-vtkCxxSetObjectMacro( vtkPolyDataGeodesicDistance, Seeds, vtkIdList );
+vtkCxxSetObjectMacro(vtkPolyDataGeodesicDistance, Seeds, vtkIdList);
 
 //-----------------------------------------------------------------------------
 vtkPolyDataGeodesicDistance::vtkPolyDataGeodesicDistance()
@@ -50,44 +50,43 @@ vtkPolyDataGeodesicDistance::~vtkPolyDataGeodesicDistance()
 }
 
 //-----------------------------------------------------------------------------
-vtkFloatArray *vtkPolyDataGeodesicDistance
-::GetGeodesicDistanceField(vtkPolyData *pd)
+vtkFloatArray* vtkPolyDataGeodesicDistance::GetGeodesicDistanceField(vtkPolyData* pd)
 {
   if (this->FieldDataName == NULL)
-    {
+  {
     return NULL;
-    }
+  }
 
-  vtkDataArray *arr = pd->GetPointData()->GetArray(this->FieldDataName);
-  if (vtkFloatArray *farr = vtkFloatArray::SafeDownCast(arr))
-    {
+  vtkDataArray* arr = pd->GetPointData()->GetArray(this->FieldDataName);
+  if (vtkFloatArray* farr = vtkFloatArray::SafeDownCast(arr))
+  {
     // Resize the existing one
     farr->SetNumberOfValues(pd->GetNumberOfPoints());
     if (!pd->GetPointData()->GetScalars())
-      {
-      pd->GetPointData()->SetScalars(farr);
-      }
-    return farr;
-    }
-  else if (!arr)
     {
+      pd->GetPointData()->SetScalars(farr);
+    }
+    return farr;
+  }
+  else if (!arr)
+  {
     // Create a new one
-    vtkFloatArray *farray = vtkFloatArray::New();
+    vtkFloatArray* farray = vtkFloatArray::New();
     farray->SetName(this->FieldDataName);
     farray->SetNumberOfValues(pd->GetNumberOfPoints());
     pd->GetPointData()->AddArray(farray);
     farray->Delete();
     if (!pd->GetPointData()->GetScalars())
-      {
-      pd->GetPointData()->SetScalars(farray);
-      }
-    return vtkFloatArray::SafeDownCast(
-      pd->GetPointData()->GetArray(this->FieldDataName));
-    }
-  else
     {
-    vtkErrorMacro( << "A array with a different datatype already exists with the same name on this polydata" );
+      pd->GetPointData()->SetScalars(farray);
     }
+    return vtkFloatArray::SafeDownCast(pd->GetPointData()->GetArray(this->FieldDataName));
+  }
+  else
+  {
+    vtkErrorMacro(
+      << "A array with a different datatype already exists with the same name on this polydata");
+  }
 
   return NULL;
 }
@@ -96,10 +95,10 @@ vtkFloatArray *vtkPolyDataGeodesicDistance
 int vtkPolyDataGeodesicDistance::Compute()
 {
   if (!this->Seeds || !this->Seeds->GetNumberOfIds())
-    {
-    vtkErrorMacro( << "Please supply at least one seed." );
+  {
+    vtkErrorMacro(<< "Please supply at least one seed.");
     return 0;
-    }
+  }
 
   return 1;
 }
@@ -109,24 +108,23 @@ vtkMTimeType vtkPolyDataGeodesicDistance::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime(), time;
 
-  if ( this->Seeds )
-    {
+  if (this->Seeds)
+  {
     time = this->Seeds->GetMTime();
-    mTime = ( time > mTime ? time : mTime );
-    }
+    mTime = (time > mTime ? time : mTime);
+  }
   return mTime;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPolyDataGeodesicDistance::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   if (this->Seeds)
-    {
+  {
     os << indent << "Seeds: " << this->Seeds << endl;
     this->Seeds->PrintSelf(os, indent.GetNextIndent());
-    }
-  os << indent << "FieldDataName: "
-     << (this->FieldDataName ? this->FieldDataName : "None") << endl;
+  }
+  os << indent << "FieldDataName: " << (this->FieldDataName ? this->FieldDataName : "None") << endl;
 }

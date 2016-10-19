@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -39,10 +39,12 @@ class pqSpreadSheetView;
 class pqOutputPort;
 class pqDataRepresentation;
 
-/// pqSpreadSheetViewDecorator adds decoration to a spread-sheet view. This
-/// includes widgets that allows changing the currently shown source/field etc.
-/// To use the decorator, simply instantiate a new decorator for every new
-/// instance of pqSpreadSheetView.
+/**
+* pqSpreadSheetViewDecorator adds decoration to a spread-sheet view. This
+* includes widgets that allows changing the currently shown source/field etc.
+* To use the decorator, simply instantiate a new decorator for every new
+* instance of pqSpreadSheetView.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
 {
   Q_OBJECT
@@ -52,11 +54,15 @@ public:
   pqSpreadSheetViewDecorator(pqSpreadSheetView* view);
   ~pqSpreadSheetViewDecorator();
 
-  /// Returns whether the user should allowed to interactive change the source.
-  /// being shown in the view. `true` by default.
+  /**
+  * Returns whether the user should allowed to interactive change the source.
+  * being shown in the view. `true` by default.
+  */
   bool allowChangeOfSource() const;
 
-  /// Set whether the user should be allowed to change the source interactively.
+  /**
+  * Set whether the user should be allowed to change the source interactively.
+  */
   void setAllowChangeOfSource(bool val);
 
 protected slots:

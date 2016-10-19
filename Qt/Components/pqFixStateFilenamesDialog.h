@@ -38,34 +38,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVXMLElement;
 class vtkFileSequenceParser;
 
-/// pqFixStateFilenamesDialog can be used to prompt the user with a dialog to
-/// edit the filenames referred to in a state xml. Set the state xml
-/// root-element and then call exec() on the dialog. When exec() returns with
-/// QDialog::Accepted, it will have modified that XML root element with user
-/// specified filenames where ever applicable.
+/**
+* pqFixStateFilenamesDialog can be used to prompt the user with a dialog to
+* edit the filenames referred to in a state xml. Set the state xml
+* root-element and then call exec() on the dialog. When exec() returns with
+* QDialog::Accepted, it will have modified that XML root element with user
+* specified filenames where ever applicable.
+*/
 class PQCOMPONENTS_EXPORT pqFixStateFilenamesDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
+
 public:
-  /// \c xml is the state xml root-element. Note that the xml may get modified, if
-  /// the user picks different filesnames.
-  pqFixStateFilenamesDialog(vtkPVXMLElement* xml,
-    QWidget* parent=0, Qt::WindowFlags f=0);
+  /**
+  * \c xml is the state xml root-element. Note that the xml may get modified, if
+  * the user picks different filesnames.
+  */
+  pqFixStateFilenamesDialog(vtkPVXMLElement* xml, QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFixStateFilenamesDialog();
 
-  /// Call this method to check if the dialog needs to be shown at all.
+  /**
+  * Call this method to check if the dialog needs to be shown at all.
+  */
   bool hasFileNames() const;
 
-  /// Provides access to the xml root.
+  /**
+  * Provides access to the xml root.
+  */
   vtkPVXMLElement* xmlRoot() const;
 
-  /// Overridden to update xml tree based on user chosen filenames.
+  /**
+  * Overridden to update xml tree based on user chosen filenames.
+  */
   virtual void accept();
 
 protected:
-
-  /// Detect File paterns, constructing the filename to be shown in the pipeline browser.
+  /**
+  * Detect File paterns, constructing the filename to be shown in the pipeline browser.
+  */
   QString ConstructPipelineName(QStringList files);
 
 private slots:
@@ -76,7 +87,7 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
-  vtkFileSequenceParser * SequenceParser;
+  vtkFileSequenceParser* SequenceParser;
 };
 
 #endif

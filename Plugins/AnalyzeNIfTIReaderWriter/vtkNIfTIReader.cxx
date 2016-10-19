@@ -40,11 +40,11 @@ vtkNIfTIReader::vtkNIfTIReader()
   q = new double*[4];
   s = new double*[4];
   int count;
-  for(count=0;count<4;count++)
-    {
+  for (count = 0; count < 4; count++)
+  {
     q[count] = new double[4];
     s[count] = new double[4];
-    }
+  }
   this->niftiHeader = 0;
   this->niftiHeaderUnsignedCharArray = 0;
   this->niftiHeaderSize = 348;
@@ -55,270 +55,267 @@ vtkNIfTIReader::vtkNIfTIReader()
 vtkNIfTIReader::~vtkNIfTIReader()
 {
   int count;
-  for(count=0;count<4;count++)
-    {
-    delete [] q[count];
+  for (count = 0; count < 4; count++)
+  {
+    delete[] q[count];
     q[count] = NULL;
-    delete [] s[count];
+    delete[] s[count];
     s[count] = NULL;
-    }
-  delete [] q;
-  delete [] s;
+  }
+  delete[] q;
+  delete[] s;
   q = NULL;
   s = NULL;
   if (this->niftiHeader)
-    {
+  {
     this->niftiHeader->Delete();
     this->niftiHeader = 0;
-    }
+  }
   if (this->niftiHeaderUnsignedCharArray)
-    {
+  {
     delete this->niftiHeaderUnsignedCharArray;
     this->niftiHeaderUnsignedCharArray = 0;
-    }
+  }
 }
 
-
-//GetExtension from uiig library.
-static std::string
-GetExtension( const std::string& filename ) {
+// GetExtension from uiig library.
+static std::string GetExtension(const std::string& filename)
+{
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const std::string::size_type it = filename.find_last_of( "." );
+  const std::string::size_type it = filename.find_last_of(".");
 
   // This determines the file's type by creating a new std::string
   // who's value is the extension of the input filename
   // eg. "myimage.gif" has an extension of "gif"
-  std::string fileExt( filename, it+1, filename.length() );
+  std::string fileExt(filename, it + 1, filename.length());
 
-  return( fileExt );
+  return (fileExt);
 }
 
-//GetRootName from uiig library.
-static std::string
-GetRootName( const std::string& filename )
+// GetRootName from uiig library.
+static std::string GetRootName(const std::string& filename)
 {
   const std::string fileExt = GetExtension(filename);
 
   // Create a base filename
   // i.e Image.hdr --> Image
-  if( fileExt.length() > 0 )
-    {
-    const std::string::size_type it = filename.find_last_of( fileExt );
-    std::string baseName( filename, 0, it-fileExt.length() );
-    return( baseName );
-    }
-  //Default to return same as input when the extension is nothing (Analyze)
-  return( filename );
+  if (fileExt.length() > 0)
+  {
+    const std::string::size_type it = filename.find_last_of(fileExt);
+    std::string baseName(filename, 0, it - fileExt.length());
+    return (baseName);
+  }
+  // Default to return same as input when the extension is nothing (Analyze)
+  return (filename);
 }
 
-static std::string
-GetHeaderFileName( const std::string & filename )
+static std::string GetHeaderFileName(const std::string& filename)
 {
   std::string ImageFileName = GetRootName(filename);
   std::string fileExt = GetExtension(filename);
-  //If file was named xxx.img.gz then remove both the gz and the img endings.
-  if(!fileExt.compare("gz"))
-    {
-    ImageFileName=GetRootName(GetRootName(filename));
-    }
-  else if(!fileExt.compare("nii"))
-    {
+  // If file was named xxx.img.gz then remove both the gz and the img endings.
+  if (!fileExt.compare("gz"))
+  {
+    ImageFileName = GetRootName(GetRootName(filename));
+  }
+  else if (!fileExt.compare("nii"))
+  {
     ImageFileName += ".nii";
-    }
-  else if(!fileExt.compare("hdr"))
-    {
+  }
+  else if (!fileExt.compare("hdr"))
+  {
     ImageFileName += ".hdr";
-    }
-  else if(!fileExt.compare("img"))
-    {
+  }
+  else if (!fileExt.compare("img"))
+  {
     ImageFileName += ".hdr";
-    }
-  return( ImageFileName );
+  }
+  return (ImageFileName);
 }
 
-//Returns the base image filename.
-static std::string GetImageFileName( const std::string& filename )
+// Returns the base image filename.
+static std::string GetImageFileName(const std::string& filename)
 {
   // Why do we add ".nii" here?  Look in fileutils.h
   std::string fileExt = GetExtension(filename);
   std::string ImageFileName = GetRootName(filename);
-  if(!fileExt.compare("gz"))
-    {
-    //First strip both extensions off
-    ImageFileName=GetRootName(GetRootName(filename));
+  if (!fileExt.compare("gz"))
+  {
+    // First strip both extensions off
+    ImageFileName = GetRootName(GetRootName(filename));
     ImageFileName += ".nii.gz";
-    }
-  else if(!fileExt.compare("nii"))
-    {
+  }
+  else if (!fileExt.compare("nii"))
+  {
     ImageFileName += ".nii";
-    }
-  else if(!fileExt.compare("img"))
-    {
+  }
+  else if (!fileExt.compare("img"))
+  {
     ImageFileName += ".img";
-    }
-  else if(!fileExt.compare("hdr"))
-    {
+  }
+  else if (!fileExt.compare("hdr"))
+  {
     ImageFileName += ".img";
-    }
+  }
   else
-    {
-    //uiig::Reporter* reporter = uiig::Reporter::getReporter();
-    //std::string temp="Error, Can not determine compressed file image name. ";
-    //temp+=filename;
-    //reporter->setMessage( temp );
+  {
+    // uiig::Reporter* reporter = uiig::Reporter::getReporter();
+    // std::string temp="Error, Can not determine compressed file image name. ";
+    // temp+=filename;
+    // reporter->setMessage( temp );
     return ("");
-    }
-  return( ImageFileName );
+  }
+  return (ImageFileName);
 }
 
-static bool ReadBufferAsBinary(istream& is, void *buffer, unsigned int num)
+static bool ReadBufferAsBinary(istream& is, void* buffer, unsigned int num)
 {
 
   const unsigned int numberOfBytesToBeRead = num;
 
-  is.read( static_cast<char *>( buffer ), numberOfBytesToBeRead );
+  is.read(static_cast<char*>(buffer), numberOfBytesToBeRead);
 
   const unsigned int numberOfBytesRead = is.gcount();
 
 #ifdef __APPLE_CC__
   // fail() is broken in the Mac. It returns true when reaches eof().
-  if ( numberOfBytesRead != numberOfBytesToBeRead )
+  if (numberOfBytesRead != numberOfBytesToBeRead)
 #else
-  if ( ( numberOfBytesRead != numberOfBytesToBeRead )  || is.fail() )
+  if ((numberOfBytesRead != numberOfBytesToBeRead) || is.fail())
 #endif
-    {
+  {
     return false; // read failed
-    }
+  }
 
   return true;
-
 }
 
 //----------------------------------------------------------------------------
 void vtkNIfTIReader::ExecuteInformation()
 {
 
-  nifti_image * m_NiftiImage;
+  nifti_image* m_NiftiImage;
   dataTypeSize = 1.0;
   unsigned int numComponents = 1;
   nifti_1_header tempNiftiHeader;
-  unsigned char * niftiHeaderUnsignedCharArrayPtr = (unsigned char *) &tempNiftiHeader;
+  unsigned char* niftiHeaderUnsignedCharArrayPtr = (unsigned char*)&tempNiftiHeader;
 
   this->niftiHeaderUnsignedCharArray = new unsigned char[this->niftiHeaderSize];
-  
+
   CanReadFile(this->GetFileName());
 
-  m_NiftiImage=vtknifti1_io::nifti_image_read(this->GetFileName(),true);
+  m_NiftiImage = vtknifti1_io::nifti_image_read(this->GetFileName(), true);
   if (m_NiftiImage == NULL)
-    {
+  {
     vtkErrorMacro("Read failed");
     return;
-    }
+  }
 
   tempNiftiHeader = vtknifti1_io::nifti_convert_nim2nhdr(m_NiftiImage);
 
   int count;
 
-  for (count = 0;count<this->niftiHeaderSize;count++){
+  for (count = 0; count < this->niftiHeaderSize; count++)
+  {
     this->niftiHeaderUnsignedCharArray[count] = niftiHeaderUnsignedCharArrayPtr[count];
-    }
+  }
 
-  const int dims=m_NiftiImage->ndim;
+  const int dims = m_NiftiImage->ndim;
   size_t numElts = 1;
 
   switch (dims)
-    {
-  case 7:
-    numElts *= m_NiftiImage->nw;
-  case 6:
-    numElts *= m_NiftiImage->nv;
-  case 5:
-    numElts *= m_NiftiImage->nu;
-  case 4:
-    numElts *= m_NiftiImage->nt;
-  case 3:
-    numElts *= m_NiftiImage->nz;
-  case 2:
-    numElts *= m_NiftiImage->ny;
-  case 1:
-    numElts *= m_NiftiImage->nx;
-    break;
-  default:
-    numElts = 0;
-    }
+  {
+    case 7:
+      numElts *= m_NiftiImage->nw;
+    case 6:
+      numElts *= m_NiftiImage->nv;
+    case 5:
+      numElts *= m_NiftiImage->nu;
+    case 4:
+      numElts *= m_NiftiImage->nt;
+    case 3:
+      numElts *= m_NiftiImage->nz;
+    case 2:
+      numElts *= m_NiftiImage->ny;
+    case 1:
+      numElts *= m_NiftiImage->nx;
+      break;
+    default:
+      numElts = 0;
+  }
 
   Type = m_NiftiImage->datatype;
 
-  switch(Type)
-    {
-  case DT_BINARY:
-    this->SetDataScalarType(VTK_BIT);
-    dataTypeSize = 0.125;
-    break;
-  case DT_UNSIGNED_CHAR:
-    this->SetDataScalarTypeToUnsignedChar();
-    dataTypeSize = 1;
-    break;
-  case DT_INT8:
-    this->SetDataScalarTypeToSignedChar();
-    dataTypeSize = 1;
-    break;
-  case DT_SIGNED_SHORT:
-    this->SetDataScalarTypeToShort();
-    dataTypeSize = 2;
-    break;
-  case DT_UINT16:
-    this->SetDataScalarTypeToUnsignedShort();
-    dataTypeSize = 2;
-    break;
-  case DT_SIGNED_INT:
-    this->SetDataScalarTypeToInt();
-    dataTypeSize = 4;
-    break;
-  case DT_UINT32:
-    this->SetDataScalarTypeToUnsignedInt();
-    dataTypeSize = 4;
-    break;
-  case DT_FLOAT:
-    this->SetDataScalarTypeToFloat();
-    dataTypeSize = 4;
-    break;
-  case DT_DOUBLE:
-    this->SetDataScalarTypeToDouble();
-    dataTypeSize = 8;
-    break;
-  case DT_INT64:
-    this->SetDataScalarType(VTK_LONG);
-    dataTypeSize = 8;
-    break;
-  case DT_UINT64:
-    this->SetDataScalarType(VTK_UNSIGNED_LONG);
-    dataTypeSize = 8;
-    break;
-  case DT_RGB:
-    this->SetDataScalarTypeToUnsignedChar();
-    numComponents = 3;
-    dataTypeSize = 3;
-    break;
-  case DT_RGBA32:
-    this->SetDataScalarTypeToUnsignedChar();
-    numComponents = 4;
-    dataTypeSize = 4;
-    break;
-  default:
-    vtkErrorMacro("cannot handle this NIfTI type yet.");
-    break;
-    }
+  switch (Type)
+  {
+    case DT_BINARY:
+      this->SetDataScalarType(VTK_BIT);
+      dataTypeSize = 0.125;
+      break;
+    case DT_UNSIGNED_CHAR:
+      this->SetDataScalarTypeToUnsignedChar();
+      dataTypeSize = 1;
+      break;
+    case DT_INT8:
+      this->SetDataScalarTypeToSignedChar();
+      dataTypeSize = 1;
+      break;
+    case DT_SIGNED_SHORT:
+      this->SetDataScalarTypeToShort();
+      dataTypeSize = 2;
+      break;
+    case DT_UINT16:
+      this->SetDataScalarTypeToUnsignedShort();
+      dataTypeSize = 2;
+      break;
+    case DT_SIGNED_INT:
+      this->SetDataScalarTypeToInt();
+      dataTypeSize = 4;
+      break;
+    case DT_UINT32:
+      this->SetDataScalarTypeToUnsignedInt();
+      dataTypeSize = 4;
+      break;
+    case DT_FLOAT:
+      this->SetDataScalarTypeToFloat();
+      dataTypeSize = 4;
+      break;
+    case DT_DOUBLE:
+      this->SetDataScalarTypeToDouble();
+      dataTypeSize = 8;
+      break;
+    case DT_INT64:
+      this->SetDataScalarType(VTK_LONG);
+      dataTypeSize = 8;
+      break;
+    case DT_UINT64:
+      this->SetDataScalarType(VTK_UNSIGNED_LONG);
+      dataTypeSize = 8;
+      break;
+    case DT_RGB:
+      this->SetDataScalarTypeToUnsignedChar();
+      numComponents = 3;
+      dataTypeSize = 3;
+      break;
+    case DT_RGBA32:
+      this->SetDataScalarTypeToUnsignedChar();
+      numComponents = 4;
+      dataTypeSize = 4;
+      break;
+    default:
+      vtkErrorMacro("cannot handle this NIfTI type yet.");
+      break;
+  }
   //
   // set up the dimension stuff
 
   this->SetNumberOfScalarComponents(numComponents);
 
-  width  = m_NiftiImage->dim[1];
+  width = m_NiftiImage->dim[1];
   height = m_NiftiImage->dim[2];
-  depth  = m_NiftiImage->dim[3];
+  depth = m_NiftiImage->dim[3];
 
   this->DataExtent[0] = 0;
   this->DataExtent[1] = m_NiftiImage->dim[1] - 1;
@@ -331,27 +328,28 @@ void vtkNIfTIReader::ExecuteInformation()
   this->DataSpacing[1] = m_NiftiImage->pixdim[2];
   this->DataSpacing[2] = m_NiftiImage->pixdim[3];
 
-
-  //set origin offset
+  // set origin offset
 
   qform_code = m_NiftiImage->qform_code;
   sform_code = m_NiftiImage->sform_code;
 
-  int row,col;
+  int row, col;
 
-  for (row=0;row<4;row++){
-    for (col=0;col<4;col++){
+  for (row = 0; row < 4; row++)
+  {
+    for (col = 0; col < 4; col++)
+    {
       s[row][col] = m_NiftiImage->sto_xyz.m[row][col];
       q[row][col] = m_NiftiImage->qto_xyz.m[row][col];
-      }
     }
+  }
 
   int inDim[3];
   double inOriginOffset[3];
   double flippedOriginOffset[3];
   double outNoFlipOriginOffset[3];
   double outOriginOffset[3];
-  
+
   int InPlaceFilteredAxes[3];
   int flipAxis[3];
 
@@ -359,242 +357,316 @@ void vtkNIfTIReader::ExecuteInformation()
   flipAxis[1] = 0;
   flipAxis[2] = 0;
 
-  InPlaceFilteredAxes[0]=0;
-  InPlaceFilteredAxes[1]=1;
-  InPlaceFilteredAxes[2]=2;
+  InPlaceFilteredAxes[0] = 0;
+  InPlaceFilteredAxes[1] = 1;
+  InPlaceFilteredAxes[2] = 2;
 
   /*if(sform_code>0){
   inOriginOffset[0] = s[0][3];
   inOriginOffset[1] = s[1][3];
   inOriginOffset[2] = s[2][3];
-  } else */ if (qform_code>0){
+  } else */ if (qform_code > 0)
+  {
     inOriginOffset[0] = q[0][3];
     inOriginOffset[1] = q[1][3];
     inOriginOffset[2] = q[2][3];
-    } else {
+  }
+  else
+  {
     inOriginOffset[0] = 0.0;
     inOriginOffset[1] = 0.0;
     inOriginOffset[2] = 0.0;
-    }
+  }
 
-  if(sform_code>0){
-    if(s[0][0]>=1.0){
-      InPlaceFilteredAxes[0]=0;
+  if (sform_code > 0)
+  {
+    if (s[0][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 0;
       flipAxis[0] = 0;
-      } else if (s[0][0]<=-1.0){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 1;
-      }
-    if(s[0][1]>=1.0){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 0;
-      } else if (s[0][1]<=-1.0){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 1;
-      }
-    if(s[0][2]>=1.0){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 0;
-      } else if (s[0][2]<=-1.0){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 1;
-      }
-    if(s[1][0]>=1.0){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 0;
-      } else if (s[1][0]<=-1.0){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 1;
-      }
-    if(s[1][1]>=1.0){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 0;
-      } else if (s[1][1]<=-1.0){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 1;
-      }
-    if(s[1][2]>=1.0){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 0;
-      } else if (s[1][2]<=-1.0){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 1;
-      }
-    if(s[2][0]>=1.0){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 0;
-      } else if (s[2][0]<=-1.0){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 1;
-      }
-    if(s[2][1]>=1.0){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 0;
-      } else if (s[2][1]<=-1.0){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 1;
-      }
-    if(s[2][2]>=1.0){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 0;
-      } else if (s[2][2]<=-1.0){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 1;
-      }
-    } else if(qform_code>0){
-    if(q[0][0]>=1.0){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 0;
-      } else if (q[0][0]<=-1.0){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 1;
-      }
-    if(q[0][1]>=1.0){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 0;
-      } else if (q[0][1]<=-1.0){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 1;
-      }
-    if(q[0][2]>=1.0){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 0;
-      } else if (q[0][2]<=-1.0){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 1;
-      }
-    if(q[1][0]>=1.0){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 0;
-      } else if (q[1][0]<=-1.0){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 1;
-      }
-    if(q[1][1]>=1.0){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 0;
-      } else if (q[1][1]<=-1.0){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 1;
-      }
-    if(q[1][2]>=1.0){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 0;
-      } else if (q[1][2]<=-1.0){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 1;
-      }
-    if(q[2][0]>=1.0){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 0;
-      } else if (q[2][0]<=-1.0){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 1;
-      }
-    if(q[2][1]>=1.0){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 0;
-      } else if (q[2][1]<=-1.0){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 1;
-      }
-    if(q[2][2]>=1.0){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 0;
-      } else if (q[2][2]<=-1.0){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 1;
-      }
     }
+    else if (s[0][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 1;
+    }
+    if (s[0][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 0;
+    }
+    else if (s[0][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 1;
+    }
+    if (s[0][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 0;
+    }
+    else if (s[0][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 1;
+    }
+    if (s[1][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 0;
+    }
+    else if (s[1][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 1;
+    }
+    if (s[1][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 0;
+    }
+    else if (s[1][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 1;
+    }
+    if (s[1][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 0;
+    }
+    else if (s[1][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 1;
+    }
+    if (s[2][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 0;
+    }
+    else if (s[2][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 1;
+    }
+    if (s[2][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 0;
+    }
+    else if (s[2][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 1;
+    }
+    if (s[2][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 0;
+    }
+    else if (s[2][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 1;
+    }
+  }
+  else if (qform_code > 0)
+  {
+    if (q[0][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 0;
+    }
+    else if (q[0][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 1;
+    }
+    if (q[0][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 0;
+    }
+    else if (q[0][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 1;
+    }
+    if (q[0][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 0;
+    }
+    else if (q[0][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 1;
+    }
+    if (q[1][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 0;
+    }
+    else if (q[1][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 1;
+    }
+    if (q[1][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 0;
+    }
+    else if (q[1][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 1;
+    }
+    if (q[1][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 0;
+    }
+    else if (q[1][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 1;
+    }
+    if (q[2][0] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 0;
+    }
+    else if (q[2][0] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 1;
+    }
+    if (q[2][1] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 0;
+    }
+    else if (q[2][1] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 1;
+    }
+    if (q[2][2] >= 1.0)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 0;
+    }
+    else if (q[2][2] <= -1.0)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 1;
+    }
+  }
 
-  if((InPlaceFilteredAxes[0]==InPlaceFilteredAxes[1])||(InPlaceFilteredAxes[0]==InPlaceFilteredAxes[2])||(InPlaceFilteredAxes[1]==InPlaceFilteredAxes[2])){
+  if ((InPlaceFilteredAxes[0] == InPlaceFilteredAxes[1]) ||
+    (InPlaceFilteredAxes[0] == InPlaceFilteredAxes[2]) ||
+    (InPlaceFilteredAxes[1] == InPlaceFilteredAxes[2]))
+  {
     flipAxis[0] = 0;
     flipAxis[1] = 0;
     flipAxis[2] = 0;
-    InPlaceFilteredAxes[0]=0;
-    InPlaceFilteredAxes[1]=1;
-    InPlaceFilteredAxes[2]=2;
-    }
-  
-  for (count=0;count<3;count++){
-    inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
-    }
+    InPlaceFilteredAxes[0] = 0;
+    InPlaceFilteredAxes[1] = 1;
+    InPlaceFilteredAxes[2] = 2;
+  }
 
-  for (count=0;count<3;count++){
-    if(flipAxis[count]){
+  for (count = 0; count < 3; count++)
+  {
+    inDim[count] = (this->DataExtent[(count * 2) + 1] - this->DataExtent[count * 2]) + 1;
+  }
+
+  for (count = 0; count < 3; count++)
+  {
+    if (flipAxis[count])
+    {
       flippedOriginOffset[count] = inOriginOffset[count] - inDim[count];
-      } else {
-      flippedOriginOffset[count] = inOriginOffset[count];
-      }
     }
+    else
+    {
+      flippedOriginOffset[count] = inOriginOffset[count];
+    }
+  }
 
-  for (count=0;count<3;count++){
+  for (count = 0; count < 3; count++)
+  {
     outOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
     outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
+  }
+
+  for (count = 0; count < 3; count++)
+  {
+    if (qform_code > 0)
+    {
+      this->DataOrigin[count] = outOriginOffset[count];
+      // this->DataOrigin[count]       = outNoFlipOriginOffset[count];
     }
-
-  for (count=0;count<3;count++){
-    if(qform_code>0){
-      this->DataOrigin[count]       = outOriginOffset[count];
-      //this->DataOrigin[count]       = outNoFlipOriginOffset[count];
-      } else {
-      this->DataOrigin[count]       = outNoFlipOriginOffset[count];
-      }
+    else
+    {
+      this->DataOrigin[count] = outNoFlipOriginOffset[count];
     }
+  }
 
-
-  imageSizeInBytes = (int) (numElts * dataTypeSize);
+  imageSizeInBytes = (int)(numElts * dataTypeSize);
 
 #define LSB_FIRST 1
 #define MSB_FIRST 2
 
-  if(m_NiftiImage->byteorder==MSB_FIRST){
+  if (m_NiftiImage->byteorder == MSB_FIRST)
+  {
     this->SetDataByteOrderToBigEndian();
-    } else {
+  }
+  else
+  {
     this->SetDataByteOrderToLittleEndian();
-    }
+  }
 
   this->vtkImageReader::ExecuteInformation();
-
 }
-
 
 //----------------------------------------------------------------------------
 // This function reads in one data of data.
 // templated to handle different data types.
 template <class OT>
-void vtkNIfTIReaderUpdate2(vtkNIfTIReader *self, vtkImageData * vtkNotUsed(data), OT *outPtr, long offset)
+void vtkNIfTIReaderUpdate2(
+  vtkNIfTIReader* self, vtkImageData* vtkNotUsed(data), OT* outPtr, long offset)
 {
-  //unsigned int dim;
-  //char * const p = static_cast<char *>(outPtr);
-  char *  p = (char *)(outPtr);
-  //4 cases to handle
-  //1: given .hdr and image is .img
-  //2: given .nii
-  //3: given .nii.gz
-  //4: given .hdr and image is .img.gz
+  // unsigned int dim;
+  // char * const p = static_cast<char *>(outPtr);
+  char* p = (char*)(outPtr);
+  // 4 cases to handle
+  // 1: given .hdr and image is .img
+  // 2: given .nii
+  // 3: given .nii.gz
+  // 4: given .hdr and image is .img.gz
   //   Special processing needed for this case onl
   // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */
-  std::string ImageFileName = GetImageFileName( self->GetFileName() );
-  //NOTE: gzFile operations act just like FILE * operations when the files
+  std::string ImageFileName = GetImageFileName(self->GetFileName());
+  // NOTE: gzFile operations act just like FILE * operations when the files
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
   // In addition, it has the added benifit of reading gzip compressed image
   // files that do not have a .gz ending.
-  gzFile file_p = ::gzopen( ImageFileName.c_str(), "rb" );
-  if( file_p == NULL )
-    {
+  gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
+  if (file_p == NULL)
+  {
     /* Do a separate check to take care of case #4 */
     ImageFileName += ".gz";
-    file_p = ::gzopen( ImageFileName.c_str(), "rb" );
-    if( file_p == NULL )
-      {
-      //vtkErrorMacro( << "File cannot be read");
-      }
+    file_p = ::gzopen(ImageFileName.c_str(), "rb");
+    if (file_p == NULL)
+    {
+      // vtkErrorMacro( << "File cannot be read");
     }
+  }
 
   // Seek through the file to the correct position, This is only necessary
   // when readin in sub-volumes
@@ -605,94 +677,93 @@ void vtkNIfTIReaderUpdate2(vtkNIfTIReader *self, vtkImageData * vtkNotUsed(data)
   // ::gzseek( file_p, total_offset, SEEK_SET );
 
   // read image in
-  ::gzseek( file_p, offset, SEEK_SET);
-  ::gzread( file_p, p, self->getImageSizeInBytes());
-  gzclose( file_p );
-  //SwapBytesIfNecessary( buffer, numberOfPixels );
-
+  ::gzseek(file_p, offset, SEEK_SET);
+  ::gzread(file_p, p, self->getImageSizeInBytes());
+  gzclose(file_p);
+  // SwapBytesIfNecessary( buffer, numberOfPixels );
 }
-
 
 //----------------------------------------------------------------------------
 // This function reads a data from a file.  The datas extent/axes
 // are assumed to be the same as the file extent/order.
-void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInformation *outInfo)
+void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo)
 {
-  vtkImageData *data = this->AllocateOutputData(output, outInfo);
+  vtkImageData* data = this->AllocateOutputData(output, outInfo);
 
   if (this->UpdateExtentIsEmpty(outInfo, output))
-    {
+  {
     return;
-    }
+  }
   if (this->GetFileName() == NULL)
-    {
+  {
     vtkErrorMacro(<< "Either a FileName or FilePrefix must be specified.");
     return;
-    }
+  }
 
   data->GetPointData()->GetScalars()->SetName("NIfTIImage");
 
-  vtkFieldData *fa = data->GetFieldData();
+  vtkFieldData* fa = data->GetFieldData();
 
   if (!fa)
-    {
+  {
     fa = vtkFieldData::New();
     data->SetFieldData(fa);
     fa->Delete();
     fa = data->GetFieldData();
-    }
+  }
 
-  vtkDataArray * validDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
+  vtkDataArray* validDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
   if (!validDataArray)
-    {
+  {
     this->niftiHeader = vtkUnsignedCharArray::New();
     this->niftiHeader->SetName(NIFTI_HEADER_ARRAY);
     this->niftiHeader->SetNumberOfValues(this->niftiHeaderSize);
     fa->AddArray(this->niftiHeader);
     validDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
-    }
+  }
   this->niftiHeader = vtkUnsignedCharArray::SafeDownCast(validDataArray);
 
   int count;
 
-  for(count=0;count<this->niftiHeaderSize;count++){
+  for (count = 0; count < this->niftiHeaderSize; count++)
+  {
     this->niftiHeader->SetValue(count, niftiHeaderUnsignedCharArray[count]);
-    }
-  
-  vtkDataArray * tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
+  }
+
+  vtkDataArray* tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
   if (!tempVolumeOriginDoubleArray)
-    {
-    vtkDoubleArray * volumeOriginDoubleArray = NULL;
+  {
+    vtkDoubleArray* volumeOriginDoubleArray = NULL;
     volumeOriginDoubleArray = vtkDoubleArray::New();
     volumeOriginDoubleArray->SetName(VOLUME_ORIGIN_DOUBLE_ARRAY);
     volumeOriginDoubleArray->SetNumberOfValues(3);
-    volumeOriginDoubleArray->SetValue(0,this->DataOrigin[0]);
-    volumeOriginDoubleArray->SetValue(1,this->DataOrigin[1]);
-    volumeOriginDoubleArray->SetValue(2,this->DataOrigin[2]);
+    volumeOriginDoubleArray->SetValue(0, this->DataOrigin[0]);
+    volumeOriginDoubleArray->SetValue(1, this->DataOrigin[1]);
+    volumeOriginDoubleArray->SetValue(2, this->DataOrigin[2]);
     fa->AddArray(volumeOriginDoubleArray);
     volumeOriginDoubleArray->Delete();
     tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
-    }
+  }
 
-  vtkDataArray * tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
+  vtkDataArray* tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
   if (!tempVolumeSpacingDoubleArray)
-    {
-    vtkDoubleArray * volumeSpacingDoubleArray = NULL;
+  {
+    vtkDoubleArray* volumeSpacingDoubleArray = NULL;
     volumeSpacingDoubleArray = vtkDoubleArray::New();
     volumeSpacingDoubleArray->SetName(VOLUME_SPACING_DOUBLE_ARRAY);
     volumeSpacingDoubleArray->SetNumberOfValues(3);
-    volumeSpacingDoubleArray->SetValue(0,this->DataSpacing[0]);
-    volumeSpacingDoubleArray->SetValue(1,this->DataSpacing[1]);
-    volumeSpacingDoubleArray->SetValue(2,this->DataSpacing[2]);
+    volumeSpacingDoubleArray->SetValue(0, this->DataSpacing[0]);
+    volumeSpacingDoubleArray->SetValue(1, this->DataSpacing[1]);
+    volumeSpacingDoubleArray->SetValue(2, this->DataSpacing[2]);
     fa->AddArray(volumeSpacingDoubleArray);
     volumeSpacingDoubleArray->Delete();
     tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
-    }
+  }
 
-  vtkStringArray * nameArray;
-  vtkAbstractArray * nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
+  vtkStringArray* nameArray;
+  vtkAbstractArray* nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
   if (!nameAbstractArray)
-    {
+  {
     nameArray = vtkStringArray::New();
     nameArray->SetName(NAME_ARRAY);
     nameArray->SetNumberOfValues(1);
@@ -700,50 +771,49 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
 
     // Remove directory part
     size_t position = fileName.rfind("/");
-    if(position != std::string::npos)
-      {
+    if (position != std::string::npos)
+    {
       fileName.erase(0, position + 1);
-      }
+    }
     position = fileName.rfind("\\");
-    if(position != std::string::npos)
-      {
+    if (position != std::string::npos)
+    {
       fileName.erase(0, position + 1);
-      }
+    }
 
     nameArray->SetValue(0, fileName);
     fa->AddArray(nameArray);
     nameArray->Delete();
     nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
-    }
+  }
   nameArray = vtkStringArray::SafeDownCast(nameAbstractArray);
 
   // Call the correct templated function for the output
-  void *outPtr;
+  void* outPtr;
   long offset = 348;
 
-  if (niftiType == 2){
+  if (niftiType == 2)
+  {
     offset = 0;
-    }
+  }
 
   // Call the correct templated function for the input
   outPtr = data->GetScalarPointer();
   size_t tempDataSize = data->GetPointData()->GetScalars()->GetDataSize();
   size_t tempDataTypeSize = data->GetPointData()->GetScalars()->GetDataTypeSize();
-  size_t outPtrSize = tempDataSize*tempDataTypeSize;
-  nifti_1_header * niftiPointer = (nifti_1_header *) niftiHeaderUnsignedCharArray;
-  offset = (long) (niftiPointer->vox_offset);
+  size_t outPtrSize = tempDataSize * tempDataTypeSize;
+  nifti_1_header* niftiPointer = (nifti_1_header*)niftiHeaderUnsignedCharArray;
+  offset = (long)(niftiPointer->vox_offset);
   switch (data->GetScalarType())
-    {
-  vtkTemplateMacro(
-        vtkNIfTIReaderUpdate2(this, data, static_cast<VTK_TT*>(outPtr), offset)
-        );
-  default:
-    vtkErrorMacro(<< "Execute: Unknown data type");
-    }
+  {
+    vtkTemplateMacro(vtkNIfTIReaderUpdate2(this, data, static_cast<VTK_TT*>(outPtr), offset));
+    default:
+      vtkErrorMacro(<< "Execute: Unknown data type");
+  }
 
   // start of variables
 
-  unsigned char * outUnsignedCharPtr = (unsigned char *) outPtr;
+  unsigned char* outUnsignedCharPtr = (unsigned char*)outPtr;
 
   int inDim[3];
   int outDim[3];
@@ -759,8 +829,8 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   double outOrigin[3];
   double inExtent[6];
   double outExtent[6];
-  int scalarSize = (int) dataTypeSize;
-  
+  int scalarSize = (int)dataTypeSize;
+
   int InPlaceFilteredAxes[3];
   long inOffset;
   long charInOffset;
@@ -771,9 +841,9 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   flipAxis[1] = 0;
   flipAxis[2] = 0;
 
-  InPlaceFilteredAxes[0]=0;
-  InPlaceFilteredAxes[1]=1;
-  InPlaceFilteredAxes[2]=2;
+  InPlaceFilteredAxes[0] = 0;
+  InPlaceFilteredAxes[1] = 1;
+  InPlaceFilteredAxes[2] = 2;
 
   inOriginOffset[0] = s[0][3];
   inOriginOffset[1] = s[1][3];
@@ -781,144 +851,204 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
 
   double epsilon = 0.0001;
 
-  if(sform_code>0){
-    if((s[0][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=0;
+  if (sform_code > 0)
+  {
+    if ((s[0][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 0;
       flipAxis[0] = 0;
-      } else if ((s[0][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 1;
-      }
-    if((s[0][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 0;
-      } else if ((s[0][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 1;
-      }
-    if((s[0][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 0;
-      } else if ((s[0][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 1;
-      }
-    if((s[1][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 0;
-      } else if ((s[1][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 1;
-      }
-    if((s[1][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 0;
-      } else if ((s[1][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 1;
-      }
-    if((s[1][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 0;
-      } else if ((s[1][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 1;
-      }
-    if((s[2][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 0;
-      } else if ((s[2][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 1;
-      }
-    if((s[2][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 0;
-      } else if ((s[2][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 1;
-      }
-    if((s[2][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 0;
-      } else if ((s[2][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 1;
-      }
-    } else if(qform_code>0){
-    if((q[0][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 0;
-      } else if ((q[0][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=0;
-      flipAxis[0] = 1;
-      }
-    if((q[0][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 0;
-      } else if ((q[0][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=1;
-      flipAxis[0] = 1;
-      }
-    if((q[0][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 0;
-      } else if ((q[0][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[0]=2;
-      flipAxis[0] = 1;
-      }
-    if((q[1][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 0;
-      } else if ((q[1][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=0;
-      flipAxis[1] = 1;
-      }
-    if((q[1][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 0;
-      } else if ((q[1][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=1;
-      flipAxis[1] = 1;
-      }
-    if((q[1][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 0;
-      } else if ((q[1][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[1]=2;
-      flipAxis[1] = 1;
-      }
-    if((q[2][0]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 0;
-      } else if ((q[2][0]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=0;
-      flipAxis[2] = 1;
-      }
-    if((q[2][1]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 0;
-      } else if ((q[2][1]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=1;
-      flipAxis[2] = 1;
-      }
-    if((q[2][2]-1.0)>= -epsilon){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 0;
-      } else if ((q[2][2]+1.0)<=epsilon){
-      InPlaceFilteredAxes[2]=2;
-      flipAxis[2] = 1;
-      }
     }
+    else if ((s[0][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 1;
+    }
+    if ((s[0][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 0;
+    }
+    else if ((s[0][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 1;
+    }
+    if ((s[0][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 0;
+    }
+    else if ((s[0][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 1;
+    }
+    if ((s[1][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 0;
+    }
+    else if ((s[1][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 1;
+    }
+    if ((s[1][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 0;
+    }
+    else if ((s[1][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 1;
+    }
+    if ((s[1][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 0;
+    }
+    else if ((s[1][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 1;
+    }
+    if ((s[2][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 0;
+    }
+    else if ((s[2][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 1;
+    }
+    if ((s[2][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 0;
+    }
+    else if ((s[2][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 1;
+    }
+    if ((s[2][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 0;
+    }
+    else if ((s[2][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 1;
+    }
+  }
+  else if (qform_code > 0)
+  {
+    if ((q[0][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 0;
+    }
+    else if ((q[0][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 0;
+      flipAxis[0] = 1;
+    }
+    if ((q[0][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 0;
+    }
+    else if ((q[0][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 1;
+      flipAxis[0] = 1;
+    }
+    if ((q[0][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 0;
+    }
+    else if ((q[0][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[0] = 2;
+      flipAxis[0] = 1;
+    }
+    if ((q[1][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 0;
+    }
+    else if ((q[1][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 0;
+      flipAxis[1] = 1;
+    }
+    if ((q[1][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 0;
+    }
+    else if ((q[1][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 1;
+      flipAxis[1] = 1;
+    }
+    if ((q[1][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 0;
+    }
+    else if ((q[1][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[1] = 2;
+      flipAxis[1] = 1;
+    }
+    if ((q[2][0] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 0;
+    }
+    else if ((q[2][0] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 0;
+      flipAxis[2] = 1;
+    }
+    if ((q[2][1] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 0;
+    }
+    else if ((q[2][1] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 1;
+      flipAxis[2] = 1;
+    }
+    if ((q[2][2] - 1.0) >= -epsilon)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 0;
+    }
+    else if ((q[2][2] + 1.0) <= epsilon)
+    {
+      InPlaceFilteredAxes[2] = 2;
+      flipAxis[2] = 1;
+    }
+  }
 
-  if((InPlaceFilteredAxes[0]==InPlaceFilteredAxes[1])||(InPlaceFilteredAxes[0]==InPlaceFilteredAxes[2])||(InPlaceFilteredAxes[1]==InPlaceFilteredAxes[2])){
+  if ((InPlaceFilteredAxes[0] == InPlaceFilteredAxes[1]) ||
+    (InPlaceFilteredAxes[0] == InPlaceFilteredAxes[2]) ||
+    (InPlaceFilteredAxes[1] == InPlaceFilteredAxes[2]))
+  {
     flipAxis[0] = 0;
     flipAxis[1] = 0;
     flipAxis[2] = 0;
-    InPlaceFilteredAxes[0]=0;
-    InPlaceFilteredAxes[1]=1;
-    InPlaceFilteredAxes[2]=2;
-    }
+    InPlaceFilteredAxes[0] = 0;
+    InPlaceFilteredAxes[1] = 1;
+    InPlaceFilteredAxes[2] = 2;
+  }
 
   /*for (count=0;count<3;count++){
     if(flipAxis[count]){
@@ -928,148 +1058,179 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
     }
   }*/
 
-  for (count=0;count<3;count++){
-    inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
+  for (count = 0; count < 3; count++)
+  {
+    inDim[count] = (this->DataExtent[(count * 2) + 1] - this->DataExtent[count * 2]) + 1;
     inSpacing[count] = this->DataSpacing[count];
-    inExtent[count*2] = this->DataExtent[count*2];
-    inExtent[(count*2)+1] = this->DataExtent[(count*2)+1];
+    inExtent[count * 2] = this->DataExtent[count * 2];
+    inExtent[(count * 2) + 1] = this->DataExtent[(count * 2) + 1];
     inIncrements[count] = this->DataIncrements[count];
     inOrigin[count] = this->DataOrigin[count];
-    }
+  }
 
   inOrigin[0] = -128.5;
   inOrigin[1] = -128.5;
   inOrigin[2] = -128.5;
 
-  inStride[0] =                       scalarSize;
-  inStride[1] =            inDim[0] * scalarSize;//0
-  inStride[2] = inDim[1] * inDim[0] * scalarSize;//1 0
+  inStride[0] = scalarSize;
+  inStride[1] = inDim[0] * scalarSize;            // 0
+  inStride[2] = inDim[1] * inDim[0] * scalarSize; // 1 0
 
-  for (count=0;count<3;count++){
-    if(flipAxis[count]){
+  for (count = 0; count < 3; count++)
+  {
+    if (flipAxis[count])
+    {
       inOriginOffset[count] = inOriginOffset[count] - inDim[count];
-      }
     }
+  }
 
-  for (count=0;count<3;count++){
-    outDim[count]          = inDim[InPlaceFilteredAxes[count]];
-    outStride[count]       = inStride[InPlaceFilteredAxes[count]];
-    outIncrements[count]   = inIncrements[InPlaceFilteredAxes[count]];
-    outSpacing[count]      = inSpacing[InPlaceFilteredAxes[count]];
-    outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
-    outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
-    outOrigin[count]       = inOrigin[InPlaceFilteredAxes[count]];
-    }
+  for (count = 0; count < 3; count++)
+  {
+    outDim[count] = inDim[InPlaceFilteredAxes[count]];
+    outStride[count] = inStride[InPlaceFilteredAxes[count]];
+    outIncrements[count] = inIncrements[InPlaceFilteredAxes[count]];
+    outSpacing[count] = inSpacing[InPlaceFilteredAxes[count]];
+    outExtent[count * 2] = inExtent[InPlaceFilteredAxes[count] * 2];
+    outExtent[(count * 2) + 1] = inExtent[(InPlaceFilteredAxes[count] * 2) + 1];
+    outOrigin[count] = inOrigin[InPlaceFilteredAxes[count]];
+  }
 
-  for (count=0;count<3;count++){
-    this->DataIncrements[count]   = outIncrements[count];
-    this->DataSpacing[count]      = outSpacing[count];
-    this->DataExtent[count*2]     = (int) (outExtent[count*2]);
-    this->DataExtent[(count*2)+1] = (int) (outExtent[(count*2)+1]);
-    this->DataOrigin[count]       = outOrigin[count];
-    }
+  for (count = 0; count < 3; count++)
+  {
+    this->DataIncrements[count] = outIncrements[count];
+    this->DataSpacing[count] = outSpacing[count];
+    this->DataExtent[count * 2] = (int)(outExtent[count * 2]);
+    this->DataExtent[(count * 2) + 1] = (int)(outExtent[(count * 2) + 1]);
+    this->DataOrigin[count] = outOrigin[count];
+  }
 
   unsigned char* tempUnsignedCharData = NULL;
 
-  //permute
+  // permute
 
-  size_t tempUnsignedCharDataSize = outDim[0]*outDim[1]*outDim[2]*scalarSize;
+  size_t tempUnsignedCharDataSize = outDim[0] * outDim[1] * outDim[2] * scalarSize;
 
   tempUnsignedCharData = new unsigned char[tempUnsignedCharDataSize];
-  
+
   int idSize;
   int idZ, idY, idX;
 
   // Loop through input voxels
   count = 0;
-  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
-    for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
-      for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
-        inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
+  for (inIndex[2] = 0; inIndex[2] < outDim[2]; inIndex[2]++)
+  {
+    for (inIndex[1] = 0; inIndex[1] < outDim[1]; inIndex[1]++)
+    {
+      for (inIndex[0] = 0; inIndex[0] < outDim[0]; inIndex[0]++)
+      {
+        inOffset =
+          (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
 
-        for (idSize = 0; idSize < scalarSize ; idSize++){
+        for (idSize = 0; idSize < scalarSize; idSize++)
+        {
           charInOffset = inOffset + idSize;
           tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset];
-          }
         }
       }
     }
+  }
 
-  long outSliceSize = outDim[0]*outDim[1]*scalarSize;
-  long outRowSize   = outDim[0]*scalarSize;
+  long outSliceSize = outDim[0] * outDim[1] * scalarSize;
+  long outRowSize = outDim[0] * scalarSize;
   long outRowOffset;
   long outSliceOffset;
   long outOffset;
   long charOutOffset;
 
-
   // Loop through output voxels
   count = 0;
-  for (idZ = 0 ; idZ < outDim[2] ; idZ++){
+  for (idZ = 0; idZ < outDim[2]; idZ++)
+  {
     outSliceOffset = idZ * outSliceSize;
-    for (idY = 0; idY < outDim[1]; idY++){
+    for (idY = 0; idY < outDim[1]; idY++)
+    {
       outRowOffset = idY * outRowSize;
-      for (idX = 0; idX < outDim[0]  ; idX++){
+      for (idX = 0; idX < outDim[0]; idX++)
+      {
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){
+        for (idSize = 0; idSize < scalarSize; idSize++)
+        {
           charOutOffset = outOffset + idSize;
           outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
-          }
         }
       }
     }
+  }
 
-  //now flip
-
+  // now flip
 
   // Loop through input voxels
   count = 0;
-  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
-    if(flipAxis[2]==1){
-      flipIndex[2] = ((outDim[2] -1) - inIndex[2]);
-      } else {
+  for (inIndex[2] = 0; inIndex[2] < outDim[2]; inIndex[2]++)
+  {
+    if (flipAxis[2] == 1)
+    {
+      flipIndex[2] = ((outDim[2] - 1) - inIndex[2]);
+    }
+    else
+    {
       flipIndex[2] = inIndex[2];
+    }
+    for (inIndex[1] = 0; inIndex[1] < outDim[1]; inIndex[1]++)
+    {
+      if (flipAxis[1] == 1)
+      {
+        flipIndex[1] = ((outDim[1] - 1) - inIndex[1]);
       }
-    for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
-      if(flipAxis[1]==1){
-        flipIndex[1] = ((outDim[1] -1) - inIndex[1]);
-        } else {
+      else
+      {
         flipIndex[1] = inIndex[1];
+      }
+      for (inIndex[0] = 0; inIndex[0] < outDim[0]; inIndex[0]++)
+      {
+        if (flipAxis[0] == 1)
+        {
+          flipIndex[0] = ((outDim[0] - 1) - inIndex[0]);
         }
-      for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
-        if(flipAxis[0]==1){
-          flipIndex[0] = ((outDim[0] -1) - inIndex[0]);
-          } else {
+        else
+        {
           flipIndex[0] = inIndex[0];
-          }
-        inOffset = (flipIndex[2] * outSliceSize) + (flipIndex[1] * outRowSize) + (flipIndex[0] * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){
+        }
+        inOffset =
+          (flipIndex[2] * outSliceSize) + (flipIndex[1] * outRowSize) + (flipIndex[0] * scalarSize);
+        for (idSize = 0; idSize < scalarSize; idSize++)
+        {
           charInOffset = inOffset + idSize;
           tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset];
-          }
         }
       }
     }
+  }
 
   // Loop through output voxels
   count = 0;
-  for (idZ = 0 ; idZ < outDim[2] ; idZ++){
+  for (idZ = 0; idZ < outDim[2]; idZ++)
+  {
     outSliceOffset = idZ * outSliceSize;
-    for (idY = 0; idY < outDim[1]; idY++){
+    for (idY = 0; idY < outDim[1]; idY++)
+    {
       outRowOffset = idY * outRowSize;
-      for (idX = 0; idX < outDim[0]  ; idX++){
+      for (idX = 0; idX < outDim[0]; idX++)
+      {
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){
+        for (idSize = 0; idSize < scalarSize; idSize++)
+        {
           charOutOffset = outOffset + idSize;
-          if( (count >=0) && (static_cast<size_t>(count) < outPtrSize) &&
-              (charOutOffset >=0) && (static_cast<size_t>(charOutOffset) < tempUnsignedCharDataSize) ){
+          if ((count >= 0) && (static_cast<size_t>(count) < outPtrSize) && (charOutOffset >= 0) &&
+            (static_cast<size_t>(charOutOffset) < tempUnsignedCharDataSize))
+          {
             outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count];
-            }
-          count++;
           }
+          count++;
         }
       }
     }
+  }
 
   delete tempUnsignedCharData;
   tempUnsignedCharData = NULL;
@@ -1078,7 +1239,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
 //----------------------------------------------------------------------------
 void vtkNIfTIReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
@@ -1089,51 +1250,47 @@ int vtkNIfTIReader::CanReadFile(const char* fname)
 
   // we check that the correction extension is given by the user
   std::string filenameext = GetExtension(filename);
-  if(filenameext != std::string("hdr")
-     && filenameext != std::string("img.gz")
-     && filenameext != std::string("img")
-     && filenameext != std::string("nii")
-     && filenameext != std::string("nii.gz")
-     )
-    {
+  if (filenameext != std::string("hdr") && filenameext != std::string("img.gz") &&
+    filenameext != std::string("img") && filenameext != std::string("nii") &&
+    filenameext != std::string("nii.gz"))
+  {
     return false;
-    }
+  }
 
   const std::string HeaderFileName = GetHeaderFileName(filename);
   //
   // only try to read HDR files
   std::string ext = GetExtension(HeaderFileName);
 
-  if(ext == std::string("gz"))
-    {
+  if (ext == std::string("gz"))
+  {
     ext = GetExtension(GetRootName(HeaderFileName));
-    }
-  if(ext != std::string("hdr") && ext != std::string("img") && ext != std::string("nii")  )
-    {
+  }
+  if (ext != std::string("hdr") && ext != std::string("img") && ext != std::string("nii"))
+  {
     return false;
-    }
+  }
 
-  ifstream   local_InputStream;
-  local_InputStream.open( HeaderFileName.c_str(),
-                          ios::in | ios::binary );
-  if( local_InputStream.fail() )
-    {
+  ifstream local_InputStream;
+  local_InputStream.open(HeaderFileName.c_str(), ios::in | ios::binary);
+  if (local_InputStream.fail())
+  {
     return false;
-    }
+  }
 
   struct nifti_1_header m_hdr;
-  if( ! ReadBufferAsBinary( local_InputStream, (void *)&(m_hdr), sizeof(struct nifti_1_header) ) )
-    {
+  if (!ReadBufferAsBinary(local_InputStream, (void*)&(m_hdr), sizeof(struct nifti_1_header)))
+  {
     return false;
-    }
+  }
   local_InputStream.close();
 
   // if the machine and file endianess are different
   // perform the byte swapping on it
-  //this->m_ByteOrder = this->CheckAnalyzeEndian(this->m_hdr);
-  //this->SwapHeaderBytesIfNecessary( &(this->m_hdr) );
+  // this->m_ByteOrder = this->CheckAnalyzeEndian(this->m_hdr);
+  // this->SwapHeaderBytesIfNecessary( &(this->m_hdr) );
 
-  //The final check is to make sure that it is a nifti  file.
+  // The final check is to make sure that it is a nifti  file.
   niftiType = vtknifti1_io::is_nifti_file(fname);
-  return ((niftiType == 1)||(niftiType == 2));
+  return ((niftiType == 1) || (niftiType == 2));
 }

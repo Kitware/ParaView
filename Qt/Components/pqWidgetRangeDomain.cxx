@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -52,19 +52,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSMAdaptor.h>
 #include <pqTimer.h>
 
-  
 class pqWidgetRangeDomain::pqInternal
 {
 public:
   pqInternal()
-    {
+  {
     this->Connection = vtkEventQtSlotConnect::New();
     this->MarkedForUpdate = false;
-    }
-  ~pqInternal()
-    {
-    this->Connection->Delete();
-    }
+  }
+  ~pqInternal() { this->Connection->Delete(); }
   QString MinProp;
   QString MaxProp;
   vtkSmartPointer<vtkSMProperty> Property;
@@ -73,10 +69,9 @@ public:
   vtkEventQtSlotConnect* Connection;
   bool MarkedForUpdate;
 };
-  
 
-pqWidgetRangeDomain::pqWidgetRangeDomain(QWidget* p, const QString& minProp,
-  const QString& maxProp, vtkSMProperty* prop, int index)
+pqWidgetRangeDomain::pqWidgetRangeDomain(
+  QWidget* p, const QString& minProp, const QString& maxProp, vtkSMProperty* prop, int index)
   : QObject(p)
 {
   this->Internal = new pqInternal();
@@ -88,52 +83,46 @@ pqWidgetRangeDomain::pqWidgetRangeDomain(QWidget* p, const QString& minProp,
   // get domain
   vtkSMDomainIterator* iter = prop->NewDomainIterator();
   iter->Begin();
-  while(!iter->IsAtEnd() && !this->Internal->Domain)
-    {
+  while (!iter->IsAtEnd() && !this->Internal->Domain)
+  {
     vtkSMEnumerationDomain* enumeration;
     enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
-    if(enumeration)
-      {
+    if (enumeration)
+    {
       this->Internal->Domain = enumeration;
-      }
+    }
 
     vtkSMDoubleRangeDomain* drange;
     drange = vtkSMDoubleRangeDomain::SafeDownCast(iter->GetDomain());
-    if(drange)
-      {
+    if (drange)
+    {
       this->Internal->Domain = drange;
-      }
-    
+    }
+
     vtkSMIntRangeDomain* irange;
     irange = vtkSMIntRangeDomain::SafeDownCast(iter->GetDomain());
-    if(irange)
-      {
+    if (irange)
+    {
       this->Internal->Domain = irange;
-      }
-    iter->Next();
     }
+    iter->Next();
+  }
   iter->Delete();
 
-  if(this->Internal->Domain)
+  if (this->Internal->Domain)
+  {
+    if (this->Internal->Domain->GetClassName() == QString("vtkSMDoubleRangeDomain") ||
+      this->Internal->Domain->GetClassName() == QString("vtkSMIntRangeDomain"))
     {
-    if(this->Internal->Domain->GetClassName() ==
-       QString("vtkSMDoubleRangeDomain") ||
-       this->Internal->Domain->GetClassName() ==
-       QString("vtkSMIntRangeDomain"))
-      {
       // some widgets use domain as hint, this tells the widget to be strict
       this->getWidget()->setProperty("strictRange", true);
-      }
-
-    this->Internal->Connection->Connect(this->Internal->Domain, 
-                                        vtkCommand::DomainModifiedEvent,
-                                        this,
-                                        SLOT(domainChanged()));
-    this->internalDomainChanged();
     }
-  
-}
 
+    this->Internal->Connection->Connect(
+      this->Internal->Domain, vtkCommand::DomainModifiedEvent, this, SLOT(domainChanged()));
+    this->internalDomainChanged();
+  }
+}
 
 pqWidgetRangeDomain::~pqWidgetRangeDomain()
 {
@@ -142,10 +131,10 @@ pqWidgetRangeDomain::~pqWidgetRangeDomain()
 
 void pqWidgetRangeDomain::domainChanged()
 {
-  if(this->Internal->MarkedForUpdate)
-    {
+  if (this->Internal->MarkedForUpdate)
+  {
     return;
-    }
+  }
 
   this->Internal->MarkedForUpdate = true;
   pqTimer::singleShot(0, this, SLOT(internalDomainChanged()));
@@ -155,17 +144,17 @@ void pqWidgetRangeDomain::domainChanged()
 void pqWidgetRangeDomain::setRange(QVariant min, QVariant max)
 {
   QWidget* range = this->getWidget();
-  if(range)
+  if (range)
+  {
+    if (!this->Internal->MinProp.isEmpty())
     {
-    if(!this->Internal->MinProp.isEmpty())
-      {
       range->setProperty(this->Internal->MinProp.toLatin1().data(), min);
-      }
-    if(!this->Internal->MaxProp.isEmpty())
-      {
-      range->setProperty(this->Internal->MaxProp.toLatin1().data(), max);
-      }
     }
+    if (!this->Internal->MaxProp.isEmpty())
+    {
+      range->setProperty(this->Internal->MaxProp.toLatin1().data(), max);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -183,15 +172,13 @@ void pqWidgetRangeDomain::internalDomainChanged()
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   int index = type == pqSMAdaptor::SINGLE_ELEMENT ? 0 : this->Internal->Index;
 
-  QList<QVariant> range = pqSMAdaptor::getMultipleElementPropertyDomain(
-    this->Internal->Property, index);
+  QList<QVariant> range =
+    pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property, index);
 
-  if(range.size() == 2)
-    {
+  if (range.size() == 2)
+  {
     this->setRange(range[0], range[1]);
-    }
+  }
 
   this->Internal->MarkedForUpdate = false;
 }
-
-

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,34 +33,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImageUtil_h
 #define _pqImageUtil_h
 
-
 #include "pqCoreModule.h"
 class QImage;
 class vtkImageData;
 class QString;
 
-/// Utility class to convert VTK images to Qt images and vice versa
+/**
+* Utility class to convert VTK images to Qt images and vice versa
+*/
 class PQCORE_EXPORT pqImageUtil
 {
 public:
-  /// convert a QImage to vtkImageData
+  /**
+  * convert a QImage to vtkImageData
+  */
   static bool toImageData(const QImage& img, vtkImageData* vtkimage);
 
-  /// convert vtkImageData to QImage
+  /**
+  * convert vtkImageData to QImage
+  */
   static bool fromImageData(vtkImageData* vtkimage, QImage& img);
 
-  /// Save an image to a file. Determines the type of the file using the file
-  /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
-  /// if file is successfully saved).
-  /// quality [0,100] -- 0 = low, 100=high, -1=default
-  static int saveImage(vtkImageData* vtkimage, const QString& filename, int quality=-1);
+  /**
+  * Save an image to a file. Determines the type of the file using the file
+  * extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
+  * if file is successfully saved).
+  * quality [0,100] -- 0 = low, 100=high, -1=default
+  */
+  static int saveImage(vtkImageData* vtkimage, const QString& filename, int quality = -1);
 
-  /// Save an image to a file. Determines the type of the file using the file
-  /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
-  /// if file is successfully saved).
-  /// quality [0,100] -- 0 = low, 100=high, -1=default
-  static int saveImage(const QImage& image, const QString& filename, int quality=-1);
+  /**
+  * Save an image to a file. Determines the type of the file using the file
+  * extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
+  * if file is successfully saved).
+  * quality [0,100] -- 0 = low, 100=high, -1=default
+  */
+  static int saveImage(const QImage& image, const QString& filename, int quality = -1);
 };
 
 #endif
-

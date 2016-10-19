@@ -29,14 +29,14 @@ class vtkMaskPoints;
 class VTK_EXPORT vtkArrowGlyphFilter : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkArrowGlyphFilter *New();
+  static vtkArrowGlyphFilter* New();
   vtkTypeMacro(vtkArrowGlyphFilter, vtkPolyDataAlgorithm);
 
   // Description:
   // Turn on/off orienting of arrows along vector/normal.
-  vtkSetMacro(ScaleByOrientationVectorMagnitude,int);
-  vtkBooleanMacro(ScaleByOrientationVectorMagnitude,int);
-  vtkGetMacro(ScaleByOrientationVectorMagnitude,int);
+  vtkSetMacro(ScaleByOrientationVectorMagnitude, int);
+  vtkBooleanMacro(ScaleByOrientationVectorMagnitude, int);
+  vtkGetMacro(ScaleByOrientationVectorMagnitude, int);
 
   // Description:
   // Array (vector) to use to control Orientation
@@ -45,8 +45,8 @@ public:
 
   // Description:
   // A Scaling factor to apply to the arrows in conjunction with ScaleArray
-  vtkSetMacro(ScaleFactor,double);
-  vtkGetMacro(ScaleFactor,double);
+  vtkSetMacro(ScaleFactor, double);
+  vtkGetMacro(ScaleFactor, double);
 
   // Description:
   // Array to use to control Scale
@@ -55,8 +55,8 @@ public:
 
   // Description:
   // A Scaling factor to apply to the arrows in conjunction with ShaftRadiusArray
-  vtkSetMacro(ShaftRadiusFactor,double);
-  vtkGetMacro(ShaftRadiusFactor,double);
+  vtkSetMacro(ShaftRadiusFactor, double);
+  vtkGetMacro(ShaftRadiusFactor, double);
 
   // Description:
   // Array to use to control ShaftRadius
@@ -65,8 +65,8 @@ public:
 
   // Description:
   // A Scaling factor to apply to the arrows in conjunction with TipRadiusArray
-  vtkSetMacro(TipRadiusFactor,double);
-  vtkGetMacro(TipRadiusFactor,double);
+  vtkSetMacro(TipRadiusFactor, double);
+  vtkGetMacro(TipRadiusFactor, double);
 
   // Description:
   // Array to use to control TipRadius
@@ -91,7 +91,7 @@ public:
   // Description:
   // This can be overwritten by subclass to return 0 when a point is
   // blanked. Default implementation is to always return 1;
-  virtual int IsPointVisible(vtkDataSet*, vtkIdType) {return 1;};
+  virtual int IsPointVisible(vtkDataSet*, vtkIdType) { return 1; };
 
   virtual void SetArrowSourceObject(vtkArrowSource* arrowsource);
 
@@ -104,42 +104,40 @@ protected:
   ~vtkArrowGlyphFilter();
 
   enum
-    {
+  {
     GlyphNPointsGather = 738233,
     GlyphNPointsScatter = 738234
-    };
+  };
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int FillInputPortInformation(int, vtkInformation *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int, vtkInformation*);
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
-  int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
-                     vtkDataSet* input,
-                     vtkInformation* request,
-                     vtkInformationVector** inputVector,
-                     vtkInformationVector* outputVector);
+  int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, vtkDataSet* input,
+    vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
-  int             ScaleByOrientationVectorMagnitude;
-  char           *OrientationVectorArray;
+  int ScaleByOrientationVectorMagnitude;
+  char* OrientationVectorArray;
   //
-  double          ScaleFactor;
-  char           *ScaleArray;
+  double ScaleFactor;
+  char* ScaleArray;
   //
-  double          ShaftRadiusFactor;
-  char           *ShaftRadiusArray;
+  double ShaftRadiusFactor;
+  char* ShaftRadiusArray;
   //
-  double          TipRadiusFactor;
-  char           *TipRadiusArray;
+  double TipRadiusFactor;
+  char* TipRadiusArray;
   //
-  vtkMaskPoints  *MaskPoints;
-  int             MaximumNumberOfPoints;
-  int             UseMaskPoints;
-  int             RandomMode;
+  vtkMaskPoints* MaskPoints;
+  int MaximumNumberOfPoints;
+  int UseMaskPoints;
+  int RandomMode;
 
   //
-//  vtkSmartPointer<vtkArrowSource> ArrowSourceObject;
-  vtkArrowSource *ArrowSourceObject;
+  //  vtkSmartPointer<vtkArrowSource> ArrowSourceObject;
+  vtkArrowSource* ArrowSourceObject;
 
 private:
   vtkArrowGlyphFilter(const vtkArrowGlyphFilter&) VTK_DELETE_FUNCTION;

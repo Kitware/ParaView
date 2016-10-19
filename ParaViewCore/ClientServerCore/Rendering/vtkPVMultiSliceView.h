@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVMultiSliceView
-// .SECTION Description
-// vtkPVMultiSliceView extends vtkPVRenderView but add meta-data informations
-// used by SliceRepresentation as a data model.
+/**
+ * @class   vtkPVMultiSliceView
+ *
+ * vtkPVMultiSliceView extends vtkPVRenderView but add meta-data informations
+ * used by SliceRepresentation as a data model.
+*/
 
 #ifndef vtkPVMultiSliceView_h
 #define vtkPVMultiSliceView_h
@@ -37,7 +39,6 @@ public:
 
   virtual void Update();
 
-  // Description:
   void SetNumberOfXSlices(unsigned int count) { this->SetNumberOfSlices(0, count); }
   void SetXSlices(const double* values) { this->SetSlices(0, values); }
   void SetNumberOfYSlices(unsigned int count) { this->SetNumberOfSlices(1, count); }
@@ -88,7 +89,6 @@ private:
 
   class vtkSliceInternal;
   vtkSliceInternal* Internal;
-
 };
 
 #endif

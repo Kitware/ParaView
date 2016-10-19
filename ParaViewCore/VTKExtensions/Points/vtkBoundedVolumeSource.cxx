@@ -36,18 +36,16 @@ vtkBoundedVolumeSource::~vtkBoundedVolumeSource()
 }
 
 //----------------------------------------------------------------------------
-int vtkBoundedVolumeSource::RequestInformation(vtkInformation *,
-  vtkInformationVector **, vtkInformationVector *outputVector)
+int vtkBoundedVolumeSource::RequestInformation(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(vtkDataObject::ORIGIN(), this->Origin, 3);
 
   int ext[6] = { 0, this->Resolution[0], 0, this->Resolution[1], 0, this->Resolution[2] };
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), ext, 6);
 
-  double spacing[3] = {
-    this->Scale[0] / this->Resolution[0],
-    this->Scale[1] / this->Resolution[1],
+  double spacing[3] = { this->Scale[0] / this->Resolution[0], this->Scale[1] / this->Resolution[1],
     this->Scale[2] / this->Resolution[2] };
   outInfo->Set(vtkDataObject::SPACING(), spacing, 3);
   vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_FLOAT, 1);
@@ -57,14 +55,12 @@ int vtkBoundedVolumeSource::RequestInformation(vtkInformation *,
 
 //----------------------------------------------------------------------------
 void vtkBoundedVolumeSource::ExecuteDataWithInformation(
-  vtkDataObject *vtkNotUsed(odata), vtkInformation *outInfo)
+  vtkDataObject* vtkNotUsed(odata), vtkInformation* outInfo)
 {
-  vtkImageData *data = vtkImageData::GetData(outInfo);
+  vtkImageData* data = vtkImageData::GetData(outInfo);
   int* execExt = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
 
-  double spacing[3] = {
-    this->Scale[0] / this->Resolution[0],
-    this->Scale[1] / this->Resolution[1],
+  double spacing[3] = { this->Scale[0] / this->Resolution[0], this->Scale[1] / this->Resolution[1],
     this->Scale[2] / this->Resolution[2] };
   data->SetSpacing(spacing);
   data->SetOrigin(this->Origin);
@@ -75,7 +71,10 @@ void vtkBoundedVolumeSource::ExecuteDataWithInformation(
 void vtkBoundedVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Origin: " << this->Origin[0] << ", " << this->Origin[1] << ", " << this->Origin[2] << endl;
-  os << indent << "Scale: " << this->Scale[0] << ", " << this->Scale[1] << ", " << this->Scale[2] << endl;
-  os << indent << "Resolution: " << this->Resolution[0] << ", " << this->Resolution[1] << ", " << this->Resolution[2] << endl;
+  os << indent << "Origin: " << this->Origin[0] << ", " << this->Origin[1] << ", "
+     << this->Origin[2] << endl;
+  os << indent << "Scale: " << this->Scale[0] << ", " << this->Scale[1] << ", " << this->Scale[2]
+     << endl;
+  os << indent << "Resolution: " << this->Resolution[0] << ", " << this->Resolution[1] << ", "
+     << this->Resolution[2] << endl;
 }

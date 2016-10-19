@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,23 +43,26 @@ class PQWIDGETS_EXPORT pqProgressWidget : public QWidget
 {
   Q_OBJECT
 public:
-  pqProgressWidget(QWidget* parent=0);
+  pqProgressWidget(QWidget* parent = 0);
   virtual ~pqProgressWidget();
 
-  QToolButton* getAbortButton() const
-    {
-    return this->AbortButton;
-    }
+  QToolButton* getAbortButton() const { return this->AbortButton; }
 public slots:
-  /// Set the progress.
+  /**
+  * Set the progress.
+  */
   void setProgress(const QString& message, int value);
 
-  /// Enabled/Disable the progress. This is different from 
-  /// enabling/disabling the widget itself. This shows/hides
-  /// the progress part of the widget.
+  /**
+  * Enabled/Disable the progress. This is different from
+  * enabling/disabling the widget itself. This shows/hides
+  * the progress part of the widget.
+  */
   void enableProgress(bool enabled);
 
-  /// Enable/Disable the abort button.
+  /**
+  * Enable/Disable the abort button.
+  */
   void enableAbort(bool enabled);
 
 signals:
@@ -76,4 +79,3 @@ private:
 };
 
 #endif
-

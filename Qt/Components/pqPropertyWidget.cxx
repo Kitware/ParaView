@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,21 +43,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
-  : QWidget(parentObject),
-    Proxy(smProxy),
-    Property(0),
-    ChangeAvailableAsChangeFinished(true),
-    Selected(false),
-    Timer(new pqTimer())
+pqPropertyWidget::pqPropertyWidget(vtkSMProxy* smProxy, QWidget* parentObject)
+  : QWidget(parentObject)
+  , Proxy(smProxy)
+  , Property(0)
+  , ChangeAvailableAsChangeFinished(true)
+  , Selected(false)
+  , Timer(new pqTimer())
 {
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);
 
-  this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
-                this, SIGNAL(changeAvailable()));
-
+  this->connect(&this->Links, SIGNAL(qtWidgetChanged()), this, SIGNAL(changeAvailable()));
 
   // This has to be a QueuedConnection otherwise changeFinished() gets fired
   // before changeAvailable() is handled by pqProxyWidget and see BUG #13029.
@@ -71,9 +69,9 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
 pqPropertyWidget::~pqPropertyWidget()
 {
   foreach (pqPropertyWidgetDecorator* decorator, this->Decorators)
-    {
+  {
     delete decorator;
-    }
+  }
 
   this->Decorators.clear();
 }
@@ -82,9 +80,9 @@ pqPropertyWidget::~pqPropertyWidget()
 void pqPropertyWidget::onChangeAvailable()
 {
   if (this->ChangeAvailableAsChangeFinished)
-    {
+  {
     emit this->changeFinished();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -110,26 +108,25 @@ vtkSMProxy* pqPropertyWidget::proxy() const
 QString pqPropertyWidget::getTooltip(vtkSMProperty* smproperty)
 {
   if (smproperty && smproperty->GetDocumentation())
-    {
-    QString doc = pqProxy::rstToHtml(
-      smproperty->GetDocumentation()->GetDescription()).c_str();
+  {
+    QString doc = pqProxy::rstToHtml(smproperty->GetDocumentation()->GetDescription()).c_str();
     doc = doc.trimmed();
-    doc = doc.replace(QRegExp("\\s+")," ");
+    doc = doc.replace(QRegExp("\\s+"), " ");
     return QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc);
-    }
+  }
   return QString();
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::setProperty(vtkSMProperty *smproperty)
+void pqPropertyWidget::setProperty(vtkSMProperty* smproperty)
 {
   this->Property = smproperty;
   this->setToolTip(pqPropertyWidget::getTooltip(smproperty));
   if ((smproperty->GetHints() &&
-       smproperty->GetHints()->FindNestedElementByName("RestartRequired")))
-    {
+        smproperty->GetHints()->FindNestedElementByName("RestartRequired")))
+  {
     this->connect(this, SIGNAL(changeAvailable()), SIGNAL(restartRequired()));
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +146,6 @@ void pqPropertyWidget::setPanelVisibility(const char* vis)
 {
   return this->Property->SetPanelVisibility(vis);
 }
-
 
 //-----------------------------------------------------------------------------
 void pqPropertyWidget::apply()
@@ -178,70 +174,43 @@ bool pqPropertyWidget::showLabel() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::addPropertyLink(QObject *qobject,
-                                       const char *qproperty,
-                                       const char *qsignal,
-                                       vtkSMProperty *smproperty,
-                                       int smindex)
+void pqPropertyWidget::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProperty* smproperty, int smindex)
 {
-  this->Links.addPropertyLink(qobject,
-                              qproperty,
-                              qsignal,
-                              this->Proxy,
-                              smproperty,
-                              smindex);
+  this->Links.addPropertyLink(qobject, qproperty, qsignal, this->Proxy, smproperty, smindex);
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::addPropertyLink(QObject *qobject,
-                                       const char *qproperty,
-                                       const char *qsignal,
-                                       vtkSMProxy* smproxy,
-                                       vtkSMProperty *smproperty,
-                                       int smindex)
+void pqPropertyWidget::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
 {
-  this->Links.addPropertyLink(qobject, qproperty, qsignal,
-    smproxy, smproperty, smindex);
+  this->Links.addPropertyLink(qobject, qproperty, qsignal, smproxy, smproperty, smindex);
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::removePropertyLink(QObject *qobject,
-                                       const char *qproperty,
-                                       const char *qsignal,
-                                       vtkSMProperty *smproperty,
-                                       int smindex)
+void pqPropertyWidget::removePropertyLink(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProperty* smproperty, int smindex)
 {
-  this->Links.removePropertyLink(qobject,
-                              qproperty,
-                              qsignal,
-                              this->Proxy,
-                              smproperty,
-                              smindex);
+  this->Links.removePropertyLink(qobject, qproperty, qsignal, this->Proxy, smproperty, smindex);
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::removePropertyLink(QObject *qobject,
-                                       const char *qproperty,
-                                       const char *qsignal,
-                                       vtkSMProxy* smproxy,
-                                       vtkSMProperty *smproperty,
-                                       int smindex)
+void pqPropertyWidget::removePropertyLink(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
 {
-  this->Links.removePropertyLink(qobject, qproperty, qsignal,
-    smproxy, smproperty, smindex);
+  this->Links.removePropertyLink(qobject, qproperty, qsignal, smproxy, smproperty, smindex);
 }
-
 
 //-----------------------------------------------------------------------------
 void pqPropertyWidget::addDecorator(pqPropertyWidgetDecorator* decorator)
 {
   if (!decorator || decorator->parent() != this)
-    {
+  {
     qCritical("Either the decorator is NULL or has an invalid parent."
-      "Please check the code.");
-    }
+              "Please check the code.");
+  }
   else
-    {
+  {
     this->Decorators.push_back(decorator);
-    }
+  }
 }

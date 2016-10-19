@@ -52,29 +52,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMessageBox>
 
-
 namespace
 {
-  static const char* cp_python_export_code =
-    "from paraview import cpexport\n"
-    "cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
-    "   simulation_input_map={%2},\n"
-    "   screenshot_info={%3},\n"
-    "   rescale_data_range=%4,\n"
-    "   enable_live_viz=%5,\n"
-    "   live_viz_frequency=%6,\n"
-    "   cinema_tracks={%7},\n"
-    "   array_selection = {%9},\n"
-    "   filename='%8')\n";
+static const char* cp_python_export_code = "from paraview import cpexport\n"
+                                           "cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
+                                           "   simulation_input_map={%2},\n"
+                                           "   screenshot_info={%3},\n"
+                                           "   rescale_data_range=%4,\n"
+                                           "   enable_live_viz=%5,\n"
+                                           "   live_viz_frequency=%6,\n"
+                                           "   cinema_tracks={%7},\n"
+                                           "   array_selection = {%9},\n"
+                                           "   filename='%8')\n";
 }
 
 //-----------------------------------------------------------------------------
-pqCPExportStateWizard::pqCPExportStateWizard(
-  QWidget *parentObject, Qt::WindowFlags parentFlags)
+pqCPExportStateWizard::pqCPExportStateWizard(QWidget* parentObject, Qt::WindowFlags parentFlags)
   : Superclass(parentObject, parentFlags)
 {
 }
-
 
 //-----------------------------------------------------------------------------
 pqCPExportStateWizard::~pqCPExportStateWizard()
@@ -91,89 +87,87 @@ void pqCPExportStateWizard::customize()
 //-----------------------------------------------------------------------------
 bool pqCPExportStateWizard::getCommandString(QString& command)
 {
-  QString export_rendering = this->Internals->outputRendering->isChecked() ?
-    "True" : "False";
+  QString export_rendering = this->Internals->outputRendering->isChecked() ? "True" : "False";
   QString rendering_info; // a map from the render view name to render output params
   if (this->Internals->outputRendering->isChecked() == 0 &&
-      this->Internals->liveViz->isChecked() == 0)
-    {
+    this->Internals->liveViz->isChecked() == 0)
+  {
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
     vtkSMSessionProxyManager* proxyManager =
-        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    pqServerManagerModel* smModel =
-      pqApplicationCore::instance()->getServerManagerModel();
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
     bool haveSomeWriters = false;
     QStringList filtersWithoutConsumers;
-    for(unsigned int i=0;i<proxyManager->GetNumberOfProxies("sources");i++)
+    for (unsigned int i = 0; i < proxyManager->GetNumberOfProxies("sources"); i++)
+    {
+      if (vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+            proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
       {
-      if(vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
-           proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
-        {
         vtkPVXMLElement* writerProxyHint = proxy->GetHints();
-        if(writerProxyHint && writerProxyHint->FindNestedElementByName("WriterProxy"))
-          {
+        if (writerProxyHint && writerProxyHint->FindNestedElementByName("WriterProxy"))
+        {
           haveSomeWriters = true;
-          }
+        }
         else
-          {
+        {
           pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(proxy);
-          if(input && input->getNumberOfConsumers() == 0)
-            {
+          if (input && input->getNumberOfConsumers() == 0)
+          {
             filtersWithoutConsumers << proxyManager->GetProxyName("sources", i);
-            }
           }
         }
       }
-    if(!haveSomeWriters)
-      {
+    }
+    if (!haveSomeWriters)
+    {
       QMessageBox messageBox;
-      QString message(tr("No output specified. Generated script should be modified to output information."));
+      QString message(
+        tr("No output specified. Generated script should be modified to output information."));
       messageBox.setText(message);
       messageBox.exec();
-      }
-    else if(filtersWithoutConsumers.size() != 0)
-      {
+    }
+    else if (filtersWithoutConsumers.size() != 0)
+    {
       QMessageBox messageBox;
       QString message(tr("The following filters have no consumers and will not be saved:\n"));
-      for(QStringList::const_iterator iter=filtersWithoutConsumers.constBegin();
-          iter!=filtersWithoutConsumers.constEnd();iter++)
-        {
+      for (QStringList::const_iterator iter = filtersWithoutConsumers.constBegin();
+           iter != filtersWithoutConsumers.constEnd(); iter++)
+      {
         message.append("  ");
         message.append(iter->toLocal8Bit().constData());
         message.append("\n");
-        }
+      }
       messageBox.setText(message);
       messageBox.exec();
-      }
     }
-  else if(this->Internals->outputRendering->isChecked())
-    {
+  }
+  else if (this->Internals->outputRendering->isChecked())
+  {
     // Format as defined in cpstate.py
     QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
     rendering_info = this->Internals->wViewSelection->getSelectionAsString(format);
-    }
+  }
 
   QString cinema_tracks;
   QString array_selection;
-  if(this->Internals->outputCinema->isChecked())
-    {
+  if (this->Internals->outputCinema->isChecked())
+  {
     // Format as defined in pv_introspect.make_cinema_store.make_cinema_store (_userDefinedValues)
     QString format("'%1' : %2");
     cinema_tracks = this->Internals->wCinemaTrackSelection->getTrackSelectionAsString(format);
     array_selection = this->Internals->wCinemaTrackSelection->getArraySelectionAsString(format);
-    }
+  }
 
-  QString filters ="ParaView Python State Files (*.py);;All files (*)";
+  QString filters = "ParaView Python State Files (*.py);;All files (*)";
 
-  pqFileDialog file_dialog (NULL, this,
-    tr("Save Server State:"), QString(), filters);
+  pqFileDialog file_dialog(NULL, this, tr("Save Server State:"), QString(), filters);
   file_dialog.setObjectName("ExportCoprocessingStateFileDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (!file_dialog.exec())
-    {
+  {
     return false;
-    }
+  }
 
   QString filename = file_dialog.getSelectedFiles()[0];
 #ifdef _WIN32
@@ -187,34 +181,32 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
   // the map from the simulation inputs in the paraview gui
   // to the adaptor's named inputs (usually 'input')
   QString sim_inputs_map;
-  for (int cc=0; cc < this->Internals->nameWidget->rowCount(); cc++)
-    {
+  for (int cc = 0; cc < this->Internals->nameWidget->rowCount(); cc++)
+  {
     QTableWidgetItem* item0 = this->Internals->nameWidget->item(cc, 0);
     QTableWidgetItem* item1 = this->Internals->nameWidget->item(cc, 1);
-    sim_inputs_map +=
-      QString(" '%1' : '%2',").arg(item0->text()).arg(item1->text());
-    }
+    sim_inputs_map += QString(" '%1' : '%2',").arg(item0->text()).arg(item1->text());
+  }
   // remove last ","
   sim_inputs_map.chop(1);
 
-  QString rescale_data_range = (this->Internals->rescaleDataRange->isChecked() == true ?
-                                "True" : "False");
+  QString rescale_data_range =
+    (this->Internals->rescaleDataRange->isChecked() == true ? "True" : "False");
 
-  QString live_visualization = (this->Internals->liveViz->isChecked() == true ?
-                                "True" : "False");
+  QString live_visualization = (this->Internals->liveViz->isChecked() == true ? "True" : "False");
 
   command = cp_python_export_code;
   // may be set by the user in the future
   const int live_visualization_frequency = 1;
   command = command.arg(export_rendering)
-                   .arg(sim_inputs_map)
-                   .arg(rendering_info)
-                   .arg(rescale_data_range)
-                   .arg(live_visualization)
-                   .arg(live_visualization_frequency)
-                   .arg(cinema_tracks)
-                   .arg(filename)
-                   .arg(array_selection);
+              .arg(sim_inputs_map)
+              .arg(rendering_info)
+              .arg(rescale_data_range)
+              .arg(live_visualization)
+              .arg(live_visualization_frequency)
+              .arg(cinema_tracks)
+              .arg(filename)
+              .arg(array_selection);
 
   return true;
 }

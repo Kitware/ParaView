@@ -42,6 +42,7 @@ class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
   vtkVRActiveObjectManipulationStyle(QObject* parent);
   ~vtkVRActiveObjectManipulationStyle();
@@ -51,10 +52,11 @@ public:
   virtual bool update();
 
 protected:
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleSpaceNavigatorAnalog(const vtkVREventData& data);
   std::string Analog;
+
 protected:
 };
 
-#endif //vtkVRActiveObjectManipulationStyle.h_
+#endif // vtkVRActiveObjectManipulationStyle.h_

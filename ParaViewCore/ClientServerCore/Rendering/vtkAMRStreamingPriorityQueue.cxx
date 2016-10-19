@@ -57,35 +57,34 @@ void vtkAMRStreamingPriorityQueue::Initialize(vtkAMRInformation* amr)
   this->Internals = new vtkInternals();
   this->Internals->AMRMetadata = amr;
 
-  for (unsigned int cc=0; cc < amr->GetTotalNumberOfBlocks(); cc++)
-    {
+  for (unsigned int cc = 0; cc < amr->GetTotalNumberOfBlocks(); cc++)
+  {
     vtkStreamingPriorityQueueItem item;
     item.Identifier = cc;
     item.Priority = (amr->GetTotalNumberOfBlocks() - cc);
 
-    unsigned int level=0, index=0;
-    this->Internals->AMRMetadata->ComputeIndexPair(
-      item.Identifier, level, index);
+    unsigned int level = 0, index = 0;
+    this->Internals->AMRMetadata->ComputeIndexPair(item.Identifier, level, index);
     item.Refinement = static_cast<double>(level);
 
     double block_bounds[6];
     this->Internals->AMRMetadata->GetBounds(level, index, block_bounds);
     item.Bounds.SetBounds(block_bounds);
 
-      // default priority is to prefer lower levels. Thus even without
-      // view-planes we have reasonable priority.
+    // default priority is to prefer lower levels. Thus even without
+    // view-planes we have reasonable priority.
     this->Internals->PriorityQueue.push(item);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkAMRStreamingPriorityQueue::Reinitialize()
 {
   if (this->Internals->AMRMetadata)
-    {
+  {
     vtkSmartPointer<vtkAMRInformation> info = this->Internals->AMRMetadata;
     this->Initialize(info);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -98,22 +97,22 @@ bool vtkAMRStreamingPriorityQueue::IsEmpty()
 unsigned int vtkAMRStreamingPriorityQueue::Pop()
 {
   if (this->IsEmpty())
-    {
+  {
     vtkErrorMacro("Queue is empty!");
     return 0;
-    }
+  }
 
-  int num_procs = this->Controller? this->Controller->GetNumberOfProcesses() : 1;
-  int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
+  int num_procs = this->Controller ? this->Controller->GetNumberOfProcesses() : 1;
+  int myid = this->Controller ? this->Controller->GetLocalProcessId() : 0;
   assert(myid < num_procs);
 
   std::vector<vtkStreamingPriorityQueueItem> items;
   items.resize(num_procs);
-  for (int cc=0; cc < num_procs && !this->Internals->PriorityQueue.empty(); cc++)
-    {
+  for (int cc = 0; cc < num_procs && !this->Internals->PriorityQueue.empty(); cc++)
+  {
     items[cc] = this->Internals->PriorityQueue.top();
     this->Internals->PriorityQueue.pop();
-    }
+  }
 
   // at the end, when the queue empties out in the middle of a pop, right now,
   // all other processes are simply going to ask for block 0 (set in
@@ -130,13 +129,13 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24],
-  const double clamp_bounds[6])
+void vtkAMRStreamingPriorityQueue::Update(
+  const double view_planes[24], const double clamp_bounds[6])
 {
   if (!this->Internals->AMRMetadata)
-    {
+  {
     return;
-    }
+  }
   this->Internals->PriorityQueue.UpdatePriorities(view_planes, clamp_bounds);
 }
 

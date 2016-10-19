@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -43,29 +43,26 @@ bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
 {
   Q_ASSERT(other != NULL);
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   pqProxySelection new_selection;
   vtkSMProxySelectionModel::SelectionType::const_iterator iter;
-  const vtkSMProxySelectionModel::SelectionType &selection =
-    other->GetSelection();
+  const vtkSMProxySelectionModel::SelectionType& selection = other->GetSelection();
   for (iter = selection.begin(); iter != selection.end(); ++iter)
-    {
+  {
     vtkSMProxy* proxy = iter->GetPointer();
-    pqServerManagerModelItem* item =
-      smmodel->findItem<pqServerManagerModelItem*>(proxy);
+    pqServerManagerModelItem* item = smmodel->findItem<pqServerManagerModelItem*>(proxy);
     if (item)
-      {
+    {
       new_selection.insert(item);
-      }
     }
+  }
 
   if (*this != new_selection)
-    {
+  {
     *this = new_selection;
     return true;
-    }
+  }
 
   return false;
 }
@@ -77,22 +74,22 @@ bool pqProxySelection::copyTo(vtkSMProxySelectionModel* other) const
 
   vtkSMProxySelectionModel::SelectionType selection;
   foreach (pqServerManagerModelItem* item, *this)
-    {
+  {
     pqProxy* proxy = qobject_cast<pqProxy*>(item);
-    pqOutputPort* port= qobject_cast<pqOutputPort*>(item);
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     if (port)
-      {
-      selection.insert(port->getOutputPortProxy());
-      }
-    else if (proxy)
-      {
-      selection.insert(proxy->getProxy());
-      }
-    }
-  if (other->GetSelection() != selection)
     {
+      selection.insert(port->getOutputPortProxy());
+    }
+    else if (proxy)
+    {
+      selection.insert(proxy->getProxy());
+    }
+  }
+  if (other->GetSelection() != selection)
+  {
     other->Select(selection, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
     return true;
-    }
+  }
   return false;
 }

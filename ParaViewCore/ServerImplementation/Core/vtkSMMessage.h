@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMMessage
-// .SECTION Description
-// Header class that setup every thing in order to use Protobuf messages in
-// a transparent manner
+/**
+ * @class   vtkSMMessage
+ *
+ * Header class that setup every thing in order to use Protobuf messages in
+ * a transparent manner
+*/
 
 #ifndef vtkSMMessage_h
 #define vtkSMMessage_h
@@ -24,53 +26,53 @@
 
 #include <string>
 #if __GNUC__
-# pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 #include "vtkPVMessage.pb.h"
 #include "vtkSystemIncludes.h"
 #include "vtk_protobuf.h"
 #if __GNUC__
-# pragma GCC diagnostic warning "-Wsign-compare"
+#pragma GCC diagnostic warning "-Wsign-compare"
 #endif
 
 #include "vtkClientServerStream.h"
 
-inline vtkClientServerStream& operator << (vtkClientServerStream& stream,
-  const paraview_protobuf::Variant& variant)
+inline vtkClientServerStream& operator<<(
+  vtkClientServerStream& stream, const paraview_protobuf::Variant& variant)
 {
   switch (variant.type())
-    {
-  case paraview_protobuf::Variant::INT:
-    for (int cc=0; cc < variant.integer_size(); cc++)
+  {
+    case paraview_protobuf::Variant::INT:
+      for (int cc = 0; cc < variant.integer_size(); cc++)
       {
-      stream << variant.integer(cc);
+        stream << variant.integer(cc);
       }
-    break;
+      break;
 
-  case paraview_protobuf::Variant::FLOAT64:
-    for (int cc=0; cc < variant.float64_size(); cc++)
+    case paraview_protobuf::Variant::FLOAT64:
+      for (int cc = 0; cc < variant.float64_size(); cc++)
       {
-      stream << variant.float64(cc);
+        stream << variant.float64(cc);
       }
-    break;
+      break;
 
-  case paraview_protobuf::Variant::IDTYPE:
-    for (int cc=0; cc < variant.idtype_size(); cc++)
+    case paraview_protobuf::Variant::IDTYPE:
+      for (int cc = 0; cc < variant.idtype_size(); cc++)
       {
-      stream << variant.idtype(cc);
+        stream << variant.idtype(cc);
       }
-    break;
+      break;
 
-  case paraview_protobuf::Variant::STRING:
-    for (int cc=0; cc < variant.txt_size(); cc++)
+    case paraview_protobuf::Variant::STRING:
+      for (int cc = 0; cc < variant.txt_size(); cc++)
       {
-      stream << variant.txt(cc).c_str();
+        stream << variant.txt(cc).c_str();
       }
-    break;
+      break;
 
-  default:
-    break;
-    }
+    default:
+      break;
+  }
   return stream;
 }
 

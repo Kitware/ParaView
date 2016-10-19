@@ -16,7 +16,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSIVectorPropertyTemplate.txx"
 
-
 vtkStandardNewMacro(vtkSIIdTypeVectorProperty);
 //----------------------------------------------------------------------------
 vtkSIIdTypeVectorProperty::vtkSIIdTypeVectorProperty()

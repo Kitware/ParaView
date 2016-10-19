@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,12 +40,10 @@ class PQPYTHON_EXPORT pqPythonDebugLeaksView : public vtkQtDebugLeaksView
   Q_OBJECT
 
 public:
-
-  pqPythonDebugLeaksView(QWidget* p=0);
+  pqPythonDebugLeaksView(QWidget* p = 0);
   virtual ~pqPythonDebugLeaksView();
 
 protected:
-
   virtual void onObjectDoubleClicked(vtkObjectBase* object);
   virtual void onClassNameDoubleClicked(const QString& className);
 

@@ -32,12 +32,12 @@
 
 #include "pqTransferFunctionEditor.h"
 
-class pqTransferFunctionDialog::pqInternals: public Ui::pqTransferFunctionDialog
+class pqTransferFunctionDialog::pqInternals : public Ui::pqTransferFunctionDialog
 {
-
 };
 
-pqTransferFunctionDialog::pqTransferFunctionDialog(QWidget* parentObject) : QDialog(parentObject)
+pqTransferFunctionDialog::pqTransferFunctionDialog(QWidget* parentObject)
+  : QDialog(parentObject)
 {
   this->Internals = new pqTransferFunctionDialog::pqInternals();
   this->Internals->setupUi(this);
@@ -49,13 +49,13 @@ pqTransferFunctionDialog::~pqTransferFunctionDialog()
 {
 }
 
-void  pqTransferFunctionDialog::setRepresentation(pqPipelineRepresentation* repr)
+void pqTransferFunctionDialog::setRepresentation(pqPipelineRepresentation* repr)
 {
   opacityEditor()->setRepresentation(repr);
   radiusEditor()->setRepresentation(repr);
 }
 
-void  pqTransferFunctionDialog::show(pqTransferFunctionEditor* editor)
+void pqTransferFunctionDialog::show(pqTransferFunctionEditor* editor)
 {
   this->Internals->TransferFunctionTabs->setCurrentWidget(editor);
   this->Superclass::show();
@@ -70,6 +70,3 @@ pqTransferFunctionEditor* pqTransferFunctionDialog::radiusEditor()
 {
   return this->Internals->RadiusPage;
 }
-
-
-

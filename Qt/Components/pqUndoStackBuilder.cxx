@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -62,15 +62,15 @@ pqUndoStackBuilder::~pqUndoStackBuilder()
 void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
 {
   if (this->UndoStack == stack)
-    {
+  {
     return;
-    }
+  }
 
   this->Superclass::SetUndoStack(stack);
 }
 
 //-----------------------------------------------------------------------------
-bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
+bool pqUndoStackBuilder::Filter(vtkSMSession* session, vtkTypeUInt32 globalId)
 {
   vtkObject* remoteObj = session->GetRemoteObject(globalId);
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
@@ -78,72 +78,66 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
   // We filter proxy type that must not be involved in undo/redo state.
   // The property themselves are already filtered based on a flag in the XML.
   // XML Flag: state_ignored="1"
-  if( !remoteObj || (proxy && (
-      proxy->IsA("vtkSMCameraProxy") ||
+  if (!remoteObj ||
+    (proxy && (proxy->IsA("vtkSMCameraProxy") ||
 
-      // we no longer skip TimeKeeper. We need to record the changes to
-      // TimeSources, SuppressedTimeSources properties.
-      // proxy->IsA("vtkSMTimeKeeperProxy") ||
-      //
-      proxy->IsA("vtkSMAnimationScene") ||
-      proxy->IsA("vtkSMAnimationSceneProxy") ||
-      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
-      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy") ||
-      !strcmp(proxy->GetXMLName(),"FileInformationHelper") )))
-    {
+                // we no longer skip TimeKeeper. We need to record the changes to
+                // TimeSources, SuppressedTimeSources properties.
+                // proxy->IsA("vtkSMTimeKeeperProxy") ||
+                //
+                proxy->IsA("vtkSMAnimationScene") || proxy->IsA("vtkSMAnimationSceneProxy") ||
+                proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
+                proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy") ||
+                !strcmp(proxy->GetXMLName(), "FileInformationHelper"))))
+  {
     return true;
-    }
+  }
 
   // We do not keep track of ProxySelectionModel in Undo/redo
-  if(remoteObj->IsA("vtkSMProxySelectionModel"))
-    {
+  if (remoteObj->IsA("vtkSMProxySelectionModel"))
+  {
     return true;
-    }
+  }
 
   // We keep the state, no filtering here
   return false;
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
-                                        vtkTypeUInt32 globalId,
-                                        const vtkSMMessage *oldState,
-                                        const vtkSMMessage *newState)
+void pqUndoStackBuilder::OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
+  const vtkSMMessage* oldState, const vtkSMMessage* newState)
 {
-  if(this->Filter(session, globalId))
-    {
+  if (this->Filter(session, globalId))
+  {
     return;
-    }
+  }
 
-  bool auto_element = !this->IgnoreAllChanges &&
-    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
+  bool auto_element = !this->IgnoreAllChanges && !this->IgnoreIsolatedChanges && !this->UndoRedoing;
 
   if (auto_element)
-    {
-    vtkSMRemoteObject* proxy =
-      vtkSMRemoteObject::SafeDownCast(session->GetRemoteObject(globalId));
+  {
+    vtkSMRemoteObject* proxy = vtkSMRemoteObject::SafeDownCast(session->GetRemoteObject(globalId));
     std::ostringstream stream;
-    stream << "Changed '" << proxy->GetClassName() <<"'";
+    stream << "Changed '" << proxy->GetClassName() << "'";
     this->Begin(stream.str().c_str());
-    }
+  }
 
   this->Superclass::OnStateChange(session, globalId, oldState, newState);
 
- if (auto_element)
-    {
+  if (auto_element)
+  {
     this->End();
 
     if (this->UndoSet->GetNumberOfElements() > 0)
-      {
+    {
       this->PushToStack();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoStackBuilder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "IgnoreIsolatedChanges: " 
-    << this->IgnoreIsolatedChanges << endl;
+  os << indent << "IgnoreIsolatedChanges: " << this->IgnoreIsolatedChanges << endl;
 }

@@ -12,25 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyConfigurationWriter - Base readers of a vtkSMProxy's vtkSMProperty's.
-//
-// .SECTION Description
-// vtkSMProxyConfigurationWriter writes state for properties for a single
-// proxy. Internally the ParaView state machinery is employed.
-//
-// The notion of proxy configuration is similar to state but lighter
-// as the proxy its domains and and its server side objects are assumed to
-// already exist. Configuration also provides subseting mechanism so that
-// properties may be excluded if needed.
-//
-// Subsetting is achieved through a specialized iterator derived from
-// vtkSMPropertyIterator.
-//
-// .SECTION See also
-// vtkSMProxyConfigurationReader, vtkSMPropertyIterator, vtkSMNamedPropertyIterator
-//
-// .SECTION Thanks
-// This class was contribued by SciberQuest Inc.
+/**
+ * @class   vtkSMProxyConfigurationWriter
+ * @brief   Base readers of a vtkSMProxy's vtkSMProperty's.
+ *
+ *
+ * vtkSMProxyConfigurationWriter writes state for properties for a single
+ * proxy. Internally the ParaView state machinery is employed.
+ *
+ * The notion of proxy configuration is similar to state but lighter
+ * as the proxy its domains and and its server side objects are assumed to
+ * already exist. Configuration also provides subseting mechanism so that
+ * properties may be excluded if needed.
+ *
+ * Subsetting is achieved through a specialized iterator derived from
+ * vtkSMPropertyIterator.
+ *
+ * @sa
+ * vtkSMProxyConfigurationReader, vtkSMPropertyIterator, vtkSMNamedPropertyIterator
+ *
+ * @par Thanks:
+ * This class was contribued by SciberQuest Inc.
+*/
+
 #ifndef vtkSMProxyConfigurationWriter_h
 #define vtkSMProxyConfigurationWriter_h
 
@@ -48,26 +52,38 @@ public:
   vtkTypeMacro(vtkSMProxyConfigurationWriter, vtkSMObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the proxy to write out.
-  virtual void SetProxy(vtkSMProxy *proxy);
-  vtkGetObjectMacro(Proxy,vtkSMProxy);
+  //@{
+  /**
+   * Set the proxy to write out.
+   */
+  virtual void SetProxy(vtkSMProxy* proxy);
+  vtkGetObjectMacro(Proxy, vtkSMProxy);
+  //@}
 
-  // Description:
-  // Set the ieterator used to traverse properties during the write.
-  // If no iterator is set then all properties are written.
-  virtual void SetPropertyIterator(vtkSMPropertyIterator *iter);
-  vtkGetObjectMacro(PropertyIterator,vtkSMPropertyIterator);
+  //@{
+  /**
+   * Set the ieterator used to traverse properties during the write.
+   * If no iterator is set then all properties are written.
+   */
+  virtual void SetPropertyIterator(vtkSMPropertyIterator* iter);
+  vtkGetObjectMacro(PropertyIterator, vtkSMPropertyIterator);
+  //@}
 
-  // Description:
-  // Set/Get the file name.
+  //@{
+  /**
+   * Set/Get the file name.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Set/get file meta data.
+  //@{
+  /**
+   * Set/get file meta data.
+   */
   vtkSetStringMacro(FileIdentifier);
   vtkGetStringMacro(FileIdentifier);
+  //@}
 
   vtkSetStringMacro(FileDescription);
   vtkGetStringMacro(FileDescription);
@@ -75,18 +91,22 @@ public:
   vtkSetStringMacro(FileExtension);
   vtkGetStringMacro(FileExtension);
 
-  // Description:
-  // Return the writer version string.
-  virtual const char *GetWriterVersion(){ return "1.0"; }
+  /**
+   * Return the writer version string.
+   */
+  virtual const char* GetWriterVersion() { return "1.0"; }
 
-  // Description:
-  // Write the proxy's state directly to an XML file, in PV state format.
+  //@{
+  /**
+   * Write the proxy's state directly to an XML file, in PV state format.
+   */
   virtual int WriteConfiguration();
-  virtual int WriteConfiguration(const char *fileName);
-  // Description:
-  // Write the proxy's state to a stream, in PV state format.
-  virtual int WriteConfiguration(ostream &os);
-
+  virtual int WriteConfiguration(const char* fileName);
+  //@}
+  /**
+   * Write the proxy's state to a stream, in PV state format.
+   */
+  virtual int WriteConfiguration(ostream& os);
 
 protected:
   vtkSMProxyConfigurationWriter();
@@ -97,15 +117,14 @@ private:
   void operator=(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
 
 private:
-  char *FileName;
+  char* FileName;
   //-------------------
-  vtkSMProxy *Proxy;
-  vtkSMPropertyIterator *PropertyIterator;
+  vtkSMProxy* Proxy;
+  vtkSMPropertyIterator* PropertyIterator;
   //-------------------
-  char *FileIdentifier;
-  char *FileDescription;
-  char *FileExtension;
+  char* FileIdentifier;
+  char* FileDescription;
+  char* FileExtension;
 };
 
 #endif
-

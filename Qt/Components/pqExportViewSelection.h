@@ -35,57 +35,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QWidget>
 
-
 class pqRenderViewBase;
 class pqContextView;
 class pqImageOutputInfo;
 
 namespace Ui
 {
-  class ExportViewSelection;
+class ExportViewSelection;
 }
 
-
-/// @brief Widget to select views to be included in a coprocessing script.
-///
-/// The user selection can be queried as a string to be included in a Python
-/// script directly. The widget is used by pqCinemaConfiguration and
-/// pqSGExportStateWizard.
+/**
+* @brief Widget to select views to be included in a coprocessing script.
+*
+* The user selection can be queried as a string to be included in a Python
+* script directly. The widget is used by pqCinemaConfiguration and
+* pqSGExportStateWizard.
+*/
 class PQCOMPONENTS_EXPORT pqExportViewSelection : public QWidget
 {
   Q_OBJECT;
 
 public:
-
   pqExportViewSelection(QWidget* parent_ = NULL);
   ~pqExportViewSelection();
 
-  void populateViews(QList<pqRenderViewBase*> const &  renderViews,
-    QList<pqContextView*> const & contextViews);
+  void populateViews(
+    QList<pqRenderViewBase*> const& renderViews, QList<pqContextView*> const& contextViews);
 
-  /// Hides/shows cinema options.
+  /**
+  * Hides/shows cinema options.
+  */
   void setCinemaVisible(bool status);
 
   QList<pqImageOutputInfo*> getImageOutputInfos();
 
-  /// Returns a string containing a comma separated set of views with each
-  /// view defined as in 'format'.
-  /// Order of view values:
-  /// 1. View name
-  /// 2. Image file name
-  /// 3. Frequency
-  /// 4. Fit to screen
-  /// 5. Magnification
-  /// 6. Image width
-  /// 7. Image height
-  /// 8. Cinema specific options (dictionary; phi, theta, composite, etc..)
-  ///
-  /// Example: Format as defined in pqCinemaConfiguration
-  /// format = "'%1' : ['%2', %3, %4, %5, %6, %7, %8]"
-  /// returns -> 'ViewName1' : ['Imname', 1, 1, 1, 1, 1, {'composite': True ...}],
-  ///            'ViewName2' : [...],
-  ///            ... (for N views)
-  QString getSelectionAsString(QString const & scriptFromat);
+  /**
+  * Returns a string containing a comma separated set of views with each
+  * view defined as in 'format'.
+  * Order of view values:
+  * 1. View name
+  * 2. Image file name
+  * 3. Frequency
+  * 4. Fit to screen
+  * 5. Magnification
+  * 6. Image width
+  * 7. Image height
+  * 8. Cinema specific options (dictionary; phi, theta, composite, etc..)
+  *
+  * Example: Format as defined in pqCinemaConfiguration
+  * format = "'%1' : ['%2', %3, %4, %5, %6, %7, %8]"
+  * returns -> 'ViewName1' : ['Imname', 1, 1, 1, 1, 1, {'composite': True ...}],
+  *            'ViewName2' : [...],
+  *            ... (for N views)
+  */
+  QString getSelectionAsString(QString const& scriptFromat);
 
 private slots:
 
@@ -93,21 +96,26 @@ private slots:
   void onNextClicked();
 
 private:
+  /**
+  * Checks if a given string marker exists in infoFormat and replaces it with the
+  * appropriate value in parameters.
+  * @note This helper for getSelectionAsPythonScript(...) is needed given that QString::arg's
+  * result is undefined when called on a string with no unreplaced "%i" markers. See
+  * , http://doc.qt.io/qt-4.8/qstring.html#arg
+  */
+  void patchFormatString(QMap<QString, QString> const& parameters, QString& infoFormat);
 
-  /// Checks if a given string marker exists in infoFormat and replaces it with the
-  /// appropriate value in parameters.
-  /// @note This helper for getSelectionAsPythonScript(...) is needed given that QString::arg's
-  /// result is undefined when called on a string with no unreplaced "%i" markers. See
-  /// , http://doc.qt.io/qt-4.8/qstring.html#arg
-  void patchFormatString(QMap<QString, QString> const & parameters, QString & infoFormat);
-
-  /// @note This is templated to handle pqRenderViewBase* and pqContextView*
-  /// given that only these two pqView sub-types are supported by cinema. When
-  /// cinema gives support to all the pqView types the template will be removed.
+  /**
+  * @note This is templated to handle pqRenderViewBase* and pqContextView*
+  * given that only these two pqView sub-types are supported by cinema. When
+  * cinema gives support to all the pqView types the template will be removed.
+  */
   template <typename T>
-  void addViews(T const & views, int numberOfViews);
+  void addViews(T const& views, int numberOfViews);
 
-///////////////////////////////////////////////////////////////////////////////
+  /**
+  *
+  */
 
   Ui::ExportViewSelection* Ui;
 };

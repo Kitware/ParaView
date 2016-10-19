@@ -43,16 +43,16 @@
 //----------------------------------------------------------------------------
 // STATICS
 vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
-    vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
+  vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
-vtkSMSession* vtkSMSession::New(vtkPVSessionBase *otherSession)
+vtkSMSession* vtkSMSession::New(vtkPVSessionBase* otherSession)
 {
   return vtkSMSession::New(otherSession->GetSessionCore());
 }
 //----------------------------------------------------------------------------
-vtkSMSession* vtkSMSession::New(vtkPVSessionCore *otherSessionCore)
+vtkSMSession* vtkSMSession::New(vtkPVSessionCore* otherSessionCore)
 {
   vtkSMSession* session = new vtkSMSession(true, otherSessionCore);
   session->InitializeObjectBase();
@@ -60,14 +60,14 @@ vtkSMSession* vtkSMSession::New(vtkPVSessionCore *otherSessionCore)
 }
 
 //----------------------------------------------------------------------------
-vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/,
-                           vtkPVSessionCore* preExistingSessionCore/*=NULL*/)
+vtkSMSession::vtkSMSession(
+  bool initialize_during_constructor /*=true*/, vtkPVSessionCore* preExistingSessionCore /*=NULL*/)
   : vtkPVSessionBase(preExistingSessionCore ? preExistingSessionCore : vtkPVSessionCore::New())
 {
-  if(!preExistingSessionCore)
-    {
+  if (!preExistingSessionCore)
+  {
     this->SessionCore->UnRegister(NULL);
-    }
+  }
 
   this->SessionProxyManager = NULL;
   this->StateLocator = vtkSMStateLocator::New();
@@ -87,26 +87,26 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/,
   // we will initialize it in this->Initialize().
 
   if (initialize_during_constructor)
-    {
+  {
     this->Initialize();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
   if (vtkSMProxyManager::IsInitialized())
-    {
+  {
     vtkSMProxyManager::GetProxyManager()->GetPluginManager()->UnRegisterSession(this);
-    }
+  }
 
   this->StateLocator->Delete();
   this->ProxyLocator->Delete();
   if (this->SessionProxyManager)
-    {
+  {
     this->SessionProxyManager->Delete();
     this->SessionProxyManager = NULL;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -115,9 +115,9 @@ vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
   if (vtkProcessModule::GetProcessModule() &&
     vtkProcessModule::GetProcessModule()->GetPartitionId() > 0 &&
     !vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
-    {
+  {
     return vtkPVSession::SERVERS;
-    }
+  }
 
   return vtkPVSession::CLIENT_AND_SERVERS;
 }
@@ -135,21 +135,18 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
 void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 {
   // check is global-undo-stack builder is set.
-  vtkSMUndoStackBuilder* usb =
-    vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+  vtkSMUndoStackBuilder* usb = vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
 
-  if (usb == NULL ||
-    (this->GetProcessRoles() & vtkPVSession::CLIENT) == 0)
-    {
+  if (usb == NULL || (this->GetProcessRoles() & vtkPVSession::CLIENT) == 0)
+  {
     return;
-    }
+  }
 
   vtkTypeUInt32 globalId = msg->global_id();
-  vtkSMRemoteObject *remoteObj =
-    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
+  vtkSMRemoteObject* remoteObj = vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
 
-  if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
-    {
+  if (remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
+  {
     vtkSMMessage newState;
     newState.CopyFrom(*remoteObj->GetFullState());
 
@@ -159,26 +156,26 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
     // Store state in cache
     vtkSMMessage oldState;
-    bool createAction = !this->StateLocator->FindState( globalId, &oldState,
-      /* We want only a local lookup => false */          false );
+    bool createAction = !this->StateLocator->FindState(globalId, &oldState,
+      /* We want only a local lookup => false */ false);
 
     // This is a filtering Hack, I don't like it. :-(
     if (newState.GetExtension(ProxyState::xml_name) != "Camera")
-      {
+    {
       this->StateLocator->RegisterState(&newState);
-      }
+    }
 
     // Propagate to undo stack builder if possible
     if (createAction)
-      {
+    {
       usb->OnCreateObject(this, &newState);
-      }
-    else if (oldState.SerializeAsString() != newState.SerializeAsString())
-      {
-      // Update
-      usb->OnStateChange( this, globalId, &oldState, &newState);
-      }
     }
+    else if (oldState.SerializeAsString() != newState.SerializeAsString())
+    {
+      // Update
+      usb->OnStateChange(this, globalId, &oldState, &newState);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -192,10 +189,10 @@ void vtkSMSession::Initialize()
   // All these initializations need to be done on all nodes in symmetric-batch
   // mode. In non-symmetric-batch mode. Which means we are a CLIENT,
   // so if we are not then we stop the initialisation here !
-  if( !(this->GetProcessRoles() & vtkPVSession::CLIENT) )
-    {
+  if (!(this->GetProcessRoles() & vtkPVSession::CLIENT))
+  {
     return;
-    }
+  }
 
   // Initialize the proxy manager.
   // this updates proxy definitions if we are connected to a remote server.
@@ -206,25 +203,23 @@ void vtkSMSession::Initialize()
   vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
 
   // Setup default mapper parameters.
-  const char *group = "misc";
-  const char *name = "GlobalMapperProperties"; 
-  
+  const char* group = "misc";
+  const char* name = "GlobalMapperProperties";
+
   // First try and get the prototype, if its NULL then the proxy is not
   // available.
-  vtkSMProxy* prototype  = 
-    this->SessionProxyManager->GetPrototypeProxy(group, name);
+  vtkSMProxy* prototype = this->SessionProxyManager->GetPrototypeProxy(group, name);
   if (!prototype)
     return;
 
-  vtkSMProxy* globalMapperProperties =
-    this->SessionProxyManager->NewProxy(group, name);
+  vtkSMProxy* globalMapperProperties = this->SessionProxyManager->NewProxy(group, name);
   if (globalMapperProperties)
-    {
+  {
     vtkSMPropertyHelper(globalMapperProperties, "Mode").Set("ShiftZBuffer");
     vtkSMPropertyHelper(globalMapperProperties, "ZShift").Set(2.0e-3);
     globalMapperProperties->UpdateVTKObjects();
     globalMapperProperties->Delete();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -250,9 +245,9 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 void vtkSMSession::Disconnect(vtkSMSession* session)
 {
   if (!session)
-    {
+  {
     return;
-    }
+  }
 
   // Ensure that the session no longer sends state updates to the server-side.
   // This is critical to ensure we don't mess up the collaboration state.
@@ -265,7 +260,7 @@ void vtkSMSession::Disconnect(vtkSMSession* session)
   pm->UnRegisterSession(session);
   // Although I'd like to have this check, when Disconnect() is called from
   // Python, we have 1 reference that gets cleared with the Python call returns.
-  //if (session != NULL)
+  // if (session != NULL)
   //  {
   //  vtkGenericWarningMacro(
   //    "vtkSMSession wasn't destroyed after UnRegisterSession. "
@@ -280,11 +275,10 @@ void vtkSMSession::Disconnect(vtkIdType sid)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkWeakPointer<vtkSMSession> session = vtkSMSession::SafeDownCast(pm->GetSession(sid));
   if (!session)
-    {
-    vtkGenericWarningMacro(
-      "Failed to locate session " << sid << ". Cannot disconnect.");
+  {
+    vtkGenericWarningMacro("Failed to locate session " << sid << ". Cannot disconnect.");
     return;
-    }
+  }
 
   vtkSMSession::Disconnect(session);
 }
@@ -296,20 +290,19 @@ vtkIdType vtkSMSession::ConnectToSelf()
   vtkIdType sid = 0;
 
   if (vtkSMSession::AutoMPI->IsPossible())
-    {
+  {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
     if (port > 0)
-      {
+    {
       sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
       if (sid > 0)
-        {
+      {
         return sid;
-        }
       }
-    vtkGenericWarningMacro(
-      "Failed to automatically launch 'pvserver' for multi-core support. "
-      "Defaulting to local session.");
     }
+    vtkGenericWarningMacro("Failed to automatically launch 'pvserver' for multi-core support. "
+                           "Defaulting to local session.");
+  }
 
   vtkSMSession* session = vtkSMSession::New();
   sid = pm->RegisterSession(session);
@@ -336,8 +329,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemoteInternal(
-  const char* hostname, int port, bool is_auto_mpi)
+vtkIdType vtkSMSession::ConnectToRemoteInternal(const char* hostname, int port, bool is_auto_mpi)
 {
   std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
@@ -345,28 +337,27 @@ vtkIdType vtkSMSession::ConnectToRemoteInternal(
   session->IsAutoMPI = is_auto_mpi;
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
-    {
+  {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
-    }
+  }
   session->Delete();
   return sid;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
-  const char* rshost, int rsport)
+vtkIdType vtkSMSession::ConnectToRemote(
+  const char* dshost, int dsport, const char* rshost, int rsport)
 {
   std::ostringstream sname;
-  sname << "cdsrs://" << dshost << ":" << dsport << "/"
-    << rshost << ":" << rsport;
+  sname << "cdsrs://" << dshost << ":" << dsport << "/" << rshost << ":" << rsport;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
-    {
+  {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
-    }
+  }
   session->Delete();
   return sid;
 }
@@ -374,28 +365,28 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
 //----------------------------------------------------------------------------
 namespace
 {
-  class vtkTemp
+class vtkTemp
+{
+public:
+  bool (*Callback)();
+  vtkSMSessionClient* Session;
+  vtkTemp()
+  {
+    this->Callback = NULL;
+    this->Session = NULL;
+  }
+  void OnEvent()
+  {
+    if (this->Callback != NULL)
     {
-  public:
-    bool (*Callback) ();
-    vtkSMSessionClient* Session;
-    vtkTemp()
+      bool continue_waiting = (*this->Callback)();
+      if (!continue_waiting && this->Session)
       {
-      this->Callback = NULL;
-      this->Session = NULL;
+        this->Session->SetAbortConnect(true);
       }
-    void OnEvent()
-      {
-      if (this->Callback != NULL)
-        {
-        bool continue_waiting = (*this->Callback)();
-        if (!continue_waiting && this->Session )
-          {
-          this->Session->SetAbortConnect(true);
-          }
-        }
-      }
-    };
+    }
+  }
+};
 }
 
 //----------------------------------------------------------------------------
@@ -405,33 +396,31 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ReverseConnectToRemote(
-  int dsport, int rsport, bool (*callback)())
+vtkIdType vtkSMSession::ReverseConnectToRemote(int dsport, int rsport, bool (*callback)())
 {
   vtkTemp temp;
   temp.Callback = callback;
 
   std::ostringstream sname;
   if (rsport <= -1)
-    {
+  {
     sname << "csrc://localhost:" << dsport;
-    }
+  }
   else
-    {
-    sname << "cdsrsrc://localhost:" << dsport << "/localhost:"<< rsport;
-    }
+  {
+    sname << "cdsrsrc://localhost:" << dsport << "/localhost:" << rsport;
+  }
 
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   temp.Session = session;
-  unsigned long id = session->AddObserver(vtkCommand::ProgressEvent,
-    &temp, &vtkTemp::OnEvent);
+  unsigned long id = session->AddObserver(vtkCommand::ProgressEvent, &temp, &vtkTemp::OnEvent);
 
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
-    {
+  {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
-    }
+  }
   session->RemoveObserver(id);
   session->Delete();
   return sid;
@@ -440,22 +429,22 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
 unsigned int vtkSMSession::GetRenderClientMode()
 {
   if (this->GetIsAutoMPI())
-    {
+  {
     return vtkSMSession::RENDERING_SPLIT;
-    }
+  }
   if (this->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
-      this->GetController(vtkPVSession::RENDER_SERVER_ROOT))
-    {
+    this->GetController(vtkPVSession::RENDER_SERVER_ROOT))
+  {
     // when the two controller are different, we have a separate render-server
     // and data-server session.
     return vtkSMSession::RENDERING_SPLIT;
-    }
+  }
 
   vtkPVServerInformation* server_info = this->GetServerInformation();
   if (server_info && server_info->GetNumberOfMachines() > 0)
-    {
+  {
     return vtkSMSession::RENDERING_SPLIT;
-    }
+  }
 
   return vtkSMSession::RENDERING_UNIFIED;
 }
@@ -466,32 +455,31 @@ void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
   vtkTypeUInt32 id = message->global_id();
 
   // Find the object for whom this message is meant.
-  vtkSMRemoteObject* remoteObj =
-    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
+  vtkSMRemoteObject* remoteObj = vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
 
-  //cout << "##########     Server notification    ##########" << endl;
-  //cout << id << " = " << remoteObj << "(" << (remoteObj?
+  // cout << "##########     Server notification    ##########" << endl;
+  // cout << id << " = " << remoteObj << "(" << (remoteObj?
   //    remoteObj->GetClassName() : "null") << ")" << endl;
-  //state.PrintDebugString();
-  //cout << "###################################################" << endl;
+  // state.PrintDebugString();
+  // cout << "###################################################" << endl;
 
   // ProcessingRemoteNotification = true prevent
   // "ignore_synchronization" properties to be loaded...
   // Therefore camera properties won't be shared
   // (I don't understand this comment, but copying it from the original code).
-  if(remoteObj)
-    {
+  if (remoteObj)
+  {
     bool previousValue = this->StartProcessingRemoteNotification();
     remoteObj->EnableLocalPushOnly();
     remoteObj->LoadState(message, this->GetProxyLocator());
-    
+
     vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
     if (proxy)
-      {
+    {
       proxy->UpdateVTKObjects();
-      }
+    }
 
     remoteObj->DisableLocalPushOnly();
     this->StopProcessingRemoteNotification(previousValue);
-    }
+  }
 }

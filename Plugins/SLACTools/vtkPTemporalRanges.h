@@ -37,31 +37,28 @@ class vtkPTemporalRanges : public vtkTemporalRanges
 {
 public:
   vtkTypeMacro(vtkPTemporalRanges, vtkTemporalRanges);
-  static vtkPTemporalRanges *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent);
+  static vtkPTemporalRanges* New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  virtual void SetController(vtkMultiProcessController *);
+  virtual void SetController(vtkMultiProcessController*);
 
 protected:
   vtkPTemporalRanges();
   ~vtkPTemporalRanges();
 
-  vtkMultiProcessController *Controller;
+  vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual void Reduce(vtkTable *table);
+  virtual void Reduce(vtkTable* table);
 
 private:
-  vtkPTemporalRanges(const vtkPTemporalRanges &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPTemporalRanges &) VTK_DELETE_FUNCTION;
+  vtkPTemporalRanges(const vtkPTemporalRanges&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPTemporalRanges&) VTK_DELETE_FUNCTION;
 
   class vtkRangeTableReduction;
   friend class vtkRangeTableReduction;
-
 };
 
-#endif //vtkPTemporalRanges_h
+#endif // vtkPTemporalRanges_h

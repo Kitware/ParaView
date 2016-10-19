@@ -38,38 +38,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqOutputPort;
 class pqView;
 
-/// pqFindDataSelectionDisplayFrame is designed to be used by pqFindDataDialog.
-/// pqFindDataDialog uses this class to allow controlling the display properties
-/// for the selection in the active view. Currently, it only support
-/// controlling the display properties for the selection in a render view.
-/// It monitors the active selection by tracking pqSelectionManager as well as
-/// the active view by tracking pqActiveObjects singleton.
+/**
+* pqFindDataSelectionDisplayFrame is designed to be used by pqFindDataDialog.
+* pqFindDataDialog uses this class to allow controlling the display properties
+* for the selection in the active view. Currently, it only support
+* controlling the display properties for the selection in a render view.
+* It monitors the active selection by tracking pqSelectionManager as well as
+* the active view by tracking pqActiveObjects singleton.
+*/
 class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(bool useVerticalLayout
-             READ useVerticalLayout
-             WRITE setUseVerticalLayout)
+  Q_PROPERTY(bool useVerticalLayout READ useVerticalLayout WRITE setUseVerticalLayout)
 
   typedef QWidget Superclass;
+
 public:
-  pqFindDataSelectionDisplayFrame(QWidget* parent=0, Qt::WindowFlags f=0);
+  pqFindDataSelectionDisplayFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqFindDataSelectionDisplayFrame();
 
-  /// pqFindDataSelectionDisplayFrame can be made to lay itself out in a more
-  /// vertical fashion rather than the default, horizontal layout. To use a
-  /// vertical layout, use this method.
+  /**
+  * pqFindDataSelectionDisplayFrame can be made to lay itself out in a more
+  * vertical fashion rather than the default, horizontal layout. To use a
+  * vertical layout, use this method.
+  */
   void setUseVerticalLayout(bool);
   bool useVerticalLayout() const;
 
 public slots:
-  /// Set the output port that is currently selected for which we are
-  /// controlling the selection display properties.
+  /**
+  * Set the output port that is currently selected for which we are
+  * controlling the selection display properties.
+  */
   void setSelectedPort(pqOutputPort*);
 
-  /// set the view in which we are controlling the selection display properties.
-  /// label properties as well as which array to label with affect only the
-  /// active view.
+  /**
+  * set the view in which we are controlling the selection display properties.
+  * label properties as well as which array to label with affect only the
+  * active view.
+  */
   void setView(pqView*);
 
 private slots:
@@ -83,8 +90,10 @@ private slots:
   void showFrustum(bool);
   void onDataUpdated();
 
-  /// List for selection changes and enable/disable UI elements as appropriate.
-  /// \c frustum indicates whether the selection is frustum-based or not.
+  /**
+  * List for selection changes and enable/disable UI elements as appropriate.
+  * \c frustum indicates whether the selection is frustum-based or not.
+  */
   void onSelectionModeChanged(bool frustum);
 
 private:

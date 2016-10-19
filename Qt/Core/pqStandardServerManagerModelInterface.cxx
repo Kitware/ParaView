@@ -70,104 +70,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  //-----------------------------------------------------------------------------
-  inline pqProxy* CreatePQView(
-    const QString& group, const QString& name, vtkSMViewProxy* proxy, pqServer* server)
-    {
-    QObject* parent = NULL;
-    QString xmlname = proxy->GetXMLName();
-    if (xmlname == pqSpreadSheetView::spreadsheetViewType())
-      {
-      return new pqSpreadSheetView(group, name, proxy, server, parent);
-      }
-    if (xmlname == pqMultiSliceView::multiSliceViewType())
-      {
-      return new pqMultiSliceView(
-        xmlname, group, name, proxy, server, parent);
-      }
+//-----------------------------------------------------------------------------
+inline pqProxy* CreatePQView(
+  const QString& group, const QString& name, vtkSMViewProxy* proxy, pqServer* server)
+{
+  QObject* parent = NULL;
+  QString xmlname = proxy->GetXMLName();
+  if (xmlname == pqSpreadSheetView::spreadsheetViewType())
+  {
+    return new pqSpreadSheetView(group, name, proxy, server, parent);
+  }
+  if (xmlname == pqMultiSliceView::multiSliceViewType())
+  {
+    return new pqMultiSliceView(xmlname, group, name, proxy, server, parent);
+  }
 #if defined(PARAVIEW_ENABLE_PYTHON)
-    if (xmlname == pqPythonView::pythonViewType())
-      {
-      return new pqPythonView(xmlname, group, name, proxy, server, parent);
-      }
+  if (xmlname == pqPythonView::pythonViewType())
+  {
+    return new pqPythonView(xmlname, group, name, proxy, server, parent);
+  }
 #endif
-    if (vtkSMRenderViewProxy::SafeDownCast(proxy))
-      {
-      return new pqRenderView(group, name, proxy, server, parent);
-      }
+  if (vtkSMRenderViewProxy::SafeDownCast(proxy))
+  {
+    return new pqRenderView(group, name, proxy, server, parent);
+  }
 
-    if (vtkSMComparativeViewProxy::SafeDownCast(proxy))
-      {
-      if (xmlname == pqComparativeXYBarChartView::chartViewType())
-        {
-        return new pqComparativeXYBarChartView(
-          group, name, vtkSMComparativeViewProxy::SafeDownCast(proxy),
-          server, parent);
-        }
-      if (xmlname == pqComparativeXYChartView::chartViewType())
-        {
-        return new pqComparativeXYChartView(
-          group, name, vtkSMComparativeViewProxy::SafeDownCast(proxy),
-          server, parent);
-        }
-      // Handle the other comparative render views.
-      return new pqComparativeRenderView(
-        group, name, proxy, server, parent);
-      }
-    if (xmlname == "XYChartView" || xmlname == "QuartileChartView")
-      {
-      return new pqXYChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "XYBagChartView")
-      {
-      return new pqXYBagChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "XYBarChartView")
-      {
-      return new pqXYBarChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "XYHistogramChartView")
-      {
-      return new pqXYHistogramChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "BoxChartView")
-      {
-      return new pqBoxChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "XYFunctionalBagChartView")
-      {
-      return new pqXYFunctionalBagChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "ParallelCoordinatesChartView")
-      {
-      return new pqParallelCoordinatesChartView(group, name,
-        vtkSMContextViewProxy::SafeDownCast(proxy),
-        server, parent);
-      }
-    if (xmlname == "PlotMatrixView")
-      {
-      return new pqPlotMatrixView(
-        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-      }
-    return NULL;
+  if (vtkSMComparativeViewProxy::SafeDownCast(proxy))
+  {
+    if (xmlname == pqComparativeXYBarChartView::chartViewType())
+    {
+      return new pqComparativeXYBarChartView(
+        group, name, vtkSMComparativeViewProxy::SafeDownCast(proxy), server, parent);
     }
+    if (xmlname == pqComparativeXYChartView::chartViewType())
+    {
+      return new pqComparativeXYChartView(
+        group, name, vtkSMComparativeViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    // Handle the other comparative render views.
+    return new pqComparativeRenderView(group, name, proxy, server, parent);
+  }
+  if (xmlname == "XYChartView" || xmlname == "QuartileChartView")
+  {
+    return new pqXYChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "XYBagChartView")
+  {
+    return new pqXYBagChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "XYBarChartView")
+  {
+    return new pqXYBarChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "XYHistogramChartView")
+  {
+    return new pqXYHistogramChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "BoxChartView")
+  {
+    return new pqBoxChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "XYFunctionalBagChartView")
+  {
+    return new pqXYFunctionalBagChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "ParallelCoordinatesChartView")
+  {
+    return new pqParallelCoordinatesChartView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  if (xmlname == "PlotMatrixView")
+  {
+    return new pqPlotMatrixView(
+      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+  }
+  return NULL;
+}
 }
 
 //-----------------------------------------------------------------------------
-pqStandardServerManagerModelInterface::pqStandardServerManagerModelInterface(
-  QObject* _parent) : QObject(_parent)
+pqStandardServerManagerModelInterface::pqStandardServerManagerModelInterface(QObject* _parent)
+  : QObject(_parent)
 {
 }
 
@@ -182,64 +171,62 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
 {
   QString xml_type = proxy->GetXMLName();
   if (group == "views" && vtkSMViewProxy::SafeDownCast(proxy))
-    {
+  {
     return CreatePQView(group, name, vtkSMViewProxy::SafeDownCast(proxy), server);
-    }
+  }
   else if (group == "layouts")
-    {
+  {
     return new pqProxy(group, name, proxy, server, NULL);
-    }
+  }
   else if (group == "sources")
-    {
+  {
     if (pqPipelineFilter::getInputPorts(proxy).size() > 0)
-      {
+    {
       return new pqPipelineFilter(name, proxy, server, 0);
-      }
+    }
     else
-      {
+    {
       return new pqPipelineSource(name, proxy, server, 0);
-      }
     }
+  }
   else if (group == "timekeeper")
-    {
+  {
     return new pqTimeKeeper(group, name, proxy, server, 0);
-    }
+  }
   else if (group == "lookup_tables")
-    {
+  {
     return new pqScalarsToColors(group, name, proxy, server, 0);
-    }
+  }
   else if (group == "scalar_bars")
-    {
+  {
     return new pqScalarBarRepresentation(group, name, proxy, server, 0);
-    }
+  }
   else if (group == "representations")
-    {
+  {
     if (proxy->IsA("vtkSMRepresentationProxy") && proxy->GetProperty("Input"))
-      {
+    {
       if (proxy->IsA("vtkSMPVRepresentationProxy") || xml_type == "ImageSliceRepresentation")
-        {
+      {
         // pqPipelineRepresentation is a design flaw! We need to get rid of it
         // and have helper code that manages the crap in that class
         return new pqPipelineRepresentation(group, name, proxy, server, 0);
-        }
+      }
 
       // If everything fails, simply create a pqDataRepresentation object.
       return new pqDataRepresentation(group, name, proxy, server, 0);
-      }
     }
+  }
   else if (group == "animation")
-    {
+  {
     if (xml_type == "AnimationScene")
-      {
+    {
       return new pqAnimationScene(group, name, proxy, server, 0);
-      }
-    else if (xml_type == "KeyFrameAnimationCue" ||
-      xml_type == "CameraAnimationCue" ||
-      xml_type == "TimeAnimationCue" ||
-      xml_type == "PythonAnimationCue")
-      {
-      return new pqAnimationCue(group, name, proxy, server, 0);
-      }
     }
+    else if (xml_type == "KeyFrameAnimationCue" || xml_type == "CameraAnimationCue" ||
+      xml_type == "TimeAnimationCue" || xml_type == "PythonAnimationCue")
+    {
+      return new pqAnimationCue(group, name, proxy, server, 0);
+    }
+  }
   return 0;
 }

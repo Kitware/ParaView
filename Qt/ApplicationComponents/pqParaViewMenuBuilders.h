@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -38,54 +38,75 @@ class QMenu;
 class QWidget;
 class QMainWindow;
 
-/// pqParaViewMenuBuilders provides helper methods to build menus that are
-/// exactly as used by ParaView client. Simply call the appropriate method with
-/// the menu as an argument, and it will be populated with actions and reactions
-/// for standard ParaView behavior.
+/**
+* pqParaViewMenuBuilders provides helper methods to build menus that are
+* exactly as used by ParaView client. Simply call the appropriate method with
+* the menu as an argument, and it will be populated with actions and reactions
+* for standard ParaView behavior.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqParaViewMenuBuilders
 {
 public:
-  /// Builds standard File menu.
+  /**
+  * Builds standard File menu.
+  */
   static void buildFileMenu(QMenu& menu);
 
-  /// Builds the standard Edit menu.
+  /**
+  * Builds the standard Edit menu.
+  */
   static void buildEditMenu(QMenu& menu);
 
-  /// Builds "Sources" menu.
-  /// If you want to automatically add toolbars for sources as requested in the
-  /// configuration pass in a non-null main window.
-  static void buildSourcesMenu(QMenu& menu, QMainWindow* mainWindow =0);
+  /**
+  * Builds "Sources" menu.
+  * If you want to automatically add toolbars for sources as requested in the
+  * configuration pass in a non-null main window.
+  */
+  static void buildSourcesMenu(QMenu& menu, QMainWindow* mainWindow = 0);
 
-  /// Builds "Filters" menu.
-  /// If you want to automatically add toolbars for filters as requested in the
-  /// configuration pass in a non-null main window.
-  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow=0);
+  /**
+  * Builds "Filters" menu.
+  * If you want to automatically add toolbars for filters as requested in the
+  * configuration pass in a non-null main window.
+  */
+  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0);
 
-  /// Builds the "Tools" menu.
+  /**
+  * Builds the "Tools" menu.
+  */
   static void buildToolsMenu(QMenu& menu);
 
-  /// Builds the "Catalyst" menu
+  /**
+  * Builds the "Catalyst" menu
+  */
   static void buildCatalystMenu(QMenu& menu);
 
-  /// Builds the "View" menu. 
+  /**
+  * Builds the "View" menu.
+  */
   static void buildViewMenu(QMenu& menu, QMainWindow& window);
 
-  /// Builds the "Macros" menu. This menu is automatically hidden is python
-  /// support is not enabled.
+  /**
+  * Builds the "Macros" menu. This menu is automatically hidden is python
+  * support is not enabled.
+  */
   static void buildMacrosMenu(QMenu& menu);
 
-  /// Builds the help menu.
+  /**
+  * Builds the help menu.
+  */
   static void buildHelpMenu(QMenu& menu);
 
-  /// Builds the context menu shown over the pipeline browser for some common
-  /// pipeline operations.
+  /**
+  * Builds the context menu shown over the pipeline browser for some common
+  * pipeline operations.
+  */
   static void buildPipelineBrowserContextMenu(QWidget&);
 
-  /// Builds and adds all standard ParaView toolbars.
+  /**
+  * Builds and adds all standard ParaView toolbars.
+  */
   static void buildToolbars(QMainWindow& mainWindow);
-
 };
 
 #endif
-
-

@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIArraySelectionProperty - InformationOnly property
-// .SECTION Description
-// SIProperty that deals with ArraySelection object
+/**
+ * @class   vtkSIArraySelectionProperty
+ * @brief   InformationOnly property
+ *
+ * SIProperty that deals with ArraySelection object
+*/
 
 #ifndef vtkSIArraySelectionProperty_h
 #define vtkSIArraySelectionProperty_h
@@ -35,14 +38,14 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
 private:
   vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

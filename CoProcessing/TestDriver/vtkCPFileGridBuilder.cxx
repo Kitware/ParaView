@@ -47,80 +47,76 @@ vtkDataObject* vtkCPFileGridBuilder::GetGrid()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkCPFileGridBuilder::GetGrid(
-  unsigned long timeStep, double time, int & builtNewGrid)
+vtkDataObject* vtkCPFileGridBuilder::GetGrid(unsigned long timeStep, double time, int& builtNewGrid)
 {
   builtNewGrid = 0;
-  if(this->FileName == 0)
-    {
+  if (this->FileName == 0)
+  {
     vtkWarningMacro("FileName is not set.");
     return 0;
-    }
+  }
 
   vtkCPBaseFieldBuilder* fieldBuilder = this->GetFieldBuilder();
-  if(fieldBuilder == 0 && this->KeepPointData == 0 && this->KeepCellData == 0)
-    {
+  if (fieldBuilder == 0 && this->KeepPointData == 0 && this->KeepCellData == 0)
+  {
     vtkWarningMacro("Need field data.");
     return 0;
-    }
+  }
 
-  if(!this->KeepPointData)
+  if (!this->KeepPointData)
+  {
+    if (this->Grid->IsA("vtkCompositeDataSet"))
     {
-    if(this->Grid->IsA("vtkCompositeDataSet"))
-      {
-      vtkCompositeDataIterator* iter =
-        vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
+      vtkCompositeDataIterator* iter = vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
       iter->SkipEmptyNodesOn();
-      for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
-        {
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
         vtkDataSet::SafeDownCast(iter->GetCurrentDataObject())->GetPointData()->Initialize();
-        }
-      iter->Delete();
       }
+      iter->Delete();
+    }
     else
-      {
+    {
       vtkDataSet::SafeDownCast(this->Grid)->GetPointData()->Initialize();
-      }
     }
+  }
 
-  if(!this->KeepCellData)
+  if (!this->KeepCellData)
+  {
+    if (this->Grid->IsA("vtkCompositeDataSet"))
     {
-    if(this->Grid->IsA("vtkCompositeDataSet"))
-      {
-      vtkCompositeDataIterator* iter =
-        vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
+      vtkCompositeDataIterator* iter = vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
       iter->SkipEmptyNodesOn();
-      for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
-        {
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
         vtkDataSet::SafeDownCast(iter->GetCurrentDataObject())->GetCellData()->Initialize();
-        }
+      }
       iter->Delete();
-      }
-    else
-      {
-      vtkDataSet::SafeDownCast(this->Grid)->GetCellData()->Initialize();
-      }
     }
-
-  if(fieldBuilder)
+    else
     {
-    if(this->Grid->IsA("vtkCompositeDataSet"))
-      {
-      vtkCompositeDataIterator* iter =
-        vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
-      iter->SkipEmptyNodesOn();
-      for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
-        {
-        fieldBuilder->BuildField(timeStep, time,
-                       vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
-        }
-      iter->Delete();
-      }
-    else
-      {
-      fieldBuilder->BuildField(timeStep, time, vtkDataSet::SafeDownCast(this->Grid));
-      }
+      vtkDataSet::SafeDownCast(this->Grid)->GetCellData()->Initialize();
     }
+  }
+
+  if (fieldBuilder)
+  {
+    if (this->Grid->IsA("vtkCompositeDataSet"))
+    {
+      vtkCompositeDataIterator* iter = vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
+      iter->SkipEmptyNodesOn();
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+        fieldBuilder->BuildField(
+          timeStep, time, vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
+      }
+      iter->Delete();
+    }
+    else
+    {
+      fieldBuilder->BuildField(timeStep, time, vtkDataSet::SafeDownCast(this->Grid));
+    }
+  }
   builtNewGrid = 1;
   return this->Grid;
 }

@@ -52,14 +52,14 @@ Ph.D. thesis of Christian BOUCHENY.
 //////////////////////////////////////////////////////////////////////////
 
 /**************************************************/
-uniform sampler2D    s2_C;
-uniform sampler2D    s2_Z;
+uniform sampler2D s2_C;
+uniform sampler2D s2_Z;
 /**************************************************/
 
-void main (void)
+void main(void)
 {
-  vec4  color  = texture2D(s2_C,gl_TexCoord[0].st);
-  float z      = texture2D(s2_Z,gl_TexCoord[0].st).r;
+  vec4 color = texture2D(s2_C, gl_TexCoord[0].st);
+  float z = texture2D(s2_Z, gl_TexCoord[0].st).r;
 
   gl_FragColor = color * z;
   gl_FragDepth = z;

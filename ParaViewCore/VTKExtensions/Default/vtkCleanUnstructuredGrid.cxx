@@ -48,31 +48,28 @@ void vtkCleanUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkCleanUnstructuredGrid::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+int vtkCleanUnstructuredGrid::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkUnstructuredGrid *output= vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid* output =
+    vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   if (input->GetNumberOfCells() == 0)
-    {
+  {
     // set up a ugrid with same data arrays as input, but
     // no points, cells or data.
     output->Allocate(1);
     output->GetPointData()->CopyAllocate(input->GetPointData(), VTK_CELL_SIZE);
     output->GetCellData()->CopyAllocate(input->GetCellData(), 1);
-    vtkPoints *pts = vtkPoints::New();
+    vtkPoints* pts = vtkPoints::New();
     output->SetPoints(pts);
     pts->Delete();
     return 1;
-    }
+  }
 
   output->GetPointData()->CopyAllocate(input->GetPointData());
   output->GetCellData()->PassData(input->GetCellData());
@@ -90,64 +87,62 @@ int vtkCleanUnstructuredGrid::RequestData(
 
   vtkIdType progressStep = num / 100;
   if (progressStep == 0)
-    {
+  {
     progressStep = 1;
-    }
+  }
   for (id = 0; id < num; ++id)
-    {
+  {
     if (id % progressStep == 0)
-      {
-      this->UpdateProgress(0.8*((float)id/num));
-      }
+    {
+      this->UpdateProgress(0.8 * ((float)id / num));
+    }
     input->GetPoint(id, pt);
     if (this->Locator->InsertUniquePoint(pt, newId))
-      {
-      output->GetPointData()->CopyData(input->GetPointData(),id,newId);
-      }
-    ptMap[id] = newId;
+    {
+      output->GetPointData()->CopyData(input->GetPointData(), id, newId);
     }
+    ptMap[id] = newId;
+  }
   output->SetPoints(newPts);
   newPts->Delete();
 
   // Now copy the cells.
-  vtkIdList *cellPoints = vtkIdList::New();
+  vtkIdList* cellPoints = vtkIdList::New();
   num = input->GetNumberOfCells();
   output->Allocate(num);
   for (id = 0; id < num; ++id)
-    {
+  {
     if (id % progressStep == 0)
-      {
-      this->UpdateProgress(0.8+0.2*((float)id/num));
-      }
+    {
+      this->UpdateProgress(0.8 + 0.2 * ((float)id / num));
+    }
     // special handling for polyhedron cells
-    if (vtkUnstructuredGrid::SafeDownCast(input) &&
-        input->GetCellType(id) == VTK_POLYHEDRON)
-      {
+    if (vtkUnstructuredGrid::SafeDownCast(input) && input->GetCellType(id) == VTK_POLYHEDRON)
+    {
       vtkUnstructuredGrid::SafeDownCast(input)->GetFaceStream(id, cellPoints);
       vtkUnstructuredGrid::ConvertFaceStreamPointIds(cellPoints, ptMap);
-      }
-    else    
-      {
+    }
+    else
+    {
       input->GetCellPoints(id, cellPoints);
-      for (int i=0; i < cellPoints->GetNumberOfIds(); i++)
-        {
+      for (int i = 0; i < cellPoints->GetNumberOfIds(); i++)
+      {
         int cellPtId = cellPoints->GetId(i);
         newId = ptMap[cellPtId];
         cellPoints->SetId(i, newId);
-        }
       }
-    output->InsertNextCell(input->GetCellType(id), cellPoints);
     }
+    output->InsertNextCell(input->GetCellType(id), cellPoints);
+  }
 
-  delete [] ptMap;
+  delete[] ptMap;
   cellPoints->Delete();
   output->Squeeze();
 
   return 1;
 }
 
-int vtkCleanUnstructuredGrid::FillInputPortInformation(int vtkNotUsed(port),
-                                                       vtkInformation *info)
+int vtkCleanUnstructuredGrid::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;

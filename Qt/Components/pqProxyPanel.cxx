@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -61,18 +61,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxyPanel::pqImplementation
 {
 public:
-  pqImplementation(vtkSMProxy* pxy) : Proxy(pxy)
+  pqImplementation(vtkSMProxy* pxy)
+    : Proxy(pxy)
   {
-  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  this->InformationObsolete = true;
-  this->Selected = false;
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->InformationObsolete = true;
+    this->Selected = false;
   }
-  
-  ~pqImplementation()
-  {
-    delete this->PropertyManager;
-  }
-  
+
+  ~pqImplementation() { delete this->PropertyManager; }
+
   vtkSmartPointer<vtkSMProxy> Proxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPropertyManager* PropertyManager;
@@ -80,18 +78,18 @@ public:
 
   // Flag indicating to the best of our knowledge, the information properties
   // and domains are not up-to-date since the proxy was modified since the last
-  // time we updated the properties and their domains. This is just a guess, 
+  // time we updated the properties and their domains. This is just a guess,
   // to reduce number of updates information calls.
   bool InformationObsolete;
- 
+
   // Indicates if the panel is currently selected.
   bool Selected;
 };
 
 //-----------------------------------------------------------------------------
-pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
-  QWidget(p),
-  Implementation(new pqImplementation(pxy))
+pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p)
+  : QWidget(p)
+  , Implementation(new pqImplementation(pxy))
 {
   // Just make sure that the proxy is setup properly.
   this->Implementation->Proxy->UpdateVTKObjects();
@@ -99,17 +97,14 @@ pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
 
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
-  QObject::connect(this->Implementation->PropertyManager,
-                   SIGNAL(modified()),
-                   this, SLOT(setModified()));
+  QObject::connect(
+    this->Implementation->PropertyManager, SIGNAL(modified()), this, SLOT(setModified()));
 
   this->Implementation->VTKConnect->Connect(
-    this->Implementation->Proxy, vtkCommand::ModifiedEvent,
-    this, SLOT(proxyModifiedEvent()));
+    this->Implementation->Proxy, vtkCommand::ModifiedEvent, this, SLOT(proxyModifiedEvent()));
 
   this->Implementation->VTKConnect->Connect(
-    this->Implementation->Proxy, vtkCommand::UpdateDataEvent,
-    this, SLOT(dataUpdated()));
+    this->Implementation->Proxy, vtkCommand::UpdateDataEvent, this, SLOT(dataUpdated()));
 }
 
 //-----------------------------------------------------------------------------
@@ -141,9 +136,9 @@ void pqProxyPanel::dataUpdated()
 {
   this->Implementation->InformationObsolete = true;
   if (this->Implementation->Selected)
-    {
+  {
     this->updateInformationAndDomains();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -158,9 +153,8 @@ QSize pqProxyPanel::sizeHint() const
   opt.rect = rect();
   opt.palette = palette();
   opt.state = QStyle::State_None;
-  return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).
-                                    expandedTo(QApplication::globalStrut()), 
-                                    this));
+  return (style()->sizeFromContents(
+    QStyle::CT_LineEdit, &opt, QSize(w, h).expandedTo(QApplication::globalStrut()), this));
 }
 
 //-----------------------------------------------------------------------------
@@ -177,9 +171,9 @@ void pqProxyPanel::accept()
   this->Implementation->PropertyManager->accept();
 
   if (this->Implementation->Selected)
-    {
+  {
     this->updateInformationAndDomains();
-    }
+  }
 
   emit this->onaccept();
 }
@@ -209,14 +203,14 @@ void pqProxyPanel::deselect()
   this->Implementation->Selected = false;
   emit this->ondeselect();
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqProxyPanel::setView(pqView* rm)
 {
-  if(this->Implementation->View == rm)
-    {
+  if (this->Implementation->View == rm)
+  {
     return;
-    }
+  }
 
   this->Implementation->View = rm;
   emit this->viewChanged(this->Implementation->View);
@@ -238,24 +232,24 @@ void pqProxyPanel::proxyModifiedEvent()
 //-----------------------------------------------------------------------------
 // Update information properties and domains. Since this is not a
 // particularly fast operation, we update the information and domains
-// only when the panel is selected or an already active panel is 
-// accepted. 
+// only when the panel is selected or an already active panel is
+// accepted.
 void pqProxyPanel::updateInformationAndDomains()
 {
   if (this->Implementation->InformationObsolete)
-    {
+  {
     vtkSMSourceProxy* sp;
     sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy);
-    if(sp)
-      {
+    if (sp)
+    {
       sp->UpdatePipelineInformation();
-      }
-    else
-      {
-      this->Implementation->Proxy->UpdatePropertyInformation();
-      }
-    this->Implementation->InformationObsolete = false;
     }
+    else
+    {
+      this->Implementation->Proxy->UpdatePropertyInformation();
+    }
+    this->Implementation->InformationObsolete = false;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -273,37 +267,37 @@ bool pqProxyPanel::event(QEvent* e)
   //  with tooltips set (auto panel or not)
   //  if a custom panel doesn't name its widgets to match the SM property,
   //  no tooltip will be shown
-  if(!e->isAccepted() && e->type() == QEvent::ToolTip)
-    {
+  if (!e->isAccepted() && e->type() == QEvent::ToolTip)
+  {
     QHelpEvent* he = static_cast<QHelpEvent*>(e);
     // find the sm property this mouse is over
     QWidget* w = QApplication::widgetAt(he->globalPos());
-    if(this->isAncestorOf(w))
-      {
+    if (this->isAncestorOf(w))
+    {
       vtkSMProperty* smProperty = NULL;
-      for(; !smProperty && w != this; w = w->parentWidget())
-        {
+      for (; !smProperty && w != this; w = w->parentWidget())
+      {
         QString name = w->objectName();
         int trimIndex = name.lastIndexOf(QRegExp("_[0-9]*$"));
-        if(trimIndex != -1)
-          {
-          name = name.left(trimIndex);
-          }
-        smProperty = this->Implementation->Proxy->GetProperty(name.toLatin1().data());
-        }
-
-      if(smProperty)
+        if (trimIndex != -1)
         {
+          name = name.left(trimIndex);
+        }
+        smProperty = this->Implementation->Proxy->GetProperty(name.toLatin1().data());
+      }
+
+      if (smProperty)
+      {
         vtkSMDocumentation* doc = smProperty->GetDocumentation();
-        if(doc)
-          {
-          QToolTip::showText(he->globalPos(), QString("<p>%1</p>").arg(doc->GetDescription()), this);
+        if (doc)
+        {
+          QToolTip::showText(
+            he->globalPos(), QString("<p>%1</p>").arg(doc->GetDescription()), this);
           ret = true;
           e->setAccepted(true);
-          }
         }
       }
     }
+  }
   return ret;
 }
-

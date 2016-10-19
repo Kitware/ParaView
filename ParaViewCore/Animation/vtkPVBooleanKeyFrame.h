@@ -12,28 +12,30 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVBooleanKeyFrame
-// .SECTION Description
-// Empty key frame. Can be used to toggle boolean properties.
+/**
+ * @class   vtkPVBooleanKeyFrame
+ *
+ * Empty key frame. Can be used to toggle boolean properties.
+*/
 
 #ifndef vtkPVBooleanKeyFrame_h
 #define vtkPVBooleanKeyFrame_h
 
 #include "vtkPVKeyFrame.h"
 
-class VTKPVANIMATION_EXPORT vtkPVBooleanKeyFrame: public vtkPVKeyFrame
+class VTKPVANIMATION_EXPORT vtkPVBooleanKeyFrame : public vtkPVKeyFrame
 {
 public:
   vtkTypeMacro(vtkPVBooleanKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVBooleanKeyFrame* New();
 
-  // Description:
-  // This method will do the actual interpolation.
-  // currenttime is normalized to the time range between
-  // this key frame and the next key frame.
-  virtual void UpdateValue(double currenttime,
-    vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next);
+  /**
+   * This method will do the actual interpolation.
+   * currenttime is normalized to the time range between
+   * this key frame and the next key frame.
+   */
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next);
 
 protected:
   vtkPVBooleanKeyFrame();
@@ -42,6 +44,5 @@ protected:
 private:
   vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
-
 };
 #endif

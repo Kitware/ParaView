@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,52 +40,71 @@ class vtkSMProxy;
 class vtkSMProperty;
 class vtkEventQtSlotConnect;
 
-/// pqComparativeVisPanel is a properties page for the comparative view. It
-/// allows the user to change the layout of the grid as well as add/remove
-/// parameters to compare in the view.
+/**
+* pqComparativeVisPanel is a properties page for the comparative view. It
+* allows the user to change the layout of the grid as well as add/remove
+* parameters to compare in the view.
+*/
 class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
+
 public:
-  pqComparativeVisPanel(QWidget* parent=0);
+  pqComparativeVisPanel(QWidget* parent = 0);
   ~pqComparativeVisPanel();
 
-  /// Access the current view being shown by this panel.
+  /**
+  * Access the current view being shown by this panel.
+  */
   pqView* view() const;
 
 public slots:
-  /// Set the view to shown in this panel. If the view is not a comparative view
-  /// then the panel will be disabled, otherwise, it shows the properties of the
-  /// view.
+  /**
+  * Set the view to shown in this panel. If the view is not a comparative view
+  * then the panel will be disabled, otherwise, it shows the properties of the
+  * view.
+  */
   void setView(pqView*);
 
 protected slots:
-  ///// If vtkSMProxy has a TimestepValues property then this method will set the
-  ///// TimeRange property of vtkSMComparativeViewProxy to reflect the values.
-  //void setTimeRangeFromSource(vtkSMProxy*);
+  /**
+  * If vtkSMProxy has a TimestepValues property then this method will set the
+  * TimeRange property of vtkSMComparativeViewProxy to reflect the values.
+  */
+  // void setTimeRangeFromSource(vtkSMProxy*);
 
-  /// Called when the "+" button is clicked to add a new parameter.
+  /**
+  * Called when the "+" button is clicked to add a new parameter.
+  */
   void addParameter();
 
-  /// Updates the list of animated parameters from the proxy.
+  /**
+  * Updates the list of animated parameters from the proxy.
+  */
   void updateParametersList();
 
-  /// Called when the selection in the active parameters widget changes.
+  /**
+  * Called when the selection in the active parameters widget changes.
+  */
   void parameterSelectionChanged();
 
   void sizeUpdated();
 
-  /// Triggered when user clicks the delete button to remove a parameter.
+  /**
+  * Triggered when user clicks the delete button to remove a parameter.
+  */
   void removeParameter(int index);
 
 protected:
-  //void activateCue(vtkSMProperty* cuesProperty, 
-  //vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+  // void activateCue(vtkSMProperty* cuesProperty,
+  // vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 
-  /// Finds the row (-1 if none found) for the given (proxy,property).
-  int findRow(
-    vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+  /**
+  * Finds the row (-1 if none found) for the given (proxy,property).
+  */
+  int findRow(vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+
 private:
   Q_DISABLE_COPY(pqComparativeVisPanel)
 
@@ -95,5 +114,3 @@ private:
 };
 
 #endif
-
-

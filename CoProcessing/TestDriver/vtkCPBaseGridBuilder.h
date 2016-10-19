@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPBaseGridBuilder - Abstract class for creating grids.
-// .SECTION Description
-// Abstract class for creating grids for a test driver.  
+/**
+ * @class   vtkCPBaseGridBuilder
+ * @brief   Abstract class for creating grids.
+ *
+ * Abstract class for creating grids for a test driver.
+*/
 
 #ifndef vtkCPBaseGridBuilder_h
 #define vtkCPBaseGridBuilder_h
@@ -30,11 +33,11 @@ public:
   vtkTypeMacro(vtkCPBaseGridBuilder, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return a grid.  BuiltNewGrid is 0 if the grid is the same
-  // as the last time step.
-  virtual vtkDataObject* GetGrid(unsigned long TimeStep, double Time,
-                                 int & BuiltNewGrid) = 0;
+  /**
+   * Return a grid.  BuiltNewGrid is 0 if the grid is the same
+   * as the last time step.
+   */
+  virtual vtkDataObject* GetGrid(unsigned long TimeStep, double Time, int& BuiltNewGrid) = 0;
 
   // maybe also have a subdivide grid cells here as well
 

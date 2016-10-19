@@ -31,29 +31,31 @@ void fillArray(vtkDoubleArray* array, double* dataPointer, int dataSize, const c
   array->SetName(name);
   array->SetNumberOfComponents(1);
   array->Allocate(dataSize);
-  for(int i=0;i<dataSize;i++)
-    {
+  for (int i = 0; i < dataSize; i++)
+  {
     array->InsertNextTuple1(dataPointer[i]);
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
 // Return true if both array are equals
-bool compareArray(vtkTable* table, const char* arrayName, double* dataPointer, int dataSize, bool print)
+bool compareArray(
+  vtkTable* table, const char* arrayName, double* dataPointer, int dataSize, bool print)
 {
   vtkDoubleArray* array = vtkDoubleArray::SafeDownCast(table->GetColumnByName(arrayName));
-  if(!array)
+  if (!array)
     return false;
 
-  if(dataSize != array->GetNumberOfTuples())
+  if (dataSize != array->GetNumberOfTuples())
     return false;
 
-  for(int i=0;i<dataSize;i++)
-    {
-    if(print) cout << "Sorted value: " << array->GetValue(i) << " expected " << dataPointer[i] << endl;
-    if(array->GetValue(i) != dataPointer[i])
+  for (int i = 0; i < dataSize; i++)
+  {
+    if (print)
+      cout << "Sorted value: " << array->GetValue(i) << " expected " << dataPointer[i] << endl;
+    if (array->GetValue(i) != dataPointer[i])
       return false;
-    }
+  }
 
   return true;
 }
@@ -62,15 +64,17 @@ bool compareArray(vtkTable* table, const char* arrayName, double* dataPointer, i
 int sortWithSimilarValues(bool debug)
 {
   const int size = 10;
-  double dataArray[size] =   { 0,1,2,1,3,1,3,1,2,100000 };
-  double sortedArray[size] = { 0,1,1,1,1,2,2,3,3,100000 };
+  double dataArray[size] = { 0, 1, 2, 1, 3, 1, 3, 1, 2, 100000 };
+  double sortedArray[size] = { 0, 1, 1, 1, 1, 2, 2, 3, 3, 100000 };
 
   vtkSmartPointer<vtkDoubleArray> dataToSort = vtkSmartPointer<vtkDoubleArray>::New();
   fillArray(dataToSort.GetPointer(), dataArray, size, "data");
 
   vtkSmartPointer<vtkTable> input = vtkSmartPointer<vtkTable>::New();
-  input->AddColumn(dataToSort);;
-  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
+  input->AddColumn(dataToSort);
+  ;
+  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter =
+    vtkSmartPointer<vtkSortedTableStreamer>::New();
 
   sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(0);
@@ -80,10 +84,10 @@ int sortWithSimilarValues(bool debug)
   sortingfilter->SetBlockSize(1024);
   sortingfilter->Update();
 
-  if(!compareArray(sortingfilter->GetOutput(), "data", sortedArray, size, debug))
-    {
+  if (!compareArray(sortingfilter->GetOutput(), "data", sortedArray, size, debug))
+  {
     return EXIT_FAILURE;
-    }
+  }
 
   return EXIT_SUCCESS;
 }
@@ -95,17 +99,19 @@ int sortWithEpsilonValues(bool debug)
   const int size = 10;
   double dataArray[size];
   double sortedArray[size];
-  for(int i=0;i<size;i++)
-    {
-    dataArray[size - i - 1] = sortedArray[i] = 10 + epsilon * i ;
-    }
+  for (int i = 0; i < size; i++)
+  {
+    dataArray[size - i - 1] = sortedArray[i] = 10 + epsilon * i;
+  }
 
   vtkSmartPointer<vtkDoubleArray> dataToSort = vtkSmartPointer<vtkDoubleArray>::New();
   fillArray(dataToSort.GetPointer(), dataArray, size, "data");
 
   vtkSmartPointer<vtkTable> input = vtkSmartPointer<vtkTable>::New();
-  input->AddColumn(dataToSort);;
-  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
+  input->AddColumn(dataToSort);
+  ;
+  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter =
+    vtkSmartPointer<vtkSortedTableStreamer>::New();
 
   sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(0);
@@ -115,10 +121,10 @@ int sortWithEpsilonValues(bool debug)
   sortingfilter->SetBlockSize(1024);
   sortingfilter->Update();
 
-  if(!compareArray(sortingfilter->GetOutput(), "data", sortedArray, size, debug))
-    {
+  if (!compareArray(sortingfilter->GetOutput(), "data", sortedArray, size, debug))
+  {
     return EXIT_FAILURE;
-    }
+  }
 
   return EXIT_SUCCESS;
 }
@@ -130,20 +136,22 @@ int sortMagnitudeOnUnsignedCharVector()
   dataToSort->SetNumberOfComponents(3);
   dataToSort->SetName("data");
   dataToSort->Allocate(3 * 128 * 128 * 128);
-  for(int r=0;r<256;r+=2)
+  for (int r = 0; r < 256; r += 2)
+  {
+    for (int g = 0; g < 256; g += 2)
     {
-    for(int g=0;g<256;g+=2)
+      for (int b = 0; b < 256; b += 2)
       {
-      for(int b=0;b<256;b+=2)
-        {
-        dataToSort->InsertNextTuple3(r,g,b);
-        }
+        dataToSort->InsertNextTuple3(r, g, b);
       }
     }
+  }
 
   vtkSmartPointer<vtkTable> input = vtkSmartPointer<vtkTable>::New();
-  input->AddColumn(dataToSort);;
-  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
+  input->AddColumn(dataToSort);
+  ;
+  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter =
+    vtkSmartPointer<vtkSortedTableStreamer>::New();
 
   sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(-1); // Magnitude
@@ -157,7 +165,7 @@ int sortMagnitudeOnUnsignedCharVector()
 }
 
 // ----------------------------------------------------------------------------
-int TestSortingTable(int vtkNotUsed(argc), char **vtkNotUsed(argv))
+int TestSortingTable(int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   // Create Fake MPI controller
   vtkDummyController* ctrl = vtkDummyController::New();
@@ -167,17 +175,13 @@ int TestSortingTable(int vtkNotUsed(argc), char **vtkNotUsed(argv))
 
   // --------------------------------------------------------------------------
   cout << "Testing sorting with similar values: "
-       << ((result += sortWithSimilarValues(debug)) ? "FAILED" :  "SUCCESS")
-       << endl;
+       << ((result += sortWithSimilarValues(debug)) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
   cout << "Testing sorting with epsilon values: "
-       << ((result += sortWithEpsilonValues(debug)) ? "FAILED" :  "SUCCESS")
-       << endl;
+       << ((result += sortWithEpsilonValues(debug)) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
   cout << "Testing sorting with magnitude on unsigned char: "
-       << ((result += sortMagnitudeOnUnsignedCharVector())
-           ? "FAILED" :  "SUCCESS")
-       << endl;
+       << ((result += sortMagnitudeOnUnsignedCharVector()) ? "FAILED" : "SUCCESS") << endl;
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 

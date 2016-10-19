@@ -57,19 +57,19 @@ class pqFindDataCurrentSelectionFrame::pqInternals
   QPointer<pqOutputPort> ShowingPort;
 
   void deleteSpreadSheet()
-    {
+  {
     this->ViewProxy = NULL;
     this->RepresentationProxy = NULL;
     delete this->Model;
     this->Ui.spreadsheet->setModel(NULL);
-    }
+  }
 
 public:
   Ui::FindDataCurrentSelectionFrame Ui;
   QPointer<pqSelectionManager> SelectionManager;
 
   pqInternals(pqFindDataCurrentSelectionFrame* self)
-    {
+  {
     this->SelectionManager = qobject_cast<pqSelectionManager*>(
       pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
 
@@ -81,42 +81,38 @@ public:
 
     self->connect(this->SelectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
       SLOT(showSelectedData(pqOutputPort*)));
-    self->connect(this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)),
-      SLOT(updateFieldType()));
-    self->connect(this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)),
-      SLOT(invertSelection(bool)));
+    self->connect(
+      this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(updateFieldType()));
+    self->connect(
+      this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)), SLOT(invertSelection(bool)));
 
     this->showSelectedData(this->SelectionManager->getSelectedPort(), self);
-    }
+  }
 
-  ~pqInternals()
-    {
-    this->deleteSpreadSheet();
-    }
+  ~pqInternals() { this->deleteSpreadSheet(); }
 
   //---------------------------------------------------------------------------
   // setup the proxies needed for the spreadsheet view.
   // we will create a new view/representation is server changes, otherwise
   // we'll reuse the old one.
   void setupSpreadsheet(pqServer* server)
-    {
+  {
     if (server == NULL)
-      {
+    {
       this->deleteSpreadSheet();
       return;
-      }
+    }
 
     Q_ASSERT(server != NULL);
 
     if (this->ViewProxy && this->ViewProxy->GetSession() != server->session())
-      {
+    {
       this->deleteSpreadSheet();
-      }
+    }
 
-    Q_ASSERT(this->ViewProxy == NULL ||
-      (this->ViewProxy->GetSession() == server->session()));
+    Q_ASSERT(this->ViewProxy == NULL || (this->ViewProxy->GetSession() == server->session()));
     if (!this->ViewProxy)
-      {
+    {
       vtkSMSessionProxyManager* pxm = server->proxyManager();
 
       vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
@@ -126,8 +122,8 @@ public:
       vtkSMPropertyHelper(repr, "CompositeDataSetIndex").Set(0);
       repr->UpdateVTKObjects();
 
-      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
-        pxm->NewProxy("views", "SpreadSheetView"));
+      vtkSMViewProxy* view =
+        vtkSMViewProxy::SafeDownCast(pxm->NewProxy("views", "SpreadSheetView"));
       view->PrototypeOn();
       vtkSMPropertyHelper(view, "SelectionOnly").Set(1);
       vtkSMPropertyHelper(view, "Representations").Set(repr);
@@ -142,40 +138,38 @@ public:
       this->Model->setActiveRepresentationProxy(repr);
 
       this->Ui.spreadsheet->setModel(this->Model);
-      }
     }
+  }
 
   //---------------------------------------------------------------------------
   void showSelectedData(pqOutputPort* port, pqFindDataCurrentSelectionFrame* self)
-    {
+  {
     bool new_selection = (port != this->ShowingPort);
 
     if (this->ShowingPort)
-      {
+    {
       self->disconnect(this->ShowingPort->getSource());
-      }
+    }
     this->ShowingPort = port;
     if (port)
-      {
-      self->connect(port->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)),
-        SLOT(updateSpreadSheet()));
-      }
-    this->setupSpreadsheet(port? port->getServer(): NULL);
+    {
+      self->connect(
+        port->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)), SLOT(updateSpreadSheet()));
+    }
+    this->setupSpreadsheet(port ? port->getServer() : NULL);
 
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
-    pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(
-      this->Ui.showTypeComboBox, port);
+    pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
     this->Ui.showTypeComboBox->blockSignals(prev);
     this->Ui.invertSelectionCheckBox->setEnabled(port != NULL);
     if (port)
-      {
-      vtkSMPropertyHelper(this->RepresentationProxy, "Input").Set(
-        port->getSource()->getProxy(),
-        port->getPortNumber());
+    {
+      vtkSMPropertyHelper(this->RepresentationProxy, "Input")
+        .Set(port->getSource()->getProxy(), port->getPortNumber());
 
-      vtkSMSourceProxy *selectionSource = port->getSelectionInput();
+      vtkSMSourceProxy* selectionSource = port->getSelectionInput();
       if (new_selection && selectionSource)
-        {
+      {
         // if the selection is a new one, we try to show the element type more
         // appropriate based on the type of selection itself, i.e. if points are
         // being selected, show points. If cells are being selected show cells.
@@ -186,54 +180,53 @@ public:
           vtkSelectionNode::ConvertSelectionFieldToAttributeType(
             vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt()));
         if (index != -1)
-          {
+        {
           prev = this->Ui.showTypeComboBox->blockSignals(true);
           this->Ui.showTypeComboBox->setCurrentIndex(index);
           this->Ui.showTypeComboBox->blockSignals(prev);
-          }
         }
+      }
       this->updateFieldType();
 
-      bool checked = selectionSource &&
-        (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
+      bool checked =
+        selectionSource && (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
       prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
       this->Ui.invertSelectionCheckBox->setChecked(checked);
       this->Ui.invertSelectionCheckBox->blockSignals(prev);
-      }
     }
+  }
 
   //---------------------------------------------------------------------------
   // update the field the spreadsheet is showing based on the value of the
   // combobox.
   void updateFieldType()
-    {
+  {
     if (this->RepresentationProxy)
-      {
-      int fieldType = this->Ui.showTypeComboBox->itemData(
-        this->Ui.showTypeComboBox->currentIndex()).toInt();
-      vtkSMPropertyHelper(this->RepresentationProxy,
-        "FieldAssociation").Set(fieldType);
+    {
+      int fieldType =
+        this->Ui.showTypeComboBox->itemData(this->Ui.showTypeComboBox->currentIndex()).toInt();
+      vtkSMPropertyHelper(this->RepresentationProxy, "FieldAssociation").Set(fieldType);
       this->RepresentationProxy->UpdateVTKObjects();
       this->ViewProxy->StillRender();
-      }
     }
+  }
 
   void updateSpreadSheet()
-    {
+  {
     if (this->ViewProxy)
-      {
+    {
       this->ViewProxy->StillRender();
-      }
     }
+  }
 
-  pqOutputPort* showingPort() const { return this->ShowingPort;}
+  pqOutputPort* showingPort() const { return this->ShowingPort; }
 };
 
 //-----------------------------------------------------------------------------
 pqFindDataCurrentSelectionFrame::pqFindDataCurrentSelectionFrame(
   QWidget* parentObject, Qt::WindowFlags wflags)
-  : Superclass(parentObject, wflags),
-  Internals(new pqInternals(this))
+  : Superclass(parentObject, wflags)
+  , Internals(new pqInternals(this))
 {
 }
 
@@ -266,25 +259,25 @@ void pqFindDataCurrentSelectionFrame::updateFieldType()
 //-----------------------------------------------------------------------------
 void pqFindDataCurrentSelectionFrame::invertSelection(bool val)
 {
-  Ui::FindDataCurrentSelectionFrame &ui = this->Internals->Ui;
+  Ui::FindDataCurrentSelectionFrame& ui = this->Internals->Ui;
   ui.invertSelectionCheckBox->blockSignals(true);
   ui.invertSelectionCheckBox->setChecked(val);
   ui.invertSelectionCheckBox->blockSignals(false);
 
   pqOutputPort* port = this->showingPort();
   if (port)
-    {
-    vtkSMSourceProxy *selectionSource = port->getSelectionInput();
+  {
+    vtkSMSourceProxy* selectionSource = port->getSelectionInput();
     if (selectionSource)
-      {
-      vtkSMPropertyHelper(selectionSource, "InsideOut").Set(val? 1 : 0);
+    {
+      vtkSMPropertyHelper(selectionSource, "InsideOut").Set(val ? 1 : 0);
       selectionSource->UpdateVTKObjects();
       port->renderAllViews();
 
       // update spread sheet
       this->Internals->updateSpreadSheet();
-      }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------

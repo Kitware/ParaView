@@ -43,8 +43,7 @@ vtkChartSelectionRepresentation::~vtkChartSelectionRepresentation()
 }
 
 //----------------------------------------------------------------------------
-void vtkChartSelectionRepresentation::SetChartRepresentation(
-  vtkChartRepresentation* repr)
+void vtkChartSelectionRepresentation::SetChartRepresentation(vtkChartRepresentation* repr)
 {
   this->ChartRepresentation = repr;
 }
@@ -60,11 +59,11 @@ bool vtkChartSelectionRepresentation::AddToView(vtkView* view)
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(view);
   if (pvview)
-    {
+  {
     this->ContextView = pvview;
     this->EnableServerSideRendering = pvview->InTileDisplayMode();
     return this->Superclass::AddToView(view);
-    }
+  }
   return false;
 }
 
@@ -72,11 +71,11 @@ bool vtkChartSelectionRepresentation::AddToView(vtkView* view)
 bool vtkChartSelectionRepresentation::RemoveFromView(vtkView* view)
 {
   if (view == this->ContextView.GetPointer())
-    {
+  {
     this->ContextView = NULL;
     this->EnableServerSideRendering = false;
     return this->Superclass::RemoveFromView(view);
-    }
+  }
   return false;
 }
 
@@ -90,18 +89,18 @@ int vtkChartSelectionRepresentation::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkChartSelectionRepresentation::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-    {
+  {
     return this->Superclass::RequestData(request, inputVector, outputVector);
-    }
+  }
 
   vtkSmartPointer<vtkSelection> localSelection;
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+  {
     vtkSelection* inputSelection = vtkSelection::GetData(inputVector[0], 0);
     assert(inputSelection);
 
@@ -112,9 +111,9 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
     // called on the processes that have the input data (which may come in
     // handy at some point).
     if (this->ChartRepresentation->MapSelectionToView(clone.GetPointer()) == false)
-      {
+    {
       clone->Initialize();
-      }
+    }
 
     vtkNew<vtkSelectionDeliveryFilter> courier;
     courier->SetInputDataObject(clone.GetPointer());
@@ -122,17 +121,17 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
     localSelection = vtkSelection::SafeDownCast(courier->GetOutputDataObject(0));
 
     if (this->EnableServerSideRendering)
-      {
+    {
       // distribute the selection from the root node to all processes.
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       int myId = pm->GetPartitionId();
       int numProcs = pm->GetNumberOfLocalPartitions();
 
       if (numProcs > 1)
-        {
+      {
         vtkMultiProcessController* controller = pm->GetGlobalController();
         if (myId == 0)
-          {
+        {
           std::ostringstream res;
           vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, clone.GetPointer());
 
@@ -141,16 +140,15 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
           controller->Broadcast(&size, 1, 0);
 
           // Send the XML string.
-          controller->Broadcast(
-            const_cast<char*>(res.str().c_str()), size, 0);
+          controller->Broadcast(const_cast<char*>(res.str().c_str()), size, 0);
 
           localSelection = clone.GetPointer();
-          }
+        }
         else
-          {
+        {
           int size = 0;
           controller->Broadcast(&size, 1, 0);
-          char* xml = new char[size+1];
+          char* xml = new char[size + 1];
 
           // Get the string itself.
           controller->Broadcast(xml, size, 0);
@@ -162,21 +160,21 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
           delete[] xml;
 
           localSelection = sel.GetPointer();
-          }
         }
       }
     }
+  }
   else
-    {
+  {
     vtkNew<vtkSelectionDeliveryFilter> courier;
     courier->Update();
     localSelection = vtkSelection::SafeDownCast(courier->GetOutputDataObject(0));
-    }
+  }
 
   if (this->ContextView)
-    {
+  {
     this->ContextView->SetSelection(this->ChartRepresentation, localSelection);
-    }
+  }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -185,8 +183,6 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
 void vtkChartSelectionRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ChartRepresentation: "
-    << this->ChartRepresentation.GetPointer() << endl;
-  os << indent << "EnableServerSideRendering: " <<
-    this->EnableServerSideRendering << endl;
+  os << indent << "ChartRepresentation: " << this->ChartRepresentation.GetPointer() << endl;
+  os << indent << "EnableServerSideRendering: " << this->EnableServerSideRendering << endl;
 }

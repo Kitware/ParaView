@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractListModel>
 
-/// Qt model that stores a sorted collection of unique floating-point numbers
-class PQCOMPONENTS_EXPORT pqScalarSetModel :
-  public QAbstractListModel
+/**
+* Qt model that stores a sorted collection of unique floating-point numbers
+*/
+class PQCOMPONENTS_EXPORT pqScalarSetModel : public QAbstractListModel
 {
   typedef QAbstractListModel base;
 
@@ -49,15 +50,25 @@ public:
   pqScalarSetModel();
   ~pqScalarSetModel();
 
-  /// Clears the model contents
+  /**
+  * Clears the model contents
+  */
   void clear();
-  /// Inserts a floating-point number into the model
+  /**
+  * Inserts a floating-point number into the model
+  */
   QModelIndex insert(double value);
-  /// Erases a floating-point number from the model
+  /**
+  * Erases a floating-point number from the model
+  */
   void erase(double value);
-  /// Erases a zero-based row from the model
+  /**
+  * Erases a zero-based row from the model
+  */
   void erase(int row);
-  /// Returns the sorted collection of numbers stored in the model
+  /**
+  * Returns the sorted collection of numbers stored in the model
+  */
   const QList<double> values();
 
   /** Controls formatting of displayed data, supports the
@@ -65,15 +76,18 @@ public:
   void setFormat(char f, int precision = 3);
 
   virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-  virtual Qt::ItemFlags flags(const QModelIndex& index ) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
   virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
   virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
-  /// Get/Set if the order in which the values are inserted must be preserved. 
-  /// Off by default i.e. values will be sorted. If set after inserting a few values,
-  /// the order of values inserted until the flag was set is lost.
+  /**
+  * Get/Set if the order in which the values are inserted must be preserved.
+  * Off by default i.e. values will be sorted. If set after inserting a few values,
+  * the order of values inserted until the flag was set is lost.
+  */
   void setPreserveOrder(bool);
   bool preserveOrder() const;
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

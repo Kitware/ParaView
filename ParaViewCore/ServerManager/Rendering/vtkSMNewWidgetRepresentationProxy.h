@@ -12,16 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMNewWidgetRepresentationProxy - proxy for 3D widgets and
-// their representations in ParaView.
-// .SECTION Description
-// vtkSMNewWidgetRepresentationProxy is a proxy for 3D widgets and their
-// representations. It has several responsibilities.
-// \li Sets up the link between the Widget and its representation on VTK side.
-// \li Sets up event handlers to ensure that the representation proxy's info
-// properties are updated any time the widget fires interaction events.
-// \li Provides API to perform tasks typical with 3DWidgets in ParaView e.g.
-// picking, placing widget on data bounds.
+/**
+ * @class   vtkSMNewWidgetRepresentationProxy
+ * @brief   proxy for 3D widgets and
+ * their representations in ParaView.
+ *
+ * vtkSMNewWidgetRepresentationProxy is a proxy for 3D widgets and their
+ * representations. It has several responsibilities.
+ * \li Sets up the link between the Widget and its representation on VTK side.
+ * \li Sets up event handlers to ensure that the representation proxy's info
+ * properties are updated any time the widget fires interaction events.
+ * \li Provides API to perform tasks typical with 3DWidgets in ParaView e.g.
+ * picking, placing widget on data bounds.
+*/
 
 #ifndef vtkSMNewWidgetRepresentationProxy_h
 #define vtkSMNewWidgetRepresentationProxy_h
@@ -41,31 +44,41 @@ public:
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get the widget for the representation.
+  //@{
+  /**
+   * Get the widget for the representation.
+   */
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
+  //@}
 
-  // Description:
-  // Get Representation Proxy.
+  //@{
+  /**
+   * Get Representation Proxy.
+   */
   vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
+  //@}
 
-  // Description:
-  // Called to link properties from a Widget to \c controlledProxy i.e. a
-  // proxy whose properties are being manipulated using this Widget.
-  // Currently, we only support linking with one controlled proxy at a time. One
-  // must call UnlinkProperties() before one can call this method on another
-  // controlledProxy. The \c controlledPropertyGroup is used to determine the
-  // mapping between this widget properties and controlledProxy properties.
+  //@{
+  /**
+   * Called to link properties from a Widget to \c controlledProxy i.e. a
+   * proxy whose properties are being manipulated using this Widget.
+   * Currently, we only support linking with one controlled proxy at a time. One
+   * must call UnlinkProperties() before one can call this method on another
+   * controlledProxy. The \c controlledPropertyGroup is used to determine the
+   * mapping between this widget properties and controlledProxy properties.
+   */
   bool LinkProperties(vtkSMProxy* controlledProxy, vtkSMPropertyGroup* controlledPropertyGroup);
   bool UnlinkProperties(vtkSMProxy* controlledProxy);
+  //@}
 
 protected:
   vtkSMNewWidgetRepresentationProxy();
   ~vtkSMNewWidgetRepresentationProxy();
 
-  // Description:
-  // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
-  // EndCreateVTKObjects().
+  /**
+   * Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
+   * EndCreateVTKObjects().
+   */
   virtual void CreateVTKObjects();
 
   vtkSMProxy* RepresentationProxy;
@@ -76,18 +89,19 @@ protected:
 
   friend class vtkSMNewWidgetRepresentationObserver;
 
-  // Description:
-  // Called every time the user interacts with the widget.
+  /**
+   * Called every time the user interacts with the widget.
+   */
   virtual void ExecuteEvent(unsigned long event);
 
-  // Description:
-  // Called everytime a controlled property's unchecked values change.
+  /**
+   * Called everytime a controlled property's unchecked values change.
+   */
   void ProcessLinkedPropertyEvent(vtkSMProperty* controlledProperty, unsigned long event);
-private:
 
+private:
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMNewWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

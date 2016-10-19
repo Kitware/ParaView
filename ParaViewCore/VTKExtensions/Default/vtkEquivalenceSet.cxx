@@ -16,12 +16,7 @@
 #include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 
-
 vtkStandardNewMacro(vtkEquivalenceSet);
-
-
-
-
 
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
@@ -42,10 +37,10 @@ vtkEquivalenceSet::~vtkEquivalenceSet()
 {
   this->Resolved = 0;
   if (this->EquivalenceArray)
-    {
+  {
     this->EquivalenceArray->Delete();
     this->EquivalenceArray = 0;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -67,16 +62,15 @@ void vtkEquivalenceSet::DeepCopy(vtkEquivalenceSet* in)
 void vtkEquivalenceSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
+
   vtkIdType num = this->GetNumberOfMembers();
   os << indent << "NumberOfMembers: " << num << endl;
   for (vtkIdType ii = 0; ii < num; ++ii)
-    {
+  {
     os << indent << "  " << ii << ": " << this->GetEquivalentSetId(ii) << endl;
-    }
+  }
   os << endl;
 }
-
 
 //----------------------------------------------------------------------------
 // Return the id of the equivalent set.
@@ -86,10 +80,10 @@ int vtkEquivalenceSet::GetEquivalentSetId(int memberId)
 
   ref = this->GetReference(memberId);
   while (!this->Resolved && ref != memberId)
-    {
+  {
     memberId = ref;
     ref = this->GetReference(memberId);
-    }
+  }
 
   return ref;
 }
@@ -99,9 +93,9 @@ int vtkEquivalenceSet::GetEquivalentSetId(int memberId)
 int vtkEquivalenceSet::GetReference(int memberId)
 {
   if (memberId >= this->EquivalenceArray->GetNumberOfTuples())
-    { // We might consider this an error ...
+  { // We might consider this an error ...
     return memberId;
-    }
+  }
   return this->EquivalenceArray->GetValue(memberId);
 }
 
@@ -112,52 +106,51 @@ int vtkEquivalenceSet::GetReference(int memberId)
 void vtkEquivalenceSet::AddEquivalence(int id1, int id2)
 {
   if (this->Resolved)
-    {
+  {
     vtkGenericWarningMacro("Set already resolved, you cannot add more equivalences.");
     return;
-    }
+  }
 
   int num = this->EquivalenceArray->GetNumberOfTuples();
 
   // Expand the range to include both ids.
   while (num <= id1 || num <= id2)
-    {
+  {
     // All values inserted are equivalent to only themselves.
     this->EquivalenceArray->InsertNextTuple1(num);
     ++num;
-    }
+  }
 
- // Our rule for references in the equivalent set is that
- // all elements must point to a member equal to or smaller
- // than itself.
+  // Our rule for references in the equivalent set is that
+  // all elements must point to a member equal to or smaller
+  // than itself.
 
- // The only problem we could encounter is changing a reference.
- // we do not want to orphan anything previously referenced.
+  // The only problem we could encounter is changing a reference.
+  // we do not want to orphan anything previously referenced.
 
   // Replace the larger references.
   if (id1 < id2)
-    {
+  {
     // We could follow the references to the smallest.  It might
     // make this processing more efficient.  This is a compromise.
     // The referenced id will always be smaller than the id so
     // order does not change.
     this->EquateInternal(this->GetReference(id1), id2);
-    }
+  }
   else
-    {
+  {
     this->EquateInternal(this->GetReference(id2), id1);
-    }
+  }
 }
 
-
 //----------------------------------------------------------------------------
-int vtkEquivalenceSet::GetNumberOfMembers() 
-{ 
+int vtkEquivalenceSet::GetNumberOfMembers()
+{
   return this->EquivalenceArray->GetNumberOfTuples();
 }
 
 //----------------------------------------------------------------------------
-int* vtkEquivalenceSet::GetPointer() 
+int* vtkEquivalenceSet::GetPointer()
 {
   return this->EquivalenceArray->GetPointer(0);
 }
@@ -171,9 +164,8 @@ void vtkEquivalenceSet::Squeeze()
 //----------------------------------------------------------------------------
 vtkIdType vtkEquivalenceSet::Capacity()
 {
-  return this->EquivalenceArray->Capacity(); 
+  return this->EquivalenceArray->Capacity();
 }
-
 
 //----------------------------------------------------------------------------
 // id1 must be less than or equal to id2.
@@ -181,36 +173,35 @@ void vtkEquivalenceSet::EquateInternal(int id1, int id2)
 {
   // This is the reference that might be orphaned in this process.
   int oldRef = this->GetEquivalentSetId(id2);
-  
+
   // The two ids are already equal (not the only way they might be equal).
   if (oldRef == id1)
-    {
+  {
     return;
-    }
-  
- // The only problem we could encounter is changing a reference.
- // we do not want to orphan anything previously referenced.
+  }
+
+  // The only problem we could encounter is changing a reference.
+  // we do not want to orphan anything previously referenced.
   if (oldRef == id2)
-    {
+  {
     this->EquivalenceArray->SetValue(id2, id1);
-    }
+  }
   else if (oldRef > id1)
-    {
+  {
     this->EquivalenceArray->SetValue(id2, id1);
     this->EquateInternal(id1, oldRef);
-    }
+  }
   else
-    { // oldRef < id1
+  { // oldRef < id1
     this->EquateInternal(oldRef, id1);
-    }
+  }
 }
-
 
 //----------------------------------------------------------------------------
 // Returns the number of merged sets.
 int vtkEquivalenceSet::ResolveEquivalences()
 {
-  // Go through the equivalence array collapsing chains 
+  // Go through the equivalence array collapsing chains
   // and assigning consecutive ids.
   int count = 0;
   int id;
@@ -218,26 +209,25 @@ int vtkEquivalenceSet::ResolveEquivalences()
 
   int numIds = this->EquivalenceArray->GetNumberOfTuples();
   for (int ii = 0; ii < numIds; ++ii)
-    {
+  {
     id = this->EquivalenceArray->GetValue(ii);
     if (id == ii)
-      { // This is a new equivalence set.
+    { // This is a new equivalence set.
       this->EquivalenceArray->SetValue(ii, count);
       ++count;
-      }
+    }
     else
-      {
+    {
       // All earlier ids will be resolved already.
       // This array only point to less than or equal ids. (id <= ii).
       newId = this->EquivalenceArray->GetValue(id);
-      this->EquivalenceArray->SetValue(ii,newId);
-      }
+      this->EquivalenceArray->SetValue(ii, newId);
     }
+  }
   this->Resolved = 1;
-  //cerr << "Final number of equivalent sets: " << count << endl;
+  // cerr << "Final number of equivalent sets: " << count << endl;
 
   this->NumberOfResolvedSets = count;
 
   return count;
 }
-

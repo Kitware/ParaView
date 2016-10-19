@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIntegrateFlowThroughSurface - Integrates vector dot normal.
-// .SECTION Description
-// First this filter finds point normals for a surface.  It
-// Takes a point vector field from the input and computes the
-// dot product with the normal.  It then integrates this dot value
-// to get net flow through the surface.
+/**
+ * @class   vtkIntegrateFlowThroughSurface
+ * @brief   Integrates vector dot normal.
+ *
+ * First this filter finds point normals for a surface.  It
+ * Takes a point vector field from the input and computes the
+ * dot product with the normal.  It then integrates this dot value
+ * to get net flow through the surface.
+*/
 
 #ifndef vtkIntegrateFlowThroughSurface_h
 #define vtkIntegrateFlowThroughSurface_h
@@ -28,25 +31,22 @@
 class vtkIdList;
 class vtkDataSetAttributes;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkIntegrateFlowThroughSurface, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkIntegrateFlowThroughSurface *New();
-  
+  static vtkIntegrateFlowThroughSurface* New();
+
 protected:
   vtkIntegrateFlowThroughSurface();
   ~vtkIntegrateFlowThroughSurface();
 
   // Usual data generation method
   // Usual data generation method
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, 
-                          vtkInformationVector *);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include "pqPythonEventSource.h"
 
-/** Python event source with Image comparison capabilities 
+/** Python event source with Image comparison capabilities
 
  import QtTestingImage
  QtTestingImage.compareImage('widgetName', 'baseline', threshold, 'tempDir')
@@ -46,12 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class vtkImageData;
 
-class PQCORE_EXPORT pqPythonEventSourceImage :
-  public pqPythonEventSource
+class PQCORE_EXPORT pqPythonEventSourceImage : public pqPythonEventSource
 {
   Q_OBJECT
 public:
-  pqPythonEventSourceImage(QObject* p=0);
+  pqPythonEventSourceImage(QObject* p = 0);
   ~pqPythonEventSourceImage();
 
 protected:
@@ -62,4 +61,3 @@ protected slots:
 };
 
 #endif // !_pqPythonEventSourceImage_h
-

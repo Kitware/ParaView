@@ -27,7 +27,8 @@
 //
 // </verbatim>
 // .SECTION Description
-// The vtkPointSpriteDefaultPainter replaces the vtkScalarsToColorsPainter by a vtkTwoScalarsToColorsPainter
+// The vtkPointSpriteDefaultPainter replaces the vtkScalarsToColorsPainter by a
+// vtkTwoScalarsToColorsPainter
 // and add a vtkDepthSortPainter in the painter chain.
 
 #ifndef vtkPointSpriteDefaultPainter_h
@@ -40,7 +41,7 @@ class vtkDepthSortPainter;
 
 class VTKPOINTSPRITERENDERING_EXPORT vtkPointSpriteDefaultPainter : public vtkDefaultPainter
 {
-public :
+public:
   static vtkPointSpriteDefaultPainter* New();
   vtkTypeMacro(vtkPointSpriteDefaultPainter, vtkDefaultPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -58,7 +59,7 @@ protected:
 
   // Description:
   // Take part in garbage collection.
-  virtual void ReportReferences(vtkGarbageCollector *collector);
+  virtual void ReportReferences(vtkGarbageCollector* collector);
 
   vtkDepthSortPainter* DepthSortPainter;
 

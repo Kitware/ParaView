@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSetGet.h" // needed for VTK_LEGACY.
 class pqTimer;
 
-/// pqRenderViewBase is an abstract base class for all render-view based views.
-/// It encapuslates some of the commonly needed functionality for all such
-/// views.
+/**
+* pqRenderViewBase is an abstract base class for all render-view based views.
+* It encapuslates some of the commonly needed functionality for all such
+* views.
+*/
 class PQCORE_EXPORT pqRenderViewBase : public pqView
 {
   Q_OBJECT
@@ -53,64 +55,78 @@ protected:
   // \c view  :- RenderView proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqRenderViewBase(const QString& type,
-                   const QString& group,
-                   const QString& name, 
-                   vtkSMViewProxy* renModule, 
-                   pqServer* server, 
-                   QObject* parent=NULL);
+  pqRenderViewBase(const QString& type, const QString& group, const QString& name,
+    vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
 public:
   // Destructor.
   virtual ~pqRenderViewBase();
 
-  /// Resets the camera to include all visible data.
-  /// It is essential to call this resetCamera, to ensure that the reset camera
-  /// action gets pushed on the interaction undo stack.
-  virtual void resetCamera()=0;
+  /**
+  * Resets the camera to include all visible data.
+  * It is essential to call this resetCamera, to ensure that the reset camera
+  * action gets pushed on the interaction undo stack.
+  */
+  virtual void resetCamera() = 0;
 
-  /// Called to reset the view's display.  This method calls resetCamera().
+  /**
+  * Called to reset the view's display.  This method calls resetCamera().
+  */
   virtual void resetDisplay();
 
-  /// Convenience method to enable stereo rendering on all views that support
-  /// stereo rendering. If mode==0, stereo rendering is disabled. mode is same
-  /// that used for vtkRenderWindow::SetStereoType.
-  /// This does not request a render, the caller must explicitly call render on
-  /// the views.
-  /// @deprecated Use pqStereoModeHelper instead, which provides a more
-  /// convenient mechanism for application code to temporarily change stereo
-  /// mode on all render views.
+  /**
+  * Convenience method to enable stereo rendering on all views that support
+  * stereo rendering. If mode==0, stereo rendering is disabled. mode is same
+  * that used for vtkRenderWindow::SetStereoType.
+  * This does not request a render, the caller must explicitly call render on
+  * the views.
+  * @deprecated Use pqStereoModeHelper instead, which provides a more
+  * convenient mechanism for application code to temporarily change stereo
+  * mode on all render views.
+  */
   VTK_LEGACY(static void setStereo(int mode));
 
 protected slots:
   virtual void initializeAfterObjectsCreated();
 
-  /// Triggered by DelayNonInteractiveRenderEvent
+  /**
+  * Triggered by DelayNonInteractiveRenderEvent
+  */
   void beginDelayInteractiveRender();
   void endDelayInteractiveRender();
 
-  /// Triggered by internal timer to update the status bar message
+  /**
+  * Triggered by internal timer to update the status bar message
+  */
   void updateStatusMessage();
 
 protected:
-  /// Overridden to popup the context menu, if some actions have been added
-  /// using addMenuAction.
+  /**
+  * Overridden to popup the context menu, if some actions have been added
+  * using addMenuAction.
+  */
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
-  /// Creates a new instance of the QWidget subclass to be used to show this
-  /// view. Default implementation creates a QVTKWidget.
+  /**
+  * Creates a new instance of the QWidget subclass to be used to show this
+  * view. Default implementation creates a QVTKWidget.
+  */
   virtual QWidget* createWidget();
 
-  /// Use this method to initialize the pqObject state using the
-  /// underlying vtkSMProxy. This needs to be done only once,
-  /// after the object has been created. 
+  /**
+  * Use this method to initialize the pqObject state using the
+  * underlying vtkSMProxy. This needs to be done only once,
+  * after the object has been created.
+  */
   virtual void initialize();
 
-  /// On Mac, we usually try to cache the front buffer to avoid unecessary
+  /**
+  * On Mac, we usually try to cache the front buffer to avoid unecessary
+  */
   //  updates.
   bool AllowCaching;
 
-private: 
+private:
   Q_DISABLE_COPY(pqRenderViewBase)
 
   class pqInternal;

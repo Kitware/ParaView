@@ -58,17 +58,16 @@ void vtkSMDeserializerXMLCache::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   std::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement> >::iterator iter;
-  for( iter = this->Internals->XMLCacheMap.begin();
-       iter != this->Internals->XMLCacheMap.end();
+  for (iter = this->Internals->XMLCacheMap.begin(); iter != this->Internals->XMLCacheMap.end();
        iter++)
-    {
+  {
     os << indent << "Proxy " << iter->first << " state:" << endl;
     iter->second.GetPointer()->PrintXML(os, indent.GetNextIndent());
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDeserializerXMLCache::CacheXMLProxyState(vtkTypeUInt32 id, vtkPVXMLElement *xml)
+void vtkSMDeserializerXMLCache::CacheXMLProxyState(vtkTypeUInt32 id, vtkPVXMLElement* xml)
 {
   this->Internals->XMLCacheMap[id] = xml;
 }

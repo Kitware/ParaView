@@ -34,21 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction to support saving/restoring main window geometry/layout.
-/// This reaction can support both loading and restoring window geometry. Use
-/// separate instances of this reaction to each role, passing appropriate value
-/// for the \c load argument to the constructor.
+/**
+* @ingroup Reactions
+* Reaction to support saving/restoring main window geometry/layout.
+* This reaction can support both loading and restoring window geometry. Use
+* separate instances of this reaction to each role, passing appropriate value
+* for the \c load argument to the constructor.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadRestoreWindowLayoutReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqLoadRestoreWindowLayoutReaction(bool load, QAction* parent=0);
+  pqLoadRestoreWindowLayoutReaction(bool load, QAction* parent = 0);
   virtual ~pqLoadRestoreWindowLayoutReaction();
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 private:

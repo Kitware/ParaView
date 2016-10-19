@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVConnectivityFilter - change the defaults for vtkConnectivityFilter
-// .SECTION Description
-// vtkPVConnectivityFilter is a subclass of vtkConnectivityFilter.  It
-// changes the default settings.  We want different defaults than
-// vtkConnectivityFilter has, but we don't want the user to have access to
-// these parameters in the UI.
+/**
+ * @class   vtkPVConnectivityFilter
+ * @brief   change the defaults for vtkConnectivityFilter
+ *
+ * vtkPVConnectivityFilter is a subclass of vtkConnectivityFilter.  It
+ * changes the default settings.  We want different defaults than
+ * vtkConnectivityFilter has, but we don't want the user to have access to
+ * these parameters in the UI.
+*/
 
 #ifndef vtkPVConnectivityFilter_h
 #define vtkPVConnectivityFilter_h
@@ -30,12 +33,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVConnectivityFilter : public vtkConne
 public:
   vtkTypeMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  static vtkPVConnectivityFilter *New();
-  
+
+  static vtkPVConnectivityFilter* New();
+
 protected:
   vtkPVConnectivityFilter();
-  ~vtkPVConnectivityFilter() {};
+  ~vtkPVConnectivityFilter(){};
 
 private:
   vtkPVConnectivityFilter(const vtkPVConnectivityFilter&) VTK_DELETE_FUNCTION;

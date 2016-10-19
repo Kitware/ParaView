@@ -36,53 +36,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
-pqColorTableModel::pqColorTableModel(pqColorOpacityEditorWidget * widget,
-                                     QObject* parentObject) :
-  Superclass(parentObject), Widget(widget)
-  {
-    this->NumberOfRowsCache = this->rowCount();
-  }
+pqColorTableModel::pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject)
+  : Superclass(parentObject)
+  , Widget(widget)
+{
+  this->NumberOfRowsCache = this->rowCount();
+}
 
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqColorTableModel::flags(const QModelIndex &idx) const
+Qt::ItemFlags pqColorTableModel::flags(const QModelIndex& idx) const
 {
   Qt::ItemFlags parentFlags = this->Superclass::flags(idx);
-  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount()-1))
-    {
+  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount() - 1))
+  {
     return parentFlags;
-    }
+  }
   return parentFlags | Qt::ItemIsEditable;
 }
 
 //-----------------------------------------------------------------------------
-bool pqColorTableModel::setData(const QModelIndex &idx, const QVariant &value, int role)
+bool pqColorTableModel::setData(const QModelIndex& idx, const QVariant& value, int role)
 {
   Q_UNUSED(role);
 
   // Do not edit first and last control point scalar values
-  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount()-1))
-    {
+  if (idx.column() == 0 && (idx.row() == 0 || idx.row() == this->rowCount() - 1))
+  {
     return false;
-    }
+  }
 
   if (this->Widget && this->Widget->proxy())
-    {
+  {
     vtkDiscretizableColorTransferFunction* stc =
       vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->proxy()->GetClientSideObject());
     if (stc)
-      {
+    {
       double range[2];
       stc->GetRange(range);
       double newValue = value.toDouble();
       if (idx.column() == 0 && (newValue < range[0] || newValue > range[1]))
-        {
+      {
         return false;
-        }
+      }
       else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
-        {
+      {
         return false;
-        }
+      }
 
       double xrgbms[6];
       stc->GetNodeValue(idx.row(), xrgbms);
@@ -91,35 +91,34 @@ bool pqColorTableModel::setData(const QModelIndex &idx, const QVariant &value, i
 
       emit this->dataChanged(idx, idx);
       return true;
-      }
     }
+  }
 
   return false;
 }
 
 //-----------------------------------------------------------------------------
- int pqColorTableModel::rowCount(const QModelIndex & parentIndex) const
- {
-   Q_UNUSED(parentIndex);
+int pqColorTableModel::rowCount(const QModelIndex& parentIndex) const
+{
+  Q_UNUSED(parentIndex);
 
-   int size = 0;
-   if (this->Widget && this->Widget->proxy())
-     {
-     vtkDiscretizableColorTransferFunction* stc =
-       vtkDiscretizableColorTransferFunction::SafeDownCast(
-         this->Widget->proxy()->GetClientSideObject());
-     if (stc)
-       {
-       size = stc->GetSize();
-       }
-     }
+  int size = 0;
+  if (this->Widget && this->Widget->proxy())
+  {
+    vtkDiscretizableColorTransferFunction* stc =
+      vtkDiscretizableColorTransferFunction::SafeDownCast(
+        this->Widget->proxy()->GetClientSideObject());
+    if (stc)
+    {
+      size = stc->GetSize();
+    }
+  }
 
-   return size;
- }
-
+  return size;
+}
 
 //-----------------------------------------------------------------------------
-int pqColorTableModel::columnCount(const QModelIndex & parentIndex) const
+int pqColorTableModel::columnCount(const QModelIndex& parentIndex) const
 {
   Q_UNUSED(parentIndex);
   return 4;
@@ -129,31 +128,31 @@ int pqColorTableModel::columnCount(const QModelIndex & parentIndex) const
 QVariant pqColorTableModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DisplayRole || role == Qt::EditRole)
-    {
+  {
     vtkDiscretizableColorTransferFunction* stc = NULL;
     if (this->Widget && this->Widget->proxy())
-      {
+    {
       stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
         this->Widget->proxy()->GetClientSideObject());
-      }
+    }
     if (!stc)
-      {
+    {
       return QVariant();
-      }
+    }
 
     // Get the XRGB value
     double xrgbms[6];
     stc->GetNodeValue(idx.row(), xrgbms);
 
     if (idx.column() >= 0 && idx.column() < 4)
-      {
-      return QString::number(xrgbms[idx.column()]);
-      }
-    }
-  else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
     {
+      return QString::number(xrgbms[idx.column()]);
+    }
+  }
+  else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
+  {
     switch (idx.column())
-      {
+    {
       case 0:
         return "Data Value";
       case 1:
@@ -162,8 +161,8 @@ QVariant pqColorTableModel::data(const QModelIndex& idx, int role) const
         return "Green Component";
       case 3:
         return "Blue Component";
-      }
     }
+  }
   return QVariant();
 }
 
@@ -171,9 +170,9 @@ QVariant pqColorTableModel::data(const QModelIndex& idx, int role) const
 QVariant pqColorTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    {
+  {
     switch (section)
-      {
+    {
       case 0:
         return "Value";
       case 1:
@@ -182,8 +181,8 @@ QVariant pqColorTableModel::headerData(int section, Qt::Orientation orientation,
         return "G";
       case 3:
         return "B";
-      }
     }
+  }
   return this->Superclass::headerData(section, orientation, role);
 }
 
@@ -195,19 +194,19 @@ void pqColorTableModel::refresh()
   // way to do this.
   int currentNumberOfRows = this->rowCount();
   if (this->NumberOfRowsCache < currentNumberOfRows)
-    {
-    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows-1);
+  {
+    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows - 1);
     this->endInsertRows();
-    }
+  }
   else if (this->NumberOfRowsCache > currentNumberOfRows)
-    {
-    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache-1);
+  {
+    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache - 1);
     this->endRemoveRows();
-    }
+  }
   this->NumberOfRowsCache = currentNumberOfRows;
 
   QModelIndex topLeft = this->createIndex(0, 0);
-  QModelIndex bottomRight = this->createIndex(this->rowCount()-1, this->columnCount()-1);
+  QModelIndex bottomRight = this->createIndex(this->rowCount() - 1, this->columnCount() - 1);
 
   emit dataChanged(topLeft, bottomRight);
 }

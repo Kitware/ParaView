@@ -29,7 +29,6 @@
 // .SECTION Description
 // this program tests the point sprite support by vtkPointSpriteProperty.
 
-
 #include "vtkActor.h"
 #include "vtkBrownianPoints.h"
 #include "vtkCamera.h"
@@ -46,26 +45,26 @@
 #include "vtkRegressionTestImage.h"
 #include "vtkTestUtilities.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  vtkSphereSource * sphere = vtkSphereSource::New();
+  vtkSphereSource* sphere = vtkSphereSource::New();
   sphere->SetRadius(5);
   sphere->SetPhiResolution(20);
   sphere->SetThetaResolution(20);
 
-  vtkBrownianPoints * randomVector = vtkBrownianPoints::New();
+  vtkBrownianPoints* randomVector = vtkBrownianPoints::New();
   randomVector->SetMinimumSpeed(0);
   randomVector->SetMaximumSpeed(1);
   randomVector->SetInputConnection(sphere->GetOutputPort());
 
-  vtkPainterPolyDataMapper *mapper = vtkPainterPolyDataMapper::New();
+  vtkPainterPolyDataMapper* mapper = vtkPainterPolyDataMapper::New();
   mapper->SetInputConnection(randomVector->GetOutputPort());
   mapper->SetColorModeToMapScalars();
   mapper->SetScalarModeToUsePointFieldData();
   mapper->SelectColorArray("BrownianVectors");
   mapper->SetInterpolateScalarsBeforeMapping(0);
 
-  vtkActor *actor = vtkActor::New();
+  vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
 
   vtkPointSpriteProperty* property = vtkPointSpriteProperty::New();
@@ -76,14 +75,14 @@ int main(int argc, char *argv[])
   property->SetRepresentationToPoints();
   actor->SetProperty(property);
 
-  vtkRenderer *renderer = vtkRenderer::New();
+  vtkRenderer* renderer = vtkRenderer::New();
   renderer->AddActor(actor);
   renderer->SetBackground(0.5, 0.5, 0.5);
 
-  vtkRenderWindow *renWin = vtkRenderWindow::New();
+  vtkRenderWindow* renWin = vtkRenderWindow::New();
   renWin->AddRenderer(renderer);
 
-  vtkRenderWindowInteractor *interactor = vtkRenderWindowInteractor::New();
+  vtkRenderWindowInteractor* interactor = vtkRenderWindowInteractor::New();
   interactor->SetRenderWindow(renWin);
 
   renWin->SetSize(400, 400);
@@ -91,11 +90,11 @@ int main(int argc, char *argv[])
   interactor->Initialize();
   renWin->Render();
 
-  int retVal = vtkRegressionTestImageThreshold(renWin,18);
+  int retVal = vtkRegressionTestImageThreshold(renWin, 18);
   if (retVal == vtkRegressionTester::DO_INTERACTOR)
-    {
+  {
     interactor->Start();
-    }
+  }
 
   sphere->Delete();
   randomVector->Delete();
@@ -108,4 +107,3 @@ int main(int argc, char *argv[])
 
   return !retVal;
 }
-

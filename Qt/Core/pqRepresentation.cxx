@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -56,25 +56,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqRepresentation::pqRepresentation( const QString& group, 
-                                    const QString& name,
-                                    vtkSMProxy* repr,
-                                    pqServer* server, 
-                                    QObject* _parent/*=null*/):
-  pqProxy(group, name, repr, server, _parent)
+pqRepresentation::pqRepresentation(const QString& group, const QString& name, vtkSMProxy* repr,
+  pqServer* server, QObject* _parent /*=null*/)
+  : pqProxy(group, name, repr, server, _parent)
 {
   this->Internal = new pqRepresentation::pqInternal();
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
   // vtkCommand::EndEvent is fired when the representation is updated.
-  this->Internal->VTKConnect->Connect(
-    repr, vtkCommand::EndEvent, this, SIGNAL(updated()));
+  this->Internal->VTKConnect->Connect(repr, vtkCommand::EndEvent, this, SIGNAL(updated()));
   if (repr->GetProperty("Visibility"))
-    {
-    this->Internal->VTKConnect->Connect(
-      repr->GetProperty("Visibility"), vtkCommand::ModifiedEvent,
+  {
+    this->Internal->VTKConnect->Connect(repr->GetProperty("Visibility"), vtkCommand::ModifiedEvent,
       this, SLOT(onVisibilityChanged()), 0, 0, Qt::QueuedConnection);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -99,24 +94,23 @@ pqView* pqRepresentation::getView() const
 //-----------------------------------------------------------------------------
 vtkSMViewProxy* pqRepresentation::getViewProxy() const
 {
-  return (this->Internal->View?
-    this->Internal->View->getViewProxy() : NULL);
+  return (this->Internal->View ? this->Internal->View->getViewProxy() : NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqRepresentation::renderView(bool force)
 {
   if (this->Internal->View)
-    {
+  {
     if (force)
-      {
+    {
       this->Internal->View->forceRender();
-      }
-    else
-      {
-      this->Internal->View->render();
-      }
     }
+    else
+    {
+      this->Internal->View->render();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -128,16 +122,14 @@ void pqRepresentation::onVisibilityChanged()
 //-----------------------------------------------------------------------------
 bool pqRepresentation::isVisible() const
 {
-  int visible = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("Visibility")).toInt();
+  int visible =
+    pqSMAdaptor::getElementProperty(this->getProxy()->GetProperty("Visibility")).toInt();
   return (visible != 0);
 }
 
 //-----------------------------------------------------------------------------
 void pqRepresentation::setVisible(bool visible)
 {
-  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Visibility"),
-    (visible? 1 : 0));
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Visibility"), (visible ? 1 : 0));
   this->getProxy()->UpdateVTKObjects();
 }
-

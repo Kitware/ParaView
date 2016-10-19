@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSession
-// .SECTION Description
-// vtkSession defines a session i.e. a conversation, if you will. It can be
-// between different processes or same process. What types of conversations are
-// possible i.e what protocols are supported, is defined by the subclasses.
+/**
+ * @class   vtkSession
+ *
+ * vtkSession defines a session i.e. a conversation, if you will. It can be
+ * between different processes or same process. What types of conversations are
+ * possible i.e what protocols are supported, is defined by the subclasses.
+*/
 
 #ifndef vtkSession_h
 #define vtkSession_h
@@ -30,8 +32,9 @@ public:
   vtkTypeMacro(vtkSession, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns true is this session is active/alive/valid.
+  /**
+   * Returns true is this session is active/alive/valid.
+   */
   virtual bool GetIsAlive() = 0;
 
 protected:
@@ -43,22 +46,23 @@ protected:
   // Need to manually active the session
   friend class vtkPVServerSideAnimationPlayer;
 
-  // Description:
-  // Subclasses must call this to mark the session active. This sets the active
-  // session pointer held by the vtkProcessModule, making it easier for filters
-  // etc. that need information about the active session to access it.
+  /**
+   * Subclasses must call this to mark the session active. This sets the active
+   * session pointer held by the vtkProcessModule, making it easier for filters
+   * etc. that need information about the active session to access it.
+   */
   virtual void Activate();
 
-  // Description:
-  // Subclasses must call this to mark the session inactive. This sets the active
-  // session pointer held by the vtkProcessModule, making it easier for filters
-  // etc. that need information about the active session to access it.
+  /**
+   * Subclasses must call this to mark the session inactive. This sets the active
+   * session pointer held by the vtkProcessModule, making it easier for filters
+   * etc. that need information about the active session to access it.
+   */
   virtual void DeActivate();
 
 private:
   vtkSession(const vtkSession&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSession&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

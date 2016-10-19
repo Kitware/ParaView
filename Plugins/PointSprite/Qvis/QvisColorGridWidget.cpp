@@ -61,29 +61,28 @@
 //
 // ****************************************************************************
 
-QvisColorGridWidget::QvisColorGridWidget(QWidget *parentObject, const char* /*name*/)
-: QWidget(parentObject)
+QvisColorGridWidget::QvisColorGridWidget(QWidget* parentObject, const char* /*name*/)
+  : QWidget(parentObject)
 {
-    numRows = 1;
-    numColumns = 1;
+  numRows = 1;
+  numColumns = 1;
 
-    drawFrame = false;
+  drawFrame = false;
 
-    currentActiveColor = -1;
-    currentSelectedColor = -1;
+  currentActiveColor = -1;
+  currentSelectedColor = -1;
 
-    numPaletteColors = 0;
-    paletteColors = 0;
+  numPaletteColors = 0;
+  paletteColors = 0;
 
-    drawPixmap = 0;
+  drawPixmap = 0;
 
-    boxSizeValue = 16;
-    boxPaddingValue = 8;
-    setMinimumSize(minimumSize());
+  boxSizeValue = 16;
+  boxPaddingValue = 8;
+  setMinimumSize(minimumSize());
 
-    // Set the default size policy.
-    setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
-        QSizePolicy::MinimumExpanding));
+  // Set the default size policy.
+  setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 }
 
 // ****************************************************************************
@@ -101,11 +100,11 @@ QvisColorGridWidget::QvisColorGridWidget(QWidget *parentObject, const char* /*na
 
 QvisColorGridWidget::~QvisColorGridWidget()
 {
-    if(paletteColors)
-       delete [] paletteColors;
+  if (paletteColors)
+    delete[] paletteColors;
 
-    if(drawPixmap)
-       delete drawPixmap;
+  if (drawPixmap)
+    delete drawPixmap;
 }
 
 // ****************************************************************************
@@ -121,11 +120,10 @@ QvisColorGridWidget::~QvisColorGridWidget()
 //
 // ****************************************************************************
 
-QSize
-QvisColorGridWidget::sizeHint() const
+QSize QvisColorGridWidget::sizeHint() const
 {
-    return QSize(boxSizeValue * numColumns + boxPaddingValue * (numColumns + 1),
-                 boxSizeValue * numRows + boxPaddingValue * (numRows + 1));
+  return QSize(boxSizeValue * numColumns + boxPaddingValue * (numColumns + 1),
+    boxSizeValue * numRows + boxPaddingValue * (numRows + 1));
 }
 
 // ****************************************************************************
@@ -141,41 +139,36 @@ QvisColorGridWidget::sizeHint() const
 //
 // ****************************************************************************
 
-QSize
-QvisColorGridWidget::minimumSize() const
+QSize QvisColorGridWidget::minimumSize() const
 {
-    return QSize(boxSizeValue * numColumns + boxPaddingValue * (numColumns + 1),
-                 boxSizeValue * numRows + boxPaddingValue * (numRows + 1));
+  return QSize(boxSizeValue * numColumns + boxPaddingValue * (numColumns + 1),
+    boxSizeValue * numRows + boxPaddingValue * (numRows + 1));
 }
 
 //
 // Properties.
 //
 
-void
-QvisColorGridWidget::setBoxSize(int val)
+void QvisColorGridWidget::setBoxSize(int val)
 {
-    boxSizeValue = val;
-    setMinimumSize(minimumSize());
+  boxSizeValue = val;
+  setMinimumSize(minimumSize());
 }
 
-void
-QvisColorGridWidget::setBoxPadding(int val)
+void QvisColorGridWidget::setBoxPadding(int val)
 {
-    boxPaddingValue = val;
-    setMinimumSize(minimumSize());
+  boxPaddingValue = val;
+  setMinimumSize(minimumSize());
 }
 
-int
-QvisColorGridWidget::boxSize() const
+int QvisColorGridWidget::boxSize() const
 {
-    return boxSizeValue;
+  return boxSizeValue;
 }
 
-int
-QvisColorGridWidget::boxPadding() const
+int QvisColorGridWidget::boxPadding() const
 {
-    return boxPaddingValue;
+  return boxPaddingValue;
 }
 
 // ****************************************************************************
@@ -204,49 +197,47 @@ QvisColorGridWidget::boxPadding() const
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setPaletteColors(const QColor *c, int nColors,
-    int suggestedColumns)
+void QvisColorGridWidget::setPaletteColors(const QColor* c, int nColors, int suggestedColumns)
 {
-    if(c != 0 && nColors > 0)
+  if (c != 0 && nColors > 0)
+  {
+    if (paletteColors)
+      delete[] paletteColors;
+
+    // Copy the color array.
+    numPaletteColors = nColors;
+    paletteColors = new QColor[numPaletteColors];
+    for (int i = 0; i < numPaletteColors; ++i)
+      paletteColors[i] = c[i];
+
+    // Figure out the number of rows and columns.
+    numColumns = suggestedColumns;
+    if (numColumns < 1)
+      numColumns = 6;
+    numRows = nColors / numColumns;
+    if (numRows < 1)
+      numRows = 1;
+    if (numRows * numColumns < nColors)
+      ++numRows;
+
+    // Adjust the active and selected colors if necessary.
+    currentActiveColor = -1;
+    if (currentSelectedColor >= numPaletteColors)
+      currentSelectedColor = -1;
+
+    // Make the widget repaint if it is visible.
+    if (isVisible())
     {
-        if(paletteColors)
-            delete [] paletteColors;
-
-        // Copy the color array.
-        numPaletteColors = nColors;
-        paletteColors = new QColor[numPaletteColors];
-        for(int i = 0; i < numPaletteColors; ++i)
-            paletteColors[i] = c[i];
-
-        // Figure out the number of rows and columns.
-        numColumns = suggestedColumns;
-        if(numColumns < 1)
-            numColumns = 6;
-        numRows = nColors / numColumns;
-        if(numRows < 1)
-            numRows = 1;
-        if(numRows * numColumns < nColors)
-            ++numRows;
-
-        // Adjust the active and selected colors if necessary.
-        currentActiveColor = -1;
-        if(currentSelectedColor >= numPaletteColors)
-            currentSelectedColor = -1;
-
-        // Make the widget repaint if it is visible.
-        if(isVisible())
-        {
-            delete drawPixmap;
-            drawPixmap = 0;
-            update();
-        }
-        else if(drawPixmap)
-        {
-            delete drawPixmap;
-            drawPixmap = 0;
-        }
+      delete drawPixmap;
+      drawPixmap = 0;
+      update();
     }
+    else if (drawPixmap)
+    {
+      delete drawPixmap;
+      drawPixmap = 0;
+    }
+  }
 }
 
 // ****************************************************************************
@@ -271,47 +262,46 @@ QvisColorGridWidget::setPaletteColors(const QColor *c, int nColors,
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setPaletteColor(const QColor &color, int index)
+void QvisColorGridWidget::setPaletteColor(const QColor& color, int index)
 {
-    if(index >= 0 && index < numPaletteColors)
+  if (index >= 0 && index < numPaletteColors)
+  {
+    // If the colors are different, update the widget.
+    if (color != paletteColors[index])
     {
-        // If the colors are different, update the widget.
-        if(color != paletteColors[index])
+      QRegion region;
+
+      // Replace the color
+      paletteColors[index] = color;
+
+      // Redraw the color in the appropriate manner.
+      if (index == currentSelectedColor)
+        region = drawSelectedColor(0, index);
+      else if (index == activeColorIndex())
+        region = drawHighlightedColor(0, index);
+      else
+      {
+        int _x, _y, w, h;
+        getColorRect(index, _x, _y, w, h);
+        region = QRegion(_x, _y, w, h);
+
+        if (drawPixmap)
         {
-            QRegion region;
-
-            // Replace the color
-            paletteColors[index] = color;
-
-            // Redraw the color in the appropriate manner.
-            if(index == currentSelectedColor)
-                region = drawSelectedColor(0, index);
-            else if(index == activeColorIndex())
-                region = drawHighlightedColor(0, index);
-            else
-            {
-                int _x, _y, w, h;
-                getColorRect(index, _x, _y, w, h);
-                region = QRegion(_x, _y, w, h);
-
-                if(drawPixmap)
-                {
-                    QPainter paint(drawPixmap);
-                    drawColor(paint, index);
-                }
-            }
-
-            // Repaint the region that was changed.
-            if(isVisible())
-                repaint(region);
-            else if(drawPixmap)
-            {
-                delete drawPixmap;
-                drawPixmap = 0;
-            }
+          QPainter paint(drawPixmap);
+          drawColor(paint, index);
         }
+      }
+
+      // Repaint the region that was changed.
+      if (isVisible())
+        repaint(region);
+      else if (drawPixmap)
+      {
+        delete drawPixmap;
+        drawPixmap = 0;
+      }
     }
+  }
 }
 
 // ****************************************************************************
@@ -340,47 +330,45 @@ QvisColorGridWidget::setPaletteColor(const QColor &color, int index)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setSelectedColorIndex(int index)
+void QvisColorGridWidget::setSelectedColorIndex(int index)
 {
-    if(index >= -1 && index < numPaletteColors)
+  if (index >= -1 && index < numPaletteColors)
+  {
+    QRegion region;
+
+    // If we currently have a selected color, unhighlight it.
+    if (currentSelectedColor != -1)
+      region = drawUnHighlightedColor(0, currentSelectedColor);
+
+    // Set the new value.
+    currentSelectedColor = index;
+
+    // If the selected color that we set is a real color, highlight
+    // the new selected color.
+    if (currentSelectedColor != -1)
     {
-        QRegion region;
-
-        // If we currently have a selected color, unhighlight it.
-        if(currentSelectedColor != -1)
-            region = drawUnHighlightedColor(0, currentSelectedColor);
-
-        // Set the new value.
-        currentSelectedColor = index;
-
-        // If the selected color that we set is a real color, highlight
-        // the new selected color.
-        if(currentSelectedColor != -1)
-        {
-            region = region + drawSelectedColor(0, currentSelectedColor);
-        }
-
-        // Update the widget.
-        if(isVisible())
-            repaint(region);
-        else if(drawPixmap)
-        {
-            delete drawPixmap;
-            drawPixmap = 0;
-        }
-
-        // emit the selectedColor signal.
-        if(currentSelectedColor != -1)
-        {
-            emit selectedColor(paletteColors[currentSelectedColor]);
-            emit selectedColor(paletteColors[currentSelectedColor],
-                               currentSelectedColor);
-            int row, column;
-            getRowColumnFromIndex(currentSelectedColor, row, column);
-            emit selectedColor(paletteColors[currentSelectedColor], row, column);
-        }
+      region = region + drawSelectedColor(0, currentSelectedColor);
     }
+
+    // Update the widget.
+    if (isVisible())
+      repaint(region);
+    else if (drawPixmap)
+    {
+      delete drawPixmap;
+      drawPixmap = 0;
+    }
+
+    // emit the selectedColor signal.
+    if (currentSelectedColor != -1)
+    {
+      emit selectedColor(paletteColors[currentSelectedColor]);
+      emit selectedColor(paletteColors[currentSelectedColor], currentSelectedColor);
+      int row, column;
+      getRowColumnFromIndex(currentSelectedColor, row, column);
+      emit selectedColor(paletteColors[currentSelectedColor], row, column);
+    }
+  }
 }
 
 // ****************************************************************************
@@ -402,24 +390,23 @@ QvisColorGridWidget::setSelectedColorIndex(int index)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setSelectedColor(const QColor &color)
+void QvisColorGridWidget::setSelectedColor(const QColor& color)
 {
-    // Figure out the index of the color. If it is not in the palette, we'll
-    // end up unselecting the currently selected color.
-    int index = -1;
-    bool notFound = true;
-    for(int i = 0; i < numPaletteColors && notFound; ++i)
+  // Figure out the index of the color. If it is not in the palette, we'll
+  // end up unselecting the currently selected color.
+  int index = -1;
+  bool notFound = true;
+  for (int i = 0; i < numPaletteColors && notFound; ++i)
+  {
+    if (color == paletteColors[i])
     {
-        if(color == paletteColors[i])
-        {
-            index = i;
-            notFound = false;
-        }
+      index = i;
+      notFound = false;
     }
+  }
 
-    // Set the selected color.
-    setSelectedColorIndex(index);
+  // Set the selected color.
+  setSelectedColorIndex(index);
 }
 
 // ****************************************************************************
@@ -439,25 +426,24 @@ QvisColorGridWidget::setSelectedColor(const QColor &color)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setFrame(bool val)
+void QvisColorGridWidget::setFrame(bool val)
 {
-    if(val != drawFrame)
+  if (val != drawFrame)
+  {
+    drawFrame = val;
+
+    if (drawPixmap)
     {
-        drawFrame = val;
-
-        if(drawPixmap)
-        {
-            delete drawPixmap;
-            drawPixmap = 0;
-        }
-
-        if(isVisible())
-        {
-            // Make the widget redraw itself.
-            update();
-        }
+      delete drawPixmap;
+      drawPixmap = 0;
     }
+
+    if (isVisible())
+    {
+      // Make the widget redraw itself.
+      update();
+    }
+  }
 }
 
 // ****************************************************************************
@@ -475,10 +461,9 @@ QvisColorGridWidget::setFrame(bool val)
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::rows() const
+int QvisColorGridWidget::rows() const
 {
-    return numRows;
+  return numRows;
 }
 
 // ****************************************************************************
@@ -496,10 +481,9 @@ QvisColorGridWidget::rows() const
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::columns() const
+int QvisColorGridWidget::columns() const
 {
-    return numColumns;
+  return numColumns;
 }
 
 // ****************************************************************************
@@ -517,15 +501,14 @@ QvisColorGridWidget::columns() const
 //
 // ****************************************************************************
 
-QColor
-QvisColorGridWidget::selectedColor() const
+QColor QvisColorGridWidget::selectedColor() const
 {
-    QColor retval;
+  QColor retval;
 
-    if(currentSelectedColor != -1)
-        retval = paletteColors[currentSelectedColor];
+  if (currentSelectedColor != -1)
+    retval = paletteColors[currentSelectedColor];
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -551,10 +534,9 @@ QvisColorGridWidget::selectedColor() const
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::selectedColorIndex() const
+int QvisColorGridWidget::selectedColorIndex() const
 {
-    return currentSelectedColor;
+  return currentSelectedColor;
 }
 
 // ****************************************************************************
@@ -574,17 +556,16 @@ QvisColorGridWidget::selectedColorIndex() const
 //
 // ****************************************************************************
 
-QColor
-QvisColorGridWidget::paletteColor(int index) const
+QColor QvisColorGridWidget::paletteColor(int index) const
 {
-    QColor retval;
+  QColor retval;
 
-    if(index >= 0 && index < numPaletteColors)
-    {
-        retval = paletteColors[index];
-    }
+  if (index >= 0 && index < numPaletteColors)
+  {
+    retval = paletteColors[index];
+  }
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -602,18 +583,17 @@ QvisColorGridWidget::paletteColor(int index) const
 //
 // ****************************************************************************
 
-bool
-QvisColorGridWidget::containsColor(const QColor &color) const
+bool QvisColorGridWidget::containsColor(const QColor& color) const
 {
-    bool notFound = true;
+  bool notFound = true;
 
-    for(int i = 0; i < numPaletteColors && notFound; ++i)
-    {
-        if(color == paletteColors[i])
-            notFound = false;
-    }
+  for (int i = 0; i < numPaletteColors && notFound; ++i)
+  {
+    if (color == paletteColors[i])
+      notFound = false;
+  }
 
-    return !notFound;
+  return !notFound;
 }
 
 // ****************************************************************************
@@ -631,10 +611,9 @@ QvisColorGridWidget::containsColor(const QColor &color) const
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::activeColorIndex() const
+int QvisColorGridWidget::activeColorIndex() const
 {
-    return currentActiveColor;
+  return currentActiveColor;
 }
 
 // ****************************************************************************
@@ -659,35 +638,34 @@ QvisColorGridWidget::activeColorIndex() const
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::setActiveColorIndex(int index)
+void QvisColorGridWidget::setActiveColorIndex(int index)
 {
-    if(index >= -1 && index < numPaletteColors)
+  if (index >= -1 && index < numPaletteColors)
+  {
+    QRegion region;
+
+    // If we currently have an active color, unhighlight it.
+    if (activeColorIndex() != -1)
     {
-        QRegion region;
-
-        // If we currently have an active color, unhighlight it.
-        if(activeColorIndex() != -1)
-        {
-            if(activeColorIndex() == currentSelectedColor)
-                region = drawSelectedColor(0, activeColorIndex());
-            else
-                region = drawUnHighlightedColor(0, activeColorIndex());
-        }
-
-        currentActiveColor = index;
-
-        // If the active color that we set is a real color, highlight the new
-        // active color.
-        if(activeColorIndex() == currentSelectedColor)
-            region = region + drawSelectedColor(0, activeColorIndex());
-        else if(activeColorIndex() != -1)
-            region = region + drawHighlightedColor(0, activeColorIndex());
-
-        // Update the pixmap.
-        if(isVisible())
-            repaint(region);
+      if (activeColorIndex() == currentSelectedColor)
+        region = drawSelectedColor(0, activeColorIndex());
+      else
+        region = drawUnHighlightedColor(0, activeColorIndex());
     }
+
+    currentActiveColor = index;
+
+    // If the active color that we set is a real color, highlight the new
+    // active color.
+    if (activeColorIndex() == currentSelectedColor)
+      region = region + drawSelectedColor(0, activeColorIndex());
+    else if (activeColorIndex() != -1)
+      region = region + drawHighlightedColor(0, activeColorIndex());
+
+    // Update the pixmap.
+    if (isVisible())
+      repaint(region);
+  }
 }
 
 // ****************************************************************************
@@ -709,49 +687,48 @@ QvisColorGridWidget::setActiveColorIndex(int index)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::keyPressEvent(QKeyEvent *e)
+void QvisColorGridWidget::keyPressEvent(QKeyEvent* e)
 {
-    QColor temp;
-    int    column = activeColorIndex() % numColumns;
-    int    row = activeColorIndex() / numColumns;
+  QColor temp;
+  int column = activeColorIndex() % numColumns;
+  int row = activeColorIndex() / numColumns;
 
-    // Handle the key strokes.
-    switch(e->key())
-    {
+  // Handle the key strokes.
+  switch (e->key())
+  {
     case Qt::Key_Escape:
-        // emit an empty color.
-        emit selectedColor(temp);
-        break;
+      // emit an empty color.
+      emit selectedColor(temp);
+      break;
     case Qt::Key_Return:
     case Qt::Key_Enter:
-        setSelectedColorIndex(activeColorIndex());
-        break;
+      setSelectedColorIndex(activeColorIndex());
+      break;
     case Qt::Key_Left:
-        if(column == 0)
-            setActiveColorIndex(getIndex(row, numColumns - 1));
-        else
-            setActiveColorIndex(getIndex(row, column - 1));
-        break;
+      if (column == 0)
+        setActiveColorIndex(getIndex(row, numColumns - 1));
+      else
+        setActiveColorIndex(getIndex(row, column - 1));
+      break;
     case Qt::Key_Right:
-        if(column == numColumns - 1)
-            setActiveColorIndex(getIndex(row, 0));
-        else
-            setActiveColorIndex(getIndex(row, column + 1));
-        break;
+      if (column == numColumns - 1)
+        setActiveColorIndex(getIndex(row, 0));
+      else
+        setActiveColorIndex(getIndex(row, column + 1));
+      break;
     case Qt::Key_Up:
-        if(row == 0)
-            setActiveColorIndex(getIndex(numRows - 1, column));
-        else
-            setActiveColorIndex(getIndex(row - 1, column));
-        break;
+      if (row == 0)
+        setActiveColorIndex(getIndex(numRows - 1, column));
+      else
+        setActiveColorIndex(getIndex(row - 1, column));
+      break;
     case Qt::Key_Down:
-        if(row == numRows - 1)
-            setActiveColorIndex(getIndex(0, column));
-        else
-            setActiveColorIndex(getIndex(row + 1, column));
-        break;
-    }
+      if (row == numRows - 1)
+        setActiveColorIndex(getIndex(0, column));
+      else
+        setActiveColorIndex(getIndex(row + 1, column));
+      break;
+  }
 }
 
 // ****************************************************************************
@@ -767,11 +744,10 @@ QvisColorGridWidget::keyPressEvent(QKeyEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::enterEvent(QEvent *)
+void QvisColorGridWidget::enterEvent(QEvent*)
 {
-    // We've entered the widget, turn on mouse tracking.
-    setMouseTracking(true);
+  // We've entered the widget, turn on mouse tracking.
+  setMouseTracking(true);
 }
 
 // ****************************************************************************
@@ -787,14 +763,13 @@ QvisColorGridWidget::enterEvent(QEvent *)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::leaveEvent(QEvent *)
+void QvisColorGridWidget::leaveEvent(QEvent*)
 {
-    // We've left the widget, turn off mouse tracking.
-    setMouseTracking(false);
+  // We've left the widget, turn off mouse tracking.
+  setMouseTracking(false);
 
-    // Indicate that no color is active.
-    setActiveColorIndex(-1);
+  // Indicate that no color is active.
+  setActiveColorIndex(-1);
 }
 
 // ****************************************************************************
@@ -814,27 +789,25 @@ QvisColorGridWidget::leaveEvent(QEvent *)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::mousePressEvent(QMouseEvent *e)
+void QvisColorGridWidget::mousePressEvent(QMouseEvent* e)
 {
-  if(e->button() == Qt::RightButton)
+  if (e->button() == Qt::RightButton)
+  {
+    int index = getColorIndex(e->x(), e->y());
+
+    // If a valid color index was returned, select the color.
+    if (index != -1)
     {
-        int index = getColorIndex(e->x(), e->y());
+      // Set the selected color.
+      setSelectedColorIndex(index);
 
-        // If a valid color index was returned, select the color.
-        if(index != -1)
-        {
-            // Set the selected color.
-            setSelectedColorIndex(index);
-
-            // Emit a signal that allows us to activate a menu.
-            int row, column;
-            QPoint center(e->x(), e->y());
-            getRowColumnFromIndex(currentSelectedColor, row, column);
-            emit activateMenu(selectedColor(), row, column,
-                              mapToGlobal(center));
-        }
+      // Emit a signal that allows us to activate a menu.
+      int row, column;
+      QPoint center(e->x(), e->y());
+      getRowColumnFromIndex(currentSelectedColor, row, column);
+      emit activateMenu(selectedColor(), row, column, mapToGlobal(center));
     }
+  }
 }
 
 // ****************************************************************************
@@ -856,17 +829,16 @@ QvisColorGridWidget::mousePressEvent(QMouseEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::mouseMoveEvent(QMouseEvent *e)
+void QvisColorGridWidget::mouseMoveEvent(QMouseEvent* e)
 {
-    int index = getColorIndex(e->x(), e->y());
+  int index = getColorIndex(e->x(), e->y());
 
-    // If we've moved the mouse to a new active color, unhighlight the old one
-    // and highlight the new one.
-    if(index != activeColorIndex())
-    {
-        setActiveColorIndex(index);
-    }
+  // If we've moved the mouse to a new active color, unhighlight the old one
+  // and highlight the new one.
+  if (index != activeColorIndex())
+  {
+    setActiveColorIndex(index);
+  }
 }
 
 // ****************************************************************************
@@ -888,17 +860,16 @@ QvisColorGridWidget::mouseMoveEvent(QMouseEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::mouseReleaseEvent(QMouseEvent *e)
+void QvisColorGridWidget::mouseReleaseEvent(QMouseEvent* e)
 {
-    int index = getColorIndex(e->x(), e->y());
+  int index = getColorIndex(e->x(), e->y());
 
-    // If a valid color index was returned, select the color.
-    if(index != -1)
-    {
-        // Set the selected color.
-        setSelectedColorIndex(index);
-    }
+  // If a valid color index was returned, select the color.
+  if (index != -1)
+  {
+    // Set the selected color.
+    setSelectedColorIndex(index);
+  }
 }
 
 // ****************************************************************************
@@ -917,26 +888,25 @@ QvisColorGridWidget::mouseReleaseEvent(QMouseEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::paintEvent(QPaintEvent *e)
+void QvisColorGridWidget::paintEvent(QPaintEvent* e)
 {
-    // If the pixmap has not been created, create it and draw into it.
-    if(drawPixmap == 0)
-    {
-        drawPixmap = new QPixmap(width(), height());
-        drawColorArray();
-    }
+  // If the pixmap has not been created, create it and draw into it.
+  if (drawPixmap == 0)
+  {
+    drawPixmap = new QPixmap(width(), height());
+    drawColorArray();
+  }
 
-    // Blit the pixmap onto the widget.
-    QPainter paint;
-    paint.begin(this);
-    if(!e->region().isEmpty())
-    {
-        paint.setClipRegion(e->region());
-        paint.setClipping(true);
-    }
-    paint.drawPixmap(0, 0, *drawPixmap);
-    paint.end();
+  // Blit the pixmap onto the widget.
+  QPainter paint;
+  paint.begin(this);
+  if (!e->region().isEmpty())
+  {
+    paint.setClipRegion(e->region());
+    paint.setClipping(true);
+  }
+  paint.drawPixmap(0, 0, *drawPixmap);
+  paint.end();
 }
 
 // ****************************************************************************
@@ -953,15 +923,14 @@ QvisColorGridWidget::paintEvent(QPaintEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::resizeEvent(QResizeEvent *)
+void QvisColorGridWidget::resizeEvent(QResizeEvent*)
 {
-    // Delete the pixmap so the entire widget will be redrawn.
-    if(drawPixmap)
-    {
-        delete drawPixmap;
-        drawPixmap = 0;
-    }
+  // Delete the pixmap so the entire widget will be redrawn.
+  if (drawPixmap)
+  {
+    delete drawPixmap;
+    drawPixmap = 0;
+  }
 }
 
 // ****************************************************************************
@@ -985,23 +954,22 @@ QvisColorGridWidget::resizeEvent(QResizeEvent *)
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::getColorIndex(int _x, int _y) const
+int QvisColorGridWidget::getColorIndex(int _x, int _y) const
 {
-    int index = -1;
+  int index = -1;
 
-    // See if the _x,_y coordinate is in the widget.
-    if(QRect(0, 0, width(), height()).contains(QPoint(_x, _y)))
-    {
-        int boxWidth  = (width()  - boxPaddingValue) / numColumns;
-        int boxHeight = (height() - boxPaddingValue) / numRows;
+  // See if the _x,_y coordinate is in the widget.
+  if (QRect(0, 0, width(), height()).contains(QPoint(_x, _y)))
+  {
+    int boxWidth = (width() - boxPaddingValue) / numColumns;
+    int boxHeight = (height() - boxPaddingValue) / numRows;
 
-        int column = (_x - boxPaddingValue) / boxWidth;
-        int row = (_y - boxPaddingValue) / boxHeight;
-        index = getIndex(row, column);
-    }
+    int column = (_x - boxPaddingValue) / boxWidth;
+    int row = (_y - boxPaddingValue) / boxHeight;
+    index = getIndex(row, column);
+  }
 
-    return index;
+  return index;
 }
 
 // ****************************************************************************
@@ -1025,10 +993,9 @@ QvisColorGridWidget::getColorIndex(int _x, int _y) const
 //
 // ****************************************************************************
 
-int
-QvisColorGridWidget::getIndex(int row, int column) const
+int QvisColorGridWidget::getIndex(int row, int column) const
 {
-    return (row * numColumns) + column;
+  return (row * numColumns) + column;
 }
 
 // ****************************************************************************
@@ -1053,11 +1020,10 @@ QvisColorGridWidget::getIndex(int row, int column) const
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::getRowColumnFromIndex(int index, int &row, int &column) const
+void QvisColorGridWidget::getRowColumnFromIndex(int index, int& row, int& column) const
 {
-    row = index / numColumns;
-    column = index % numColumns;
+  row = index / numColumns;
+  column = index % numColumns;
 }
 
 // ****************************************************************************
@@ -1081,23 +1047,21 @@ QvisColorGridWidget::getRowColumnFromIndex(int index, int &row, int &column) con
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::getColorRect(int index, int &_x, int &_y,
-    int &w, int &h)
+void QvisColorGridWidget::getColorRect(int index, int& _x, int& _y, int& w, int& h)
 {
-    int column = index % numColumns;
-    int row = index / numColumns;
+  int column = index % numColumns;
+  int row = index / numColumns;
 
-    int boxWidth  = (width() - boxPaddingValue) / numColumns;
-    int boxHeight = (height() -  boxPaddingValue) / numRows;
+  int boxWidth = (width() - boxPaddingValue) / numColumns;
+  int boxHeight = (height() - boxPaddingValue) / numRows;
 
-    // Figure out the _x,_y location.
-    _x = column * boxWidth + boxPaddingValue;
-    _y = row * boxHeight + boxPaddingValue;
+  // Figure out the _x,_y location.
+  _x = column * boxWidth + boxPaddingValue;
+  _y = row * boxHeight + boxPaddingValue;
 
-    // Figure out the width, height.
-    w = boxWidth - boxPaddingValue;
-    h = boxHeight - boxPaddingValue;
+  // Figure out the width, height.
+  w = boxWidth - boxPaddingValue;
+  h = boxHeight - boxPaddingValue;
 }
 
 // ****************************************************************************
@@ -1125,41 +1089,39 @@ QvisColorGridWidget::getColorRect(int index, int &_x, int &_y,
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::drawColorArray()
+void QvisColorGridWidget::drawColorArray()
 {
-    // Fill the pixmap with the background color or draw a frame.
-    QPainter paint(drawPixmap);
+  // Fill the pixmap with the background color or draw a frame.
+  QPainter paint(drawPixmap);
 
 #ifdef Q_WS_MACX
-    paint.fillRect(rect(), palette().brush(QPalette::Background));
+  paint.fillRect(rect(), palette().brush(QPalette::Background));
 #else
-    paint.fillRect(rect(), palette().brush(QPalette::Button));
+  paint.fillRect(rect(), palette().brush(QPalette::Button));
 #endif
 
-    if(drawFrame)
-    {
-      drawBox(paint, rect(), palette().light().color(),
-                palette().dark().color());
-    }
+  if (drawFrame)
+  {
+    drawBox(paint, rect(), palette().light().color(), palette().dark().color());
+  }
 
-    // Draw all of the color boxes.
-    int index = 0;
-    for(int i = 0; i < numRows; ++i)
+  // Draw all of the color boxes.
+  int index = 0;
+  for (int i = 0; i < numRows; ++i)
+  {
+    for (int j = 0; j < numColumns; ++j, ++index)
     {
-        for(int j = 0; j < numColumns; ++j, ++index)
-        {
-            if(index < numPaletteColors)
-            {
-                if(index == currentSelectedColor)
-                    drawSelectedColor(&paint, index);
-                else if(index == activeColorIndex())
-                    drawHighlightedColor(&paint, index);
-                else
-                    drawColor(paint, index);
-            }
-        }
+      if (index < numPaletteColors)
+      {
+        if (index == currentSelectedColor)
+          drawSelectedColor(&paint, index);
+        else if (index == activeColorIndex())
+          drawHighlightedColor(&paint, index);
+        else
+          drawColor(paint, index);
+      }
     }
+  }
 }
 
 // ****************************************************************************
@@ -1186,31 +1148,30 @@ QvisColorGridWidget::drawColorArray()
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::drawBox(QPainter &paint, const QRect &r,
-    const QColor &light, const QColor &dark, int lw)
+void QvisColorGridWidget::drawBox(
+  QPainter& paint, const QRect& r, const QColor& light, const QColor& dark, int lw)
 {
-    int i;
-    int X  = r.x();
-    int X2 = r.x() + r.width() - 1;
-    int Y  = r.y();
-    int Y2 = r.y() + r.height() - 1;
+  int i;
+  int X = r.x();
+  int X2 = r.x() + r.width() - 1;
+  int Y = r.y();
+  int Y2 = r.y() + r.height() - 1;
 
-    // Draw the highlight
-    paint.setPen(QPen(light));
-    for(i = 0; i < lw; ++i)
-    {
-        paint.drawLine(QPoint(X + i, Y + i), QPoint(X + i, Y2 - i));
-        paint.drawLine(QPoint(X + i, Y + i), QPoint(X2 - i, Y + i));
-    }
+  // Draw the highlight
+  paint.setPen(QPen(light));
+  for (i = 0; i < lw; ++i)
+  {
+    paint.drawLine(QPoint(X + i, Y + i), QPoint(X + i, Y2 - i));
+    paint.drawLine(QPoint(X + i, Y + i), QPoint(X2 - i, Y + i));
+  }
 
-    // Draw the shadow
-    paint.setPen(QPen(dark));
-    for(i = 0; i < lw; ++i)
-    {
-        paint.drawLine(QPoint(X + i + 1, Y2 - i), QPoint(X2, Y2 - i));
-        paint.drawLine(QPoint(X2 - i, Y + i + 1), QPoint(X2 - i, Y2));
-    }
+  // Draw the shadow
+  paint.setPen(QPen(dark));
+  for (i = 0; i < lw; ++i)
+  {
+    paint.drawLine(QPoint(X + i + 1, Y2 - i), QPoint(X2, Y2 - i));
+    paint.drawLine(QPoint(X2 - i, Y + i + 1), QPoint(X2 - i, Y2));
+  }
 }
 
 // ****************************************************************************
@@ -1232,20 +1193,18 @@ QvisColorGridWidget::drawBox(QPainter &paint, const QRect &r,
 //
 // ****************************************************************************
 
-void
-QvisColorGridWidget::drawColor(QPainter &paint, int index)
+void QvisColorGridWidget::drawColor(QPainter& paint, int index)
 {
-    if(index >= 0)
-    {
-        // Get the location of the index'th color box.
-        int _x, _y, boxWidth, boxHeight;
-        getColorRect(index, _x, _y, boxWidth, boxHeight);
+  if (index >= 0)
+  {
+    // Get the location of the index'th color box.
+    int _x, _y, boxWidth, boxHeight;
+    getColorRect(index, _x, _y, boxWidth, boxHeight);
 
-        paint.setPen(palette().dark().color());
-        paint.drawRect(_x, _y, boxWidth, boxHeight);
-        paint.fillRect(_x + 1, _y + 1, boxWidth - 2, boxHeight - 2,
-                       paletteColors[index]);
-    }
+    paint.setPen(palette().dark().color());
+    paint.drawRect(_x, _y, boxWidth, boxHeight);
+    paint.fillRect(_x + 1, _y + 1, boxWidth - 2, boxHeight - 2, paletteColors[index]);
+  }
 }
 
 // ****************************************************************************
@@ -1270,41 +1229,38 @@ QvisColorGridWidget::drawColor(QPainter &paint, int index)
 //
 // ****************************************************************************
 
-QRegion
-QvisColorGridWidget::drawHighlightedColor(QPainter *paint, int index)
+QRegion QvisColorGridWidget::drawHighlightedColor(QPainter* paint, int index)
 {
-    QRegion retval;
+  QRegion retval;
 
-    if(drawPixmap && index >= 0)
+  if (drawPixmap && index >= 0)
+  {
+    // Get the location of the index'th color box.
+    int _x, _y, boxWidth, boxHeight;
+    getColorRect(index, _x, _y, boxWidth, boxHeight);
+
+    QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+      boxHeight + boxPaddingValue);
+
+    // Draw the button and the color over the button.
+    if (paint == 0)
     {
-        // Get the location of the index'th color box.
-        int _x, _y, boxWidth, boxHeight;
-        getColorRect(index, _x, _y, boxWidth, boxHeight);
-
-        QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-                boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
-
-        // Draw the button and the color over the button.
-        if(paint == 0)
-        {
-            QPainter p2(drawPixmap);
-            drawBox(p2, r, palette().light().color(),
-                    palette().dark().color());
-            drawColor(p2, index);
-        }
-        else
-        {
-            drawBox(*paint, r, palette().light().color(),
-                    palette().dark().color());
-            drawColor(*paint, index);
-        }
-
-        // return the region that we drew on.
-        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-            boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
+      QPainter p2(drawPixmap);
+      drawBox(p2, r, palette().light().color(), palette().dark().color());
+      drawColor(p2, index);
+    }
+    else
+    {
+      drawBox(*paint, r, palette().light().color(), palette().dark().color());
+      drawColor(*paint, index);
     }
 
-    return retval;
+    // return the region that we drew on.
+    retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+      boxHeight + boxPaddingValue);
+  }
+
+  return retval;
 }
 
 // ****************************************************************************
@@ -1337,46 +1293,43 @@ QvisColorGridWidget::drawHighlightedColor(QPainter *paint, int index)
 //
 // ****************************************************************************
 
-QRegion
-QvisColorGridWidget::drawUnHighlightedColor(QPainter *paint, int index)
+QRegion QvisColorGridWidget::drawUnHighlightedColor(QPainter* paint, int index)
 {
-    QRegion retval;
+  QRegion retval;
 
-    if(drawPixmap && index >= 0)
-    {
-        // Get the location of the index'th color box.
-        int _x, _y, boxWidth, boxHeight;
-        getColorRect(index, _x, _y, boxWidth, boxHeight);
+  if (drawPixmap && index >= 0)
+  {
+    // Get the location of the index'th color box.
+    int _x, _y, boxWidth, boxHeight;
+    getColorRect(index, _x, _y, boxWidth, boxHeight);
 
 #ifdef Q_WS_MACX
-        QBrush brush(palette().brush(QPalette::Background));
+    QBrush brush(palette().brush(QPalette::Background));
 #else
-        QBrush brush(palette().brush(QPalette::Button));
+    QBrush brush(palette().brush(QPalette::Button));
 #endif
 
-        // Draw the button and the color over the button.
-        if(paint == 0)
-        {
-            QPainter p2(drawPixmap);
-            p2.fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-                        boxWidth + boxPaddingValue, boxHeight + boxPaddingValue,
-                        brush);
-            drawColor(p2, index);
-        }
-        else
-        {
-            paint->fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-                            boxWidth + boxPaddingValue, boxHeight + boxPaddingValue,
-                            brush);
-            drawColor(*paint, index);
-        }
-
-        // return the region that we drew on.
-        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-            boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
+    // Draw the button and the color over the button.
+    if (paint == 0)
+    {
+      QPainter p2(drawPixmap);
+      p2.fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+        boxHeight + boxPaddingValue, brush);
+      drawColor(p2, index);
+    }
+    else
+    {
+      paint->fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
+        boxWidth + boxPaddingValue, boxHeight + boxPaddingValue, brush);
+      drawColor(*paint, index);
     }
 
-    return retval;
+    // return the region that we drew on.
+    retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+      boxHeight + boxPaddingValue);
+  }
+
+  return retval;
 }
 
 // ****************************************************************************
@@ -1404,42 +1357,41 @@ QvisColorGridWidget::drawUnHighlightedColor(QPainter *paint, int index)
 //
 // ****************************************************************************
 
-QRegion
-QvisColorGridWidget::drawSelectedColor(QPainter *paint, int index)
+QRegion QvisColorGridWidget::drawSelectedColor(QPainter* paint, int index)
 {
-    QRegion retval;
+  QRegion retval;
 
-    if(drawPixmap && index >= 0)
+  if (drawPixmap && index >= 0)
+  {
+    // Get the location of the index'th color box.
+    int _x, _y, boxWidth, boxHeight;
+    getColorRect(index, _x, _y, boxWidth, boxHeight);
+
+    QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+      boxHeight + boxPaddingValue);
+
+    if (paint == 0)
     {
-        // Get the location of the index'th color box.
-        int _x, _y, boxWidth, boxHeight;
-        getColorRect(index, _x, _y, boxWidth, boxHeight);
+      // Draw a sunken button.
+      QPainter p2(drawPixmap);
+      drawBox(p2, r, palette().dark().color(), palette().light().color());
 
-        QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-                boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
+      // Draw the color over the button.
+      drawColor(p2, index);
+    }
+    else
+    {
+      // Draw a sunken button.
+      drawBox(*paint, r, palette().dark().color(), palette().light().color());
 
-        if(paint == 0)
-        {
-            // Draw a sunken button.
-            QPainter p2(drawPixmap);
-            drawBox(p2, r, palette().dark().color(), palette().light().color());
-
-            // Draw the color over the button.
-            drawColor(p2, index);
-        }
-        else
-        {
-            // Draw a sunken button.
-            drawBox(*paint, r, palette().dark().color(), palette().light().color());
-
-            // Draw the color over the button.
-            drawColor(*paint, index);
-        }
-
-        // return the region that we drew on.
-        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
-            boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
+      // Draw the color over the button.
+      drawColor(*paint, index);
     }
 
-    return retval;
+    // return the region that we drew on.
+    retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2, boxWidth + boxPaddingValue,
+      boxHeight + boxPaddingValue);
+  }
+
+  return retval;
 }

@@ -47,7 +47,6 @@
 #include <cstdlib>
 #include <iostream>
 
-
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::QvisAbstractOpacityBar
 //
@@ -59,17 +58,16 @@
 //
 // ****************************************************************************
 
-QvisAbstractOpacityBar::QvisAbstractOpacityBar(QWidget *parentObject,
-  const char* /*name*/)
-    : QFrame(parentObject)
+QvisAbstractOpacityBar::QvisAbstractOpacityBar(QWidget* parentObject, const char* /*name*/)
+  : QFrame(parentObject)
 {
-    setFrameStyle( QFrame::Panel | QFrame::Sunken );
-    setLineWidth( 2 );
-    setMinimumHeight(50);
-    setMinimumWidth(128);
-    pix = new QPixmap;
-    backgroundColorControlPoints = 0;
-    backgroundPixmap = NULL;
+  setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  setLineWidth(2);
+  setMinimumHeight(50);
+  setMinimumWidth(128);
+  pix = new QPixmap;
+  backgroundColorControlPoints = 0;
+  backgroundPixmap = NULL;
 }
 
 // ****************************************************************************
@@ -89,19 +87,20 @@ QvisAbstractOpacityBar::QvisAbstractOpacityBar(QWidget *parentObject,
 
 QvisAbstractOpacityBar::~QvisAbstractOpacityBar()
 {
-    delete pix;
-    delete backgroundColorControlPoints;
-    pix = 0;
-    showBackgroundPixmap = false;
+  delete pix;
+  delete backgroundColorControlPoints;
+  pix = 0;
+  showBackgroundPixmap = false;
 }
 
 void QvisAbstractOpacityBar::SetShowBackgroundPixmap(bool showFlag)
 {
-    showBackgroundPixmap = showFlag;
+  showBackgroundPixmap = showFlag;
 }
 
 // ****************************************************************************
-//  Method:  QvisAbstractOpacityBar::SetBackgroundColorControlPoints(const ColorControlPointList *ccp)
+//  Method:  QvisAbstractOpacityBar::SetBackgroundColorControlPoints(const ColorControlPointList
+//  *ccp)
 //
 //  Purpose: Set color control points for color transfer function backdrop
 //
@@ -113,46 +112,52 @@ void QvisAbstractOpacityBar::SetShowBackgroundPixmap(bool showFlag)
 //
 // ****************************************************************************
 
-void QvisAbstractOpacityBar::SetBackgroundColorControlPoints(const pointsprite::ColorControlPointList *ccp)
+void QvisAbstractOpacityBar::SetBackgroundColorControlPoints(
+  const pointsprite::ColorControlPointList* ccp)
 {
-  if (backgroundColorControlPoints) delete backgroundColorControlPoints;
+  if (backgroundColorControlPoints)
+    delete backgroundColorControlPoints;
   backgroundColorControlPoints = NULL;
-  if (ccp) {
+  if (ccp)
+  {
     backgroundColorControlPoints = new pointsprite::ColorControlPointList(*ccp);
   }
   this->update();
 }
 
-void QvisAbstractOpacityBar::SetBackgroundPixmap(QPixmap *background)
+void QvisAbstractOpacityBar::SetBackgroundPixmap(QPixmap* background)
 {
-  if (this->backgroundPixmap) delete this->backgroundPixmap;
+  if (this->backgroundPixmap)
+    delete this->backgroundPixmap;
   this->backgroundPixmap = NULL;
-  if (background) {
+  if (background)
+  {
     this->backgroundPixmap = new QPixmap(*background);
   }
 }
 
-void QvisAbstractOpacityBar::paintBackground(QPainter &painter, int w, int h)
+void QvisAbstractOpacityBar::paintBackground(QPainter& painter, int w, int h)
 {
-  if (this->showBackgroundPixmap && this->backgroundPixmap) {
-    painter.drawPixmap(0,0, *this->backgroundPixmap);
-  }
-/*
-  else if (backgroundColorControlPoints && backgroundColorControlPoints->GetNumControlPoints()>1)
+  if (this->showBackgroundPixmap && this->backgroundPixmap)
   {
-    unsigned char *cols = new unsigned char[w*3];
-    backgroundColorControlPoints->GetColors(cols, w);
-    for (int x=0; x<w; ++x) {
-      QRgb bgCols = QColor(cols[x*3+0], cols[x*3+1], cols[x*3+2]).rgb();
-      painter.setPen(bgCols);
-      painter.drawLine(x,0, x, h-1);
-    }
-    delete[] cols;
+    painter.drawPixmap(0, 0, *this->backgroundPixmap);
   }
-*/
+  /*
+    else if (backgroundColorControlPoints && backgroundColorControlPoints->GetNumControlPoints()>1)
+    {
+      unsigned char *cols = new unsigned char[w*3];
+      backgroundColorControlPoints->GetColors(cols, w);
+      for (int x=0; x<w; ++x) {
+        QRgb bgCols = QColor(cols[x*3+0], cols[x*3+1], cols[x*3+2]).rgb();
+        painter.setPen(bgCols);
+        painter.drawLine(x,0, x, h-1);
+      }
+      delete[] cols;
+    }
+  */
   else
   {
-    painter.fillRect(0,0, w,h, QBrush(Qt::black));
+    painter.fillRect(0, 0, w, h, QBrush(Qt::black));
   }
 }
 
@@ -166,17 +171,15 @@ void QvisAbstractOpacityBar::paintBackground(QPainter &painter, int w, int h)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-int
-QvisAbstractOpacityBar::val2x(float val)
+int QvisAbstractOpacityBar::val2x(float val)
 {
-    QRect c = contentsRect();
-    int w = c.width();
-    int l = c.left();
-    int _x = int(val*float(w) + l);
-    _x = qMax(l, qMin(l+w, _x));
-    return _x;
+  QRect c = contentsRect();
+  int w = c.width();
+  int l = c.left();
+  int _x = int(val * float(w) + l);
+  _x = qMax(l, qMin(l + w, _x));
+  return _x;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::x2val
@@ -188,17 +191,15 @@ QvisAbstractOpacityBar::val2x(float val)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-float
-QvisAbstractOpacityBar::x2val(int _x)
+float QvisAbstractOpacityBar::x2val(int _x)
 {
-    QRect c = contentsRect();
-    int w = c.width();
-    int l = c.left();
-    float val = float(_x-l)/float(w);
-    val = qMax((float)0, qMin((float)1, val));
-    return val;
+  QRect c = contentsRect();
+  int w = c.width();
+  int l = c.left();
+  float val = float(_x - l) / float(w);
+  val = qMax((float)0, qMin((float)1, val));
+  return val;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::val2y
@@ -210,17 +211,15 @@ QvisAbstractOpacityBar::x2val(int _x)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-int
-QvisAbstractOpacityBar::val2y(float val)
+int QvisAbstractOpacityBar::val2y(float val)
 {
-    QRect c = contentsRect();
-    int h = c.height();
-    int t = c.top();
-    int _y = int((1-val)*float(h) + t);
-    _y = qMax(t, qMin(t+h, _y));
-    return _y;
+  QRect c = contentsRect();
+  int h = c.height();
+  int t = c.top();
+  int _y = int((1 - val) * float(h) + t);
+  _y = qMax(t, qMin(t + h, _y));
+  return _y;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::y2val
@@ -232,17 +231,15 @@ QvisAbstractOpacityBar::val2y(float val)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-float
-QvisAbstractOpacityBar::y2val(int _y)
+float QvisAbstractOpacityBar::y2val(int _y)
 {
-    QRect c = contentsRect();
-    int h = c.height();
-    int t = c.top();
-    float val = float(_y-t)/float(h);
-    val = qMax((float)0, qMin((float)1, ((float)1-val)));
-    return val;
+  QRect c = contentsRect();
+  int h = c.height();
+  int t = c.top();
+  float val = float(_y - t) / float(h);
+  val = qMax((float)0, qMin((float)1, ((float)1 - val)));
+  return val;
 }
-
 
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::paintEvent
@@ -254,19 +251,17 @@ QvisAbstractOpacityBar::y2val(int _y)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisAbstractOpacityBar::paintEvent(QPaintEvent *e)
+void QvisAbstractOpacityBar::paintEvent(QPaintEvent* e)
 {
-    QFrame::paintEvent(e);
-    if (!pix) return;
-    //
-    QPainter painter(this);
-    this->paintToPixmap(contentsRect().width(), contentsRect().height());
-    painter.drawPixmap(contentsRect().left(),contentsRect().top(),*pix);
-    painter.end();
+  QFrame::paintEvent(e);
+  if (!pix)
+    return;
+  //
+  QPainter painter(this);
+  this->paintToPixmap(contentsRect().width(), contentsRect().height());
+  painter.drawPixmap(contentsRect().left(), contentsRect().top(), *pix);
+  painter.end();
 }
-
-
 
 // ****************************************************************************
 //  Method:  QvisAbstractOpacityBar::resizeEvent
@@ -278,22 +273,20 @@ QvisAbstractOpacityBar::paintEvent(QPaintEvent *e)
 //  Creation:    January 31, 2001
 //
 // ****************************************************************************
-void
-QvisAbstractOpacityBar::resizeEvent(QResizeEvent*)
+void QvisAbstractOpacityBar::resizeEvent(QResizeEvent*)
 {
-    QRect framerect(rect());
-    framerect.setTop(framerect.top()       +5);
-    framerect.setBottom(framerect.bottom( )-5);
-    framerect.setLeft(framerect.left()     +13);
-    framerect.setRight(framerect.right()   -13);
-    setFrameRect(framerect);
+  QRect framerect(rect());
+  framerect.setTop(framerect.top() + 5);
+  framerect.setBottom(framerect.bottom() - 5);
+  framerect.setLeft(framerect.left() + 13);
+  framerect.setRight(framerect.right() - 13);
+  setFrameRect(framerect);
 
-    int w=contentsRect().width();
-    int h=contentsRect().height();
+  int w = contentsRect().width();
+  int h = contentsRect().height();
 
-    delete pix;
-    pix = new QPixmap(w,h);
+  delete pix;
+  pix = new QPixmap(w, h);
 
-    emit resized();
-
+  emit resized();
 }

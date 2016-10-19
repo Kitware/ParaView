@@ -34,52 +34,45 @@ public:
   static vtkSMProxyClipboardPropertyIterator* New();
   vtkTypeMacro(vtkSMProxyClipboardPropertyIterator, vtkSMPropertyIterator);
   virtual void Next()
-    {
+  {
     do
-      {
-      this->Superclass::Next();
-      }
-    while (!this->IsAtEnd() && this->Skip(this->GetKey(), this->GetProperty()));
-    }
-  virtual void Begin()
     {
+      this->Superclass::Next();
+    } while (!this->IsAtEnd() && this->Skip(this->GetKey(), this->GetProperty()));
+  }
+  virtual void Begin()
+  {
     this->Superclass::Begin();
-    if (!this->IsAtEnd() &&
-      this->Skip(this->GetKey(), this->GetProperty()))
-      {
+    if (!this->IsAtEnd() && this->Skip(this->GetKey(), this->GetProperty()))
+    {
       this->Next();
-      }
     }
+  }
 
 protected:
-  vtkSMProxyClipboardPropertyIterator()
-    {
-    }
-  ~vtkSMProxyClipboardPropertyIterator()
-    {
-    }
+  vtkSMProxyClipboardPropertyIterator() {}
+  ~vtkSMProxyClipboardPropertyIterator() {}
 
   bool Skip(const char* vtkNotUsed(pname), vtkSMProperty* prop) const
+  {
+    if (prop->GetPanelVisibility() == NULL || strcmp(prop->GetPanelVisibility(), "never") == 0)
     {
-    if (prop->GetPanelVisibility() == NULL ||
-      strcmp(prop->GetPanelVisibility(), "never") == 0)
-      {
       return true;
-      }
+    }
     if (vtkSMInputProperty::SafeDownCast(prop) != NULL)
-      {
+    {
       // FIXME: don't skip selection inputs.
       return true;
-      }
+    }
     else if (vtkSMProxyProperty::SafeDownCast(prop) &&
       (prop->GetRepeatable() || prop->FindDomain("vtkSMProxyListDomain")))
-      {
+    {
       // we skip repeatable properties to skip properties like Representations,
       // Props etc.
       return true;
-      }
-    return false;
     }
+    return false;
+  }
 
 private:
   vtkSMProxyClipboardPropertyIterator(const vtkSMProxyClipboardPropertyIterator&);
@@ -94,34 +87,34 @@ class vtkSMProxyClipboardInternals
   vtkSmartPointer<vtkPVXMLElement> CopiedState;
 
   vtkPVXMLElement* Save(vtkSMProxy* source)
-    {
+  {
     vtkNew<vtkSMProxyClipboardPropertyIterator> iter;
     iter->SetProxy(source);
     vtkPVXMLElement* sourceState = source->SaveXMLState(NULL, iter.GetPointer());
     if (!sourceState)
-      {
+    {
       return NULL;
-      }
+    }
     // Now save state for proxies on proxy list domains.
     vtkSmartPointer<vtkSMPropertyIterator> piter;
     piter.TakeReference(source->NewPropertyIterator());
     for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
-      {
+    {
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(piter->GetProperty());
-      vtkSMProxyListDomain* pld = pp? vtkSMProxyListDomain::SafeDownCast(
-        pp->FindDomain("vtkSMProxyListDomain")) : NULL;
+      vtkSMProxyListDomain* pld =
+        pp ? vtkSMProxyListDomain::SafeDownCast(pp->FindDomain("vtkSMProxyListDomain")) : NULL;
       if (!pld)
-        {
+      {
         continue;
-        }
+      }
       if (pp->GetNumberOfProxies() == 0)
-        {
+      {
         continue;
-        }
+      }
       iter->SetProxy(source);
       vtkPVXMLElement* proxyState = this->Save(pp->GetProxy(0));
       if (proxyState)
-        {
+      {
         vtkNew<vtkPVXMLElement> container;
         container->SetName("ClipboardState");
         container->SetAttribute("property_name", piter->GetKey());
@@ -130,75 +123,70 @@ class vtkSMProxyClipboardInternals
         container->AddNestedElement(proxyState);
         proxyState->Delete();
         sourceState->AddNestedElement(container.GetPointer());
-        }
       }
-    return sourceState;
     }
+    return sourceState;
+  }
 
   bool Load(vtkSMProxy* target, vtkPVXMLElement* targetState) const
-    {
+  {
     if (!target || !targetState)
-      {
+    {
       return true;
-      }
+    }
     vtkNew<vtkSMProxyLocator> locator;
     locator->UseSessionToLocateProxy(true);
     locator->SetSession(target->GetSession());
     if (!target->LoadXMLState(targetState, locator.GetPointer()))
-      {
+    {
       return false;
-      }
+    }
 
-    for (unsigned int cc=0, max=targetState->GetNumberOfNestedElements(); cc < max; ++cc)
-      {
+    for (unsigned int cc = 0, max = targetState->GetNumberOfNestedElements(); cc < max; ++cc)
+    {
       vtkPVXMLElement* elem = targetState->GetNestedElement(cc);
       if (elem == NULL || elem->GetName() == NULL || strcmp(elem->GetName(), "ClipboardState") != 0)
-        {
+      {
         continue;
-        }
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        target->GetProperty(elem->GetAttribute("property_name")));
-      vtkSMProxyListDomain* pld = pp? vtkSMProxyListDomain::SafeDownCast(
-        pp->FindDomain("vtkSMProxyListDomain")) : NULL;
-      if (!pld)
-        {
-        continue;
-        }
-      vtkSMProxy* newValue = pld->FindProxy(elem->GetAttribute("value_xmlgroup"),
-        elem->GetAttribute("value_xmlname"));
-      if (!newValue || !this->Load(newValue, elem->GetNestedElement(0)))
-        {
-        continue;
-        }
-      pp->SetProxy(0, newValue);
       }
+      vtkSMProxyProperty* pp =
+        vtkSMProxyProperty::SafeDownCast(target->GetProperty(elem->GetAttribute("property_name")));
+      vtkSMProxyListDomain* pld =
+        pp ? vtkSMProxyListDomain::SafeDownCast(pp->FindDomain("vtkSMProxyListDomain")) : NULL;
+      if (!pld)
+      {
+        continue;
+      }
+      vtkSMProxy* newValue =
+        pld->FindProxy(elem->GetAttribute("value_xmlgroup"), elem->GetAttribute("value_xmlname"));
+      if (!newValue || !this->Load(newValue, elem->GetNestedElement(0)))
+      {
+        continue;
+      }
+      pp->SetProxy(0, newValue);
+    }
     target->UpdateVTKObjects();
     return true;
-    }
+  }
+
 public:
-  bool CanPaste(vtkSMProxy* vtkNotUsed(target)) const
-    {
-    return this->CopiedState != NULL;
-    }
-  void Clear()
-    {
-    this->CopiedState = NULL;
-    }
+  bool CanPaste(vtkSMProxy* vtkNotUsed(target)) const { return this->CopiedState != NULL; }
+  void Clear() { this->CopiedState = NULL; }
 
   bool Copy(vtkSMProxy* source)
-    {
+  {
     this->CopiedState.TakeReference(this->Save(source));
     return this->CopiedState != NULL;
-    }
+  }
 
   bool Paste(vtkSMProxy* source) const
-    {
+  {
     if (this->CopiedState == NULL || source == NULL)
-      {
+    {
       return false;
-      }
-    return this->Load(source, this->CopiedState);
     }
+    return this->Load(source, this->CopiedState);
+  }
 };
 //============================================================================
 
@@ -220,9 +208,9 @@ bool vtkSMProxyClipboard::Copy(vtkSMProxy* source)
 {
   this->Internals->Clear();
   if (!source)
-    {
+  {
     return false;
-    }
+  }
   return this->Internals->Copy(source);
 }
 
@@ -236,9 +224,9 @@ bool vtkSMProxyClipboard::CanPaste(vtkSMProxy* target)
 bool vtkSMProxyClipboard::Paste(vtkSMProxy* target)
 {
   if (!this->CanPaste(target))
-    {
+  {
     return false;
-    }
+  }
 
   return this->Internals->Paste(target);
 }

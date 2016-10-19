@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPLinearScalarFieldFunction - Class for specifying scalars at points.
-// .SECTION Description
-// Class for specifying a scalar field that is linear with respect to the
-// coordinate components as well as time.
+/**
+ * @class   vtkCPLinearScalarFieldFunction
+ * @brief   Class for specifying scalars at points.
+ *
+ * Class for specifying a scalar field that is linear with respect to the
+ * coordinate components as well as time.
+*/
 
 #ifndef vtkCPLinearScalarFieldFunction_h
 #define vtkCPLinearScalarFieldFunction_h
@@ -23,42 +26,59 @@
 #include "vtkCPScalarFieldFunction.h"
 #include "vtkPVCatalystTestDriverModule.h" // needed for export macros
 
-class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPLinearScalarFieldFunction : public vtkCPScalarFieldFunction
+class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPLinearScalarFieldFunction
+  : public vtkCPScalarFieldFunction
 {
 public:
-  static vtkCPLinearScalarFieldFunction * New();
+  static vtkCPLinearScalarFieldFunction* New();
   vtkTypeMacro(vtkCPLinearScalarFieldFunction, vtkCPScalarFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Compute the field value at Point.
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time);
+  /**
+   * Compute the field value at Point.
+   */
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time);
 
-  // Description:
-  // Set/get the constant value for the field.
+  //@{
+  /**
+   * Set/get the constant value for the field.
+   */
   vtkSetMacro(Constant, double);
   vtkGetMacro(Constant, double);
+  //@}
 
-  // Description:
-  // Set/get the XMultiplier for the field.
+  //@{
+  /**
+   * Set/get the XMultiplier for the field.
+   */
   vtkSetMacro(XMultiplier, double);
   vtkGetMacro(XMultiplier, double);
+  //@}
 
-  // Description:
-  // Set/get the YMultiplier for the field.
+  //@{
+  /**
+   * Set/get the YMultiplier for the field.
+   */
   vtkSetMacro(YMultiplier, double);
   vtkGetMacro(YMultiplier, double);
+  //@}
 
-  // Description:
-  // Set/get the ZMultiplier for the field.
+  //@{
+  /**
+   * Set/get the ZMultiplier for the field.
+   */
   vtkSetMacro(ZMultiplier, double);
   vtkGetMacro(ZMultiplier, double);
+  //@}
 
-  // Description:
-  // Set/get the TimeMultiplier for the field.
+  //@{
+  /**
+   * Set/get the TimeMultiplier for the field.
+   */
   vtkSetMacro(TimeMultiplier, double);
   vtkGetMacro(TimeMultiplier, double);
+  //@}
 
 protected:
   vtkCPLinearScalarFieldFunction();
@@ -68,25 +88,32 @@ private:
   vtkCPLinearScalarFieldFunction(const vtkCPLinearScalarFieldFunction&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCPLinearScalarFieldFunction&) VTK_DELETE_FUNCTION;
 
-  // Description:
-  // The constant value for the scalar field.
+  /**
+   * The constant value for the scalar field.
+   */
   double Constant;
 
-  // Description:
-  // The XMultiplier for the scalar field.
+  /**
+   * The XMultiplier for the scalar field.
+   */
   double XMultiplier;
 
-  // Description:
-  // The YMultiplier for the scalar field.
+  /**
+   * The YMultiplier for the scalar field.
+   */
   double YMultiplier;
 
-  // Description:
-  // The ZMultiplier for the scalar field.
+  /**
+   * The ZMultiplier for the scalar field.
+   */
   double ZMultiplier;
 
-  // Description:
-  // The TimeMultiplier for the scalar field.
+  //@{
+  /**
+   * The TimeMultiplier for the scalar field.
+   */
   double TimeMultiplier;
 };
+//@}
 
 #endif

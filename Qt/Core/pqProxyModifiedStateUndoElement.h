@@ -12,14 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// .NAME pqProxyModifiedStateUndoElement - undo element to capture the change
-/// in the modified state for a pqProxy.
-/// .SECTION Description
-/// pqProxyModifiedStateUndoElement can be used to capture the change in the
-/// modified state of a pqProxy. Currently it only captures the change from
-/// UNINITIALIZED to UNMODIFIED or vice-versa.  This is used by the
-/// pqObjectInspectorWidget to control the apply button state when the first
-/// accept is undone.
+/**
+* .NAME pqProxyModifiedStateUndoElement - undo element to capture the change
+* in the modified state for a pqProxy.
+* .SECTION Description
+* pqProxyModifiedStateUndoElement can be used to capture the change in the
+* modified state of a pqProxy. Currently it only captures the change from
+* UNINITIALIZED to UNMODIFIED or vice-versa.  This is used by the
+* pqObjectInspectorWidget to control the apply button state when the first
+* accept is undone.
+*/
 
 #ifndef pqProxyModifiedStateUndoElement_h
 #define pqProxyModifiedStateUndoElement_h
@@ -36,21 +38,19 @@ public:
   vtkTypeMacro(pqProxyModifiedStateUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual int Undo()
-    {
-    return this->InternalUndoRedo(true)? 1 : 0;
-    }
-  virtual int Redo()
-    {
-    return this->InternalUndoRedo(false)? 1 : 0;
-    }
+  virtual int Undo() { return this->InternalUndoRedo(true) ? 1 : 0; }
+  virtual int Redo() { return this->InternalUndoRedo(false) ? 1 : 0; }
 
-  /// Use this to initialize the element if the pqProxy was marked as
-  /// UNMODIFIED.
+  /**
+  * Use this to initialize the element if the pqProxy was marked as
+  * UNMODIFIED.
+  */
   void MadeUnmodified(pqProxy*);
 
-  /// Use this to initialize the element if the pqProxy was marked as
-  /// UNINITIALIZED.
+  /**
+  * Use this to initialize the element if the pqProxy was marked as
+  * UNINITIALIZED.
+  */
   void MadeUninitialized(pqProxy*);
 
 protected:
@@ -60,10 +60,10 @@ protected:
   bool InternalUndoRedo(bool undo);
   vtkTypeUInt32 ProxySourceGlobalId;
   bool Reverse;
+
 private:
   pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

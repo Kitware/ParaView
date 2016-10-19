@@ -12,17 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVImplicitCylinderRepresentation - extends vtkImplicitCylinderRepresentation
-// .SECTION Description
-// vtkPVImplicitCylinderRepresentation extends vtkImplicitCylinderRepresentation
-// to add ParaView proper initialisation values
+/**
+ * @class   vtkPVImplicitCylinderRepresentation
+ * @brief   extends vtkImplicitCylinderRepresentation
+ *
+ * vtkPVImplicitCylinderRepresentation extends vtkImplicitCylinderRepresentation
+ * to add ParaView proper initialisation values
+*/
 
 #ifndef vtkPVImplicitCylinderRepresentation_h
 #define vtkPVImplicitCylinderRepresentation_h
 
 #include "vtkImplicitCylinderRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitCylinderRepresentation
   : public vtkImplicitCylinderRepresentation
@@ -37,7 +39,8 @@ protected:
   ~vtkPVImplicitCylinderRepresentation();
 
 private:
-  vtkPVImplicitCylinderRepresentation(const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVImplicitCylinderRepresentation(
+    const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
 };
 

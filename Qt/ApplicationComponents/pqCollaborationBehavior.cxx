@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,23 +47,17 @@ pqCollaborationBehavior::pqCollaborationBehavior(QObject* parentObject)
   pqApplicationCore* core = pqApplicationCore::instance();
   core->registerManager("COLLABORATION_MANAGER", this->CollaborationManager);
 
-  QObject::connect( core->getServerManagerModel(),
-                    SIGNAL(preServerAdded(pqServer*)),
-                    this->CollaborationManager, SLOT(onServerAdded(pqServer*)));
+  QObject::connect(core->getServerManagerModel(), SIGNAL(preServerAdded(pqServer*)),
+    this->CollaborationManager, SLOT(onServerAdded(pqServer*)));
 
-  QObject::connect( core->getServerManagerModel(),
-                    SIGNAL(aboutToRemoveServer(pqServer*)),
-                    this->CollaborationManager, SLOT(onServerRemoved(pqServer*)));
+  QObject::connect(core->getServerManagerModel(), SIGNAL(aboutToRemoveServer(pqServer*)),
+    this->CollaborationManager, SLOT(onServerRemoved(pqServer*)));
 
-  QObject::connect( this->CollaborationManager,
-                    SIGNAL(triggeredMasterChanged(bool)),
-                    core,
-                    SIGNAL(updateMasterEnableState(bool)));
+  QObject::connect(this->CollaborationManager, SIGNAL(triggeredMasterChanged(bool)), core,
+    SIGNAL(updateMasterEnableState(bool)));
 
   // We attach mouse listener on active change time otherwise when the view
   // is just added, the widget is not yet correctly initialized...
-  QObject::connect( &pqActiveObjects::instance(),
-                    SIGNAL(viewChanged(pqView*)),
-                    this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
-                    Qt::UniqueConnection);
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()), Qt::UniqueConnection);
 }

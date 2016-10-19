@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,12 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObjectList>
 
-/// the main plugin interface for GUI extensions
-/// one instance of this resides in the plugin
+/**
+* the main plugin interface for GUI extensions
+* one instance of this resides in the plugin
+*/
 class pqPlugin
 {
 public:
-  /// destructor
+  /**
+  * destructor
+  */
   virtual ~pqPlugin() {}
 
   virtual QObjectList interfaces() = 0;
@@ -49,4 +53,3 @@ public:
 Q_DECLARE_INTERFACE(pqPlugin, "com.kitware/paraview/plugin")
 
 #endif
-

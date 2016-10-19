@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkCommandOptionsXMLParser.h
 
@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCommandOptionsXMLParser - ParaView options storage
-// .SECTION Description
-// An object of this class represents a storage for ParaView options
-// 
-// These options can be retrieved during run-time, set using configuration file
-// or using Command Line Arguments.
+/**
+ * @class   vtkCommandOptionsXMLParser
+ * @brief   ParaView options storage
+ *
+ * An object of this class represents a storage for ParaView options
+ *
+ * These options can be retrieved during run-time, set using configuration file
+ * or using Command Line Arguments.
+*/
 
 #ifndef vtkCommandOptionsXMLParser_h
 #define vtkCommandOptionsXMLParser_h
@@ -33,27 +36,29 @@ class VTKPVCOMMON_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
 {
 public:
   static vtkCommandOptionsXMLParser* New();
-  vtkTypeMacro(vtkCommandOptionsXMLParser,vtkXMLParser);
+  vtkTypeMacro(vtkCommandOptionsXMLParser, vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Add arguments to the xml parser.  These should be the 
-  // long arguments from the vtkCommandOptions class of the form
-  // --foo, and pass in the variable that needs to be set with the value.
-  void AddBooleanArgument(const char* longarg, int* var, int type=0);
-  void AddArgument(const char* longarg, int* var, int type=0);
-  void AddArgument(const char* longarg, char** var, int type=0);
-  void SetPVOptions(vtkCommandOptions* o) 
-    {
-      this->PVOptions = o;
-    }
+  //@{
+  /**
+   * Add arguments to the xml parser.  These should be the
+   * long arguments from the vtkCommandOptions class of the form
+   * --foo, and pass in the variable that needs to be set with the value.
+   */
+  void AddBooleanArgument(const char* longarg, int* var, int type = 0);
+  void AddArgument(const char* longarg, int* var, int type = 0);
+  void AddArgument(const char* longarg, char** var, int type = 0);
+  void SetPVOptions(vtkCommandOptions* o) { this->PVOptions = o; }
 protected:
-  // Description:
-  // Default constructor.
+  //@}
+  /**
+   * Default constructor.
+   */
   vtkCommandOptionsXMLParser();
 
-  // Description:
-  // Destructor.
+  /**
+   * Destructor.
+   */
   virtual ~vtkCommandOptionsXMLParser();
 
   // Called when a new element is opened in the XML source.  Should be
@@ -65,7 +70,7 @@ protected:
 
   // Called at the end of an element in the XML source opened when
   // StartElement was called.
-  virtual void EndElement(const char* name);  
+  virtual void EndElement(const char* name);
   // Call to process the .. of  <Option>...</>
   void HandleOption(const char** atts);
   // Call to process the .. of  <Option>...</>
@@ -83,4 +88,3 @@ private:
 };
 
 #endif // #ifndef vtkCommandOptionsXMLParser_h
-

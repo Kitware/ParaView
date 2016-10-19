@@ -49,8 +49,9 @@ class vtkVRStyleScaleWorld : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
-  vtkVRStyleScaleWorld(QObject* parent=0);
+  vtkVRStyleScaleWorld(QObject* parent = 0);
   virtual ~vtkVRStyleScaleWorld();
 
   /// called to handle an event. If the style does not handle this event or
@@ -72,22 +73,21 @@ public:
   virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
-  void HandleButtonPlus ( const vtkVREventData& data );
-  void HandleButtonMinus ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  void SetButtonValue( std::string dest, int value );
-  void SetAnalogValue( std::string dest, double value );
-  void SetAnalogVectorValue( std::string dest,
-                             const double* value,
-                             unsigned int total);
+  void HandleButtonPlus(const vtkVREventData& data);
+  void HandleButtonMinus(const vtkVREventData& data);
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleTracker(const vtkVREventData& data);
+  void SetButtonValue(std::string dest, int value);
+  void SetAnalogValue(std::string dest, double value);
+  void SetAnalogVectorValue(std::string dest, const double* value, unsigned int total);
 
-  void SetTrackerValue( std::string dest, double value );
-  void SetTrackerVectorValue( std::string dest, const double value[16] );
-  std::vector<std::string> tokenize( std::string input);
+  void SetTrackerValue(std::string dest, double value);
+  void SetTrackerVectorValue(std::string dest, const double value[16]);
+  std::vector<std::string> tokenize(std::string input);
   std::string ButtonPlus;
   std::string ButtonMinus;
   double ScaleFactor;
+
 private:
   Q_DISABLE_COPY(vtkVRStyleScaleWorld)
 };

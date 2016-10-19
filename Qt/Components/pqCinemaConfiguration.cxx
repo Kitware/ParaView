@@ -37,12 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "ui_pqCinemaConfiguration.h"
 
-
 // ----------------------------------------------------------------------------
-pqCinemaConfiguration::pqCinemaConfiguration(vtkSMProxy* proxy_,  vtkSMPropertyGroup*
-  smpgroup, QWidget* parent_)
-: Superclass(proxy_, parent_)
-, Ui(new Ui::CinemaConfiguration())
+pqCinemaConfiguration::pqCinemaConfiguration(
+  vtkSMProxy* proxy_, vtkSMPropertyGroup* smpgroup, QWidget* parent_)
+  : Superclass(proxy_, parent_)
+  , Ui(new Ui::CinemaConfiguration())
 {
   Q_UNUSED(smpgroup);
   this->Ui->setupUi(this);
@@ -54,14 +53,14 @@ pqCinemaConfiguration::pqCinemaConfiguration(vtkSMProxy* proxy_,  vtkSMPropertyG
   this->setMinimumHeight(700);
 
   // link ui to proxy properties
-  this->addPropertyLink(this, "viewSelection", SIGNAL(viewSelectionChanged()),
-    proxy_->GetProperty("ViewSelection"));
+  this->addPropertyLink(
+    this, "viewSelection", SIGNAL(viewSelectionChanged()), proxy_->GetProperty("ViewSelection"));
 
-  this->addPropertyLink(this, "trackSelection", SIGNAL(trackSelectionChanged()),
-    proxy_->GetProperty("TrackSelection"));
+  this->addPropertyLink(
+    this, "trackSelection", SIGNAL(trackSelectionChanged()), proxy_->GetProperty("TrackSelection"));
 
-  this->addPropertyLink(this, "arraySelection", SIGNAL(arraySelectionChanged()),
-    proxy_->GetProperty("ArraySelection"));
+  this->addPropertyLink(
+    this, "arraySelection", SIGNAL(arraySelectionChanged()), proxy_->GetProperty("ArraySelection"));
 
   // update ui with current views and filters and connect signals
   this->populateElements();

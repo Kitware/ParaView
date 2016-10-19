@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,34 +42,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  QAction* findExitAction(QMenu* menu)
+QAction* findExitAction(QMenu* menu)
+{
+  foreach (QAction* action, menu->actions())
+  {
+    QString name = action->text().toLower();
+    name.remove('&');
+    if (name == "exit" || name == "quit")
     {
-    foreach (QAction* action, menu->actions())
-      {
-      QString name = action->text().toLower();
-      name.remove('&');
-      if (name == "exit" || name == "quit")
-        {
-        return action;
-        }
-      }
-    return NULL;
+      return action;
     }
+  }
+  return NULL;
+}
 
-  QAction* findHelpMenuAction(QMenuBar* menubar)
+QAction* findHelpMenuAction(QMenuBar* menubar)
+{
+  QList<QAction*> menuBarActions = menubar->actions();
+  foreach (QAction* existingMenuAction, menuBarActions)
+  {
+    QString menuName = existingMenuAction->text().toLower();
+    menuName.remove('&');
+    if (menuName == "help")
     {
-    QList<QAction *> menuBarActions = menubar->actions();
-    foreach(QAction *existingMenuAction, menuBarActions)
-      {
-      QString menuName = existingMenuAction->text().toLower();
-      menuName.remove('&');
-      if (menuName == "help")
-        {
-        return existingMenuAction;
-        }
-      }
-    return NULL;
+      return existingMenuAction;
     }
+  }
+  return NULL;
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -77,12 +77,12 @@ pqPluginActionGroupBehavior::pqPluginActionGroupBehavior(QMainWindow* parentObje
   : Superclass(parentObject)
 {
   pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
-  QObject::connect(pm, SIGNAL(interfaceRegistered(QObject*)),
-    this, SLOT(addPluginInterface(QObject*)));
+  QObject::connect(
+    pm, SIGNAL(interfaceRegistered(QObject*)), this, SLOT(addPluginInterface(QObject*)));
   foreach (QObject* iface, pm->interfaces())
-    {
+  {
     this->addPluginInterface(iface);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -90,81 +90,77 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
 {
   pqActionGroupInterface* agi = qobject_cast<pqActionGroupInterface*>(iface);
   if (!agi)
-    {
+  {
     return;
-    }
+  }
 
   QMainWindow* mainWindow = qobject_cast<QMainWindow*>(this->parent());
   if (!mainWindow)
-    {
+  {
     qWarning("Could not find MainWindow. Cannot load actions from the plugin.");
     return;
-    }
+  }
 
   QString name = agi->groupName();
   QStringList splitName = name.split('/', QString::SkipEmptyParts);
 
   if (splitName.size() == 2 && splitName[0] == "ToolBar")
-    {
+  {
     QToolBar* tb = new QToolBar(splitName[1], mainWindow);
     tb->setObjectName(splitName[1]);
     tb->addActions(agi->actionGroup()->actions());
     mainWindow->addToolBar(tb);
-    }
-  else if(splitName.size() == 2 && splitName[0] == "MenuBar")
+  }
+  else if (splitName.size() == 2 && splitName[0] == "MenuBar")
+  {
+    QMenu* menu = NULL;
+    QList<QAction*> menuBarActions = mainWindow->menuBar()->actions();
+    foreach (QAction* existingMenuAction, menuBarActions)
     {
-    QMenu *menu = NULL;
-    QList<QAction *> menuBarActions = mainWindow->menuBar()->actions();
-    foreach(QAction *existingMenuAction, menuBarActions)
-      {
       QString menuName = existingMenuAction->text();
       menuName.remove('&');
       if (menuName == splitName[1])
-        {
+      {
         menu = existingMenuAction->menu();
         break;
-        }
       }
+    }
     if (menu)
-      {
+    {
       QAction* exitAction = ::findExitAction(menu);
 
       // Add to existing menu (before exit action, if exists).
-      QAction *a;
+      QAction* a;
       if (exitAction == NULL)
-        {
-        menu->addSeparator();
-        }
-      foreach(a, agi->actionGroup()->actions())
-        {
-        menu->insertAction(exitAction, a);
-        }
-      if (exitAction != NULL)
-        {
-        menu->insertSeparator(exitAction);
-        }
-      }
-    else
       {
+        menu->addSeparator();
+      }
+      foreach (a, agi->actionGroup()->actions())
+      {
+        menu->insertAction(exitAction, a);
+      }
+      if (exitAction != NULL)
+      {
+        menu->insertSeparator(exitAction);
+      }
+    }
+    else
+    {
       // Create new menu.
       menu = new QMenu(splitName[1], mainWindow);
       menu->setObjectName(splitName[1]);
       menu->addActions(agi->actionGroup()->actions());
       // insert new menus before the Help menu is possible.
-      mainWindow->menuBar()->insertMenu(
-        ::findHelpMenuAction(mainWindow->menuBar()), menu);
-      }
+      mainWindow->menuBar()->insertMenu(::findHelpMenuAction(mainWindow->menuBar()), menu);
     }
+  }
   else if (splitName.size())
-    {
-    QString msg = 
-      QString("Do not know what action group \"%1\" is").arg(splitName[0]);
+  {
+    QString msg = QString("Do not know what action group \"%1\" is").arg(splitName[0]);
     qWarning("%s", msg.toLatin1().data());
-    }
-  else 
-    {
+  }
+  else
+  {
     qWarning("Action group doesn't have an identifier.");
-    }
+  }
 }
-
-

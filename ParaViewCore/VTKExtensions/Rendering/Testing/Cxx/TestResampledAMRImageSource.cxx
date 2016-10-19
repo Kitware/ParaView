@@ -30,8 +30,12 @@
 #define TEST_SUCCESS 0
 #define TEST_FAILED 1
 
-#define vtk_assert(x)\
-  if (! (x) ) { cerr << "ERROR: Condition FAILED!! : " << #x << endl;  return TEST_FAILED;}
+#define vtk_assert(x)                                                                              \
+  if (!(x))                                                                                        \
+  {                                                                                                \
+    cerr << "ERROR: Condition FAILED!! : " << #x << endl;                                          \
+    return TEST_FAILED;                                                                            \
+  }
 
 int TestResampledAMRImageSource(int argc, char* argv[])
 {
@@ -47,8 +51,7 @@ int TestResampledAMRImageSource(int argc, char* argv[])
   reader->GetCellDataArraySelection()->EnableAllArrays();
   reader->Update();
 
-  vtkOverlappingAMR* data = vtkOverlappingAMR::SafeDownCast(
-    reader->GetOutputDataObject(0));
+  vtkOverlappingAMR* data = vtkOverlappingAMR::SafeDownCast(reader->GetOutputDataObject(0));
 
   vtkNew<vtkResampledAMRImageSource> resampler;
   resampler->SetMaxDimensions(32, 32, 32);
@@ -58,9 +61,8 @@ int TestResampledAMRImageSource(int argc, char* argv[])
   vtk_assert(resampler->NeedsInitialization() == false);
 
   // request a few blocks explicitly.
-  vtkCompositeDataPipeline* cp = vtkCompositeDataPipeline::SafeDownCast(
-    reader->GetExecutive());
-  int blocks[] = {1, 2, 13, 17};
+  vtkCompositeDataPipeline* cp = vtkCompositeDataPipeline::SafeDownCast(reader->GetExecutive());
+  int blocks[] = { 1, 2, 13, 17 };
   vtkInformation* info = cp->GetOutputInformation(0);
   info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
   info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), blocks, 4);
@@ -69,8 +71,7 @@ int TestResampledAMRImageSource(int argc, char* argv[])
   resampler->UpdateResampledVolume(data);
   vtk_assert(resampler->NeedsInitialization() == false);
 
-  vtkImageData* output = vtkImageData::SafeDownCast(
-    resampler->GetOutputDataObject(0));
+  vtkImageData* output = vtkImageData::SafeDownCast(resampler->GetOutputDataObject(0));
   vtk_assert(output != NULL);
   vtk_assert(output->GetDimensions()[0] == 32);
   vtk_assert(output->GetDimensions()[1] == 32);
@@ -78,7 +79,7 @@ int TestResampledAMRImageSource(int argc, char* argv[])
 
   vtkDataArray* temp = output->GetPointData()->GetArray("temp");
   vtk_assert(temp != NULL);
-  cout << "Tuple: 14544: " << temp->GetTuple1(14544) <<endl;
+  cout << "Tuple: 14544: " << temp->GetTuple1(14544) << endl;
 
   // FIXME: Add more validation code.
   return TEST_SUCCESS;

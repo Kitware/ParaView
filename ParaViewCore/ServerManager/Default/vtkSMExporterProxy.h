@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExporterProxy - proxy for view exporters.
-// .SECTION Description
-// vtkSMExporterProxy is a proxy for vtkExporter subclasses. It makes it
-// possible to export render views using these exporters.
+/**
+ * @class   vtkSMExporterProxy
+ * @brief   proxy for view exporters.
+ *
+ * vtkSMExporterProxy is a proxy for vtkExporter subclasses. It makes it
+ * possible to export render views using these exporters.
+*/
 
 #ifndef vtkSMExporterProxy_h
 #define vtkSMExporterProxy_h
@@ -31,39 +34,47 @@ public:
   vtkTypeMacro(vtkSMExporterProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the view proxy to export.
+  //@{
+  /**
+   * Set the view proxy to export.
+   */
   void SetView(vtkSMViewProxy* view);
   vtkGetObjectMacro(View, vtkSMViewProxy);
+  //@}
 
-  // Description:
-  // Exports the view.
-  virtual void Write()=0;
+  /**
+   * Exports the view.
+   */
+  virtual void Write() = 0;
 
-  // Description:
-  // Returns if the view can be exported. 
-  // Default implementation return true if the view is a render view.
+  /**
+   * Returns if the view can be exported.
+   * Default implementation return true if the view is a render view.
+   */
   virtual bool CanExport(vtkSMProxy*) = 0;
 
-  // Description:
-  // Returns the suggested file extension for this exporter.
+  //@{
+  /**
+   * Returns the suggested file extension for this exporter.
+   */
   vtkGetStringMacro(FileExtension);
+  //@}
 
 protected:
   vtkSMExporterProxy();
   ~vtkSMExporterProxy();
-  // Description:
-  // Read attributes from an XML element.
+  /**
+   * Read attributes from an XML element.
+   */
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
   vtkSetStringMacro(FileExtension);
   vtkSMViewProxy* View;
   char* FileExtension;
+
 private:
   vtkSMExporterProxy(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

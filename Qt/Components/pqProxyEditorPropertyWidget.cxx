@@ -45,12 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
-  vtkSMProxy *smproxy, vtkSMProperty* smproperty, QWidget *parentObject)
-: Superclass(smproxy, parentObject)
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
+  : Superclass(smproxy, parentObject)
 {
   this->setShowLabel(false);
 
-  QPushButton *button = new QPushButton("Edit", this);
+  QPushButton* button = new QPushButton("Edit", this);
   button->setObjectName("PushButton");
   this->connect(button, SIGNAL(clicked()), SLOT(buttonClicked()));
   button->setEnabled(false);
@@ -58,25 +58,25 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
 
   // If ProxyEditorPropertyWidget hints are present, we'll add a checkbox to
   // control that property on the "other" proxy.
-  if (vtkPVXMLElement* hints = smproperty->GetHints()?
-    smproperty->GetHints()->FindNestedElementByName("ProxyEditorPropertyWidget") : NULL)
-    {
+  if (vtkPVXMLElement* hints = smproperty->GetHints()
+      ? smproperty->GetHints()->FindNestedElementByName("ProxyEditorPropertyWidget")
+      : NULL)
+  {
     this->Checkbox = new QCheckBox(this);
     this->Checkbox->setText(tr(smproperty->GetXMLLabel()));
     this->Checkbox->setEnabled(false);
     this->Checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->PropertyName = hints->GetAttributeOrDefault("property", "");
-    this->connect(&this->links(), SIGNAL(qtWidgetChanged()),
-      this, SIGNAL(changeAvailable()));
-    }
+    this->connect(&this->links(), SIGNAL(qtWidgetChanged()), this, SIGNAL(changeAvailable()));
+  }
 
-  QHBoxLayout *hbox= new QHBoxLayout(this);
+  QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->setMargin(0);
   hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
   if (this->Checkbox)
-    {
+  {
     hbox->addWidget(this->Checkbox);
-    }
+  }
   hbox->addWidget(button);
 
   this->addPropertyLink(this, "proxyToEdit", SIGNAL(dummySignal()), smproperty);
@@ -94,36 +94,33 @@ pqProxyEditorPropertyWidget::~pqProxyEditorPropertyWidget()
 void pqProxyEditorPropertyWidget::setProxyToEdit(pqSMProxy smproxy)
 {
   if (this->ProxyToEdit && this->Checkbox &&
-      this->ProxyToEdit->GetProperty(this->PropertyName.toStdString().c_str()))
-    {
-    this->links().removePropertyLink(
-      this->Checkbox, "checked", SIGNAL(toggled(bool)),
-      this->ProxyToEdit, this->ProxyToEdit->GetProperty(
-          this->PropertyName.toStdString().c_str()));
-    }
+    this->ProxyToEdit->GetProperty(this->PropertyName.toStdString().c_str()))
+  {
+    this->links().removePropertyLink(this->Checkbox, "checked", SIGNAL(toggled(bool)),
+      this->ProxyToEdit, this->ProxyToEdit->GetProperty(this->PropertyName.toStdString().c_str()));
+  }
   this->ProxyToEdit = smproxy;
   this->Button->setEnabled(smproxy != NULL);
   if (this->Editor && this->Editor->proxy() != smproxy)
-    {
+  {
     delete this->Editor;
-    }
+  }
 
   if (this->Checkbox)
+  {
+    if (vtkSMProperty* smproperty =
+          smproxy ? smproxy->GetProperty(this->PropertyName.toStdString().c_str()) : NULL)
     {
-    if (vtkSMProperty* smproperty = smproxy?
-      smproxy->GetProperty(this->PropertyName.toStdString().c_str()) : NULL)
-      {
       this->Checkbox->setEnabled(true);
       this->Checkbox->setToolTip(pqPropertyWidget::getTooltip(smproperty));
       this->links().addPropertyLink(
-        this->Checkbox, "checked", SIGNAL(toggled(bool)),
-        smproxy, smproperty);
-      }
-    else
-      {
-      this->Checkbox->setEnabled(false);
-      }
+        this->Checkbox, "checked", SIGNAL(toggled(bool)), smproxy, smproperty);
     }
+    else
+    {
+      this->Checkbox->setEnabled(false);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -136,21 +133,20 @@ pqSMProxy pqProxyEditorPropertyWidget::proxyToEdit() const
 void pqProxyEditorPropertyWidget::buttonClicked()
 {
   if (!this->ProxyToEdit.GetPointer())
-    {
+  {
     qCritical() << "No proxy to edit!";
     return;
-    }
+  }
 
   if (this->Editor == NULL)
-    {
+  {
     this->Editor = new pqProxyWidgetDialog(this->ProxyToEdit.GetPointer(), this);
     this->Editor->setEnableSearchBar(this->Editor->hasAdvancedProperties());
-    this->Editor->setSettingsKey(
-      QString("pqProxyEditorPropertyWidget.%1.%2")
-        .arg(this->proxy()->GetXMLName())
-        .arg(this->property()->GetXMLName()));
+    this->Editor->setSettingsKey(QString("pqProxyEditorPropertyWidget.%1.%2")
+                                   .arg(this->proxy()->GetXMLName())
+                                   .arg(this->property()->GetXMLName()));
     this->connect(this->Editor, SIGNAL(accepted()), SIGNAL(changeAvailable()));
-    }
+  }
   this->Editor->setWindowTitle(this->Button->text());
   this->Editor->setObjectName("EditProxy");
   this->Editor->show();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,7 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 //-----------------------------------------------------------------------------
-pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
+pqVCRController::pqVCRController(QObject* _parent /*=null*/)
+  : QObject(_parent)
 {
 }
 
@@ -62,58 +63,53 @@ pqVCRController::~pqVCRController()
 void pqVCRController::setAnimationScene(pqAnimationScene* scene)
 {
   if (this->Scene == scene)
-    {
+  {
     return;
-    }
+  }
   if (this->Scene)
-    {
+  {
     QObject::disconnect(this->Scene, 0, this, 0);
-    }
+  }
   this->Scene = scene;
   if (this->Scene)
-    {
+  {
     QObject::connect(this->Scene, SIGNAL(tick(int)), this, SLOT(onTick()));
-    QObject::connect(this->Scene, SIGNAL(loopChanged()),
-      this, SLOT(onLoopPropertyChanged()));
-    QObject::connect(this->Scene, SIGNAL(clockTimeRangesChanged()),
-        this, SLOT(onTimeRangesChanged()));
-    QObject::connect(this->Scene, SIGNAL(beginPlay()),
-      this, SLOT(onBeginPlay()));
-    QObject::connect(this->Scene, SIGNAL(endPlay()),
-      this, SLOT(onEndPlay()));
-    bool loop_checked = pqSMAdaptor::getElementProperty(
-        scene->getProxy()->GetProperty("Loop")).toBool();
+    QObject::connect(this->Scene, SIGNAL(loopChanged()), this, SLOT(onLoopPropertyChanged()));
+    QObject::connect(
+      this->Scene, SIGNAL(clockTimeRangesChanged()), this, SLOT(onTimeRangesChanged()));
+    QObject::connect(this->Scene, SIGNAL(beginPlay()), this, SLOT(onBeginPlay()));
+    QObject::connect(this->Scene, SIGNAL(endPlay()), this, SLOT(onEndPlay()));
+    bool loop_checked =
+      pqSMAdaptor::getElementProperty(scene->getProxy()->GetProperty("Loop")).toBool();
     emit this->loop(loop_checked);
-    }
+  }
 
   this->onTimeRangesChanged();
-  emit this->enabled (this->Scene != NULL);
+  emit this->enabled(this->Scene != NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onTimeRangesChanged()
 {
   if (this->Scene)
-    {
+  {
     QPair<double, double> range = this->Scene->getClockTimeRange();
     emit this->timeRanges(range.first, range.second);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onPlay()
 {
   if (!this->Scene)
-    {
+  {
     qDebug() << "No active scene. Cannot play.";
     return;
-    }
+  }
 
   BEGIN_UNDO_EXCLUDE();
 
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this->Scene->getProxy())
-    .arg("Play");
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("Play");
 
   this->Scene->getProxy()->InvokeCommand("Play");
 
@@ -153,8 +149,7 @@ void pqVCRController::onEndPlay()
 void pqVCRController::onLoopPropertyChanged()
 {
   vtkSMProxy* scene = this->Scene->getProxy();
-  bool loop_checked = pqSMAdaptor::getElementProperty(
-    scene->GetProperty("Loop")).toBool();
+  bool loop_checked = pqSMAdaptor::getElementProperty(scene->GetProperty("Loop")).toBool();
   emit this->loop(loop_checked);
 }
 
@@ -162,7 +157,7 @@ void pqVCRController::onLoopPropertyChanged()
 void pqVCRController::onLoop(bool checked)
 {
   vtkSMProxy* scene = this->Scene->getProxy();
-  pqSMAdaptor::setElementProperty(scene->GetProperty("Loop"),checked);
+  pqSMAdaptor::setElementProperty(scene->GetProperty("Loop"), checked);
   scene->UpdateProperty("Loop");
 }
 
@@ -170,21 +165,19 @@ void pqVCRController::onLoop(bool checked)
 void pqVCRController::onPause()
 {
   if (!this->Scene)
-    {
+  {
     qDebug() << "No active scene. Cannot play.";
     return;
-    }
+  }
   this->Scene->getProxy()->InvokeCommand("Stop");
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToFirst");
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this->Scene->getProxy())
-    .arg("GoToFirst");
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToFirst");
   emit this->endNonUndoableChanges();
 }
 
@@ -193,9 +186,7 @@ void pqVCRController::onPreviousFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToPrevious");
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this->Scene->getProxy())
-    .arg("GoToPrevious");
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToPrevious");
   emit this->endNonUndoableChanges();
 }
 
@@ -204,9 +195,7 @@ void pqVCRController::onNextFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToNext");
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this->Scene->getProxy())
-    .arg("GoToNext");
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToNext");
   emit this->endNonUndoableChanges();
 }
 
@@ -215,9 +204,6 @@ void pqVCRController::onLastFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToLast");
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this->Scene->getProxy())
-    .arg("GoToLast");
+  SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToLast");
   emit this->endNonUndoableChanges();
 }
-

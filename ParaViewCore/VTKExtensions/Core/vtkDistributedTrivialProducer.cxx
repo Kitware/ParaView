@@ -35,26 +35,27 @@ struct vtkPVTrivialProducerStaticInternal
 
   bool HasKey(const char* key)
   {
-    if(key == NULL)
-      {
+    if (key == NULL)
+    {
       return false;
-      }
+    }
     return this->RegisteredDataObjectMap.find(key) != this->RegisteredDataObjectMap.end();
   }
 
   vtkDataObject* GetDataObject(const char* key)
   {
-    if(this->HasKey(key))
-      {
+    if (this->HasKey(key))
+    {
       return this->RegisteredDataObjectMap[key].GetPointer();
-      }
+    }
     return NULL;
   }
 
   void Print(ostream& os, vtkIndent indent)
   {
-    std::map<std::string, vtkSmartPointer<vtkDataObject> >::iterator iter = this->RegisteredDataObjectMap.begin();
-    while(iter != this->RegisteredDataObjectMap.end())
+    std::map<std::string, vtkSmartPointer<vtkDataObject> >::iterator iter =
+      this->RegisteredDataObjectMap.begin();
+    while (iter != this->RegisteredDataObjectMap.end())
     {
       os << indent << iter->first.c_str() << "\n";
       iter->second.GetPointer()->PrintSelf(os, indent.GetNextIndent());
@@ -78,38 +79,39 @@ vtkDistributedTrivialProducer::~vtkDistributedTrivialProducer()
 //----------------------------------------------------------------------------
 void vtkDistributedTrivialProducer::SetGlobalOutput(const char* key, vtkDataObject* output)
 {
-  if(key)
-    {
+  if (key)
+  {
     vtkDistributedTrivialProducer::InternalStatic->RegisteredDataObjectMap[key] = output;
     cout << "Set Global Dataset for " << key << endl;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkDistributedTrivialProducer::ReleaseGlobalOutput(const char* key)
 {
-  if(key)
-    {
+  if (key)
+  {
     vtkDistributedTrivialProducer::InternalStatic->RegisteredDataObjectMap.erase(key);
-    }
+  }
   else
-    {
+  {
     vtkDistributedTrivialProducer::InternalStatic->RegisteredDataObjectMap.clear();
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkDistributedTrivialProducer::UpdateFromGlobal(const char* key)
 {
   cout << "Update DS with key " << key << endl;
-  if(vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key))
-    {
-    //vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key)->PrintSelf(cout, vtkIndent(5));
-    }
+  if (vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key))
+  {
+    // vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key)->PrintSelf(cout,
+    // vtkIndent(5));
+  }
   else
-    {
+  {
     cout << "No dataset" << endl;
-    }
+  }
   this->SetOutput(vtkDistributedTrivialProducer::InternalStatic->GetDataObject(key));
 }
 

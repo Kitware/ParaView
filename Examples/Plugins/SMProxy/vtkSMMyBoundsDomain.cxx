@@ -6,7 +6,7 @@
 
 vtkStandardNewMacro(vtkSMMyBoundsDomain)
 
-vtkSMMyBoundsDomain::vtkSMMyBoundsDomain()
+  vtkSMMyBoundsDomain::vtkSMMyBoundsDomain()
 {
 }
 
@@ -23,16 +23,16 @@ void vtkSMMyBoundsDomain::Update(vtkSMProperty*)
 {
   vtkPVDataInformation* inputInformation = this->GetInputInformation();
   if (!inputInformation)
-    {
+  {
     return;
-    }
+  }
 
   double bounds[6];
   inputInformation->GetBounds(bounds);
 
   // average the x, y
-  double avgx = ( bounds[1] + bounds[0] ) / 2.0;
-  double avgy = ( bounds[3] + bounds[2] ) / 2.0;
+  double avgx = (bounds[1] + bounds[0]) / 2.0;
+  double avgy = (bounds[3] + bounds[2]) / 2.0;
 
   std::vector<vtkEntry> entries;
   entries.push_back(vtkEntry(avgx, avgx));
@@ -41,4 +41,3 @@ void vtkSMMyBoundsDomain::Update(vtkSMProperty*)
 
   this->SetEntries(entries);
 }
-

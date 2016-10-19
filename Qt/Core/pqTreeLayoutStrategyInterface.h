@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,22 +39,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkAreaLayoutStrategy;
 
-/// interface class for plugins that create view modules
+/**
+* interface class for plugins that create view modules
+*/
 class PQCORE_EXPORT pqTreeLayoutStrategyInterface
 {
 public:
-  /// destructor
+  /**
+  * destructor
+  */
   pqTreeLayoutStrategyInterface();
   virtual ~pqTreeLayoutStrategyInterface();
-  
-  /// Return a list of layout strategies supported by this interface
+
+  /**
+  * Return a list of layout strategies supported by this interface
+  */
   virtual QStringList treeLayoutStrategies() const = 0;
 
   virtual vtkAreaLayoutStrategy* getTreeLayoutStrategy(const QString& layoutStrategy) = 0;
-
 };
 
 Q_DECLARE_INTERFACE(pqTreeLayoutStrategyInterface, "com.kitware/paraview/treeLayoutStrategy")
 
 #endif
-

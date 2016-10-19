@@ -52,7 +52,7 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
   this->Actor->GetProperty()->SetAmbient(1.0);
   this->Actor->GetProperty()->SetDiffuse(0.0);
   this->Actor->GetProperty()->SetSpecular(0.0);
-  this->Actor->SetPickable(0); 
+  this->Actor->SetPickable(0);
 }
 
 //----------------------------------------------------------------------------
@@ -75,12 +75,12 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
   // representation is not visible (among other things). In which case there's
   // nothing to do.
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
+  {
     // Standard representation stuff, first.
     // 1. Provide the data being rendered.
     vtkPVRenderView::SetPiece(inInfo, this, this->ProcessedData);
@@ -92,43 +92,41 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
     // The only thing extra we need to do here is that we need to let the view
     // know that this representation is streaming capable (or not).
     vtkPVRenderView::SetStreamable(inInfo, this, this->GetStreamingCapablePipeline());
-    }
+  }
   else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     if (this->RenderedData == NULL)
-      {
+    {
       vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
       vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
       vtkAlgorithm* producer = producerPort->GetProducer();
 
-      this->RenderedData =
-        producer->GetOutputDataObject(producerPort->GetIndex());
+      this->RenderedData = producer->GetOutputDataObject(producerPort->GetIndex());
       this->Mapper->SetInputDataObject(this->RenderedData);
-      }
     }
+  }
   else if (request_type == vtkPVRenderView::REQUEST_STREAMING_UPDATE())
-    {
+  {
     if (this->GetStreamingCapablePipeline())
-      {
+    {
       // This is a streaming update request, request next piece.
       double view_planes[24];
       inInfo->Get(vtkPVRenderView::VIEW_PLANES(), view_planes);
       if (this->StreamingUpdate(view_planes))
-        {
+      {
         // since we indeed "had" a next piece to produce, give it to the view
         // so it can deliver it to the rendering nodes.
-        vtkPVRenderView::SetNextStreamedPiece(
-          inInfo, this, this->ProcessedPiece);
-        }
+        vtkPVRenderView::SetNextStreamedPiece(inInfo, this, this->ProcessedPiece);
       }
     }
+  }
   else if (request_type == vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE())
-    {
+  {
     vtkDataObject* piece = vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this);
     if (piece)
-      {
-      assert (this->RenderedData != NULL);
-      vtkStreamingStatusMacro( << this << ": received new piece.");
+    {
+      assert(this->RenderedData != NULL);
+      vtkStreamingStatusMacro(<< this << ": received new piece.");
 
       // merge with what we are already rendering.
       vtkNew<vtkAppendCompositeDataLeaves> appender;
@@ -138,16 +136,15 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
 
       this->RenderedData = appender->GetOutputDataObject(0);
       this->Mapper->SetInputDataObject(this->RenderedData);
-      }
     }
+  }
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkAMROutlineRepresentation::RequestInformation(vtkInformation *rqst,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector)
+int vtkAMROutlineRepresentation::RequestInformation(
+  vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Determine if the input is streaming capable. A pipeline is streaming
   // capable if it provides us with COMPOSITE_DATA_META_DATA() in the
@@ -156,83 +153,78 @@ int vtkAMROutlineRepresentation::RequestInformation(vtkInformation *rqst,
 
   this->StreamingCapablePipeline = false;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-    {
+  {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()) &&
       vtkPVView::GetEnableStreaming())
-      {
+    {
       this->StreamingCapablePipeline = true;
-      }
     }
+  }
 
-  vtkStreamingStatusMacro(
-    << this << ": streaming capable input pipeline? "
-    << (this->StreamingCapablePipeline? "yes" : "no"));
+  vtkStreamingStatusMacro(<< this << ": streaming capable input pipeline? "
+                          << (this->StreamingCapablePipeline ? "yes" : "no"));
   return this->Superclass::RequestInformation(rqst, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
 int vtkAMROutlineRepresentation::RequestUpdateExtent(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (!this->Superclass::RequestUpdateExtent(request, inputVector,
-      outputVector))
-    {
+  if (!this->Superclass::RequestUpdateExtent(request, inputVector, outputVector))
+  {
     return 0;
-    }
+  }
 
-  for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
+  for (int cc = 0; cc < this->GetNumberOfInputPorts(); cc++)
+  {
+    for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
     {
-    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
-      {
       vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
       if (this->InStreamingUpdate)
-        {
+      {
         assert(this->PriorityQueue->IsEmpty() == false);
         int cid = static_cast<int>(this->PriorityQueue->Pop());
         vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
         // Request the next "group of blocks" to stream.
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
         info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), &cid, 1);
-        }
+      }
       else
-        {
+      {
         // let the source deliver whatever is the default. What the reader does
         // when the downstream doesn't request any particular blocks in poorly
         // defined right now. I am assuming the reader will only read the root
         // block or down to some user-specified level.
         info->Remove(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS());
         info->Remove(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
-        }
       }
     }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
-  vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+int vtkAMROutlineRepresentation::RequestData(
+  vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-    {
+  {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()) &&
-      this->GetStreamingCapablePipeline() &&
-      !this->GetInStreamingUpdate())
-      {
+      this->GetStreamingCapablePipeline() && !this->GetInStreamingUpdate())
+    {
       // Since the representation reexecuted, it means that the input changed
       // and we should initialize our streaming.
       vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
         inInfo->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()));
       this->PriorityQueue->Initialize(amr->GetAMRInfo());
-      }
     }
+  }
 
   this->ProcessedPiece = 0;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-    {
+  {
     // Do the streaming independent "transformation" of the data here, in our
     // case, generate the outline from the input data.
     // To keep things simple here, we don't bother about the "flip-book" caching
@@ -249,35 +241,35 @@ int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
     geomFilter->SetInputData(input);
     geomFilter->Update();
     if (!this->GetInStreamingUpdate())
-      {
+    {
       this->ProcessedData = geomFilter->GetOutputDataObject(0);
 
       double bounds[6];
       input->GetBounds(bounds);
       this->DataBounds.SetBounds(bounds);
-      }
-    else
-      {
-      this->ProcessedPiece = geomFilter->GetOutputDataObject(0);
-      }
     }
-  else
+    else
     {
+      this->ProcessedPiece = geomFilter->GetOutputDataObject(0);
+    }
+  }
+  else
+  {
     // create an empty dataset. This is needed so that view knows what dataset
     // to expect from the other processes on this node.
     this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
     this->DataBounds.Reset();
-    }
+  }
 
   if (!this->GetInStreamingUpdate())
-    {
+  {
     this->RenderedData = 0;
 
     // provide the mapper with an empty input. This is needed only because
     // mappers die when input is NULL, currently.
     vtkNew<vtkMultiBlockDataSet> tmp;
     this->Mapper->SetInputDataObject(tmp.GetPointer());
-    }
+  }
 
   return this->Superclass::RequestData(rqst, inputVector, outputVector);
 }
@@ -287,12 +279,12 @@ bool vtkAMROutlineRepresentation::StreamingUpdate(const double view_planes[24])
 {
   assert(this->InStreamingUpdate == false);
   if (!this->PriorityQueue->IsEmpty())
-    {
+  {
     this->InStreamingUpdate = true;
     vtkStreamingStatusMacro(<< this << ": doing streaming-update.")
 
-    // update the priority queue, if needed.
-    this->PriorityQueue->Update(view_planes);
+      // update the priority queue, if needed.
+      this->PriorityQueue->Update(view_planes);
 
     // This ensure that the representation re-executes.
     this->MarkModified();
@@ -302,7 +294,7 @@ bool vtkAMROutlineRepresentation::StreamingUpdate(const double view_planes[24])
 
     this->InStreamingUpdate = false;
     return true;
-    }
+  }
 
   return false;
 }
@@ -326,10 +318,10 @@ bool vtkAMROutlineRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->AddActor(this->Actor);
     return this->Superclass::AddToView(view);
-    }
+  }
   return false;
 }
 
@@ -338,10 +330,10 @@ bool vtkAMROutlineRepresentation::RemoveFromView(vtkView* view)
 {
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
-    {
+  {
     rview->GetRenderer()->RemoveActor(this->Actor);
     return this->Superclass::RemoveFromView(view);
-    }
+  }
   return false;
 }
 
@@ -349,6 +341,5 @@ bool vtkAMROutlineRepresentation::RemoveFromView(vtkView* view)
 void vtkAMROutlineRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "StreamingCapablePipeline: " << this->StreamingCapablePipeline
-    << endl;
+  os << indent << "StreamingCapablePipeline: " << this->StreamingCapablePipeline << endl;
 }

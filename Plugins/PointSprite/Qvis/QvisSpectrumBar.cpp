@@ -50,13 +50,13 @@
 #include <qtimer.h>
 
 // Some constants for paging modes.
-#define NO_PAGING      -1
-#define INCREMENT       0
-#define DECREMENT       1
-#define PAGE_INCREMENT  2
-#define PAGE_DECREMENT  3
-#define PAGE_HOME       4
-#define PAGE_END        5
+#define NO_PAGING -1
+#define INCREMENT 0
+#define DECREMENT 1
+#define PAGE_INCREMENT 2
+#define PAGE_DECREMENT 3
+#define PAGE_HOME 4
+#define PAGE_END 5
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -66,12 +66,12 @@
 
 typedef struct
 {
-    int   rank;
-    float position;
-    float color[3];
+  int rank;
+  float position;
+  float color[3];
 } ControlPoint;
 
-static int ControlPointCompare(const void *c1, const void *c2);
+static int ControlPointCompare(const void* c1, const void* c2);
 
 // ****************************************************************************
 // Class: ControlPointList
@@ -92,37 +92,38 @@ static int ControlPointCompare(const void *c1, const void *c2);
 class ControlPointList
 {
 public:
-    ControlPointList();
-    ~ControlPointList();
-    void  Add(const ControlPoint *cpt);
-    bool  CanBeEdited() const;
-    int   ChangeSelectedIndex(float _pos, float width, int equal);
-    void  Clear();
-    float ColorValue(int index) const;
-    void  DeleteHighestRank();
-    void  GiveHighestRank(int index);
-    int   NumColorValues() const;
-    int   NumControlPoints() const;
-    float Position(int index) const;
-    int   Rank(int rank) const;
-    void  SetColor(int index, float r, float g, float b);
-    void  SetColorValues(const float *cv, int n);
-    void  SetEditMode(bool val);
-    void  SetPosition(int index, float _pos);
-    void  Sort();
+  ControlPointList();
+  ~ControlPointList();
+  void Add(const ControlPoint* cpt);
+  bool CanBeEdited() const;
+  int ChangeSelectedIndex(float _pos, float width, int equal);
+  void Clear();
+  float ColorValue(int index) const;
+  void DeleteHighestRank();
+  void GiveHighestRank(int index);
+  int NumColorValues() const;
+  int NumControlPoints() const;
+  float Position(int index) const;
+  int Rank(int rank) const;
+  void SetColor(int index, float r, float g, float b);
+  void SetColorValues(const float* cv, int n);
+  void SetEditMode(bool val);
+  void SetPosition(int index, float _pos);
+  void Sort();
 
-    const ControlPoint &operator [](int index) const;
+  const ControlPoint& operator[](int index) const;
+
 private:
-    static const int CPLIST_INCREMENT;
-    static const ControlPoint defaultControlPoint1;
-    static const ControlPoint defaultControlPoint2;
+  static const int CPLIST_INCREMENT;
+  static const ControlPoint defaultControlPoint1;
+  static const ControlPoint defaultControlPoint2;
 
-    bool         editable;
-    int          nels;
-    int          total_nels;
-    int          nvals;
-    ControlPoint *list;
-    float        *colorvals;
+  bool editable;
+  int nels;
+  int total_nels;
+  int nvals;
+  ControlPoint* list;
+  float* colorvals;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -153,34 +154,34 @@ private:
 //
 // ****************************************************************************
 
-QvisSpectrumBar::QvisSpectrumBar(QWidget *parentObject, const char* /*name*/) :
-    QWidget(parentObject)
+QvisSpectrumBar::QvisSpectrumBar(QWidget* parentObject, const char* /*name*/)
+  : QWidget(parentObject)
 {
-    pixmap = 0;
+  pixmap = 0;
 
-    orientation = HorizontalTop;
-    b_smoothing = true;
-    b_equalSpacing = false;
-    b_sliding = false;
-    b_continuousUpdate = false;
-    b_suppressUpdates = false;
-    margin = 4;
-    paging_mode = NO_PAGING;
-    shiftApplied = false;
+  orientation = HorizontalTop;
+  b_smoothing = true;
+  b_equalSpacing = false;
+  b_sliding = false;
+  b_continuousUpdate = false;
+  b_suppressUpdates = false;
+  margin = 4;
+  paging_mode = NO_PAGING;
+  shiftApplied = false;
 
-    controlPoints = new ControlPointList;
+  controlPoints = new ControlPointList;
 
-    // Create a timer used for paging/incrementing/decrementing.
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(handlePaging()));
+  // Create a timer used for paging/incrementing/decrementing.
+  timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(handlePaging()));
 
-    // Set the focus policy to StrongFocus. This means that the widget will
-    // accept focus by tabbing and clicking.
-    setFocusPolicy(Qt::StrongFocus);
+  // Set the focus policy to StrongFocus. This means that the widget will
+  // accept focus by tabbing and clicking.
+  setFocusPolicy(Qt::StrongFocus);
 
-    // Set the widget's minimum width and height.
-    setMinimumWidth(50);
-    setMinimumHeight(60);
+  // Set the widget's minimum width and height.
+  setMinimumWidth(50);
+  setMinimumHeight(60);
 }
 
 // ****************************************************************************
@@ -200,9 +201,9 @@ QvisSpectrumBar::QvisSpectrumBar(QWidget *parentObject, const char* /*name*/) :
 
 QvisSpectrumBar::~QvisSpectrumBar()
 {
-    deletePixmap();
+  deletePixmap();
 
-    delete controlPoints;
+  delete controlPoints;
 }
 
 // ****************************************************************************
@@ -218,15 +219,14 @@ QvisSpectrumBar::~QvisSpectrumBar()
 //
 // ****************************************************************************
 
-QSize
-QvisSpectrumBar::sizeHint() const
+QSize QvisSpectrumBar::sizeHint() const
 {
-    QSize retval(250, 100);
+  QSize retval(250, 100);
 
-    if(orientation == VerticalLeft || orientation == VerticalRight)
-        retval = QSize(100, 250);
+  if (orientation == VerticalLeft || orientation == VerticalRight)
+    retval = QSize(100, 250);
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -242,15 +242,14 @@ QvisSpectrumBar::sizeHint() const
 //
 // ****************************************************************************
 
-QSizePolicy
-QvisSpectrumBar::sizePolicy() const
+QSizePolicy QvisSpectrumBar::sizePolicy() const
 {
-    QSizePolicy retval(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  QSizePolicy retval(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    if(orientation == VerticalLeft || orientation == VerticalRight)
-        retval = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+  if (orientation == VerticalLeft || orientation == VerticalRight)
+    retval = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -267,10 +266,9 @@ QvisSpectrumBar::sizePolicy() const
 //
 // ****************************************************************************
 
-bool
-QvisSpectrumBar::equalSpacing() const
+bool QvisSpectrumBar::equalSpacing() const
 {
-    return b_equalSpacing;
+  return b_equalSpacing;
 }
 
 // ****************************************************************************
@@ -287,10 +285,9 @@ QvisSpectrumBar::equalSpacing() const
 //
 // ****************************************************************************
 
-bool
-QvisSpectrumBar::smoothing() const
+bool QvisSpectrumBar::smoothing() const
 {
-    return b_smoothing;
+  return b_smoothing;
 }
 
 // ****************************************************************************
@@ -307,10 +304,9 @@ QvisSpectrumBar::smoothing() const
 //
 // ****************************************************************************
 
-bool
-QvisSpectrumBar::continuousUpdate() const
+bool QvisSpectrumBar::continuousUpdate() const
 {
-    return b_continuousUpdate;
+  return b_continuousUpdate;
 }
 
 // ****************************************************************************
@@ -329,15 +325,14 @@ QvisSpectrumBar::continuousUpdate() const
 //
 // ****************************************************************************
 
-QColor
-QvisSpectrumBar::controlPointColor(int index) const
+QColor QvisSpectrumBar::controlPointColor(int index) const
 {
-    if(index >= 0 && index < controlPoints->NumControlPoints())
-        return QColor((int)(controlPoints->operator[](index).color[0] * 255.),
-                     (int)(controlPoints->operator[](index).color[1] * 255.),
-                     (int)(controlPoints->operator[](index).color[2] * 255.));
-    else
-        return QColor(0,0,0);
+  if (index >= 0 && index < controlPoints->NumControlPoints())
+    return QColor((int)(controlPoints->operator[](index).color[0] * 255.),
+      (int)(controlPoints->operator[](index).color[1] * 255.),
+      (int)(controlPoints->operator[](index).color[2] * 255.));
+  else
+    return QColor(0, 0, 0);
 }
 
 // ****************************************************************************
@@ -356,15 +351,14 @@ QvisSpectrumBar::controlPointColor(int index) const
 //
 // ****************************************************************************
 
-float
-QvisSpectrumBar::controlPointPosition(int index) const
+float QvisSpectrumBar::controlPointPosition(int index) const
 {
-    float retval = 0.;
+  float retval = 0.;
 
-    if(index >= 0 && index < controlPoints->NumControlPoints())
-        retval = controlPoints->Position(index);
+  if (index >= 0 && index < controlPoints->NumControlPoints())
+    retval = controlPoints->Position(index);
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -382,10 +376,9 @@ QvisSpectrumBar::controlPointPosition(int index) const
 //
 // ****************************************************************************
 
-int
-QvisSpectrumBar::numControlPoints() const
+int QvisSpectrumBar::numControlPoints() const
 {
-    return controlPoints->CanBeEdited() ? controlPoints->NumControlPoints():0;
+  return controlPoints->CanBeEdited() ? controlPoints->NumControlPoints() : 0;
 }
 
 // ****************************************************************************
@@ -403,10 +396,9 @@ QvisSpectrumBar::numControlPoints() const
 //
 // ****************************************************************************
 
-int
-QvisSpectrumBar::activeControlPoint() const
+int QvisSpectrumBar::activeControlPoint() const
 {
-    return controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  return controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 }
 
 // ****************************************************************************
@@ -425,14 +417,13 @@ QvisSpectrumBar::activeControlPoint() const
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setEqualSpacing(bool val)
+void QvisSpectrumBar::setEqualSpacing(bool val)
 {
-    if(val != b_equalSpacing)
-    {
-        b_equalSpacing = val;
-        updateEntireWidget();
-    }
+  if (val != b_equalSpacing)
+  {
+    b_equalSpacing = val;
+    updateEntireWidget();
+  }
 }
 
 // ****************************************************************************
@@ -453,22 +444,20 @@ QvisSpectrumBar::setEqualSpacing(bool val)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setSmoothing(bool val)
+void QvisSpectrumBar::setSmoothing(bool val)
 {
-    if(val != b_smoothing)
-    {
-        b_smoothing = val;
+  if (val != b_smoothing)
+  {
+    b_smoothing = val;
 
-        if(isVisible() && !b_suppressUpdates)
-        {
-            drawSpectrum();
-            update(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(),
-                   spectrumArea.height());
-        }
-        else
-            deletePixmap();
+    if (isVisible() && !b_suppressUpdates)
+    {
+      drawSpectrum();
+      update(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(), spectrumArea.height());
     }
+    else
+      deletePixmap();
+  }
 }
 
 // ****************************************************************************
@@ -488,10 +477,9 @@ QvisSpectrumBar::setSmoothing(bool val)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setContinuousUpdate(bool val)
+void QvisSpectrumBar::setContinuousUpdate(bool val)
 {
-    b_continuousUpdate = val;
+  b_continuousUpdate = val;
 }
 
 // ****************************************************************************
@@ -509,10 +497,9 @@ QvisSpectrumBar::setContinuousUpdate(bool val)
 //
 // ****************************************************************************
 
-bool
-QvisSpectrumBar::suppressUpdates() const
+bool QvisSpectrumBar::suppressUpdates() const
 {
-    return b_suppressUpdates;
+  return b_suppressUpdates;
 }
 
 // ****************************************************************************
@@ -532,10 +519,9 @@ QvisSpectrumBar::suppressUpdates() const
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setSuppressUpdates(bool val)
+void QvisSpectrumBar::setSuppressUpdates(bool val)
 {
-    b_suppressUpdates = val;
+  b_suppressUpdates = val;
 }
 
 // ****************************************************************************
@@ -557,81 +543,80 @@ QvisSpectrumBar::setSuppressUpdates(bool val)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::addControlPoint(const QColor &color, float position)
+void QvisSpectrumBar::addControlPoint(const QColor& color, float position)
 {
-    int          index;
-    ControlPoint temp;
+  int index;
+  ControlPoint temp;
 
-    // Init some values.
-    controlPoints->SetEditMode(true);
+  // Init some values.
+  controlPoints->SetEditMode(true);
 
-    // Sort the points in case they are out of order.
-    controlPoints->Sort();
-    index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  // Sort the points in case they are out of order.
+  controlPoints->Sort();
+  index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-    // Store the colors in the control point.
-    temp.color[0] = (float)color.red() / 255;
-    temp.color[1] = (float)color.green() / 255;
-    temp.color[2] = (float)color.blue() / 255;
+  // Store the colors in the control point.
+  temp.color[0] = (float)color.red() / 255;
+  temp.color[1] = (float)color.green() / 255;
+  temp.color[2] = (float)color.blue() / 255;
 
-    // Figure out a position for the new point.
-    if(position < 0. || position > 1.)
+  // Figure out a position for the new point.
+  if (position < 0. || position > 1.)
+  {
+    // A position of -1 means that we should let the widget figure out
+    // where to place the new control point.
+    if (position == -1.)
     {
-        // A position of -1 means that we should let the widget figure out
-        // where to place the new control point.
-        if(position == -1.)
+      // Figure the position that should be used.
+      if (index == controlPoints->NumControlPoints() - 1)
+      {
+        // Compute the distance to the next point.
+        float dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
+
+        // If the distance is small enough, realign the points and recalculate the
+        // distance to the next point.
+        if (dx <= 0.)
         {
-            // Figure the position that should be used.
-            if(index == controlPoints->NumControlPoints() - 1)
-            {
-                // Compute the distance to the next point.
-                float dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
-
-                // If the distance is small enough, realign the points and recalculate the
-                // distance to the next point.
-                if(dx <= 0.)
-                {
-                    alignControlPoints();
-                    dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
-                }
-
-                // Add new point to the left.
-                temp.position = controlPoints->Position(index - 1) + dx * 0.5f;
-            }
-            else
-            {
-                // Compute the distance to the next point.
-                float dx = controlPoints->Position(index + 1) - controlPoints->Position(index);
-
-                // If the distance is small enough, realign the points and recalculate the
-                // distance to the next point.
-                if(dx <= 0.)
-                {
-                    alignControlPoints();
-                    dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
-                }
-
-                // Add new point to the right.
-                temp.position = controlPoints->Position(index) + dx * 0.5f;
-            }
+          alignControlPoints();
+          dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
         }
-        else
-            temp.position = 0.;
+
+        // Add new point to the left.
+        temp.position = controlPoints->Position(index - 1) + dx * 0.5f;
+      }
+      else
+      {
+        // Compute the distance to the next point.
+        float dx = controlPoints->Position(index + 1) - controlPoints->Position(index);
+
+        // If the distance is small enough, realign the points and recalculate the
+        // distance to the next point.
+        if (dx <= 0.)
+        {
+          alignControlPoints();
+          dx = controlPoints->Position(index) - controlPoints->Position(index - 1);
+        }
+
+        // Add new point to the right.
+        temp.position = controlPoints->Position(index) + dx * 0.5f;
+      }
     }
     else
-        temp.position = position;
+      temp.position = 0.;
+  }
+  else
+    temp.position = position;
 
-    // Add the point.
-    controlPoints->Add(&temp);
+  // Add the point.
+  controlPoints->Add(&temp);
 
-    // Redraw the widget.
-    updateEntireWidget();
+  // Redraw the widget.
+  updateEntireWidget();
 
-    // Get the index of the new point and emit signals.
-    index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-    emit controlPointAdded(index, color, temp.position);
-    emit activeControlPointChanged(index);
+  // Get the index of the new point and emit signals.
+  index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  emit controlPointAdded(index, color, temp.position);
+  emit activeControlPointChanged(index);
 }
 
 // ****************************************************************************
@@ -647,39 +632,38 @@ QvisSpectrumBar::addControlPoint(const QColor &color, float position)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::alignControlPoints()
+void QvisSpectrumBar::alignControlPoints()
 {
-    // Sort the points in case they are out of order.
-    controlPoints->Sort();
+  // Sort the points in case they are out of order.
+  controlPoints->Sort();
 
-    // Set the position in all of the control points.
-    int i;
-    float _pos = 0.;
-    float delta = 1. /(float)(controlPoints->NumControlPoints() - 1);
-    float *oldPos = new float[controlPoints->NumControlPoints()];
-    for(i = 0; i < controlPoints->NumControlPoints(); ++i)
-    {
-        // Save the old position
-        oldPos[i] = controlPoints->Position(i);
+  // Set the position in all of the control points.
+  int i;
+  float _pos = 0.;
+  float delta = 1. / (float)(controlPoints->NumControlPoints() - 1);
+  float* oldPos = new float[controlPoints->NumControlPoints()];
+  for (i = 0; i < controlPoints->NumControlPoints(); ++i)
+  {
+    // Save the old position
+    oldPos[i] = controlPoints->Position(i);
 
-        // Set the new position
-        controlPoints->SetPosition(i, _pos);
-        _pos += delta;
-    }
+    // Set the new position
+    controlPoints->SetPosition(i, _pos);
+    _pos += delta;
+  }
 
-    // Redraw the entire widget
-    updateEntireWidget();
+  // Redraw the entire widget
+  updateEntireWidget();
 
-    // Emit a signal for each of the control points that changed.
-    for(i = 0; i < controlPoints->NumControlPoints(); ++i)
-    {
-        if(oldPos[i] != controlPoints->Position(i))
-            emit controlPointMoved(i, controlPoints->Position(i));
-    }
+  // Emit a signal for each of the control points that changed.
+  for (i = 0; i < controlPoints->NumControlPoints(); ++i)
+  {
+    if (oldPos[i] != controlPoints->Position(i))
+      emit controlPointMoved(i, controlPoints->Position(i));
+  }
 
-    // Delete the old position array.
-    delete [] oldPos;
+  // Delete the old position array.
+  delete[] oldPos;
 }
 
 // ****************************************************************************
@@ -697,32 +681,30 @@ QvisSpectrumBar::alignControlPoints()
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::removeControlPoint()
+void QvisSpectrumBar::removeControlPoint()
 {
-    // Only do the operation if there are more than 2 control points.
-    if(controlPoints->NumControlPoints() > 2)
-    {
-        controlPoints->SetEditMode(true);
+  // Only do the operation if there are more than 2 control points.
+  if (controlPoints->NumControlPoints() > 2)
+  {
+    controlPoints->SetEditMode(true);
 
-        // Delete the highest ranking control point from the control point list.
-        int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-        ControlPoint removedPoint = controlPoints->operator[](index);
-        controlPoints->DeleteHighestRank();
+    // Delete the highest ranking control point from the control point list.
+    int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+    ControlPoint removedPoint = controlPoints->operator[](index);
+    controlPoints->DeleteHighestRank();
 
-        // Redraw the widget.
-        updateEntireWidget();
+    // Redraw the widget.
+    updateEntireWidget();
 
-        // Emit information about the control point that was removed.
-        QColor temp((int)(removedPoint.color[0] * 255.),
-                    (int)(removedPoint.color[1] * 255.),
-                    (int)(removedPoint.color[2] * 255.));
-        emit controlPointRemoved(index, temp, removedPoint.position);
+    // Emit information about the control point that was removed.
+    QColor temp((int)(removedPoint.color[0] * 255.), (int)(removedPoint.color[1] * 255.),
+      (int)(removedPoint.color[2] * 255.));
+    emit controlPointRemoved(index, temp, removedPoint.position);
 
-        // Emit the index of the new active control point.
-        index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-        emit activeControlPointChanged(index);
-    }
+    // Emit the index of the new active control point.
+    index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+    emit activeControlPointChanged(index);
+  }
 }
 
 // ****************************************************************************
@@ -744,22 +726,21 @@ QvisSpectrumBar::removeControlPoint()
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setRawColors(unsigned char *colors, int ncolors)
+void QvisSpectrumBar::setRawColors(unsigned char* colors, int ncolors)
 {
-    float *fcolors = new float[ncolors * 3];
+  float* fcolors = new float[ncolors * 3];
 
-    // Turn the unsigned chars into floats.
-    for(int i = 0; i < ncolors * 3; ++i)
-        fcolors[i] = (float)colors[i] / 255;
+  // Turn the unsigned chars into floats.
+  for (int i = 0; i < ncolors * 3; ++i)
+    fcolors[i] = (float)colors[i] / 255;
 
-    // Note that the fcolors array is owned by the controlPoints object after
-    // the call to SetColorValues.
-    controlPoints->SetColorValues(fcolors, ncolors);
-    controlPoints->SetEditMode(false);
+  // Note that the fcolors array is owned by the controlPoints object after
+  // the call to SetColorValues.
+  controlPoints->SetColorValues(fcolors, ncolors);
+  controlPoints->SetEditMode(false);
 
-    // Redraw the widget.
-    updateEntireWidget();
+  // Redraw the widget.
+  updateEntireWidget();
 }
 
 // ****************************************************************************
@@ -781,29 +762,28 @@ QvisSpectrumBar::setRawColors(unsigned char *colors, int ncolors)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setEditMode(bool val)
+void QvisSpectrumBar::setEditMode(bool val)
 {
-    if(!val)
+  if (!val)
+  {
+    float* fcolors = new float[256 * 3];
+    unsigned char* raw = getRawColors(256);
+
+    if (raw)
     {
-        float *fcolors = new float[256 * 3];
-        unsigned char *raw = getRawColors(256);
+      // Turn the unsigned chars into floats.
+      for (int i = 0; i < 256 * 3; ++i)
+        fcolors[i] = (float)raw[i] / 255;
 
-        if(raw)
-        {
-            // Turn the unsigned chars into floats.
-            for(int i = 0; i < 256 * 3; ++i)
-                fcolors[i] = (float)raw[i] / 255;
-
-            // Note that the fcolors array is owned by the controlPoints object after
-            // the call to SetColorValues.
-            controlPoints->SetColorValues(fcolors, 256);
-            delete [] raw;
-        }
+      // Note that the fcolors array is owned by the controlPoints object after
+      // the call to SetColorValues.
+      controlPoints->SetColorValues(fcolors, 256);
+      delete[] raw;
     }
+  }
 
-    controlPoints->SetEditMode(val);
-    updateEntireWidget();
+  controlPoints->SetEditMode(val);
+  updateEntireWidget();
 }
 
 // ****************************************************************************
@@ -825,17 +805,16 @@ QvisSpectrumBar::setEditMode(bool val)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::updateEntireWidget()
+void QvisSpectrumBar::updateEntireWidget()
 {
-    if(isVisible() && !b_suppressUpdates)
-    {
-        drawControls();
-        drawSpectrum();
-        update();
-    }
-    else
-        deletePixmap();
+  if (isVisible() && !b_suppressUpdates)
+  {
+    drawControls();
+    drawSpectrum();
+    update();
+  }
+  else
+    deletePixmap();
 }
 
 // ****************************************************************************
@@ -851,11 +830,10 @@ QvisSpectrumBar::updateEntireWidget()
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::deletePixmap()
+void QvisSpectrumBar::deletePixmap()
 {
-    delete pixmap;
-    pixmap = 0;
+  delete pixmap;
+  pixmap = 0;
 }
 
 // ****************************************************************************
@@ -877,24 +855,23 @@ QvisSpectrumBar::deletePixmap()
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setControlPointColor(int index, const QColor &color)
+void QvisSpectrumBar::setControlPointColor(int index, const QColor& color)
 {
-    if(index >= 0 && index < controlPoints->NumControlPoints())
-    {
-         float r, g, b;
-         r = (float)color.red() / 255.;
-         g = (float)color.green() / 255.;
-         b = (float)color.blue() / 255.;
+  if (index >= 0 && index < controlPoints->NumControlPoints())
+  {
+    float r, g, b;
+    r = (float)color.red() / 255.;
+    g = (float)color.green() / 255.;
+    b = (float)color.blue() / 255.;
 
-         // Set the color and update the widget.
-         controlPoints->SetEditMode(true);
-         controlPoints->SetColor(index, r, g, b);
-         updateEntireWidget();
+    // Set the color and update the widget.
+    controlPoints->SetEditMode(true);
+    controlPoints->SetColor(index, r, g, b);
+    updateEntireWidget();
 
-         // Emit a signal indicating that a control point changed colors.
-         emit controlPointColorChanged(index, color);
-    }
+    // Emit a signal indicating that a control point changed colors.
+    emit controlPointColorChanged(index, color);
+  }
 }
 
 // ****************************************************************************
@@ -916,21 +893,22 @@ QvisSpectrumBar::setControlPointColor(int index, const QColor &color)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setControlPointPosition(int index, float position)
+void QvisSpectrumBar::setControlPointPosition(int index, float position)
 {
-    if(index >= 0 && index < controlPoints->NumControlPoints())
-    {
-        if(position < 0.) position = 0.;
-        if(position > 1.) position = 1.;
+  if (index >= 0 && index < controlPoints->NumControlPoints())
+  {
+    if (position < 0.)
+      position = 0.;
+    if (position > 1.)
+      position = 1.;
 
-        // Set the position and update the widget.
-        controlPoints->SetEditMode(true);
-        moveControlPointRedraw(index, position, true);
+    // Set the position and update the widget.
+    controlPoints->SetEditMode(true);
+    moveControlPointRedraw(index, position, true);
 
-        // Emit a signal indicating that a control point moved.
-        emit controlPointMoved(index, position);
-    }
+    // Emit a signal indicating that a control point moved.
+    emit controlPointMoved(index, position);
+  }
 }
 
 // ****************************************************************************
@@ -946,10 +924,9 @@ QvisSpectrumBar::setControlPointPosition(int index, float position)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::setOrientation(QvisSpectrumBar::ControlOrientation)
+void QvisSpectrumBar::setOrientation(QvisSpectrumBar::ControlOrientation)
 {
-    // Not supported yet.
+  // Not supported yet.
 }
 
 // ****************************************************************************
@@ -971,79 +948,70 @@ QvisSpectrumBar::setOrientation(QvisSpectrumBar::ControlOrientation)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::drawControls()
+void QvisSpectrumBar::drawControls()
 {
-    // If the pixmap is not allocated, allocate it.
-    bool totalFill = false;
-    if(pixmap == 0)
-    {
-        pixmap = new QPixmap(width(), height());
-        totalFill = true;
-    }
+  // If the pixmap is not allocated, allocate it.
+  bool totalFill = false;
+  if (pixmap == 0)
+  {
+    pixmap = new QPixmap(width(), height());
+    totalFill = true;
+  }
 
 #ifdef Q_WS_MACX
-    QBrush brush(palette().brush(QPalette::Background));
+  QBrush brush(palette().brush(QPalette::Background));
 #else
-    QBrush brush(palette().brush(QPalette::Button));
+  QBrush brush(palette().brush(QPalette::Button));
 #endif
 
-    // Create a painter and fill in the entire area with the background color.
-    QPainter paint(pixmap);
-    if(totalFill)
-        paint.fillRect(0, 0, width(), height(), brush);
-    else
-        paint.fillRect(controlsArea.x(), controlsArea.y(),
-                       controlsArea.width(), controlsArea.height(),
-                       brush);
+  // Create a painter and fill in the entire area with the background color.
+  QPainter paint(pixmap);
+  if (totalFill)
+    paint.fillRect(0, 0, width(), height(), brush);
+  else
+    paint.fillRect(
+      controlsArea.x(), controlsArea.y(), controlsArea.width(), controlsArea.height(), brush);
 
-    // If we're not in editable mode, then we don't need to draw any
-    // control points.
-    if(!controlPoints->CanBeEdited())
-        return;
+  // If we're not in editable mode, then we don't need to draw any
+  // control points.
+  if (!controlPoints->CanBeEdited())
+    return;
 
-    // Draw all the control points in the list in the order of lowest to
-    // highest rank. This ensures that control points can properly overlap.
-    int sel_index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-    for(int i = 0; i < controlPoints->NumControlPoints(); ++i)
-    {
-        // Get the control point with rank i.
-        int index = controlPoints->Rank(i);
+  // Draw all the control points in the list in the order of lowest to
+  // highest rank. This ensures that control points can properly overlap.
+  int sel_index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  for (int i = 0; i < controlPoints->NumControlPoints(); ++i)
+  {
+    // Get the control point with rank i.
+    int index = controlPoints->Rank(i);
 
-        // Get the bounding rectangle for the index'th control point.
-        QPoint cpLocation(controlPointLocation(index));
+    // Get the bounding rectangle for the index'th control point.
+    QPoint cpLocation(controlPointLocation(index));
 
-        // Create a QColor to use to draw the color in the control point.
-        QColor _controlPointColor((int)(controlPoints->operator[](index).color[0] * 255.),
-                                 (int)(controlPoints->operator[](index).color[1] * 255.),
-                                 (int)(controlPoints->operator[](index).color[2] * 255.));
+    // Create a QColor to use to draw the color in the control point.
+    QColor _controlPointColor((int)(controlPoints->operator[](index).color[0] * 255.),
+      (int)(controlPoints->operator[](index).color[1] * 255.),
+      (int)(controlPoints->operator[](index).color[2] * 255.));
 
-        // Hard code the select color to yellow for now.
-        QColor _selectColor(255, 255, 0);
+    // Hard code the select color to yellow for now.
+    QColor _selectColor(255, 255, 0);
 
-        // Draw the control point.
-        drawControlPoint(&paint,
-                         palette().light(),
-                         palette().dark(),
+    // Draw the control point.
+    drawControlPoint(&paint, palette().light(), palette().dark(),
 #ifdef Q_WS_MACX
-                         palette().brush(QPalette::Background),
+      palette().brush(QPalette::Background),
 #else
-                         palette().button(),
+      palette().button(),
 #endif
-                         _selectColor,
-                         _controlPointColor,
-                         cpLocation.x(), cpLocation.y(),
-                         slider.width(), slider.height(),
-                         2,
-                         orientation, index == sel_index);
-    }
+      _selectColor, _controlPointColor, cpLocation.x(), cpLocation.y(), slider.width(),
+      slider.height(), 2, orientation, index == sel_index);
+  }
 
-    // Make pixmap the background pixmap.
-//    setBackgroundPixmap(*pixmap);
-     QPalette _palette;
-     _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
-     this->setPalette(_palette);
-
+  // Make pixmap the background pixmap.
+  //    setBackgroundPixmap(*pixmap);
+  QPalette _palette;
+  _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
+  this->setPalette(_palette);
 }
 
 // ****************************************************************************
@@ -1066,42 +1034,41 @@ QvisSpectrumBar::drawControls()
 //
 // ****************************************************************************
 
-QPoint
-QvisSpectrumBar::controlPointLocation(int index) const
+QPoint QvisSpectrumBar::controlPointLocation(int index) const
 {
-    int   offset, _x, _y;
-    float _pos;
+  int offset, _x, _y;
+  float _pos;
 
-    // Figure out the position where the control point should be drawn.
-    // This ignores position information in equal spacing mode.
-    if(equalSpacing())
-    {
-        // Figure out the offset
-        _pos = (float)index /(float)(controlPoints->NumControlPoints() - 1);
-        if(orientation == HorizontalTop || orientation == HorizontalBottom)
-            offset = spectrumArea.width() / controlPoints->NumControlPoints();
-        else
-            offset = spectrumArea.height() / controlPoints->NumControlPoints();
-    }
+  // Figure out the position where the control point should be drawn.
+  // This ignores position information in equal spacing mode.
+  if (equalSpacing())
+  {
+    // Figure out the offset
+    _pos = (float)index / (float)(controlPoints->NumControlPoints() - 1);
+    if (orientation == HorizontalTop || orientation == HorizontalBottom)
+      offset = spectrumArea.width() / controlPoints->NumControlPoints();
     else
-    {
-        _pos = controlPoints->operator[](index).position;
-        offset = 0;
-    }
+      offset = spectrumArea.height() / controlPoints->NumControlPoints();
+  }
+  else
+  {
+    _pos = controlPoints->operator[](index).position;
+    offset = 0;
+  }
 
-    // Figure the x,_y location of where to draw the control point.
-    if(orientation == HorizontalTop || orientation == HorizontalBottom)
-    {
-        _x = (int)(_pos *(spectrumArea.width() - offset)) + offset/2 + margin;
-        _y = controlsArea.y();
-    }
-    else
-    {
-        _x = controlsArea.x();
-        _y = (int)(_pos *(spectrumArea.height() - offset)) + offset/2;
-    }
+  // Figure the x,_y location of where to draw the control point.
+  if (orientation == HorizontalTop || orientation == HorizontalBottom)
+  {
+    _x = (int)(_pos * (spectrumArea.width() - offset)) + offset / 2 + margin;
+    _y = controlsArea.y();
+  }
+  else
+  {
+    _x = controlsArea.x();
+    _y = (int)(_pos * (spectrumArea.height() - offset)) + offset / 2;
+  }
 
-    return QPoint(_x, _y);
+  return QPoint(_x, _y);
 }
 
 // ****************************************************************************
@@ -1134,130 +1101,145 @@ QvisSpectrumBar::controlPointLocation(int index) const
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::drawControlPoint(QPainter *paint, const QBrush &top,
-    const QBrush &bottom, const QBrush &fore, const QColor &sel,
-    const QColor &cpt, int _x, int _y, int w, int h, int shadow_thick,
-    ControlOrientation orient, bool selected)
+void QvisSpectrumBar::drawControlPoint(QPainter* paint, const QBrush& top, const QBrush& bottom,
+  const QBrush& fore, const QColor& sel, const QColor& cpt, int _x, int _y, int w, int h,
+  int shadow_thick, ControlOrientation orient, bool selected)
 {
-    int wd2 = w >> 1;
-    int s2 = (shadow_thick << 1) + 1;
-    int h1 = (int)((float)wd2 * 1.7320);
-    int h2 = (int)((float)shadow_thick * 1.7320) + 1;
-    int h3 = (int)((float)(w -(shadow_thick << 1)) * 1.7320 * 0.5) + 1;
-    int w2 = (int)((float)(7 * h3 / 30) * 1.7320);
+  int wd2 = w >> 1;
+  int s2 = (shadow_thick << 1) + 1;
+  int h1 = (int)((float)wd2 * 1.7320);
+  int h2 = (int)((float)shadow_thick * 1.7320) + 1;
+  int h3 = (int)((float)(w - (shadow_thick << 1)) * 1.7320 * 0.5) + 1;
+  int w2 = (int)((float)(7 * h3 / 30) * 1.7320);
 
-    int X[17], Y[17];
-    QPolygon poly(5);
+  int X[17], Y[17];
+  QPolygon poly(5);
 
-#define COPY_POINT(DI,SI) poly.setPoint((DI), X[SI], Y[SI])
+#define COPY_POINT(DI, SI) poly.setPoint((DI), X[SI], Y[SI])
 
-    // Fill the vertices.
-    X[0] = _x + wd2;              Y[0] = _y + h;
-    X[1] = _x + w;                Y[1] = _y + h - h1;
-    X[2] = _x + w;                Y[2] = _y;
-    X[3] = _x;                    Y[3] = _y;
-    X[4] = _x;                    Y[4] = _y + h - h1;
-    X[5] = _x + wd2;              Y[5] = _y + h - h2;
-    X[6] = _x + w - shadow_thick; Y[6] = _y + h - h2 - h3;
-    X[7] = _x + w - shadow_thick; Y[7] = _y + shadow_thick;
-    X[8] = _x + shadow_thick;     Y[8] = _y + shadow_thick;
-    X[9] = _x + shadow_thick;     Y[9] = _y + h - h2 - h3;
-    X[10] = _x + w - s2;          Y[10] = _y + h - h2 - h3;
-    X[11] = _x + w - s2;          Y[11] = _y + s2;
-    X[12] = _x + s2;              Y[12] = _y + s2;
-    X[13] = _x + s2;              Y[13] = _y + h - h2 - h3;
-    X[14] = _x + wd2;             Y[14] = _y + h - h2 - int(h3 * 0.15);
-    X[15] = _x + wd2 + w2;        Y[15] = _y + h - h2 - int(0.85 * h3);
-    X[16] = _x + wd2 - w2;        Y[16] = _y + h - h2 - int(0.85 * h3);
+  // Fill the vertices.
+  X[0] = _x + wd2;
+  Y[0] = _y + h;
+  X[1] = _x + w;
+  Y[1] = _y + h - h1;
+  X[2] = _x + w;
+  Y[2] = _y;
+  X[3] = _x;
+  Y[3] = _y;
+  X[4] = _x;
+  Y[4] = _y + h - h1;
+  X[5] = _x + wd2;
+  Y[5] = _y + h - h2;
+  X[6] = _x + w - shadow_thick;
+  Y[6] = _y + h - h2 - h3;
+  X[7] = _x + w - shadow_thick;
+  Y[7] = _y + shadow_thick;
+  X[8] = _x + shadow_thick;
+  Y[8] = _y + shadow_thick;
+  X[9] = _x + shadow_thick;
+  Y[9] = _y + h - h2 - h3;
+  X[10] = _x + w - s2;
+  Y[10] = _y + h - h2 - h3;
+  X[11] = _x + w - s2;
+  Y[11] = _y + s2;
+  X[12] = _x + s2;
+  Y[12] = _y + s2;
+  X[13] = _x + s2;
+  Y[13] = _y + h - h2 - h3;
+  X[14] = _x + wd2;
+  Y[14] = _y + h - h2 - int(h3 * 0.15);
+  X[15] = _x + wd2 + w2;
+  Y[15] = _y + h - h2 - int(0.85 * h3);
+  X[16] = _x + wd2 - w2;
+  Y[16] = _y + h - h2 - int(0.85 * h3);
 
-    paint->setPen(Qt::NoPen);            // do not draw outline
+  paint->setPen(Qt::NoPen); // do not draw outline
 
+  // Create a polygon.
+  COPY_POINT(0, 0);
+  COPY_POINT(1, 1);
+  COPY_POINT(2, 6);
+  COPY_POINT(3, 5);
+  paint->setBrush(bottom);
+
+  paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+
+  // Create a polygon.
+  COPY_POINT(0, 1);
+  COPY_POINT(1, 2);
+  COPY_POINT(2, 7);
+  COPY_POINT(3, 6);
+  paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+
+  // Create a polygon.
+  COPY_POINT(0, 2);
+  COPY_POINT(1, 3);
+  COPY_POINT(2, 8);
+  COPY_POINT(3, 7);
+  paint->setBrush(top);
+  paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+
+  // Create a polygon.
+  COPY_POINT(0, 3);
+  COPY_POINT(1, 4);
+  COPY_POINT(2, 9);
+  COPY_POINT(3, 8);
+  paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+
+  // Create a polygon.
+  COPY_POINT(0, 4);
+  COPY_POINT(1, 0);
+  COPY_POINT(2, 5);
+  COPY_POINT(3, 9);
+  paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+
+  // Create a polygon.
+  COPY_POINT(0, 5);
+  COPY_POINT(1, 6);
+  COPY_POINT(2, 7);
+  COPY_POINT(3, 8);
+  COPY_POINT(4, 9);
+  paint->setBrush(fore);
+  paint->drawPolygon(poly.constData(), 5, Qt::OddEvenFill);
+
+  // If the width is > 2 times the shadow thickness then we have
+  // room to draw the interior color rectangle.
+  if (w > (shadow_thick << 1))
+  {
     // Create a polygon.
-    COPY_POINT(0, 0);
-    COPY_POINT(1, 1);
-    COPY_POINT(2, 6);
-    COPY_POINT(3, 5);
-    paint->setBrush(bottom);
-
+    COPY_POINT(0, 10);
+    COPY_POINT(1, 11);
+    COPY_POINT(2, 12);
+    COPY_POINT(3, 13);
+    paint->setBrush(cpt);
     paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
 
-    // Create a polygon.
-    COPY_POINT(0, 1);
-    COPY_POINT(1, 2);
-    COPY_POINT(2, 7);
-    COPY_POINT(3, 6);
-    paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
+    int boxX, boxY, boxWidth, boxHeight;
 
-    // Create a polygon.
-    COPY_POINT(0, 2);
-    COPY_POINT(1, 3);
-    COPY_POINT(2, 8);
-    COPY_POINT(3, 7);
-    paint->setBrush(top);
-    paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
-
-    // Create a polygon.
-    COPY_POINT(0, 3);
-    COPY_POINT(1, 4);
-    COPY_POINT(2, 9);
-    COPY_POINT(3, 8);
-    paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
-
-    // Create a polygon.
-    COPY_POINT(0, 4);
-    COPY_POINT(1, 0);
-    COPY_POINT(2, 5);
-    COPY_POINT(3, 9);
-    paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
-
-    // Create a polygon.
-    COPY_POINT(0, 5);
-    COPY_POINT(1, 6);
-    COPY_POINT(2, 7);
-    COPY_POINT(3, 8);
-    COPY_POINT(4, 9);
-    paint->setBrush(fore);
-    paint->drawPolygon(poly.constData(), 5, Qt::OddEvenFill);
-
-    // If the width is > 2 times the shadow thickness then we have
-    // room to draw the interior color rectangle.
-    if(w >(shadow_thick << 1))
+    switch (orient)
     {
-        // Create a polygon.
-        COPY_POINT(0, 10);
-        COPY_POINT(1, 11);
-        COPY_POINT(2, 12);
-        COPY_POINT(3, 13);
-        paint->setBrush(cpt);
-        paint->drawPolygon(poly.constData(), 4, Qt::OddEvenFill);
-
-        int boxX, boxY, boxWidth, boxHeight;
-
-        switch(orient)
-        {
-        case HorizontalTop:
-            boxX = X[12];
-            boxY = Y[12];
-            boxWidth = X[11] - X[12];
-            boxHeight = Y[10] - Y[11];
-            break;
-        default:
-            boxX = boxY = boxWidth = boxHeight = 0; // just for now.
-        }
-
-        // Draw the sunken bevel around the spectrum.
-        drawBox(paint, QRect(boxX, boxY, boxWidth, boxHeight),
-          palette().dark().color(), palette().light().color());
-
-        // Create the select polygon.
-        if(selected)
-        {
-            QPalette g(palette());
-            g.setColor(QPalette::Button, sel);
-            drawArrow(paint, true, X[16], Y[16], w2 << 1,(int)(h3 * 0.65), g);
-        }
+      case HorizontalTop:
+        boxX = X[12];
+        boxY = Y[12];
+        boxWidth = X[11] - X[12];
+        boxHeight = Y[10] - Y[11];
+        break;
+      default:
+        boxX = boxY = boxWidth = boxHeight = 0; // just for now.
     }
+
+    // Draw the sunken bevel around the spectrum.
+    drawBox(paint, QRect(boxX, boxY, boxWidth, boxHeight), palette().dark().color(),
+      palette().light().color());
+
+    // Create the select polygon.
+    if (selected)
+    {
+      QPalette g(palette());
+      g.setColor(QPalette::Button, sel);
+      drawArrow(paint, true, X[16], Y[16], w2 << 1, (int)(h3 * 0.65), g);
+    }
+  }
 }
 
 // ****************************************************************************
@@ -1280,31 +1262,30 @@ QvisSpectrumBar::drawControlPoint(QPainter *paint, const QBrush &top,
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::drawBox(QPainter *paint, const QRect &r,
-    const QColor &light, const QColor &dark, int lw)
+void QvisSpectrumBar::drawBox(
+  QPainter* paint, const QRect& r, const QColor& light, const QColor& dark, int lw)
 {
-    int i;
-    int X  = r.x();
-    int X2 = r.x() + r.width() - 1;
-    int Y  = r.y();
-    int Y2 = r.y() + r.height() - 1;
+  int i;
+  int X = r.x();
+  int X2 = r.x() + r.width() - 1;
+  int Y = r.y();
+  int Y2 = r.y() + r.height() - 1;
 
-    // Draw the highlight
-    paint->setPen(QPen(light));
-    for(i = 0; i < lw; ++i)
-    {
-        paint->drawLine(QPoint(X + i, Y + i), QPoint(X + i, Y2 - i));
-        paint->drawLine(QPoint(X + i, Y + i), QPoint(X2 - i, Y + i));
-    }
+  // Draw the highlight
+  paint->setPen(QPen(light));
+  for (i = 0; i < lw; ++i)
+  {
+    paint->drawLine(QPoint(X + i, Y + i), QPoint(X + i, Y2 - i));
+    paint->drawLine(QPoint(X + i, Y + i), QPoint(X2 - i, Y + i));
+  }
 
-    // Draw the shadow
-    paint->setPen(QPen(dark));
-    for(i = 0; i < lw; ++i)
-    {
-        paint->drawLine(QPoint(X + i + 1, Y2 - i), QPoint(X2, Y2 - i));
-        paint->drawLine(QPoint(X2 - i, Y + i + 1), QPoint(X2 - i, Y2));
-    }
+  // Draw the shadow
+  paint->setPen(QPen(dark));
+  for (i = 0; i < lw; ++i)
+  {
+    paint->drawLine(QPoint(X + i + 1, Y2 - i), QPoint(X2, Y2 - i));
+    paint->drawLine(QPoint(X2 - i, Y + i + 1), QPoint(X2 - i, Y2));
+  }
 }
 
 // ****************************************************************************
@@ -1325,154 +1306,152 @@ QvisSpectrumBar::drawBox(QPainter *paint, const QRect &r,
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::drawArrow(QPainter *p, bool down, int _x, int _y, int w, int h,
-    const QPalette &g)
+void QvisSpectrumBar::drawArrow(
+  QPainter* p, bool down, int _x, int _y, int w, int h, const QPalette& g)
 {
-    QPolygon bFill;            // fill polygon
-    QPolygon bTop;             // top shadow.
-    QPolygon bBot;             // bottom shadow.
-    QPolygon bLeft;            // left shadow.
-    QMatrix  matrix;           // xform matrix
-    bool vertical = orientation == HorizontalTop ||
-                    orientation == HorizontalBottom;
-    bool horizontal = !vertical;
-    int     dim = w < h ? w : h;
-    int     colspec = 0x0000;     // color specification array
+  QPolygon bFill; // fill polygon
+  QPolygon bTop;  // top shadow.
+  QPolygon bBot;  // bottom shadow.
+  QPolygon bLeft; // left shadow.
+  QMatrix matrix; // xform matrix
+  bool vertical = orientation == HorizontalTop || orientation == HorizontalBottom;
+  bool horizontal = !vertical;
+  int dim = w < h ? w : h;
+  int colspec = 0x0000; // color specification array
 
-    if(dim < 2)                   // too small arrow
-        return;
+  if (dim < 2) // too small arrow
+    return;
 
-    // adjust size and center(to fix rotation below)
-    if(w >  dim)
+  // adjust size and center(to fix rotation below)
+  if (w > dim)
+  {
+    _x += (w - dim) / 2;
+    w = dim;
+  }
+  if (h > dim)
+  {
+    _y += (h - dim) / 2;
+    h = dim;
+  }
+
+  if (dim > 3)
+  {
+    if (dim > 6)
+      bFill.resize(dim & 1 ? 3 : 4);
+    bTop.resize((dim / 2) * 2);
+    bBot.resize(dim & 1 ? dim + 1 : dim);
+    bLeft.resize(dim > 4 ? 4 : 2);
+    bLeft.putPoints(0, 2, 0, 0, 0, dim - 1);
+
+    if (dim > 4)
+      bLeft.putPoints(2, 2, 1, 2, 1, dim - 3);
+    bTop.putPoints(0, 4, 1, 0, 1, 1, 2, 1, 3, 1);
+    bBot.putPoints(0, 4, 1, dim - 1, 1, dim - 2, 2, dim - 2, 3, dim - 2);
+
+    for (int i = 0; i < dim / 2 - 2; i++)
     {
-        _x += (w-dim)/2;
-        w = dim;
+      bTop.putPoints(i * 2 + 4, 2, 2 + i * 2, 2 + i, 5 + i * 2, 2 + i);
+      bBot.putPoints(i * 2 + 4, 2, 2 + i * 2, dim - 3 - i, 5 + i * 2, dim - 3 - i);
     }
-    if(h > dim)
-    {
-        _y += (h-dim)/2;
-        h = dim;
+
+    if (dim & 1) // odd number size: extra line
+      bBot.putPoints(dim - 1, 2, dim - 3, dim / 2, dim - 1, dim / 2);
+    if (dim > 6)
+    { // dim>6: must fill interior
+      bFill.putPoints(0, 2, 1, dim - 3, 1, 2);
+      if (dim & 1) // if size is an odd number
+        bFill.setPoint(2, dim - 3, dim / 2);
+      else
+        bFill.putPoints(2, 2, dim - 4, dim / 2 - 1, dim - 4, dim / 2);
     }
+  }
+  else
+  {
+    if (dim == 3)
+    { // 3x3 arrow pattern
+      bLeft.setPoints(4, 0, 0, 0, 2, 1, 1, 1, 1);
+      bTop.setPoints(2, 1, 0, 1, 0);
+      bBot.setPoints(2, 1, 2, 2, 1);
+    }
+    else
+    { // 2x2 arrow pattern
+      bLeft.setPoints(2, 0, 0, 0, 1);
+      bTop.setPoints(2, 1, 0, 1, 0);
+      bBot.setPoints(2, 1, 1, 1, 1);
+    }
+  }
 
-    if(dim > 3)
+  if (orientation == HorizontalBottom || orientation == VerticalRight)
+  {
+    matrix.translate(_x, _y);
+    if (vertical)
     {
-        if(dim > 6)
-            bFill.resize(dim & 1 ? 3 : 4);
-        bTop.resize((dim/2)*2);
-        bBot.resize(dim & 1 ? dim + 1 : dim);
-        bLeft.resize(dim > 4 ? 4 : 2);
-        bLeft.putPoints(0, 2, 0,0, 0,dim-1);
-
-        if(dim > 4)
-            bLeft.putPoints(2, 2, 1,2, 1,dim-3);
-        bTop.putPoints(0, 4, 1,0, 1,1, 2,1, 3,1);
-        bBot.putPoints(0, 4, 1,dim-1, 1,dim-2, 2,dim-2, 3,dim-2);
-
-        for(int i=0; i<dim/2-2 ; i++)
-        {
-            bTop.putPoints(i*2+4, 2, 2+i*2,2+i, 5+i*2, 2+i);
-            bBot.putPoints(i*2+4, 2, 2+i*2,dim-3-i, 5+i*2,dim-3-i);
-        }
-
-        if(dim & 1)                // odd number size: extra line
-            bBot.putPoints(dim-1, 2, dim-3,dim/2, dim-1,dim/2);
-        if(dim > 6)
-        {            // dim>6: must fill interior
-            bFill.putPoints(0, 2, 1,dim-3, 1,2);
-            if(dim & 1)            // if size is an odd number
-                bFill.setPoint(2, dim - 3, dim / 2);
-            else
-                bFill.putPoints(2, 2, dim-4,dim/2-1, dim-4,dim/2);
-        }
+      matrix.translate(0, h - 1);
+      matrix.rotate(-90);
     }
     else
     {
-        if(dim == 3)
-        {            // 3x3 arrow pattern
-            bLeft.setPoints(4, 0,0, 0,2, 1,1, 1,1);
-            bTop .setPoints(2, 1,0, 1,0);
-            bBot .setPoints(2, 1,2, 2,1);
-        }
-        else
-        {                    // 2x2 arrow pattern
-            bLeft.setPoints(2, 0,0, 0,1);
-            bTop .setPoints(2, 1,0, 1,0);
-            bBot .setPoints(2, 1,1, 1,1);
-        }
+      matrix.translate(w - 1, h - 1);
+      matrix.rotate(180);
     }
 
-    if(orientation == HorizontalBottom || orientation == VerticalRight)
-    {
-        matrix.translate(_x, _y);
-        if(vertical)
-        {
-            matrix.translate(0, h - 1);
-            matrix.rotate(-90);
-        }
-        else
-        {
-            matrix.translate(w - 1, h - 1);
-            matrix.rotate(180);
-        }
-
-        if(down)
-            colspec = horizontal ? 0x2334 : 0x2343;
-        else
-            colspec = horizontal ? 0x1443 : 0x1434;
-    }
+    if (down)
+      colspec = horizontal ? 0x2334 : 0x2343;
     else
+      colspec = horizontal ? 0x1443 : 0x1434;
+  }
+  else
+  {
+    matrix.translate(_x, _y);
+    if (vertical)
     {
-        matrix.translate(_x, _y);
-        if(vertical)
-        {
-            matrix.translate(w-1, 0);
-            matrix.rotate(90);
-        }
-        if(down)
-            colspec = horizontal ? 0x2443 : 0x2434;
-        else
-            colspec = horizontal ? 0x1334 : 0x1343;
+      matrix.translate(w - 1, 0);
+      matrix.rotate(90);
     }
+    if (down)
+      colspec = horizontal ? 0x2443 : 0x2434;
+    else
+      colspec = horizontal ? 0x1334 : 0x1343;
+  }
 
-    QColor *cols[5];
-    cols[0] = 0;
-    cols[1] = (QColor *)&g.button();
-    cols[2] = (QColor *)&g.mid();
-    cols[3] = (QColor *)&g.light();
-    cols[4] = (QColor *)&g.dark();
+  QColor* cols[5];
+  cols[0] = 0;
+  cols[1] = (QColor*)&g.button();
+  cols[2] = (QColor*)&g.mid();
+  cols[3] = (QColor*)&g.light();
+  cols[4] = (QColor*)&g.dark();
 
-#define CMID    *cols[(colspec>>12) & 0xf ]
-#define CLEFT   *cols[(colspec>>8) & 0xf ]
-#define CTOP    *cols[(colspec>>4) & 0xf ]
-#define CBOT    *cols[ colspec & 0xf ]
+#define CMID *cols[(colspec >> 12) & 0xf]
+#define CLEFT *cols[(colspec >> 8) & 0xf]
+#define CTOP *cols[(colspec >> 4) & 0xf]
+#define CBOT *cols[colspec & 0xf]
 
-    QPen     savePen   = p->pen();     // save current pen
-    QBrush   saveBrush = p->brush();   // save current brush
-    QMatrix wxm = p->worldMatrix();
-    QPen     pen(Qt::NoPen);
+  QPen savePen = p->pen();       // save current pen
+  QBrush saveBrush = p->brush(); // save current brush
+  QMatrix wxm = p->worldMatrix();
+  QPen pen(Qt::NoPen);
 #ifdef Q_WS_MACX
-    QBrush   brush(g.brush(QPalette::Background));
+  QBrush brush(g.brush(QPalette::Background));
 #else
-    QBrush   brush(g.brush(QPalette::Button));
+  QBrush brush(g.brush(QPalette::Button));
 #endif
 
-    p->setPen(pen);
-    p->setBrush(brush);
-    p->setWorldMatrix(matrix, true);   // set transformation matrix
-    p->drawPolygon(bFill);             // fill arrow
-    p->setBrush(Qt::NoBrush);              // don't fill
+  p->setPen(pen);
+  p->setBrush(brush);
+  p->setWorldMatrix(matrix, true); // set transformation matrix
+  p->drawPolygon(bFill);           // fill arrow
+  p->setBrush(Qt::NoBrush);        // don't fill
 
-    p->setPen(CLEFT);
-    p->drawLines(bLeft.constData(),bLeft.size());
-    p->setPen(CTOP);
-    p->drawLines(bTop.constData(),bTop.size());
-    p->setPen(CBOT);
-    p->drawLines(bBot.constData(),bBot.size());
+  p->setPen(CLEFT);
+  p->drawLines(bLeft.constData(), bLeft.size());
+  p->setPen(CTOP);
+  p->drawLines(bTop.constData(), bTop.size());
+  p->setPen(CBOT);
+  p->drawLines(bBot.constData(), bBot.size());
 
-    p->setWorldMatrix(wxm);
-    p->setBrush(saveBrush);            // restore brush
-    p->setPen(savePen);                // restore pen
+  p->setWorldMatrix(wxm);
+  p->setBrush(saveBrush); // restore brush
+  p->setPen(savePen);     // restore pen
 
 #undef CMID
 #undef CLEFT
@@ -1499,81 +1478,78 @@ QvisSpectrumBar::drawArrow(QPainter *p, bool down, int _x, int _y, int w, int h,
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::drawSpectrum()
+void QvisSpectrumBar::drawSpectrum()
 {
-    // If the pixmap is not allocated, allocate it.
-    bool totalFill = false;
-    if(pixmap == 0)
-    {
-        pixmap = new QPixmap(width(), height());
-        totalFill = true;
-    }
+  // If the pixmap is not allocated, allocate it.
+  bool totalFill = false;
+  if (pixmap == 0)
+  {
+    pixmap = new QPixmap(width(), height());
+    totalFill = true;
+  }
 
 #ifdef Q_WS_MACX
-    QBrush brush(palette().brush(QPalette::Background));
+  QBrush brush(palette().brush(QPalette::Background));
 #else
-    QBrush brush(palette().brush(QPalette::Button));
+  QBrush brush(palette().brush(QPalette::Button));
 #endif
 
-    // Create a painter and fill in the entire area with the background color.
-    QPainter paint(pixmap);
-    if(totalFill)
-        paint.fillRect(0, 0, width(), height(), brush);
+  // Create a painter and fill in the entire area with the background color.
+  QPainter paint(pixmap);
+  if (totalFill)
+    paint.fillRect(0, 0, width(), height(), brush);
 
-    // Get the area that we can draw the spectrum in.
-    QRect area(spectrumArea.x() + 2, spectrumArea.y() + 2,
-               spectrumArea.width() - 4, spectrumArea.height() - 4);
+  // Get the area that we can draw the spectrum in.
+  QRect area(spectrumArea.x() + 2, spectrumArea.y() + 2, spectrumArea.width() - 4,
+    spectrumArea.height() - 4);
 
-    // Figure out the range based on the orientation of the widget.
-    int range;
-    if(orientation == HorizontalTop || orientation == HorizontalBottom)
-        range = area.width();
-    else
-        range = area.height();
+  // Figure out the range based on the orientation of the widget.
+  int range;
+  if (orientation == HorizontalTop || orientation == HorizontalBottom)
+    range = area.width();
+  else
+    range = area.height();
 
-    // Get an array containing the interpolated color spectrum in a form we can use.
-    unsigned char *interpolatedColors = getRawColors(range);
+  // Get an array containing the interpolated color spectrum in a form we can use.
+  unsigned char* interpolatedColors = getRawColors(range);
 
-    // Draw the spectrum.
-    if(interpolatedColors)
+  // Draw the spectrum.
+  if (interpolatedColors)
+  {
+    unsigned char* cptr = interpolatedColors;
+
+    // Draw the spectrum based on the orientation of the widget.
+    if (orientation == HorizontalTop || orientation == HorizontalBottom)
     {
-        unsigned char *cptr = interpolatedColors;
-
-        // Draw the spectrum based on the orientation of the widget.
-        if(orientation == HorizontalTop || orientation == HorizontalBottom)
-        {
-            // Draw vertical lines.
-            for(int i = 0; i < range; ++i, cptr += 3)
-            {
-                paint.setPen(QPen(QColor((int)cptr[0],(int)cptr[1],(int)cptr[2])));
-                paint.drawLine(i + area.x(), area.y(),
-                               i + area.x(), area.y() + area.height() + 1);
-            }
-        }
-        else
-        {
-            // Draw horizontal lines.
-            for(int i = range - 1; i >= 0; --i, cptr += 3)
-            {
-                paint.setPen(QPen(QColor((int)cptr[0],(int)cptr[1],(int)cptr[2])));
-                paint.drawLine(area.x(), i + area.y(),
-                               area.x() + area.width() + 1, i + area.y());
-            }
-        }
-
-        // Draw the sunken bevel around the spectrum.
-        drawBox(&paint, spectrumArea, palette().dark().color(), palette().light().color());
-
-        // Delete the color array.
-        delete [] interpolatedColors;
+      // Draw vertical lines.
+      for (int i = 0; i < range; ++i, cptr += 3)
+      {
+        paint.setPen(QPen(QColor((int)cptr[0], (int)cptr[1], (int)cptr[2])));
+        paint.drawLine(i + area.x(), area.y(), i + area.x(), area.y() + area.height() + 1);
+      }
+    }
+    else
+    {
+      // Draw horizontal lines.
+      for (int i = range - 1; i >= 0; --i, cptr += 3)
+      {
+        paint.setPen(QPen(QColor((int)cptr[0], (int)cptr[1], (int)cptr[2])));
+        paint.drawLine(area.x(), i + area.y(), area.x() + area.width() + 1, i + area.y());
+      }
     }
 
-    // Make pixmap the background pixmap.
-//    setBackgroundPixmap(*pixmap);
-     QPalette _palette;
-     _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
-     this->setPalette(_palette);
+    // Draw the sunken bevel around the spectrum.
+    drawBox(&paint, spectrumArea, palette().dark().color(), palette().light().color());
+
+    // Delete the color array.
+    delete[] interpolatedColors;
+  }
+
+  // Make pixmap the background pixmap.
+  //    setBackgroundPixmap(*pixmap);
+  QPalette _palette;
+  _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
+  this->setPalette(_palette);
 }
 
 // ****************************************************************************
@@ -1603,214 +1579,208 @@ QvisSpectrumBar::drawSpectrum()
 //
 // ****************************************************************************
 
-unsigned char *
-QvisSpectrumBar::getRawColors(int range)
+unsigned char* QvisSpectrumBar::getRawColors(int range)
 {
-    unsigned char *row = NULL;
-    int i, ci, npoints, c = 0;
-    ControlPoint *oldpts = NULL, *newpts = NULL;
-    ControlPoint *c1 = NULL, *c2 = NULL;
+  unsigned char* row = NULL;
+  int i, ci, npoints, c = 0;
+  ControlPoint *oldpts = NULL, *newpts = NULL;
+  ControlPoint *c1 = NULL, *c2 = NULL;
 
-    // Return early if the range is bad.
-    if(range < 1)
-        return 0;
+  // Return early if the range is bad.
+  if (range < 1)
+    return 0;
 
-    // Allocate memory for the array to be returned.
-    int arrayLength = range * 3;
-    row = new unsigned char[arrayLength];
+  // Allocate memory for the array to be returned.
+  int arrayLength = range * 3;
+  row = new unsigned char[arrayLength];
 
-    /*******************************************
-     * Phase I -- If the widget is non-editable
-     *            then it has no control points.
-     *            We must do colors differently.
-     ******************************************/
-    if(!this->controlPoints->CanBeEdited())
+  /*******************************************
+   * Phase I -- If the widget is non-editable
+   *            then it has no control points.
+   *            We must do colors differently.
+   ******************************************/
+  if (!this->controlPoints->CanBeEdited())
+  {
+    for (i = 0; i < range; ++i)
     {
-        for(i = 0; i < range; ++i)
-        {
-            /* The desired index into the colors we have. */
-            int src_index = (int)(((float)i /(float)(range - 1)) *
-               (this->controlPoints->NumColorValues() - 1)) * 3;
+      /* The desired index into the colors we have. */
+      int src_index =
+        (int)(((float)i / (float)(range - 1)) * (this->controlPoints->NumColorValues() - 1)) * 3;
 
-            row[i * 3]     = (unsigned char)(controlPoints->ColorValue(src_index) * 255.);
-            row[i * 3 + 1] = (unsigned char)(controlPoints->ColorValue(src_index+1) * 255.);
-            row[i * 3 + 2] = (unsigned char)(controlPoints->ColorValue(src_index+2) * 255.);
-        }
-
-        return row;
+      row[i * 3] = (unsigned char)(controlPoints->ColorValue(src_index) * 255.);
+      row[i * 3 + 1] = (unsigned char)(controlPoints->ColorValue(src_index + 1) * 255.);
+      row[i * 3 + 2] = (unsigned char)(controlPoints->ColorValue(src_index + 2) * 255.);
     }
 
-    /*******************************************
-     * Phase II -- Determine the number of
-     *             control points needed and
-     *             allocate storage.
-     ******************************************/
-    npoints = this->controlPoints->NumControlPoints();
-    if(equalSpacing() || !smoothing())
-        oldpts = new ControlPoint[npoints + 1];
-    else
-        oldpts = new ControlPoint[npoints];
+    return row;
+  }
 
-    // Sort the color control points.
-    for(i = 0; i < this->controlPoints->NumControlPoints(); ++i)
-        oldpts[i] = this->controlPoints->operator[](i);
-    qsort((void *)oldpts, npoints, sizeof(ControlPoint), ControlPointCompare);
+  /*******************************************
+   * Phase II -- Determine the number of
+   *             control points needed and
+   *             allocate storage.
+   ******************************************/
+  npoints = this->controlPoints->NumControlPoints();
+  if (equalSpacing() || !smoothing())
+    oldpts = new ControlPoint[npoints + 1];
+  else
+    oldpts = new ControlPoint[npoints];
 
-    /*******************************************
-     * Phase III -- Process the control points.
-     ******************************************/
-    if(equalSpacing() || !smoothing())
+  // Sort the color control points.
+  for (i = 0; i < this->controlPoints->NumControlPoints(); ++i)
+    oldpts[i] = this->controlPoints->operator[](i);
+  qsort((void*)oldpts, npoints, sizeof(ControlPoint), ControlPointCompare);
+
+  /*******************************************
+   * Phase III -- Process the control points.
+   ******************************************/
+  if (equalSpacing() || !smoothing())
+  {
+    ++npoints;
+    newpts = new ControlPoint[npoints];
+
+    if (equalSpacing())
     {
-        ++npoints;
-        newpts = new ControlPoint[npoints];
+      // Do the equal spacing case.
+      for (i = 0; i < npoints; ++i)
+      {
+        ci = (i < (npoints - 2)) ? i : (npoints - 2);
+        newpts[i].position = (float)i / (float)(npoints - 1);
 
-        if(equalSpacing())
+        if (!smoothing())
         {
-            // Do the equal spacing case.
-            for(i = 0; i < npoints; ++i)
-            {
-                ci = (i <(npoints - 2)) ? i :(npoints - 2);
-                newpts[i].position = (float)i /(float)(npoints - 1);
-
-                if(!smoothing())
-                {
-                    memcpy((char *)newpts[i].color,
-                          (char *)oldpts[ci].color, 3 * sizeof(float));
-                }
-                else
-                {
-                    if(i < 1 || i >= npoints - 1)
-                    {
-                        memcpy((char *)newpts[i].color,
-                              (char *)oldpts[ci].color,
-                               3 * sizeof(float));
-                    }
-                    else
-                    {
-                        newpts[i].color[0] = (oldpts[i].color[0] +
-                            oldpts[i-1].color[0])*0.5;
-                        newpts[i].color[1] = (oldpts[i].color[1] +
-                            oldpts[i-1].color[1])*0.5;
-                        newpts[i].color[2] = (oldpts[i].color[2] +
-                            oldpts[i-1].color[2])*0.5;
-                    }
-                }
-            } // end for
-        } // end if equal spacing
+          memcpy((char*)newpts[i].color, (char*)oldpts[ci].color, 3 * sizeof(float));
+        }
         else
         {
-            // Do non-equal, non-smooth case.
-            memcpy((char *)newpts,(char *)oldpts, sizeof(ControlPoint));
-            for(i = 1; i < npoints - 1; i++)
-            {
-                newpts[i].position = oldpts[i-1].position +
-                   ((oldpts[i].position - oldpts[i-1].position) * 0.5);
-                memcpy((char *)newpts[i].color,
-                      (char *)oldpts[i].color,
-                       3 * sizeof(float));
-            }
-            memcpy((char *)&newpts[npoints-1],(char *)&oldpts[npoints-2],
-                   sizeof(ControlPoint));
+          if (i < 1 || i >= npoints - 1)
+          {
+            memcpy((char*)newpts[i].color, (char*)oldpts[ci].color, 3 * sizeof(float));
+          }
+          else
+          {
+            newpts[i].color[0] = (oldpts[i].color[0] + oldpts[i - 1].color[0]) * 0.5;
+            newpts[i].color[1] = (oldpts[i].color[1] + oldpts[i - 1].color[1]) * 0.5;
+            newpts[i].color[2] = (oldpts[i].color[2] + oldpts[i - 1].color[2]) * 0.5;
+          }
         }
-        c1 = newpts;
-    }
+      } // end for
+    }   // end if equal spacing
     else
-        c1 = oldpts;
-
-    /********************************************
-     * Phase IV -- Figure the colors for a row.
-     ********************************************/
-    c2 = c1;
-    int consecutiveZeroLengthRanges = 0;
-    for(ci = 0; ci < npoints - 1; ci++)
     {
-        float delta_r, delta_g, delta_b;
-        float r_sum, g_sum, b_sum;
-        int   color_start_i, color_end_i, color_range;
+      // Do non-equal, non-smooth case.
+      memcpy((char*)newpts, (char*)oldpts, sizeof(ControlPoint));
+      for (i = 1; i < npoints - 1; i++)
+      {
+        newpts[i].position =
+          oldpts[i - 1].position + ((oldpts[i].position - oldpts[i - 1].position) * 0.5);
+        memcpy((char*)newpts[i].color, (char*)oldpts[i].color, 3 * sizeof(float));
+      }
+      memcpy((char*)&newpts[npoints - 1], (char*)&oldpts[npoints - 2], sizeof(ControlPoint));
+    }
+    c1 = newpts;
+  }
+  else
+    c1 = oldpts;
 
-        // Initialize some variables.
-        c2++;
-        color_start_i = int(c1->position * range);
-        color_end_i = int(c2->position * range);
-        color_range = color_end_i - color_start_i;
+  /********************************************
+   * Phase IV -- Figure the colors for a row.
+   ********************************************/
+  c2 = c1;
+  int consecutiveZeroLengthRanges = 0;
+  for (ci = 0; ci < npoints - 1; ci++)
+  {
+    float delta_r, delta_g, delta_b;
+    float r_sum, g_sum, b_sum;
+    int color_start_i, color_end_i, color_range;
 
-        if(color_range > 1)
+    // Initialize some variables.
+    c2++;
+    color_start_i = int(c1->position * range);
+    color_end_i = int(c2->position * range);
+    color_range = color_end_i - color_start_i;
+
+    if (color_range > 1)
+    {
+      consecutiveZeroLengthRanges = 0;
+      if (ci == 0 && color_start_i != 0)
+      {
+        for (i = 0; i < color_start_i; i++)
         {
-            consecutiveZeroLengthRanges = 0;
-            if(ci == 0 && color_start_i != 0)
-            {
-                for(i = 0; i < color_start_i; i++)
-                {
-                    if(c < arrayLength)
-                    {
-                        row[c++] = (unsigned char)(c1->color[0] * 255);
-                        row[c++] = (unsigned char)(c1->color[1] * 255);
-                        row[c++] = (unsigned char)(c1->color[2] * 255);
-                    }
-                }
-            }
-
-            // Figure out some deltas.
-            if(smoothing())
-            {
-                delta_r = (float)(c2->color[0]-c1->color[0])/(float)(color_range-1);
-                delta_g = (float)(c2->color[1]-c1->color[1])/(float)(color_range-1);
-                delta_b = (float)(c2->color[2]-c1->color[2])/(float)(color_range-1);
-            }
-            else
-                delta_r = delta_g = delta_b = 0.;
-
-            // Initialize sums.
-            r_sum = c1->color[0]; g_sum = c1->color[1]; b_sum = c1->color[2];
-
-            // Interpolate color1 to color2.
-            for(i = color_start_i; i < color_end_i; i++)
-            {
-                // Store the colors as 24 bit rgb.
-                if(c < arrayLength)
-                {
-                    row[c++] = (unsigned char)(r_sum * 255);
-                    row[c++] = (unsigned char)(g_sum * 255);
-                    row[c++] = (unsigned char)(b_sum * 255);
-                }
-
-                // Add the color deltas.
-                r_sum += delta_r; g_sum += delta_g; b_sum += delta_b;
-            }
-
-            if(ci == npoints - 2 && color_end_i != range)
-            {
-                for(i = color_end_i; i < range; i++)
-                {
-                    if(c < arrayLength)
-                    {
-                        row[c++] = (unsigned char)(c2->color[0] * 255);
-                        row[c++] = (unsigned char)(c2->color[1] * 255);
-                        row[c++] = (unsigned char)(c2->color[2] * 255);
-                    }
-                }
-            }
-        }
-        else if(c < arrayLength)
-        {
+          if (c < arrayLength)
+          {
             row[c++] = (unsigned char)(c1->color[0] * 255);
             row[c++] = (unsigned char)(c1->color[1] * 255);
             row[c++] = (unsigned char)(c1->color[2] * 255);
+          }
+        }
+      }
 
-            // If this is the second zero length range in a row, back up.
-            if(++consecutiveZeroLengthRanges > 1)
-                c -= 3;
+      // Figure out some deltas.
+      if (smoothing())
+      {
+        delta_r = (float)(c2->color[0] - c1->color[0]) / (float)(color_range - 1);
+        delta_g = (float)(c2->color[1] - c1->color[1]) / (float)(color_range - 1);
+        delta_b = (float)(c2->color[2] - c1->color[2]) / (float)(color_range - 1);
+      }
+      else
+        delta_r = delta_g = delta_b = 0.;
+
+      // Initialize sums.
+      r_sum = c1->color[0];
+      g_sum = c1->color[1];
+      b_sum = c1->color[2];
+
+      // Interpolate color1 to color2.
+      for (i = color_start_i; i < color_end_i; i++)
+      {
+        // Store the colors as 24 bit rgb.
+        if (c < arrayLength)
+        {
+          row[c++] = (unsigned char)(r_sum * 255);
+          row[c++] = (unsigned char)(g_sum * 255);
+          row[c++] = (unsigned char)(b_sum * 255);
         }
 
-        c1++;
+        // Add the color deltas.
+        r_sum += delta_r;
+        g_sum += delta_g;
+        b_sum += delta_b;
+      }
+
+      if (ci == npoints - 2 && color_end_i != range)
+      {
+        for (i = color_end_i; i < range; i++)
+        {
+          if (c < arrayLength)
+          {
+            row[c++] = (unsigned char)(c2->color[0] * 255);
+            row[c++] = (unsigned char)(c2->color[1] * 255);
+            row[c++] = (unsigned char)(c2->color[2] * 255);
+          }
+        }
+      }
+    }
+    else if (c < arrayLength)
+    {
+      row[c++] = (unsigned char)(c1->color[0] * 255);
+      row[c++] = (unsigned char)(c1->color[1] * 255);
+      row[c++] = (unsigned char)(c1->color[2] * 255);
+
+      // If this is the second zero length range in a row, back up.
+      if (++consecutiveZeroLengthRanges > 1)
+        c -= 3;
     }
 
-    // Free unneeded memory.
-    delete [] oldpts;
-    delete [] newpts;
+    c1++;
+  }
 
-    // Return some color information.
-    return row;
+  // Free unneeded memory.
+  delete[] oldpts;
+  delete[] newpts;
+
+  // Return some color information.
+  return row;
 }
 
 // ****************************************************************************
@@ -1831,39 +1801,38 @@ QvisSpectrumBar::getRawColors(int range)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::paintEvent(QPaintEvent* /*e*/)
+void QvisSpectrumBar::paintEvent(QPaintEvent* /*e*/)
 {
-    // bool clipByRegion = true;
-/*
-    // If the spectrum pixmap does not exist, generate it.
-    if(pixmap == 0)
-    {
-        drawControls();
-        drawSpectrum();
-        clipByRegion = false;
-    }
+  // bool clipByRegion = true;
+  /*
+      // If the spectrum pixmap does not exist, generate it.
+      if(pixmap == 0)
+      {
+          drawControls();
+          drawSpectrum();
+          clipByRegion = false;
+      }
 
-    // Create a painter to draw on this widget. If the pixmaps that we're
-    // blitting did not have to be created, pay attention to the clipping
-    // region stored in the paint event.
-    QPainter paint(this);
-    if(clipByRegion && !e->region().isEmpty())
-        paint.setClipRegion(e->region());
+      // Create a painter to draw on this widget. If the pixmaps that we're
+      // blitting did not have to be created, pay attention to the clipping
+      // region stored in the paint event.
+      QPainter paint(this);
+      if(clipByRegion && !e->region().isEmpty())
+          paint.setClipRegion(e->region());
 
-    // Blit the pixmaps to the screen.
-    paint.drawPixmap(QPoint(0,0), *pixmap);
+      // Blit the pixmaps to the screen.
+      paint.drawPixmap(QPoint(0,0), *pixmap);
 
-    // If this widget has the focus then draw the focus rectangle.
-    if(hasFocus())
-    {
+      // If this widget has the focus then draw the focus rectangle.
+      if(hasFocus())
+      {
 
-        QStyleOptionFocusRect option;
-        option.init(this);
-        option.backgroundColor = palette().color(QPalette::Background);
-        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &paint, this);
-    }
-*/
+          QStyleOptionFocusRect option;
+          option.init(this);
+          option.backgroundColor = palette().color(QPalette::Background);
+          style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &paint, this);
+      }
+  */
 }
 
 // ****************************************************************************
@@ -1881,40 +1850,39 @@ QvisSpectrumBar::paintEvent(QPaintEvent* /*e*/)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::resizeEvent(QResizeEvent *)
+void QvisSpectrumBar::resizeEvent(QResizeEvent*)
 {
-    // Recalculate the size of the spectrum area and the controls area.
-    if(orientation == HorizontalTop)
-    {
-        int controlHeight = int(height() * 0.4) - margin;
-        if(controlHeight > 60)
-            controlHeight = 60;
+  // Recalculate the size of the spectrum area and the controls area.
+  if (orientation == HorizontalTop)
+  {
+    int controlHeight = int(height() * 0.4) - margin;
+    if (controlHeight > 60)
+      controlHeight = 60;
 
-        controlsArea.setHeight(controlHeight);
-        slider.setWidth((int)(controlsArea.height() / 1.6));
-        slider.setHeight(controlsArea.height());
+    controlsArea.setHeight(controlHeight);
+    slider.setWidth((int)(controlsArea.height() / 1.6));
+    slider.setHeight(controlsArea.height());
 
-        controlsArea.setX(margin);
-        controlsArea.setY(margin);
-        controlsArea.setWidth(width() -(margin << 1));
+    controlsArea.setX(margin);
+    controlsArea.setY(margin);
+    controlsArea.setWidth(width() - (margin << 1));
 
-        // These are not important since the slider never moves.
-        slider.setX(0);
-        slider.setY(controlsArea.y());
+    // These are not important since the slider never moves.
+    slider.setX(0);
+    slider.setY(controlsArea.y());
 
-        // Figure the area for the spectrum area.
-        spectrumArea.setX(margin +(slider.width() >> 1));
-        spectrumArea.setY(margin + controlsArea.height());
-        spectrumArea.setWidth(width() -(spectrumArea.x() << 1));
-        spectrumArea.setHeight(height() - spectrumArea.y() - margin);
-    }
-    else
-        qDebug("This orientation is not supported yet!");
+    // Figure the area for the spectrum area.
+    spectrumArea.setX(margin + (slider.width() >> 1));
+    spectrumArea.setY(margin + controlsArea.height());
+    spectrumArea.setWidth(width() - (spectrumArea.x() << 1));
+    spectrumArea.setHeight(height() - spectrumArea.y() - margin);
+  }
+  else
+    qDebug("This orientation is not supported yet!");
 
-    // Update the whole widget.
-    deletePixmap();
-    update();
+  // Update the whole widget.
+  deletePixmap();
+  update();
 }
 
 // ****************************************************************************
@@ -1932,12 +1900,11 @@ QvisSpectrumBar::resizeEvent(QResizeEvent *)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::paletteChange(const QPalette &)
+void QvisSpectrumBar::paletteChange(const QPalette&)
 {
-    // Update the whole widget.
-    deletePixmap();
-    update();
+  // Update the whole widget.
+  deletePixmap();
+  update();
 }
 
 // ****************************************************************************
@@ -1958,83 +1925,82 @@ QvisSpectrumBar::paletteChange(const QPalette &)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::keyPressEvent(QKeyEvent *e)
+void QvisSpectrumBar::keyPressEvent(QKeyEvent* e)
 {
-    // Figure the currently selected point.
-    int current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-    int new_sel;
+  // Figure the currently selected point.
+  int current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  int new_sel;
 
-    if(equalSpacing())
+  if (equalSpacing())
+  {
+    switch (e->key())
     {
-        switch(e->key())
-        {
-        case Qt::Key_Left:
-            if(current_sel > 0)
-                new_sel = current_sel - 1;
-            else
-                new_sel = controlPoints->NumControlPoints() - 1;
-            controlPoints->GiveHighestRank(new_sel);
-            updateControlPoints();
-            break;
-        case Qt::Key_Right:
-            if(current_sel < controlPoints->NumControlPoints() - 1)
-                new_sel = current_sel + 1;
-            else
-                new_sel = 0;
-            controlPoints->GiveHighestRank(new_sel);
-            updateControlPoints();
-            break;
-        case Qt::Key_Up:
-        case Qt::Key_Return:
-            colorSelected(current_sel);
-        }
+      case Qt::Key_Left:
+        if (current_sel > 0)
+          new_sel = current_sel - 1;
+        else
+          new_sel = controlPoints->NumControlPoints() - 1;
+        controlPoints->GiveHighestRank(new_sel);
+        updateControlPoints();
+        break;
+      case Qt::Key_Right:
+        if (current_sel < controlPoints->NumControlPoints() - 1)
+          new_sel = current_sel + 1;
+        else
+          new_sel = 0;
+        controlPoints->GiveHighestRank(new_sel);
+        updateControlPoints();
+        break;
+      case Qt::Key_Up:
+      case Qt::Key_Return:
+        colorSelected(current_sel);
     }
-    else
+  }
+  else
+  {
+    switch (e->key())
     {
-        switch(e->key())
-        {
-        case Qt::Key_Shift:
-            shiftApplied = true;
-            break;
-        case Qt::Key_Left:
-            if(shiftApplied)
-                moveControlPoint(PAGE_DECREMENT);
-            else
-                moveControlPoint(DECREMENT);
-            break;
-        case Qt::Key_Up:
-        case Qt::Key_Return:
-            colorSelected(current_sel);
-            break;
-        case Qt::Key_Right:
-            if(shiftApplied)
-                moveControlPoint(PAGE_INCREMENT);
-            else
-                moveControlPoint(INCREMENT);
-            break;
-        case Qt::Key_PageUp:
-            moveControlPoint(PAGE_INCREMENT);
-            break;
-        case Qt::Key_PageDown:
-            moveControlPoint(PAGE_DECREMENT);
-            break;
-        case Qt::Key_Home:
-            moveControlPoint(PAGE_HOME);
-            break;
-        case Qt::Key_End:
-            moveControlPoint(PAGE_END);
-            break;
-        case Qt::Key_Backspace:
-        case Qt::Key_Space:
-            // Find the index of the control point with the lowest rank.
-            new_sel = controlPoints->Rank(0);
-            // Give the control point the highest rank and redraw the controls.
-            controlPoints->GiveHighestRank(new_sel);
-            updateControlPoints();
-            break;
-        }
+      case Qt::Key_Shift:
+        shiftApplied = true;
+        break;
+      case Qt::Key_Left:
+        if (shiftApplied)
+          moveControlPoint(PAGE_DECREMENT);
+        else
+          moveControlPoint(DECREMENT);
+        break;
+      case Qt::Key_Up:
+      case Qt::Key_Return:
+        colorSelected(current_sel);
+        break;
+      case Qt::Key_Right:
+        if (shiftApplied)
+          moveControlPoint(PAGE_INCREMENT);
+        else
+          moveControlPoint(INCREMENT);
+        break;
+      case Qt::Key_PageUp:
+        moveControlPoint(PAGE_INCREMENT);
+        break;
+      case Qt::Key_PageDown:
+        moveControlPoint(PAGE_DECREMENT);
+        break;
+      case Qt::Key_Home:
+        moveControlPoint(PAGE_HOME);
+        break;
+      case Qt::Key_End:
+        moveControlPoint(PAGE_END);
+        break;
+      case Qt::Key_Backspace:
+      case Qt::Key_Space:
+        // Find the index of the control point with the lowest rank.
+        new_sel = controlPoints->Rank(0);
+        // Give the control point the highest rank and redraw the controls.
+        controlPoints->GiveHighestRank(new_sel);
+        updateControlPoints();
+        break;
     }
+  }
 }
 
 // ****************************************************************************
@@ -2054,16 +2020,15 @@ QvisSpectrumBar::keyPressEvent(QKeyEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::colorSelected(int index)
+void QvisSpectrumBar::colorSelected(int index)
 {
-    // Get the location of the current control point.
-    QPoint p(controlPointLocation(index));
-    // Figure out the center of the control point.
-    QPoint pc(p.x() + slider.width() / 2, p.y() + slider.height() / 2);
+  // Get the location of the current control point.
+  QPoint p(controlPointLocation(index));
+  // Figure out the center of the control point.
+  QPoint pc(p.x() + slider.width() / 2, p.y() + slider.height() / 2);
 
-    emit selectColor(index);
-    emit selectColor(index, mapToGlobal(pc));
+  emit selectColor(index);
+  emit selectColor(index, mapToGlobal(pc));
 }
 
 // ****************************************************************************
@@ -2083,11 +2048,10 @@ QvisSpectrumBar::colorSelected(int index)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::keyReleaseEvent(QKeyEvent *e)
+void QvisSpectrumBar::keyReleaseEvent(QKeyEvent* e)
 {
-    if(e->key() == Qt::Key_Shift)
-        shiftApplied = false;
+  if (e->key() == Qt::Key_Shift)
+    shiftApplied = false;
 }
 
 // ****************************************************************************
@@ -2110,93 +2074,92 @@ QvisSpectrumBar::keyReleaseEvent(QKeyEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::mousePressEvent(QMouseEvent * /*e*/)
+void QvisSpectrumBar::mousePressEvent(QMouseEvent* /*e*/)
 {
-/*
-    // Check to see if a slider was clicked. If so, we need to
-    // set the active slider and update the controls.
-    int   new_sel, current_sel;
-    float fpos, fwidth;
+  /*
+      // Check to see if a slider was clicked. If so, we need to
+      // set the active slider and update the controls.
+      int   new_sel, current_sel;
+      float fpos, fwidth;
 
-    // Figure the currently selected point.
-    current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+      // Figure the currently selected point.
+      current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-    // Figure the position of the event and the width of the
-    // slider as numbers in the range [0.,1.].
-    if(orientation == HorizontalTop || orientation == HorizontalBottom)
-    {
-        fpos = ((float)(e->x() - controlsArea.x() - slider.width()/2) /
-               (float)(controlsArea.width() - slider.width()));
-        fwidth = (float)slider.width() /
-                (float)(controlsArea.width() - slider.width());
-    }
-    else
-    {
-        fpos = ((float)(e->y() - controlsArea.y()) /
-               (float)controlsArea.height());
-        fwidth = (float)slider.height() /
-                (float)controlsArea.height();
-    }
+      // Figure the position of the event and the width of the
+      // slider as numbers in the range [0.,1.].
+      if(orientation == HorizontalTop || orientation == HorizontalBottom)
+      {
+          fpos = ((float)(e->x() - controlsArea.x() - slider.width()/2) /
+                 (float)(controlsArea.width() - slider.width()));
+          fwidth = (float)slider.width() /
+                  (float)(controlsArea.width() - slider.width());
+      }
+      else
+      {
+          fpos = ((float)(e->y() - controlsArea.y()) /
+                 (float)controlsArea.height());
+          fwidth = (float)slider.height() /
+                  (float)controlsArea.height();
+      }
 
-    // See if we selected a new control point.
-    new_sel = controlPoints->ChangeSelectedIndex(fpos, fwidth, equalSpacing());
+      // See if we selected a new control point.
+      new_sel = controlPoints->ChangeSelectedIndex(fpos, fwidth, equalSpacing());
 
-    // If we did select a point, set its location into the fields
-    // that are used to track the slider's location.
-    if(new_sel != -1 && new_sel != current_sel)
-    {
-        // Sort the control points and get the new index.
-        controlPoints->Sort();
-        new_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+      // If we did select a point, set its location into the fields
+      // that are used to track the slider's location.
+      if(new_sel != -1 && new_sel != current_sel)
+      {
+          // Sort the control points and get the new index.
+          controlPoints->Sort();
+          new_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-        // Redraw the controls.
-        drawControls();
+          // Redraw the controls.
+          drawControls();
 
-        // Figure out the regions covered by the old and new control points
-        // and only repaint those regions.
-        QPoint newLocation(controlPointLocation(new_sel));
-        QPoint oldLocation(controlPointLocation(current_sel));
+          // Figure out the regions covered by the old and new control points
+          // and only repaint those regions.
+          QPoint newLocation(controlPointLocation(new_sel));
+          QPoint oldLocation(controlPointLocation(current_sel));
 
-        QRegion r(newLocation.x(), newLocation.y(),
-                  slider.width(), slider.height());
-        QRegion r2(oldLocation.x(), oldLocation.y(),
-                   slider.width(), slider.height());
+          QRegion r(newLocation.x(), newLocation.y(),
+                    slider.width(), slider.height());
+          QRegion r2(oldLocation.x(), oldLocation.y(),
+                     slider.width(), slider.height());
 
-        // Update the region covered by the new and old control points.
-        repaint(r + r2);
+          // Update the region covered by the new and old control points.
+          repaint(r + r2);
 
-        // Emit a signal containing the index of the new control point.
-        emit activeControlPointChanged(new_sel);
-    }
-    else if(new_sel == -1 && controlPoints->CanBeEdited() && !b_equalSpacing)
-    {
-        // The trough: check to see what side of the current control point we're on.
-        new_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+          // Emit a signal containing the index of the new control point.
+          emit activeControlPointChanged(new_sel);
+      }
+      else if(new_sel == -1 && controlPoints->CanBeEdited() && !b_equalSpacing)
+      {
+          // The trough: check to see what side of the current control point we're on.
+          new_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-        // If we're on the left of the current control point, decrement.
-        bool page_decrement = (fpos < controlPoints->operator[](new_sel).position);
+          // If we're on the left of the current control point, decrement.
+          bool page_decrement = (fpos < controlPoints->operator[](new_sel).position);
 
-        if(page_decrement)
-        {
-            moveControlPoint(PAGE_DECREMENT);
-            paging_mode = PAGE_DECREMENT;
-            timer->start(150);
-        }
-        else
-        {
-            moveControlPoint(PAGE_INCREMENT);
-            paging_mode = PAGE_INCREMENT;
-            timer->start(150);
-        }
-    }
+          if(page_decrement)
+          {
+              moveControlPoint(PAGE_DECREMENT);
+              paging_mode = PAGE_DECREMENT;
+              timer->start(150);
+          }
+          else
+          {
+              moveControlPoint(PAGE_INCREMENT);
+              paging_mode = PAGE_INCREMENT;
+              timer->start(150);
+          }
+      }
 
-    // If a control point was clicked with the right mouse button, emit
-    // a signal that will tell external customers that the control point
-    // wants a new color.
-    if(new_sel != -1 && e->button() == Qt::RightButton)
-        colorSelected(new_sel);
-*/
+      // If a control point was clicked with the right mouse button, emit
+      // a signal that will tell external customers that the control point
+      // wants a new color.
+      if(new_sel != -1 && e->button() == Qt::RightButton)
+          colorSelected(new_sel);
+  */
 }
 
 // ****************************************************************************
@@ -2223,54 +2186,54 @@ QvisSpectrumBar::mousePressEvent(QMouseEvent * /*e*/)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::mouseMoveEvent(QMouseEvent *e)
+void QvisSpectrumBar::mouseMoveEvent(QMouseEvent* e)
 {
-    // If the widget is doing paging events, ignore mouse motion.
-    if(paging_mode != NO_PAGING || !controlPoints->CanBeEdited() || b_equalSpacing)
-        return;
+  // If the widget is doing paging events, ignore mouse motion.
+  if (paging_mode != NO_PAGING || !controlPoints->CanBeEdited() || b_equalSpacing)
+    return;
 
-    // Indicate that the mouse is sliding a control point.
-    b_sliding = true;
+  // Indicate that the mouse is sliding a control point.
+  b_sliding = true;
 
-    int   current_sel;
-    float fpos;
+  int current_sel;
+  float fpos;
 
-    // Figure the currently selected point.
-    current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  // Figure the currently selected point.
+  current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-    // Figure the position of the event as a number in the range [0.,1.].
-    if(orientation == HorizontalTop || orientation == HorizontalBottom)
+  // Figure the position of the event as a number in the range [0.,1.].
+  if (orientation == HorizontalTop || orientation == HorizontalBottom)
+  {
+    fpos = ((float)(e->x() - controlsArea.x() - slider.width() / 2) /
+      (float)(controlsArea.width() - slider.width()));
+  }
+  else
+  {
+    fpos = ((float)(e->y() - controlsArea.y()) / (float)controlsArea.height());
+  }
+
+  // Clamp the position to [0, 1.]
+  if (fpos < 0.)
+    fpos = 0.;
+  if (fpos > 1.)
+    fpos = 1.;
+
+  // If the position is different than the current position, udpate the
+  // control area and emit a signal.
+  if (fpos != controlPoints->Position(current_sel))
+  {
+    // Move the control point to its new location and redraw.
+    moveControlPointRedraw(current_sel, fpos, continuousUpdate());
+
+    // If we're emitting signals with each mouse movement, emit the
+    // position of the current control point.
+    if (continuousUpdate())
     {
-        fpos = ((float)(e->x() - controlsArea.x() - slider.width()/2) /
-               (float)(controlsArea.width() - slider.width()));
+      controlPoints->Sort();
+      current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+      emit controlPointMoved(current_sel, fpos);
     }
-    else
-    {
-        fpos = ((float)(e->y() - controlsArea.y()) /
-               (float)controlsArea.height());
-    }
-
-    // Clamp the position to [0, 1.]
-    if(fpos < 0.) fpos = 0.;
-    if(fpos > 1.) fpos = 1.;
-
-    // If the position is different than the current position, udpate the
-    // control area and emit a signal.
-    if(fpos != controlPoints->Position(current_sel))
-    {
-        // Move the control point to its new location and redraw.
-        moveControlPointRedraw(current_sel, fpos, continuousUpdate());
-
-        // If we're emitting signals with each mouse movement, emit the
-        // position of the current control point.
-        if(continuousUpdate())
-        {
-            controlPoints->Sort();
-            current_sel = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-            emit controlPointMoved(current_sel, fpos);
-        }
-    }
+  }
 }
 
 // ****************************************************************************
@@ -2288,34 +2251,32 @@ QvisSpectrumBar::mouseMoveEvent(QMouseEvent *e)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::mouseReleaseEvent(QMouseEvent *)
+void QvisSpectrumBar::mouseReleaseEvent(QMouseEvent*)
 {
-    // If we're doing some paging, stop the timer.
-    if(paging_mode != NO_PAGING)
+  // If we're doing some paging, stop the timer.
+  if (paging_mode != NO_PAGING)
+  {
+    timer->stop();
+    paging_mode = NO_PAGING;
+  }
+
+  if (b_sliding)
+  {
+    b_sliding = false;
+
+    if (!continuousUpdate())
     {
-        timer->stop();
-        paging_mode = NO_PAGING;
+      drawSpectrum();
+      QRegion r(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(), spectrumArea.height());
+      repaint(r);
+
+      // Emit a signal containing the index and position of the control
+      // point with the highest rank.
+      controlPoints->Sort();
+      int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+      emit controlPointMoved(index, controlPoints->Position(index));
     }
-
-    if(b_sliding)
-    {
-        b_sliding = false;
-
-        if(!continuousUpdate())
-        {
-            drawSpectrum();
-            QRegion r(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(),
-                      spectrumArea.height());
-            repaint(r);
-
-            // Emit a signal containing the index and position of the control
-            // point with the highest rank.
-            controlPoints->Sort();
-            int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-            emit controlPointMoved(index, controlPoints->Position(index));
-        }
-    }
+  }
 }
 
 // ****************************************************************************
@@ -2335,23 +2296,21 @@ QvisSpectrumBar::mouseReleaseEvent(QMouseEvent *)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::updateControlPoints()
+void QvisSpectrumBar::updateControlPoints()
 {
-    controlPoints->Sort();
-    int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  controlPoints->Sort();
+  int index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-    if(isVisible())
-    {
-        drawControls();
-        update(controlsArea.x(), controlsArea.y(), controlsArea.width(),
-               controlsArea.height());
-    }
-    else
-        deletePixmap();
+  if (isVisible())
+  {
+    drawControls();
+    update(controlsArea.x(), controlsArea.y(), controlsArea.width(), controlsArea.height());
+  }
+  else
+    deletePixmap();
 
-    // Emit a signal containing the index of the new control point.
-    emit activeControlPointChanged(index);
+  // Emit a signal containing the index of the new control point.
+  emit activeControlPointChanged(index);
 }
 
 // ****************************************************************************
@@ -2377,50 +2336,46 @@ QvisSpectrumBar::updateControlPoints()
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::moveControlPointRedraw(int index, float _pos, bool redrawSpectrum)
+void QvisSpectrumBar::moveControlPointRedraw(int index, float _pos, bool redrawSpectrum)
 {
-    // Get the current location of the control point.
-    QPoint oldLocation(controlPointLocation(index));
+  // Get the current location of the control point.
+  QPoint oldLocation(controlPointLocation(index));
 
-    // Set the new position and draw the controls.
-    controlPoints->SetPosition(index, _pos);
+  // Set the new position and draw the controls.
+  controlPoints->SetPosition(index, _pos);
 
-    // If we're suppressing updates, delete the pixmaps and return.
-    if(b_suppressUpdates)
+  // If we're suppressing updates, delete the pixmaps and return.
+  if (b_suppressUpdates)
+  {
+    deletePixmap();
+    return;
+  }
+
+  if (isVisible())
+  {
+    drawControls();
+
+    // Construct a region that covers the old and new locations of the control point.
+    QPoint newLocation(controlPointLocation(index));
+    QRegion r(newLocation.x(), newLocation.y(), slider.width(), slider.height());
+    QRegion r2(oldLocation.x(), oldLocation.y(), slider.width(), slider.height());
+    QRegion final(r + r2);
+
+    // Update the spectrum
+    if (redrawSpectrum)
     {
-        deletePixmap();
-        return;
+      drawSpectrum();
+      QRegion r3(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(), spectrumArea.height());
+      final = final + r3;
     }
 
-    if(isVisible())
-    {
-        drawControls();
-
-        // Construct a region that covers the old and new locations of the control point.
-        QPoint newLocation(controlPointLocation(index));
-        QRegion r(newLocation.x(), newLocation.y(),
-                  slider.width(), slider.height());
-        QRegion r2(oldLocation.x(), oldLocation.y(),
-                   slider.width(), slider.height());
-        QRegion final(r + r2);
-
-        // Update the spectrum
-        if(redrawSpectrum)
-        {
-            drawSpectrum();
-            QRegion r3(spectrumArea.x(), spectrumArea.y(), spectrumArea.width(),
-                       spectrumArea.height());
-            final = final + r3;
-        }
-
-        // Update the region covered by the new and old control points and
-        // maybe the spectrum area. By only repainting those relatively small
-        // rectangles, flicker due to repainting is much reduced.
-        repaint(final);
-    }
-    else
-        deletePixmap();
+    // Update the region covered by the new and old control points and
+    // maybe the spectrum area. By only repainting those relatively small
+    // rectangles, flicker due to repainting is much reduced.
+    repaint(final);
+  }
+  else
+    deletePixmap();
 }
 
 // ****************************************************************************
@@ -2441,74 +2396,75 @@ QvisSpectrumBar::moveControlPointRedraw(int index, float _pos, bool redrawSpectr
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::moveControlPoint(int changeType)
+void QvisSpectrumBar::moveControlPoint(int changeType)
 {
-    int   index;
-    float increment, page_increment;
+  int index;
+  float increment, page_increment;
 
-    // Return if we cannot modify the control point.
-    if(!controlPoints->CanBeEdited() || b_equalSpacing)
-        return;
+  // Return if we cannot modify the control point.
+  if (!controlPoints->CanBeEdited() || b_equalSpacing)
+    return;
 
-    // Get the index of the highest ranking control point.
-    index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+  // Get the index of the highest ranking control point.
+  index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
 
-    // Figure out the increments and page increments based on the
-    // widget's orientation.
-    if(orientation == HorizontalTop || orientation == HorizontalBottom)
-    {
-        increment = 1. /(float)controlsArea.width();
-        page_increment = (float)slider.width() * increment;
-    }
-    else
-    {
-        increment = 1. /(float)controlsArea.height();
-        page_increment = (float)slider.height() * increment;
-    }
+  // Figure out the increments and page increments based on the
+  // widget's orientation.
+  if (orientation == HorizontalTop || orientation == HorizontalBottom)
+  {
+    increment = 1. / (float)controlsArea.width();
+    page_increment = (float)slider.width() * increment;
+  }
+  else
+  {
+    increment = 1. / (float)controlsArea.height();
+    page_increment = (float)slider.height() * increment;
+  }
 
-    // Change the value by the appropriate amount
-    float old_position = controlPoints->Position(index);
-    float new_position = controlPoints->Position(index);
-    switch(changeType)
-    {
+  // Change the value by the appropriate amount
+  float old_position = controlPoints->Position(index);
+  float new_position = controlPoints->Position(index);
+  switch (changeType)
+  {
     case INCREMENT:
-        new_position += increment;
-        break;
+      new_position += increment;
+      break;
     case DECREMENT:
-        new_position -= increment;
-        break;
+      new_position -= increment;
+      break;
     case PAGE_INCREMENT:
-        new_position += page_increment;
-        break;
+      new_position += page_increment;
+      break;
     case PAGE_DECREMENT:
-        new_position -= page_increment;
-        break;
+      new_position -= page_increment;
+      break;
     case PAGE_HOME:
-        new_position = 0.;
-        break;
+      new_position = 0.;
+      break;
     case PAGE_END:
-        new_position = 1.;
-        break;
-    }
+      new_position = 1.;
+      break;
+  }
 
-    // Make sure the new position is in [0., 1.]
-    if(new_position < 0.) new_position = 0.;
-    if(new_position > 1.) new_position = 1.;
+  // Make sure the new position is in [0., 1.]
+  if (new_position < 0.)
+    new_position = 0.;
+  if (new_position > 1.)
+    new_position = 1.;
 
-    // If the new position differs from the old position, store the new
-    // position and update the widget.
-    if(new_position != old_position)
-    {
-        // Move the control point and redraw the spectrum and the controls.
-        moveControlPointRedraw(index, new_position, true);
+  // If the new position differs from the old position, store the new
+  // position and update the widget.
+  if (new_position != old_position)
+  {
+    // Move the control point and redraw the spectrum and the controls.
+    moveControlPointRedraw(index, new_position, true);
 
-        // Emit a signal containing the index and position of the control
-        // point with the highest rank.
-        controlPoints->Sort();
-        index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
-        emit controlPointMoved(index, new_position);
-    }
+    // Emit a signal containing the index and position of the control
+    // point with the highest rank.
+    controlPoints->Sort();
+    index = controlPoints->Rank(controlPoints->NumControlPoints() - 1);
+    emit controlPointMoved(index, new_position);
+  }
 }
 
 // ****************************************************************************
@@ -2525,10 +2481,9 @@ QvisSpectrumBar::moveControlPoint(int changeType)
 //
 // ****************************************************************************
 
-void
-QvisSpectrumBar::handlePaging()
+void QvisSpectrumBar::handlePaging()
 {
-    moveControlPoint(paging_mode);
+  moveControlPoint(paging_mode);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2538,8 +2493,8 @@ QvisSpectrumBar::handlePaging()
 //////////////////////////////////////////////////////////////////////////////
 
 const int ControlPointList::CPLIST_INCREMENT = 5;
-const ControlPoint ControlPointList::defaultControlPoint1 = {1, 0., {1., 0., 0.}};
-const ControlPoint ControlPointList::defaultControlPoint2 = {0, 1., {0., 0., 1.}};
+const ControlPoint ControlPointList::defaultControlPoint1 = { 1, 0., { 1., 0., 0. } };
+const ControlPoint ControlPointList::defaultControlPoint2 = { 0, 1., { 0., 0., 1. } };
 
 // ****************************************************************************
 // Method: ControlPointList::ControlPointList
@@ -2556,17 +2511,17 @@ const ControlPoint ControlPointList::defaultControlPoint2 = {0, 1., {0., 0., 1.}
 
 ControlPointList::ControlPointList()
 {
-    editable = true;
-    nvals = 0;
-    colorvals = NULL;
+  editable = true;
+  nvals = 0;
+  colorvals = NULL;
 
-    nels = 2;
-    total_nels = CPLIST_INCREMENT;
-    list = new ControlPoint[CPLIST_INCREMENT];
+  nels = 2;
+  total_nels = CPLIST_INCREMENT;
+  list = new ControlPoint[CPLIST_INCREMENT];
 
-    // Init the control points.
-    list[0] = defaultControlPoint1;
-    list[1] = defaultControlPoint2;
+  // Init the control points.
+  list[0] = defaultControlPoint1;
+  list[1] = defaultControlPoint2;
 }
 
 // ****************************************************************************
@@ -2584,7 +2539,7 @@ ControlPointList::ControlPointList()
 
 ControlPointList::~ControlPointList()
 {
-    Clear();
+  Clear();
 }
 
 // ****************************************************************************
@@ -2600,14 +2555,13 @@ ControlPointList::~ControlPointList()
 //
 // ****************************************************************************
 
-void
-ControlPointList::Clear()
+void ControlPointList::Clear()
 {
-    nels = 0;
-    total_nels = 0;
-    delete [] list;
-    nvals = 0;
-    delete [] colorvals;
+  nels = 0;
+  total_nels = 0;
+  delete[] list;
+  nvals = 0;
+  delete[] colorvals;
 }
 
 // ****************************************************************************
@@ -2628,13 +2582,12 @@ ControlPointList::Clear()
 //
 // ****************************************************************************
 
-float
-ControlPointList::ColorValue(int index) const
+float ControlPointList::ColorValue(int index) const
 {
-    if(nvals == 0 || colorvals == NULL || index < 0 || index >= nvals*3)
-        return 0.;
-    else
-        return colorvals[index];
+  if (nvals == 0 || colorvals == NULL || index < 0 || index >= nvals * 3)
+    return 0.;
+  else
+    return colorvals[index];
 }
 
 // ****************************************************************************
@@ -2655,13 +2608,12 @@ ControlPointList::ColorValue(int index) const
 //
 // ****************************************************************************
 
-const ControlPoint &
-ControlPointList::operator [](int index) const
+const ControlPoint& ControlPointList::operator[](int index) const
 {
-    if(nels == 0 || list == NULL || index < 0 || index >= nels)
-        return defaultControlPoint1;
-    else
-        return list[index];
+  if (nels == 0 || list == NULL || index < 0 || index >= nels)
+    return defaultControlPoint1;
+  else
+    return list[index];
 }
 
 // ****************************************************************************
@@ -2682,13 +2634,12 @@ ControlPointList::operator [](int index) const
 //
 // ****************************************************************************
 
-float
-ControlPointList::Position(int index) const
+float ControlPointList::Position(int index) const
 {
-    if(nels == 0 || list == NULL || index < 0 || index >= nels)
-        return 0.;
-    else
-        return list[index].position;
+  if (nels == 0 || list == NULL || index < 0 || index >= nels)
+    return 0.;
+  else
+    return list[index].position;
 }
 
 // ****************************************************************************
@@ -2708,11 +2659,10 @@ ControlPointList::Position(int index) const
 //
 // ****************************************************************************
 
-void
-ControlPointList::SetPosition(int index, float _pos)
+void ControlPointList::SetPosition(int index, float _pos)
 {
-    if(nels != 0 && list != NULL && index >= 0 && index < nels)
-        list[index].position = _pos;
+  if (nels != 0 && list != NULL && index >= 0 && index < nels)
+    list[index].position = _pos;
 }
 
 // ****************************************************************************
@@ -2730,10 +2680,9 @@ ControlPointList::SetPosition(int index, float _pos)
 //
 // ****************************************************************************
 
-int
-ControlPointList::NumControlPoints() const
+int ControlPointList::NumControlPoints() const
 {
-    return nels;
+  return nels;
 }
 
 // ****************************************************************************
@@ -2751,10 +2700,9 @@ ControlPointList::NumControlPoints() const
 //
 // ****************************************************************************
 
-int
-ControlPointList::NumColorValues() const
+int ControlPointList::NumColorValues() const
 {
-    return nvals;
+  return nvals;
 }
 
 // ****************************************************************************
@@ -2772,10 +2720,9 @@ ControlPointList::NumColorValues() const
 //
 // ****************************************************************************
 
-bool
-ControlPointList::CanBeEdited() const
+bool ControlPointList::CanBeEdited() const
 {
-    return editable;
+  return editable;
 }
 
 // ****************************************************************************
@@ -2794,10 +2741,9 @@ ControlPointList::CanBeEdited() const
 //
 // ****************************************************************************
 
-void
-ControlPointList::SetEditMode(bool val)
+void ControlPointList::SetEditMode(bool val)
 {
-    editable = val;
+  editable = val;
 }
 
 // ****************************************************************************
@@ -2819,15 +2765,14 @@ ControlPointList::SetEditMode(bool val)
 //
 // ****************************************************************************
 
-void
-ControlPointList::SetColor(int index, float r, float g, float b)
+void ControlPointList::SetColor(int index, float r, float g, float b)
 {
-    if(nels != 0 && list != NULL && index >= 0 && index < nels)
-    {
-        list[index].color[0] = r;
-        list[index].color[1] = g;
-        list[index].color[2] = b;
-    }
+  if (nels != 0 && list != NULL && index >= 0 && index < nels)
+  {
+    list[index].color[0] = r;
+    list[index].color[1] = g;
+    list[index].color[2] = b;
+  }
 }
 
 // ****************************************************************************
@@ -2849,15 +2794,14 @@ ControlPointList::SetColor(int index, float r, float g, float b)
 //
 // ****************************************************************************
 
-void
-ControlPointList::SetColorValues(const float *colors, int ncolors)
+void ControlPointList::SetColorValues(const float* colors, int ncolors)
 {
-    // If there are already raw colors in the list, free them.
-    delete [] colorvals;
+  // If there are already raw colors in the list, free them.
+  delete[] colorvals;
 
-    // Make this object own the colors array that is passed in.
-    nvals = ncolors;
-    colorvals = (float *)colors;
+  // Make this object own the colors array that is passed in.
+  nvals = ncolors;
+  colorvals = (float*)colors;
 }
 
 // ****************************************************************************
@@ -2876,33 +2820,32 @@ ControlPointList::SetColorValues(const float *colors, int ncolors)
 //
 // ****************************************************************************
 
-void
-ControlPointList::Add(const ControlPoint *cpt)
+void ControlPointList::Add(const ControlPoint* cpt)
 {
-    ControlPoint *newList = NULL;
+  ControlPoint* newList = NULL;
 
-    // See if we need to resize.
-    if(nels + 1 > total_nels)
-    {
-        total_nels += CPLIST_INCREMENT;
-        newList = new ControlPoint[total_nels];
+  // See if we need to resize.
+  if (nels + 1 > total_nels)
+  {
+    total_nels += CPLIST_INCREMENT;
+    newList = new ControlPoint[total_nels];
 
-        // Copy the elements into the new array.
-        memcpy((char *)newList,(char *)list, nels * sizeof(ControlPoint));
+    // Copy the elements into the new array.
+    memcpy((char*)newList, (char*)list, nels * sizeof(ControlPoint));
 
-        // Update the lists.
-        delete [] list;
-        list = newList;
-    }
+    // Update the lists.
+    delete[] list;
+    list = newList;
+  }
 
-    // Put the new control point in the list. Ignore any rank it might
-    // have. We're going to manage them here.
-    memcpy((char *)&list[nels],(char *)cpt, sizeof(ControlPoint));
-    list[nels].rank = nels;
-    ++nels;
+  // Put the new control point in the list. Ignore any rank it might
+  // have. We're going to manage them here.
+  memcpy((char*)&list[nels], (char*)cpt, sizeof(ControlPoint));
+  list[nels].rank = nels;
+  ++nels;
 
-    // Sort the points.
-    Sort();
+  // Sort the points.
+  Sort();
 }
 
 // ****************************************************************************
@@ -2923,19 +2866,18 @@ ControlPointList::Add(const ControlPoint *cpt)
 //
 // ****************************************************************************
 
-int
-ControlPointList::Rank(int rank) const
+int ControlPointList::Rank(int rank) const
 {
-    int i, retval = 0;
+  int i, retval = 0;
 
-    for(i = 0; i < nels; ++i)
-        if(rank == list[i].rank)
-        {
-            retval = i;
-            break;
-        }
+  for (i = 0; i < nels; ++i)
+    if (rank == list[i].rank)
+    {
+      retval = i;
+      break;
+    }
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -2951,27 +2893,25 @@ ControlPointList::Rank(int rank) const
 //
 // ****************************************************************************
 
-void
-ControlPointList::DeleteHighestRank()
+void ControlPointList::DeleteHighestRank()
 {
-    int rank = 0;
+  int rank = 0;
 
-    if(nels <= 2)
-        return;
+  if (nels <= 2)
+    return;
 
-    // Get the rank of the point we're deleting.
-    rank = Rank(nels - 1);
+  // Get the rank of the point we're deleting.
+  rank = Rank(nels - 1);
 
-    // Move all of the control points and ranks that were to the
-    // right of the point that we want to delete.
-    if(rank != nels - 1)
-    {
-        memcpy((char *)&list[rank],(char *)&list[rank + 1],
-              (nels - 1 - rank) * sizeof(ControlPoint));
-    }
+  // Move all of the control points and ranks that were to the
+  // right of the point that we want to delete.
+  if (rank != nels - 1)
+  {
+    memcpy((char*)&list[rank], (char*)&list[rank + 1], (nels - 1 - rank) * sizeof(ControlPoint));
+  }
 
-    // Reduce the length of the list.
-    --nels;
+  // Reduce the length of the list.
+  --nels;
 }
 
 // ****************************************************************************
@@ -2996,44 +2936,43 @@ ControlPointList::DeleteHighestRank()
 //
 // ****************************************************************************
 
-int
-ControlPointList::ChangeSelectedIndex(float _pos, float width, int equal)
+int ControlPointList::ChangeSelectedIndex(float _pos, float width, int equal)
 {
-    int   i, index, retval = -1;
-    float position, offset, wd2 = width * 0.6;
+  int i, index, retval = -1;
+  float position, offset, wd2 = width * 0.6;
 
-    if(equal)
-        offset = 1. / nels;
+  if (equal)
+    offset = 1. / nels;
+  else
+    offset = 0.;
+
+  // Descend through the ranks.
+  for (i = nels - 1; i >= 0; --i)
+  {
+    // Find the index with rank i.
+    index = Rank(i);
+
+    if (equal)
+      position = (index * (1. - offset)) + (offset * 0.5);
     else
-        offset = 0.;
+      position = list[index].position;
 
-    // Descend through the ranks.
-    for(i = nels - 1; i >= 0; --i)
+    /* See if the position is in the control point. */
+    if ((_pos - wd2 <= position) && (position <= _pos + wd2))
     {
-        // Find the index with rank i.
-        index = Rank(i);
-
-        if(equal)
-            position = (index *(1. - offset)) +(offset * 0.5);
-        else
-            position = list[index].position;
-
-        /* See if the position is in the control point. */
-        if((_pos - wd2 <= position) &&(position <= _pos + wd2))
-        {
-            retval = index;
-            break;
-        }
+      retval = index;
+      break;
     }
+  }
 
-    // If we found a control point, adjust the ranks so it
-    // has the highest rank.
-    if(retval >= 0)
-    {
-        GiveHighestRank(retval);
-    }
+  // If we found a control point, adjust the ranks so it
+  // has the highest rank.
+  if (retval >= 0)
+  {
+    GiveHighestRank(retval);
+  }
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -3052,17 +2991,16 @@ ControlPointList::ChangeSelectedIndex(float _pos, float width, int equal)
 //
 // ****************************************************************************
 
-void
-ControlPointList::GiveHighestRank(int index)
+void ControlPointList::GiveHighestRank(int index)
 {
-    for(int i = 0; i < nels; ++i)
-    {
-        if(list[i].rank > list[index].rank)
-            --(list[i].rank);
-    }
+  for (int i = 0; i < nels; ++i)
+  {
+    if (list[i].rank > list[index].rank)
+      --(list[i].rank);
+  }
 
-    // Give the specified point the highest rank.
-    list[index].rank = nels - 1;
+  // Give the specified point the highest rank.
+  list[index].rank = nels - 1;
 }
 
 // ****************************************************************************
@@ -3078,10 +3016,9 @@ ControlPointList::GiveHighestRank(int index)
 //
 // ****************************************************************************
 
-void
-ControlPointList::Sort()
+void ControlPointList::Sort()
 {
-    qsort((void *)list, nels, sizeof(ControlPoint), ControlPointCompare);
+  qsort((void*)list, nels, sizeof(ControlPoint), ControlPointCompare);
 }
 
 // ****************************************************************************
@@ -3102,23 +3039,22 @@ ControlPointList::Sort()
 //
 // ****************************************************************************
 
-static int
-ControlPointCompare(const void *c1, const void *c2)
+static int ControlPointCompare(const void* c1, const void* c2)
 {
-    ControlPoint *cp1 = (ControlPoint *)c1;
-    ControlPoint *cp2 = (ControlPoint *)c2;
+  ControlPoint* cp1 = (ControlPoint*)c1;
+  ControlPoint* cp2 = (ControlPoint*)c2;
 
-    if(cp1->position < cp2->position)
-        return -1;
-    else if(cp1->position == cp2->position)
-    {
-        if(cp1->rank < cp2->rank)
-            return -1;
-        else if(cp1->rank == cp2->rank)
-            return 0;
-        else
-            return 1;
-    }
+  if (cp1->position < cp2->position)
+    return -1;
+  else if (cp1->position == cp2->position)
+  {
+    if (cp1->rank < cp2->rank)
+      return -1;
+    else if (cp1->rank == cp2->rank)
+      return 0;
     else
-        return 1;
+      return 1;
+  }
+  else
+    return 1;
 }

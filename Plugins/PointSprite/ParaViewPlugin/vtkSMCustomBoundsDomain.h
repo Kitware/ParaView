@@ -47,7 +47,6 @@ protected:
 private:
   vtkSMCustomBoundsDomain(const vtkSMCustomBoundsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMCustomBoundsDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

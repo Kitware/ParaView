@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,20 +40,27 @@ class pqObjectPanel;
 class pqProxy;
 class QWidget;
 
-/// interface class for plugins that create pqObjectPanels
+/**
+* interface class for plugins that create pqObjectPanels
+*/
 class PQCOMPONENTS_EXPORT pqObjectPanelInterface
 {
 public:
-  /// destructor
+  /**
+  * destructor
+  */
   virtual ~pqObjectPanelInterface();
 
-  /// Returns true if this panel can be created for the given the proxy.
+  /**
+  * Returns true if this panel can be created for the given the proxy.
+  */
   virtual bool canCreatePanel(pqProxy* proxy) const = 0;
-  /// Creates a panel for the given proxy
+  /**
+  * Creates a panel for the given proxy
+  */
   virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* p) = 0;
 };
 
 Q_DECLARE_INTERFACE(pqObjectPanelInterface, "com.kitware/paraview/objectpanel")
 
 #endif
-

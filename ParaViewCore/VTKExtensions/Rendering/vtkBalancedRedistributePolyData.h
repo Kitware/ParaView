@@ -17,7 +17,10 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkBalancedRedistributePolyData - do balance of cells on processors
+/**
+ * @class   vtkBalancedRedistributePolyData
+ * @brief   do balance of cells on processors
+*/
 
 #ifndef vtkBalancedRedistributePolyData_h
 #define vtkBalancedRedistributePolyData_h
@@ -26,22 +29,21 @@
 #include "vtkWeightedRedistributePolyData.h"
 class vtkMultiProcessController;
 
-
 //*******************************************************************
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData : public vtkWeightedRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData
+  : public vtkWeightedRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  static vtkBalancedRedistributePolyData *New();
+  static vtkBalancedRedistributePolyData* New();
 
 protected:
   vtkBalancedRedistributePolyData();
   ~vtkBalancedRedistributePolyData();
-  void MakeSchedule (vtkPolyData*, vtkCommSched*);
+  void MakeSchedule(vtkPolyData*, vtkCommSched*);
 
 private:
   vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
@@ -51,5 +53,3 @@ private:
 //****************************************************************
 
 #endif
-
-

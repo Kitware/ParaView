@@ -32,10 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqHelpWindowNoWebKit_h
 #define pqHelpWindowNoWebKit_h
 
-///============================================================================
-/// This is an internal header used by pqHelpWindow.
-/// This header gets included when PARAVIEW_USE_QTWEBKIT is OFF.
-///============================================================================
+/**
+*============================================================================
+* This is an internal header used by pqHelpWindow.
+* This header gets included when PARAVIEW_USE_QTWEBKIT is OFF.
+*============================================================================
+*/
 
 #include <QTextBrowser>
 
@@ -44,41 +46,42 @@ namespace
 // ****************************************************************************
 //            CLASS pqTextBrowser
 // ****************************************************************************
-/// Internal class used to add overload the QTextBrowser
+/**
+* Internal class used to add overload the QTextBrowser
+*/
 class pqTextBrowser : public QTextBrowser
 {
 public:
   pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = 0)
-    {
+  {
     this->HelpEngine = helpEngine;
     this->setParent(_parent);
     this->setOpenLinks(false);
-    }
+  }
   ~pqTextBrowser() {}
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
-    {
+  {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);
     self->connect(instance, SIGNAL(anchorClicked(const QUrl&)), SLOT(showPage(const QUrl&)));
     return instance;
-    }
-  void setUrl(const QUrl& url)
-    {
-    this->setSource(url);
-    }
+  }
+  void setUrl(const QUrl& url) { this->setSource(url); }
 protected:
-  /// Implementation reference from:
-  /// http://doc.qt.digia.com/qq/qq28-qthelp.html
-  QVariant loadResource(int type, const QUrl &url)
-    {
+  /**
+  * Implementation reference from:
+  * http://doc.qt.digia.com/qq/qq28-qthelp.html
+  */
+  QVariant loadResource(int type, const QUrl& url)
+  {
     if (url.scheme() == "qthelp")
-      {
+    {
       return QVariant(this->HelpEngine->fileData(url));
-      }
-    else
-      {
-      return QTextBrowser::loadResource(type, url);
-      }
     }
+    else
+    {
+      return QTextBrowser::loadResource(type, url);
+    }
+  }
   QPointer<QHelpEngine> HelpEngine;
 };
 

@@ -39,26 +39,24 @@ pqPointSpriteTextureComboBox::pqPointSpriteTextureComboBox(QWidget* parentObject
 
 pqPointSpriteTextureComboBox::~pqPointSpriteTextureComboBox()
 {
-
 }
 
 void pqPointSpriteTextureComboBox::updateEnableState()
 {
   if (this->RenderMode == vtkPointSpriteProperty::TexturedSprite)
-    {
+  {
     this->setEnabled(true);
     this->setToolTip("Select/Load texture to apply on sprites.");
-    }
+  }
   else
-    {
+  {
     if (this->isEnabled())
-      {
+    {
       this->CachedTextureIndex = this->currentIndex();
-      }
-    this->setEnabled(false);
-    this->setToolTip(
-        "Textures are only used in the TexturedSprite render mode.");
     }
+    this->setEnabled(false);
+    this->setToolTip("Textures are only used in the TexturedSprite render mode.");
+  }
 }
 
 // Description:
@@ -74,19 +72,18 @@ void pqPointSpriteTextureComboBox::setRenderMode(int mode)
 void pqPointSpriteTextureComboBox::updateTexture()
 {
   if (this->isEnabled())
-    {
+  {
     if (this->CachedTextureIndex != -1)
-      {
-      this->onActivated(this->CachedTextureIndex);
-      }
-    else
-      {
-      this->onActivated(this->currentIndex());
-      }
-    }
-  else
     {
-    this->onActivated(0);
+      this->onActivated(this->CachedTextureIndex);
     }
+    else
+    {
+      this->onActivated(this->currentIndex());
+    }
+  }
+  else
+  {
+    this->onActivated(0);
+  }
 }
-

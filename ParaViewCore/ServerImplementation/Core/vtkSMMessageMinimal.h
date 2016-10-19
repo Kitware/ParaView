@@ -26,8 +26,8 @@
 
 namespace paraview_protobuf
 {
-  class Message;
-  class MessageCollection;
+class Message;
+class MessageCollection;
 }
 
 typedef paraview_protobuf::Message vtkSMMessage;

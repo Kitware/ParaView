@@ -45,7 +45,7 @@ class pqVRPNEventListener : public QObject
   Q_OBJECT
 public:
   typedef QObject Superclass;
-  explicit pqVRPNEventListener(QObject *_parent = NULL);
+  explicit pqVRPNEventListener(QObject* _parent = NULL);
   ~pqVRPNEventListener();
 
   // Description:
@@ -59,11 +59,11 @@ public slots:
   // connection will be removed automatically when it is deleted, or when
   // removeConnection is called. The listener will stop listening once all
   // connection are removed.
-  void addConnection(pqVRPNConnection *conn);
+  void addConnection(pqVRPNConnection* conn);
 
   // Description:
   // Remove a connection from the listener.
-  void removeConnection(pqVRPNConnection *conn);
+  void removeConnection(pqVRPNConnection* conn);
 
   // Description:
   // Remove the pqVRPNConnection that is the Qt signal/slot sender which
@@ -74,8 +74,8 @@ signals:
 
   // Description:
   // Internal use only.
-  void addConnectionInternal(pqVRPNConnection *conn);
-  void removeConnectionInternal(pqVRPNConnection *conn);
+  void addConnectionInternal(pqVRPNConnection* conn);
+  void removeConnectionInternal(pqVRPNConnection* conn);
   void listen();
 
 private:
@@ -87,7 +87,7 @@ private:
   // Stop the listener.
   void stop();
 
-  pqVRPNThreadBridge *Bridge;
+  pqVRPNThreadBridge* Bridge;
   QThread Thread;
 };
 
@@ -100,12 +100,11 @@ public:
   QList<pqVRPNConnection*> Connections;
 
 public slots:
-  void addConnection(pqVRPNConnection *conn);
-  void removeConnection(pqVRPNConnection *conn);
+  void addConnection(pqVRPNConnection* conn);
+  void removeConnection(pqVRPNConnection* conn);
 
 protected slots:
   void listen();
 };
-
 
 #endif

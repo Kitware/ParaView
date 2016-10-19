@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,18 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationKeyFrame.h"
 
-
 pqAnimationTrack::pqAnimationTrack(QObject* p)
-  : QObject(p), Deletable(true), Rect(0,0,1,1)
+  : QObject(p)
+  , Deletable(true)
+  , Rect(0, 0, 1, 1)
 {
 }
 
 pqAnimationTrack::~pqAnimationTrack()
 {
-  while(this->Frames.count())
-    {
+  while (this->Frames.count())
+  {
     this->removeKeyFrame(this->Frames[0]);
-    }
+  }
 }
 
 int pqAnimationTrack::count()
@@ -61,12 +62,12 @@ pqAnimationKeyFrame* pqAnimationTrack::keyFrame(int i)
 }
 
 QRectF pqAnimationTrack::boundingRect() const
-{ 
+{
   return this->Rect;
 }
 
 void pqAnimationTrack::setBoundingRect(const QRectF& r)
-{ 
+{
   this->removeFromIndex();
   this->Rect = r;
   this->addToIndex();
@@ -76,10 +77,10 @@ void pqAnimationTrack::setBoundingRect(const QRectF& r)
 
 void pqAnimationTrack::adjustKeyFrameRects()
 {
-  foreach(pqAnimationKeyFrame* f, this->Frames)
-    {
+  foreach (pqAnimationKeyFrame* f, this->Frames)
+  {
     f->adjustRect();
-    }
+  }
 }
 
 pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
@@ -93,19 +94,17 @@ pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
 void pqAnimationTrack::removeKeyFrame(pqAnimationKeyFrame* frame)
 {
   int idx = this->Frames.indexOf(frame);
-  if(idx >= 0)
-    {
+  if (idx >= 0)
+  {
     delete this->Frames.takeAt(idx);
     this->update();
-    }
+  }
 }
-
 
 QVariant pqAnimationTrack::property() const
 {
   return this->Property;
 }
-
 
 void pqAnimationTrack::setProperty(const QVariant& p)
 {
@@ -114,17 +113,14 @@ void pqAnimationTrack::setProperty(const QVariant& p)
   this->update();
 }
 
-void pqAnimationTrack::paint(QPainter* p,
-                     const QStyleOptionGraphicsItem*,
-                     QWidget *)
+void pqAnimationTrack::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*)
 {
   // draw border for this track
   p->save();
   p->setBrush(QBrush());
-  QPen pen(QColor(0,0,0));
+  QPen pen(QColor(0, 0, 0));
   pen.setWidth(0);
   p->setPen(pen);
   p->drawRect(this->boundingRect());
   p->restore();
 }
-

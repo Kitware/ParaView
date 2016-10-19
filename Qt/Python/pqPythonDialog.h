@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   Qt dialog that embeds an instance of pqPythonShell, providing the user
   with an interactive Python console where they can enter Python commands
   manually and see the corresponding output.
-  
+
   \sa pqPythonShell, pqConsoleWidget
 */
 class pqPythonShell;
@@ -56,35 +56,44 @@ public:
   ~pqPythonDialog();
 
 public slots:
-  /// Execute a commond in the python shell.
+  /**
+  * Execute a commond in the python shell.
+  */
   void runString(const QString& script);
 
-  /// Simply prints some text onto the shell. Note that this does not treat it
-  /// as a python script and hence doesn't execute it.
+  /**
+  * Simply prints some text onto the shell. Note that this does not treat it
+  * as a python script and hence doesn't execute it.
+  */
   void print(const QString& msg);
 
-  /// Treats each string in the given stringlist as a filename and tries to
-  /// execute the file as a python script.
+  /**
+  * Treats each string in the given stringlist as a filename and tries to
+  * execute the file as a python script.
+  */
   void runScript(const QStringList&);
 
-  /// Return a pointer to the pqPythonShell widget used by this dialog.
+  /**
+  * Return a pointer to the pqPythonShell widget used by this dialog.
+  */
   pqPythonShell* shell();
 
 protected:
-  /// Overloaded to save window geometry on close events.
-  void closeEvent(QCloseEvent *event);
+  /**
+  * Overloaded to save window geometry on close events.
+  */
+  void closeEvent(QCloseEvent* event);
 
 private slots:
   void runScript();
   void clearConsole();
- 
+
 private:
   pqPythonDialog(const pqPythonDialog&);
   pqPythonDialog& operator=(const pqPythonDialog&);
-  
+
   struct pqImplementation;
   pqImplementation* const Implementation;
 };
 
 #endif // !_pqPythonDialog_h
-

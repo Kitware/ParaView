@@ -27,26 +27,22 @@ class vtkSMInteractionUndoStackBuilderObserver : public vtkCommand
 {
 public:
   static vtkSMInteractionUndoStackBuilderObserver* New()
-    { return new vtkSMInteractionUndoStackBuilderObserver(); }
+  {
+    return new vtkSMInteractionUndoStackBuilderObserver();
+  }
 
-  void SetTarget(vtkSMInteractionUndoStackBuilder* target)
-    {
-    this->Target = target;
-    }
+  void SetTarget(vtkSMInteractionUndoStackBuilder* target) { this->Target = target; }
 
   virtual void Execute(vtkObject* caller, unsigned long event, void* data)
-    {
+  {
     if (this->Target)
-      {
+    {
       this->Target->ExecuteEvent(caller, event, data);
-      }
     }
+  }
 
 protected:
-  vtkSMInteractionUndoStackBuilderObserver()
-    {
-    this->Target = 0;
-    }
+  vtkSMInteractionUndoStackBuilderObserver() { this->Target = 0; }
   vtkSMInteractionUndoStackBuilder* Target;
 };
 
@@ -61,7 +57,7 @@ vtkSMInteractionUndoStackBuilder::vtkSMInteractionUndoStackBuilder()
   this->RenderView = 0;
   this->UndoStack = 0;
 
-  vtkSMInteractionUndoStackBuilderObserver * observer =
+  vtkSMInteractionUndoStackBuilderObserver* observer =
     vtkSMInteractionUndoStackBuilderObserver::New();
 
   observer->SetTarget(this);
@@ -82,25 +78,22 @@ vtkSMInteractionUndoStackBuilder::~vtkSMInteractionUndoStackBuilder()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMInteractionUndoStackBuilder::SetRenderView(
-  vtkSMRenderViewProxy* renView)
+void vtkSMInteractionUndoStackBuilder::SetRenderView(vtkSMRenderViewProxy* renView)
 {
   if (this->RenderView)
-    {
+  {
     // Remove old interactors.
     vtkRenderWindowInteractor* interactor = this->RenderView->GetInteractor();
     interactor->RemoveObserver(this->Observer);
-    }
+  }
 
   vtkSetObjectBodyMacro(RenderView, vtkSMRenderViewProxy, renView);
   if (this->RenderView)
-    {
+  {
     vtkRenderWindowInteractor* interactor = this->RenderView->GetInteractor();
-    interactor->AddObserver(vtkCommand::StartInteractionEvent,
-      this->Observer);
-    interactor->AddObserver(vtkCommand::EndInteractionEvent,
-      this->Observer, 100);
-    }
+    interactor->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
+    interactor->AddObserver(vtkCommand::EndInteractionEvent, this->Observer, 100);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -108,22 +101,22 @@ void vtkSMInteractionUndoStackBuilder::ExecuteEvent(
   vtkObject* vtkNotUsed(caller), unsigned long event, void* vtkNotUsed(data))
 {
   switch (event)
-    {
-  case vtkCommand::StartInteractionEvent:
-    this->StartInteraction();
-    break;
+  {
+    case vtkCommand::StartInteractionEvent:
+      this->StartInteraction();
+      break;
 
-  case vtkCommand::EndInteractionEvent:
-    this->EndInteraction();
-    break;
-    }
+    case vtkCommand::EndInteractionEvent:
+      this->EndInteraction();
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMInteractionUndoStackBuilder::StartInteraction()
 {
   // Interaction began -- get camera properties and save them.
-  //this->RenderView->SynchronizeCameraProperties();
+  // this->RenderView->SynchronizeCameraProperties();
   this->UndoSet->RemoveAllElements();
 
   this->PropertyModified("CameraPosition");
@@ -141,11 +134,11 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
   // Then push undo set on stack.
 
   if (this->UndoSet->GetNumberOfElements() == 0)
-    {
+  {
     return;
-    }
+  }
 
- // this->RenderView->SynchronizeCameraProperties();
+  // this->RenderView->SynchronizeCameraProperties();
   this->PropertyModified("CameraPosition");
   this->PropertyModified("CameraFocalPoint");
   this->PropertyModified("CameraViewUp");
@@ -154,21 +147,20 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
   this->PropertyModified("RotationFactor");
 
   if (this->UndoStack)
-    {
+  {
     this->UndoStack->Push("Interaction", this->UndoSet);
-    }
+  }
   else
-    {
+  {
     vtkWarningMacro("No UndoStack set.");
-    }
+  }
   this->UndoSet->RemoveAllElements();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMInteractionUndoStackBuilder::PropertyModified(const char* pname)
 {
-  vtkSMPropertyModificationUndoElement* elem =
-      vtkSMPropertyModificationUndoElement::New();
+  vtkSMPropertyModificationUndoElement* elem = vtkSMPropertyModificationUndoElement::New();
   elem->ModifiedProperty(this->RenderView, pname);
   this->UndoSet->AddElement(elem);
   elem->Delete();

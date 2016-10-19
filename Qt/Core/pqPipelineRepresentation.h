@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,12 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineRepresentation.h
-/// \date 4/24/2006
+/**
+* \file pqPipelineRepresentation.h
+* \date 4/24/2006
+*/
 
 #ifndef _pqPipelineRepresentation_h
 #define _pqPipelineRepresentation_h
-
 
 #include "pqDataRepresentation.h"
 #include <QPair>
@@ -49,14 +50,17 @@ class vtkPVDataSetAttributesInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkSMRepresentationProxy;
 
-/// This is PQ representation for a single display. A pqRepresentation represents
-/// a single vtkSMRepresentationProxy. The display can be added to
-/// only one render module or more (ofcouse on the same server, this class
-/// doesn't worry about that.
+/**
+* This is PQ representation for a single display. A pqRepresentation represents
+* a single vtkSMRepresentationProxy. The display can be added to
+* only one render module or more (ofcouse on the same server, this class
+* doesn't worry about that.
+*/
 class PQCORE_EXPORT pqPipelineRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
   typedef pqDataRepresentation Superclass;
+
 public:
   // Constructor.
   // \c group :- smgroup in which the proxy has been registered.
@@ -64,29 +68,25 @@ public:
   // \c repr  :- the representation proxy.
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
-  pqPipelineRepresentation( const QString& group, 
-                            const QString& name,
-                            vtkSMProxy* repr, 
-                            pqServer* server,
-                            QObject* parent=NULL);
+  pqPipelineRepresentation(const QString& group, const QString& name, vtkSMProxy* repr,
+    pqServer* server, QObject* parent = NULL);
   virtual ~pqPipelineRepresentation();
 
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
 
 protected:
-
   // Overridden to set up some additional Qt connections
   virtual void setView(pqView* view);
 
 public slots:
   // If lookuptable is set up and is used for coloring,
-  // then calling this method resets the table ranges to match the current 
+  // then calling this method resets the table ranges to match the current
   // range of the selected array.
   void resetLookupTableScalarRange();
 
   // If lookuptable is set up and is used for coloring,
-  // then calling this method resets the table ranges to match the 
+  // then calling this method resets the table ranges to match the
   // range of the selected array over time. This can potentially be a slow
   // processes hence use with caution!!!
   void resetLookupTableScalarRangeOverTime();

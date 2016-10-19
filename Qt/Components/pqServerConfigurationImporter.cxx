@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -51,20 +51,21 @@ public:
   QString ActiveFetchedData;
   QString ActiveSourceName;
   bool AbortFetch;
-  pqInternals() : AbortFetch(false)
-    {
-    }
+  pqInternals()
+    : AbortFetch(false)
+  {
+  }
 
   static const char* getOS()
-    {
-#if defined (_WIN32)
+  {
+#if defined(_WIN32)
     return "win32";
-#elif defined (__APPLE__)
+#elif defined(__APPLE__)
     return "macos";
 #else
     return "nix";
 #endif
-    }
+  }
 
   // for every url, the following locations are tried.
   // 1) ${url}
@@ -75,26 +76,32 @@ public:
   // 6) ${url}/servers.pvsc
   // 7) ${url}/servers.xml
   static QList<QUrl> getAlternativeURLs(const QUrl& url)
-    {
+  {
     QList<QUrl> urls;
     urls.append(url);
 
     QUrl new_url = url;
 
-    new_url.setPath(url.path() + QString("/v%1_%2/%3/servers.pvsc").arg(
-        PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR).arg(getOS()));
+    new_url.setPath(url.path() +
+      QString("/v%1_%2/%3/servers.pvsc")
+        .arg(PARAVIEW_VERSION_MAJOR)
+        .arg(PARAVIEW_VERSION_MINOR)
+        .arg(getOS()));
     urls.append(new_url);
 
-    new_url.setPath(url.path() + QString("/v%1_%2/%3/servers.xml").arg(
-        PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR).arg(getOS()));
+    new_url.setPath(url.path() +
+      QString("/v%1_%2/%3/servers.xml")
+        .arg(PARAVIEW_VERSION_MAJOR)
+        .arg(PARAVIEW_VERSION_MINOR)
+        .arg(getOS()));
     urls.append(new_url);
 
-    new_url.setPath(url.path() + QString("/v%1_%2/servers.pvsc").arg(
-        PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR));
+    new_url.setPath(url.path() +
+      QString("/v%1_%2/servers.pvsc").arg(PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR));
     urls.append(new_url);
 
-    new_url.setPath(url.path() + QString("/v%1_%2/servers.xml").arg(
-        PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR));
+    new_url.setPath(url.path() +
+      QString("/v%1_%2/servers.xml").arg(PARAVIEW_VERSION_MAJOR).arg(PARAVIEW_VERSION_MINOR));
     urls.append(new_url);
 
     new_url.setPath(url.path() + QString("/servers.pvsc"));
@@ -103,17 +110,17 @@ public:
     new_url.setPath(url.path() + QString("/servers.xml"));
     urls.append(new_url);
     return urls;
-    }
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqServerConfigurationImporter::pqServerConfigurationImporter(QObject* parentObject)
-  : Superclass(parentObject), Internals(new pqInternals())
+  : Superclass(parentObject)
+  , Internals(new pqInternals())
 {
-  QObject::connect(
-    &this->Internals->NetworkAccessManager,
-    SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-    this, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)));
+  QObject::connect(&this->Internals->NetworkAccessManager,
+    SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
+    SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -124,25 +131,24 @@ pqServerConfigurationImporter::~pqServerConfigurationImporter()
 }
 
 //-----------------------------------------------------------------------------
-const QList<pqServerConfigurationImporter::Item>&
-pqServerConfigurationImporter::configurations() const
+const QList<pqServerConfigurationImporter::Item>& pqServerConfigurationImporter::configurations()
+  const
 {
   return this->Internals->Configurations;
 }
 
 //-----------------------------------------------------------------------------
 void pqServerConfigurationImporter::addSource(
-  const QString& name, const QUrl& url,
-  pqServerConfigurationImporter::SourceMode /*mode=PVSC*/)
+  const QString& name, const QUrl& url, pqServerConfigurationImporter::SourceMode /*mode=PVSC*/)
 {
   if (url.isValid())
-    {
+  {
     this->Internals->SourceURLs[name] = url;
-    }
+  }
   else
-    {
+  {
     qWarning() << "Invalid url: " << url;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -155,17 +161,16 @@ void pqServerConfigurationImporter::clearSources()
 void pqServerConfigurationImporter::fetchConfigurations()
 {
   if (this->Internals->ActiveReply)
-    {
+  {
     qWarning() << "fetchConfigurations() already is progress.";
     return;
-    }
+  }
 
   this->Internals->Configurations.clear();
   this->Internals->AbortFetch = false;
 
-  for (QMapIterator<QString, QUrl> iter(this->Internals->SourceURLs);
-    iter.hasNext(); )
-    {
+  for (QMapIterator<QString, QUrl> iter(this->Internals->SourceURLs); iter.hasNext();)
+  {
     // this is funny, but evidently, that's how QMapIterator it to be used.
     iter.next();
 
@@ -175,17 +180,17 @@ void pqServerConfigurationImporter::fetchConfigurations()
 
     QList<QUrl> alternative_urls = pqInternals::getAlternativeURLs(url);
     foreach (const QUrl& cur_url, alternative_urls)
-      {
+    {
       if (this->fetch(cur_url))
-        {
-        break;
-        }
-      }
-    if (this->Internals->AbortFetch)
       {
-      break;
+        break;
       }
     }
+    if (this->Internals->AbortFetch)
+    {
+      break;
+    }
+  }
 
   emit this->configurationsUpdated();
 }
@@ -194,13 +199,11 @@ void pqServerConfigurationImporter::fetchConfigurations()
 bool pqServerConfigurationImporter::fetch(const QUrl& url)
 {
   if (this->Internals->AbortFetch)
-    {
+  {
     return false;
-    }
+  }
 
-
-  QNetworkReply* reply =
-    this->Internals->NetworkAccessManager.get(QNetworkRequest(url));
+  QNetworkReply* reply = this->Internals->NetworkAccessManager.get(QNetworkRequest(url));
   this->Internals->ActiveReply = reply;
 
   this->Internals->ActiveFetchedData.clear();
@@ -208,10 +211,9 @@ bool pqServerConfigurationImporter::fetch(const QUrl& url)
   QEventLoop eventLoop;
   // setup so that the loop quits when network communication ends or
   // abortFetch() is called.
-  QObject::connect(reply, SIGNAL(finished()),
-    &eventLoop, SLOT(quit()));
-  QObject::connect(this, SIGNAL(abortFetchTriggered()),
-    &eventLoop, SLOT(quit()), Qt::QueuedConnection);
+  QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+  QObject::connect(
+    this, SIGNAL(abortFetchTriggered()), &eventLoop, SLOT(quit()), Qt::QueuedConnection);
   // setup to read fetched data.
   QObject::connect(reply, SIGNAL(readyRead()), this, SLOT(readCurrentData()));
 
@@ -219,25 +221,25 @@ bool pqServerConfigurationImporter::fetch(const QUrl& url)
   eventLoop.exec();
 
   bool return_value = false;
-  QVariant redirectionTarget =
-    reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+  QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error() != QNetworkReply::NoError)
-    {
+  {
     emit this->message(QString("Request failed: %1").arg(reply->errorString()));
-    }
+  }
   else if (!redirectionTarget.isNull())
-    {
+  {
     // handle re-direction
     return_value = this->fetch(url.resolved(redirectionTarget.toUrl()));
-    }
+  }
   else if (!this->Internals->AbortFetch)
-    {
+  {
     // we've successfully downloaded the file.
     return_value = this->processDownloadedContents();
-    }
+  }
 
   // this will set ActiveReply to NULL automatically.
-  delete reply; reply = NULL;
+  delete reply;
+  reply = NULL;
   return return_value;
 }
 
@@ -245,18 +247,17 @@ bool pqServerConfigurationImporter::fetch(const QUrl& url)
 void pqServerConfigurationImporter::abortFetch()
 {
   if (this->Internals->ActiveReply)
-    {
+  {
     this->Internals->AbortFetch = true;
     this->Internals->ActiveReply->abort();
     emit this->abortFetchTriggered();
-    }
+  }
 }
 //-----------------------------------------------------------------------------
 void pqServerConfigurationImporter::readCurrentData()
 {
   Q_ASSERT(this->Internals->ActiveReply != NULL);
-  this->Internals->ActiveFetchedData.append(
-    this->Internals->ActiveReply->readAll());
+  this->Internals->ActiveFetchedData.append(this->Internals->ActiveReply->readAll());
 }
 
 //-----------------------------------------------------------------------------
@@ -264,23 +265,23 @@ bool pqServerConfigurationImporter::processDownloadedContents()
 {
   vtkNew<vtkPVXMLParser> parser;
   if (!parser->Parse(this->Internals->ActiveFetchedData.toLatin1().data()))
-    {
+  {
     return false;
-    }
+  }
 
   vtkPVXMLElement* root = parser->GetRootElement();
   if (QString(root->GetName()) != "Servers")
-    {
+  {
     return false;
-    }
+  }
 
   bool appended = false;
   // FIXME: We may want to add some version-number checking here.
-  for (unsigned int cc=0; cc < root->GetNumberOfNestedElements(); cc++)
-    {
+  for (unsigned int cc = 0; cc < root->GetNumberOfNestedElements(); cc++)
+  {
     vtkPVXMLElement* child = root->GetNestedElement(cc);
     if (child->GetName() && strcmp(child->GetName(), "Server") == 0)
-      {
+    {
       pqServerConfiguration config(child);
       config.setMutable(true);
       Item item;
@@ -288,12 +289,12 @@ bool pqServerConfigurationImporter::processDownloadedContents()
       item.SourceName = this->Internals->ActiveSourceName;
       this->Internals->Configurations.append(item);
       appended = true;
-      }
     }
+  }
 
   if (appended)
-    {
+  {
     emit this->incrementalUpdate();
-    }
+  }
   return true;
 }

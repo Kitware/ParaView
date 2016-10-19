@@ -45,34 +45,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMessageBox>
 
-
 class pqFindDataDialog::pqInternals
 {
 public:
   Ui::FindDataDialog Ui;
 
   pqInternals(pqFindDataDialog* self)
-    {
+  {
     // Setup the UI.
     this->Ui.setupUi(self);
-    self->connect(this->Ui.currentSelectionFrame,
-      SIGNAL(showing(pqOutputPort*)), SLOT(showing(pqOutputPort*)));
-    self->connect(this->Ui.createSelectionFrame, SIGNAL(helpRequested()),
-      SIGNAL(helpRequested()));
+    self->connect(
+      this->Ui.currentSelectionFrame, SIGNAL(showing(pqOutputPort*)), SLOT(showing(pqOutputPort*)));
+    self->connect(this->Ui.createSelectionFrame, SIGNAL(helpRequested()), SIGNAL(helpRequested()));
 
-    self->connect(this->Ui.freezeSelection, SIGNAL(clicked()),
-      SLOT(freezeSelection()));
-    self->connect(this->Ui.extractSelection, SIGNAL(clicked()),
-      SLOT(extractSelection()));
-    self->connect(this->Ui.extractSelectionOverTime, SIGNAL(clicked()),
-      SLOT(extractSelectionOverTime()));
-    }
+    self->connect(this->Ui.freezeSelection, SIGNAL(clicked()), SLOT(freezeSelection()));
+    self->connect(this->Ui.extractSelection, SIGNAL(clicked()), SLOT(extractSelection()));
+    self->connect(
+      this->Ui.extractSelectionOverTime, SIGNAL(clicked()), SLOT(extractSelectionOverTime()));
+  }
 };
 
 //-----------------------------------------------------------------------------
 pqFindDataDialog::pqFindDataDialog(QWidget* parentObject, Qt::WindowFlags wflags)
-  : Superclass(parentObject, wflags),
-  Internals (new pqInternals(this))
+  : Superclass(parentObject, wflags)
+  , Internals(new pqInternals(this))
 {
   this->showing(this->Internals->Ui.currentSelectionFrame->showingPort());
 }
@@ -88,17 +84,15 @@ pqFindDataDialog::~pqFindDataDialog()
 void pqFindDataDialog::showing(pqOutputPort* port)
 {
   if (port)
-    {
-    this->Internals->Ui.currentSelectionLabel->setText(
-      QString("Current Selection (%1 : %2)")
-      .arg(port->getSource()->getSMName())
-      .arg(port->getPortNumber()));
-    }
+  {
+    this->Internals->Ui.currentSelectionLabel->setText(QString("Current Selection (%1 : %2)")
+                                                         .arg(port->getSource()->getSMName())
+                                                         .arg(port->getPortNumber()));
+  }
   else
-    {
-    this->Internals->Ui.currentSelectionLabel->setText(
-      QString("Current Selection (none)"));
-    }
+  {
+    this->Internals->Ui.currentSelectionLabel->setText(QString("Current Selection (none)"));
+  }
 
   // enable extraction buttons only if we have an active selection.
   this->Internals->Ui.freezeSelection->setEnabled(port != NULL);
@@ -109,81 +103,70 @@ void pqFindDataDialog::showing(pqOutputPort* port)
 //-----------------------------------------------------------------------------
 void pqFindDataDialog::freezeSelection()
 {
-  pqOutputPort* port = 
-    this->Internals->Ui.currentSelectionFrame->showingPort();
+  pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
   Q_ASSERT(port != NULL);
 
-  vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
-    port->getSelectionInput());
+  vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(port->getSelectionInput());
 
   if (curSelSource && port->getServer()->isRemote())
-    {
+  {
     // BUG: 6783. Warn user when converting a Frustum|Threshold|Query selection to
     // an id based selection.
     if (strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
       strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
       strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
-      {
+    {
       // We need to determine how many ids are present approximately.
-      vtkSMSourceProxy* sourceProxy =
-        vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
-      vtkPVDataInformation* selectedInformation = sourceProxy->GetSelectionOutput(
-        port->getPortNumber())->GetDataInformation();
+      vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+      vtkPVDataInformation* selectedInformation =
+        sourceProxy->GetSelectionOutput(port->getPortNumber())->GetDataInformation();
       int fdType = vtkSMPropertyHelper(curSelSource, "FieldType").GetAsInt();
-      if ((fdType == vtkSelectionNode::POINT &&
-          selectedInformation->GetNumberOfPoints() > 10000) ||
-        (fdType == vtkSelectionNode::CELL &&
-         selectedInformation->GetNumberOfCells() > 10000))
-        {
+      if ((fdType == vtkSelectionNode::POINT && selectedInformation->GetNumberOfPoints() > 10000) ||
+        (fdType == vtkSelectionNode::CELL && selectedInformation->GetNumberOfCells() > 10000))
+      {
         if (QMessageBox::warning(this, tr("Convert Selection"),
-            tr("This selection converion can potentially result in fetching a "
-              "large amount of data to the client.\n"
-              "Are you sure you want to continue?"),
-            QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) !=
-          QMessageBox::Ok)
-          {
+              tr("This selection converion can potentially result in fetching a "
+                 "large amount of data to the client.\n"
+                 "Are you sure you want to continue?"),
+              QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) != QMessageBox::Ok)
+        {
           return;
-          }
         }
       }
     }
+  }
   if (!curSelSource)
-    {
+  {
     return;
-    }
+  }
 
   vtkSMSourceProxy* selSource = vtkSMSourceProxy::SafeDownCast(
-    vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::INDICES,
-      curSelSource,
-      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
-      port->getPortNumber()));
+    vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::INDICES, curSelSource,
+      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
   if (selSource)
-    {
+  {
     if (selSource != curSelSource)
-      {
+    {
       selSource->UpdateVTKObjects();
       port->setSelectionInput(selSource, 0);
-      }
-    selSource->Delete();
     }
+    selSource->Delete();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqFindDataDialog::extractSelection()
 {
-  pqOutputPort* port = 
-    this->Internals->Ui.currentSelectionFrame->showingPort();
+  pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
   Q_ASSERT(port != NULL);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-  builder->createFilter(
-    "filters", "ExtractSelection", port->getSource(), port->getPortNumber());
+  builder->createFilter("filters", "ExtractSelection", port->getSource(), port->getPortNumber());
 }
 
 //-----------------------------------------------------------------------------
 void pqFindDataDialog::extractSelectionOverTime()
 {
-  pqOutputPort* port = 
-    this->Internals->Ui.currentSelectionFrame->showingPort();
+  pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
   Q_ASSERT(port != NULL);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   builder->createFilter(

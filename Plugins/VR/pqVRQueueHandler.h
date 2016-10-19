@@ -47,8 +47,9 @@ class pqVRQueueHandler : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqVRQueueHandler(vtkVRQueue* queue, QObject* parent=0);
+  pqVRQueueHandler(vtkVRQueue* queue, QObject* parent = 0);
   virtual ~pqVRQueueHandler();
 
   /// Add/remove interactor style.

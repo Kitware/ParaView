@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,17 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetSelectionHelper::pqTreeWidgetSelectionHelper(QTreeWidget* tree):
-  Superclass(tree)
+pqTreeWidgetSelectionHelper::pqTreeWidgetSelectionHelper(QTreeWidget* tree)
+  : Superclass(tree)
 {
   this->TreeWidget = tree;
   tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
   tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  QObject::connect(tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
-    this, SLOT(onItemPressed(QTreeWidgetItem*, int)));
-  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(showContextMenu(const QPoint&)));
+  QObject::connect(tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,
+    SLOT(onItemPressed(QTreeWidgetItem*, int)));
+  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+    SLOT(showContextMenu(const QPoint&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -59,14 +59,14 @@ pqTreeWidgetSelectionHelper::~pqTreeWidgetSelectionHelper()
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int )
+void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int)
 {
   this->PressState = -1;
   if ((item->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-    {
+  {
     this->PressState = item->checkState(0);
     this->Selection = this->TreeWidget->selectionModel()->selection();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -74,24 +74,23 @@ void pqTreeWidgetSelectionHelper::setSelectedItemsCheckState(Qt::CheckState stat
 {
   // Change all checkable items in the this->Selection to match the new
   // check state.
-  this->TreeWidget->selectionModel()->select(this->Selection, 
-    QItemSelectionModel::ClearAndSelect);
+  this->TreeWidget->selectionModel()->select(this->Selection, QItemSelectionModel::ClearAndSelect);
 
   QList<QTreeWidgetItem*> items = this->TreeWidget->selectedItems();
   foreach (QTreeWidgetItem* curitem, items)
-    {
+  {
     if ((curitem->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-      {
-      curitem->setCheckState(/*column*/0, state);
-      }
+    {
+      curitem->setCheckState(/*column*/ 0, state);
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeWidgetSelectionHelper::showContextMenu(const QPoint &pos)
+void pqTreeWidgetSelectionHelper::showContextMenu(const QPoint& pos)
 {
   if (this->TreeWidget->selectionModel()->selectedIndexes().size() > 0)
-    {
+  {
     QMenu menu;
     menu.setObjectName("TreeWidgetCheckMenu");
     QAction* check = new QAction("Check", &menu);
@@ -100,12 +99,12 @@ void pqTreeWidgetSelectionHelper::showContextMenu(const QPoint &pos)
     menu.addAction(uncheck);
     QAction* result = menu.exec(this->TreeWidget->mapToGlobal(pos));
     if (result == check)
-      {
+    {
       this->setSelectedItemsCheckState(Qt::Checked);
-      }
-    else if (result == uncheck)
-      {
-      this->setSelectedItemsCheckState(Qt::Unchecked);
-      }
     }
+    else if (result == uncheck)
+    {
+      this->setSelectedItemsCheckState(Qt::Unchecked);
+    }
+  }
 }

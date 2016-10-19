@@ -39,7 +39,8 @@
 #define GAUSSIANCONTROLPOINTLIST_H
 #include <AttributeSubject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 class GaussianControlPoint;
 
 // ****************************************************************************
@@ -60,60 +61,58 @@ class GaussianControlPoint;
 class GaussianControlPointList : public AttributeSubject
 {
 public:
-    GaussianControlPointList();
-    GaussianControlPointList(const GaussianControlPointList &obj);
-    virtual ~GaussianControlPointList();
+  GaussianControlPointList();
+  GaussianControlPointList(const GaussianControlPointList& obj);
+  virtual ~GaussianControlPointList();
 
-    virtual GaussianControlPointList& operator = (const GaussianControlPointList &obj);
-    virtual bool operator == (const GaussianControlPointList &obj) const;
-    virtual bool operator != (const GaussianControlPointList &obj) const;
+  virtual GaussianControlPointList& operator=(const GaussianControlPointList& obj);
+  virtual bool operator==(const GaussianControlPointList& obj) const;
+  virtual bool operator!=(const GaussianControlPointList& obj) const;
 
-    virtual const std::string TypeName() const;
-    virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const std::string &) const;
-    virtual AttributeSubject *NewInstance(bool) const;
+  virtual const std::string TypeName() const;
+  virtual bool CopyAttributes(const AttributeGroup*);
+  virtual AttributeSubject* CreateCompatible(const std::string&) const;
+  virtual AttributeSubject* NewInstance(bool) const;
 
-    // Property selection methods
-    virtual void SelectAll();
-    void SelectControlPoints();
+  // Property selection methods
+  virtual void SelectAll();
+  void SelectControlPoints();
 
-    // Property setting methods
+  // Property setting methods
 
-    // Property getting methods
-    const AttributeGroupVector &GetControlPoints() const;
-          AttributeGroupVector &GetControlPoints();
+  // Property getting methods
+  const AttributeGroupVector& GetControlPoints() const;
+  AttributeGroupVector& GetControlPoints();
 
-    // Persistence methods
-    virtual bool CreateNode(DataNode *node, bool completeSave, bool forceAdd);
-    virtual void SetFromNode(DataNode *node);
+  // Persistence methods
+  virtual bool CreateNode(DataNode* node, bool completeSave, bool forceAdd);
+  virtual void SetFromNode(DataNode* node);
 
+  // Attributegroup convenience methods
+  void AddControlPoints(const GaussianControlPoint&);
+  void ClearControlPoints();
+  void RemoveControlPoints(int i);
+  int GetNumControlPoints() const;
+  GaussianControlPoint& GetControlPoints(int i);
+  const GaussianControlPoint& GetControlPoints(int i) const;
 
-    // Attributegroup convenience methods
-    void AddControlPoints(const GaussianControlPoint &);
-    void ClearControlPoints();
-    void RemoveControlPoints(int i);
-    int  GetNumControlPoints() const;
-    GaussianControlPoint &GetControlPoints(int i);
-    const GaussianControlPoint &GetControlPoints(int i) const;
+  GaussianControlPoint& operator[](int i);
+  const GaussianControlPoint& operator[](int i) const;
 
-    GaussianControlPoint &operator [] (int i);
-    const GaussianControlPoint &operator [] (int i) const;
-
-
-    // Keyframing methods
-    virtual std::string               GetFieldName(int index) const;
-    virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual std::string               GetFieldTypeName(int index) const;
-    virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
+  // Keyframing methods
+  virtual std::string GetFieldName(int index) const;
+  virtual AttributeGroup::FieldType GetFieldType(int index) const;
+  virtual std::string GetFieldTypeName(int index) const;
+  virtual bool FieldsEqual(int index, const AttributeGroup* rhs) const;
 
 protected:
-    AttributeGroup *CreateSubAttributeGroup(int index);
+  AttributeGroup* CreateSubAttributeGroup(int index);
+
 private:
-    AttributeGroupVector controlPoints;
+  AttributeGroupVector controlPoints;
 
-    // Static class format string for type map.
-    static const char *TypeMapFormatString;
+  // Static class format string for type map.
+  static const char* TypeMapFormatString;
 };
-
 }
 #endif

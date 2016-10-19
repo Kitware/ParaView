@@ -53,20 +53,19 @@ vtkTypeUInt32 vtkPVSessionCoreInterpreterHelper::GetNextGlobalIdChunk(vtkTypeUIn
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkPVSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
-  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(
-    this->Core->GetSIObject(gid));
+  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(this->Core->GetSIObject(gid));
   if (!siProxy)
+  {
+    switch (this->LogLevel)
     {
-    switch(this->LogLevel)
-      {
-    case 0:
-      vtkErrorMacro("No vtkSIProxy for id : " << gid);
-      break;
-    default:
-      vtkWarningMacro("No vtkSIProxy for id : " << gid);
-      }
-    return NULL;
+      case 0:
+        vtkErrorMacro("No vtkSIProxy for id : " << gid);
+        break;
+      default:
+        vtkWarningMacro("No vtkSIProxy for id : " << gid);
     }
+    return NULL;
+  }
   return siProxy->GetVTKObject();
 }
 
@@ -79,20 +78,18 @@ vtkProcessModule* vtkPVSessionCoreInterpreterHelper::GetProcessModule()
 //----------------------------------------------------------------------------
 vtkPVProgressHandler* vtkPVSessionCoreInterpreterHelper::GetActiveProgressHandler()
 {
-  vtkPVSession* session = vtkPVSession::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetActiveSession());
+  vtkPVSession* session =
+    vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
   if (!session)
-    {
-    session = vtkPVSession::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetSession());
-    }
+  {
+    session = vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetSession());
+  }
 
-  return session? session->GetProgressHandler() : NULL;
+  return session ? session->GetProgressHandler() : NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionCoreInterpreterHelper::SetMPIMToNSocketConnection(
-  vtkMPIMToNSocketConnection* m2n)
+void vtkPVSessionCoreInterpreterHelper::SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* m2n)
 {
   this->Core->SetMPIMToNSocketConnection(m2n);
 }

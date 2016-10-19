@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,24 +40,27 @@ class QListWidgetItem;
 class vtkSMDoubleRangeDomain;
 class vtkSMIntRangeDomain;
 
-/// pqScalarValueListPropertyWidget provides a table widget to which users are
-/// add values e.g. for IsoValues for the Contour filter.
+/**
+* pqScalarValueListPropertyWidget provides a table widget to which users are
+* add values e.g. for IsoValues for the Contour filter.
+*/
 class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   Q_PROPERTY(QVariantList scalars READ scalars WRITE setScalars)
 
   typedef pqPropertyWidget Superclass;
+
 public:
-  pqScalarValueListPropertyWidget(vtkSMProperty *property,
-                                  vtkSMProxy *proxy,
-                                  QWidget *parent = 0);
+  pqScalarValueListPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqScalarValueListPropertyWidget();
 
-  void setScalars(const QVariantList &scalars);
+  void setScalars(const QVariantList& scalars);
   QVariantList scalars() const;
 
-  /// Sets range domain that will be used to initialize the scalar range.
+  /**
+  * Sets range domain that will be used to initialize the scalar range.
+  */
   void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
   void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
 
@@ -67,12 +70,15 @@ signals:
 private slots:
   void smRangeModified();
 
-  /// slots called when corresponding buttons are clicked.
+  /**
+  * slots called when corresponding buttons are clicked.
+  */
   void add();
   void addRange();
   void remove();
   void removeAll();
   void editPastLastRow();
+
 private:
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
 

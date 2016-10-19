@@ -12,20 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDimensionsDomain - int range domain based on the data dimensions.
-// .SECTION Description
-// vtkSMDimensionsDomain is a subclass of vtkSMIntRangeDomain. It relies on two
-// required properties: "Input", "Direction". "Input" is generally an
-// vtkSMInputProperty which provides the information about the data extents.
-// "Direction" is an option required property which helps determine the
-// direction (VTK_XY_PLANE, VTK_YZ_PLANE or VTK_XZ_PLANE). If "Direction" is not
-// provided then the property must be a 3 element property while when Direction
-// is provided the property must be a 1 element property.
-//
-// Supported Required-Property functions:
-// \li \c Input : points to a property that provides the data producer.
-// \li \c Direction: points to a property that provides the value for the
-//                   selected direction.
+/**
+ * @class   vtkSMDimensionsDomain
+ * @brief   int range domain based on the data dimensions.
+ *
+ * vtkSMDimensionsDomain is a subclass of vtkSMIntRangeDomain. It relies on two
+ * required properties: "Input", "Direction". "Input" is generally an
+ * vtkSMInputProperty which provides the information about the data extents.
+ * "Direction" is an option required property which helps determine the
+ * direction (VTK_XY_PLANE, VTK_YZ_PLANE or VTK_XZ_PLANE). If "Direction" is not
+ * provided then the property must be a 3 element property while when Direction
+ * is provided the property must be a 1 element property.
+ *
+ * Supported Required-Property functions:
+ * \li \c Input : points to a property that provides the data producer.
+ * \li \c Direction: points to a property that provides the value for the
+ *                   selected direction.
+*/
 
 #ifndef vtkSMDimensionsDomain_h
 #define vtkSMDimensionsDomain_h
@@ -43,9 +46,10 @@ public:
   vtkTypeMacro(vtkSMDimensionsDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Update the domain using the "unchecked" values (if available) for all
-  // required properties. 
+  /**
+   * Update the domain using the "unchecked" values (if available) for all
+   * required properties.
+   */
   virtual void Update(vtkSMProperty*);
 
 protected:
@@ -56,12 +60,9 @@ protected:
   int GetDirection(vtkSMIntVectorProperty* ivp);
   void GetExtent(vtkSMProxyProperty* pp, int extent[6]);
 
-
 private:
   vtkSMDimensionsDomain(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

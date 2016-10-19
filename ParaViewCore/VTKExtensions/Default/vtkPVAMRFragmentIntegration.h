@@ -12,13 +12,16 @@
   the U.S. Government retains certain rights in this software.
 
 =========================================================================*/
-// .NAME vtkPVAMRFragmentIntegration - Generates fragment analysis from an
-// amr volume and a previously run contour on that volume
-//
-// .SECTION Description
-//
-// .SEE vtkAMRFragmentIntegration
-//
+/**
+ * @class   vtkPVAMRFragmentIntegration
+ * @brief   Generates fragment analysis from an
+ * amr volume and a previously run contour on that volume
+ *
+ *
+ *
+ * .SEE vtkAMRFragmentIntegration
+ *
+*/
 
 #ifndef vtkPVAMRFragmentIntegration_h
 #define vtkPVAMRFragmentIntegration_h
@@ -29,40 +32,52 @@
 // Forware declaration.
 class vtkPVAMRFragmentIntegrationInternal;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRFragmentIntegration : public vtkAMRFragmentIntegration
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRFragmentIntegration
+  : public vtkAMRFragmentIntegration
 {
 public:
   static vtkPVAMRFragmentIntegration* New();
-  vtkTypeMacro(vtkPVAMRFragmentIntegration,vtkAMRFragmentIntegration);
+  vtkTypeMacro(vtkPVAMRFragmentIntegration, vtkAMRFragmentIntegration);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkPVAMRFragmentIntegration();
   virtual ~vtkPVAMRFragmentIntegration();
 
-  // Description:
-  // Add to list of volume arrays which are used for generating contours.
+  //@{
+  /**
+   * Add to list of volume arrays which are used for generating contours.
+   */
   void AddInputVolumeArrayToProcess(const char* name);
   void ClearInputVolumeArrayToProcess();
+  //@}
 
-  // Description:
-  // Add to list of mass arrays 
+  //@{
+  /**
+   * Add to list of mass arrays
+   */
   void AddInputMassArrayToProcess(const char* name);
   void ClearInputMassArrayToProcess();
+  //@}
 
-  // Description:
-  // Add to list of volume weighted arrays 
+  //@{
+  /**
+   * Add to list of volume weighted arrays
+   */
   void AddInputVolumeWeightedArrayToProcess(const char* name);
   void ClearInputVolumeWeightedArrayToProcess();
+  //@}
 
-  // Description:
-  // Add to list of mass weighted arrays 
+  //@{
+  /**
+   * Add to list of mass weighted arrays
+   */
   void AddInputMassWeightedArrayToProcess(const char* name);
   void ClearInputMassWeightedArrayToProcess();
+  //@}
 
-  void SetContourConnection (vtkAlgorithmOutput*);
+  void SetContourConnection(vtkAlgorithmOutput*);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
   vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;

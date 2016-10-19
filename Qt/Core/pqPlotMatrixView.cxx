@@ -34,11 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMContextViewProxy.h"
 
 //-----------------------------------------------------------------------------
-pqPlotMatrixView::pqPlotMatrixView(const QString &group,
-                                   const QString &name,
-                                   vtkSMContextViewProxy *viewModule,
-                                   pqServer *server,
-                                   QObject *parentObj)
+pqPlotMatrixView::pqPlotMatrixView(const QString& group, const QString& name,
+  vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parentObj)
   : pqContextView(viewType(), group, name, viewModule, server, parentObj)
 {
 }

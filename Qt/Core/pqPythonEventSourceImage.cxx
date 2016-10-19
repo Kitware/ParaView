@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -56,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreTestUtility.h"
 #include "pqOptions.h"
 
-
 // since we have only one instance at a time
 static pqPythonEventSourceImage* Instance = 0;
 bool SnapshotResult = false;
@@ -67,13 +66,12 @@ int SnapshotWidth = 1;
 int SnapshotHeight = 1;
 
 //-----------------------------------------------------------------------------
-static PyObject*
-QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
+static PyObject* QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
 {
   // void QtTestingImage.compareImage('png file', 'baselineFile')   or
   // void QtTestingImage.compareImage('object', 'baselineFile', width, height)
   //   an exception is thrown in this fails
- 
+
   pqThreadedEventSource::msleep(1000);
 
   const char* object = 0;
@@ -83,21 +81,18 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   int height = 0;
   bool image_image_compare = false;
 
-  if(!PyArg_ParseTuple(args, 
-                       const_cast<char*>("ssii"), 
-                       &object, &baseline, &width, &height))
+  if (!PyArg_ParseTuple(args, const_cast<char*>("ssii"), &object, &baseline, &width, &height))
+  {
+    if (PyArg_ParseTuple(args, const_cast<char*>("ss"), &pngfile, &baseline))
     {
-    if(PyArg_ParseTuple(args, 
-        const_cast<char*>("ss"), &pngfile, &baseline))
-      {
       image_image_compare = true;
-      }
+    }
     else
-      {
+    {
       PyErr_SetString(PyExc_TypeError, "bad arguments to compareImage()");
       return NULL;
-      }
     }
+  }
 
   SnapshotResult = false;
   SnapshotWidget = object;
@@ -113,40 +108,34 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   // pqThreadedEventSource::waitForGUI(). We should deprecate that.
   // Qt::BlockingQueuedConnection will "block until the slot returns".
 
-  if(!image_image_compare && SnapshotWidget == QString::null)
-    {
+  if (!image_image_compare && SnapshotWidget == QString::null)
+  {
     PyErr_SetString(PyExc_ValueError, "object not found");
     return NULL;
-    }
+  }
 
-  if(!SnapshotResult)
-    {
+  if (!SnapshotResult)
+  {
     PyErr_SetString(PyExc_ValueError, "image comparison failed");
     return NULL;
-    }
+  }
 
   return Py_BuildValue(const_cast<char*>(""));
 }
 
 //-----------------------------------------------------------------------------
 static PyMethodDef QtTestingImageMethods[] = {
-  {
-    const_cast<char*>("compareImage"), 
-    QtTestingImage_compareImage,
-    METH_VARARGS,
-    const_cast<char*>("compare the snapshot of a widget/image with a baseline")
-  },
+  { const_cast<char*>("compareImage"), QtTestingImage_compareImage, METH_VARARGS,
+    const_cast<char*>("compare the snapshot of a widget/image with a baseline") },
 
-  {NULL, NULL, 0, NULL} // Sentinal
+  { NULL, NULL, 0, NULL } // Sentinal
 };
 
 //-----------------------------------------------------------------------------
-PyMODINIT_FUNC
-initQtTestingImage(void)
+PyMODINIT_FUNC initQtTestingImage(void)
 {
   Py_InitModule(const_cast<char*>("QtTestingImage"), QtTestingImageMethods);
 }
-
 
 //-----------------------------------------------------------------------------
 pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
@@ -154,8 +143,7 @@ pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
 {
   // add QtTesting to python's inittab, so it is
   // available to all interpreters
-  PyImport_AppendInittab(const_cast<char*>("QtTestingImage"),
-                         initQtTestingImage);
+  PyImport_AppendInittab(const_cast<char*>("QtTestingImage"), initQtTestingImage);
 }
 
 //-----------------------------------------------------------------------------
@@ -181,34 +169,32 @@ void pqPythonEventSourceImage::doComparison()
   baseline_image += "/Baseline/";
   baseline_image += SnapshotBaseline;
 
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  pqOptions* const options =
+    pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   int threshold = options->GetCurrentImageThreshold();
 
   QString test_directory = pqCoreTestUtility::TestDirectory();
-  if(test_directory == QString::null)
-    {
+  if (test_directory == QString::null)
+  {
     test_directory = ".";
-    }
+  }
 
   if (SnapshotWidget != QString::null)
-    {
-    QWidget* widget =
-      qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
+  {
+    QWidget* widget = qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
     if (widget)
-      {
-      widget->resize(SnapshotWidth, SnapshotHeight);
-      ::SnapshotResult = pqCoreTestUtility::CompareImage(
-        widget, baseline_image, threshold, std::cerr, test_directory,
-        QSize(SnapshotWidth, SnapshotHeight));
-      }
-    }
-  else if (SnapshotTestImage != QString::null)
     {
+      widget->resize(SnapshotWidth, SnapshotHeight);
+      ::SnapshotResult = pqCoreTestUtility::CompareImage(widget, baseline_image, threshold,
+        std::cerr, test_directory, QSize(SnapshotWidth, SnapshotHeight));
+    }
+  }
+  else if (SnapshotTestImage != QString::null)
+  {
     SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT", test_directory);
-    SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_DATA_ROOT",
-      pqCoreTestUtility::DataRoot());
+    SnapshotTestImage =
+      SnapshotTestImage.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
     ::SnapshotResult = pqCoreTestUtility::CompareImage(
       SnapshotTestImage, baseline_image, threshold, std::cerr, test_directory);
-    }
+  }
 }

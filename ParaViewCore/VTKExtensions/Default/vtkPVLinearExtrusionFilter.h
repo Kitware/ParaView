@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVLinearExtrusionFilter - change a default value
-// .SECTION Description
-// vtkPVLinearExtrusionFilter is a subclass of vtkPLinearExtrusionFilter.
-// The only difference is changing the default extrusion type to vector
-// extrusion
+/**
+ * @class   vtkPVLinearExtrusionFilter
+ * @brief   change a default value
+ *
+ * vtkPVLinearExtrusionFilter is a subclass of vtkPLinearExtrusionFilter.
+ * The only difference is changing the default extrusion type to vector
+ * extrusion
+*/
 
 #ifndef vtkPVLinearExtrusionFilter_h
 #define vtkPVLinearExtrusionFilter_h
@@ -27,14 +30,14 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLinearExtrusionFilter : public vtkPLinearExtrusionFilter
 {
 public:
-  static vtkPVLinearExtrusionFilter *New();
+  static vtkPVLinearExtrusionFilter* New();
   vtkTypeMacro(vtkPVLinearExtrusionFilter, vtkPLinearExtrusionFilter);
-  void PrintSelf(ostream &os, vtkIndent indent);
-  
+  void PrintSelf(ostream& os, vtkIndent indent);
+
 protected:
   vtkPVLinearExtrusionFilter();
-  ~vtkPVLinearExtrusionFilter() {};
-  
+  ~vtkPVLinearExtrusionFilter(){};
+
 private:
   vtkPVLinearExtrusionFilter(const vtkPVLinearExtrusionFilter&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVLinearExtrusionFilter&) VTK_DELETE_FUNCTION;

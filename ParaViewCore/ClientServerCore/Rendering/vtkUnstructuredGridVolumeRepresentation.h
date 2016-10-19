@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkUnstructuredGridVolumeRepresentation - representation for showing
-// vtkUnstructuredGrid datasets as volumes.
-// .SECTION Description
-// vtkUnstructuredGridVolumeRepresentation is a representation for volume
-// rendering vtkUnstructuredGrid datasets. It simply renders a translucent
-// surface for LOD i.e. interactive rendering.
+/**
+ * @class   vtkUnstructuredGridVolumeRepresentation
+ * @brief   representation for showing
+ * vtkUnstructuredGrid datasets as volumes.
+ *
+ * vtkUnstructuredGridVolumeRepresentation is a representation for volume
+ * rendering vtkUnstructuredGrid datasets. It simply renders a translucent
+ * surface for LOD i.e. interactive rendering.
+*/
 
 #ifndef vtkUnstructuredGridVolumeRepresentation_h
 #define vtkUnstructuredGridVolumeRepresentation_h
@@ -39,41 +42,49 @@ class vtkUnstructuredGridVolumeMapper;
 class vtkVolumeProperty;
 class vtkVolumeRepresentationPreprocessor;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkUnstructuredGridVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkUnstructuredGridVolumeRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkUnstructuredGridVolumeRepresentation* New();
   vtkTypeMacro(vtkUnstructuredGridVolumeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Register a volume mapper with the representation.
+  /**
+   * Register a volume mapper with the representation.
+   */
   void AddVolumeMapper(const char* name, vtkUnstructuredGridVolumeMapper*);
 
-  // Description:
-  // Set the active volume mapper to use.
+  //@{
+  /**
+   * Set the active volume mapper to use.
+   */
   virtual void SetActiveVolumeMapper(const char*);
   vtkUnstructuredGridVolumeMapper* GetActiveVolumeMapper();
+  //@}
 
-  // Description:
-  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
-  // typically called by the vtkView to request meta-data from the
-  // representations or ask them to perform certain tasks e.g.
-  // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
+  /**
+   * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+   * typically called by the vtkView to request meta-data from the
+   * representations or ask them to perform certain tasks e.g.
+   * PrepareForRendering.
+   */
+  virtual int ProcessViewRequest(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
 
-  // Description:
-  // This needs to be called on all instances of vtkGeometryRepresentation when
-  // the input is modified. This is essential since the geometry filter does not
-  // have any real-input on the client side which messes with the Update
-  // requests.
+  /**
+   * This needs to be called on all instances of vtkGeometryRepresentation when
+   * the input is modified. This is essential since the geometry filter does not
+   * have any real-input on the client side which messes with the Update
+   * requests.
+   */
   virtual void MarkModified();
 
-  // Description:
-  // Get/Set the visibility for this representation. When the visibility of
-  // representation of false, all view passes are ignored.
-  // Overridden to propagate to the active representation.
+  /**
+   * Get/Set the visibility for this representation. When the visibility of
+   * representation of false, all view passes are ignored.
+   * Overridden to propagate to the active representation.
+   */
   virtual void SetVisibility(bool val);
 
   //***************************************************************************
@@ -95,48 +106,55 @@ public:
   void SetScalarOpacity(vtkPiecewiseFunction* pwf);
   void SetScalarOpacityUnitDistance(double val);
 
-  // Description:
-  // Provides access to the actor used by this representation.
+  /**
+   * Provides access to the actor used by this representation.
+   */
   vtkPVLODVolume* GetActor() { return this->Actor; }
 
-  // Description:
-  // Specify whether or not to redistribute the data. The default is false
-  // since that is the only way in general to guarantee correct rendering.
-  // Can set to true if all rendered data sets are based on the same
-  // data partitioning in order to save on the data redistribution.
+  //@{
+  /**
+   * Specify whether or not to redistribute the data. The default is false
+   * since that is the only way in general to guarantee correct rendering.
+   * Can set to true if all rendered data sets are based on the same
+   * data partitioning in order to save on the data redistribution.
+   */
   vtkSetMacro(UseDataPartitions, bool);
   vtkGetMacro(UseDataPartitions, bool);
+  //@}
 
 protected:
   vtkUnstructuredGridVolumeRepresentation();
   ~vtkUnstructuredGridVolumeRepresentation();
 
-  // Description:
-  // Fill input port information.
+  /**
+   * Fill input port information.
+   */
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  // Description:
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  // Description:
-  // Adds the representation to the view.  This is called from
-  // vtkView::AddRepresentation().  Subclasses should override this method.
-  // Returns true if the addition succeeds.
+  /**
+   * Adds the representation to the view.  This is called from
+   * vtkView::AddRepresentation().  Subclasses should override this method.
+   * Returns true if the addition succeeds.
+   */
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
-  // Description:
-  // Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
+  /**
+   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
+   */
   virtual bool IsCached(double cache_key);
 
-  // Description:
-  // Passes on parameters to the active volume mapper
+  /**
+   * Passes on parameters to the active volume mapper
+   */
   virtual void UpdateMapperParameters();
 
   vtkVolumeRepresentationPreprocessor* Preprocessor;
@@ -152,12 +170,12 @@ protected:
   bool UseDataPartitions;
 
 private:
-  vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkUnstructuredGridVolumeRepresentation(
+    const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

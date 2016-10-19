@@ -38,7 +38,8 @@
 #include <DataNode.h>
 #include <GaussianControlPoint.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // ****************************************************************************
 // Method: GaussianControlPoint::GaussianControlPoint
@@ -55,13 +56,14 @@ namespace pointsprite {
 //
 // ****************************************************************************
 
-GaussianControlPoint::GaussianControlPoint() : AttributeSubject("fffff")
+GaussianControlPoint::GaussianControlPoint()
+  : AttributeSubject("fffff")
 {
-    x = 0;
-    height = 0;
-    width = 0.001;
-    xBias = 0;
-    yBias = 0;
+  x = 0;
+  height = 0;
+  width = 0.001;
+  xBias = 0;
+  yBias = 0;
 }
 
 // ****************************************************************************
@@ -79,15 +81,16 @@ GaussianControlPoint::GaussianControlPoint() : AttributeSubject("fffff")
 //
 // ****************************************************************************
 
-GaussianControlPoint::GaussianControlPoint(const GaussianControlPoint &obj) : AttributeSubject("fffff")
+GaussianControlPoint::GaussianControlPoint(const GaussianControlPoint& obj)
+  : AttributeSubject("fffff")
 {
-    x = obj.x;
-    height = obj.height;
-    width = obj.width;
-    xBias = obj.xBias;
-    yBias = obj.yBias;
+  x = obj.x;
+  height = obj.height;
+  width = obj.width;
+  xBias = obj.xBias;
+  yBias = obj.yBias;
 
-    SelectAll();
+  SelectAll();
 }
 
 // ****************************************************************************
@@ -107,7 +110,7 @@ GaussianControlPoint::GaussianControlPoint(const GaussianControlPoint &obj) : At
 
 GaussianControlPoint::~GaussianControlPoint()
 {
-    // nothing here
+  // nothing here
 }
 
 // ****************************************************************************
@@ -125,16 +128,15 @@ GaussianControlPoint::~GaussianControlPoint()
 //
 // ****************************************************************************
 
-void
-GaussianControlPoint::operator = (const GaussianControlPoint &obj)
+void GaussianControlPoint::operator=(const GaussianControlPoint& obj)
 {
-    x = obj.x;
-    height = obj.height;
-    width = obj.width;
-    xBias = obj.xBias;
-    yBias = obj.yBias;
+  x = obj.x;
+  height = obj.height;
+  width = obj.width;
+  xBias = obj.xBias;
+  yBias = obj.yBias;
 
-    SelectAll();
+  SelectAll();
 }
 
 // ****************************************************************************
@@ -152,15 +154,11 @@ GaussianControlPoint::operator = (const GaussianControlPoint &obj)
 //
 // ****************************************************************************
 
-bool
-GaussianControlPoint::operator == (const GaussianControlPoint &obj) const
+bool GaussianControlPoint::operator==(const GaussianControlPoint& obj) const
 {
-    // Create the return value
-    return ((x == obj.x) &&
-            (height == obj.height) &&
-            (width == obj.width) &&
-            (xBias == obj.xBias) &&
-            (yBias == obj.yBias));
+  // Create the return value
+  return ((x == obj.x) && (height == obj.height) && (width == obj.width) && (xBias == obj.xBias) &&
+    (yBias == obj.yBias));
 }
 
 // ****************************************************************************
@@ -178,10 +176,9 @@ GaussianControlPoint::operator == (const GaussianControlPoint &obj) const
 //
 // ****************************************************************************
 
-bool
-GaussianControlPoint::operator != (const GaussianControlPoint &obj) const
+bool GaussianControlPoint::operator!=(const GaussianControlPoint& obj) const
 {
-    return !(this->operator == (obj));
+  return !(this->operator==(obj));
 }
 
 // ****************************************************************************
@@ -199,10 +196,9 @@ GaussianControlPoint::operator != (const GaussianControlPoint &obj) const
 //
 // ****************************************************************************
 
-const std::string
-GaussianControlPoint::TypeName() const
+const std::string GaussianControlPoint::TypeName() const
 {
-    return "GaussianControlPoint";
+  return "GaussianControlPoint";
 }
 
 // ****************************************************************************
@@ -220,17 +216,16 @@ GaussianControlPoint::TypeName() const
 //
 // ****************************************************************************
 
-bool
-GaussianControlPoint::CopyAttributes(const AttributeGroup *atts)
+bool GaussianControlPoint::CopyAttributes(const AttributeGroup* atts)
 {
-    if(TypeName() != atts->TypeName())
-        return false;
+  if (TypeName() != atts->TypeName())
+    return false;
 
-    // Call assignment operator.
-    const GaussianControlPoint *tmp = (const GaussianControlPoint *)atts;
-    *this = *tmp;
+  // Call assignment operator.
+  const GaussianControlPoint* tmp = (const GaussianControlPoint*)atts;
+  *this = *tmp;
 
-    return true;
+  return true;
 }
 
 // ****************************************************************************
@@ -248,15 +243,14 @@ GaussianControlPoint::CopyAttributes(const AttributeGroup *atts)
 //
 // ****************************************************************************
 
-AttributeSubject *
-GaussianControlPoint::CreateCompatible(const std::string &tname) const
+AttributeSubject* GaussianControlPoint::CreateCompatible(const std::string& tname) const
 {
-    AttributeSubject *retval = 0;
-    if(TypeName() == tname)
-        retval = new GaussianControlPoint(*this);
-    // Other cases could go here too.
+  AttributeSubject* retval = 0;
+  if (TypeName() == tname)
+    retval = new GaussianControlPoint(*this);
+  // Other cases could go here too.
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -274,16 +268,15 @@ GaussianControlPoint::CreateCompatible(const std::string &tname) const
 //
 // ****************************************************************************
 
-AttributeSubject *
-GaussianControlPoint::NewInstance(bool copy) const
+AttributeSubject* GaussianControlPoint::NewInstance(bool copy) const
 {
-    AttributeSubject *retval = 0;
-    if(copy)
-        retval = new GaussianControlPoint(*this);
-    else
-        retval = new GaussianControlPoint;
+  AttributeSubject* retval = 0;
+  if (copy)
+    retval = new GaussianControlPoint(*this);
+  else
+    retval = new GaussianControlPoint;
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -301,14 +294,13 @@ GaussianControlPoint::NewInstance(bool copy) const
 //
 // ****************************************************************************
 
-void
-GaussianControlPoint::SelectAll()
+void GaussianControlPoint::SelectAll()
 {
-    Select(0, (void *)&x);
-    Select(1, (void *)&height);
-    Select(2, (void *)&width);
-    Select(3, (void *)&xBias);
-    Select(4, (void *)&yBias);
+  Select(0, (void*)&x);
+  Select(1, (void*)&height);
+  Select(2, (void*)&width);
+  Select(3, (void*)&xBias);
+  Select(4, (void*)&yBias);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,7 +311,8 @@ GaussianControlPoint::SelectAll()
 // Method: GaussianControlPoint::CreateNode
 //
 // Purpose:
-//   This method creates a DataNode representation of the object so it can be saved to a config file.
+//   This method creates a DataNode representation of the object so it can be saved to a config
+//   file.
 //
 // Note:       Autogenerated by xml2atts.
 //
@@ -330,62 +323,61 @@ GaussianControlPoint::SelectAll()
 //
 // ****************************************************************************
 
-bool
-GaussianControlPoint::CreateNode(DataNode *parentNode, bool completeSave, bool forceAdd)
+bool GaussianControlPoint::CreateNode(DataNode* parentNode, bool completeSave, bool forceAdd)
 {
-    if(parentNode == 0)
-        return false;
+  if (parentNode == 0)
+    return false;
 
-    GaussianControlPoint defaultObject;
-    bool addToParent = false;
-    // Create a node for GaussianControlPoint.
-    DataNode *node = new DataNode("GaussianControlPoint");
+  GaussianControlPoint defaultObject;
+  bool addToParent = false;
+  // Create a node for GaussianControlPoint.
+  DataNode* node = new DataNode("GaussianControlPoint");
 
-    if(completeSave || !FieldsEqual(0, &defaultObject))
-    {
-        addToParent = true;
-        node->AddNode(new DataNode("x", x));
-    }
+  if (completeSave || !FieldsEqual(0, &defaultObject))
+  {
+    addToParent = true;
+    node->AddNode(new DataNode("x", x));
+  }
 
-    if(completeSave || !FieldsEqual(1, &defaultObject))
-    {
-        addToParent = true;
-        node->AddNode(new DataNode("height", height));
-    }
+  if (completeSave || !FieldsEqual(1, &defaultObject))
+  {
+    addToParent = true;
+    node->AddNode(new DataNode("height", height));
+  }
 
-    if(completeSave || !FieldsEqual(2, &defaultObject))
-    {
-        addToParent = true;
-        node->AddNode(new DataNode("width", width));
-    }
+  if (completeSave || !FieldsEqual(2, &defaultObject))
+  {
+    addToParent = true;
+    node->AddNode(new DataNode("width", width));
+  }
 
-    if(completeSave || !FieldsEqual(3, &defaultObject))
-    {
-        addToParent = true;
-        node->AddNode(new DataNode("xBias", xBias));
-    }
+  if (completeSave || !FieldsEqual(3, &defaultObject))
+  {
+    addToParent = true;
+    node->AddNode(new DataNode("xBias", xBias));
+  }
 
-    if(completeSave || !FieldsEqual(4, &defaultObject))
-    {
-        addToParent = true;
-        node->AddNode(new DataNode("yBias", yBias));
-    }
+  if (completeSave || !FieldsEqual(4, &defaultObject))
+  {
+    addToParent = true;
+    node->AddNode(new DataNode("yBias", yBias));
+  }
 
+  // Add the node to the parent node.
+  if (addToParent || forceAdd)
+    parentNode->AddNode(node);
+  else
+    delete node;
 
-    // Add the node to the parent node.
-    if(addToParent || forceAdd)
-        parentNode->AddNode(node);
-    else
-        delete node;
-
-    return (addToParent || forceAdd);
+  return (addToParent || forceAdd);
 }
 
 // ****************************************************************************
 // Method: GaussianControlPoint::SetFromNode
 //
 // Purpose:
-//   This method sets attributes in this object from values in a DataNode representation of the object.
+//   This method sets attributes in this object from values in a DataNode representation of the
+//   object.
 //
 // Note:       Autogenerated by xml2atts.
 //
@@ -396,101 +388,90 @@ GaussianControlPoint::CreateNode(DataNode *parentNode, bool completeSave, bool f
 //
 // ****************************************************************************
 
-void
-GaussianControlPoint::SetFromNode(DataNode *parentNode)
+void GaussianControlPoint::SetFromNode(DataNode* parentNode)
 {
-    //int i;
-    if(parentNode == 0)
-        return;
+  // int i;
+  if (parentNode == 0)
+    return;
 
-    DataNode *searchNode = parentNode->GetNode("GaussianControlPoint");
-    if(searchNode == 0)
-        return;
+  DataNode* searchNode = parentNode->GetNode("GaussianControlPoint");
+  if (searchNode == 0)
+    return;
 
-    DataNode *node;
-    if((node = searchNode->GetNode("x")) != 0)
-        SetX(node->AsFloat());
-    if((node = searchNode->GetNode("height")) != 0)
-        SetHeight(node->AsFloat());
-    if((node = searchNode->GetNode("width")) != 0)
-        SetWidth(node->AsFloat());
-    if((node = searchNode->GetNode("xBias")) != 0)
-        SetXBias(node->AsFloat());
-    if((node = searchNode->GetNode("yBias")) != 0)
-        SetYBias(node->AsFloat());
+  DataNode* node;
+  if ((node = searchNode->GetNode("x")) != 0)
+    SetX(node->AsFloat());
+  if ((node = searchNode->GetNode("height")) != 0)
+    SetHeight(node->AsFloat());
+  if ((node = searchNode->GetNode("width")) != 0)
+    SetWidth(node->AsFloat());
+  if ((node = searchNode->GetNode("xBias")) != 0)
+    SetXBias(node->AsFloat());
+  if ((node = searchNode->GetNode("yBias")) != 0)
+    SetYBias(node->AsFloat());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Set property methods
 ///////////////////////////////////////////////////////////////////////////////
 
-void
-GaussianControlPoint::SetX(float x_)
+void GaussianControlPoint::SetX(float x_)
 {
-    x = x_;
-    Select(0, (void *)&x);
+  x = x_;
+  Select(0, (void*)&x);
 }
 
-void
-GaussianControlPoint::SetHeight(float height_)
+void GaussianControlPoint::SetHeight(float height_)
 {
-    height = height_;
-    Select(1, (void *)&height);
+  height = height_;
+  Select(1, (void*)&height);
 }
 
-void
-GaussianControlPoint::SetWidth(float width_)
+void GaussianControlPoint::SetWidth(float width_)
 {
-    width = width_;
-    Select(2, (void *)&width);
+  width = width_;
+  Select(2, (void*)&width);
 }
 
-void
-GaussianControlPoint::SetXBias(float xBias_)
+void GaussianControlPoint::SetXBias(float xBias_)
 {
-    xBias = xBias_;
-    Select(3, (void *)&xBias);
+  xBias = xBias_;
+  Select(3, (void*)&xBias);
 }
 
-void
-GaussianControlPoint::SetYBias(float yBias_)
+void GaussianControlPoint::SetYBias(float yBias_)
 {
-    yBias = yBias_;
-    Select(4, (void *)&yBias);
+  yBias = yBias_;
+  Select(4, (void*)&yBias);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get property methods
 ///////////////////////////////////////////////////////////////////////////////
 
-float
-GaussianControlPoint::GetX() const
+float GaussianControlPoint::GetX() const
 {
-    return x;
+  return x;
 }
 
-float
-GaussianControlPoint::GetHeight() const
+float GaussianControlPoint::GetHeight() const
 {
-    return height;
+  return height;
 }
 
-float
-GaussianControlPoint::GetWidth() const
+float GaussianControlPoint::GetWidth() const
 {
-    return width;
+  return width;
 }
 
-float
-GaussianControlPoint::GetXBias() const
+float GaussianControlPoint::GetXBias() const
 {
-    return xBias;
+  return xBias;
 }
 
-float
-GaussianControlPoint::GetYBias() const
+float GaussianControlPoint::GetYBias() const
 {
-    return yBias;
+  return yBias;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -512,18 +493,23 @@ GaussianControlPoint::GetYBias() const
 //
 // ****************************************************************************
 
-std::string
-GaussianControlPoint::GetFieldName(int index) const
+std::string GaussianControlPoint::GetFieldName(int index) const
 {
-    switch (index)
-    {
-        case 0:  return "x";
-        case 1:  return "height";
-        case 2:  return "width";
-        case 3:  return "xBias";
-        case 4:  return "yBias";
-        default:  return "invalid index";
-    }
+  switch (index)
+  {
+    case 0:
+      return "x";
+    case 1:
+      return "height";
+    case 2:
+      return "width";
+    case 3:
+      return "xBias";
+    case 4:
+      return "yBias";
+    default:
+      return "invalid index";
+  }
 }
 
 // ****************************************************************************
@@ -541,18 +527,23 @@ GaussianControlPoint::GetFieldName(int index) const
 //
 // ****************************************************************************
 
-AttributeGroup::FieldType
-GaussianControlPoint::GetFieldType(int index) const
+AttributeGroup::FieldType GaussianControlPoint::GetFieldType(int index) const
 {
-    switch (index)
-    {
-        case 0:  return FieldType_float;
-        case 1:  return FieldType_float;
-        case 2:  return FieldType_float;
-        case 3:  return FieldType_float;
-        case 4:  return FieldType_float;
-        default:  return FieldType_unknown;
-    }
+  switch (index)
+  {
+    case 0:
+      return FieldType_float;
+    case 1:
+      return FieldType_float;
+    case 2:
+      return FieldType_float;
+    case 3:
+      return FieldType_float;
+    case 4:
+      return FieldType_float;
+    default:
+      return FieldType_unknown;
+  }
 }
 
 // ****************************************************************************
@@ -570,18 +561,23 @@ GaussianControlPoint::GetFieldType(int index) const
 //
 // ****************************************************************************
 
-std::string
-GaussianControlPoint::GetFieldTypeName(int index) const
+std::string GaussianControlPoint::GetFieldTypeName(int index) const
 {
-    switch (index)
-    {
-        case 0:  return "float";
-        case 1:  return "float";
-        case 2:  return "float";
-        case 3:  return "float";
-        case 4:  return "float";
-        default:  return "invalid index";
-    }
+  switch (index)
+  {
+    case 0:
+      return "float";
+    case 1:
+      return "float";
+    case 2:
+      return "float";
+    case 3:
+      return "float";
+    case 4:
+      return "float";
+    default:
+      return "invalid index";
+  }
 }
 
 // ****************************************************************************
@@ -599,46 +595,45 @@ GaussianControlPoint::GetFieldTypeName(int index) const
 //
 // ****************************************************************************
 
-bool
-GaussianControlPoint::FieldsEqual(int index_, const AttributeGroup *rhs) const
+bool GaussianControlPoint::FieldsEqual(int index_, const AttributeGroup* rhs) const
 {
-    const GaussianControlPoint &obj = *((const GaussianControlPoint*)rhs);
-    bool retval = false;
-    switch (index_)
-    {
+  const GaussianControlPoint& obj = *((const GaussianControlPoint*)rhs);
+  bool retval = false;
+  switch (index_)
+  {
     case 0:
-        {  // new scope
-        retval = (x == obj.x);
-        }
-        break;
-    case 1:
-        {  // new scope
-        retval = (height == obj.height);
-        }
-        break;
-    case 2:
-        {  // new scope
-        retval = (width == obj.width);
-        }
-        break;
-    case 3:
-        {  // new scope
-        retval = (xBias == obj.xBias);
-        }
-        break;
-    case 4:
-        {  // new scope
-        retval = (yBias == obj.yBias);
-        }
-        break;
-    default: retval = false;
+    { // new scope
+      retval = (x == obj.x);
     }
+    break;
+    case 1:
+    { // new scope
+      retval = (height == obj.height);
+    }
+    break;
+    case 2:
+    { // new scope
+      retval = (width == obj.width);
+    }
+    break;
+    case 3:
+    { // new scope
+      retval = (xBias == obj.xBias);
+    }
+    break;
+    case 4:
+    { // new scope
+      retval = (yBias == obj.yBias);
+    }
+    break;
+    default:
+      retval = false;
+  }
 
-    return retval;
+  return retval;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // User-defined methods.
 ///////////////////////////////////////////////////////////////////////////////
-
 }

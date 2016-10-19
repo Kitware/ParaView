@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMProxy.h"
 
-
 vtkStandardNewMacro(vtkSMCameraConfigurationReader);
 
 //-----------------------------------------------------------------------------
@@ -36,23 +35,23 @@ vtkSMCameraConfigurationReader::vtkSMCameraConfigurationReader()
 
 //-----------------------------------------------------------------------------
 vtkSMCameraConfigurationReader::~vtkSMCameraConfigurationReader()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-void vtkSMCameraConfigurationReader::SetRenderViewProxy(
-      vtkSMProxy *rvProxy)
+void vtkSMCameraConfigurationReader::SetRenderViewProxy(vtkSMProxy* rvProxy)
 {
   this->vtkSMProxyConfigurationReader::SetProxy(rvProxy);
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMCameraConfigurationReader::ReadConfiguration(const char *filename)
+int vtkSMCameraConfigurationReader::ReadConfiguration(const char* filename)
 {
-  int ok=this->Superclass::ReadConfiguration(filename);
+  int ok = this->Superclass::ReadConfiguration(filename);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -60,13 +59,13 @@ int vtkSMCameraConfigurationReader::ReadConfiguration(const char *filename)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMCameraConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
+int vtkSMCameraConfigurationReader::ReadConfiguration(vtkPVXMLElement* x)
 {
-  int ok=this->Superclass::ReadConfiguration(x);
+  int ok = this->Superclass::ReadConfiguration(x);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -76,6 +75,5 @@ int vtkSMCameraConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
-

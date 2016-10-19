@@ -40,7 +40,8 @@
 
 #include <vector>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // ****************************************************************************
 //  Class:  ConstInterp
 //
@@ -55,9 +56,9 @@ namespace pointsprite {
 template <class T>
 struct ConstInterp
 {
-    inline static void InterpScalar(void *, void *a1,void *a2,        double);
-    inline static void InterpArray(void *,  void *a1,void *a2, int l, double);
-    inline static void InterpVector(void *, void *a1,void *a2,        double);
+  inline static void InterpScalar(void*, void* a1, void* a2, double);
+  inline static void InterpArray(void*, void* a1, void* a2, int l, double);
+  inline static void InterpVector(void*, void* a1, void* a2, double);
 };
 
 // ****************************************************************************
@@ -73,9 +74,9 @@ struct ConstInterp
 template <class T>
 struct LinInterp
 {
-    inline static void InterpScalar(void *, void *a1,void *a2,        double);
-    inline static void InterpArray(void *,  void *a1,void *a2, int l, double);
-    inline static void InterpVector(void *, void *a1,void *a2,        double);
+  inline static void InterpScalar(void*, void* a1, void* a2, double);
+  inline static void InterpArray(void*, void* a1, void* a2, int l, double);
+  inline static void InterpVector(void*, void* a1, void* a2, double);
 };
 
 // ----------------------------------------------------------------------------
@@ -83,8 +84,6 @@ struct LinInterp
 //                               Inline Methods
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-
-
 
 // ****************************************************************************
 //  Methods:  ConstInterp<T>::Interp*
@@ -105,55 +104,52 @@ struct LinInterp
 //
 // ****************************************************************************
 template <class T>
-void
-ConstInterp<T>::InterpScalar(void *out_, void *a1_, void *a2_, double f)
+void ConstInterp<T>::InterpScalar(void* out_, void* a1_, void* a2_, double f)
 {
-    T *out = (T*)out_;
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
+  T* out = (T*)out_;
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  if (f < .5)
+    *out = *a1;
+  else
+    *out = *a2;
+}
+
+template <class T>
+void ConstInterp<T>::InterpArray(void* out_, void* a1_, void* a2_, int l, double f)
+{
+  T* out = (T*)out_;
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  for (int i = 0; i < l; i++)
+  {
     if (f < .5)
-        *out = *a1;
+      out[i] = a1[i];
     else
-        *out = *a2;
+      out[i] = a2[i];
+  }
 }
 
 template <class T>
-void
-ConstInterp<T>::InterpArray(void *out_, void *a1_, void *a2_, int l, double f)
+void ConstInterp<T>::InterpVector(void* out_, void* a1_, void* a2_, double f)
 {
-    T *out = (T*)out_;
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
-    for (int i=0; i<l; i++)
-    {
-        if (f < .5)
-            out[i] = a1[i];
-        else
-            out[i] = a2[i];
-    }
-}
-
-template <class T>
-void
-ConstInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
-{
-    std::vector<T> &out = *(std::vector<T>*)out_;
-    std::vector<T> &a1  = *(std::vector<T>*)a1_;
-    std::vector<T> &a2  = *(std::vector<T>*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 > l2)
-        out = a1;
+  std::vector<T>& out = *(std::vector<T>*)out_;
+  std::vector<T>& a1 = *(std::vector<T>*)a1_;
+  std::vector<T>& a2 = *(std::vector<T>*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 > l2)
+    out = a1;
+  else
+    out = a2;
+  int l = (l1 < l2) ? l1 : l2;
+  for (int i = 0; i < l; i++)
+  {
+    if (f < .5)
+      out[i] = a1[i];
     else
-        out = a2;
-    int l = (l1 < l2) ? l1 : l2;
-    for (int i=0; i<l; i++)
-    {
-        if (f < .5)
-            out[i] = a1[i];
-        else
-            out[i] = a2[i];
-    }
+      out[i] = a2[i];
+  }
 }
 
 // ****************************************************************************
@@ -180,34 +176,33 @@ ConstInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 //    Added template<> to conform to new C++ rules.
 //
 // ****************************************************************************
-template<>
-void
-ConstInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, double f)
+template <>
+void ConstInterp<AttributeGroup*>::InterpVector(void* out_, void* a1_, void* a2_, double f)
 {
-    AttributeGroupVector &out= *(AttributeGroupVector*)out_;
-    AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
-    AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 > l2)
-    {
-        for (int i=l2; i<l1; i++)
-            out[i]->CopyAttributes(a1[i]);
-    }
-    else
-    {
-        for (int i=l1; i<l2; i++)
-            out[i]->CopyAttributes(a2[i]);
-    }
+  AttributeGroupVector& out = *(AttributeGroupVector*)out_;
+  AttributeGroupVector& a1 = *(AttributeGroupVector*)a1_;
+  AttributeGroupVector& a2 = *(AttributeGroupVector*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 > l2)
+  {
+    for (int i = l2; i < l1; i++)
+      out[i]->CopyAttributes(a1[i]);
+  }
+  else
+  {
+    for (int i = l1; i < l2; i++)
+      out[i]->CopyAttributes(a2[i]);
+  }
 
-    int l = (l1 < l2) ? l1 : l2;
-    for (int i=0; i<l; i++)
-    {
-        if (f < .5)
-            out[i]->CopyAttributes(a1[i]);
-        else
-            out[i]->CopyAttributes(a2[i]);
-    }
+  int l = (l1 < l2) ? l1 : l2;
+  for (int i = 0; i < l; i++)
+  {
+    if (f < .5)
+      out[i]->CopyAttributes(a1[i]);
+    else
+      out[i]->CopyAttributes(a2[i]);
+  }
 }
 
 // ****************************************************************************
@@ -228,44 +223,41 @@ ConstInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, dou
 //
 // ****************************************************************************
 template <class T>
-void
-LinInterp<T>::InterpScalar(void *out_, void *a1_, void *a2_, double f)
+void LinInterp<T>::InterpScalar(void* out_, void* a1_, void* a2_, double f)
 {
-    T *out = (T*)out_;
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
-    *out = T((1.0 - f) * (*a1)  +  f * (*a2));
+  T* out = (T*)out_;
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  *out = T((1.0 - f) * (*a1) + f * (*a2));
 }
 
 template <class T>
-void
-LinInterp<T>::InterpArray(void *out_, void *a1_, void *a2_, int l, double f)
+void LinInterp<T>::InterpArray(void* out_, void* a1_, void* a2_, int l, double f)
 {
-    T *out = (T*)out_;
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
-    for (int i=0; i<l; i++)
-    {
-        out[i] = T((1.0 - f) * (a1[i])  +  f * (a2[i]));
-    }
+  T* out = (T*)out_;
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  for (int i = 0; i < l; i++)
+  {
+    out[i] = T((1.0 - f) * (a1[i]) + f * (a2[i]));
+  }
 }
 
 template <class T>
-void
-LinInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
+void LinInterp<T>::InterpVector(void* out_, void* a1_, void* a2_, double f)
 {
-    std::vector<T> &out = *(std::vector<T>*)out_;
-    std::vector<T> &a1  = *(std::vector<T>*)a1_;
-    std::vector<T> &a2  = *(std::vector<T>*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 > l2)
-        out = a1;
-    else
-        out = a2;
-    int l = (l1 < l2) ? l1 : l2;
-    for (int i=0; i<l; i++)
-        out[i] = T((1.0 - f) * (a1[i])  +  f * (a2[i]));
+  std::vector<T>& out = *(std::vector<T>*)out_;
+  std::vector<T>& a1 = *(std::vector<T>*)a1_;
+  std::vector<T>& a2 = *(std::vector<T>*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 > l2)
+    out = a1;
+  else
+    out = a2;
+  int l = (l1 < l2) ? l1 : l2;
+  for (int i = 0; i < l; i++)
+    out[i] = T((1.0 - f) * (a1[i]) + f * (a2[i]));
 }
 
 // ****************************************************************************
@@ -290,43 +282,40 @@ LinInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 //    Added template<> to conform to new C++ rules.
 //
 // ****************************************************************************
-template<>
-void
-LinInterp<int>::InterpScalar(void *out_, void *a1_, void *a2_, double f)
+template <>
+void LinInterp<int>::InterpScalar(void* out_, void* a1_, void* a2_, double f)
 {
-    int *out = (int*)out_;
-    int *a1  = (int*)a1_;
-    int *a2  = (int*)a2_;
-    *out = int((1.0 - f) * (*a1)  +  f * (*a2)  + 0.5);  // round ints
+  int* out = (int*)out_;
+  int* a1 = (int*)a1_;
+  int* a2 = (int*)a2_;
+  *out = int((1.0 - f) * (*a1) + f * (*a2) + 0.5); // round ints
 }
 
-template<>
-void
-LinInterp<int>::InterpArray(void *out_, void *a1_, void *a2_, int l, double f)
+template <>
+void LinInterp<int>::InterpArray(void* out_, void* a1_, void* a2_, int l, double f)
 {
-    int *out = (int*)out_;
-    int *a1  = (int*)a1_;
-    int *a2  = (int*)a2_;
-    for (int i=0; i<l; i++)
-        out[i] = int((1.0 - f) * (a1[i])  +  f * (a2[i])  + 0.5); // round ints
+  int* out = (int*)out_;
+  int* a1 = (int*)a1_;
+  int* a2 = (int*)a2_;
+  for (int i = 0; i < l; i++)
+    out[i] = int((1.0 - f) * (a1[i]) + f * (a2[i]) + 0.5); // round ints
 }
 
-template<>
-void
-LinInterp<int>::InterpVector(void *out_, void *a1_, void *a2_, double f)
+template <>
+void LinInterp<int>::InterpVector(void* out_, void* a1_, void* a2_, double f)
 {
-    std::vector<int> &out = *(std::vector<int>*)out_;
-    std::vector<int> &a1  = *(std::vector<int>*)a1_;
-    std::vector<int> &a2  = *(std::vector<int>*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 > l2)
-        out = a1;
-    else
-        out = a2;
-    int l = (l1 < l2) ? l1 : l2;
-    for (int i=0; i<l; i++)
-        out[i] = int((1.0 - f) * (a1[i])  +  f * (a2[i]));
+  std::vector<int>& out = *(std::vector<int>*)out_;
+  std::vector<int>& a1 = *(std::vector<int>*)a1_;
+  std::vector<int>& a2 = *(std::vector<int>*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 > l2)
+    out = a1;
+  else
+    out = a2;
+  int l = (l1 < l2) ? l1 : l2;
+  for (int i = 0; i < l; i++)
+    out[i] = int((1.0 - f) * (a1[i]) + f * (a2[i]));
 }
 
 // ****************************************************************************
@@ -353,31 +342,30 @@ LinInterp<int>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 //    Added template<> to conform to new C++ rules.
 //
 // ****************************************************************************
-template<>
-void
-LinInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, double f)
+template <>
+void LinInterp<AttributeGroup*>::InterpVector(void* out_, void* a1_, void* a2_, double f)
 {
-    AttributeGroupVector &out= *(AttributeGroupVector*)out_;
-    AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
-    AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 > l2)
-    {
-        for (int i=l2; i<l1; i++)
-            out[i]->CopyAttributes(a1[i]);
-    }
-    else
-    {
-        for (int i=l1; i<l2; i++)
-            out[i]->CopyAttributes(a2[i]);
-    }
+  AttributeGroupVector& out = *(AttributeGroupVector*)out_;
+  AttributeGroupVector& a1 = *(AttributeGroupVector*)a1_;
+  AttributeGroupVector& a2 = *(AttributeGroupVector*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 > l2)
+  {
+    for (int i = l2; i < l1; i++)
+      out[i]->CopyAttributes(a1[i]);
+  }
+  else
+  {
+    for (int i = l1; i < l2; i++)
+      out[i]->CopyAttributes(a2[i]);
+  }
 
-    int l = (l1 < l2) ? l1 : l2;
-    for (int i=0; i<l; i++)
-    {
-        out[i]->InterpolateLinear(a1[i],a2[i],f);
-    }
+  int l = (l1 < l2) ? l1 : l2;
+  for (int i = 0; i < l; i++)
+  {
+    out[i]->InterpolateLinear(a1[i], a2[i], f);
+  }
 }
 }
 #endif

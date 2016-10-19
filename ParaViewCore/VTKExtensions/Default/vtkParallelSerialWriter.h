@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkParallelSerialWriter - parallel meta-writer for serial formats
-// .SECTION Description:
-// vtkParallelSerialWriter is a meta-writer that enables serial writers
-// to work in parallel. It gathers data to the 1st node and invokes the
-// internal writer. The reduction is controlled defined by the PreGatherHelper
-// and PostGatherHelper.
-// This also makes it possible to write time-series for temporal datasets using
-// simple non-time-aware writers.
+/**
+ * @class   vtkParallelSerialWriter
+ * @brief   parallel meta-writer for serial formats
+ *
+ * vtkParallelSerialWriter is a meta-writer that enables serial writers
+ * to work in parallel. It gathers data to the 1st node and invokes the
+ * internal writer. The reduction is controlled defined by the PreGatherHelper
+ * and PostGatherHelper.
+ * This also makes it possible to write time-series for temporal datasets using
+ * simple non-time-aware writers.
+*/
 
 #ifndef vtkParallelSerialWriter_h
 #define vtkParallelSerialWriter_h
@@ -36,85 +39,111 @@ public:
   vtkTypeMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/get the internal writer.
+  //@{
+  /**
+   * Set/get the internal writer.
+   */
   void SetWriter(vtkAlgorithm*);
   vtkGetObjectMacro(Writer, vtkAlgorithm);
+  //@}
 
-  // Description:
-  // Return the MTime also considering the internal writer.
+  /**
+   * Return the MTime also considering the internal writer.
+   */
   virtual vtkMTimeType GetMTime();
 
-  // Description:
-  // Name of the method used to set the file name of the internal
-  // writer. By default, this is SetFileName.
+  //@{
+  /**
+   * Name of the method used to set the file name of the internal
+   * writer. By default, this is SetFileName.
+   */
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
+  //@}
 
-  // Description:
-  // Get/Set the name of the output file.
+  //@{
+  /**
+   * Get/Set the name of the output file.
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Invoke the writer.  Returns 1 for success, 0 for failure.
+  /**
+   * Invoke the writer.  Returns 1 for success, 0 for failure.
+   */
   int Write();
 
-  // Description:
-  // Get/Set the piece number to write.  The same piece number is used
-  // for all inputs.
+  //@{
+  /**
+   * Get/Set the piece number to write.  The same piece number is used
+   * for all inputs.
+   */
   vtkGetMacro(Piece, int);
   vtkSetMacro(Piece, int);
+  //@}
 
-  // Description:
-  // Get/Set the number of pieces into which the inputs are split.
+  //@{
+  /**
+   * Get/Set the number of pieces into which the inputs are split.
+   */
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
+  //@}
 
-  // Description:
-  // Get/Set the number of ghost levels to be written.
+  //@{
+  /**
+   * Get/Set the number of ghost levels to be written.
+   */
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
+  //@}
 
-  // Description:
-  // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm
-  // that runs on each node's data before it is sent to the root.
+  //@{
+  /**
+   * Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm
+   * that runs on each node's data before it is sent to the root.
+   */
   void SetPreGatherHelper(vtkAlgorithm*);
   vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
+  //@}
 
-  // Description:
-  // Get/Set the reduction helper. Reduction helper is an algorithm with
-  // multiple input connections, that produces a single output as
-  // the reduced output. This is run on the root node to produce a result
-  // from the gathered results of each node.
+  //@{
+  /**
+   * Get/Set the reduction helper. Reduction helper is an algorithm with
+   * multiple input connections, that produces a single output as
+   * the reduced output. This is run on the root node to produce a result
+   * from the gathered results of each node.
+   */
   void SetPostGatherHelper(vtkAlgorithm*);
   vtkGetObjectMacro(PostGatherHelper, vtkAlgorithm);
+  //@}
 
-  // Description:
-  // Must be set to true to write all timesteps, otherwise only the current
-  // timestep will be written out. Off by default.
+  //@{
+  /**
+   * Must be set to true to write all timesteps, otherwise only the current
+   * timestep will be written out. Off by default.
+   */
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
+  //@}
 
-  // Description:
-  // Get/Set the interpreter to use to call methods on the writer.
-  void SetInterpreter(vtkClientServerInterpreter* interp)
-    { this->Interpreter = interp; }
+  /**
+   * Get/Set the interpreter to use to call methods on the writer.
+   */
+  void SetInterpreter(vtkClientServerInterpreter* interp) { this->Interpreter = interp; }
 
 protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter();
 
-  int RequestInformation(vtkInformation* request,
-                         vtkInformationVector** inputVector,
-                         vtkInformationVector* outputVector);
-  int RequestUpdateExtent(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
-  int RequestData(vtkInformation* request,
-                  vtkInformationVector** inputVector,
-                  vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
@@ -143,7 +172,6 @@ private:
   char* FileName;
 
   vtkClientServerInterpreter* Interpreter;
-
 };
 
 #endif

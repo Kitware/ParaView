@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,7 +46,9 @@ class QString;
 class vtkImageData;
 class vtkRenderWindow;
 
-/// Provides ParaView-specific functionality for regression testing
+/**
+* Provides ParaView-specific functionality for regression testing
+*/
 class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
 {
   Q_OBJECT
@@ -57,57 +59,56 @@ public:
   ~pqCoreTestUtility();
 
 public:
-  /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
-  /// (slashes forward), or empty string
+  /**
+  * Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
+  * (slashes forward), or empty string
+  */
   static QString DataRoot();
 
-  /// Returns the temporary test directory in which tests can write
-  /// temporary outputs, difference images etc.
+  /**
+  * Returns the temporary test directory in which tests can write
+  * temporary outputs, difference images etc.
+  */
   static QString TestDirectory();
 
-  /// Returns the baseline directory in which test recorder will write
-  /// baseline images.
+  /**
+  * Returns the baseline directory in which test recorder will write
+  * baseline images.
+  */
   static QString BaselineDirectory();
 
-
-  /// Saves the contents of a render window to a file for later use as a
-  /// reference image
+  /**
+  * Saves the contents of a render window to a file for later use as a
+  * reference image
+  */
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
 
-  /// Compares the contents of a render window to a reference image,
-  /// returning true iff the two match within a given threshold
-  static bool CompareImage(vtkRenderWindow* RenderWindow, 
-                           const QString& ReferenceImage, 
-                           double Threshold, 
-                           ostream& Output, 
-                           const QString& TempDirectory);
+  /**
+  * Compares the contents of a render window to a reference image,
+  * returning true iff the two match within a given threshold
+  */
+  static bool CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage,
+    double Threshold, ostream& Output, const QString& TempDirectory);
 
-  /// Compares the test image to a reference image,
-  /// returning true iff the two match within a given threshold
-  static bool CompareImage(vtkImageData* testImage,
-                           const QString& ReferenceImage, 
-                           double Threshold, 
-                           ostream& Output, 
-                           const QString& TempDirectory);
+  /**
+  * Compares the test image to a reference image,
+  * returning true iff the two match within a given threshold
+  */
+  static bool CompareImage(vtkImageData* testImage, const QString& ReferenceImage, double Threshold,
+    ostream& Output, const QString& TempDirectory);
 
-  static bool CompareImage(const QString& testPNGImage,
-                           const QString& ReferenceImage, 
-                           double Threshold, 
-                           ostream& Output, 
-                           const QString& TempDirectory);
+  static bool CompareImage(const QString& testPNGImage, const QString& ReferenceImage,
+    double Threshold, ostream& Output, const QString& TempDirectory);
 
-  /// Compares the contents of any arbitrary QWidget to a reference image,
-  /// returning true iff the two match within a given threshold
-  static bool CompareImage(QWidget* widget,
-                           const QString& referenceImage, 
-                           double threshold, 
-                           ostream& output,
-                           const QString& tempDirectory,
-                           const QSize& size = QSize(300, 300));
+  /**
+  * Compares the contents of any arbitrary QWidget to a reference image,
+  * returning true iff the two match within a given threshold
+  */
+  static bool CompareImage(QWidget* widget, const QString& referenceImage, double threshold,
+    ostream& output, const QString& tempDirectory, const QSize& size = QSize(300, 300));
 
-  static bool CompareView(pqView* curView,
-    const QString& referenceImage, double threshold, const QString& tempDirectory,
-    const QSize& size=QSize());
+  static bool CompareView(pqView* curView, const QString& referenceImage, double threshold,
+    const QString& tempDirectory, const QSize& size = QSize());
 
   static const char* PQ_COMPAREVIEW_PROPERTY_NAME;
 
@@ -116,4 +117,3 @@ private:
 };
 
 #endif // !_pqCoreTestUtility_h
-

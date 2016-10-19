@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -41,57 +41,66 @@ class vtkEventQtSlotConnect;
 class vtkSMComparativeAnimationCueProxy;
 class vtkSMProxy;
 
-/// pqComparativeCueWidget is designed to be used by
-/// pqComparativeVisPanel to show/edit the values for an
-/// vtkSMComparativeAnimationCueProxy.
+/**
+* pqComparativeCueWidget is designed to be used by
+* pqComparativeVisPanel to show/edit the values for an
+* vtkSMComparativeAnimationCueProxy.
+*/
 class PQCOMPONENTS_EXPORT pqComparativeCueWidget : public QTableWidget
 {
   Q_OBJECT
   typedef QTableWidget Superclass;
+
 public:
-  pqComparativeCueWidget(QWidget* parent=0);
+  pqComparativeCueWidget(QWidget* parent = 0);
   virtual ~pqComparativeCueWidget();
 
-  /// Get/Set the cue that is currently being shown/edited by this widget.
+  /**
+  * Get/Set the cue that is currently being shown/edited by this widget.
+  */
   void setCue(vtkSMProxy*);
   vtkSMComparativeAnimationCueProxy* cue() const;
 
-  QSize size() const
-    { return this->Size; }
+  QSize size() const { return this->Size; }
 
   // Returns if this cue can accept more than 1 value as a parameter value.
   bool acceptsMultipleValues() const;
 
 public slots:
-  /// Set the comparative grid size.
+  /**
+  * Set the comparative grid size.
+  */
   void setSize(int w, int h)
-    { 
+  {
     this->Size = QSize(w, h);
     this->updateGUIOnIdle();
-    }
+  }
 
 signals:
   // triggered every time the user changes the values.
   void valuesChanged();
 
 protected slots:
-  /// refreshes the GUI with values from the proxy.
+  /**
+  * refreshes the GUI with values from the proxy.
+  */
   void updateGUI();
 
-  void updateGUIOnIdle()
-    { this->IdleUpdateTimer.start(); }
+  void updateGUIOnIdle() { this->IdleUpdateTimer.start(); }
 
-  void onSelectionChanged()
-    { this->SelectionChanged = true; }
+  void onSelectionChanged() { this->SelectionChanged = true; }
 
   void onCellChanged(int x, int y);
 
 protected:
-  /// called when mouse is released. We use this to popup the range editing
-  /// dialog if the selection changed.
+  /**
+  * called when mouse is released. We use this to popup the range editing
+  * dialog if the selection changed.
+  */
   virtual void mouseReleaseEvent(QMouseEvent* evt);
 
   void editRange();
+
 private:
   Q_DISABLE_COPY(pqComparativeCueWidget)
 
@@ -104,5 +113,3 @@ private:
 };
 
 #endif
-
-

@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// FunctionalBag chart view
+/**
+* FunctionalBag chart view
+*/
 class PQCORE_EXPORT pqXYFunctionalBagChartView : public pqContextView
 {
   Q_OBJECT
@@ -49,11 +51,8 @@ public:
   virtual bool supportsSelection() const { return true; }
 
 public:
-  pqXYFunctionalBagChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  pqXYFunctionalBagChartView(const QString& group, const QString& name,
+    vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
 
   virtual ~pqXYFunctionalBagChartView();
 

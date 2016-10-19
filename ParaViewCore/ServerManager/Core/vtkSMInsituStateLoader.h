@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInsituStateLoader
-// .SECTION Description
-//
+/**
+ * @class   vtkSMInsituStateLoader
+ *
+ *
+*/
 
 #ifndef vtkSMInsituStateLoader_h
 #define vtkSMInsituStateLoader_h
@@ -33,14 +35,14 @@ protected:
   vtkSMInsituStateLoader();
   ~vtkSMInsituStateLoader();
 
-  // Description:
-  // Overridden to try to reuse existing proxies as much as possible.
+  /**
+   * Overridden to try to reuse existing proxies as much as possible.
+   */
   virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator);
 
 private:
   vtkSMInsituStateLoader(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

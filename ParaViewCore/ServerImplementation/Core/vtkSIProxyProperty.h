@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIProxyProperty
-// .SECTION Description
-// ServerSide Property use to set Object array as method argument.
-// Those object could be either SMProxy instance or their SIProxy instance
-// or the VTK object managed by the SIProxy instance. The type of object is
-// specified inside the XML definition of the property with the attribute
-// argument_type=[VTK, SMProxy, SIProxy].
+/**
+ * @class   vtkSIProxyProperty
+ *
+ * ServerSide Property use to set Object array as method argument.
+ * Those object could be either SMProxy instance or their SIProxy instance
+ * or the VTK object managed by the SIProxy instance. The type of object is
+ * specified inside the XML definition of the property with the attribute
+ * argument_type=[VTK, SMProxy, SIProxy].
+*/
 
 #ifndef vtkSIProxyProperty_h
 #define vtkSIProxyProperty_h
@@ -33,18 +35,24 @@ public:
   vtkTypeMacro(vtkSIProxyProperty, vtkSIProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Command that can be used to remove inputs. If set, this
-  // command is called before the main Command is called with
-  // all the arguments.
+  //@{
+  /**
+   * Command that can be used to remove inputs. If set, this
+   * command is called before the main Command is called with
+   * all the arguments.
+   */
   vtkGetStringMacro(CleanCommand);
+  //@}
 
-  // Description:
-  // Remove command is the command called to remove the VTK
-  // object on the server-side. If set, CleanCommand is ignored.
-  // Instead for every proxy that was absent from the proxies
-  // previously pushed, the RemoveCommand is invoked.
+  //@{
+  /**
+   * Remove command is the command called to remove the VTK
+   * object on the server-side. If set, CleanCommand is ignored.
+   * Instead for every proxy that was absent from the proxies
+   * previously pushed, the RemoveCommand is invoked.
+   */
   vtkGetStringMacro(RemoveCommand);
+  //@}
 
   // When set to true, the property will push a NULL i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
@@ -55,28 +63,36 @@ protected:
   vtkSIProxyProperty();
   ~vtkSIProxyProperty();
 
-  // Description:
-  // Push a new state to the underneath implementation
+  /**
+   * Push a new state to the underneath implementation
+   */
   virtual bool Push(vtkSMMessage*, int);
 
-  // Description:
-  // Parse the xml for the property.
+  /**
+   * Parse the xml for the property.
+   */
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 
-  // Description:
-  // Command that can be used to remove inputs. If set, this
-  // command is called before the main Command is called with
-  // all the arguments.
+  //@{
+  /**
+   * Command that can be used to remove inputs. If set, this
+   * command is called before the main Command is called with
+   * all the arguments.
+   */
   vtkSetStringMacro(CleanCommand);
   char* CleanCommand;
+  //@}
 
-  // Description:
-  // Remove command is the command called to remove the VTK
-  // object on the server-side. If set, CleanCommand is ignored.
-  // Instead for every proxy that was absent from the proxies
-  // previously pushed, the RemoveCommand is invoked.
+  //@{
+  /**
+   * Remove command is the command called to remove the VTK
+   * object on the server-side. If set, CleanCommand is ignored.
+   * Instead for every proxy that was absent from the proxies
+   * previously pushed, the RemoveCommand is invoked.
+   */
   vtkSetStringMacro(RemoveCommand);
   char* RemoveCommand;
+  //@}
 
   // When set to true, the property will push a NULL i.e. 0 when there are no
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
@@ -84,10 +100,12 @@ protected:
   vtkSetMacro(NullOnEmpty, bool);
   bool NullOnEmpty;
 
-
-  enum TypeArg {
-    VTK, SMProxy, SIProxy
-    };
+  enum TypeArg
+  {
+    VTK,
+    SMProxy,
+    SIProxy
+  };
 
   // Proxy type: VTK (default), SMProxy, Kernel,
   // In the XML we expect argument_type="VTK"     (default value if not set)
@@ -105,11 +123,10 @@ private:
   vtkSIProxyProperty(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
   class InternalCache;
-  InternalCache *Cache;
+  InternalCache* Cache;
 
   class vtkObjectCache;
   vtkObjectCache* ObjectCache;
-
 };
 
 #endif

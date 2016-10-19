@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSITimeLabelProperty
-// .SECTION Description
-// SIProperty that deals with TimeLabel annotation on Algorithm object type
+/**
+ * @class   vtkSITimeLabelProperty
+ *
+ * SIProperty that deals with TimeLabel annotation on Algorithm object type
+*/
 
 #ifndef vtkSITimeLabelProperty_h
 #define vtkSITimeLabelProperty_h
@@ -35,14 +37,14 @@ protected:
 
   friend class vtkSIProxy;
 
-  // Description:
-  // Pull the current state of the underneath implementation
+  /**
+   * Pull the current state of the underneath implementation
+   */
   virtual bool Pull(vtkSMMessage*);
 
 private:
   vtkSITimeLabelProperty(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

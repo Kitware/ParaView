@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,59 +36,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QVector>
 
-pqDelimitedTextParser::pqDelimitedTextParser(SeriesT series, char delimiter) :
-  Series(series),
-  Delimiter(delimiter)
+pqDelimitedTextParser::pqDelimitedTextParser(SeriesT series, char delimiter)
+  : Series(series)
+  , Delimiter(delimiter)
 {
 }
 
 void pqDelimitedTextParser::parse(const QString& path)
 {
   QFile file(path);
-  if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     return;
-    
-  switch(this->Series)
-    {
+
+  switch (this->Series)
+  {
     case COLUMN_SERIES:
       this->parseColumns(file);
       break;
-    }
+  }
 }
 
 void pqDelimitedTextParser::parseColumns(QIODevice& stream)
 {
   QVector<QStringList> series;
-  
+
   emit startParsing();
-  
-  for(;;)
-    {
+
+  for (;;)
+  {
     QByteArray line = stream.readLine();
 
     int column = 0;
     int begin = 0;
-    
-    for(int i = 0; i < line.size(); ++i)
+
+    for (int i = 0; i < line.size(); ++i)
+    {
+      if (line[i] == this->Delimiter || i == line.size() - 1)
       {
-      if(line[i] == this->Delimiter || i == line.size() - 1)
-        {
-        while(series.size() <= column)
+        while (series.size() <= column)
           series.push_back(QStringList());
-          
+
         series[column].push_back(QString(line.mid(begin, i - begin)));
-        
+
         ++column;
-        begin = i+1;
-        }
+        begin = i + 1;
       }
-    
-    if(stream.atEnd())
-      break;
     }
-  
-  for(int i = 0; i != series.size(); ++i)
+
+    if (stream.atEnd())
+      break;
+  }
+
+  for (int i = 0; i != series.size(); ++i)
     emit parseSeries(series[i]);
-  
+
   emit finishParsing();
 }

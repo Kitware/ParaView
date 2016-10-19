@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,14 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLockPanelsBehavior;
 class QMainWindow;
 
-/// @ingroup Reactions
-/// Reaction to toggle locking of dockable panels.
-/// Note: For this reaction to have any effect on the dockable panels,
-/// a pqLockPanelsBehavior must be instantiated.
+/**
+* @ingroup Reactions
+* Reaction to toggle locking of dockable panels.
+* Note: For this reaction to have any effect on the dockable panels,
+* a pqLockPanelsBehavior must be instantiated.
+*/
 class pqLockPanelsReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqLockPanelsReaction(QAction* action);
   ~pqLockPanelsReaction();

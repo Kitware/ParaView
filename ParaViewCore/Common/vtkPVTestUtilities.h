@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTestUtilities - A class to facilitate common test operations
-// .SECTION Description
-//
+/**
+ * @class   vtkPVTestUtilities
+ * @brief   A class to facilitate common test operations
+ *
+ *
+*/
 
 #ifndef vtkPVTestUtilities_h
 #define vtkPVTestUtilities_h
@@ -29,50 +32,51 @@ class VTKPVCOMMON_EXPORT vtkPVTestUtilities : public vtkObject
 {
 public:
   // the usual vtk stuff
-  vtkTypeMacro(vtkPVTestUtilities,vtkObject);
+  vtkTypeMacro(vtkPVTestUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkPVTestUtilities *New();
+  static vtkPVTestUtilities* New();
 
-  // Description:
-  // Initialize the object from command tail arguments.
-  void Initialize(int argc, char **argv);
-  // Description:
-  // Given a path relative to the Data root (provided
-  // in argv by -D option), construct a OS independent path
-  // to the file specified by "name". "name" should not start
-  // with a path seperator and if path seperators are needed
-  // use '/'. Be sure to delete [] the return when you are
-  // finished.
-  char *GetDataFilePath(const char *name) {
-    return this->GetFilePath(this->DataRoot,name); }
-  // Description:
-  // Given a path relative to the working directory (provided
-  // in argv by -T option), construct a OS independent path
-  // to the file specified by "name". "name" should not start
-  // with a path seperator and if path seperators are needed
-  // use '/'. Be sure to delete [] the return when you are
-  // finished.
-  char *GetTempFilePath(const char *name) {
-    return this->GetFilePath(this->TempRoot,name); }
+  /**
+   * Initialize the object from command tail arguments.
+   */
+  void Initialize(int argc, char** argv);
+  /**
+   * Given a path relative to the Data root (provided
+   * in argv by -D option), construct a OS independent path
+   * to the file specified by "name". "name" should not start
+   * with a path seperator and if path seperators are needed
+   * use '/'. Be sure to delete [] the return when you are
+   * finished.
+   */
+  char* GetDataFilePath(const char* name) { return this->GetFilePath(this->DataRoot, name); }
+  /**
+   * Given a path relative to the working directory (provided
+   * in argv by -T option), construct a OS independent path
+   * to the file specified by "name". "name" should not start
+   * with a path seperator and if path seperators are needed
+   * use '/'. Be sure to delete [] the return when you are
+   * finished.
+   */
+  char* GetTempFilePath(const char* name) { return this->GetFilePath(this->TempRoot, name); }
 
 protected:
-  vtkPVTestUtilities(){ this->Initialize(0,0); }
-  ~vtkPVTestUtilities(){ this->Initialize(0,0); }
+  vtkPVTestUtilities() { this->Initialize(0, 0); }
+  ~vtkPVTestUtilities() { this->Initialize(0, 0); }
 
 private:
-  vtkPVTestUtilities(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTestUtilities &) VTK_DELETE_FUNCTION;
+  vtkPVTestUtilities(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
   ///
   char GetPathSep();
-  char *GetDataRoot();
-  char *GetTempRoot();
-  char *GetCommandTailArgument(const char *tag);
-  char *GetFilePath(const char *base, const char *name);
+  char* GetDataRoot();
+  char* GetTempRoot();
+  char* GetCommandTailArgument(const char* tag);
+  char* GetFilePath(const char* base, const char* name);
   //
   int Argc;
-  char **Argv;
-  char *DataRoot;
-  char *TempRoot;
+  char** Argv;
+  char* DataRoot;
+  char* TempRoot;
 };
 
 #endif

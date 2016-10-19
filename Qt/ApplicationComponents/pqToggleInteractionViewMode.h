@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -37,17 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqView;
 
-/// @ingroup Reactions
-/// pqToggleInteractionViewMode is a reaction that toggle 2D/3D interaction mode
+/**
+* @ingroup Reactions
+* pqToggleInteractionViewMode is a reaction that toggle 2D/3D interaction mode
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqToggleInteractionViewMode : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  pqToggleInteractionViewMode(QAction* parent, pqView* view=0);
+  pqToggleInteractionViewMode(QAction* parent, pqView* view = 0);
 
 protected:
-  /// Called when the action is triggered.
+  /**
+  * Called when the action is triggered.
+  */
   virtual void onTriggered();
 
 public slots:
@@ -59,5 +64,3 @@ private:
 };
 
 #endif
-
-

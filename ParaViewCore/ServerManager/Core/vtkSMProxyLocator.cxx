@@ -56,40 +56,40 @@ vtkSMProxy* vtkSMProxyLocator::LocateProxy(vtkTypeUInt32 id)
   // Look in the cache first
   vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.find(id);
   if (iter != this->Internal->Proxies.end())
-    {
+  {
     return iter->second.GetPointer();
-    }
+  }
 
   // if custom assignments are specified, use those.
   iter = this->Internal->AssignedProxies.find(id);
   if (iter != this->Internal->AssignedProxies.end())
-    {
+  {
     if (iter->second.GetPointer() != NULL)
-      {
+    {
       // add to the Proxies map.
       this->Internal->Proxies[id] = iter->second;
-      }
-    return iter->second.GetPointer();
     }
+    return iter->second.GetPointer();
+  }
 
   // Try to lookup in session (if we setup the locator to use the session too)
   vtkSMProxy* proxy;
-  if(this->LocateProxyWithSessionToo && this->Session)
-    {
+  if (this->LocateProxyWithSessionToo && this->Session)
+  {
     proxy = vtkSMProxy::SafeDownCast(this->Session->GetRemoteObject(id));
-    if(proxy)
-      {
+    if (proxy)
+    {
       this->Internal->Proxies[id] = proxy;
       return proxy;
-      }
     }
+  }
 
   // Create a brand new proxy
   proxy = this->NewProxy(id);
   if (proxy)
-    {
+  {
     this->Internal->Proxies[id].TakeReference(proxy);
-    }
+  }
 
   return proxy;
 }
@@ -104,12 +104,12 @@ void vtkSMProxyLocator::Clear()
 vtkSMProxy* vtkSMProxyLocator::NewProxy(vtkTypeUInt32 id)
 {
   if (this->Deserializer)
-    {
+  {
     // Ask the deserializer to create a new proxy with the given id. The
     // deserializer will locate the State(XML/Protobuf) for the proxy with
     // that id, and load the state on it and then return this fresh proxy, if possible.
     return this->Deserializer->NewProxy(id, this);
-    }
+  }
   return 0;
 }
 
@@ -129,17 +129,17 @@ void vtkSMProxyLocator::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMProxyLocator::GetLocatedProxies(vtkCollection* collectionToFill)
 {
-  if(!collectionToFill)
-    {
+  if (!collectionToFill)
+  {
     return;
-    }
+  }
 
   vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.begin();
-  while(iter != this->Internal->Proxies.end())
-    {
+  while (iter != this->Internal->Proxies.end())
+  {
     collectionToFill->AddItem(iter->second.GetPointer());
     iter++;
-    }
+  }
 }
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMProxyLocator::GetSession()
@@ -151,8 +151,7 @@ void vtkSMProxyLocator::SetSession(vtkSMSession* s)
 {
   this->Session = s;
   if (this->Deserializer)
-    {
-    this->Deserializer->SetSessionProxyManager(
-      s? s->GetSessionProxyManager() : NULL);
-    }
+  {
+    this->Deserializer->SetSessionProxyManager(s ? s->GetSessionProxyManager() : NULL);
+  }
 }

@@ -36,28 +36,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineRepresentation;
 
-/// @ingroup Reactions
-/// Reaction to customize the active lookup table's range.
+/**
+* @ingroup Reactions
+* Reaction to customize the active lookup table's range.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqRescaleVisibleScalarRangeReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqRescaleVisibleScalarRangeReaction(QAction* parent);
 
   void rescaleVisibleScalarRange();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    {
-    pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange();
-    }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange(); }
 
 private:
   Q_DISABLE_COPY(pqRescaleVisibleScalarRangeReaction)

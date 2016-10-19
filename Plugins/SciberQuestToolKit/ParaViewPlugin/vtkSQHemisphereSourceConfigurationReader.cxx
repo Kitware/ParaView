@@ -51,16 +51,17 @@ vtkSQHemisphereSourceConfigurationReader::vtkSQHemisphereSourceConfigurationRead
 
 //-----------------------------------------------------------------------------
 vtkSQHemisphereSourceConfigurationReader::~vtkSQHemisphereSourceConfigurationReader()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(const char *filename)
+int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(const char* filename)
 {
-  int ok=this->Superclass::ReadConfiguration(filename);
+  int ok = this->Superclass::ReadConfiguration(filename);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -68,13 +69,13 @@ int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(const char *file
 }
 
 //-----------------------------------------------------------------------------
-int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement *x)
+int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement* x)
 {
-  int ok=this->Superclass::ReadConfiguration(x);
+  int ok = this->Superclass::ReadConfiguration(x);
   if (!ok)
-    {
+  {
     return 0;
-    }
+  }
 
   this->GetProxy()->UpdateVTKObjects();
 
@@ -84,5 +85,5 @@ int vtkSQHemisphereSourceConfigurationReader::ReadConfiguration(vtkPVXMLElement 
 //-----------------------------------------------------------------------------
 void vtkSQHemisphereSourceConfigurationReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

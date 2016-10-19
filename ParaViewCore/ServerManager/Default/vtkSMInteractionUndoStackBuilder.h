@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInteractionUndoStackBuilder - builder server manager undo
-// sets for render view interactions and pushes them on the undo stack.
-// .SECTION Description
-// vtkSMInteractionUndoStackBuilder specializes in interaction.
-// This class can create undo elements for only one render view
-// at a time.
+/**
+ * @class   vtkSMInteractionUndoStackBuilder
+ * @brief   builder server manager undo
+ * sets for render view interactions and pushes them on the undo stack.
+ *
+ * vtkSMInteractionUndoStackBuilder specializes in interaction.
+ * This class can create undo elements for only one render view
+ * at a time.
+*/
 
 #ifndef vtkSMInteractionUndoStackBuilder_h
 #define vtkSMInteractionUndoStackBuilder_h
@@ -37,37 +40,45 @@ public:
   vtkTypeMacro(vtkSMInteractionUndoStackBuilder, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the render view proxy for which we are monitoring the
-  // interactions.
+  //@{
+  /**
+   * Get/Set the render view proxy for which we are monitoring the
+   * interactions.
+   */
   void SetRenderView(vtkSMRenderViewProxy*);
   vtkGetObjectMacro(RenderView, vtkSMRenderViewProxy);
+  //@}
 
-  // Description:
-  // Get/Set the undo stack that this builder will build.
+  //@{
+  /**
+   * Get/Set the undo stack that this builder will build.
+   */
   vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
   virtual void SetUndoStack(vtkSMUndoStack*);
+  //@}
 
-  // Description:
-  // Clear the undo set currently being recorded.
+  /**
+   * Clear the undo set currently being recorded.
+   */
   void Clear();
 
-
-  // Description:
-  // Called to record the state at the beginning of an interaction.
-  // Usually, this method isn't called directly, since the builder
-  // listens to interaction events on the interactor and calls it
-  // automatically. May be used when changing the camera
-  // programatically.
+  /**
+   * Called to record the state at the beginning of an interaction.
+   * Usually, this method isn't called directly, since the builder
+   * listens to interaction events on the interactor and calls it
+   * automatically. May be used when changing the camera
+   * programatically.
+   */
   void StartInteraction();
 
-  // Description:
-  // Called to record the state at the end of an interaction and push
-  // it on the stack.
-  // Usually, this method isn't called directly, since the builder
-  // listens to interaction events on the interactor and calls it
-  // automatically. May be used when changing the camera
-  // programatically.
+  /**
+   * Called to record the state at the end of an interaction and push
+   * it on the stack.
+   * Usually, this method isn't called directly, since the builder
+   * listens to interaction events on the interactor and calls it
+   * automatically. May be used when changing the camera
+   * programatically.
+   */
   void EndInteraction();
 
 protected:
@@ -78,23 +89,20 @@ protected:
   vtkSMUndoStack* UndoStack;
   vtkUndoSet* UndoSet;
 
-
-  // Description:
-  // Event handler.
+  /**
+   * Event handler.
+   */
   void ExecuteEvent(vtkObject* caller, unsigned long event, void* data);
-
 
   void PropertyModified(const char* pname);
 
   friend class vtkSMInteractionUndoStackBuilderObserver;
+
 private:
   vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
 
-
   vtkSMInteractionUndoStackBuilderObserver* Observer;
-
 };
-
 
 #endif

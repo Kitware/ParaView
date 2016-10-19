@@ -39,7 +39,8 @@
 #define GAUSSIANCONTROLPOINT_H
 #include <AttributeSubject.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // ****************************************************************************
 // Class: GaussianControlPoint
 //
@@ -58,54 +59,52 @@ namespace pointsprite {
 class GaussianControlPoint : public AttributeSubject
 {
 public:
-    GaussianControlPoint();
-    GaussianControlPoint(const GaussianControlPoint &obj);
-    virtual ~GaussianControlPoint();
+  GaussianControlPoint();
+  GaussianControlPoint(const GaussianControlPoint& obj);
+  virtual ~GaussianControlPoint();
 
-    virtual void operator = (const GaussianControlPoint &obj);
-    virtual bool operator == (const GaussianControlPoint &obj) const;
-    virtual bool operator != (const GaussianControlPoint &obj) const;
+  virtual void operator=(const GaussianControlPoint& obj);
+  virtual bool operator==(const GaussianControlPoint& obj) const;
+  virtual bool operator!=(const GaussianControlPoint& obj) const;
 
-    virtual const std::string TypeName() const;
-    virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const std::string &) const;
-    virtual AttributeSubject *NewInstance(bool) const;
+  virtual const std::string TypeName() const;
+  virtual bool CopyAttributes(const AttributeGroup*);
+  virtual AttributeSubject* CreateCompatible(const std::string&) const;
+  virtual AttributeSubject* NewInstance(bool) const;
 
-    // Property selection methods
-    virtual void SelectAll();
+  // Property selection methods
+  virtual void SelectAll();
 
-    // Property setting methods
-    void SetX(float x_);
-    void SetHeight(float height_);
-    void SetWidth(float width_);
-    void SetXBias(float xBias_);
-    void SetYBias(float yBias_);
+  // Property setting methods
+  void SetX(float x_);
+  void SetHeight(float height_);
+  void SetWidth(float width_);
+  void SetXBias(float xBias_);
+  void SetYBias(float yBias_);
 
-    // Property getting methods
-    float GetX() const;
-    float GetHeight() const;
-    float GetWidth() const;
-    float GetXBias() const;
-    float GetYBias() const;
+  // Property getting methods
+  float GetX() const;
+  float GetHeight() const;
+  float GetWidth() const;
+  float GetXBias() const;
+  float GetYBias() const;
 
-    // Persistence methods
-    virtual bool CreateNode(DataNode *node, bool completeSave, bool forceAdd);
-    virtual void SetFromNode(DataNode *node);
+  // Persistence methods
+  virtual bool CreateNode(DataNode* node, bool completeSave, bool forceAdd);
+  virtual void SetFromNode(DataNode* node);
 
-
-    // Keyframing methods
-    virtual std::string               GetFieldName(int index) const;
-    virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual std::string               GetFieldTypeName(int index) const;
-    virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
+  // Keyframing methods
+  virtual std::string GetFieldName(int index) const;
+  virtual AttributeGroup::FieldType GetFieldType(int index) const;
+  virtual std::string GetFieldTypeName(int index) const;
+  virtual bool FieldsEqual(int index, const AttributeGroup* rhs) const;
 
 private:
-    float x;
-    float height;
-    float width;
-    float xBias;
-    float yBias;
+  float x;
+  float height;
+  float width;
+  float xBias;
+  float yBias;
 };
-
 }
 #endif

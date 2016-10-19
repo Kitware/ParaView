@@ -69,24 +69,22 @@ void vtkPVCameraKeyFrame::SetParallelScale(double scale)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::UpdateValue( double currenttime,
-                                       vtkPVAnimationCue* cue,
-                                       vtkPVKeyFrame* next)
+void vtkPVCameraKeyFrame::UpdateValue(
+  double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next)
 {
-  vtkPVCameraAnimationCue* cameraCue =
-    vtkPVCameraAnimationCue::SafeDownCast(cue);
+  vtkPVCameraAnimationCue* cameraCue = vtkPVCameraAnimationCue::SafeDownCast(cue);
   if (!cameraCue)
-    {
+  {
     vtkErrorMacro("This keyframe can only be added to "
-      "vtkPVCameraCueManipulator.");
+                  "vtkPVCameraCueManipulator.");
     return;
-    }
+  }
   if (!cameraCue->GetCamera())
-    {
+  {
     return;
-    }
+  }
   if (next == this)
-    {
+  {
     assert(currenttime == 0.0);
     // Happens for the last keyframe. In PATH based animations, the last
     // keyframe is bogus, we really want to the previous keyframe to handle
@@ -95,15 +93,15 @@ void vtkPVCameraKeyFrame::UpdateValue( double currenttime,
     manip = vtkPVCameraCueManipulator::SafeDownCast(cue->GetManipulator());
 
     if (manip)
-      {
+    {
       vtkPVKeyFrame* kf = manip->GetPreviousKeyFrame(this);
       if (kf && kf != this)
-        {
+      {
         kf->UpdateValue(1.0, cue, this);
         return;
-        }
       }
     }
+  }
 
   // Local vars
   vtkCamera* camera = vtkCamera::New();
@@ -178,9 +176,8 @@ void vtkPVCameraKeyFrame::SetClosedPositionPath(bool val)
   this->Modified();
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVCameraKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Camera: " << this->Camera << endl;

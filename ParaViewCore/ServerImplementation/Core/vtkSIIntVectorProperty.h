@@ -12,10 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIIntVectorProperty
-// .SECTION Description
-// ServerSide Property use to set int array as method argument.
-
+/**
+ * @class   vtkSIIntVectorProperty
+ *
+ * ServerSide Property use to set int array as method argument.
+*/
 
 #ifndef vtkSIIntVectorProperty_h
 #define vtkSIIntVectorProperty_h
@@ -44,7 +45,6 @@ protected:
 private:
   vtkSIIntVectorProperty(const vtkSIIntVectorProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSIIntVectorProperty&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

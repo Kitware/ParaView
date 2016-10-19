@@ -35,23 +35,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QDebug>
 
-/// pqDebugType provides a mechanism for application to define categories for
-/// debugging various components of the UI. By passing an appropriate name for
-/// the envVariable in the constructor, the debug output will only be
-/// generated when that variable is set.
-/// For example, if you want to put out debug messages when an environment
-/// variable MY_DEBUG_FOO is defined, you can do the following:
-/// \code{.cpp}
-///   pqDebug("MY_DEBUG_FOO") << "This will be printed when MY_DEBUG_FOO "
-///                           << "is defined.";
-/// \endcode
+/**
+* pqDebugType provides a mechanism for application to define categories for
+* debugging various components of the UI. By passing an appropriate name for
+* the envVariable in the constructor, the debug output will only be
+* generated when that variable is set.
+* For example, if you want to put out debug messages when an environment
+* variable MY_DEBUG_FOO is defined, you can do the following:
+* \code{.cpp}
+*   pqDebug("MY_DEBUG_FOO") << "This will be printed when MY_DEBUG_FOO "
+*                           << "is defined.";
+* \endcode
+*/
 class PQCORE_EXPORT pqDebugType
 {
 protected:
   bool Enabled;
 
 public:
-  pqDebugType(const QString& envVariable=QString());
+  pqDebugType(const QString& envVariable = QString());
 
   virtual ~pqDebugType();
 
@@ -60,11 +62,17 @@ public:
   virtual operator bool() const { return this->Enabled; }
 };
 
-PQCORE_EXPORT QDebug pqDebug(const pqDebugType& type=pqDebugType());
-inline QDebug pqDebug(const QString& type) { return pqDebug(pqDebugType(type)); }
+PQCORE_EXPORT QDebug pqDebug(const pqDebugType& type = pqDebugType());
+inline QDebug pqDebug(const QString& type)
+{
+  return pqDebug(pqDebugType(type));
+}
 
 #include <string>
-inline QDebug &operator<<(QDebug debug, const std::string& stdstring)
-{ debug << stdstring.c_str(); return debug.maybeSpace(); }
+inline QDebug& operator<<(QDebug debug, const std::string& stdstring)
+{
+  debug << stdstring.c_str();
+  return debug.maybeSpace();
+}
 
 #endif

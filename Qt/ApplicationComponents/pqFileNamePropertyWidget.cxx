@@ -59,37 +59,37 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
 {
   this->setChangeAvailableAsChangeFinished(false);
 
-  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smproperty);
-  if(!svp)
-    {
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(smproperty);
+  if (!svp)
+  {
     return;
-    }
-  
+  }
+
   // find the domain
-  vtkSmartPointer<vtkSMInputFileNameDomain> domain = vtkSMInputFileNameDomain::SafeDownCast(svp->FindDomain("vtkSMInputFileNameDomain"));
+  vtkSmartPointer<vtkSMInputFileNameDomain> domain =
+    vtkSMInputFileNameDomain::SafeDownCast(svp->FindDomain("vtkSMInputFileNameDomain"));
 
-  if(!domain)
-    {
+  if (!domain)
+  {
     domain = vtkSmartPointer<vtkSMInputFileNameDomain>::New();
-    }
+  }
 
-  QHBoxLayout *layoutLocal = new QHBoxLayout;
+  QHBoxLayout* layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   QLineEdit* lineEdit = new pqLineEdit(this);
   lineEdit->setObjectName(smproxy->GetPropertyName(smproperty));
-  this->addPropertyLink(lineEdit, "text",
-                        SIGNAL(textChanged(const QString&)), smproperty);
-  this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
-                this, SIGNAL(changeFinished()));
+  this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(const QString&)), smproperty);
+  this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
   this->setChangeAvailableAsChangeFinished(false);
-  
+
   layoutLocal->addWidget(lineEdit);
 
   PV_DEBUG_PANELS() << "LineEdit for a "
-                << "StringVectorProperty with a InputFileNameDomain ("
-                << pqPropertyWidget::getXMLName(vtkSMInputFileNameDomain::SafeDownCast(domain)) << ") ";
+                    << "StringVectorProperty with a InputFileNameDomain ("
+                    << pqPropertyWidget::getXMLName(vtkSMInputFileNameDomain::SafeDownCast(domain))
+                    << ") ";
 
   PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically allocated";
 
@@ -99,10 +99,10 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   resetButton->setToolTip("Reset using current data values");
   resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
 
-  pqCoreUtilities::connect(svp, vtkCommand::DomainModifiedEvent,
-    this, SIGNAL(highlightResetButton()));
-  pqCoreUtilities::connect(svp, vtkCommand::UncheckedPropertyModifiedEvent,
-    this, SIGNAL(highlightResetButton()));
+  pqCoreUtilities::connect(
+    svp, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));
+  pqCoreUtilities::connect(
+    svp, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(highlightResetButton()));
 
   this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
   resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
@@ -111,7 +111,6 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   layoutLocal->addWidget(resetButton);
 
   this->setLayout(layoutLocal);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -129,22 +128,21 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   vtkSMProperty* smproperty = this->property();
 
   const char* fileName = "";
-  if (vtkSMInputFileNameDomain* domain = vtkSMInputFileNameDomain::SafeDownCast(
-      smproperty->GetDomain("filename")))
-    {
+  if (vtkSMInputFileNameDomain* domain =
+        vtkSMInputFileNameDomain::SafeDownCast(smproperty->GetDomain("filename")))
+  {
     if (domain->GetFileName() != "")
-      {
+    {
       fileName = domain->GetFileName().c_str();
-      }
     }
-
+  }
 
   vtkSMUncheckedPropertyHelper helper(smproperty);
   if (strcmp(helper.GetAsString(), fileName))
-    {
+  {
     vtkSMUncheckedPropertyHelper(smproxy, "FileName").Set(fileName);
     emit this->changeAvailable();
     emit this->changeFinished();
     return;
-    }
+  }
 }

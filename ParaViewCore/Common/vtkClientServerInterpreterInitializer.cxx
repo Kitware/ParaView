@@ -24,11 +24,9 @@
 class vtkClientServerInterpreterInitializer::vtkInternals
 {
 public:
-  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter> >
-    VectorOfInterpreters;
+  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter> > VectorOfInterpreters;
   VectorOfInterpreters Interpreters;
-  typedef std::vector<
-    vtkClientServerInterpreterInitializer::InterpreterInitializationCallback>
+  typedef std::vector<vtkClientServerInterpreterInitializer::InterpreterInitializationCallback>
     VectorOfCallbacks;
   VectorOfCallbacks Callbacks;
 };
@@ -39,14 +37,12 @@ public:
 // protected.
 vtkClientServerInterpreterInitializer* vtkClientServerInterpreterInitializer::New()
 {
-  vtkObject* ret =
-    vtkObjectFactory::CreateInstance("vtkClientServerInterpreterInitializer");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkClientServerInterpreterInitializer");
   if (ret)
-    {
+  {
     return static_cast<vtkClientServerInterpreterInitializer*>(ret);
-    }
-  vtkClientServerInterpreterInitializer *o =
-      new vtkClientServerInterpreterInitializer;
+  }
+  vtkClientServerInterpreterInitializer* o = new vtkClientServerInterpreterInitializer;
   o->InitializeObjectBase();
   return o;
 }
@@ -64,35 +60,31 @@ vtkClientServerInterpreterInitializer::~vtkClientServerInterpreterInitializer()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreterInitializer*
-vtkClientServerInterpreterInitializer::GetInitializer()
+vtkClientServerInterpreterInitializer* vtkClientServerInterpreterInitializer::GetInitializer()
 {
   static vtkSmartPointer<vtkClientServerInterpreterInitializer> Singleton;
   if (!Singleton)
-    {
+  {
     Singleton.TakeReference(vtkClientServerInterpreterInitializer::New());
-    }
+  }
   return Singleton;
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter*
-vtkClientServerInterpreterInitializer::GetGlobalInterpreter()
+vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::GetGlobalInterpreter()
 {
   static vtkSmartPointer<vtkClientServerInterpreter> Singleton;
   if (!Singleton)
-    {
+  {
     vtkClientServerInterpreterInitializer* initializer =
       vtkClientServerInterpreterInitializer::GetInitializer();
     Singleton.TakeReference(initializer->NewInterpreter());
-    }
+  }
   return Singleton;
-
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter*
-vtkClientServerInterpreterInitializer::NewInterpreter()
+vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::NewInterpreter()
 {
   vtkClientServerInterpreter* interp = vtkClientServerInterpreter::New();
   // THIS DOES NOT AFFECT REF-COUNT.
@@ -101,37 +93,34 @@ vtkClientServerInterpreterInitializer::NewInterpreter()
 }
 
 //----------------------------------------------------------------------------
-void vtkClientServerInterpreterInitializer::RegisterInterpreter(
-  vtkClientServerInterpreter* interp)
+void vtkClientServerInterpreterInitializer::RegisterInterpreter(vtkClientServerInterpreter* interp)
 {
   // THIS DOES NOT AFFECT REF-COUNT.
   this->Internals->Interpreters.push_back(interp);
 
   // Initialize using existing callbacks.
   vtkInternals::VectorOfCallbacks::iterator iter;
-  for (iter = this->Internals->Callbacks.begin();
-    iter != this->Internals->Callbacks.end(); ++iter)
-    {
+  for (iter = this->Internals->Callbacks.begin(); iter != this->Internals->Callbacks.end(); ++iter)
+  {
     (*(*iter))(interp);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkClientServerInterpreterInitializer::RegisterCallback(
-  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-  callback)
+  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback callback)
 {
   this->Internals->Callbacks.push_back(callback);
 
   vtkInternals::VectorOfInterpreters::iterator iter;
-  for (iter = this->Internals->Interpreters.begin();
-    iter != this->Internals->Interpreters.end(); ++iter)
-    {
+  for (iter = this->Internals->Interpreters.begin(); iter != this->Internals->Interpreters.end();
+       ++iter)
+  {
     if (iter->GetPointer() != NULL)
-      {
+    {
       (*callback)(iter->GetPointer());
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------

@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPluginLoader - Used to load ParaView plugins.
-// .SECTION Description
-// vtkPVPluginLoader can be used to load plugins for ParaView. vtkPVPluginLoader
-// loads the plugin on the local process. For verbose details during the process
-// of loading the plugin, try setting the environment variable PV_PLUGIN_DEBUG.
-// This class only needed when loading plugins from shared libraries
-// dynamically. For statically importing plugins, one directly uses
-// PV_PLUGIN_IMPORT() macro defined in vtkPVPlugin.h.
+/**
+ * @class   vtkPVPluginLoader
+ * @brief   Used to load ParaView plugins.
+ *
+ * vtkPVPluginLoader can be used to load plugins for ParaView. vtkPVPluginLoader
+ * loads the plugin on the local process. For verbose details during the process
+ * of loading the plugin, try setting the environment variable PV_PLUGIN_DEBUG.
+ * This class only needed when loading plugins from shared libraries
+ * dynamically. For statically importing plugins, one directly uses
+ * PV_PLUGIN_IMPORT() macro defined in vtkPVPlugin.h.
+*/
 
 #ifndef vtkPVPluginLoader_h
 #define vtkPVPluginLoader_h
@@ -41,78 +44,101 @@ public:
   vtkTypeMacro(vtkPVPluginLoader, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Tries to the load the plugin given the path to the plugin file.
-  bool LoadPlugin(const char* filename)
-    { return this->LoadPluginInternal(filename, false); }
-  bool LoadPluginSilently(const char* filename)
-    { return this->LoadPluginInternal(filename, true); }
+  /**
+   * Tries to the load the plugin given the path to the plugin file.
+   */
+  bool LoadPlugin(const char* filename) { return this->LoadPluginInternal(filename, false); }
+  bool LoadPluginSilently(const char* filename) { return this->LoadPluginInternal(filename, true); }
 
-  // Description:
-  // Simply forwards the call to
-  // vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
-  // configuration xml.
+  /**
+   * Simply forwards the call to
+   * vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
+   * configuration xml.
+   */
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
 
-  // Description:
-  // Loads all plugins under the directories mentioned in the SearchPaths.
+  /**
+   * Loads all plugins under the directories mentioned in the SearchPaths.
+   */
   void LoadPluginsFromPluginSearchPath();
 
-  // Description:
-  // Use PV_PLUGIN_CONFILE_FILE xml file to load specified plugins
-  // It can contain path to multiples xml pluginc config files
-  // sperated by env separator.
-  // It allow user to fine pick which plugins to load, instead of using PV_PLUGIN_PATH
-  // the format a xml plugin file should be the following :
-  // <?xml version="1.0"?>
-  //  <Plugins>
-  //    <Plugin name="MyPlugin" filename="absolute/path/to/libMyPlugin.so"/>
-  //    ...
-  //  </Plugins>
+  /**
+   * Use PV_PLUGIN_CONFILE_FILE xml file to load specified plugins
+   * It can contain path to multiples xml pluginc config files
+   * sperated by env separator.
+   * It allow user to fine pick which plugins to load, instead of using PV_PLUGIN_PATH
+   * the format a xml plugin file should be the following :
+   * <?xml version="1.0"?>
+   * <Plugins>
+   * <Plugin name="MyPlugin" filename="absolute/path/to/libMyPlugin.so"/>
+   * ...
+   * </Plugins>
+   */
   void LoadPluginsFromPluginConfigFile();
 
-  // Description:
-  // Loads all plugin libraries at a path.
+  /**
+   * Loads all plugin libraries at a path.
+   */
   void LoadPluginsFromPath(const char* path);
 
-  // Description:
-  // Returns the full filename for the plugin attempted to load most recently
-  // using LoadPlugin().
+  //@{
+  /**
+   * Returns the full filename for the plugin attempted to load most recently
+   * using LoadPlugin().
+   */
   vtkGetStringMacro(FileName);
+  //@}
 
-  // Description:
-  // Get the plugin name. This returns a valid name only after the plugin has
-  // been loaded.
+  //@{
+  /**
+   * Get the plugin name. This returns a valid name only after the plugin has
+   * been loaded.
+   */
   vtkGetStringMacro(PluginName);
+  //@}
 
-  // Description:
-  // Get the plugin version string. This returns a valid version string only
-  // after the plugin has been loaded.
+  //@{
+  /**
+   * Get the plugin version string. This returns a valid version string only
+   * after the plugin has been loaded.
+   */
   vtkGetStringMacro(PluginVersion);
+  //@}
 
-  // Description:
-  // Get the error string if the plugin failed to load. Returns NULL if the
-  // plugin was loaded successfully.
+  //@{
+  /**
+   * Get the error string if the plugin failed to load. Returns NULL if the
+   * plugin was loaded successfully.
+   */
   vtkGetStringMacro(ErrorString);
+  //@}
 
-  // Description:
-  // Get a string of standard search paths (path1;path2;path3)
-  // search paths are based on PV_PLUGIN_PATH,
-  // plugin dir relative to executable.
+  //@{
+  /**
+   * Get a string of standard search paths (path1;path2;path3)
+   * search paths are based on PV_PLUGIN_PATH,
+   * plugin dir relative to executable.
+   */
   vtkGetStringMacro(SearchPaths);
+  //@}
 
-  // Description:
-  // Returns the status of most recent LoadPlugin call.
+  //@{
+  /**
+   * Returns the status of most recent LoadPlugin call.
+   */
   vtkGetMacro(Loaded, bool);
+  //@}
 
-  // Description:
-  // Sets the function used to load static plugins.
+  /**
+   * Sets the function used to load static plugins.
+   */
   static void SetStaticPluginLoadFunction(vtkPluginLoadFunction function);
 
-  // Description:
-  // Internal method used in pqParaViewPlugin.cxx.in to tell the
-  // vtkPVPluginLoader that a library was unloaded so it doesn't try to unload
-  // it again.
+  /**
+   * Internal method used in pqParaViewPlugin.cxx.in to tell the
+   * vtkPVPluginLoader that a library was unloaded so it doesn't try to unload
+   * it again.
+   */
   static void PluginLibraryUnloaded(const char* pluginname);
 
 protected:
@@ -121,10 +147,11 @@ protected:
 
   bool LoadPluginInternal(const char* filename, bool no_errors);
 
-  // Description:
-  // Called by LoadPluginInternal() to do the final steps in loading of a
-  // plugin.
-  bool LoadPlugin(const char*file, vtkPVPlugin* plugin);
+  /**
+   * Called by LoadPluginInternal() to do the final steps in loading of a
+   * plugin.
+   */
+  bool LoadPlugin(const char* file, vtkPVPlugin* plugin);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);
@@ -139,6 +166,7 @@ protected:
   char* SearchPaths;
   bool DebugPlugin;
   bool Loaded;
+
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;

@@ -39,94 +39,86 @@ vtkTimeStepProgressFilter::vtkTimeStepProgressFilter()
 vtkTimeStepProgressFilter::~vtkTimeStepProgressFilter()
 {
   if (this->TimeSteps != NULL)
-    {
+  {
     delete[] this->TimeSteps;
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
-int vtkTimeStepProgressFilter::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkTimeStepProgressFilter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkTimeStepProgressFilter::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkTimeStepProgressFilter::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Store and copy time info
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
-    {
+  {
     inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), this->TimeRange);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
-                 this->TimeRange, 2);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), this->TimeRange, 2);
     this->UseTimeRange = true;
-    }
+  }
   else if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
-    {
-    double *inTimes =
-      inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    this->NumTimeSteps =
-      inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  {
+    double* inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    this->NumTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
     if (this->TimeSteps != NULL)
-      {
+    {
       delete[] this->TimeSteps;
-      }
-    this->TimeSteps = new double [this->NumTimeSteps];
+    }
+    this->TimeSteps = new double[this->NumTimeSteps];
 
     for (int i = 0; i < this->NumTimeSteps; i++)
-      {
+    {
       this->TimeSteps[i] = inTimes[i];
-      }
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-      this->TimeSteps, this->NumTimeSteps);
-    this->UseTimeRange = false;
     }
+    outInfo->Set(
+      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), this->TimeSteps, this->NumTimeSteps);
+    this->UseTimeRange = false;
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkTimeStepProgressFilter::RequestData(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkTimeStepProgressFilter::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0]);
   vtkTable* output = vtkTable::GetData(outputVector);
 
-  vtkInformation* inputInfo = input? input->GetInformation() : 0;
+  vtkInformation* inputInfo = input ? input->GetInformation() : 0;
 
   double val = 0;
   if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP()))
-    {
+  {
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
     if (this->UseTimeRange && time >= this->TimeRange[0] && time <= this->TimeRange[1])
-      {
+    {
       val = (time - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]);
-      }
-    else if (this->NumTimeSteps != 0)
-      {
-      int i = std::lower_bound(this->TimeSteps, this->TimeSteps + this->NumTimeSteps, time ) - this->TimeSteps;
-      if (this->TimeSteps[i] != time)
-        {
-        if (std::abs((this->TimeSteps[i - 1] - time)) <
-          std::abs((time - this->TimeSteps[i])))
-          {
-          i--;
-          }
-        }
-      val = static_cast<double>(i) / this->NumTimeSteps;
-      }
     }
+    else if (this->NumTimeSteps != 0)
+    {
+      int i = std::lower_bound(this->TimeSteps, this->TimeSteps + this->NumTimeSteps, time) -
+        this->TimeSteps;
+      if (this->TimeSteps[i] != time)
+      {
+        if (std::abs((this->TimeSteps[i - 1] - time)) < std::abs((time - this->TimeSteps[i])))
+        {
+          i--;
+        }
+      }
+      val = static_cast<double>(i) / this->NumTimeSteps;
+    }
+  }
   vtkNew<vtkDoubleArray> data;
   data->SetName("ProgressRate");
   data->SetNumberOfComponents(1);

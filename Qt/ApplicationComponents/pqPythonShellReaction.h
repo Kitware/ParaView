@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -35,32 +35,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// pqPythonShellReaction is a reaction to handle showing of the python shell.
+/**
+* @ingroup Reactions
+* pqPythonShellReaction is a reaction to handle showing of the python shell.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPythonShellReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
   pqPythonShellReaction(QAction* parent);
 
-  /// Pops up the python shell dialog when compiled with PARAVIEW_ENABLE_PYTHON
-  /// flag on.
+  /**
+  * Pops up the python shell dialog when compiled with PARAVIEW_ENABLE_PYTHON
+  * flag on.
+  */
   static void showPythonShell();
 
-  /// Executes a python script.
+  /**
+  * Executes a python script.
+  */
   static void executeScript(const char* filename);
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqPythonShellReaction::showPythonShell(); }
-
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqPythonShellReaction::showPythonShell(); }
 
 private:
   Q_DISABLE_COPY(pqPythonShellReaction)
 };
 
 #endif
-
-

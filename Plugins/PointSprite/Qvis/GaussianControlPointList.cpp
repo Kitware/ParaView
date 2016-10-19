@@ -39,9 +39,10 @@
 #include <GaussianControlPoint.h>
 #include <GaussianControlPointList.h>
 
-namespace pointsprite {
+namespace pointsprite
+{
 // Type map format string
-const char *GaussianControlPointList::TypeMapFormatString = "a*";
+const char* GaussianControlPointList::TypeMapFormatString = "a*";
 
 // ****************************************************************************
 // Method: GaussianControlPointList::GaussianControlPointList
@@ -58,8 +59,8 @@ const char *GaussianControlPointList::TypeMapFormatString = "a*";
 //
 // ****************************************************************************
 
-GaussianControlPointList::GaussianControlPointList() :
-    AttributeSubject(GaussianControlPointList::TypeMapFormatString)
+GaussianControlPointList::GaussianControlPointList()
+  : AttributeSubject(GaussianControlPointList::TypeMapFormatString)
 {
 }
 
@@ -78,28 +79,28 @@ GaussianControlPointList::GaussianControlPointList() :
 //
 // ****************************************************************************
 
-GaussianControlPointList::GaussianControlPointList(const GaussianControlPointList &obj) :
-    AttributeSubject(GaussianControlPointList::TypeMapFormatString)
+GaussianControlPointList::GaussianControlPointList(const GaussianControlPointList& obj)
+  : AttributeSubject(GaussianControlPointList::TypeMapFormatString)
 {
-    AttributeGroupVector::const_iterator pos;
+  AttributeGroupVector::const_iterator pos;
 
-    // *** Copy the controlPoints field ***
-    // Delete the AttributeGroup objects and clear the vector.
-    for(pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
-        delete *pos;
-    controlPoints.clear();
-    if(obj.controlPoints.size() > 0)
-        controlPoints.reserve(obj.controlPoints.size());
-    // Duplicate the controlPoints from obj.
-    for(pos = obj.controlPoints.begin(); pos != obj.controlPoints.end(); ++pos)
-    {
-        GaussianControlPoint *oldGaussianControlPoint = (GaussianControlPoint *)(*pos);
-        GaussianControlPoint *newGaussianControlPoint = new GaussianControlPoint(*oldGaussianControlPoint);
-        controlPoints.push_back(newGaussianControlPoint);
-    }
+  // *** Copy the controlPoints field ***
+  // Delete the AttributeGroup objects and clear the vector.
+  for (pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
+    delete *pos;
+  controlPoints.clear();
+  if (obj.controlPoints.size() > 0)
+    controlPoints.reserve(obj.controlPoints.size());
+  // Duplicate the controlPoints from obj.
+  for (pos = obj.controlPoints.begin(); pos != obj.controlPoints.end(); ++pos)
+  {
+    GaussianControlPoint* oldGaussianControlPoint = (GaussianControlPoint*)(*pos);
+    GaussianControlPoint* newGaussianControlPoint =
+      new GaussianControlPoint(*oldGaussianControlPoint);
+    controlPoints.push_back(newGaussianControlPoint);
+  }
 
-
-    SelectAll();
+  SelectAll();
 }
 
 // ****************************************************************************
@@ -119,11 +120,11 @@ GaussianControlPointList::GaussianControlPointList(const GaussianControlPointLis
 
 GaussianControlPointList::~GaussianControlPointList()
 {
-    AttributeGroupVector::iterator pos;
+  AttributeGroupVector::iterator pos;
 
-    // Destroy the controlPoints field.
-    for(pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
-        delete *pos;
+  // Destroy the controlPoints field.
+  for (pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
+    delete *pos;
 }
 
 // ****************************************************************************
@@ -141,30 +142,30 @@ GaussianControlPointList::~GaussianControlPointList()
 //
 // ****************************************************************************
 
-GaussianControlPointList&
-GaussianControlPointList::operator = (const GaussianControlPointList &obj)
+GaussianControlPointList& GaussianControlPointList::operator=(const GaussianControlPointList& obj)
 {
-    if (this == &obj) return *this;
-    AttributeGroupVector::const_iterator pos;
-
-    // *** Copy the controlPoints field ***
-    // Delete the AttributeGroup objects and clear the vector.
-    for(pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
-        delete *pos;
-    controlPoints.clear();
-    if(obj.controlPoints.size() > 0)
-        controlPoints.reserve(obj.controlPoints.size());
-    // Duplicate the controlPoints from obj.
-    for(pos = obj.controlPoints.begin(); pos != obj.controlPoints.end(); ++pos)
-    {
-        GaussianControlPoint *oldGaussianControlPoint = (GaussianControlPoint *)(*pos);
-        GaussianControlPoint *newGaussianControlPoint = new GaussianControlPoint(*oldGaussianControlPoint);
-        controlPoints.push_back(newGaussianControlPoint);
-    }
-
-
-    SelectAll();
+  if (this == &obj)
     return *this;
+  AttributeGroupVector::const_iterator pos;
+
+  // *** Copy the controlPoints field ***
+  // Delete the AttributeGroup objects and clear the vector.
+  for (pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
+    delete *pos;
+  controlPoints.clear();
+  if (obj.controlPoints.size() > 0)
+    controlPoints.reserve(obj.controlPoints.size());
+  // Duplicate the controlPoints from obj.
+  for (pos = obj.controlPoints.begin(); pos != obj.controlPoints.end(); ++pos)
+  {
+    GaussianControlPoint* oldGaussianControlPoint = (GaussianControlPoint*)(*pos);
+    GaussianControlPoint* newGaussianControlPoint =
+      new GaussianControlPoint(*oldGaussianControlPoint);
+    controlPoints.push_back(newGaussianControlPoint);
+  }
+
+  SelectAll();
+  return *this;
 }
 
 // ****************************************************************************
@@ -182,22 +183,22 @@ GaussianControlPointList::operator = (const GaussianControlPointList &obj)
 //
 // ****************************************************************************
 
-bool
-GaussianControlPointList::operator == (const GaussianControlPointList &obj) const
+bool GaussianControlPointList::operator==(const GaussianControlPointList& obj) const
 {
-    unsigned int i;
+  unsigned int i;
 
-    bool controlPoints_equal = (obj.controlPoints.size() == controlPoints.size());
-    for(i = 0; (i < controlPoints.size()) && controlPoints_equal; ++i)
-    {
-        // Make references to GaussianControlPoint from AttributeGroup *.
-        const GaussianControlPoint &controlPoints1 = *((const GaussianControlPoint *)(controlPoints[i]));
-        const GaussianControlPoint &controlPoints2 = *((const GaussianControlPoint *)(obj.controlPoints[i]));
-        controlPoints_equal = (controlPoints1 == controlPoints2);
-    }
+  bool controlPoints_equal = (obj.controlPoints.size() == controlPoints.size());
+  for (i = 0; (i < controlPoints.size()) && controlPoints_equal; ++i)
+  {
+    // Make references to GaussianControlPoint from AttributeGroup *.
+    const GaussianControlPoint& controlPoints1 = *((const GaussianControlPoint*)(controlPoints[i]));
+    const GaussianControlPoint& controlPoints2 =
+      *((const GaussianControlPoint*)(obj.controlPoints[i]));
+    controlPoints_equal = (controlPoints1 == controlPoints2);
+  }
 
-    // Create the return value
-    return (controlPoints_equal);
+  // Create the return value
+  return (controlPoints_equal);
 }
 
 // ****************************************************************************
@@ -215,10 +216,9 @@ GaussianControlPointList::operator == (const GaussianControlPointList &obj) cons
 //
 // ****************************************************************************
 
-bool
-GaussianControlPointList::operator != (const GaussianControlPointList &obj) const
+bool GaussianControlPointList::operator!=(const GaussianControlPointList& obj) const
 {
-    return !(this->operator == (obj));
+  return !(this->operator==(obj));
 }
 
 // ****************************************************************************
@@ -236,10 +236,9 @@ GaussianControlPointList::operator != (const GaussianControlPointList &obj) cons
 //
 // ****************************************************************************
 
-const std::string
-GaussianControlPointList::TypeName() const
+const std::string GaussianControlPointList::TypeName() const
 {
-    return "GaussianControlPointList";
+  return "GaussianControlPointList";
 }
 
 // ****************************************************************************
@@ -257,17 +256,16 @@ GaussianControlPointList::TypeName() const
 //
 // ****************************************************************************
 
-bool
-GaussianControlPointList::CopyAttributes(const AttributeGroup *atts)
+bool GaussianControlPointList::CopyAttributes(const AttributeGroup* atts)
 {
-    if(TypeName() != atts->TypeName())
-        return false;
+  if (TypeName() != atts->TypeName())
+    return false;
 
-    // Call assignment operator.
-    const GaussianControlPointList *tmp = (const GaussianControlPointList *)atts;
-    *this = *tmp;
+  // Call assignment operator.
+  const GaussianControlPointList* tmp = (const GaussianControlPointList*)atts;
+  *this = *tmp;
 
-    return true;
+  return true;
 }
 
 // ****************************************************************************
@@ -285,15 +283,14 @@ GaussianControlPointList::CopyAttributes(const AttributeGroup *atts)
 //
 // ****************************************************************************
 
-AttributeSubject *
-GaussianControlPointList::CreateCompatible(const std::string &tname) const
+AttributeSubject* GaussianControlPointList::CreateCompatible(const std::string& tname) const
 {
-    AttributeSubject *retval = 0;
-    if(TypeName() == tname)
-        retval = new GaussianControlPointList(*this);
-    // Other cases could go here too.
+  AttributeSubject* retval = 0;
+  if (TypeName() == tname)
+    retval = new GaussianControlPointList(*this);
+  // Other cases could go here too.
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -311,16 +308,15 @@ GaussianControlPointList::CreateCompatible(const std::string &tname) const
 //
 // ****************************************************************************
 
-AttributeSubject *
-GaussianControlPointList::NewInstance(bool copy) const
+AttributeSubject* GaussianControlPointList::NewInstance(bool copy) const
 {
-    AttributeSubject *retval = 0;
-    if(copy)
-        retval = new GaussianControlPointList(*this);
-    else
-        retval = new GaussianControlPointList;
+  AttributeSubject* retval = 0;
+  if (copy)
+    retval = new GaussianControlPointList(*this);
+  else
+    retval = new GaussianControlPointList;
 
-    return retval;
+  return retval;
 }
 
 // ****************************************************************************
@@ -338,10 +334,9 @@ GaussianControlPointList::NewInstance(bool copy) const
 //
 // ****************************************************************************
 
-void
-GaussianControlPointList::SelectAll()
+void GaussianControlPointList::SelectAll()
 {
-    Select(0, (void *)&controlPoints);
+  Select(0, (void*)&controlPoints);
 }
 
 // ****************************************************************************
@@ -359,10 +354,9 @@ GaussianControlPointList::SelectAll()
 //
 // ****************************************************************************
 
-AttributeGroup *
-GaussianControlPointList::CreateSubAttributeGroup(int)
+AttributeGroup* GaussianControlPointList::CreateSubAttributeGroup(int)
 {
-    return new GaussianControlPoint;
+  return new GaussianControlPoint;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,7 +367,8 @@ GaussianControlPointList::CreateSubAttributeGroup(int)
 // Method: GaussianControlPointList::CreateNode
 //
 // Purpose:
-//   This method creates a DataNode representation of the object so it can be saved to a config file.
+//   This method creates a DataNode representation of the object so it can be saved to a config
+//   file.
 //
 // Note:       Autogenerated by xml2atts.
 //
@@ -384,39 +379,38 @@ GaussianControlPointList::CreateSubAttributeGroup(int)
 //
 // ****************************************************************************
 
-bool
-GaussianControlPointList::CreateNode(DataNode *parentNode, bool completeSave, bool forceAdd)
+bool GaussianControlPointList::CreateNode(DataNode* parentNode, bool completeSave, bool forceAdd)
 {
-    if(parentNode == 0)
-        return false;
+  if (parentNode == 0)
+    return false;
 
-    GaussianControlPointList defaultObject;
-    bool addToParent = false;
-    // Create a node for GaussianControlPointList.
-    DataNode *node = new DataNode("GaussianControlPointList");
+  GaussianControlPointList defaultObject;
+  bool addToParent = false;
+  // Create a node for GaussianControlPointList.
+  DataNode* node = new DataNode("GaussianControlPointList");
 
-    if(completeSave || !FieldsEqual(0, &defaultObject))
-    {
-        addToParent = true;
-        for(unsigned int i = 0; i < controlPoints.size(); ++i)
-            controlPoints[i]->CreateNode(node, completeSave, true);
-    }
+  if (completeSave || !FieldsEqual(0, &defaultObject))
+  {
+    addToParent = true;
+    for (unsigned int i = 0; i < controlPoints.size(); ++i)
+      controlPoints[i]->CreateNode(node, completeSave, true);
+  }
 
+  // Add the node to the parent node.
+  if (addToParent || forceAdd)
+    parentNode->AddNode(node);
+  else
+    delete node;
 
-    // Add the node to the parent node.
-    if(addToParent || forceAdd)
-        parentNode->AddNode(node);
-    else
-        delete node;
-
-    return (addToParent || forceAdd);
+  return (addToParent || forceAdd);
 }
 
 // ****************************************************************************
 // Method: GaussianControlPointList::SetFromNode
 //
 // Purpose:
-//   This method sets attributes in this object from values in a DataNode representation of the object.
+//   This method sets attributes in this object from values in a DataNode representation of the
+//   object.
 //
 // Note:       Autogenerated by xml2atts.
 //
@@ -427,35 +421,33 @@ GaussianControlPointList::CreateNode(DataNode *parentNode, bool completeSave, bo
 //
 // ****************************************************************************
 
-void
-GaussianControlPointList::SetFromNode(DataNode *parentNode)
+void GaussianControlPointList::SetFromNode(DataNode* parentNode)
 {
-    int i;
-    if(parentNode == 0)
-        return;
+  int i;
+  if (parentNode == 0)
+    return;
 
-    DataNode *searchNode = parentNode->GetNode("GaussianControlPointList");
-    if(searchNode == 0)
-        return;
+  DataNode* searchNode = parentNode->GetNode("GaussianControlPointList");
+  if (searchNode == 0)
+    return;
 
-    //DataNode *node;
-    DataNode **children;
-    // Clear all the GaussianControlPoints.
-    ClearControlPoints();
+  // DataNode *node;
+  DataNode** children;
+  // Clear all the GaussianControlPoints.
+  ClearControlPoints();
 
-    // Go through all of the children and construct a new
-    // GaussianControlPoint for each one of them.
-    children = searchNode->GetChildren();
-    for(i = 0; i < searchNode->GetNumChildren(); ++i)
+  // Go through all of the children and construct a new
+  // GaussianControlPoint for each one of them.
+  children = searchNode->GetChildren();
+  for (i = 0; i < searchNode->GetNumChildren(); ++i)
+  {
+    if (children[i]->GetKey() == std::string("GaussianControlPoint"))
     {
-        if(children[i]->GetKey() == std::string("GaussianControlPoint"))
-        {
-            GaussianControlPoint temp;
-            temp.SetFromNode(children[i]);
-            AddControlPoints(temp);
-        }
+      GaussianControlPoint temp;
+      temp.SetFromNode(children[i]);
+      AddControlPoints(temp);
     }
-
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -466,26 +458,23 @@ GaussianControlPointList::SetFromNode(DataNode *parentNode)
 // Get property methods
 ///////////////////////////////////////////////////////////////////////////////
 
-const AttributeGroupVector &
-GaussianControlPointList::GetControlPoints() const
+const AttributeGroupVector& GaussianControlPointList::GetControlPoints() const
 {
-    return controlPoints;
+  return controlPoints;
 }
 
-AttributeGroupVector &
-GaussianControlPointList::GetControlPoints()
+AttributeGroupVector& GaussianControlPointList::GetControlPoints()
 {
-    return controlPoints;
+  return controlPoints;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Select property methods
 ///////////////////////////////////////////////////////////////////////////////
 
-void
-GaussianControlPointList::SelectControlPoints()
+void GaussianControlPointList::SelectControlPoints()
 {
-    Select(0, (void *)&controlPoints);
+  Select(0, (void*)&controlPoints);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -507,14 +496,13 @@ GaussianControlPointList::SelectControlPoints()
 //
 // ****************************************************************************
 
-void
-GaussianControlPointList::AddControlPoints(const GaussianControlPoint &obj)
+void GaussianControlPointList::AddControlPoints(const GaussianControlPoint& obj)
 {
-    GaussianControlPoint *newGaussianControlPoint = new GaussianControlPoint(obj);
-    controlPoints.push_back(newGaussianControlPoint);
+  GaussianControlPoint* newGaussianControlPoint = new GaussianControlPoint(obj);
+  controlPoints.push_back(newGaussianControlPoint);
 
-    // Indicate that things have changed by selecting it.
-    Select(0, (void *)&controlPoints);
+  // Indicate that things have changed by selecting it.
+  Select(0, (void*)&controlPoints);
 }
 
 // ****************************************************************************
@@ -532,17 +520,16 @@ GaussianControlPointList::AddControlPoints(const GaussianControlPoint &obj)
 //
 // ****************************************************************************
 
-void
-GaussianControlPointList::ClearControlPoints()
+void GaussianControlPointList::ClearControlPoints()
 {
-    AttributeGroupVector::iterator pos;
+  AttributeGroupVector::iterator pos;
 
-    for(pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
-        delete *pos;
-    controlPoints.clear();
+  for (pos = controlPoints.begin(); pos != controlPoints.end(); ++pos)
+    delete *pos;
+  controlPoints.clear();
 
-    // Indicate that things have changed by selecting the list.
-    Select(0, (void *)&controlPoints);
+  // Indicate that things have changed by selecting the list.
+  Select(0, (void*)&controlPoints);
 }
 
 // ****************************************************************************
@@ -560,24 +547,23 @@ GaussianControlPointList::ClearControlPoints()
 //
 // ****************************************************************************
 
-void
-GaussianControlPointList::RemoveControlPoints(int index)
+void GaussianControlPointList::RemoveControlPoints(int index)
 {
-    AttributeGroupVector::iterator pos = controlPoints.begin();
+  AttributeGroupVector::iterator pos = controlPoints.begin();
 
-    // Iterate through the vector "index" times.
-    for(int i = 0; i < index; ++i)
-        ++pos;
+  // Iterate through the vector "index" times.
+  for (int i = 0; i < index; ++i)
+    ++pos;
 
-    // If pos is still a valid iterator, remove that element.
-    if(pos != controlPoints.end())
-    {
-        delete *pos;
-        controlPoints.erase(pos);
-    }
+  // If pos is still a valid iterator, remove that element.
+  if (pos != controlPoints.end())
+  {
+    delete *pos;
+    controlPoints.erase(pos);
+  }
 
-    // Indicate that things have changed by selecting the list.
-    Select(0, (void *)&controlPoints);
+  // Indicate that things have changed by selecting the list.
+  Select(0, (void*)&controlPoints);
 }
 
 // ****************************************************************************
@@ -595,10 +581,9 @@ GaussianControlPointList::RemoveControlPoints(int index)
 //
 // ****************************************************************************
 
-int
-GaussianControlPointList::GetNumControlPoints() const
+int GaussianControlPointList::GetNumControlPoints() const
 {
-    return static_cast<int>(controlPoints.size());
+  return static_cast<int>(controlPoints.size());
 }
 
 // ****************************************************************************
@@ -616,10 +601,9 @@ GaussianControlPointList::GetNumControlPoints() const
 //
 // ****************************************************************************
 
-GaussianControlPoint &
-GaussianControlPointList::GetControlPoints(int i)
+GaussianControlPoint& GaussianControlPointList::GetControlPoints(int i)
 {
-    return *((GaussianControlPoint *)controlPoints[i]);
+  return *((GaussianControlPoint*)controlPoints[i]);
 }
 
 // ****************************************************************************
@@ -637,10 +621,9 @@ GaussianControlPointList::GetControlPoints(int i)
 //
 // ****************************************************************************
 
-const GaussianControlPoint &
-GaussianControlPointList::GetControlPoints(int i) const
+const GaussianControlPoint& GaussianControlPointList::GetControlPoints(int i) const
 {
-    return *((GaussianControlPoint *)controlPoints[i]);
+  return *((GaussianControlPoint*)controlPoints[i]);
 }
 
 // ****************************************************************************
@@ -658,10 +641,9 @@ GaussianControlPointList::GetControlPoints(int i) const
 //
 // ****************************************************************************
 
-GaussianControlPoint &
-GaussianControlPointList::operator [] (int i)
+GaussianControlPoint& GaussianControlPointList::operator[](int i)
 {
-    return *((GaussianControlPoint *)controlPoints[i]);
+  return *((GaussianControlPoint*)controlPoints[i]);
 }
 
 // ****************************************************************************
@@ -679,10 +661,9 @@ GaussianControlPointList::operator [] (int i)
 //
 // ****************************************************************************
 
-const GaussianControlPoint &
-GaussianControlPointList::operator [] (int i) const
+const GaussianControlPoint& GaussianControlPointList::operator[](int i) const
 {
-    return *((GaussianControlPoint *)controlPoints[i]);
+  return *((GaussianControlPoint*)controlPoints[i]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -704,14 +685,15 @@ GaussianControlPointList::operator [] (int i) const
 //
 // ****************************************************************************
 
-std::string
-GaussianControlPointList::GetFieldName(int index) const
+std::string GaussianControlPointList::GetFieldName(int index) const
 {
-    switch (index)
-    {
-        case 0:  return "controlPoints";
-        default:  return "invalid index";
-    }
+  switch (index)
+  {
+    case 0:
+      return "controlPoints";
+    default:
+      return "invalid index";
+  }
 }
 
 // ****************************************************************************
@@ -729,14 +711,15 @@ GaussianControlPointList::GetFieldName(int index) const
 //
 // ****************************************************************************
 
-AttributeGroup::FieldType
-GaussianControlPointList::GetFieldType(int index) const
+AttributeGroup::FieldType GaussianControlPointList::GetFieldType(int index) const
 {
-    switch (index)
-    {
-        case 0:  return AttributeGroup::FieldType_attVector;
-        default:  return AttributeGroup::FieldType_unknown;
-    }
+  switch (index)
+  {
+    case 0:
+      return AttributeGroup::FieldType_attVector;
+    default:
+      return AttributeGroup::FieldType_unknown;
+  }
 }
 
 // ****************************************************************************
@@ -754,14 +737,15 @@ GaussianControlPointList::GetFieldType(int index) const
 //
 // ****************************************************************************
 
-std::string
-GaussianControlPointList::GetFieldTypeName(int index) const
+std::string GaussianControlPointList::GetFieldTypeName(int index) const
 {
-    switch (index)
-    {
-        case 0:  return "attVector";
-        default:  return "invalid index";
-    }
+  switch (index)
+  {
+    case 0:
+      return "attVector";
+    default:
+      return "invalid index";
+  }
 }
 
 // ****************************************************************************
@@ -779,37 +763,38 @@ GaussianControlPointList::GetFieldTypeName(int index) const
 //
 // ****************************************************************************
 
-bool
-GaussianControlPointList::FieldsEqual(int index_, const AttributeGroup *rhs) const
+bool GaussianControlPointList::FieldsEqual(int index_, const AttributeGroup* rhs) const
 {
-    unsigned int i;
+  unsigned int i;
 
-    const GaussianControlPointList &obj = *((const GaussianControlPointList*)rhs);
-    bool retval = false;
-    switch (index_)
-    {
+  const GaussianControlPointList& obj = *((const GaussianControlPointList*)rhs);
+  bool retval = false;
+  switch (index_)
+  {
     case 0:
-        {  // new scope
-        bool controlPoints_equal = (obj.controlPoints.size() == controlPoints.size());
-        for(i = 0; (i < controlPoints.size()) && controlPoints_equal; ++i)
-        {
-            // Make references to GaussianControlPoint from AttributeGroup *.
-            const GaussianControlPoint &controlPoints1 = *((const GaussianControlPoint *)(controlPoints[i]));
-            const GaussianControlPoint &controlPoints2 = *((const GaussianControlPoint *)(obj.controlPoints[i]));
-            controlPoints_equal = (controlPoints1 == controlPoints2);
-        }
+    { // new scope
+      bool controlPoints_equal = (obj.controlPoints.size() == controlPoints.size());
+      for (i = 0; (i < controlPoints.size()) && controlPoints_equal; ++i)
+      {
+        // Make references to GaussianControlPoint from AttributeGroup *.
+        const GaussianControlPoint& controlPoints1 =
+          *((const GaussianControlPoint*)(controlPoints[i]));
+        const GaussianControlPoint& controlPoints2 =
+          *((const GaussianControlPoint*)(obj.controlPoints[i]));
+        controlPoints_equal = (controlPoints1 == controlPoints2);
+      }
 
-        retval = controlPoints_equal;
-        }
-        break;
-    default: retval = false;
+      retval = controlPoints_equal;
     }
+    break;
+    default:
+      retval = false;
+  }
 
-    return retval;
+  return retval;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // User-defined methods.
 ///////////////////////////////////////////////////////////////////////////////
-
 }

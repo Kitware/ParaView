@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,23 +38,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 #include "pqTextureComboBox.h"
 
-/// Property widget for selecting the texture to apply to a surface.
-///
-/// To use this widget for a property add the 'panel_widget="texture_selector"'
-/// to the property's XML.
+/**
+* Property widget for selecting the texture to apply to a surface.
+*
+* To use this widget for a property add the 'panel_widget="texture_selector"'
+* to the property's XML.
+*/
 class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  pqTextureSelectorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqTextureSelectorPropertyWidget();
 
 private slots:
-  void handleViewChanged(pqView *view);
+  void handleViewChanged(pqView* view);
 
 private:
-  pqTextureComboBox *Selector;
+  pqTextureComboBox* Selector;
 };
 
 #endif // _pqTextureSelectorPropertyWidget_h

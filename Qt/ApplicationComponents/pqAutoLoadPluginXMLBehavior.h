@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -36,23 +36,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QSet>
 
-/// @ingroup Behaviors
-///
-/// ParaView plugins can load gui configuration xmls eg. xmls for defining the
-/// filters menu, readers etc. This behavior ensures that as soon as such
-/// plugins are loaded if they provide any XMLs in the ":/.*/ParaViewResources/"
-/// resource location, then such xmls are parsed and an attempt is made to load
-/// them (by calling pqApplicationCore::loadConfiguration()).
-///
-/// Without going into too much detail, if you want your application to
-/// automatically load GUI configuration XMLs from plugins, instantiate this
-/// behavior.
+/**
+* @ingroup Behaviors
+*
+* ParaView plugins can load gui configuration xmls eg. xmls for defining the
+* filters menu, readers etc. This behavior ensures that as soon as such
+* plugins are loaded if they provide any XMLs in the ":/.{*}/ParaViewResources/"
+* resource location, then such xmls are parsed and an attempt is made to load
+* them (by calling pqApplicationCore::loadConfiguration()).
+*
+* Note: {} is to keep the *+/ from ending the comment block.
+*
+* Without going into too much detail, if you want your application to
+* automatically load GUI configuration XMLs from plugins, instantiate this
+* behavior.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoLoadPluginXMLBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqAutoLoadPluginXMLBehavior(QObject* parent=0);
+  pqAutoLoadPluginXMLBehavior(QObject* parent = 0);
 
 protected slots:
   void updateResources();

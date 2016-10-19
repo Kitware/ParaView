@@ -34,20 +34,19 @@
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkStringList.h"
 
-
 vtkStandardNewMacro(vtkSQVolumeSourceConfigurationWriter);
 
 //-----------------------------------------------------------------------------
 vtkSQVolumeSourceConfigurationWriter::vtkSQVolumeSourceConfigurationWriter()
 {
-  vtkStringList *propNames=vtkStringList::New();
+  vtkStringList* propNames = vtkStringList::New();
   propNames->AddString("Origin");
   propNames->AddString("Point1");
   propNames->AddString("Point2");
   propNames->AddString("Point3");
   propNames->AddString("Resolution");
 
-  vtkSMNamedPropertyIterator *propIt=vtkSMNamedPropertyIterator::New();
+  vtkSMNamedPropertyIterator* propIt = vtkSMNamedPropertyIterator::New();
   propIt->SetPropertyNames(propNames);
   propNames->Delete();
   this->SetPropertyIterator(propIt);
@@ -61,11 +60,11 @@ vtkSQVolumeSourceConfigurationWriter::vtkSQVolumeSourceConfigurationWriter()
 
 //-----------------------------------------------------------------------------
 vtkSQVolumeSourceConfigurationWriter::~vtkSQVolumeSourceConfigurationWriter()
-{}
+{
+}
 
 //-----------------------------------------------------------------------------
-void vtkSQVolumeSourceConfigurationWriter::SetProxy(
-      vtkSMProxy *proxy)
+void vtkSQVolumeSourceConfigurationWriter::SetProxy(vtkSMProxy* proxy)
 {
   this->vtkSMProxyConfigurationWriter::SetProxy(proxy);
   this->GetPropertyIterator()->SetProxy(proxy);
@@ -74,5 +73,5 @@ void vtkSQVolumeSourceConfigurationWriter::SetProxy(
 //-----------------------------------------------------------------------------
 void vtkSQVolumeSourceConfigurationWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }

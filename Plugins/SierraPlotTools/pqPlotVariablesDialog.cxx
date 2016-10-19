@@ -52,76 +52,75 @@
 
 #include "ui_pqVariablePlot.h"
 
-// used to show line number in #pragma message 
+// used to show line number in #pragma message
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 
 ///////////////////////////////////////////////////////////////////////////////
-class pqPlotVariablesDialog::pqUI : public Ui::pqVariablePlot {};
+class pqPlotVariablesDialog::pqUI : public Ui::pqVariablePlot
+{
+};
 
 //
-// This class stores the range values for a variable and its 
+// This class stores the range values for a variable and its
 // components.
 //
 class VarRange
 {
 public:
-
   static const int MIN_ELEMENT_INDEX = 0;
   static const int MAX_ELEMENT_INDEX = 1;
 
-  VarRange(QString name) :
-    varName(name),
-    numComponents(0),
-    numElements(0),
-    ranges(NULL)
+  VarRange(QString name)
+    : varName(name)
+    , numComponents(0)
+    , numElements(0)
+    , ranges(NULL)
   {
   }
 
   virtual ~VarRange()
   {
     if (ranges)
+    {
+      for (int i = 0; i < numComponents; i++)
       {
-      for (int i=0; i < numComponents; i++)
-        {
-        delete [] ranges[i];
-        }
-      delete [] ranges;
+        delete[] ranges[i];
+      }
+      delete[] ranges;
 
       ranges = 0;
-      }
+    }
 
     if (magnitudes)
-      {
-      delete [] magnitudes;
-      }
+    {
+      delete[] magnitudes;
+    }
   }
 
   QString varName;
   int numComponents;
   int numElements;
-  double **ranges;
-  double *magnitudes;
+  double** ranges;
+  double* magnitudes;
 };
 
 //
 // This class encapsulates the concept/implementation of the GUI elements
 // that make up a "range".
-// The "range" consists of labels for the min & max, line edit boxes for the 
+// The "range" consists of labels for the min & max, line edit boxes for the
 // min and max values
-// 
+//
 //
 class pqRangeWidget
 {
 public:
-
   struct RangeWidgetGroup
   {
-    RangeWidgetGroup(QLabel * minLabel, QLabel * maxLabel,
-      QLineEdit * minLineEdit, QLineEdit * maxLineEdit,
-      QFrame * minLabelEditFrame, QFrame * maxLabelEditFrame,
-      QHBoxLayout * minLayout, QHBoxLayout * maxLayout)
-      {
+    RangeWidgetGroup(QLabel* minLabel, QLabel* maxLabel, QLineEdit* minLineEdit,
+      QLineEdit* maxLineEdit, QFrame* minLabelEditFrame, QFrame* maxLabelEditFrame,
+      QHBoxLayout* minLayout, QHBoxLayout* maxLayout)
+    {
       this->minRangeLabel = minLabel;
       this->maxRangeLabel = maxLabel;
       this->minLineEditRange = minLineEdit;
@@ -130,55 +129,55 @@ public:
       this->maxFrame = maxLabelEditFrame;
       this->minHorizontalLayout = minLayout;
       this->maxHorizontalLayout = maxLayout;
-      }
+    }
 
     virtual ~RangeWidgetGroup()
-      {
+    {
       delete this->minFrame;
       delete this->maxFrame;
-      }
+    }
 
-    QLabel * minRangeLabel;
-    QLabel * maxRangeLabel;
-    QLineEdit * minLineEditRange;
-    QLineEdit * maxLineEditRange;
-    QFrame * minFrame;
-    QFrame * maxFrame;
-    QHBoxLayout * minHorizontalLayout;
-    QHBoxLayout * maxHorizontalLayout;
+    QLabel* minRangeLabel;
+    QLabel* maxRangeLabel;
+    QLineEdit* minLineEditRange;
+    QLineEdit* maxLineEditRange;
+    QFrame* minFrame;
+    QFrame* maxFrame;
+    QHBoxLayout* minHorizontalLayout;
+    QHBoxLayout* maxHorizontalLayout;
   };
 
-  pqRangeWidget(QString variableAsString) :
-    varName(variableAsString)
+  pqRangeWidget(QString variableAsString)
+    : varName(variableAsString)
   {
   }
 
   virtual ~pqRangeWidget()
   {
     for (int i = 0; i < int(rangeWidgetGroups.size()); i++)
-      {
+    {
       delete rangeWidgetGroups[i];
-      }
+    }
     if (this->horizLine)
-      {
+    {
       delete this->horizLine;
       this->horizLine = NULL;
-      }
+    }
   }
 
-  std::vector<RangeWidgetGroup *> rangeWidgetGroups;
-  QFrame * horizLine;
+  std::vector<RangeWidgetGroup*> rangeWidgetGroups;
+  QFrame* horizLine;
   QString varName;
 
   static int precision;
 
-  RangeWidgetGroup * allocAndMakeMinMax(VarRange * varRange, const QString & varToDisplay, int componentIndex,
-      QVBoxLayout * theVarRangeLayout, QWidget * parentWidget)
+  RangeWidgetGroup* allocAndMakeMinMax(VarRange* varRange, const QString& varToDisplay,
+    int componentIndex, QVBoxLayout* theVarRangeLayout, QWidget* parentWidget)
   {
-    QLabel *minRangeLabel;
-    QLabel *maxRangeLabel;
-    QLineEdit *maxLineEditRange;
-    QLineEdit *minLineEditRange;
+    QLabel* minRangeLabel;
+    QLabel* maxRangeLabel;
+    QLineEdit* maxLineEditRange;
+    QLineEdit* minLineEditRange;
 
     QString minStr = varToDisplay + QString(" min");
     QString maxStr = varToDisplay + QString(" max");
@@ -187,9 +186,9 @@ public:
     // varToDisplay Min, varToDisplay Max
     //
 
-    QFrame * minFrame = new QFrame(parentWidget);
-    minFrame->setMaximumSize(QSize(16777215,40));
-    QHBoxLayout * minHorizontalLayout = new QHBoxLayout(minFrame);
+    QFrame* minFrame = new QFrame(parentWidget);
+    minFrame->setMaximumSize(QSize(16777215, 40));
+    QHBoxLayout* minHorizontalLayout = new QHBoxLayout(minFrame);
     minRangeLabel = new QLabel(minFrame);
     minRangeLabel->setObjectName(varRange->varName + QString("_") + QString("minRangeLabel"));
     minRangeLabel->setText(minStr);
@@ -197,23 +196,23 @@ public:
     minLineEditRange = new QLineEdit(minFrame);
     minLineEditRange->setObjectName(varRange->varName + QString("_") + QString("minLineEditRange"));
 
-    double rangeVal=0.0;
+    double rangeVal = 0.0;
     if (componentIndex == -1)
-      {
+    {
       // get the magnitude of the range
       rangeVal = varRange->magnitudes[VarRange::MIN_ELEMENT_INDEX];
-      }
+    }
     else
-      {
+    {
       // get range itself
       rangeVal = varRange->ranges[componentIndex][VarRange::MIN_ELEMENT_INDEX];
-      }
+    }
     minLineEditRange->setText(QString("").setNum(rangeVal, 'e', pqRangeWidget::precision));
     minHorizontalLayout->addWidget(minLineEditRange);
 
-    QFrame * maxFrame = new QFrame(parentWidget);
-    maxFrame->setMaximumSize(QSize(16777215,40));
-    QHBoxLayout * maxHorizontalLayout = new QHBoxLayout(maxFrame);
+    QFrame* maxFrame = new QFrame(parentWidget);
+    maxFrame->setMaximumSize(QSize(16777215, 40));
+    QHBoxLayout* maxHorizontalLayout = new QHBoxLayout(maxFrame);
     maxRangeLabel = new QLabel(maxFrame);
     maxRangeLabel->setObjectName(varRange->varName + QString("_") + QString("maxRangeLabel"));
     maxRangeLabel->setText(maxStr);
@@ -221,38 +220,38 @@ public:
     maxLineEditRange = new QLineEdit(maxFrame);
     maxLineEditRange->setObjectName(varRange->varName + QString("_") + QString("maxLineEditRange"));
     if (componentIndex == -1)
-      {
+    {
       // get the magnitude of the range
       rangeVal = varRange->magnitudes[VarRange::MAX_ELEMENT_INDEX];
-      }
+    }
     else
-      {
+    {
       // get range itself
       rangeVal = varRange->ranges[componentIndex][VarRange::MAX_ELEMENT_INDEX];
-      }
+    }
     maxLineEditRange->setText(QString("").setNum(rangeVal, 'e', pqRangeWidget::precision));
     maxHorizontalLayout->addWidget(maxLineEditRange);
 
     theVarRangeLayout->addWidget(minFrame);
     theVarRangeLayout->addWidget(maxFrame);
 
-    RangeWidgetGroup * rangeWidgetGroup = new RangeWidgetGroup(minRangeLabel,
-      maxRangeLabel, minLineEditRange, maxLineEditRange,
-      minFrame, maxFrame, minHorizontalLayout, maxHorizontalLayout);
+    RangeWidgetGroup* rangeWidgetGroup =
+      new RangeWidgetGroup(minRangeLabel, maxRangeLabel, minLineEditRange, maxLineEditRange,
+        minFrame, maxFrame, minHorizontalLayout, maxHorizontalLayout);
 
     return rangeWidgetGroup;
   }
 
-  void build(pqPlotVariablesDialog::pqUI *ui, VarRange * varRange,
-    int componentIndex)
-    {
-    rangeWidgetGroups.push_back(this->allocAndMakeMinMax(varRange, this->varName, componentIndex, ui->scrollWidgetLayout, ui->rangeScrollArea));
+  void build(pqPlotVariablesDialog::pqUI* ui, VarRange* varRange, int componentIndex)
+  {
+    rangeWidgetGroups.push_back(this->allocAndMakeMinMax(
+      varRange, this->varName, componentIndex, ui->scrollWidgetLayout, ui->rangeScrollArea));
 
     // Add a (QFrame) horizontal line for visual separation
     horizLine = new QFrame(ui->rangeScrollArea);
     horizLine->setFrameShape(QFrame::HLine);
     ui->scrollWidgetLayout->addWidget(horizLine);
-    }
+  }
 };
 
 //
@@ -266,27 +265,29 @@ int pqRangeWidget::precision = 0;
 class pqPlotVariablesDialog::pqInternal
 {
 public:
-
   static const int DEFAULT_FLOATING_POINT_PRECISION = 7;
 
   enum separators_enum
-    {
+  {
     e_unknownSep = -1,
     e_commaSep = 0,
     e_dashSep,
-    };
+  };
 
-  pqInternal() :
-    listWidget(NULL),
-    verticalSpacer(NULL),
-    plotType(-1)
-    {
+  pqInternal()
+    : listWidget(NULL)
+    , verticalSpacer(NULL)
+    , plotType(-1)
+  {
     varRanges.clear();
     rangeWidgets.clear();
-    pqPlotVariablesDialog::pqInternal::precision = pqPlotVariablesDialog::pqInternal::DEFAULT_FLOATING_POINT_PRECISION;
+    pqPlotVariablesDialog::pqInternal::precision =
+      pqPlotVariablesDialog::pqInternal::DEFAULT_FLOATING_POINT_PRECISION;
 
-    // we set the pqRangeWidget::precision class variable here, because we want the DEFAULT_FLOATING_POINT_PRECISION
-    //   to be associated with the pqPlotVariablesDialog::pqInternal, and not have to propagate it down
+    // we set the pqRangeWidget::precision class variable here, because we want the
+    // DEFAULT_FLOATING_POINT_PRECISION
+    //   to be associated with the pqPlotVariablesDialog::pqInternal, and not have to propagate it
+    //   down
     //   to a "lower level" class
     pqRangeWidget::precision = pqPlotVariablesDialog::pqInternal::precision;
 
@@ -320,44 +321,35 @@ public:
     componentArrayIndicesMap["_xy"] = 3;
     componentArrayIndicesMap["_yz"] = 4;
     componentArrayIndicesMap["_zx"] = 5;
-    }
+  }
 
   virtual ~pqInternal()
-    {
-    QMap<QString, VarRange *>::iterator mapI = varRanges.begin();
+  {
+    QMap<QString, VarRange*>::iterator mapI = varRanges.begin();
     while (mapI != varRanges.end())
-      {
-      VarRange * vr = mapI.value();
+    {
+      VarRange* vr = mapI.value();
       delete vr;
       mapI++;
-      }
     }
+  }
 
   virtual void addVariable(QString varName);
-  virtual double computeMagnitude(VarRange * vr, int k);
-  virtual bool addRangeToUI(pqPlotVariablesDialog::pqUI *ui, QString variableAsString);
-  virtual bool removeRangeFromUI(pqPlotVariablesDialog::pqUI *ui, QString variableAsString);
-  virtual bool inSelection(const QString & itemStr, QList<QListWidgetItem *> & selectedItems);
+  virtual double computeMagnitude(VarRange* vr, int k);
+  virtual bool addRangeToUI(pqPlotVariablesDialog::pqUI* ui, QString variableAsString);
+  virtual bool removeRangeFromUI(pqPlotVariablesDialog::pqUI* ui, QString variableAsString);
+  virtual bool inSelection(const QString& itemStr, QList<QListWidgetItem*>& selectedItems);
 
   virtual int getPlotType() { return plotType; }
 
-  virtual void setPlotType(int type)
-    {
-    plotType = type;
-    }
+  virtual void setPlotType(int type) { plotType = type; }
 
-  virtual void setPlotter(pqPlotter * thePlotter)
-    {
-    plotter = thePlotter;
-    }
+  virtual void setPlotter(pqPlotter* thePlotter) { plotter = thePlotter; }
 
-  virtual pqPlotter * getPlotter()
-    {
-    return plotter;
-    }
+  virtual pqPlotter* getPlotter() { return plotter; }
 
   //-----------------------------------------------------------------------------
-  void updateHoverWithPlotter(pqPlotVariablesDialog::pqUI * _ui)
+  void updateHoverWithPlotter(pqPlotVariablesDialog::pqUI* _ui)
   {
     _ui->variableVsWhatever->setPlotter(this->getPlotter());
   }
@@ -366,20 +358,20 @@ public:
   int getNumberPostSeparator(int begIndex, QString lineEditText)
   {
     if (begIndex >= lineEditText.size())
-      {
+    {
       return -1;
-      }
+    }
 
     int index = begIndex;
-    while (! isSeparator(lineEditText[index]) && (index < lineEditText.size()) )
-      {
+    while (!isSeparator(lineEditText[index]) && (index < lineEditText.size()))
+    {
       index++;
-      }
+    }
 
     if (index >= lineEditText.size())
-      {
+    {
       return lineEditText.size() - 1;
-      }
+    }
 
     return index - 1;
   }
@@ -388,51 +380,51 @@ public:
   bool isSeparator(QChar ch)
   {
     if (ch.toLatin1() == ',')
-      {
+    {
       return true;
-      }
+    }
     if (ch.toLatin1() == '-')
-      {
+    {
       return true;
-      }
+    }
 
     return false;
   }
 
   //-----------------------------------------------------------------------------
-  bool separator(QChar ch, separators_enum & sepType)
+  bool separator(QChar ch, separators_enum& sepType)
   {
     sepType = e_unknownSep;
     if (ch.toLatin1() == ',')
-      {
+    {
       sepType = e_commaSep;
       return true;
-      }
+    }
     if (ch.toLatin1() == '-')
-      {
+    {
       sepType = e_dashSep;
       return true;
-      }
+    }
 
-      //qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalide range separator " << ;
+    // qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalide range separator " << ;
 
     return false;
   }
 
   //-----------------------------------------------------------------------------
-  int findSeparator(int parseIndex, separators_enum & sepType, QString lineEditText)
+  int findSeparator(int parseIndex, separators_enum& sepType, QString lineEditText)
   {
-    int i=parseIndex;
+    int i = parseIndex;
     sepType = e_unknownSep;
-    while (! this->separator(lineEditText[i], sepType) && i < lineEditText.length())
-      {
+    while (!this->separator(lineEditText[i], sepType) && i < lineEditText.length())
+    {
       i++;
-      }
+    }
 
     if (i >= lineEditText.length())
-      {
+    {
       return -1;
-      }
+    }
 
     return i;
   }
@@ -441,75 +433,75 @@ public:
   // This method parses a string for a number.
   // if the starting parseIndex is a separator, this is an error
   //
-  QPair<int,int> parseNumberRange(int & parseIndex, separators_enum & sepType, QString lineEditText)
+  QPair<int, int> parseNumberRange(int& parseIndex, separators_enum& sepType, QString lineEditText)
   {
     sepType = e_unknownSep;
 
-    QPair<int,int> retRange(-1,-1);
+    QPair<int, int> retRange(-1, -1);
     int rangeBeg = -1;
     int rangeEnd = -1;
 
     if (lineEditText.length() <= 0)
-      {
+    {
       return retRange;
-      }
+    }
 
     if (isSeparator(lineEditText[parseIndex]))
-      {
+    {
       return retRange;
-      }
+    }
 
     if (parseIndex >= lineEditText.length())
-      {
+    {
       return retRange;
-      }
+    }
 
     // look for separator, starting at parseIndex
     int separatorIndex = this->findSeparator(parseIndex, sepType, lineEditText);
 
     if (separatorIndex == -1)
-      {
-      rangeBeg = this->util.getNumber(parseIndex, lineEditText.length()-1, lineEditText);
+    {
+      rangeBeg = this->util.getNumber(parseIndex, lineEditText.length() - 1, lineEditText);
       parseIndex = -1; // end of line or something
-      }
+    }
     else
+    {
+      switch (sepType)
       {
-      switch(sepType)
-        {
         case e_commaSep:
-          rangeBeg = this->util.getNumber(parseIndex, separatorIndex-1, lineEditText);
+          rangeBeg = this->util.getNumber(parseIndex, separatorIndex - 1, lineEditText);
           parseIndex = separatorIndex + 1;
           break;
 
         case e_dashSep:
+        {
+          rangeBeg = this->util.getNumber(parseIndex, separatorIndex - 1, lineEditText);
+          int rangeEndIndex = this->getNumberPostSeparator(separatorIndex + 1, lineEditText);
+          if (rangeEndIndex != -1)
+          {
+            rangeEnd = this->util.getNumber(separatorIndex + 1, rangeEndIndex, lineEditText);
+            parseIndex = rangeEndIndex + 1;
+
+            // if the next char is a separator, then advance the index to parse at
+            if (isSeparator(lineEditText[parseIndex]))
             {
-            rangeBeg = this->util.getNumber(parseIndex, separatorIndex-1, lineEditText);
-            int rangeEndIndex = this->getNumberPostSeparator(separatorIndex+1, lineEditText);
-            if (rangeEndIndex != -1)
-              {
-              rangeEnd = this->util.getNumber(separatorIndex+1, rangeEndIndex, lineEditText);
-              parseIndex = rangeEndIndex + 1;
-
-              // if the next char is a separator, then advance the index to parse at
-              if (isSeparator(lineEditText[parseIndex]))
-                {
-                parseIndex++;
-                }
-              }
-            else
-              {
-              // error with range specification
-              rangeBeg = -1;
-              rangeEnd = -1;
-              }
-            break;
+              parseIndex++;
             }
-
-        case e_unknownSep:
-          //Do something here?
+          }
+          else
+          {
+            // error with range specification
+            rangeBeg = -1;
+            rangeEnd = -1;
+          }
           break;
         }
+
+        case e_unknownSep:
+          // Do something here?
+          break;
       }
+    }
 
     retRange.first = rangeBeg;
     retRange.second = rangeEnd;
@@ -518,7 +510,7 @@ public:
   }
 
   //-----------------------------------------------------------------------------
-  QString removeAllWhiteSpace_andValidate(QString inString, bool & errFlag)
+  QString removeAllWhiteSpace_andValidate(QString inString, bool& errFlag)
   {
     errFlag = false;
     QString retString("");
@@ -528,20 +520,21 @@ public:
 
     // pass 2 - look for invalid characters
     for (int i = 0; i < retString.length(); i++)
+    {
+      if (!this->util.validChar(retString[i].toLatin1()))
       {
-      if ( ! this->util.validChar(retString[i].toLatin1()))
-        {
         errFlag = true;
         break;
-        }
       }
+    }
 
     // pass 3 -- set an error flag if the stripped string is empty
     if (retString.length() <= 0)
-      {
-      qWarning() << "removeAllWhiteSpace_andValidate: ERROR - selection string: " << inString << ", is empty";
+    {
+      qWarning() << "removeAllWhiteSpace_andValidate: ERROR - selection string: " << inString
+                 << ", is empty";
       errFlag = true;
-      }
+    }
 
     return retString;
   }
@@ -550,12 +543,12 @@ public:
   QString componentSuffixString(QString variableAsString)
   {
     for (int i = 0; i < this->validComponentSuffixes.size(); i++)
-      {
+    {
       if (variableAsString.endsWith(this->validComponentSuffixes[i]))
-        {
+      {
         return this->validComponentSuffixes[i];
-        }
       }
+    }
 
     return QString("");
   }
@@ -568,9 +561,9 @@ public:
     QString suffixString = this->componentSuffixString(variableAsString);
 
     if (suffixString != QString(""))
-      {
+    {
       index = this->componentArrayIndicesMap[suffixString];
-      }
+    }
 
     return index;
   }
@@ -586,9 +579,9 @@ public:
     {
       int positionToTruncate = retString.size() - suffixString.size();
       if (positionToTruncate > 0)
-        {
+      {
         retString.truncate(positionToTruncate);
-        }
+      }
     }
 
     return retString;
@@ -597,93 +590,96 @@ public:
   //=============================================================================
 
   QStringList validComponentSuffixes;
-  QMap<QString,int> componentArrayIndicesMap;
-  QMap<QString, VarRange *> varRanges;
-  QMap<QString, bool> variableSelectionStates;  // to keep track of selection state
-  QVector<pqRangeWidget *> rangeWidgets;
-  QListWidget * listWidget;
-  QSpacerItem * verticalSpacer;
+  QMap<QString, int> componentArrayIndicesMap;
+  QMap<QString, VarRange*> varRanges;
+  QMap<QString, bool> variableSelectionStates; // to keep track of selection state
+  QVector<pqRangeWidget*> rangeWidgets;
+  QListWidget* listWidget;
+  QSpacerItem* verticalSpacer;
   pqSierraPlotToolsUtils util;
 
   static int precision;
 
   int plotType;
-  pqPlotter * plotter;
+  pqPlotter* plotter;
 };
 
-int pqPlotVariablesDialog::pqInternal::precision = pqPlotVariablesDialog::pqInternal::DEFAULT_FLOATING_POINT_PRECISION;
+int pqPlotVariablesDialog::pqInternal::precision =
+  pqPlotVariablesDialog::pqInternal::DEFAULT_FLOATING_POINT_PRECISION;
 
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::pqInternal::addVariable(QString varName)
 {
-  VarRange * vr = this->varRanges[varName];
+  VarRange* vr = this->varRanges[varName];
   if (vr == NULL)
-    {
+  {
     vr = new VarRange(varName);
     this->varRanges[varName] = vr;
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotVariablesDialog::pqInternal::removeRangeFromUI(pqPlotVariablesDialog::pqUI *_ui, QString variableAsString)
+bool pqPlotVariablesDialog::pqInternal::removeRangeFromUI(
+  pqPlotVariablesDialog::pqUI* _ui, QString variableAsString)
 {
-  pqRangeWidget * rangeWidget;
+  pqRangeWidget* rangeWidget;
 
   int i;
   for (i = 0; i < this->rangeWidgets.size(); i++)
-    {
+  {
     rangeWidget = this->rangeWidgets[i];
     if (rangeWidget->varName == variableAsString)
-      {
+    {
       delete rangeWidget;
       this->rangeWidgets.remove(i);
 
       // if no more range widgets left, remove the vertical spacer
       if (this->rangeWidgets.size() == 0)
-        {
+      {
         if (this->verticalSpacer)
-          {
+        {
           _ui->scrollWidgetLayout->removeItem(this->verticalSpacer);
           this->verticalSpacer = NULL;
-          }
         }
+      }
 
       // update the scroll area geometry
       // so that it resizes if need be
       _ui->rangeScrollArea->updateGeometry();
 
       return true;
-      }
     }
+  }
 
   return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotVariablesDialog::pqInternal::addRangeToUI(pqPlotVariablesDialog::pqUI *_ui, QString variableAsString)
+bool pqPlotVariablesDialog::pqInternal::addRangeToUI(
+  pqPlotVariablesDialog::pqUI* _ui, QString variableAsString)
 {
   QString strippedVariableName = this->stripComponentSuffix(variableAsString);
   int arrayIndex = this->componentArrayIndexFromSuffix(variableAsString);
-  VarRange * varRange = this->varRanges[strippedVariableName];
+  VarRange* varRange = this->varRanges[strippedVariableName];
 
   if (varRange != NULL)
-    {
-    pqRangeWidget * rangeWidget = new pqRangeWidget(variableAsString);
+  {
+    pqRangeWidget* rangeWidget = new pqRangeWidget(variableAsString);
     rangeWidget->build(_ui, varRange, arrayIndex);
 
     this->rangeWidgets.append(rangeWidget);
-    }
+  }
   else
-    {
+  {
     qCritical() << "* ERROR * variable " << variableAsString << " has no valid range";
     return false;
-    }
+  }
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
-double pqPlotVariablesDialog::pqInternal::computeMagnitude(VarRange * vr, int k)
+double pqPlotVariablesDialog::pqInternal::computeMagnitude(VarRange* vr, int k)
 {
   double magnitude = 0.0;
   for (int i = 0; i < vr->numComponents; i++)
@@ -696,11 +692,10 @@ double pqPlotVariablesDialog::pqInternal::computeMagnitude(VarRange * vr, int k)
   return magnitude;
 }
 //=============================================================================
-pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
-                                             Qt::WindowFlags f/*=0*/)
+pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget* p, Qt::WindowFlags f /*=0*/)
   : QDialog(p, f)
 {
-  pqSierraPlotToolsManager *manager = pqSierraPlotToolsManager::instance();
+  pqSierraPlotToolsManager* manager = pqSierraPlotToolsManager::instance();
   this->Server = manager->getActiveServer();
 
   this->Internal = new pqPlotVariablesDialog::pqInternal();
@@ -710,25 +705,27 @@ pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
 
   // connect signals and slots to the list widget
   QObject::connect(this->ui->okCancelButtonBox, SIGNAL(accepted(void)), this, SLOT(slotOk(void)));
-  QObject::connect(this->ui->okCancelButtonBox, SIGNAL(rejected(void)), this, SLOT(slotCancel(void)));
+  QObject::connect(
+    this->ui->okCancelButtonBox, SIGNAL(rejected(void)), this, SLOT(slotCancel(void)));
 
   QObject::connect(this->ui->useParaViewGUIToSelectNodesCheckBox, SIGNAL(toggled(bool)), this,
     SLOT(slotUseParaViewGUIToSelectNodesCheckBox(bool)));
 
   // set up some parameters for the scroll area
   // scroll area height should not be more than 60% of desktop main screen
-  this->ui->rangeScrollArea->setMaximumHeight(int(0.5 * QApplication::desktop()->availableGeometry().height()));
+  this->ui->rangeScrollArea->setMaximumHeight(
+    int(0.5 * QApplication::desktop()->availableGeometry().height()));
 
   // main dialog height should not be more than a certain percentage of desktop main screen
 
-  //float deskTopHeight = QApplication::desktop()->availableGeometry().height();
+  // float deskTopHeight = QApplication::desktop()->availableGeometry().height();
 
-  pqPlotVariablesDialog * myDialog = this;
+  pqPlotVariablesDialog* myDialog = this;
   //  myDialog->setMaximumHeight(0.1 * deskTopHeight);
 
   myDialog->setMaximumHeight(555);
 
-  //QSizePolicy tmpSizePolicy = this->sizePolicy(); //If this doesn't do anything, why is it here?
+  // QSizePolicy tmpSizePolicy = this->sizePolicy(); //If this doesn't do anything, why is it here?
 }
 
 //-----------------------------------------------------------------------------
@@ -760,15 +757,15 @@ QString pqPlotVariablesDialog::stripComponentSuffix(QString variableAsString)
 void pqPlotVariablesDialog::activateSelectionByNumberFrame()
 {
   if (this->Internal->getPlotter()->amIAbleToSelectByNumber())
-    {
+  {
     this->ui->selectionByNumberFrame->show();
     this->setupActivationForOKButton(true);
-    }
+  }
   else
-    {
+  {
     this->ui->selectionByNumberFrame->hide();
     this->setupActivationForOKButton(false);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -790,7 +787,7 @@ void pqPlotVariablesDialog::setPlotType(int type)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::setPlotter(pqPlotter * thePlotter)
+void pqPlotVariablesDialog::setPlotter(pqPlotter* thePlotter)
 {
   this->Internal->setPlotter(thePlotter);
 
@@ -798,7 +795,7 @@ void pqPlotVariablesDialog::setPlotter(pqPlotter * thePlotter)
 }
 
 //-----------------------------------------------------------------------------
-pqPlotter * pqPlotVariablesDialog::getPlotter()
+pqPlotter* pqPlotVariablesDialog::getPlotter()
 {
   return this->Internal->getPlotter();
 }
@@ -814,10 +811,12 @@ void pqPlotVariablesDialog::setFloatingPointPrecision(int precis)
 {
   pqPlotVariablesDialog::pqInternal::precision = precis;
 
-    // we set the pqRangeWidget::precision class variable here, because we want the concept of "precision"
-    //   to be associated with the pqPlotVariablesDialog::pqInternal, and not have to propagate it down
-    //   to a "lower level" class
-    pqRangeWidget::precision = pqPlotVariablesDialog::pqInternal::precision;
+  // we set the pqRangeWidget::precision class variable here, because we want the concept of
+  // "precision"
+  //   to be associated with the pqPlotVariablesDialog::pqInternal, and not have to propagate it
+  //   down
+  //   to a "lower level" class
+  pqRangeWidget::precision = pqPlotVariablesDialog::pqInternal::precision;
 }
 
 //-----------------------------------------------------------------------------
@@ -827,31 +826,32 @@ int pqPlotVariablesDialog::getFloatingPointPrecision()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::allocSetRange(QString varName, int numComp, int numElems, double ** ranges)
+void pqPlotVariablesDialog::allocSetRange(
+  QString varName, int numComp, int numElems, double** ranges)
 {
-  VarRange * vr = this->Internal->varRanges[varName];
+  VarRange* vr = this->Internal->varRanges[varName];
   if (vr != NULL)
-    {
+  {
     vr->numComponents = numComp;
     vr->numElements = numElems;
 
-    vr->ranges = new double * [numComp];
+    vr->ranges = new double*[numComp];
     for (int j = 0; j < numComp; j++)
-      {
+    {
       vr->ranges[j] = new double[numElems];
       for (int k = 0; k < numElems; k++)
-        {
-        vr->ranges[j][k] = ranges[j][k];
-        }
-      }
-
-    // compute the magnitude
-    vr->magnitudes = new double [numElems];
-    for (int k = 0; k < numElems; k++)
       {
-      vr->magnitudes[k] = this->Internal->computeMagnitude(vr,k);
+        vr->ranges[j][k] = ranges[j][k];
       }
     }
+
+    // compute the magnitude
+    vr->magnitudes = new double[numElems];
+    for (int k = 0; k < numElems; k++)
+    {
+      vr->magnitudes[k] = this->Internal->computeMagnitude(vr, k);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -872,35 +872,36 @@ void pqPlotVariablesDialog::setEnableNumberItems(bool flag)
 void pqPlotVariablesDialog::setupActivationForOKButton(bool flag)
 {
   if (flag)
-    {
+  {
     // Disable the OK button, until some range is entered in the numberItemsLineEdit box
-    QPushButton * okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
+    QPushButton* okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
 
     // connect a signal for when the user enters some data in numberItemsLineEdit box
-    connect(this->ui->numberItemsLineEdit, SIGNAL(textChanged(const QString & )), this, SLOT(slotTextChanged(const QString &)));
-    }
+    connect(this->ui->numberItemsLineEdit, SIGNAL(textChanged(const QString&)), this,
+      SLOT(slotTextChanged(const QString&)));
+  }
   else
-    {
+  {
     // Enable the OK button
-    QPushButton * okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
+    QPushButton* okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
     okButton->setEnabled(true);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::slotTextChanged(const QString & text)
+void pqPlotVariablesDialog::slotTextChanged(const QString& text)
 {
   QString nonWhite = this->Internal->util.removeAllWhiteSpace(text);
-  QPushButton * okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
+  QPushButton* okButton = this->ui->okCancelButtonBox->button(QDialogButtonBox::Ok);
   if (nonWhite.size() > 0)
-    {
+  {
     okButton->setEnabled(true);
-    }
+  }
   else
-    {
+  {
     okButton->setEnabled(false);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -910,54 +911,56 @@ QString pqPlotVariablesDialog::getNumberItemsLineEdit()
 }
 
 //-----------------------------------------------------------------------------
-QList<int> pqPlotVariablesDialog::determineSelectedItemsList(bool & errFlag)
+QList<int> pqPlotVariablesDialog::determineSelectedItemsList(bool& errFlag)
 {
   QList<int> retList;
 
-  QString lineEditText = this->Internal->removeAllWhiteSpace_andValidate(this->ui->numberItemsLineEdit->text(), errFlag);
+  QString lineEditText =
+    this->Internal->removeAllWhiteSpace_andValidate(this->ui->numberItemsLineEdit->text(), errFlag);
 
   if (errFlag)
-    {
+  {
     return retList;
-    }
+  }
 
-  int parseIndex=0;
+  int parseIndex = 0;
   while (parseIndex != -1 && parseIndex < lineEditText.length())
-    {
-    QPair<int,int> range;
+  {
+    QPair<int, int> range;
 
     pqInternal::separators_enum sepType;
     range = this->Internal->parseNumberRange(parseIndex, sepType, lineEditText);
 
     if (range.first >= 0)
-      {
+    {
       if (sepType == pqInternal::e_dashSep)
-        {
+      {
         // if dash, find the range, if comma (or something else god forbid!) then don't do the range
         int i;
         for (i = range.first; i <= range.second; i++)
-          {
+        {
           // only append unique values
-          if (! retList.contains(i))
-            {
+          if (!retList.contains(i))
+          {
             retList.append(i);
-            }
           }
         }
-      else
-        {
-        // comma, so just put in the first value
-          retList.append(range.first);
-        }
       }
-    else
+      else
       {
-      // some sort of error, deal with it
-        qWarning() << "pqPlotVariablesDialog::determineSelectedItemsList: ERROR - range specification error";
-        errFlag = true;
-        return retList;
+        // comma, so just put in the first value
+        retList.append(range.first);
       }
     }
+    else
+    {
+      // some sort of error, deal with it
+      qWarning()
+        << "pqPlotVariablesDialog::determineSelectedItemsList: ERROR - range specification error";
+      errFlag = true;
+      return retList;
+    }
+  }
 
   return retList;
 }
@@ -989,13 +992,14 @@ bool pqPlotVariablesDialog::areVariablesSelected()
 }
 
 //-----------------------------------------------------------------------------
-QList<QListWidgetItem *> pqPlotVariablesDialog::getSelectedItems()
+QList<QListWidgetItem*> pqPlotVariablesDialog::getSelectedItems()
 {
   return this->Internal->listWidget->selectedItems();
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(vtkSMStringVectorProperty * stringVecProp)
+QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(
+  vtkSMStringVectorProperty* stringVecProp)
 {
   QStringList retList;
 
@@ -1003,18 +1007,18 @@ QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(vtkSMStringVecto
   uNumElems = stringVecProp->GetNumberOfElements();
 
   for (unsigned int i = 0; i < uNumElems; i += 2)
-    {
-    const char * elemPtr = stringVecProp->GetElement(i);
-    //const char * elemPtr_status = stringVecProp->GetElement(i+1);
+  {
+    const char* elemPtr = stringVecProp->GetElement(i);
+    // const char * elemPtr_status = stringVecProp->GetElement(i+1);
 
     QString elemAsQString(elemPtr);
-    VarRange * vr = this->Internal->varRanges[elemAsQString];
+    VarRange* vr = this->Internal->varRanges[elemAsQString];
     if (vr != NULL)
-      {
+    {
       QStringList compList;
 
-      switch(vr->numComponents)
-        {
+      switch (vr->numComponents)
+      {
         case 1:
           compList.append(elemAsQString);
           break;
@@ -1038,11 +1042,11 @@ QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(vtkSMStringVecto
 
         default:
           break;
-        }
+      }
 
       retList.append(compList);
-      }
     }
+  }
 
   return retList;
 }
@@ -1050,22 +1054,22 @@ QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(vtkSMStringVecto
 //-----------------------------------------------------------------------------
 QStringList pqPlotVariablesDialog::getSelectedItemsStringList()
 {
-  QList<QListWidgetItem *> selectedItems = this->getSelectedItems();
+  QList<QListWidgetItem*> selectedItems = this->getSelectedItems();
   QStringList retList;
 
-  QList<QListWidgetItem *>::iterator iter = selectedItems.begin();
+  QList<QListWidgetItem*>::iterator iter = selectedItems.begin();
   while (iter != selectedItems.end())
-    {
+  {
     QString variableAsString = (*iter)->text();
     retList.append(variableAsString);
     iter++;
-    }
+  }
 
   return retList;
 }
 
 //-----------------------------------------------------------------------------
-QListWidget * pqPlotVariablesDialog::getVariableList()
+QListWidget* pqPlotVariablesDialog::getVariableList()
 {
   return this->Internal->listWidget;
 }
@@ -1073,35 +1077,38 @@ QListWidget * pqPlotVariablesDialog::getVariableList()
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::setupVariablesList(QStringList varStrings)
 {
-  QGridLayout * varListLayout = new QGridLayout(ui->pickVariableFrame);
+  QGridLayout* varListLayout = new QGridLayout(ui->pickVariableFrame);
   this->Internal->listWidget = new QListWidget(ui->pickVariableFrame);
   varListLayout->addWidget(this->Internal->listWidget);
 
   this->Internal->listWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
   QStringList::const_iterator constIterator;
-  for (constIterator = varStrings.constBegin(); constIterator != varStrings.constEnd(); ++constIterator)
-    {
+  for (constIterator = varStrings.constBegin(); constIterator != varStrings.constEnd();
+       ++constIterator)
+  {
     QString theVarNameStr = (*constIterator);
     this->Internal->listWidget->addItem(theVarNameStr);
     this->Internal->variableSelectionStates[theVarNameStr] = false;
-    }
+  }
 
   // connect signals and slots to the list widget
-  QObject::connect(this->Internal->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(slotItemSelectionChanged()));
+  QObject::connect(this->Internal->listWidget, SIGNAL(itemSelectionChanged()), this,
+    SLOT(slotItemSelectionChanged()));
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotVariablesDialog::pqInternal::inSelection(const QString & itemStr, QList<QListWidgetItem *> & selectedItems)
+bool pqPlotVariablesDialog::pqInternal::inSelection(
+  const QString& itemStr, QList<QListWidgetItem*>& selectedItems)
 {
-  QList<QListWidgetItem *>::iterator iter;
-  for (iter=selectedItems.begin(); iter != selectedItems.end(); iter++)
-    {
+  QList<QListWidgetItem*>::iterator iter;
+  for (iter = selectedItems.begin(); iter != selectedItems.end(); iter++)
+  {
     if ((*iter)->text() == itemStr)
-      {
+    {
       return true;
-      }
     }
+  }
 
   return false;
 }
@@ -1109,16 +1116,16 @@ bool pqPlotVariablesDialog::pqInternal::inSelection(const QString & itemStr, QLi
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::slotItemSelectionChanged()
 {
-  QList<QListWidgetItem *> selectedItems = this->Internal->listWidget->selectedItems();
+  QList<QListWidgetItem*> selectedItems = this->Internal->listWidget->selectedItems();
 
   // Find all deselected variables:
   // first go through all the selection states. If a variable was selected,
-  // but is not in the current selection list, than that means it was 
+  // but is not in the current selection list, than that means it was
   // delselected
   QMap<QString, bool>::iterator statesIter = this->Internal->variableSelectionStates.begin();
-  for ( ; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
+  for (; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
   {
-    if (*statesIter == true && ! this->Internal->inSelection(statesIter.key(), selectedItems))
+    if (*statesIter == true && !this->Internal->inSelection(statesIter.key(), selectedItems))
     {
       // deselection
       emit this->variableDeselectionByName(statesIter.key());
@@ -1130,10 +1137,10 @@ void pqPlotVariablesDialog::slotItemSelectionChanged()
 
   // Now find all selected variables (that were not selected in the first pass):
   // first go through all the selection states. If a variable was selected,
-  // but is not in the current selection list, than that means it was 
+  // but is not in the current selection list, than that means it was
   // delselected
   statesIter = this->Internal->variableSelectionStates.begin();
-  for ( ; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
+  for (; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
   {
     if (*statesIter == false && this->Internal->inSelection(statesIter.key(), selectedItems))
     {
@@ -1145,12 +1152,12 @@ void pqPlotVariablesDialog::slotItemSelectionChanged()
     }
   }
 
-  //pqPlotVariablesDialog * myDialog = this;
+  // pqPlotVariablesDialog * myDialog = this;
 
-  //QSize dialogSize = myDialog->size();
-  //QSize maxSize = myDialog->maximumSize();
-  //QSizePolicy tmpSizePolicy = myDialog->sizePolicy(); 
-  //QSizePolicy::Policy verticalPolicy = sizePolicy.verticalPolicy();
+  // QSize dialogSize = myDialog->size();
+  // QSize maxSize = myDialog->maximumSize();
+  // QSizePolicy tmpSizePolicy = myDialog->sizePolicy();
+  // QSizePolicy::Policy verticalPolicy = sizePolicy.verticalPolicy();
 }
 
 //-----------------------------------------------------------------------------
@@ -1160,20 +1167,21 @@ bool pqPlotVariablesDialog::addRangeToUI(QString itemText)
   // Remove the verticalSpacer (if it exists)
   // because we always want to add it after the last range
   if (this->Internal->verticalSpacer)
-    {
+  {
     ui->scrollWidgetLayout->removeItem(this->Internal->verticalSpacer);
     this->Internal->verticalSpacer = NULL;
-    }
+  }
 
   bool flag = this->Internal->addRangeToUI(this->ui, itemText);
 
-  if (! flag)
+  if (!flag)
   {
     return false;
   }
 
   // add in a vertical spacer
-  this->Internal->verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  this->Internal->verticalSpacer =
+    new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   this->ui->scrollWidgetLayout->addItem(this->Internal->verticalSpacer);
 
   // update the scroll area geometry

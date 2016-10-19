@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QStyledItemDelegate>
 
-/// Delegate for QTableView to draw a checkbox as an left-right (unchecked)
-/// and top-bottom (checked) arrow.
-/// The checkbox has an extra state for unchecked disabled.
-/// Based on a Stack overflow answer:
-/// http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+/**
+* Delegate for QTableView to draw a checkbox as an left-right (unchecked)
+* and top-bottom (checked) arrow.
+* The checkbox has an extra state for unchecked disabled.
+* Based on a Stack overflow answer:
+* http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+*/
 class PQCORE_EXPORT pqCheckBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
@@ -50,15 +52,13 @@ public:
     NOT_EXPANDED_DISABLED
   };
 
-  pqCheckBoxDelegate(QObject *parent);
+  pqCheckBoxDelegate(QObject* parent);
   ~pqCheckBoxDelegate();
 
-  void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const;
-  bool editorEvent(QEvent *event,
-                   QAbstractItemModel *model,
-                   const QStyleOptionViewItem &option,
-                   const QModelIndex &index);
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
+    const QModelIndex& index);
+
 private:
   Q_DISABLE_COPY(pqCheckBoxDelegate)
   struct pqInternals;

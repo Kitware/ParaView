@@ -24,9 +24,9 @@
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
-  Grid grid = (Grid) { .NumberOfPoints = 0, .Points = 0, .NumberOfCells = 0, .Cells = 0};
-  unsigned int numPoints[3] = {70, 60, 44};
-  double spacing[3] = {1, 1.1, 1.3};
+  Grid grid = (Grid){.NumberOfPoints = 0, .Points = 0, .NumberOfCells = 0, .Cells = 0 };
+  unsigned int numPoints[3] = { 70, 60, 44 };
+  double spacing[3] = { 1, 1.1, 1.3 };
   InitializeGrid(&grid, numPoints, spacing);
   Attributes attributes;
   InitializeAttributes(&attributes, &grid);
@@ -36,21 +36,21 @@ int main(int argc, char* argv[])
 #endif
   unsigned int numberOfTimeSteps = 100;
   unsigned int timeStep;
-  for(timeStep=0;timeStep<numberOfTimeSteps;timeStep++)
-    {
+  for (timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)
+  {
     // use a time step length of 0.1
     double time = timeStep * 0.1;
     UpdateFields(&attributes, time);
 #ifdef USE_CATALYST
     int lastTimeStep = 0;
-    if(timeStep == numberOfTimeSteps-1)
-      {
+    if (timeStep == numberOfTimeSteps - 1)
+    {
       lastTimeStep = 1;
-      }
-    CatalystCoProcess(grid.NumberOfPoints, grid.Points, grid.NumberOfCells, grid.Cells,
-                      attributes.Velocity, attributes.Pressure, time, timeStep, lastTimeStep);
-#endif
     }
+    CatalystCoProcess(grid.NumberOfPoints, grid.Points, grid.NumberOfCells, grid.Cells,
+      attributes.Velocity, attributes.Pressure, time, timeStep, lastTimeStep);
+#endif
+  }
 
 #ifdef USE_CATALYST
   CatalystFinalize();

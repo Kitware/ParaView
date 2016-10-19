@@ -38,41 +38,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 class vtkSMProxy;
 
-/// GUI for ContourWidgetRepresentation. This is a 3D widget that edits a Contour.
+/**
+* GUI for ContourWidgetRepresentation. This is a 3D widget that edits a Contour.
+*/
 class PQDEPRECATED_EXPORT pqContourWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
+
 public:
   pqContourWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
   virtual ~pqContourWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
   virtual void resetBounds(double /*bounds*/[6]) {}
-  virtual void resetBounds()
-    { return this->Superclass::resetBounds(); }
+  virtual void resetBounds() { return this->Superclass::resetBounds(); }
 
   // Some convenient methods
   // Set the point placer/line interpolator
   virtual void setPointPlacer(vtkSMProxy*);
   virtual void setLineInterpolator(vtkSMProxy*);
 
-  /// Activates the widget. Respects the visibility flag.
+  /**
+  * Activates the widget. Respects the visibility flag.
+  */
   virtual void select();
-  /// Deactivates the widget.
+  /**
+  * Deactivates the widget.
+  */
   virtual void deselect();
 
-  /// Set the line color
+  /**
+  * Set the line color
+  */
   virtual void setLineColor(const QColor& color);
 
 signals:
-  /// Signal emitted when the representation proxy's "ClosedLoop" property
-  /// is modified.
+  /**
+  * Signal emitted when the representation proxy's "ClosedLoop" property
+  * is modified.
+  */
   void contourLoopClosed();
   void contourDone();
 
@@ -80,30 +92,44 @@ public slots:
   void removeAllNodes();
   void checkContourLoopClosed();
 
-  /// Close the contour loop
+  /**
+  * Close the contour loop
+  */
   void closeLoop(bool);
 
-  ///Move to the next mode ( Drawing, Editing, Done )
-  void updateMode( );
+  /**
+  *Move to the next mode ( Drawing, Editing, Done )
+  */
+  void updateMode();
 
-  ///Toggle the edit mode, which will switch between Edit/Modify mode
-  void toggleEditMode( );
+  /**
+  *Toggle the edit mode, which will switch between Edit/Modify mode
+  */
+  void toggleEditMode();
 
-  ///Finish editing the contour
-  void finishContour( );
+  /**
+  *Finish editing the contour
+  */
+  void finishContour();
 
-  /// Resets pending changes. Default implementation
-  /// pushes the property values of the controlled widget to the
-  /// 3D widget properties.
-  /// The correspondence is determined from the <Hints />
-  /// associated with the controlled proxy.
+  /**
+  * Resets pending changes. Default implementation
+  * pushes the property values of the controlled widget to the
+  * 3D widget properties.
+  * The correspondence is determined from the <Hints />
+  * associated with the controlled proxy.
+  */
   virtual void reset();
 
 protected:
-  /// Internal method to create the widget.
+  /**
+  * Internal method to create the widget.
+  */
   virtual void createWidget(pqServer*);
 
-  /// Update the widget visibility according to the WidgetVisible and Selected flags
+  /**
+  * Update the widget visibility according to the WidgetVisible and Selected flags
+  */
   virtual void updateWidgetVisibility();
 
 protected slots:
@@ -112,8 +138,7 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqContourWidget)
 
-  void updateRepProperty(vtkSMProxy* smProxy,
-    const char* propertyName);
+  void updateRepProperty(vtkSMProxy* smProxy, const char* propertyName);
 
   class pqInternals;
   pqInternals* Internals;

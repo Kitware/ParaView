@@ -12,14 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGridAxesHelper - is a helper object used by vtkGridAxes2DActor,
-// vtkGridAxes3DActor, and vtkGridAxesPlane2DActor.
-// .SECTION Description
-// vtkGridAxes2DActor, vtkGridAxes3DActor, and vtkGridAxesPlane2DActor shares a lot
-// of the computations and logic. This class makes it possible to share all
-// such information between these classes.
-// This class works with a single face of the bounding box specified using the
-// GridBounds.
+/**
+ * @class   vtkGridAxesHelper
+ * @brief   is a helper object used by vtkGridAxes2DActor,
+ * vtkGridAxes3DActor, and vtkGridAxesPlane2DActor.
+ *
+ * vtkGridAxes2DActor, vtkGridAxes3DActor, and vtkGridAxesPlane2DActor shares a lot
+ * of the computations and logic. This class makes it possible to share all
+ * such information between these classes.
+ * This class works with a single face of the bounding box specified using the
+ * GridBounds.
+*/
 
 #ifndef vtkGridAxesHelper_h
 #define vtkGridAxesHelper_h
@@ -27,7 +30,7 @@
 #include "vtkObject.h"
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkVector.h" // needed for vtkVector.
+#include "vtkVector.h"                       // needed for vtkVector.
 
 class vtkMatrix4x4;
 class vtkViewport;
@@ -39,129 +42,157 @@ public:
   vtkTypeMacro(vtkGridAxesHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set the bounding box defining the grid space. This, together with the
-  // \c Face identify which planar surface this class is interested in. This
-  // class is designed to work with a single planar surface.
+  //@{
+  /**
+   * Set the bounding box defining the grid space. This, together with the
+   * \c Face identify which planar surface this class is interested in. This
+   * class is designed to work with a single planar surface.
+   */
   vtkSetVector6Macro(GridBounds, double);
   vtkGetVector6Macro(GridBounds, double);
+  //@}
 
   // These are in the same order as the faces of a vtkVoxel.
   enum Faces
-    {
+  {
     MIN_YZ,
     MIN_ZX,
     MIN_XY,
     MAX_YZ,
     MAX_ZX,
     MAX_XY
-    };
+  };
 
-  // Description:
-  // Indicate which face of the specified bounds is this class operating with.
+  //@{
+  /**
+   * Indicate which face of the specified bounds is this class operating with.
+   */
   vtkSetClampMacro(Face, int, MIN_YZ, MAX_XY);
   vtkGetMacro(Face, int);
+  //@}
 
-  // Description:
-  // Valid values for LabelMask.
+  /**
+   * Valid values for LabelMask.
+   */
   enum LabelMasks
-    {
-    MIN_X=0x01,
-    MIN_Y=0x02,
-    MIN_Z=0x04,
-    MAX_X=0x08,
-    MAX_Y=0x010,
-    MAX_Z=0x020
-    };
+  {
+    MIN_X = 0x01,
+    MIN_Y = 0x02,
+    MIN_Z = 0x04,
+    MAX_X = 0x08,
+    MAX_Y = 0x010,
+    MAX_Z = 0x020
+  };
 
-  // Description:
-  // Set the axes to label.
+  //@{
+  /**
+   * Set the axes to label.
+   */
   vtkSetMacro(LabelMask, unsigned int);
   vtkGetMacro(LabelMask, unsigned int);
+  //@}
 
-  // Description:
-  // Get the 4 points in world coordinates that define the grid plane. The
-  // points are in anticlockwise anticlockwise order with the face normal
-  // pointing outward from the box defined by the GridBounds.
+  /**
+   * Get the 4 points in world coordinates that define the grid plane. The
+   * points are in anticlockwise anticlockwise order with the face normal
+   * pointing outward from the box defined by the GridBounds.
+   */
   vtkTuple<vtkVector3d, 4> GetPoints();
 
-  // Description:
-  // Returns which of the 3 coordinate axes for the 2 axes for this plane: 0 for
-  // X axis, 1, for Y axis, and 3 for Z axis. The two axes are specified in
-  // order so that together with the face normal (which is point outwards from
-  // the box defined by GridBounds), they form a right-handed coordinate system.
+  /**
+   * Returns which of the 3 coordinate axes for the 2 axes for this plane: 0 for
+   * X axis, 1, for Y axis, and 3 for Z axis. The two axes are specified in
+   * order so that together with the face normal (which is point outwards from
+   * the box defined by GridBounds), they form a right-handed coordinate system.
+   */
   vtkVector2i GetActiveAxes();
 
-  // Description:
-  // Returns the visibility for labels for each of the 4 axis defined by the
-  // face points based on the LabelMask.
+  /**
+   * Returns the visibility for labels for each of the 4 axis defined by the
+   * face points based on the LabelMask.
+   */
   vtkTuple<bool, 4> GetLabelVisibilities();
 
-  // Description:
-  // Set the transform matrix to use to transform the points. The matrix's MTime
-  // will be used to determine if the transformed points needed to be
-  // recomputed, when needed.
+  //@{
+  /**
+   * Set the transform matrix to use to transform the points. The matrix's MTime
+   * will be used to determine if the transformed points needed to be
+   * recomputed, when needed.
+   */
   void SetMatrix(vtkMatrix4x4*);
   vtkGetObjectMacro(Matrix, vtkMatrix4x4);
+  //@}
 
-  // Description:
-  // Get the 4 points of the plane transformed using the transformation matrix
-  // set using SetMatrix(), if any. This method to compute the transformed
-  // points the first time its called since the plane points or the
-  // transformation matrix was set.
+  /**
+   * Get the 4 points of the plane transformed using the transformation matrix
+   * set using SetMatrix(), if any. This method to compute the transformed
+   * points the first time its called since the plane points or the
+   * transformation matrix was set.
+   */
   vtkTuple<vtkVector3d, 4> GetTransformedPoints();
 
-  // Description:
-  // Transforms the give point using the Matrix.
+  /**
+   * Transforms the give point using the Matrix.
+   */
   vtkVector3d TransformPoint(const vtkVector3d& point);
 
-  // Description:
-  // Get the normal to the grid plane face **after** applying the transform
-  // specified using transformation matrix.
-  // Similar to GetTransformedPoints(), this method will only compute when
-  // input parameters have changed since the last time this method was called.
+  /**
+   * Get the normal to the grid plane face **after** applying the transform
+   * specified using transformation matrix.
+   * Similar to GetTransformedPoints(), this method will only compute when
+   * input parameters have changed since the last time this method was called.
+   */
   vtkVector3d GetTransformedFaceNormal();
 
-  // Description:
-  // Call this method before accessing any of the attributes in viewport space.
-  // This computes the location of the plane in the viewport space using the
-  // specified viewport. This method should typically be called once per render.
+  /**
+   * Call this method before accessing any of the attributes in viewport space.
+   * This computes the location of the plane in the viewport space using the
+   * specified viewport. This method should typically be called once per render.
+   */
   bool UpdateForViewport(vtkViewport* viewport);
 
-  // Description:
-  // Get the positions for the plane points in viewport coordinates.
+  /**
+   * Get the positions for the plane points in viewport coordinates.
+   */
   vtkTuple<vtkVector2i, 4> GetViewportPoints() const { return this->ViewportPoints; }
   vtkTuple<vtkVector2d, 4> GetViewportPointsAsDouble() const
-    { return this->ViewportPointsAsDouble; }
+  {
+    return this->ViewportPointsAsDouble;
+  }
 
-  // Description:
-  // Get the axis vectors formed using the points returned by
-  // GetViewportPoints(). These are in non-normalized form.
-  vtkTuple<vtkVector2d, 4> GetViewportVectors() const
-    { return this->ViewportVectors; }
+  /**
+   * Get the axis vectors formed using the points returned by
+   * GetViewportPoints(). These are in non-normalized form.
+   */
+  vtkTuple<vtkVector2d, 4> GetViewportVectors() const { return this->ViewportVectors; }
 
-  // Description:
-  // Get the normals to the axis vectors in viewport space. There are not true
-  // normals to the axis vector. These are normalized.
-  vtkTuple<vtkVector2d, 4> GetViewportNormals() const
-    { return this->ViewportNormals; }
+  /**
+   * Get the normals to the axis vectors in viewport space. There are not true
+   * normals to the axis vector. These are normalized.
+   */
+  vtkTuple<vtkVector2d, 4> GetViewportNormals() const { return this->ViewportNormals; }
 
-  // Description:
-  // Get if the face is facing backwards in the current viewport.
+  //@{
+  /**
+   * Get if the face is facing backwards in the current viewport.
+   */
   vtkGetMacro(Backface, bool);
+  //@}
 
 protected:
   vtkGridAxesHelper();
   ~vtkGridAxesHelper();
 
-  // Description:
-  // Get/Set label visibility overrides. This is more of a hack. We needed a
-  // mechanism to override which labels are drawn in vtkGridAxes3DActor. This
-  // makes that possible.
+  /**
+   * Get/Set label visibility overrides. This is more of a hack. We needed a
+   * mechanism to override which labels are drawn in vtkGridAxes3DActor. This
+   * makes that possible.
+   */
   void SetLabelVisibilityOverrides(const vtkTuple<bool, 4>& overrides)
-    { this->LabelVisibilityOverrides = overrides; }
-  vtkTuple<bool, 4> GetLabelVisibilityOverrides()
-    { return this->LabelVisibilityOverrides; }
+  {
+    this->LabelVisibilityOverrides = overrides;
+  }
+  vtkTuple<bool, 4> GetLabelVisibilityOverrides() { return this->LabelVisibilityOverrides; }
   friend class vtkGridAxes3DActor;
 
   double GridBounds[6];
@@ -190,7 +221,6 @@ protected:
 private:
   vtkGridAxesHelper(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
   void operator=(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

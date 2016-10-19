@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCPPluginManager.h"
 
 //-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
+pqCPPluginManager::pqCPPluginManager(QObject* parentObject)
+  : Superclass(parentObject)
 {
 }
 

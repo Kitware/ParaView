@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMRemoteObjectUpdateUndoElement - vtkSMRemoteObject undo element.
-// .SECTION Description
-// This class keeps the before and after state of the RemoteObject in the
-// vtkSMMessage form. It works with any proxy and RemoteObject. It is a very
-// generic undoElement.
+/**
+ * @class   vtkSMRemoteObjectUpdateUndoElement
+ * @brief   vtkSMRemoteObject undo element.
+ *
+ * This class keeps the before and after state of the RemoteObject in the
+ * vtkSMMessage form. It works with any proxy and RemoteObject. It is a very
+ * generic undoElement.
+*/
 
 #ifndef vtkSMRemoteObjectUpdateUndoElement_h
 #define vtkSMRemoteObjectUpdateUndoElement_h
@@ -35,24 +38,27 @@ public:
   vtkTypeMacro(vtkSMRemoteObjectUpdateUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Undo the operation encapsulated by this element.
-  // \return the status of the operation, 1 on success, 0 otherwise.
+  /**
+   * Undo the operation encapsulated by this element.
+   * \return the status of the operation, 1 on success, 0 otherwise.
+   */
   virtual int Undo();
 
-  // Description:
-  // Redo the operation encaspsulated by this element.
-  // \return the status of the operation, 1 on success, 0 otherwise.
+  /**
+   * Redo the operation encaspsulated by this element.
+   * \return the status of the operation, 1 on success, 0 otherwise.
+   */
   virtual int Redo();
 
-  // Description:
-  // Set ProxyLocator to use if any.
+  /**
+   * Set ProxyLocator to use if any.
+   */
   virtual void SetProxyLocator(vtkSMProxyLocator*);
 
-  // Description:
-  // Set the state of the UndoElement
-  virtual void SetUndoRedoState(const vtkSMMessage* before,
-                                const vtkSMMessage* after);
+  /**
+   * Set the state of the UndoElement
+   */
+  virtual void SetUndoRedoState(const vtkSMMessage* before, const vtkSMMessage* after);
 
   // Current full state of the UndoElement
   vtkSMMessage* BeforeState;
@@ -72,7 +78,6 @@ protected:
 private:
   vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

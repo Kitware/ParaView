@@ -75,10 +75,10 @@ bool pqSettingsDialog::ShowRestartRequired = false;
 
 //-----------------------------------------------------------------------------
 pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
-  : Superclass(parentObject, f),
-  Internals (new pqSettingsDialog::pqInternals())
+  : Superclass(parentObject, f)
+  , Internals(new pqSettingsDialog::pqInternals())
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.setupUi(this);
   ui.tabBar->setDocumentMode(false);
   ui.tabBar->setDrawBase(false);
@@ -97,28 +97,28 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   iter->SetSession(server->session());
   iter->SetModeToOneGroup();
   for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
-    {
+  {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)
-      {
+    {
       proxies_to_show.push_back(proxy);
-      }
     }
+  }
 
   // Add color palette.
   if (vtkSMProxy* proxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette"))
-    {
+  {
     proxies_to_show.push_back(proxy);
-    }
+  }
 
   foreach (vtkSMProxy* proxy, proxies_to_show)
-    {
+  {
     QString proxyName = proxy->GetXMLName();
 
-    QScrollArea *scrollArea = new QScrollArea(this);
+    QScrollArea* scrollArea = new QScrollArea(this);
     scrollArea->setObjectName(QString("ScrollArea%1").arg(proxyName));
     scrollArea->setWidgetResizable(true);
-    scrollArea->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    scrollArea->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     QWidget* container = new QWidget(scrollArea);
@@ -139,8 +139,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
     this->connect(widget, SIGNAL(restartRequired()), SLOT(showRestartRequiredMessage()));
     vbox->addWidget(widget);
 
-    QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
-      QSizePolicy::MinimumExpanding);
+    QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
 
     scrollArea->setWidget(container);
@@ -153,14 +152,14 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 
     this->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
     widget->connect(this, SIGNAL(filterWidgets(bool, QString)), SLOT(filterWidgets(bool, QString)));
-    }
+  }
 
   // Disable some buttons to start
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
   this->connect(ui.buttonBox->button(QDialogButtonBox::RestoreDefaults), SIGNAL(clicked()),
-                SLOT(onRestoreDefaults()));
+    SLOT(onRestoreDefaults()));
   this->connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(clicked(QAbstractButton*)));
   this->connect(this, SIGNAL(accepted()), SLOT(onAccepted()));
   this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
@@ -190,30 +189,30 @@ void pqSettingsDialog::serverRemoved(pqServer* server)
 {
   // BUG #14957: Close this dialog if the server session closes.
   if (this->Internals->Server == server)
-    {
+  {
     this->close();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqSettingsDialog::clicked(QAbstractButton *button)
+void pqSettingsDialog::clicked(QAbstractButton* button)
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   QDialogButtonBox::ButtonRole role = ui.buttonBox->buttonRole(button);
   switch (role)
-    {
-  case QDialogButtonBox::AcceptRole:
-  case QDialogButtonBox::ApplyRole:
-    emit this->accepted();
-    break;
+  {
+    case QDialogButtonBox::AcceptRole:
+    case QDialogButtonBox::ApplyRole:
+      emit this->accepted();
+      break;
 
-  case QDialogButtonBox::ResetRole:
-  case QDialogButtonBox::RejectRole:
-    emit this->rejected();
-    break;
-  default:
-    break;
-    }
+    case QDialogButtonBox::ResetRole:
+    case QDialogButtonBox::RejectRole:
+      emit this->rejected();
+      break;
+    default:
+      break;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -221,39 +220,39 @@ void pqSettingsDialog::onAccepted()
 {
   // If there are any properties that needed to save their values in QSettings,
   // do that. Otherwise, save to the vtkSMSettings singleton.
-  vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
   pqSettings* qSettings = pqApplicationCore::instance()->settings();
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(server->session());
   iter->SetModeToOneGroup();
   for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
-    {
+  {
     vtkSMProxy* proxy = iter->GetProxy();
     settings->SetProxySettings(proxy);
     vtkSmartPointer<vtkSMPropertyIterator> iter2;
     iter2.TakeReference(proxy->NewPropertyIterator());
     for (iter2->Begin(); !iter2->IsAtEnd(); iter2->Next())
-      {
+    {
       vtkSMProperty* smproperty = iter2->GetProperty();
       if (smproperty && smproperty->GetHints() &&
         smproperty->GetHints()->FindNestedElementByName("SaveInQSettings"))
-        {
+      {
         QString key = QString("%1.%2").arg(iter->GetKey()).arg(iter2->GetKey());
         qSettings->saveInQSettings(key.toLatin1().data(), smproperty);
-        }
       }
     }
+  }
 
   // Save color palette settings
   vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
   if (paletteProxy)
-    {
+  {
     settings->SetProxySettings(paletteProxy);
-    }
+  }
 
   // Disable buttons
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
@@ -269,7 +268,7 @@ void pqSettingsDialog::onAccepted()
 void pqSettingsDialog::onRejected()
 {
   // Disable buttons
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 }
@@ -277,48 +276,47 @@ void pqSettingsDialog::onRejected()
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::onRestoreDefaults()
 {
-  pqServer* server = pqActiveObjects::instance().activeServer();  
-  vtkSMSession * session = server->session();
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  vtkSMSession* session = server->session();
 
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(session);
   iter->SetModeToOneGroup();
   for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
-    {
+  {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)
-      {
+    {
       proxy->ResetPropertiesToXMLDefaults();
-      }
     }
+  }
 
   vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
   if (paletteProxy)
-    {
+  {
     paletteProxy->ResetPropertiesToXMLDefaults();
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::onTabIndexChanged(int index)
 {
   int stackWidgetIndex = this->Internals->TabToStackedWidgets[index];
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.stackedWidget->setCurrentIndex(stackWidgetIndex);
 }
 
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::filterPanelWidgets()
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
-  emit this->filterWidgets(
-    ui.SearchBox->isAdvancedSearchActive(), ui.SearchBox->text());
+  Ui::SettingsDialog& ui = this->Internals->Ui;
+  emit this->filterWidgets(ui.SearchBox->isAdvancedSearchActive(), ui.SearchBox->text());
 }
 
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::onChangeAvailable()
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(true);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
 }
@@ -326,7 +324,7 @@ void pqSettingsDialog::onChangeAvailable()
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::showRestartRequiredMessage()
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
+  Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.restartRequiredLabel->setVisible(true);
   pqSettingsDialog::ShowRestartRequired = true;
 }
@@ -335,15 +333,15 @@ void pqSettingsDialog::showRestartRequiredMessage()
 void pqSettingsDialog::showTab(const QString& title)
 {
   if (!title.isEmpty())
+  {
+    Ui::SettingsDialog& ui = this->Internals->Ui;
+    for (int cc = 0; cc < ui.tabBar->count(); ++cc)
     {
-    Ui::SettingsDialog &ui = this->Internals->Ui;
-    for (int cc=0; cc < ui.tabBar->count(); ++cc)
-      {
       if (ui.tabBar->tabText(cc) == title)
-        {
+      {
         ui.tabBar->setCurrentIndex(cc);
         break;
-        }
       }
     }
+  }
 }

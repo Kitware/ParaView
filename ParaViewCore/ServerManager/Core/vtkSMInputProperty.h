@@ -12,17 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInputProperty - proxy representing inputs to a filter
-// .SECTION Description
-// vtkSMInputProperty is a concrete sub-class of vtkSMProperty representing
-// inputs to a filter (through vtkSMProxy). It is a special property that
-// always calls AddInput on a vtkSMSourceProxy.
-// The xml configuration for input proxy supports the following attributes:
-// multiple_input: For an input port that connects multiple connections 
-// such as the input of an append filter. port_index: The input port to
-// be used.
-// .SECTION See Also
-// vtkSMInputProperty vtkSMSourceProxy
+/**
+ * @class   vtkSMInputProperty
+ * @brief   proxy representing inputs to a filter
+ *
+ * vtkSMInputProperty is a concrete sub-class of vtkSMProperty representing
+ * inputs to a filter (through vtkSMProxy). It is a special property that
+ * always calls AddInput on a vtkSMSourceProxy.
+ * The xml configuration for input proxy supports the following attributes:
+ * multiple_input: For an input port that connects multiple connections
+ * such as the input of an append filter. port_index: The input port to
+ * be used.
+ * @sa
+ * vtkSMInputProperty vtkSMSourceProxy
+*/
 
 #ifndef vtkSMInputProperty_h
 #define vtkSMInputProperty_h
@@ -41,59 +44,74 @@ public:
   vtkTypeMacro(vtkSMInputProperty, vtkSMProxyProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Should be set to true if the "input port" this property represents
-  // can accept multiple inputs (for example, an append filter)
+  //@{
+  /**
+   * Should be set to true if the "input port" this property represents
+   * can accept multiple inputs (for example, an append filter)
+   */
   vtkSetMacro(MultipleInput, int);
   vtkGetMacro(MultipleInput, int);
+  //@}
 
-  // Description:
-  // Add a proxy to the list of input proxies. The outputPort controls
-  // which outputPort will be used in connecting the pipeline.
-  // The proxy is added with corresponding Add and Set methods and
-  // can be removed with RemoveXXX() methods as usual.
+  //@{
+  /**
+   * Add a proxy to the list of input proxies. The outputPort controls
+   * which outputPort will be used in connecting the pipeline.
+   * The proxy is added with corresponding Add and Set methods and
+   * can be removed with RemoveXXX() methods as usual.
+   */
   void AddInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
-  void SetInputConnection(
-    unsigned int idx, vtkSMProxy* proxy, unsigned int outputPort);
+  void SetInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int outputPort);
+  //@}
 
   void AddUncheckedInputConnection(vtkSMProxy* proxy, unsigned int outputPort);
-  void SetUncheckedInputConnection(
-    unsigned int idx, vtkSMProxy* proxy, unsigned int inputPort);
+  void SetUncheckedInputConnection(unsigned int idx, vtkSMProxy* proxy, unsigned int inputPort);
 
-  // Description:
-  // Sets the value of the property to the list of proxies specified.
-  virtual void SetProxies(unsigned int numElements,
-    vtkSMProxy* proxies[], unsigned int outputports[]);
+  //@{
+  /**
+   * Sets the value of the property to the list of proxies specified.
+   */
+  virtual void SetProxies(
+    unsigned int numElements, vtkSMProxy* proxies[], unsigned int outputports[]);
   using Superclass::SetProxies;
+  //@}
 
-  // Description:
-  // Given an index for a connection (proxy), returns which output port
-  // is used to connect the pipeline.
+  //@{
+  /**
+   * Given an index for a connection (proxy), returns which output port
+   * is used to connect the pipeline.
+   */
   unsigned int GetOutputPortForConnection(unsigned int idx);
   unsigned int GetUncheckedOutputPortForConnection(unsigned int idx);
+  //@}
 
-  // Description:
-  // Controls which input port this property uses when making connections.
-  // By default, this is 0.
+  //@{
+  /**
+   * Controls which input port this property uses when making connections.
+   * By default, this is 0.
+   */
   vtkSetMacro(PortIndex, int);
   vtkGetMacro(PortIndex, int);
+  //@}
 
 protected:
   vtkSMInputProperty();
   ~vtkSMInputProperty();
 
-  // Description:
-  // Set the appropriate ivars from the xml element. Should
-  // be overwritten by subclass if adding ivars.
+  /**
+   * Set the appropriate ivars from the xml element. Should
+   * be overwritten by subclass if adding ivars.
+   */
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
-  // Description:
-  // Fill state property/proxy XML element with output port attribute
-  virtual vtkPVXMLElement* AddProxyElementState(
-    vtkPVXMLElement *propertyElement, unsigned int idx);
+  /**
+   * Fill state property/proxy XML element with output port attribute
+   */
+  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement* propertyElement, unsigned int idx);
 
   int MultipleInput;
   int PortIndex;
+
 private:
   vtkSMInputProperty(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;

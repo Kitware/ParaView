@@ -48,8 +48,9 @@ class vtkVRPropertyStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
+
 public:
-  vtkVRPropertyStyle(QObject* parent=0);
+  vtkVRPropertyStyle(QObject* parent = 0);
   virtual ~vtkVRPropertyStyle();
 
   /// called to handle an event. If the style does not handle this event or
@@ -73,25 +74,22 @@ public:
   /// Get/set the property being controlled by this style.
   virtual vtkSMProperty* getSMProperty() const;
   virtual vtkSMProxy* getSMProxy() const;
-  virtual const QString& getSMPropertyName() const
-    {return this->PropertyName; }
+  virtual const QString& getSMPropertyName() const { return this->PropertyName; }
   void setSMProperty(vtkSMProxy*, const QString& property_name);
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  void SetButtonValue( std::string dest, int value );
-  void SetAnalogValue( std::string dest, double value );
-  void SetAnalogVectorValue( std::string dest,
-                             const double* value,
-                             unsigned int total);
-  void SetTrackerValue( std::string dest, double value );
-  void SetTrackerVectorValue( std::string dest, const double value[16] );
+  void HandleButton(const vtkVREventData& data);
+  void HandleAnalog(const vtkVREventData& data);
+  void HandleTracker(const vtkVREventData& data);
+  void SetButtonValue(std::string dest, int value);
+  void SetAnalogValue(std::string dest, double value);
+  void SetAnalogVectorValue(std::string dest, const double* value, unsigned int total);
+  void SetTrackerValue(std::string dest, double value);
+  void SetTrackerVectorValue(std::string dest, const double value[16]);
   vtkSmartPointer<vtkSMProxy> Proxy;
   QString PropertyName;
-  std::vector<std::string> tokenize( std::string input);
-  std::map<std::string,std::string> Map;
+  std::vector<std::string> tokenize(std::string input);
+  std::map<std::string, std::string> Map;
 
 private:
   Q_DISABLE_COPY(vtkVRPropertyStyle)

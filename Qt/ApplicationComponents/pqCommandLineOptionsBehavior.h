@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -35,19 +35,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
 
-/// @ingroup Behaviors
-/// pqCommandLineOptionsBehavior processes command-line options on startup and
-/// performs relevant actions such as loading data files, connecting to server
-/// etc.
-/// This also handles test playback and image comparison.
+/**
+* @ingroup Behaviors
+* pqCommandLineOptionsBehavior processes command-line options on startup and
+* performs relevant actions such as loading data files, connecting to server
+* etc.
+* This also handles test playback and image comparison.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandLineOptionsBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
-public:
-  pqCommandLineOptionsBehavior(QObject* parent=0);
 
-  /// Used during testing to "initialize" application state as much as possible.
+public:
+  pqCommandLineOptionsBehavior(QObject* parent = 0);
+
+  /**
+  * Used during testing to "initialize" application state as much as possible.
+  */
   static void resetApplication();
 
 protected slots:
@@ -59,5 +64,3 @@ private:
 };
 
 #endif
-
-

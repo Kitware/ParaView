@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVEnsembleDataReaderInformation - Information obeject to
-// collect file information from vtkEnsembleDataReader.
-// .SECTION Description
-// Gather information about data files from vtkEnsembleDataReader.
+/**
+ * @class   vtkPVEnsembleDataReaderInformation
+ * @brief   Information obeject to
+ * collect file information from vtkEnsembleDataReader.
+ *
+ * Gather information about data files from vtkEnsembleDataReader.
+*/
 
 #ifndef vtkPVEnsembleDataReaderInformation_h
 #define vtkPVEnsembleDataReaderInformation_h
@@ -31,21 +34,27 @@ public:
   vtkTypeMacro(vtkPVEnsembleDataReaderInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // Get number of files contained in the ensemble.
+  /**
+   * Get number of files contained in the ensemble.
+   */
   virtual unsigned int GetFileCount();
 
-  // Description:
-  // Get the file path for the input row index.
+  /**
+   * Get the file path for the input row index.
+   */
   virtual vtkStdString GetFilePath(const unsigned int);
 
 protected:
@@ -57,7 +66,7 @@ private:
   void operator=(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
 
   class vtkInternal;
-  vtkInternal *Internal;
+  vtkInternal* Internal;
 };
 
 #endif

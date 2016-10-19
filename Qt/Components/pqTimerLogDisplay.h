@@ -8,7 +8,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqTimerLogDisplay : public QDialog
   Q_OBJECT
 
 public:
-  pqTimerLogDisplay(QWidget *p = NULL);
+  pqTimerLogDisplay(QWidget* p = NULL);
   ~pqTimerLogDisplay();
   typedef QDialog Superclass;
 
@@ -61,15 +61,14 @@ public slots:
   void setBufferLength(int value);
   void setEnable(bool state);
   void save();
-  void save(const QString &filename);
-  void save(const QStringList &files);
+  void save(const QString& filename);
+  void save(const QStringList& files);
 
   void saveState();
   void restoreState();
 
 protected:
-  virtual void addToLog(const QString &source,
-                        vtkPVTimerInformation *timerInfo);
+  virtual void addToLog(const QString& source, vtkPVTimerInformation* timerInfo);
 
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
@@ -82,7 +81,7 @@ private:
   Q_DISABLE_COPY(pqTimerLogDisplay)
 
   double LogThreshold;
-  pqTimerLogDisplayUi *ui;
+  pqTimerLogDisplayUi* ui;
 };
 
 #endif //_pqTimerLogDisplay_h

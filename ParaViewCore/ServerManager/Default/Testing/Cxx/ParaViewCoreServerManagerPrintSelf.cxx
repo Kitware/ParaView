@@ -129,16 +129,18 @@
 #include "vtkSMWriterFactory.h"
 #include "vtkSMWriterProxy.h"
 
-#define PRINT_SELF(classname)\
-  cout <<"------------------------------------" << endl;\
-  cout << "Class: " << #classname << endl;\
-  c = classname::New(); c->Print(cout); c->Delete();
+#define PRINT_SELF(classname)                                                                      \
+  cout << "------------------------------------" << endl;                                          \
+  cout << "Class: " << #classname << endl;                                                         \
+  c = classname::New();                                                                            \
+  c->Print(cout);                                                                                  \
+  c->Delete();
 
-int ParaViewCoreServerManagerPrintSelf(int , char *[])
+int ParaViewCoreServerManagerPrintSelf(int, char* [])
 {
-  vtkObject *c;
+  vtkObject* c;
 
-//  PRINT_SELF(vtkInitializationHelper);
+  //  PRINT_SELF(vtkInitializationHelper);
   PRINT_SELF(vtkPVComparativeAnimationCue);
   PRINT_SELF(vtkPVComparativeView);
   PRINT_SELF(vtkPVKeyFrameAnimationCueForProxies);
@@ -202,7 +204,7 @@ int ParaViewCoreServerManagerPrintSelf(int , char *[])
   PRINT_SELF(vtkSMPluginLoaderProxy);
   PRINT_SELF(vtkSMPluginManager);
   PRINT_SELF(vtkSMProperty);
-  //PRINT_SELF(vtkSMPropertyHelper);
+  // PRINT_SELF(vtkSMPropertyHelper);
   PRINT_SELF(vtkSMPropertyIterator);
   PRINT_SELF(vtkSMPropertyLink);
   PRINT_SELF(vtkSMPropertyModificationUndoElement);
@@ -214,7 +216,7 @@ int ParaViewCoreServerManagerPrintSelf(int , char *[])
   PRINT_SELF(vtkSMProxyLink);
   PRINT_SELF(vtkSMProxyListDomain);
   PRINT_SELF(vtkSMProxyLocator);
-  //PRINT_SELF(vtkSMProxyManager);
+  // PRINT_SELF(vtkSMProxyManager);
   PRINT_SELF(vtkSMProxyProperty);
   PRINT_SELF(vtkSMProxySelectionModel);
   PRINT_SELF(vtkSMPSWriterProxy);
@@ -228,7 +230,7 @@ int ParaViewCoreServerManagerPrintSelf(int , char *[])
   PRINT_SELF(vtkSMRepresentationProxy);
   PRINT_SELF(vtkSMScalarBarWidgetRepresentationProxy);
   PRINT_SELF(vtkSMSelectionHelper);
-  //PRINT_SELF(vtkSMSession);
+  // PRINT_SELF(vtkSMSession);
   PRINT_SELF(vtkSMSessionClient);
   PRINT_SELF(vtkSMSILDomain);
   PRINT_SELF(vtkSMSILModel);

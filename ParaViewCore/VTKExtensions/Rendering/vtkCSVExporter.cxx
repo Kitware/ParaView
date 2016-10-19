@@ -32,37 +32,39 @@ public:
   std::map<double, std::pair<std::string, int> > Lines;
   int ColumnCount;
 
-  vtkInternals() : ColumnCount(0)
-    {
-    }
+  vtkInternals()
+    : ColumnCount(0)
+  {
+  }
 
   void AddColumnValue(const char* delim, double xval, const std::string& value)
-    {
+  {
     std::pair<std::string, int>& item = this->Lines[xval];
     std::ostringstream stream;
     stream << item.first.c_str();
     while (item.second < this->ColumnCount)
-      {
+    {
       stream << delim;
       item.second++;
-      }
+    }
     stream << value.c_str();
     item.first = stream.str();
-    }
+  }
   void DumpLines(const char* delim, ofstream& ofs)
-    {
-    ofs << (this->XColumnName.empty()? "X" : this->XColumnName.c_str()) << delim << this->Header.c_str() << endl;
+  {
+    ofs << (this->XColumnName.empty() ? "X" : this->XColumnName.c_str()) << delim
+        << this->Header.c_str() << endl;
     for (std::map<double, std::pair<std::string, int> >::iterator iter = this->Lines.begin();
-      iter != this->Lines.end(); ++iter)
-      {
+         iter != this->Lines.end(); ++iter)
+    {
       ofs << iter->first << "," << iter->second.first.c_str();
-      for (int cc=iter->second.second; cc < (this->ColumnCount-1); cc++)
-        {
+      for (int cc = iter->second.second; cc < (this->ColumnCount - 1); cc++)
+      {
         ofs << ",";
-        }
-      ofs << endl;
       }
+      ofs << endl;
     }
+  }
 };
 
 vtkStandardNewMacro(vtkCSVExporter);
@@ -70,9 +72,9 @@ vtkStandardNewMacro(vtkCSVExporter);
 vtkCSVExporter::vtkCSVExporter()
 {
   this->FileStream = 0;
-  this->FileName=0;
+  this->FileName = 0;
   this->FilterColumnsByVisibility = false;
-  this->FieldDelimiter =0;
+  this->FieldDelimiter = 0;
   this->SetFieldDelimiter(",");
   this->Internals = new vtkInternals();
   this->Mode = STREAM_ROWS;
@@ -82,9 +84,9 @@ vtkCSVExporter::vtkCSVExporter()
 vtkCSVExporter::~vtkCSVExporter()
 {
   if (this->FileStream)
-    {
+  {
     this->Close();
-    }
+  }
   delete this->Internals;
   this->Internals = NULL;
   delete this->FileStream;
@@ -100,42 +102,42 @@ bool vtkCSVExporter::Open(vtkCSVExporter::ExporterModes mode)
   this->FileStream = 0;
   this->FileStream = new ofstream(this->FileName);
   if (!this->FileStream || !(*this->FileStream))
-    {
+  {
     vtkErrorMacro("Failed to open for writing: " << this->FileName);
     delete this->FileStream;
     this->FileStream = 0;
     return false;
-    }
+  }
   this->Mode = mode;
   return true;
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::AddColumn(
-  vtkAbstractArray* yarray, const char* yarrayname/*=NULL*/, vtkDataArray* xarray/*=NULL*/)
+  vtkAbstractArray* yarray, const char* yarrayname /*=NULL*/, vtkDataArray* xarray /*=NULL*/)
 {
   if (this->Mode != STREAM_COLUMNS)
-    {
+  {
     vtkErrorMacro("Incorrect exporter mode. 'OpenFile' must be called with "
-      "'STREAM_COLUMNS' to use 'AddColumn' API.");
+                  "'STREAM_COLUMNS' to use 'AddColumn' API.");
     return;
-    }
+  }
 
-  yarrayname = yarrayname? yarrayname : yarray->GetName();
-  this->Internals->Header += (this->Internals->ColumnCount > 0)? "," : "";
+  yarrayname = yarrayname ? yarrayname : yarray->GetName();
+  this->Internals->Header += (this->Internals->ColumnCount > 0) ? "," : "";
   this->Internals->Header += "\"" + std::string(yarrayname) + "\"";
 
   assert(xarray == NULL || (xarray->GetNumberOfTuples() == yarray->GetNumberOfTuples()));
   if (xarray && xarray->GetName() && this->Internals->XColumnName.empty())
-    {
+  {
     this->Internals->XColumnName = "\"" + std::string(xarray->GetName()) + "\"";
-    }
-  for (vtkIdType cc=0, max=yarray->GetNumberOfTuples(); cc < max; ++cc)
-    {
+  }
+  for (vtkIdType cc = 0, max = yarray->GetNumberOfTuples(); cc < max; ++cc)
+  {
     this->Internals->AddColumnValue(this->FieldDelimiter,
-      xarray? xarray->GetTuple1(cc) : static_cast<double>(cc),
+      xarray ? xarray->GetTuple1(cc) : static_cast<double>(cc),
       yarray->GetVariantValue(cc).ToString());
-    }
+  }
   this->Internals->ColumnCount++;
 }
 
@@ -143,36 +145,36 @@ void vtkCSVExporter::AddColumn(
 void vtkCSVExporter::WriteHeader(vtkFieldData* data)
 {
   if (!this->FileStream)
-    {
+  {
     vtkErrorMacro("Please call Open(STREAM_ROWS)");
     return;
-    }
+  }
   if (this->Mode != STREAM_ROWS)
-    {
+  {
     vtkErrorMacro("Incorrect exporter mode. 'OpenFile' must be called with "
-      "'STREAM_ROWS' to use 'WriteHeader' API.");
+                  "'STREAM_ROWS' to use 'WriteHeader' API.");
     return;
-    }
+  }
   bool first = true;
   int numArrays = data->GetNumberOfArrays();
-  for (int cc=0; cc < numArrays; cc++)
-    {
+  for (int cc = 0; cc < numArrays; cc++)
+  {
     vtkAbstractArray* array = data->GetAbstractArray(cc);
     int numComps = array->GetNumberOfComponents();
-    for (int comp=0; comp < numComps; comp++)
-      {
+    for (int comp = 0; comp < numComps; comp++)
+    {
       if (!first)
-        {
+      {
         (*this->FileStream) << this->FieldDelimiter;
-        }
+      }
       (*this->FileStream) << array->GetName();
       if (numComps > 1)
-        {
+      {
         (*this->FileStream) << ":" << comp;
-        }
-      first = false;
       }
+      first = false;
     }
+  }
   (*this->FileStream) << "\n";
 }
 
@@ -180,62 +182,59 @@ void vtkCSVExporter::WriteHeader(vtkFieldData* data)
 void vtkCSVExporter::WriteData(vtkFieldData* data)
 {
   if (!this->FileStream)
-    {
+  {
     vtkErrorMacro("Please call Open()");
     return;
-    }
+  }
   if (this->Mode != STREAM_ROWS)
-    {
+  {
     vtkErrorMacro("Incorrect exporter mode. 'OpenFile' must be called with "
-      "'STREAM_ROWS' to use 'WriteData' API.");
+                  "'STREAM_ROWS' to use 'WriteData' API.");
     return;
-    }
+  }
 
   vtkIdType numTuples = data->GetNumberOfTuples();
   int numArrays = data->GetNumberOfArrays();
-  for (vtkIdType tuple=0; tuple < numTuples; tuple++)
-    {
+  for (vtkIdType tuple = 0; tuple < numTuples; tuple++)
+  {
     bool first = true;
-    for (int cc=0; cc < numArrays; cc++)
-      {
+    for (int cc = 0; cc < numArrays; cc++)
+    {
       vtkAbstractArray* array = data->GetAbstractArray(cc);
       int numComps = array->GetNumberOfComponents();
-      for (int comp=0; comp < numComps; comp++)
-        {
+      for (int comp = 0; comp < numComps; comp++)
+      {
         if (!first)
-          {
+        {
           (*this->FileStream) << this->FieldDelimiter;
-          }
-        vtkVariant value = array->GetVariantValue(tuple*numComps + comp);
+        }
+        vtkVariant value = array->GetVariantValue(tuple * numComps + comp);
 
         // to avoid weird characters in the output, cast char /
         // signed char / unsigned char variables to integers
-        value =   ( value.IsChar() ||
-                    value.IsSignedChar() ||
-                    value.IsUnsignedChar()
-                  )
-                ? vtkVariant( value.ToInt() )
-                : value;
+        value = (value.IsChar() || value.IsSignedChar() || value.IsUnsignedChar())
+          ? vtkVariant(value.ToInt())
+          : value;
 
         (*this->FileStream) << value.ToString().c_str();
         first = false;
-        }
       }
-    (*this->FileStream) << "\n";
     }
+    (*this->FileStream) << "\n";
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::Close()
 {
   if (!this->FileStream)
-    {
+  {
     return;
-    }
+  }
   if (this->Mode == STREAM_COLUMNS)
-    {
+  {
     this->Internals->DumpLines(this->FieldDelimiter, *this->FileStream);
-    }
+  }
   this->FileStream->close();
   delete this->FileStream;
   this->FileStream = 0;
@@ -245,16 +244,17 @@ void vtkCSVExporter::Close()
 void vtkCSVExporter::Abort()
 {
   if (this->FileStream)
-    {
+  {
     this->Close();
     vtksys::SystemTools::RemoveFile(this->FileName);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << (this->FileName? this->FileName : "(none)") << endl;
-  os << indent << "FieldDelimiter: " << (this->FieldDelimiter? this->FieldDelimiter : "(none)") << endl;
+  os << indent << "FileName: " << (this->FileName ? this->FileName : "(none)") << endl;
+  os << indent << "FieldDelimiter: " << (this->FieldDelimiter ? this->FieldDelimiter : "(none)")
+     << endl;
 }

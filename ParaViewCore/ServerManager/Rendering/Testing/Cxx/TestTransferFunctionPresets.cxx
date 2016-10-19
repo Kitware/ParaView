@@ -24,19 +24,25 @@ PURPOSE.  See the above copyright notice for more information.
 #include <cassert>
 #include <sstream>
 
-#define myassert(condition, message) \
-  if ((condition)) \
-  { cout << message << " -- SUCCESS" << endl; } \
-  else  \
-  { cout << message << " -- FAILED" << endl; return EXIT_FAILURE; }
+#define myassert(condition, message)                                                               \
+  if ((condition))                                                                                 \
+  {                                                                                                \
+    cout << message << " -- SUCCESS" << endl;                                                      \
+  }                                                                                                \
+  else                                                                                             \
+  {                                                                                                \
+    cout << message << " -- FAILED" << endl;                                                       \
+    return EXIT_FAILURE;                                                                           \
+  }
 
 int TestTransferFunctionPresets(int argc, char* argv[])
 {
-  (void) argc;
+  (void)argc;
 
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
-  vtkSmartPointer<vtkSMTransferFunctionPresets> presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+  vtkSmartPointer<vtkSMTransferFunctionPresets> presets =
+    vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
 
   myassert(presets->GetNumberOfPresets() > 0, "Load presets");
   cout << "Number of presets: " << presets->GetNumberOfPresets() << endl;
@@ -44,8 +50,7 @@ int TestTransferFunctionPresets(int argc, char* argv[])
   unsigned int testPreset = 10;
 
   myassert(presets->GetPresetAsString(testPreset).empty() == false, "Has test preset");
-  cout << "Preset: " << endl
-       << presets->GetPresetAsString(testPreset);
+  cout << "Preset: " << endl << presets->GetPresetAsString(testPreset);
 
   unsigned int old_size = presets->GetNumberOfPresets();
 
@@ -59,14 +64,17 @@ int TestTransferFunctionPresets(int argc, char* argv[])
   presets->AddPreset("Bogus", preset);
   /*
 
-  myassert(presets->GetPreset(testPreset)["ColorSpace"].asString() == "Bogus", "Overridden preset is of right type");
+  myassert(presets->GetPreset(testPreset)["ColorSpace"].asString() == "Bogus", "Overridden preset is
+  of right type");
 
   // create new instance and verify that our overridden preset survived.
   presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
-  myassert(presets->GetPresetAsString(testPreset).empty() == false, "Has overridden preset on reload");
+  myassert(presets->GetPresetAsString(testPreset).empty() == false, "Has overridden preset on
+  reload");
   cout << "Preset: " << endl
        << presets->GetPresetAsString(testPreset);
-  myassert(presets->GetPreset(testPreset)["ColorSpace"].asString() == "Bogus", "Overridden preset is of right type");
+  myassert(presets->GetPreset(testPreset)["ColorSpace"].asString() == "Bogus", "Overridden preset is
+  of right type");
   myassert(presets->RemovePreset(testPreset) == true, "Can remove custom preset after reload");
 
   // Now we'd expect to get the default preset.

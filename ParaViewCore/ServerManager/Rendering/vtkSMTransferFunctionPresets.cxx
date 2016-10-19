@@ -34,57 +34,59 @@ class vtkSMTransferFunctionPresets::vtkInternals
 {
 public:
   vtkInternals()
-    : Modified(false),
-    CustomPresetsLoaded(false)
-    {
-    }
+    : Modified(false)
+    , CustomPresetsLoaded(false)
+  {
+  }
 
   ~vtkInternals()
-    {
+  {
     if (this->Modified)
-      {
+    {
       assert(this->CustomPresetsLoaded);
       if (vtkSMSettings* settings = vtkSMSettings::GetInstance())
-        {
+      {
         std::ostringstream stream;
         stream << "[\n";
         bool not_first = false;
         for (std::vector<Json::Value>::const_iterator iter = this->CustomPresets.begin();
-          iter != this->CustomPresets.end(); ++iter)
-          {
+             iter != this->CustomPresets.end(); ++iter)
+        {
           if (not_first)
-            {
+          {
             stream << ",\n";
-            }
+          }
           not_first = true;
           stream << iter->toStyledString().c_str();
-          }
+        }
         stream << "]";
         settings->SetSetting("TransferFuctionPresets.CustomPresets", stream.str());
-        }
       }
     }
+  }
 
   const std::vector<Json::Value>& GetPresets()
-    {
+  {
     if (this->Presets.empty())
-      {
+    {
       this->LoadBuiltinPresets();
       this->LoadCustomPresets();
-      this->Presets.insert(this->Presets.end(), this->BuiltinPresets.begin(), this->BuiltinPresets.end());
-      this->Presets.insert(this->Presets.end(), this->CustomPresets.begin(), this->CustomPresets.end());
-      }
-    return this->Presets;
+      this->Presets.insert(
+        this->Presets.end(), this->BuiltinPresets.begin(), this->BuiltinPresets.end());
+      this->Presets.insert(
+        this->Presets.end(), this->CustomPresets.begin(), this->CustomPresets.end());
     }
+    return this->Presets;
+  }
 
   bool RemovePreset(unsigned int index)
-    {
+  {
     this->GetPresets();
     if (index >= static_cast<unsigned int>(this->Presets.size()) ||
       index < static_cast<unsigned int>(this->BuiltinPresets.size()))
-      {
+    {
       return false;
-      }
+    }
     this->Presets.erase(this->Presets.begin() + index);
     index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
 
@@ -92,31 +94,31 @@ public:
     assert(this->CustomPresets.size() > index);
     this->CustomPresets.erase(this->CustomPresets.begin() + index);
     return true;
-    }
+  }
 
   void AddPreset(const char* name, const Json::Value& value)
-    {
+  {
     this->LoadCustomPresets();
     this->CustomPresets.push_back(value);
     this->CustomPresets.back()["Name"] = name;
     this->Presets.clear();
     this->Modified = true;
-    }
+  }
 
   bool IsPresetBuiltin(unsigned int index)
-    {
+  {
     this->LoadBuiltinPresets();
     return index < static_cast<unsigned int>(this->BuiltinPresets.size());
-    }
+  }
 
   bool RenamePreset(unsigned int index, const char* newname)
-    {
+  {
     if (newname && newname[0])
-      {
-      const std::vector<Json::Value> &presets = this->GetPresets();
+    {
+      const std::vector<Json::Value>& presets = this->GetPresets();
       if (index < static_cast<unsigned int>(presets.size()) &&
         index >= static_cast<unsigned int>(this->BuiltinPresets.size()))
-        {
+      {
         index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
         assert(this->CustomPresets.size() > index);
 
@@ -124,43 +126,43 @@ public:
         this->Presets.clear();
         this->Modified = true;
         return true;
-        }
       }
-    return false;
     }
+    return false;
+  }
 
   bool ImportPresets(const char* filename)
-    {
+  {
     Json::Reader reader;
     Json::Value root;
     ifstream file;
     file.open(filename);
     if (!file)
-      {
+    {
       vtkGenericWarningMacro("Failed to open file: " << filename);
       return false;
-      }
+    }
     if (!reader.parse(file, root))
-      {
+    {
       vtkGenericWarningMacro("File is not is a format suitable for presets: " << filename);
       return false;
-      }
+    }
     if (!root.isArray())
-      {
+    {
       vtkGenericWarningMacro("File may not contain presets: " << filename);
       return false;
-      }
-    return this->ImportPresets(root);
     }
+    return this->ImportPresets(root);
+  }
 
   bool ImportPresets(const Json::Value& root)
-    {
+  {
     this->LoadCustomPresets();
     this->CustomPresets.insert(this->CustomPresets.end(), root.begin(), root.end());
     this->Modified = true;
     this->Presets.clear();
     return true;
-    }
+  }
 
 private:
   std::vector<Json::Value> BuiltinPresets;
@@ -170,44 +172,48 @@ private:
   bool CustomPresetsLoaded;
 
   void LoadBuiltinPresets()
+  {
+    if (this->BuiltinPresets.empty() == false)
     {
-    if (this->BuiltinPresets.empty() == false) { return; }
+      return;
+    }
     char* rawJSON = vtkSMTransferFunctionPresetsColorMapsJSON();
     Json::Reader reader;
     Json::Value value;
     if (!reader.parse(std::string(rawJSON), value))
-      {
-      vtkGenericWarningMacro(
-        << "Failed to parse builtin transfer function presets: "
-        << reader.getFormattedErrorMessages().c_str());
-      }
-    delete [] rawJSON;
-    this->BuiltinPresets.insert(this->BuiltinPresets.end(), value.begin(), value.end());
+    {
+      vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
+                             << reader.getFormattedErrorMessages().c_str());
     }
+    delete[] rawJSON;
+    this->BuiltinPresets.insert(this->BuiltinPresets.end(), value.begin(), value.end());
+  }
 
   void LoadCustomPresets()
+  {
+    if (this->CustomPresetsLoaded)
     {
-    if (this->CustomPresetsLoaded) { return; }
+      return;
+    }
     this->CustomPresetsLoaded = true;
 
     const char* const settingsKey = "TransferFuctionPresets.CustomPresets";
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
     if (settings == NULL || !settings->HasSetting(settingsKey))
-      {
+    {
       return;
-      }
+    }
 
     std::string presetJSON = settings->GetSettingAsString(settingsKey, "");
     Json::Reader reader;
     Json::Value value;
     if (!presetJSON.empty() && !reader.parse(presetJSON, value))
-      {
-      vtkGenericWarningMacro(
-        << "Failed to parse custom transfer function presets: "
-        << reader.getFormattedErrorMessages().c_str());
-      }
-    this->CustomPresets.insert(this->CustomPresets.end(), value.begin(), value.end());
+    {
+      vtkGenericWarningMacro(<< "Failed to parse custom transfer function presets: "
+                             << reader.getFormattedErrorMessages().c_str());
     }
+    this->CustomPresets.insert(this->CustomPresets.end(), value.begin(), value.end());
+  }
 };
 
 vtkStandardNewMacro(vtkSMTransferFunctionPresets);
@@ -215,7 +221,6 @@ vtkStandardNewMacro(vtkSMTransferFunctionPresets);
 vtkSMTransferFunctionPresets::vtkSMTransferFunctionPresets()
   : Internals(new vtkSMTransferFunctionPresets::vtkInternals())
 {
-
 }
 
 //----------------------------------------------------------------------------
@@ -228,46 +233,45 @@ vtkSMTransferFunctionPresets::~vtkSMTransferFunctionPresets()
 //----------------------------------------------------------------------------
 vtkStdString vtkSMTransferFunctionPresets::GetPresetAsString(unsigned int index)
 {
-  const std::vector<Json::Value> &presets = this->Internals->GetPresets();
-  return index < static_cast<unsigned int>(presets.size())?
-    presets[index].toStyledString() : vtkStdString();
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index].toStyledString()
+                                                           : vtkStdString();
 }
 
 //----------------------------------------------------------------------------
 const Json::Value& vtkSMTransferFunctionPresets::GetPreset(unsigned int index)
 {
   static Json::Value nullValue;
-  const std::vector<Json::Value> &presets = this->Internals->GetPresets();
-  return index < static_cast<unsigned int>(presets.size())?
-    presets[index] : nullValue;
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index] : nullValue;
 }
 
 //----------------------------------------------------------------------------
-const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(
-  const char* name)
+const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
 {
   static Json::Value nullValue;
   if (name == NULL)
-    {
+  {
     return nullValue;
-    }
-  const std::vector<Json::Value> &presets = this->Internals->GetPresets();
-  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end(); ++iter)
-    {
+  }
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
+       ++iter)
+  {
     if (iter->get("Name", Json::Value()).asString() == name)
-      {
+    {
       return (*iter);
-      }
     }
+  }
   return nullValue;
 }
 
 //----------------------------------------------------------------------------
 vtkStdString vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
 {
-  const std::vector<Json::Value> &presets = this->Internals->GetPresets();
-  return index < static_cast<unsigned int>(presets.size())?
-    presets[index]["Name"].asString() : vtkStdString();
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index]["Name"].asString()
+                                                           : vtkStdString();
 }
 
 //----------------------------------------------------------------------------
@@ -277,32 +281,29 @@ bool vtkSMTransferFunctionPresets::RenamePreset(unsigned int index, const char* 
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::AddPreset(
-  const char* name, const vtkStdString& preset)
+bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdString& preset)
 {
   if (!name)
-    {
+  {
     vtkErrorMacro("Invalid 'name' specified.");
     return false;
-    }
+  }
 
   Json::Value value;
   Json::Reader reader;
   if (!reader.parse(preset, value))
-    {
+  {
     vtkErrorMacro("Invalid preset string.");
-      vtkGenericWarningMacro(
-        << "Failed to parse builtin transfer function presets: "
-        << reader.getFormattedErrorMessages().c_str());
+    vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
+                           << reader.getFormattedErrorMessages().c_str());
     return false;
-    }
+  }
   this->Internals->AddPreset(name, value);
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::AddPreset(
-  const char* name, const Json::Value& preset)
+bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const Json::Value& preset)
 {
   this->Internals->AddPreset(name, preset);
   return true;
@@ -310,32 +311,33 @@ bool vtkSMTransferFunctionPresets::AddPreset(
 
 //----------------------------------------------------------------------------
 vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
-  const Json::Value& preset, const char* prefix/*=NULL*/)
+  const Json::Value& preset, const char* prefix /*=NULL*/)
 {
-  prefix = prefix? prefix : "Preset";
+  prefix = prefix ? prefix : "Preset";
 
   std::set<std::string> names;
-  const std::vector<Json::Value> &presets = this->Internals->GetPresets();
-  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end(); ++iter)
-    {
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
+       ++iter)
+  {
     names.insert(iter->get("Name", Json::Value()).asString());
-    }
+  }
 
   std::string name = prefix;
-  std::string separator = name.size() > 0? " " : "";
+  std::string separator = name.size() > 0 ? " " : "";
   int suffix = 0;
   while (names.find(name) != names.end())
-    {
+  {
     std::ostringstream stream;
     stream << prefix << separator.c_str() << suffix;
     name = stream.str();
     suffix++;
     if (suffix > 1000)
-      {
+    {
       vtkErrorMacro("Giving up. Cannot find a unique name. Please provide a good prefix.");
       return vtkStdString();
-      }
     }
+  }
   this->AddPreset(name.c_str(), preset);
   return name;
 }
@@ -374,10 +376,10 @@ bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& pr
 bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 {
   if (index >= this->GetNumberOfPresets())
-    {
+  {
     vtkWarningMacro("Invalid 'index' specified:" << index);
     return false;
-    }
+  }
 
   return this->Internals->IsPresetBuiltin(index);
 }
@@ -386,37 +388,34 @@ bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
 {
   if (!filename)
-    {
+  {
     vtkErrorMacro("Invalid filename specified.");
     return false;
-    }
+  }
 
-  SM_SCOPED_TRACE(CallFunction)
-    .arg("ImportPresets")
-    .arg("filename", filename);
-  if (vtksys::SystemTools::LowerCase(
-      vtksys::SystemTools::GetFilenameLastExtension(filename)) == ".xml")
-    {
+  SM_SCOPED_TRACE(CallFunction).arg("ImportPresets").arg("filename", filename);
+  if (vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename)) ==
+    ".xml")
+  {
     ifstream in(filename);
     if (in)
-      {
+    {
       std::ostringstream contents;
       contents << in.rdbuf();
       in.close();
       return this->ImportPresets(
-        vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(
-          contents.str().c_str()));
-      }
+        vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(contents.str().c_str()));
+    }
     else
-      {
+    {
       vtkErrorMacro("Failed to open file: " << filename);
       return false;
-      }
     }
+  }
   else
-    {
+  {
     return this->Internals->ImportPresets(filename);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

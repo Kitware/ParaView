@@ -36,19 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h" // needed for EXPORT macro.
 #include <QColor>
 
-/// pqColorDialogEventTranslator translates events on QColorDialog
-/// that they can be recorded in tests in a platform independent
-/// way.
-class PQWIDGETS_EXPORT pqColorDialogEventTranslator :
-  public pqWidgetEventTranslator
+/**
+* pqColorDialogEventTranslator translates events on QColorDialog
+* that they can be recorded in tests in a platform independent
+* way.
+*/
+class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
   typedef pqWidgetEventTranslator Superclass;
+
 public:
-  pqColorDialogEventTranslator(QObject* parent=0);
+  pqColorDialogEventTranslator(QObject* parent = 0);
   ~pqColorDialogEventTranslator();
 
-  /// Overridden to handle events on QColorDialog.
+  /**
+  * Overridden to handle events on QColorDialog.
+  */
   using Superclass::translateEvent;
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 

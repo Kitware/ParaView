@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -35,26 +35,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include <QToolBar>
 
-/// pqMainControlsToolbar is the toolbar with actions (and reactions) for the
-/// "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",
-/// "Save Data", "Connect", "Disconnect", "Undo", "Redo".
-/// Simply instantiate this and put it in your application UI file or
-/// QMainWindow to use it.
+/**
+* pqMainControlsToolbar is the toolbar with actions (and reactions) for the
+* "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",
+* "Save Data", "Connect", "Disconnect", "Undo", "Redo".
+* Simply instantiate this and put it in your application UI file or
+* QMainWindow to use it.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqMainControlsToolbar : public QToolBar
 {
   Q_OBJECT
   typedef QToolBar Superclass;
+
 public:
-  pqMainControlsToolbar(const QString& title, QWidget* parentObject=0)
+  pqMainControlsToolbar(const QString& title, QWidget* parentObject = 0)
     : Superclass(title, parentObject)
-    {
+  {
     this->constructor();
-    }
-  pqMainControlsToolbar(QWidget* parentObject=0)
+  }
+  pqMainControlsToolbar(QWidget* parentObject = 0)
     : Superclass(parentObject)
-    {
+  {
     this->constructor();
-    }
+  }
 
 private:
   Q_DISABLE_COPY(pqMainControlsToolbar)
@@ -63,5 +66,3 @@ private:
 };
 
 #endif
-
-

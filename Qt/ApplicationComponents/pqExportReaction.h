@@ -34,37 +34,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-
 class pqProxyWidget;
 class pqView;
 
-/// @ingroup Reactions
-/// Reaction for exporting a view. Uses pqViewExporterManager for actual
-/// exporting.
+/**
+* @ingroup Reactions
+* Reaction for exporting a view. Uses pqViewExporterManager for actual
+* exporting.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqExportReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
+
 public:
-  /// Constructor. Parent cannot be NULL.
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
   pqExportReaction(QAction* parent);
 
-  /// Exports the current view. Returns the exported filename of successful
-  /// export, otherwise returns an empty QString.
+  /**
+  * Exports the current view. Returns the exported filename of successful
+  * export, otherwise returns an empty QString.
+  */
   QString exportActiveView();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { this->exportActiveView(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { this->exportActiveView(); }
 
 private:
-  /// Creates a dialog widget containing the predefined proxyWidget.
+  /**
+  * Creates a dialog widget containing the predefined proxyWidget.
+  */
   QDialog* createConfigurationDialog(pqProxyWidget* proxyWidget);
 
   pqView* ConnectedView;
@@ -73,5 +84,3 @@ private:
 };
 
 #endif
-
-

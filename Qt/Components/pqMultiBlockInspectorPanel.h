@@ -43,7 +43,7 @@ class PQCOMPONENTS_EXPORT pqMultiBlockInspectorPanel : public QWidget
   Q_OBJECT
 
 public:
-  pqMultiBlockInspectorPanel(QWidget *parent = 0);
+  pqMultiBlockInspectorPanel(QWidget* parent = 0);
   ~pqMultiBlockInspectorPanel();
 
   pqOutputPort* getOutputPort() const;
@@ -52,9 +52,11 @@ public:
   QString lookupBlockName(unsigned int flatIndex) const;
 
 public slots:
-  /// ParaView events
-  void onPortChanged(pqOutputPort *port);
-  void onRepresentationChanged(pqRepresentation *representation);
+  /**
+  * ParaView events
+  */
+  void onPortChanged(pqOutputPort* port);
+  void onRepresentationChanged(pqRepresentation* representation);
   void onDataUpdated();
 
   void setBlockVisibility(unsigned int index, bool visible);
@@ -62,38 +64,37 @@ public slots:
   void setBlockVisibility(const QList<unsigned int>& indices, bool visible);
   void clearBlockVisibility(const QList<unsigned int>& indices);
 
-  void setBlockColor(unsigned int index, const QColor &color);
+  void setBlockColor(unsigned int index, const QColor& color);
   void clearBlockColor(unsigned int index);
-  void setBlockColor(const QList<unsigned int>& indices, const QColor &color);
+  void setBlockColor(const QList<unsigned int>& indices, const QColor& color);
   void clearBlockColor(const QList<unsigned int>& indices);
 
   void setBlockOpacity(unsigned int index, double opacity);
   void clearBlockOpacity(unsigned int index);
-  void setBlockOpacity(const QList<unsigned int> &indices, double opacity);
-  void clearBlockOpacity(const QList<unsigned int> &indices);
+  void setBlockOpacity(const QList<unsigned int>& indices, double opacity);
+  void clearBlockOpacity(const QList<unsigned int>& indices);
 
   void promptAndSetBlockOpacity(unsigned int index);
-  void promptAndSetBlockOpacity(const QList<unsigned int> &indices);
+  void promptAndSetBlockOpacity(const QList<unsigned int>& indices);
 
   void showOnlyBlock(unsigned int index);
   void showOnlyBlocks(const QList<unsigned int>& indices);
   void showAllBlocks();
 
 private slots:
-  /// ParaView events
-  void onSelectionChanged(pqOutputPort *port);
+  /**
+  * ParaView events
+  */
+  void onSelectionChanged(pqOutputPort* port);
   void onColorArrayNameModified();
 
-  void onCustomContextMenuRequested(const QPoint &pos);
-  void onItemChanged(QTreeWidgetItem *item, int column);
+  void onCustomContextMenuRequested(const QPoint& pos);
+  void onItemChanged(QTreeWidgetItem* item, int column);
   void updateTree();
-  void updateTree(vtkPVCompositeDataInformation *iter,
-                  QTreeWidgetItem *parent,
-                  int& flatIndex, bool visibility,
-                  int inheritedColorIndex,
-                  int inheritedOpacityIndex);
+  void updateTree(vtkPVCompositeDataInformation* iter, QTreeWidgetItem* parent, int& flatIndex,
+    bool visibility, int inheritedColorIndex, int inheritedOpacityIndex);
   void onItemSelectionChanged();
-  void onItemDoubleClicked(QTreeWidgetItem * item, int column);
+  void onItemDoubleClicked(QTreeWidgetItem* item, int column);
   void updateBlockVisibilities();
   void updateBlockColors();
   void updateBlockOpacities();
@@ -101,34 +102,30 @@ private slots:
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
 
- enum NodeType
- {
-   INTERNAL_NODE,
-   LEAF_NODE
- };
+  enum NodeType
+  {
+    INTERNAL_NODE,
+    LEAF_NODE
+  };
 
-  void buildTree(vtkPVCompositeDataInformation *iter,
-                 QTreeWidgetItem *parent,
-                 int& flatIndex, // composite-data id
-                 int& leafIndex); // leaf-only index.
-  void unsetChildVisibilities(QTreeWidgetItem *parent);
-  QIcon makeColorIcon(int flatIndex, NodeType nodeType, 
-                      int inheritedColorIndex, int leafIndex=-1) const;
-  QIcon makeOpacityIcon(int flatIndex, NodeType nodeType, 
-                        int inheritedOpacityIndex) const;
+  void buildTree(vtkPVCompositeDataInformation* iter, QTreeWidgetItem* parent,
+    int& flatIndex,  // composite-data id
+    int& leafIndex); // leaf-only index.
+  void unsetChildVisibilities(QTreeWidgetItem* parent);
+  QIcon makeColorIcon(
+    int flatIndex, NodeType nodeType, int inheritedColorIndex, int leafIndex = -1) const;
+  QIcon makeOpacityIcon(int flatIndex, NodeType nodeType, int inheritedOpacityIndex) const;
   QIcon makeNullIcon() const;
 
-
-
 private:
-  QTreeWidget *TreeWidget;
+  QTreeWidget* TreeWidget;
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   QMap<unsigned int, bool> BlockVisibilites;
   QMap<unsigned int, QColor> BlockColors;
   QMap<unsigned int, double> BlockOpacities;
-  vtkEventQtSlotConnect *PropertyListener;
-  vtkSMProxy *ColorTransferProxy;
+  vtkEventQtSlotConnect* PropertyListener;
+  vtkSMProxy* ColorTransferProxy;
   vtkDiscretizableColorTransferFunction* ColorTransferFunction;
   vtkPiecewiseFunction* OpacityTransferFunction;
   unsigned int BlockColorsDistinctValues;
@@ -143,7 +140,7 @@ private:
     QColor Color;
     double Opacity;
 
-    bool operator<(const BlockIcon &other) const
+    bool operator<(const BlockIcon& other) const
     {
       QColor c = this->HasColor ? this->Color : QColor();
       c.setAlphaF(this->HasOpacity ? this->Opacity : 1.0);

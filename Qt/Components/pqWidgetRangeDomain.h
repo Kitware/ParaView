@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,14 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProperty;
 class QWidget;
 
-/// observes the domain for a property and updates the 
-/// minimum and/or maximum properties of the object
+/**
+* observes the domain for a property and updates the
+* minimum and/or maximum properties of the object
+*/
 class PQCOMPONENTS_EXPORT pqWidgetRangeDomain : public QObject
 {
   Q_OBJECT
 public:
   pqWidgetRangeDomain(QWidget* p, const QString& minProp, const QString& maxProp,
-                      vtkSMProperty* prop, int index=-1);
+    vtkSMProperty* prop, int index = -1);
   ~pqWidgetRangeDomain();
 
 public slots:
@@ -58,10 +60,10 @@ protected:
   virtual void setRange(QVariant min, QVariant max);
 
   QWidget* getWidget() const;
+
 private:
   class pqInternal;
   pqInternal* Internal;
 };
 
 #endif
-

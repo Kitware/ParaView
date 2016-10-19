@@ -12,12 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkBlockDeliveryPreprocessor - filter used by block-delivery
-// representation for pre-processing data.
-// .SECTION Description
-// vtkBlockDeliveryPreprocessor is a filter used by block-delivery
-// representation for pre-processing data.
-// It internally uses vtkAttributeDataToTableFilter.
+/**
+ * @class   vtkBlockDeliveryPreprocessor
+ * @brief   filter used by block-delivery
+ * representation for pre-processing data.
+ *
+ * vtkBlockDeliveryPreprocessor is a filter used by block-delivery
+ * representation for pre-processing data.
+ * It internally uses vtkAttributeDataToTableFilter.
+*/
 
 #ifndef vtkBlockDeliveryPreprocessor_h
 #define vtkBlockDeliveryPreprocessor_h
@@ -25,49 +28,65 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor
+  : public vtkDataObjectAlgorithm
 {
 public:
   static vtkBlockDeliveryPreprocessor* New();
   vtkTypeMacro(vtkBlockDeliveryPreprocessor, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // In case of Composite datasets, set the flat index of the subtree to pass.
-  // Default or empty results in passing the entire composite tree.
+  //@{
+  /**
+   * In case of Composite datasets, set the flat index of the subtree to pass.
+   * Default or empty results in passing the entire composite tree.
+   */
   void AddCompositeDataSetIndex(unsigned int index);
   void RemoveAllCompositeDataSetIndices();
+  //@}
 
-  // Description:
-  // Allow user to enable/disable cell connectivity generation in the datamodel
+  //@{
+  /**
+   * Allow user to enable/disable cell connectivity generation in the datamodel
+   */
   vtkSetMacro(GenerateCellConnectivity, bool);
   vtkGetMacro(GenerateCellConnectivity, bool);
+  //@}
 
-  // Description:
-  // Select the attribute type. Accepted values are
-  // \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
-  // \li vtkDataObject::FIELD_ASSOCIATION_CELLS,
-  // \li vtkDataObject::FIELD_ASSOCIATION_NONE,
-  // \li vtkDataObject::FIELD_ASSOCIATION_VERTICES,
-  // \li vtkDataObject::FIELD_ASSOCIATION_EDGES,
-  // \li vtkDataObject::FIELD_ASSOCIATION_ROWS
-  // If value is vtkDataObject::FIELD_ASSOCIATION_NONE, then FieldData
-  // associated with the input dataobject is extracted.
+  //@{
+  /**
+   * Select the attribute type. Accepted values are
+   * \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
+   * \li vtkDataObject::FIELD_ASSOCIATION_CELLS,
+   * \li vtkDataObject::FIELD_ASSOCIATION_NONE,
+   * \li vtkDataObject::FIELD_ASSOCIATION_VERTICES,
+   * \li vtkDataObject::FIELD_ASSOCIATION_EDGES,
+   * \li vtkDataObject::FIELD_ASSOCIATION_ROWS
+   * If value is vtkDataObject::FIELD_ASSOCIATION_NONE, then FieldData
+   * associated with the input dataobject is extracted.
+   */
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
+  //@}
 
-  // Description:
-  // Flatten the table, i.e. split any multicomponent columns into separate
-  // components, internally the vtkSplitColumnComponents filter is used.
+  //@{
+  /**
+   * Flatten the table, i.e. split any multicomponent columns into separate
+   * components, internally the vtkSplitColumnComponents filter is used.
+   */
   vtkSetMacro(FlattenTable, int);
   vtkGetMacro(FlattenTable, int);
+  //@}
 
-  // Description:
-  // When set (default) the vtkOriginalIndices array will be added to the
-  // output. Can be overridden by setting this flag to 0.
-  // This is only respected when AddMetaData is true.
+  //@{
+  /**
+   * When set (default) the vtkOriginalIndices array will be added to the
+   * output. Can be overridden by setting this flag to 0.
+   * This is only respected when AddMetaData is true.
+   */
   vtkSetMacro(GenerateOriginalIds, bool);
   vtkGetMacro(GenerateOriginalIds, bool);
+  //@}
 
 protected:
   vtkBlockDeliveryPreprocessor();
@@ -75,29 +94,25 @@ protected:
 
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
-  virtual int RequestDataObject(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector*);
+  /**
+   * This is called by the superclass.
+   * This is the method you should override.
+   */
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   int FieldAssociation;
   int FlattenTable;
   bool GenerateOriginalIds;
   bool GenerateCellConnectivity;
+
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
   void operator=(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
 
   class CompositeDataSetIndicesType;
-  CompositeDataSetIndicesType *CompositeDataSetIndices;
-
+  CompositeDataSetIndicesType* CompositeDataSetIndices;
 };
 
 #endif
-

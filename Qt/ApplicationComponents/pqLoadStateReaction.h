@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -34,36 +34,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-/// @ingroup Reactions
-/// Reaction for load state action.
+/**
+* @ingroup Reactions
+* Reaction for load state action.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
-public:
-  /// Constructor. Parent cannot be NULL.
-  pqLoadStateReaction(QAction *parent);
 
-  /// Loads the state file.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
+public:
+  /**
+  * Constructor. Parent cannot be NULL.
+  */
+  pqLoadStateReaction(QAction* parent);
+
+  /**
+  * Loads the state file.
+  * Note that this method is static. Applications can simply use this without
+  * having to create a reaction instance.
+  */
   static void loadState(const QString& filename);
   static void loadState();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
   void updateEnableState();
 
 protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqLoadStateReaction::loadState(); }
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered() { pqLoadStateReaction::loadState(); }
 
 private:
   Q_DISABLE_COPY(pqLoadStateReaction)
 };
 
 #endif
-
-

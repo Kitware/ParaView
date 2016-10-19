@@ -40,7 +40,8 @@
 
 #include <vector>
 
-namespace pointsprite {
+namespace pointsprite
+{
 
 // ****************************************************************************
 //  Class:  EqualVal
@@ -55,9 +56,9 @@ namespace pointsprite {
 template <class T>
 struct EqualVal
 {
-    inline static bool EqualScalar(void *a1,void *a2);
-    inline static bool EqualArray (void *a1,void *a2, int l);
-    inline static bool EqualVector(void *a1,void *a2);
+  inline static bool EqualScalar(void* a1, void* a2);
+  inline static bool EqualArray(void* a1, void* a2, int l);
+  inline static bool EqualVector(void* a1, void* a2);
 };
 
 // ----------------------------------------------------------------------------
@@ -65,7 +66,6 @@ struct EqualVal
 //                               Inline Methods
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-
 
 // ****************************************************************************
 //  Methods:  EqualVal<T>::Equal*
@@ -83,54 +83,51 @@ struct EqualVal
 //
 // ****************************************************************************
 template <class T>
-bool
-EqualVal<T>::EqualScalar(void *a1_, void *a2_)
+bool EqualVal<T>::EqualScalar(void* a1_, void* a2_)
 {
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
-    if (*a1 == *a2)
-       return true;
-    else
-       return false;
-}
-
-template <class T>
-bool
-EqualVal<T>::EqualArray(void *a1_, void *a2_, int l)
-{
-    if (a1_ == a2_)
-       return true;
-    T *a1  = (T*)a1_;
-    T *a2  = (T*)a2_;
-    for (int i=0; i<l; i++)
-    {
-       if (a1[i] != a2[i])
-          return false;
-    }
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  if (*a1 == *a2)
     return true;
+  else
+    return false;
 }
 
 template <class T>
-bool
-EqualVal<T>::EqualVector(void *a1_, void *a2_)
+bool EqualVal<T>::EqualArray(void* a1_, void* a2_, int l)
 {
-    if (a1_ == a2_)
-       return true;
-    std::vector<T> &a1  = *(std::vector<T>*)a1_;
-    std::vector<T> &a2  = *(std::vector<T>*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 != l2)
+  if (a1_ == a2_)
+    return true;
+  T* a1 = (T*)a1_;
+  T* a2 = (T*)a2_;
+  for (int i = 0; i < l; i++)
+  {
+    if (a1[i] != a2[i])
+      return false;
+  }
+  return true;
+}
+
+template <class T>
+bool EqualVal<T>::EqualVector(void* a1_, void* a2_)
+{
+  if (a1_ == a2_)
+    return true;
+  std::vector<T>& a1 = *(std::vector<T>*)a1_;
+  std::vector<T>& a2 = *(std::vector<T>*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 != l2)
+    return false;
+  else
+  {
+    for (int i = 0; i < l1; i++)
+    {
+      if (a1[i] != a2[i])
         return false;
-    else
-    {
-        for (int i=0; i<l1; i++)
-        {
-           if (a1[i] != a2[i])
-              return false;
-        }
     }
-    return true;
+  }
+  return true;
 }
 
 // ****************************************************************************
@@ -147,24 +144,23 @@ EqualVal<T>::EqualVector(void *a1_, void *a2_)
 //  Creation:    06May03
 //
 // ****************************************************************************
-template<>
-bool
-EqualVal<AttributeGroup*>::EqualVector(void *a1_, void *a2_)
+template <>
+bool EqualVal<AttributeGroup*>::EqualVector(void* a1_, void* a2_)
 {
-    if (a1_ == a2_)
-       return true;
-    AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
-    AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = static_cast<int>(a1.size());
-    int l2 = static_cast<int>(a2.size());
-    if (l1 != l2)
-       return false;
-    for (int i=0; i<l1; i++)
-    {
-        if (!a1[i]->EqualTo(a2[i]))
-           return false;
-    }
+  if (a1_ == a2_)
     return true;
+  AttributeGroupVector& a1 = *(AttributeGroupVector*)a1_;
+  AttributeGroupVector& a2 = *(AttributeGroupVector*)a2_;
+  int l1 = static_cast<int>(a1.size());
+  int l2 = static_cast<int>(a2.size());
+  if (l1 != l2)
+    return false;
+  for (int i = 0; i < l1; i++)
+  {
+    if (!a1[i]->EqualTo(a2[i]))
+      return false;
+  }
+  return true;
 }
 }
 #endif

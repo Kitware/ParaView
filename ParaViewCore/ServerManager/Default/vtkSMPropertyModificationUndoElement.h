@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPropertyModificationUndoElement
-// .SECTION Description
-// This is the concrete implementation for the Undo element for a property
-// modification event.
-// The undo action sets the property to the value that was pushed on
-// to the server previous to the modification.
-// The redo action sets the property to the modified value.
+/**
+ * @class   vtkSMPropertyModificationUndoElement
+ *
+ * This is the concrete implementation for the Undo element for a property
+ * modification event.
+ * The undo action sets the property to the value that was pushed on
+ * to the server previous to the modification.
+ * The redo action sets the property to the modified value.
+*/
 
 #ifndef vtkSMPropertyModificationUndoElement_h
 #define vtkSMPropertyModificationUndoElement_h
@@ -28,32 +30,37 @@
 #include "vtkSMUndoElement.h"
 class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement
+  : public vtkSMUndoElement
 {
 public:
   static vtkSMPropertyModificationUndoElement* New();
   vtkTypeMacro(vtkSMPropertyModificationUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Undo the operation encapsulated by this element.
+  /**
+   * Undo the operation encapsulated by this element.
+   */
   virtual int Undo();
 
-  // Description:
-  // Redo the operation encaspsulated by this element.
+  /**
+   * Redo the operation encaspsulated by this element.
+   */
   virtual int Redo();
 
-  // Description:
-  // Set the property/proxy that was modified.
+  /**
+   * Set the property/proxy that was modified.
+   */
   void ModifiedProperty(vtkSMProxy* proxy, const char* propertyname);
 
-  // Description:
-  // Called on the older element in the UndoSet to merge with the
-  // element being added if  both the elements are \c mergeable.
-  // vtkSMPropertyModificationUndoElement is mergeable with
-  // vtkSMPropertyModificationUndoElement alone if both
-  // represent change to the same property.
-  // Returns if the merge was successful.
+  /**
+   * Called on the older element in the UndoSet to merge with the
+   * element being added if  both the elements are \c mergeable.
+   * vtkSMPropertyModificationUndoElement is mergeable with
+   * vtkSMPropertyModificationUndoElement alone if both
+   * represent change to the same property.
+   * Returns if the merge was successful.
+   */
   virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element));
 
 protected:
@@ -69,7 +76,8 @@ protected:
   vtkSMMessage* PropertyState;
 
 private:
-  vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyModificationUndoElement(
+    const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
 };
 

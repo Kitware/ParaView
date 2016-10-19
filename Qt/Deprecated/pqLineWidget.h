@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -39,26 +39,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 
-/// Provides a complete Qt UI for working with a 3D line widget
+/**
+* Provides a complete Qt UI for working with a 3D line widget
+*/
 class PQDEPRECATED_EXPORT pqLineWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
-  
+
   Q_OBJECT
-  
+
 public:
-  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0, 
-    const char* xmlname="LineWidgetRepresentation");
+  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0,
+    const char* xmlname = "LineWidgetRepresentation");
   ~pqLineWidget();
 
-  /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
-  /// with reference proxy bounds.
-  /// This should be explicitly called after the panel is created
-  /// and the widget is initialized i.e. the reference proxy, controlled proxy
-  /// and hints have been set.
-  virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
+  /**
+  * Resets the bounds of the 3D widget to the reference proxy bounds.
+  * This typically calls PlaceWidget on the underlying 3D Widget
+  * with reference proxy bounds.
+  * This should be explicitly called after the panel is created
+  * and the widget is initialized i.e. the reference proxy, controlled proxy
+  * and hints have been set.
+  */
+  virtual void resetBounds() { this->Superclass::resetBounds(); }
   virtual void resetBounds(double bounds[6]);
 
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
@@ -70,10 +73,11 @@ public slots:
   void onZAxis();
 
 protected:
-  virtual void setControlledProperty(const char* function,
-    vtkSMProperty * controlled_property);
+  virtual void setControlledProperty(const char* function, vtkSMProperty* controlled_property);
 
-  /// Called on pick.
+  /**
+  * Called on pick.
+  */
   virtual void pick(double, double, double);
 
 private slots:

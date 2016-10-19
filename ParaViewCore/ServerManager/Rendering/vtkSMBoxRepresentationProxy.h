@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBoxRepresentationProxy - proxy for vtkBoxRepresentation
-// .SECTION Description
-// vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
-// specialization is needed to set the tranform on the vtkBoxRepresentation.
+/**
+ * @class   vtkSMBoxRepresentationProxy
+ * @brief   proxy for vtkBoxRepresentation
+ *
+ * vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
+ * specialization is needed to set the tranform on the vtkBoxRepresentation.
+*/
 
 #ifndef vtkSMBoxRepresentationProxy_h
 #define vtkSMBoxRepresentationProxy_h
@@ -23,7 +26,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMWidgetRepresentationProxy.h"
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBoxRepresentationProxy : public vtkSMWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBoxRepresentationProxy
+  : public vtkSMWidgetRepresentationProxy
 {
 public:
   static vtkSMBoxRepresentationProxy* New();
@@ -33,7 +37,9 @@ public:
   virtual void UpdateVTKObjects();
   virtual void UpdatePropertyInformation();
   virtual void UpdatePropertyInformation(vtkSMProperty* prop)
-    { this->Superclass::UpdatePropertyInformation(prop); }
+  {
+    this->Superclass::UpdatePropertyInformation(prop);
+  }
 
 protected:
   vtkSMBoxRepresentationProxy();
@@ -45,8 +51,6 @@ protected:
 private:
   vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif
-

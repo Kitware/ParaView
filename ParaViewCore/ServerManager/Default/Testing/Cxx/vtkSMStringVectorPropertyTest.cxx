@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMStringVectorPropertyTest::SetNumberOfElements()
 {
-  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty* smproperty = vtkSMStringVectorProperty::New();
   QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
   smproperty->SetNumberOfElements(5);
@@ -34,7 +34,7 @@ void vtkSMStringVectorPropertyTest::SetNumberOfElements()
 
 void vtkSMStringVectorPropertyTest::SetElement()
 {
-  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty* smproperty = vtkSMStringVectorProperty::New();
 
   smproperty->SetElement(2, "Hello");
   QCOMPARE(smproperty->GetNumberOfElements(), 3U);
@@ -47,9 +47,9 @@ void vtkSMStringVectorPropertyTest::SetElement()
 
 void vtkSMStringVectorPropertyTest::SetElements()
 {
-  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty* smproperty = vtkSMStringVectorProperty::New();
 
-  const char *values[] = {"Para", "View"};
+  const char* values[] = { "Para", "View" };
   smproperty->SetElements(values, 2);
   QCOMPARE(smproperty->GetNumberOfElements(), 2U);
   QCOMPARE(smproperty->GetElement(0), "Para");
@@ -60,8 +60,8 @@ void vtkSMStringVectorPropertyTest::SetElements()
 
 void vtkSMStringVectorPropertyTest::Copy()
 {
-  vtkSMStringVectorProperty *property1 = vtkSMStringVectorProperty::New();
-  vtkSMStringVectorProperty *property2 = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty* property1 = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty* property2 = vtkSMStringVectorProperty::New();
 
   property1->SetElement(0, "Test");
   property1->SetElement(1, "tseT");

@@ -24,14 +24,15 @@
 #include "pqSLACManager.h"
 
 //=============================================================================
-pqSLACActionGroup::pqSLACActionGroup(QObject *p) : QActionGroup(p)
+pqSLACActionGroup::pqSLACActionGroup(QObject* p)
+  : QActionGroup(p)
 {
-  pqSLACManager *manager = pqSLACManager::instance();
+  pqSLACManager* manager = pqSLACManager::instance();
   if (!manager)
-    {
+  {
     qFatal("Cannot get SLAC Tools manager.");
     return;
-    }
+  }
 
   this->addAction(manager->actionDataLoadManager());
   this->addAction(manager->actionShowEField());

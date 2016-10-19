@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAppendRectilinearGrid - appends rectliner grids together.
-// .SECTION Description
-// vtkAppendRectilinearGrid appends rectilinear grids to produce a
-// single combined rectilinear grid. Inputs are appends based on
-// their extents.
+/**
+ * @class   vtkAppendRectilinearGrid
+ * @brief   appends rectliner grids together.
+ *
+ * vtkAppendRectilinearGrid appends rectilinear grids to produce a
+ * single combined rectilinear grid. Inputs are appends based on
+ * their extents.
+*/
 
 #ifndef vtkAppendRectilinearGrid_h
 #define vtkAppendRectilinearGrid_h
@@ -36,27 +39,22 @@ protected:
   ~vtkAppendRectilinearGrid();
 
   // Propagate UPDATE_EXTENT up to the inputs.
-  virtual int RequestUpdateExtent(vtkInformation *,
-                                  vtkInformationVector **,
-                                  vtkInformationVector *);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Tell the output information about the data this filter will produce.
-  virtual int RequestInformation (vtkInformation *,
-                                  vtkInformationVector **,
-                                  vtkInformationVector *);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Perform actual execution.
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  void CopyArray(vtkAbstractArray* outArray, const int* outExt,
-    vtkAbstractArray* inArray, const int* inExt);
+  void CopyArray(
+    vtkAbstractArray* outArray, const int* outExt, vtkAbstractArray* inArray, const int* inExt);
+
 private:
   vtkAppendRectilinearGrid(const vtkAppendRectilinearGrid&) VTK_DELETE_FUNCTION;
   void operator=(const vtkAppendRectilinearGrid&) VTK_DELETE_FUNCTION;
 };
 
 #endif
-

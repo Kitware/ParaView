@@ -25,7 +25,6 @@
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 
-
 vtkStandardNewMacro(vtkSMPythonViewProxy);
 
 //----------------------------------------------------------------------------
@@ -42,8 +41,7 @@ vtkSMPythonViewProxy::~vtkSMPythonViewProxy()
 vtkRenderer* vtkSMPythonViewProxy::GetRenderer()
 {
   this->CreateVTKObjects();
-  vtkPythonView* pv = vtkPythonView::SafeDownCast(
-    this->GetClientSideObject());
+  vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
   return pv ? pv->GetRenderer() : NULL;
 }
 
@@ -51,8 +49,7 @@ vtkRenderer* vtkSMPythonViewProxy::GetRenderer()
 vtkRenderWindow* vtkSMPythonViewProxy::GetRenderWindow()
 {
   this->CreateVTKObjects();
-  vtkPythonView* pv = vtkPythonView::SafeDownCast(
-    this->GetClientSideObject());
+  vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
   return pv ? pv->GetRenderWindow() : NULL;
 }
 
@@ -63,27 +60,25 @@ bool vtkSMPythonViewProxy::LastRenderWasInteractive()
 }
 
 //----------------------------------------------------------------------------
-vtkImageData * vtkSMPythonViewProxy::CaptureWindowInternal(int magnification)
+vtkImageData* vtkSMPythonViewProxy::CaptureWindowInternal(int magnification)
 {
   this->GetRenderWindow()->SwapBuffersOff();
 
   this->CreateVTKObjects();
-  vtkPythonView* pv = vtkPythonView::SafeDownCast(
-    this->GetClientSideObject());
+  vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
   if (pv)
-    {
+  {
     pv->SetMagnification(magnification);
-    }
+  }
 
   this->StillRender();
 
   if (pv)
-    {
+  {
     pv->SetMagnification(1);
-    }
+  }
 
-  vtkSmartPointer<vtkWindowToImageFilter> w2i =
-    vtkSmartPointer<vtkWindowToImageFilter>::New();
+  vtkSmartPointer<vtkWindowToImageFilter> w2i = vtkSmartPointer<vtkWindowToImageFilter>::New();
   w2i->SetInput(this->GetRenderWindow());
   w2i->SetMagnification(magnification);
   w2i->ReadFrontBufferOff();
@@ -93,8 +88,7 @@ vtkImageData * vtkSMPythonViewProxy::CaptureWindowInternal(int magnification)
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << w2i.GetPointer() << "Update"
+  stream << vtkClientServerStream::Invoke << w2i.GetPointer() << "Update"
          << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
 

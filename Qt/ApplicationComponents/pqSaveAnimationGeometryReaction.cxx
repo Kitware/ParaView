@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,16 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqSaveAnimationGeometryReaction::pqSaveAnimationGeometryReaction(
-  QAction* parentObject): Superclass(parentObject)
+pqSaveAnimationGeometryReaction::pqSaveAnimationGeometryReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
-  QObject::connect(activeObjects, SIGNAL(viewChanged(pqView*)),
-    this, SLOT(updateEnableState()));
+  QObject::connect(
+    activeObjects, SIGNAL(serverChanged(pqServer*)), this, SLOT(updateEnableState()));
+  QObject::connect(activeObjects, SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -57,8 +56,7 @@ pqSaveAnimationGeometryReaction::pqSaveAnimationGeometryReaction(
 void pqSaveAnimationGeometryReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool is_enabled = (activeObjects->activeServer() != NULL &&
-    activeObjects->activeView() != NULL);
+  bool is_enabled = (activeObjects->activeServer() != NULL && activeObjects->activeView() != NULL);
   this->parentAction()->setEnabled(is_enabled);
 }
 
@@ -67,53 +65,48 @@ void pqSaveAnimationGeometryReaction::saveAnimationGeometry()
 {
   pqAnimationManager* mgr = pqPVApplicationCore::instance()->animationManager();
   if (!mgr || !mgr->getActiveScene())
-    {
+  {
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
-    }
+  }
 
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
-    {
+  {
     qDebug() << "Cannot save animation geometry since no active view.";
     return;
-    }
+  }
 
   QString filters = "ParaView Data files (*.pvd);;All files (*)";
-  pqFileDialog fileDialog (pqActiveObjects::instance().activeServer(),
-    pqCoreUtilities::mainWidget(),
-    tr("Save Animation Geometry"), 
-    QString(), 
-    filters);
+  pqFileDialog fileDialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
+    tr("Save Animation Geometry"), QString(), filters);
   fileDialog.setObjectName("FileSaveAnimationDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)
-    {
-    pqSaveAnimationGeometryReaction::saveAnimationGeometry(
-      fileDialog.getSelectedFiles()[0]);
-    }
+  {
+    pqSaveAnimationGeometryReaction::saveAnimationGeometry(fileDialog.getSelectedFiles()[0]);
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveAnimationGeometryReaction::saveAnimationGeometry(
-  const QString& filename)
+void pqSaveAnimationGeometryReaction::saveAnimationGeometry(const QString& filename)
 {
   pqAnimationManager* mgr = pqPVApplicationCore::instance()->animationManager();
   if (!mgr || !mgr->getActiveScene())
-    {
+  {
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
-    }
+  }
 
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
-    {
+  {
     qDebug() << "Cannot save animation geometry since no active view.";
     return;
-    }
+  }
 
   if (!mgr->saveGeometry(filename, view))
-    {
+  {
     qDebug() << "Animation save geometry failed!";
-    }
+  }
 }

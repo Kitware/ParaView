@@ -25,8 +25,7 @@
 
 #include <assert.h>
 
-#define GET_PV_COMPARATIVE_VIEW()\
-  vtkPVComparativeView::SafeDownCast(this->GetClientSideObject())
+#define GET_PV_COMPARATIVE_VIEW() vtkPVComparativeView::SafeDownCast(this->GetClientSideObject())
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
@@ -46,61 +45,58 @@ void vtkSMComparativeViewProxy::Update()
 {
   // Make sure we don't track in Undo/Redo the proxy update that we have set in
   // the comparative view
-  vtkSMUndoStackBuilder* usb =
-    vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+  vtkSMUndoStackBuilder* usb = vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
   if (usb)
-    {
+  {
     bool prev = usb->GetIgnoreAllChanges();
     usb->SetIgnoreAllChanges(true);
     this->Superclass::Update();
     usb->SetIgnoreAllChanges(prev);
-    }
+  }
   else
-    {
+  {
     // Simply update
     this->Superclass::Update();
-    }
+  }
 
   // I can't remember where is this flag coming from. Keeping it as it was for
   // now.
-  this->NeedsUpdate =false;
+  this->NeedsUpdate = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
   // If prototype do not setup subproxy location and do not send anything
   // to the server
-  if(this->Location == 0)
-    {
+  if (this->Location == 0)
+  {
     this->Superclass::CreateVTKObjects();
     return;
-    }
+  }
 
-  this->GetSubProxy("RootView")->SetLocation(
-    vtkPVSession::CLIENT_AND_SERVERS);
+  this->GetSubProxy("RootView")->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
   this->Superclass::CreateVTKObjects();
   if (!this->ObjectsCreated)
-    {
+  {
     return;
-    }
+  }
 
-  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(
-    this->GetSubProxy("RootView"));
+  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RootView"));
   if (!rootView)
-    {
+  {
     vtkErrorMacro("Subproxy \"Root\" must be defined in the xml configuration.");
     return;
-    }
+  }
 
-  GET_PV_COMPARATIVE_VIEW()->AddObserver(
-    vtkCommand::ConfigureEvent,
-    this, &vtkSMComparativeViewProxy::InvokeConfigureEvent);
+  GET_PV_COMPARATIVE_VIEW()
+    ->AddObserver(
+      vtkCommand::ConfigureEvent, this, &vtkSMComparativeViewProxy::InvokeConfigureEvent);
 
   GET_PV_COMPARATIVE_VIEW()->Initialize(rootView);
 }
@@ -121,8 +117,8 @@ vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
 void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == NULL)
-    {
-    //cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
+  {
+    // cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
     // The representation that gets added to this view is a consumer of it's
     // input. While this view is a consumer of the representation. So, when the
     // input source is modified, that call eventually leads to
@@ -140,13 +136,12 @@ void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 
     // TODO: Need to update data ranges by collecting ranges from all views.
     GET_PV_COMPARATIVE_VIEW()->MarkOutdated();
-    }
+  }
   this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMComparativeViewProxy::GetRepresentationType(
-  vtkSMSourceProxy* src, int outputport)
+const char* vtkSMComparativeViewProxy::GetRepresentationType(vtkSMSourceProxy* src, int outputport)
 {
   return this->GetRootView()->GetRepresentationType(src, outputport);
 }
@@ -155,34 +150,32 @@ const char* vtkSMComparativeViewProxy::GetRepresentationType(
 void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
 {
   if (!collection)
-    {
+  {
     return;
-    }
+  }
 
   GET_PV_COMPARATIVE_VIEW()->GetViews(collection);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::GetRepresentationsForView(
-  vtkSMViewProxy* view, vtkCollection *collection)
+  vtkSMViewProxy* view, vtkCollection* collection)
 {
   if (!collection)
-    {
+  {
     return;
-    }
+  }
 
   GET_PV_COMPARATIVE_VIEW()->GetRepresentationsForView(view, collection);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
-  vtkCollection* collection)
+void vtkSMComparativeViewProxy::GetRepresentations(int x, int y, vtkCollection* collection)
 {
   if (!collection)
-    {
+  {
     return;
-    }
+  }
 
   GET_PV_COMPARATIVE_VIEW()->GetRepresentations(x, y, collection);
 }
@@ -191,8 +184,7 @@ void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
 void vtkSMComparativeViewProxy::SetupInteractor(vtkRenderWindowInteractor*)
 {
   vtkErrorMacro("vtkSMComparativeViewProxy doesn't support SetupInteractor. "
-      "Please setup interactors on each of the internal views explicitly.");
-
+                "Please setup interactors on each of the internal views explicitly.");
 }
 //----------------------------------------------------------------------------
 bool vtkSMComparativeViewProxy::MakeRenderWindowInteractor(bool quiet)
@@ -203,10 +195,10 @@ bool vtkSMComparativeViewProxy::MakeRenderWindowInteractor(bool quiet)
 
   views->InitTraversal();
   for (vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject());
-    view != NULL; view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject()))
-    {
+       view != NULL; view = vtkSMViewProxy::SafeDownCast(views->GetNextItemAsObject()))
+  {
     flag = view->MakeRenderWindowInteractor(quiet) && flag;
-    }
+  }
   return flag;
 }
 

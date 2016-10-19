@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,56 +47,32 @@ struct pqPythonDialog::pqImplementation
   Ui::pqPythonDialog Ui;
 };
 
-pqPythonDialog::pqPythonDialog(QWidget* Parent) :
-  Superclass(Parent),
-  Implementation(new pqImplementation())
+pqPythonDialog::pqPythonDialog(QWidget* Parent)
+  : Superclass(Parent)
+  , Implementation(new pqImplementation())
 {
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("pythonDialog");
   this->setWindowTitle(tr("Python Shell"));
 
-  QObject::connect(
-    this->Implementation->Ui.clear,
-    SIGNAL(clicked()),
-    this,
-    SLOT(clearConsole()));
+  QObject::connect(this->Implementation->Ui.clear, SIGNAL(clicked()), this, SLOT(clearConsole()));
 
-  QObject::connect(
-    this->Implementation->Ui.close,
-    SIGNAL(clicked()),
-    this,
-    SLOT(close()));
-    
-  QObject::connect(
-    this->Implementation->Ui.runScript,
-    SIGNAL(clicked()),
-    this,
-    SLOT(runScript()));
-    
-  QObject::connect(
-    this->Implementation->Ui.reset,
-    SIGNAL(clicked()),
-    this->Implementation->Ui.shellWidget,
-    SLOT(reset()));
+  QObject::connect(this->Implementation->Ui.close, SIGNAL(clicked()), this, SLOT(close()));
 
-  QObject::connect(
-    this->Implementation->Ui.shellWidget,
-    SIGNAL(executing(bool)),
-    this->Implementation->Ui.runScript,
-    SLOT(setDisabled(bool)));
+  QObject::connect(this->Implementation->Ui.runScript, SIGNAL(clicked()), this, SLOT(runScript()));
 
-  QObject::connect(
-    this->Implementation->Ui.shellWidget,
-    SIGNAL(executing(bool)),
-    this->Implementation->Ui.clear,
-    SLOT(setDisabled(bool)));
+  QObject::connect(this->Implementation->Ui.reset, SIGNAL(clicked()),
+    this->Implementation->Ui.shellWidget, SLOT(reset()));
 
-  QObject::connect(
-    this->Implementation->Ui.shellWidget,
-    SIGNAL(executing(bool)),
-    this->Implementation->Ui.close,
-    SLOT(setDisabled(bool)));
-    
+  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
+    this->Implementation->Ui.runScript, SLOT(setDisabled(bool)));
+
+  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
+    this->Implementation->Ui.clear, SLOT(setDisabled(bool)));
+
+  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
+    this->Implementation->Ui.close, SLOT(setDisabled(bool)));
+
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
 }
 
@@ -106,13 +82,13 @@ pqPythonDialog::~pqPythonDialog()
   // its position to be [0,0].  If not visible, then we have already saved
   // the correct geometry state in closeEvent().
   if (this->isVisible())
-    {
+  {
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
-    }
+  }
   delete Implementation;
 }
 
-void pqPythonDialog::closeEvent(QCloseEvent *e)
+void pqPythonDialog::closeEvent(QCloseEvent* e)
 {
   pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
   e->accept();
@@ -126,34 +102,30 @@ pqPythonShell* pqPythonDialog::shell()
 void pqPythonDialog::runScript()
 {
   pqFileDialog dialog(
-    NULL,
-    this,
-    tr("Run Script"),
-    QString(),
-    QString(tr("Python Script (*.py);;All files (*)")));
+    NULL, this, tr("Run Script"), QString(), QString(tr("Python Script (*.py);;All files (*)")));
   dialog.setObjectName("PythonShellRunScriptDialog");
   dialog.setFileMode(pqFileDialog::ExistingFile);
   if (dialog.exec() == QDialog::Accepted)
-    {
+  {
     this->runScript(dialog.getSelectedFiles());
-    }
+  }
 }
 
 void pqPythonDialog::runScript(const QStringList& files)
 {
-  for(int i = 0; i != files.size(); ++i)
-    {
+  for (int i = 0; i != files.size(); ++i)
+  {
     QFile file(files[i]);
-    if(file.open(QIODevice::ReadOnly))
-      {
+    if (file.open(QIODevice::ReadOnly))
+    {
       QByteArray code = file.readAll();
       this->Implementation->Ui.shellWidget->executeScript(code.data());
-      }
-    else
-      {
-      qCritical() << "Error opening " << files[i];
-      }
     }
+    else
+    {
+      qCritical() << "Error opening " << files[i];
+    }
+  }
 }
 
 void pqPythonDialog::print(const QString& msg)

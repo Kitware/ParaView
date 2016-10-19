@@ -23,13 +23,12 @@
 // protected.
 vtkCacheSizeKeeper* vtkCacheSizeKeeper::New()
 {
-  vtkObject* ret =
-    vtkObjectFactory::CreateInstance("vtkCacheSizeKeeper");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkCacheSizeKeeper");
   if (ret)
-    {
+  {
     return static_cast<vtkCacheSizeKeeper*>(ret);
-    }
-  vtkCacheSizeKeeper *o = new vtkCacheSizeKeeper;
+  }
+  vtkCacheSizeKeeper* o = new vtkCacheSizeKeeper;
   o->InitializeObjectBase();
   return o;
 }
@@ -39,9 +38,9 @@ vtkCacheSizeKeeper* vtkCacheSizeKeeper::GetInstance()
 {
   static vtkSmartPointer<vtkCacheSizeKeeper> Singleton;
   if (Singleton.GetPointer() == NULL)
-    {
+  {
     Singleton.TakeReference(vtkCacheSizeKeeper::New());
-    }
+  }
   return Singleton.GetPointer();
 }
 
@@ -50,7 +49,7 @@ vtkCacheSizeKeeper::vtkCacheSizeKeeper()
 {
   this->CacheSize = 0;
   this->CacheFull = 0;
-  this->CacheLimit = 100*1024; // 100 MBs.
+  this->CacheLimit = 100 * 1024; // 100 MBs.
 }
 
 //-----------------------------------------------------------------------------

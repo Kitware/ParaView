@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,9 +39,6 @@ pqPVAnimationWidget::pqPVAnimationWidget(QWidget* parentObject)
   : Superclass(parentObject)
 {
   pqAnimationManager* mgr = pqPVApplicationCore::instance()->animationManager();
-  QObject::connect(mgr, SIGNAL(activeSceneChanged(pqAnimationScene*)), 
-                   this, SLOT(setScene(pqAnimationScene*)));
+  QObject::connect(
+    mgr, SIGNAL(activeSceneChanged(pqAnimationScene*)), this, SLOT(setScene(pqAnimationScene*)));
 }
-
-
-

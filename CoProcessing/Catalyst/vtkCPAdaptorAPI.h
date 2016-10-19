@@ -37,8 +37,7 @@ public:
 
   /// this is the function that determines whether or not there
   /// is anything to coprocess this time step
-  static void RequestDataDescription(int* timeStep, double* time,
-    int* coprocessThisTimeStep);
+  static void RequestDataDescription(int* timeStep, double* time, int* coprocessThisTimeStep);
 
   /// this function sets needgrid to 1 if it does not have a copy of the grid
   /// it sets needgrid to 0 if it does have a copy of the grid but does not
@@ -50,12 +49,10 @@ public:
   static void CoProcess();
 
   /// provides access to the vtkCPDataDescription instance.
-  static vtkCPDataDescription* GetCoProcessorData()
-    { return vtkCPAdaptorAPI::CoProcessorData; }
+  static vtkCPDataDescription* GetCoProcessorData() { return vtkCPAdaptorAPI::CoProcessorData; }
 
   /// provides access to the vtkCPProcessor instance.
-  static vtkCPProcessor* GetCoProcessor()
-    { return vtkCPAdaptorAPI::CoProcessor; }
+  static vtkCPProcessor* GetCoProcessor() { return vtkCPAdaptorAPI::CoProcessor; }
 
 protected:
   static vtkCPDataDescription* CoProcessorData;
@@ -67,7 +64,6 @@ protected:
   // It is reset to falase after calling coprocess as well
   // as if coprocessing is not needed for this time/time step
   static bool IsTimeDataSet;
-
 };
 #endif
 // VTK-HeaderTest-Exclude: vtkCPAdaptorAPI.h

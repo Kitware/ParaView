@@ -45,67 +45,61 @@ vtkSMChartSeriesListDomain::~vtkSMChartSeriesListDomain()
 void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
 {
   vtkSMProperty* input = this->GetRequiredProperty("Input");
-  vtkSMProperty* fieldDataSelection =
-    this->GetRequiredProperty("FieldDataSelection");
+  vtkSMProperty* fieldDataSelection = this->GetRequiredProperty("FieldDataSelection");
 
   if (!input || !fieldDataSelection)
-    {
+  {
     vtkWarningMacro("Missing required properties. Update failed.");
     return;
-    }
-
+  }
 
   // build strings based on the current domain.
   vtkPVDataInformation* dataInfo = this->GetInputInformation();
   if (!dataInfo)
-    {
+  {
     return;
-    }
+  }
 
   std::vector<vtkStdString> strings;
-  int fieldAssociation =
-    vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
-  vtkPVDataSetAttributesInformation* dsa =
-    dataInfo->GetAttributeInformation(fieldAssociation);
+  int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
+  vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
 
-  for (int cc=0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
-    {
+  for (int cc = 0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
+  {
     this->PopulateArrayComponents(dsa->GetArrayInformation(cc), strings);
-    }
+  }
 
   // Process point coordinates array
   if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
+  {
     this->PopulateArrayComponents(dataInfo->GetPointArrayInformation(), strings);
-    }
-  
+  }
+
   this->SetStrings(strings);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMChartSeriesListDomain::PopulateArrayComponents(  
+void vtkSMChartSeriesListDomain::PopulateArrayComponents(
   vtkPVArrayInformation* arrayInfo, std::vector<vtkStdString>& strings)
 {
-  if (arrayInfo &&
-    (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
-    {
+  if (arrayInfo && (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
+  {
     if (arrayInfo->GetNumberOfComponents() > 1)
+    {
+      for (int kk = 0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
       {
-      for (int kk=0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
-        {
-        strings.push_back(vtkSMArrayListDomain::CreateMangledName(
-          arrayInfo, kk));
-        }
-      }
-    else
-      {
-      const char* arrayName = arrayInfo->GetName();
-      if (arrayName)
-        {
-        strings.push_back(arrayName);
-        }
+        strings.push_back(vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk));
       }
     }
+    else
+    {
+      const char* arrayName = arrayInfo->GetName();
+      if (arrayName)
+      {
+        strings.push_back(arrayName);
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -116,13 +110,13 @@ vtkPVDataInformation* vtkSMChartSeriesListDomain::GetInputInformation()
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
   if (helper.GetNumberOfElements() > 0)
-    {
+  {
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
     if (sp)
-      {
+    {
       return sp->GetDataInformation(helper.GetOutputPort());
-      }
     }
+  }
   return NULL;
 }
 
@@ -130,24 +124,24 @@ vtkPVDataInformation* vtkSMChartSeriesListDomain::GetInputInformation()
 int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(prop, element))
-    {
+  {
     return 0;
-    }
+  }
 
   int hide_partial_arrays;
   if (element->GetScalarAttribute("hide_partial_arrays", &hide_partial_arrays))
-    {
+  {
     this->HidePartialArrays = (hide_partial_arrays == 1);
-    }
+  }
 
   if (!this->GetRequiredProperty("Input"))
-    {
+  {
     vtkWarningMacro("Missing 'Input' property. Domain may not work correctly.");
-    }
+  }
   if (!this->GetRequiredProperty("FieldDataSelection"))
-    {
+  {
     vtkWarningMacro("Missing 'FieldDataSelection' property. Domain may not work correctly.")
-    }
+  }
 
   return 1;
 }
@@ -155,33 +149,26 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
 //----------------------------------------------------------------------------
 const char** vtkSMChartSeriesListDomain::GetKnownSeriesNames()
 {
-  static const char* strings_to_check[] =
-    { "bin_extents",
-      "Time",
-      "time",
-      "arc_length",
-      NULL
-    };
+  static const char* strings_to_check[] = { "bin_extents", "Time", "time", "arc_length", NULL };
   return strings_to_check;
 }
 //----------------------------------------------------------------------------
 int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  const char** strings_to_check =
-    vtkSMChartSeriesListDomain::GetKnownSeriesNames();
+  const char** strings_to_check = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
 
   const std::vector<vtkStdString> domain_strings = this->GetStrings();
-  for (int cc=0; strings_to_check[cc] != NULL; cc++)
-    {
+  for (int cc = 0; strings_to_check[cc] != NULL; cc++)
+  {
     if (std::find(domain_strings.begin(), domain_strings.end(),
-      std::string(strings_to_check[cc])) != domain_strings.end())
-      {
+          std::string(strings_to_check[cc])) != domain_strings.end())
+    {
       vtkSMPropertyHelper helper(prop);
       helper.SetUseUnchecked(use_unchecked_values);
       helper.Set(strings_to_check[cc]);
       return 1;
-      }
     }
+  }
 
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }

@@ -32,61 +32,60 @@ PURPOSE.  See the above copyright notice for more information.
 // This demonstrates how to put together a simple application with rendering
 // capabilities using the vtkSMParaViewPipelineControllerWithRendering.
 
-
 namespace
 {
-  vtkSMRenderViewProxy* SetupView(vtkSMSession* session)
-    {
-    vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
-    vtkSmartPointer<vtkSMRenderViewProxy> view;
-    view.TakeReference(vtkSMRenderViewProxy::SafeDownCast(pxm->NewProxy("views", "RenderView")));
+vtkSMRenderViewProxy* SetupView(vtkSMSession* session)
+{
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+  vtkSmartPointer<vtkSMRenderViewProxy> view;
+  view.TakeReference(vtkSMRenderViewProxy::SafeDownCast(pxm->NewProxy("views", "RenderView")));
 
-    // You can create as many controller instances as needed. Controllers have
-    // no persistent state.
-    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  // You can create as many controller instances as needed. Controllers have
+  // no persistent state.
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
-    // Initialize the view.
-    controller->InitializeProxy(view.Get());
+  // Initialize the view.
+  controller->InitializeProxy(view.Get());
 
-    view->UpdateVTKObjects();
+  view->UpdateVTKObjects();
 
-    // Registration is optional. For an application, you have  to decide if you
-    // are going to register proxies with proxy manager or not. Generally,
-    // registration helps with state save/restore and hence may make sense for
-    // most applications.
-    controller->RegisterViewProxy(view.Get());
+  // Registration is optional. For an application, you have  to decide if you
+  // are going to register proxies with proxy manager or not. Generally,
+  // registration helps with state save/restore and hence may make sense for
+  // most applications.
+  controller->RegisterViewProxy(view.Get());
 
-    // Since in this example we are not using Qt, we setup a standard
-    // vtkRenderWindowInteractor to enable interaction.
-    view->MakeRenderWindowInteractor();
+  // Since in this example we are not using Qt, we setup a standard
+  // vtkRenderWindowInteractor to enable interaction.
+  view->MakeRenderWindowInteractor();
 
-    return view.Get();
-    }
+  return view.Get();
+}
 
-  vtkSMSourceProxy* CreatePipelineProxy(vtkSMSession* session,
-    const char* xmlgroup, const char* xmlname, vtkSMProxy* input=NULL)
-    {
-    vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
-    vtkSmartPointer<vtkSMSourceProxy> proxy;
-    proxy.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy(xmlgroup, xmlname)));
-    if (!proxy)
-      {
-      vtkGenericWarningMacro("Failed to create: " << xmlgroup << ", " << xmlname << ". Aborting !!!");
-      abort();
-      }
+vtkSMSourceProxy* CreatePipelineProxy(
+  vtkSMSession* session, const char* xmlgroup, const char* xmlname, vtkSMProxy* input = NULL)
+{
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+  vtkSmartPointer<vtkSMSourceProxy> proxy;
+  proxy.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy(xmlgroup, xmlname)));
+  if (!proxy)
+  {
+    vtkGenericWarningMacro("Failed to create: " << xmlgroup << ", " << xmlname << ". Aborting !!!");
+    abort();
+  }
 
-    vtkNew<vtkSMParaViewPipelineController> controller;
-    controller->PreInitializeProxy(proxy.Get());
-    if (input != NULL)
-      {
-      vtkSMPropertyHelper(proxy, "Input").Set(input);
-      }
-    controller->PostInitializeProxy(proxy.Get());
-    proxy->UpdateVTKObjects();
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  controller->PreInitializeProxy(proxy.Get());
+  if (input != NULL)
+  {
+    vtkSMPropertyHelper(proxy, "Input").Set(input);
+  }
+  controller->PostInitializeProxy(proxy.Get());
+  proxy->UpdateVTKObjects();
 
-    controller->RegisterPipelineProxy(proxy);
-    return proxy.Get();
-    }
+  controller->RegisterPipelineProxy(proxy);
+  return proxy.Get();
+}
 }
 
 int TestParaViewPipelineControllerWithRendering(int argc, char* argv[])
@@ -119,24 +118,24 @@ int TestParaViewPipelineControllerWithRendering(int argc, char* argv[])
 
   vtkSMSourceProxy* slice = CreatePipelineProxy(session.Get(), "filters", "Cut", wavelet);
   vtkSMProxy* cutFunction = vtkSMPropertyHelper(slice, "CutFunction").GetAsProxy();
-  double normal[] = {0, 0, 1};
+  double normal[] = { 0, 0, 1 };
   vtkSMPropertyHelper(cutFunction, "Normal").Set(normal, 3);
   cutFunction->UpdateVTKObjects();
 
   // Show the slice in the view.
   vtkSMProxy* sliceRepresentation = controller->Show(slice, 0, view);
-  (void) sliceRepresentation;
+  (void)sliceRepresentation;
 
   view->ResetCamera();
   view->StillRender();
 
-  for (int cc=1; cc < argc; cc++)
-    {
+  for (int cc = 1; cc < argc; cc++)
+  {
     if (strcmp(argv[cc], "-I") == 0)
-      {
+    {
       view->GetInteractor()->Start();
-      }
     }
+  }
 
   // Cleanup.
 

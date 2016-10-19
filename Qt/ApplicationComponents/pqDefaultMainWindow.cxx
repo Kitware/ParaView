@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,9 +37,8 @@ class pqDefaultMainWindow::pqInternals : public Ui::MainWindow
 };
 
 //-----------------------------------------------------------------------------
-pqDefaultMainWindow::pqDefaultMainWindow(
-  QWidget* parentObject, Qt::WindowFlags winFlags):
-  Superclass(parentObject, winFlags)
+pqDefaultMainWindow::pqDefaultMainWindow(QWidget* parentObject, Qt::WindowFlags winFlags)
+  : Superclass(parentObject, winFlags)
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
@@ -51,5 +50,3 @@ pqDefaultMainWindow::~pqDefaultMainWindow()
   delete this->Internals;
   this->Internals = 0;
 }
-
-

@@ -85,33 +85,29 @@ void vtkSMPlotMatrixViewProxy::PostRender(bool interactive)
   this->Superclass::PostRender(interactive);
 
   if (this->ActiveChanged)
-    {
-    vtkPVPlotMatrixView *matrix =
-        vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
+  {
+    vtkPVPlotMatrixView* matrix = vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
     if (matrix)
-      {
+    {
       vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-             << VTKOBJECT(this) << "SetActivePlot"
-             << matrix->GetActiveRow() << matrix->GetActiveColumn()
-             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetActivePlot"
+             << matrix->GetActiveRow() << matrix->GetActiveColumn() << vtkClientServerStream::End;
       this->ExecuteStream(stream);
       this->ActiveChanged = false;
-      }
     }
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPlotMatrixViewProxy::AnimationTickEvent()
 {
   if (this->Session->GetProcessRoles() != vtkPVSession::CLIENT_AND_SERVERS)
-    {
+  {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << VTKOBJECT(this) << "AdvanceAnimationPath"
+    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "AdvanceAnimationPath"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -119,51 +115,42 @@ void vtkSMPlotMatrixViewProxy::SendAnimationPath()
 {
   // Only send this to the render server(s) if we are not in builtin mode.
   if (this->Session->GetProcessRoles() != vtkPVSession::CLIENT_AND_SERVERS)
-    {
-    vtkPVPlotMatrixView *matrix =
-        vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
+  {
+    vtkPVPlotMatrixView* matrix = vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
     if (!matrix)
-      {
+    {
       return;
-      }
-    vtkScatterPlotMatrix *plotMatrix =
-        vtkScatterPlotMatrix::SafeDownCast(matrix->GetContextItem());
+    }
+    vtkScatterPlotMatrix* plotMatrix = vtkScatterPlotMatrix::SafeDownCast(matrix->GetContextItem());
     if (!plotMatrix || plotMatrix->GetNumberOfAnimationPathElements() == 0)
-      {
+    {
       return;
-      }
+    }
 
     vtkIdType n = plotMatrix->GetNumberOfAnimationPathElements();
 
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << VTKOBJECT(this) << "ClearAnimationPath"
+    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ClearAnimationPath"
            << vtkClientServerStream::End;
 
     for (vtkIdType i = 0; i < n; ++i)
-      {
+    {
       vtkVector2i element = plotMatrix->GetAnimationPathElement(i);
-      stream << vtkClientServerStream::Invoke
-             << VTKOBJECT(this) << "AddAnimationPath"
-             << element[0] << element[1]
-             << vtkClientServerStream::End;
-      }
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "AddAnimationPath" << element[0]
+             << element[1] << vtkClientServerStream::End;
+    }
 
-    stream << vtkClientServerStream::Invoke
-           << VTKOBJECT(this) << "StartAnimationPath"
+    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "StartAnimationPath"
            << vtkClientServerStream::End;
 
     this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER);
     this->MarkModified(this);
-    }
+  }
 }
-
-
 
 //----------------------------------------------------------------------------
 vtkAbstractContextItem* vtkSMPlotMatrixViewProxy::GetContextItem()
 {
-  vtkPVPlotMatrixView* pvview = vtkPVPlotMatrixView::SafeDownCast(
-    this->GetClientSideObject());
-  return pvview? pvview->GetContextItem() : NULL;
+  vtkPVPlotMatrixView* pvview = vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
+  return pvview ? pvview->GetContextItem() : NULL;
 }

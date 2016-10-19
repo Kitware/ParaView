@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVMemoryUseInformation
-// .SECTION Description
-// A vtkClientServerStream serializable container for a single process's
-// instantaneous memory usage.
+/**
+ * @class   vtkPVMemoryUseInformation
+ *
+ * A vtkClientServerStream serializable container for a single process's
+ * instantaneous memory usage.
+*/
 
 #ifndef vtkPVMemoryUseInformation_h
 #define vtkPVMemoryUseInformation_h
@@ -34,44 +36,56 @@ public:
   vtkTypeMacro(vtkPVMemoryUseInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Transfer information about a single object into this object.
+  /**
+   * Transfer information about a single object into this object.
+   */
   virtual void CopyFromObject(vtkObject*);
 
-  // Description:
-  // Merge another information object.
+  /**
+   * Merge another information object.
+   */
   virtual void AddInformation(vtkPVInformation*);
 
-  // Description:
-  // Manage a serialized version of the information.
+  //@{
+  /**
+   * Manage a serialized version of the information.
+   */
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+  //@}
 
-  // Description:
-  // access the managed information.
-  size_t GetSize(){ return this->MemInfos.size(); }
-  int GetProcessType(int i){ return this->MemInfos[i].ProcessType; }
-  int GetRank(int i){ return this->MemInfos[i].Rank; }
-  long long GetProcMemoryUse(int i){ return this->MemInfos[i].ProcMemUse; }
-  long long GetHostMemoryUse(int i){ return this->MemInfos[i].HostMemUse; }
+  /**
+   * access the managed information.
+   */
+  size_t GetSize() { return this->MemInfos.size(); }
+  int GetProcessType(int i) { return this->MemInfos[i].ProcessType; }
+  int GetRank(int i) { return this->MemInfos[i].Rank; }
+  long long GetProcMemoryUse(int i) { return this->MemInfos[i].ProcMemUse; }
+  long long GetHostMemoryUse(int i) { return this->MemInfos[i].HostMemUse; }
 
 protected:
   vtkPVMemoryUseInformation();
   ~vtkPVMemoryUseInformation();
 
 private:
-
   class MemInfo
+  {
+  public:
+    MemInfo()
+      : ProcessType(-1)
+      , Rank(0)
+      , ProcMemUse(0)
+      , HostMemUse(0)
     {
-    public:
-      MemInfo() : ProcessType(-1), Rank(0), ProcMemUse(0), HostMemUse(0) {}
-      void Print();
-    public:
-      int ProcessType;
-      int Rank;
-      long long ProcMemUse;
-      long long HostMemUse;
-    };
+    }
+    void Print();
+
+  public:
+    int ProcessType;
+    int Rank;
+    long long ProcMemUse;
+    long long HostMemUse;
+  };
   vector<MemInfo> MemInfos;
 
 private:

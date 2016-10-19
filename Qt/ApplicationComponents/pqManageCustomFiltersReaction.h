@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -36,23 +36,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqCustomFilterManagerModel;
 
-/// @ingroup Reactions
-/// Reaction for showing the custom-filter manager dialog.
-/// For now, this also manages loading and saving of custom filters in the
-/// application settings. We may want to move that code to a separate behavior.
+/**
+* @ingroup Reactions
+* Reaction for showing the custom-filter manager dialog.
+* For now, this also manages loading and saving of custom filters in the
+* application settings. We may want to move that code to a separate behavior.
+*/
 class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;
+
 public:
   pqManageCustomFiltersReaction(QAction* parentObject);
 
-  /// Pops up the manage custom filters dialog.
+  /**
+  * Pops up the manage custom filters dialog.
+  */
   void manageCustomFilters();
 
 protected:
-  virtual void onTriggered()
-    { this->manageCustomFilters(); }
+  virtual void onTriggered() { this->manageCustomFilters(); }
 
 private:
   Q_DISABLE_COPY(pqManageCustomFiltersReaction)
@@ -60,5 +64,3 @@ private:
 };
 
 #endif
-
-

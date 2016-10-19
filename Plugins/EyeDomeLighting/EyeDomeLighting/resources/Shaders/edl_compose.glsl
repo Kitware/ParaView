@@ -53,27 +53,26 @@ Ph.D. thesis of Christian BOUCHENY.
 //////////////////////////////////////////////////////////////////////////
 
 /**************************************************/
-uniform sampler2D    s2_S1;  // fine scale
-uniform sampler2D    s2_S2;  // larger medium scale
-uniform sampler2D    s2_C;   // scene color image
+uniform sampler2D s2_S1; // fine scale
+uniform sampler2D s2_S2; // larger medium scale
+uniform sampler2D s2_C;  // scene color image
 /**************************************************/
 
-void main (void)
+void main(void)
 {
-  vec4  shade1  =  texture2D(s2_S1,gl_TexCoord[0].st);
-  vec4  shade2  =  texture2D(s2_S2,gl_TexCoord[0].st);
-  vec4  color   =  texture2D(s2_C,gl_TexCoord[0].st);
-  float z1      =  shade1.a;
-  float z2      =  shade2.a;
-  if(shade1.a >0.99)
-    {
-    gl_FragColor = vec4(shade1.rgb,1.) * color;
-    }
+  vec4 shade1 = texture2D(s2_S1, gl_TexCoord[0].st);
+  vec4 shade2 = texture2D(s2_S2, gl_TexCoord[0].st);
+  vec4 color = texture2D(s2_C, gl_TexCoord[0].st);
+  float z1 = shade1.a;
+  float z2 = shade2.a;
+  if (shade1.a > 0.99)
+  {
+    gl_FragColor = vec4(shade1.rgb, 1.) * color;
+  }
   else
-    {
-    float lum = mix(shade1.x,shade2.x,0.3);
-    gl_FragColor = vec4(color.rgb*lum, color.a);
-    }
+  {
+    float lum = mix(shade1.x, shade2.x, 0.3);
+    gl_FragColor = vec4(color.rgb * lum, color.a);
+  }
   gl_FragDepth = shade1.a; // write stored depth
-
 }

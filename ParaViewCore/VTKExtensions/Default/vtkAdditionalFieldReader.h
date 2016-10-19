@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkAdditionalFieldReader - read field data arrays and add to an input
-// .SECTION Description
-//
+/**
+ * @class   vtkAdditionalFieldReader
+ * @brief   read field data arrays and add to an input
+ *
+ *
+*/
 
 #ifndef vtkAdditionalFieldReader_h
 #define vtkAdditionalFieldReader_h
@@ -25,26 +28,28 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAdditionalFieldReader : public vtkPassInputTypeAlgorithm
 {
 public:
-  vtkTypeMacro(vtkAdditionalFieldReader,vtkPassInputTypeAlgorithm);
-  static vtkAdditionalFieldReader *New();
+  vtkTypeMacro(vtkAdditionalFieldReader, vtkPassInputTypeAlgorithm);
+  static vtkAdditionalFieldReader* New();
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The file to open to retrieve field data arrays
+  //@{
+  /**
+   * The file to open to retrieve field data arrays
+   */
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //@}
 
 protected:
   vtkAdditionalFieldReader();
   ~vtkAdditionalFieldReader();
 
-  int RequestData(vtkInformation*,vtkInformationVector**,
-                  vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-
-  // Description:
-  // The name of the file to be opened.
-  char *FileName;
+  /**
+   * The name of the file to be opened.
+   */
+  char* FileName;
 
 private:
   vtkAdditionalFieldReader(const vtkAdditionalFieldReader&) VTK_DELETE_FUNCTION;

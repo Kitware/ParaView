@@ -47,24 +47,23 @@ class VTK_EXPORT vtkSQPlaneSourceConfigurationFileInfo
 {
 public:
   vtkSQPlaneSourceConfigurationFileInfo()
-        :
-    FileIdentifier("SQPlaneSourceConfiguration"),
-    FileDescription("SciberQuest plane source configuration"),
-    FileExtension(".sqpsc")
-       {}
-  virtual ~vtkSQPlaneSourceConfigurationFileInfo(){}
+    : FileIdentifier("SQPlaneSourceConfiguration")
+    , FileDescription("SciberQuest plane source configuration")
+    , FileExtension(".sqpsc")
+  {
+  }
+  virtual ~vtkSQPlaneSourceConfigurationFileInfo() {}
 
-  virtual void PrintSelf(ostream &os, vtkIndent indent)
-    {
-    os
-      << indent << "FileIdentifier: " << this->FileIdentifier << std::endl
-      << indent << "FileDescription: " << this->FileDescription << std::endl
-      << indent << "FileExtension: " << this->FileExtension << std::endl;
-    }
+  virtual void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    os << indent << "FileIdentifier: " << this->FileIdentifier << std::endl
+       << indent << "FileDescription: " << this->FileDescription << std::endl
+       << indent << "FileExtension: " << this->FileExtension << std::endl;
+  }
 
-  const char *FileIdentifier;
-  const char *FileDescription;
-  const char *FileExtension;
+  const char* FileIdentifier;
+  const char* FileDescription;
+  const char* FileExtension;
 };
 
 #endif

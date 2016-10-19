@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPScalarFieldFunction - Abstract class for specifying scalars at points.
-// .SECTION Description
-// Abstract class for specifying scalars at specified points.  
+/**
+ * @class   vtkCPScalarFieldFunction
+ * @brief   Abstract class for specifying scalars at points.
+ *
+ * Abstract class for specifying scalars at specified points.
+*/
 
 #ifndef vtkCPScalarFieldFunction_h
 #define vtkCPScalarFieldFunction_h
@@ -28,15 +31,17 @@ public:
   vtkTypeMacro(vtkCPScalarFieldFunction, vtkCPTensorFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get the NumberOfComponents.  This is abstract to make sure 
-  // that the value for the NumberOfComponents cannot be changed.
-  virtual unsigned int GetNumberOfComponents() {return 1;};
+  /**
+   * Get the NumberOfComponents.  This is abstract to make sure
+   * that the value for the NumberOfComponents cannot be changed.
+   */
+  virtual unsigned int GetNumberOfComponents() { return 1; };
 
-  // Description:
-  // Compute the field value at Point.
-  virtual double ComputeComponenentAtPoint(unsigned int component, double point[3],
-                                           unsigned long timeStep, double time) = 0;
+  /**
+   * Compute the field value at Point.
+   */
+  virtual double ComputeComponenentAtPoint(
+    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
 
 protected:
   vtkCPScalarFieldFunction();

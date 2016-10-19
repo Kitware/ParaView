@@ -17,7 +17,10 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkWeightedRedistributePolyData - do weighted balance of cells on processors
+/**
+ * @class   vtkWeightedRedistributePolyData
+ * @brief   do weighted balance of cells on processors
+*/
 
 #ifndef vtkWeightedRedistributePolyData_h
 #define vtkWeightedRedistributePolyData_h
@@ -29,18 +32,19 @@ class vtkMultiProcessController;
 
 //*******************************************************************
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkWeightedRedistributePolyData : public vtkRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkWeightedRedistributePolyData
+  : public vtkRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkWeightedRedistributePolyData, vtkRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Construct object.
-  static vtkWeightedRedistributePolyData *New();
+  /**
+   * Construct object.
+   */
+  static vtkWeightedRedistributePolyData* New();
 
-  void SetWeights (int, int, float );
-
+  void SetWeights(int, int, float);
 
 protected:
   vtkWeightedRedistributePolyData();
@@ -48,15 +52,15 @@ protected:
 
   enum
   {
-    NUM_LOC_CELLS_TAG  = 70,
-    
-    SCHED_LEN_1_TAG    = 300,
-    SCHED_LEN_2_TAG    = 301,
-    SCHED_1_TAG        = 310,
-    SCHED_2_TAG        = 311
+    NUM_LOC_CELLS_TAG = 70,
+
+    SCHED_LEN_1_TAG = 300,
+    SCHED_LEN_2_TAG = 301,
+    SCHED_1_TAG = 310,
+    SCHED_2_TAG = 311
   };
 
-  virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
+  virtual void MakeSchedule(vtkPolyData* input, vtkCommSched*);
   float* Weights;
 
 private:
@@ -67,5 +71,3 @@ private:
 //****************************************************************
 
 #endif
-
-

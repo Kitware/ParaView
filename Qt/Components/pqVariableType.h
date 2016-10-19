@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,10 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqVariableType_h
 #define _pqVariableType_h
 
-/// Provides a standard enumeration of variables that can be displayed for a dataset
+/**
+* Provides a standard enumeration of variables that can be displayed for a dataset
+*/
 enum pqVariableType
 {
-  /// Used to represent an empty selection
+  /**
+  * Used to represent an empty selection
+  */
   VARIABLE_TYPE_NONE = 0,
   VARIABLE_TYPE_CELL = 1,
   VARIABLE_TYPE_NODE = 2,

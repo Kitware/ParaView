@@ -57,27 +57,29 @@
 /// pqNodePlotter
 ///
 
-QStringList pqNodePlotter::getTheVars(vtkSMProxy * meshReaderProxy)
+QStringList pqNodePlotter::getTheVars(vtkSMProxy* meshReaderProxy)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("PointVariablesInfo");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("PointVariablesInfo");
 
   return getStringsFromProperty(prop);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProperty * pqNodePlotter::getSMVariableProperty(vtkSMProxy *meshReaderProxy)
+vtkSMProperty* pqNodePlotter::getSMVariableProperty(vtkSMProxy* meshReaderProxy)
 {
   return this->getSMNamedVariableProperty(meshReaderProxy, QString("PointVariables"));
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation * pqNodePlotter::getDataSetAttributesInformation(vtkPVDataInformation * pvDataInfo)
+vtkPVDataSetAttributesInformation* pqNodePlotter::getDataSetAttributesInformation(
+  vtkPVDataInformation* pvDataInfo)
 {
   return pvDataInfo->GetPointDataInformation();
 }
 
 //-----------------------------------------------------------------------------
-vtkPVArrayInformation * pqNodePlotter::getArrayInformation(vtkPVDataSetAttributesInformation * pvDataSetAttributesInformation)
+vtkPVArrayInformation* pqNodePlotter::getArrayInformation(
+  vtkPVDataSetAttributesInformation* pvDataSetAttributesInformation)
 {
   return pvDataSetAttributesInformation->GetArrayInformation("GlobalNodeId");
 }
@@ -89,23 +91,23 @@ bool pqNodePlotter::amIAbleToSelectByNumber()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource * pqNodePlotter::getPlotFilter()
+pqPipelineSource* pqNodePlotter::getPlotFilter()
 {
   return this->findPipelineSource("ExtractSelectionOverTime");
 }
 
 //-----------------------------------------------------------------------------
-void pqNodePlotter::setVarsStatus(vtkSMProxy * meshReaderProxy, bool flag)
+void pqNodePlotter::setVarsStatus(vtkSMProxy* meshReaderProxy, bool flag)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("PointVariables");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("PointVariables");
 
   setVarElementsStatus(prop, flag);
 }
 
 //-----------------------------------------------------------------------------
-void pqNodePlotter::setVarsActive(vtkSMProxy * meshReaderProxy, QString varName, bool activeFlag)
+void pqNodePlotter::setVarsActive(vtkSMProxy* meshReaderProxy, QString varName, bool activeFlag)
 {
-  vtkSMProperty * prop = meshReaderProxy->GetProperty("PointVariables");
+  vtkSMProperty* prop = meshReaderProxy->GetProperty("PointVariables");
 
   setVarElementsActive(prop, varName, activeFlag);
 
@@ -119,63 +121,66 @@ QString pqNodePlotter::getFilterName()
 }
 
 //-----------------------------------------------------------------------------
-QMap<QString, QList<pqOutputPort*> > pqNodePlotter::buildNamedInputs(pqPipelineSource * meshReader, QList<int> itemList, bool & success)
+QMap<QString, QList<pqOutputPort*> > pqNodePlotter::buildNamedInputs(
+  pqPipelineSource* meshReader, QList<int> itemList, bool& success)
 {
   success = false;
 
-  QMap<QString, QList<pqOutputPort*> > namedInputs = pqPlotter::buildNamedInputs(meshReader, itemList, success);
-  if (! success)
-    {
+  QMap<QString, QList<pqOutputPort*> > namedInputs =
+    pqPlotter::buildNamedInputs(meshReader, itemList, success);
+  if (!success)
+  {
     return namedInputs;
-    }
+  }
 
-  pqApplicationCore *core = pqApplicationCore::instance();
+  pqApplicationCore* core = pqApplicationCore::instance();
   // build a vtkPVSelectionSource filter
-  pqPipelineSource * selectionSource = NULL;
-  pqObjectBuilder *builder = core->getObjectBuilder();
+  pqPipelineSource* selectionSource = NULL;
+  pqObjectBuilder* builder = core->getObjectBuilder();
 
-  selectionSource = builder->createSource ("sources", "GlobalIDSelectionSource", this->getActiveServer());
+  selectionSource =
+    builder->createSource("sources", "GlobalIDSelectionSource", this->getActiveServer());
 
-  vtkSMProxy * sourceProxy = selectionSource ->getProxy(); 
+  vtkSMProxy* sourceProxy = selectionSource->getProxy();
 
-  QList<pqOutputPort *> selectionInput;
+  QList<pqOutputPort*> selectionInput;
   selectionInput.push_back(selectionSource->getOutputPort(0));
   namedInputs["Selection"] = selectionInput;
 
-  vtkSMProperty * prop = sourceProxy->GetProperty("IDs");
-  vtkSMVectorProperty * vecProp = dynamic_cast<vtkSMVectorProperty *>(prop);
+  vtkSMProperty* prop = sourceProxy->GetProperty("IDs");
+  vtkSMVectorProperty* vecProp = dynamic_cast<vtkSMVectorProperty*>(prop);
 
   if (vecProp != NULL)
-    {
-    vtkSMIdTypeVectorProperty * idTypeProp = dynamic_cast<vtkSMIdTypeVectorProperty *>(vecProp);
+  {
+    vtkSMIdTypeVectorProperty* idTypeProp = dynamic_cast<vtkSMIdTypeVectorProperty*>(vecProp);
     if (idTypeProp != NULL)
-      {
+    {
       // add in all of them
       int i;
       for (i = 0; i < itemList.size(); i++)
-        {
+      {
         int val = itemList[i];
         idTypeProp->SetElement(i, val);
-        }
       }
     }
-  else 
-    {
+  }
+  else
+  {
     qWarning() << "pqNodePlotter::buildNamedInputs: ERROR - can not find IDs in mesh ";
-    success = false;    
+    success = false;
     return namedInputs;
-    }
+  }
 
-  vtkSMProperty * fieldTypeProp = sourceProxy->GetProperty("FieldType");
+  vtkSMProperty* fieldTypeProp = sourceProxy->GetProperty("FieldType");
   if (fieldTypeProp != NULL)
-    {
-    vtkSMIntVectorProperty * intVecProp = dynamic_cast<vtkSMIntVectorProperty *>(fieldTypeProp);
+  {
+    vtkSMIntVectorProperty* intVecProp = dynamic_cast<vtkSMIntVectorProperty*>(fieldTypeProp);
     if (intVecProp != NULL)
-      {
+    {
       // set field type to Point
       intVecProp->SetElement(0, vtkSelectionNode::POINT);
-      }
     }
+  }
 
   return namedInputs;
 }

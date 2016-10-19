@@ -62,24 +62,21 @@ class pqMultiSliceAxisWidget::pqInternal
 {
 
 public:
-  pqInternal(
-    pqMultiSliceAxisWidget& object):Widget_ptr(&object)
-    {
+  pqInternal(pqMultiSliceAxisWidget& object)
+    : Widget_ptr(&object)
+  {
     this->View = new QVTKWidget(Widget_ptr);
     this->Range[0] = -10.;
     this->Range[1] = +10.;
 
-    this->SliceItem->AddObserver(vtkCommand::EndInteractionEvent,
-                                 this->Widget_ptr,
-                                 &pqMultiSliceAxisWidget::onMarkClicked);
-    }
+    this->SliceItem->AddObserver(
+      vtkCommand::EndInteractionEvent, this->Widget_ptr, &pqMultiSliceAxisWidget::onMarkClicked);
+  }
 
-  ~pqInternal()
-    {
-    }
+  ~pqInternal() {}
 
   void init()
-    {
+  {
     this->ContextView->SetInteractor(this->View->GetInteractor());
     this->View->SetRenderWindow(this->ContextView->GetRenderWindow());
 #if defined(Q_WS_WIN) || defined(Q_OS_WIN)
@@ -95,18 +92,18 @@ public:
     this->SliceItem->GetAxis()->SetPosition(vtkAxis::TOP);
     this->SliceItem->GetAxis()->SetTitle("Default title");
     this->SliceItem->GetAxis()->Update();
-    }
+  }
 
-  vtkNew<vtkContextView>           ContextView;
+  vtkNew<vtkContextView> ContextView;
   vtkNew<vtkMultiSliceContextItem> SliceItem;
-  QPointer<QVTKWidget>             View;
-  double                           Range[2];
-  pqMultiSliceAxisWidget*          Widget_ptr;
+  QPointer<QVTKWidget> View;
+  double Range[2];
+  pqMultiSliceAxisWidget* Widget_ptr;
 };
 
 //-----------------------------------------------------------------------------
-pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(
-                             QWidget* parentW/*=NULL*/):Superclass(parentW)
+pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(QWidget* parentW /*=NULL*/)
+  : Superclass(parentW)
 {
   this->Internal = new pqMultiSliceAxisWidget::pqInternal(*this);
   this->Internal->init();
@@ -115,14 +112,11 @@ pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(
   vLayout->addWidget(this->Internal->View);
 
   this->Internal->SliceItem->AddObserver(
-        vtkMultiSliceContextItem::AddSliceEvent, this,
-        &pqMultiSliceAxisWidget::invalidateCallback);
+    vtkMultiSliceContextItem::AddSliceEvent, this, &pqMultiSliceAxisWidget::invalidateCallback);
   this->Internal->SliceItem->AddObserver(
-        vtkMultiSliceContextItem::RemoveSliceEvent, this,
-        &pqMultiSliceAxisWidget::invalidateCallback);
+    vtkMultiSliceContextItem::RemoveSliceEvent, this, &pqMultiSliceAxisWidget::invalidateCallback);
   this->Internal->SliceItem->AddObserver(
-        vtkMultiSliceContextItem::ModifySliceEvent, this,
-        &pqMultiSliceAxisWidget::invalidateCallback);
+    vtkMultiSliceContextItem::ModifySliceEvent, this, &pqMultiSliceAxisWidget::invalidateCallback);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,10 +126,10 @@ pqMultiSliceAxisWidget::~pqMultiSliceAxisWidget()
   // will be deleted in the same time as us.
 
   // remove internal data structure
-  if(this->Internal)
-    {
+  if (this->Internal)
+  {
     delete this->Internal;
-    }
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -152,13 +146,13 @@ void pqMultiSliceAxisWidget::setTitle(const QString& newTitle)
 }
 
 // ----------------------------------------------------------------------------
-QString pqMultiSliceAxisWidget::title()const
+QString pqMultiSliceAxisWidget::title() const
 {
   return QString(this->Internal->SliceItem->GetAxis()->GetTitle());
 }
 
 // ----------------------------------------------------------------------------
-vtkContextScene* pqMultiSliceAxisWidget::scene()const
+vtkContextScene* pqMultiSliceAxisWidget::scene() const
 {
   return this->Internal->ContextView->GetScene();
 }
@@ -169,11 +163,11 @@ void pqMultiSliceAxisWidget::renderView()
   // bug 0013947
   // on Mac OSX don't render into invalid drawable, all subsequent
   // OpenGL calls fail with invalid framebuffer operation.
-  vtkRenderWindow *renWin = this->Internal->View->GetRenderWindow();
+  vtkRenderWindow* renWin = this->Internal->View->GetRenderWindow();
   if (!renWin->IsDrawable())
-    {
+  {
     return;
-    }
+  }
 
   this->Internal->View->GetRenderWindow()->Render();
 }
@@ -197,29 +191,29 @@ void pqMultiSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long eventi
 {
   int index = this->Internal->SliceItem->GetActiveSliceIndex();
   switch (eventid)
-    {
-  case vtkMultiSliceContextItem::AddSliceEvent:
-    emit this->sliceAdded(index);
-    break;
+  {
+    case vtkMultiSliceContextItem::AddSliceEvent:
+      emit this->sliceAdded(index);
+      break;
 
-  case vtkMultiSliceContextItem::RemoveSliceEvent:
-    emit this->sliceRemoved(index);
-    break;
+    case vtkMultiSliceContextItem::RemoveSliceEvent:
+      emit this->sliceRemoved(index);
+      break;
 
-  case vtkMultiSliceContextItem::ModifySliceEvent:
-    emit this->sliceModified(index);
-    break;
-    }
+    case vtkMultiSliceContextItem::ModifySliceEvent:
+      emit this->sliceModified(index);
+      break;
+  }
 }
 
 // ----------------------------------------------------------------------------
-const double* pqMultiSliceAxisWidget::getVisibleSlices(int &nbSlices) const
+const double* pqMultiSliceAxisWidget::getVisibleSlices(int& nbSlices) const
 {
   return this->Internal->SliceItem->GetVisibleSlices(nbSlices);
 }
 
 // ----------------------------------------------------------------------------
-const double* pqMultiSliceAxisWidget::getSlices(int &nbSlices) const
+const double* pqMultiSliceAxisWidget::getSlices(int& nbSlices) const
 {
   return this->Internal->SliceItem->GetSlices(nbSlices);
 }
@@ -237,8 +231,7 @@ void pqMultiSliceAxisWidget::SetEdgeMargin(int margin)
 }
 
 // ----------------------------------------------------------------------------
-void pqMultiSliceAxisWidget::updateSlices( double* values, bool* visibility,
-                                           int numberOfValues)
+void pqMultiSliceAxisWidget::updateSlices(double* values, bool* visibility, int numberOfValues)
 {
   this->Internal->SliceItem->SetSlices(values, visibility, numberOfValues);
 }
@@ -247,12 +240,12 @@ void pqMultiSliceAxisWidget::updateSlices( double* values, bool* visibility,
 void pqMultiSliceAxisWidget::onMarkClicked(vtkObject* src, unsigned long eventId, void* dataArray)
 {
   vtkMultiSliceContextItem* item = vtkMultiSliceContextItem::SafeDownCast(src);
-  if(item && eventId == vtkCommand::EndInteractionEvent)
-    {
-    int *array = reinterpret_cast<int*>(dataArray);
-    int button   = array[0];
+  if (item && eventId == vtkCommand::EndInteractionEvent)
+  {
+    int* array = reinterpret_cast<int*>(dataArray);
+    int button = array[0];
     int modifier = array[1];
     double value = item->GetSliceValue(array[2]);
     emit markClicked(button, modifier, value);
-    }
+  }
 }

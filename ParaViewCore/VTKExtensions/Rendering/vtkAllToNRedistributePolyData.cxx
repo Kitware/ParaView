@@ -40,45 +40,48 @@ vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData()
 //----------------------------------------------------------------------------
 void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "Number of processes: " << this->NumberOfProcesses << endl;
 }
 
-
 //*****************************************************************
-void vtkAllToNRedistributePolyData::MakeSchedule (vtkPolyData* input,
-                                                  vtkCommSched* localSched)
+void vtkAllToNRedistributePolyData::MakeSchedule(vtkPolyData* input, vtkCommSched* localSched)
 
 {
-//*****************************************************************
-// purpose: This routine sets up a schedule to shift cells around so
-//          the number of cells on each processor is as even as possible.
-//
-//*****************************************************************
+  //*****************************************************************
+  // purpose: This routine sets up a schedule to shift cells around so
+  //          the number of cells on each processor is as even as possible.
+  //
+  //*****************************************************************
 
   // get total number of polys and figure out how many each processor should have
 
   int numProcs;
   if (!this->Controller)
-    {
+  {
     vtkErrorMacro("need controller to set weights");
     return;
-    }
+  }
 
   numProcs = this->Controller->GetNumberOfProcesses();
 
   // make sure the cells are redistributed into a valid range.
   int numberOfValidProcesses = this->NumberOfProcesses;
-  if (numberOfValidProcesses <= 0) { numberOfValidProcesses = numProcs; }
-  if (numberOfValidProcesses > numProcs ) { numberOfValidProcesses = numProcs; }
+  if (numberOfValidProcesses <= 0)
+  {
+    numberOfValidProcesses = numProcs;
+  }
+  if (numberOfValidProcesses > numProcs)
+  {
+    numberOfValidProcesses = numProcs;
+  }
 
-  this->SetWeights(0, numberOfValidProcesses-1, 1.);
+  this->SetWeights(0, numberOfValidProcesses - 1, 1.);
   if (numberOfValidProcesses < numProcs)
-    {
-    this->SetWeights(numberOfValidProcesses, numProcs-1, 0.);
-    }
+  {
+    this->SetWeights(numberOfValidProcesses, numProcs - 1, 0.);
+  }
 
   this->Superclass::MakeSchedule(input, localSched);
-
 }
 //*****************************************************************

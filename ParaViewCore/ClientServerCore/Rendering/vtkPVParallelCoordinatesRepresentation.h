@@ -12,11 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVParallelCoordinatesRepresentation
-// .SECTION Description
-// vtkPVParallelCoordinatesRepresentation is the vtkChartParallelCoordinates
-// subclass for parallel coordinates representation. It exposes API from
-// underlying vtkChartParallelCoordinates.
+/**
+ * @class   vtkPVParallelCoordinatesRepresentation
+ *
+ * vtkPVParallelCoordinatesRepresentation is the vtkChartParallelCoordinates
+ * subclass for parallel coordinates representation. It exposes API from
+ * underlying vtkChartParallelCoordinates.
+*/
 
 #ifndef vtkPVParallelCoordinatesRepresentation_h
 #define vtkPVParallelCoordinatesRepresentation_h
@@ -26,79 +28,100 @@
 
 class vtkChartParallelCoordinates;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVParallelCoordinatesRepresentation* New();
   vtkTypeMacro(vtkPVParallelCoordinatesRepresentation, vtkChartRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set visibility of the representation.
+  /**
+   * Set visibility of the representation.
+   */
   virtual void SetVisibility(bool visible);
 
-  // Description:
-  // Set series visibility given its name. The order is currently ignored, but
-  // in future we can add support to respect that as in
-  // vtkPVPlotMatrixRepresentation.
+  //@{
+  /**
+   * Set series visibility given its name. The order is currently ignored, but
+   * in future we can add support to respect that as in
+   * vtkPVPlotMatrixRepresentation.
+   */
   void SetSeriesVisibility(const char* series, bool visibility);
   void ClearSeriesVisibilities();
+  //@}
 
-  // Description:
-  // Provides access to the underlying VTK representation.
+  /**
+   * Provides access to the underlying VTK representation.
+   */
   vtkChartParallelCoordinates* GetChart();
 
-  // Description:
-  // Sets the line thickness for the plot.
+  //@{
+  /**
+   * Sets the line thickness for the plot.
+   */
   vtkSetMacro(LineThickness, int);
+  //@}
 
-  // Description:
-  // Set the line style for the plot.
+  //@{
+  /**
+   * Set the line style for the plot.
+   */
   vtkSetMacro(LineStyle, int);
+  //@}
 
-  // Description:
-  // Sets the color to used for the lines in the plot.
+  //@{
+  /**
+   * Sets the color to used for the lines in the plot.
+   */
   vtkSetVector3Macro(Color, double);
+  //@}
 
-  // Description:
-  // Sets the opacity for the lines in the plot.
+  //@{
+  /**
+   * Sets the opacity for the lines in the plot.
+   */
   vtkSetMacro(Opacity, double);
+  //@}
 
-  // Description:
-  // Called by vtkPVContextView::Export() to export the representation's data to
-  // a CSV file. Return false on failure which will call the exporting process
-  // to abort and raise an error. Default implementation simply returns false.
+  /**
+   * Called by vtkPVContextView::Export() to export the representation's data to
+   * a CSV file. Return false on failure which will call the exporting process
+   * to abort and raise an error. Default implementation simply returns false.
+   */
   virtual bool Export(vtkCSVExporter* exporter);
 
 protected:
   vtkPVParallelCoordinatesRepresentation();
   ~vtkPVParallelCoordinatesRepresentation();
 
-  // Description:
-  // Overridden to pass information about changes to series visibility etc. to
-  // the plot-matrix.
+  /**
+   * Overridden to pass information about changes to series visibility etc. to
+   * the plot-matrix.
+   */
   virtual void PrepareForRendering();
 
   virtual bool AddToView(vtkView* view);
 
-  // Description:
-  // Removes the representation to the view.  This is called from
-  // vtkView::RemoveRepresentation().  Subclasses should override this method.
-  // Returns true if the removal succeeds.
+  /**
+   * Removes the representation to the view.  This is called from
+   * vtkView::RemoveRepresentation().  Subclasses should override this method.
+   * Returns true if the removal succeeds.
+   */
   virtual bool RemoveFromView(vtkView* view);
 
   int LineThickness;
   int LineStyle;
   double Color[3];
   double Opacity;
+
 private:
   vtkPVParallelCoordinatesRepresentation(
-      const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
+    const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
 
   class vtkInternals;
   vtkInternals* Internals;
-
 };
 
 #endif

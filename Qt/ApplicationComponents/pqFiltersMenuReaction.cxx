@@ -65,13 +65,12 @@ static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
   // if "Input" is present, we return that, otherwise the "first"
   // vtkSMInputProperty encountered is returned.
 
-  vtkSMInputProperty *prop = vtkSMInputProperty::SafeDownCast(
-    proxy->GetProperty("Input"));
+  vtkSMInputProperty* prop = vtkSMInputProperty::SafeDownCast(proxy->GetProperty("Input"));
   vtkSMPropertyIterator* propIter = proxy->NewPropertyIterator();
   for (propIter->Begin(); !prop && !propIter->IsAtEnd(); propIter->Next())
-    {
+  {
     prop = vtkSMInputProperty::SafeDownCast(propIter->GetProperty());
-    }
+  }
 
   propIter->Delete();
   return prop;
@@ -79,81 +78,72 @@ static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 
 namespace
 {
-  QString getDomainDisplayText(vtkSMDomain* domain, vtkSMInputProperty*)
+QString getDomainDisplayText(vtkSMDomain* domain, vtkSMInputProperty*)
+{
+  if (domain->IsA("vtkSMDataTypeDomain"))
+  {
+    QStringList types;
+    vtkSMDataTypeDomain* dtd = static_cast<vtkSMDataTypeDomain*>(domain);
+    for (unsigned int cc = 0; cc < dtd->GetNumberOfDataTypes(); cc++)
     {
-    if (domain->IsA("vtkSMDataTypeDomain"))
-      {
-      QStringList types;
-      vtkSMDataTypeDomain* dtd = static_cast<vtkSMDataTypeDomain*>(domain);
-      for (unsigned int cc=0; cc < dtd->GetNumberOfDataTypes(); cc++)
-        {
-        types << dtd->GetDataType(cc);
-        }
-
-      return QString("Input data must be %1").arg(
-        types.join(" or "));
-      }
-    else if (domain->IsA("vtkSMInputArrayDomain"))
-      {
-      vtkSMInputArrayDomain* iad = static_cast<vtkSMInputArrayDomain*>(domain);
-      QString txt = (iad->GetAttributeType() == vtkSMInputArrayDomain::ANY?
-        QString("Requires an attribute array") :
-        QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
-      std::vector<int> numbersOfComponents = iad->GetAcceptableNumbersOfComponents();
-      if (numbersOfComponents.size() > 0)
-        {
-        txt += QString(" with ");
-        for (unsigned int i = 0; i < numbersOfComponents.size(); i++)
-          {
-          if (i == numbersOfComponents.size() - 1)
-            {
-            txt += QString("%1 ").arg(numbersOfComponents[i]);
-            }
-          else
-            {
-            txt += QString("%1 or ").arg(numbersOfComponents[i]);
-            }
-          }
-        txt += QString("component(s)");
-        }
-      return txt;
-      }
-    return QString("Requirements not met");
+      types << dtd->GetDataType(cc);
     }
+
+    return QString("Input data must be %1").arg(types.join(" or "));
+  }
+  else if (domain->IsA("vtkSMInputArrayDomain"))
+  {
+    vtkSMInputArrayDomain* iad = static_cast<vtkSMInputArrayDomain*>(domain);
+    QString txt = (iad->GetAttributeType() == vtkSMInputArrayDomain::ANY
+        ? QString("Requires an attribute array")
+        : QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
+    std::vector<int> numbersOfComponents = iad->GetAcceptableNumbersOfComponents();
+    if (numbersOfComponents.size() > 0)
+    {
+      txt += QString(" with ");
+      for (unsigned int i = 0; i < numbersOfComponents.size(); i++)
+      {
+        if (i == numbersOfComponents.size() - 1)
+        {
+          txt += QString("%1 ").arg(numbersOfComponents[i]);
+        }
+        else
+        {
+          txt += QString("%1 or ").arg(numbersOfComponents[i]);
+        }
+      }
+      txt += QString("component(s)");
+    }
+    return txt;
+  }
+  return QString("Requirements not met");
+}
 }
 
 //-----------------------------------------------------------------------------
-pqFiltersMenuReaction::pqFiltersMenuReaction(
-  pqProxyGroupMenuManager* menuManager)
-: Superclass(menuManager)
+pqFiltersMenuReaction::pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager)
+  : Superclass(menuManager)
 {
-  QObject::connect(&this->Timer, SIGNAL(timeout()),
-    this, SLOT(setEnableStateDirty()));
+  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(setEnableStateDirty()));
   this->Timer.setInterval(10);
   this->Timer.setSingleShot(true);
 
-  QObject::connect(
-    menuManager, SIGNAL(triggered(const QString&, const QString&)),
-    this, SLOT(onTriggered(const QString&, const QString&)));
+  QObject::connect(menuManager, SIGNAL(triggered(const QString&, const QString&)), this,
+    SLOT(onTriggered(const QString&, const QString&)));
 
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
-    &this->Timer, SLOT(start()));
-  QObject::connect(activeObjects, SIGNAL(selectionChanged(pqProxySelection)),
-    &this->Timer, SLOT(start()));
-  QObject::connect(activeObjects, SIGNAL(dataUpdated()),
-    &this->Timer, SLOT(start()));
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-                   SIGNAL(pluginsUpdated()),
-                   &this->Timer, SLOT(start()));
-
-  QObject::connect(pqApplicationCore::instance(),
-    SIGNAL(forceFilterMenuRefresh()),
+  QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)), &this->Timer, SLOT(start()));
+  QObject::connect(
+    activeObjects, SIGNAL(selectionChanged(pqProxySelection)), &this->Timer, SLOT(start()));
+  QObject::connect(activeObjects, SIGNAL(dataUpdated()), &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(), SIGNAL(pluginsUpdated()),
     &this->Timer, SLOT(start()));
 
-  QObject::connect(pqApplicationCore::instance(),
-                   SIGNAL(updateMasterEnableState(bool)),
-                   this, SLOT(setEnableStateDirty()));
+  QObject::connect(
+    pqApplicationCore::instance(), SIGNAL(forceFilterMenuRefresh()), &this->Timer, SLOT(start()));
+
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(updateMasterEnableState(bool)), this,
+    SLOT(setEnableStateDirty()));
 
   // force the state to compute the first time
   this->IsDirty = true;
@@ -171,15 +161,15 @@ void pqFiltersMenuReaction::setEnableStateDirty()
 void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
 {
   if (!this->IsDirty)
-    {
+  {
     return;
-    }
+  }
   // Impossible to validate anything without any SessionProxyManager
-  if(!vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
-    {
-    pqTimer::singleShot(100,this,SLOT(updateEnableState())); // Try later
+  if (!vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
+  {
+    pqTimer::singleShot(100, this, SLOT(updateEnableState())); // Try later
     return;
-    }
+  }
 
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   pqServer* server = activeObjects->activeServer();
@@ -187,8 +177,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   enabled = enabled ? server->isMaster() : enabled;
 
   // Make sure we already have a selection model
-  vtkSMProxySelectionModel* selModel =
-    pqActiveObjects::instance().activeSourcesSelectionModel();
+  vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
   enabled = enabled && (selModel != NULL);
 
   // selected ports.
@@ -196,121 +185,118 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
 
   // If active proxy is non-existent, then also the filters are disabled.
   if (enabled)
-    {
+  {
     pqApplicationCore* core = pqApplicationCore::instance();
     pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-    for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
-      {
+    for (unsigned int cc = 0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
+    {
       pqServerManagerModelItem* item =
-        smmodel->findItem<pqServerManagerModelItem*>(
-          selModel->GetSelectedProxy(cc));
+        smmodel->findItem<pqServerManagerModelItem*>(selModel->GetSelectedProxy(cc));
       pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
       pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
       if (opPort)
-        {
+      {
         source = opPort->getSource();
-        }
+      }
       else if (source)
-        {
+      {
         opPort = source->getOutputPort(0);
-        }
+      }
       if (source && source->modifiedState() == pqProxy::UNINITIALIZED)
-        {
+      {
         enabled = false;
         // we will update when the active representation updates the data.
         break;
-        }
+      }
 
       // Make sure we still have a valid port, this issue came up with multi-server
-      if(opPort)
-        {
-        outputPorts.append(opPort);
-        }
-      }
-    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.size() == 0)
+      if (opPort)
       {
-      enabled = false;
+        outputPorts.append(opPort);
       }
     }
+    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.size() == 0)
+    {
+      enabled = false;
+    }
+  }
 
-  pqProxyGroupMenuManager* mgr =
-    static_cast<pqProxyGroupMenuManager*>(this->parent());
+  pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
   mgr->setEnabled(enabled);
   bool some_enabled = false;
-  const QList<QAction*> &actionsList = updateOnlyToolbars ? mgr->actionsInToolbars() : mgr->actions();
+  const QList<QAction*>& actionsList =
+    updateOnlyToolbars ? mgr->actionsInToolbars() : mgr->actions();
   foreach (QAction* action, actionsList)
-    {
+  {
     vtkSMProxy* prototype = mgr->getPrototype(action);
     if (!prototype || !enabled)
-      {
+    {
       action->setEnabled(false);
       action->setStatusTip("Requires an input");
       continue;
-      }
+    }
 
     int numProcs = outputPorts[0]->getServer()->getNumberOfPartitions();
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(prototype);
-    if (sp && (
-        (sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS && numProcs > 1) ||
-        (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1)))
-      {
+    if (sp && ((sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS && numProcs > 1) ||
+                (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1)))
+    {
       // Skip single process filters when running in multiprocesses and vice
       // versa.
       action->setEnabled(false);
       if (numProcs > 1)
-        {
+      {
         action->setStatusTip("Not supported in parallel");
-        }
-      else
-        {
-        action->setStatusTip("Supported only in parallel");
-        }
-      continue;
       }
+      else
+      {
+        action->setStatusTip("Supported only in parallel");
+      }
+      continue;
+    }
 
     // TODO: Handle case where a proxy has multiple input properties.
-    vtkSMInputProperty *input = ::getInputProperty(prototype);
+    vtkSMInputProperty* input = ::getInputProperty(prototype);
     if (input)
+    {
+      if (!input->GetMultipleInput() && outputPorts.size() > 1)
       {
-      if(!input->GetMultipleInput() && outputPorts.size() > 1)
-        {
         action->setEnabled(false);
         action->setStatusTip("Multiple inputs not support");
         continue;
-        }
+      }
 
       input->RemoveAllUncheckedProxies();
-      for (int cc=0; cc < outputPorts.size(); cc++)
-        {
+      for (int cc = 0; cc < outputPorts.size(); cc++)
+      {
         pqOutputPort* port = outputPorts[cc];
-        input->AddUncheckedInputConnection(
-          port->getSource()->getProxy(), port->getPortNumber());
-        }
+        input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
+      }
 
       vtkSMDomain* domain = NULL;
       if (input->IsInDomains(&domain))
-        {
+      {
         action->setEnabled(true);
         some_enabled = true;
         const char* help = prototype->GetDocumentation()->GetShortHelp();
-        action->setStatusTip(help? help : "");
-        }
+        action->setStatusTip(help ? help : "");
+      }
       else
-        {
+      {
         action->setEnabled(false);
         // Here we need to go to the domain that returned false and find out why
         // it said the domain criteria wasn't met.
         action->setStatusTip(::getDomainDisplayText(domain, input));
-        }
-      input->RemoveAllUncheckedProxies();
       }
+      input->RemoveAllUncheckedProxies();
     }
+  }
 
   if (!some_enabled)
-    {
+  {
     mgr->setEnabled(false);
-    }
+  }
   // If we updated only the toolbars, then the state of other actions may still
   // be dirty
   this->IsDirty = updateOnlyToolbars;
@@ -326,38 +312,36 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy(
-    xmlgroup.toLatin1().data(), xmlname.toLatin1().data());
+  vtkSMProxy* prototype =
+    pxm->GetPrototypeProxy(xmlgroup.toLatin1().data(), xmlname.toLatin1().data());
   if (!prototype)
-    {
+  {
     qCritical() << "Unknown proxy type: " << xmlname;
     return 0;
-    }
+  }
 
   // Get the list of selected sources.
   QMap<QString, QList<pqOutputPort*> > namedInputs;
   QList<pqOutputPort*> selectedOutputPorts;
 
-  vtkSMProxySelectionModel* selModel =
-    pqActiveObjects::instance().activeSourcesSelectionModel();
+  vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
   // Determine the list of selected output ports.
-  for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
-    {
+  for (unsigned int cc = 0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
+  {
     pqServerManagerModelItem* item =
-      smmodel->findItem<pqServerManagerModelItem*>(
-        selModel->GetSelectedProxy(cc));
+      smmodel->findItem<pqServerManagerModelItem*>(selModel->GetSelectedProxy(cc));
 
     pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
     if (opPort)
-      {
+    {
       selectedOutputPorts.push_back(opPort);
-      }
-    else if (source)
-      {
-      selectedOutputPorts.push_back(source->getOutputPort(0));
-      }
     }
+    else if (source)
+    {
+      selectedOutputPorts.push_back(source->getOutputPort(0));
+    }
+  }
 
   QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
   namedInputs[inputPortNames[0]] = selectedOutputPorts;
@@ -366,33 +350,30 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   // user to make selection for the inputs for each port. We may change that in
   // future to be smarter.
   if (pqPipelineFilter::getRequiredInputPorts(prototype).size() > 1)
-    {
-    vtkSMProxy* filterProxy = pxm->GetPrototypeProxy("filters",
-      xmlname.toLatin1().data());
+  {
+    vtkSMProxy* filterProxy = pxm->GetPrototypeProxy("filters", xmlname.toLatin1().data());
     vtkSMPropertyHelper helper(filterProxy, inputPortNames[0]);
     helper.RemoveAllValues();
 
-    foreach (pqOutputPort *outputPort, selectedOutputPorts)
-      {
-      helper.Add(outputPort->getSource()->getProxy(),
-        outputPort->getPortNumber());
-      }
+    foreach (pqOutputPort* outputPort, selectedOutputPorts)
+    {
+      helper.Add(outputPort->getSource()->getProxy(), outputPort->getPortNumber());
+    }
 
     pqChangeInputDialog dialog(filterProxy, pqCoreUtilities::mainWidget());
     dialog.setObjectName("SelectInputDialog");
     if (QDialog::Accepted != dialog.exec())
-      {
+    {
       helper.RemoveAllValues();
       // User aborted creation.
       return 0;
-      }
+    }
     helper.RemoveAllValues();
     namedInputs = dialog.selectedInputs();
-    }
+  }
 
   BEGIN_UNDO_SET(QString("Create '%1'").arg(xmlname));
-  pqPipelineSource* filter = builder->createFilter("filters", xmlname,
-    namedInputs, server);
+  pqPipelineSource* filter = builder->createFilter("filters", xmlname, namedInputs, server);
   END_UNDO_SET();
   return filter;
 }

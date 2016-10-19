@@ -55,32 +55,32 @@ vtkMultiBlockDataSet* vtkCPMultiBlockGridBuilder::GetGrid()
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkCPMultiBlockGridBuilder::GetGrid(
-  unsigned long timeStep, double time, int & builtNewGrid)
+  unsigned long timeStep, double time, int& builtNewGrid)
 {
   builtNewGrid = 0;
-  if(!this->Grid)
-    {
+  if (!this->Grid)
+  {
     builtNewGrid = 1;
     vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::New();
     this->SetGrid(multiBlock);
     multiBlock->Delete();
-    }
+  }
   unsigned int numberOfBlocks = static_cast<unsigned int>(this->Internal->GridBuilders.size());
-  if(this->Grid->GetNumberOfBlocks() != numberOfBlocks)
-    {
+  if (this->Grid->GetNumberOfBlocks() != numberOfBlocks)
+  {
     builtNewGrid = 1;
     this->Grid->SetNumberOfBlocks(numberOfBlocks);
-    }
-  for(unsigned int ui=0;ui<numberOfBlocks;ui++)
-    {
+  }
+  for (unsigned int ui = 0; ui < numberOfBlocks; ui++)
+  {
     int builtNewDataObject = 0;
-    this->Grid->SetBlock(ui, this->Internal->GridBuilders[ui]->GetGrid(
-                           timeStep, time, builtNewDataObject));
-    if(builtNewDataObject)
-      {
+    this->Grid->SetBlock(
+      ui, this->Internal->GridBuilders[ui]->GetGrid(timeStep, time, builtNewDataObject));
+    if (builtNewDataObject)
+    {
       builtNewGrid = 1;
-      }
     }
+  }
   return this->Grid;
 }
 
@@ -91,16 +91,14 @@ void vtkCPMultiBlockGridBuilder::AddGridBuilder(vtkCPGridBuilder* gridBuilder)
 }
 
 //----------------------------------------------------------------------------
-void vtkCPMultiBlockGridBuilder::RemoveGridBuilder(
-  vtkCPGridBuilder* gridBuilder)
+void vtkCPMultiBlockGridBuilder::RemoveGridBuilder(vtkCPGridBuilder* gridBuilder)
 {
-  vtkCPMultiBlockGridBuilderInternals::GridBuilderIterator it =
-    std::find(this->Internal->GridBuilders.begin(),
-                 this->Internal->GridBuilders.end(), gridBuilder);
-  if(it != this->Internal->GridBuilders.end())
-    {
+  vtkCPMultiBlockGridBuilderInternals::GridBuilderIterator it = std::find(
+    this->Internal->GridBuilders.begin(), this->Internal->GridBuilders.end(), gridBuilder);
+  if (it != this->Internal->GridBuilders.end())
+  {
     this->Internal->GridBuilders.erase(it);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -116,14 +114,13 @@ unsigned int vtkCPMultiBlockGridBuilder::GetNumberOfGridBuilders()
 }
 
 //----------------------------------------------------------------------------
-vtkCPGridBuilder*
-vtkCPMultiBlockGridBuilder::GetGridBuilder(unsigned int which)
+vtkCPGridBuilder* vtkCPMultiBlockGridBuilder::GetGridBuilder(unsigned int which)
 {
-  if(which >= this->GetNumberOfGridBuilders())
-    {
+  if (which >= this->GetNumberOfGridBuilders())
+  {
     vtkWarningMacro("Bad input.");
     return 0;
-    }
+  }
   return this->Internal->GridBuilders[which];
 }
 

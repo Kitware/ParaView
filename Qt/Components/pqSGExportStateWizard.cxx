@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // HACK.
 namespace
 {
-  static QPointer<pqSGExportStateWizard> ActiveWizard;
+static QPointer<pqSGExportStateWizard> ActiveWizard;
 }
 
 pqSGExportStateWizardPage2::pqSGExportStateWizardPage2(QWidget* _parent)
@@ -82,26 +82,25 @@ void pqSGExportStateWizardPage2::initializePage()
   this->Internals->simulationInputs->clear();
   this->Internals->allInputs->clear();
   QList<pqPipelineSource*> sources =
-    pqApplicationCore::instance()->getServerManagerModel()->
-    findItems<pqPipelineSource*>();
+    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqPipelineSource*>();
   foreach (pqPipelineSource* source, sources)
-    {
+  {
     if (qobject_cast<pqPipelineFilter*>(source))
-      {
+    {
       continue;
-      }
-    if(this->Internals->showAllSources->isChecked())
-      {
+    }
+    if (this->Internals->showAllSources->isChecked())
+    {
       this->Internals->allInputs->addItem(source->getSMName());
-      }
+    }
     else
-      { // determine if the source is a reader or not, only include readers
-      if( vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) )
-        {
+    { // determine if the source is a reader or not, only include readers
+      if (vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()))
+      {
         this->Internals->allInputs->addItem(source->getSMName());
-        }
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -114,78 +113,74 @@ bool pqSGExportStateWizardPage2::isComplete() const
 void pqSGExportStateWizardPage3::initializePage()
 {
   this->Internals->nameWidget->clearContents();
-  this->Internals->nameWidget->setRowCount(
-    this->Internals->simulationInputs->count());
-  for (int cc=0; cc < this->Internals->simulationInputs->count(); cc++)
-    {
+  this->Internals->nameWidget->setRowCount(this->Internals->simulationInputs->count());
+  for (int cc = 0; cc < this->Internals->simulationInputs->count(); cc++)
+  {
     QListWidgetItem* item = this->Internals->simulationInputs->item(cc);
     QString text = item->text();
     this->Internals->nameWidget->setItem(cc, 0, new QTableWidgetItem(text));
     // if there is only 1 input then call it input, otherwise
     // use the same name as the filter
-    if(this->Internals->simulationInputs->count() == 1)
-      {
+    if (this->Internals->simulationInputs->count() == 1)
+    {
       this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem("input"));
-      }
+    }
     else
-      {
+    {
       this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
-      }
+    }
     QTableWidgetItem* tableItem = this->Internals->nameWidget->item(cc, 1);
-    tableItem->setFlags(tableItem->flags()|Qt::ItemIsEditable);
+    tableItem->setFlags(tableItem->flags() | Qt::ItemIsEditable);
 
     tableItem = this->Internals->nameWidget->item(cc, 0);
     tableItem->setFlags(tableItem->flags() & ~Qt::ItemIsEditable);
-    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-pqSGExportStateWizard::pqSGExportStateWizard(
-  QWidget *parentObject, Qt::WindowFlags parentFlags)
-: Superclass(parentObject, parentFlags)
+pqSGExportStateWizard::pqSGExportStateWizard(QWidget* parentObject, Qt::WindowFlags parentFlags)
+  : Superclass(parentObject, parentFlags)
 {
   ::ActiveWizard = this;
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   ::ActiveWizard = NULL;
-  //this->setWizardStyle(ModernStyle);
+  // this->setWizardStyle(ModernStyle);
   this->setOption(QWizard::NoCancelButton, false);
   this->Internals->wViewSelection->hide();
   this->Internals->rescaleDataRange->hide();
   this->Internals->laRescaleDataRange->hide();
 
-  QObject::connect(this->Internals->allInputs, SIGNAL(itemSelectionChanged()),
-    this, SLOT(updateAddRemoveButton()));
-  QObject::connect(this->Internals->simulationInputs, SIGNAL(itemSelectionChanged()),
-    this, SLOT(updateAddRemoveButton()));
-  QObject::connect(this->Internals->showAllSources, SIGNAL(toggled(bool)),
-    this, SLOT(onShowAllSources(bool)));
-  QObject::connect(this->Internals->addButton, SIGNAL(clicked()),
-    this, SLOT(onAdd()));
-  QObject::connect(this->Internals->removeButton, SIGNAL(clicked()),
-    this, SLOT(onRemove()));
+  QObject::connect(this->Internals->allInputs, SIGNAL(itemSelectionChanged()), this,
+    SLOT(updateAddRemoveButton()));
+  QObject::connect(this->Internals->simulationInputs, SIGNAL(itemSelectionChanged()), this,
+    SLOT(updateAddRemoveButton()));
+  QObject::connect(
+    this->Internals->showAllSources, SIGNAL(toggled(bool)), this, SLOT(onShowAllSources(bool)));
+  QObject::connect(this->Internals->addButton, SIGNAL(clicked()), this, SLOT(onAdd()));
+  QObject::connect(this->Internals->removeButton, SIGNAL(clicked()), this, SLOT(onRemove()));
 
-  QObject::connect(this->Internals->allInputs, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-    this, SLOT(onAdd()));
+  QObject::connect(
+    this->Internals->allInputs, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onAdd()));
   QObject::connect(this->Internals->simulationInputs, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
     this, SLOT(onRemove()));
 
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
-                   this->Internals->wViewSelection, SLOT(setVisible(bool)));
+    this->Internals->wViewSelection, SLOT(setVisible(bool)));
 
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
-                   this->Internals->rescaleDataRange, SLOT(setVisible(bool)));
+    this->Internals->rescaleDataRange, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
-                   this->Internals->laRescaleDataRange, SLOT(setVisible(bool)));
+    this->Internals->laRescaleDataRange, SLOT(setVisible(bool)));
 
   this->Internals->wCinemaTrackSelection->hide();
 
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
-                   this->Internals->outputRendering, SLOT(setChecked(bool)));
+    this->Internals->outputRendering, SLOT(setChecked(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
-                   this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
-  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
-                   this, SLOT(toggleCinema(bool)));
+    this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
+  QObject::connect(
+    this->Internals->outputCinema, SIGNAL(toggled(bool)), this, SLOT(toggleCinema(bool)));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
@@ -213,8 +208,7 @@ pqSGExportStateWizard::~pqSGExportStateWizard()
 //-----------------------------------------------------------------------------
 void pqSGExportStateWizard::updateAddRemoveButton()
 {
-  this->Internals->addButton->setEnabled(
-    this->Internals->allInputs->selectedItems().size() > 0);
+  this->Internals->addButton->setEnabled(this->Internals->allInputs->selectedItems().size() > 0);
   this->Internals->removeButton->setEnabled(
     this->Internals->simulationInputs->selectedItems().size() > 0);
 }
@@ -222,43 +216,42 @@ void pqSGExportStateWizard::updateAddRemoveButton()
 //-----------------------------------------------------------------------------
 void pqSGExportStateWizard::onShowAllSources(bool isChecked)
 {
-  if(isChecked)
-    { // add any sources that aren't readers and aren't in simulationInputs
+  if (isChecked)
+  { // add any sources that aren't readers and aren't in simulationInputs
     QList<pqPipelineSource*> sources =
-      pqApplicationCore::instance()->getServerManagerModel()->
-      findItems<pqPipelineSource*>();
+      pqApplicationCore::instance()->getServerManagerModel()->findItems<pqPipelineSource*>();
     foreach (pqPipelineSource* source, sources)
-      {
+    {
       if (qobject_cast<pqPipelineFilter*>(source))
-        {
+      {
         continue;
-        }
-      if( vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) == NULL )
-        {
+      }
+      if (vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) == NULL)
+      {
         // make sure it's not in the list of simulationInputs
         QList<QListWidgetItem*> matchingNames =
           this->Internals->simulationInputs->findItems(source->getSMName(), 0);
-        if(matchingNames.isEmpty())
-          {
+        if (matchingNames.isEmpty())
+        {
           this->Internals->allInputs->addItem(source->getSMName());
-          }
         }
       }
     }
+  }
   else
-    { // remove any source that aren't readers from allInputs
-    for(int i=this->Internals->allInputs->count()-1;i>=0;i--)
-      {
+  { // remove any source that aren't readers from allInputs
+    for (int i = this->Internals->allInputs->count() - 1; i >= 0; i--)
+    {
       QListWidgetItem* item = this->Internals->allInputs->item(i);
       QString text = item->text();
       pqPipelineSource* source =
         pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(text);
-      if( vtkSMCoreUtilities::GetFileNameProperty(source->getProxy())==NULL )
-        {
+      if (vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) == NULL)
+      {
         delete this->Internals->allInputs->takeItem(i);
-        }
       }
     }
+  }
   dynamic_cast<pqSGExportStateWizardPage2*>(this->currentPage())->emitCompleteChanged();
 }
 
@@ -266,38 +259,36 @@ void pqSGExportStateWizard::onShowAllSources(bool isChecked)
 void pqSGExportStateWizard::onAdd()
 {
   foreach (QListWidgetItem* item, this->Internals->allInputs->selectedItems())
-    {
+  {
     QString text = item->text();
     this->Internals->simulationInputs->addItem(text);
-    delete this->Internals->allInputs->takeItem(
-      this->Internals->allInputs->row(item));
-    }
-  dynamic_cast<pqSGExportStateWizardPage2*>(
-    this->currentPage())->emitCompleteChanged();
+    delete this->Internals->allInputs->takeItem(this->Internals->allInputs->row(item));
+  }
+  dynamic_cast<pqSGExportStateWizardPage2*>(this->currentPage())->emitCompleteChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqSGExportStateWizard::onRemove()
 {
   foreach (QListWidgetItem* item, this->Internals->simulationInputs->selectedItems())
-    {
+  {
     QString text = item->text();
-    if(this->Internals->showAllSources->isChecked())
-      { // we show all sources...
+    if (this->Internals->showAllSources->isChecked())
+    { // we show all sources...
       this->Internals->allInputs->addItem(text);
-      }
+    }
     else
-      { // show only reader sources...
+    { // show only reader sources...
       pqPipelineSource* source =
         pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(text);
-      if( vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) )
-        {
+      if (vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()))
+      {
         this->Internals->allInputs->addItem(text);
-        }
       }
+    }
     delete this->Internals->simulationInputs->takeItem(
       this->Internals->simulationInputs->row(item));
-    }
+  }
   dynamic_cast<pqSGExportStateWizardPage2*>(this->currentPage())->emitCompleteChanged();
 }
 
@@ -311,40 +302,40 @@ QList<pqImageOutputInfo*> pqSGExportStateWizard::getImageOutputInfos()
 bool pqSGExportStateWizard::validateCurrentPage()
 {
   if (!this->Superclass::validateCurrentPage())
-    {
+  {
     return false;
-    }
+  }
 
   if (this->nextId() != -1)
-    {
+  {
     // not yet done with the wizard.
     return true;
-    }
+  }
 
   QString command;
   if (this->getCommandString(command))
-    {
+  {
     // ensure Python in initialized.
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(command.toLatin1().data());
     return true;
-    }
+  }
   return false;
 }
 
 //-----------------------------------------------------------------------------
 void pqSGExportStateWizard::toggleCinema(bool state)
 {
-  if(state)
-    {
-    //cinema depends on rendering being on (unchecking it should not be possible)
+  if (state)
+  {
+    // cinema depends on rendering being on (unchecking it should not be possible)
     this->Internals->outputRendering->setEnabled(false);
-    //add cinema controls to each view
+    // add cinema controls to each view
     this->Internals->wViewSelection->setCinemaVisible(true);
-    }
+  }
   else
-    {
+  {
     this->Internals->outputRendering->setEnabled(true);
     this->Internals->wViewSelection->setCinemaVisible(false);
-    }
+  }
 }

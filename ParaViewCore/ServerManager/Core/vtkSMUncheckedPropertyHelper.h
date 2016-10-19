@@ -22,9 +22,8 @@
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
 {
 public:
-  vtkSMUncheckedPropertyHelper(
-    vtkSMProxy *proxy, const char *name, bool quiet = false);
-  vtkSMUncheckedPropertyHelper(vtkSMProperty *property, bool quiet = false);
+  vtkSMUncheckedPropertyHelper(vtkSMProxy* proxy, const char* name, bool quiet = false);
+  vtkSMUncheckedPropertyHelper(vtkSMProperty* property, bool quiet = false);
 
 private:
   vtkSMUncheckedPropertyHelper(const vtkSMUncheckedPropertyHelper&) VTK_DELETE_FUNCTION;

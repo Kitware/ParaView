@@ -21,13 +21,13 @@ class vtkPNGWriter;
 class vtkParticlePipeline : public vtkCPPipeline
 {
 public:
-  static vtkParticlePipeline* New ();
-  vtkTypeMacro (vtkParticlePipeline, vtkCPPipeline);
-  void PrintSelf (ostream& os, vtkIndent indent);
+  static vtkParticlePipeline* New();
+  vtkTypeMacro(vtkParticlePipeline, vtkCPPipeline);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual int RequestDataDescription (vtkCPDataDescription *desc);
-  
-  virtual int CoProcess (vtkCPDataDescription* desc);
+  virtual int RequestDataDescription(vtkCPDataDescription* desc);
+
+  virtual int CoProcess(vtkCPDataDescription* desc);
 
   // Description:
   // name of the image file to output
@@ -36,45 +36,45 @@ public:
 
   // Description:
   // radius of the sphere glyph to place on the particles
-  vtkSetMacro (ParticleRadius, double);
-  vtkGetMacro (ParticleRadius, double);
+  vtkSetMacro(ParticleRadius, double);
+  vtkGetMacro(ParticleRadius, double);
 
   // Description:
   // angle of the camera around the mass of particles in the x-z plane
-  vtkSetMacro (CameraThetaAngle, double);
-  vtkGetMacro (CameraThetaAngle, double);
+  vtkSetMacro(CameraThetaAngle, double);
+  vtkGetMacro(CameraThetaAngle, double);
 
   // Description:
   // angle the camera makes with the y axis (relative to particles' center)
-  vtkSetMacro (CameraPhiAngle, double);
-  vtkGetMacro (CameraPhiAngle, double);
+  vtkSetMacro(CameraPhiAngle, double);
+  vtkGetMacro(CameraPhiAngle, double);
 
   // Description:
   // distance the camera is from the particles' center
   // zero means to find the optimal viewing distance (default: zero)
-  vtkSetMacro (CameraDistance, double);
-  vtkGetMacro (CameraDistance, double);
+  vtkSetMacro(CameraDistance, double);
+  vtkGetMacro(CameraDistance, double);
 
   // Description:
   // bounds of the particle space.  This will be used to set the camera
   // distance (if requested) and the box outline.
-  vtkSetVector6Macro (Bounds, double);
-  vtkGetVectorMacro (Bounds, double, 6);
+  vtkSetVector6Macro(Bounds, double);
+  vtkGetVectorMacro(Bounds, double, 6);
 
   // Description:
   // max and min value for the attributes to use in defining the color lookup
-  vtkSetMacro (AttributeMaximum, double);
-  vtkGetMacro (AttributeMaximum, double);
-  vtkSetMacro (AttributeMinimum, double);
-  vtkGetMacro (AttributeMinimum, double);
+  vtkSetMacro(AttributeMaximum, double);
+  vtkGetMacro(AttributeMaximum, double);
+  vtkSetMacro(AttributeMinimum, double);
+  vtkGetMacro(AttributeMinimum, double);
 
 protected:
-  vtkParticlePipeline ();
-  virtual ~vtkParticlePipeline ();
+  vtkParticlePipeline();
+  virtual ~vtkParticlePipeline();
 
-  void SetupPipeline ();
+  void SetupPipeline();
 
-  char *Filename;
+  char* Filename;
 
   double ParticleRadius;
 
@@ -104,9 +104,8 @@ protected:
   vtkPNGWriter* writer;
 
 private:
-  vtkParticlePipeline (const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
-  void operator= (const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
-
+  vtkParticlePipeline(const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
 };
 
 #endif /* vtkParticlePipeline_H */

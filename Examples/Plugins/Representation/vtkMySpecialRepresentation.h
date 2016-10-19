@@ -35,7 +35,6 @@ protected:
 private:
   vtkMySpecialRepresentation(const vtkMySpecialRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkMySpecialRepresentation&) VTK_DELETE_FUNCTION;
-
 };
 
 #endif

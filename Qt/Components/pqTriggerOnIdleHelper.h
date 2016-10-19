@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -40,21 +40,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 
-/// Often times we need to call certain slots on idle. However, just relying on
-/// Qt's idle is not safe since progress events often result in processing of
-/// pending events, which may not be a safe place for such slots to be called.
-/// In that such cases this class can be used. It emits the triggered() signal
-/// when the server (set using setServer()) is indeed idle. Otherwise it simply
-/// reschedules the triggering of another time.
+/**
+* Often times we need to call certain slots on idle. However, just relying on
+* Qt's idle is not safe since progress events often result in processing of
+* pending events, which may not be a safe place for such slots to be called.
+* In that such cases this class can be used. It emits the triggered() signal
+* when the server (set using setServer()) is indeed idle. Otherwise it simply
+* reschedules the triggering of another time.
+*/
 class PQCOMPONENTS_EXPORT pqTriggerOnIdleHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  pqTriggerOnIdleHelper(QObject* parent=0);
+  pqTriggerOnIdleHelper(QObject* parent = 0);
   virtual ~pqTriggerOnIdleHelper();
 
-  /// get the server
+  /**
+  * get the server
+  */
   pqServer* server() const;
 
 signals:

@@ -21,18 +21,18 @@
 void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
 {
   if (!Superclass::CoProcessor)
-    {
+  {
     Superclass::CoProcessor = vtkCPProcessor::New();
     Superclass::CoProcessor->Initialize();
-    }
+  }
   // needed to initialize vtkCPDataDescription.
   Superclass::CoProcessorInitialize();
 
-  if(pythonFileName)
-    {
+  if (pythonFileName)
+  {
     vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
     pipeline->Initialize(pythonFileName);
     Superclass::CoProcessor->AddPipeline(pipeline);
     pipeline->FastDelete();
-    }
+  }
 }

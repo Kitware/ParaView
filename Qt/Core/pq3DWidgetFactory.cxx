@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct WidgetRecord
 {
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
-  vtkSMProxy *ReferenceProxy;
+  vtkSMProxy* ReferenceProxy;
 };
 
 class pq3DWidgetFactoryInternal
@@ -62,12 +62,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pq3DWidgetFactory::pq3DWidgetFactory(QObject* _parent/*=null*/)
-: QObject(_parent)
+pq3DWidgetFactory::pq3DWidgetFactory(QObject* _parent /*=null*/)
+  : QObject(_parent)
 {
   this->Internal = new pq3DWidgetFactoryInternal();
   QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
-    SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)), this, 
+    SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)), this,
     SLOT(proxyUnRegistered(QString, QString, vtkSMProxy*)));
 }
 
@@ -78,38 +78,34 @@ pq3DWidgetFactory::~pq3DWidgetFactory()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
-    pqServer* server, vtkSMProxy *referenceProxy)
+vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(
+  const QString& name, pqServer* server, vtkSMProxy* referenceProxy)
 {
   QList<WidgetRecord>::iterator iter = this->Internal->Widgets.begin();
   for (; iter != this->Internal->Widgets.end(); iter++)
-    {
+  {
     vtkSMNewWidgetRepresentationProxy* proxy = iter->WidgetProxy.GetPointer();
-    if (proxy &&
-        proxy->GetSession() == server->session() &&
-        name == proxy->GetXMLName() &&
-        iter->ReferenceProxy == referenceProxy)
-      {
+    if (proxy && proxy->GetSession() == server->session() && name == proxy->GetXMLName() &&
+      iter->ReferenceProxy == referenceProxy)
+    {
       this->Internal->WidgetsInUse.push_back(*iter);
       this->Internal->Widgets.erase(iter);
       return proxy;
-      }
     }
+  }
 
-  pqObjectBuilder* builder = 
-    pqApplicationCore::instance()->getObjectBuilder();
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
   // We register  the 3DWidget proxy under prototypes so that it
   // is never saved in state
-  vtkSMNewWidgetRepresentationProxy* proxy = vtkSMNewWidgetRepresentationProxy::SafeDownCast(
-    builder->createProxy("representations", 
-      name.toLatin1().data(), server,
-      "3d_widgets_prototypes"));
+  vtkSMNewWidgetRepresentationProxy* proxy =
+    vtkSMNewWidgetRepresentationProxy::SafeDownCast(builder->createProxy(
+      "representations", name.toLatin1().data(), server, "3d_widgets_prototypes"));
   if (!proxy)
-    {
+  {
     qDebug() << "Could not create the 3D widget with name: " << name;
     return NULL;
-    }
+  }
 
   // make record for this newly created 3D widget
   WidgetRecord record;
@@ -125,48 +121,47 @@ void pq3DWidgetFactory::free3DWidget(vtkSMNewWidgetRepresentationProxy* widget)
 {
   QList<WidgetRecord>::iterator iter = this->Internal->WidgetsInUse.begin();
   for (; iter != this->Internal->WidgetsInUse.end(); iter++)
-    {
+  {
     vtkSMNewWidgetRepresentationProxy* proxy = iter->WidgetProxy.GetPointer();
     if (proxy == widget)
-      {
+    {
       this->Internal->Widgets.push_back(*iter);
       this->Internal->WidgetsInUse.erase(iter);
       return;
-      }
     }
+  }
   // qDebug() << "free3DWidget called on a free widget on a widget not managed"
   // " by this class.";
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidgetFactory::proxyUnRegistered(QString group, 
-  QString vtkNotUsed(name), vtkSMProxy* proxy)
+void pq3DWidgetFactory::proxyUnRegistered(
+  QString group, QString vtkNotUsed(name), vtkSMProxy* proxy)
 {
   vtkSMNewWidgetRepresentationProxy* widget;
-  if (group != "3d_widgets_prototypes" || 
+  if (group != "3d_widgets_prototypes" ||
     (widget = vtkSMNewWidgetRepresentationProxy::SafeDownCast(proxy)) == 0)
-    {
+  {
     return;
-    }
+  }
   // Check if the unregistered proxy is the one managed by this class.
   QList<WidgetRecord>::iterator iter;
-  for (iter = this->Internal->WidgetsInUse.begin(); 
-    iter != this->Internal->WidgetsInUse.end(); iter++)
-    {
+  for (iter = this->Internal->WidgetsInUse.begin(); iter != this->Internal->WidgetsInUse.end();
+       iter++)
+  {
     if (iter->WidgetProxy.GetPointer() == widget)
-      {
+    {
       this->Internal->WidgetsInUse.erase(iter);
       break;
-      }
     }
+  }
 
-  for (iter = this->Internal->Widgets.begin();
-    iter != this->Internal->Widgets.end(); ++iter)
-    {
+  for (iter = this->Internal->Widgets.begin(); iter != this->Internal->Widgets.end(); ++iter)
+  {
     if (iter->WidgetProxy.GetPointer() == widget)
-      {
+    {
       this->Internal->Widgets.erase(iter);
       break;
-      }
     }
+  }
 }
