@@ -156,8 +156,6 @@ set (Module_SRCS
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.cxx
   pqHandlePropertyWidget.h
-  pqHelpReaction.cxx
-  pqHelpReaction.h
   pqHideAllReaction.cxx
   pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -224,8 +222,6 @@ set (Module_SRCS
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.cxx
   pqPluginDockWidgetsBehavior.h
-  pqPluginDocumentationBehavior.cxx
-  pqPluginDocumentationBehavior.h
   pqPluginSettingsBehavior.cxx
   pqPluginSettingsBehavior.h
   pqPointPickingHelper.cxx
@@ -390,7 +386,6 @@ set (Module_MOC_HDRS
   pqGenericPropertyWidgetDecorator.h
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.h
-  pqHelpReaction.h
   pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h
@@ -423,7 +418,6 @@ set (Module_MOC_HDRS
   pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
-  pqPluginDocumentationBehavior.h
   pqPluginSettingsBehavior.h
   pqPointPickingHelper.h
   pqPropertyGroupButton.h
@@ -533,9 +527,22 @@ set (Module_RESOURCE_FILES
 )
 
 include(ParaViewQt)
-pv_find_package_qt(qt_private_targets REQUIRED QUIET
-  QT4_COMPONENTS QtHelp
-  QT5_COMPONENTS Widgets Help)
+if (PARAVIEW_USE_QTHELP)
+  pv_find_package_qt(qt_private_targets REQUIRED QUIET
+    QT4_COMPONENTS QtHelp
+    QT5_COMPONENTS Widgets Help)
+  list(APPEND Module_SRCS
+    pqHelpReaction.cxx
+    pqHelpReaction.h
+    pqPluginDocumentationBehavior.cxx
+    pqPluginDocumentationBehavior.h)
+  list(APPEND Module_MOC_HDRS
+    pqHelpReaction.h
+    pqPluginDocumentationBehavior.h)
+else()
+  pv_find_package_qt(qt_private_targets REQUIRED QUIET
+    QT5_COMPONENTS Widgets)
+endif()
 
 # not sure this is the best way, but "moc" is complaining about
 # interfaces defined under Components and this seems like the only way to fix

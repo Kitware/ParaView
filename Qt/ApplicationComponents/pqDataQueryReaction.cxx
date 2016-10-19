@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqFindDataDialog.h"
+#ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
+#endif
 #include "vtkPVConfig.h"
 
 #include <QMessageBox>
@@ -54,7 +56,9 @@ pqDataQueryReaction::~pqDataQueryReaction()
 //-----------------------------------------------------------------------------
 void pqDataQueryReaction::showHelp()
 {
+#ifdef PARAVIEW_USE_QTHELP
   pqHelpReaction::showHelp("qthelp://paraview.org/paraview/Book/Book_Chapter6.html");
+#endif
 }
 
 //-----------------------------------------------------------------------------

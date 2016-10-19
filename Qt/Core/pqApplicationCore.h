@@ -57,7 +57,9 @@ class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
 class QApplication;
+#ifdef PARAVIEW_USE_QTHELP
 class QHelpEngine;
+#endif
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
@@ -134,11 +136,13 @@ public:
   */
   void unRegisterManager(const QString& function);
 
+#ifdef PARAVIEW_USE_QTHELP
   /**
   * provides access to the help engine. The engine is created the first time
   * this method is called.
   */
   QHelpEngine* helpEngine();
+#endif
 
   /**
   * QHelpEngine doesn't like filenames in resource space. This method creates
@@ -389,7 +393,9 @@ protected:
   pqRecentlyUsedResourcesList* RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
+#ifdef PARAVIEW_USE_QTHELP
   QHelpEngine* HelpEngine;
+#endif
   QPointer<pqTestUtility> TestUtility;
 
 private:

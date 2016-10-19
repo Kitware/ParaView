@@ -244,6 +244,13 @@ cmake_dependent_option(PARAVIEW_USE_QTWEBKIT
   "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
 mark_as_advanced(PARAVIEW_USE_QTWEBKIT)
 
+# Add an option to enable using Qt Help, as needed.
+# Default is ON to enable integrated help/documentation.
+cmake_dependent_option(PARAVIEW_USE_QTHELP
+  "Use Qt Help infrastructure as needed." ON
+  "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
+mark_as_advanced(PARAVIEW_USE_QTHELP)
+
 # This option controls the behavior of the build_help_project function.  If it is
 # on then the .qch file will be generated, if not then the function does nothing.
 cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
