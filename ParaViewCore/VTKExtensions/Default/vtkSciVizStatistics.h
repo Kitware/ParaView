@@ -116,11 +116,11 @@ public:
   enum Tasks
   {
     MODEL_INPUT,     //!< Execute Learn and Derive operations of a statistical engine on the input
-                     //!dataset
+                     //! dataset
     CREATE_MODEL,    //!< Create a statistical model from a random subset the input dataset
     ASSESS_INPUT,    //!< Assess the input dataset using a statistical model from input port 1
     MODEL_AND_ASSESS //!< Create a statistical model of the input dataset and use it to assess the
-                     //!dataset. This is a bad idea.
+                     //! dataset. This is a bad idea.
   };
 
   //@{

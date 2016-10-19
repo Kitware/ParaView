@@ -424,8 +424,8 @@ void pqPlotter::setVarElementsActive(vtkSMProperty* prop, QString varName, bool 
     vtkSMStringVectorProperty* stringVecProp = dynamic_cast<vtkSMStringVectorProperty*>(prop);
 
     //#pragma message (__FILE__ "[" STRING(__LINE__) "]: pqPlotter::setVarElementsActive: CAUTION:
-    //vtkSMStringVectorProperty * stringVecProp being used to directly update data, i.e. not using
-    //pqSMAdaptor::setElementProperty()")
+    // vtkSMStringVectorProperty * stringVecProp being used to directly update data, i.e. not using
+    // pqSMAdaptor::setElementProperty()")
 
     if (stringVecProp != NULL)
     {
