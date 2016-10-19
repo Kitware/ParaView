@@ -2228,15 +2228,15 @@
                          default_values="1"
                          name="VerticalDimension"
                          number_of_elements="1">
-        <Documentation>Specify whether to only read variables from a
-        single level, from layer midpoints or from layer
-        interface.</Documentation>
+        <Documentation>Specify whether to read variables from the
+        single layer, from midpoint layers or from interface
+        layers.</Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Single level [time, ncol]"
+          <Entry text="Single layer [time, ncol]"
                  value="0" />
-          <Entry text="Layer midpoints [time, lev, ncol]"
+          <Entry text="Midpoint layers [time, lev, ncol]"
                  value="1" />
-          <Entry text="Layer interface [time, ilev, ncol]"
+          <Entry text="Interface layers [time, ilev, ncol]"
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
@@ -2257,9 +2257,78 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which NetCDF dual-grid point
+        <Documentation>This property lists which NetCDF CAM point
         variables to load.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="SingleMidpointLayer"
+                         command="SetSingleMidpointLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the midpoint layers. The layer
+          is specified by MidpointLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetMidpointLayersRange"
+                         information_only="1"
+                         name="MidpointLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="MidpointLayerIndex"
+                            command="SetMidpointLayerIndex"
+                            number_of_elements="1"
+                            default_values="0">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="MidpointLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleMidpointLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the midpoint layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SingleInterfaceLayer"
+                         command="SetSingleInterfaceLayer"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the interface layers. The layer
+          is specified by InterfaceLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetInterfaceLayersRange"
+                         information_only="1"
+                         name="InterfaceLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="InterfaceLayerIndex"
+                            command="SetInterfaceLayerIndex"
+                            number_of_elements="1"
+                            default_values="0">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="InterfaceLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleInterfaceLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the interface layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty default_values="1"
                          name="CellLayerRight"
                          number_of_elements="1"
@@ -7112,6 +7181,10 @@
           <Property name="ConnectivityFileName" />
           <Property name="VerticalDimension" />
           <Property name="PointArrayStatus" />
+          <Property name="SingleMidpointLayer" />
+          <Property name="MidpointLayerIndex" />
+          <Property name="SingleInterfaceLayer" />
+          <Property name="InterfaceLayerIndex" />
           <Property name="CellLayerRight" />
         </ExposedProperties>
       </SubProxy>
