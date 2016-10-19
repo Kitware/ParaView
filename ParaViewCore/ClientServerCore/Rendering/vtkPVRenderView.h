@@ -582,6 +582,13 @@ public:
   vtkSetMacro(UpdateAnnotation, bool);
   //@}
 
+  //@{}
+  /**
+   * Set color of annotation text for developers
+   */
+  void SetAnnotationColor(double r, double g, double b);
+  //@}
+
   /**
    * Set the vtkPVGridAxes3DActor to use for the view.
    */

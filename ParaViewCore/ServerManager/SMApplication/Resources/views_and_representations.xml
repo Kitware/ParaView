@@ -1540,6 +1540,16 @@
                         property="ShowAnnotation"/>
         </Hints>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetAnnotationColor"
+                            default_values="1 1 1"
+                            name="AnnotationColor"
+                            panel_widget="color_selector_with_palette"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+        </Hints>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"

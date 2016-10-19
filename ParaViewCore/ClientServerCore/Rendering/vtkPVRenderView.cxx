@@ -2601,6 +2601,12 @@ void vtkPVRenderView::SetShowAnnotation(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetAnnotationColor(double r, double g, double b)
+{
+  this->Annotation->GetTextActor()->GetTextProperty()->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateAnnotationText()
 {
   if (this->UpdateAnnotation && this->ShowAnnotation && !this->MakingSelection)
