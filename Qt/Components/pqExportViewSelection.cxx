@@ -71,6 +71,15 @@ void pqExportViewSelection::onPreviousClicked()
     {
       this->Ui->pbNext->setEnabled(true);
     }
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    // Update the current composite flag to adjust array selection
+    if (pqImageOutputInfo* qinfo =
+      qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(previousIndex)))
+    {
+    bool isComposite = qinfo->getComposite();
+    emit arraySelectionEnabledChanged(isComposite);
+    }
   }
 }
 
@@ -88,6 +97,15 @@ void pqExportViewSelection::onNextClicked()
     if (!this->Ui->pbPrevious->isEnabled())
     {
       this->Ui->pbPrevious->setEnabled(true);
+    }
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    // Update the current composite flag to adjust array selection
+    if (pqImageOutputInfo* qinfo =
+      qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(nextIndex)))
+    {
+    bool isComposite = qinfo->getComposite();
+    emit arraySelectionEnabledChanged(isComposite);
     }
   }
 }
@@ -121,6 +139,10 @@ void pqExportViewSelection::addViews(T const& views, int numberOfViews)
 
     pqImageOutputInfo* info = new pqImageOutputInfo(this->Ui->swViews, parentFlags, *it, viewName);
     this->Ui->swViews->addWidget(info);
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    QObject::connect(info, SIGNAL(compositeChanged(bool)), this,
+      SIGNAL(arraySelectionEnabledChanged(bool)));
   }
 }
 

@@ -93,6 +93,9 @@ public:
   */
   QString getSelectionAsString(QString const& scriptFromat);
 
+signals:
+  void arraySelectionEnabledChanged(bool enabled); 
+
 private slots:
 
   void onPreviousClicked();

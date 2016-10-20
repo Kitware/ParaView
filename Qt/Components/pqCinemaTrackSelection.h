@@ -102,6 +102,9 @@ public:
   */
   void initializePipelineBrowser();
 
+public slots:
+  void enableArraySelection(bool enable);
+
 private slots:
 
   /**

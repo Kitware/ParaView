@@ -82,6 +82,9 @@ public:
   QString getTrackObjectName();
   void setView(pqView* const view);
 
+signals:
+  void compositeChanged(bool checked);
+
 public slots:
   void updateImageFileName();
   void updateImageFileNameExtension(const QString&);

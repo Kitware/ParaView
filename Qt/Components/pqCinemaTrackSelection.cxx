@@ -250,6 +250,12 @@ void pqCinemaTrackSelection::onPipelineItemChanged(
   {
     track->show();
     this->Ui->tabProxyProperties->setTabEnabled(1, true);
+
+    // array selection is disabled, so set jump to the 'controls' tab
+    if (!this->Ui->tabProxyProperties->isTabEnabled(0))
+      {
+        this->Ui->tabProxyProperties->setCurrentIndex(1);
+      }
   }
   else
   {
@@ -272,6 +278,17 @@ void pqCinemaTrackSelection::onPipelineItemChanged(
       prevTrack->hide();
     }
   }
+}
+
+// ----------------------------------------------------------------------------
+void pqCinemaTrackSelection::enableArraySelection(bool enable)
+{
+  this->Ui->tabProxyProperties->setTabEnabled(0, enable);
+
+  // force item selection changed to update the active tab
+  pqPipelineBrowserWidget* plBrowser = this->Ui->wPipelineBrowser;
+  QItemSelectionModel* selModel = plBrowser->getSelectionModel();
+  this->onPipelineItemChanged(selModel->currentIndex(), QModelIndex());
 }
 
 // ----------------------------------------------------------------------------

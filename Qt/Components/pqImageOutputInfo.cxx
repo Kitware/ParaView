@@ -305,6 +305,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
     this->Ui->cinemaExport->addItem("azimuth-elevation-roll");
     this->Ui->cinemaExport->addItem("yaw-pitch-roll");
     this->Ui->cinemaExport->setCurrentIndex(index);
+    emit compositeChanged(true);
   }
   else
   {
@@ -312,6 +313,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
     this->Ui->cinemaExport->addItem("static");
     this->Ui->cinemaExport->addItem("phi-theta");
     this->Ui->cinemaExport->setCurrentIndex(index > 2 ? 2 : index);
+    emit compositeChanged(false);
   }
 }
 

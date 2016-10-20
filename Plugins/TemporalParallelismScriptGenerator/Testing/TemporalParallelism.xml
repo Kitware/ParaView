@@ -17,7 +17,7 @@
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0" command="mouseMove" arguments="1,0,0,433,502" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0" command="mouseRelease" arguments="1,0,0,433,502" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/timeCompartmentSize" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/timeCompartmentSize" command="spin" arguments="up" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/finishButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/ExportSpatio-TemporalStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/stpscript.py" />
 </pqevents>
