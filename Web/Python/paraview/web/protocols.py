@@ -561,39 +561,10 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
     def __init__(self, pathToColorMaps=None):
         super(ParaViewWebColorManager, self).__init__()
+        self.presets = servermanager.vtkSMTransferFunctionPresets()
         self.colorMapNames = []
-        if pathToColorMaps is not None:
-            self.pathToLuts = pathToColorMaps
-        else:
-            module_path = os.path.abspath(__file__)
-            path = os.path.dirname(module_path)
-            self.pathToLuts = os.path.join(path, '..', 'ColorMaps.xml')
-
-    # Rather than keeping a map of these xml strings in memory, it's very
-    # quick to just scan the file when we need a color map.  This is a
-    # convenience function to read the colormaps file and find the one
-    # associated with a particular name, then return it as xml text.  Also
-    # builds a list of preset color names and stores them in an instance
-    # variable.
-    def findColorMapText(self, colorMapName):
-        content = None
-        self.colorMapNames = []
-        with open(self.pathToLuts, 'r') as fd:
-            content = fd.read()
-            if content is not None:
-                colorMapMatcher = re.compile('(<ColorMap\s+.+?(?=</ColorMap>)</ColorMap>)', re.DOTALL)
-                nameMatcher = re.compile('name="([^"]+)"')
-                iterator = colorMapMatcher.finditer(content)
-                for match in iterator:
-                    colorMap = match.group(1)
-                    m = nameMatcher.search(colorMap)
-                    if m:
-                        mapName = m.group(1)
-                        self.colorMapNames.append(mapName)
-                        if mapName == colorMapName:
-                            return colorMap
-
-        return None
+        for i in range(self.presets.GetNumberOfPresets()):
+            self.colorMapNames.append(self.presets.GetPresetName(i))
 
     # RpcName: getScalarBarVisibilities => pv.color.manager.scalarbar.visibility.get
     @exportRpc("pv.color.manager.scalarbar.visibility.get")
@@ -710,17 +681,13 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             # No array just diffuse color
             repProxy.ColorArrayName = ''
         else:
-            # Select data array
-            vtkSMPVRepresentationProxy.SetScalarColoring(repProxy.SMProxy, arrayName, locationMap[arrayLocation])
-            lut = repProxy.LookupTable
-            lut.VectorMode = str(vectorMode)
-            lut.VectorComponent = int(vectorComponent)
-
-            # FIXME: This should happen once at the time the lookup table is created
-            # Also, the False is the default, but we need it here to avoid the
-            # ambiguous call error
-            if rescale or (lut != lutProxy):
-                vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(repProxy.SMProxy, arrayName, locationMap[arrayLocation], False)
+            simple.ColorBy(repProxy, (arrayLocation, arrayName))
+            if repProxy.LookupTable:
+                lut = repProxy.LookupTable
+                lut.VectorMode = str(vectorMode)
+                lut.VectorComponent = int(vectorComponent)
+            if rescale:
+                repProxy.RescaleTransferFunctionToDataRange(rescale, False)
 
         self.updateScalarBars()
 
@@ -994,10 +961,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         result = {}
 
         # Loop over all presets
-        self.findColorMapText('')
         for name in self.colorMapNames:
-            colorMapText = self.findColorMapText(name)
-            vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy, colorMapText)
+            lutProxy.ApplyPreset(name, True)
             rgb = [ 0, 0, 0 ]
             for i in range(numSamples):
                 lut.GetColor(dataRange[0] + float(i) * delta, rgb)
@@ -1038,17 +1003,15 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         Choose the color map preset to use when coloring by an array.
         """
         repProxy = self.mapIdToProxy(representation)
-        colorMapText = self.findColorMapText(paletteName)
+        lutProxy = repProxy.LookupTable
 
-        if colorMapText is not None:
-            lutProxy = repProxy.LookupTable
-            if lutProxy is not None:
-                vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy.SMProxy, colorMapText)
-                simple.Render()
-                self.getApplication().InvokeEvent('PushRender')
-                return { 'result': 'success' }
-            else:
-                return { 'result': 'Representation proxy ' + representation + ' is missing lookup table' }
+        if lutProxy is not None:
+            lutProxy.ApplyPreset(paletteName, True)
+            simple.Render()
+            self.getApplication().InvokeEvent('PushRender')
+            return { 'result': 'success' }
+        else:
+            return { 'result': 'Representation proxy ' + representation + ' is missing lookup table' }
 
         return { 'result': 'preset ' + paletteName + ' not found' }
 
@@ -1060,7 +1023,6 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         list will contain the names of any presets you provided in the file you
         supplied to the constructor of this protocol.
         """
-        self.findColorMapText('')
         return self.colorMapNames
 
 # =============================================================================
