@@ -103,6 +103,13 @@ public slots:
   // yet it will be initialized.
   void executeScript(const QString& filename);
 
+  /**
+   * Same as `executeScript()` except that is also triggers a render on all
+   * views in the application after the script has been processed. This is used
+   * when playing back macros, for example.
+   */
+  void executeScriptAndRender(const QString& filename);
+
   // Description:
   // Launch python editor to edit the macro
   void editMacro(const QString& fileName);
