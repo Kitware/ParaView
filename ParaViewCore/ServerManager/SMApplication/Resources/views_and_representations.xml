@@ -2431,8 +2431,8 @@
         captures from a RenderView.</Documentation>
       </IntVectorProperty>
       <Property
-          name="StartCaptureValues"
-          command="StartCaptureValues"
+          name="BeginValueCapture"
+          command="BeginValueCapture"
           >
         <Documentation>Initiates a render state where RGB colors
         encode values from a particular array.</Documentation>
@@ -2471,13 +2471,22 @@
       </IntVectorProperty>
       <IntVectorProperty
           name="ValueRenderingMode"
-          command="SetValueRenderingMode"
+          command="SetValueRenderingModeCommand"
           default_values="1"
           animateable="0"
           number_of_elements="1"
           >
         <IntRangeDomain name="range" />
         <Documentation>Select rendering mode of the value pass (either INVERTIBLE_LUT (1) or
+        FLOATING_POINT (2)).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="ValueRenderingModeGet"
+          command="GetValueRenderingModeCommand"
+          default_values="1"
+          information_only="1"
+          >
+        <Documentation>Get active rendering mode of the value pass (either INVERTIBLE_LUT (1) or
         FLOATING_POINT (2)).</Documentation>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2504,8 +2513,8 @@
         produce RGB colors.</Documentation>
       </DoubleVectorProperty>
       <Property
-          name="StopCaptureValues"
-          command="StopCaptureValues"
+          name="EndValueCapture"
+          command="EndValueCapture"
           >
         <Documentation>Terminantes the render state where RGB colors
         encode values from a particular array and returns to normal
@@ -2663,16 +2672,17 @@
       <PropertyGroup label="Cinema Export"
                      panel_visibility="never">
         <Property name="ValueRenderingMode"/>
+        <Property name="ValueRenderingModeGet"/>
         <Property name="CaptureZBuffer"/>
         <Property name="MaxClipBounds"/>
         <Property name="LockBounds"/>
-        <Property name="StartCaptureValues" />
+        <Property name="BeginValueCapture" />
         <Property name="DrawCells"/>
         <Property name="ArrayNameToDraw"/>
         <Property name="ArrayNumberToDraw"/>
         <Property name="ArrayComponentToDraw"/>
         <Property name="ScalarRange"/>
-        <Property name="StopCaptureValues" />
+        <Property name="EndValueCapture"/>
         <Property name="CaptureValuesFloat" />
         <Property name="StartCaptureLuminance" />
         <Property name="StopCaptureLuminance" />

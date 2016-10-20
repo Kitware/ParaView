@@ -910,14 +910,16 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
         enableFloatVal = False if 'floatValues' not in cinemaParams else cinemaParams['floatValues']
 
-        explore(cs, p, userDefined = userDefValues,
+        pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+        pid = pm.GetPartitionId()
+
+        explore(cs, p, iSave = (pid == 0), userDefined = userDefValues,
                 specLevel = specLevel,
                 camType = camType,
                 tracking = tracking_def, floatValues = enableFloatVal)
 
         view.LockBounds = 0
-        pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
-        pid = pm.GetPartitionId()
+
         if pid == 0:
             cs.save()
         atLeastOneViewExported = True

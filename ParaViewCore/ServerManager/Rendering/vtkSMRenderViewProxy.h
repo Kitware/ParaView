@@ -214,6 +214,13 @@ public:
   vtkFloatArray* GetValuesFloat();
 
   //@{
+
+  /**
+   * Value raster capture controls.
+   */
+  void StartCaptureValues();
+  void StopCaptureValues();
+
   /**
    * Access to the current vtkValuePass rendering mode.
    */

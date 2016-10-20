@@ -809,16 +809,16 @@ public:
   void SetArrayNumberToDraw(int fieldAttributeType);
   void SetArrayComponentToDraw(int comp);
   void SetScalarRange(double min, double max);
-  void StartCaptureValues();
-  void StopCaptureValues();
+  void BeginValueCapture();
+  void EndValueCapture();
   //@}
 
   //@{
   /**
    * Current rendering mode of vtkValuePass (float or invertible RGB).
    */
-  void SetValueRenderingMode(int mode);
-  int GetValueRenderingMode();
+  void SetValueRenderingModeCommand(int mode);
+  int GetValueRenderingModeCommand();
   //@}
 
   //@{

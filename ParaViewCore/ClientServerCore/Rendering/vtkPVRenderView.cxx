@@ -2710,7 +2710,7 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVRenderView::SetValueRenderingMode(int mode)
+void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 {
 #ifdef VTKGL2
   // Fixes issue with the background (black) when comming back from FLOATING_POINT
@@ -2764,7 +2764,7 @@ void vtkPVRenderView::SetValueRenderingMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVRenderView::GetValueRenderingMode()
+int vtkPVRenderView::GetValueRenderingModeCommand()
 {
 #ifdef VTKGL2
 #ifdef PARAVIEW_USE_ICE_T
@@ -2801,7 +2801,7 @@ void vtkPVRenderView::SetScalarRange(double min, double max)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StartCaptureValues()
+void vtkPVRenderView::BeginValueCapture()
 {
   if (!this->Internals->IsInCapture)
   {
@@ -2836,7 +2836,7 @@ void vtkPVRenderView::StartCaptureValues()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StopCaptureValues()
+void vtkPVRenderView::EndValueCapture()
 {
 #if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
   if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())

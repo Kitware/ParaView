@@ -714,7 +714,12 @@ class FileStore(Store):
 
         dirname = os.path.dirname(fname)
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
+			# In batch mode '-sym', the dir might be created by a different rank.
+            try:
+                os.makedirs(dirname)
+            except OSError:
+                print ("OSError: Could not make dirs! This is expected if running in batch mode with '-sym'")
+                pass
 
         if not document.data is None:
             doctype = self.determine_type(document.descriptor)
