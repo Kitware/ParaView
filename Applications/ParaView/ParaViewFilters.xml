@@ -61,7 +61,7 @@
 
   <Category name="Temporal" menu_label="&amp;Temporal">
     <Proxy group="filters" name="ExtractTimeSteps" />
-    <Proxy group="filters" name="GroupDataSetsOverTime" />
+    <Proxy group="filters" name="GroupTimeSteps" />
     <Proxy group="filters" name="ParticlePath" />
     <Proxy group="filters" name="ParticleTracer" />
     <Proxy group="filters" name="StreakLine" />
