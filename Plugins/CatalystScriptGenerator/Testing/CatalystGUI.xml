@@ -30,7 +30,7 @@
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/addButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/outputRendering" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/outputRendering" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/finishButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ExportStateWizard/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
 </pqevents>

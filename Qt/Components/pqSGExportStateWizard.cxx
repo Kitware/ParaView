@@ -179,8 +179,10 @@ pqSGExportStateWizard::pqSGExportStateWizard(QWidget* parentObject, Qt::WindowFl
     this->Internals->outputRendering, SLOT(setChecked(bool)));
   QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
     this->Internals->wCinemaTrackSelection, SLOT(setVisible(bool)));
-  QObject::connect(
-    this->Internals->outputCinema, SIGNAL(toggled(bool)), this, SLOT(toggleCinema(bool)));
+  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
+    this, SLOT(toggleCinema(bool)));
+  QObject::connect(this->Internals->wViewSelection, SIGNAL(arraySelectionEnabledChanged(bool)),
+    this->Internals->wCinemaTrackSelection, SLOT(enableArraySelection(bool)));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 

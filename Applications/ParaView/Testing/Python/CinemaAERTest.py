@@ -12,7 +12,7 @@ from vtk import *
 testDir = vtk.util.misc.vtkGetTempDir()
 import os
 
-cinemaDBFileName = os.path.join(testDir, "cinema_aer.json")
+cinemaDBFileName = os.path.join(testDir, "cinema_aer.cdb")
 # create a new 'Time Source'
 timeSource1 = TimeSource()
 

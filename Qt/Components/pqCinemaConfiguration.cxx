@@ -62,9 +62,14 @@ pqCinemaConfiguration::pqCinemaConfiguration(
   this->addPropertyLink(
     this, "arraySelection", SIGNAL(arraySelectionChanged()), proxy_->GetProperty("ArraySelection"));
 
+  // other ui connections
+  QObject::connect(this->Ui->wViewSelection, SIGNAL(arraySelectionEnabledChanged(bool)),
+    this->Ui->wTrackSelection, SLOT(enableArraySelection(bool)));
+
   // update ui with current views and filters and connect signals
   this->populateElements();
   this->Ui->wViewSelection->setCinemaVisible(true);
+  this->Ui->wViewSelection->setCatalystOptionsVisible(false);
 }
 
 // ----------------------------------------------------------------------------

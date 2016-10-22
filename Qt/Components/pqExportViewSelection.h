@@ -67,6 +67,9 @@ public:
   */
   void setCinemaVisible(bool status);
 
+  /// Hides/shows catalyst specific entries
+  void setCatalystOptionsVisible(bool status);
+
   QList<pqImageOutputInfo*> getImageOutputInfos();
 
   /**
@@ -89,6 +92,9 @@ public:
   *            ... (for N views)
   */
   QString getSelectionAsString(QString const& scriptFromat);
+
+signals:
+  void arraySelectionEnabledChanged(bool enabled); 
 
 private slots:
 

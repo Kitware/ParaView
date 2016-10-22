@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>549</width>
-    <height>396</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -28,19 +28,15 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QWidget" name="widget_3" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="0">
-         <widget class="QLabel" name="imageWriteFrequencyLabel">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>Write Frequency</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QComboBox" name="imageType">
           <property name="enabled">
@@ -95,6 +91,68 @@
           </item>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="imageTypeLabel">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Image Type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="imageFileNameLabel">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>File Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="imageFileName">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>The file name must contain %t.  This gets replaced with the time step.</string>
+          </property>
+          <property name="accessibleName">
+           <string/>
+          </property>
+          <property name="text">
+           <string>image_%t.png</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="fitToScreenLabel">
+          <property name="text">
+           <string>Fit to Screen</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="imageWriteFrequency">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="imageMagnificationLabel">
           <property name="enabled">
@@ -105,8 +163,8 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="imageWriteFrequency">
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="imageMagnification">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -140,150 +198,51 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QSpinBox" name="imageMagnification">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="imageTypeLabel">
+        <item row="2" column="0">
+         <widget class="QLabel" name="imageWriteFrequencyLabel">
           <property name="enabled">
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>Image Type</string>
+           <string>Write Frequency</string>
           </property>
          </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="imageFileNameLabel">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>File Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Fit to Screen</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="imageFileName">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="toolTip">
-           <string>The file name must contain %t.  This gets replaced with the time step.</string>
-          </property>
-          <property name="accessibleName">
-           <string/>
-          </property>
-          <property name="text">
-           <string>image_%t.png</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" rowspan="5">
-         <widget class="QLabel" name="thumbnailLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>150</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>147</width>
-            <height>145</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>View not currently available</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QCheckBox" name="composite">
-          <property name="toolTip">
-           <string>Whether to export specA or B format stores</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="laComposite">
-          <property name="text">
-           <string>Composite</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <layout class="QFormLayout" name="formLayout">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="laFloatValue">
-            <property name="text">
-             <string>GL Float</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="cbUseFloatValues">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="toolTip">
-              <string>Try to render via OpenGL float buffers first.</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </item>
        </layout>
+      </item>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLabel" name="thumbnailLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>147</width>
+          <height>145</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>View not currently available</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -302,7 +261,7 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="2">
+        <item row="3" column="2">
          <widget class="QWidget" name="wCameraOptions" native="true">
           <property name="enabled">
            <bool>true</bool>
@@ -312,6 +271,18 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>60</height>
+           </size>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="2">
@@ -416,7 +387,7 @@
           </layout>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="cinemaLabel">
           <property name="enabled">
            <bool>true</bool>
@@ -426,7 +397,7 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
+        <item row="2" column="2">
          <widget class="QComboBox" name="cinemaExport">
           <property name="enabled">
            <bool>true</bool>
@@ -467,7 +438,7 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="2">
+        <item row="4" column="2">
          <widget class="QLineEdit" name="trackObjectName">
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter name from Pipeline Browser for camera to track over time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -477,10 +448,50 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="trackObjectLabel">
           <property name="text">
            <string>Track Object</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="laComposite">
+          <property name="text">
+           <string>Composite</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QCheckBox" name="composite">
+          <property name="toolTip">
+           <string>Whether to export specA or B format stores</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="laFloatValue">
+          <property name="text">
+           <string>GL Float</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCheckBox" name="cbUseFloatValues">
+          <property name="toolTip">
+           <string>Try to render via OpenGL float buffers first.</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

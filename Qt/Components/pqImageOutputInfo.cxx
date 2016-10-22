@@ -107,6 +107,7 @@ QString pqImageOutputInfo::getImageFileName()
 {
   return this->Ui->imageFileName->displayText();
 }
+
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::hideFrequencyInput()
 {
@@ -120,17 +121,35 @@ void pqImageOutputInfo::showFrequencyInput()
   this->Ui->imageWriteFrequency->show();
   this->Ui->imageWriteFrequencyLabel->show();
 }
+
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::hideFitToScreen()
 {
   this->Ui->fitToScreen->hide();
+  this->Ui->fitToScreenLabel->hide();
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::showFitToScreen()
 {
   this->Ui->fitToScreen->show();
+  this->Ui->fitToScreenLabel->show();
 }
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::hideMagnification()
+{
+  this->Ui->imageMagnification->hide();
+  this->Ui->imageMagnificationLabel->hide();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::showMagnification()
+{
+  this->Ui->imageMagnification->show();
+  this->Ui->imageMagnificationLabel->show();
+}
+
 //-----------------------------------------------------------------------------
 int pqImageOutputInfo::getWriteFrequency()
 {
@@ -286,6 +305,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
     this->Ui->cinemaExport->addItem("azimuth-elevation-roll");
     this->Ui->cinemaExport->addItem("yaw-pitch-roll");
     this->Ui->cinemaExport->setCurrentIndex(index);
+    emit compositeChanged(true);
   }
   else
   {
@@ -293,6 +313,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
     this->Ui->cinemaExport->addItem("static");
     this->Ui->cinemaExport->addItem("phi-theta");
     this->Ui->cinemaExport->setCurrentIndex(index > 2 ? 2 : index);
+    emit compositeChanged(false);
   }
 }
 

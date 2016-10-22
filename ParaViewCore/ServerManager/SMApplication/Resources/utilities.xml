@@ -2812,7 +2812,7 @@
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
     <RenderViewExporterProxy class="vtkCinemaExporter"
-                             file_extension="json"
+                             file_extension="cdb"
                              name="CinemaExporter">
       <Documentation long_help="Export view to a Cinema Database"
                      short_help="Cinema Database">CinemaExporter is a render window

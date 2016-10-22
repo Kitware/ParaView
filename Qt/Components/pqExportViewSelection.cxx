@@ -71,6 +71,15 @@ void pqExportViewSelection::onPreviousClicked()
     {
       this->Ui->pbNext->setEnabled(true);
     }
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    // Update the current composite flag to adjust array selection
+    if (pqImageOutputInfo* qinfo =
+      qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(previousIndex)))
+    {
+    bool isComposite = qinfo->getComposite();
+    emit arraySelectionEnabledChanged(isComposite);
+    }
   }
 }
 
@@ -88,6 +97,15 @@ void pqExportViewSelection::onNextClicked()
     if (!this->Ui->pbPrevious->isEnabled())
     {
       this->Ui->pbPrevious->setEnabled(true);
+    }
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    // Update the current composite flag to adjust array selection
+    if (pqImageOutputInfo* qinfo =
+      qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(nextIndex)))
+    {
+    bool isComposite = qinfo->getComposite();
+    emit arraySelectionEnabledChanged(isComposite);
     }
   }
 }
@@ -121,6 +139,10 @@ void pqExportViewSelection::addViews(T const& views, int numberOfViews)
 
     pqImageOutputInfo* info = new pqImageOutputInfo(this->Ui->swViews, parentFlags, *it, viewName);
     this->Ui->swViews->addWidget(info);
+
+    // FIXME: Make each view have its own pqCinemaTrackSelection
+    QObject::connect(info, SIGNAL(compositeChanged(bool)), this,
+      SIGNAL(arraySelectionEnabledChanged(bool)));
   }
 }
 
@@ -151,6 +173,32 @@ void pqExportViewSelection::setCinemaVisible(bool status)
       info->setCinemaVisible(status);
     }
   }
+}
+
+void pqExportViewSelection::setCatalystOptionsVisible(bool status)
+{
+
+  typedef pqImageOutputInfo* InfoPtr;
+
+  int const size_ = this->Ui->swViews->count();
+  for (int i = 0 ; i < size_ ; i++)
+    {
+    if (InfoPtr info = qobject_cast<InfoPtr>(this->Ui->swViews->widget(i)))
+      {
+      if (!status)
+        {
+        info->hideFrequencyInput();
+        info->hideFitToScreen();
+        info->hideMagnification();
+        }
+      else
+        {
+        info->showFrequencyInput();
+        info->showFitToScreen();
+        info->showMagnification();
+        }
+      }
+    }
 }
 
 QString pqExportViewSelection::getSelectionAsString(QString const& scriptFormat)

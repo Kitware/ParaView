@@ -63,6 +63,8 @@ public:
   void showFrequencyInput();
   void hideFitToScreen();
   void showFitToScreen();
+  void hideMagnification();
+  void showMagnification();
   int getWriteFrequency();
   bool fitToScreen();
   int getMagnification();
@@ -79,6 +81,9 @@ public:
   double getRoll();
   QString getTrackObjectName();
   void setView(pqView* const view);
+
+signals:
+  void compositeChanged(bool checked);
 
 public slots:
   void updateImageFileName();
