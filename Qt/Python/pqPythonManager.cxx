@@ -37,41 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqObjectBuilder.h"
+#include "pqOutputWindowAdapter.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonScriptEditor.h"
 #include "pqPythonShell.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVConfig.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSMTrace.h"
 
-// These includes are so that we can listen for server creation/removal
-// and reset the python interpreter when it happens.
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqOutputWindowAdapter.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-
 #include <QApplication>
 #include <QCursor>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileDialog>
 #include <QLayout>
 #include <QMainWindow>
 #include <QSplitter>
 #include <QStatusBar>
-
-#include <QDir>
-#include <QFile>
-#include <QFileDialog>
 #include <QTextStream>
-
 #include <QTimer>
-
-#define mySTR_HELPER(x) #x
-#define mySTR(x) __mySTR_HELPER(x)
 
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
@@ -160,7 +151,7 @@ pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
   // Create an instance of the macro supervisor
   this->Internal->MacroSupervisor = new pqPythonMacroSupervisor(this);
   this->connect(this->Internal->MacroSupervisor, SIGNAL(executeScriptRequested(const QString&)),
-    SLOT(executeScript(const QString&)));
+    SLOT(executeScriptAndRender(const QString&)));
 
   // Listen the signal when a macro wants to be edited
   QObject::connect(this->Internal->MacroSupervisor, SIGNAL(onEditMacro(const QString&)), this,
@@ -242,6 +233,13 @@ void pqPythonManager::executeScript(const QString& filename)
 {
   pqPythonDialog* dialog = this->pythonShellDialog();
   dialog->runScript(QStringList(filename));
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonManager::executeScriptAndRender(const QString& filename)
+{
+  this->executeScript(filename);
+  pqApplicationCore::instance()->render();
 }
 
 //-----------------------------------------------------------------------------

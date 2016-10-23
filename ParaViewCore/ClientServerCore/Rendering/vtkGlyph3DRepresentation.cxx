@@ -124,8 +124,8 @@ int vtkGlyph3DRepresentation::RequestData(
 {
   if (inputVector[1]->GetNumberOfInformationObjects() == 1)
   {
-    this->GlyphMapper->SetInputDataObject(1, vtkDataObject::GetData(inputVector[1], 0));
-    this->LODGlyphMapper->SetInputDataObject(1, vtkDataObject::GetData(inputVector[1], 0));
+    this->GlyphMapper->SetInputConnection(1, this->GetInternalOutputPort(1));
+    this->LODGlyphMapper->SetInputConnection(1, this->GetInternalOutputPort(1));
   }
   else
   {
