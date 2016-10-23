@@ -10477,8 +10477,8 @@ source.</Documentation>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkMultiBlockFromTimeSeriesFilter"
-                 label="Group Datasets Over Time"
-                 name="GroupDataSetsOverTime">
+                 label="Group Time Steps"
+                 name="GroupTimeSteps">
       <Documentation long_help="Group data set over time."
                      short_help="Group all the time steps in the input into one collection with no time.">
                      Groups all the time steps in the input into a collection with no time information.
