@@ -374,6 +374,9 @@ protected slots:
   void onStateSaved(vtkPVXMLElement* root);
 
 protected:
+  void clearViewsForLoadingState(pqServer* server);
+
+
   bool LoadingState;
 
   pqOutputWindow* OutputWindow;

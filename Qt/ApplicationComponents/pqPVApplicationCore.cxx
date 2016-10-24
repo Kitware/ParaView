@@ -223,3 +223,15 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
     return QObject::eventFilter(obj, event_);
   }
 }
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqServer *server)
+{
+  pqPythonManager* manager = this->pythonManager();
+#ifdef PARAVIEW_ENABLE_PYTHON
+  this->clearViewsForLoadingState(server);
+  manager->executeScriptAndRender(filename);
+#else
+  qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
+#endif
+}

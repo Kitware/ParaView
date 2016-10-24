@@ -35,8 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqPVApplicationCore.h"
 #include "pqServer.h"
 #include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
+#include "vtkNew.h"
+#include "vtkPVConfig.h"
 #include "vtkPVXMLParser.h"
 
 #include <QFileInfo>
@@ -65,8 +68,7 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
 {
   if (server == NULL)
   {
-    pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-    server = activeObjects->activeServer();
+    server = pqActiveObjects::instance().activeServer();
   }
 
   if (!server)
@@ -74,33 +76,42 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
     return;
   }
 
-  // Read in the xml file to restore.
-  vtkPVXMLParser* xmlParser = vtkPVXMLParser::New();
-  xmlParser->SetFileName(filename.toLatin1().data());
-  xmlParser->Parse();
-
-  // Get the root element from the parser.
-  vtkPVXMLElement* root = xmlParser->GetRootElement();
-  if (root)
+  if (filename.endsWith(".pvsm"))
   {
-    pqApplicationCore::instance()->loadState(root, server);
-    // Add this to the list of recent server resources ...
-    pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-      server, filename);
+    vtkNew<vtkPVXMLParser> xmlParser;
+    xmlParser->SetFileName(filename.toLatin1().data());
+    xmlParser->Parse();
+
+    vtkPVXMLElement* root = xmlParser->GetRootElement();
+    if (root)
+    {
+      pqApplicationCore::instance()->loadState(root, server);
+      // Add this to the list of recent server resources ...
+      pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+        server, filename);
+    }
   }
   else
-  {
-    qCritical("Root does not exist. Either state file could not be opened "
-              "or it does not contain valid xml");
+  { // python file
+#ifdef PARAVIEW_ENABLE_PYTHON
+    pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server);
+    pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+      server, filename);
+#else
+    qWarning("ParaView was not built with Python support so it cannot open a python file");
+#endif
   }
-  xmlParser->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void pqLoadStateReaction::loadState()
 {
   pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
-    "ParaView state file (*.pvsm);;All files (*)");
+    "ParaView state file (*.pvsm"
+#ifdef PARAVIEW_ENABLE_PYTHON
+    ", *.py"
+#endif
+    ");;All files (*)");
   fileDialog.setObjectName("FileLoadServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
