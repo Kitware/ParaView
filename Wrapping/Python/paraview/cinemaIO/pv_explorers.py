@@ -168,6 +168,9 @@ class ImageExplorer(explorers.Explorer):
                     simple.Render()
                     image = self.view.GetValuesFloat()
                     idata = numpy_support.vtk_to_numpy(image)
+                    self.updateRange(self.view.ArrayNameToDraw,
+                                     self.view.ArrayComponentToDraw,
+                                     [idata.min(), idata.max()])
                     rw = self.view.GetRenderWindow()
                     width, height = rw.GetSize()
                     try:
@@ -258,6 +261,26 @@ class ImageExplorer(explorers.Explorer):
             simple.Render()
         except RuntimeError:
             pass
+
+    def updateRange(self, name, component, drange):
+        fname = name + "_" + str(component)
+        cs = self.cinema_store
+        plist = cs.parameter_list
+        for pname, param in plist.items():
+            if 'valueRanges' in param:
+                # now we know it is a color type parameter
+                vrange = param['valueRanges'][fname]
+                lrange = list(vrange)
+                updated = False
+                if drange[0] < vrange[0]:
+                    updated = True
+                    lrange[0] = drange[0]
+                if drange[1] > vrange[1]:
+                    updated = True
+                    lrange[1] = drange[1]
+                if updated:
+                    param['valueRanges'][fname][0] = float(lrange[0])
+                    param['valueRanges'][fname][1] = float(lrange[1])
 
 class Camera(explorers.Track):
     """
