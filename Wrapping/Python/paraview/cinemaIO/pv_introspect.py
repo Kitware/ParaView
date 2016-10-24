@@ -342,6 +342,17 @@ def add_customized_array_selection(sourceName, source, fields, userDefined, arra
                 defaultName = fName
     return defaultName
 
+def range_epsilon(minmax):
+    """ ensure that min and max have some separation to assist rendering """
+    if minmax[0] == minmax[1]:
+        epsilon = minmax[0]*1E-6
+        if epsilon == 0.0:
+            epsilon = 1E-6
+        minV = minmax[0] - epsilon
+        maxV = minmax[1] + epsilon
+        return [minV, maxV]
+    return minmax
+
 def extend_range(arrayRanges, name, minmax):
     """
     This updates the data ranges in the data base meta file.
@@ -353,21 +364,22 @@ def extend_range(arrayRanges, name, minmax):
     This version happens in catalyst, where we recreate the
     database file every timestep.
     """
+    adjustedMinMax = range_epsilon(minmax)
     if name in arrayRanges:
         updated = False
-        nowMinMax = list(arrayRanges[name])
-        if minmax[0] < nowMinMax[0]:
+        temporalMinMax = list(arrayRanges[name])
+        if adjustedMinMax[0] < temporalMinMax[0]:
             updated = True
-            nowMinMax[0] = minmax[0]
-        if minmax[1] > nowMinMax[1]:
+            temporalMinMax[0] = adjustedMinMax[0]
+        if adjustedMinMax[1] > temporalMinMax[1]:
             updated = True
-            nowMinMax[1] = minmax[1]
+            temporalMinMax[1] = adjustedMinMax[1]
         #if updated:
         #    print (name, " was ", arrayRanges[name], " now ", nowMinMax)
-        arrayRanges[name] = nowMinMax
+        arrayRanges[name] = temporalMinMax
     else:
         #print (name, " newminmax ", minmax)
-        arrayRanges[name] = minmax
+        arrayRanges[name] = adjustedMinMax
 
 def update_all_ranges(cs, arrayRanges):
     """
@@ -398,7 +410,7 @@ def update_all_ranges(cs, arrayRanges):
                     updated = False
                     cai = proxy.GetCellDataInformation().GetArray(aname)
                     if cai:
-                        drange = cai.GetRange(component)
+                        drange = range_epsilon(cai.GetRange(component))
                         if drange[0] < vrange[0]:
                             updated = True
                             lrange[0] = drange[0]
@@ -412,7 +424,7 @@ def update_all_ranges(cs, arrayRanges):
                     updated = False
                     pai = proxy.GetPointDataInformation().GetArray(aname)
                     if pai:
-                        drange = pai.GetRange(component)
+                        drange = range_epsilon(pai.GetRange(component))
                         if drange[0] < vrange[0]:
                             updated = True
                             lrange[0] = drange[0]
