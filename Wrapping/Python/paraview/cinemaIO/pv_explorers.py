@@ -244,6 +244,7 @@ class ImageExplorer(explorers.Explorer):
                 simple.Render()
                 self.ValueMode = self.view.GetValueRenderingMode()
                 self.CheckFloatSupport = False
+                self.cinema_store.add_metadata({'value_mode':self.ValueMode})
 
             self.CaptureDepth = False
             self.CaptureLuminance = False
