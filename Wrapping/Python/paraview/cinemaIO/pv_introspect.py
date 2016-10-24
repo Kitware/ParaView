@@ -283,33 +283,30 @@ def filter_has_parameters(name):
                      paraview.simple.servermanager.filters.Slice,
                      paraview.simple.servermanager.filters.Contour]))
 
-def add_control_and_colors(name, cs, userDefined):
+def add_control_and_colors(name, cs, userDefined, arrayRanges):
     """add parameters that change the settings and color of a filter"""
     source = paraview.simple.FindSource(name)
     #make up list of color options
     fields = {'depth':'depth','luminance':'luminance'}
-    ranges = {}
     defaultName = None
     view_proxy = paraview.simple.GetActiveView()
     rep = paraview.servermanager.GetRepresentation(source, view_proxy)
 
     # select value arrays
     if rep.Representation != 'Outline':
-            defaultName = add_customized_array_selection(name, source, fields, ranges, userDefined)
+            defaultName = add_customized_array_selection(name, source, fields, userDefined, arrayRanges)
 
     if defaultName == None:
         fields['white']='rgb'
         defaultName='white'
 
-    cparam = cinema_store.make_field("color"+name, fields, default=defaultName, valueRanges=ranges)
+    cparam = cinema_store.make_field("color"+name, fields, default=defaultName, valueRanges=arrayRanges)
     cs.add_field("color"+name,cparam,'vis',[name])
 
-def add_customized_array_selection(sourceName, source, fields, ranges, userDefined):
+def add_customized_array_selection(sourceName, source, fields, userDefined, arrayRanges):
     isArrayNotSelected = lambda aName, arrays: (aName not in arrays)
 
     defaultName = None
-    cda = source.GetCellDataInformation()
-
     if (source not in userDefined):
         return defaultName
 
@@ -318,6 +315,7 @@ def add_customized_array_selection(sourceName, source, fields, ranges, userDefin
 
     arrayNames = userDefined[source]["arraySelection"]
 
+    cda = source.GetCellDataInformation()
     for a in range(0, cda.GetNumberOfArrays()):
         arr = cda.GetArray(a)
         arrName = arr.GetName()
@@ -326,9 +324,10 @@ def add_customized_array_selection(sourceName, source, fields, ranges, userDefin
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
-            ranges[fName] = arr.GetRange(i)
+            extend_range(arrayRanges, fName, arr.GetRange(i))
             if defaultName == None:
                 defaultName = fName
+
     pda = source.GetPointDataInformation()
     for a in range(0, pda.GetNumberOfArrays()):
         arr = pda.GetArray(a)
@@ -338,10 +337,104 @@ def add_customized_array_selection(sourceName, source, fields, ranges, userDefin
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
-            ranges[fName] = arr.GetRange(i)
+            extend_range(arrayRanges, fName, arr.GetRange(i))
             if defaultName == None:
                 defaultName = fName
     return defaultName
+
+def range_epsilon(minmax):
+    """ ensure that min and max have some separation to assist rendering """
+    if minmax[0] == minmax[1]:
+        epsilon = minmax[0]*1E-6
+        if epsilon == 0.0:
+            epsilon = 1E-6
+        minV = minmax[0] - epsilon
+        maxV = minmax[1] + epsilon
+        return [minV, maxV]
+    return minmax
+
+def extend_range(arrayRanges, name, minmax):
+    """
+    This updates the data ranges in the data base meta file.
+    Throughout a time varying data export ranges will vary.
+    Here we accumulate them as we go so that by the end we get
+    the min and max values over for each array component over
+    all time.
+
+    This version happens in catalyst, where we recreate the
+    database file every timestep.
+    """
+    adjustedMinMax = range_epsilon(minmax)
+    if name in arrayRanges:
+        updated = False
+        temporalMinMax = list(arrayRanges[name])
+        if adjustedMinMax[0] < temporalMinMax[0]:
+            updated = True
+            temporalMinMax[0] = adjustedMinMax[0]
+        if adjustedMinMax[1] > temporalMinMax[1]:
+            updated = True
+            temporalMinMax[1] = adjustedMinMax[1]
+        #if updated:
+        #    print (name, " was ", arrayRanges[name], " now ", nowMinMax)
+        arrayRanges[name] = temporalMinMax
+    else:
+        #print (name, " newminmax ", minmax)
+        arrayRanges[name] = adjustedMinMax
+
+def update_all_ranges(cs, arrayRanges):
+    """
+    This updates the data ranges in the data base meta file.
+    Throughout a time varying data export ranges will vary.
+    Here we accumulate them as we go so that by the end we get
+    the min and max values over for each array component over
+    all time.
+
+    This version happens in paraview export for time varying data
+    where we recreate the database file once, and afterward only
+    output new rasters.
+    """
+    plist = cs.parameter_list
+    for pname, param in plist.items():
+        if 'valueRanges' in param:
+            # now we know it is a color type parameter
+            filtername =  pname[5:] #get the filter name for this parameter
+            proxy = paraview.simple.FindSource(filtername) #get the filter
+            if not proxy is None:
+                for name, vrange in param['valueRanges'].items():
+                    #iterate over all the colors choices to get each array comp
+                    lrange = list(vrange)
+                    compidx = name.rfind('_') #get array name and component
+                    aname = name[:compidx]
+                    component = int(name[compidx+1:])
+
+                    updated = False
+                    cai = proxy.GetCellDataInformation().GetArray(aname)
+                    if cai:
+                        drange = range_epsilon(cai.GetRange(component))
+                        if drange[0] < vrange[0]:
+                            updated = True
+                            lrange[0] = drange[0]
+                        if drange[1] > vrange[1]:
+                            updated = True
+                            lrange[1] = drange[1]
+                        if updated:
+                            param['valueRanges'][name] = tuple(lrange)
+                            #print ("C", aname, component, " was ", vrange)
+                            #print ("C", aname, component, " now ", lrange)
+                    updated = False
+                    pai = proxy.GetPointDataInformation().GetArray(aname)
+                    if pai:
+                        drange = range_epsilon(pai.GetRange(component))
+                        if drange[0] < vrange[0]:
+                            updated = True
+                            lrange[0] = drange[0]
+                        if drange[1] > vrange[1]:
+                            updated = True
+                            lrange[1] = drange[1]
+                        if updated:
+                            param['valueRanges'][name] = tuple(lrange)
+                            #print ("P", aname, component, " was ", vrange)
+                            #print ("P", aname, component, " now ", lrange)
 
 def make_cinema_store(proxies,
                       ocsfname,
@@ -349,7 +442,8 @@ def make_cinema_store(proxies,
                       forcetime=False,
                       userDefined = {},
                       specLevel = "A",
-                      camType='phi-theta'):
+                      camType='phi-theta',
+                      arrayRanges = {}):
     """
     Takes in the pipeline, structured as a tree, and makes a cinema store definition
     containing all the parameters we will vary.
@@ -381,6 +475,7 @@ def make_cinema_store(proxies,
     nearfar_values = []
     viewangle_values = []
     cs = cinema_store.FileStore(ocsfname)
+
     try:
         cs.load()
         tprop = cs.get_parameter('time')
@@ -442,7 +537,7 @@ def make_cinema_store(proxies,
             pass
         else:
             cs.assign_parameter_dependence(proxy_name,'vis',dependency_list)
-            add_control_and_colors(proxy_name, cs, userDefined)
+            add_control_and_colors(proxy_name, cs, userDefined, arrayRanges)
             cs.assign_parameter_dependence("color"+proxy_name,'vis',[proxy_name])
 
     fnp = ""
@@ -616,7 +711,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
             specLevel = "A",
             camType = 'phi-theta',
             tracking = {},
-            floatValues = True):
+            floatValues = True,
+            arrayRanges = {}):
     """
     Runs a pipeline through all the changes we know how to make and saves off
     images into the store for each one.
@@ -767,6 +863,8 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
             cs.add_metadata({'camera_up':up_values})
             cs.add_metadata({'camera_nearfar':nearfar_values})
             cs.add_metadata({'camera_angle':viewangle_values})
+
+            update_all_ranges(cs, arrayRanges)
             e.explore({'time':float_limiter(t)})
 
 def explore_customized_array_selection(sourceName, source, colorList, userDefined):
@@ -903,11 +1001,12 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
         p = inspect()
 
+        arrayRanges = {}
         cs = make_cinema_store(p, filePath, view, forcetime = False,
                                userDefined = userDefValues,
                                specLevel = specLevel,
-                               camType = camType)
-
+                               camType = camType,
+                               arrayRanges = arrayRanges)
         enableFloatVal = False if 'floatValues' not in cinemaParams else cinemaParams['floatValues']
 
         pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
@@ -916,7 +1015,8 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         explore(cs, p, iSave = (pid == 0), userDefined = userDefValues,
                 specLevel = specLevel,
                 camType = camType,
-                tracking = tracking_def, floatValues = enableFloatVal)
+                tracking = tracking_def, floatValues = enableFloatVal,
+                arrayRanges = arrayRanges)
 
         view.LockBounds = 0
 
