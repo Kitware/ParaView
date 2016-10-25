@@ -85,7 +85,9 @@ if (PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/DetachedFromLayoutIndirect.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonConsole.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TestPopOutWidget.xml # needs programmable filter
-    ${CMAKE_CURRENT_SOURCE_DIR}/MultipleNumberOfComponents.xml)
+    ${CMAKE_CURRENT_SOURCE_DIR}/MultipleNumberOfComponents.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheetNullArrayName.xml # needs programmable filter
+  )
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
