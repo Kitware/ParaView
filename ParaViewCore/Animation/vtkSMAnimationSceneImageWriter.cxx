@@ -374,7 +374,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
 #endif
   else
   {
-    vtkErrorMacro("Unknown extension " << extension.c_str());
+    vtkErrorMacro("Unknown extension " << extension);
     return false;
   }
 
