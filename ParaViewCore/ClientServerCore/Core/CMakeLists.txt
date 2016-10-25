@@ -89,6 +89,20 @@ if (PARAVIEW_PLUGIN_LOADER_PATHS)
       COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
 endif ()
 
+if (PARAVIEW_WITH_SUPERBUILD_MESA)
+  set(pv_options_definitions
+    PARAVIEW_WITH_SUPERBUILD_MESA)
+
+  if (PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
+    list(APPEND pv_options_definitions
+      PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
+  endif ()
+
+  set_source_files_properties(vtkPVOptions.cxx
+    PROPERTIES
+      COMPILE_DEFINITIONS "${pv_options_definitions}")
+endif ()
+
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
     vtkPythonExtractSelection.cxx

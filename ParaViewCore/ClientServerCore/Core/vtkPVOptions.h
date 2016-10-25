@@ -311,6 +311,7 @@ private:
   int DisableRegistry;
   int ForceMPIInitOnClient;
   int ForceNoMPIInitOnClient;
+  int DummyMesaFlag;
 
   // inline setters
   vtkSetStringMacro(StereoType);
