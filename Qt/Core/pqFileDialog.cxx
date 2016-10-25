@@ -987,7 +987,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool&
     return false;
   }
 
-  // User choose and existing file or a brand new filename.
+  // User chose an existing file or a brand new filename.
   if (this->Implementation->Mode == pqFileDialog::AnyFile)
   {
     // If mode is a "save" dialog, we fix the extension first.
