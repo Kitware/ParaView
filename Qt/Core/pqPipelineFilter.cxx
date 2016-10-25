@@ -306,7 +306,7 @@ pqOutputPort* pqPipelineFilter::getInput(const QString& portname, int index) con
     qCritical() << "Invalid index: " << index;
     return 0;
   }
-
+  
   return iter.value()[index];
 }
 
@@ -315,6 +315,21 @@ pqPipelineSource* pqPipelineFilter::getInput(int index) const
 {
   pqOutputPort* op = this->getInput(this->getInputPortName(0), index);
   return (op ? op->getSource() : 0);
+}
+
+//-----------------------------------------------------------------------------
+pqOutputPort* pqPipelineFilter::getAnyInput() const
+{
+  for (int i = 0; i < this->getNumberOfInputPorts(); i++)
+  {
+    QString portName = this->getInputPortName(i);
+    pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portName);
+    if (iter != this->Internal->Inputs.end() && iter.value().size() > 0)
+    {
+      return iter.value()[0];
+    }
+  }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

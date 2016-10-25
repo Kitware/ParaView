@@ -268,7 +268,7 @@ void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
     return;
   }
 
-  pqOutputPort* firstInput = filter->getInput(filter->getInputPortName(0), 0);
+  pqOutputPort* firstInput = filter->getAnyInput();
   if (!firstInput)
   {
     return;
