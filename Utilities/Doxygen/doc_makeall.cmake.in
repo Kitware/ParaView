@@ -238,7 +238,7 @@ endforeach()
 # Convert the VTK headers to the Doxygen format.
 
 step(1 "convert VTK headers to doxygen format")
-file(MAKE_DIRECTORY "$INTERMEDIATE_DOX_DIR}")
+file(MAKE_DIRECTORY "${INTERMEDIATE_DOX_DIR}")
 #execute_process(COMMAND ${PERL}
 #  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_header2doxygen.pl"
 #  --to "${INTERMEDIATE_DOX_DIR}"
