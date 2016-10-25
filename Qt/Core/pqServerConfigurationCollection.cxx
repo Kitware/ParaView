@@ -122,7 +122,21 @@ bool pqServerConfigurationCollection::load(const QString& filename, bool mutable
 //-----------------------------------------------------------------------------
 bool pqServerConfigurationCollection::saveNow()
 {
-  return this->save(userServers(), true);
+  pqOptions* options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  if (!options || !options->GetDisableRegistry())
+  {
+    return this->save(userServers(), true);
+  }
+  else
+  {
+    static bool warned = false;
+    if (!warned)
+    {
+      qWarning() << "When running with the -dr flag the server settings will not be saved.";
+      warned = true;
+    }
+    return true;
+  }
 }
 
 //-----------------------------------------------------------------------------
