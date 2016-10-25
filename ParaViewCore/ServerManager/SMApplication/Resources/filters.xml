@@ -12901,7 +12901,7 @@ source.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetTask"
-                         default_values="3"
+                         default_values="0"
                          name="Task"
                          number_of_elements="1">
         <EnumerationDomain name="task_list">
@@ -13045,7 +13045,7 @@ source.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetTask"
-                         default_values="3"
+                         default_values="0"
                          name="Task"
                          number_of_elements="1">
         <EnumerationDomain name="task_list">
