@@ -342,6 +342,8 @@ class CompositeDataSetBuilder(DataSetBuilder):
         self.view.CenterAxesVisibility = 0
         self.view.OrientationAxesVisibility = 0
         self.view.UpdatePropertyInformation()
+        if 'camera' in sceneConfig and 'CameraFocalPoint' in sceneConfig['camera']:
+            self.view.CenterOfRotation = sceneConfig['camera']['CameraFocalPoint']
 
         # Initialize camera
         for key, value in sceneConfig['camera'].iteritems():
