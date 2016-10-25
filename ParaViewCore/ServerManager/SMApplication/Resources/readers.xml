@@ -2810,6 +2810,12 @@
           <!-- <Entry value="100" text="Scalar - Density"/> -->
           <Entry text="Scalar - Pressure"
                  value="110" />
+          <Entry text="Scalar - Pressure Coefficient"
+                 value="111" />
+          <Entry text="Scalar - Mach Number"
+                 value="112" />
+          <Entry text="Scalar - Sound Speed"
+                 value="113" />
           <Entry text="Scalar - Temperature"
                  value="120" />
           <Entry text="Scalar - Enthalpy"
