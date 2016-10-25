@@ -606,7 +606,6 @@ void pqServerConnectDialog::saveServers()
 {
   QString filters;
   filters += "ParaView server configuration file (*.pvsc)";
-  filters += ";;All files (*)";
 
   pqFileDialog dialog(NULL, this, tr("Save Server Configuration File"), QString(), filters);
   dialog.setObjectName("SaveServerConfigurationDialog");
