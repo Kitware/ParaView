@@ -100,7 +100,11 @@ void pqCollapsedGroup::paintEvent(QPaintEvent*)
   // Draw frame
   if (option.subControls & QStyle::SC_GroupBoxFrame)
   {
+#if QT_VERSION >= 0x050000
+    QStyleOptionFrame frame;
+#else
     QStyleOptionFrameV2 frame;
+#endif
     frame.QStyleOption::operator=(option);
     frame.features = option.features;
     frame.lineWidth = option.lineWidth;
