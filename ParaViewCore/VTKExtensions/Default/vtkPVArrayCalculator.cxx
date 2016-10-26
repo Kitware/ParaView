@@ -41,6 +41,13 @@ std::string vtkJoinToString(const A& a, const B& b)
   return stream.str();
 }
 
+std::string vtkQuoteString(const std::string& s)
+{
+  std::ostringstream stream;
+  stream << '\"' << s << '\"';
+  return stream.str();
+}
+
 class add_scalar_variables
 {
   vtkPVArrayCalculator* Calc;
@@ -99,11 +106,13 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
   {
     vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
     const char* array_name = array->GetName();
+
     int numberComps = array->GetNumberOfComponents();
 
     if (numberComps == 1)
     {
       this->AddScalarVariable(array_name, array_name, 0);
+      this->AddScalarVariable(vtkQuoteString(array_name).c_str(), array_name);
     }
     else
     {
@@ -113,16 +122,21 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
 
         if (array->GetComponentName(i))
         {
-          possible_names.insert(vtkJoinToString(array_name, array->GetComponentName(i)));
+          std::string name(vtkJoinToString(array_name, array->GetComponentName(i)));
+          possible_names.insert(name);
+          possible_names.insert(vtkQuoteString(name).c_str());
         }
-        possible_names.insert(
-          vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
+        std::string name(vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
+        possible_names.insert(name);
+        possible_names.insert(vtkQuoteString(name).c_str());
 
-        // also put a <ArrayName>_<ComponetNumber> to handle past versions of
+        // also put a <ArrayName>_<ComponentNumber> to handle past versions of
         // vtkPVArrayCalculator when component names were not used and index was
         // used e.g. state files prior to fixing of BUG #12951.
         std::string default_name = vtkJoinToString(array_name, i);
+
         possible_names.insert(default_name);
+        possible_names.insert(vtkQuoteString(default_name).c_str());
 
         std::for_each(
           possible_names.begin(), possible_names.end(), add_scalar_variables(this, array_name, i));
@@ -131,6 +145,7 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
       if (numberComps == 3)
       {
         this->AddVectorArrayName(array_name, 0, 1, 2);
+        this->AddVectorVariable(vtkQuoteString(array_name).c_str(), array_name, 0, 1, 2);
       }
     }
   }
