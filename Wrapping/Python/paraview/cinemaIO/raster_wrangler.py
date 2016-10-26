@@ -261,20 +261,12 @@ class RasterWrangler(object):
             # TODO: just one copy of this code in cinema
             w0 = numpy.left_shift(imageSlice[:,:,0].astype(numpy.uint32), 16)
             w1 = numpy.left_shift(imageSlice[:,:,1].astype(numpy.uint32), 8)
-            w2 = imageSlice[:,:,2]
+            w2 = imageSlice[:,:,2].astype(numpy.uint32)
             value = numpy.bitwise_or(w0,w1)
             value = numpy.bitwise_or(value,w2)
-            value = numpy.subtract(value.astype(numpy.int32), 1)
-            if vrange[1] != vrange[0]:
-                normalized_val = numpy.divide(value.astype(numpy.float32),
-                                              (0xFFFFFE/(vrange[1]-vrange[0])))
-            else:
-                normalized_val = numpy.divide(value.astype(numpy.float32),
-                                              0xFFFFFE)
-            adjusted_val = numpy.add(normalized_val, vrange[0])
-            #print "RANGE", vrange[0], "," , vrange[1]
-            #print "BV", adjusted_val.shape, \
-            # numpy.amin(adjusted_val), numpy.amax(adjusted_val)
+            value = numpy.subtract(value, 1)
+            value = value.astype(numpy.float32)
+            adjusted_val = numpy.divide(value, float(0xFFFFFE))
 
             self.zwriter(adjusted_val, adjustedName)
 
