@@ -355,6 +355,9 @@ class CompositeDataSetBuilder(DataSetBuilder):
         for data in self.config['scene']:
             rep = simple.Show(data['source'], self.view)
             self.representations.append(rep)
+            if 'representation' in data:
+                for key in data['representation']:
+                    rep.GetProperty(key).SetData(data['representation'][key])
 
         # Add directory path
         self.dataHandler.registerData(name='directory', rootFile=True, fileName='file.txt', categories=['trash'])
