@@ -511,8 +511,7 @@ bool pqAnimationManager::saveAnimation()
   {
     filters += "AVI files (*.avi);;";
   }
-  filters += "JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
-  filters += "All files(*)";
+  filters += "JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png)";
 
   QWidget* parent_window = pqCoreUtilities::mainWidget();
 
