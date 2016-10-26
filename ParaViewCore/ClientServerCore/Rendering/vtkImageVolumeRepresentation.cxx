@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCellData.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
@@ -350,6 +351,20 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   this->Actor->SetMapper(this->VolumeMapper);
   // this is necessary since volume mappers don't like empty arrays.
   this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
+
+#ifdef VTKGL2
+  if (this->Property)
+  {
+    // Update the mapper's vector mode
+    vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
+
+    int const mode = ctf->GetVectorMode();
+    int const comp = ctf->GetVectorComponent();
+
+    this->VolumeMapper->SetVectorMode(mode);
+    this->VolumeMapper->SetVectorComponent(comp);
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------
