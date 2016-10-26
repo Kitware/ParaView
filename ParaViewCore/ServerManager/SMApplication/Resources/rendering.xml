@@ -201,6 +201,9 @@
       </IntVectorProperty>
       <!-- End of FixedPointVolumeRayCastMapper -->
     </Proxy>
+    <Proxy class="vtkSmartVolumeMapper"
+           name="UnstructuredGridResampleToImageMapper"
+           processes="client|renderserver|dataserver"></Proxy>
     <!-- End of "mappers" -->
   </ProxyGroup>
   <ProxyGroup name="ugrid_raycast_functions">

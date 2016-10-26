@@ -28,17 +28,17 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
+class vtkAbstractVolumeMapper;
 class vtkColorTransferFunction;
-class vtkOrderedCompositeDistributor;
+class vtkOutlineSource;
+class vtkPExtentTranslator;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkProjectedTetrahedraMapper;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODVolume;
-class vtkPVUpdateSuppressor;
-class vtkUnstructuredDataDeliveryFilter;
-class vtkUnstructuredGridVolumeMapper;
+class vtkResampleToImage;
 class vtkVolumeProperty;
 class vtkVolumeRepresentationPreprocessor;
 
@@ -53,14 +53,14 @@ public:
   /**
    * Register a volume mapper with the representation.
    */
-  void AddVolumeMapper(const char* name, vtkUnstructuredGridVolumeMapper*);
+  void AddVolumeMapper(const char* name, vtkAbstractVolumeMapper*);
 
   //@{
   /**
    * Set the active volume mapper to use.
    */
   virtual void SetActiveVolumeMapper(const char*);
-  vtkUnstructuredGridVolumeMapper* GetActiveVolumeMapper();
+  vtkAbstractVolumeMapper* GetActiveVolumeMapper();
   //@}
 
   /**
@@ -90,6 +90,15 @@ public:
   //***************************************************************************
   // Forwarded to vtkVolumeRepresentationPreprocessor
   void SetExtractedBlockIndex(unsigned int index);
+
+  //***************************************************************************
+  // Forwarded to vtkResampleToImage
+  void SetSamplingDimensions(int dims[3])
+  {
+    this->SetSamplingDimensions(dims[0], dims[1], dims[2]);
+  }
+  void SetSamplingDimensions(int xdim, int ydim, int zdim);
+
 
   //***************************************************************************
   // Forwarded to Actor.
@@ -157,11 +166,24 @@ protected:
    */
   virtual void UpdateMapperParameters();
 
+  int ProcessViewRequestResampleToImage(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+  int RequestDataResampleToImage(vtkInformation* request,
+    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+
   vtkVolumeRepresentationPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
   vtkProjectedTetrahedraMapper* DefaultMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
+
+  vtkResampleToImage *ResampleToImageFilter;
+  unsigned long DataSize;
+  vtkPExtentTranslator *PExtentTranslator;
+  double Origin[3];
+  double Spacing[3];
+  int WholeExtent[6];
+  vtkOutlineSource* OutlineSource;
 
   vtkPVGeometryFilter* LODGeometryFilter;
   vtkPolyDataMapper* LODMapper;
