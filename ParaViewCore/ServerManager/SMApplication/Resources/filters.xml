@@ -5381,7 +5381,7 @@ array.
         <DataType value="vtkDataSet" />
       </DataTypeDomain>
       <InputArrayDomain name="input_array1" attribute_type="point"
-            number_of_components="9" />
+            number_of_components="6,9" />
       <InputArrayDomain name="input_array2" attribute_type="point"
             number_of_components="1" optional="1" />
       <Documentation>
