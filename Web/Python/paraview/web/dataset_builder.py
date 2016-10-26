@@ -342,6 +342,8 @@ class CompositeDataSetBuilder(DataSetBuilder):
         self.view.CenterAxesVisibility = 0
         self.view.OrientationAxesVisibility = 0
         self.view.UpdatePropertyInformation()
+        if 'camera' in sceneConfig and 'CameraFocalPoint' in sceneConfig['camera']:
+            self.view.CenterOfRotation = sceneConfig['camera']['CameraFocalPoint']
 
         # Initialize camera
         for key, value in sceneConfig['camera'].iteritems():
@@ -353,6 +355,9 @@ class CompositeDataSetBuilder(DataSetBuilder):
         for data in self.config['scene']:
             rep = simple.Show(data['source'], self.view)
             self.representations.append(rep)
+            if 'representation' in data:
+                for key in data['representation']:
+                    rep.GetProperty(key).SetData(data['representation'][key])
 
         # Add directory path
         self.dataHandler.registerData(name='directory', rootFile=True, fileName='file.txt', categories=['trash'])
