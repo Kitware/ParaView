@@ -441,7 +441,7 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
   {
     // Don't show ASCII characted for char arrays.
     const char* column_name = view->GetColumnName(column);
-    if (strcmp(column_name, "Cell Type") == 0)
+    if (column_name && strcmp(column_name, "Cell Type") == 0)
     {
       return getCellTypeAsString(value.ToInt());
     }
@@ -538,7 +538,8 @@ bool pqSpreadSheetViewModel::isSortable(int section)
   vtkSpreadSheetView* view = this->GetView();
   if (view->GetNumberOfColumns() > section)
   {
-    return strcmp(view->GetColumnName(section), "Structured Coordinates") != 0;
+    const char* columnName = view->GetColumnName(section);
+    return columnName && strcmp(columnName, "Structured Coordinates") != 0;
   }
 
   return false;
