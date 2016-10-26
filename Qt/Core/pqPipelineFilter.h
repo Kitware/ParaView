@@ -107,11 +107,21 @@ public:
   */
   int getInputCount() const { return this->getNumberOfInputs(this->getInputPortName(0)); }
 
-  // Get a list of all inputs.
+  /**
+  * Get a list of all inputs.
+  */
   QList<pqOutputPort*> getInputs() const { return this->getInputs(this->getInputPortName(0)); }
 
-  // Get input at given index.
+  /**
+  * Get input at given index.
+  */
   pqPipelineSource* getInput(int index) const;
+
+  /**
+  * Get first available input, any port, any index.
+  * Return NULL if none are available.
+  */
+  pqOutputPort* getAnyInput() const;
 
   /**
   * "Replace input" is a hint given to the GUI to turn off input visibility
@@ -136,9 +146,11 @@ protected slots:
   void inputChanged(vtkObject*, unsigned long, void* client_data);
 
 protected:
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created.
+  /**
+  * Use this method to initialize the pqObject state using the
+  * underlying vtkSMProxy. This needs to be done only once,
+  * after the object has been created.
+  */
   virtual void initialize();
 
   /**
