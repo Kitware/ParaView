@@ -570,24 +570,35 @@ class CompositeDataSetBuilder(DataSetBuilder):
                         image.UnRegister(None)
 
                     if lightType == 'normal':
-                        for comp in range(3):
-                            # Configure view to handle POINT_DATA / CELL_DATA
-                            self.view.DrawCells = 0
-                            self.view.ArrayNameToDraw = 'Normals'
-                            self.view.ArrayComponentToDraw = comp
-                            self.view.ScalarRange = [-1.0, 1.0]
-                            self.view.StartCaptureValues()
-                            image = self.view.CaptureWindow(1)
-                            imagescalars = image.GetPointData().GetScalars()
-                            self.view.StopCaptureValues()
+                        if rep.Representation == 'Point Gaussian' or rep.Representation == 'Points':
+                            uniqNormal = [(camPos['position'][i] - camPos['focalPoint'][i]) for i in range(3)]
+                            tmpNormalArray = vtkFloatArray()
+                            tmpNormalArray.SetNumberOfComponents(1)
+                            tmpNormalArray.SetNumberOfTuples(imageSize)
 
-                            # Convert RGB => Float => Write
-                            floatArray = data_converter.convertRGBArrayToFloatArray(imagescalars, [-1.0, 1.0])
-                            with open(os.path.join(dest_path, 'normal_%d_%d.float32' % (compositeIdx, comp)), 'wb') as f:
-                                f.write(buffer(floatArray))
+                            for comp in range(3):
+                                tmpNormalArray.FillComponent(0, uniqNormal[comp])
+                                with open(os.path.join(dest_path, 'normal_%d_%d.float32' % (compositeIdx, comp)), 'wb') as f:
+                                    f.write(buffer(tmpNormalArray))
+                        else:
+                            for comp in range(3):
+                                # Configure view to handle POINT_DATA / CELL_DATA
+                                self.view.DrawCells = 0
+                                self.view.ArrayNameToDraw = 'Normals'
+                                self.view.ArrayComponentToDraw = comp
+                                self.view.ScalarRange = [-1.0, 1.0]
+                                self.view.StartCaptureValues()
+                                image = self.view.CaptureWindow(1)
+                                imagescalars = image.GetPointData().GetScalars()
+                                self.view.StopCaptureValues()
 
-                            # Free memory
-                            image.UnRegister(None)
+                                # Convert RGB => Float => Write
+                                floatArray = data_converter.convertRGBArrayToFloatArray(imagescalars, [-1.0, 1.0])
+                                with open(os.path.join(dest_path, 'normal_%d_%d.float32' % (compositeIdx, comp)), 'wb') as f:
+                                    f.write(buffer(floatArray))
+
+                                # Free memory
+                                image.UnRegister(None)
 
                 # Handle color by
                 for fieldName, fieldConfig in self.config['scene'][compositeIdx]['colors'].iteritems():
