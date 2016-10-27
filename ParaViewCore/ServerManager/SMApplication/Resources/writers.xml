@@ -308,6 +308,7 @@
                proxyname="XMLPPolyDataWriterCore"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
+            <Property name="GhostLevel" />
             <Property name="DataMode" />
             <Property name="HeaderType" />
             <Property name="EncodeAppendedData" />
@@ -352,6 +353,7 @@
                proxyname="XMLPUnstructuredGridWriterCore"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
+            <Property name="GhostLevel" />
             <Property name="DataMode" />
             <Property name="HeaderType" />
             <Property name="EncodeAppendedData" />
