@@ -324,7 +324,7 @@ def add_customized_array_selection(sourceName, source, fields, userDefined, arra
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
-            extend_range(arrayRanges, fName, arr.GetRange(i))
+            extend_range(arrayRanges, fName, list(arr.GetRange(i)))
             if defaultName == None:
                 defaultName = fName
 
@@ -337,7 +337,7 @@ def add_customized_array_selection(sourceName, source, fields, userDefined, arra
         for i in range(0, arr.GetNumberOfComponents()):
             fName = arrName+"_"+str(i)
             fields[fName] = 'value'
-            extend_range(arrayRanges, fName, arr.GetRange(i))
+            extend_range(arrayRanges, fName, list(arr.GetRange(i)))
             if defaultName == None:
                 defaultName = fName
     return defaultName
@@ -418,7 +418,7 @@ def update_all_ranges(cs, arrayRanges):
                             updated = True
                             lrange[1] = drange[1]
                         if updated:
-                            param['valueRanges'][name] = tuple(lrange)
+                            param['valueRanges'][name] = lrange
                             #print ("C", aname, component, " was ", vrange)
                             #print ("C", aname, component, " now ", lrange)
                     updated = False
@@ -432,7 +432,7 @@ def update_all_ranges(cs, arrayRanges):
                             updated = True
                             lrange[1] = drange[1]
                         if updated:
-                            param['valueRanges'][name] = tuple(lrange)
+                            param['valueRanges'][name] = lrange
                             #print ("P", aname, component, " was ", vrange)
                             #print ("P", aname, component, " now ", lrange)
 
