@@ -48,33 +48,9 @@ INPUT                = \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_index.dox" \
           @PV_MODULE_DIRS_DOXYGEN_ESCAPED@
 
-# Since vtk.*.h header files are prepreprocessed using perl and placed under the "dox"
-# sub-directory, we don't want them to get processed twice. Hence, we exlcude the original
-# vtk* headers from the source dir.
-EXCLUDE_PATTERNS     = "@ParaView_SOURCE_DIR@/*/vtk*.h"
 EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkSetGet.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingSquaresCases.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingCubesCases.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkWindows.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTcl.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTk.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTclUtil.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPython.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPythonUtil.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkJavaAwt.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkJavaUtil.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPythonUtil.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTclUtil.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Parallel/MPI/vtkMPI.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/Import/vtk3DS.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/Import/vtkVRML.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/PLY/vtkPLY.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Rendering/OpenGL/vtkOpenGL.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Rendering/FreeType/fonts/vtkEmbeddedFonts.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Testing/Rendering/Testing/vtkRegressionTestImage.h" \
-    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Testing/Core/Testing/vtkTestDriver.h" \
+
 
 # TAGFILES           = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk@VTK_MAJOR_VERSION@-nightly.tag"=http://www.vtk.org/doc/nightly/html
 TAGFILES             = @TAGFILES@
