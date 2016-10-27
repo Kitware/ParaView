@@ -648,10 +648,10 @@
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
-                   name="PDataSetWriter"
+                   name="PDataSetWriterPolyData"
                    parallel_only="1">
       <Documentation short_help="Writer that writes polydata as legacy vtk files.">
-      Writer to write any type of data object in a legacy vtk data file. This
+      Writer to write vtkPolyData in a legacy vtk data file. This
       version is used when running in parallel. It gathers data to first node
       and saves one file.</Documentation>
       <SubProxy>
@@ -670,7 +670,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkPolyData" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
@@ -702,8 +702,69 @@
         <WriterFactory extensions="vtk"
                        file_description="Legacy VTK Files" />
       </Hints>
-      <!-- End of PDataSetWriter -->
+      <!-- End of PDataSetWriterPolyData -->
     </PSWriterProxy>
+
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PDataSetWriterUnstructuredGrid"
+                   parallel_only="1">
+      <Documentation short_help="Writer that writes unstructured grid as legacy vtk files.">
+      Writer to write vtkUnstructuredGrid of data object in a legacy vtk data file. This
+      version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="DataSetWriterCore"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each timestep available from the
+        reader.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="Append" />
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="vtk"
+                       file_description="Legacy VTK Files" />
+      </Hints>
+      <!-- End of PDataSetWriterUnstructuredGrid -->
+    </PSWriterProxy>
+
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
