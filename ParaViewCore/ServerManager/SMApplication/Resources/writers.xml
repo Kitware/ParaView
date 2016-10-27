@@ -828,7 +828,7 @@
       <!-- End of PSTLWriter -->
     </PSWriterProxy>
     <!-- ================================================================= -->
-    <PSWriterProxy class="vtkHoudiniPolyDataWriter"
+    <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
                    name="HoudiniWriter">
       <Documentation short_help="Write polygonal data in Houdini .geo format.">
@@ -851,6 +851,23 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="WriteAllTimeSteps"
+                         command="SetWriteAllTimeSteps"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Writer" class="vtkHoudiniPolyDataWriter" />
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
