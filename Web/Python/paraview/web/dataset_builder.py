@@ -495,6 +495,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
 
         self.view.UpdatePropertyInformation()
         self.view.Background = [0,0,0]
+        imageSize = self.view.ViewSize[0] * self.view.ViewSize[1]
 
         # Generate the heavy data
         for camPos in self.getCamera():
