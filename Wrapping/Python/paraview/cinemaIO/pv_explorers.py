@@ -168,9 +168,11 @@ class ImageExplorer(explorers.Explorer):
                     simple.Render()
                     image = self.view.GetValuesFloat()
                     idata = numpy_support.vtk_to_numpy(image)
+                    idataMin = idata.min() if len(idata) > 0 else 0
+                    idataMax = idata.max() if len(idata) > 0 else 0
                     self.updateRange(self.view.ArrayNameToDraw,
                                      self.view.ArrayComponentToDraw,
-                                     [idata.min(), idata.max()])
+                                     [idataMin, idataMax])
                     rw = self.view.GetRenderWindow()
                     width, height = rw.GetSize()
                     try:
