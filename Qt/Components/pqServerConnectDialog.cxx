@@ -559,6 +559,7 @@ void pqServerConnectDialog::acceptConfigurationPage2()
     this->Internals->OriginalName);
   pqApplicationCore::instance()->serverConfigurations().addConfiguration(
     this->Internals->ActiveConfiguration);
+  pqApplicationCore::instance()->serverConfigurations().saveNow();
 
   // Now, make this newly edited configuration the selected one.
   QList<QTableWidgetItem*> items = this->Internals->servers->findItems(
@@ -606,7 +607,6 @@ void pqServerConnectDialog::saveServers()
 {
   QString filters;
   filters += "ParaView server configuration file (*.pvsc)";
-  filters += ";;All files (*)";
 
   pqFileDialog dialog(NULL, this, tr("Save Server Configuration File"), QString(), filters);
   dialog.setObjectName("SaveServerConfigurationDialog");
@@ -633,6 +633,7 @@ void pqServerConnectDialog::loadServers()
     pqApplicationCore::instance()->serverConfigurations().load(
       dialog.getSelectedFiles()[0], /*mutable_configs=*/true);
   }
+  pqApplicationCore::instance()->serverConfigurations().saveNow();
 }
 
 //-----------------------------------------------------------------------------
