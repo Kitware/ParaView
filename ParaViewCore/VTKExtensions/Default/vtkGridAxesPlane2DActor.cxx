@@ -47,8 +47,6 @@ vtkGridAxesPlane2DActor::vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper)
   , GenerateEdges(true)
   , GenerateTicks(true)
   , TickDirection(vtkGridAxesPlane2DActor::TICK_DIRECTION_BOTH)
-  , EnableLayerSupport(false)
-  , Layer(0)
   , Helper(helper)
   , HelperManagedExternally(helper != NULL)
 {
@@ -114,24 +112,8 @@ void vtkGridAxesPlane2DActor::SetTickPositions(int index, vtkDoubleArray* data)
 }
 
 //----------------------------------------------------------------------------
-bool vtkGridAxesPlane2DActor::IsLayerActive(vtkViewport* viewport)
-{
-  if (this->EnableLayerSupport)
-  {
-    vtkRenderer* ren = vtkRenderer::SafeDownCast(viewport);
-    return (ren && ren->GetLayer() == this->Layer);
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
 int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
-  if (!this->IsLayerActive(viewport))
-  {
-    return 0;
-  }
-
   // Do tasks that need to be done when this->MTime changes.
   this->Update(viewport);
   return this->Actor->RenderOpaqueGeometry(viewport);
@@ -140,20 +122,12 @@ int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 //----------------------------------------------------------------------------
 int vtkGridAxesPlane2DActor::RenderTranslucentPolygonalGeometry(vtkViewport* viewport)
 {
-  if (!this->IsLayerActive(viewport))
-  {
-    return 0;
-  }
   return this->Actor->RenderTranslucentPolygonalGeometry(viewport);
 }
 
 //----------------------------------------------------------------------------
 int vtkGridAxesPlane2DActor::RenderOverlay(vtkViewport* viewport)
 {
-  if (!this->IsLayerActive(viewport))
-  {
-    return 0;
-  }
   return this->Actor->RenderOverlay(viewport);
 }
 

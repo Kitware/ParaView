@@ -16,6 +16,7 @@
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGridAxes3DRepresentation.h"
 #include "vtkPolarAxesRepresentation.h"
 #include "vtkSelectionRepresentation.h"
 #include "vtkView.h"
@@ -25,6 +26,8 @@ vtkCxxSetObjectMacro(
   vtkPVCompositeRepresentation, SelectionRepresentation, vtkSelectionRepresentation);
 vtkCxxSetObjectMacro(
   vtkPVCompositeRepresentation, PolarAxesRepresentation, vtkPolarAxesRepresentation);
+vtkCxxSetObjectMacro(
+  vtkPVCompositeRepresentation, GridAxesRepresentation, vtkPVGridAxes3DRepresentation);
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
@@ -34,6 +37,10 @@ vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 
   this->SelectionVisibility = false;
   this->SelectionRepresentation->SetVisibility(false);
+
+  this->GridAxesRepresentation = vtkPVGridAxes3DRepresentation::New();
+  this->GridAxesVisibility = false;
+  this->GridAxesRepresentation->SetVisibility(false);
 }
 
 //----------------------------------------------------------------------------
@@ -41,6 +48,7 @@ vtkPVCompositeRepresentation::~vtkPVCompositeRepresentation()
 {
   this->SetSelectionRepresentation(NULL);
   this->SetPolarAxesRepresentation(NULL);
+  this->SetGridAxesRepresentation(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -49,6 +57,7 @@ void vtkPVCompositeRepresentation::SetVisibility(bool visible)
   this->Superclass::SetVisibility(visible);
   this->SetSelectionVisibility(this->SelectionVisibility);
   this->SetPolarAxesVisibility(visible);
+  this->SetGridAxesVisibility(this->GridAxesVisibility);
 }
 
 //----------------------------------------------------------------------------
@@ -68,6 +77,13 @@ void vtkPVCompositeRepresentation::SetPolarAxesVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::SetGridAxesVisibility(bool visible)
+{
+  this->GridAxesVisibility = visible;
+  this->GridAxesRepresentation->SetVisibility(this->GetVisibility() && visible);
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
@@ -76,11 +92,13 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
   }
 
   view->AddRepresentation(this->SelectionRepresentation);
+  view->AddRepresentation(this->GridAxesRepresentation);
 
   if (this->PolarAxesRepresentation)
   {
     view->AddRepresentation(this->PolarAxesRepresentation);
   }
+
   return true;
 }
 
@@ -88,10 +106,13 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 {
   view->RemoveRepresentation(this->SelectionRepresentation);
+  view->RemoveRepresentation(this->GridAxesRepresentation);
+
   if (this->PolarAxesRepresentation)
   {
     view->RemoveRepresentation(this->PolarAxesRepresentation);
   }
+
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -99,11 +120,13 @@ bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 void vtkPVCompositeRepresentation::MarkModified()
 {
   this->SelectionRepresentation->MarkModified();
+  this->GridAxesRepresentation->MarkModified();
 
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->MarkModified();
   }
+
   this->Superclass::MarkModified();
 }
 
@@ -111,6 +134,8 @@ void vtkPVCompositeRepresentation::MarkModified()
 void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 {
   this->SelectionRepresentation->SetUpdateTime(time);
+  this->GridAxesRepresentation->SetUpdateTime(time);
+
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->SetUpdateTime(time);
@@ -123,6 +148,8 @@ void vtkPVCompositeRepresentation::SetUpdateTime(double time)
 void vtkPVCompositeRepresentation::SetForceUseCache(bool val)
 {
   this->SelectionRepresentation->SetForceUseCache(val);
+  this->GridAxesRepresentation->SetForceUseCache(val);
+
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->SetForceUseCache(val);
@@ -135,12 +162,56 @@ void vtkPVCompositeRepresentation::SetForceUseCache(bool val)
 void vtkPVCompositeRepresentation::SetForcedCacheKey(double val)
 {
   this->SelectionRepresentation->SetForcedCacheKey(val);
+  this->GridAxesRepresentation->SetForcedCacheKey(val);
+
   if (this->PolarAxesRepresentation)
   {
     this->PolarAxesRepresentation->SetForcedCacheKey(val);
   }
 
   this->Superclass::SetForcedCacheKey(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)
+{
+  this->GridAxesRepresentation->SetInputConnection(port, input);
+  this->Superclass::SetInputConnection(port, input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::SetInputConnection(vtkAlgorithmOutput* input)
+{
+  this->GridAxesRepresentation->SetInputConnection(input);
+  this->Superclass::SetInputConnection(input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::AddInputConnection(int port, vtkAlgorithmOutput* input)
+{
+  this->GridAxesRepresentation->AddInputConnection(port, input);
+  this->Superclass::AddInputConnection(port, input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::AddInputConnection(vtkAlgorithmOutput* input)
+{
+  this->GridAxesRepresentation->AddInputConnection(input);
+  this->Superclass::AddInputConnection(input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmOutput* input)
+{
+  this->GridAxesRepresentation->RemoveInputConnection(port, input);
+  this->Superclass::RemoveInputConnection(port, input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::RemoveInputConnection(int port, int idx)
+{
+  this->GridAxesRepresentation->RemoveInputConnection(port, idx);
+  this->Superclass::RemoveInputConnection(port, idx);
 }
 
 //----------------------------------------------------------------------------
@@ -166,6 +237,7 @@ unsigned int vtkPVCompositeRepresentation::Initialize(
 {
   unsigned int minId = minIdAvailable;
   minId = this->SelectionRepresentation->Initialize(minId, maxIdAvailable);
+  minId = this->GridAxesRepresentation->Initialize(minId, maxIdAvailable);
   if (this->PolarAxesRepresentation)
   {
     minId = this->PolarAxesRepresentation->Initialize(minId, maxIdAvailable);

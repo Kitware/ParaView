@@ -15,6 +15,7 @@
 #include "vtkGridAxes2DActor.h"
 
 #include "vtkAxis.h"
+#include "vtkBillboardTextActor3D.h"
 #include "vtkContext2D.h"
 #include "vtkContextScene.h"
 #include "vtkDoubleArray.h"
@@ -23,7 +24,6 @@
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
 #include "vtkStringArray.h"
-#include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkVectorOperators.h"
 
@@ -45,17 +45,10 @@ inline bool IsInViewport(vtkViewport* viewport, const vtkVector2<T>& point)
 
 class vtkGridAxes2DActor::vtkLabels
 {
-  static inline bool RenderTextActor(vtkTextActor* actor, bool do_background, bool do_foreground)
-  {
-    int textDisplayLocation = actor->GetProperty()->GetDisplayLocation();
-    return (textDisplayLocation == VTK_FOREGROUND_LOCATION && do_foreground) ||
-      (textDisplayLocation == VTK_BACKGROUND_LOCATION && do_background);
-  }
-
 public:
-  typedef std::vector<vtkSmartPointer<vtkTextActor> > TickLabelsType;
+  typedef std::vector<vtkSmartPointer<vtkBillboardTextActor3D> > TickLabelsType;
   TickLabelsType TickLabels[4];
-  vtkNew<vtkTextActor> TitleLabels[4];
+  vtkNew<vtkBillboardTextActor3D> TitleLabels[4];
   vtkVector2i Justifications[4];
 
   vtkLabels()
@@ -73,7 +66,7 @@ public:
     {
       if (!iter->GetPointer())
       {
-        (*iter) = vtkSmartPointer<vtkTextActor>::New();
+        (*iter) = vtkSmartPointer<vtkBillboardTextActor3D>::New();
         if (property)
         {
           iter->GetPointer()->GetTextProperty()->ShallowCopy(property);
@@ -82,7 +75,22 @@ public:
     }
   }
 
-  int RenderOpaqueGeometry(vtkViewport* viewport, bool do_background, bool do_foreground)
+  void SyncPropertyKeys(vtkInformation* keys)
+  {
+    for (int cc = 0; cc < 4; cc++)
+    {
+      for (TickLabelsType::iterator iter = this->TickLabels[cc].begin();
+           iter != this->TickLabels[cc].end(); ++iter)
+      {
+        iter->GetPointer()->SetPropertyKeys(keys);
+      }
+      if (this->TitleLabels[cc]->GetVisibility())
+      {
+        this->TitleLabels[cc]->SetPropertyKeys(keys);
+      }
+    }
+  }
+  int RenderOpaqueGeometry(vtkViewport* viewport)
   {
     int counter = 0;
     for (int cc = 0; cc < 4; cc++)
@@ -90,21 +98,38 @@ public:
       for (TickLabelsType::iterator iter = this->TickLabels[cc].begin();
            iter != this->TickLabels[cc].end(); ++iter)
       {
-        if (this->RenderTextActor(iter->GetPointer(), do_background, do_foreground))
-        {
-          counter += iter->GetPointer()->RenderOpaqueGeometry(viewport);
-        }
+        counter += iter->GetPointer()->RenderOpaqueGeometry(viewport);
       }
-      if (this->TitleLabels[cc]->GetVisibility() &&
-        this->RenderTextActor(this->TitleLabels[cc].Get(), do_background, do_foreground))
+      if (this->TitleLabels[cc]->GetVisibility())
       {
         counter += this->TitleLabels[cc]->RenderOpaqueGeometry(viewport);
       }
     }
     return counter;
   }
-  int RenderTranslucentPolygonalGeometry(
-    vtkViewport* viewport, bool do_background, bool do_foreground)
+  int HasTranslucentPolygonalGeometry()
+  {
+    for (int cc = 0; cc < 4; cc++)
+    {
+      for (TickLabelsType::iterator iter = this->TickLabels[cc].begin();
+           iter != this->TickLabels[cc].end(); ++iter)
+      {
+        if (iter->GetPointer()->HasTranslucentPolygonalGeometry())
+        {
+          return 1;
+        }
+      }
+      if (this->TitleLabels[cc]->GetVisibility())
+      {
+        if (this->TitleLabels[cc]->HasTranslucentPolygonalGeometry())
+        {
+          return 1;
+        }
+      }
+    }
+    return 0;
+  }
+  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport)
   {
     int counter = 0;
     for (int cc = 0; cc < 4; cc++)
@@ -112,20 +137,16 @@ public:
       for (TickLabelsType::iterator iter = this->TickLabels[cc].begin();
            iter != this->TickLabels[cc].end(); ++iter)
       {
-        if (this->RenderTextActor(iter->GetPointer(), do_background, do_foreground))
-        {
-          counter += iter->GetPointer()->RenderTranslucentPolygonalGeometry(viewport);
-        }
+        counter += iter->GetPointer()->RenderTranslucentPolygonalGeometry(viewport);
       }
-      if (this->TitleLabels[cc]->GetVisibility() &&
-        this->RenderTextActor(this->TitleLabels[cc].Get(), do_background, do_foreground))
+      if (this->TitleLabels[cc]->GetVisibility())
       {
         counter += this->TitleLabels[cc]->RenderTranslucentPolygonalGeometry(viewport);
       }
     }
     return counter;
   }
-  int RenderOverlay(vtkViewport* viewport, bool do_background, bool do_foreground)
+  int RenderOverlay(vtkViewport* viewport)
   {
     int counter = 0;
     for (int cc = 0; cc < 4; cc++)
@@ -133,13 +154,9 @@ public:
       for (TickLabelsType::iterator iter = this->TickLabels[cc].begin();
            iter != this->TickLabels[cc].end(); ++iter)
       {
-        if (this->RenderTextActor(iter->GetPointer(), do_background, do_foreground))
-        {
-          counter += iter->GetPointer()->RenderOverlay(viewport);
-        }
+        counter += iter->GetPointer()->RenderOverlay(viewport);
       }
-      if (this->TitleLabels[cc]->GetVisibility() &&
-        this->RenderTextActor(this->TitleLabels[cc].Get(), do_background, do_foreground))
+      if (this->TitleLabels[cc]->GetVisibility())
       {
         counter += this->TitleLabels[cc]->RenderOverlay(viewport);
       }
@@ -165,10 +182,7 @@ vtkStandardNewMacro(vtkGridAxes2DActor);
 vtkGridAxes2DActor::vtkGridAxes2DActor()
   : Face(vtkGridAxes2DActor::MIN_YZ)
   , LabelMask(0xFF)
-  , EnableLayerSupport(false)
-  , BackgroundLayer(0)
-  , ForegroundLayer(0)
-  , GeometryLayer(0)
+  , ForceOpaque(false)
   , Labels(new vtkGridAxes2DActor::vtkLabels())
   , DoRender(false)
 {
@@ -315,20 +329,11 @@ int vtkGridAxes2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
     return 0;
   }
 
-  vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
-  assert(renderer != NULL);
-  bool do_background =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->BackgroundLayer);
-  bool do_foreground =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->ForegroundLayer);
-
-  if (do_background)
-  {
-    this->UpdateTextActors(viewport);
-  }
+  this->UpdateTextActors(viewport);
 
   int counter = 0;
-  counter += this->Labels->RenderOpaqueGeometry(viewport, do_background, do_foreground);
+  this->Labels->SyncPropertyKeys(this->GetPropertyKeys());
+  counter += this->Labels->RenderOpaqueGeometry(viewport);
   counter += this->PlaneActor->RenderOpaqueGeometry(viewport);
   return counter;
 }
@@ -341,16 +346,9 @@ int vtkGridAxes2DActor::RenderTranslucentPolygonalGeometry(vtkViewport* viewport
     return 0;
   }
 
-  vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
-  assert(renderer != NULL);
-  bool do_background =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->BackgroundLayer);
-  bool do_foreground =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->ForegroundLayer);
-
   int counter = 0;
-  counter +=
-    this->Labels->RenderTranslucentPolygonalGeometry(viewport, do_background, do_foreground);
+  this->Labels->SyncPropertyKeys(this->GetPropertyKeys());
+  counter += this->Labels->RenderTranslucentPolygonalGeometry(viewport);
   counter += this->PlaneActor->RenderTranslucentPolygonalGeometry(viewport);
   return counter;
 }
@@ -363,15 +361,9 @@ int vtkGridAxes2DActor::RenderOverlay(vtkViewport* viewport)
     return 0;
   }
 
-  vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
-  assert(renderer != NULL);
-  bool do_background =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->BackgroundLayer);
-  bool do_foreground =
-    (this->EnableLayerSupport == false || renderer->GetLayer() == this->ForegroundLayer);
-
   int counter = 0;
-  counter += this->Labels->RenderOverlay(viewport, do_background, do_foreground);
+  this->Labels->SyncPropertyKeys(this->GetPropertyKeys());
+  counter += this->Labels->RenderOverlay(viewport);
   counter += this->PlaneActor->RenderOverlay(viewport);
   return counter;
 }
@@ -379,7 +371,10 @@ int vtkGridAxes2DActor::RenderOverlay(vtkViewport* viewport)
 //----------------------------------------------------------------------------
 int vtkGridAxes2DActor::HasTranslucentPolygonalGeometry()
 {
-  return this->PlaneActor->HasTranslucentPolygonalGeometry();
+  return (this->PlaneActor->HasTranslucentPolygonalGeometry() ||
+           this->Labels->HasTranslucentPolygonalGeometry())
+    ? 1
+    : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -398,8 +393,6 @@ bool vtkGridAxes2DActor::Update(vtkViewport* viewport)
   this->Helper->SetMatrix(this->GetMatrix());
   this->Helper->SetLabelMask(this->LabelMask);
   this->PlaneActor->SetUserMatrix(this->GetMatrix());
-  this->PlaneActor->SetEnableLayerSupport(this->EnableLayerSupport);
-  this->PlaneActor->SetLayer(this->GeometryLayer);
 
   vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
   assert(renderer != NULL);
@@ -407,19 +400,16 @@ bool vtkGridAxes2DActor::Update(vtkViewport* viewport)
   // This is needed so the vtkAxis labels account for tile scaling.
   this->AxisHelperScene->SetRenderer(renderer);
 
-  if (this->EnableLayerSupport == false || renderer->GetLayer() == this->BackgroundLayer)
+  if ((this->Helper->UpdateForViewport(viewport) == false) ||
+    (this->GetProperty()->GetBackfaceCulling() && this->Helper->GetBackface()) ||
+    (this->GetProperty()->GetFrontfaceCulling() && !this->Helper->GetBackface()))
   {
-    if ((this->Helper->UpdateForViewport(viewport) == false) ||
-      (this->GetProperty()->GetBackfaceCulling() && this->Helper->GetBackface()) ||
-      (this->GetProperty()->GetFrontfaceCulling() && !this->Helper->GetBackface()))
-    {
-      this->DoRender = false;
-      return false;
-    }
-    this->DoRender = true;
-    this->UpdateTextProperties(viewport);
-    this->UpdateLabelPositions(viewport);
+    this->DoRender = false;
+    return false;
   }
+  this->DoRender = true;
+  this->UpdateTextProperties(viewport);
+  this->UpdateLabelPositions(viewport);
 
   return this->DoRender;
 }
@@ -559,17 +549,13 @@ void vtkGridAxes2DActor::UpdateLabelPositions(vtkViewport*)
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
+void vtkGridAxes2DActor::UpdateTextActors(vtkViewport*)
 {
-  // Decide on text rendering layer (back or front).
-  int textDisplayLocation =
-    this->Helper->GetBackface() ? VTK_BACKGROUND_LOCATION : VTK_FOREGROUND_LOCATION;
-
   const vtkTuple<vtkVector3d, 4>& gridPoints = this->Helper->GetPoints();
   const vtkVector2i& activeAxes = this->Helper->GetActiveAxes();
   const vtkTuple<bool, 4>& labelVisibilties = this->Helper->GetLabelVisibilities();
   const vtkTuple<vtkVector2d, 4>& axisNormals = this->Helper->GetViewportNormals();
-  const vtkTuple<vtkVector2d, 4>& viewportPoints = this->Helper->GetViewportPointsAsDouble();
+  const vtkTuple<vtkVector3d, 4> facePoints = this->Helper->GetTransformedPoints();
 
   vtkAxis* activeAxisHelpers[2];
   activeAxisHelpers[0] = this->AxisHelpers[activeAxes[0]].GetPointer();
@@ -587,88 +573,50 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
       continue;
     }
 
-    typedef std::pair<vtkVector2i, vtkIdType> LabelPositionsPair;
-    typedef std::vector<LabelPositionsPair> LabelPositionsPairVector;
-    LabelPositionsPairVector labelPositions;
-
-    vtkNew<vtkCoordinate> coordinate;
-    coordinate->SetCoordinateSystemToWorld();
-
     /// XXX: improve this.
     vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 10),
       vtkContext2D::FloatToInt(axisNormals[index].GetY() * 10));
 
+    vtkLabels::ResizeLabels(
+      this->Labels->TickLabels[index], numTicks, activeAxisHelpers[axis]->GetLabelProperties());
+
     for (vtkIdType cc = 0; cc < numTicks; ++cc)
     {
+      vtkBillboardTextActor3D* labelActor = this->Labels->TickLabels[index][cc];
+
       vtkVector3d tickPosition = gridPoints[index];
       tickPosition[activeAxes[axis]] = tickPositions->GetValue(cc);
+      vtkVector3d tickWC = this->Helper->TransformPoint(tickPosition);
 
-      vtkVector3d transformedPosition = this->Helper->TransformPoint(tickPosition);
-      coordinate->SetValue(transformedPosition.GetData());
-      vtkVector2i pos(coordinate->GetComputedViewportValue(viewport));
-      if (IsInViewport(viewport, pos))
-      {
-        // Need to offset the position in viewport space along the axis normal
-        // (which too is in viewport space!!).
-        pos = pos + offset;
-        labelPositions.push_back(LabelPositionsPair(pos, cc));
-      }
-    }
-
-    vtkLabels::ResizeLabels(this->Labels->TickLabels[index],
-      static_cast<vtkIdType>(labelPositions.size()), activeAxisHelpers[axis]->GetLabelProperties());
-    vtkIdType actorIndex = 0;
-    for (LabelPositionsPairVector::const_iterator iter = labelPositions.begin();
-         iter != labelPositions.end(); ++iter, ++actorIndex)
-    {
-      vtkIdType cc = iter->second;
-      vtkTextActor* labelActor = this->Labels->TickLabels[index][actorIndex];
+      labelActor->SetPosition(tickWC.GetData());
       labelActor->SetInput(labels->GetValue(cc).c_str());
-      labelActor->GetProperty()->SetDisplayLocation(textDisplayLocation);
-
-      // pass justification information.
       labelActor->GetTextProperty()->SetJustification(this->Labels->Justifications[index].GetX());
       labelActor->GetTextProperty()->SetVerticalJustification(
         this->Labels->Justifications[index].GetY());
-
-      // This is consistent with what vtkAxis which is not the same as the
-      // vtkTextRepresentation or vtkScalarBarActor.
-      labelActor->SetTextScaleModeToNone();
-      labelActor->ComputeScaledFont(viewport);
-      labelActor->GetPositionCoordinate()->SetCoordinateSystemToViewport();
-      labelActor->GetPositionCoordinate()->SetValue(iter->first.GetX(), iter->first.GetY());
+      labelActor->SetDisplayOffset(offset.GetData());
+      labelActor->SetForceOpaque(this->ForceOpaque);
     }
   }
 
   for (int index = 0; index < 4; index++)
   {
     // Setup title text.
-    vtkTextActor* titleActor = this->Labels->TitleLabels[index].GetPointer();
+    vtkBillboardTextActor3D* titleActor = this->Labels->TitleLabels[index].GetPointer();
     const vtkStdString& label = this->Titles[activeAxes[index % 2]];
     if (label.empty() == false && labelVisibilties[index])
     {
-      vtkVector2d midPoint = (viewportPoints[index] + viewportPoints[(index + 1) % 4]) * 0.5;
+      vtkVector3d midPoint = (facePoints[index] + facePoints[(index + 1) % 4]) * 0.5;
       /// XXX: improve this.
       vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 30),
         vtkContext2D::FloatToInt(axisNormals[index].GetY() * 30));
-      midPoint = midPoint + vtkVector2d(offset.GetX(), offset.GetY());
-      if (IsInViewport(viewport, midPoint))
-      {
-        titleActor->SetInput(label.c_str());
-        titleActor->GetTextProperty()->SetJustification(this->Labels->Justifications[index].GetX());
-        titleActor->GetTextProperty()->SetVerticalJustification(
-          this->Labels->Justifications[index].GetY());
-        titleActor->GetPositionCoordinate()->SetCoordinateSystemToViewport();
-        titleActor->GetPositionCoordinate()->SetValue(midPoint.GetX(), midPoint.GetY());
-        titleActor->SetTextScaleModeToNone();
-        titleActor->ComputeScaledFont(viewport);
-        titleActor->SetVisibility(1);
-        titleActor->GetProperty()->SetDisplayLocation(textDisplayLocation);
-      }
-      else
-      {
-        titleActor->SetVisibility(0);
-      }
+      titleActor->SetInput(label.c_str());
+      titleActor->GetTextProperty()->SetJustification(this->Labels->Justifications[index].GetX());
+      titleActor->GetTextProperty()->SetVerticalJustification(
+        this->Labels->Justifications[index].GetY());
+      titleActor->SetPosition(midPoint.GetData());
+      titleActor->SetDisplayOffset(offset.GetData());
+      titleActor->SetVisibility(1);
+      titleActor->SetForceOpaque(this->ForceOpaque);
     }
     else
     {

@@ -67,6 +67,7 @@ set (Module_SRCS
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVGridAxes3DRepresentation.cxx
   vtkPVHardwareSelector.cxx
   vtkPVHistogramChartRepresentation.cxx
   vtkPVImageSliceMapper.cxx

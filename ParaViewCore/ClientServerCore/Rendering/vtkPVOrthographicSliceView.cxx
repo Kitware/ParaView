@@ -471,7 +471,6 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
       {
         assert(this->GridAxes3DActors[cc]);
         this->GridAxes3DActors[cc]->ShallowCopy(this->GridAxes3DActor);
-        this->GridAxes3DActors[cc]->SetEnableLayerSupport(false);
         this->GridAxes3DActors[cc]->SetLabelMask(0xff);
       }
       this->GridAxes3DActors[YZ_PLANE]->SetFaceMask(
@@ -654,7 +653,6 @@ void vtkPVOrthographicSliceView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridAc
     if (this->GridAxes3DActors[cc] && !in_tile_display_mode)
     {
       this->GridAxes3DActors[cc]->ShallowCopy(gridActor);
-      this->GridAxes3DActors[cc]->SetEnableLayerSupport(false);
       this->Renderers[cc]->AddViewProp(this->GridAxes3DActors[cc]);
     }
   }

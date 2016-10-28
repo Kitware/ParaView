@@ -795,20 +795,13 @@ void vtkPVRenderView::SetGridAxes3DActor(vtkPVGridAxes3DActor* gridActor)
     const bool in_tile_display_mode = this->InTileDisplayMode();
     if (this->GridAxes3DActor)
     {
-      this->GetNonCompositedRenderer()->RemoveViewProp(this->GridAxes3DActor);
       this->GetRenderer()->RemoveViewProp(this->GridAxes3DActor);
       culler->DoNotCullList.erase(this->GridAxes3DActor);
     }
     this->GridAxes3DActor = gridActor;
     if (this->GridAxes3DActor && !in_tile_display_mode)
     {
-      this->GetNonCompositedRenderer()->AddViewProp(this->GridAxes3DActor);
       this->GetRenderer()->AddViewProp(this->GridAxes3DActor);
-
-      this->GridAxes3DActor->SetEnableLayerSupport(true);
-      this->GridAxes3DActor->SetBackgroundLayer(this->GetRenderer()->GetLayer());
-      this->GridAxes3DActor->SetGeometryLayer(this->GetRenderer()->GetLayer());
-      this->GridAxes3DActor->SetForegroundLayer(this->GetNonCompositedRenderer()->GetLayer());
       culler->DoNotCullList.insert(this->GridAxes3DActor);
     }
   }

@@ -3820,6 +3820,20 @@
           <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
+      <ProxyProperty name="DataAxesGrid"
+                     command="SetGridAxesRepresentation"
+                     panel_widget="proxy_editor"
+                     skip_dependency="1">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="representations" name="GridAxesRepresentation" />
+        </ProxyListDomain>
+        <Hints>
+          <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
+               property on the GridAxes3DActor proxy for a checkbox
+               on the UI -->
+          <ProxyEditorPropertyWidget property="Visibility" />
+        </Hints>
+      </ProxyProperty>
       <SubProxy>
         <Proxy name="SelectionRepresentation"
                proxygroup="representations"
@@ -5446,8 +5460,147 @@
         <Property name="PointLabelOpacity" function="Opacity"/>
         <Property name="PointLabelShadow" function="Shadow"/>
       </PropertyGroup>
-
       <!-- End of SelectionRepresentation -->
+    </RepresentationProxy>
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkPVGridAxes3DRepresentation"
+                         name="GridAxesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         si_class="vtkSIProxy">
+      <Documentation>Proxy to show a selection as geometry.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <InputArrayDomain name="input_array_any"></InputArrayDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy command="SetGridAxes">
+        <Proxy name="GridAxes"
+               proxygroup="annotations"
+               proxyname="GridAxes3DActor" />
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <PropertyGroup label="Title Texts">
+            <Property name="XTitle"/>
+            <Property name="YTitle"/>
+            <Property name="ZTitle"/>
+          </PropertyGroup>
+          <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
+            <Property name="XTitleColor" function="Color"/>
+            <Property name="XTitleFontFamily" function="Family"/>
+            <Property name="XTitleBold" function="Bold" />
+            <Property name="XTitleItalic" function="Italics"/>
+            <Property name="XTitleFontSize" function="Size" />
+            <Property name="XTitleShadow" function="Shadow" />
+            <Property name="XTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
+            <Property name="YTitleColor" function="Color"/>
+            <Property name="YTitleFontFamily" function="Family"/>
+            <Property name="YTitleBold" function="Bold" />
+            <Property name="YTitleItalic" function="Italics"/>
+            <Property name="YTitleFontSize" function="Size" />
+            <Property name="YTitleShadow" function="Shadow" />
+            <Property name="YTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
+            <Property name="ZTitleColor" function="Color"/>
+            <Property name="ZTitleFontFamily" function="Family"/>
+            <Property name="ZTitleBold" function="Bold" />
+            <Property name="ZTitleItalic" function="Italics"/>
+            <Property name="ZTitleFontSize" function="Size" />
+            <Property name="ZTitleShadow" function="Shadow" />
+            <Property name="ZTitleOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Face Properties">
+            <Property name="FacesToRender" />
+            <Property name="CullBackface" />
+            <Property name="CullFrontface" />
+            <Property name="GridColor"/>
+          </PropertyGroup>
+          <Property name="ShowGrid"/>
+          <Property name="ShowEdges"/>
+          <Property name="ShowTicks"/>
+          <PropertyGroup label="Label Properties">
+            <Property name="LabelUniqueEdgesOnly" />
+            <Property name="AxesToLabel" />
+          </PropertyGroup>
+          <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
+            <Property name="XLabelColor" function="Color"/>
+            <Property name="XLabelFontFamily" function="Family"/>
+            <Property name="XLabelBold" function="Bold" />
+            <Property name="XLabelItalic" function="Italics"/>
+            <Property name="XLabelFontSize" function="Size" />
+            <Property name="XLabelShadow" function="Shadow" />
+            <Property name="XLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
+            <Property name="YLabelColor" function="Color"/>
+            <Property name="YLabelFontFamily" function="Family"/>
+            <Property name="YLabelBold" function="Bold" />
+            <Property name="YLabelItalic" function="Italics"/>
+            <Property name="YLabelFontSize" function="Size" />
+            <Property name="YLabelShadow" function="Shadow" />
+            <Property name="YLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
+            <Property name="ZLabelColor" function="Color"/>
+            <Property name="ZLabelFontFamily" function="Family"/>
+            <Property name="ZLabelBold" function="Bold" />
+            <Property name="ZLabelItalic" function="Italics"/>
+            <Property name="ZLabelFontSize" function="Size" />
+            <Property name="ZLabelShadow" function="Shadow" />
+            <Property name="ZLabelOpacity" function="Opacity" />
+          </PropertyGroup>
+          <PropertyGroup label="X Axis Label Properties">
+            <Property name="XAxisNotation" />
+            <Property name="XAxisPrecision" />
+            <Property name="XAxisUseCustomLabels" />
+            <Property name="XAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Y Axis Label Properties">
+            <Property name="YAxisNotation" />
+            <Property name="YAxisPrecision" />
+            <Property name="YAxisUseCustomLabels" />
+            <Property name="YAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Z Axis Label Properties">
+            <Property name="ZAxisNotation" />
+            <Property name="ZAxisPrecision" />
+            <Property name="ZAxisUseCustomLabels" />
+            <Property name="ZAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Data Transform">
+            <Property name="DataScale" />
+            <Property name="DataPosition" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of GridAxesRepresentation -->
     </RepresentationProxy>
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkMoleculeRepresentation"
