@@ -1205,7 +1205,13 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   w2i->SetMagnification(magnification);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
+#ifdef VTKGL2
+  // we don't need the boundary fix for GL2. The boundary issue
+  // was an OpenGL fixed pipeline artifact. (See paraview/paraview#16813).
+  w2i->FixBoundaryOff();
+#else
   w2i->FixBoundaryOn();
+#endif
 
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.

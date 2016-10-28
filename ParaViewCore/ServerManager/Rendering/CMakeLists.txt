@@ -128,5 +128,7 @@ set_source_files_properties(
   HEADER_FILE_ONLY
   WRAP_EXCLUDE)
 #-----------------------------------------------------------------------------
-
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  add_definitions(-DVTKGL2)
+endif()
 vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})
