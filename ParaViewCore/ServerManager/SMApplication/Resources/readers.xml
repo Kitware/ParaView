@@ -2250,7 +2250,8 @@
                             name="PointArrayStatus"
                             number_of_elements="2"
                             number_of_elements_per_command="2"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="advanced">
         <ArraySelectionDomain name="array_list">
           <RequiredProperties>
             <Property function="ArrayList"
@@ -2264,7 +2265,8 @@
       <IntVectorProperty name="SingleMidpointLayer"
                          command="SetSingleMidpointLayer"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="0"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Load only one layer from variables on the midpoint layers. The layer
@@ -2277,7 +2279,8 @@
       <IntVectorProperty name="MidpointLayerIndex"
                             command="SetMidpointLayerIndex"
                             number_of_elements="1"
-                            default_values="0">
+                            default_values="0"
+                            panel_visibility="advanced">
         <IntRangeDomain name="range"  default_mode="min">
           <RequiredProperties>
             <Property function="Range"
@@ -2298,7 +2301,8 @@
       <IntVectorProperty name="SingleInterfaceLayer"
                          command="SetSingleInterfaceLayer"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="0"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Load only one layer from variables on the interface layers. The layer
@@ -2311,7 +2315,8 @@
       <IntVectorProperty name="InterfaceLayerIndex"
                             command="SetInterfaceLayerIndex"
                             number_of_elements="1"
-                            default_values="0">
+                            default_values="0"
+                            panel_visibility="advanced">
         <IntRangeDomain name="range"  default_mode="min">
           <RequiredProperties>
             <Property function="Range"
