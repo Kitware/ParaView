@@ -266,6 +266,15 @@
                   name="XMLPPolyDataWriterCore">
       <Documentation>Internal writer used to write XML poly data in
       parallel.</Documentation>
+      <IntVectorProperty command="SetGhostLevel"
+                         default_values="1"
+                         name="GhostLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The number of ghost levels to include in the output
+        file(s).</Documentation>
+      </IntVectorProperty>
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
@@ -274,6 +283,15 @@
                   name="XMLPUnstructuredGridWriterCore">
       <Documentation>Internal writer used to write XML poly data in
       parallel.</Documentation>
+      <IntVectorProperty command="SetGhostLevel"
+                         default_values="1"
+                         name="GhostLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The number of ghost levels to include in the output
+        file(s).</Documentation>
+      </IntVectorProperty>
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
