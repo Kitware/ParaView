@@ -13,7 +13,6 @@
   <Proxy group="writers" name="XMLMultiBlockDataWriter" />
   <Proxy group="writers" name="XMLHierarchicalBoxDataWriter" />
   <Proxy group="writers" name="DataSetWriter" />
-  <Proxy group="writers" name="PDataSetWriter" />
   <Proxy group="writers" name="PPLYWriter" />
   <Proxy group="writers" name="PSTLWriter" />
   <Proxy group="writers" name="MetaImageWriter" />
