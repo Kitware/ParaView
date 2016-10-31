@@ -2224,14 +2224,116 @@
         <Documentation>This property specifies the file name to read for the
         points and field information.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetSingleLevel"
-                         default_values="0"
-                         name="SingleLevel"
+      <IntVectorProperty command="SetVerticalDimension"
+                         default_values="1"
+                         name="VerticalDimension"
                          number_of_elements="1">
-        <Documentation>Specify whether to only read in a single level and any
-        variables that are prescribed over this surface.</Documentation>
-        <BooleanDomain name="bool" />
+        <Documentation>Specify whether to read variables from the
+        single layer, from midpoint layers or from interface
+        layers.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Single layer [time, ncol]"
+                 value="0" />
+          <Entry text="Midpoint layers [time, lev, ncol]"
+                 value="1" />
+          <Entry text="Interface layers [time, ilev, ncol]"
+                 value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="advanced">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF CAM point
+        variables to load.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SingleMidpointLayer"
+                         command="SetSingleMidpointLayer"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the midpoint layers. The layer
+          is specified by MidpointLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetMidpointLayersRange"
+                         information_only="1"
+                         name="MidpointLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="MidpointLayerIndex"
+                            command="SetMidpointLayerIndex"
+                            number_of_elements="1"
+                            default_values="0"
+                            panel_visibility="advanced">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="MidpointLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleMidpointLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the midpoint layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SingleInterfaceLayer"
+                         command="SetSingleInterfaceLayer"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the interface layers. The layer
+          is specified by InterfaceLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetInterfaceLayersRange"
+                         information_only="1"
+                         name="InterfaceLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="InterfaceLayerIndex"
+                            command="SetInterfaceLayerIndex"
+                            number_of_elements="1"
+                            default_values="0"
+                            panel_visibility="advanced">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="InterfaceLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleInterfaceLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the interface layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty default_values="1"
                          name="CellLayerRight"
                          number_of_elements="1"
@@ -7082,7 +7184,12 @@
                proxyname="NetCDFCAMReaderCore"></Proxy>
         <ExposedProperties>
           <Property name="ConnectivityFileName" />
-          <Property name="SingleLevel" />
+          <Property name="VerticalDimension" />
+          <Property name="PointArrayStatus" />
+          <Property name="SingleMidpointLayer" />
+          <Property name="MidpointLayerIndex" />
+          <Property name="SingleInterfaceLayer" />
+          <Property name="InterfaceLayerIndex" />
           <Property name="CellLayerRight" />
         </ExposedProperties>
       </SubProxy>
