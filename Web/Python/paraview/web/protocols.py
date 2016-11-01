@@ -1784,7 +1784,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         simple.Show()
         simple.Render()
         simple.ResetCamera()
-        self.getApplication().InvokeEvent('PushRender')
+        if self.getApplication():
+            self.getApplication().InvokeEvent('PushRender')
 
         return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
