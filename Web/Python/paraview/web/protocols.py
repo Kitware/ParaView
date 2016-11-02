@@ -1753,7 +1753,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             simple.LoadState(fileToLoad[0])
             simple.Render()
             simple.ResetCamera()
-            self.getApplication().InvokeEvent('PushRender')
+            if self.getApplication():
+                self.getApplication().InvokeEvent('PushRender')
 
             return { 'success': True }
 
