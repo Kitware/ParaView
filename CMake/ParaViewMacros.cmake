@@ -262,7 +262,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   else()
 
     add_custom_command(
-      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}"
 
       # process each html file to separate it out into files for each proxy.
       COMMAND ${CMAKE_COMMAND}
@@ -274,7 +274,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
               -Dinput_xmls:STRING=${xmls_string}
               -Dinput_gui_xmls:STRING=${gui_xmls_string}
               -Doutput_dir:PATH=${output_dir}
-              -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml
+              -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}
               -P ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
       DEPENDS ${xmls}
@@ -287,7 +287,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
       COMMENT "Generating Documentation HTMLs from xmls")
 
     set (dependencies ${dependencies}
-         "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml")
+         "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}")
     set (${output_files} ${dependencies} PARENT_SCOPE)
   endif()
 endfunction()
