@@ -80,6 +80,10 @@ endif()
 set (toc
   "<toc> <section title=\"${name}\" ref=\"${index_page}\" >\n ${toc} </section> </toc>")
 
+if (given_toc)
+  set(toc "${given_toc}")
+endif ()
+
 set(matching_files)
 if (file_patterns)
   set(patterns)

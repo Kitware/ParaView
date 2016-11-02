@@ -363,9 +363,9 @@ function(build_help_project name)
 
   set (qhp_filename ${arg_DESTINATION_DIRECTORY}/${name}.qhp)
 
-  set (extra_args)
+  set (copy_directory_command)
   if (arg_DOCUMENTATION_SOURCE_DIR)
-    set (extra_args
+    set (copy_directory_command
       # copy all htmls from source to destination directory (same location where the
       # qhp file is present.
       COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -374,53 +374,37 @@ function(build_help_project name)
       )
   endif()
 
-  if (NOT DEFINED arg_TABLE_OF_CONTENTS)
-    # sanitize arg_FILEPATTERNS since we pass it as a command line argument.
-    # Escape ';' in lists
-    string(REPLACE "_" "_u"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
-    string(REPLACE ";" "_s"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+  # sanitize arg_FILEPATTERNS since we pass it as a command line argument.
+  # Escape ';' in lists
+  string(REPLACE "_" "_u"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+  string(REPLACE ";" "_s"  arg_FILEPATTERNS "${arg_FILEPATTERNS}")
 
-    set (extra_args ${extra_args}
-
-    # generate the toc at run-time.
-    COMMAND ${CMAKE_COMMAND}
-            -Doutput_file:FILEPATH=${qhp_filename}
-            "-Dfile_patterns:STRING=${arg_FILEPATTERNS}"
-            -Dnamespace:STRING="${arg_NAMESPACE}"
-            -Dfolder:PATH=${arg_FOLDER}
-            -Dname:STRING="${name}"
-            -P "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
-    )
-  else ()
-    # toc is provided, we'll just configure the file.
-    set(patterns)
-    foreach (filepattern IN LISTS arg_FILEPATTERNS)
-      list(APPEND patterns
-        "${arg_DESTINATION_DIRECTORY}/${filepattern}")
-    endforeach ()
-    file (GLOB matching_files RELATIVE "${arg_DESTINATION_DIRECTORY}" ${patterns} )
-    set (files)
-    foreach(filename IN LISTS matching_files)
-      set (files "${files}<file>${filename}</file>\n")
-    endforeach()
-
-    configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
-      ${qhp_filename})
-    list (APPEND arg_DEPENDS ${qhp_filename})
-  endif()
+  # Remove newlines from the table of contents.
+  string(REPLACE "\n" " " arg_TABLE_OF_CONTENTS "${arg_TABLE_OF_CONTENTS}")
 
   ADD_CUSTOM_COMMAND(
     OUTPUT ${arg_DESTINATION_DIRECTORY}/${name}.qch
     DEPENDS ${arg_DEPENDS}
             ${ParaView_CMAKE_DIR}/generate_qhp.cmake
-  
-    ${extra_args}
+
+    ${copy_directory_command}
+
+    # generate the toc at run-time.
+    VERBATIM
+    COMMAND ${CMAKE_COMMAND}
+            -Doutput_file:FILEPATH=${qhp_filename}
+            "-Dfile_patterns:STRING=${arg_FILEPATTERNS}"
+            -Dnamespace:STRING=${arg_NAMESPACE}
+            -Dfolder:PATH=${arg_FOLDER}
+            -Dname:STRING=${name}
+            "-Dgiven_toc:STRING=${arg_TABLE_OF_CONTENTS}"
+            -P "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
 
     # Now, compile the qhp file to generate the qch.
     COMMAND ${QT_HELP_GENERATOR}
             ${qhp_filename}
             -o ${arg_DESTINATION_DIRECTORY}/${name}.qch
-  
+
     COMMENT "Compiling Qt help project ${name}.qhp"
 
     WORKING_DIRECTORY "${arg_DESTINATION_DIRECTORY}"
