@@ -86,8 +86,8 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AddActive" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ChoosePreset" command="activate" arguments="" />
   <!-- Load "Spectrum" -->
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,108,8,/0:0" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,108,8,/0:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,108,38,/0:0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,108,38,/0:0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AnnotationsTable" command="mousePress" arguments="1,1,0,30,9,/5:2" />
