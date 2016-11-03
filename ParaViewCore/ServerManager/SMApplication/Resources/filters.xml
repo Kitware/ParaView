@@ -11152,7 +11152,7 @@ source.</Documentation>
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array">
         </InputArrayDomain>
