@@ -64,6 +64,10 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   Ui::LinePropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
 
+  #ifdef Q_OS_MAC
+    ui.pickLabel->setText(ui.pickLabel->text().replace("Ctrl", "Cmd"));
+  #endif
+
   new QDoubleValidator(ui.point1X);
   new QDoubleValidator(ui.point1Y);
   new QDoubleValidator(ui.point1Z);
