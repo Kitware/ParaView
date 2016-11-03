@@ -215,7 +215,6 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor* rwi, dou
       }
     }
 
-    ren->ResetCameraClippingRange();
     rwi->Render();
 
     // Update to process mouse events to get the new position

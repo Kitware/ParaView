@@ -92,7 +92,6 @@ void vtkPVTrackballZoom::OnMouseMove(
       camera->SetFocalPoint(fp);
     }
     camera->SetPosition(pos);
-    ren->ResetCameraClippingRange();
   }
 
   rwi->Render();

@@ -104,7 +104,6 @@ void vtkPVTrackballMoveActor::OnMouseMove(
       this->GetGUIHelper()->SetActiveActorTranslate(move);
     }
 
-    ren->ResetCameraClippingRange();
     rwi->Render();
   }
 }

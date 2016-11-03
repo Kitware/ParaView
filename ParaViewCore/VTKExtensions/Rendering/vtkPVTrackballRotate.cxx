@@ -140,8 +140,6 @@ void vtkPVTrackballRotate::OnMouseMove(
   temp = camera->GetPosition();
   camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
 
-  ren->ResetCameraClippingRange();
-
   rwi->Render();
   transform->Delete();
 }
