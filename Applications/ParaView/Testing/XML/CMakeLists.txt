@@ -67,6 +67,7 @@ paraview_test_load_data(""
   TestMultipleNumberOfComponentsPlugin.xml
   tube.exo
   vehicle_data.csv
+  viscoplastic-ring.h5
   )
 
 SET (TESTS_WITHOUT_BASELINES
@@ -125,6 +126,7 @@ SET(TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeScalarBar.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestHiddenLineRemoval.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestOpacityRendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TruchasReader.xml
 )
 
 if(PARAVIEW_USE_VISITBRIDGE)
