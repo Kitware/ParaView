@@ -553,11 +553,13 @@ class SourceProxyInLayer(explorers.LayerControl):
     A track that turns on and off an source proxy in a layer
     """
     def showme(self):
+        simple.SetActiveSource(self.proxy)
         self.representation.Visibility = 1
 
     def hideme(self):
         self.representation.Visibility = 0
 
-    def __init__(self, parameter, representation):
+    def __init__(self, parameter, representation, proxy):
         super(SourceProxyInLayer, self).__init__(parameter, self.showme, self.hideme)
         self.representation = representation
+        self.proxy = proxy
