@@ -239,8 +239,7 @@ int vtkRulerSourceRepresentation::ProcessViewRequest(
     vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
     // `gather_before_delivery` is true, since vtkLineSource (which is the
     // source for the ruler) doesn't produce any data on ranks except the root.
-    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
-      /*deliver_to_client=*/true, /*gather_before_delivery=*/true);
+    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
