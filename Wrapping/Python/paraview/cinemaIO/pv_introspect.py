@@ -773,7 +773,7 @@ def explore(cs, proxies, iSave = True, currentTime = None, userDefined = {},
                     #hide all annotations
                     if rep.LookupTable:
                         rep.SetScalarBarVisibility(view_proxy, False)
-                    tc1 = pv_explorers.SourceProxyInLayer(name, rep)
+                    tc1 = pv_explorers.SourceProxyInLayer(name, rep, sp)
                     lt = explorers.Layer('vis', [tc1])
                     tracks.append(lt)
 
