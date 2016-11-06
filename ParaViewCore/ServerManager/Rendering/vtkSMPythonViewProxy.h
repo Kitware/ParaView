@@ -51,6 +51,13 @@ public:
    */
   virtual bool LastRenderWasInteractive();
 
+  /**
+   * Overridden to disable creation on an interactor. PythonView does not
+   * support interactor.
+   */
+  bool MakeRenderWindowInteractor(bool) VTK_OVERRIDE
+  { return false; }
+
 protected:
   vtkSMPythonViewProxy();
   ~vtkSMPythonViewProxy();
