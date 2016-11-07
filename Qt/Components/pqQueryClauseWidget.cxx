@@ -54,6 +54,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMap>
 
+namespace
+{
+class SCOPED_BLOCK_SIGNALS
+{
+  QPointer<QObject> Object;
+  bool PreBlockSignals;
+
+public:
+  SCOPED_BLOCK_SIGNALS(QObject* obj, bool newval = true)
+    : Object(obj)
+    , PreBlockSignals(false)
+  {
+    if (obj)
+    {
+      this->PreBlockSignals = obj->blockSignals(newval);
+    }
+  }
+  ~SCOPED_BLOCK_SIGNALS()
+  {
+    if (this->Object)
+    {
+      this->Object->blockSignals(this->PreBlockSignals);
+    }
+  }
+};
+}
+
 // BUG #13806, remove collective operations temporarily since they don't work
 // for composite datasets (esp. in parallel) as expected.
 //#define REMOVE_COLLECTIVE_CLAUSES
@@ -95,8 +122,15 @@ pqQueryClauseWidget::pqQueryClauseWidget(QWidget* parentObject, Qt::WindowFlags 
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  QObject::connect(
-    this->Internals->showCompositeTree, SIGNAL(clicked()), this, SLOT(showCompositeTree()));
+  this->connect(this->Internals->showCompositeTree, SIGNAL(clicked()), SLOT(showCompositeTree()));
+  this->connect(this->Internals->helpButton, SIGNAL(clicked()), SIGNAL(helpRequested()));
+
+  this->connect(this->Internals->criteria, SIGNAL(currentIndexChanged(int)),
+    SLOT(populateSelectionCondition()));
+  this->connect(this->Internals->criteria, SIGNAL(currentIndexChanged(int)),
+    SLOT(updateDependentClauseWidgets()));
+  this->connect(
+    this->Internals->condition, SIGNAL(currentIndexChanged(int)), SLOT(updateValueWidget()));
 
   if (qobject_cast<pqQueryClauseWidget*>(parentObject))
   {
@@ -122,20 +156,16 @@ vtkPVDataSetAttributesInformation* pqQueryClauseWidget::getChosenAttributeInfo()
 void pqQueryClauseWidget::initialize(
   pqQueryClauseWidget::CriteriaTypes type_flags, bool qualifier_mode)
 {
+  // this avoids calling callbacks as the combo boxes are updated. We
+  // explicitly call those callbacks here once the combo boxes are populated.
+  SCOPED_BLOCK_SIGNALS a(this->Internals->criteria);
+  SCOPED_BLOCK_SIGNALS b(this->Internals->condition);
+
   this->AsQualifier = qualifier_mode;
   this->populateSelectionCriteria(type_flags);
   this->populateSelectionCondition();
   this->updateValueWidget();
-
   this->updateDependentClauseWidgets();
-
-  QObject::connect(this->Internals->criteria, SIGNAL(currentIndexChanged(int)), this,
-    SLOT(populateSelectionCondition()));
-  QObject::connect(this->Internals->criteria, SIGNAL(currentIndexChanged(int)), this,
-    SLOT(updateDependentClauseWidgets()));
-  QObject::connect(
-    this->Internals->condition, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValueWidget()));
-  QObject::connect(this->Internals->helpButton, SIGNAL(clicked()), this, SIGNAL(helpRequested()));
 }
 
 //-----------------------------------------------------------------------------
