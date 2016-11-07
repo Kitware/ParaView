@@ -284,6 +284,8 @@ set (Module_SRCS
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.cxx
   pqStandardPropertyWidgetInterface.h
+  pqStandardRecentlyUsedResourceLoaderImplementation.cxx
+  pqStandardRecentlyUsedResourceLoaderImplementation.h
   pqStandardViewFrameActionsImplementation.cxx
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.cxx
@@ -449,6 +451,7 @@ set (Module_MOC_HDRS
   pqSpreadSheetViewDecorator.h
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.h
+  pqStandardRecentlyUsedResourceLoaderImplementation.h
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
   pqStreamingTestingEventPlayer.h
@@ -548,7 +551,7 @@ endif()
 # interfaces defined under Components and this seems like the only way to fix
 # that issue.
 pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components -I ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 pv_qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 

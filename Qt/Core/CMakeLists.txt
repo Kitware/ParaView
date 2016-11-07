@@ -151,6 +151,8 @@ set(Module_SRCS
   pqQVTKWidgetEventTranslator.cxx
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidget.h
+  pqRecentlyUsedResourceLoaderInterface.cxx
+  pqRecentlyUsedResourceLoaderInterface.h
   pqRecentlyUsedResourcesList.cxx
   pqRecentlyUsedResourcesList.h
   pqRenderViewBase.cxx
