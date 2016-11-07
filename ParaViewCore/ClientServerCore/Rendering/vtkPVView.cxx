@@ -201,8 +201,8 @@ bool vtkPVView::GetLocalProcessSupportsInteraction()
   // ranks since all views share the same render window. Setting up interactor
   // on even the root node will have unintended side effects since all views
   // share the render window. One can override this and allow the creation of an
-  // interactor by setting the PV_ALLOW_BATCH_INTERATOR environment variable.
-  if (getenv("PV_ALLOW_BATCH_INTERATOR"))
+  // interactor by setting the PV_ALLOW_BATCH_INTERACTION environment variable.
+  if (getenv("PV_ALLOW_BATCH_INTERACTION"))
   {
     return this->SynchronizedWindows->GetLocalProcessIsDriver();
   }
