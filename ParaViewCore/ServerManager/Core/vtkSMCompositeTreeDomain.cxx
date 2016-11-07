@@ -189,8 +189,17 @@ int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property, bool use
       }
       if (info)
       {
-        helper.Set(0, index);
-        return 1;
+        const bool repeatable = (ivp->GetRepeatCommand() == 1);
+        const int num_elements_per_command = ivp->GetNumberOfElementsPerCommand();
+        const int num_elements = ivp->GetNumberOfElements();
+
+        // Ensure that we don't set incorrect number of elements as the default
+        // for any property.
+        if ((repeatable && num_elements_per_command == 1) || (!repeatable && num_elements == 1))
+        {
+          helper.Set(0, index);
+          return 1;
+        }
       }
     }
   }
