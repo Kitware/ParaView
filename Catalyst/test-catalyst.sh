@@ -11,9 +11,18 @@ die () {
 [ "$#" -lt 3 ] && \
     die "$usage"
 
+readlink_cmd="readlink"
+if [[ $OSTYPE == darwin* ]]; then
+  # Use greadlink on the mac
+  readlink_cmd="greadlink"
+  echo "$readlink_cmd"
+fi
+
+echo "$readlink_cmd"
+
 curscript="$0"
 scriptdir="$( dirname "$curscript" )"
-scriptdir="$( readlink -f "$scriptdir" )"
+scriptdir="$( "${readlink_cmd}" -f "$scriptdir" )"
 
 # Where the edition directories live.
 editiondir="$scriptdir/Editions"
