@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLoadStateReaction.h
+   Module:  pqRecentlyUsedResourceLoaderInterface.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqLoadStateReaction_h
-#define pqLoadStateReaction_h
+#include "pqRecentlyUsedResourceLoaderInterface.h"
 
-#include "pqReaction.h"
-
-/**
-* @ingroup Reactions
-* Reaction for load state action.
-*/
-class pqServer;
-class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadStateReaction : public pqReaction
+//-----------------------------------------------------------------------------
+pqRecentlyUsedResourceLoaderInterface::pqRecentlyUsedResourceLoaderInterface()
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
+}
 
-public:
-  /**
-  * Constructor. Parent cannot be NULL.
-  */
-  pqLoadStateReaction(QAction* parent);
+//-----------------------------------------------------------------------------
+pqRecentlyUsedResourceLoaderInterface::~pqRecentlyUsedResourceLoaderInterface()
+{
+}
 
-  /**
-  * Loads the state file.
-  * Note that this method is static. Applications can simply use this without
-  * having to create a reaction instance.
-  * If no server is specified, active server is used.
-  */
-  static void loadState(const QString& filename, pqServer* server = NULL);
-  static void loadState();
-
-public slots:
-  /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
-  void updateEnableState();
-
-protected:
-  /**
-  * Called when the action is triggered.
-  */
-  virtual void onTriggered() { pqLoadStateReaction::loadState(); }
-
-private:
-  Q_DISABLE_COPY(pqLoadStateReaction)
-};
-
-#endif
+//-----------------------------------------------------------------------------
+QIcon pqRecentlyUsedResourceLoaderInterface::icon(const pqServerResource&)
+{
+  return QIcon();
+}

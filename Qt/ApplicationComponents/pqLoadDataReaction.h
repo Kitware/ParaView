@@ -63,8 +63,15 @@ public:
   * NULL.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
+  *
+  * If `readergroup` and `readername` are non empty, then they are assumed to be
+  * the type of the reader to use and reader factory is not used.
+  *
+  * If `server` is NULL, active server is used.
   */
-  static pqPipelineSource* loadData(const QList<QStringList>& files);
+  static pqPipelineSource* loadData(const QList<QStringList>& files,
+    const QString& readergroup = QString(), const QString& readername = QString(),
+    pqServer* server = NULL);
 
   /**
   * Loads data files. Uses reader factory to determine what reader are
@@ -72,8 +79,16 @@ public:
   * NULL.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
+  *
+  * If `readergroup` and `readername` are non empty, then they are assumed to be
+  * the type of the reader to use and reader factory is not used.
+  *
+  * If `server` is NULL, active server is used.
   */
-  static pqPipelineSource* loadData(const QStringList& files);
+  static pqPipelineSource* loadData(const QStringList& files,
+    const QString& readergroup = QString(), const QString& readername = QString(),
+    pqServer* server = NULL);
+
   static QList<pqPipelineSource*> loadData();
 
 public slots:

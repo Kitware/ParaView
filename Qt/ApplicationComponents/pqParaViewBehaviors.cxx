@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
+#include "pqCoreTestUtility.h"
 #include "pqCrashRecoveryBehavior.h"
 #include "pqDataTimeStepBehavior.h"
 #include "pqDefaultViewBehavior.h"
@@ -53,13 +54,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
+#include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqStandardViewFrameActionsImplementation.h"
+#include "pqStreamingTestingEventPlayer.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqUndoStack.h"
 #include "pqVerifyRequiredPluginBehavior.h"
-
-#include "pqCoreTestUtility.h"
-#include "pqStreamingTestingEventPlayer.h"
 #include "pqViewStreamingBehavior.h"
 
 #include <QMainWindow>
@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PQ_BEHAVIOR_DEFINE_FLAG(_name, _default) bool pqParaViewBehaviors::_name = _default;
 PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets, true);
 PQ_BEHAVIOR_DEFINE_FLAG(StandardViewFrameActions, true);
+PQ_BEHAVIOR_DEFINE_FLAG(StandardRecentlyUsedResourceLoader, true);
 PQ_BEHAVIOR_DEFINE_FLAG(QtMessageHandlerBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(DataTimeStepBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(SpreadSheetVisibilityBehavior, true);
@@ -111,6 +112,12 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   {
     // Register standard types of view-frame actions.
     pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
+  }
+
+  if (PQ_IS_BEHAVIOR_ENABLED(StandardRecentlyUsedResourceLoader))
+  {
+    // Register standard recent file menu handlers.
+    pgm->addInterface(new pqStandardRecentlyUsedResourceLoaderImplementation(pgm));
   }
 
   // Load plugins distributed with application.

@@ -37,18 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
-#include "pqRecentlyUsedResourcesList.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
-#include "pqServerResource.h"
+#include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
+#include "vtkStringList.h"
 
 #include <QDebug>
 
-#include "vtkStringList.h"
 
 //-----------------------------------------------------------------------------
 pqLoadDataReaction::pqLoadDataReaction(QAction* parentObject)
@@ -98,21 +97,24 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
+pqPipelineSource* pqLoadDataReaction::loadData(
+  const QStringList& files, const QString& smgroup, const QString& smname, pqServer* server)
 {
   QList<QStringList> f;
   f.append(files);
-  return pqLoadDataReaction::loadData(f);
+  return pqLoadDataReaction::loadData(f, smgroup, smname, server);
 }
+
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
+pqPipelineSource* pqLoadDataReaction::loadData(
+  const QList<QStringList>& files, const QString& smgroup, const QString& smname, pqServer* server)
 {
   if (files.empty())
   {
     return NULL;
   }
 
-  pqServer* server = pqActiveObjects::instance().activeServer();
+  server = server != NULL ? server : pqActiveObjects::instance().activeServer();
   if (!server)
   {
     qCritical() << "Cannot create reader without an active server.";
@@ -124,11 +126,10 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
 
   // Extension to ReaderType,ReaderGroup Hash table
   QHash<QString, QPair<QString, QString> > extensionToReaderSelection;
-  QStringList file;
-  foreach (file, files)
+  foreach (const QStringList& filegroup, files)
   {
     QPair<QString, QString> readerInfo; // type,group
-    QString filename(file[0]);
+    QString filename(filegroup[0]);
     QFileInfo fi(filename);
 
     if (!pqLoadDataReaction::TestFileReadability(filename, server, readerFactory))
@@ -136,27 +137,36 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
       qWarning() << "File '" << filename << "' cannot be read.";
       continue;
     }
-    // Determine reader type based on if we have asked the user for this extension before
-    QHash<QString, QPair<QString, QString> >::const_iterator it =
-      extensionToReaderSelection.find(fi.suffix());
-    if (it != extensionToReaderSelection.end())
+
+    if (!smgroup.isEmpty() && !smname.isEmpty())
     {
-      readerInfo = it.value();
+      readerInfo = QPair<QString, QString>(smname, smgroup);
     }
     else
     {
-      // Determine reader type based on the first file
-      bool valid =
-        pqLoadDataReaction::DetermineFileReader(filename, server, readerFactory, readerInfo);
-      if (valid == 0)
+      // Determine reader type based on if we have asked the user for this extension before
+      QHash<QString, QPair<QString, QString> >::const_iterator it =
+        extensionToReaderSelection.find(fi.suffix());
+      if (it != extensionToReaderSelection.end())
       {
-        // no reader selected
-        continue;
+        readerInfo = it.value();
+      }
+      else
+      {
+        // Determine reader type based on the first filegroup
+        bool valid =
+          pqLoadDataReaction::DetermineFileReader(filename, server, readerFactory, readerInfo);
+        if (valid == 0)
+        {
+          // no reader selected
+          continue;
+        }
       }
     }
-    // read the file
+
+    // read the filegroup
     BEGIN_UNDO_SET("Create 'Reader'");
-    reader = pqLoadDataReaction::LoadFile(file, server, readerInfo);
+    reader = pqLoadDataReaction::LoadFile(filegroup, server, readerInfo);
     END_UNDO_SET();
 
     // add this extension to the hash set
@@ -230,21 +240,8 @@ pqPipelineSource* pqLoadDataReaction::LoadFile(
 
   if (reader)
   {
-    pqApplicationCore* core = pqApplicationCore::instance();
-
-    // Add this to the list of recent server resources ...
-    pqServerResource resource = server->getResource();
-    resource.setPath(files[0]);
-    resource.addData("readergroup", reader->getProxy()->GetXMLGroup());
-    resource.addData("reader", reader->getProxy()->GetXMLName());
-    resource.addData("extrafilesCount", QString("%1").arg(files.size() - 1));
-    for (int cc = 1; cc < files.size(); cc++)
-    {
-      resource.addData(QString("file.%1").arg(cc - 1), files[cc]);
-    }
-    core->recentlyUsedResources().add(resource);
-    core->recentlyUsedResources().save(*core->settings());
+    pqStandardRecentlyUsedResourceLoaderImplementation::addDataFilesToRecentResources(
+      server, files, reader->getProxy()->GetXMLGroup(), reader->getProxy()->GetXMLName());
   }
-
   return reader;
 }

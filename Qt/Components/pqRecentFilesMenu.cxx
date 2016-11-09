@@ -33,163 +33,157 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
-#include "pqFileDialogModel.h"
-#include "pqObjectBuilder.h"
+#include "pqInterfaceTracker.h"
+#include "pqRecentlyUsedResourceLoaderInterface.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqServerConfiguration.h"
 #include "pqServerConnectDialog.h"
 #include "pqServerLauncher.h"
 #include "pqServerManagerModel.h"
 #include "pqServerResource.h"
-#include "pqTimer.h"
-#include "pqUndoStack.h"
 
-#include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
-
+#include <QMap>
 #include <QMenu>
 #include <QMessageBox>
 #include <QScopedPointer>
 #include <QtDebug>
+
 #include <algorithm>
 
-/////////////////////////////////////////////////////////////////////////////
-// pqRecentFilesMenu::pqImplementation
-
-class pqRecentFilesMenu::pqImplementation
+//=============================================================================
+namespace rfm
 {
-public:
-  pqImplementation(QMenu& menu)
-    : Menu(menu)
+bool canLoad(
+  const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces, const pqServerResource& resource)
+{
+  // using foreach here was causing failures on VS
+  for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
   {
+    pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
+    if (iface->canLoad(resource))
+    {
+      return true;
+    }
   }
+  return false;
+}
 
-  ~pqImplementation() {}
-
-  QMenu& Menu;
-  pqServerResource RecentResource;
-
-  /// Functor that returns true if two resources have the same URI scheme and host(s)
-  class SameSchemeAndHost
+bool iconAndLabel(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
+  const pqServerResource& resource, QIcon& icon, QString& label)
+{
+  // using foreach here was causing failures on VS
+  for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
   {
-  public:
-    SameSchemeAndHost(const pqServerResource& lhs)
-      : LHS(lhs)
+    pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
+    if (iface->canLoad(resource))
     {
+      icon = iface->icon(resource);
+      label = iface->label(resource);
+      return true;
     }
+  }
+  return false;
+}
 
-    bool operator()(const pqServerResource& rhs) const
+bool load(const QList<pqRecentlyUsedResourceLoaderInterface*>& ifaces,
+  const pqServerResource& resource, pqServer* server)
+{
+  // using foreach here was causing failures on VS
+  for (int cc = 0, max = ifaces.size(); cc < max; ++cc)
+  {
+    pqRecentlyUsedResourceLoaderInterface* iface = ifaces[cc];
+    if (iface->canLoad(resource))
     {
-      return this->LHS.schemeHosts() == rhs.schemeHosts();
+      return iface->load(resource, server);
     }
+  }
+  return false;
+}
+}
 
-  private:
-    void operator=(const SameSchemeAndHost&);
-    const pqServerResource& LHS;
-  };
-
-private:
-  void operator=(const pqImplementation&);
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// pqRecentFilesMenu
-
+//=============================================================================
 pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p)
   : QObject(p)
-  , Implementation(new pqImplementation(menu))
+  , Menu(&menu)
+  , SortByServers(true)
 {
-  connect(&pqApplicationCore::instance()->recentlyUsedResources(), SIGNAL(changed()), this,
-    SLOT(onResourcesChanged()));
-
-  connect(
-    &this->Implementation->Menu, SIGNAL(triggered(QAction*)), this, SLOT(onOpenResource(QAction*)));
-
-  this->onResourcesChanged();
+  this->connect(this->Menu, SIGNAL(aboutToShow()), SLOT(buildMenu()));
+  this->connect(this->Menu, SIGNAL(triggered(QAction*)), SLOT(onOpenResource(QAction*)));
 }
 
 //-----------------------------------------------------------------------------
 pqRecentFilesMenu::~pqRecentFilesMenu()
 {
-  delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
-void pqRecentFilesMenu::onResourcesChanged()
+void pqRecentFilesMenu::buildMenu()
 {
-  this->Implementation->Menu.clear();
+  if (!this->Menu)
+  {
+    return;
+  }
+
+  this->Menu->clear();
+
+  pqInterfaceTracker* itk = pqApplicationCore::instance()->interfaceTracker();
+  QList<pqRecentlyUsedResourceLoaderInterface*> ifaces =
+    itk->interfaces<pqRecentlyUsedResourceLoaderInterface*>();
 
   // Get the set of all resources in most-recently-used order ...
   const pqRecentlyUsedResourcesList::ListT& resources =
     pqApplicationCore::instance()->recentlyUsedResources().list();
 
-  // Get the set of servers with unique scheme/host in most-recently-used order ...
-  pqRecentlyUsedResourcesList::ListT servers;
-  for (int i = 0; i != resources.size(); ++i)
-  {
-    pqServerResource resource = resources[i];
-    pqServerResource server = resource.scheme() == "session"
-      ? resource.sessionServer().schemeHostsPorts()
-      : resource.schemeHostsPorts();
+  // Sort resources to cluster them by servers.
+  typedef QMap<QString, QList<pqServerResource> > ClusteredResourcesType;
+  ClusteredResourcesType clusteredResources;
 
-    // If this host isn't already in the list, add it ...
-    if (!std::count_if(servers.begin(), servers.end(), pqImplementation::SameSchemeAndHost(server)))
+  for (int cc = 0; cc < resources.size(); cc++)
+  {
+    const pqServerResource& resource = resources[cc];
+    QString key;
+    if (this->SortByServers)
     {
-      servers.push_back(server);
+      pqServerResource hostResource = (resource.scheme() == "session")
+        ? resource.sessionServer().schemeHostsPorts()
+        : resource.schemeHostsPorts();
+      key = hostResource.toURI();
     }
+    clusteredResources[key].push_back(resource);
   }
 
   // Display the servers ...
-  for (int i = 0; i != servers.size(); ++i)
+  for (ClusteredResourcesType::const_iterator criter = clusteredResources.begin();
+       criter != clusteredResources.end(); ++criter)
   {
-    const pqServerResource& server = servers[i];
-
-    const QString label = server.schemeHosts().toURI();
-
-    QAction* const action = new QAction(label, &this->Implementation->Menu);
-    action->setData(server.serializeString());
-
-    action->setIcon(QIcon(":/pqWidgets/Icons/pqConnect16.png"));
-
-    QFont font = action->font();
-    font.setBold(true);
-    action->setFont(font);
-
-    this->Implementation->Menu.addAction(action);
-
-    // Display sessions associated with the server first ...
-    for (int j = 0; j != resources.size(); ++j)
+    if (!criter.key().isEmpty())
     {
-      const pqServerResource& resource = resources[j];
+      Q_ASSERT(this->SortByServers == true);
 
-      if (resource.scheme() != "session" || resource.path().isEmpty() ||
-        resource.sessionServer().schemeHosts() != server.schemeHosts())
-      {
-        continue;
-      }
+      // Add a separator for the server.
+      QAction* const action = new QAction(criter.key(), this->Menu);
+      action->setIcon(QIcon(":/pqWidgets/Icons/pqConnect16.png"));
 
-      QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
-      act->setData(resource.serializeString());
-      act->setIcon(QIcon(":/pqWidgets/Icons/pvIcon32.png"));
-
-      this->Implementation->Menu.addAction(act);
+      // ensure that the server stands out
+      QFont font = action->font();
+      font.setBold(true);
+      action->setFont(font);
+      this->Menu->addAction(action);
     }
 
-    // Display files associated with the server next ...
-    for (int j = 0; j != resources.size(); ++j)
+    // now add actions for the recent items.
+    for (int kk = 0; kk < criter.value().size(); ++kk)
     {
-      const pqServerResource& resource = resources[j];
-
-      if (resource.scheme() == "session" || resource.path().isEmpty() ||
-        resource.schemeHosts() != server.schemeHosts())
+      const pqServerResource& item = criter.value()[kk];
+      QString label;
+      QIcon icon;
+      if (rfm::iconAndLabel(ifaces, item, icon, label))
       {
-        continue;
+        QAction* const act = new QAction(label, this->Menu);
+        act->setData(item.serializeString());
+        act->setIcon(icon);
+        this->Menu->addAction(act);
       }
-
-      QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
-      act->setData(resource.serializeString());
-
-      this->Implementation->Menu.addAction(act);
     }
   }
 }
@@ -197,18 +191,16 @@ void pqRecentFilesMenu::onResourcesChanged()
 //-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource(QAction* action)
 {
-  // Note: we can't update the resources here because it would destroy the
-  // action that's calling this slot.  So, schedule an update for the
-  // next time the UI is idle.
-  this->Implementation->RecentResource = pqServerResource(action->data().toString());
-  pqTimer::singleShot(0, this, SLOT(onOpenResource()));
+  QString data = action ? action->data().toString() : QString();
+  if (!data.isEmpty())
+  {
+    this->onOpenResource(pqServerResource(action->data().toString()));
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqRecentFilesMenu::onOpenResource()
+void pqRecentFilesMenu::onOpenResource(const pqServerResource& resource)
 {
-  const pqServerResource resource = this->Implementation->RecentResource;
-
   const pqServerResource server = resource.scheme() == "session"
     ? resource.sessionServer().schemeHostsPorts()
     : resource.schemeHostsPorts();
@@ -238,112 +230,25 @@ void pqRecentFilesMenu::onOpenResource()
       }
     }
   }
+
   if (pq_server)
   {
-    this->onServerStarted(pq_server);
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqRecentFilesMenu::onServerStarted(pqServer* server)
-{
-  if (this->open(server, this->Implementation->RecentResource))
-  {
-    pqRecentlyUsedResourcesList& mruList = pqApplicationCore::instance()->recentlyUsedResources();
-    mruList.add(this->Implementation->RecentResource);
-    mruList.save(*pqApplicationCore::instance()->settings());
+    this->open(pq_server, resource);
   }
 }
 
 //-----------------------------------------------------------------------------
 bool pqRecentFilesMenu::open(pqServer* server, const pqServerResource& resource) const
 {
-  if (!server)
+  pqInterfaceTracker* itk = pqApplicationCore::instance()->interfaceTracker();
+  QList<pqRecentlyUsedResourceLoaderInterface*> ifaces =
+    itk->interfaces<pqRecentlyUsedResourceLoaderInterface*>();
+  if (rfm::load(ifaces, resource, server))
   {
-    qCritical() << "Cannot open a resource with NULL server";
-    return false;
+    pqRecentlyUsedResourcesList& mruList = pqApplicationCore::instance()->recentlyUsedResources();
+    mruList.add(resource);
+    mruList.save(*pqApplicationCore::instance()->settings());
+    return true;
   }
-  pqFileDialogModel fileModel(server, NULL);
-  if (resource.scheme() == "session")
-  {
-    if (!resource.path().isEmpty())
-    {
-      // make sure the file exists
-      QString sessionFile = resource.path();
-      if (sessionFile.isEmpty() || !fileModel.fileExists(sessionFile, sessionFile))
-      {
-        qCritical() << "File does not exist: " << sessionFile << "\n";
-        return false;
-      }
-
-      // Read in the xml file to restore.
-      vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->SetFileName(sessionFile.toLatin1().data());
-      xmlParser->Parse();
-
-      // Get the root element from the parser.
-      if (vtkPVXMLElement* const root = xmlParser->GetRootElement())
-      {
-        pqApplicationCore::instance()->loadState(root, server);
-        return true;
-      }
-      else
-      {
-        qCritical() << "Root does not exist. Either state file could not be opened "
-                       "or it does not contain valid xml";
-      }
-    }
-  }
-  else if (!resource.path().isEmpty())
-  {
-    QString readerGroup = resource.data("readergroup");
-    QString readerName = resource.data("reader");
-    if (readerName.isEmpty() || readerGroup.isEmpty())
-    {
-      qDebug() << "Recent changes to the settings code have "
-               << "made these old entries unusable.";
-      return false;
-    }
-
-    QStringList files;
-    // make sure the file exists
-    QString filename = resource.path();
-    if (filename.isEmpty() || !fileModel.fileExists(filename, filename))
-    {
-      qCritical() << "File does not exist: " << filename << "\n";
-      return false;
-    }
-    files.push_back(filename);
-    QString extrafilesCount = resource.data("extrafilesCount");
-    if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
-    {
-      for (int cc = 0; cc < extrafilesCount.toInt(); cc++)
-      {
-        QString extrafile = resource.data(QString("file.%1").arg(cc));
-        if (!extrafile.isEmpty() && fileModel.fileExists(extrafile, extrafile))
-        {
-          files.push_back(extrafile);
-        }
-      }
-    }
-    if (this->createReader(readerGroup, readerName, files, server) != NULL)
-    {
-      return true;
-    }
-    qCritical() << "Error opening file " << resource.path() << "\n";
-  }
-
   return false;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqRecentFilesMenu::createReader(const QString& readerGroup,
-  const QString& readerName, const QStringList& files, pqServer* server) const
-{
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();
-  BEGIN_UNDO_SET("Create Reader");
-  pqPipelineSource* reader = builder->createReader(readerGroup, readerName, files, server);
-  END_UNDO_SET();
-  return reader;
 }

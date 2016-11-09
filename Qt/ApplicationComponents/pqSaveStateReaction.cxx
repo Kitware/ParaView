@@ -38,9 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPVApplicationCore.h"
 #include "pqProxyWidgetDialog.h"
-#include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
-#include "pqServerResource.h"
+#include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
@@ -50,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <QtDebug>
-
 #include <QFile>
 #include <QTextStream>
 
@@ -107,14 +105,10 @@ void pqSaveStateReaction::saveState(const QString& filename)
   pqApplicationCore::instance()->saveState(filename);
   pqServer* server = pqActiveObjects::instance().activeServer();
   // Add this to the list of recent server resources ...
-  pqServerResource resource;
-  resource.setScheme("session");
-  resource.setPath(filename);
-  resource.setSessionServer(server->getResource());
-  pqApplicationCore::instance()->recentlyUsedResources().add(resource);
-  pqApplicationCore::instance()->recentlyUsedResources().save(
-    *pqApplicationCore::instance()->settings());
+  pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+    server, filename);
 }
+
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::savePythonState(const QString& filename)
 {

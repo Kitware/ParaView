@@ -35,9 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
-#include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
-#include "pqServerResource.h"
+#include "pqStandardRecentlyUsedResourceLoaderImplementation.h"
 #include "vtkPVXMLParser.h"
 
 #include <QFileInfo>
@@ -62,10 +61,18 @@ void pqLoadStateReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqLoadStateReaction::loadState(const QString& filename)
+void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
 {
-  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  pqServer* server = activeObjects->activeServer();
+  if (server == NULL)
+  {
+    pqActiveObjects* activeObjects = &pqActiveObjects::instance();
+    server = activeObjects->activeServer();
+  }
+
+  if (!server)
+  {
+    return;
+  }
 
   // Read in the xml file to restore.
   vtkPVXMLParser* xmlParser = vtkPVXMLParser::New();
@@ -77,15 +84,9 @@ void pqLoadStateReaction::loadState(const QString& filename)
   if (root)
   {
     pqApplicationCore::instance()->loadState(root, server);
-
     // Add this to the list of recent server resources ...
-    pqServerResource resource;
-    resource.setScheme("session");
-    resource.setPath(filename);
-    resource.setSessionServer(server->getResource());
-    pqApplicationCore::instance()->recentlyUsedResources().add(resource);
-    pqApplicationCore::instance()->recentlyUsedResources().save(
-      *pqApplicationCore::instance()->settings());
+    pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+      server, filename);
   }
   else
   {
