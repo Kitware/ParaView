@@ -339,9 +339,16 @@ function(build_help_project name)
     message(FATAL_ERROR "No DESTINATION_DIRECTORY specified in build_help_project()")
   endif()
 
+  if (PARAVIEW_QT_VERSION STREQUAL "4")
+    set(qt_binary_dir_hints "${QT_BINARY_DIR}")
+  else() # Qt5
+    # Qt5's CMake config doesn't support QT_BINARY_DIR
+    set(qt_binary_dir_hints "${Qt5_DIR}/../../../bin")
+  endif()
+
   find_program(QT_HELP_GENERATOR
     qhelpgenerator
-    HINTS "${QT_BINARY_DIR}"
+    HINTS "${qt_binary_dir_hints}"
     DOC "qhelpgenerator used to compile Qt help project files")
   mark_as_advanced(QT_HELP_GENERATOR)
 
