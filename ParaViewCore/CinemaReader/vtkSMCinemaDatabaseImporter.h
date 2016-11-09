@@ -41,7 +41,7 @@ public:
 
   /**
    * Returns true if the \c session supports Cinema databases. Currently, only
-   * **builtin** sessions are supported.
+   * **builtin** sessions and single rank client-server sessions are supported.
    * @param[in] session session to check for Cinema importing support.
    * @returns `true` if supported, else `false`.
    */

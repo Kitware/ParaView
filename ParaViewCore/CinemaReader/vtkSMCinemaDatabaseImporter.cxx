@@ -21,7 +21,7 @@
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSelfGeneratingSourceProxy.h"
-#include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
@@ -44,8 +44,9 @@ vtkSMCinemaDatabaseImporter::~vtkSMCinemaDatabaseImporter()
 //----------------------------------------------------------------------------
 bool vtkSMCinemaDatabaseImporter::SupportsCinema(vtkSMSession* session)
 {
-  return (session != NULL && vtkSMSessionClient::SafeDownCast(session) == NULL &&
-    session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER | vtkPVSession::RENDER_SERVER) == 1);
+  return (session != NULL &&
+    session->GetNumberOfProcesses(vtkPVSession::DATA_SERVER | vtkPVSession::RENDER_SERVER) == 1 &&
+    session->GetRenderClientMode() == vtkSMSession::RENDERING_UNIFIED);
 }
 
 //----------------------------------------------------------------------------
