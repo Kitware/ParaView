@@ -1751,12 +1751,14 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Check if we were asked to load a state file
         if extension == 'pvsm':
             simple.LoadState(fileToLoad[0])
-            simple.Render()
+            newView = simple.Render()
+            simple.SetActiveView(newView)
             simple.ResetCamera()
             if self.getApplication():
+                self.getApplication().InvokeEvent('ResetActiveView')
                 self.getApplication().InvokeEvent('PushRender')
 
-            return { 'success': True }
+            return { 'success': True, 'view': newView.GetGlobalIDAsString() }
 
         readerName = None
         if extension in self.readerFactoryMap:
