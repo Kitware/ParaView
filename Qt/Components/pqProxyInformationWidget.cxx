@@ -518,7 +518,10 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::onCurrentItemChanged(QTreeWidgetItem* item)
 {
-  vtkPVDataInformation* info =
-    reinterpret_cast<vtkPVDataInformation*>(item->data(0, Qt::UserRole).value<void*>());
-  this->fillDataInformation(info);
+  if (item)
+  {
+    vtkPVDataInformation* info =
+      reinterpret_cast<vtkPVDataInformation*>(item->data(0, Qt::UserRole).value<void*>());
+    this->fillDataInformation(info);
+  }
 }
