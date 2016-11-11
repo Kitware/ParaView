@@ -42,6 +42,7 @@ vtkRulerLineForInput::~vtkRulerLineForInput()
 
 void vtkRulerLineForInput::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
 }
 
 int vtkRulerLineForInput::FillInputPortInformation(int, vtkInformation* info)
@@ -52,7 +53,7 @@ int vtkRulerLineForInput::FillInputPortInformation(int, vtkInformation* info)
 }
 
 int vtkRulerLineForInput::RequestInformation(
-  vtkInformation* request, vtkInformationVector** inVectors, vtkInformationVector* outVector)
+  vtkInformation* vtkNotUsed(request), vtkInformationVector** vtkNotUsed(inVectors), vtkInformationVector* outVector)
 {
   vtkInformation* outInfo = outVector->GetInformationObject(0);
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
@@ -60,7 +61,7 @@ int vtkRulerLineForInput::RequestInformation(
   return 1;
 }
 int vtkRulerLineForInput::RequestData(
-  vtkInformation* request, vtkInformationVector** inVectors, vtkInformationVector* outVector)
+  vtkInformation* vtkNotUsed(request), vtkInformationVector** inVectors, vtkInformationVector* outVector)
 {
   vtkDataObject* inputData = vtkDataObject::GetData(inVectors[0], 0);
   vtkBoundingBox bbox;
@@ -80,11 +81,11 @@ int vtkRulerLineForInput::RequestData(
     for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToFirstItem())
     {
       vtkDataObject* block = itr->GetCurrentDataObject();
-      vtkDataSet* dataset = vtkDataSet::SafeDownCast(block);
+      vtkDataSet* blockAsDataset = vtkDataSet::SafeDownCast(block);
       if (dataset)
       {
         double tmpBounds[6];
-        dataset->GetBounds(tmpBounds);
+        blockAsDataset->GetBounds(tmpBounds);
         bbox.AddBounds(tmpBounds);
       }
     }
