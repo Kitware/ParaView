@@ -230,7 +230,11 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   pqPythonManager* manager = this->pythonManager();
 #ifdef PARAVIEW_ENABLE_PYTHON
   this->clearViewsForLoadingState(server);
+  // comment in pqApplicationCore says this->LoadingState is unreliable, but it is still
+  // necessary to avoid warning messages
+  this->LoadingState = true;
   manager->executeScriptAndRender(filename);
+  this->LoadingState = false;
 #else
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
