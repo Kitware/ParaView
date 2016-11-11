@@ -17,7 +17,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCubeAxesActor.h"
 #include "vtkFloatArray.h"
-#include "vtkFrameBufferObject.h"
+#include "vtkFrameBufferObjectBase.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
 #include "vtkMatrix3x3.h"
