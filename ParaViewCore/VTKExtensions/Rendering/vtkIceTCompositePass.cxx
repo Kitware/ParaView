@@ -699,7 +699,24 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
       *(wcvc->Element[0] + i) = mv_matrix[i];
     }
     vtkMatrix4x4::Multiply4x4(wcvc, vcdc, wcdc);
+
+    // Swap out the projection matrix for the (possibly modified) one from
+    // iceT. This lets vtkCoordinate and vtkRenderer coordinate conversion
+    // methods to work properly.
+    vtkMatrix4x4 *oldExplicitProj = cam->GetExplicitProjectionTransformMatrix();
+    vtkNew<vtkMatrix4x4> tmpProjMat;
+    tmpProjMat->DeepCopy(vcdc);
+    tmpProjMat->Transpose();
+    bool oldUseExplicitProj = cam->GetUseExplicitProjectionTransformMatrix();
+    cam->SetExplicitProjectionTransformMatrix(tmpProjMat.Get());
+    cam->UseExplicitProjectionTransformMatrixOn();
+
     this->RenderPass->Render(render_state);
+
+    // Reset the projection matrix:
+    cam->SetExplicitProjectionTransformMatrix(oldExplicitProj);
+    cam->SetUseExplicitProjectionTransformMatrix(oldUseExplicitProj);
+
     cam->Modified();
 
     // copy the results
