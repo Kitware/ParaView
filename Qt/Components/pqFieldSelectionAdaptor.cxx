@@ -196,6 +196,9 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
 
   QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
   QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
+  QPixmap globalPixmap(":/pqWidgets/Icons/pqGlobalData16.png");
+  QPixmap rowPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png");
+  QPixmap edgePixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png");
 
   vtkSMArrayListDomain* ald =
     vtkSMArrayListDomain::SafeDownCast(this->Property->GetDomain("array_list"));
@@ -227,7 +230,20 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
         break;
 
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
         pix = &pointPixmap;
+        break;
+
+      case vtkDataObject::FIELD_ASSOCIATION_NONE:
+        pix = &globalPixmap;
+        break;
+
+      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+        pix = &rowPixmap;
+        break;
+
+      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+        pix = &edgePixmap;
         break;
     }
 
