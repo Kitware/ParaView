@@ -42,6 +42,7 @@ public:
 
     void MarkModified() VTK_OVERRIDE;
   void SetVisibility(bool) VTK_OVERRIDE;
+  void SetGridAxesVisibility(bool);
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
@@ -55,6 +56,9 @@ protected:
   bool AddToView(vtkView* view) VTK_OVERRIDE;
   bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
   bool IsCached(double cache_key) VTK_OVERRIDE;
+  void UpdateVisibility();
+
+  bool GridAxesVisibility;
 
   vtkNew<vtkPolyData> DummyPolyData;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;

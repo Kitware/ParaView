@@ -3828,10 +3828,9 @@
           <Proxy group="representations" name="GridAxesRepresentation" />
         </ProxyListDomain>
         <Hints>
-          <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
-               property on the GridAxes3DActor proxy for a checkbox
-               on the UI -->
-          <ProxyEditorPropertyWidget property="Visibility" />
+          <!-- tell pqProxyEditorPropertyWidget that use the "GridAxesVisibility"
+               property on the GridAxes3DRepr for a checkbox on the UI -->
+          <ProxyEditorPropertyWidget property="GridAxesVisibility" />
         </Hints>
       </ProxyProperty>
       <SubProxy>
@@ -5498,12 +5497,19 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridAxesVisibility"
+                         name="GridAxesVisibility"
+                         default_values="0"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Used for the checkbox in the UI.</Documentation>
+      </IntVectorProperty>
       <SubProxy command="SetGridAxes">
         <Proxy name="GridAxes"
                proxygroup="annotations"
                proxyname="GridAxes3DActor" />
         <ExposedProperties>
-          <Property name="Visibility" />
           <PropertyGroup label="Title Texts">
             <Property name="XTitle"/>
             <Property name="YTitle"/>

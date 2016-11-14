@@ -39,7 +39,6 @@ vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
   this->SelectionRepresentation->SetVisibility(false);
 
   this->GridAxesRepresentation = vtkPVGridAxes3DRepresentation::New();
-  this->GridAxesVisibility = false;
   this->GridAxesRepresentation->SetVisibility(false);
 }
 
@@ -56,8 +55,8 @@ void vtkPVCompositeRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
   this->SetSelectionVisibility(this->SelectionVisibility);
+  this->GridAxesRepresentation->SetVisibility(visible);
   this->SetPolarAxesVisibility(visible);
-  this->SetGridAxesVisibility(this->GridAxesVisibility);
 }
 
 //----------------------------------------------------------------------------
@@ -74,13 +73,6 @@ void vtkPVCompositeRepresentation::SetPolarAxesVisibility(bool visible)
   {
     this->PolarAxesRepresentation->SetParentVisibility(visible);
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCompositeRepresentation::SetGridAxesVisibility(bool visible)
-{
-  this->GridAxesVisibility = visible;
-  this->GridAxesRepresentation->SetVisibility(this->GetVisibility() && visible);
 }
 
 //----------------------------------------------------------------------------

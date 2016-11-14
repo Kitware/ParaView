@@ -1140,10 +1140,12 @@
         GridAxes3DActor can be used to render a grid in a render view.
       </Documentation>
 
+      <!-- Panel vis is 'never'. Use ProxyEditorPropertyWidget to set. -->
       <IntVectorProperty name="Visibility"
                          command="SetVisibility"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="0"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>
           Show/hide the axes grid.

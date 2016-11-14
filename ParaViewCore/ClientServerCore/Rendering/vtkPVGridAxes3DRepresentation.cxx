@@ -76,6 +76,7 @@ void vtkPVGridAxes3DRepresentation::SetGridAxes(vtkPVGridAxes3DActor* gridAxes)
   if (this->GridAxes)
   {
     this->GridAxes->Register(this);
+    this->GridAxes->SetVisibility(this->GridAxesVisibility);
   }
 
   this->Modified();
@@ -95,9 +96,17 @@ void vtkPVGridAxes3DRepresentation::MarkModified()
 void vtkPVGridAxes3DRepresentation::SetVisibility(bool vis)
 {
   this->Superclass::SetVisibility(vis);
-  if (this->GridAxes)
+  this->UpdateVisibility();
+}
+
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::SetGridAxesVisibility(bool vis)
+{
+  if (vis != this->GridAxesVisibility)
   {
-    this->GridAxes->SetVisibility(vis ? 1 : 0);
+    this->GridAxesVisibility = vis;
+    this->UpdateVisibility();
+    this->Modified();
   }
 }
 
@@ -152,8 +161,9 @@ int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
 
 //------------------------------------------------------------------------------
 vtkPVGridAxes3DRepresentation::vtkPVGridAxes3DRepresentation()
+  : GridAxesVisibility(false)
+  , GridAxes(NULL)
 {
-  this->GridAxes = NULL;
   this->CacheKeeper->SetInputData(this->DummyPolyData.Get());
 }
 
@@ -306,4 +316,13 @@ bool vtkPVGridAxes3DRepresentation::RemoveFromView(vtkView* view)
 bool vtkPVGridAxes3DRepresentation::IsCached(double cache_key)
 {
   return this->CacheKeeper->IsCached(cache_key);
+}
+
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::UpdateVisibility()
+{
+  if (this->GridAxes)
+  {
+    this->GridAxes->SetVisibility((this->GetVisibility() && this->GridAxesVisibility) ? 1 : 0);
+  }
 }

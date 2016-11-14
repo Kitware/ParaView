@@ -78,11 +78,6 @@ public:
    */
   virtual void SetPolarAxesVisibility(bool visible);
 
-  /*
-   * Set the grid axes visibility.
-   */
-  virtual void SetGridAxesVisibility(bool visible);
-
   //@{
   /**
    * Passed on to internal representations as well.
@@ -136,7 +131,6 @@ protected:
   vtkPolarAxesRepresentation* PolarAxesRepresentation;
 
   bool SelectionVisibility;
-  bool GridAxesVisibility;
 
 private:
   vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
