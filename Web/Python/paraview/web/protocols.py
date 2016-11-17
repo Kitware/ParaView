@@ -3,7 +3,7 @@ protocols that can be combined together to provide a flexible way to define
 very specific web application.
 """
 
-import os, sys, logging, types, inspect, traceback, logging, re, json
+import os, sys, logging, types, inspect, traceback, logging, re, json, fnmatch
 from time import time
 
 # import Twisted reactor for later callback
@@ -40,6 +40,23 @@ from vtk.vtkPVServerManagerCore import *
 # Needed for:
 #    vtkDataObject
 from vtk.vtkCommonDataModel import *
+
+# =============================================================================
+# Helper methods
+# =============================================================================
+
+def tryint(s):
+    try:
+        return int(s)
+    except:
+        return s
+
+def alphanum_key(s):
+    """ Turn a string into a list of string and number chunks.
+        "z23a" -> ["z", 23, "a"]
+    """
+    return [ tryint(c) for c in re.split('([0-9]+)', s) ]
+
 
 # =============================================================================
 #
@@ -1099,7 +1116,19 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             self.readAllowedProxies(proxyFile)
 
         if fileToLoad:
-            self.open(fileToLoad)
+            if '*' in fileToLoad:
+                fullBasePathForGroup = os.path.dirname(self.getAbsolutePath(fileToLoad))
+                fileNamePattern = os.path.basename(fileToLoad)
+                groupToLoad = []
+
+                for fileName in os.listdir(fullBasePathForGroup):
+                    if fnmatch.fnmatch(fileName, fileNamePattern):
+                        groupToLoad.append(os.path.join(fullBasePathForGroup, fileName))
+
+                groupToLoad.sort(key=alphanum_key)
+                self.open(groupToLoad)
+            else:
+                self.open(fileToLoad)
 
         self.simpleTypes = [int, float, list, str]
         self.view = simple.GetRenderView()
