@@ -5622,10 +5622,6 @@
             <Property name="ZAxisUseCustomLabels" />
             <Property name="ZAxisLabels" />
           </PropertyGroup>
-          <PropertyGroup label="Data Transform">
-            <Property name="DataScale" />
-            <Property name="DataPosition" />
-          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of GridAxesRepresentation -->
