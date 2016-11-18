@@ -55,6 +55,12 @@ public:
       // this will copy both checked and unchecked property values.
       this->Output->Copy(input);
     }
+    vtkSMProxy* parent = vtkSMProxy::SafeDownCast(caller);
+    if (parent && this->Output)
+    {
+      // this will update the output object.
+      this->Output->GetParent()->UpdateVTKObjects();
+    }
   }
 };
 }
@@ -97,6 +103,8 @@ public:
               input->AddObserver(vtkCommand::PropertyModifiedEvent, observer));
             this->ObserverIds.push_back(
               input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer));
+            this->ObserverIds.push_back(
+              parent->AddObserver(vtkCommand::UpdatePropertyEvent, observer));
             observer->FastDelete();
             output->Copy(input);
           }
