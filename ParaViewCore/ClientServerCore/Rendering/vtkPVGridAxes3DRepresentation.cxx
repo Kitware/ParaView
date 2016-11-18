@@ -111,6 +111,40 @@ void vtkPVGridAxes3DRepresentation::SetGridAxesVisibility(bool vis)
 }
 
 //------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::SetPosition(double pos[3])
+{
+  if (this->Position[0] != pos[0] || this->Position[1] != pos[1] || this->Position[2] != pos[2])
+  {
+    std::copy(pos, pos + 3, this->Position);
+    this->Modified();
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::SetPosition(double x, double y, double z)
+{
+  double tmp[3] = { x, y, z };
+  this->SetPosition(tmp);
+}
+
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::SetScale(double scale[3])
+{
+  if (this->Scale[0] != scale[0] || this->Scale[1] != scale[1] || this->Scale[2] != scale[2])
+  {
+    std::copy(scale, scale + 3, this->Scale);
+    this->Modified();
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::SetScale(double x, double y, double z)
+{
+  double tmp[3] = { x, y, z };
+  this->SetScale(tmp);
+}
+
+//------------------------------------------------------------------------------
 int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
@@ -165,6 +199,8 @@ vtkPVGridAxes3DRepresentation::vtkPVGridAxes3DRepresentation()
   , GridAxes(NULL)
 {
   this->CacheKeeper->SetInputData(this->DummyPolyData.Get());
+  std::fill(this->Position, this->Position + 3, 0.);
+  std::fill(this->Scale, this->Scale + 3, 1.);
 }
 
 //------------------------------------------------------------------------------
@@ -261,20 +297,20 @@ int vtkPVGridAxes3DRepresentation::RequestData(
 
     if (vtkMath::AreBoundsInitialized(bounds))
     {
+      // Account for transform info:
+      for (int i = 0; i < 3; ++i)
+      {
+        bounds[2 * i] = bounds[2 * i] * this->Scale[i] + this->Position[i];
+        bounds[2 * i + 1] = bounds[2 * i + 1] * this->Scale[i] + this->Position[i];
+      }
+
       // Create the dataset:
       vtkPoints* points = vtkPoints::New();
       this->DummyPolyData->SetPoints(points);
       points->Delete();
 
-      vtkCellArray* lines = vtkCellArray::New();
-      this->DummyPolyData->SetLines(lines);
-      lines->Delete();
-
       points->InsertNextPoint(bounds[0], bounds[2], bounds[4]);
       points->InsertNextPoint(bounds[1], bounds[3], bounds[5]);
-
-      vtkIdType line[2] = { 0, 1 };
-      lines->InsertNextCell(2, line);
     }
   }
 

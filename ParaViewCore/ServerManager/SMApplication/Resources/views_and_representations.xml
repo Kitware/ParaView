@@ -3822,8 +3822,7 @@
       </SubProxy>
       <ProxyProperty name="DataAxesGrid"
                      command="SetGridAxesRepresentation"
-                     panel_widget="proxy_editor"
-                     skip_dependency="1">
+                     panel_widget="proxy_editor">
         <ProxyListDomain name="proxy_list">
           <Proxy group="representations" name="GridAxesRepresentation" />
         </ProxyListDomain>
@@ -5505,6 +5504,29 @@
         <BooleanDomain name="bool" />
         <Documentation>Used for the checkbox in the UI.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            name="Position"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Keeps axes synced with actor transforms.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            panel_visibility="never"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Keeps axes synced with actor transforms.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ProxyList>
+          <Link name="Scale" with_property="Scale" />
+          <Link name="Position" with_property="Position" />
+        </ProxyList>
+      </Hints>
+
       <SubProxy command="SetGridAxes">
         <Proxy name="GridAxes"
                proxygroup="annotations"

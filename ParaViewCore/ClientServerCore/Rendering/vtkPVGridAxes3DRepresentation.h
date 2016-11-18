@@ -43,6 +43,11 @@ public:
     void MarkModified() VTK_OVERRIDE;
   void SetVisibility(bool) VTK_OVERRIDE;
   void SetGridAxesVisibility(bool);
+  void SetPosition(double pos[3]);
+  void SetPosition(double x, double y, double z);
+  void SetScale(double scale[3]);
+  void SetScale(double x, double y, double z);
+
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
@@ -59,6 +64,10 @@ protected:
   void UpdateVisibility();
 
   bool GridAxesVisibility;
+
+  // These are used to keep the axes up-to-date with actor transforms:
+  double Position[3];
+  double Scale[3];
 
   vtkNew<vtkPolyData> DummyPolyData;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
