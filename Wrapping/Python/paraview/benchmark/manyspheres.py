@@ -92,6 +92,7 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     if OSPRay:
         view.EnableOSPRay = 1
 
+    print 'Generating bounding box'
     import math
     edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
     box = Box()
@@ -102,6 +103,7 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     boxDisplay = Show()
     boxDisplay.SetRepresentationType('Outline')
 
+    print 'Generating all spheres'
     gen = ProgrammableSource(Script='''
 import math
 import vtk
@@ -127,8 +129,13 @@ controller = vtk.vtkMultiProcessController.GetGlobalController()
 np = controller.GetNumberOfProcesses()
 p = controller.GetLocalProcessId()
 
-ns=lambda p:num_spheres/np + (1 if p >= np-num_spheres%np else 0)
-start=int(sum([ns(P) for P in range(0,p)]))
+ns=lambda rank:num_spheres/np + (1 if rank >= np-num_spheres%np else 0)
+
+# Not sure why but the builtin sum() gives wierd results here so we'll just
+# so it manually
+start=0
+for r in range(0,p):
+    start += int(ns(r))
 end=start+ns(p)
 
 ss = vtk.vtkSphereSource()
@@ -136,7 +143,7 @@ ss.SetPhiResolution(res)
 ss.SetThetaResolution(res)
 
 ap = vtk.vtkAppendPolyData()
-print ('source',p,': generating',end - start,'spheres from',start,'to',end)
+print '  source %d: generating %d spheres from %d to %d' % (p, end-start, start, end)
 for x in range(start,end):
     i = x%edge
     j = math.floor((x / edge))%edge
@@ -164,46 +171,40 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
     genDisplay.SetRepresentationType('Surface')
 
     if color:
+        print 'Assigning colors'
         pidScale = ProcessIdScalars()
         pidScaleDisplay = Show()
 
-    deltaAz = 45.0 / num_frames
-    deltaEl = 45.0 / num_frames
-
-    Render()
-
-    # Use a dummy camera to workaround MPI bugs when directly interacting with
-    # the view's camera
-    c = vtk.vtkCamera()
-    c.SetPosition(view.CameraPosition)
-    c.SetFocalPoint(view.CameraFocalPoint)
-    c.SetViewUp(view.CameraViewUp)
-    c.SetViewAngle(view.CameraViewAngle)
-
+    print 'Repositioning initial camera'
+    c = GetActiveCamera()
     c.Azimuth(22.5)
     c.Elevation(22.5)
-    view.CameraPosition = c.GetPosition()
-    view.CameraFocalPoint = c.GetFocalPoint()
-    view.CameraViewUp = c.GetViewUp()
-    view.CameraViewAngle = c.GetViewAngle()
 
+    print 'Rendering first frame'
+    Render()
+
+    print 'Saving frame 0 screenshot'
     fdigits = int(math.ceil(math.log(num_frames, 10)))
     frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
+
+    print 'Gathering geometry counts'
     vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
-    num_polys = sum([r.GetRepresentedDataInformation().GetNumberOfCells() for r in view.Representations])
-    num_points = sum([r.GetRepresentedDataInformation().GetNumberOfPoints() for r in view.Representations])
+    num_polys = 0
+    num_points = 0
+    for r in view.Representations:
+        num_polys  += r.GetRepresentedDataInformation().GetNumberOfCells()
+        num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
     vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
+    print 'Beginning benchmark loop'
+    deltaAz = 45.0 / num_frames
+    deltaEl = 45.0 / num_frames
     memtime_stamp()
     fpsT0 = dt.datetime.now()
     for frame in range(1, num_frames):
         c.Azimuth(deltaAz)
         c.Elevation(deltaEl)
-        view.CameraPosition = c.GetPosition()
-        view.CameraFocalPoint = c.GetFocalPoint()
-        view.CameraViewUp = c.GetViewUp()
-        view.CameraViewAngle = c.GetViewAngle()
         Render()
         flush_render_buffer()
         memtime_stamp()
@@ -229,7 +230,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
         logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
                                     num_polys, 'Polys', save_logs,
                                     output_basename)
-        print ('Points / Frame: %(np)d' % {'np': num_points})
+        print 'Points / Frame: %(np)d' % {'np': num_points}
 
 
 def main(argv):
@@ -268,7 +269,8 @@ def main(argv):
 
     run(output_basename=args.output_basename, num_spheres=args.spheres,
         num_spheres_in_scene=args.spheres_in_scene, resolution=args.resolution,
-        view_size=args.view_size, num_frames=args.frames, color=args.color, OSPRay=args.OSPRay)
+        view_size=args.view_size, num_frames=args.frames, color=args.color,
+        OSPRay=args.OSPRay)
 
 if __name__ == "__main__":
     import sys
