@@ -1,0 +1,207 @@
+import datetime as dt
+from paraview import servermanager
+from paraview.simple import *
+#from paraview.benchmark import *
+import logbase, logparser
+
+logbase.maximize_logs()
+records = []
+n0 = dt.datetime.now()
+
+def get_render_view(size):
+    '''Similar to GetRenderView except if a new view is created, it's
+    created with the specified size instead of having t resize afterwards
+    '''
+    view = active_objects.view
+    if not view:
+        # it's possible that there's no active view, but a render view exists.
+        # If so, locate that and return it (before trying to create a new one).
+        view = servermanager.GetRenderView()
+    if not view:
+        view = CreateRenderView(ViewSize=size)
+    return view
+
+
+def save_render_buffer(fname):
+    '''Similar to SaveScreenshot except a re-render will not be triggered'''
+    import vtk
+    w = GetRenderView().SMProxy.GetRenderWindow()
+    w2i = vtk.vtkWindowToImageFilter()
+    w2i.ReadFrontBufferOff()
+    w2i.ShouldRerenderOff()
+    w2i.SetInput(w)
+    w2i.Modified()
+    tiff = TIFFWriter()
+    tiff.Input = w2i.GetOutput()
+    tiff.FileName = fname
+    tiff.UpdatePipeline()
+
+
+def flush_render_buffer():
+    '''When running as a single process use the WindowToImage filter to
+    force a framebuffer read.  This bypasses driver optimizations that
+    perform lazy rendering and allows you to get actual frame rates for
+    a single process with a GPU.  Multi-process doesn't need this since
+    compositing forces the frame buffer read.
+    '''
+
+    # If we're not using off-screen rendering then we can bypass this since
+    # the frame buffer display will force a GL flush
+    w = GetRenderView().SMProxy.GetRenderWindow()
+    if not w.GetOffScreenRendering():
+        return
+
+    import vtk
+
+    # If we're using MPI we can also bypass this since compositing will
+    # for a GL flush
+    controller = vtk.vtkMultiProcessController.GetGlobalController()
+    if controller.GetNumberOfProcesses() > 1:
+        return
+
+    # Force a GL flush by retrieving the frame buffer image
+    w2i = vtk.vtkWindowToImageFilter()
+    w2i.ReadFrontBufferOff()
+    w2i.ShouldRerenderOff()
+    w2i.SetInput(w)
+    w2i.Modified()
+    w2i.Update()
+
+
+def memtime_stamp():
+    global records
+    global n0
+    m = logbase.get_memuse()
+    n1 = dt.datetime.now()
+    et = n1 - n0
+    print (et, m)
+    n0 = n1
+    records.append([et, m])
+
+
+def run(output_basename='log', dimension=100, view_size=(1920, 1080),
+        num_frames=10, save_logs=True, color=False, OSPRay=False):
+
+    import vtk
+    controller = vtk.vtkMultiProcessController.GetGlobalController()
+
+    view = get_render_view(view_size)
+    if OSPRay:
+        view.EnableOSPRay = 1
+
+    print 'Generating wavelet'
+    wavelet = Wavelet()
+    d2 = dimension/2
+    wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
+    wavelet.Maximum = 100.0
+    waveletDisplay = Show()
+    waveletDisplay.SetRepresentationType('Outline')
+
+    print 'Calculating 10 isocontours'
+    contour = Contour(Input=wavelet)
+    contour.ContourBy = ['POINTS', 'RTData']
+    contour.PointMergeMethod = 'Uniform Binning'
+    contour.ComputeScalars = 1
+    contour.Isosurfaces = list(map(float, range(10, 110, 10)))
+    contourDisplay = Show()
+    contourDisplay.SetRepresentationType('Surface')
+
+    if color:
+        ColorBy(contourDisplay, ('POINTS', 'RTData'))
+        contourDisplay.RescaleTransferFunctionToDataRange(True, False)
+
+    print 'Repositioning initial camera'
+    c = GetActiveCamera()
+    c.Azimuth(22.5)
+    c.Elevation(22.5)
+
+    print 'Rendering first frame'
+    Render()
+
+    print 'Saving frame 0 screenshot'
+    import math
+    fdigits = int(math.ceil(math.log(num_frames, 10)))
+    frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
+    SaveScreenshot(frame_fname_fmt % {'f': 0})
+
+    print 'Gathering geometry counts'
+    vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
+    num_polys = 0
+    num_points = 0
+    for r in view.Representations:
+        num_polys  += r.GetRepresentedDataInformation().GetNumberOfCells()
+        num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
+    vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
+
+    print 'Beginning benchmark loop'
+    deltaAz = 45.0 / num_frames
+    deltaEl = 45.0 / num_frames
+    memtime_stamp()
+    fpsT0 = dt.datetime.now()
+    for frame in range(1, num_frames):
+        c.Azimuth(deltaAz)
+        c.Elevation(deltaEl)
+        Render()
+        flush_render_buffer()
+        memtime_stamp()
+    fpsT1 = dt.datetime.now()
+
+    if controller.GetLocalProcessId() == 0:
+        if save_logs:
+            # Save the arguments this was executed with
+            with open(output_basename + '.args.txt', 'w') as argfile:
+                argfile.write(str({
+                    'output_basename': output_basename,
+                    'dimension': dimension,
+                    'view_size': view_size,
+                    'num_frames': num_frames,
+                    'save_logs': save_logs}))
+
+            # Save the memory statistics collected
+            with open(output_basename + '.mem.txt', 'w') as ofile:
+                ofile.write('\n'.join([str(x) for x in records]))
+
+        # Process frame timing statistics
+        logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
+                                    num_polys, 'Polys', save_logs,
+                                    output_basename)
+        print 'Points / Frame: %(np)d' % {'np': num_points}
+
+
+def main(argv):
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Benchmark ParaView geometry rendering')
+    parser.add_argument('-o', '--output-basename', default='log', type=str,
+                        help='Basename to use for generated output files')
+    parser.add_argument('-d', '--dimension', default=100, type=int,
+                        help='The dimension of each side of the cubic volume')
+    parser.add_argument('-v', '--view-size', default=[400, 400],
+                        type=lambda s: [int(x) for x in s.split(',')],
+                        help='View size used to render')
+    parser.add_argument('-f', '--frames', default=10, type=int,
+                        help='Number of frames')
+    parser.add_argument('-c', '--color', action='store_true',
+                        help='Enable color renderings')
+    parser.add_argument('-y', '--OSPRay', action='store_true',
+                        help='Use OSPRAY to render')
+
+    args = parser.parse_args(argv)
+
+    options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
+    url = options.GetServerURL()
+    if url:
+        import re
+        m = re.match('([^:/]*://)?([^:]*)(:([0-9]+))?', url)
+        if m.group(4):
+            Connect(m.group(2), m.group(4))
+        else:
+            Connect(m.group(2))
+
+    run(output_basename=args.output_basename, dimension=args.dimension,
+        view_size=args.view_size, num_frames=args.frames, color=args.color,
+        OSPRay=args.OSPRay)
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1:])
