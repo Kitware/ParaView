@@ -32,6 +32,10 @@
         "type":"BOOL",
         "value":"ON"
       },
+      { "name":"Module_vtkFiltersParallel",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name":"Module_vtkFiltersSources",
         "type":"BOOL",
         "value":"ON"
@@ -81,6 +85,18 @@
       ],
       "cswrap":true,
       "pythonwrap":true
+    },
+    { "name": "vtkFiltersParallel",
+      "path": "VTK/Filters/Parallel",
+      "include": [
+        { "class": "vtkAggregateDataSetFilter" }
+      ],
+      "replace": [
+        { "path": "VTK/Filters/Parallel/module.cmake" },
+        { "path": "VTK/Filters/Parallel/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
     },
     { "name":"vtkFiltersSources",
       "path":"VTK/Filters/Sources",
