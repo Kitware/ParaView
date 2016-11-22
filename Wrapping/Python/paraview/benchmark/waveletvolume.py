@@ -79,11 +79,8 @@ def memtime_stamp():
     records.append([et, m])
 
 
-def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
-        resolution=725, view_size=(1920, 1080), num_frames=10, save_logs=True,
-        color=False, OSPRay=False):
-    if num_spheres_in_scene is None:
-        num_spheres_in_scene = num_spheres
+def run(output_basename='log', dimension=100, view_size=(1920, 1080),
+        num_frames=10, save_logs=True, OSPRay=False):
 
     import vtk
     controller = vtk.vtkMultiProcessController.GetGlobalController()
@@ -92,88 +89,13 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     if OSPRay:
         view.EnableOSPRay = 1
 
-    print 'Generating bounding box'
-    import math
-    edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
-    box = Box()
-    box.XLength = edge
-    box.YLength = edge
-    box.ZLength = edge
-    box.Center = [edge * 0.5, edge * 0.5, edge * 0.5]
-    boxDisplay = Show()
-    boxDisplay.SetRepresentationType('Outline')
-
-    print 'Generating all spheres'
-    gen = ProgrammableSource(Script='''
-import math
-import vtk
-
-try:
-    num_spheres
-except:
-    num_spheres = 8
-
-try:
-    num_spheres_in_scene
-except:
-    num_spheres_in_scene = num_spheres
-
-try:
-    res
-except:
-    res = 725
-
-edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
-
-controller = vtk.vtkMultiProcessController.GetGlobalController()
-np = controller.GetNumberOfProcesses()
-p = controller.GetLocalProcessId()
-
-ns=lambda rank:num_spheres/np + (1 if rank >= np-num_spheres%np else 0)
-
-# Not sure why but the builtin sum() gives wierd results here so we'll just
-# so it manually
-start=0
-for r in range(0,p):
-    start += int(ns(r))
-end=start+ns(p)
-
-ss = vtk.vtkSphereSource()
-ss.SetPhiResolution(res)
-ss.SetThetaResolution(res)
-
-ap = vtk.vtkAppendPolyData()
-print '  source %d: generating %d spheres from %d to %d' % (p, end-start, start, end)
-for x in range(start,end):
-    i = x%edge
-    j = math.floor((x / edge))%edge
-    k = math.floor((x / (edge * edge)))
-    ss.SetCenter(i + 0.5,j + 0.5,k + 0.5)
-    ss.Update()
-    pd = vtk.vtkPolyData()
-    pd.ShallowCopy(ss.GetOutput())
-    # pd.GetPointData().RemoveArray('Normals')
-    ap.AddInputData(pd)
-
-ap.Update()
-self.GetOutput().ShallowCopy(ap.GetOutput())
-''')
-
-    paramprop = gen.GetProperty('Parameters')
-    paramprop.SetElement(0, 'num_spheres_in_scene')
-    paramprop.SetElement(1, str(num_spheres_in_scene))
-    paramprop.SetElement(2, 'num_spheres')
-    paramprop.SetElement(3, str(num_spheres))
-    paramprop.SetElement(4, 'res')
-    paramprop.SetElement(5, str(resolution))
-    gen.UpdateProperty('Parameters')
-    genDisplay = Show()
-    genDisplay.SetRepresentationType('Surface')
-
-    if color:
-        print 'Assigning colors'
-        pidScale = ProcessIdScalars()
-        pidScaleDisplay = Show()
+    print 'Generating wavelet'
+    wavelet = Wavelet()
+    d2 = dimension/2
+    wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
+    wavelet.Maximum = 100.0
+    waveletDisplay = Show()
+    waveletDisplay.SetRepresentationType('Volume')
 
     print 'Repositioning initial camera'
     c = GetActiveCamera()
@@ -184,17 +106,16 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
     Render()
 
     print 'Saving frame 0 screenshot'
+    import math
     fdigits = int(math.ceil(math.log(num_frames, 10)))
     frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
     print 'Gathering geometry counts'
     vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
-    num_polys = 0
-    num_points = 0
+    num_voxels = 0
     for r in view.Representations:
-        num_polys  += r.GetRepresentedDataInformation().GetNumberOfCells()
-        num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
+        num_voxels += r.GetRepresentedDataInformation().GetNumberOfCells()
     vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
     print 'Beginning benchmark loop'
@@ -216,11 +137,10 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
             with open(output_basename + '.args.txt', 'w') as argfile:
                 argfile.write(str({
                     'output_basename': output_basename,
-                    'num_spheres': num_spheres,
-                    'num_spheres_in_scene': num_spheres_in_scene,
-                    'resolution': resolution, 'view_size': view_size,
-                    'num_frames': num_frames, 'save_logs': save_logs,
-                    'color': color}))
+                    'dimension': dimension,
+                    'view_size': view_size,
+                    'num_frames': num_frames,
+                    'save_logs': save_logs}))
 
             # Save the memory statistics collected
             with open(output_basename + '.mem.txt', 'w') as ofile:
@@ -228,9 +148,8 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
 
         # Process frame timing statistics
         logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
-                                    num_polys, 'Polys', save_logs,
+                                    num_voxels, 'Voxels', save_logs,
                                     output_basename)
-        print 'Points / Frame: %(np)d' % {'np': num_points}
 
 
 def main(argv):
@@ -239,19 +158,13 @@ def main(argv):
         description='Benchmark ParaView geometry rendering')
     parser.add_argument('-o', '--output-basename', default='log', type=str,
                         help='Basename to use for generated output files')
-    parser.add_argument('-s', '--spheres', default=100, type=int,
-                        help='The total number of spheres to render')
-    parser.add_argument('-n', '--spheres-in-scene', type=int,
-                        help='The number of spheres in the entire scene, including those not rendered.')
-    parser.add_argument('-r', '--resolution', default=4, type=int,
-                        help='Theta and Phi resolution to use for the spheres')
+    parser.add_argument('-d', '--dimension', default=100, type=int,
+                        help='The dimension of each side of the cubic volume')
     parser.add_argument('-v', '--view-size', default=[400, 400],
                         type=lambda s: [int(x) for x in s.split(',')],
                         help='View size used to render')
     parser.add_argument('-f', '--frames', default=10, type=int,
                         help='Number of frames')
-    parser.add_argument('-c', '--color', action='store_true',
-                        help='Enable color renderings')
     parser.add_argument('-y', '--OSPRay', action='store_true',
                         help='Use OSPRAY to render')
 
@@ -267,10 +180,8 @@ def main(argv):
         else:
             Connect(m.group(2))
 
-    run(output_basename=args.output_basename, num_spheres=args.spheres,
-        num_spheres_in_scene=args.spheres_in_scene, resolution=args.resolution,
-        view_size=args.view_size, num_frames=args.frames, color=args.color,
-        OSPRay=args.OSPRay)
+    run(output_basename=args.output_basename, dimension=args.dimension,
+        view_size=args.view_size, num_frames=args.frames, OSPRay=args.OSPRay)
 
 if __name__ == "__main__":
     import sys
