@@ -182,8 +182,9 @@ macro(pv_process_plugins root_src root_build)
     set(PARAVIEW_BUILD_PLUGIN_${pv-plugin} ${${pv-plugin}_DEFAULT_ENABLED}
       CACHE BOOL "Build ${pv-plugin} Plugin")
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_${pv-plugin})
-    cmake_dependent_option(PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin} "Load ${pv-plugin} Plugin Automatically" OFF
-                           "PARAVIEW_BUILD_PLUGIN_${pv-plugin}" ${${pv-plugin}_AUTOLOAD})
+    cmake_dependent_option(PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin}
+      "Load ${pv-plugin} Plugin Automatically"
+      ${${pv-plugin}_AUTOLOAD} "PARAVIEW_BUILD_PLUGIN_${pv-plugin}" OFF)
     mark_as_advanced(PARAVIEW_AUTOLOAD_PLUGIN_${pv-plugin})
   endforeach()
 
