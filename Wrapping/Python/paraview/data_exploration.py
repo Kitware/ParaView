@@ -695,7 +695,7 @@ class ImageResampler(object):
         self.array_colors = array_colors
         self.custom_probing_bounds = custom_probing_bounds
         self.number_of_slices = sampling_dimesions[2]
-        self.resampler = simple.ImageResampling(Input=data_to_probe, SamplingDimension=sampling_dimesions)
+        self.resampler = simple.ResampleToImage(Input=data_to_probe, SamplingDimensions=sampling_dimesions)
         if custom_probing_bounds:
             self.resampler.UseInputBounds = 0
             self.resampler.CustomSamplingBounds = custom_probing_bounds
