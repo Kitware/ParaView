@@ -158,8 +158,24 @@
           <String value="Projected tetra" />
           <String value="Z sweep" />
           <String value="Bunyk ray cast" />
+          <String value="Resample To Image" />
         </StringListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetSamplingDimensions"
+                         default_values="128 128 128"
+                         name="SamplingDimensions"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" min="1 1 1"/>
+        <Documentation>
+        How many linear samples we want along each axis
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="SelectMapper"
+                                   value="Resample To Image" />
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
                             default_values="1"
                             name="ScalarOpacityUnitDistance"
@@ -205,6 +221,11 @@
                proxygroup="mappers"
                proxyname="ProjectedTetrahedraMapper"></Proxy>
         <ShareProperties subproxy="VolumeDummyMapper"></ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="VolumeResampleToImageMapper"
+               proxygroup="mappers"
+               proxyname="UnstructuredGridResampleToImageMapper"></Proxy>
       </SubProxy>
       <!-- end of UnstructuredGridVolumeRepresentation -->
     </RepresentationProxy>
