@@ -74,7 +74,7 @@ def memtime_stamp():
     m = logbase.get_memuse()
     n1 = dt.datetime.now()
     et = n1 - n0
-    print (et, m)
+    print(et, m)
     n0 = n1
     records.append([et, m])
 
@@ -89,7 +89,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
     if OSPRay:
         view.EnableOSPRay = 1
 
-    print 'Generating wavelet'
+    print('Generating wavelet')
     wavelet = Wavelet()
     d2 = dimension/2
     wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
@@ -97,7 +97,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
     waveletDisplay = Show()
     waveletDisplay.SetRepresentationType('Outline')
 
-    print 'Calculating 10 isocontours'
+    print('Calculating 10 isocontours')
     contour = Contour(Input=wavelet)
     contour.ContourBy = ['POINTS', 'RTData']
     contour.PointMergeMethod = 'Uniform Binning'
@@ -110,21 +110,21 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
         ColorBy(contourDisplay, ('POINTS', 'RTData'))
         contourDisplay.RescaleTransferFunctionToDataRange(True, False)
 
-    print 'Repositioning initial camera'
+    print('Repositioning initial camera')
     c = GetActiveCamera()
     c.Azimuth(22.5)
     c.Elevation(22.5)
 
-    print 'Rendering first frame'
+    print('Rendering first frame')
     Render()
 
-    print 'Saving frame 0 screenshot'
+    print('Saving frame 0 screenshot')
     import math
     fdigits = int(math.ceil(math.log(num_frames, 10)))
     frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
-    print 'Gathering geometry counts'
+    print('Gathering geometry counts')
     vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
     num_polys = 0
     num_points = 0
@@ -133,7 +133,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
         num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
     vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
-    print 'Beginning benchmark loop'
+    print('Beginning benchmark loop')
     deltaAz = 45.0 / num_frames
     deltaEl = 45.0 / num_frames
     memtime_stamp()
@@ -165,7 +165,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
         logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
                                     num_polys, 'Polys', save_logs,
                                     output_basename)
-        print 'Points / Frame: %(np)d' % {'np': num_points}
+        print('Points / Frame:', num_points)
 
 
 def main(argv):

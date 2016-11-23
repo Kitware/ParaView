@@ -74,7 +74,7 @@ def memtime_stamp():
     m = logbase.get_memuse()
     n1 = dt.datetime.now()
     et = n1 - n0
-    print (et, m)
+    print(et, m)
     n0 = n1
     records.append([et, m])
 
@@ -89,7 +89,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
     if OSPRay:
         view.EnableOSPRay = 1
 
-    print 'Generating wavelet'
+    print('Generating wavelet')
     wavelet = Wavelet()
     d2 = dimension/2
     wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
@@ -97,28 +97,28 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
     waveletDisplay = Show()
     waveletDisplay.SetRepresentationType('Volume')
 
-    print 'Repositioning initial camera'
+    print('Repositioning initial camera')
     c = GetActiveCamera()
     c.Azimuth(22.5)
     c.Elevation(22.5)
 
-    print 'Rendering first frame'
+    print('Rendering first frame')
     Render()
 
-    print 'Saving frame 0 screenshot'
+    print('Saving frame 0 screenshot')
     import math
     fdigits = int(math.ceil(math.log(num_frames, 10)))
     frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
-    print 'Gathering geometry counts'
+    print('Gathering geometry counts')
     vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
     num_voxels = 0
     for r in view.Representations:
         num_voxels += r.GetRepresentedDataInformation().GetNumberOfCells()
     vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
-    print 'Beginning benchmark loop'
+    print('Beginning benchmark loop')
     deltaAz = 45.0 / num_frames
     deltaEl = 45.0 / num_frames
     memtime_stamp()
