@@ -53,6 +53,7 @@ vtkSMProperty::vtkSMProperty()
   this->PanelVisibility = 0;
   this->PanelVisibilityDefaultForRepresentation = 0;
   this->PanelWidget = 0;
+  this->DisableSubTrace = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -96,6 +97,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetPanelVisibility(0);
   this->SetPanelVisibilityDefaultForRepresentation(0);
   this->SetPanelWidget(0);
+  this->SetDisableSubTrace(0);
   if (this->Links)
   {
     this->Links->Delete();
@@ -463,6 +465,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   if (panel_widget)
   {
     this->SetPanelWidget(panel_widget);
+  }
+
+  const char* disable_sub_trace = element->GetAttribute("disable_sub_trace");
+  if (disable_sub_trace)
+  {
+    this->SetDisableSubTrace(disable_sub_trace);
   }
 
   // Manage deprecated XML definition
