@@ -43,6 +43,19 @@ Learning Resources
 [Kitware Training]: http://www.kitware.com/products/protraining.php
 [Guide]: http://www.paraview.org/paraview-guide/
 
+
+Building
+========
+
+The easiest method for beginners to build ParaView from source is using the
+[ParaView Superbuild][sbrepo].  It is possible to build ParaView without using the
+superbuild as well. A little dated version of those instructions are
+available [here][buildinstall].  These will be updated in near future
+(contributions are welcome).
+
+[sbrepo]: https://gitlab.kitware.com/paraview/paraview-superbuild
+[buildinstall]: http://www.paraview.org/Wiki/ParaView:Build_And_Install
+
 Reporting Bugs
 ==============
 
