@@ -323,6 +323,7 @@
     { "name": "vtkFiltersSources",
       "path": "VTK/Filters/Sources",
       "include": [
+        { "class": "vtkEllipseArcSource" },
         { "class": "vtkFrustumSource" },
         { "class": "vtkOutlineSource" }
       ],
@@ -442,6 +443,7 @@
         { "class": "vtkAxisActor" },
         { "class": "vtkAxisFollower" },
         { "class": "vtkCubeAxesActor" },
+        { "class": "vtkPolarAxesActor" },
         { "class": "vtkProp3DAxisFollower" },
         { "class": "vtkScalarBarActor" }
       ],
@@ -541,6 +543,7 @@
         { "class": "vtkGeometryRepresentationWithFaces" },
         { "class": "vtkGlyph3DRepresentation" },
         { "class": "vtkOutlineRepresentation" },
+        { "class": "vtkPolarAxesRepresentation" },
         { "class": "vtkPVCacheKeeper" },
         { "class": "vtkPVCacheKeeperPipeline" },
         { "class": "vtkPVClientServerSynchronizedRenderers" },
@@ -968,6 +971,7 @@
         "ImageSliceRepresentation",
         "MoleculeRepresentation",
         "OutlineRepresentation",
+        "PolarAxesRepresentation",
         "PVRepresentationBase",
         "RenderView",
         "SelectionRepresentation",

@@ -15,6 +15,7 @@
 #include "vtkSMProxyListDomain.h"
 
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
@@ -22,6 +23,8 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxyInternals.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -98,6 +101,43 @@ public:
             output->Copy(input);
           }
         }
+      }
+      else if (child && child->GetName() && strcmp(child->GetName(), "ShareProperties") == 0)
+      {
+        const char* name = child->GetAttribute("parent_subproxy");
+        if (!name || !name[0])
+        {
+          continue;
+        }
+        vtkSMProxy* src_subproxy = parent->GetSubProxy(name);
+        if (!src_subproxy)
+        {
+          vtkErrorWithObjectMacro(parent, "Subproxy " << name << " must be defined before "
+            "its properties can be shared with another subproxy.");
+          continue;
+        }
+        vtkNew<vtkSMProxyLink> sharingLink;
+        sharingLink->PropagateUpdateVTKObjectsOff();
+
+        // Read the exceptions.
+        for (unsigned int j=0; j < child->GetNumberOfNestedElements(); j++)
+        {
+          vtkPVXMLElement* exceptionProp = child->GetNestedElement(j);
+          if (strcmp(exceptionProp->GetName(), "Exception") != 0)
+          {
+            continue;
+          }
+          const char* exp_name = exceptionProp->GetAttribute("name");
+          if (!exp_name)
+          {
+            vtkErrorWithObjectMacro(parent, "Exception tag must have the attribute 'name'.");
+            continue;
+          }
+          sharingLink->AddException(exp_name);
+        }
+        sharingLink->AddLinkedProxy(src_subproxy, vtkSMLink::INPUT);
+        sharingLink->AddLinkedProxy(plproxy, vtkSMLink::OUTPUT);
+        parent->Internals->SubProxyLinks.push_back(sharingLink.Get());
       }
     }
   }

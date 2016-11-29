@@ -938,6 +938,8 @@ protected:
 
 private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement, const char* subproxy_name);
+
+  friend class vtkSMProxyInfo;
 };
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used
