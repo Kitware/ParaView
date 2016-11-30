@@ -32,6 +32,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkProperty.h" // needed for VTK_POINTS etc.
 
+class vtkCallbackCommand;
 class vtkCompositeDataDisplayAttributes;
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
@@ -335,6 +336,12 @@ protected:
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
   virtual bool IsCached(double cache_key);
+
+  // Callback registered with the InternalProgressObserver.
+  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void* clientdata, void*);
+  void InternalProgressCallback(vtkAlgorithm* algorithm);
+  // The observer to report progress from the internal filters.
+  vtkCallbackCommand* InternalProgressObserver;
 
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;

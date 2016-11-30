@@ -1453,7 +1453,12 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     if (input->GetNumberOfCells() > 0)
     {
+      this->DataSetSurfaceFilter->AddObserver(
+        vtkCommand::ProgressEvent, this->InternalProgressObserver);
+
       this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
+      
+      this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
     }
 
     if (this->Triangulate && (output->GetNumberOfPolys() > 0))
