@@ -73,6 +73,12 @@ public:
    */
   vtkGetStringMacro(StateFileName); // Bug #5711
                                     //@}
+  //@{
+  /**
+   * Servers file to load on startup.
+   */
+  vtkGetStringMacro(ServersFileName);
+                                    //@}
 
   //@{
   /**
@@ -278,6 +284,7 @@ protected:
   int MultiClientModeWithErrorMacro;
   int MultiServerMode;
   int SymmetricMPIMode;
+  char* ServersFileName;
   char* StateFileName; // loading state file(Bug #5711)
   char* TestPlugin;    // to load plugins from command line for tests
   char* TestPluginPath;
@@ -286,6 +293,7 @@ protected:
 
   // inline setters
   vtkSetStringMacro(ServerURL);
+  vtkSetStringMacro(ServersFileName);
   vtkSetStringMacro(StateFileName);
   vtkSetStringMacro(TestPlugin);
   vtkSetStringMacro(TestPluginPath);

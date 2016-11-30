@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
+#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
@@ -51,7 +52,11 @@ namespace
 // get path to user-servers
 static QString userServers()
 {
-  return pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
+  const char* serversFileName =
+    vtkProcessModule::GetProcessModule()->GetOptions()->GetServersFileName();
+
+  return serversFileName ? serversFileName :
+    pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
 }
 
 // get path to shared system servers.
