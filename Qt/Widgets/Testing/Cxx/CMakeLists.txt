@@ -1,5 +1,4 @@
 SET(MyTests
-  CTKSliders
   FlatTreeView
   Animation
   )
