@@ -354,7 +354,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     # iterate over all views that were saved in state and update write requencies
     if export_rendering:
         pxm = servermanager.ProxyManager()
-        for key, vtuple in screenshot_info.iteritems():
+        for key, vtuple in screenshot_info.items():
             view = pxm.GetProxy("views", key)
             if not view: continue
             image_write_frequency = int(vtuple[1])

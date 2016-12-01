@@ -49,7 +49,7 @@ class _PVBlotInterp(cmd.Cmd):
     _blotish_commands = {}
     def __init__(self, completekey='tab', stdin=None, stdout=None):
         cmd.Cmd.__init__(self, completekey, stdin, stdout)
-        for funcname, func in blotish.__dict__.iteritems():
+        for funcname, func in blotish.__dict__.items():
             if funcname[0] == '_' or not inspect.isfunction(func): continue
             if not func.__doc__ or not len(func.__doc__):
                 raise blotish.BlotishError("Method %s is undocumented." % funcname)

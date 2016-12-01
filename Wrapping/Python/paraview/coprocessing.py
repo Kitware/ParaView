@@ -164,7 +164,7 @@ class CoProcessor(object):
                self.__InitialFrequencies = None
         else:
             simtime = datadescription.GetTime()
-            for name, producer in self.__ProducersMap.iteritems():
+            for name, producer in self.__ProducersMap.items():
                 producer.GetClientSideObject().SetOutput(
                     datadescription.GetInputDescriptionByName(name).GetGrid(),
                     simtime)

@@ -1119,7 +1119,7 @@ class CallMethod(TraceItem):
             pass
         accessor = Trace.get_accessor(sm._getPyProxy(proxy))
         args = [str(CallMethod.marshall(x)) for x in args]
-        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s.%s(%s)" % (accessor, methodname, ", ".join(args)))
         return to_trace
 
@@ -1172,7 +1172,7 @@ class CallFunction(TraceItem):
         except KeyError:
             pass
         args = [str(CallMethod.marshall(x)) for x in args]
-        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
