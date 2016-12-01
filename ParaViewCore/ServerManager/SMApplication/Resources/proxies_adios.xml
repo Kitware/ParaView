@@ -4,6 +4,7 @@
     <!-- ================================================================= -->
     <WriterProxy class="vtkADIOSWriter"
                   name="ADIOSWriter"
+                  supports_parallel="1"
                   mpi_required="true">
       <Documentation short_help="Write ADIOS BP files using VTKs schema.">
         Writer to write ADIOS BP files using a VTK specific schema
