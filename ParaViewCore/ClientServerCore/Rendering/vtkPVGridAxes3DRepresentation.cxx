@@ -22,6 +22,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMolecule.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPVCacheKeeper.h"
@@ -212,8 +213,9 @@ vtkPVGridAxes3DRepresentation::~vtkPVGridAxes3DRepresentation()
 //------------------------------------------------------------------------------
 int vtkPVGridAxes3DRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMolecule");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -232,6 +234,8 @@ int vtkPVGridAxes3DRepresentation::RequestData(
     double bounds[6];
     vtkDataSet* ds = vtkDataSet::GetData(inInfoVec[0], 0);
     vtkCompositeDataSet* cds = vtkCompositeDataSet::GetData(inInfoVec[0], 0);
+    vtkMolecule* mol = vtkMolecule::SafeDownCast(
+      inInfoVec[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT()));
 
     if (ds)
     {
@@ -253,6 +257,10 @@ int vtkPVGridAxes3DRepresentation::RequestData(
       }
       iter->Delete();
       bbox.GetBounds(bounds);
+    }
+    else if (mol)
+    {
+      mol->GetBounds(bounds);
     }
     else
     {
