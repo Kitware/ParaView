@@ -17,12 +17,14 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
+#include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMolecule.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPVCacheKeeper.h"
@@ -32,11 +34,6 @@
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkRenderer.h"
-
-#ifdef PARAVIEW_USE_MPI
-#include "vtkCommunicator.h"
-#include "vtkMultiProcessController.h"
-#endif // PARAVIEW_USE_MPI
 
 #include <algorithm>
 
@@ -77,10 +74,11 @@ void vtkPVGridAxes3DRepresentation::SetGridAxes(vtkPVGridAxes3DActor* gridAxes)
   if (this->GridAxes)
   {
     this->GridAxes->Register(this);
-    this->GridAxes->SetVisibility(this->GridAxesVisibility);
   }
 
-  this->Modified();
+  this->UpdateVisibility();
+
+  this->MarkModified();
 }
 
 //------------------------------------------------------------------------------
@@ -107,7 +105,7 @@ void vtkPVGridAxes3DRepresentation::SetGridAxesVisibility(bool vis)
   {
     this->GridAxesVisibility = vis;
     this->UpdateVisibility();
-    this->Modified();
+    this->MarkModified();
   }
 }
 
@@ -117,7 +115,7 @@ void vtkPVGridAxes3DRepresentation::SetPosition(double pos[3])
   if (this->Position[0] != pos[0] || this->Position[1] != pos[1] || this->Position[2] != pos[2])
   {
     std::copy(pos, pos + 3, this->Position);
-    this->Modified();
+    this->MarkModified();
   }
 }
 
@@ -134,7 +132,7 @@ void vtkPVGridAxes3DRepresentation::SetScale(double scale[3])
   if (this->Scale[0] != scale[0] || this->Scale[1] != scale[1] || this->Scale[2] != scale[2])
   {
     std::copy(scale, scale + 3, this->Scale);
-    this->Modified();
+    this->MarkModified();
   }
 }
 
@@ -267,7 +265,6 @@ int vtkPVGridAxes3DRepresentation::RequestData(
       vtkMath::UninitializeBounds(bounds);
     }
 
-#ifdef PARAVIEW_USE_MPI
     vtkMultiProcessController* mpc = vtkMultiProcessController::GetGlobalController();
     if (mpc && mpc->GetNumberOfProcesses() > 1)
     {
@@ -301,7 +298,6 @@ int vtkPVGridAxes3DRepresentation::RequestData(
       bounds[4] = -gBounds[4];
       bounds[5] = gBounds[5];
     }
-#endif // PARAVIEW_USE_MPI
 
     if (vtkMath::AreBoundsInitialized(bounds))
     {
