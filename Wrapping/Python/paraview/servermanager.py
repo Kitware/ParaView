@@ -354,6 +354,9 @@ class Proxy(object):
         "Returns false if the underlying SMProxies are the same."
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash(self.SMProxy)
+
     def __iter__(self):
         "Creates an iterator for the properties."
         return PropertyIterator(self)

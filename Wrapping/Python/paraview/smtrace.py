@@ -67,7 +67,12 @@ garbage collected since there's no reference to it.
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
+import sys
 from paraview.vtk import vtkTimeStamp
+
+
+if sys.version_info >= (3,):
+    xrange = range
 
 class TraceOutput:
   """Internal class used to collect the trace output. Everytime anything is pushed into

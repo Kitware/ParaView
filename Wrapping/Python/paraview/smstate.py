@@ -13,6 +13,10 @@ Note, this cannot be called when Python tracing is active.
 from paraview import servermanager as sm
 from paraview import smtrace
 from paraview import simple
+import sys
+
+if sys.version_info >= (3,):
+    xrange = range
 
 class supported_proxies(object):
     """filter object used to hide proxies that are currently not supported by
