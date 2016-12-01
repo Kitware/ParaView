@@ -53,6 +53,7 @@ public:
   QPointer<pqProxyWidget> ProxyWidget;
   bool ShowingAdvancedProperties;
   bool HideProxyWidgetsInDefaultView;
+  bool HideProxyWidgets;
   pqInternal(pqProxySelectionWidget* self)
     : ShowingAdvancedProperties(false)
     , HideProxyWidgetsInDefaultView(false)
@@ -89,7 +90,8 @@ public:
     this->ShowingAdvancedProperties = showing_advanced_properties;
     if (this->ProxyWidget)
     {
-      if (!showing_advanced_properties && this->HideProxyWidgetsInDefaultView)
+      if (this->HideProxyWidgets || 
+        (!showing_advanced_properties && this->HideProxyWidgetsInDefaultView))
       {
         this->ProxyWidget->hide();
       }
@@ -127,6 +129,8 @@ pqProxySelectionWidget::pqProxySelectionWidget(
     : NULL;
   this->Internal->HideProxyWidgetsInDefaultView = (hints &&
     strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
+  this->Internal->HideProxyWidgets = (hints &&
+    strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "never") == 0);
 }
 
 //-----------------------------------------------------------------------------
