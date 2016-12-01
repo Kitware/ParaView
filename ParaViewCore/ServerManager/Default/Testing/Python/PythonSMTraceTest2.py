@@ -51,7 +51,7 @@ create_pipeline()
 
 # Trace state and grab the trace output string
 state = smstate.get_state()
-print state
+print(state)
 
 # Clear all the proxies
 clear_proxies()

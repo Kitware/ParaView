@@ -46,6 +46,11 @@ import paraview._backwardscompatibilityhelper
 # Bring OutputPort in our namespace.
 from paraview.servermanager import OutputPort
 
+import sys
+
+if sys.version_info >= (3,):
+    xrange = range
+
 
 def GetParaViewVersion():
     """Returns the version of the ParaView build"""
@@ -1863,7 +1868,8 @@ class _active_session_observer:
 
     def __del__(self):
         if servermanager:
-            servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
+            if servermanager.vtkSMProxyManager:
+                servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
 
 # -----------------------------------------------------------------------------
 

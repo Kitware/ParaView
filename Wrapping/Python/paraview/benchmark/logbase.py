@@ -107,7 +107,10 @@ def dump_logs( filename ) :
     """
     import pickle
     global logs
-    f = open(filename, "w")
+    if sys.version_info < (3,):
+        f = open(filename, "w")
+    else:
+        f = open(filename, "wb")
     pickle.dump(logs, f)
     f.close()
 
@@ -119,7 +122,10 @@ def import_logs( filename ) :
     import pickle
     global logs
     logs = []
-    f = open(filename, "r")
+    if sys.version_info < (3,):
+        f = open(filename, "r")
+    else:
+        f = open(filename, "rb")
     logs = pickle.load(f)
     f.close()
 

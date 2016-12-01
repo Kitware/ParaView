@@ -1,4 +1,3 @@
-
 from paraview.simple import *
 
 from paraview import smtesting
@@ -91,4 +90,4 @@ vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.Play()
 assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() > 0 and vtkPVCacheKeeper.GetCacheHits() == 0
 
-print "All's well that ends well! Looks like the cache is working as expected."
+print("All's well that ends well! Looks like the cache is working as expected.")

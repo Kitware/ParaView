@@ -6,7 +6,7 @@ paraview.compatibility.minor = 4
 from paraview import servermanager
 
 def Error(message):
-  raise "ERROR: %s" % message
+  raise Exception("ERROR: %s" % message)
   
 servermanager.Connect()
 pxm = servermanager.ProxyManager()
@@ -25,11 +25,11 @@ pxm.RegisterProxy("filters", "s3", p3);
 
 iter = pxm.__iter__();
 for proxy in iter:
-  print "%s.%s ==> %s" % (iter.GetGroup(), iter.GetKey(), proxy.GetXMLName())
+  print("%s.%s ==> %s" % (iter.GetGroup(), iter.GetKey(), proxy.GetXMLName()))
 
-print "Number of sources: %d" % pxm.GetNumberOfProxies("sources")
-print "Number of filters: %d" % pxm.GetNumberOfProxies("filters")
-print "Number of non-existant: %d" % pxm.GetNumberOfProxies("non-existant")
+print("Number of sources: %d" % pxm.GetNumberOfProxies("sources"))
+print("Number of filters: %d" % pxm.GetNumberOfProxies("filters"))
+print("Number of non-existant: %d" % pxm.GetNumberOfProxies("non-existant"))
 if pxm.GetNumberOfProxies("sources") != 3:
   Error("Number of proxies in \"sources\" group reported incorrect.");
 
@@ -39,6 +39,6 @@ if pxm.GetNumberOfProxies("filters") != 4:
 if pxm.GetNumberOfProxies("non-existant") != 0:
   Error("Number of proxies in \"non-existant\" group reported incorrect.");
 
-print "\nProxies under filters.s2"
+print("\nProxies under filters.s2")
 for proxy in pxm.GetProxies("filters","s2"):
-  print proxy.GetXMLName()
+  print(proxy.GetXMLName())

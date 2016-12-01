@@ -22,4 +22,4 @@ view.CenterOfRotation = [0.5, 0.5, 0.5]
 Render()
 
 if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError('Test failed.')

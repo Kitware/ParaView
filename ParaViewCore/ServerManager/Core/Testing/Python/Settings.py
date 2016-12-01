@@ -45,9 +45,9 @@ settings.AddCollectionFromString("{}", 1500000.0)
 def check_comment(expected, settings, field):
   actual = settings.GetSettingDescription(field)
   if actual != expected:
-    print "Comment for %s was not what was expected" % field
-    print "expected:", expected
-    print "actual  :", actual
+    print("Comment for %s was not what was expected" % field)
+    print("expected: %s" % expected)
+    print("actual  : %s" % actual)
     sys.exit(-1)
 
 check_comment("// Default settings for sources.", settings, ".sources")
@@ -60,29 +60,29 @@ check_comment("// Center comment", settings, ".sources.SphereSource.Center")
 settingPath = ".sources.SphereSource.Radius"
 settingValue = settings.GetSettingAsDouble(settingPath, 0, 0.0)
 if settingValue != trueRadius:
-  print "Direct access of setting value", settingPath, "failed"
+  print("Direct access of setting value %s failed" % settingPath)
   sys.exit(-1)
 
 settingValue = settings.GetSettingAsDouble(settingPath, 0, 0.0)
 if settingValue != trueRadius:
-  print "Direct access of setting value", settingPath, "as vector element failed"
+  print("Direct access of setting value %s as vector element failed" % settingPath)
   sys.exit(-1)
 
 settingPath = ".sources.SphereSource.ThetaResolution"
 settingValue = settings.GetSettingAsInt(settingPath, 0, 0)
 if settingValue != trueThetaResolution:
-  print "Direct access of setting value", settingPath, "failed"
+  print("Direct access of setting value %s failed" % settingPath)
   sys.exit(-1)
 
 settingPath = ".sources.SphereSource.Center"
 if settings.GetSettingNumberOfElements(settingPath) != len(trueCenter):
-  print "Number of elements query failed"
+  print("Number of elements query failed")
   sys.exit(-1)
 
-for i in xrange(3):
+for i in range(3):
   settingValue = settings.GetSettingAsDouble(settingPath, i, 0.0)
   if settingValue != trueCenter[i]:
-    print "Direct access of setting value", settingPath, "[", i, "] failed"
+    print("Direct access of setting value %s[%i] failed" % (settingPath, i))
     sys.exit(-1)
 
 # The sphere source should pick up the settings from the user settings string
@@ -92,7 +92,7 @@ settings.GetProxySettings(s);
 radiusProperty = s.GetProperty("Radius")
 radius = radiusProperty.GetElement(0)
 if radius != trueRadius:
-  print "Radius property does not match setting value"
+  print("Radius property does not match setting value")
   s.FastDelete()
   sys.exit(-1)
 s.FastDelete()
@@ -104,7 +104,7 @@ s.FastDelete()
 #
 settings.ClearAllSettings()
 if settings.HasSetting(".sources.SphereSource"):
-  print "Setting '.sources.SphereSource' should have been cleared"
+  print("Setting '.sources.SphereSource' should have been cleared")
   sys.exit(-1)
 
 settings.SetSetting(".sources.SphereSource.ints", 5)
@@ -116,21 +116,21 @@ settings.SetSetting(".sources.SphereSource.strings", 1, "two")
 settings.SetSetting(".sources.SphereSource.strings", 1, "three")
 
 if settings.GetSettingAsInt(".sources.SphereSource.ints", 0, 0) != 5:
-  print "Setting '.sources.SphereSource.ints[0]' should have value 5"
+  print("Setting '.sources.SphereSource.ints[0]' should have value 5")
   sys.exit(-1)
 
 if settings.GetSettingAsInt(".sources.SphereSource.ints", 1, 0) != 2:
-  print "Setting '.sources.SphereSource.ints[1]' should have value 2"
+  print("Setting '.sources.SphereSource.ints[1]' should have value 2")
   sys.exit(-1)
 
 if settings.GetSettingAsDouble(".sources.SphereSource.double", 0, 0.0) != 5.0:
-  print "Setting '.sources.SphereSource.double' should have value 5.0"
+  print("Setting '.sources.SphereSource.double' should have value 5.0")
   sys.exit(-1)
 
 if settings.GetSettingAsString(".sources.SphereSource.strings", 0, "") != "one":
-  print "Setting '.sources.SphereSource.strings[0]' should have value 'one'"
+  print("Setting '.sources.SphereSource.strings[0]' should have value 'one'")
   sys.exit(-1)
 
 if settings.GetSettingAsString(".sources.SphereSource.strings", 1, "") != "three":
-  print "Setting '.sources.SphereSource.strings[1]' should have value 'three'"
+  print("Setting '.sources.SphereSource.strings[1]' should have value 'three'")
   sys.exit(-1)

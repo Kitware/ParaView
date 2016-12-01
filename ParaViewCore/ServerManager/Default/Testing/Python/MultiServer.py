@@ -7,7 +7,7 @@ smtesting.ProcessCommandLineArguments()
 
 # Test fails method
 def failed(msg):
-   print "Error: %s" % msg
+   print("Error: %s" % msg)
    sys.exit(1)
 
 # ---- Start testing ----
@@ -23,7 +23,7 @@ Connect()
 
 if len(servermanager.Connections) != 2:
    failed("We should have 2 connections instead of %s" % str(servermanager.Connections))
-print "1) We have two server connections. <== OK"
+print("1) We have two server connections. <== OK")
 
 # keep ref to connections
 secondConnection = servermanager.ActiveConnection
@@ -55,4 +55,4 @@ if len(servermanager.Connections) != 0:
 # Even if we don't have any connection, this should not failed
 servermanager.Disconnect()
 
-print "3) Test passed !!! YAY"
+print("3) Test passed !!! YAY")

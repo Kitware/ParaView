@@ -48,4 +48,4 @@ view.StillRender()
 
 smtesting.DoRegressionTesting(view.SMProxy)
 if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError('Test failed.')

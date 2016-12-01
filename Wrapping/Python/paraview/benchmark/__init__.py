@@ -17,7 +17,9 @@ run method, or call the manyspheres.py module directly via pvbatch or pvpython.
     TODO: the end of frame markers are heuristic, likely buggy
 '''
 
-import logbase
-import logparser
+from __future__ import absolute_import
+
+from . import logbase
+from . import logparser
 
 __all__ = ['logbase', 'logparser']

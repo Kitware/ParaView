@@ -168,7 +168,7 @@ class Trace(object):
 
     @classmethod
     def has_accessor(cls, obj):
-        return cls.__REGISTERED_ACCESSORS.has_key(obj)
+        return obj in cls.__REGISTERED_ACCESSORS
 
     @classmethod
     def create_accessor(cls, obj):
@@ -1226,7 +1226,7 @@ def _create_trace_item_internal(key, args=None, kwargs=None):
     __ActiveTraceItems = [x for x in __ActiveTraceItems if not x() is None]
 
     g = globals()
-    if g.has_key(key) and callable(g[key]):
+    if key in g and callable(g[key]):
         args = args if args else []
         kwargs = kwargs if kwargs else {}
         traceitemtype = g[key]

@@ -6,7 +6,7 @@ import os.path
 import sys
 from paraview.simple import *
 
-print 'starting'
+print('starting')
 
 paraview.simple._DisableFirstRenderCameraReset()
 
@@ -54,7 +54,7 @@ if pm.GetSymmetricMPIMode() == True:
     numcells = da2.GetValue(0)
 
 if processId == 0 and numcells != 8000:
-    print "ERROR: ", fname, " has ", numcells, " but should have 8000."
+    print("ERROR: %s has %d but should have 8000." % (fname, numcells))
     sys.exit(1)
 
-print "Test passed."
+print("Test passed.")

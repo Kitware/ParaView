@@ -23,9 +23,9 @@ display = Show()
 transform = servermanager.vtk.vtkTransform()
 transform.Scale(2, 1, 1)
 matrix = transform.GetMatrix()
-print "-------------------------------"
-print "Transformation Matrix: "
-print matrix
+print("-------------------------------")
+print("Transformation Matrix: ")
+print(matrix)
 
 flattened_transform = []
 for j in range(4):
@@ -37,4 +37,4 @@ display.UserTransform = flattened_transform
 view = Render()
 view.OrientationAxesVisibility = 0
 if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError('Test failed.')

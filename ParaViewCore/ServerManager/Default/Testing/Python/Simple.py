@@ -40,4 +40,4 @@ view.ResetCamera()
 view.StillRender()
 
 if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError('Test failed.')

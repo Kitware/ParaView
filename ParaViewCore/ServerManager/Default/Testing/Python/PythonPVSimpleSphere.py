@@ -7,7 +7,7 @@ sphere.PhiResolution = 20
 sphere.ThetaResolution = 20
 
 clientsphere = servermanager.Fetch(sphere)
-if clientsphere.GetNumberOfPolys() != 720L:
+if clientsphere.GetNumberOfPolys() != 720:
     raise smtesting.TestError('Test failed: Problem fetching polydata.')
 
 elev = Elevation(sphere)
@@ -20,7 +20,7 @@ if mindata.GetPointData().GetNumberOfArrays() != 2:
     raise smtesting.TestError('Test failed: Wrong number of arrays.')
 
 array = mindata.GetPointData().GetArray('Elevation')
-print array.GetNumberOfTuples(), array.GetTuple1(0)
+print("%d %f" % (array.GetNumberOfTuples(), array.GetTuple1(0)))
 
 if array.GetTuple1(0) < 0.2 and array.GetTuple1(0) > 0.29:
     raise smtesting.TestError('Test failed: Bad array value.')

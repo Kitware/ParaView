@@ -112,7 +112,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
         start_set = source_set
     else:
         # if nothing is specified, we save all views and sources.
-        start_set = simple.GetSources().values() + simple.GetViews()
+        start_set = [x for x in simple.GetSources().values()] + simple.GetViews()
     start_set = [x for x in start_set if filter(x)]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
