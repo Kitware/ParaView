@@ -148,7 +148,8 @@ class Trace(object):
 
     @classmethod
     def unregister_accessor(cls, accessor):
-        del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
+        if accessor.get_object() in cls.__REGISTERED_ACCESSORS:
+            del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
 
     @classmethod
     def get_accessor(cls, obj):
