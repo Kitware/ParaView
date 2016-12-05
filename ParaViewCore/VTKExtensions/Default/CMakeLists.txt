@@ -130,6 +130,7 @@ set(Module_SRCS
   vtkPVTextSource.cxx
   vtkPVTransform.cxx
   vtkPVTransposeTable.cxx
+  vtkRulerLineForInput.cxx
   vtkQuerySelectionSource.cxx
   vtkRectilinearGridConnectivity.cxx
   vtkSciVizStatistics.cxx
