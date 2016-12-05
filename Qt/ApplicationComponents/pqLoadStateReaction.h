@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+class pqServer;
+
 /**
 * @ingroup Reactions
 * Reaction for load state action.

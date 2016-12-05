@@ -396,14 +396,8 @@ void pqApplicationCore::loadStateFromString(
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadState(
-  vtkPVXMLElement* rootElement, pqServer* server, vtkSMStateLoader* loader)
+void pqApplicationCore::clearViewsForLoadingState(pqServer* server)
 {
-  if (!server || !rootElement)
-  {
-    return;
-  }
-
   // BUG #12398:
   // This change was added to prevent VisTrails from recording unwanted events.
   // We disable recording view deletion in Undo/Stack
@@ -436,6 +430,18 @@ void pqApplicationCore::loadState(
     }
   }
   END_UNDO_EXCLUDE();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadState(
+  vtkPVXMLElement* rootElement, pqServer* server, vtkSMStateLoader* loader)
+{
+  if (!server || !rootElement)
+  {
+    return;
+  }
+
+  this->clearViewsForLoadingState(server);
   this->loadStateIncremental(rootElement, server, loader);
 }
 

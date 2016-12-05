@@ -100,6 +100,8 @@ public:
   */
   virtual void registerForQuicklaunch(QWidget*);
 
+  void loadStateFromPythonFile(const QString& filename, pqServer* server);
+
 public slots:
   /**
   * Pops-up the quick launch dialog.

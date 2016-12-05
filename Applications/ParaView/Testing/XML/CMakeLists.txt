@@ -467,6 +467,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceExportAndSaveData.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/SaveLoadStatePython.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     ${CMAKE_CURRENT_SOURCE_DIR}/RestoreArrayDefaultTransferFunction.xml

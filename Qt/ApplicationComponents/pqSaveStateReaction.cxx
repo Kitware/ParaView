@@ -151,6 +151,10 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
   }
   QTextStream out(&file);
   out << state;
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  // Add this to the list of recent server resources ...
+  pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+    server, filename);
 #else
   qCritical() << "Failed to save '" << filename
               << "' since Python support in not enabled in this build.";
