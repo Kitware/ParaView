@@ -355,6 +355,9 @@ set(_vtk_modules
   
   vtkIOTecplotTable
   # needed for vtkTecplotReader
+
+  vtkIOTRUCHAS
+  # needed for GE/LANL vtkTRUCHASReader
   )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
