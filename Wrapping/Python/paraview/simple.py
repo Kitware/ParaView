@@ -1557,6 +1557,21 @@ def ExportView(filename, view=None, **params):
     del proxy
     del helper
 
+def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
+    if proxy == None:
+        proxy = GetActiveSource()
+
+    propertyToReset = proxy.SMProxy.GetProperty(propertyName)
+
+    if propertyToReset != None:
+        propertyToReset.ResetToDefault()
+
+        if restoreFromSettings:
+            settings = paraview.servermanager.vtkSMSettings.GetInstance()
+            settings.GetPropertySetting(propertyToReset)
+
+        proxy.SMProxy.UpdateVTKObjects()
+
 #==============================================================================
 # Usage and demo code set
 #==============================================================================
