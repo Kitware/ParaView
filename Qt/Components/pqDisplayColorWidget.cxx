@@ -554,7 +554,7 @@ void pqDisplayColorWidget::componentNumberChanged()
       .arg("display", this->Representation->getProxy())
       .arg("arrayname", arrayName.toLatin1().data())
       .arg("attribute_type", association)
-      .arg("component", number)
+      .arg("component", this->Components->itemText(number + 1).toLatin1().data())
       .arg("lut", this->ColorTransferFunction->getProxy());
 
     this->ColorTransferFunction->setVectorMode(
