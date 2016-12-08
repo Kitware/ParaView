@@ -53,6 +53,11 @@ paraview_add_test_python(
   TestPythonViewScript.py
 )
 
+paraview_add_test_python(
+  NO_DATA NO_VALID NO_OUTPUT NO_RT
+  TestResetProperty.py
+)
+
 paraview_add_test_pvbatch(
   NO_DATA NO_RT
   CinemaTest.py
