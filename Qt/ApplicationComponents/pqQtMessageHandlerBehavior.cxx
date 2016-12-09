@@ -57,6 +57,8 @@ static void QtMessageOutput(QtMsgType type, const QMessageLogContext& context, c
     case QtFatalMsg:
       vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
       break;
+    default:
+      break;
   }
 }
 
