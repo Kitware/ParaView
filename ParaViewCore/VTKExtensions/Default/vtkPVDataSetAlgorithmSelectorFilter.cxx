@@ -15,6 +15,7 @@
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCallbackCommand.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -38,7 +39,7 @@ public:
   vtkObject* Owner;
 
   vtkInternals()
-    : ActiveFilter(0)
+    : ActiveFilter(-1)
   {
   }
 };
@@ -52,10 +53,18 @@ vtkPVDataSetAlgorithmSelectorFilter::vtkPVDataSetAlgorithmSelectorFilter()
   this->SetNumberOfOutputPorts(1);
   this->SetNumberOfInputPorts(1);
   this->OutputType = VTK_DATA_SET;
+
+  // Setup a callback for the internal filters to report progress.
+  this->InternalProgressObserver = vtkCallbackCommand::New();
+  this->InternalProgressObserver->SetCallback(
+    &vtkPVDataSetAlgorithmSelectorFilter::InternalProgressCallbackFunction);
+  this->InternalProgressObserver->SetClientData(this);
 }
 //----------------------------------------------------------------------------
 vtkPVDataSetAlgorithmSelectorFilter::~vtkPVDataSetAlgorithmSelectorFilter()
 {
+  this->SetActiveFilter(-1);
+  this->InternalProgressObserver->Delete();
   delete this->Internal;
   this->Internal = NULL;
 }
@@ -115,6 +124,24 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataSetAlgorithmSelectorFilter::InternalProgressCallbackFunction(
+  vtkObject* arg, unsigned long, void* clientdata, void*)
+{
+  reinterpret_cast<vtkPVDataSetAlgorithmSelectorFilter*>(clientdata)
+    ->InternalProgressCallback(static_cast<vtkAlgorithm*>(arg));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAlgorithmSelectorFilter::InternalProgressCallback(vtkAlgorithm* algorithm)
+{
+  this->UpdateProgress(algorithm->GetProgress());
+  if (this->AbortExecute)
+  {
+    algorithm->SetAbortExecute(1);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataSetAlgorithmSelectorFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -145,6 +172,10 @@ void vtkPVDataSetAlgorithmSelectorFilter::UnRegisterFilter(int index)
   int size = static_cast<int>(this->Internal->RegisteredFilters.size());
   if (index >= 0 && index < size)
   {
+    if (index == this->Internal->ActiveFilter)
+    {
+      this->SetActiveFilter(-1);
+    }
     std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator iter =
       this->Internal->RegisteredFilters.begin();
     iter += index;
@@ -186,15 +217,30 @@ vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::GetActiveFilter()
 //----------------------------------------------------------------------------
 vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::SetActiveFilter(int index)
 {
-  int size = static_cast<int>(this->Internal->RegisteredFilters.size());
-  if (index >= 0 && index < size)
+  if (index != this->Internal->ActiveFilter)
   {
-    this->Internal->ActiveFilter = index;
-    this->Modified();
-    return this->Internal->RegisteredFilters.at(index);
+    int size = static_cast<int>(this->Internal->RegisteredFilters.size());
+    if (this->Internal->ActiveFilter >= 0 && this->Internal->ActiveFilter < size)
+    {
+      this->GetActiveFilter()->RemoveObserver(this->InternalProgressObserver);
+    }
+
+    if (index >= 0 && index < size)
+    {
+      this->Internal->ActiveFilter = index;
+      this->Modified();
+      vtkAlgorithm* activeAlgorithm = this->GetActiveFilter();
+      activeAlgorithm->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+      return activeAlgorithm;
+    }
+    else
+    {
+      this->Internal->ActiveFilter = -1;
+    }
   }
   return NULL;
 }
+
 //----------------------------------------------------------------------------
 // Overload standard modified time function. If cut functions is modified,
 // or contour values modified, then this object is modified as well.

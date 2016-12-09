@@ -581,10 +581,12 @@ void vtkSMRenderViewProxy::ResetCamera()
 {
   SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetCamera").arg("comment", "reset view to fit data");
 
+  this->GetSession()->PrepareProgress();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ResetCamera"
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
+  this->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

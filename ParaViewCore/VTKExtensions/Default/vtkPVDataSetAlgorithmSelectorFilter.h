@@ -29,6 +29,8 @@
 #include "vtkAlgorithm.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
+class vtkCallbackCommand;
+
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDataSetAlgorithmSelectorFilter : public vtkAlgorithm
 {
 public:
@@ -105,6 +107,12 @@ protected:
   vtkGetMacro(OutputType, int);
   vtkSetMacro(OutputType, int);
   int OutputType;
+
+  // Callback registered with the InternalProgressObserver.
+  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void* clientdata, void*);
+  void InternalProgressCallback(vtkAlgorithm* algorithm);
+  // The observer to report progress from the internal filters.
+  vtkCallbackCommand* InternalProgressObserver;
 
 private:
   vtkPVDataSetAlgorithmSelectorFilter(
