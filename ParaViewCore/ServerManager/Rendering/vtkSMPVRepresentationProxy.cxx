@@ -495,22 +495,6 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
     return false;
   }
 
-  if (useComponent)
-  {
-    SM_SCOPED_TRACE(SetScalarColoring)
-      .arg("display", this)
-      .arg("arrayname", arrayname)
-      .arg("attribute_type", attribute_type)
-      .arg("component", component);
-  }
-  else
-  {
-    SM_SCOPED_TRACE(SetScalarColoring)
-      .arg("display", this)
-      .arg("arrayname", arrayname)
-      .arg("attribute_type", attribute_type);
-  }
-
   vtkSMPropertyHelper colorArrayHelper(colorArray);
   colorArrayHelper.SetInputArrayToProcess(attribute_type, arrayname);
 
@@ -523,6 +507,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   }
 
   // Now, setup transfer functions.
+  bool haveComponent = useComponent;
   vtkNew<vtkSMTransferFunctionManager> mgr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
   {
@@ -541,6 +526,21 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
         lutProxy->UpdateVTKObjects();
       }
     }
+    else
+    {
+      // No Component defined for coloring, in order to generate a valid trace
+      // a component is needed, recover currently used component
+      const char* vectorMode = vtkSMPropertyHelper(lutProxy, "VectorMode").GetAsString();
+      haveComponent = true;
+      if (strcmp(vectorMode, "Component") == 0)
+      {
+        component = vtkSMPropertyHelper(lutProxy, "VectorComponent").GetAsInt();
+      }
+      else // Magnitude
+      {
+        component = -1;
+      }
+    }
 
     vtkSMPropertyHelper(lutProperty).Set(lutProxy);
 
@@ -553,7 +553,31 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
         vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).Set(1);
         lutProxy->UpdateVTKObjects();
       }
+      if (haveComponent)
+      {
+        const char* componentName = colorArrayInfo->GetComponentName(component);
+        if (strcmp(componentName, "") != 0)
+        {
+          SM_SCOPED_TRACE(SetScalarColoring)
+            .arg("display", this)
+            .arg("arrayname", arrayname)
+            .arg("attribute_type", attribute_type)
+            .arg("component", componentName);
+        }
+        else
+        {
+          haveComponent = false;
+        }
+      }
     }
+  }
+
+  if (!haveComponent)
+  {
+    SM_SCOPED_TRACE(SetScalarColoring)
+      .arg("display", this)
+      .arg("arrayname", arrayname)
+      .arg("attribute_type", attribute_type);
   }
 
   if (vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction"))
