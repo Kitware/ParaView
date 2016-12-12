@@ -186,8 +186,12 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
       this->Internals->PythonLexer.GetPointer(), this->Internals->HtmlFormatter.GetPointer()));
     vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction, args, NULL));
 
+#if VTK_PYTHON_VERSION == 2
     vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
     char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
+#else
+    char* resultingTextAsCString = PyString_AsString(resultingText);
+#endif
 
     QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
 
