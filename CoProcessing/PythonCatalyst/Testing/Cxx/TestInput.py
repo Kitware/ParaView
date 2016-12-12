@@ -55,7 +55,7 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
     timestep = datadescription.GetTimeStep()
-    print "Timestep:", timestep, "Time:", datadescription.GetTime()
+    print("Timestep: %d Time: %f" % ( timestep, datadescription.GetTime()))
 
     # Update the coprocessor by providing it the newly generated simulation data.
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
@@ -68,17 +68,17 @@ def DoCoProcessing(datadescription):
     array_range = array.GetRange()
     if timestep == 0:
       if array_range[0] < 37 or array_range[0] > 38 or array_range[1] < 276 or array_range[1] > 277:
-        print 'ERROR: bad range of ', array_range, ' for step 0'
+        print('ERROR: bad range of %f for step 0' % array_range)
         sys.exit(1)
     if timestep == 1:
       if array_range[0] < 74 or array_range[0] > 76 or array_range[1] < 443 or array_range[1] > 445:
-        print 'ERROR: bad range of ', array_range, ' for step 1'
+        print('ERROR: bad range of %f for step 1' % array_range)
         sys.exit(1)
     if timestep == 2:
       if array_range[0] < 77 or array_range[0] > 79 or array_range[1] < 357 or array_range[1] > 458:
-        print 'ERROR: bad range of ', array_range, ' for step 2'
+        print('ERROR: bad range of %f for step 2' % array_range)
         sys.exit(1)
     if timestep == 3:
       if array_range[0] < -43 or array_range[0] > 44 or array_range[1] < 304 or array_range[1] > 305:
-        print 'ERROR: bad range of ', array_range, ' for step 3'
+        print('ERROR: bad range of %f for step 3' % array_range)
         sys.exit(1)
