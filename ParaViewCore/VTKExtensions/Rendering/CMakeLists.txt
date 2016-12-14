@@ -49,6 +49,7 @@ set(Module_SRCS
   vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
+  vtkPVCameraCollection.cxx
   vtkPVCenterAxesActor.cxx
   vtkPVDefaultPass.cxx
   vtkPVDiscretizableColorTransferFunction.cxx

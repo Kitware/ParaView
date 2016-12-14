@@ -127,6 +127,7 @@
         { "class": "vtkPartitionOrderingInterface" },
         { "class": "vtkPVAxesActor" },
         { "class": "vtkPVAxesWidget" },
+        { "class": "vtkPVCameraCollection" },
         { "class": "vtkPVCenterAxesActor" },
         { "class": "vtkPVDefaultPass" },
         { "class": "vtkPVDiscretizableColorTransferFunction" },

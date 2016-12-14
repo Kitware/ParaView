@@ -18,10 +18,12 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVSessionCore.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSIProperty.h"
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMMessage.h"
@@ -446,6 +448,19 @@ vtkObjectBase* vtkSIProxy::GetVTKObject()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSIProxy::ExtendDefinition(const char* xml)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  if (!parser->Parse(xml))
+  {
+    vtkErrorMacro("Failed to parse extended proxy definition. Not a valid XML.");
+    return false;
+  }
+
+  return this->ReadXMLAttributes(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
 bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
@@ -476,20 +491,17 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
     }
   }
 
-  if (this->Internals->SIProperties.size() == 0)
+  for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
   {
-    for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); ++i)
+    vtkPVXMLElement* propElement = element->GetNestedElement(i);
+    // read property xml
+    const char* name = propElement->GetAttribute("name");
+    std::string tagName = propElement->GetName();
+    if (name && tagName.find("Property") == (tagName.size() - 8))
     {
-      vtkPVXMLElement* propElement = element->GetNestedElement(i);
-      // read property xml
-      const char* name = propElement->GetAttribute("name");
-      std::string tagName = propElement->GetName();
-      if (name && tagName.find("Property") == (tagName.size() - 8))
+      if (!this->ReadXMLProperty(propElement))
       {
-        if (!this->ReadXMLProperty(propElement))
-        {
-          return false;
-        }
+        return false;
       }
     }
   }

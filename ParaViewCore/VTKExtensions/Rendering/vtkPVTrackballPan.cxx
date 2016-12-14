@@ -146,7 +146,6 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWin
     camera->SetPosition(pos);
     camera->SetFocalPoint(fp);
   }
-  ren->ResetCameraClippingRange();
   rwi->Render();
 }
 

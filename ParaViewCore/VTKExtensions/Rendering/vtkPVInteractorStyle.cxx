@@ -295,7 +295,6 @@ void vtkPVInteractorStyle::DollyToPosition(double fact, int* position, vtkRender
 
     // Move camera in/out along projection direction
     cam->Dolly(fact);
-    renderer->ResetCameraClippingRange();
 
     // Find new focal point
     cam->GetPosition(newCameraPos);
@@ -309,7 +308,6 @@ void vtkPVInteractorStyle::DollyToPosition(double fact, int* position, vtkRender
     newPoint[2] = newCameraPos[2] + norm[2] * t;
 
     cam->SetFocalPoint(newPoint);
-    renderer->ResetCameraClippingRange();
   }
 }
 

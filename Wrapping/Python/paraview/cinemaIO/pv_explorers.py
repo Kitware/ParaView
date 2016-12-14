@@ -38,6 +38,7 @@ import numpy as np
 import paraview
 import math
 from paraview import numpy_support as numpy_support
+from utils import convert_pose_to_camera
 
 class ValueMode():
   INVERTIBLE_LUT = 1
@@ -361,36 +362,11 @@ class PoseCamera(explorers.Track):
         #use that as point to spin around
         iPosition = self.cstore.metadata['camera_eye'][-1]
         iFocalPoint = self.cstore.metadata['camera_at'][-1]
-        iViewUp = VecNormalize(self.cstore.metadata['camera_up'][-1])
-
-        atvec = VecNormalize(np.subtract(iPosition, iFocalPoint))
-        rightvec = np.cross(atvec, iViewUp)
-        m = [[rightvec[0], rightvec[1], rightvec[2]],
-             [iViewUp[0], iViewUp[1], iViewUp[2]],
-             [atvec[0],  atvec[1],  atvec[2]]]
-        #OK because orthogonal thus invert equals trans
-        mInv = [[m[0][0], m[1][0], m[2][0]],
-                [m[0][1], m[1][1], m[2][1]],
-                [m[0][2], m[1][2], m[2][2]]]
-        mi = MatrixMatrixMul(mInv, pose)
-        mf = MatrixMatrixMul(mi, m)
-
-        if self.camType == "azimuth-elevation-roll":
-            pi = np.subtract(iPosition, iFocalPoint)
-            pr = VecMatrixMul(pi, mf)
-            pf = np.add(pr, iFocalPoint)
-            self.view.GetActiveCamera().SetPosition(pf)
-            self.view.GetActiveCamera().SetFocalPoint(iFocalPoint)
-        elif self.camType == "yaw-pitch-roll":
-            pi = np.subtract(iFocalPoint, iPosition)
-            pr = VecMatrixMul(pi, mf)
-            pf = np.add(pr, iPosition)
-            self.view.GetActiveCamera().SetFocalPoint(pf)
-            self.view.GetActiveCamera().SetPosition(iPosition)
-        else:
-            print ("ERROR unexpected camera type")
-        newUp = VecMatrixMul(iViewUp, mf)
-        self.view.GetActiveCamera().SetViewUp(newUp)
+        iViewUp = self.cstore.metadata['camera_up'][-1]
+        newp, newf, newv = convert_pose_to_camera(iPosition, iFocalPoint, iViewUp, pose, self.camType)
+        self.view.GetActiveCamera().SetPosition(newp)
+        self.view.GetActiveCamera().SetFocalPoint(newf)
+        self.view.GetActiveCamera().SetViewUp(newv)
 
 class Slice(explorers.Track):
     """

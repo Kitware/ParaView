@@ -88,6 +88,7 @@ MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES
 INCLUDE_PATH         =
 EXPAND_ONLY_PREDEF   = YES
+EXPAND_AS_DEFINED = PQ_BEHAVIOR_DEFINE_METHODS
 PREDEFINED  = "vtkSetMacro(name,type)= \
                  virtual void Set##name (type);" \
               "vtkGetMacro(name,type)= \

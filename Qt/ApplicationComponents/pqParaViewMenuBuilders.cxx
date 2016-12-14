@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "pqHideAllReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
+#include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadRestoreWindowLayoutReaction.h"
@@ -121,6 +122,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
+  new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
 
   new pqLoadStateReaction(ui.actionFileLoadServerState);

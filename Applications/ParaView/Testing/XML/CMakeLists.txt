@@ -2,8 +2,10 @@
 # the data.
 paraview_test_load_data_dirs(""
   "Iron Xdmf"
+  amr
   ANALYZE
   dualSphereAnimation
+  ensemble-wavelet
   EnSight
   ExRestarts
   FieldDataBlocks
@@ -14,15 +16,14 @@ paraview_test_load_data_dirs(""
   GMV/partial-pyramid
   GMV/quadratic_cells
   RodPlate
+  singleSphereAnimation
   SLAC/pic-example
   SPCTH
   SPCTH/Dave_Karelitz_Small
   SPCTH/DerivedDensity
   VisItBridge
-  amr
-  ensemble-wavelet
-  singleSphereAnimation
   )
+
 paraview_test_load_data(""
   ,REGEX:tensors_.*\\.vti
   artifact.dta
@@ -399,7 +400,6 @@ if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
     )
 endif()
 
-
 if (PARAVIEW_USE_MPI)
   list(APPEND TESTS_WITH_BASELINES
     # Test uses D3 which is available in MPI only builds.
@@ -497,6 +497,23 @@ if(PARAVIEW_ENABLE_PYTHON)
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
+  endif()
+
+  if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2" AND numpy_found)
+    # Cinema importing capabilities are only available in Python + OpenGL2
+    # add the cinema database files.
+    paraview_test_load_data("" "cinema-composite.cdb/image/info.json")
+    foreach(poseidx RANGE 0 17)
+      foreach(visidx RANGE 0 1)
+        paraview_test_load_data_dirs("" "cinema-composite.cdb/image/pose=${poseidx}/vis=${visidx}")
+      endforeach()
+    endforeach()
+    list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/ImportCinema.xml)
+
+    # presently, we don't support client-server configurations.
+    set(ImportCinema_DISABLE_CS TRUE)
+    set(ImportCinema_DISABLE_CRS TRUE)
   endif()
 endif()
 

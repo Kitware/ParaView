@@ -109,6 +109,7 @@ public:
     INSITU_SERVER_PAUSED,
     INSITU_BREAKPOINT,
     INSITU_WRITER_PARAMETERS,
+    CINEMA_MARK,
     LAST
   };
 
@@ -385,6 +386,10 @@ private:
     {
       return INSITU_EXTRACT;
     }
+    else if (port->getSourceProxy()->HasAnnotation("CINEMA"))
+    {
+      return CINEMA_MARK;
+    }
     else if (pqLiveInsituManager::isWriterParametersProxy(port->getSourceProxy()))
     {
       return INSITU_WRITER_PARAMETERS;
@@ -488,6 +493,8 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
   this->PixmapList[pqPipelineModelDataItem::INSITU_WRITER_PARAMETERS].load(
     ":/pqWidgets/Icons/pqSave32.png");
+  this->PixmapList[pqPipelineModelDataItem::CINEMA_MARK].load(
+    ":/pqWidgets/Icons/cinemascience_mark.png");
 }
 
 //-----------------------------------------------------------------------------

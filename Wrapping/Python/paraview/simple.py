@@ -878,6 +878,22 @@ def ExtendFileSeries(proxy=None):
     return helper.ExtendFileSeries(proxy.SMProxy)
 
 # -----------------------------------------------------------------------------
+def ImportCinema(filename, view=None):
+    """Import a cinema database. This can potentially create multiple
+    sources/filters for visualizable objects in the Cinema database.
+    Returns True on success. If view is provided, then the cinema sources
+    are shown in that view as indicated in the database.
+    """
+    try:
+        from paraview.vtk.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
+    except ImportError:
+        # cinema not supported in current configuration
+        return False
+    session = servermanager.ActiveConnection.Session
+    importer = vtkSMCinemaDatabaseImporter()
+    return importer.ImportCinema(filename, session, view)
+
+# -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):
     """Creates a writer that can write the data produced by the source proxy in
        the given file format (identified by the extension). If no source is

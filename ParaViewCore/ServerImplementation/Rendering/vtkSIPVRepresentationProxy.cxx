@@ -62,10 +62,13 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
   vtkPVCompositeRepresentation* pvrepresentation =
     vtkPVCompositeRepresentation::SafeDownCast(this->GetVTKObject());
 
-  // Pass on the cube-axes and selection-represenations
-  vtkSelectionRepresentation* selection = vtkSelectionRepresentation::SafeDownCast(
-    this->GetSubSIProxy("SelectionRepresentation")->GetVTKObject());
-  pvrepresentation->SetSelectionRepresentation(selection);
+  // Pass on the selection-representation
+  if (vtkSIProxy* siProxy = this->GetSubSIProxy("SelectionRepresentation"))
+  {
+    vtkSelectionRepresentation* selection =
+      vtkSelectionRepresentation::SafeDownCast(siProxy->GetVTKObject());
+    pvrepresentation->SetSelectionRepresentation(selection);
+  }
 
   // Update internal data-structures for the types of representations provided
   // by this instance.

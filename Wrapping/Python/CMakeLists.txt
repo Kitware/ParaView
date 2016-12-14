@@ -59,6 +59,7 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/benchmark/manyspheres.py
   paraview/benchmark/basic.py
   paraview/calculator.py
+  paraview/cinemareader.py
   paraview/cinemaIO/cinema_store.py
   paraview/cinemaIO/explorers.py
   paraview/cinemaIO/__init__.py
@@ -66,6 +67,7 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/cinemaIO/pv_explorers.py
   paraview/cinemaIO/pv_introspect.py
   paraview/cinemaIO/raster_wrangler.py
+  paraview/cinemaIO/utils.py
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py

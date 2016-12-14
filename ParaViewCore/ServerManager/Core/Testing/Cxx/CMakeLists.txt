@@ -1,5 +1,6 @@
 paraview_add_test_cxx(${vtk-module}CxxTests tests
-  NO_DATA NO_OUTPUT NO_VALID
+  NO_DATA NO_VALID
+  TestSelfGeneratingSourceProxy.cxx
   TestSessionProxyManager.cxx
   TestSettings.cxx
   TestRecreateVTKObjects.cxx

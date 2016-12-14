@@ -95,7 +95,6 @@ void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWi
 
   camera->ApplyTransform(transform);
   camera->OrthogonalizeViewUp();
-  ren->ResetCameraClippingRange();
 
   rwi->Render();
   transform->Delete();
