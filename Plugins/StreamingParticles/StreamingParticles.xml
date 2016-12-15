@@ -121,11 +121,19 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="UseOutline" />
-          <Property name="UseBlockDetailInformation" />
-          <Property name="ProcessesCanLoadAnyBlock" />
-          <Property name="DetailLevel" />
-          <Property name="StreamingRequestSize" />
+          <PropertyGroup label="Streaming Particles">
+            <Property name="UseOutline" />
+            <Property name="UseBlockDetailInformation" />
+            <Property name="ProcessesCanLoadAnyBlock" />
+            <Property name="DetailLevel" />
+            <Property name="StreamingRequestSize" />
+            <Hints>
+               <PropertyWidgetDecorator type="GenericDecorator"
+                                        mode="visibility"
+                                        property="Representation"
+                                        value="Streaming Particles" />
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
     </Extension>
@@ -149,11 +157,19 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="UseOutline" />
-          <Property name="UseBlockDetailInformation" />
-          <Property name="ProcessesCanLoadAnyBlock" />
-          <Property name="DetailLevel" />
-          <Property name="StreamingRequestSize" />
+          <PropertyGroup label="Styreaming Particles">
+            <Property name="UseOutline" />
+            <Property name="UseBlockDetailInformation" />
+            <Property name="ProcessesCanLoadAnyBlock" />
+            <Property name="DetailLevel" />
+            <Property name="StreamingRequestSize" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Streaming Particles" />
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
     </Extension>
