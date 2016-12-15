@@ -109,7 +109,7 @@ void pqLoadStateReaction::loadState()
   pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
     "ParaView state file (*.pvsm"
 #ifdef PARAVIEW_ENABLE_PYTHON
-    ", *.py"
+    " *.py"
 #endif
     ");;All files (*)");
   fileDialog.setObjectName("FileLoadServerStateDialog");
