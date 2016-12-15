@@ -3513,20 +3513,6 @@
         <Documentation>Set the visibility for the selection, if
         any.</Documentation>
       </IntVectorProperty>
-      <ProxyProperty name="PolarAxes"
-                     command="SetPolarAxesRepresentation"
-                     panel_widget="proxy_editor">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="representations" name="PolarAxesRepresentation" />
-        </ProxyListDomain>
-        <Hints>
-          <ProxyEditorPropertyWidget property="Visibility"/>
-            <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
-                 property on the GridAxes3DActor proxy for a checkbox
-                 on the UI -->
-        </Hints>
-      </ProxyProperty>
-
       <RepresentationType subproxy="OutlineRepresentation"
                           text="Outline" />
       <RepresentationType subproxy="SurfaceRepresentation"
@@ -3798,6 +3784,24 @@
           <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat" panel_visibility="never"/>
         </ExposedProperties>
       </SubProxy>
+      <ProxyProperty name="PolarAxes"
+                     command="SetPolarAxesRepresentation"
+                     panel_visibility="advanced"
+                     panel_widget="proxy_editor">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="representations" name="PolarAxesRepresentation" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxyEditorPropertyWidget property="Visibility"/>
+            <!-- tell pqProxyEditorPropertyWidget that use the "Visibility"
+                 property on the PolarAxesActor proxy for a checkbox
+                 on the UI -->
+        </Hints>
+      </ProxyProperty>
+      <PropertyGroup label="Annotations">
+        <Property name="PolarAxes"
+                  panel_visibility="advanced" />
+      </PropertyGroup>
     </PVRepresentationProxy>
   </ProxyGroup>
 
