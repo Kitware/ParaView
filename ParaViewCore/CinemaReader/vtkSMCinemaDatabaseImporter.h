@@ -24,8 +24,10 @@
 #ifndef vtkSMCinemaDatabaseImporter_h
 #define vtkSMCinemaDatabaseImporter_h
 
-#include "vtkPVCinemaReaderModule.h" // for export macros
 #include "vtkSMObject.h"
+
+#include "vtkPVCinemaReaderModule.h" // for export macros
+#include <string> // needed for std::string
 
 class vtkPVCinemaDatabaseInformation;
 class vtkSMSelfGeneratingSourceProxy;
