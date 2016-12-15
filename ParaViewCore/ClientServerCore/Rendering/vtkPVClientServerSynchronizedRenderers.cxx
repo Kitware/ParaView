@@ -59,6 +59,7 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
     {
       vtkUnsignedCharArray* data = vtkUnsignedCharArray::New();
       this->ParallelController->Receive(data, 1, 0x023430);
+      this->Compressor->SetImageResolution(header[1], header[2]);
       this->Decompress(data, rawImage.GetRawPtr());
       data->Delete();
     }
@@ -104,6 +105,7 @@ void vtkPVClientServerSynchronizedRenderers::SlaveEndRender()
   header[2] = rawImage.GetHeight();
   header[3] = rawImage.IsValid() ? rawImage.GetRawPtr()->GetNumberOfComponents() : 0;
 
+  this->Compressor->SetImageResolution(header[1], header[2]);
   // send the image to the client.
   this->ParallelController->Send(header, 4, 1, 0x023430);
   if (rawImage.IsValid())
