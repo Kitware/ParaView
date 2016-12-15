@@ -374,6 +374,12 @@
            <Property name="StepSize" />
            <Property name="NormalizeVectors" />
            <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Rendering controls -->
@@ -389,6 +395,12 @@
            <Property name="HighColorContrastEnhancementFactor" />
 
            <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Fragment Masking -->
@@ -397,6 +409,12 @@
            <Property name="MaskThreshold" />
            <Property name="MaskIntensity" />
            <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Noise texture controls -->
@@ -411,21 +429,45 @@
            <Property name="ImpulseNoiseProbability" />
            <Property name="ImpulseNoiseBackgroundValue" />
            <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Parallel  controls -->
          <PropertyGroup label="SurfaceLIC: Parallelization">
            <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Interactivity controls -->
          <PropertyGroup label="SurfaceLIC: Interactivity">
            <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- benchmarking -->
          <PropertyGroup label="SurfaceLIC: Benchmark">
            <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
         <!-- </PropertyGroup> -->
         </ExposedProperties>
@@ -456,6 +498,12 @@
            <Property name="StepSize" />
            <Property name="NormalizeVectors" />
            <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Rendering controls -->
@@ -471,6 +519,12 @@
            <Property name="HighColorContrastEnhancementFactor" />
 
            <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Fragment Masking -->
@@ -479,6 +533,12 @@
            <Property name="MaskThreshold" />
            <Property name="MaskIntensity" />
            <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Noise texture controls -->
@@ -493,21 +553,45 @@
            <Property name="ImpulseNoiseProbability" />
            <Property name="ImpulseNoiseBackgroundValue" />
            <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Parallel  controls -->
          <PropertyGroup label="SurfaceLIC: Parallelization">
            <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Interactivity controls -->
          <PropertyGroup label="SurfaceLIC: Interactivity">
            <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- benchmarking -->
          <PropertyGroup label="SurfaceLIC: Benchmark">
            <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
         <!-- </PropertyGroup> -->
         </ExposedProperties>
@@ -537,6 +621,12 @@
            <Property name="StepSize" />
            <Property name="NormalizeVectors" />
            <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Rendering controls -->
@@ -552,6 +642,12 @@
            <Property name="HighColorContrastEnhancementFactor" />
 
            <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Fragment Masking -->
@@ -560,6 +656,12 @@
            <Property name="MaskThreshold" />
            <Property name="MaskIntensity" />
            <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Noise texture controls -->
@@ -574,21 +676,45 @@
            <Property name="ImpulseNoiseProbability" />
            <Property name="ImpulseNoiseBackgroundValue" />
            <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Parallel  controls -->
          <PropertyGroup label="SurfaceLIC: Parallelization">
            <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Interactivity controls -->
          <PropertyGroup label="SurfaceLIC: Interactivity">
            <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- benchmarking -->
          <PropertyGroup label="SurfaceLIC: Benchmark">
            <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
         <!-- </PropertyGroup> -->
         </ExposedProperties>
@@ -618,6 +744,12 @@
            <Property name="StepSize" />
            <Property name="NormalizeVectors" />
            <Property name="EnhancedLIC" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Rendering controls -->
@@ -633,6 +765,12 @@
            <Property name="HighColorContrastEnhancementFactor" />
 
            <Property name="AntiAlias" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Fragment Masking -->
@@ -641,6 +779,12 @@
            <Property name="MaskThreshold" />
            <Property name="MaskIntensity" />
            <Property name="MaskColor" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Noise texture controls -->
@@ -655,21 +799,45 @@
            <Property name="ImpulseNoiseProbability" />
            <Property name="ImpulseNoiseBackgroundValue" />
            <Property name="NoiseGeneratorSeed" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Parallel  controls -->
          <PropertyGroup label="SurfaceLIC: Parallelization">
            <Property name="CompositeStrategy" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- Interactivity controls -->
          <PropertyGroup label="SurfaceLIC: Interactivity">
            <Property name="UseLICForLOD" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
 
          <!-- benchmarking -->
          <PropertyGroup label="SurfaceLIC: Benchmark">
            <Property name="WriteLog" />
+           <Hints>
+             <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="Representation"
+                                      value="Surface LIC" />
+           </Hints>
          </PropertyGroup>
         <!-- </PropertyGroup> -->
         </ExposedProperties>

@@ -862,6 +862,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
   // map of a group-tag and the pqProxyWidgetItem for the group, if any.
   QMap<int, QPointer<pqProxyWidgetItem> > groupItems;
   QMap<int, QString> groupLabels;
+  QMap<int, vtkPVXMLElement*> groupHints;
 
   for (size_t index = 0; index < smproxy->GetNumberOfPropertyGroups(); index++)
   {
@@ -872,6 +873,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       groupProperties[group->GetProperty(static_cast<unsigned int>(j))] = group_tag;
     }
     groupLabels[group_tag] = group->GetXMLLabel();
+    groupHints[group_tag] = group->GetHints();
 
     if (group->GetNumberOfProperties() == 0)
     {
@@ -913,6 +915,16 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       {
         PV_DEBUG_PANELS() << "Group " << group->GetXMLLabel() << " is controlled by widget "
                           << propertyWidget->metaObject()->className();
+
+        // Create decorators, if any.
+        QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(group->GetHints());
+        foreach (const QString& type, decoratorTypes.keys())
+        {
+          if (interface->createWidgetDecorator(type, decoratorTypes[type], propertyWidget))
+          {
+            break;
+          }
+        }
 
         propertyWidget->setParent(this);
         QString groupTypeName = group->GetPanelWidget();
@@ -1066,6 +1078,24 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     {
       item->appendToDefaultVisibilityForRepresentations(
         smProperty->GetPanelVisibilityDefaultForRepresentation());
+    }
+
+    if (property_group_tag != -1)
+    {
+      // Create decorators, if any.
+      pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
+      foreach (pqPropertyWidgetInterface* interface,
+        interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
+      {
+        QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(groupHints[property_group_tag]);
+        foreach (const QString& type, decoratorTypes.keys())
+        {
+          if (interface->createWidgetDecorator(type, decoratorTypes[type], propertyWidget))
+          {
+            break;
+          }
+        }
+      }
     }
 
     this->Internals->appendToItems(item, this);

@@ -3702,6 +3702,12 @@
             <Property name="OSPRayUseScaleArray" />
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Surface" />
+            </Hints>
           </PropertyGroup>
 
         </ExposedProperties>
@@ -3745,6 +3751,12 @@
             <Property name="GlyphType"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="3d glyphs"/>
+            <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="Representation"
+                                         value="3D Glyphs" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3862,18 +3874,26 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityFunction"
-                    panel_visibility="never" />
-          <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="advanced" />
-          <Property name="ExtractedBlockIndex"
-                    panel_visibility="never" />
-          <Property name="SelectMapper"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume" />
-          <Property name="SamplingDimensions"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume"/>
+          <PropertyGroup label="Volume Rendering">
+            <Property name="ScalarOpacityFunction"
+                      panel_visibility="never" />
+            <Property name="ScalarOpacityUnitDistance"
+                      panel_visibility="advanced" />
+            <Property name="ExtractedBlockIndex"
+                      panel_visibility="never" />
+            <Property name="SelectMapper"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="SamplingDimensions"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume" />
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 
@@ -3922,18 +3942,26 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityFunction"
-                    panel_visibility="never" />
-          <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="advanced" />
-          <Property name="ExtractedBlockIndex"
-                    panel_visibility="never" />
-          <Property name="SelectMapper"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume" />
-          <Property name="SamplingDimensions"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume"/>
+          <PropertyGroup label="Volume Rendering">
+            <Property name="ScalarOpacityFunction"
+                      panel_visibility="never" />
+            <Property name="ScalarOpacityUnitDistance"
+                      panel_visibility="advanced" />
+            <Property name="ExtractedBlockIndex"
+                      panel_visibility="never" />
+            <Property name="SelectMapper"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="SamplingDimensions"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume" />
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -3993,6 +4021,12 @@
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"
                       override="1"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -4054,6 +4088,12 @@
                       panel_visibility_default_for_representation="volume" />
             <Property name="InterpolationType"
                       panel_visibility="never" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Volume" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -4121,6 +4161,7 @@
           <Exception name="Input" />
         </ShareProperties>
         <ExposedProperties>
+        <PropertyGroup label="Volume Rendering">
           <Property name="ScalarOpacityUnitDistance"
                     panel_visibility="advanced" />
           <Property name="ScalarOpacityFunction" />
@@ -4129,6 +4170,13 @@
           <Property name="StreamingRequestSize" />
           <Property name="NumberOfSamples" />
           <Property name="Shade" />
+          <Hints>
+            <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="Representation"
+                                     value="Volume" />
+          </Hints>
+        </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
 

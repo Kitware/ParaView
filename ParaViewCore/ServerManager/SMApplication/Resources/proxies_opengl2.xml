@@ -581,6 +581,12 @@
             <Property name="OpacityArray" />
             <Property name="OpacityTransferFunction" />
             <Property name="CustomShader" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Point Gaussian" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -615,6 +621,12 @@
             <Property name="OpacityArray" />
             <Property name="OpacityTransferFunction" />
             <Property name="CustomShader" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Point Gaussian" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
