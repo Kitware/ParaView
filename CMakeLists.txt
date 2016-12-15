@@ -206,6 +206,9 @@ set(VTK_OPENVR_OBJECT_FACTORY OFF
     CACHE INTERNAL "ParaView requires the OpenVR factory be disabled" FORCE)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 
+# NvPipe requires an NVIDIA GPU.
+option(PARAVIEW_ENABLE_NVPIPE "Build ParaView with NvPipe remoting." OFF)
+
 # Xdmf3 is not ON by default since it depends on Boost.
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support (requires Boost)." OFF)
 

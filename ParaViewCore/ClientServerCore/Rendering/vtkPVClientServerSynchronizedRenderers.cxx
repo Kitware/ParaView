@@ -18,9 +18,13 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
+#include "vtkPVConfig.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
+#ifdef PARAVIEW_ENABLE_NVPIPE
+#include "vtkNvPipeCompressor.h"
+#endif
 
 #include <assert.h>
 #include <sstream>
@@ -31,8 +35,13 @@ vtkCxxSetObjectMacro(vtkPVClientServerSynchronizedRenderers, Compressor, vtkImag
 vtkPVClientServerSynchronizedRenderers::vtkPVClientServerSynchronizedRenderers()
 {
   this->Compressor = NULL;
+#ifdef PARAVIEW_ENABLE_NVPIPE
+  this->ConfigureCompressor("vtkNvPipeCompressor 0 1 1920 1080");
+  this->LossLessCompression = false;
+#else
   this->ConfigureCompressor("vtkLZ4Compressor 0 3");
   this->LossLessCompression = true;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -181,6 +190,13 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
     {
       comp = vtkLZ4Compressor::New();
     }
+#ifdef PARAVIEW_ENABLE_NVPIPE
+    else if (className == "vtkNvPipeCompressor")
+    {
+      comp = vtkNvPipeCompressor::New();
+    }
+#endif
+
     else if (className == "NULL" || className.empty())
     {
       this->SetCompressor(0);
