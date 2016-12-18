@@ -254,15 +254,12 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
     // Now determine best value for Nh in [Nh/2,Nh-1]
     double bestQ = vtkMath::Inf();
     int best = -1;
-    for (int i = Nh / 2; i < Nh; ++i)
+    double ar = Nv * wmp / static_cast<double>(hmp * Nh);
+    double q = (ar >= 1.0) ? ar : 1. / ar;
+    if (q < bestQ)
     {
-      double ar = Nv * wmp / static_cast<double>(hmp * Nh);
-      double q = (ar >= 1.0) ? ar : 1. / ar;
-      if (q < bestQ)
-      {
-        bestQ = q;
-        best = i;
-      }
+      bestQ = q;
+      best = Nh-1;
     }
     Nh = best;
   }
