@@ -72,6 +72,11 @@ public:
   const char* GetProxyName(vtkSMProxy* proxy);
 
   /**
+   * Inverse of `GetProxyName`, returns the first proxy with the given name.
+   */
+  vtkSMProxy* GetProxyWithName(const char* pname);
+
+  /**
    * This always returns true.
    */
   virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;

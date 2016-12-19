@@ -337,6 +337,22 @@ const char* vtkSMProxyListDomain::GetProxyName(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyListDomain::GetProxyWithName(const char* pname)
+{
+  vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies = this->Internals->GetProxies();
+  for (iter = proxies.begin(); pname != NULL && iter != proxies.end(); iter++)
+  {
+    if (iter->Proxy && iter->Proxy->GetXMLName() && strcmp(iter->Proxy->GetXMLName(), pname) == 0)
+    {
+      return iter->Proxy;
+    }
+  }
+
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(prop);

@@ -160,7 +160,12 @@ public:
   vtkSMProxy* GetUncheckedProxy(unsigned int idx);
 
   /**
-   * Copy all property values.
+   * Copy all property values. This method behaves differently for properties
+   * with vtkSMProxyListDomain and those without it. If the property has a
+   * vtkSMProxyListDomain, then the property is acting as an enumeration, giving
+   * user ability to pick one of the available proxies in the domain, hence a
+   * `Copy` request, will find an equivalent proxy on the target's domain and
+   * set that as the value of the target property.
    */
   virtual void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
