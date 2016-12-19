@@ -25,6 +25,10 @@
 #include "vtkSMSourceProxy.h"
 
 class vtkPVProminentValuesInformation;
+namespace vtkPVComparativeViewNS
+{
+class vtkCloningVectorOfRepresentations;
+}
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentationProxy : public vtkSMSourceProxy
 {
@@ -161,7 +165,7 @@ private:
   friend class vtkSMViewProxy;
   //@}
 
-  friend class vtkPVComparativeView;
+  friend class vtkPVComparativeViewNS::vtkCloningVectorOfRepresentations;
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
   bool VTKRepresentationUpdated;
