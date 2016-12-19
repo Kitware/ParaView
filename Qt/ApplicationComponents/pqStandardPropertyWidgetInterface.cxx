@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlanePropertyWidget.h"
 #include "pqIndexSelectionWidget.h"
 #include "pqInputDataTypeDecorator.h"
+#include "pqInputSelectorWidget.h"
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLightsEditor.h"
 #include "pqLinePropertyWidget.h"
@@ -158,6 +159,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "index_selection")
   {
     return new pqIndexSelectionWidget(smProxy, smProperty);
+  }
+  else if (name == "input_selector")
+  {
+    return new pqInputSelectorWidget(smProxy, smProperty);
   }
   else if (name == "camera_manipulator")
   {
