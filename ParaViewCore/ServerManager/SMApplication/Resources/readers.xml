@@ -5974,6 +5974,16 @@
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetUse64BitFloats"
+                         default_values="0"
+                         label="Expect 64-bit Floats/Scalars"
+                         name="Use64BitFloats"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Expect the openFOAM case to use 64-bit label values.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetCreateCellToPoint"
                          default_values="1"
                          label="Create cell-to-point filtered data"
