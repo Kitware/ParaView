@@ -5725,6 +5725,18 @@
         </RepresentationProxy>
       </SubProxy>
 
+      <StringVectorProperty command="SetSeriesLabelPrefix"
+                            name="SeriesLabelPrefix"
+                            number_of_elements="1"
+                            default_value=""
+                            panel_visibility="advanced">
+      <Documentation>
+        Specify a string to prefix to the **SeriesLabel** (**Legend Name**) for each
+        of series being plotted. This will get prefixed to the labels (legend names) specified
+        for each of the series individually via the **Series Parameters**.
+      </Documentation>
+      </StringVectorProperty>
+
       <!-- End of XYChartRepresentationBase -->
     </ChartRepresentationProxy>
 
@@ -6567,18 +6579,6 @@
         <Property name="SeriesPlotCorner"
                   function="SeriesPlotCorner"/>
       </PropertyGroup>
-
-      <StringVectorProperty command="SetSeriesLabelPrefix"
-                            name="SeriesLabelPrefix"
-                            number_of_elements="1"
-                            default_value=""
-                            panel_visibility="advanced">
-      <Documentation>
-        Specify a string to prefix to the **SeriesLabel** (**Legend Name**) for each
-        of series being plotted. This will get prefixed to the labels (legend names) specified
-        for each of the series individually via the **Series Parameters**.
-      </Documentation>
-      </StringVectorProperty>
 
     </ChartRepresentationProxy>
 
