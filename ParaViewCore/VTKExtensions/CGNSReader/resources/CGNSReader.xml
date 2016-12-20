@@ -11,8 +11,7 @@
         a multi-block dataset.
       </Documentation>
       <Hints>
-        <ReaderFactory extensions="cgns"
-           file_description="CGNS Files (Plugin)" />
+        <ReaderFactory extensions="cgns" file_description="CGNS Files" />
       </Hints>
 
       <StringVectorProperty name="FileName"
@@ -170,7 +169,7 @@
       </Documentation>
       <Hints>
         <ReaderFactory extensions="cgns"
-           file_description="CGNS Files (Plugin)" />
+           file_description="CGNS Files" />
       </Hints>
 
       <StringVectorProperty name="FileNameInfo"
