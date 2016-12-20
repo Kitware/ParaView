@@ -4,6 +4,14 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes since 5.2
+-----------------
+
+###Removed ctkRangeSlider and ctkDoubleRangeSlider###
+
+These classes were not used by ParaView. Use pqDoubleRangeSliderPropertyWidget
+instead.
+
 Changes in 5.2
 --------------
 
