@@ -67,7 +67,7 @@ def RequestDataDescription(datadescription):
         # We are just going to request all fields and meshes from the simulation
         # code/adaptor.
         for i in range(datadescription.GetNumberOfInputDescriptions()):
-            print 'input dname ', datadescription.GetInputDescriptionName(i)
+            print('input dname %s' % datadescription.GetInputDescriptionName(i))
             datadescription.GetInputDescription(i).AllFieldsOn()
             datadescription.GetInputDescription(i).GenerateMeshOn()
         return
