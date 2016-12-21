@@ -87,7 +87,7 @@ bool vtkDeserialize(vtkClientServerStream& css, int msgIdx, vtkDataSetAttributes
   for (int cc = 0; cc < numArrays; ++cc)
   {
     vtkTypeUInt32 length;
-    if (!css.GetArgumentLength(msgIdx, idx++, &length))
+    if (!css.GetArgumentLength(msgIdx, idx, &length))
     {
       return false;
     }
@@ -221,7 +221,7 @@ int vtkCompleteArrays::RequestData(
     css.SetData(&data[0], length);
 
     vtkDeserialize(css, 0, output->GetPointData());
-    vtkDeserialize(css, 1, output->GetPointData());
+    vtkDeserialize(css, 1, output->GetCellData());
     vtkPointSet* ps = vtkPointSet::SafeDownCast(output);
     if (ps)
     {
