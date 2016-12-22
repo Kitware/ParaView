@@ -353,7 +353,7 @@ class Store(object):
 
     def isdependee(self, name):
         """ check if the named parameter has others that depend on it """
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in self.parameter_associations.items():
             if name in dependees:
                 return True
         return False
@@ -370,7 +370,7 @@ class Store(object):
     def getdependers(self, name):
         """ return a list of all the parameters that depend on the given one """
         result = []
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in self.parameter_associations.items():
             if name in dependees["vis"]:
                 result.append(depender)
         return result
@@ -387,7 +387,7 @@ class Store(object):
 
     def getRelatedField(self, parameter):
         ''' Returns the 'field' argument related to a 'parameter'. '''
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in self.parameter_associations.items():
             if parameter in dependees["vis"] and \
                self.isfield(depender):
                 return depender
@@ -524,13 +524,13 @@ class Store(object):
             ok_vals = []
 
             ok_desc = {}
-            for param, value in descriptor.iteritems():
+            for param, value in descriptor.items():
                 if self.dependencies_satisfied(param, descriptor):
                     ok_desc.update({param:value})
 
             OK = True
             if fixedargs:
-                for k,v in fixedargs.iteritems():
+                for k,v in fixedargs.items():
                     if not (k in ok_desc and ok_desc[k] == v):
                         OK = False
             if OK:
@@ -728,7 +728,7 @@ class FileStore(Store):
             elif doctype == 'VALUE':
                 #find the range for the value that this raster shows
                 vrange = [0,1]
-                for parname, parvalue in document.descriptor.iteritems():
+                for parname, parvalue in document.descriptor.items():
                     param = self.get_parameter(parname)
                     if 'valueRanges' in param:
                         #we now have a color parameter, look for the range

@@ -58,9 +58,9 @@ create_pipeline()
 
 # Stop trace and grab the trace output string
 trace_string = smtrace.stop_trace()
-print trace_string
+print(trace_string)
 # Uncomment these lines to print the trace string or save it to a file
-print trace_string
+print(trace_string)
 #smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
@@ -71,19 +71,19 @@ for source in GetSources().values():
 # Confirm that all the representations have been removed from the view except 1
 # for the scalar bar.
 if len(ren.Representations) != 1:
-    print "View should not have any representations except the scalar bar!"
+    print("View should not have any representations except the scalar bar!")
     sys.exit(1)
 
 # destroy the scalar bar too
 Delete(ren.Representations[0])
 
 if len(ren.Representations) != 0:
-    print "View should not have any representations at this point!"
+    print("View should not have any representations at this point!")
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
 if GetSources():
-    print "All sources should have be removed."
+    print("All sources should have be removed.")
     sys.exit(1)
 
 # change camera to confirm that trace restores it.
@@ -97,7 +97,7 @@ exec(code)
 # Confirm that the clip filter has been recreated
 clip = [x for x in GetSources().values() if x.GetXMLLabel() == "Clip"]
 if not clip:
-    print "After replaying trace, could not find Clip filter."
+    print("After replaying trace, could not find Clip filter.")
     sys.exit(1)
 
 # Do a screenshot regression test

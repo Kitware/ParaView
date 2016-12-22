@@ -13,6 +13,10 @@ Note, this cannot be called when Python tracing is active.
 from paraview import servermanager as sm
 from paraview import smtrace
 from paraview import simple
+import sys
+
+if sys.version_info >= (3,):
+    xrange = range
 
 class supported_proxies(object):
     """filter object used to hide proxies that are currently not supported by
@@ -112,7 +116,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
         start_set = source_set
     else:
         # if nothing is specified, we save all views and sources.
-        start_set = simple.GetSources().values() + simple.GetViews()
+        start_set = [x for x in simple.GetSources().values()] + simple.GetViews()
     start_set = [x for x in start_set if filter(x)]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
@@ -141,9 +145,8 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
     if views:
         # sort views by their names, so the state has some structure to it.
-        views = sorted(views, cmp=lambda x,y:\
-                cmp(smtrace.Trace.get_registered_name(x, "views"),
-                    smtrace.Trace.get_registered_name(y, "views")))
+        views = sorted(views, key=lambda x:\
+                smtrace.Trace.get_registered_name(x, "views"))
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup views used in the visualization",

@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+
 import sys
-import logbase
+from . import logbase
 
 
 class FrameLogEntry:

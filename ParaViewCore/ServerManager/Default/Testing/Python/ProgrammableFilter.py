@@ -53,24 +53,24 @@ myoutput = servermanager.Fetch(filter, sum, sum)
 
 cellData = myoutput.GetCellData()
 if cellData.GetArray("ObjectId").GetValue(0) != 7472:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(0).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(0).GetName())
   sys.exit(1)
 
 if cellData.GetArray("GlobalElementId").GetValue(0) != 27919128:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(1).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(1).GetName())
   sys.exit(1)
 
 if cellData.GetArray("PedigreeElementId").GetValue(0) != 27919128:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(2).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(2).GetName())
   sys.exit(1)
 
 pointData = myoutput.GetPointData()
 if pointData.GetArray("GlobalNodeId").GetValue(0) != 36120750:
-  print "ERROR: Wrong value returned from point %s array." % pointData.GetArray(0).GetName()
+  print("ERROR: Wrong value returned from point %s array." % pointData.GetArray(0).GetName())
   sys.exit(1)
 
 if pointData.GetArray("PedigreeNodeId").GetValue(0) != 36120750:
-  print "ERROR: Wrong value returned from point %s array." % pointData.GetArray(1).GetName()
+  print("ERROR: Wrong value returned from point %s array." % pointData.GetArray(1).GetName())
   sys.exit(1)
 
 #---------------Now repeat--------------
@@ -115,24 +115,24 @@ myoutput = servermanager.Fetch(filter, sum, sum)
 
 cellData = myoutput.GetCellData()
 if cellData.GetArray("ObjectId").GetValue(0) != 7472:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(0).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(0).GetName())
   sys.exit(1)
 
 if cellData.GetArray("GlobalElementId").GetValue(0) != 27919128:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(1).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(1).GetName())
   sys.exit(1)
 
 if cellData.GetArray("PedigreeElementId").GetValue(0) != 27919128:
-  print "ERROR: Wrong value returned from cell %s array." % cellData.GetArray(2).GetName()
+  print("ERROR: Wrong value returned from cell %s array." % cellData.GetArray(2).GetName())
   sys.exit(1)
 
 pointData = myoutput.GetPointData()
 if pointData.GetArray("GlobalNodeId").GetValue(0) != 36120750:
-  print "ERROR: Wrong value returned from point %s array." % pointData.GetArray(0).GetName()
+  print("ERROR: Wrong value returned from point %s array." % pointData.GetArray(0).GetName())
   sys.exit(1)
 
 if pointData.GetArray("PedigreeNodeId").GetValue(0) != 36120750:
-  print "ERROR: Wrong value returned from point %s array." % pointData.GetArray(1).GetName()
+  print("ERROR: Wrong value returned from point %s array." % pointData.GetArray(1).GetName())
   sys.exit(1)
 
 

@@ -67,7 +67,12 @@ garbage collected since there's no reference to it.
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
+import sys
 from paraview.vtk import vtkTimeStamp
+
+
+if sys.version_info >= (3,):
+    xrange = range
 
 class TraceOutput:
   """Internal class used to collect the trace output. Everytime anything is pushed into
@@ -143,7 +148,8 @@ class Trace(object):
 
     @classmethod
     def unregister_accessor(cls, accessor):
-        del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
+        if accessor.get_object() in cls.__REGISTERED_ACCESSORS:
+            del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
 
     @classmethod
     def get_accessor(cls, obj):
@@ -168,7 +174,7 @@ class Trace(object):
 
     @classmethod
     def has_accessor(cls, obj):
-        return cls.__REGISTERED_ACCESSORS.has_key(obj)
+        return obj in cls.__REGISTERED_ACCESSORS
 
     @classmethod
     def create_accessor(cls, obj):
@@ -1114,7 +1120,7 @@ class CallMethod(TraceItem):
             pass
         accessor = Trace.get_accessor(sm._getPyProxy(proxy))
         args = [str(CallMethod.marshall(x)) for x in args]
-        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s.%s(%s)" % (accessor, methodname, ", ".join(args)))
         return to_trace
 
@@ -1167,7 +1173,7 @@ class CallFunction(TraceItem):
         except KeyError:
             pass
         args = [str(CallMethod.marshall(x)) for x in args]
-        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
@@ -1226,7 +1232,7 @@ def _create_trace_item_internal(key, args=None, kwargs=None):
     __ActiveTraceItems = [x for x in __ActiveTraceItems if not x() is None]
 
     g = globals()
-    if g.has_key(key) and callable(g[key]):
+    if key in g and callable(g[key]):
         args = args if args else []
         kwargs = kwargs if kwargs else {}
         traceitemtype = g[key]

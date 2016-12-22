@@ -12,7 +12,7 @@ smtesting.ProcessCommandLineArguments()
 servermanager.Connect()
 
 pvsm_file = os.path.join(smtesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
-print "State file: %s" % pvsm_file
+print("State file: %s" % pvsm_file)
 
 smtesting.LoadServerManagerState(pvsm_file)
 

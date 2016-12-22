@@ -204,7 +204,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
 
   loadPythonModules << "_code = compile(_source, \"" << fileNameName << ".py\", \"exec\")"
                     << std::endl;
-  loadPythonModules << "exec _code in _" << fileNameName << ".__dict__" << std::endl;
+  loadPythonModules << "exec(_code, _" << fileNameName << ".__dict__)" << std::endl;
   loadPythonModules << "del _source" << std::endl;
   loadPythonModules << "del _code" << std::endl;
   loadPythonModules << "import " << fileNameName << std::endl;

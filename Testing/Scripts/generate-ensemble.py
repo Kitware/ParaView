@@ -17,7 +17,7 @@ for yMag in (18, 36, 72):
         fTime = open(fileNameTime, "w");
         fEnsemble.write ("{:d},{:d},{:s}\n".format(yMag, zMag, fileNameTime))
         for step in range(numSteps):
-            print "Timestep ", step
+            print("Timestep %d" % step)
 
             wavelet = pvsimple.Wavelet()
             wavelet.Maximum = 300+50*math.sin(step * 2 * 3.1415927 / 10)

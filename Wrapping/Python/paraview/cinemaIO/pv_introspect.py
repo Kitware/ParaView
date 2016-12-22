@@ -935,7 +935,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
     atLeastOneViewExported = False
     cinema_dirs = []
-    for viewName, viewParams in viewSelection.iteritems():
+    for viewName, viewParams in viewSelection.items():
 
         # check if this view was selected to export as spec b
         cinemaParams = viewParams[6]
@@ -1047,7 +1047,7 @@ def prepare_selection(trackSelection, arraySelection):
     proxies.  Although this is not necessary in the menu->export case (proxies could
     be accessed by name directly), we comply for compatibility.'''
     userDef = {}
-    for name, values in trackSelection.iteritems():
+    for name, values in trackSelection.items():
         source = paraview.simple.FindSource(name)
         if (source is None):
               # Following the smtrace.py convention pqCinemaTrackSelection passes
@@ -1078,7 +1078,7 @@ def prepare_selection(trackSelection, arraySelection):
                 options[controlName] = values
                 userDef[source] = options
 
-    for name, arrayNames in arraySelection.iteritems():
+    for name, arrayNames in arraySelection.items():
         source = paraview.simple.FindSource(name)
         if (source is None):
               # Following the smtrace.py convention pqCinemaTrackSelection passes

@@ -5,6 +5,8 @@ from vtk.vtkPVServerManagerRendering import *
 from vtk import *
 from paraview import smtesting
 
+if sys.version_info > (3,):
+    xrange = range
 
 NUM_POINTS = 5
 

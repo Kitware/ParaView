@@ -110,7 +110,7 @@ try:
   baselineIndex = sys.argv.index('-B')+1
   baselinePath = sys.argv[baselineIndex]
 except:
-  print "Could not get baseline directory. Test failed."
+  print("Could not get baseline directory. Test failed.")
 baseline_file = os.path.join(baselinePath, "ColorBy.png")
 import vtk.test.Testing
 vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()

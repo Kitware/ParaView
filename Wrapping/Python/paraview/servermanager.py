@@ -354,6 +354,9 @@ class Proxy(object):
         "Returns false if the underlying SMProxies are the same."
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash(self.SMProxy)
+
     def __iter__(self):
         "Creates an iterator for the properties."
         return PropertyIterator(self)
@@ -2287,7 +2290,11 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     data from. Default is port 0.
     """
 
-    import types
+    import sys
+    if sys.version_info < (3,):
+        integer_types = (int, long,)
+    else:
+        integer_types = (int,)
 
     reducer = filters.ReductionFilter(Input=OutputPort(input,idx))
 
@@ -2310,7 +2317,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
             paraview.print_debug_info("use unstructured append filter")
             reducer.PostGatherHelperName = "vtkAppendFilter"
 
-    elif type(arg1) is types.IntType:
+    elif type(arg1) in integer_types:
         reducer.PassThrough = arg1
 
     else:

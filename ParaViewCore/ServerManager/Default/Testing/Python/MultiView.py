@@ -35,10 +35,10 @@ for i in [0, 1, 2]:
     filename = "%s/view1_%d.png" % (smtesting.TempDir, i)
     WriteImage(filename, v1)
     if testing1.RegressionTest(filename, smtesting.Threshold) != testing1.PASSED:
-        raise RuntimeError, "Failed image comparison for view 1 on run #%d"%i
+        raise RuntimeError("Failed image comparison for view 1 on run #%d"%i)
 
     Render(v2)
     filename = "%s/view2_%d.png" % (smtesting.TempDir, i)
     WriteImage(filename, v2)
     if testing2.RegressionTest(filename, smtesting.Threshold) != testing2.PASSED:
-        raise RuntimeError, "Failed image comparison for view 2 on run #%d"%i
+        raise RuntimeError("Failed image comparison for view 2 on run #%d"%i)

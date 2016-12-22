@@ -1,6 +1,6 @@
 import sys
 if len(sys.argv) != 3:
-    print "command is 'python <python driver code> <script name> <number of time steps>'"
+    print("command is 'python <python driver code> <script name> <number of time steps>'")
     sys.exit(1)
 import paraview
 import paraview.vtk as vtk
@@ -22,13 +22,13 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
     scriptpath, scriptname = os.path.split(scriptname)
     sys.path.append(scriptpath)
     if scriptname.endswith(".py"):
-        print 'script name is ', scriptname
+        print('script name is %s' % scriptname)
         scriptname = scriptname[0:len(scriptname)-3]
     try:
         cpscript = __import__(scriptname)
     except:
-        print sys.exc_info()
-        print 'Cannot find ', scriptname, ' -- no coprocessing will be performed.'
+        print(sys.exc_info())
+        print('Cannot find %s -- no coprocessing will be performed.' % scriptname)
         sys.exit(1)
         return
 
@@ -52,14 +52,14 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
 try:
     numsteps = int(sys.argv[2])
 except ValueError:
-    print 'the last argument should be a number'
+    print('the last argument should be a number')
     numsteps = 10
 
 
 #imageData2 = vtk.vtkImageData()
 
 for step in range(numsteps):
-    print "Timestep ", step
+    print("Timestep %d" % step)
     # assume simulation time starts at 0
     time = step/float(numsteps)
 

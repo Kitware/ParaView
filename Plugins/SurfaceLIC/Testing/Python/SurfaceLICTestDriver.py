@@ -16,20 +16,20 @@ rw.Render()
 if opengl2:
     mapper = vtk.vtkCompositeSurfaceLICMapper()
     ok = mapper.GetLICInterface().IsSupported(rw)
-    print
-    print 'SurfaceLIC %s Supported by the OpenGL drivers\n'%\
-          'is' if(ok) else 'is not'
+    print()
+    print('SurfaceLIC %s Supported by the OpenGL drivers\n'%\
+          'is' if(ok) else 'is not')
     del mapper
 else:
     em = rw.GetExtensionManager()
     painter = vtk.vtkSurfaceLICPainter()
     ok = painter.IsSupported(rw)
-    print
-    print 'SurfaceLIC %s Supported by:\n  %s\n  %s\n  %s\n'%(
+    print()
+    print('SurfaceLIC %s Supported by:\n  %s\n  %s\n  %s\n'%(
           'is' if(ok) else 'is not',
           em.GetDriverGLVersion(),
           em.GetDriverGLVendor(),
-          em.GetDriverGLRenderer())
+          em.GetDriverGLRenderer()))
     del painter
 del rw
 
@@ -50,12 +50,12 @@ if ok:
     WriteImage('%s/../../%s.png'%(smtesting.TempDir, imageFile))
 
   if not smtesting.DoRegressionTesting(view.SMProxy):
-    raise smtesting.TestError, 'Test failed.'
+    raise smtesting.TestError('Test failed.')
 
-  print
-  print 'Test passes'
+  print()
+  print('Test passes')
 
 else:
-  print 'Skipped untested.'
+  print('Skipped untested.')
 
-print
+print()

@@ -125,7 +125,12 @@ std::string getModuleAttrAsString(const char* module, const char* attribute)
     return result.str();
   }
 
-  std::string result = PyBytes_AsString(attr);
+#if PY_MAJOR_VERSION >= 3
+  const char* cdata = PyUnicode_AsUTF8(attr);
+#else
+  const char* cdata = PyBytes_AsString(attr);
+#endif
+  std::string result(cdata? cdata : "");
   return result;
 }
 

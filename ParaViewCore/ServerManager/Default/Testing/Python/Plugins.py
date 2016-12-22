@@ -15,12 +15,12 @@ rep = Show()
 
 # Ensure that loading the SurfaceLIC lead to adding the SelectLICVectors
 # property correctly.
-print rep.GetProperty("SelectInputVectors")
-print rep.SelectInputVectors
+print(rep.GetProperty("SelectInputVectors"))
+print(rep.SelectInputVectors)
 
 try:
     LoadDistributedPlugin("NonExistantPluginName", False, globals())
-    print "Error: LoadDistributedPlugin should have thrown a RunTimeError!!!"
+    print("Error: LoadDistributedPlugin should have thrown a RunTimeError!!!")
     sys.exit(1)
 except:
     # We expect an error.
@@ -28,7 +28,7 @@ except:
 
 try:
     MomentVectors()
-    print "Error: MomentVectors should not exist before loading the plugin"
+    print("Error: MomentVectors should not exist before loading the plugin")
     sys.exit(1)
 except:
     pass

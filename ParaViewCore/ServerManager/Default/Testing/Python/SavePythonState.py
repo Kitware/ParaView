@@ -4,10 +4,10 @@
 
 import sys
 from paraview import smtesting
-print sys.argv
+print(sys.argv)
 smtesting.ProcessCommandLineArguments()
 
-execfile(sys.argv[1])
+exec(open(sys.argv[1]).read())
 
 
 _view = GetActiveView()
