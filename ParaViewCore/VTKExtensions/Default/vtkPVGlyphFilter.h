@@ -135,6 +135,16 @@ protected:
   bool UseCellCenters(vtkDataSet* input);
 
   /**
+   * Returns true if input scalars are used for glyphing.
+   */
+  bool NeedsScalars();
+
+  /**
+   * Returns true if input vectors are used for glyphing.
+   */
+  bool NeedsVectors();
+
+  /**
    * Method called in RequestData() to do the actual data processing. This will
    * apply a Cell Centers before the Glyph. The \c input, filling up the \c output
    * based on the filter parameters.

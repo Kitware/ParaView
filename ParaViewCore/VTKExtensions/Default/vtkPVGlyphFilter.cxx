@@ -235,9 +235,6 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   , Controller(0)
   , Internals(new vtkPVGlyphFilter::vtkInternals())
 {
-  this->SetColorModeToColorByScalar();
-  this->SetScaleModeToScaleByVector();
-
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -405,6 +402,13 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 //-----------------------------------------------------------------------------
 bool vtkPVGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
 {
+  // confirm that both scalars and vectors are being used by the Glyph filter,
+  // otherwise, the mismatch in array association for the two is not an issue.
+  if (!this->NeedsScalars() || !this->NeedsVectors())
+  {
+    return true;
+  }
+
   vtkDataArray* inSScalars = this->GetInputArrayToProcess(0, input);
   vtkDataArray* inVectors = this->GetInputArrayToProcess(1, input);
   int inSScalarsAssociation = this->GetInputArrayAssociation(0, input);
@@ -422,6 +426,46 @@ bool vtkPVGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
   }
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::NeedsScalars()
+{
+  if (this->ScaleMode == VTK_SCALE_BY_SCALAR)
+  {
+    return true;
+  }
+  if (this->ColorMode == VTK_COLOR_BY_SCALAR)
+  {
+    return true;
+  }
+  if (this->IndexMode == VTK_INDEXING_BY_SCALAR)
+  {
+    return true;
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::NeedsVectors()
+{
+  if (this->ScaleMode == VTK_SCALE_BY_VECTOR || this->ScaleMode == VTK_SCALE_BY_VECTORCOMPONENTS)
+  {
+    return true;
+  }
+  if (this->ColorMode == VTK_COLOR_BY_VECTOR)
+  {
+    return true;
+  }
+  if (this->VectorMode == VTK_USE_VECTOR)
+  {
+    return true;
+  }
+  if (this->IndexMode == VTK_INDEXING_BY_VECTOR)
+  {
+    return true;
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
