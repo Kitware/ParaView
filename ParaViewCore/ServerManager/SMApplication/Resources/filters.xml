@@ -14896,6 +14896,45 @@ source.</Documentation>
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetMarkBlankPointsAndCells"
+                         default_values="0"
+                         name="MarkBlankPointsAndCells"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set, points that did not get valid values during resampling, and
+        cells containing such points, are marked as blank.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End vtkResampleToImage -->
     </SourceProxy>
     <!-- ==================================================================== -->
