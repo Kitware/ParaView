@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPythonShellReaction.h"
 
+#include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
 #include "vtkPVConfig.h"
 
@@ -43,10 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPythonShellReaction::pqPythonShellReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  parentObject->setEnabled(false);
-#ifdef PARAVIEW_ENABLE_PYTHON
   parentObject->setEnabled(true);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -60,11 +58,13 @@ void pqPythonShellReaction::showPythonShell()
     dialog->show();
     dialog->raise();
     dialog->activateWindow();
-    return;
   }
+#else
+  pqCoreUtilities::promptUser("pqPythonShellReaction::NoPython", QMessageBox::Critical,
+    tr("Python support not enabled"), tr("Python support is required to use the Python shell, but "
+                                         "Python is not available in this build."),
+    QMessageBox::Ok | QMessageBox::Save);
 #endif
-
-  qCritical("Python support not enabled.");
 }
 
 //-----------------------------------------------------------------------------
@@ -75,10 +75,12 @@ void pqPythonShellReaction::executeScript(const char* filename)
   if (manager)
   {
     manager->executeScript(filename);
-    return;
   }
+#else
+  Q_UNUSED(filename);
+  pqCoreUtilities::promptUser("pqPythonShellReaction::NoPythonExecuteScript", QMessageBox::Critical,
+    tr("Python support not enabled"), tr("Python support is required to execute Python script, but "
+                                         "Python is not available in this build."),
+    QMessageBox::Ok | QMessageBox::Save);
 #endif
-
-  (void)filename;
-  qCritical("Python support not enabled.");
 }
