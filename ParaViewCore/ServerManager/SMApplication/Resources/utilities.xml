@@ -2236,6 +2236,55 @@
       </StringVectorProperty>
       <!-- End of FileInformationHelper -->
     </Proxy>
+    <Proxy class="vtkPVFilePathEncodingHelper"
+           name="FilePathEncodingHelper">
+      <IntVectorProperty command="MakeDirectory"
+                         information_only="1"
+                         name="MakeDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="DeleteDirectory"
+                         information_only="1"
+                         name="DeleteDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="OpenDirectory"
+                         information_only="1"
+                         name="OpenDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="RenameDirectory"
+                         information_only="1"
+                         name="RenameDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="GetActiveFileIsReadable"
+                         information_only="1"
+                         name="ActiveFileIsReadable">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <StringVectorProperty command="SetPath"
+                            name="ActiveFileName"
+                            number_of_elements="1">
+        <Documentation>Set the filename we need to use.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSecondaryPath"
+                            name="SecondaryFileName"
+                            number_of_elements="1">
+        <Documentation>Set the secondary filename we may
+        need to use.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetActiveGlobalId"
+                            name="ActiveGlobalId"
+                            default_values="0"
+                            number_of_elements="1">
+        <Documentation>Set the globalId of the vtkObject to use
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+
     <Proxy class="vtkPVEnvironmentInformationHelper"
            name="EnvironmentInformationHelper">
       <StringVectorProperty command="SetVariable"

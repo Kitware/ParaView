@@ -29,9 +29,11 @@
 #define vtkPVFileInformationHelper_h
 
 #include "vtkObject.h"
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVFileInformationHelper : public vtkObject
+#include <string> // needed for std::string
+
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVFileInformationHelper : public vtkObject
 {
 public:
   static vtkPVFileInformationHelper* New();
@@ -114,6 +116,18 @@ public:
    * Returns if this->Path is a directory.
    */
   bool GetActiveFileIsDirectory();
+
+  /**
+   * Transform local code page string to UTF8 string
+   * on windows only, pass through oterwise
+   */
+  static std::string LocalToUtf8Win32(const std::string& path);
+
+  /**
+   * Transform utf8 string to local code page string
+   * on windows only, pass through oterwise
+   */
+  static std::string Utf8ToLocalWin32(const std::string& path);
 
 protected:
   vtkPVFileInformationHelper();

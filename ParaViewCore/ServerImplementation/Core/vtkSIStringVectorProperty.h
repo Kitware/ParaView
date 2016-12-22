@@ -16,6 +16,7 @@
  * @class   vtkSIStringVectorProperty
  *
  * ServerImplementation Property to deal with String array as method arguments.
+ * It also takes care of string encoding on server side.
 */
 
 #ifndef vtkSIStringVectorProperty_h
@@ -66,6 +67,7 @@ private:
 
   bool Push(const vtkVectorOfStrings& values);
   vtkVectorOfInts* ElementTypes;
+  bool NeedReencoding;
 };
 
 #endif

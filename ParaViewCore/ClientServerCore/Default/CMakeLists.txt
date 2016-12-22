@@ -41,7 +41,6 @@ set (Module_SRCS
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
   vtkPVFileInformation.cxx
-  vtkPVFileInformationHelper.cxx
   vtkPVSingleOutputExtractSelection.cxx
   vtkSliceAlongPolyPlane.cxx
   ${Mac_SRCS}

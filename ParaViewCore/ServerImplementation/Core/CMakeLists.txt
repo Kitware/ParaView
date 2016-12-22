@@ -30,6 +30,7 @@
 #==========================================================================
 set (Module_SRCS
   vtkPVCatalystSessionCore.cxx
+  vtkPVFilePathEncodingHelper.cxx
   vtkPVProxyDefinitionIterator.cxx
   vtkPVSessionBase.cxx
   vtkPVSessionCore.cxx

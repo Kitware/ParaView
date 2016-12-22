@@ -1120,7 +1120,7 @@ bool pqFileDialog::selectFile(const QString& f)
 {
   // We don't use QFileInfo here since it messes the paths up if the client and
   // the server are heterogeneous systems.
-  std::string unix_path = f.toLocal8Bit().data();
+  std::string unix_path = f.toUtf8().data();
   vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
 
   std::string filename, dirname;

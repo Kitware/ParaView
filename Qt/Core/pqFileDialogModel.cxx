@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDirectory.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
-#include <vtkProcessModule.h>
 #include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
@@ -391,7 +390,6 @@ public:
       }
       else if (info->GetType() != vtkPVFileInformation::FILE_GROUP)
       {
-        char* fp = info->GetFullPath();
         files.push_back(pqFileDialogModelFileInfo(QString::fromUtf8(info->GetName()),
           QString::fromUtf8(info->GetFullPath()),
           static_cast<vtkPVFileInformation::FileTypes>(info->GetType()), info->GetHidden(),
@@ -565,29 +563,29 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
   return this->Implementation->cleanPath(QString::fromUtf8 (info->GetFullPath()));
 }
 
-QStringList pqFileDialogModel::getFilePaths(const QModelIndex& index)
+QStringList pqFileDialogModel::getFilePaths(const QModelIndex& localIndex)
 {
-  if (index.model() == this)
+  if (localIndex.model() == this)
   {
-    return this->Implementation->getFilePaths(index);
+    return this->Implementation->getFilePaths(localIndex);
   }
   return QStringList();
 }
 
-bool pqFileDialogModel::isHidden(const QModelIndex& index)
+bool pqFileDialogModel::isHidden(const QModelIndex& localIndex)
 {
-  if (index.model() == this)
+  if (localIndex.model() == this)
   {
-    return this->Implementation->isHidden(index);
+    return this->Implementation->isHidden(localIndex);
   }
   return false;
 }
 
-bool pqFileDialogModel::isDir(const QModelIndex& index)
+bool pqFileDialogModel::isDir(const QModelIndex& localIndex)
 {
-  if (index.model() == this)
+  if (localIndex.model() == this)
   {
-    return this->Implementation->isDir(index);
+    return this->Implementation->isDir(localIndex);
   }
 
   return false;
@@ -628,7 +626,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   {
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
-    ret = dirProxy->MakeDirectory(dirPath.toLocal8Bit().data(), vtkProcessModule::DATA_SERVER);
+    ret = dirProxy->MakeDirectory(dirPath.toUtf8().data());
     dirProxy->Delete();
   }
   else
@@ -662,7 +660,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   {
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
-    ret = dirProxy->DeleteDirectory(dirPath.toLocal8Bit().data(), vtkProcessModule::DATA_SERVER);
+    ret = dirProxy->DeleteDirectory(dirPath.toUtf8().data());
     dirProxy->Delete();
   }
   else
@@ -718,7 +716,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
     ret = dirProxy->Rename(
-      oldPath.toLocal8Bit().data(), newPath.toLocal8Bit().data(), vtkProcessModule::DATA_SERVER);
+      oldPath.toUtf8().data(), newPath.toUtf8().data());
     dirProxy->Delete();
   }
   else

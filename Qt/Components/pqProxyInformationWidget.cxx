@@ -199,8 +199,7 @@ void pqProxyInformationWidget::updateInformation()
             smprop = smprop->GetInformationProperty();
             source->getProxy()->UpdatePropertyInformation(smprop);
           }
-          QString filename =
-            pqObjectBuilder::getLongPath(pqSMAdaptor::getElementProperty(smprop).toString());
+          QString filename = pqSMAdaptor::getElementProperty(smprop).toString();
           QString path = vtksys::SystemTools::GetFilenamePath(filename.toUtf8().data()).c_str();
 
           this->Ui->properties->show();

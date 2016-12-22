@@ -224,28 +224,6 @@ inline QString pqObjectBuilderGetPath(const QString& filename, bool use_dir)
 }
 
 //-----------------------------------------------------------------------------
-QString pqObjectBuilder::getLongPath(const QString& filename)
-{
-  QString longFilename(filename);
-#if defined(_WIN32)
-  QByteArray buffer = filename.toLocal8Bit();
-  char* ifname = buffer.data();
-  char* fname = 0;
-  DWORD len = GetLongPathName(ifname, NULL, 0);
-  if (len > 0)
-  {
-    fname = new char[len];
-    if (GetLongPathName(ifname, fname, len) > 0)
-    {
-      longFilename = QString::fromLocal8Bit(fname);
-    }
-  }
-  delete[] fname;
-#endif
-  return longFilename;
-}
-
-//-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createReader(
   const QString& sm_group, const QString& sm_name, const QStringList& files, pqServer* server)
 {
@@ -255,7 +233,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
   }
 
   unsigned int numFiles = files.size();
-  QString reg_name = QFileInfo(pqObjectBuilder::getLongPath(files[0])).fileName();
+  QString reg_name = QFileInfo(files[0]).fileName();
 
   if (numFiles > 1)
   {
@@ -264,7 +242,7 @@ pqPipelineSource* pqObjectBuilder::createReader(
     // something different, just give up and add the '*' anyway.
     for (unsigned int i = 1; i < numFiles; i++)
     {
-      QString nextFile = QFileInfo(pqObjectBuilder::getLongPath(files[i])).fileName();
+      QString nextFile = QFileInfo(files[i]).fileName();
       if (nextFile.startsWith(reg_name))
         continue;
       QString commonPrefix = reg_name;

@@ -30,6 +30,8 @@
 #include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
+#include <string> // Needed for std::string
+
 class vtkCollection;
 class vtkPVFileInformationSet;
 class vtkFileSequenceParser;

@@ -143,7 +143,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
       tr("Internal Open File"), QString(), QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
-    if (!dialog.selectFile(options->GetParaViewDataName()))
+    if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
     {
       qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
     }

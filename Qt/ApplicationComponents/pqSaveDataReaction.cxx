@@ -137,7 +137,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   vtkSMWriterFactory* writerFactory = vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
   vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(writerFactory->CreateWriter(filename.toLocal8Bit().data(),
+  proxy.TakeReference(writerFactory->CreateWriter(filename.toUtf8().data(),
     vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()), port->getPortNumber()));
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
