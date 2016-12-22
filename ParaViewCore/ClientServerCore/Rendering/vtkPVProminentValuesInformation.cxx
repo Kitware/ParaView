@@ -151,7 +151,9 @@ void vtkPVProminentValuesInformation::SetNumberOfComponents(int numComps)
   }
   this->NumberOfComponents = numComps;
   if (this->DistinctValues)
+  {
     this->DistinctValues->clear();
+  }
   if (numComps <= 0)
   {
     this->NumberOfComponents = 0;
@@ -200,11 +202,6 @@ int vtkPVProminentValuesInformation::Compare(vtkPVProminentValuesInformation* in
 void vtkPVProminentValuesInformation::CopyFromObject(vtkObject* obj)
 {
   vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(obj);
-  if (!repr)
-  {
-    this->Initialize();
-  }
-
   // Locate named array in dataset(s).
   // (This bit adapted from vtkPVDataInformation.)
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(repr->GetRenderedDataObject(0));
@@ -608,16 +605,11 @@ void vtkPVProminentValuesInformation::AddDistinctValues(vtkPVProminentValuesInfo
 
   for (int i = 0; i <= this->NumberOfComponents; ++i)
   {
-    vtkInternalDistinctValues::iterator ait = this->DistinctValues->find(i);
     vtkInternalDistinctValues::iterator bit = info->DistinctValues->find(i);
     vtkInternalDistinctValues::mapped_type::iterator
       eit; // iterator over entries of component [ab]it->second.
     bool tooManyValues = false;
-    if (ait == this->DistinctValues->end() || bit == info->DistinctValues->end())
-    { // someone had too many values to be rendered as categorical data.
-      tooManyValues = true;
-    }
-    else
+    if (bit != info->DistinctValues->end())
     { // Add info's values to our list of unique keys
       for (eit = bit->second.begin(); eit != bit->second.end(); ++eit)
       {
@@ -645,7 +637,9 @@ vtkAbstractArray* vtkPVProminentValuesInformation::GetProminentComponentValues(i
   vtkInternalDistinctValues::iterator compEntry;
   vtkIdType nt = 0;
   if (component < 0 && this->NumberOfComponents == 1)
+  {
     component = 0;
+  }
   if (!this->DistinctValues ||
     (compEntry = this->DistinctValues->find(component)) == this->DistinctValues->end() ||
     (nt = static_cast<vtkIdType>(compEntry->second.size())) == 0)
