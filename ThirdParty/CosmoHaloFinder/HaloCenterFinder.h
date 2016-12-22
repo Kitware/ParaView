@@ -176,7 +176,6 @@ private:
   string outFile;               // File of particles written by this processor
 
 
-  POSVEL_T deadSize;            // Border size for dead particles
   POSVEL_T bb;                  // Interparticle distance for halos
   POSVEL_T rSmooth;             // smoothing scale for potential (physical units)
   POSVEL_T distFactor;          // Scale positions by, used in chain size

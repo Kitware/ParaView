@@ -212,7 +212,7 @@ private:
   POSVEL_T *data[numDataDims];
 
   // scale factor
-  POSVEL_T xscal, vscal;
+  POSVEL_T xscal;
 
   int *halo, *nextp, *hsize;
 

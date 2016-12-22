@@ -130,9 +130,6 @@ private:
   int    myProc;                // My processor number
   int    numProc;               // Total number of processors
 
-  long   totalParticles;        // Number of particles on all files
-  int    headerSize;            // For BLOCK files
-
   int    layoutSize[DIMENSION]; // Decomposition of processors
   int    layoutPos[DIMENSION];  // Position of this processor in decomposition
 

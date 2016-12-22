@@ -217,13 +217,6 @@ public:
   int getChildIndex(SPHNode* node, ID_T pindx);
 
 private:
-  int    myProc;                // My processor number
-  int    numProc;               // Total number of processors
-
-  POSVEL_T boxSize;             // Physical box size of the data set
-  POSVEL_T deadSize;            // Border size for dead particles
-  POSVEL_T bb;                  // Interparticle distance for halos
-
   ID_T   particleCount;         // Total particles
   ID_T   nodeCount;             // Total nodes
   POSVEL_T particleMass;        // Average particle mass
