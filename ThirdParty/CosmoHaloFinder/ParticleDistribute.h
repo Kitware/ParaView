@@ -244,7 +244,6 @@ private:
   int    layoutSize[DIMENSION]; // Decomposition of processors
   int    layoutPos[DIMENSION];  // Position of this processor in decomposition
 
-  long   np;                    // Number of particles in the problem
   POSVEL_T boxSize;             // Physical box size (rL)
   POSVEL_T massConvertFactor;   // Multiply every mass read by this
   POSVEL_T distConvertFactor;   // Multiply every position read by this

@@ -144,6 +144,7 @@ public:
 
   void deallocate(pointer p, size_type n)
   {
+    (void) n;
     ::bigchunk_free((void *) p);
   }
 };
