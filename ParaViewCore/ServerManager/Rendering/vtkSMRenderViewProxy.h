@@ -113,7 +113,7 @@ public:
   /**
    * Convenience method for zooming to a representation.
    */
-  void ZoomTo(vtkSMProxy* representation);
+  virtual void ZoomTo(vtkSMProxy* representation);
 
   //@{
   /**
