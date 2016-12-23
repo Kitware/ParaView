@@ -511,6 +511,12 @@ public:
    */
   virtual void ClearUncheckedElements() {}
 
+  /**
+   * Given the string, this method will create and set a well-formated
+   * string as XMLLabel and returns it. Need to be deleted after use.
+   */
+  static const char* CreateNewPrettyLabel(const char* name);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -692,7 +698,7 @@ private:
    * Given the string, this method will create and set a well-formated
    * string as XMLLabel.
    */
-  void CreatePrettyLabel(const char* name);
+  void CreateAndSetPrettyLabel(const char* name);
 
   bool PendingModifiedEvents;
   bool BlockModifiedEvents;

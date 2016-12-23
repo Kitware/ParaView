@@ -317,8 +317,17 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
+void vtkSMProperty::CreateAndSetPrettyLabel(const char* xmlname)
 {
+  const char* label = vtkSMProperty::CreateNewPrettyLabel(xmlname);
+  this->SetXMLLabel(label);
+  delete[] label;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProperty::CreateNewPrettyLabel(const char* xmlname)
+{
+
   // Add space before every capital letter not preceeded by a capital letter
   // or space hence:
   // "MySpace" ==> "My Space"
@@ -352,8 +361,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
     ptr++;
   }
   *ptr = 0;
-  this->SetXMLLabel(label);
-  delete[] label;
+  return label;
 }
 
 //---------------------------------------------------------------------------
@@ -375,7 +383,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   }
   else
   {
-    this->CreatePrettyLabel(xmlname);
+    this->CreateAndSetPrettyLabel(xmlname);
   }
 
   const char* command = element->GetAttribute("command");
