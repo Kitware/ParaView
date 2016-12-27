@@ -61,6 +61,7 @@ set (Module_SRCS
   vtkPVClientServerSynchronizedRenderers.cxx
   vtkPVCompositeOrthographicSliceRepresentation.cxx
   vtkPVCompositeRepresentation.cxx
+  vtkPVContextInteractorStyle.cxx
   vtkPVContextView.cxx
   vtkPVDataDeliveryManager.cxx
   vtkPVDataRepresentation.cxx

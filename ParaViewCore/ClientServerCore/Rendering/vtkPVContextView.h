@@ -30,7 +30,7 @@
 class vtkAbstractContextItem;
 class vtkChart;
 class vtkChartRepresentation;
-class vtkContextInteractorStyle;
+class vtkPVContextInteractorStyle;
 class vtkContextView;
 class vtkCSVExporter;
 class vtkInformationIntegerKey;
@@ -190,7 +190,7 @@ private:
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.
   vtkSmartPointer<vtkSelection> SelectionClone;
-  vtkNew<vtkContextInteractorStyle> InteractorStyle;
+  vtkNew<vtkPVContextInteractorStyle> InteractorStyle;
 
   template <class T>
   vtkSelection* GetSelectionImplementation(T* chart);
