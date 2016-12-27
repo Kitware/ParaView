@@ -1,9 +1,10 @@
+from __future__ import print_function
 import sys
 
-print 'running the test script with args', sys.argv
+print('running the test script with args', sys.argv)
 
 if len(sys.argv) != 2:
-    print 'need to pass in the test directory location'
+    print('need to pass in the test directory location')
     sys.exit(1)
 
 
@@ -29,7 +30,7 @@ if bounds[0] < 1.25 or bounds[0] > 1.27 or \
    bounds[3] < 63.9 or bounds[3] > 64.1 or \
    bounds[4] < 29.9 or bounds[4] > 30.1 or \
    bounds[5] < 29.9 or bounds[5] > 30.1:
-    print 'Time step 40: wrong particle bounds', bounds
+    print('Time step 40: wrong particle bounds', bounds)
     sys.exit(1)
 
 
@@ -45,7 +46,7 @@ t.UpdatePipeline()
 
 grid = servermanager.Fetch(t)
 if grid.GetNumberOfPoints() != 7:
-    print 'Time step 40: wrong number of points', grid.GetNumberOfPoints()
+    print('Time step 40: wrong number of points', grid.GetNumberOfPoints())
     sys.exit(1)
 
 r.FileName = sys.argv[1]+'/particles_80.pvtp'
@@ -60,12 +61,12 @@ if bounds[0] < 2. or bounds[0] > 2.1 or \
    bounds[3] < 63.9 or bounds[3] > 64.1 or \
    bounds[4] < 29.9 or bounds[4] > 30.1 or \
    bounds[5] < 29.9 or bounds[5] > 30.1:
-    print 'Time step 80: wrong particle bounds for initial injected particles', bounds
+    print('Time step 80: wrong particle bounds for initial injected particles', bounds)
     sys.exit(1)
 
 grid = servermanager.Fetch(t)
 if grid.GetNumberOfPoints() != 7:
-    print 'Time step 80: wrong number of points for initial injected particles', grid.GetNumberOfPoints()
+    print('Time step 80: wrong number of points for initial injected particles', grid.GetNumberOfPoints())
     sys.exit(1)
 
 # threshold to get the seeds that were injected at time step 70
@@ -80,12 +81,12 @@ if bounds[0] < 1.23 or bounds[0] > 1.25 or \
    bounds[3] < 63.9 or bounds[3] > 64.1 or \
    bounds[4] < 29.9 or bounds[4] > 30.1 or \
    bounds[5] < 29.9 or bounds[5] > 30.1:
-    print 'Time step 80: wrong particle bounds for reinjected particles', bounds
+    print('Time step 80: wrong particle bounds for reinjected particles', bounds)
     sys.exit(1)
 
 grid = servermanager.Fetch(t)
 if grid.GetNumberOfPoints() != 7:
-    print 'Time step 80: wrong number of points for reinjected particles', grid.GetNumberOfPoints()
+    print('Time step 80: wrong number of points for reinjected particles', grid.GetNumberOfPoints())
     sys.exit(1)
 
-print 'test passed'
+print('test passed')
