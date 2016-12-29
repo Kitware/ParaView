@@ -55,7 +55,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST") == NULL);
 
   // Tmp objects
-  QPixmap mousePixmap(":/pqWidgets/Icons/pqMousePick15.png");
+  QPixmap mousePixmap(":/pqCore/Icons/pqMousePick15.png");
   int w = mousePixmap.width();
   int h = mousePixmap.height();
   QImage image(w, h, QImage::Format_ARGB32);

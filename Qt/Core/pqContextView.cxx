@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQVTKWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
+#include "pqUndoStack.h"
 #include "vtkAnnotationLink.h"
 #include "vtkChartXY.h"
 #include "vtkCommand.h"
@@ -109,6 +110,11 @@ pqContextView::pqContextView(const QString& type, const QString& group, const QS
   this->Command = command::New(*this);
   vtkObject::SafeDownCast(viewProxy->GetClientSideObject())
     ->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
+
+  this->Internal->VTKConnect->Connect(
+    viewProxy, vtkCommand::StartInteractionEvent, this, SLOT(startInteraction()));
+  this->Internal->VTKConnect->Connect(
+    viewProxy, vtkCommand::EndInteractionEvent, this, SLOT(endInteraction()));
 }
 
 //-----------------------------------------------------------------------------
@@ -169,6 +175,7 @@ void pqContextView::resetDisplay()
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqContextView::selectionChanged()
 {
   // Fill the selection source with the selection from the view
@@ -179,6 +186,7 @@ void pqContextView::selectionChanged()
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqContextView::setSelection(vtkSelection* sel)
 {
   // Get the representation's source
@@ -218,6 +226,7 @@ void pqContextView::setSelection(vtkSelection* sel)
   emit this->selected(opPort);
 }
 
+//-----------------------------------------------------------------------------
 void pqContextView::setSelectionAction(int selAction)
 {
   if (this->Internal->SelectionAction == selAction || selAction < vtkChart::SELECT ||
@@ -228,7 +237,20 @@ void pqContextView::setSelectionAction(int selAction)
   this->Internal->SelectionAction = selAction;
 }
 
+//-----------------------------------------------------------------------------
 int pqContextView::selectionAction()
 {
   return this->Internal->SelectionAction;
+}
+
+//-----------------------------------------------------------------------------
+void pqContextView::startInteraction()
+{
+  BEGIN_UNDO_SET("Interaction");
+}
+
+//-----------------------------------------------------------------------------
+void pqContextView::endInteraction()
+{
+  END_UNDO_SET();
 }

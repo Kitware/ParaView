@@ -29,6 +29,7 @@
 
 class vtkAbstractContextItem;
 class vtkContextView;
+class vtkEventForwarderCommand;
 class vtkImageData;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
@@ -105,6 +106,13 @@ protected:
   void OnInteractionEvent();
 
   /**
+   * Forwards vtkCommand::StartInteractionEvent and
+   * vtkCommand::EndInteractionEvent
+   * from the vtkRenderWindowInteractor
+   */
+  void OnForwardInteractionEvent(vtkObject*, unsigned long, void*);
+
+  /**
    * Used to update the legend position on interaction event.
    * This also fires the vtkCommand::InteractionEvent.
    */
@@ -149,6 +157,7 @@ private:
   void CopyAxisRangesFromChart();
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
+  vtkNew<vtkEventForwarderCommand> EventForwarder;
 };
 
 #endif

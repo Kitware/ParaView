@@ -18,11 +18,11 @@
 #include "vtkChartLegend.h"
 #include "vtkChartXY.h"
 #include "vtkClientServerStream.h"
-#include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
+#include "vtkEventForwarderCommand.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -55,11 +55,13 @@ vtkSMContextViewProxy::vtkSMContextViewProxy()
   this->ChartView = NULL;
   this->SkipPlotableCheck = false;
   this->InteractorHelper->SetViewProxy(this);
+  this->EventForwarder->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::~vtkSMContextViewProxy()
 {
+  this->EventForwarder->SetTarget(NULL);
   this->InteractorHelper->SetViewProxy(NULL);
   this->InteractorHelper->CleanupInteractor();
 }
@@ -71,10 +73,23 @@ void vtkSMContextViewProxy::SetupInteractor(vtkRenderWindowInteractor* iren)
   {
     this->CreateVTKObjects();
     vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(this->GetClientSideObject());
+    if (vtkRenderWindowInteractor* oldiren = pvview->GetInteractor())
+    {
+      oldiren->GetInteractorStyle()->RemoveObserver(this->EventForwarder.Get());
+    }
 
     // Remember, these calls end up changing ivars on iren.
     pvview->SetupInteractor(iren);
     this->InteractorHelper->SetupInteractor(pvview->GetInteractor());
+
+    if (iren)
+    {
+      // Forward StartInteractionEvent and EndInteractionEvent from the proxy.
+      iren->GetInteractorStyle()->AddObserver(
+        vtkCommand::StartInteractionEvent, this->EventForwarder.Get());
+      iren->GetInteractorStyle()->AddObserver(
+        vtkCommand::EndInteractionEvent, this->EventForwarder.Get());
+    }
   }
 }
 

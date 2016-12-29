@@ -550,6 +550,7 @@
         { "class": "vtkPVClientServerSynchronizedRenderers" },
         { "class": "vtkPVCompositeRepresentation" },
         { "class": "vtkPVContextView" },
+        { "class": "vtkPVContextInteractorStyle" },
         { "class": "vtkPVDataDeliveryManager" },
         { "class": "vtkPVDataRepresentation" },
         { "class": "vtkPVDataRepresentationPipeline" },

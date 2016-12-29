@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkNew.h"
 
-#if defined(VTKGL2) and defined(PARAVIEW_ENABLE_PYTHON)
+#if defined(VTKGL2) && defined(PARAVIEW_ENABLE_PYTHON)
 #include "vtkSMCinemaDatabaseImporter.h"
 #endif
 
@@ -65,7 +65,7 @@ pqImportCinemaReaction::~pqImportCinemaReaction()
 //-----------------------------------------------------------------------------
 void pqImportCinemaReaction::updateEnableState()
 {
-#if defined(VTKGL2) and defined(PARAVIEW_ENABLE_PYTHON)
+#if defined(VTKGL2) && defined(PARAVIEW_ENABLE_PYTHON)
   bool enable_state = false;
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   vtkSMSession* session =
@@ -114,7 +114,7 @@ bool pqImportCinemaReaction::loadCinemaDatabase()
 //-----------------------------------------------------------------------------
 bool pqImportCinemaReaction::loadCinemaDatabase(const QString& dbase, pqServer* server)
 {
-#if defined(VTKGL2) and defined(PARAVIEW_ENABLE_PYTHON)
+#if defined(VTKGL2) && defined(PARAVIEW_ENABLE_PYTHON)
   CLEAR_UNDO_STACK();
 
   server = (server != NULL) ? server : pqActiveObjects::instance().activeServer();

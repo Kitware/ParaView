@@ -81,6 +81,17 @@ public:
   */
   virtual void resetDisplay();
 
+protected slots:
+  //@{
+  /**
+   * Slots called when vtkCommand::StartInteractionEvent and
+   * vtkCommand::EndInteractionEvent are fired by vtkSMContextViewProxy. We use
+   * these to mark an undo-set.
+   */
+  void startInteraction();
+  void endInteraction();
+  //@}
+
 protected:
   /**
   * Constructor:
