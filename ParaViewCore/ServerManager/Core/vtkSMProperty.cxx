@@ -53,6 +53,7 @@ vtkSMProperty::vtkSMProperty()
   this->PanelVisibility = 0;
   this->PanelVisibilityDefaultForRepresentation = 0;
   this->PanelWidget = 0;
+  this->DisableSubTrace = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -96,6 +97,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetPanelVisibility(0);
   this->SetPanelVisibilityDefaultForRepresentation(0);
   this->SetPanelWidget(0);
+  this->SetDisableSubTrace(0);
   if (this->Links)
   {
     this->Links->Delete();
@@ -315,8 +317,17 @@ vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
+void vtkSMProperty::CreateAndSetPrettyLabel(const char* xmlname)
 {
+  const char* label = vtkSMProperty::CreateNewPrettyLabel(xmlname);
+  this->SetXMLLabel(label);
+  delete[] label;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProperty::CreateNewPrettyLabel(const char* xmlname)
+{
+
   // Add space before every capital letter not preceeded by a capital letter
   // or space hence:
   // "MySpace" ==> "My Space"
@@ -350,8 +361,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
     ptr++;
   }
   *ptr = 0;
-  this->SetXMLLabel(label);
-  delete[] label;
+  return label;
 }
 
 //---------------------------------------------------------------------------
@@ -373,7 +383,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   }
   else
   {
-    this->CreatePrettyLabel(xmlname);
+    this->CreateAndSetPrettyLabel(xmlname);
   }
 
   const char* command = element->GetAttribute("command");
@@ -463,6 +473,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   if (panel_widget)
   {
     this->SetPanelWidget(panel_widget);
+  }
+
+  const char* disable_sub_trace = element->GetAttribute("disable_sub_trace");
+  if (disable_sub_trace)
+  {
+    this->SetDisableSubTrace(disable_sub_trace);
   }
 
   // Manage deprecated XML definition

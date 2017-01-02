@@ -620,6 +620,21 @@
 
   </ProxyGroup>
 
+  <ProxyGroup name="cell_locators">
+     <Proxy class="vtkCellLocator"
+            name="CellLocator"
+            label="Cell Locator"/>
+     <Proxy class="vtkCellTreeLocator"
+            name="CellTreeLocator"
+            label="Tree Cell Locator"/>
+     <Proxy class="vtkModifiedBSPTree"
+            name="ModifiedBSPTree"
+            label="BSP Tree Cell Locator"/>
+     <Proxy class="vtkOBBTree"
+            name="OBBTree"
+            label="OBB Tree Cell Locator"/>
+  </ProxyGroup>
+
   <ProxyGroup name="implicit_functions">
     <NullProxy name="None"></NullProxy>
     <NullProxy name="Scalar"></NullProxy>
@@ -3807,5 +3822,19 @@
            name="PointSource"/>
     <Proxy group="extended_sources"
            name="HighResLineSource"/>
+  </ProxyGroup>
+  <ProxyGroup name="integrators">
+    <Proxy class="vtkRungeKutta2"
+           name="RungeKutta2"
+           label="Runge Kutta 2">
+    </Proxy>
+    <Proxy class="vtkRungeKutta4"
+           name="RungeKutta4"
+           label="Runge Kutta 4">
+    </Proxy>
+    <Proxy class="vtkRungeKutta45"
+           name="RungeKutta45"
+           label="Runge Kutta 4/5">
+    </Proxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

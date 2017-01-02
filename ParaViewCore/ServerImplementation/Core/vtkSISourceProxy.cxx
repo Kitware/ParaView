@@ -24,6 +24,7 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 #include "vtkPVCompositeDataPipeline.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVPostFilter.h"
@@ -206,7 +207,9 @@ bool vtkGeometryRepresentationDoRequestGhostCells(vtkInformation* info)
     return false;
   }
 
-  if (vtkUnstructuredGrid::GetData(info) != NULL || vtkCompositeDataSet::GetData(info) != NULL)
+  if (vtkUnstructuredGrid::GetData(info) != NULL 
+    || vtkCompositeDataSet::GetData(info) != NULL
+    || vtkPolyData::GetData(info) != NULL)
   {
     // ensure that there's no WholeExtent to ensure
     // that this UG was never born out of a structured dataset.

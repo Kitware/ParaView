@@ -477,11 +477,12 @@ class RealProxyAccessor(Accessor):
         pld_props = [x for x in self.OrderedProperties if x.has_proxy_list_domain()]
         for prop in pld_props:
             paccessor = Trace.get_accessor(prop.get_property_value())
-            sub_trace = paccessor.trace_ctor(None, filter)
-            if sub_trace:
-                trace.append_separated(\
-                    "# init the %s selected for '%s'" % (prop.get_value(), prop.get_property_name()))
-                trace.append(sub_trace)
+            if not prop.DisableSubTrace:
+              sub_trace = paccessor.trace_ctor(None, filter)
+              if sub_trace:
+                  trace.append_separated(\
+                      "# init the %s selected for '%s'" % (prop.get_value(), prop.get_property_name()))
+                  trace.append(sub_trace)
         return trace.raw_data()
 
 def ProxyAccessor(*args, **kwargs):
@@ -513,7 +514,7 @@ class PropertyTraceHelper(object):
         pld_domain = pyprop.FindDomain("vtkSMProxyListDomain")
         self.HasProxyListDomain = isinstance(pyprop, sm.ProxyProperty) and pld_domain != None
         self.ProxyListDomainProxyAccessors = []
-
+        self.DisableSubTrace = pyprop.GetDisableSubTrace()
         if self.HasProxyListDomain:
             # register accessors for proxies in the proxy list domain.
             # This is cheating. Since there's no accessor for a proxy in the domain
@@ -815,7 +816,7 @@ class PropertiesModified(NestableTraceItem):
             # is shown on the same pqProxyWidget as the ColorTransferFunction proxy --
             # which is non-standard.
             if proxy.ScalarOpacityFunction:
-                self.ScalarOpacityFunctionHack = PropertiesModified(proxy.ScalarOpacityFunction)
+                self.ScalarOpacityFunctionHack = PropertiesModified(self.proxy.ScalarOpacityFunction)
         except: pass
 
     def finalize(self):
@@ -831,12 +832,13 @@ class PropertiesModified(NestableTraceItem):
             val = prop.get_property_value()
             if val:
                 valaccessor = Trace.get_accessor(val)
-                props = valaccessor.get_properties()
-                props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
-                if props_to_trace:
-                  Trace.Output.append_separated([
-                      "# Properties modified on %s" % valaccessor,
-                      valaccessor.trace_properties(props_to_trace, in_ctor=False)])
+                if not prop.DisableSubTrace:
+                  props = valaccessor.get_properties()
+                  props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
+                  if props_to_trace:
+                    Trace.Output.append_separated([
+                        "# Properties modified on %s" % valaccessor,
+                        valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
 
         try:
