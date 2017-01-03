@@ -465,7 +465,7 @@
         <item row="0" column="2">
          <widget class="QCheckBox" name="composite">
           <property name="toolTip">
-           <string>Whether to export specA or B format stores</string>
+           <string>Whether to export specA (simple RGB) or newer (compositible deferred rendering images) format stores</string>
           </property>
           <property name="text">
            <string/>
