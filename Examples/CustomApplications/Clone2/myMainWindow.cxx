@@ -32,15 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
+#include "pqApplyBehavior.h"
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqDefaultViewBehavior.h"
+#ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
+#endif
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-//#include "pqDeleteBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
-//#include "pqPVNewSourceBehavior.h"
+#include "pqInterfaceTracker.h"
+#include "pqStandardViewFrameActionsImplementation.h"
 
 #include <QAction>
 #include <QList>
@@ -68,9 +71,10 @@ myMainWindow::myMainWindow()
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-  // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget, SIGNAL(helpRequested(QString)), this,
-    SLOT(showHelpForProxy(const QString&)));
+  // Enable help from the properties panel.
+  QObject::connect(this->Internals->proxyTabWidget,
+    SIGNAL(helpRequested(const QString&, const QString&)), this,
+    SLOT(showHelpForProxy(const QString&, const QString&)));
 
 // Populate application menus with actions.
 #if 0
@@ -116,16 +120,58 @@ myMainWindow::myMainWindow()
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
 
-// Final step, define application behaviors. Since we want all ParaView
-// behaviors, we use this convenience method.
-#if 0
+#if 1
+  // Final step, define application behaviors. Since we want some paraview behaviors
+  // we can use static method to configure the pqParaViewBehaviors and select
+  // only the components we want
+  pqParaViewBehaviors::setEnableStandardPropertyWidgets(false);
+  pqParaViewBehaviors::setEnableStandardRecentlyUsedResourceLoader(false);
+  pqParaViewBehaviors::setEnableQtMessageHandlerBehavior(false);
+  pqParaViewBehaviors::setEnableDataTimeStepBehavior(false);
+  pqParaViewBehaviors::setEnableSpreadSheetVisibilityBehavior(false);
+  pqParaViewBehaviors::setEnablePipelineContextMenuBehavior(false);
+  pqParaViewBehaviors::setEnableObjectPickingBehavior(false);
+  pqParaViewBehaviors::setEnableUndoRedoBehavior(false);
+  pqParaViewBehaviors::setEnableCrashRecoveryBehavior(false);
+  pqParaViewBehaviors::setEnablePluginDockWidgetsBehavior(false);
+  pqParaViewBehaviors::setEnableVerifyRequiredPluginBehavior(false);
+  pqParaViewBehaviors::setEnablePluginActionGroupBehavior(false);
+  pqParaViewBehaviors::setEnableFixPathsInStateFilesBehavior(false);
+  pqParaViewBehaviors::setEnableCommandLineOptionsBehavior(false);
+  pqParaViewBehaviors::setEnablePersistentMainWindowStateBehavior(false);
+  pqParaViewBehaviors::setEnableCollaborationBehavior(false);
+  pqParaViewBehaviors::setEnableViewStreamingBehavior(false);
+  pqParaViewBehaviors::setEnablePluginSettingsBehavior(false);
+  pqParaViewBehaviors::setEnableQuickLaunchShortcuts(false);
+  pqParaViewBehaviors::setEnableLockPanelsBehavior(false);
+
+  // This is actually useless, as they are activated by default
+  pqParaViewBehaviors::setEnableStandardViewFrameActions(true);
+  pqParaViewBehaviors::setEnableDefaultViewBehavior(true);
+  pqParaViewBehaviors::setEnableAlwaysConnectedBehavior(true);
+  pqParaViewBehaviors::setEnableAutoLoadPluginXMLBehavior(true);
+  pqParaViewBehaviors::setEnableApplyBehavior(true);
   new pqParaViewBehaviors(this, this);
+
 #else
+  // Or do everything manually, not recommended
+
+  // Register standard types of view-frame actions.
+  // Needed for Default View Behavior
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
+  pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
+
+  // Create behaviors
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
-  //  new pqPVNewSourceBehavior(this);
-  //  new pqDeleteBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
+  pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
+  
+  // Register panels
+  foreach (pqPropertiesPanel* ppanel, this->findChildren<pqPropertiesPanel*>())
+  {
+    applyBehavior->registerPanel(ppanel);
+  }
 #endif
 }
 
@@ -136,7 +182,9 @@ myMainWindow::~myMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void myMainWindow::showHelpForProxy(const QString& proxyname)
+void myMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
 {
-  pqHelpReaction::showHelp(QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
+#ifdef PARAVIEW_USE_QTHELP
+  pqHelpReaction::showProxyHelp(groupname, proxyname);
+#endif
 }

@@ -50,7 +50,7 @@ protected:
   void showEvent(QShowEvent* evt);
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname, const QString& groupname);
+  void showHelpForProxy(const QString& groupname, const QString& proxyname);
   void showWelcomeDialog();
 
 private:

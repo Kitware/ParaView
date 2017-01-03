@@ -69,13 +69,11 @@ The Input menu allows the user to select the data set to which this filter will 
            This property defines the other end of the direction vector (large scalar values).
          </Documentation>
       </DoubleVectorProperty>
-
-      <Hints>
-        <PropertyGroup type="Line" label="Elevation Widget">
-          <Property function="Point1WorldPosition" name="LowPoint" />
-          <Property function="Point2WorldPosition" name="HighPoint" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="LowPoint" />
+        <Property function="Point2WorldPosition" name="HighPoint" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
    <!-- End OrientedElevationFilter -->
    </MyElevationProxy>
   

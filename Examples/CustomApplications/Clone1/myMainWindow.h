@@ -45,7 +45,7 @@ public:
   ~myMainWindow();
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname);
+  void showHelpForProxy(const QString& groupname, const QString& proxyname);
 
 private:
   Q_DISABLE_COPY(myMainWindow)

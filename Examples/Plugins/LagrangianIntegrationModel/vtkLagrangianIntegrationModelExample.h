@@ -100,14 +100,15 @@ protected:
 
   /**
    * This method is called each time a particle interact with a surface
+   * With an unrecodgnized surfaceType or SURFACE_TYPE_MODEL
    * The particle next position is already positioned exactly on the surface and
    * position of the particle is not suposed to be changed
    * It is possible in this method to choose to terminate particle, alter it's variables including
    * velocity,
    * create new particle...
    */
-  virtual bool InteractWithSurface(vtkLagrangianParticle* particle, vtkDataSet* surface,
-    vtkIdType cellId, std::queue<vtkLagrangianParticle*>& particles);
+  virtual bool InteractWithSurface(int surfaceType, vtkLagrangianParticle* particle, 
+    vtkDataSet* surface, vtkIdType cellId, std::queue<vtkLagrangianParticle*>& particles);
 
   /**
    * This method is called when trying to find the intersection point between a particle
