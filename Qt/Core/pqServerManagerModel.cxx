@@ -357,7 +357,7 @@ void pqServerManagerModel::onProxyRegistered(
 
   if (view)
   {
-    // This ensures that the QVTKWidget (or any other rendering
+    // This ensures that the pqQVTKWidgetBase (or any other rendering
     // widget) for the view is created thus avoiding the window from ever
     // popping up and causing issues as as seen in BUG #13855.
     view->widget();

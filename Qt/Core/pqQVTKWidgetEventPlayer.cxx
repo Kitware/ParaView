@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
-#include "QVTKWidget.h"
 #include "pqEventDispatcher.h"
+#include "pqQVTKWidgetBase.h"
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
 {
@@ -49,7 +49,7 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  QVTKWidget* widget = qobject_cast<QVTKWidget*>(Object);
+  pqQVTKWidgetBase* widget = qobject_cast<pqQVTKWidgetBase*>(Object);
   if (widget)
   {
     if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove")

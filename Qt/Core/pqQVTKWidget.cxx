@@ -162,14 +162,19 @@ vtkTypeUInt32 pqQVTKWidget::getProxyId()
 //----------------------------------------------------------------------------
 void pqQVTKWidget::paintMousePointer(int xLocation, int yLocation)
 {
+#if QT_VERSION >= 0x050000
+  Q_UNUSED(xLocation);
+  Q_UNUSED(yLocation);
+#else
   // Local repaint
   QVTKWidget::paintEvent(NULL);
 
   // Paint mouse pointer image on top of it
   int imagePointingDelta = 10;
-  this->mRenWin->SetRGBACharPixelData(xLocation - imagePointingDelta,
+  this->GetRenderWindow()->SetRGBACharPixelData(xLocation - imagePointingDelta,
     this->height() - yLocation + imagePointingDelta,
     this->MousePointerToDraw.width() + xLocation - 1 - imagePointingDelta,
     this->height() - (this->MousePointerToDraw.height() + yLocation + 1) + imagePointingDelta,
     this->MousePointerToDraw.bits(), 1, 1);
+#endif
 }

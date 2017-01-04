@@ -145,6 +145,7 @@ set(Module_SRCS
   pqProxyModifiedStateUndoElement.h
   pqProxySelection.cxx
   pqProxySelection.h
+  pqQVTKWidgetBase.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h

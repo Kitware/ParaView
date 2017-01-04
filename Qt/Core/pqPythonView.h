@@ -56,7 +56,7 @@ protected slots:
   virtual void initializeAfterObjectsCreated();
 
   /**
-  * Setups up RenderModule and QVTKWidget binding.
+  * Setups up RenderModule and pqQVTKWidgetBase binding.
   * This method is called for all pqRenderView objects irrespective
   * of whether it is created from state/undo-redo/python or by the GUI. Hence
   * don't change any render module properties here.

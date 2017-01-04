@@ -7,7 +7,6 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "QVTKWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"

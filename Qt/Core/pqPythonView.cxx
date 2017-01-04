@@ -113,7 +113,7 @@ QWidget* pqPythonView::createWidget()
     // done. But in case it's needed for streaming view, I am letting it be.
     // vtkwidget->setAutomaticImageCacheEnabled(true);
 
-    // help the QVTKWidget know when to clear the cache
+    // help the pqQVTKWidget know when to clear the cache
     this->getConnector()->Connect(
       this->getProxy(), vtkCommand::ModifiedEvent, vtkwidget, SLOT(markCachedImageAsDirty()));
   }
@@ -130,7 +130,7 @@ void pqPythonView::initialize()
   this->Superclass::initialize();
 
   // The render module needs to obtain client side objects
-  // for the RenderWindow etc. to initialize the QVTKWidget
+  // for the RenderWindow etc. to initialize the pqQVTKWidget
   // correctly. It cannot do this unless the underlying proxy
   // has been created. Since any pqProxy should never call
   // UpdateVTKObjects() on itself in the constructor, we
@@ -170,7 +170,7 @@ void pqPythonView::initializeWidgets()
 
   this->Internal->InitializedWidgets = true;
   vtkSMPythonViewProxy* renModule = this->getPythonViewProxy();
-  if (QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->widget()))
+  if (pqQVTKWidget* vtkwidget = qobject_cast<pqQVTKWidget*>(this->widget()))
   {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     this->render();

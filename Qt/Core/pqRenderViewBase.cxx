@@ -160,7 +160,7 @@ QWidget* pqRenderViewBase::createWidget()
     // done. But in case it's needed for streaming view, I am letting it be.
     // vtkwidget->setAutomaticImageCacheEnabled(true);
 
-    // help the QVTKWidget know when to clear the cache
+    // help the pqQVTKWidgetBase know when to clear the cache
     this->getConnector()->Connect(
       this->getProxy(), vtkCommand::ModifiedEvent, vtkwidget, SLOT(markCachedImageAsDirty()));
   }
@@ -177,7 +177,7 @@ void pqRenderViewBase::initialize()
   this->Superclass::initialize();
 
   // The render module needs to obtain client side objects
-  // for the RenderWindow etc. to initialize the QVTKWidget
+  // for the RenderWindow etc. to initialize the pqQVTKWidgetBase
   // correctly. It cannot do this unless the underlying proxy
   // has been created. Since any pqProxy should never call
   // UpdateVTKObjects() on itself in the constructor, we

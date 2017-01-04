@@ -24,6 +24,7 @@
 #include <QtGui>
 
 class pqMultiSliceAxisWidget;
+class pqQVTKWidget;
 
 class PQCORE_EXPORT pqMultiSliceView : public pqRenderView
 {
@@ -111,21 +112,21 @@ protected:
   void updateViewModelCallBack(vtkObject*, unsigned long, void*);
 
   /**
-  * Override to decorate the QVTKWidget
+  * Override to decorate the pqQVTKWidgetBase
   */
   virtual QWidget* createWidget();
 
   /**
   * Helper method to get the concreate 3D widget
   */
-  QVTKWidget* getInternalWidget();
+  pqQVTKWidget* getInternalWidget();
 
   /**
   * Get axis index.
   */
   int getAxisIndex(QObject*);
 
-  QPointer<QVTKWidget> InternalWidget;
+  QPointer<pqQVTKWidget> InternalWidget;
   bool UserIsInteracting;
   QPointer<pqMultiSliceAxisWidget> AxisX;
   QPointer<pqMultiSliceAxisWidget> AxisY;

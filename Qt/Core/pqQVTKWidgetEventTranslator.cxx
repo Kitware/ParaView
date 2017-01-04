@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QMouseEvent>
 
-#include "QVTKWidget.h"
+#include "pqQVTKWidgetBase.h"
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
 {
@@ -56,7 +56,7 @@ pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator()
 bool pqQVTKWidgetEventTranslator::translateEvent(
   QObject* Object, QEvent* Event, int eventType, bool& error)
 {
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(Object);
+  pqQVTKWidgetBase* const widget = qobject_cast<pqQVTKWidgetBase*>(Object);
   if (!widget)
   {
     return false;

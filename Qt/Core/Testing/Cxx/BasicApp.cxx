@@ -5,11 +5,11 @@
 #include <QApplication>
 #include <QTimer>
 
-#include "QVTKWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
+#include "pqQVTKWidget.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -103,10 +103,10 @@ bool MainWindow::compareView(
     return false;
   }
 
-  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->widget());
+  pqQVTKWidget* const widget = qobject_cast<pqQVTKWidget*>(renModule->widget());
   if (!widget)
   {
-    output << "ERROR: Not a QVTKWidget." << endl;
+    output << "ERROR: Not a pqQVTKWidget." << endl;
     return false;
   }
 

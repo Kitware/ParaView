@@ -18,13 +18,11 @@
 #include <QtCore>
 #include <QtGui>
 
-#include "QVTKWidget.h"
-
 #include "pqDataRepresentation.h"
 #include "pqMultiSliceAxisWidget.h"
 #include "pqPropertyLinks.h"
+#include "pqQVTKWidget.h"
 #include "pqRepresentation.h"
-
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkDataRepresentation.h"
@@ -79,7 +77,7 @@ QWidget* pqMultiSliceView::createWidget()
   vtkSMProxy* smproxy = this->getProxy();
 
   // Get the internal widget that we want to decorate
-  this->InternalWidget = qobject_cast<QVTKWidget*>(this->pqRenderView::createWidget());
+  this->InternalWidget = qobject_cast<pqQVTKWidget*>(this->pqRenderView::createWidget());
 
   // Build the widget hierarchy
   QWidget* container = new QWidget();
@@ -418,7 +416,7 @@ void pqMultiSliceView::setCursor(const QCursor& c)
   }
 }
 //-----------------------------------------------------------------------------
-QVTKWidget* pqMultiSliceView::getInternalWidget()
+pqQVTKWidget* pqMultiSliceView::getInternalWidget()
 {
   return this->InternalWidget;
 }
