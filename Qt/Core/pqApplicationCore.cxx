@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXMLUtil.h"
 #include "vtkInitializationHelper.h"
 #include "vtkPVPluginTracker.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
@@ -91,6 +92,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
+
+// Do this after all above includes. On a VS2015 with Qt 5,
+// these includes cause build errors with pqOutputWindow, pqRenderView etc.
+// due to some leaked through #define's (is my guess).
+#if QT_VERSION >= 0x050000
+#include <QSurfaceFormat>
+#include "QVTKOpenGLWidget.h"
+#endif
+
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -113,6 +123,17 @@ pqApplicationCore::pqApplicationCore(
   int& argc, char** argv, pqOptions* options, QObject* parentObject)
   : QObject(parentObject)
 {
+#if QT_VERSION >= 0x050000
+  vtkPVSynchronizedRenderWindows::SetUseGenericOpenGLRenderWindow(true);
+
+  // Setup the default format.
+  QSurfaceFormat fmt = QVTKOpenGLWidget::defaultFormat();
+
+  // ParaView does not support multisamples.
+  fmt.setSamples(0);
+  QSurfaceFormat::setDefaultFormat(fmt);
+#endif
+
   vtkSmartPointer<pqOptions> defaultOptions;
   if (!options)
   {
