@@ -82,19 +82,22 @@ ResultLUT = GetColorTransferFunction('Result')
 ResultPWF = GetOpacityTransferFunction('Result')
 
 # set scalar coloring
-ColorBy(calculator1Display, ('POINTS', 'Result', '2'))
+ColorBy(calculator1Display, ('POINTS', 'Result', 'Z'))
 
 # change representation type
 calculator1Display.SetRepresentationType('Surface')
 
 # set scalar coloring
-ColorBy(calculator1Display, ('POINTS', 'Result', '1'))
+ColorBy(calculator1Display, ('POINTS', 'Result', 'X'))
 
 # rescale color and/or opacity maps used to include current data range
 calculator1Display.RescaleTransferFunctionToDataRange(True)
 
 # show color bar/color legend
 calculator1Display.SetScalarBarVisibility(renderView1, True)
+
+# Update a scalar bar component title.
+UpdateScalarBarsComponentTitle(ResultLUT, calculator1Display)
 
 #### saving camera placements for all active views
 

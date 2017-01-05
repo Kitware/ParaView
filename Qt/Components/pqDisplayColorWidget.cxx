@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
 #include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -550,16 +551,17 @@ void pqDisplayColorWidget::componentNumberChanged()
     QPair<int, QString> val = this->arraySelection();
     int association = val.first;
     const QString& arrayName = val.second;
-    SM_SCOPED_TRACE(SetScalarColoring)
-      .arg("display", this->Representation->getProxy())
-      .arg("arrayname", arrayName.toLatin1().data())
-      .arg("attribute_type", association)
-      .arg("component", this->Components->itemText(number + 1).toLatin1().data())
-      .arg("lut", this->ColorTransferFunction->getProxy());
-
     this->ColorTransferFunction->setVectorMode(
       number < 0 ? pqScalarsToColors::MAGNITUDE : pqScalarsToColors::COMPONENT,
       number < 0 ? 0 : number);
+    { // To make sure the trace is done before other calls.
+      SM_SCOPED_TRACE(SetScalarColoring)
+        .arg("display", this->Representation->getProxy())
+        .arg("arrayname", arrayName.toLatin1().data())
+        .arg("attribute_type", association)
+        .arg("component", this->Components->itemText(number + 1).toLatin1().data())
+        .arg("lut", this->ColorTransferFunction->getProxy());
+    }
 
     // we could now respect some application setting to determine if the LUT is
     // to be reset.
@@ -568,9 +570,10 @@ void pqDisplayColorWidget::componentNumberChanged()
       reprProxy, /*extend*/ false, /*force*/ false);
 
     // Update scalar bars.
-    vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
-      this->ColorTransferFunction->getProxy(),
-      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(reprProxy));
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+    tmgr->UpdateScalarBarsComponentTitle(this->ColorTransferFunction->getProxy(),
+      reprProxy);
+
     END_UNDO_SET();
 
     // render all views since this could affect multiple views.
