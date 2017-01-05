@@ -124,6 +124,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqLoadDataReaction(ui.actionFileOpen);
   new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
+  new pqReloadFilesReaction(ui.actionReloadFiles);
 
   new pqLoadStateReaction(ui.actionFileLoadServerState);
   new pqSaveStateReaction(ui.actionFileSaveServerState);
@@ -164,7 +165,6 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
-  new pqReloadFilesReaction(ui.actionReloadFiles);
 }
 
 //-----------------------------------------------------------------------------
