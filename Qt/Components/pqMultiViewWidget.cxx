@@ -467,13 +467,17 @@ QWidget* pqMultiViewWidget::createWidget(
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
       frame->setDecorationsVisibility(this->DecorationsVisible);
-      if (this->LockViewSize.isEmpty())
+      QWidget* centralWidget = frame->centralWidget();
+      if (centralWidget)
       {
-        frame->centralWidget()->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-      }
-      else
-      {
-        frame->centralWidget()->setMaximumSize(this->LockViewSize);
+        if (this->LockViewSize.isEmpty())
+        {
+          centralWidget->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        }
+        else
+        {
+          centralWidget->setMaximumSize(this->LockViewSize);
+        }
       }
       if (max_index < index)
       {
