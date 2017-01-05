@@ -71,7 +71,6 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py
-  paraview/data_exploration.py
   paraview/demos/demo1.py
   paraview/demos/show_grid_as_background.py
   paraview/extract_selection.py

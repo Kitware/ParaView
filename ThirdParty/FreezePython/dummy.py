@@ -13,7 +13,6 @@ import paraview.compile_all_pv
 import paraview.coprocessing
 import paraview.cpexport
 import paraview.cpstate
-import paraview.data_exploration
 import paraview.extract_selection
 import paraview.lookuptable
 import paraview.numeric

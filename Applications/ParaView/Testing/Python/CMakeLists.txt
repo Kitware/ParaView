@@ -58,11 +58,6 @@ paraview_add_test_python(
   TestResetProperty.py
 )
 
-paraview_add_test_pvbatch(
-  NO_DATA NO_RT
-  CinemaTest.py
-)
-
 # These tests could run safely in serial and parallel (and with both GL backends).
 set(PVBATCH_TESTS
   StructuredGridVolumeRendering.py
@@ -132,6 +127,3 @@ if(BUILD_SHARED_LIBS)
     TestRemoteProgrammableFilter.py
     )
 endif()
-
-# Extend timeout for CinemaTest
-set_tests_properties(pvpythonPython-Batch-CinemaTest PROPERTIES TIMEOUT 500)
