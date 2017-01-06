@@ -73,9 +73,9 @@ public:
    * representation that requires delivering of any geometry must register with
    * the vtkPVDataDeliveryManager and never manage the delivery on its own.
    */
-  void SetPiece(
-    vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res, unsigned long trueSize = 0);
-  void SetPiece(unsigned int repr_id, vtkDataObject* data, bool low_res);
+  void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res,
+    unsigned long trueSize = 0, int port = 0);
+  void SetPiece(unsigned int repr_id, vtkDataObject* data, bool low_res, int port = 0);
   //@}
 
   //@{
@@ -85,8 +85,8 @@ public:
    * vtkPVRenderView::GetPieceProducer() and GetPieceProducerLOD()) to obtain
    * the geometry producer for the geometry to be rendered.
    */
-  vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res);
-  vtkAlgorithmOutput* GetProducer(unsigned int, bool low_res);
+  vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res, int port = 0);
+  vtkAlgorithmOutput* GetProducer(unsigned int, bool low_res, int port = 0);
   //@}
 
   /**
@@ -96,7 +96,7 @@ public:
    * geometry to be delivered to all nodes always. That can be done by using
    * this method (via vtkPVRenderView::SetDeliverToAllProcesses()).
    */
-  void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res);
+  void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res, int port = 0);
 
   /**
    * By default, this class only delivers geometries to nodes that are doing the
@@ -108,8 +108,8 @@ public:
    * the data on the server nodes, while the latter will optionally gather the data to
    * deliver to the client and never scatter.
    */
-  void SetDeliverToClientAndRenderingProcesses(
-    vtkPVDataRepresentation*, bool deliver_to_client, bool gather_before_delivery, bool low_res);
+  void SetDeliverToClientAndRenderingProcesses(vtkPVDataRepresentation*, bool deliver_to_client,
+    bool gather_before_delivery, bool low_res, int port = 0);
 
   /**
    * Under certain cases, e.g. when remote rendering in parallel with
@@ -119,7 +119,7 @@ public:
    * redistribute the geometry as needed. Only vtkPolyData, vtkUnstructuredGrid
    * or a multi-block comprising of vtkPolyData is currently supported.
    */
-  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value = true);
+  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value = true, int port = 0);
 
   /**
    * Returns the size for all visible geometry. If low_res is true, and low-res
@@ -162,7 +162,7 @@ public:
    */
   void SetOrderedCompositingInformation(vtkPVDataRepresentation* repr,
     vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
-    const double spacing[3]);
+    const double spacing[3], int port = 0);
 
   /**
    * Internal method used to determine the list of representations that need
@@ -187,15 +187,15 @@ public:
    * it is streamable i.e. the view can call streaming passses on it and it will
    * deliver data incrementally.
    */
-  void SetStreamable(vtkPVDataRepresentation*, bool);
+  void SetStreamable(vtkPVDataRepresentation*, bool, int port = 0);
 
   //@{
   /**
    * Passes the current streamed piece. This is the piece that will be delivered
    * to the rendering node.
    */
-  void SetNextStreamedPiece(vtkPVDataRepresentation* repr, vtkDataObject* piece);
-  vtkDataObject* GetCurrentStreamedPiece(vtkPVDataRepresentation* repr);
+  void SetNextStreamedPiece(vtkPVDataRepresentation* repr, vtkDataObject* piece, int port = 0);
+  vtkDataObject* GetCurrentStreamedPiece(vtkPVDataRepresentation* repr, int port = 0);
   void ClearStreamedPieces();
   //@}
 
