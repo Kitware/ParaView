@@ -306,6 +306,7 @@
         { "class": "vtkMergeCells" },
         { "class": "vtkMultiBlockDataGroupFilter" },
         { "class": "vtkPassArrays" },
+        { "class": "vtkPassThrough" },
         { "class": "vtkSplitColumnComponents" },
         { "class": "vtkTransformPolyDataFilter" }
       ],

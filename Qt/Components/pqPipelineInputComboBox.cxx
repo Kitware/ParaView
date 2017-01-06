@@ -61,10 +61,10 @@ vtkSMProxy* PROXY(const QVariant& variant)
 
 //-----------------------------------------------------------------------------
 pqPipelineInputComboBox::pqPipelineInputComboBox(
-  vtkSMProxy* proxy, vtkSMProperty* property, QWidget* _parent)
+  vtkSMProxy* proxy, vtkSMProperty* _property, QWidget* _parent)
   : Superclass(_parent)
   , Proxy(proxy)
-  , Property(property)
+  , Property(_property)
   , UpdatePending(false)
   , InOnActivate(false)
 {
