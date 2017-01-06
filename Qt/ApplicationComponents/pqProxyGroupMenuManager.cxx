@@ -469,6 +469,10 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  if (!pxm)
+  {
+    return 0;
+  }
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(pgroup.toLatin1().data(), pname.toLatin1().data());
   if (prototype)
   {
