@@ -239,6 +239,7 @@ int vtkChartRepresentation::RequestData(
       reductionFilter->Update();
 
       data = reductionFilter->GetOutputDataObject(0);
+      data = this->TransformTable(data);
 
       if (this->EnableServerSideRendering && numProcs > 1)
       {
@@ -282,6 +283,12 @@ vtkDataObject* vtkChartRepresentation::TransformInputData(
   return data;
 }
 
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkDataObject> vtkChartRepresentation::TransformTable(
+  vtkSmartPointer<vtkDataObject> data)
+{
+  return data;
+}
 //----------------------------------------------------------------------------
 bool vtkChartRepresentation::IsCached(double cache_key)
 {

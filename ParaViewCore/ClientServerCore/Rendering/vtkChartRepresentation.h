@@ -220,6 +220,14 @@ protected:
   virtual vtkDataObject* TransformInputData(
     vtkInformationVector** inputVector, vtkDataObject* data);
 
+  /**
+   * Method to be overridden to apply an operation of the table after it is
+   * gathered to the first rank for rendering the chart.  This allows subclasses
+   * to operate on the final table.  The default implementation just returns the
+   * input.
+   */
+  virtual vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject> table);
+
   typedef std::map<std::string, vtkSmartPointer<vtkTable> > MapOfTables;
   /**
    * Convenience method to get all vtkTable instances with their associated

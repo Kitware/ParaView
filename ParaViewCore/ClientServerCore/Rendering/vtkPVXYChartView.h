@@ -423,6 +423,15 @@ public:
   vtkGetMacro(HideTimeMarker, bool);
   //@}
 
+  //@{
+  /**
+   * Set whether to sort the data in the chart by the x-axis array so that line
+   * plot connectivity is from left to right rather than semi-randomly by index.
+   */
+  vtkGetMacro(SortByXAxis, bool);
+  vtkSetMacro(SortByXAxis, bool);
+  //@}
+
   /**
    * Provides access to the chart view.
    */
@@ -483,6 +492,7 @@ protected:
   void SelectionChanged();
 
   bool HideTimeMarker;
+  bool SortByXAxis;
 
 private:
   vtkPVXYChartView(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;

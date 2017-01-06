@@ -16,15 +16,57 @@
 #include "vtkXYChartRepresentationInternals.h"
 
 #include "vtkCommand.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkContextView.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
+#include "vtkPVXYChartView.h"
 #include "vtkScalarsToColors.h"
+#include "vtkSmartPointer.h"
+#include "vtkSortFieldData.h"
+#include "vtkTableAlgorithm.h"
 #include "vtkWeakPointer.h"
 
 #include <map>
 #include <string>
+
+class vtkXYChartRepresentation::SortTableFilter : public vtkTableAlgorithm
+{
+private:
+  char* ArrayToSortBy;
+
+protected:
+  SortTableFilter()
+    : ArrayToSortBy(NULL)
+  {
+  }
+  ~SortTableFilter() {}
+public:
+  static SortTableFilter* New();
+  int RequestData(
+    vtkInformation*, vtkInformationVector** inVector, vtkInformationVector* outVector) VTK_OVERRIDE
+  {
+    vtkTable* in = vtkTable::GetData(inVector[0], 0);
+    vtkTable* out = vtkTable::GetData(outVector, 0);
+    if (!this->ArrayToSortBy)
+    {
+      vtkErrorMacro(<< "The array name to sort by must be set.");
+      return 0;
+    }
+    out->DeepCopy(in);
+    vtkSortFieldData::Sort(out->GetRowData(), this->ArrayToSortBy, 0, 0);
+    return 1;
+  }
+
+  vtkGetStringMacro(ArrayToSortBy);
+  vtkSetStringMacro(ArrayToSortBy);
+};
+
+vtkStandardNewMacro(vtkXYChartRepresentation::SortTableFilter);
 
 //-----------------------------------------------------------------------------
 #define vtkCxxSetChartTypeMacro(_name, _value)                                                     \
@@ -43,6 +85,7 @@ vtkXYChartRepresentation::vtkXYChartRepresentation()
   , ChartType(vtkChart::LINE)
   , XAxisSeriesName(NULL)
   , UseIndexForXAxis(true)
+  , SortDataByXAxis(false)
   , PlotDataHasChanged(false)
   , SeriesLabelPrefix(NULL)
 {
@@ -80,6 +123,16 @@ void vtkXYChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetSortDataByXAxis(bool val)
+{
+  if (this->SortDataByXAxis == val)
+  {
+    return;
+  }
+  this->SortDataByXAxis = val;
+  this->MarkModified();
+}
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetVisibility(bool visible)
 {
@@ -235,6 +288,21 @@ void vtkXYChartRepresentation::ClearLabels()
 }
 
 //----------------------------------------------------------------------------
+int vtkXYChartRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (request_type == vtkPVView::REQUEST_UPDATE())
+  {
+    vtkPVXYChartView* view = vtkPVXYChartView::SafeDownCast(inInfo->Get(vtkPVView::VIEW()));
+    if (view)
+    {
+      this->SetSortDataByXAxis(view->GetSortByXAxis());
+    }
+  }
+  return Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+}
+
+//----------------------------------------------------------------------------
 int vtkXYChartRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -250,6 +318,22 @@ int vtkXYChartRepresentation::RequestData(
 
   this->PlotDataHasChanged = true;
   return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkDataObject> vtkXYChartRepresentation::TransformTable(
+  vtkSmartPointer<vtkDataObject> data)
+{
+  if (!(this->SortDataByXAxis && this->XAxisSeriesName))
+  {
+    return Superclass::TransformTable(data);
+  }
+  vtkNew<SortTableFilter> sorter;
+  sorter->SetInputDataObject(data);
+  sorter->SetArrayToSortBy(this->XAxisSeriesName);
+  sorter->Update();
+  vtkSmartPointer<vtkDataObject> sortedTable = sorter->GetOutputDataObject(0);
+  return sortedTable;
 }
 
 //----------------------------------------------------------------------------
