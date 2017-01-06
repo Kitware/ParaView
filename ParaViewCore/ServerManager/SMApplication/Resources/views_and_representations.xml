@@ -4117,6 +4117,12 @@
             <Property name="Slice"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="slice" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Slice" />
+            </Hints>
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
