@@ -44,6 +44,22 @@ Learning Resources
 [Guide]: http://www.paraview.org/paraview-guide/
 
 
+Installation
+============
+
+ParaView is available as [BioConda](https://bioconda.github.io) package or [Docker/rkt container](https://quay.io/repository/biocontainers/paraview).
+
+You can install it via:
+
+```bash
+conda install paraview -c bioconda -c conda-forge
+```
+or run the container with
+```bash
+docker run -i -t quay.io/biocontainers/paraview:5.2.0--py27_0 pvpython --version
+```
+
+
 Building
 ========
 
