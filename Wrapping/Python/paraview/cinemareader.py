@@ -6,7 +6,7 @@ from cinema_python.cinema_store import FileStore
 from cinema_python.QueryTranslator_SpecB import QueryTranslator_SpecB
 from paraview import vtk
 from paraview.vtk.numpy_interface import dataset_adapter as dsa
-from paraview.cinemaIO.utils import convert_pose_to_camera
+from cinema_python.utils import convert_pose_to_camera
 
 from ast import literal_eval
 
