@@ -30,8 +30,8 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,39,15,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,39,15,/0:0/0:0" />
 
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionReloadFiles" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionReloadFiles" />
   <pqevent object="pqClientMainWindow/reloadOptionsMessageBox/qt_msgbox_buttonbox/reloadExistingButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport"

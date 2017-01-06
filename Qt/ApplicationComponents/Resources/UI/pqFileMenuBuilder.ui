@@ -91,6 +91,20 @@
     <bool>true</bool>
    </property>
   </action>
+  <action name="actionReloadFiles">
+   <property name="text">
+     <string>Reload Files</string>
+   </property>
+   <property name="iconText">
+    <string>Reload Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload data files in case they were changed externally.</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
   <action name="actionFileOpen">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -165,6 +179,7 @@
   <addaction name="actionFileOpen"/>
   <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="menuRecentFiles"/>
+  <addaction name="actionReloadFiles"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadServerState"/>
   <addaction name="actionFileSaveServerState"/>
