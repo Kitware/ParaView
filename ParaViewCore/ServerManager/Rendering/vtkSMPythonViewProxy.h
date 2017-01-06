@@ -23,11 +23,13 @@
 #define vtkSMPythonViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
+#include "vtkNew.h"                            // needed for vtkNew.
 #include "vtkSMViewProxy.h"
 
 class vtkImageData;
 class vtkRenderer;
 class vtkSMProxy;
+class vtkSMViewProxyInteractorHelper;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPythonViewProxy : public vtkSMViewProxy
 {
@@ -44,19 +46,25 @@ public:
   /**
    * Returns the client-side render window.
    */
-  vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
-   * Returns true if the most recent render indeed employed low-res rendering.
+   * Returns the interactor. Note, that views may not use vtkRenderWindow at all
+   * in which case they will not have any interactor and will return NULL.
+   * Default implementation returns NULL.
    */
-  virtual bool LastRenderWasInteractive();
+  vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
 
   /**
-   * Overridden to disable creation on an interactor. PythonView does not
-   * support interactor.
+   * A client process need to set the interactor to enable interactivity. Use
+   * this method to set the interactor and initialize it as needed by the
+   * RenderView. This include changing the interactor style as well as
+   * overriding VTK rendering to use the Proxy/ViewProxy API instead.
+   * Default implementation does nothing. Views that support interaction using
+   * vtkRenderWindowInteractor should override this method to set the interactor
+   * up.
    */
-  bool MakeRenderWindowInteractor(bool) VTK_OVERRIDE
-  { return false; }
+  void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
 
 protected:
   vtkSMPythonViewProxy();
@@ -70,6 +78,8 @@ protected:
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
+
+  vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 };
 
 #endif // vtkSMPythonViewProxy_h
