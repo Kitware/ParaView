@@ -185,6 +185,7 @@ public:
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
+    this->Widget->setObjectName("1QVTKWidget0");
     this->Widget->SetRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
 
