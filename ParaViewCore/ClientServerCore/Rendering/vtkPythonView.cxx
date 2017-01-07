@@ -13,6 +13,8 @@
 
 =========================================================================*/
 #include "vtkPython.h" // must be the first thing that's included
+
+#include "vtkPythonUtil.h"
 #include "vtkPythonView.h"
 
 #include "vtkObjectFactory.h"
@@ -34,58 +36,148 @@
 
 class vtkPythonView::vtkInternals
 {
-  PyObject* CustomLocals;
+  bool Initialized;
+
+  vtkSmartPyObject WrappingModule;
+  vtkSmartPyObject PythonViewModule;
+  vtkSmartPyObject ScriptModule;
+  std::string ScriptCode;
+
+  bool InitializePython()
+  {
+    if (!this->Initialized)
+    {
+      this->Initialized = true;
+      vtkPythonInterpreter::Initialize();
+      vtkPythonScopeGilEnsurer gilEnsurer;
+
+      // import the wrapping module.
+      this->WrappingModule.TakeReference(
+          PyImport_ImportModule("paraview.vtk.vtkPVClientServerCoreRendering"));
+      if (!this->WrappingModule)
+      {
+        vtkGenericWarningMacro("Failed to import `vtkPVClientServerCoreRendering`.");
+        if (PyErr_Occurred())
+        {
+          PyErr_Print();
+          PyErr_Clear();
+          return false;
+        }
+      }
+
+      this->PythonViewModule.TakeReference(
+          PyImport_ImportModule("paraview.python_view"));
+      if (!this->PythonViewModule)
+      {
+        vtkGenericWarningMacro("Failed to import 'paraview.python_view' module.");
+        if (PyErr_Occurred())
+        {
+          PyErr_Print();
+          PyErr_Clear();
+          return false;
+        }
+      }
+    }
+    return this->PythonViewModule;
+  }
+
+  /**
+   * Compile and build a Python module object from the given code.
+   */
+  vtkSmartPyObject BuildModule(const std::string& code, const std::string &fname="Script")
+  {
+    if (!this->InitializePython() || code.empty())
+    {
+      return vtkSmartPyObject();
+    }
+
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject codeObj(Py_CompileString(
+          code.c_str(), fname.c_str(), Py_file_input));
+    if (!codeObj)
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return vtkSmartPyObject();
+    }
+    vtkSmartPyObject module(PyImport_ExecCodeModule(const_cast<char*>("vtkPythonView"), codeObj));
+    return module;
+  }
 
 public:
-  vtkInternals()
-    : CustomLocals(0)
+  vtkInternals() : Initialized(false) {}
+  ~vtkInternals() {}
+
+
+  bool Prepare(const std::string& script)
   {
-  }
-  ~vtkInternals() { this->CleanupObjects(); }
-
-  PyObject* GetCustomLocalsPyObject()
-  {
-    if (this->CustomLocals)
+    if (script != this->ScriptCode)
     {
-      return this->CustomLocals;
+      this->ScriptCode = script;
+      this->ScriptModule = this->BuildModule(this->ScriptCode);
     }
-
-    // Make sure the python interpreter is initialized
-    vtkPythonInterpreter::Initialize(1);
-
-    {
-      vtkPythonScopeGilEnsurer gilEnsurer;
-      const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
-      PyRun_SimpleString(const_cast<char*>(code));
-
-      PyObject* main_module = PyImport_AddModule((char*)"__main__");
-      PyObject* global_dict = PyModule_GetDict(main_module);
-      this->CustomLocals = PyDict_GetItemString(global_dict, "__vtkPythonViewLocals");
-      if (!this->CustomLocals)
-      {
-        vtkGenericWarningMacro("Failed to locate the __vtkPythonViewLocals object.");
-        return NULL;
-      }
-      Py_INCREF(this->CustomLocals);
-
-      PyRun_SimpleString(const_cast<char*>("del __vtkPythonViewLocals"));
-    }
-
-    return this->CustomLocals;
+    return this->ScriptModule;
   }
 
-  void CleanupObjects()
+  bool CallSetupData(vtkPythonView* self)
   {
-    Py_XDECREF(this->CustomLocals);
-    this->CustomLocals = NULL;
-    if (vtkPythonInterpreter::IsInitialized())
+    if (!this->ScriptModule)
     {
-      const char* code = "import gc; gc.collect()\n";
-      vtkPythonInterpreter::RunSimpleString(code);
+      return false;
     }
+
+    if (PyObject_HasAttrString(this->ScriptModule, "setup_data") != 1)
+    {
+      // not having `setup_data` defined in the script is acceptable.
+      return true;
+    }
+
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject methodName(PyString_FromString("setup_data"));
+    vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
+    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->ScriptModule,
+          methodName.GetPointer(), view.GetPointer(), NULL));
+    return retVal;
   }
 
-  void ResetCustomLocals() { this->CleanupObjects(); }
+  bool CallRender(vtkPythonView* self, int width, int height)
+  {
+    if (!this->ScriptModule)
+    {
+      return false;
+    }
+
+    if (PyObject_HasAttrString(this->ScriptModule, "render") != 1)
+    {
+      // not having `render` defined in the script is acceptable.
+      return true;
+    }
+
+    vtkSmartPyObject renderFunction(PyObject_GetAttrString(this->ScriptModule, "render"));
+    assert(renderFunction);
+
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject methodName(PyString_FromString("call_render"));
+    vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
+    vtkSmartPyObject widthObj(PyInt_FromLong(width));
+    vtkSmartPyObject heightObj(PyInt_FromLong(height));
+    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
+          this->PythonViewModule,
+          methodName.GetPointer(),
+          renderFunction.GetPointer(),
+          view.GetPointer(),
+          widthObj.GetPointer(),
+          heightObj.GetPointer(),
+          NULL));
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return false;
+    }
+
+    return true;
+  }
 };
 
 vtkStandardNewMacro(vtkPythonView);
@@ -120,59 +212,21 @@ vtkInformationKeyMacro(vtkPythonView, REQUEST_DELIVER_DATA_TO_CLIENT, Request);
 //----------------------------------------------------------------------------
 void vtkPythonView::Update()
 {
-  vtkTimerLog::MarkStartEvent("vtkPythonView::Update");
-
-  this->Internals->ResetCustomLocals();
-
-  if (this->Script && strlen(this->Script) > 0)
+  if (!this->Internals->Prepare(this->Script? this->Script : ""))
   {
-
-    this->CallProcessViewRequest(
-      vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
-
-    // Define the view in Python by creating a new instance of the
-    // Python vtkPythonView class from the pointer to the C++
-    // vtkPythonView instance.
-    char addressOfThis[1024];
-    sprintf(addressOfThis, "%p", this);
-    char* address = addressOfThis;
-    if ((addressOfThis[0] == '0') && ((addressOfThis[1] == 'x') || (addressOfThis[1] == 'X')))
-    {
-      address += 2;
-    }
-
-    // Import necessary items from ParaView
-    std::ostringstream importStream;
-    importStream << "import paraview" << endl
-                 << "from paraview.vtk.vtkPVClientServerCoreRendering import vtkPythonView" << endl
-                 << "pythonView = vtkPythonView('" << addressOfThis << " ')" << endl;
-    this->RunSimpleStringWithCustomLocals(importStream.str().c_str());
-
-    // Evaluate the user-defined script. It should define two functions,
-    // setup_data(view) and render(view, figure) that each take a
-    // vtkPythonView (the render function also takes a matplotlib.figure
-    // as the second argument).  If these functions are not defined in
-    // this script, they must be defined in the global Python
-    // interpreter by some other means (e.g. a script executed by
-    // pvpython).
-    this->RunSimpleStringWithCustomLocals(this->Script);
-
-    // Update the data array settings. Do this only on servers where local data is available
-    if (this->IsLocalDataAvailable())
-    {
-      std::ostringstream setupDataCommandStream;
-      setupDataCommandStream << "from paraview import python_view\n"
-                             << "try:\n"
-                             << "  python_view.call_setup_data(setup_data, pythonView)\n"
-                             << "except:\n"
-                             << "  pass\n";
-      this->RunSimpleStringWithCustomLocals(setupDataCommandStream.str().c_str());
-    }
-
-    this->CallProcessViewRequest(vtkPythonView::REQUEST_DELIVER_DATA_TO_CLIENT(),
-      this->RequestInformation, this->ReplyInformationVector);
+    return;
   }
 
+  this->Superclass::Update();
+
+  vtkTimerLog::MarkStartEvent("vtkPythonView::Update");
+  // Call 'setup_data' on ranks where data is available for "transformation".
+  if (this->IsLocalDataAvailable())
+  {
+    this->Internals->CallSetupData(this);
+  }
+  this->CallProcessViewRequest(vtkPythonView::REQUEST_DELIVER_DATA_TO_CLIENT(),
+      this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPythonView::Update");
 }
 
@@ -397,17 +451,9 @@ void vtkPythonView::StillRender()
     int width = this->Size[0] * this->Magnification;
     int height = this->Size[1] * this->Magnification;
 
-    std::ostringstream renderCommandStream;
-    renderCommandStream << "from paraview import python_view\n"
-                        << "try:\n"
-                        << "  python_view.call_render(render, pythonView, " << width << ", "
-                        << height << ")\n"
-                        << "except:\n"
-                        << "  pass\n";
-    this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
+    this->Internals->CallRender(this, width, height);
 
-    // this->ImageData should be set by the call_render() function
-    // invoked above.
+    // this->ImageData should be set by the call_render() function invoked above.
     if (this->ImageData)
     {
       this->RenderTexture->SetInputData(this->ImageData);
@@ -451,40 +497,6 @@ bool vtkPythonView::IsLocalDataAvailable()
   }
 
   return available;
-}
-
-//----------------------------------------------------------------------------
-int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
-{
-  // The embedded python interpreter cannot handle DOS line-endings, see
-  // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
-  std::string buffer = code ? code : "";
-  buffer.erase(std::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
-
-  PyObject* context = this->Internals->GetCustomLocalsPyObject();
-
-  vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject result(
-    PyRun_String(const_cast<char*>(buffer.c_str()), Py_file_input, context, context));
-
-  if (result)
-  {
-    PyErr_Print();
-    return -1;
-  }
-
-  result = NULL;
-  // cast to avoid warning for python 2
-  PyObject* f = PySys_GetObject(const_cast<char*>("stdout"));
-  if (f == NULL)
-  {
-    return 0;
-  }
-  if (PyFile_WriteString("\n", f))
-  {
-    PyErr_Clear();
-  }
-  return 0;
 }
 
 //----------------------------------------------------------------------------
