@@ -5996,10 +5996,8 @@
                          name="CaseType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Decomposed Case"
-                 value="0" />
-          <Entry text="Reconstructed Case"
-                 value="1" />
+          <Entry text="Decomposed Case"    value="0" />
+          <Entry text="Reconstructed Case" value="1" />
         </EnumerationDomain>
         <Documentation>The property indicates whether decomposed mesh or
         reconstructed mesh should be read</Documentation>
@@ -6007,22 +6005,26 @@
       <IntVectorProperty animateable="0"
                          command="SetUse64BitLabels"
                          default_values="0"
-                         label="Expect 64-bit Labels"
+                         label="Expected Label Size"
                          name="Use64BitLabels"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Expect the openFOAM case to use 64-bit label values.
-        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="32-bit" value="0" />
+          <Entry text="64-bit" value="1" />
+        </EnumerationDomain>
+        <Documentation>The expected label-size for the OpenFOAM case.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUse64BitFloats"
-                         default_values="0"
-                         label="Expect 64-bit Floats/Scalars"
+                         default_values="1"
+                         label="Expect Scalar Size"
                          name="Use64BitFloats"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Expect the openFOAM case to use 64-bit label values.
-        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="32-bit (SP)" value="0" />
+          <Entry text="64-bit (DP)" value="1" />
+        </EnumerationDomain>
+        <Documentation>The expected scalar-size for the OpenFOAM case.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetCreateCellToPoint"
@@ -6130,7 +6132,8 @@
                          default_values="1"
                          label="Cache mesh"
                          name="CacheMesh"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Cache the OpenFOAM mesh between GUI selection
         changes.</Documentation>
@@ -6140,7 +6143,8 @@
                          default_values="1"
                          label="Decompose polyhedra"
                          name="DecomposePolyhedra"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Decompose polyhedra into tetrahedra and
         pyramids.</Documentation>
@@ -6150,20 +6154,21 @@
                          default_values="0"
                          label="List timesteps according to controlDict"
                          name="ListTimeStepsByControlDict"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>List time directories listed according to the settings
         in controlDict.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetPositionsIsIn13Format"
-                         default_values="0"
-                         label="Lagrangian positions are in OF 1.3 binary format"
+                         default_values="1"
+                         label="Lagrangian positions without extra data"
                          name="PositionsIsIn13Format"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>Set if Lagrangian positions files are in OpenFOAM 1.3
-        binary format.</Documentation>
+        <Documentation>Lagrangian positions without extra data (before OpenFOAM 1.4, after 2.4)</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetReadZones"
