@@ -2,11 +2,11 @@ r"""cinemareader is used by vtkCinemaDatabaseReader.
 """
 from __future__ import print_function
 
-from cinema_python.cinema_store import FileStore
-from cinema_python.QueryTranslator_SpecB import QueryTranslator_SpecB
+import cinema_python.database.file_store as file_store
+import cinema_python.images.querymaker_specb as CT
 from paraview import vtk
 from paraview.vtk.numpy_interface import dataset_adapter as dsa
-from cinema_python.utils import convert_pose_to_camera
+from cinema_python.images.camera_utils import convert_pose_to_camera
 
 from ast import literal_eval
 
@@ -127,7 +127,7 @@ class FileStoreAPI(object):
 
 class FileStoreSpecB(FileStoreAPI):
     def __init__(self, fs):
-        FileStoreAPI.__init__(self, fs, QueryTranslator_SpecB())
+        FileStoreAPI.__init__(self, fs, CT.QueryMaker_SpecB())
         self.__cameras = {}
 
     def get_objects(self):
@@ -266,7 +266,7 @@ class FileStoreSpecB(FileStoreAPI):
 __warning_count = {}
 def load(filename):
     global __warning_count
-    fs = FileStore(filename)
+    fs = file_store.FileStore(filename)
     fs.load()
 
     # check if we support this cinema database.
