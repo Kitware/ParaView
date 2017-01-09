@@ -4,6 +4,7 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   TestSessionProxyManager.cxx
   TestSettings.cxx
   TestRecreateVTKObjects.cxx
+  TestAdjustRange.cxx
   )
 
 if(NOT PARAVIEW_BUILD_QT_GUI)
