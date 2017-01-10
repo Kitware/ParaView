@@ -93,7 +93,7 @@ const vtkStdString vtkCinemaExporter::GetPythonScript()
   script += "ready=True\n";
   script += "try:\n";
   script += "    import paraview.simple\n";
-  script += "    import cinema_python.generation.paraview.pv_introspect as pvi\n";
+  script += "    import cinema_python.adaptors.paraview.pv_introspect as pvi\n";
   script += "except ImportError as e:\n";
   script += "    paraview.print_error('Cannot import cinema')\n";
   script += "    paraview.print_error(e)\n";

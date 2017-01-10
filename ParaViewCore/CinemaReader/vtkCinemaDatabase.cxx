@@ -124,10 +124,10 @@ public:
       this->Initialized = true;
       vtkPythonInterpreter::Initialize();
       vtkPythonScopeGilEnsurer gilEnsurer;
-      this->CinemaReaderModule.TakeReference(PyImport_ImportModule("paraview.cinemareader"));
+      this->CinemaReaderModule.TakeReference(PyImport_ImportModule("cinema_python.adaptors.paraview.cinemareader"));
       if (!this->CinemaReaderModule)
       {
-        vtkGenericWarningMacro("Failed to import 'paraview.cinemareader' module.");
+        vtkGenericWarningMacro("Failed to import 'cinema_python.adaptors.paraview.cinemareader' module.");
         if (PyErr_Occurred())
         {
           PyErr_Print();

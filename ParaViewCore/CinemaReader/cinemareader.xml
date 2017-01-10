@@ -3,7 +3,7 @@
     <!-- ================================================================== -->
     <Proxy name="CinemaDatabase" class="vtkCinemaDatabase">
       <Documentation>
-        Object corresponding to a cinema_python.cinema_store.FileStore
+        Object corresponding to a cinema_python.database.file_store.FileStore
       </Documentation>
       <StringVectorProperty animateable="0"
                             command="Load"

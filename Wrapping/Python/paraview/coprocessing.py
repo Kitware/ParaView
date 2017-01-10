@@ -224,7 +224,7 @@ class CoProcessor(object):
                         simple.SaveScreenshot(fname, view, magnification=view.cpMagnification)
 
         if len(cinema_dirs) > 1:
-            import cinema_python.generation.paraview.pv_introspect as pv_introspect
+            import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
             pv_introspect.make_workspace_file("cinema", cinema_dirs)
 
 
@@ -490,9 +490,9 @@ class CoProcessor(object):
             return
 
         try:
-            import cinema_python.generation.explorers as explorers
-            import cinema_python.generation.paraview.pv_explorers as pv_explorers
-            import cinema_python.generation.paraview.pv_introspect as pv_introspect
+            import cinema_python.adaptors.explorers as explorers
+            import cinema_python.adaptors.paraview.pv_explorers as pv_explorers
+            import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
             import paraview.simple as simple
         except ImportError as e:
             paraview.print_error("Cannot import cinema")
