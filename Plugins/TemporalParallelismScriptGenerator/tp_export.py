@@ -136,7 +136,7 @@ def tp_hook(varname, proxy):
     global export_rendering, screenshot_info, reader_input_map
     """callback to create our special accessors instead of the default ones."""
     pname = smtrace.Trace.get_registered_name(proxy, "sources")
-    if pname and reader_input_map.has_key(pname):
+    if pname and pname in reader_input_map:
         # this is a reader.
         return ReaderAccessor(varname, proxy, reader_input_map[pname])
     if pname and proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):

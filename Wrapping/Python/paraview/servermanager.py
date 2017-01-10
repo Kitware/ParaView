@@ -2759,7 +2759,7 @@ def __determineName(proxy, group):
     name = _make_name_valid(proxy.GetXMLLabel())
     if not name:
         return None
-    if not __nameCounter.has_key(name):
+    if name not in __nameCounter:
         __nameCounter[name] = 1
         val = 1
     else:
