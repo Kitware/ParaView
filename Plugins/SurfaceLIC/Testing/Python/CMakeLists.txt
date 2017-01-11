@@ -19,11 +19,6 @@ SET(PVBATCH_TESTS
   SurfaceLIC-ShuttleZoom2
   SurfaceLIC-ShuttleAll
   )
-# don't attempt to load plugin if linked static
-SET(STATIC_LINK 1)
-IF (BUILD_SHARED_LIBS)
-  set(STATIC_LINK 0)
-ENDIF()
 IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
   # run the tests in parallel
   SET(NP 3)
@@ -45,7 +40,7 @@ IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
-        -S ${STATIC_LINK}
+        --threshold 25
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
@@ -60,7 +55,7 @@ ELSE()
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
-        -S ${STATIC_LINK}
+        --threshold 25
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
