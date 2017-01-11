@@ -66,7 +66,7 @@ def execute(self):
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for calculator.compute().
     elocals = calculator.get_arrays(inputs[0].GetAttributes(attributeType))
-    if not elocals.has_key("id") and re.search(r'\bid\b', query):
+    if ("id" not in elocals) and re.search(r'\bid\b', query):
         # add "id" array if the query string refers to id.
         # This is a temporary fix. We should look into
         # accelerating id-based selections in the future.

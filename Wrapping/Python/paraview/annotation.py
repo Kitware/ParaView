@@ -105,7 +105,7 @@ def execute_on_global_data(self):
     inputs = [dsa.WrapDataObject(inputDO)]
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
-    if not ns.has_key(self.GetFieldArrayName()):
+    if self.GetFieldArrayName() not in ns:
         print("Failed to locate global array '%s'." % self.GetFieldArrayName(), file=sys.stderr)
         raise RuntimeError("Failed to locate global array")
 
@@ -120,7 +120,7 @@ def execute_on_global_data(self):
 
         # if the array has as many elements as the `mode_shape_range`, pick the
         # element matching the `mode_shape` (BUG #0015322).
-        elif ns.has_key("mode_shape") and ns.has_key("mode_shape_range") and \
+        elif "mode_shape" in ns and "mode_shape_range" in ns and \
             ns["mode_shape_range"].shape[1] == 2 and \
             array.shape[0] == (ns["mode_shape_range"].GetValue(1) - ns["mode_shape_range"].GetValue(0) + 1):
                 chosen_element = array[ns["mode_shape"].GetValue(0) - ns["mode_shape_range"].GetValue(0)]
@@ -151,7 +151,7 @@ def execute_on_attribute_data(self, evaluate_locally):
     inputs = [dsa.WrapDataObject(inputDO)]
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
-    if not ns.has_key(self.GetArrayName()):
+    if self.GetArrayName() not in ns:
         print("Failed to locate array '%s'." % self.GetArrayName(), file=sys.stderr)
         raise RuntimeError("Failed to locate array")
 

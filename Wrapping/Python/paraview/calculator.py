@@ -58,7 +58,7 @@ def get_arrays(attribs, controller=None):
             gathered_names = [x for x in result]
         arraynames = comm.bcast(gathered_names, root=0)
         for name in arraynames:
-            if not arrays.has_key(name):
+            if name not in arrays:
                 arrays[name] = dsa.NoneArray
     return arrays
 

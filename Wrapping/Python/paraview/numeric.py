@@ -56,7 +56,7 @@ def fromvtkarray(vtkarray):
         raise "NumPy module is not available."
     #create a numpy array of the correct type.
     vtktype = vtkarray.GetDataType()
-    if not __typeDict.has_key(vtktype):
+    if vtktype not in  __typeDict:
         raise "Cannot convert data arrays of the type %s" \
           % vtkarray.GetDataTypeAsString()
     #    size = num_comps * num_tuples

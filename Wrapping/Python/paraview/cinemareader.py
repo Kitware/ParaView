@@ -163,7 +163,7 @@ class FileStoreSpecB(FileStoreAPI):
         for item in pipeline:
             itemparents = []
             for pid in item.get("parents",[]):
-                if idmap.has_key(pid):
+                if pid in idmap:
                     itemparents.append(idmap[pid])
             parents[item["name"]] = itemparents
         return parents
@@ -215,7 +215,7 @@ class FileStoreSpecB(FileStoreAPI):
         if not field:
             return []
         p = self.fs.get_parameter(field)
-        if p and p["valueRanges"].has_key(valuename):
+        if p and valuename in p["valueRanges"]:
             return list(p["valueRanges"][valuename])
         return []
 
@@ -237,7 +237,7 @@ class FileStoreSpecB(FileStoreAPI):
             tsindex = 0
 
         # use cached cameras, if available.
-        if self.__cameras.has_key(tsindex):
+        if tsindex in self.__cameras:
             return self.__cameras[tsindex]
 
         # if not cached, read and cache.
@@ -273,7 +273,7 @@ def load(filename):
     if fs.metadata.get("type") != "composite-image-stack":
         raise RuntimeError("Only 'composite-image-stack' file stores are supported (aka Spec C)")
     if fs.metadata.get("value_mode") != 2:
-        if not __warning_count.has_key(filename):
+        if filename not in __warning_count:
             __warning_count[filename] = True
             print ("Warning: the cinema store", filename, ", encodes data values as RGB arrays "\
             "which is known to have issues in current implementation. Scalaring "\
