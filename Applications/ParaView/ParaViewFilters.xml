@@ -131,6 +131,7 @@
     <Proxy group="filters" name="SPHVolumeInterpolator" />
   </Category>
 
+  <Proxy group="filters" name="AggregateDataSet" />
   <Proxy group="filters" name="AddFieldArrays" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
