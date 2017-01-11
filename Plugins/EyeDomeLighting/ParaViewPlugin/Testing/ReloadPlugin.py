@@ -1,10 +1,10 @@
+from __future__ import print_function
 # we should be able to load in a plugin multiple times without issues,
 # as long as it's the same plugin.
 import sys
-
 import paraview.simple
 
 paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
-print 'loaded the first time successfully'
+print('loaded the first time successfully')
 paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
-print 'loaded the second time successfully'
+print('loaded the second time successfully')
