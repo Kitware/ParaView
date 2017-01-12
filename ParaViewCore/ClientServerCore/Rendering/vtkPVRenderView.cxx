@@ -531,6 +531,14 @@ vtkPVRenderView::vtkPVRenderView()
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
+  #if defined(VTKGL2)
+  vtkRenderWindow* win = this->RenderView->GetRenderWindow();
+  if (win)
+  {
+    this->Internals->ValuePasses->ReleaseGraphicsResources(win);
+  }
+  #endif
+
   // this ensure that the renderer releases graphics resources before the window
   // is destroyed.
   this->GetRenderWindow()->RemoveRenderer(this->NonCompositedRenderer);
