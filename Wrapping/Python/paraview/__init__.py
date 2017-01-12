@@ -126,6 +126,11 @@ class options:
     True to have any effect."""
     symmetric = False
 
+    """When True, `paraview.print_debug_info()` will result in printing the
+    debug messages to stdout. Default is False, hence all debug messages will be
+    suppressed."""
+    print_debug_messages = False
+
 def print_warning(text):
    """Print text"""
    print(text)
@@ -136,7 +141,8 @@ def print_error(text):
 
 def print_debug_info(text):
    """Print text"""
-   print(text)
+   if options.print_debug_messages:
+       print(text)
 
 """This variable is set whenever Python is initialized within a ParaView
 Qt-based application. Modules within the 'paraview' package often use this to
