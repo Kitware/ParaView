@@ -18,25 +18,32 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <assert.h>
 #include <cmath>
+#include <float.h> //for msvc _nextafter
 #include <sstream>
 
 namespace
 {
 
+double next_value_after(double value, double direction)
+{
+#if __cplusplus >= 201103L
+  return std::nextafter(value,direction);
+#elif defined(_MSC_VER)
+  return _nextafter(value,direction);
+#else
+  //we hope they have C99 support
+  return nextafter(value,direction);
+#endif
+
+}
+
 bool valid_range(double range[2])
 {
-  const bool range_equal = (range[0] == range[1]);
   const bool range_spans_pos_neg = (range[0] < 0 && range[1] > 0);
 
   if (range_spans_pos_neg)
   { // if the range spans both positive and negative the Adjustment will fail.
     return (vtkSMCoreUtilities::AdjustRange(range) == false);
-  }
-
-  if (range_equal)
-  { // if the range is equal the values will be shifted
-    const bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
-    return adjusted && (range[0] != range[1]);
   }
 
   // okay lastly we need to determine at least how far the range will move
@@ -47,20 +54,27 @@ bool valid_range(double range[2])
   double next_value = original_range[0];
   for (std::size_t i = 0; i < 65536 && next_value < original_range[1]; ++i)
   {
-    next_value = std::nextafter(next_value, original_range[1]);
+    next_value = next_value_after(next_value, original_range[1]);
   }
+
+  //Determine if adjust range should return true or false.
+  const bool should_be_adjusted = next_value >= original_range[1];
 
   // verify that AdjustRange range has at least 65k different valid
   // values between the min and max. It could be more if the input
   // range had more, or if we started as a denormal value
   const bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
-  return (original_range[0] == range[0]) && (next_value <= range[1]);
+
+  return (adjusted == should_be_adjusted) &&
+         (original_range[0] == range[0]) &&
+         (next_value <= range[1]);
 }
 }
 
 int TestAdjustRange(int argc, char* argv[])
 {
-
+  (void) argc;
+  (void) argv;
   // Simple set of tests to validate that vtkSMCoreUtilities::AdjustRange
   // behaves as we expect
 
