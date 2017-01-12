@@ -60,7 +60,6 @@ vtkPVOptions::vtkPVOptions()
   this->SymmetricMPIMode = 0;
   this->TellVersion = 0;
   this->EnableStreaming = 0;
-  this->UseCudaInterop = 0;
   this->SatelliteMessageIds = 0;
   this->PrintMonitors = 0;
   this->ServerURL = 0;
@@ -236,10 +235,6 @@ void vtkPVOptions::Initialize()
     "EXPERIMENTAL: When specified, view-based streaming is enabled for certain "
     "views and representation types.",
     vtkPVOptions::ALLPROCESS);
-
-  this->AddBooleanArgument("--use-cuda-interop", "-cudaiop", &this->UseCudaInterop,
-    "When specified, piston classes will use cuda interop for direct rendering",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--enable-satellite-message-ids", "-satellite",
     &this->SatelliteMessageIds,
@@ -471,7 +466,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "EnableStackTrace:" << (this->EnableStackTrace ? "yes" : "no") << endl;
 
-  os << indent << "UseCudaInterop " << this->UseCudaInterop << std::endl;
   os << indent << "SatelliteMessageIds " << this->SatelliteMessageIds << std::endl;
   os << indent << "PrintMonitors: " << this->PrintMonitors << std::endl;
   os << indent << "DisableXDisplayTests: " << this->DisableXDisplayTests << endl;

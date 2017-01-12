@@ -171,13 +171,6 @@ public:
 
   //@{
   /**
-   * When set, use cuda interop feature
-   */
-  vtkGetMacro(UseCudaInterop, int);
-  //@}
-
-  //@{
-  /**
    * Include originating process id text into server to client messages.
    */
   vtkSetMacro(SatelliteMessageIds, int);
@@ -312,7 +305,6 @@ private:
   int TellVersion;
   char* StereoType;
   int EnableStreaming;
-  int UseCudaInterop;
   int SatelliteMessageIds;
   int PrintMonitors;
   int EnableStackTrace;

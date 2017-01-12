@@ -97,10 +97,6 @@
 #include "vtkValuePasses.h"
 #endif
 
-#ifdef PARAVIEW_USE_PISTON
-#include "vtkPistonMapper.h"
-#endif
-
 #ifdef PARAVIEW_USE_ICE_T
 #include "vtkIceTSynchronizedRenderers.h"
 #endif
@@ -166,20 +162,7 @@ public:
     return (iter != this->PropMap.end() ? iter->second : NULL);
   }
 
-#ifdef PARAVIEW_USE_PISTON
-  void PreRender(vtkRenderViewBase* renderView)
-  {
-    if (vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions())
-    {
-      if (!vtkPistonMapper::IsEnabledCudaGL() && options->GetUseCudaInterop())
-      {
-        vtkPistonMapper::InitCudaGL(renderView->GetRenderWindow());
-      }
-    }
-  }
-#else
   void PreRender(vtkRenderViewBase* vtkNotUsed(renderView)) {}
-#endif // PARAVIEW_USE_PISTON
 };
 
 namespace
