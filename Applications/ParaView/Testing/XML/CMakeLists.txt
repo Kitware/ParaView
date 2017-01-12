@@ -352,6 +352,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkMultiple.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SortLineChartData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StockColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
@@ -650,6 +651,9 @@ SET (UndoRedo7_BREAK TRUE)
 SET (Flow2_THRESHOLD 15)
 SET (UndoRedo1_THRESHOLD 15)
 SET (UndoRedo4_THRESHOLD 15)
+
+# Differnces between systems on whether the lines are anti-aliased or not
+SET (SortLineChartData_THRESHOLD 50)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
