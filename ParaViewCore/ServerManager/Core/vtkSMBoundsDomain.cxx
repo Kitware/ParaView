@@ -276,6 +276,7 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
       (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]));
     std::vector<vtkEntry> entries;
     entries.push_back(vtkEntry(0, diameter));
+    this->SetEntries(entries);
   }
 }
 
@@ -299,7 +300,9 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchec
         int numCells = dataInfo->GetNumberOfCells();
         double linearNumCells = pow((double)numCells, (1.0 / 3.0));
         unitDistance = diameter;
-        if (linearNumCells != 0.0)
+        if (linearNumCells != 0.0 &&
+          !vtkMath::IsNan(linearNumCells) &&
+          !vtkMath::IsInf(linearNumCells))
         {
           unitDistance = diameter / linearNumCells;
         }
