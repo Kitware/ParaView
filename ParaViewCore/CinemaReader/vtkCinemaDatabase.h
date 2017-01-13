@@ -14,11 +14,13 @@
 =========================================================================*/
 /**
  * @class vtkCinemaDatabase
- * @brief class that provides access to `cinema_python.FileStore` API.
+ * @brief class that provides access to `cinema_python.database.file_store`
+ * API.
  *
  * vtkCinemaDatabase is an abstraction that provides access to a
- * `cinema_python.FileStore` instance. The API is limited to the functionality
- * needed for the rendering Cinema layers in ParaView.
+ * `cinema_python.database.file_store.FileStore` instance. The API is
+ * limited to the functionality needed for the rendering Cinema layers in
+ *  ParaView.
  */
 
 #ifndef vtkCinemaDatabase_h

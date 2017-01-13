@@ -59,7 +59,6 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/benchmark/manyspheres.py
   paraview/benchmark/basic.py
   paraview/calculator.py
-  paraview/cinemareader.py
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py
