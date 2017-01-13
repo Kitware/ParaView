@@ -536,17 +536,21 @@ QWidget* pqMultiViewWidget::createWidget(
         if (strcmp(container->metaObject()->className(),"QWidget") != 0)
         {
           container = new QWidget(parentWdg);
+          new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
+              ? pqSplitterLayout::TopToBottom
+              : pqSplitterLayout::LeftToRight,
+              container);
         }
         Q_ASSERT(container);
+        container->setObjectName(QString("Container.%1").arg(index));
         this->Internals->Widgets[index] = container;
 
-        pqSplitterLayout* slayout = new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
+        pqSplitterLayout* slayout = dynamic_cast<pqSplitterLayout*>(container->layout());
+        Q_ASSERT(slayout);
+        slayout->setDirection(direction == vtkSMViewLayoutProxy::VERTICAL
             ? pqSplitterLayout::TopToBottom
-            : pqSplitterLayout::LeftToRight,
-          container);
+            : pqSplitterLayout::LeftToRight);
         slayout->setSplitFraction(vlayout->GetSplitFraction(index));
-        container->setLayout(slayout);
-        container->setObjectName(QString("Container.%1").arg(index));
         slayout->addWidget(
           this->createWidget(vlayout->GetFirstChild(index), vlayout, container, max_index));
         slayout->addWidget(
