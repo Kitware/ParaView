@@ -151,6 +151,22 @@ void pqImageOutputInfo::showMagnification()
 }
 
 //-----------------------------------------------------------------------------
+void pqImageOutputInfo::hideFilenameDetails()
+{
+  this->Ui->imageFileName->hide();
+  this->Ui->imageFileNameLabel->hide();
+  this->Ui->imageTypeLabel->setText(QString("RGB file type"));
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::showFilenameDetails()
+{
+  this->Ui->imageFileName->show();
+  this->Ui->imageFileNameLabel->show();
+  this->Ui->imageTypeLabel->setText(QString("Image Type"));
+}
+
+//-----------------------------------------------------------------------------
 int pqImageOutputInfo::getWriteFrequency()
 {
   return this->Ui->imageWriteFrequency->value();

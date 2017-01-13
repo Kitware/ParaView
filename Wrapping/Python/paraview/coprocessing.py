@@ -503,6 +503,7 @@ class CoProcessor(object):
         #figure out where to put this store
         import os.path
         vfname = view.cpFileName
+        extension = os.path.splitext(vfname)[1]
         vfname = vfname[0:vfname.rfind("_")] #strip _num.ext
         fname = os.path.join(os.path.dirname(vfname),
                              "cinema",
@@ -554,7 +555,8 @@ class CoProcessor(object):
                                              forcetime = formatted_time,
                                              userDefined = self.__CinemaTracks,
                                              specLevel = specLevel,
-                                             camType = camType)
+                                             camType = camType,
+                                             extension = extension)
 
         #all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()

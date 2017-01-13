@@ -65,6 +65,8 @@ public:
   void showFitToScreen();
   void hideMagnification();
   void showMagnification();
+  void hideFilenameDetails();
+  void showFilenameDetails();
   int getWriteFrequency();
   bool fitToScreen();
   int getMagnification();
