@@ -187,7 +187,7 @@ public:
 
   // ***************************************************************
   // Internal methods, public for callbacks.
-  void InsituConnect(vtkMultiProcessController* controller);
+  void InsituConnect(vtkMultiProcessController* proc0NodesController);
 
   /**
    * Called to drop the connection between Insitu and ParaView Live.
@@ -244,7 +244,11 @@ protected:
 
   char* InsituXMLState;
   vtkWeakPointer<vtkPVSessionBase> LiveSession;
-  vtkSmartPointer<vtkMultiProcessController> Controller;
+  /**
+   * The controller that communicates between the INSITU and the
+   * LIVE process 0 nodes.
+   */
+  vtkSmartPointer<vtkMultiProcessController> Proc0NodesController;
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
 private:
