@@ -4,8 +4,50 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
-Changes since 5.2
+Changes in 5.3
 -----------------
+
+###Qt 5 Support (replacing QVTKWidget)###
+
+ParaView has switched over to using Qt 5 by default. While for most cases the
+application code should be unaffected, if your app was directly creating (or
+using) `QVTKWidget` however, you will need to change it. When
+building with Qt 5, you are expected to use `QVTKOpenGLWidget` instead of
+`QVTKWidget` (which is still needed when building with Qt 4).
+Since ParaView supports building with Qt 4 and 5 for this release, to make it
+easier, we have the following solution.
+
+A new header **pqQVTKWidgetBase.h** defines a new typedef `pqQVTKWidgetBase`.
+Include this header in your code and replace `QVTKWidget` with `pqQVTKWidgetBase`.
+`pqQVTKWidgetBase` gets typedef'ed to `QVTKWidget` for Qt 4 builds and to
+`QVTKOpenGLWidget` for Qt 5 builds.
+
+If your existing code was creating and setting up a new instance of
+`QVTKWidget`, you need to change it further. QVTKOpenGLWidget cannot work with
+any `vtkRenderWindow` (as was the case with QVTKWidget),
+it instead needs a `vtkGenericRenderWindow` (see the documentation
+for `QVTKOpenGLWidget` for details). To make that easier, **pqQVTKWidgetBase.h**
+defines another typedef `pqQVTKWidgetBaseRenderWindowType`. The code to create
+and setup QVTKWidget can then be changed as follows:
+
+    vtkNew<pqQVTKWidgetBaseRenderWindowType> renWindow;
+    pqQVTKWidgetBase* widget = new pqQVTKWidgetBase(...);
+    widget->SetRenderWindow(renWindow.Get());
+
+If you are using a `vtkView` to create the viewport. You can set that up as
+follows:
+
+    vtkNew<pqQVTKWidgetBaseRenderWindowType> renWindow;
+    pqQVTKWidgetBase* widget = new pqQVTKWidgetBase(...);
+    widget->SetRenderWindow(renWindow.Get());
+
+    vtkNew<vtkContextView> view;
+    view->SetRenderWindow(renWindow.Get());
+
+If your application supports Qt 5 alone, when you should directly use
+`QVTKOpenGLWidget`. `pqQVTKWidgetBase` is a temporary solution to support
+building with Qt 5 and Qt 4. Qt 4 support will be deprecated and remove in
+future releases.
 
 ###Removed ctkRangeSlider and ctkDoubleRangeSlider###
 
