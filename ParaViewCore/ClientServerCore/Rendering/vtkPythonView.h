@@ -35,9 +35,6 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkTexture;
 
-struct _object;
-typedef struct _object PyObject;
-
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPythonView : public vtkPVView
 {
 public:
@@ -196,9 +193,6 @@ protected:
 private:
   vtkPythonView(const vtkPythonView&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPythonView&) VTK_DELETE_FUNCTION;
-
-  // Run Python code with custom local dictionary
-  int RunSimpleStringWithCustomLocals(const char* code);
 
   class vtkInternals;
   vtkInternals* Internals;

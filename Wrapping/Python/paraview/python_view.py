@@ -146,18 +146,6 @@ def matplotlib_figure(width, height):
   return figure
 
 
-def call_setup_data(setup_data_function, view):
-  """
-  @brief Utility function to call the user-defined setup_data function. This is
-         meant to be called by the C++ side of the vtkPythonView class.
-  @parameter view vtkPythonView object
-  """
-  if setup_data_function == None:
-    return
-
-  setup_data_function(view)
-
-
 def call_render(render_function, view, width, height):
   """
   @brief Utility function to call the user-defined render function. This is

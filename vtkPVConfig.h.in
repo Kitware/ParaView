@@ -78,6 +78,10 @@
 // defined when qt support is enabled
 #cmakedefine PARAVIEW_ENABLE_QT_SUPPORT
 
+#ifdef PARAVIEW_ENABLE_QT_SUPPORT
+# define PARAVIEW_QT_VERSION @PARAVIEW_QT_VERSION@
+#endif
+
 // ParaView data root (useful for testing).
 #define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
 

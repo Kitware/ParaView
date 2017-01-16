@@ -31,27 +31,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqMultiSliceAxisWidget.h"
 
-// PV includes
-#include "QVTKWidget.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqSMAdaptor.h"
+#include "pqQVTKWidgetBase.h"
 #include "pqServer.h"
-#include "vtkSMContextViewProxy.h"
-#include "vtkSMProperty.h"
-
-// VTK includes
+#include "pqSMAdaptor.h"
 #include "vtkAxis.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkMultiSliceContextItem.h"
 #include "vtkNew.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMProperty.h"
 
 // Qt includes
 #include <QMouseEvent>
@@ -65,7 +63,8 @@ public:
   pqInternal(pqMultiSliceAxisWidget& object)
     : Widget_ptr(&object)
   {
-    this->View = new QVTKWidget(Widget_ptr);
+    this->View = new pqQVTKWidgetBase(Widget_ptr);
+    this->View->setObjectName("1QVTKWidget0");
     this->Range[0] = -10.;
     this->Range[1] = +10.;
 
@@ -77,8 +76,10 @@ public:
 
   void init()
   {
-    this->ContextView->SetInteractor(this->View->GetInteractor());
-    this->View->SetRenderWindow(this->ContextView->GetRenderWindow());
+    vtkNew<pqQVTKWidgetBaseRenderWindowType> renWin;
+    this->View->SetRenderWindow(renWin.Get());
+    this->ContextView->SetRenderWindow(renWin.Get());
+
 #if defined(Q_WS_WIN) || defined(Q_OS_WIN)
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 #endif
@@ -96,7 +97,7 @@ public:
 
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkMultiSliceContextItem> SliceItem;
-  QPointer<QVTKWidget> View;
+  QPointer<pqQVTKWidgetBase> View;
   double Range[2];
   pqMultiSliceAxisWidget* Widget_ptr;
 };
@@ -133,7 +134,7 @@ pqMultiSliceAxisWidget::~pqMultiSliceAxisWidget()
 }
 
 // ----------------------------------------------------------------------------
-QVTKWidget* pqMultiSliceAxisWidget::getVTKWidget()
+QWidget* pqMultiSliceAxisWidget::getVTKWidget()
 {
   return this->Internal->View;
 }

@@ -109,7 +109,7 @@ protected:
 
   /**
   * Creates a new instance of the QWidget subclass to be used to show this
-  * view. Default implementation creates a QVTKWidget.
+  * view. Default implementation creates a pqQVTKWidget.
   */
   virtual QWidget* createWidget();
 

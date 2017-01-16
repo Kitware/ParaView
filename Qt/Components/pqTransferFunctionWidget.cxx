@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTransferFunctionWidget.h"
 
-#include "QVTKWidget.h"
 #include "pqCoreUtilities.h"
+#include "pqQVTKWidgetBase.h"
 #include "pqTimer.h"
 #include "vtkAxis.h"
 #include "vtkBoundingBox.h"
@@ -47,12 +47,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseControlPointsItem.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPiecewiseFunctionItem.h"
-#include "vtkRenderWindow.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSmartPointer.h"
 
@@ -164,8 +164,10 @@ vtkStandardNewMacro(vtkTransferFunctionChartXY);
 
 class pqTransferFunctionWidget::pqInternals
 {
+  vtkNew<pqQVTKWidgetBaseRenderWindowType> Window;
+
 public:
-  QPointer<QVTKWidget> Widget;
+  QPointer<pqQVTKWidgetBase> Widget;
   vtkNew<vtkTransferFunctionChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -177,18 +179,21 @@ public:
   unsigned long CurrentPointEditEventId;
 
   pqInternals(pqTransferFunctionWidget* editor)
-    : Widget(new QVTKWidget(editor))
+    : Widget(new pqQVTKWidgetBase(editor))
     , CurrentPointEditEventId(0)
   {
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
+
+    this->Widget->setObjectName("1QVTKWidget0");
+    this->Widget->SetRenderWindow(this->Window.Get());
+    this->ContextView->SetRenderWindow(this->Window.Get());
 
     this->ChartXY->SetAutoSize(true);
     this->ChartXY->SetShowLegend(false);
     this->ChartXY->SetForceAxesToBounds(true);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
     this->ContextView->SetInteractor(this->Widget->GetInteractor());
-    this->Widget->SetRenderWindow(this->ContextView->GetRenderWindow());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
     this->ChartXY->SetActionToButton(vtkChart::PAN, -1);

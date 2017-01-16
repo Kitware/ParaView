@@ -128,9 +128,14 @@ pqContextView::~pqContextView()
 QWidget* pqContextView::createWidget()
 {
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
+#if QT_VERSION >= 0x050000
+  // with Qt5 i.e. QVTKOpenGLWidget, caching works just fine. So don't bother
+  // doing anything.
+#else
   // don't use caching for charts since the charts don't seem to render
   // correctly when an overlapping window is present, unlike 3D views.
   vtkwidget->setAutomaticImageCacheEnabled(false);
+#endif
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);

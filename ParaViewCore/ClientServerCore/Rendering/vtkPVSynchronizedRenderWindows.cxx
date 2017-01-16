@@ -17,13 +17,13 @@
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkSelectionSerializer.h"
@@ -38,6 +38,31 @@
 #include <sstream>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
+
+bool vtkPVSynchronizedRenderWindows::UseGenericOpenGLRenderWindow = false;
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::SetUseGenericOpenGLRenderWindow(bool val)
+{
+  vtkPVSynchronizedRenderWindows::UseGenericOpenGLRenderWindow = val;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::GetUseGenericOpenGLRenderWindow()
+{
+  return vtkPVSynchronizedRenderWindows::UseGenericOpenGLRenderWindow;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindowInternal()
+{
+  if (vtkPVSynchronizedRenderWindows::UseGenericOpenGLRenderWindow)
+  {
+    return vtkGenericOpenGLRenderWindow::New();
+  }
+  return vtkRenderWindow::New();
+}
+
+//----------------------------------------------------------------------------
 
 class vtkPVSynchronizedRenderWindows::vtkInternals
 {
@@ -567,7 +592,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
     case DATA_SERVER:
     {
       // we could very return a dummy window here.
-      vtkRenderWindow* window = vtkRenderWindow::New();
+      vtkRenderWindow* window = vtkPVSynchronizedRenderWindows::NewRenderWindowInternal();
       window->SetWindowName("ParaView Data-Server");
       return window;
     }
@@ -577,7 +602,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
     {
       // client always creates new window for each view in the multi layout
       // configuration.
-      vtkRenderWindow* window = vtkRenderWindow::New();
+      vtkRenderWindow* window = vtkPVSynchronizedRenderWindows::NewRenderWindowInternal();
       window->DoubleBufferOn();
       window->AlphaBitPlanesOn();
       window->SetWindowName("ParaView");
@@ -590,7 +615,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       // all views share the same render window.
       if (!this->Internals->SharedRenderWindow)
       {
-        vtkRenderWindow* window = vtkRenderWindow::New();
+        vtkRenderWindow* window = vtkPVSynchronizedRenderWindows::NewRenderWindowInternal();
         window->DoubleBufferOn();
         window->AlphaBitPlanesOn();
         std::ostringstream name_stream;

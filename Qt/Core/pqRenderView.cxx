@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 
 // ParaView Server Manager includes.
-#include "QVTKWidget.h"
+#include "pqQVTKWidgetBase.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
@@ -180,7 +180,7 @@ void pqRenderView::initialize()
 QWidget* pqRenderView::createWidget()
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
-  if (QVTKWidget* qvtkwidget = qobject_cast<QVTKWidget*>(vtkwidget))
+  if (pqQVTKWidgetBase* qvtkwidget = qobject_cast<pqQVTKWidgetBase*>(vtkwidget))
   {
     vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
     qvtkwidget->SetRenderWindow(renModule->GetRenderWindow());

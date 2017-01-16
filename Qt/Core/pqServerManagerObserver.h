@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMultiView;
 class pqServerManagerObserverInternal;
-class QVTKWidget;
 class vtkCommand;
 class vtkObject;
 class vtkPVXMLElement;

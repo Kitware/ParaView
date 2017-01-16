@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkContextScene;
 class vtkObject;
-class QVTKWidget;
 
 class PQCORE_EXPORT pqMultiSliceAxisWidget : public QWidget
 {
@@ -70,7 +69,7 @@ public:
   /**
   * Return the Widget that contain the ContextView
   */
-  QVTKWidget* getVTKWidget();
+  QWidget* getVTKWidget();
 
   /**
   * Return the locations of the visible slices within the range as well as

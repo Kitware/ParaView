@@ -239,6 +239,15 @@ public:
    */
   vtkPVSession* GetSession();
 
+  //@{
+  /**
+   * Use this to indicate that the process should use
+   * vtkGenericOpenGLRenderWindow rather than vtkRenderWindow in
+   * NewRenderWindow.
+   */
+  static void SetUseGenericOpenGLRenderWindow(bool val);
+  static bool GetUseGenericOpenGLRenderWindow();
+  //@}
 protected:
   vtkPVSynchronizedRenderWindows(vtkPVSession*);
   ~vtkPVSynchronizedRenderWindows();
@@ -325,6 +334,9 @@ private:
 
   template <class T>
   bool ReduceTemplate(T& size, StandardOperations operation);
+
+  static bool UseGenericOpenGLRenderWindow;
+  static vtkRenderWindow* NewRenderWindowInternal();
 };
 
 #endif

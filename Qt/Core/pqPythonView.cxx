@@ -44,11 +44,9 @@ class pqPythonView::pqInternal
 public:
   QPoint MouseOrigin;
   bool InitializedWidgets;
-  bool InitializedAfterObjectsCreated;
 
   pqInternal()
   {
-    this->InitializedAfterObjectsCreated = false;
     this->InitializedWidgets = false;
   }
   ~pqInternal() {}
@@ -97,8 +95,11 @@ QString pqPythonView::getPythonScript()
 //-----------------------------------------------------------------------------
 QWidget* pqPythonView::createWidget()
 {
+  vtkSMViewProxy* viewProxy = this->getViewProxy();
+  Q_ASSERT(viewProxy);
+
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
-  vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setViewProxy(viewProxy);
 
 // do image caching for performance
 // For now, we are doing this only on Apple because it can render
@@ -113,7 +114,7 @@ QWidget* pqPythonView::createWidget()
     // done. But in case it's needed for streaming view, I am letting it be.
     // vtkwidget->setAutomaticImageCacheEnabled(true);
 
-    // help the QVTKWidget know when to clear the cache
+    // help the pqQVTKWidget know when to clear the cache
     this->getConnector()->Connect(
       this->getProxy(), vtkCommand::ModifiedEvent, vtkwidget, SLOT(markCachedImageAsDirty()));
   }
@@ -121,60 +122,10 @@ QWidget* pqPythonView::createWidget()
 
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);
+
+  vtkwidget->SetRenderWindow(viewProxy->GetRenderWindow());
+  viewProxy->SetupInteractor(vtkwidget->GetInteractor());
   return vtkwidget;
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonView::initialize()
-{
-  this->Superclass::initialize();
-
-  // The render module needs to obtain client side objects
-  // for the RenderWindow etc. to initialize the QVTKWidget
-  // correctly. It cannot do this unless the underlying proxy
-  // has been created. Since any pqProxy should never call
-  // UpdateVTKObjects() on itself in the constructor, we
-  // do the following.
-  vtkSMProxy* proxy = this->getProxy();
-  if (!proxy->GetObjectsCreated())
-  {
-    // Wait till first UpdateVTKObjects() call on the render module.
-    // Under usual circumstances, after UpdateVTKObjects() the
-    // render module objects will be created.
-    this->getConnector()->Connect(
-      proxy, vtkCommand::UpdateEvent, this, SLOT(initializeAfterObjectsCreated()));
-  }
-  else
-  {
-    this->initializeAfterObjectsCreated();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonView::initializeAfterObjectsCreated()
-{
-  if (!this->Internal->InitializedAfterObjectsCreated)
-  {
-    this->Internal->InitializedAfterObjectsCreated = true;
-    this->initializeWidgets();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonView::initializeWidgets()
-{
-  if (this->Internal->InitializedWidgets)
-  {
-    return;
-  }
-
-  this->Internal->InitializedWidgets = true;
-  vtkSMPythonViewProxy* renModule = this->getPythonViewProxy();
-  if (QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->widget()))
-  {
-    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
-    this->render();
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +138,6 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
     {
       this->Internal->MouseOrigin = me->pos();
     }
-    this->render();
   }
   else if (e->type() == QEvent::MouseMove && !this->Internal->MouseOrigin.isNull())
   {
@@ -197,7 +147,6 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
     {
       this->Internal->MouseOrigin = QPoint();
     }
-    this->render();
   }
   else if (e->type() == QEvent::MouseButtonRelease)
   {
@@ -219,12 +168,6 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
       }
       this->Internal->MouseOrigin = QPoint();
     }
-    this->render();
   }
-  else if (e->type() == QEvent::Resize)
-  {
-    this->render();
-  }
-
   return Superclass::eventFilter(caller, e);
 }

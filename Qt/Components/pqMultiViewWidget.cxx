@@ -281,9 +281,9 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
     {
       // If the new widget that is getting the focus is a child widget of any of the
       // frames, then the frame should be made active.
-      foreach (QWidget* frame_or_splitter, this->Internals->Widgets)
+      foreach (QPointer<QWidget> frame_or_splitter, this->Internals->Widgets)
       {
-        pqViewFrame* frame = qobject_cast<pqViewFrame*>(frame_or_splitter);
+        pqViewFrame* frame = qobject_cast<pqViewFrame*>(frame_or_splitter.data());
         if (frame && frame->isAncestorOf(wdg))
         {
           this->makeActive(frame);
@@ -496,18 +496,19 @@ QWidget* pqMultiViewWidget::createWidget(
           splitter = new QSplitter(parentWdg);
         }
         Q_ASSERT(splitter);
+
+        this->Internals->Widgets[index] = splitter;
         splitter->setParent(parentWdg);
         splitter->setHandleWidth(this->DecorationsVisible ? 3 : 1);
-        this->Internals->Widgets[index] = splitter;
         splitter->setObjectName(QString("Splitter.%1").arg(index));
         splitter->setProperty("FRAME_INDEX", QVariant(index));
         splitter->setOpaqueResize(false);
         splitter->setOrientation(
           direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
-        splitter->addWidget(
-          this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
-        splitter->addWidget(
-          this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
+        splitter->insertWidget(0,
+            this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
+        splitter->insertWidget(1,
+            this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
 
         // set the sizes are percentage. QSplitter uses the initially specified
         // sizes as reference.
@@ -529,14 +530,27 @@ QWidget* pqMultiViewWidget::createWidget(
       }
       else
       {
-        QWidget* container = new QWidget(parentWdg);
-        pqSplitterLayout* slayout = new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
-            ? pqSplitterLayout::TopToBottom
-            : pqSplitterLayout::LeftToRight,
-          container);
-        slayout->setSplitFraction(vlayout->GetSplitFraction(index));
-        container->setLayout(slayout);
+        QWidget* container = this->Internals->Widgets[index];
+        // since old widget may be a splitter, which is a QWidget too, we
+        // compare with className rather than using a `qobject_cast`.
+        if (strcmp(container->metaObject()->className(),"QWidget") != 0)
+        {
+          container = new QWidget(parentWdg);
+          new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
+              ? pqSplitterLayout::TopToBottom
+              : pqSplitterLayout::LeftToRight,
+              container);
+        }
+        Q_ASSERT(container);
         container->setObjectName(QString("Container.%1").arg(index));
+        this->Internals->Widgets[index] = container;
+
+        pqSplitterLayout* slayout = dynamic_cast<pqSplitterLayout*>(container->layout());
+        Q_ASSERT(slayout);
+        slayout->setDirection(direction == vtkSMViewLayoutProxy::VERTICAL
+            ? pqSplitterLayout::TopToBottom
+            : pqSplitterLayout::LeftToRight);
+        slayout->setSplitFraction(vlayout->GetSplitFraction(index));
         slayout->addWidget(
           this->createWidget(vlayout->GetFirstChild(index), vlayout, container, max_index));
         slayout->addWidget(
@@ -561,12 +575,14 @@ void pqMultiViewWidget::reload()
     return;
   }
 
-  QWidget* cleaner = new QWidget();
+  this->setUpdatesEnabled(false);
+
+  QList<QPointer<QWidget> > oldWidgets;
   foreach (QWidget* widget, this->Internals->Widgets)
   {
     if (widget)
     {
-      widget->setParent(cleaner);
+      oldWidgets.push_back(widget);
     }
   }
 
@@ -576,12 +592,30 @@ void pqMultiViewWidget::reload()
 
   int max_index = 0;
   QWidget* child = this->createWidget(0, vlayout, parentWdg, max_index);
-  delete cleaner;
-  cleaner = NULL;
 
   // resize Widgets to remove any obsolete indices. These indices weren't
   // touched at all during the last call to createWidget().
   this->Internals->Widgets.resize(max_index + 1);
+
+  // now destroy any old widgets no longer being used.
+  QSet<QWidget*> newWidgets;
+  foreach (QWidget* widget, this->Internals->Widgets)
+  {
+    if (widget)
+    {
+      newWidgets.insert(widget);
+    }
+  }
+  foreach (QWidget* aWidget, oldWidgets)
+  {
+    if (aWidget && !newWidgets.contains(aWidget))
+    {
+      aWidget->setParent(NULL);
+      delete aWidget;
+    }
+  }
+  oldWidgets.clear();
+  newWidgets.clear();
 
   delete parentWdg->layout();
   QVBoxLayout* vbox = new QVBoxLayout(parentWdg);
@@ -653,6 +687,8 @@ void pqMultiViewWidget::reload()
       iter.remove();
     }
   }
+
+  this->setUpdatesEnabled(true);
 
   // we let the GUI updated immediately. This is needed since when a new view is
   // created (for example), it may depend on the size of the view during its
