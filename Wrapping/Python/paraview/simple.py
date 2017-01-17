@@ -51,7 +51,6 @@ import sys
 if sys.version_info >= (3,):
     xrange = range
 
-
 def GetParaViewVersion():
     """Returns the version of the ParaView build"""
     return paraview._version(servermanager.vtkSMProxyManager.GetVersionMajor(),
@@ -60,7 +59,6 @@ def GetParaViewSourceVersion():
     """Returns the paraview source version string e.g.
     'paraview version x.x.x, Date: YYYY-MM-DD'."""
     return servermanager.vtkSMProxyManager.GetParaViewSourceVersion()
-
 
 #==============================================================================
 # Client/Server Connection methods
@@ -716,7 +714,6 @@ def FindView(name):
     """
     return servermanager.ProxyManager().GetProxy("views", name)
 
-
 def GetActiveViewOrCreate(viewtype):
     """
     Returns the active view, if the active view is of the given type,
@@ -739,7 +736,6 @@ def FindViewOrCreate(name, viewtype):
         raise RuntimeError ("Failed to create/locate the specified view")
     return view
 
-
 def LocateView(displayProperties=None):
     """
     Given a displayProperties object i.e. the object returned by
@@ -755,8 +751,6 @@ def LocateView(displayProperties=None):
         except AttributeError:
             pass
     return None
-
-
 
 # -----------------------------------------------------------------------------
 
@@ -794,7 +788,6 @@ def Delete(proxy=None):
         raise RuntimeError ("Could not locate proxy to 'Delete'")
     controller = servermanager.ParaViewPipelineController()
     controller.UnRegisterProxy(proxy)
-
 
 #==============================================================================
 # Active Source / View / Camera / AnimationScene
@@ -921,7 +914,6 @@ def CreateWriter(filename, proxy=None, **extraArgs):
         SetProperties(pyproxy, **extraArgs)
     return pyproxy
 
-
 def SaveData(filename, proxy=None, **extraArgs):
     """Save data produced by 'proxy' in a file. If no proxy is specified the
     active source is used. Properties to configure the writer can be passed in
@@ -936,7 +928,6 @@ def SaveData(filename, proxy=None, **extraArgs):
     writer.UpdateVTKObjects()
     writer.UpdatePipeline()
     del writer
-
 
 # -----------------------------------------------------------------------------
 
@@ -1072,7 +1063,6 @@ def HideScalarBarIfNotNeeded(lut, view=None):
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.HideScalarBarIfNotNeeded(lut.SMProxy, view.SMProxy)
 
-
 def UpdateScalarBars(view=None):
     """Hides all unused scalar bar and shows used scalar bars. A scalar bar is used
     if some data is shown in that view that is coloring using the transfer function
@@ -1083,6 +1073,21 @@ def UpdateScalarBars(view=None):
         raise ValueError ("'view' argument cannot be None with no active is present.")
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS | tfmgr.SHOW_USED_SCALAR_BARS)
+
+def UpdateScalarBarsComponentTitle(ctf, representation=None):
+    """Update all scalar bars using the provided lookup table. The representation is used to recover
+    the array from which the component title was obtained. If None is provided the representation
+    of the active source in the active view is used."""
+    if not representation:
+        view = active_objects.view
+        proxy = active_objects.source
+        if not view:
+            raise ValueError ("'representation' argument cannot be None with no active view.")
+        if not proxy:
+            raise ValueError ("'representation' argument cannot be None with no active source.")
+        representation = GetRepresentation(view, proxy)
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.UpdateScalarBarsComponentTitle(ctf.SMProxy, representation.SMProxy)
 
 def GetScalarBar(ctf, view=None):
     """Returns the scalar bar for color transfer function in the given view.
@@ -1163,7 +1168,6 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     one is created.
     *** DEPRECATED ***: Use GetColorTransferFunction instead"""
     return GetColorTransferFunction(arrayname, **params)
-
 
 # global lookup table reader instance
 # the user can use the simple api below
@@ -1695,7 +1699,6 @@ def _create_func(key, module, skipRegisteration=False):
 
         # Create a controller instance.
         controller = servermanager.ParaViewPipelineController()
-
 
         # Instantiate the actual object from the given module.
         px = paraview._backwardscompatibilityhelper.GetProxy(module, key)
