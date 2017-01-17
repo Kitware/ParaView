@@ -276,6 +276,11 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionName(const int base,
             (cgsize_t)(self->ActualTimeStep * 32 + 1), (cgsize_t)(self->ActualTimeStep * 32 + 32),
             (void*)SolutionName);
           SolutionName[32] = '\0';
+          // NOTE: Names or identifiers contain no spaces and capitalization
+          //       is used to distinguish individual words making up a name.
+          //       For illformed CGNS files, we encounter names padded with spaces.
+          //       We handle them by removing trailing spaces.
+          CGNSRead::removeTrailingWhiteSpaces(SolutionName);
           readSolutionName = false;
         }
         cgio_release_id(self->cgioNum, iterChildId[nn]);
@@ -693,6 +698,10 @@ int vtkCGNSReader::GetCurvilinearZone(
 
     if (cgio_get_node_id(this->cgioNum, this->currentId, SolutionName, &cgioSolId) != CG_OK)
     {
+      char errmsg[CGIO_MAX_ERROR_LENGTH + 1];
+      cgio_error_message(errmsg);
+      vtkErrorMacro(<< "Problem while reading Solution of zone number " << zone
+                    << ", error : " << errmsg);
       nosolutionread = true;
     }
     else

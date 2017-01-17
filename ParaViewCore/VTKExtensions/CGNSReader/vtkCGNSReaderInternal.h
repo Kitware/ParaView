@@ -295,6 +295,20 @@ inline bool compareName(const char_33 nameOne, const char_33 nameTwo)
 }
 
 //------------------------------------------------------------------------------
+// remove trailing whitespaces
+inline void removeTrailingWhiteSpaces(char_33 name)
+{
+  for (int cc = 0; cc < 33; ++cc)
+  {
+    if (isspace(name[cc]))
+    {
+      name[cc] = 0;
+      return;
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
 // get vector from name
 inline std::vector<CGNSVector>::iterator getVectorFromName(
   std::vector<CGNSVector>& vectorList, const char_33 name)
