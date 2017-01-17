@@ -71,22 +71,23 @@ endmacro()
 #------------------------------------------------------------------------------
 macro(pv_pre_wrap_vtk_mod_cs libname module)
   set(vtk${kit}CS_HEADERS)
- 
+
   vtk_module_load(${module})
   vtk_module_headers_load(${module})
-  
+
   foreach(class ${${module}_HEADERS})
-    pv_find_vtk_header(${class}.h "${${module}_INCLUDE_DIRS}" pathfound)
-    if(pathfound)
-      if(NOT ${module}_HEADER_${class}_WRAP_EXCLUDE)
+    if(NOT ${module}_HEADER_${class}_WRAP_EXCLUDE)
+      pv_find_vtk_header(${class}.h "${${module}_INCLUDE_DIRS}" pathfound)
+
+      if(pathfound)
         if(${module}_HEADER_${class}_ABSTRACT)
           set_source_files_properties(${pathfound} PROPERTIES ABSTRACT 1)
         endif()
         list(APPEND ${module}CS_HEADERS ${pathfound})
+      else()
+        message(WARNING "Unable to find: ${class}")
       endif()
-    else()
-      message(WARNING "Unable to find: ${class}")
-    endif()  
+    endif()
   endforeach()
 
   # build hints file for the module
@@ -119,7 +120,7 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
       ${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints @ONLY)
     set(VTK_WRAP_HINTS "${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints")
   endif()
-  
+
   VTK_WRAP_ClientServer("${libname}" "${module}CS_SRCS" "${${module}CS_HEADERS}")
 
   # restore VTK_WRAP_HINTS
@@ -169,7 +170,7 @@ MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
   ENDFOREACH()
   VTK_WRAP_ClientServer("${libname}" "vtk${kit}CS_SRCS" "${vtk${kit}CS_HEADERS}")
 ENDMACRO()
- 
+
 #------------------------------------------------------------------------------
 # Macro to create ClientServer wrappers classes in a single VTK kit.
 MACRO(PV_WRAP_VTK_CS kit ukit deps)
