@@ -130,7 +130,7 @@ class CoProcessor(object):
         else:
             # the catalyst pipeline may have been changed by a live connection
             # so we need to regenerate the frequencies
-            import cpstate
+            from paraview import cpstate
             frequencies = {}
             for writer in self.__WritersList:
                 frequency = writer.parameters.GetProperty(
