@@ -307,7 +307,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolarAxes.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
@@ -569,8 +568,6 @@ endif()
 #------------------------------------------------------------------------------
 
 # Probe picking does not work in render server mode
-set(ProbePicking_DISABLE_CRS TRUE)
-set(ProbePicking_THRESHOLD 120)
 
 #------------------------------------------------------------------------------
 set (TestPythonConsole_BREAK TRUE)
@@ -599,7 +596,6 @@ set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
-set (ProbePicking_FORCE_SERIAL TRUE)
 set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
