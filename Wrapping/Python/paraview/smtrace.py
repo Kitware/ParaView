@@ -566,12 +566,21 @@ class PropertyTraceHelper(object):
         """Returns the propery value as a string. For proxy properties, this
         will either be a string used to refer to another proxy or a string used
         to refer to the proxy in a proxy list domain."""
-        if isinstance(self.get_object(), sm.ProxyProperty):
-            data = self.get_object()[:]
+        myobject = self.get_object()
+        if isinstance(myobject, sm.ProxyProperty):
+            data = myobject[:]
             if self.has_proxy_list_domain():
-                data = ["'%s'" % x.GetXMLLabel() for x in self.get_object()[:]]
+                data = ["'%s'" % x.GetXMLLabel() for x in data]
             else:
-                data = [str(Trace.get_accessor(x)) for x in self.get_object()[:]]
+                data = [str(Trace.get_accessor(x)) for x in data]
+                if isinstance(myobject, sm.InputProperty):
+                    # this is an input property, we may have to hook on to a
+                    # non-zero output port. If so, we trace `OutputPort(source,
+                    # port)`, else we just trace `source`.
+                    # Fixes #17035
+                    ports = [myobject.GetOutputPortForConnection(x) for x in range(len(data))]
+                    data = [src if port==0 else "OutputPort(%s,%d)" % (src,port) \
+                            for src,port in zip(data, ports)]
             try:
                 if len(data) > 1:
                   return "[%s]" % (", ".join(data))
@@ -580,7 +589,7 @@ class PropertyTraceHelper(object):
             except IndexError:
                 return "None"
         else:
-            return str(self.get_object())
+            return str(myobject)
 
     def has_proxy_list_domain(self):
         """Returns True if this property has a ProxyListDomain, else False."""
