@@ -16,6 +16,18 @@ endif()
 if (PARAVIEW_ENABLE_QT_SUPPORT)
   list(APPEND __dependencies vtkGUISupportQt)
 endif()
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  #list(APPEND __dependencies vtkRenderingLIC)
+  if (PARAVIEW_USE_MPI)
+    #list (APPEND __dependencies vtkRenderingParallelLIC)
+  endif()
+else()
+  list(APPEND __dependencies vtkglew)
+endif()
+
+if(PARAVIEW_USE_OSPRAY)
+  #list(APPEND __dependencies vtkRenderingOSPRay)
+endif()
 
 if (Module_vtkRenderingCore)
   list(APPEND __dependencies
@@ -28,13 +40,13 @@ if (Module_vtkRenderingCore)
     vtkFiltersParallel
     vtkFiltersParallelMPI
     vtkIOExport
-    vtkIOExportOpenGL
+    vtkIOExport${VTK_RENDERING_BACKEND}
     vtkIOImage
     vtkIOXML
     vtkInteractionStyle
     vtkParallelMPI
     vtkRenderingAnnotation
-    vtkRenderingCore
+    vtkRendering${VTK_RENDERING_BACKEND}
     vtkRenderingParallel
     vtkicet
     vtklz4)
@@ -56,7 +68,6 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkInteractionStyle
     vtkIOAMR
     vtkIOXML
-    vtkRenderingOpenGL
     vtkTestingRendering
 
   TEST_LABELS
