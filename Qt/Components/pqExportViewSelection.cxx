@@ -190,12 +190,14 @@ void pqExportViewSelection::setCatalystOptionsVisible(bool status)
         info->hideFrequencyInput();
         info->hideFitToScreen();
         info->hideMagnification();
+        info->hideFilenameDetails();
         }
       else
         {
         info->showFrequencyInput();
         info->showFitToScreen();
         info->showMagnification();
+        info->showFilenameDetails();
         }
       }
     }
