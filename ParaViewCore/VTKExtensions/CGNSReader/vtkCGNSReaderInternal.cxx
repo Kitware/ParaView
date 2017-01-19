@@ -54,11 +54,13 @@ int setUpRind(const int cgioNum, const double rindId, int* rind)
 }
 
 //------------------------------------------------------------------------------
-int getFirstNodeId(const int cgioNum, const double parentId, const char* label, double* id)
+int getFirstNodeId(
+  const int cgioNum, const double parentId, const char* label, double* id, const char* name)
 {
   int nId, n, nChildren, len;
   int ier = 0;
   char nodeLabel[CGIO_MAX_NAME_LENGTH + 1];
+  char nodeName[CGIO_MAX_NAME_LENGTH + 1];
 
   if (cgio_number_children(cgioNum, parentId, &nChildren) != CG_OK)
   {
@@ -81,11 +83,18 @@ int getFirstNodeId(const int cgioNum, const double parentId, const char* label, 
   nId = 0;
   for (n = 0; n < nChildren; n++)
   {
+
     if (cgio_get_label(cgioNum, idList[n], nodeLabel))
     {
       return 1;
     }
-    if (0 == strcmp(nodeLabel, label))
+
+    if (name != NULL && cgio_get_name(cgioNum, idList[n], nodeName))
+    {
+      return 1;
+    }
+
+    if (0 == strcmp(nodeLabel, label) && (name == NULL || 0 == strcmp(nodeName, name)))
     {
       *id = idList[n];
       nId = 1;
