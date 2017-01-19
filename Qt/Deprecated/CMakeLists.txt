@@ -28,78 +28,26 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  pq3DWidget.cxx
-  pq3DWidget.h
-  pq3DWidgetPropertyWidget.cxx
-  pq3DWidgetPropertyWidget.h
-  pqBoxWidget.cxx
-  pqBoxWidget.h
-  pqContourWidget.cxx
-  pqContourWidget.h
-  pqDistanceWidget.cxx
-  pqDistanceWidget.h
-  pqHandleWidget.cxx
-  pqHandleWidget.h
-  pqImplicitPlaneWidget.cxx
-  pqImplicitPlaneWidget.h
-  pqLineSourceWidget.cxx
-  pqLineSourceWidget.h
-  pqLineWidget.cxx
-  pqLineWidget.h
-  pqOrbitWidget.cxx
-  pqOrbitWidget.h
-  pqPointSourceWidget.cxx
-  pqPointSourceWidget.h
-  pqPolyLineWidget.cxx
-  pqPolyLineWidget.h
-  pqSphereWidget.cxx
-  pqSphereWidget.h
-  pqSplineWidget.cxx
-  pqSplineWidget.h
-  )
 
-set (Module_MOC_HDRS
-  pq3DWidget.h
-  pq3DWidgetPropertyWidget.h
-  pqBoxWidget.h
-  pqContourWidget.h
-  pqDistanceWidget.h
-  pqHandleWidget.h
-  pqImplicitPlaneWidget.h
-  pqLineSourceWidget.h
-  pqLineWidget.h
-  pqOrbitWidget.h
-  pqPointSourceWidget.h
-  pqPolyLineWidget.h
-  pqSphereWidget.h
-  pqSplineWidget.h
-)
-
-set (Module_UI_FILES
-  pqBoxWidget.ui
-  pqContourWidget.ui
-  pqHandleWidget.ui
-  pqImplicitPlaneWidget.ui
-  pqLineSourceControls.ui
-  pqLineWidget.ui
-  pqPointSourceControls.ui
-  pqPolyLineWidget.ui
-  pqSphereWidget.ui
-  pqSplineWidget.ui
-)
-
-#-----------------------------------------------------------------------------------
-include(ParaViewQt)
-pv_find_package_qt(qt_targets REQUIRED QUIET
-  QT4_COMPONENTS QtGui
-  QT5_COMPONENTS Widgets)
-pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-set(${vtk-module}_NO_HeaderTest 1)
-vtk_module_library(${vtk-module}
-  ${Module_SRCS}
-  ${__Module_RESOURCE_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_targets})
+# set (Module_SRCS
+#   )
+#
+# set (Module_MOC_HDRS
+# )
+#
+# set (Module_UI_FILES
+# )
+# #-----------------------------------------------------------------------------------
+# include(ParaViewQt)
+# pv_find_package_qt(qt_targets REQUIRED QUIET
+#   QT4_COMPONENTS QtGui
+#   QT5_COMPONENTS Widgets)
+# pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+# pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+# set(${vtk-module}_NO_HeaderTest 1)
+# vtk_module_library(${vtk-module}
+#   ${Module_SRCS}
+#   ${__Module_RESOURCE_SRCS}
+#   ${__Module_MOC_SRCS}
+#   ${__Module_UI_SRCS})
+# target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_targets})

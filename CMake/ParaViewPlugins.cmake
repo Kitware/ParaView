@@ -294,88 +294,22 @@ function(__add_paraview_property_widget outifaces outsrcs)
   endif()
 endfunction()
 
-# create implementation for a custom object panel interface
-# ADD_PARAVIEW_OBJECT_PANEL(
-#    OUTIFACES
-#    OUTSRCS
-#    [CLASS_NAME classname]
-#    XML_NAME xmlname
-#    XML_GROUP xmlgroup
-#  CLASS_NAME: optional name for the class that implements pqObjectPanel
-#              if none give ${XML_NAME}Panel is assumed (if XML_NAME is a list, then
-#              the first name in  the list is assumed).
-#  XML_GROUP : the xml group of the source/filter this panel corresponds with
-#  XML_NAME  : the xml name of the source/filter this panel corresponds with.
-#              XML_NAME can be single name or a list of names.
+# OBSOLETE: legacy object panels
 MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
-
-  SET(ARG_CLASS_NAME)
-
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;XML_NAME;XML_GROUP" "" ${ARGN} )
-
-  IF(ARG_CLASS_NAME)
-    SET(PANEL_NAME ${ARG_CLASS_NAME})
-  ELSE()
-    LIST(GET ${ARG_XML_NAME} 0 first_xml_name)
-    SET(PANEL_NAME ${first_xml_name}Panel)
-  ENDIF()
-  SET(PANEL_XML_NAME ${ARG_XML_NAME})
-  SET(PANEL_XML_GROUP ${ARG_XML_GROUP})
-  SET(${OUTIFACES} ${PANEL_NAME})
-
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
-
-  SET(PANEL_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(PANEL_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(PANEL_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
-  ENDIF ()
-
- SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
-      ${PANEL_MOC_SRCS}
-      )
-
+  message(FATAL_ERROR
+"ADD_PARAVIEW_OBJECT_PANEL is no longer supported.
+ParaView's Properties panel has been refactored in 3.98. Legacy object panel support
+was dropped in 5.2. Please refer to 'Major API Changes' in ParaView developer
+documentation for details.")
 ENDMACRO()
 
-# create implementation for a custom display panel interface
-# ADD_PARAVIEW_DISPLAY_PANEL(
-#    OUTIFACES
-#    OUTSRCS
-#    CLASS_NAME classname
-#    XML_NAME xmlname
-#  CLASS_NAME: pqDisplayPanel
-#  XML_NAME : the xml name of the display this panel corresponds with
+# OBSOLETE: legacy display panels.
 MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
-
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;XML_NAME" "" ${ARGN} )
-
-  SET(PANEL_NAME ${ARG_CLASS_NAME})
-  SET(PANEL_XML_NAME ${ARG_XML_NAME})
-  SET(${OUTIFACES} ${PANEL_NAME})
-
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
-
-  SET(DISPLAY_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(DISPLAY_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(DISPLAY_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
-  ENDIF ()
-
-  SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
-      ${DISPLAY_MOC_SRCS}
-      )
+  message(FATAL_ERROR
+"ADD_PARAVIEW_DISPLAY_PANEL is no longer supported.
+ParaView's Properties panel has been refactored in 3.98. Legacy display panel support
+was dropped in 5.2. Please refer to 'Major API Changes' in ParaView developer
+documentation for details.")
 ENDMACRO()
 
 #------------------------------------------------------------------------------
@@ -649,7 +583,7 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
 ENDMACRO()
 
 #--------------------------------------------------------------------------------------
-# DEPRECATED: Create implementation for a custom display panel decorator interface.
+# OBSOLETE: Create implementation for a custom display panel decorator interface.
 # Decorators are used to add additional decorations to display panels.
 MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR)
   message(FATAL_ERROR
@@ -660,7 +594,7 @@ ENDMACRO()
 
 
 #--------------------------------------------------------------------------------------
-# DEPRECATED: 3DWidgets are simply custom property panels (pqPropertyWidget
+# OBSOLETE: 3DWidgets are simply custom property panels (pqPropertyWidget
 # subclasses). Thus, use add_paraview_property_group_widget() to resgiter a new
 # 3D widget panel after having updated the code accordingly.
 # Creates implementation for a pq3DWidgetInterface to add new 3D widgets to ParaView.
@@ -1067,7 +1001,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     internal_paraview_install_plugin(${NAME})
 
     IF(ARG_AUTOLOAD)
-      message(WARNING "AUTOLOAD option is deprecated. Plugins built within"
+      message(WARNING "AUTOLOAD option is obsolete. Plugins built within"
         " ParaView source should use pv_plugin(..) macro with AUTOLOAD argument.")
     ENDIF()
   ENDIF()

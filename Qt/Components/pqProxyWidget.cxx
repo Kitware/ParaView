@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 
 #include "pqApplicationCore.h"
-#include "pqApplicationCore.h"
 #include "pqCommandPropertyWidget.h"
 #include "pqDisplayPanel.h"
 #include "pqDisplayPanelInterface.h"
@@ -40,9 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleVectorPropertyWidget.h"
 #include "pqIntVectorPropertyWidget.h"
 #include "pqInterfaceTracker.h"
-#include "pqObjectPanel.h"
-#include "pqObjectPanelInterface.h"
-#include "pqObjectPanelPropertyWidget.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidget.h"
 #include "pqPropertyWidgetDecorator.h"
@@ -51,14 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqStandardLegacyCustomPanels.h"
 #include "pqStringVectorPropertyWidget.h"
 #include "pqTimer.h"
-
 #include "vtkCollection.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
-
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -409,54 +402,6 @@ public:
 private:
   Q_DISABLE_COPY(pqProxyWidgetItem)
 };
-
-//---------------------------------------------------------------------------
-// Creates and returns a legacy pqDisplayPanel for the representation, if
-// possible.
-pqDisplayPanel* CreateLegacyPanel(pqRepresentation* repr)
-{
-  if (repr == NULL)
-  {
-    return NULL;
-  }
-
-  pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-  foreach (pqDisplayPanelInterface* iface, interfaceTracker->interfaces<pqDisplayPanelInterface*>())
-  {
-    if (iface && iface->canCreatePanel(repr))
-    {
-      return iface->createPanel(repr, NULL);
-    }
-  }
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
-// Creates and returns a legacy pqObjectPanel for the proxy, if
-// possible.
-pqObjectPanel* CreateLegacyPanel(pqProxy* proxy)
-{
-  if (proxy == NULL)
-  {
-    return NULL;
-  }
-  pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-  foreach (pqObjectPanelInterface* iface, interfaceTracker->interfaces<pqObjectPanelInterface*>())
-  {
-    if (iface && iface->canCreatePanel(proxy))
-    {
-      return iface->createPanel(proxy, NULL);
-    }
-  }
-
-  // try using the standard custom panels
-  pqStandardLegacyCustomPanels standardCustomPanels;
-  if (standardCustomPanels.canCreatePanel(proxy))
-  {
-    return standardCustomPanels.createPanel(proxy, 0);
-  }
-  return NULL;
-}
 }
 
 //-----------------------------------------------------------------------------------
@@ -787,55 +732,13 @@ void pqProxyWidget::createWidgets(const QStringList& properties)
     this->Internals->ProxyDocumentationLabel->hide();
   }
 
-  // Determine if a legacy custom panel is to be created for this proxy.
-  // For legacy panels, we need pqProxy subclasses. Try to see if can find
-  // them.
-  pqProxy* pqproxy =
-    pqApplicationCore::instance()->getServerManagerModel()->findItem<pqProxy*>(smproxy);
-  pqObjectPanel* legacyObjectPanel = CreateLegacyPanel(pqproxy);
-  if (legacyObjectPanel)
-  {
-    pqObjectPanelPropertyWidget* wdg = new pqObjectPanelPropertyWidget(legacyObjectPanel, this);
-    pqProxyWidgetItem* item = pqProxyWidgetItem::newItem(wdg, QString(), this);
-    this->Internals->appendToItems(item, this);
-    PV_DEBUG_PANELS() << "Using custom (legacy) object panel:"
-                      << legacyObjectPanel->metaObject()->className();
-  }
+  // Create widgets for properties.
+  this->createPropertyWidgets(properties);
 
-  pqDisplayPanel* legacyDisplayPanel = (legacyObjectPanel == NULL)
-    ? CreateLegacyPanel(qobject_cast<pqRepresentation*>(pqproxy))
-    : NULL;
-
-  if (legacyDisplayPanel)
+  // handle hints to create 3D widgets, if any.
+  if (properties.isEmpty())
   {
-    legacyDisplayPanel->dataUpdated();
-    pqDisplayPanelPropertyWidget* wdg = new pqDisplayPanelPropertyWidget(legacyDisplayPanel, this);
-    pqProxyWidgetItem* item = pqProxyWidgetItem::newItem(wdg, QString(), this);
-    this->Internals->appendToItems(item, this);
-    PV_DEBUG_PANELS() << "Using custom display panel:"
-                      << legacyDisplayPanel->metaObject()->className();
-  }
-
-  // Create widgets for properties if legacy panels were not created.
-  if (!legacyObjectPanel && !legacyDisplayPanel)
-  {
-    this->createPropertyWidgets(properties);
-
-    // handle hints to create 3D widgets, if any.
-    if (properties.isEmpty())
-    {
-      this->create3DWidgets();
-    }
-  }
-  else
-  {
-    qWarning() << smproxy->GetXMLName()
-               << "is using a custom object panel "
-                  "(pqObjectPanel subclass). pqObjectPanel and subclasses are deprecated since "
-                  "ParaView 4.0 and will no longer work in subsequent releases 5.1 onwards. "
-                  "Please update the code to use custom property widgets "
-                  "(pqPropertyWidget subclasses) instead. "
-                  "Contact the mailing list if you need assistance.";
+    this->create3DWidgets();
   }
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
   {
