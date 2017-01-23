@@ -115,4 +115,5 @@ void pqXMLEventObserver::onRecordEvent(
                     << "/>\n";
     }
   }
+  emit eventRecorded(widget, command, arguments, eventType);
 }
