@@ -87,7 +87,7 @@ set (${vtk-module}_HDRS
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
-    
+
     COMMAND protoc_compiler
            "--cpp_out=dllexport_decl=VTKPVSERVERIMPLEMENTATIONCORE_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
            --proto_path "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -98,7 +98,7 @@ add_custom_command(
 
 add_custom_target(
   protobuf_code_generation
-  DEPENDS 
+  DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
     ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
 )
