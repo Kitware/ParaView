@@ -1,6 +1,8 @@
 // ****************************************************************************
 //                    vtkInternalDataStreamIO.proto
 // ****************************************************************************
+syntax = "proto2";
+
 package paraview_protobuf;
 
 // Type of generated code : [SPEED, CODE_SIZE, LITE_RUNTIME]
