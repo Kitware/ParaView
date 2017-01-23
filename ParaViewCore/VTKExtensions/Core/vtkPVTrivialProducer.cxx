@@ -125,11 +125,13 @@ int vtkPVTrivialProducer::ProcessRequest(
 
   if (this->Internals->TimeSteps.empty() == false)
   {
-    // outputInfo->Set(
-    //   vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
     outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &this->Internals->TimeSteps[0],
       static_cast<int>(this->Internals->TimeSteps.size()));
     double timeRange[2] = { this->Internals->TimeSteps[0], this->Internals->TimeSteps.back() };
+    outputInfo->Get(vtkDataObject::DATA_OBJECT())
+      ->GetInformation()
+      ->Set(vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
+
     outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }
 

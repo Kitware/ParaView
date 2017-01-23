@@ -3730,6 +3730,45 @@
       </Hints>
       <!-- End of ADIOSWriter -->
     </SourceProxy>
+
+    <SourceProxy name="ExodusIIWriter" class="vtkPVNullSource"
+                 label="ExodusII Writer">
+      <InputProperty name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="filename.e-s.%t">
+      </StringVectorProperty>
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- TODO: this doesn't work yet -->
+        <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+        <!-- This will help us when exporting the script state -->
+        <WriterProxy group="writers" name="ExodusIIWriter" />
+      </Hints>
+      <!-- End of ExodusIIWriter -->
+    </SourceProxy>
   </ProxyGroup>
 
   <ProxyGroup name="pythontracing">
