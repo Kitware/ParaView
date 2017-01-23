@@ -59,7 +59,7 @@ resultfname = os.path.join(cinemaDBFileName, "image/info.json")
 if not os.path.isfile(resultfname):
     raise exceptions.RuntimeError, "cinema index file not written "
 
-resultfname = os.path.join(cinemaDBFileName, "image/pose=0/time=0/vis=0/colorTimeSource1=0.npz")
+resultfname = os.path.join(cinemaDBFileName, "image/pose=0/time=0/vis=0/colorTimeSource1=0.Z")
 if not os.path.isfile(resultfname):
     raise exceptions.RuntimeError, "cinema raster file not written"
 
