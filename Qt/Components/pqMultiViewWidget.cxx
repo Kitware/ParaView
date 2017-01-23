@@ -748,7 +748,15 @@ void pqMultiViewWidget::standardButtonPressed(int button)
         int location = index.toInt();
         int parent_idx = vtkSMViewLayoutProxy::GetParent(location);
         this->layoutManager()->Collapse(location);
-        this->makeActive(qobject_cast<pqViewFrame*>(this->Internals->Widgets[parent_idx]));
+        QWidget* widgetToActivate = this->Internals->Widgets[parent_idx];
+        pqViewFrame* frameToActivate = qobject_cast<pqViewFrame*>(widgetToActivate);
+        if (!frameToActivate)
+        {
+          QSplitter* splitter = qobject_cast<QSplitter*>(widgetToActivate);
+          frameToActivate = splitter && splitter->count() > 0 ?
+            qobject_cast<pqViewFrame*>(splitter->widget(0)) : NULL;
+        }
+        this->makeActive(frameToActivate);
       }
       END_UNDO_SET();
     }
