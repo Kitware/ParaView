@@ -547,6 +547,8 @@ class CoProcessor(object):
         view.MaxClipBounds = [minbds, maxbds, minbds, maxbds, minbds, maxbds]
         view.LockBounds = 1
 
+        disableValues = False if 'noValues' not in co else co['noValues']
+
         if specLevel=="B":
             p = pv_introspect.inspect(skip_invisible=True)
         else:
@@ -556,7 +558,8 @@ class CoProcessor(object):
                                              userDefined = self.__CinemaTracks,
                                              specLevel = specLevel,
                                              camType = camType,
-                                             extension = extension)
+                                             extension = extension,
+                                             disableValues = disableValues)
 
         #all nodes participate, but only root can writes out the files
         pm = servermanager.vtkProcessModule.GetProcessModule()
@@ -564,11 +567,14 @@ class CoProcessor(object):
 
         enableFloatVal = False if 'floatValues' not in co else co['floatValues']
 
-        pv_introspect.explore(fs, p, iSave = (pid == 0), currentTime = {'time':formatted_time},
+        pv_introspect.explore(fs, p, iSave = (pid == 0),
+                              currentTime = {'time':formatted_time},
                               userDefined = self.__CinemaTracks,
                               specLevel = specLevel,
                               camType = camType,
-                              tracking = tracking_def, floatValues = enableFloatVal)
+                              tracking = tracking_def,
+                              floatValues = enableFloatVal,
+                              disableValues = disableValues)
         if pid == 0:
             fs.save()
 

@@ -72,6 +72,7 @@ public:
   int getMagnification();
   bool getComposite();
   bool getUseFloatValues();
+  bool getNoValues();
 
   /**
   * Remove or add options depending on whether cinema is visible.
@@ -92,6 +93,7 @@ public slots:
   void updateImageFileNameExtension(const QString&);
   void updateCinemaType(const QString&);
   void updateComposite(int);
+  void endisAbleDirectFloat(int);
 
 private:
   void initialize(Qt::WindowFlags parentFlags, pqView* view, QString const& viewName);

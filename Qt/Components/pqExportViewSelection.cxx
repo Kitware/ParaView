@@ -246,6 +246,16 @@ QString pqExportViewSelection::getSelectionAsString(QString const& scriptFormat)
         cinemaCam += "\"floatValues\":False, ";
       }
 
+      if (viewInfo->getNoValues())
+      {
+        cinemaCam += "\"noValues\":True, ";
+      }
+      else
+      {
+        cinemaCam += "\"noValues\":False, ";
+      }
+
+
       cinemaCam += "\"camera\":\"";
       cinemaCam += camType;
       cinemaCam += "\"";

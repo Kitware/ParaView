@@ -80,6 +80,9 @@ void pqImageOutputInfo::initialize(
   QObject::connect(
     this->Ui->composite, SIGNAL(stateChanged(int)), this, SLOT(updateComposite(int)));
 
+  QObject::connect(
+    this->Ui->cbNoValues, SIGNAL(stateChanged(int)), this, SLOT(endisAbleDirectFloat(int)));
+
   this->setCinemaVisible(false);
 
   this->setupScreenshotInfo();
@@ -194,6 +197,12 @@ bool pqImageOutputInfo::getComposite()
 bool pqImageOutputInfo::getUseFloatValues()
 {
   return this->Ui->cbUseFloatValues->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+bool pqImageOutputInfo::getNoValues()
+{
+  return this->Ui->cbNoValues->isChecked();
 }
 
 //-----------------------------------------------------------------------------
@@ -312,6 +321,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
 {
   int index = this->Ui->cinemaExport->currentIndex();
   this->Ui->cinemaExport->clear();
+  this->Ui->cbNoValues->setEnabled(choseComposite);
   this->Ui->cbUseFloatValues->setEnabled(choseComposite);
   if (choseComposite)
   {
@@ -331,6 +341,12 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
     this->Ui->cinemaExport->setCurrentIndex(index > 2 ? 2 : index);
     emit compositeChanged(false);
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::endisAbleDirectFloat(int choseDisable)
+{
+  this->Ui->cbUseFloatValues->setEnabled(choseDisable==0);
 }
 
 //------------------------------------------------------------------------------
