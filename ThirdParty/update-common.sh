@@ -164,7 +164,7 @@ else
     fi
     readonly unrelated_histories_flag
 
-    git fetch "$extractdir" "upstream-$name:upstream-$name"
+    git fetch "$extractdir" "+upstream-$name:upstream-$name"
     git merge --log -s ours --no-commit $unrelated_histories_flag "upstream-$name"
     git read-tree -u --prefix="$subtree/" "upstream-$name"
 fi
