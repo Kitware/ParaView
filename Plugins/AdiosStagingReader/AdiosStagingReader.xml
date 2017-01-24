@@ -1,0 +1,35 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="CartisoStream" class="vtkCartisoReader" label="Cartiso Stream">
+      <Documentation>
+      Staging read from cartiso
+      </Documentation>
+
+      <StringVectorProperty
+        name="StreamName"
+        animateable="0"
+        command="SetStreamName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name, with path, of the Cartiso stream.
+        </Documentation>
+      </StringVectorProperty>
+      <Property
+        name="AdvanceStep"
+        command="AdvanceStep"
+        panel_widget="command_button">
+        <Documentation>
+          Advance to the next step.
+        </Documentation>
+      </Property>
+
+      <Hints>
+        <ReaderFactory filename_patterns="cartiso.full*" file_description="Cartiso Stream Reader"/>
+        <ShowInMenu/>
+      </Hints>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
