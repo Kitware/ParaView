@@ -23,7 +23,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVArrowSource.h"
+#include "vtkArrowSource.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
@@ -42,7 +42,7 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->LODGlyphMapper = vtkGlyph3DMapper::New();
   this->GlyphActor = vtkPVLODActor::New();
 
-  this->DummySource = vtkPVArrowSource::New();
+  this->DummySource = vtkArrowSource::New();
 
   this->GlyphActor->SetMapper(this->GlyphMapper);
   this->GlyphActor->SetLODMapper(this->LODGlyphMapper);

@@ -18,7 +18,6 @@
 #include "vtkDataSetMapper.h"
 #include "vtkGlyphSource2D.h"
 #include "vtkMergeArrays.h"
-#include "vtkPVArrowSource.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLegacyGlyphFilter.h"
@@ -90,13 +89,7 @@ int TestPVFilters(int argc, char* argv[])
   ribbon->SetWidth(0.1);
   ribbon->SetWidthFactor(5);
 
-  vtkPVArrowSource* arrow = vtkPVArrowSource::New();
 
-  vtkPVLinearExtrusionFilter* extrude = vtkPVLinearExtrusionFilter::New();
-  extrude->SetInputConnection(arrow->GetOutputPort());
-  extrude->SetScaleFactor(1);
-  extrude->SetExtrusionTypeToNormalExtrusion();
-  extrude->SetVector(1, 0, 0);
 
   vtkThreshold* threshold = vtkThreshold::New();
   threshold->SetInputConnection(ribbon->GetOutputPort());
@@ -109,7 +102,6 @@ int TestPVFilters(int argc, char* argv[])
 
   vtkMergeArrays* merge = vtkMergeArrays::New();
   merge->AddInputConnection(warp->GetOutputPort());
-  merge->AddInputConnection(extrude->GetOutputPort());
   merge->AddInputConnection(clip->GetOutputPort());
   merge->AddInputConnection(glyph->GetOutputPort());
   merge->Update(); // discard
@@ -140,9 +132,7 @@ int TestPVFilters(int argc, char* argv[])
   mapper->Delete();
   actor->Delete();
 
-  arrow->Delete();
   ribbon->Delete();
-  extrude->Delete();
   threshold->Delete();
   merge->Delete();
   warp->Delete();

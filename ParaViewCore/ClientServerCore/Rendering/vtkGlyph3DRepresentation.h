@@ -28,7 +28,7 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
 class vtkGlyph3DMapper;
-class vtkPVArrowSource;
+class vtkArrowSource;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGlyph3DRepresentation
   : public vtkGeometryRepresentation
@@ -139,7 +139,7 @@ protected:
   vtkGlyph3DMapper* LODGlyphMapper;
 
   vtkPVLODActor* GlyphActor;
-  vtkPVArrowSource* DummySource;
+  vtkArrowSource* DummySource;
 
   bool MeshVisibility;
 

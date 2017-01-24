@@ -46,7 +46,6 @@ set(Module_SRCS
   vtkOrderedCompositeDistributor.cxx
   vtkPartitionOrdering.cxx
   vtkPartitionOrderingInterface.cxx
-  vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVCameraCollection.cxx
