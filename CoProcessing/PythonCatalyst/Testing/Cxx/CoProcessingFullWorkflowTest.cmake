@@ -72,9 +72,9 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaComposite")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.npz" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.Z" OR
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.npz")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.Z")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store!")
   endif()
   return()
@@ -82,9 +82,9 @@ endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaCompositeFloat")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/info.json" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.npz" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=0.Z" OR
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
-     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.npz")
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.Z")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store (float value images)!")
   endif()
   return()
