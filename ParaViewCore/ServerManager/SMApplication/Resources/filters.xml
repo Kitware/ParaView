@@ -117,7 +117,6 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-
       <IntVectorProperty command="SetComputeTolerance"
                          default_values="1"
                          name="ComputeTolerance"
@@ -5359,15 +5358,20 @@ array.
       <Documentation
         long_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at
                    each point of the input data set. The glyphs are oriented and scaled according
-                   to eigenvalues and eigenvectors of tensor point data of the input data set."
+                   to eigenvalues and eigenvectors of tensor point data of the input data set.
+                   This filter supports symmetric tensors. Symmetric tensor are expected to have
+                   the following order: XX, YY, ZZ, XY, YZ, XZ"
         short_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at each
                    point of the input data set. The glyphs are oriented and scaled according to eigenvalues
-                   and eigenvectors of tensor point data of the input data set.">
+                   and eigenvectors of tensor point data of the input data set.
+                   This filter supports symmetric tensors. Symmetric tensor components are expected to have
+                   the following order: XX, YY, ZZ, XY, YZ, XZ">
 
         The Tensor Glyph filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at every point in
         the input data set. The glyphs are oriented and scaled according to eigenvalues and eigenvectors of tensor
         point data of the input data set. The Tensor Glyph filter operates on any type of data set. Its output is
-        polygonal.
+        polygonal. This filter supports symmetric tensors. Symmetric tensor components are expected to have the
+        following order: XX, YY, ZZ, XY, YZ, XZ"
       </Documentation>
 
     <InputProperty
@@ -7488,7 +7492,6 @@ source.</Documentation>
       </Hints>
       <!-- End LegacyGlyph -->
     </SourceProxy>
-
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVGlyphFilter"
