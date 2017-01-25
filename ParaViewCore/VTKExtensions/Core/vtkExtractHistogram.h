@@ -27,7 +27,7 @@
 #ifndef vtkExtractHistogram_h
 #define vtkExtractHistogram_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
 class vtkDoubleArray;
@@ -35,7 +35,7 @@ class vtkFieldData;
 class vtkIntArray;
 struct vtkEHInternals;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
 {
 public:
   static vtkExtractHistogram* New();

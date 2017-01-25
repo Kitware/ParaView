@@ -25,9 +25,9 @@
 #define vtkPVNullSource_h
 
 #include "vtkLineSource.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVNullSource : public vtkLineSource
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVNullSource : public vtkLineSource
 {
 public:
   static vtkPVNullSource* New();

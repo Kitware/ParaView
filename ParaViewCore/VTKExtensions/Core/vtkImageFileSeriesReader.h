@@ -30,7 +30,7 @@
 
 #include "vtkFileSeriesReader.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkImageFileSeriesReader : public vtkFileSeriesReader
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkImageFileSeriesReader : public vtkFileSeriesReader
 {
 public:
   static vtkImageFileSeriesReader* New();

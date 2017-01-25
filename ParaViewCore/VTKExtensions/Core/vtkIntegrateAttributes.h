@@ -28,7 +28,7 @@
 #ifndef vtkIntegrateAttributes_h
 #define vtkIntegrateAttributes_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkDataSet;
@@ -38,7 +38,7 @@ class vtkInformationVector;
 class vtkDataSetAttributes;
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateAttributes : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkIntegrateAttributes : public vtkUnstructuredGridAlgorithm
 {
 public:
   vtkTypeMacro(vtkIntegrateAttributes, vtkUnstructuredGridAlgorithm);

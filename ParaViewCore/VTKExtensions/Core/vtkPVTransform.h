@@ -24,11 +24,11 @@
 #ifndef vtkPVTransform_h
 #define vtkPVTransform_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 #include "vtkTransform.h"
 class vtkTransform;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVTransform : public vtkTransform
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTransform : public vtkTransform
 {
 public:
   static vtkPVTransform* New();

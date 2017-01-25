@@ -26,11 +26,11 @@
 #define vtkMetaReader_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
 #include <string> // for std::string
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkMetaReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkMetaReader* New();

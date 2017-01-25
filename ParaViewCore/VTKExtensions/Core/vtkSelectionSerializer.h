@@ -28,14 +28,14 @@
 #define vtkSelectionSerializer_h
 
 #include "vtkObject.h"
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkInformationIntegerKey;
 class vtkPVXMLElement;
 class vtkSelection;
 class vtkSelectionNode;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSelectionSerializer : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkSelectionSerializer : public vtkObject
 {
 public:
   static vtkSelectionSerializer* New();

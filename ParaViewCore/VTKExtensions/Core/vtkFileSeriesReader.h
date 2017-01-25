@@ -51,13 +51,13 @@
 #define vtkFileSeriesReader_h
 
 #include "vtkMetaReader.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
 class vtkStringArray;
 
 struct vtkFileSeriesReaderInternals;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkMetaReader
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkFileSeriesReader : public vtkMetaReader
 {
 public:
   static vtkFileSeriesReader* New();

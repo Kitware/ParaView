@@ -34,13 +34,13 @@
 #define vtkReductionFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 #include "vtkSmartPointer.h"                   // needed for vtkSmartPointer.
 #include <vector>                              //  needed for std::vector
 
 class vtkMultiProcessController;
 class vtkSelection;
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkReductionFilter* New();

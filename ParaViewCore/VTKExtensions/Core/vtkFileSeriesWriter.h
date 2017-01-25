@@ -25,10 +25,10 @@
 #define vtkFileSeriesWriter_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 class vtkClientServerInterpreter;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkFileSeriesWriter* New();

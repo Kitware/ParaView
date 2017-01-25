@@ -39,7 +39,6 @@ set(Module_SRCS
   vtkAMRFragmentsFilter.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
-  vtkAttributeDataReductionFilter.cxx
   vtkCellIntegrator.cxx
   vtkCleanUnstructuredGridCells.cxx
   vtkCleanUnstructuredGrid.cxx
@@ -47,12 +46,9 @@ set(Module_SRCS
   vtkEnsembleDataReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
-  vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
   vtkExtractSelectionRange.cxx
   vtkFileSequenceParser.cxx
-  vtkFileSeriesReader.cxx
-  vtkFileSeriesWriter.cxx
   vtkFlashContour.cxx
   vtkGridAxes2DActor.cxx
   vtkGridAxes3DActor.cxx
@@ -61,8 +57,6 @@ set(Module_SRCS
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
   vtkHybridProbeFilter.cxx
-  vtkImageFileSeriesReader.cxx
-  vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkIntersectFragments.cxx
   vtkIsoVolume.cxx
@@ -77,14 +71,11 @@ set(Module_SRCS
   vtkMaterialInterfaceToProcMap.cxx
   vtkMergeArrays.cxx
   vtkMergeCompositeDataSet.cxx
-  vtkMetaReader.cxx
   vtkMinMax.cxx
-  vtkParallelSerialWriter.cxx
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
   vtkPEnSightReader.cxx
   vtkPEquivalenceSet.cxx
-  vtkPExtractHistogram.cxx
   vtkPExtractTemporalFieldData.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
@@ -123,12 +114,10 @@ set(Module_SRCS
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMetaClipDataSet.cxx
   vtkPVMetaSliceDataSet.cxx
-  vtkPVNullSource.cxx
   vtkPVPlane.cxx
   vtkPVPLYWriter.cxx
   vtkPVSelectionSource.cxx
   vtkPVTextSource.cxx
-  vtkPVTransform.cxx
   vtkPVTransposeTable.cxx
   vtkRulerLineForInput.cxx
   vtkQuerySelectionSource.cxx
