@@ -595,7 +595,7 @@ bool vtkCGNSMetaData::Parse(const char* cgnsFileName)
   char nodeLabel[CGIO_MAX_NAME_LENGTH + 1];
 
   // use cgio routine to open the file
-  if (cgio_open_file(cgnsFileName, CGIO_MODE_READ, 0, &cgioNum) != CG_OK)
+  if (cgio_open_file(cgnsFileName, CGIO_MODE_READ, CG_FILE_NONE, &cgioNum) != CG_OK)
   {
     cgio_error_exit("cgio_file_open");
   }

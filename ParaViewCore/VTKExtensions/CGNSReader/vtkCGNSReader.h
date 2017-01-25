@@ -130,6 +130,15 @@ public:
   vtkGetMacro(IgnoreFlowSolutionPointers, bool);
   vtkBooleanMacro(IgnoreFlowSolutionPointers, bool);
 
+  /**
+   * This reader can support piece requests by distributing each block in each
+   * zone across ranks (default). To make the reader disregard piece request and
+   * read all blocks in the zone, set this to false (default is true).
+   */
+  vtkSetMacro(DistributeBlocks, bool);
+  vtkGetMacro(DistributeBlocks, bool);
+  vtkBooleanMacro(DistributeBlocks, bool);
+
   //@{
   /**
    * Set/get the communication object used to relay a list of files
@@ -187,6 +196,7 @@ private:
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;
+  bool DistributeBlocks;
 
   // For internal cgio calls (low level IO)
   int cgioNum;      // cgio file reference
