@@ -273,6 +273,7 @@ _allgather (
  const H5PartFile *f  /*!< IN: file handle */
  ) {
 
+ (void)f;
  return H5PART_SUCCESS;
 }
 #endif
