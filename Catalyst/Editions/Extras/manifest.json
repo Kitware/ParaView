@@ -8,7 +8,8 @@
   ],
   "cmake":{
     "cache":[
-      { "name":"Module_vtkPVVTKExtensionsRendering",
+      {
+        "name":"Module_vtkPVVTKExtensionsCore",
         "type":"BOOL",
         "value":"ON"
       },
@@ -130,8 +131,8 @@
       "cswrap":true,
       "pythonwrap":true
     },
-    { "name":"vtkPVVTKExtensionsDefault",
-      "path":"ParaViewCore/VTKExtensions/Default",
+    { "name":"vtkPVVTKExtensionsCore",
+      "path":"ParaViewCore/VTKExtensions/Core",
       "include":[
         { "class":"vtkAttributeDataReductionFilter" },
         { "class":"vtkExtractHistogram" },
@@ -140,7 +141,9 @@
         { "class":"vtkParallelSerialWriter" },
         { "class":"vtkPExtractHistogram" },
         { "class":"vtkPVNullSource" },
-        { "class":"vtkPVTransform" }
+        { "class":"vtkPVTransform" },
+        { "class":"vtkReductionFilter" },
+        { "class":"vtkSelectionSerializer" }
       ],
       "cswrap":true,
       "pythonwrap":true
@@ -236,21 +239,6 @@
       ],
       "cswrap": true,
       "pythonwrap": true
-    },
-    { "name":"vtkPVVTKExtensionsRendering",
-      "path":"ParaViewCore/VTKExtensions/Rendering",
-      "include":[
-        { "path":"module.cmake" },
-        { "class":"vtkPVArrowSource" },
-        { "class":"vtkReductionFilter" },
-        { "class":"vtkSelectionSerializer" }
-      ],
-      "replace":[
-        { "path":"ParaViewCore/VTKExtensions/Rendering/CMakeLists.txt" },
-        { "path":"ParaViewCore/VTKExtensions/Rendering/module.cmake" }
-      ],
-      "cswrap":true,
-      "pythonwrap":true
     }
   ],
   "proxies":[

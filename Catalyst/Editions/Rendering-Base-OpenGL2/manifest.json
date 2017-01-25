@@ -103,6 +103,7 @@
     { "name": "vtkPVVTKExtensionsRendering",
       "path": "ParaViewCore/VTKExtensions/Rendering",
       "include": [
+        { "path": "module.cmake" },
         { "path": "vtkIceTCompositeZPassShader_fs.glsl" },
         { "path": "vtkIceTConstants.h" },
         { "path": "vtkPVStreamingMacros.h" },
@@ -169,6 +170,8 @@
         { "class": "vtkZlibImageCompressor" }
       ],
       "replace": [
+        { "path":"ParaViewCore/VTKExtensions/Rendering/CMakeLists.txt" },
+        { "path":"ParaViewCore/VTKExtensions/Rendering/module.cmake" },
         { "path": "ParaViewCore/VTKExtensions/Rendering/Rendering-Base-glsl.catalyst.cmake" }
       ],
       "cswrap": true,
