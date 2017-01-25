@@ -261,7 +261,7 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="3" column="2">
+        <item row="5" column="2">
          <widget class="QWidget" name="wCameraOptions" native="true">
           <property name="enabled">
            <bool>true</bool>
@@ -387,7 +387,7 @@
           </layout>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="cinemaLabel">
           <property name="enabled">
            <bool>true</bool>
@@ -397,7 +397,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
+        <item row="4" column="2">
          <widget class="QComboBox" name="cinemaExport">
           <property name="enabled">
            <bool>true</bool>
@@ -438,7 +438,7 @@
           </item>
          </widget>
         </item>
-        <item row="4" column="2">
+        <item row="6" column="2">
          <widget class="QLineEdit" name="trackObjectName">
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter name from Pipeline Browser for camera to track over time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -448,7 +448,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="trackObjectLabel">
           <property name="text">
            <string>Track Object</string>
@@ -475,23 +475,40 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="laFloatValue">
           <property name="text">
-           <string>GL Float</string>
+           <string>Try Direct Float</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="2" column="2">
          <widget class="QCheckBox" name="cbUseFloatValues">
           <property name="toolTip">
-           <string>Try to render via OpenGL float buffers first.</string>
+           <string>Render recolorable float value pixels via GL_ARB_texture_float buffers if available.</string>
           </property>
           <property name="text">
            <string/>
           </property>
           <property name="checked">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="laNoFloat">
+          <property name="text">
+           <string>Disable Float</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCheckBox" name="cbNoValues">
+          <property name="toolTip">
+           <string>Use prebaked lookup table as RGB pixels instead of recolorable float value pixels. </string>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
