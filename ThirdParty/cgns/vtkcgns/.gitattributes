@@ -1,0 +1,6 @@
+*.docx binary
+
+# Kitware settings.
+* -whitespace
+src/CMakeLists.txt -crlf
+src/adf/ADF_internals.c -crlf
