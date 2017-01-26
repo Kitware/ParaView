@@ -1875,6 +1875,36 @@
           <Entry text="ZoomToMouse" value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera2DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera2DMouseWheelMotionFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera2DMouseWheelMotionFactor"/>
+        </Hints>
+        <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera3DMouseWheelMotionFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera3DMouseWheelMotionFactor"/>
+        </Hints>
+        <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetUseLightKit"
                          default_values="1"
                          name="UseLight"

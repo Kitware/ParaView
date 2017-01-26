@@ -825,6 +825,7 @@
     <SettingsProxy name="RenderViewInteractionSettings" label="Camera"
       processes="client|dataserver|renderserver">
       <IntVectorProperty name="Camera3DManipulators"
+        label="Camera 3D Manipulator"
         number_of_elements="9"
         default_values="4 1 2 3 4 1 2 4 6"
         panel_widget="camera_manipulator">
@@ -843,7 +844,19 @@
           <Entry text="ZoomToMouse" value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera3DMouseWheelMotionFactor"
+                            label="3D Mouse Wheel Factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty name="Camera2DManipulators"
+        label="Camera 2D Manipulator"
         number_of_elements="9"
         default_values="1 3 2 2 2 6 3 1 4"
         panel_widget="camera_manipulator">
@@ -861,11 +874,24 @@
           <Entry text="ZoomToMouse" value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera2DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera2DMouseWheelMotionFactor"
+                            label="2D Mouse Wheel Factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
+      </DoubleVectorProperty>
       <PropertyGroup label="2D Interaction Options">
         <Property name="Camera2DManipulators" />
+        <Property name="Camera2DMouseWheelMotionFactor" />
       </PropertyGroup>
       <PropertyGroup label="3D Interaction Options">
         <Property name="Camera3DManipulators" />
+        <Property name="Camera3DMouseWheelMotionFactor" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
