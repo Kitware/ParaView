@@ -47,6 +47,35 @@ public:
   vtkTypeMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
+  typedef enum ReductionModeType
+  {
+    REDUCE_ALL_TO_ONE = 0,
+    MOVE_ALL_TO_ONE = 1,
+    REDUCE_ALL_TO_ALL = 2
+  } ReductionModeType;
+
+  //@{
+  /**
+   * Get/Set the Reduction Mode.
+   * REDUCE_ALL_TO_ONE is the default behavior.
+   * It reduces all data on a single node, while other nodes keeps their data.
+   * MOVE_ALL_TO_ONE Reduce all data on a single node while other nodes delete their data.
+   * ALL NODES Reduce all data on all nodes.
+   */
+  vtkSetClampMacro(ReductionMode, int, vtkReductionFilter::REDUCE_ALL_TO_ONE,
+                   vtkReductionFilter::REDUCE_ALL_TO_ALL);
+  vtkGetMacro(ReductionMode, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the node to reduce to, default is 0.
+   * Not used with REDUCE_ALL_TO_ALL Reduction mode
+   */
+  vtkSetMacro(ReductionProcessId, int);
+  vtkGetMacro(ReductionProcessId, int);
+  //@}
+
   //@{
   /**
    * Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm
@@ -132,6 +161,8 @@ protected:
   vtkMultiProcessController* Controller;
   int PassThrough;
   int GenerateProcessIds;
+  int ReductionMode;
+  int ReductionProcessId;
 
 private:
   vtkReductionFilter(const vtkReductionFilter&) VTK_DELETE_FUNCTION;

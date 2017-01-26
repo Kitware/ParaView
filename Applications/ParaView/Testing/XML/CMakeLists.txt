@@ -424,13 +424,24 @@ if (PARAVIEW_USE_MPI)
 
     # Test Use Data Partitions for volume rendering
     #${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
-
   )
 
   # This test requires a parallel partition to make sense so we
   # skip running it with the built-in server.
   add_client_server_tests("pvcs"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
+  )
+
+
+  # Test AppendReduce which can only be tested with non-built-in mode
+  add_client_server_tests("pvcs"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/AppendReduce.xml
+  )
+  # Test AppendReduce which can only be tested with non-built-in mode
+  add_client_server_tests("pvcrs"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/AppendReduce.xml
   )
 
   # Test uses GhostCellsGenerator which is available in MPI only builds.
