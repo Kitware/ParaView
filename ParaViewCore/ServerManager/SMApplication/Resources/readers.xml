@@ -3087,6 +3087,19 @@
       <!-- End of XdmfReaderCore -->
     </SourceProxy>
 
+    <SourceProxy class="vtkPLYReader" name="PLYReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PLY
+        reader.</Documentation>
+      </StringVectorProperty>
+      <!-- End PLYReaderCore -->
+    </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -4686,8 +4699,19 @@
       <!-- End vrmlreader -->
     </SourceProxy>
     <SourceProxy class="vtkPLYReader"
+                 name="plyreader"
+                 base_proxygroup="internal_sources"
+                 base_proxyname="PLYReaderCore">
+      <Deprecated deprecated_in="5.3" to_remove_in="5.4">
+        This has been replaced by "PLYReader" which also support a series of PLY files.
+      </Deprecated>
+      <!-- End plyreader -->
+    </SourceProxy>
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
                  label="PLY Reader"
-                 name="plyreader">
+                 name="PLYReader"
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads files stored in Stanford University's PLY polygonal file format."
                      short_help="Read PLY polygonal files.">The PLY reader
                      reads files stored in the PLY polygonal file format
@@ -4697,20 +4721,37 @@
                      propertys "x", "y", and "z". The "face" elements must have
                      the property "vertex_indices" defined. The default file
                      extension for this reader is .ply.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PLYReaderCore"></Proxy>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
       <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never" >
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
         <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the PLY
+        <Documentation>The list of files to be read by the
         reader.</Documentation>
       </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="ply"
                        file_description="PLY Polygonal File Format" />
       </Hints>
-      <!-- End plyreader -->
     </SourceProxy>
     <SourceProxy class="vtkPDBReader"
                  label="PDB Reader"
