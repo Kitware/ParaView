@@ -241,6 +241,12 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
 class ParaViewWebViewPort(ParaViewWebProtocol):
 
+    def __init__(self, scale=1.0, maxWidth=2560, maxHeight=1440):
+        super(ParaViewWebViewPort, self).__init__()
+        self.scale = scale
+        self.maxWidth = maxWidth
+        self.maxHeight = maxHeight
+
     # RpcName: resetCamera => viewport.camera.reset
     @exportRpc("viewport.camera.reset")
     def resetCamera(self, viewId):
@@ -311,7 +317,17 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
     @exportRpc("viewport.size.update")
     def updateSize(self, view_id, width, height):
         view = self.getView(view_id)
-        view.ViewSize = [ width, height ]
+        w = width * self.scale
+        h = height * self.scale
+        if w > self.maxWidth:
+            s = float(self.maxWidth) / float(w)
+            w *= s
+            h *= s
+        elif h > self.maxHeight:
+            s = float(self.maxHeight) / float(h)
+            w *= s
+            h *= s
+        view.ViewSize = [ int(w), int(h) ]
         self.getApplication().InvokeEvent('PushRender')
 
 # =============================================================================
