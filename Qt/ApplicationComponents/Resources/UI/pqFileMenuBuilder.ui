@@ -177,7 +177,6 @@
    </property>
   </action>
   <addaction name="actionFileOpen"/>
-  <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="menuRecentFiles"/>
   <addaction name="actionReloadFiles"/>
   <addaction name="separator"/>
@@ -190,6 +189,8 @@
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveGeometry"/>
+  <addaction name="separator"/>
+  <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadWindowLayout"/>
   <addaction name="actionFileSaveWindowLayout"/>
