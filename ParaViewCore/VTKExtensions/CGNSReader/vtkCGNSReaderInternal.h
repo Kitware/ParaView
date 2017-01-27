@@ -295,6 +295,20 @@ inline bool compareName(const char_33 nameOne, const char_33 nameTwo)
 }
 
 //------------------------------------------------------------------------------
+// remove trailing whitespaces
+inline void removeTrailingWhiteSpaces(char_33 name)
+{
+  char* end = name + strlen(name) - 1;
+  while (end >= name && isspace(*end))
+  {
+    --end;
+  }
+  ++end;
+  assert(end >= name && end < name + 33);
+  *end = '\0';
+}
+
+//------------------------------------------------------------------------------
 // get vector from name
 inline std::vector<CGNSVector>::iterator getVectorFromName(
   std::vector<CGNSVector>& vectorList, const char_33 name)
@@ -330,7 +344,12 @@ void fillVectorsFromVars(std::vector<CGNSRead::CGNSVariable>& vars,
 //------------------------------------------------------------------------------
 int setUpRind(const int cgioNum, const double rindId, int* rind);
 //------------------------------------------------------------------------------
-int getFirstNodeId(const int cgioNum, const double parentId, const char* label, double* id);
+/**
+ * Find the first node with the given `label`. If `name` is non-NULL, then the
+ * first node with given `label` that has the given `name` as well.
+ */
+int getFirstNodeId(
+  const int cgioNum, const double parentId, const char* label, double* id, const char* name = NULL);
 //------------------------------------------------------------------------------
 int get_section_connectivity(const int cgioNum, const double cgioSectionId, const int dim,
   const cgsize_t* srcStart, const cgsize_t* srcEnd, const cgsize_t* srcStride,

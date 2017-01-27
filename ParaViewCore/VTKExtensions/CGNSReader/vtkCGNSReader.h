@@ -102,9 +102,33 @@ public:
   vtkGetMacro(LoadBndPatch, int);
   vtkBooleanMacro(LoadBndPatch, int);
 
+  /**
+   * This option is provided for debugging and should not be used for production
+   * runs as the output data produced may not be correct. When set to true, the
+   * read will simply read each solution (`FlowSolution_t`) node encountered in
+   * a zone and create a separate block under the block corresponding to the
+   * zone in the output.
+   */
   vtkSetMacro(CreateEachSolutionAsBlock, int);
   vtkGetMacro(CreateEachSolutionAsBlock, int);
   vtkBooleanMacro(CreateEachSolutionAsBlock, int);
+
+  /**
+   * When set to true (default is false), the reader will simply
+   * ignore `FlowSolutionPointers` since they are either incomplete or invalid
+   * and instead will rely on FlowSolution_t nodes being labelled as
+   * "...AtStep<tsindex>" to locate solution nodes for a specific timestep.
+   * Note, tsindex starts with 1 (not zero).
+   *
+   * When set to false, the reader will still try to confirm that at least one
+   * valid FlowSolution_t node is referred to in FlowSolutionPointers nodes for the
+   * current timestep. If none is found, then the reader will print out a
+   * warning and act as if IgnoreFlowSolutionPointers was set to true. To avoid
+   * this warning, one should set IgnoreFlowSolutionPointers to true.
+   */
+  vtkSetMacro(IgnoreFlowSolutionPointers, bool);
+  vtkGetMacro(IgnoreFlowSolutionPointers, bool);
+  vtkBooleanMacro(IgnoreFlowSolutionPointers, bool);
 
   //@{
   /**
@@ -162,6 +186,7 @@ private:
   int LoadBndPatch;              // option to set section loading for unstructured grid
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
+  bool IgnoreFlowSolutionPointers;
 
   // For internal cgio calls (low level IO)
   int cgioNum;      // cgio file reference
