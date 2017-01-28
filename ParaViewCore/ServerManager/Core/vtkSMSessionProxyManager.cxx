@@ -530,7 +530,7 @@ vtkStdString vtkSMSessionProxyManager::RegisterProxy(const char* groupname, vtkS
   vtkStdString label = vtkSMCoreUtilities::SanitizeName(proxy->GetXMLLabel());
   vtkStdString name = this->GetUniqueProxyName(groupname, label.c_str());
   this->RegisterProxy(groupname, name.c_str(), proxy);
-  return groupname;
+  return name;
 }
 
 //---------------------------------------------------------------------------
