@@ -119,7 +119,11 @@ def getattr(proxy, pname):
 def GetProxy(module, key):
     version = paraview.compatibility.GetVersion()
     if version < 5.2:
-      if key == "ResampleWithDataset":
-        return module.__dict__["LegacyResampleWithDataset"]()
-
+        if key == "ResampleWithDataset":
+            return module.__dict__["LegacyResampleWithDataset"]()
+    if version < 5.3:
+        if key == "PLYReader":
+            # note the case. The old reader didn't support `FileNames` property,
+            # only `FileName`.
+            return module.__dict__["plyreader"]()
     return module.__dict__[key]()

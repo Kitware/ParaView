@@ -4703,7 +4703,7 @@
                  base_proxygroup="internal_sources"
                  base_proxyname="PLYReaderCore">
       <Deprecated deprecated_in="5.3" to_remove_in="5.4">
-        This has been replaced by "PLYReader" which also support a series of PLY files.
+          This has been replaced by "PLYReader" which also supports a series of PLY files.
       </Deprecated>
       <!-- End plyreader -->
     </SourceProxy>
