@@ -289,13 +289,6 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   }
 
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
-  if (text.contains("Unrecognised OpenGL version") ||
-    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-         * repeated menu actions in the menus. */
-    text.contains("DBusMenuExporterPrivate") || text.contains("DBusMenuExporterDBus"))
-  {
-    return;
-  }
 
   QTextCharFormat format = ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
@@ -404,7 +397,17 @@ void pqOutputWindow::setupSuppressionExpressions()
 //-----------------------------------------------------------------------------
 bool pqOutputWindow::shouldMessageBeSuppressed(const QString& text)
 {
-  // See if message should be supressed
+  if (text.contains("Unrecognised OpenGL version") ||
+    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+     * repeated menu actions in the menus. */
+    text.contains("DBusMenuExporterPrivate") || text.contains("DBusMenuExporterDBus") ||
+    /* Skip XCB errors coming from Qt 5 tests. */
+    text.contains("QXcbConnection: XCB"))
+  {
+    return true;
+  }
+
+  // See if message should be suppressed
   for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
   {
     if (text.contains(this->Implementation->SuppressionExpressions[i]))
