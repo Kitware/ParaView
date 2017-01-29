@@ -1,4 +1,8 @@
 #### import the simple module from the paraview
+import paraview
+paraview.compatibility.major = 5
+paraview.compatibility.minor = 2
+
 from paraview.simple import *
 from paraview import smtesting
 import os.path
@@ -54,6 +58,7 @@ del wavelet1
 
 # create a new 'PLY Reader'
 fooply = PLYReader(FileName=plyfilename)
+fooply.GetXMLName()
 
 # show data in view
 fooplyDisplay = Show(fooply, renderView1)
