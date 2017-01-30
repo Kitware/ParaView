@@ -203,9 +203,6 @@ option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 # Xdmf3 is not ON by default since it depends on Boost.
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support (requires Boost)." OFF)
 
-# Enable CGNS support
-option(PARAVIEW_ENABLE_CGNS "Enable the CGNS file reader" OFF)
-
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif()

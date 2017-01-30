@@ -33,9 +33,6 @@
 #include <string>
 #include <vector>
 
-#include <cgns_io.h> // Low level IO for fast parsing
-#include <cgnslib.h> // DataType, and other definition
-
 #include "vtkCGNSReaderInternal.h"
 
 namespace CGNSRead

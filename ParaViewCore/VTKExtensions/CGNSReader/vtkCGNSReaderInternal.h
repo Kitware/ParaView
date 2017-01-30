@@ -29,9 +29,6 @@
 #ifndef vtkCGNSReaderInternal_h
 #define vtkCGNSReaderInternal_h
 
-#include <cgns_io.h> // Low level IO for fast parsing
-#include <cgnslib.h> // DataType, and other definition
-
 #include <iostream>
 #include <map>
 #include <string.h> // for inline strcmp
@@ -41,6 +38,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPoints.h"
+#include "vtk_cgns.h"
 
 namespace CGNSRead
 {
