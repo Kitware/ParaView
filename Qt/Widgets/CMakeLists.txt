@@ -204,6 +204,13 @@ pv_find_package_qt(qt_private_targets REQUIRED
   QT4_COMPONENTS ${qt4_private_comps}
   QT5_COMPONENTS ${qt5_private_comps})
 
+set(${vtk-module}_EXPORT_CODE_INSTALL
+  "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
+  pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
+    QT4_COMPONENTS ${qt4_public_comps}
+    QT5_COMPONENTS ${qt5_public_comps})")
+set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
+
 pv_qt_wrap_cpp(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
 
 ##########################################################################

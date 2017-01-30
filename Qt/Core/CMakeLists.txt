@@ -336,11 +336,24 @@ if (PARAVIEW_USE_QTHELP)
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
     QT4_COMPONENTS QtHelp
     QT5_COMPONENTS Help)
+
+  set(${vtk-module}_EXPORT_CODE_INSTALL
+    "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
+    pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
+      QT4_COMPONENTS QtHelp
+      QT5_COMPONENTS Help)")
 else()
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
     QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
+
+  set(${vtk-module}_EXPORT_CODE_INSTALL
+    "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
+    pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
+      QT4_COMPONENTS QtGui
+      QT5_COMPONENTS Widgets)")
 endif()
+set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
 
 pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
