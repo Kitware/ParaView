@@ -83,6 +83,7 @@ macro(pv_find_package_qt out_targets_var)
     endif()
 
     #---------------------------------------------------------
+    set(QT_USE_IMPORTED_TARGETS TRUE)
     find_package(Qt4 ${_qt_min_version} ${args} ${other_args})
     set(_qt_version ${QTVERSION})
     foreach(comp IN LISTS qt4_components qt4_optional_components)

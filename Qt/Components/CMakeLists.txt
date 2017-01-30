@@ -539,6 +539,13 @@ pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 pv_qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 
+set(${vtk-module}_EXPORT_CODE_INSTALL
+  "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
+  pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
+    QT4_COMPONENTS QtNetwork
+    QT5_COMPONENTS Widgets Network)")
+set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
+
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}
   ${Module_RESOURCE_FILES}
