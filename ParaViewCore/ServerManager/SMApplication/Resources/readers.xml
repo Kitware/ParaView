@@ -6014,26 +6014,26 @@
       <IntVectorProperty animateable="0"
                          command="SetUse64BitLabels"
                          default_values="0"
-                         label="Expected Label Size"
+                         label="Label Size"
                          name="Use64BitLabels"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="32-bit" value="0" />
           <Entry text="64-bit" value="1" />
         </EnumerationDomain>
-        <Documentation>The expected label-size for the OpenFOAM case.</Documentation>
+        <Documentation>The expected label-size for the OpenFOAM data.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetUse64BitFloats"
                          default_values="1"
-                         label="Expect Scalar Size"
+                         label="Scalar Size"
                          name="Use64BitFloats"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="32-bit (SP)" value="0" />
           <Entry text="64-bit (DP)" value="1" />
         </EnumerationDomain>
-        <Documentation>The expected scalar-size for the OpenFOAM case.</Documentation>
+        <Documentation>The expected scalar-size for the OpenFOAM data.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetCreateCellToPoint"
