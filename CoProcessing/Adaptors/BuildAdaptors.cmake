@@ -62,6 +62,8 @@ function(build_adaptor name languages)
             --build-generator ${CMAKE_GENERATOR}
             --build-makeprogram ${CMAKE_MAKE_PROGRAM}
             --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
+                            -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+                            -DQt5_DIR:PATH=${Qt5_DIR}
                             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
                             -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
