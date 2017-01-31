@@ -87,8 +87,13 @@ void pqQVTKWidget::updateSizeProperties()
   {
     BEGIN_UNDO_EXCLUDE();
     int view_size[2];
+#if QT_VERSION >= 0x050000
+    view_size[0] = this->size().width() * this->InteractorAdaptor->GetDevicePixelRatio();
+    view_size[1] = this->size().height() * this->InteractorAdaptor->GetDevicePixelRatio();
+#else
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
+#endif
     vtkSMPropertyHelper(this->ViewProxy, this->SizePropertyName.toLatin1().data())
       .Set(view_size, 2);
     this->ViewProxy->UpdateProperty(this->SizePropertyName.toLatin1().data());
