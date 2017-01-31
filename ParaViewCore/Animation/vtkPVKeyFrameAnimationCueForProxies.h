@@ -33,7 +33,7 @@ class VTKPVANIMATION_EXPORT vtkPVKeyFrameAnimationCueForProxies : public vtkPVKe
 public:
   static vtkPVKeyFrameAnimationCueForProxies* New();
   vtkTypeMacro(vtkPVKeyFrameAnimationCueForProxies, vtkPVKeyFrameAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -68,9 +68,9 @@ public:
    * ServerManager library. This only works since they object are created only
    * on the client.
    */
-  virtual void BeginUpdateAnimationValues();
-  virtual void SetAnimationValue(int index, double value);
-  virtual void EndUpdateAnimationValues();
+  virtual void BeginUpdateAnimationValues() VTK_OVERRIDE;
+  virtual void SetAnimationValue(int index, double value) VTK_OVERRIDE;
+  virtual void EndUpdateAnimationValues() VTK_OVERRIDE;
   //@}
 
 protected:

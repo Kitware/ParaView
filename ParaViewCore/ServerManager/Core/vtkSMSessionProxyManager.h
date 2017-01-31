@@ -151,7 +151,7 @@ public:
    */
   static vtkSMSessionProxyManager* New(vtkSMSession* session);
   vtkTypeMacro(vtkSMSessionProxyManager, vtkSMSessionObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   //@}
 
   /**

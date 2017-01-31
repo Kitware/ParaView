@@ -46,7 +46,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMOutputPort : public vtkSMProxy
 public:
   static vtkSMOutputPort* New();
   vtkTypeMacro(vtkSMOutputPort, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns data information. If data information is marked

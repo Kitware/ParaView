@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIVectorProperty : public vtkSIPro
 {
 public:
   vtkTypeMacro(vtkSIVectorProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -98,7 +98,7 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
+  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
   vtkSIVectorProperty(const vtkSIVectorProperty&) VTK_DELETE_FUNCTION;

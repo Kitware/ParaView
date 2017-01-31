@@ -34,7 +34,7 @@ class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkO
 {
 public:
   vtkTypeMacro(vtkInitializationHelper, vtkObject);
-  void PrintSelf(ostream&, vtkIndent);
+  void PrintSelf(ostream&, vtkIndent) VTK_OVERRIDE;
 
   //@{
   /**

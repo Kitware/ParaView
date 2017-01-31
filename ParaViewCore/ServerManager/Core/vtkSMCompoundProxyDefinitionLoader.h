@@ -37,7 +37,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundProxyDefinitionLoader : public 
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();
   vtkTypeMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializerXML);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual void SetRootElement(vtkPVXMLElement*);
 
@@ -48,7 +48,7 @@ protected:
   /**
    * Locate the XML for the proxy with the given id.
    */
-  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
+  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
   vtkPVXMLElement* RootElement;
 

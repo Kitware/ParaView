@@ -41,7 +41,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVArrayCalculator : public vtkArrayCal
 {
 public:
   vtkTypeMacro(vtkPVArrayCalculator, vtkArrayCalculator);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVArrayCalculator* New();
 
@@ -49,7 +49,7 @@ protected:
   vtkPVArrayCalculator();
   ~vtkPVArrayCalculator();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   //@{
   /**

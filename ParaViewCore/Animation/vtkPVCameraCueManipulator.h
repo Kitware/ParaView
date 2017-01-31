@@ -39,7 +39,7 @@ class VTKPVANIMATION_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueM
 public:
   static vtkPVCameraCueManipulator* New();
   vtkTypeMacro(vtkPVCameraCueManipulator, vtkPVKeyFrameCueManipulator);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum Modes
   {
@@ -77,13 +77,13 @@ protected:
 
   int Mode;
 
-  virtual void Initialize(vtkPVAnimationCue*);
-  virtual void Finalize(vtkPVAnimationCue*);
+  virtual void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  virtual void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy);
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
 
   vtkCameraInterpolator* CameraInterpolator;
   vtkSMProxy* DataSourceProxy;

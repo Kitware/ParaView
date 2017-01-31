@@ -46,7 +46,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkThreeSliceFilter : public vtkPoly
 {
 public:
   vtkTypeMacro(vtkThreeSliceFilter, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Construct with user-specified implicit function; initial value of 0.0; and
@@ -57,7 +57,7 @@ public:
   /**
    * Override GetMTime because we rely on internal filters that have their own MTime
    */
-  vtkMTimeType GetMTime();
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   /**
    * Set a Slice Normal for a given cutter
@@ -111,8 +111,8 @@ protected:
   vtkThreeSliceFilter();
   ~vtkThreeSliceFilter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkCutter* Slices[3];
   vtkPlane* Planes[3];

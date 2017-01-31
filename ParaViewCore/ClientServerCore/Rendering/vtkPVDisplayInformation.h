@@ -29,7 +29,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDisplayInformation : public vtk
 public:
   static vtkPVDisplayInformation* New();
   vtkTypeMacro(vtkPVDisplayInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns if the display can be opened up on the current processes.
@@ -45,19 +45,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object. Calls AddInformation(info, 0).
    */
-  virtual void AddInformation(vtkPVInformation* info);
+  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*);
-  virtual void CopyFromStream(const vtkClientServerStream*);
+  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{

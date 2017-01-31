@@ -30,19 +30,19 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMOrthographicSliceViewProxy
 public:
   static vtkSMOrthographicSliceViewProxy* New();
   vtkTypeMacro(vtkSMOrthographicSliceViewProxy, vtkSMRenderViewProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Overridden to set initial default slices when a representation is created.
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
 
 protected:
   vtkSMOrthographicSliceViewProxy();
@@ -50,7 +50,7 @@ protected:
 
   void InitDefaultSlices(vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy* repr);
 
-  virtual void CreateVTKObjects();
+  virtual void CreateVTKObjects() VTK_OVERRIDE;
   void OnMouseWheelBackwardEvent(vtkObject*, unsigned long, void* calldata);
   void OnMouseWheelForwardEvent(vtkObject*, unsigned long, void* calldata);
   void OnPlacePointEvent(vtkObject*, unsigned long, void* calldata);

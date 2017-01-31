@@ -60,7 +60,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxyInteractorHelper : public
 public:
   static vtkSMViewProxyInteractorHelper* New();
   vtkTypeMacro(vtkSMViewProxyInteractorHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

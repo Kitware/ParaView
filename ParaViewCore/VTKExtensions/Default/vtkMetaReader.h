@@ -84,7 +84,7 @@ public:
   /**
    * Return the MTime when also considering the internal reader.
    */
-  virtual vtkMTimeType GetMTime();
+  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -95,10 +95,10 @@ public:
   vtkGetStringMacro(FileNameMethod);
   //@}
 
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   vtkSetStringMacro(_MetaFileName);
   vtkGetStringMacro(_MetaFileName);

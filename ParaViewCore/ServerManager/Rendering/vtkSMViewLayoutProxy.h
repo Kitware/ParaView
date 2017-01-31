@@ -51,7 +51,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewLayoutProxy : public vtkSMProx
 public:
   static vtkSMViewLayoutProxy* New();
   vtkTypeMacro(vtkSMViewLayoutProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum Direction
   {
@@ -211,16 +211,16 @@ public:
   /**
    * Overridden to save custom XML state.
    */
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root) VTK_OVERRIDE
   {
     return this->Superclass::SaveXMLState(root);
   }
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
 
   /**
    * Overridden to load custom XML state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Resets the layout.
@@ -252,7 +252,7 @@ protected:
   /**
    * Called to load state from protobuf message.
    */
-  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Although this class is a proxy, it's not really a proxy in the traditional

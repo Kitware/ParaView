@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
   vtkTypeMacro(vtkPVLODActor, vtkActor);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVLODActor* New();
 
@@ -46,20 +46,20 @@ public:
    * This causes the actor to be rendered. It, in turn, will render the actor's
    * property and then mapper.
    */
-  virtual void Render(vtkRenderer*, vtkMapper*);
+  virtual void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
 
   /**
    * This method is used internally by the rendering process.
    * We overide the superclass method to properly set the estimated render time.
    */
-  int RenderOpaqueGeometry(vtkViewport* viewport);
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow*);
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -73,22 +73,22 @@ public:
    * This is a bit of a hack.  This returns the last mapper used to render.
    * It does this so that compositing can descide if anything was actually renderered.
    */
-  vtkMapper* GetMapper() { return this->SelectMapper(); }
+  vtkMapper* GetMapper() VTK_OVERRIDE { return this->SelectMapper(); }
 
   /**
    * When this objects gets modified, this method also modifies the object.
    */
-  void Modified();
+  void Modified() VTK_OVERRIDE;
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  void ShallowCopy(vtkProp* prop);
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   /**
    * Get the bounds of the current mapper.
    */
-  double* GetBounds();
+  double* GetBounds() VTK_OVERRIDE;
 
   /**
    * When set, LODMapper, if present it used, otherwise the regular mapper is

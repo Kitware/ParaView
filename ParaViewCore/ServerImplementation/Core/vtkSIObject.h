@@ -35,7 +35,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIObject : public vtkObject
 public:
   static vtkSIObject* New();
   vtkTypeMacro(vtkSIObject, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * This method is called before the deletion of the SIObject.

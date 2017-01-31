@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractScatterPlot : public vtkPolyDat
 public:
   static vtkExtractScatterPlot* New();
   vtkTypeMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -79,9 +79,9 @@ private:
   void operator=(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
   ~vtkExtractScatterPlot();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int XComponent;
   int YComponent;

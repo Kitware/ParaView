@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotHistoryReader : public vtkTable
 public:
   static vtkSpyPlotHistoryReader* New();
   vtkTypeMacro(vtkSpyPlotHistoryReader, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -67,12 +67,12 @@ protected:
   // Read the case file and the first binary file do get meta
   // informations (number of files, number of fields, number of timestep).
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void FillCache();
   void ConstructTableColumns(vtkTable* table);

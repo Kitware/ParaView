@@ -45,7 +45,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
 public:
   static vtkSMUndoStackBuilder* New();
   vtkTypeMacro(vtkSMUndoStackBuilder, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Begins monitoring of the vtkSMProxyManager for undoable operations.

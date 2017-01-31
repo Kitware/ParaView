@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepre
 public:
   static vtkPVCompositeOrthographicSliceRepresentation* New();
   vtkTypeMacro(vtkPVCompositeOrthographicSliceRepresentation, vtkPVCompositeRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void SetSliceRepresentation(int index, vtkGeometrySliceRepresentation*);
   void SetSliceRepresentation0(vtkGeometrySliceRepresentation* repr)
@@ -55,7 +55,7 @@ public:
    * Set visibility of the representation.
    * Overridden to update the cube-axes and selection visibilities.
    */
-  virtual void SetVisibility(bool visible);
+  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -63,24 +63,24 @@ public:
    * won't need this if vtkDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void SetInputConnection(vtkAlgorithmOutput* input);
-  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void AddInputConnection(vtkAlgorithmOutput* input);
-  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void RemoveInputConnection(int port, int index);
+  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void RemoveInputConnection(int port, int index) VTK_OVERRIDE;
   //@}
 
   /**
    * Propagate the modification to all internal representations.
    */
-  virtual void MarkModified();
+  virtual void MarkModified() VTK_OVERRIDE;
 
   /**
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeOrthographicSliceRepresentation();
@@ -91,14 +91,14 @@ protected:
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
 

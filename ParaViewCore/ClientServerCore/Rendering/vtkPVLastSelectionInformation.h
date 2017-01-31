@@ -31,9 +31,9 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLastSelectionInformation
 public:
   static vtkPVLastSelectionInformation* New();
   vtkTypeMacro(vtkPVLastSelectionInformation, vtkPVSelectionInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
 protected:
   vtkPVLastSelectionInformation();

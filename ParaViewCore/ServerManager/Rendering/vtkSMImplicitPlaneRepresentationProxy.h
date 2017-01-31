@@ -32,13 +32,13 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMImplicitPlaneRepresentationProxy
 public:
   static vtkSMImplicitPlaneRepresentationProxy* New();
   vtkTypeMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMWidgetRepresentationProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSMImplicitPlaneRepresentationProxy();
   ~vtkSMImplicitPlaneRepresentationProxy();
 
-  virtual void SendRepresentation();
+  virtual void SendRepresentation() VTK_OVERRIDE;
 
 private:
   vtkSMImplicitPlaneRepresentationProxy(

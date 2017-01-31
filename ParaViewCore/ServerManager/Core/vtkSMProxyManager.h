@@ -46,7 +46,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
   vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Provides access to the global ProxyManager.

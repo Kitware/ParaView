@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkTCPNetworkAccessManager : public vtkNe
 public:
   static vtkTCPNetworkAccessManager* New();
   vtkTypeMacro(vtkTCPNetworkAccessManager, vtkNetworkAccessManager);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Creates a new connection given the url.
@@ -71,30 +71,30 @@ public:
    * connect to the host/port. If absent, default is 60s. 0 or
    * negative implies no retry attempts.
    */
-  virtual vtkMultiProcessController* NewConnection(const char* url);
+  virtual vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
 
   /**
    * Used to abort pending connection creation, if any. Refer to
    * NewConnection() for details.
    */
-  virtual void AbortPendingConnection();
+  virtual void AbortPendingConnection() VTK_OVERRIDE;
 
   /**
    * Process any network activity.
    */
-  virtual int ProcessEvents(unsigned long timeout_msecs);
+  virtual int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
 
   /**
    * Peeks to check if any activity is available. When this call returns true,
    * ProcessEvents() will always result in some activity processing if called
    * afterword.
    */
-  virtual bool GetNetworkEventsAvailable();
+  virtual bool GetNetworkEventsAvailable() VTK_OVERRIDE;
 
   /**
    * Returns true is the manager is currently waiting for any connections.
    */
-  virtual bool GetPendingConnectionsPresent();
+  virtual bool GetPendingConnectionsPresent() VTK_OVERRIDE;
 
 protected:
   vtkTCPNetworkAccessManager();

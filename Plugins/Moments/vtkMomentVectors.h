@@ -39,7 +39,7 @@ class vtkMomentVectors : public vtkDataSetAlgorithm
 public:
   vtkTypeMacro(vtkMomentVectors, vtkDataSetAlgorithm);
   static vtkMomentVectors* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // These are basically a convenience method that calls SetInputArrayToProcess
@@ -90,7 +90,7 @@ protected:
   char* OutputMomentDensityName;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
   vtkMomentVectors(const vtkMomentVectors&) VTK_DELETE_FUNCTION;

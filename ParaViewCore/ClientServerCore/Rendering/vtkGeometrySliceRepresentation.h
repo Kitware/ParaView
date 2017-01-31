@@ -33,10 +33,10 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometrySliceRepresentation
 public:
   static vtkGeometrySliceRepresentation* New();
   vtkTypeMacro(vtkGeometrySliceRepresentation, vtkGeometryRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
   enum
   {
@@ -60,12 +60,12 @@ protected:
   vtkGeometrySliceRepresentation();
   ~vtkGeometrySliceRepresentation();
 
-  virtual void SetupDefaults();
+  virtual void SetupDefaults() VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual bool AddToView(vtkView* view);
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
   vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;

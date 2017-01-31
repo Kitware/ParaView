@@ -41,7 +41,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationReader
 {
 public:
   vtkTypeMacro(vtkSMCameraConfigurationReader, vtkSMProxyConfigurationReader);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkSMCameraConfigurationReader* New();
 
   /**
@@ -55,10 +55,10 @@ public:
    * managed render view proxy. This will make sure the renderview is
    * updated after the read.
    */
-  virtual int ReadConfiguration(const char* filename);
-  virtual int ReadConfiguration(vtkPVXMLElement* x);
+  virtual int ReadConfiguration(const char* filename) VTK_OVERRIDE;
+  virtual int ReadConfiguration(vtkPVXMLElement* x) VTK_OVERRIDE;
   // unhide
-  virtual int ReadConfiguration() { return this->Superclass::ReadConfiguration(); }
+  virtual int ReadConfiguration() VTK_OVERRIDE { return this->Superclass::ReadConfiguration(); }
   //@}
 
 protected:
@@ -67,7 +67,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy*) { vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy*) VTK_OVERRIDE { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;

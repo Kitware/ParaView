@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSession : public vtkSession
 {
 public:
   vtkTypeMacro(vtkPVSession, vtkSession);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum ServerFlags
   {

@@ -46,7 +46,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;

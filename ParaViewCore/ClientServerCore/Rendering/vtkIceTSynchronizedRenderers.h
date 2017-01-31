@@ -44,7 +44,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkIceTSynchronizedRenderers
 public:
   static vtkIceTSynchronizedRenderers* New();
   vtkTypeMacro(vtkIceTSynchronizedRenderers, vtkSynchronizedRenderers);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -60,7 +60,7 @@ public:
    * renderer on each processes. You can create multiple instances on
    * vtkSynchronizedRenderers to synchronize multiple renderers.
    */
-  virtual void SetRenderer(vtkRenderer*);
+  virtual void SetRenderer(vtkRenderer*) VTK_OVERRIDE;
 
   /**
    * Set the tile dimensions. Default is (1, 1).
@@ -107,8 +107,8 @@ public:
   /**
    * Set the image reduction factor. Overrides superclass implementation.
    */
-  virtual void SetImageReductionFactor(int val);
-  virtual int GetImageReductionFactor()
+  virtual void SetImageReductionFactor(int val) VTK_OVERRIDE;
+  virtual int GetImageReductionFactor() VTK_OVERRIDE
   {
     return this->IceTCompositePass->GetImageReductionFactor();
   }
@@ -118,7 +118,7 @@ public:
    * Set the parallel message communicator. This is used to communicate among
    * processes.
    */
-  virtual void SetParallelController(vtkMultiProcessController* cont)
+  virtual void SetParallelController(vtkMultiProcessController* cont) VTK_OVERRIDE
   {
     this->Superclass::SetParallelController(cont);
     this->IceTCompositePass->SetController(cont);
@@ -171,12 +171,12 @@ protected:
 
   unsigned int Identifier;
 
-  virtual void HandleEndRender();
+  virtual void HandleEndRender() VTK_OVERRIDE;
 
   /**
    * Overridden to capture image from icet buffers instead of the screen.
    */
-  virtual vtkRawImage& CaptureRenderedImage();
+  virtual vtkRawImage& CaptureRenderedImage() VTK_OVERRIDE;
 
   // We use vtkIceTCompositePass internally.
   vtkCameraPass* CameraRenderPass;
@@ -187,7 +187,7 @@ protected:
   vtkRenderPass* RenderPass;
   vtkImageProcessingPass* ImageProcessingPass;
 
-  virtual void SlaveStartRender();
+  virtual void SlaveStartRender() VTK_OVERRIDE;
 
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;

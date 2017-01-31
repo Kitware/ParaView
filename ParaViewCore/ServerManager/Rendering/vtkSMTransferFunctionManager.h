@@ -43,7 +43,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionManager : public v
 public:
   static vtkSMTransferFunctionManager* New();
   vtkTypeMacro(vtkSMTransferFunctionManager, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns a color transfer function proxy instance for mapping a data array

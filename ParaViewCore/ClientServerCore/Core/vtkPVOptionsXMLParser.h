@@ -34,13 +34,13 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptionsXMLParser : public vtkCommand
 public:
   static vtkPVOptionsXMLParser* New();
   vtkTypeMacro(vtkPVOptionsXMLParser, vtkCommandOptionsXMLParser);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkPVOptionsXMLParser() {}
   ~vtkPVOptionsXMLParser() {}
 
-  virtual void SetProcessType(const char* ptype);
+  virtual void SetProcessType(const char* ptype) VTK_OVERRIDE;
 
 private:
   vtkPVOptionsXMLParser(const vtkPVOptionsXMLParser&) VTK_DELETE_FUNCTION;

@@ -34,7 +34,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateAttributeDataFilter
 public:
   static vtkAnnotateAttributeDataFilter* New();
   vtkTypeMacro(vtkAnnotateAttributeDataFilter, vtkPythonAnnotationFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -73,7 +73,7 @@ protected:
   vtkAnnotateAttributeDataFilter();
   ~vtkAnnotateAttributeDataFilter();
 
-  virtual void EvaluateExpression();
+  virtual void EvaluateExpression() VTK_OVERRIDE;
 
   char* ArrayName;
   char* Prefix;

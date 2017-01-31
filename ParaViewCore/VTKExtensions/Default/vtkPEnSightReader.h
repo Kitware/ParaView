@@ -64,7 +64,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
 {
 public:
   vtkTypeMacro(vtkPEnSightReader, vtkPGenericEnSightReader);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //----------------------------------------------------------------------------
   // PointIds and CellIds must be stored in a different way:
@@ -612,8 +612,8 @@ protected:
   vtkPEnSightReader();
   ~vtkPEnSightReader();
 
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /*int RequestUpdateExtent(
     vtkInformation *vtkNotUsed(request),

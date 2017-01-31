@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaClipDataSet
 {
 public:
   vtkTypeMacro(vtkPVMetaClipDataSet, vtkPVDataSetAlgorithmSelectorFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVMetaClipDataSet* New();
 
@@ -57,13 +57,13 @@ public:
   void SetValue(double value);
 
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, const char* name);
+    int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType);
-  virtual void SetInputArrayToProcess(int idx, vtkInformation* info);
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) VTK_OVERRIDE;
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info) VTK_OVERRIDE;
 
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, const char* fieldName, const char* fieldType);
+    int idx, int port, int connection, const char* fieldName, const char* fieldType) VTK_OVERRIDE;
 
   /**
    * Expose method from vtkClip
@@ -75,12 +75,12 @@ public:
    * won't be used without ImplicifFuntion being set.
    */
   virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   // Add validation for active filter so that the vtkExtractGeometry
   // won't be used without ImplicifFuntion being set.
   virtual int ProcessRequest(
-    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo);
+    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
 
 protected:
   vtkPVMetaClipDataSet();

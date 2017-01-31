@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRemoteObject : public vtkSMSessionObjec
 
 public:
   vtkTypeMacro(vtkSMRemoteObject, vtkSMSessionObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -57,7 +57,7 @@ public:
    * Override the SetSession so if the object already have an ID
    * we automatically register it to the associated session
    */
-  virtual void SetSession(vtkSMSession*);
+  virtual void SetSession(vtkSMSession*) VTK_OVERRIDE;
 
   //@{
   /**

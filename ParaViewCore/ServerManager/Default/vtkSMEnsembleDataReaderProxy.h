@@ -30,16 +30,16 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMEnsembleDataReaderProxy : public vtk
 {
 public:
   vtkTypeMacro(vtkSMEnsembleDataReaderProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkSMEnsembleDataReaderProxy* New();
 
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects() VTK_OVERRIDE;
 
 protected:
   vtkSMEnsembleDataReaderProxy();
   virtual ~vtkSMEnsembleDataReaderProxy();
 
-  virtual void SetPropertyModifiedFlag(const char* name, int flag);
+  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
   bool FileNamePotentiallyModified;
 

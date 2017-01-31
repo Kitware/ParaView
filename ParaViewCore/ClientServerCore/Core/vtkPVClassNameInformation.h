@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVClassNameInformation : public vtkPVI
 public:
   static vtkPVClassNameInformation* New();
   vtkTypeMacro(vtkPVClassNameInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -56,19 +56,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*);
+  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*);
-  virtual void CopyFromStream(const vtkClientServerStream*);
+  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -78,8 +78,8 @@ public:
    * information itself. For example, PortNumber on vtkPVDataInformation
    * controls what output port the data-information is gathered from.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&);
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&);
+  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
   //@}
 
 protected:

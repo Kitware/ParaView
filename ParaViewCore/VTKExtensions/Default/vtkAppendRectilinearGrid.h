@@ -32,22 +32,22 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAppendRectilinearGrid : public vtkRect
 public:
   static vtkAppendRectilinearGrid* New();
   vtkTypeMacro(vtkAppendRectilinearGrid, vtkRectilinearGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkAppendRectilinearGrid();
   ~vtkAppendRectilinearGrid();
 
   // Propagate UPDATE_EXTENT up to the inputs.
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Tell the output information about the data this filter will produce.
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Perform actual execution.
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   void CopyArray(
     vtkAbstractArray* outArray, const int* outExt, vtkAbstractArray* inArray, const int* inExt);

@@ -35,7 +35,7 @@ class VTKPVANIMATION_EXPORT vtkPVCameraAnimationCue : public vtkPVKeyFrameAnimat
 public:
   static vtkPVCameraAnimationCue* New();
   vtkTypeMacro(vtkPVCameraAnimationCue, vtkPVKeyFrameAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -55,9 +55,9 @@ public:
    */
   void SetMode(int mode);
 
-  virtual void BeginUpdateAnimationValues() {}
-  virtual void SetAnimationValue(int, double) {}
-  virtual void EndUpdateAnimationValues();
+  virtual void BeginUpdateAnimationValues() VTK_OVERRIDE {}
+  virtual void SetAnimationValue(int, double) VTK_OVERRIDE {}
+  virtual void EndUpdateAnimationValues() VTK_OVERRIDE;
 
   void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);
 

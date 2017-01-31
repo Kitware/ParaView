@@ -34,7 +34,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor
 public:
   static vtkBlockDeliveryPreprocessor* New();
   vtkTypeMacro(vtkBlockDeliveryPreprocessor, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -92,15 +92,15 @@ protected:
   vtkBlockDeliveryPreprocessor();
   ~vtkBlockDeliveryPreprocessor();
 
-  virtual vtkExecutive* CreateDefaultExecutive();
+  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int FieldAssociation;
   int FlattenTable;

@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODVolume : public vtkVolume
 {
 public:
   vtkTypeMacro(vtkPVLODVolume, vtkVolume);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVLODVolume* New();
 
@@ -45,29 +45,29 @@ public:
   /**
    * This method is used internally by the rendering process.
    */
-  virtual int RenderOpaqueGeometry(vtkViewport* viewport);
-  virtual int RenderVolumetricGeometry(vtkViewport* viewport);
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport*);
+  virtual int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int RenderVolumetricGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport*) VTK_OVERRIDE;
   //@}
 
   /**
    * Does this prop have some translucent polygonal geometry?
    */
-  virtual int HasTranslucentPolygonalGeometry();
+  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow*);
+  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
    * Set the high res input.  Overloads the virtual vtkVolume method.
    */
   virtual void SetMapper(vtkAbstractVolumeMapper*);
-  virtual vtkAbstractVolumeMapper* GetMapper();
+  virtual vtkAbstractVolumeMapper* GetMapper() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -86,17 +86,17 @@ public:
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  virtual void ShallowCopy(vtkProp* prop);
+  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   /**
    * Get the bounds of the current mapper.
    */
-  virtual double* GetBounds();
+  virtual double* GetBounds() VTK_OVERRIDE;
 
   /**
    * Overloads the virtual vtkProp method.
    */
-  virtual void SetAllocatedRenderTime(double t, vtkViewport* v);
+  virtual void SetAllocatedRenderTime(double t, vtkViewport* v) VTK_OVERRIDE;
 
   //@{
   /**

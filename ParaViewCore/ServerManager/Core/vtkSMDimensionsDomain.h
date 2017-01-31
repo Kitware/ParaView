@@ -44,13 +44,13 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDimensionsDomain : public vtkSMIntRange
 public:
   static vtkSMDimensionsDomain* New();
   vtkTypeMacro(vtkSMDimensionsDomain, vtkSMIntRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Update the domain using the "unchecked" values (if available) for all
    * required properties.
    */
-  virtual void Update(vtkSMProperty*);
+  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
 
 protected:
   vtkSMDimensionsDomain();

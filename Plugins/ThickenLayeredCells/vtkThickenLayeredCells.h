@@ -29,7 +29,7 @@ class vtkThickenLayeredCells : public vtkUnstructuredGridAlgorithm
 public:
   static vtkThickenLayeredCells* New();
   vtkTypeMacro(vtkThickenLayeredCells, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Enable/disable thickening.
@@ -41,7 +41,7 @@ protected:
   ~vtkThickenLayeredCells();
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   bool EnableThickening;
 

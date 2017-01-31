@@ -43,7 +43,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageSliceRepresentation
 public:
   static vtkImageSliceRepresentation* New();
   vtkTypeMacro(vtkImageSliceRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -51,19 +51,19 @@ public:
    * pass the array selection to the mapper.
    */
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, const char* name);
+    int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
   }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation* info)
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(idx, info);
   }
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    const char* fieldAssociation, const char* attributeTypeorName)
+    const char* fieldAssociation, const char* attributeTypeorName) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
@@ -77,7 +77,7 @@ public:
    * PrepareForRendering.
    */
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * This needs to be called on all instances of vtkImageSliceRepresentation when
@@ -85,14 +85,14 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  virtual void MarkModified();
+  virtual void MarkModified() VTK_OVERRIDE;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    * Overridden to propagate to the active representation.
    */
-  virtual void SetVisibility(bool val);
+  virtual void SetVisibility(bool val) VTK_OVERRIDE;
 
   //@{
   /**
@@ -163,7 +163,7 @@ protected:
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Subclasses should override this to connect inputs to the internal pipeline
@@ -175,26 +175,26 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  virtual bool IsCached(double cache_key);
+  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
 
   int SliceMode;
   unsigned int Slice;

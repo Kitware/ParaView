@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVFileInformationHelper : public vt
 public:
   static vtkPVFileInformationHelper* New();
   vtkTypeMacro(vtkPVFileInformationHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

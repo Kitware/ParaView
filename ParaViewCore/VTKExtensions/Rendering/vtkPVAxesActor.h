@@ -46,35 +46,35 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesActor : public vtkProp3D
 public:
   static vtkPVAxesActor* New();
   vtkTypeMacro(vtkPVAxesActor, vtkProp3D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * For some exporters and other other operations we must be
    * able to collect all the actors or volumes. These methods
    * are used in that process.
    */
-  virtual void GetActors(vtkPropCollection*);
+  virtual void GetActors(vtkPropCollection*) VTK_OVERRIDE;
 
   //@{
   /**
    * Support the standard render methods.
    */
-  virtual int RenderOpaqueGeometry(vtkViewport* viewport);
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
-  virtual int HasTranslucentPolygonalGeometry();
+  virtual int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
   //@}
 
   /**
    * Shallow copy of an axes actor. Overloads the virtual vtkProp method.
    */
-  void ShallowCopy(vtkProp* prop);
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow*);
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -82,13 +82,13 @@ public:
    * method GetBounds(double bounds[6]) is available from the superclass.)
    */
   void GetBounds(double bounds[6]);
-  double* GetBounds();
+  double* GetBounds() VTK_OVERRIDE;
   //@}
 
   /**
    * Get the actors mtime plus consider its properties and texture if set.
    */
-  vtkMTimeType GetMTime();
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   /**
    * Return the mtime of anything that would cause the rendered image to
@@ -96,7 +96,7 @@ public:
    * prop plus anything else it depends on such as properties, textures
    * etc.
    */
-  virtual vtkMTimeType GetRedrawMTime();
+  virtual vtkMTimeType GetRedrawMTime() VTK_OVERRIDE;
 
   //@{
   /**

@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyLink : public vtkSMLink
 public:
   static vtkSMPropertyLink* New();
   vtkTypeMacro(vtkSMPropertyLink, vtkSMLink);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -55,7 +55,7 @@ public:
   /**
    * Get the number of properties that are involved in this link.
    */
-  unsigned int GetNumberOfLinkedObjects();
+  unsigned int GetNumberOfLinkedObjects() VTK_OVERRIDE;
   unsigned int GetNumberOfLinkedProperties();
   //@}
 
@@ -67,7 +67,7 @@ public:
   /**
    * Get a proxy involved in this link.
    */
-  vtkSMProxy* GetLinkedProxy(int index);
+  vtkSMProxy* GetLinkedProxy(int index) VTK_OVERRIDE;
 
   /**
    * Get a property involved in this link.
@@ -79,14 +79,14 @@ public:
    * Get the direction of a property involved in this link
    * (see vtkSMLink::UpdateDirections)
    */
-  int GetLinkedObjectDirection(int index);
+  int GetLinkedObjectDirection(int index) VTK_OVERRIDE;
   int GetLinkedPropertyDirection(int index);
   //@}
 
   /**
    * Remove all links.
    */
-  virtual void RemoveAllLinks();
+  virtual void RemoveAllLinks() VTK_OVERRIDE;
 
   /**
    * This method is used to initialize the object to the given state
@@ -95,7 +95,7 @@ public:
    * globalIDs set. This enables splitting the load process in 2 step to prevent
    * invalid state when a property refers to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMPropertyLink();
@@ -112,22 +112,22 @@ protected:
   /**
    * Load the link state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Save the state of the link.
    */
-  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
+  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
 
-  virtual void UpdateVTKObjects(vtkSMProxy* caller);
-  virtual void PropertyModified(vtkSMProxy* caller, const char* pname);
+  virtual void UpdateVTKObjects(vtkSMProxy* caller) VTK_OVERRIDE;
+  virtual void PropertyModified(vtkSMProxy* caller, const char* pname) VTK_OVERRIDE;
   virtual void PropertyModified(vtkSMProperty* property);
-  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname);
+  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname) VTK_OVERRIDE;
 
   /**
    * Update the internal protobuf state
    */
-  virtual void UpdateState();
+  virtual void UpdateState() VTK_OVERRIDE;
 
 private:
   vtkSMPropertyLinkInternals* Internals;

@@ -36,7 +36,7 @@ class VTKPARAVIEWWEBCORE_EXPORT vtkPVWebApplication : public vtkObject
 public:
   static vtkPVWebApplication* New();
   vtkTypeMacro(vtkPVWebApplication, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

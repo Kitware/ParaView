@@ -35,19 +35,19 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIDirectoryProxy : public vtkSIPro
 public:
   static vtkSIDirectoryProxy* New();
   vtkTypeMacro(vtkSIDirectoryProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual void Pull(vtkSMMessage* msg);
+  virtual void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
 
 protected:
   vtkSIDirectoryProxy();
   ~vtkSIDirectoryProxy();
 
   // We override it to skip the fake properties (DirectoryList, FileList)
-  virtual bool ReadXMLProperty(vtkPVXMLElement* property_element);
+  virtual bool ReadXMLProperty(vtkPVXMLElement* property_element) VTK_OVERRIDE;
 
 private:
   vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;

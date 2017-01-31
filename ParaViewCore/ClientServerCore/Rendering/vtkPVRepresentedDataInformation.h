@@ -31,12 +31,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation
 public:
   static vtkPVRepresentedDataInformation* New();
   vtkTypeMacro(vtkPVRepresentedDataInformation, vtkPVDataInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
 protected:
   vtkPVRepresentedDataInformation();

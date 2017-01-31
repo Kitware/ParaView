@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizKMeans : public vtkSciVizStatis
 public:
   static vtkPSciVizKMeans* New();
   vtkTypeMacro(vtkPSciVizKMeans, vtkSciVizStatistics);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -77,9 +77,9 @@ protected:
   vtkPSciVizKMeans();
   virtual ~vtkPSciVizKMeans();
 
-  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData);
+  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
   virtual int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model);
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
 
   int K;
   int MaxNumIterations;

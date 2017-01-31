@@ -29,7 +29,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerTranslator
 public:
   static vtkPVEnSightMasterServerTranslator* New();
   vtkTypeMacro(vtkPVEnSightMasterServerTranslator, vtkExtentTranslator);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -46,7 +46,7 @@ public:
    * all other pieces to empty.
    */
   int PieceToExtentThreadSafe(int piece, int numPieces, int ghostLevel, int* wholeExtent,
-    int* resultExtent, int splitMode, int byPoints);
+    int* resultExtent, int splitMode, int byPoints) VTK_OVERRIDE;
 
 protected:
   vtkPVEnSightMasterServerTranslator();

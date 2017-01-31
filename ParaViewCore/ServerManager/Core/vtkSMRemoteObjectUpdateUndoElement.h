@@ -36,19 +36,19 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRemoteObjectUpdateUndoElement : public 
 public:
   static vtkSMRemoteObjectUpdateUndoElement* New();
   vtkTypeMacro(vtkSMRemoteObjectUpdateUndoElement, vtkSMUndoElement);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Undo the operation encapsulated by this element.
    * \return the status of the operation, 1 on success, 0 otherwise.
    */
-  virtual int Undo();
+  virtual int Undo() VTK_OVERRIDE;
 
   /**
    * Redo the operation encaspsulated by this element.
    * \return the status of the operation, 1 on success, 0 otherwise.
    */
-  virtual int Redo();
+  virtual int Redo() VTK_OVERRIDE;
 
   /**
    * Set ProxyLocator to use if any.

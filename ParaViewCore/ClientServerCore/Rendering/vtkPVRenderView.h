@@ -75,7 +75,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 public:
   static vtkPVRenderView* New();
   vtkTypeMacro(vtkPVRenderView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum InteractionModes
   {
@@ -107,15 +107,15 @@ public:
    * must be called before calling any other methods on this class.
    * @CallOnAllProcessess
    */
-  virtual void Initialize(unsigned int id);
+  virtual void Initialize(unsigned int id) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
    * parameters change.
    */
-  virtual void SetSize(int, int);
-  virtual void SetPosition(int, int);
+  virtual void SetSize(int, int) VTK_OVERRIDE;
+  virtual void SetPosition(int, int) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -189,14 +189,14 @@ public:
    * Triggers a high-resolution render.
    * @CallOnAllProcessess
    */
-  virtual void StillRender();
+  virtual void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * @CallOnAllProcessess
    */
-  virtual void InteractiveRender();
+  virtual void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -675,7 +675,7 @@ public:
    * their inputs. Hence it's okay to do some extra inter-process communication
    * here.
    */
-  virtual void Update();
+  virtual void Update() VTK_OVERRIDE;
 
   /**
    * Asks representations to update their LOD geometries.
@@ -943,8 +943,8 @@ protected:
    * does any data-delivery, we don't assign IDs for these, nor affect the ID
    * uniquifier when a vtk3DWidgetRepresentation is added.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
-  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
+  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
   //@}
 
   /**

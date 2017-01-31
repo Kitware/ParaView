@@ -45,7 +45,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkReductionFilter : public vtkDataObje
 public:
   static vtkReductionFilter* New();
   vtkTypeMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -107,12 +107,12 @@ protected:
 
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void Reduce(vtkDataObject* input, vtkDataObject* output);
   vtkDataObject* PreProcess(vtkDataObject* input);

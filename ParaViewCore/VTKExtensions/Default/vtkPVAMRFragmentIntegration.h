@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRFragmentIntegration
 public:
   static vtkPVAMRFragmentIntegration* New();
   vtkTypeMacro(vtkPVAMRFragmentIntegration, vtkAMRFragmentIntegration);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkPVAMRFragmentIntegration();
   virtual ~vtkPVAMRFragmentIntegration();
@@ -77,7 +77,7 @@ public:
 
   void SetContourConnection(vtkAlgorithmOutput*);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
   vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;

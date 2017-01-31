@@ -32,25 +32,25 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMultiSliceViewProxy : public vtkSM
 public:
   static vtkSMMultiSliceViewProxy* New();
   vtkTypeMacro(vtkSMMultiSliceViewProxy, vtkSMRenderViewProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Similar to IsSelectionAvailable(), however, on failure returns the
    * error message otherwise 0.
    */
-  virtual const char* IsSelectVisiblePointsAvailable();
+  virtual const char* IsSelectVisiblePointsAvailable() VTK_OVERRIDE;
 
   /**
    * Overridden to set initial default slices when a representation is created.
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort);
+  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Fetchs data bounds from the client-side object. We simply fetch the

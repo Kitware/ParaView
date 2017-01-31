@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVMultiServerDataSource : public vtkDa
 public:
   static vtkPVMultiServerDataSource* New();
   vtkTypeMacro(vtkPVMultiServerDataSource, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Bind vtk object with a given external proxy
@@ -51,18 +51,18 @@ protected:
 
   // call 1
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector** vtkNotUsed(inputVector),
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // call 2
   virtual int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // call 3
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // call 4
   virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
   vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;

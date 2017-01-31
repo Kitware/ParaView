@@ -37,7 +37,7 @@ class VTKPVCOMMON_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
 public:
   static vtkCommandOptionsXMLParser* New();
   vtkTypeMacro(vtkCommandOptionsXMLParser, vtkXMLParser);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -66,11 +66,11 @@ protected:
   //  name = Name of new element.
   //  atts = Null-terminated array of attribute name/value pairs.
   //         Even indices are attribute names, and odd indices are values.
-  virtual void StartElement(const char* name, const char** atts);
+  virtual void StartElement(const char* name, const char** atts) VTK_OVERRIDE;
 
   // Called at the end of an element in the XML source opened when
   // StartElement was called.
-  virtual void EndElement(const char* name);
+  virtual void EndElement(const char* name) VTK_OVERRIDE;
   // Call to process the .. of  <Option>...</>
   void HandleOption(const char** atts);
   // Call to process the .. of  <Option>...</>

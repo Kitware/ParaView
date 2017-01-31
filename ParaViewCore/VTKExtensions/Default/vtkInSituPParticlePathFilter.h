@@ -86,23 +86,23 @@ protected:
    * probably were already reinjected before the restart files
    * were written.
    */
-  virtual std::vector<vtkDataSet*> GetSeedSources(vtkInformationVector* inputVector, int timeStep);
+  virtual std::vector<vtkDataSet*> GetSeedSources(vtkInformationVector* inputVector, int timeStep) VTK_OVERRIDE;
 
   /**
    * We add in a third, optional port for adding in particles for a
    * restarted simulation. These particles are only added at the first
    * time step.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * For restarts of particle paths, we add in the ability to add in
    * particles from a previous computation that we will still advect.
    */
-  virtual void AddRestartSeeds(vtkInformationVector**);
+  virtual void AddRestartSeeds(vtkInformationVector**) VTK_OVERRIDE;
 
   /**
    * Before starting the particle trace, classify
@@ -114,7 +114,7 @@ protected:
    * particles.
    */
   virtual void AssignSeedsToProcessors(double time, vtkDataSet* source, int sourceID, int ptId,
-    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints, int& localAssignedCount);
+    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints, int& localAssignedCount) VTK_OVERRIDE;
 
 private:
   vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;

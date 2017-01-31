@@ -32,14 +32,14 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkQuartileChartRepresentation
 public:
   static vtkQuartileChartRepresentation* New();
   vtkTypeMacro(vtkQuartileChartRepresentation, vtkXYChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Overridden to format the series name to remove the operation applied e.g.
    * a columnName of "min(EQPS)" and "max(EQPS)" both will return "EQPS".
    */
   virtual vtkStdString GetDefaultSeriesLabel(
-    const vtkStdString& tableName, const vtkStdString& columnName);
+    const vtkStdString& tableName, const vtkStdString& columnName) VTK_OVERRIDE;
 
   //@{
   /**

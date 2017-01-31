@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSelectionLink : public vtkSMLink
 public:
   static vtkSMSelectionLink* New();
   vtkTypeMacro(vtkSMSelectionLink, vtkSMLink);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -54,28 +54,28 @@ public:
   /**
    * Get the number of properties that are involved in this link.
    */
-  unsigned int GetNumberOfLinkedObjects();
+  unsigned int GetNumberOfLinkedObjects() VTK_OVERRIDE;
 
   /**
    * Get a proxy involved in this link.
    */
-  vtkSMProxy* GetLinkedProxy(int index);
+  vtkSMProxy* GetLinkedProxy(int index) VTK_OVERRIDE;
 
   /**
    * Get the direction of a Selection involved in this link
    * (see vtkSMLink::UpdateDirections)
    */
-  int GetLinkedObjectDirection(int index);
+  int GetLinkedObjectDirection(int index) VTK_OVERRIDE;
 
   /**
    * Remove all links.
    */
-  virtual void RemoveAllLinks();
+  virtual void RemoveAllLinks() VTK_OVERRIDE;
 
   /**
    * This method is used to initialize the object to the given protobuf state
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMSelectionLink();
@@ -87,27 +87,27 @@ protected:
   /**
    * Load the link state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Save the state of the link.
    */
-  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
+  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
 
   /**
    * Not implemented
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)){};
+  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)) VTK_OVERRIDE {};
 
   /**
    * Not implemented
    */
-  virtual void PropertyModified(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)){};
+  virtual void PropertyModified(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE {};
 
   /**
    * Not implemented
    */
-  virtual void UpdateProperty(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)){};
+  virtual void UpdateProperty(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE {};
 
   /**
    * This method find the caller in the link and update selection output accordingly
@@ -117,7 +117,7 @@ protected:
   /**
    * Update the internal protobuf state
    */
-  virtual void UpdateState();
+  virtual void UpdateState() VTK_OVERRIDE;
 
 private:
   vtkSMSelectionLinkInternals* Internals;

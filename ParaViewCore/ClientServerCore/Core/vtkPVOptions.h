@@ -38,7 +38,7 @@ protected:
 public:
   static vtkPVOptions* New();
   vtkTypeMacro(vtkPVOptions, vtkCommandOptions);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -252,24 +252,24 @@ protected:
   /**
    * Initialize arguments.
    */
-  virtual void Initialize();
+  virtual void Initialize() VTK_OVERRIDE;
 
   /**
    * After parsing, process extra option dependencies.
    */
-  virtual int PostProcess(int argc, const char* const* argv);
+  virtual int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
 
   /**
    * This method is called when wrong argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int WrongArgument(const char* argument);
+  virtual int WrongArgument(const char* argument) VTK_OVERRIDE;
 
   /**
    * This method is called when a deprecated argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int DeprecatedArgument(const char* argument);
+  virtual int DeprecatedArgument(const char* argument) VTK_OVERRIDE;
 
   //@{
   /**

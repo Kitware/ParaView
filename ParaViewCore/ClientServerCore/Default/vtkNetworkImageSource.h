@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkNetworkImageSource : public vtkImag
 public:
   static vtkNetworkImageSource* New();
   vtkTypeMacro(vtkNetworkImageSource, vtkImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -62,9 +62,9 @@ protected:
   vtkImageData* Buffer;
   int ReadImageFromFile(const char* filename);
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
   vtkNetworkImageSource(const vtkNetworkImageSource&) VTK_DELETE_FUNCTION;

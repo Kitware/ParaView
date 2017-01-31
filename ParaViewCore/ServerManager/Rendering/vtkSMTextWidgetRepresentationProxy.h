@@ -31,13 +31,13 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTextWidgetRepresentationProxy
 public:
   static vtkSMTextWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMTextWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSMTextWidgetRepresentationProxy();
   ~vtkSMTextWidgetRepresentationProxy();
 
-  virtual void CreateVTKObjects();
+  virtual void CreateVTKObjects() VTK_OVERRIDE;
 
   vtkSMProxy* TextActorProxy;
   vtkSMProxy* TextPropertyProxy;

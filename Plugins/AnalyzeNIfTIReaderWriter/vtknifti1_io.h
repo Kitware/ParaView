@@ -311,7 +311,7 @@ class vtknifti1_io : public vtkObject
 public:
   static vtknifti1_io *New();
   vtkTypeMacro(vtknifti1_io,vtkObject);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 /*****************************************************************************/
 /*--------------- Prototypes of functions defined in this file --------------*/

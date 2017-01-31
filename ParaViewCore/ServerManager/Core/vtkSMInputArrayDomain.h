@@ -76,7 +76,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputArrayDomain : public vtkSMDomain
 public:
   static vtkSMInputArrayDomain* New();
   vtkTypeMacro(vtkSMInputArrayDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns true if the value of the propery is in the domain.
@@ -84,7 +84,7 @@ public:
    * to a vtkSMSourceProxy. The input has to have one or more
    * arrays that match the requirements.
    */
-  virtual int IsInDomain(vtkSMProperty* property);
+  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if input has one or more arrays that match the
@@ -187,7 +187,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Returns true if based on this->AttributeType, the specified \c

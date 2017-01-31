@@ -36,7 +36,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPythonViewProxy : public vtkSMView
 public:
   static vtkSMPythonViewProxy* New();
   vtkTypeMacro(vtkSMPythonViewProxy, vtkSMViewProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the client-side renderer.
@@ -73,7 +73,7 @@ protected:
   /**
    * Subclasses should override this method to do the actual image capture.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification);
+  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
 
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;

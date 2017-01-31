@@ -67,14 +67,14 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomai
 public:
   static vtkSMCompositeTreeDomain* New();
   vtkTypeMacro(vtkSMCompositeTreeDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Called when the 'required-property' is modified. The property must be a
    * vtkSMInputProperty. This will obtain the composite data information for the
    * input source and then determine the valid range for the flat-index.
    */
-  virtual void Update(vtkSMProperty* input);
+  virtual void Update(vtkSMProperty* input) VTK_OVERRIDE;
 
   //@{
   /**
@@ -102,7 +102,7 @@ public:
    * Is the (unchecked) value of the property in the domain? Overwritten by
    * sub-classes.
    */
-  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) { return 1; }
+  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) VTK_OVERRIDE { return 1; }
 
   //@{
   /**
@@ -149,13 +149,13 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMCompositeTreeDomain();
   ~vtkSMCompositeTreeDomain();
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Internal implementation called by Update(vtkSMProperty*);

@@ -51,13 +51,13 @@ protected:
   vtkRangeTableReduction() { this->Parent = NULL; }
   ~vtkRangeTableReduction() { this->SetParent(NULL); }
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info)
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE
   {
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     return this->Superclass::FillInputPortInformation(port, info);
   }
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkPTemporalRanges* Parent;
 };

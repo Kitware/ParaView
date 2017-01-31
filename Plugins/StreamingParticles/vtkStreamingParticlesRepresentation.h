@@ -38,25 +38,25 @@ class vtkStreamingParticlesRepresentation : public vtkPVDataRepresentation
 public:
   static vtkStreamingParticlesRepresentation* New();
   vtkTypeMacro(vtkStreamingParticlesRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Set the input data arrays that this algorithm will process. Overridden to
   // pass the array selection to the mapper.
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, const char* name);
+    int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
   virtual void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
   }
-  virtual void SetInputArrayToProcess(int idx, vtkInformation* info)
+  virtual void SetInputArrayToProcess(int idx, vtkInformation* info) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(idx, info);
   }
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-    const char* fieldAssociation, const char* attributeTypeorName)
+    const char* fieldAssociation, const char* attributeTypeorName) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
@@ -65,12 +65,12 @@ public:
   // Description:
   // Overridden to handle various view passes.
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
-  virtual void SetVisibility(bool val);
+  virtual void SetVisibility(bool val) VTK_OVERRIDE;
 
   // Description:
   // Set the number of blocks to request at a given time on a single process
@@ -124,24 +124,24 @@ protected:
   // Adds the representation to the view.  This is called from
   // vtkView::AddRepresentation().  Subclasses should override this method.
   // Returns true if the addition succeeds.
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   // Description:
   // Removes the representation to the view.  This is called from
   // vtkView::RemoveRepresentation().  Subclasses should override this method.
   // Returns true if the removal succeeds.
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   // Description:
   // Fill input port information.
-  int FillInputPortInformation(int port, vtkInformation* info);
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Description:
   // Overridden to check if the input pipeline is streaming capable. This method
   // should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
   // and the input pipeline provides necessary AMR meta-data.
   virtual int RequestInformation(
-    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Setup the block request. During StreamingUpdate, this will request the
@@ -150,14 +150,14 @@ protected:
   // absence of specific block request to mean various things. It's expected
   // that read only the root block (or a few more) in that case.
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Generate the outline for the current input.
   // When not in StreamingUpdate, this also initializes the priority queue since
   // the input AMR may have totally changed, including its structure.
   virtual int RequestData(
-    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Returns true when the input pipeline supports streaming. It is set in

@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentation : public vtk
 {
 public:
   vtkTypeMacro(vtkPVDataRepresentation, vtkDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -162,8 +162,8 @@ public:
    * Making these methods public. When constructing composite representations,
    * we need to call these methods directly on internal representations.
    */
-  virtual bool AddToView(vtkView* view);
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
   //@}
 
   /**
@@ -172,12 +172,12 @@ public:
    * internal pipeline.
    * Overridden to use vtkPVTrivialProducer instead of vtkTrivialProducer
    */
-  virtual vtkAlgorithmOutput* GetInternalOutputPort() { return this->GetInternalOutputPort(0); }
-  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port)
+  virtual vtkAlgorithmOutput* GetInternalOutputPort() VTK_OVERRIDE { return this->GetInternalOutputPort(0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port) VTK_OVERRIDE
   {
     return this->GetInternalOutputPort(port, 0);
   }
-  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn);
+  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn) VTK_OVERRIDE;
 
   /**
    * Provides access to the view.
@@ -201,17 +201,17 @@ protected:
   /**
    * Create a default executive.
    */
-  virtual vtkExecutive* CreateDefaultExecutive();
+  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   double UpdateTime;
   bool UpdateTimeValid;

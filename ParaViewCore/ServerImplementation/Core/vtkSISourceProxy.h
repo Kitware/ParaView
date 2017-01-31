@@ -36,7 +36,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISourceProxy : public vtkSIProxy
 public:
   static vtkSISourceProxy* New();
   vtkTypeMacro(vtkSISourceProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the vtkAlgorithmOutput for an output port, if valid.
@@ -46,7 +46,7 @@ public:
   /**
    * Triggers UpdateInformation() on vtkObject if possible.
    */
-  virtual void UpdatePipelineInformation();
+  virtual void UpdatePipelineInformation() VTK_OVERRIDE;
 
   /**
    * Triggers UpdatePipeline().
@@ -82,7 +82,7 @@ protected:
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Create the output ports and add post filters for each output port.

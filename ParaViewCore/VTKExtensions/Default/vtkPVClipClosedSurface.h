@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipClosedSurface : public vtkClipCl
 {
 public:
   vtkTypeMacro(vtkPVClipClosedSurface, vtkClipClosedSurface);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVClipClosedSurface* New();
 
   //@{
@@ -54,7 +54,7 @@ protected:
   ~vtkPVClipClosedSurface();
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int InsideOut;
   vtkPlane* ClippingPlane;

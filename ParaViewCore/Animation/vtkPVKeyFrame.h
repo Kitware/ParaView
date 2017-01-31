@@ -37,7 +37,7 @@ class VTKPVANIMATION_EXPORT vtkPVKeyFrame : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVKeyFrame, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVKeyFrame* New();
 
   //@{

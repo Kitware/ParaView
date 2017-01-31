@@ -39,20 +39,20 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle
 public:
   static vtkPVInteractorStyle* New();
   vtkTypeMacro(vtkPVInteractorStyle, vtkInteractorStyleTrackballCamera);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove();
-  virtual void OnLeftButtonDown();
-  virtual void OnLeftButtonUp();
-  virtual void OnMiddleButtonDown();
-  virtual void OnMiddleButtonUp();
-  virtual void OnRightButtonDown();
-  virtual void OnRightButtonUp();
+  virtual void OnMouseMove() VTK_OVERRIDE;
+  virtual void OnLeftButtonDown() VTK_OVERRIDE;
+  virtual void OnLeftButtonUp() VTK_OVERRIDE;
+  virtual void OnMiddleButtonDown() VTK_OVERRIDE;
+  virtual void OnMiddleButtonUp() VTK_OVERRIDE;
+  virtual void OnRightButtonDown() VTK_OVERRIDE;
+  virtual void OnRightButtonUp() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -61,15 +61,15 @@ public:
    * since we don't have a mechanism to activate a manipulator by key presses
    * currently.
    */
-  virtual void OnKeyDown();
-  virtual void OnKeyUp();
+  virtual void OnKeyDown() VTK_OVERRIDE;
+  virtual void OnKeyUp() VTK_OVERRIDE;
   //@}
 
   /**
    * Overrides superclass behaviors to only support the key codes that make
    * sense in a ParaView application.
    */
-  virtual void OnChar();
+  virtual void OnChar() VTK_OVERRIDE;
 
   /**
    * Access to adding or removing manipulators.
@@ -137,7 +137,7 @@ protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();
 
-  virtual void Dolly(double factor);
+  virtual void Dolly(double factor) VTK_OVERRIDE;
 
   vtkCameraManipulator* CurrentManipulator;
   double CenterOfRotation[3];

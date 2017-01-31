@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIStringVectorProperty : public vt
 public:
   static vtkSIStringVectorProperty* New();
   vtkTypeMacro(vtkSIStringVectorProperty, vtkSIVectorProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSIStringVectorProperty();
@@ -45,17 +45,17 @@ protected:
   /**
    * Push a new state to the underneath implementation
    */
-  virtual bool Push(vtkSMMessage*, int);
+  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
   /**
    * Parse the xml for the property.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
+  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
   vtkSIStringVectorProperty(const vtkSIStringVectorProperty&) VTK_DELETE_FUNCTION;

@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPExtractTemporalFieldData
 public:
   static vtkPExtractTemporalFieldData* New();
   vtkTypeMacro(vtkPExtractTemporalFieldData, vtkExtractTemporalFieldData);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

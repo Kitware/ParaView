@@ -54,7 +54,7 @@ public:
     protected : vtkPVGL2PSExporter();
   ~vtkPVGL2PSExporter();
 
-  void WriteData();
+  void WriteData() VTK_OVERRIDE;
 
   vtkStdString FileName;
   int ExcludeCubeAxesActorsFromRasterization;

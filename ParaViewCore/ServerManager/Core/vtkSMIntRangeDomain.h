@@ -44,7 +44,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIntRangeDomain : public vtkSMDomain
 public:
   static vtkSMIntRangeDomain* New();
   vtkTypeMacro(vtkSMIntRangeDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Return a min. value if it exists. If the min. exists

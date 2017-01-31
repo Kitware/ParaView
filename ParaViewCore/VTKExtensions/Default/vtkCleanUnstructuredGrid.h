@@ -43,7 +43,7 @@ public:
 
   vtkTypeMacro(vtkCleanUnstructuredGrid, vtkUnstructuredGridAlgorithm);
 
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkCleanUnstructuredGrid();
@@ -51,8 +51,8 @@ protected:
 
   vtkPointLocator* Locator;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
 private:
   vtkCleanUnstructuredGrid(const vtkCleanUnstructuredGrid&) VTK_DELETE_FUNCTION;

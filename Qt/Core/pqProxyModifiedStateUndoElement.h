@@ -36,10 +36,10 @@ class PQCORE_EXPORT pqProxyModifiedStateUndoElement : public vtkSMUndoElement
 public:
   static pqProxyModifiedStateUndoElement* New();
   vtkTypeMacro(pqProxyModifiedStateUndoElement, vtkSMUndoElement);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int Undo() { return this->InternalUndoRedo(true) ? 1 : 0; }
-  virtual int Redo() { return this->InternalUndoRedo(false) ? 1 : 0; }
+  virtual int Undo() VTK_OVERRIDE { return this->InternalUndoRedo(true) ? 1 : 0; }
+  virtual int Redo() VTK_OVERRIDE { return this->InternalUndoRedo(false) ? 1 : 0; }
 
   /**
   * Use this to initialize the element if the pqProxy was marked as

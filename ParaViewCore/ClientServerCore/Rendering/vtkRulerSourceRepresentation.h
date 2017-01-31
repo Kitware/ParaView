@@ -38,7 +38,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkRulerSourceRepresentation
 public:
   static vtkRulerSourceRepresentation* New();
   vtkTypeMacro(vtkRulerSourceRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -63,12 +63,12 @@ public:
    */
   void SetAxisColor(double red, double green, double blue);
 
-  virtual void MarkModified();
+  virtual void MarkModified() VTK_OVERRIDE;
 
   /**
    * Set the visibility.
    */
-  virtual void SetVisibility(bool);
+  virtual void SetVisibility(bool) VTK_OVERRIDE;
 
   /**
    * Specify the format to use for labelling the distance. Note that an empty
@@ -123,37 +123,37 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
 protected:
   vtkRulerSourceRepresentation();
   ~vtkRulerSourceRepresentation();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  virtual bool IsCached(double cache_key);
+  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
 
   vtkDistanceRepresentation2D* DistanceRepresentation;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;

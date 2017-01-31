@@ -32,7 +32,7 @@ class vtkLagrangianHelperBase : public vtkDataObjectAlgorithm
 {
 public:
   vtkTypeMacro(vtkLagrangianHelperBase, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

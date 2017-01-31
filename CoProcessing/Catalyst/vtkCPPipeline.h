@@ -30,7 +30,7 @@ class VTKPVCATALYST_EXPORT vtkCPPipeline : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPPipeline, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done

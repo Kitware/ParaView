@@ -40,12 +40,12 @@ class VTKPVCINEMAREADER_EXPORT vtkPVCinemaDatabaseInformation : public vtkPVInfo
 public:
   static vtkPVCinemaDatabaseInformation* New();
   vtkTypeMacro(vtkPVCinemaDatabaseInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void CopyFromObject(vtkObject*);
-  virtual void AddInformation(vtkPVInformation*);
-  virtual void CopyToStream(vtkClientServerStream*);
-  virtual void CopyFromStream(const vtkClientServerStream*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
 
   typedef std::vector<std::string> VectorOfStrings;
   typedef VectorOfStrings PipelineObjectsType;

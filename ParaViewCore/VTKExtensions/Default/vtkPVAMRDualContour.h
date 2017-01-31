@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRDualContour : public vtkAMRDualCo
 public:
   static vtkPVAMRDualContour* New();
   vtkTypeMacro(vtkPVAMRDualContour, vtkAMRDualContour);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkPVAMRDualContour();
   virtual ~vtkPVAMRDualContour();
@@ -58,7 +58,7 @@ public:
   vtkSetMacro(VolumeFractionSurfaceValue, double);
   //@}
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
   vtkPVAMRDualContour(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;

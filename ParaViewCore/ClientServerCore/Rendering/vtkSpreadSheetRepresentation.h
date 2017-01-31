@@ -41,12 +41,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation
 public:
   static vtkSpreadSheetRepresentation* New();
   vtkTypeMacro(vtkSpreadSheetRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Since this has no delivery, just mark ourselves modified.
    */
-  virtual void MarkModified() { this->Superclass::MarkModified(); }
+  virtual void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
 
   vtkAlgorithmOutput* GetDataProducer();
   vtkAlgorithmOutput* GetExtractedDataProducer();
@@ -85,12 +85,12 @@ protected:
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkNew<vtkCleanArrays> CleanArrays;
   vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;

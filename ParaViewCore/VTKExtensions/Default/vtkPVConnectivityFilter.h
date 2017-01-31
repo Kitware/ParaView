@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVConnectivityFilter : public vtkConne
 {
 public:
   vtkTypeMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVConnectivityFilter* New();
 

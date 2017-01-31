@@ -36,14 +36,14 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkBalancedRedistributePolyData* New();
 
 protected:
   vtkBalancedRedistributePolyData();
   ~vtkBalancedRedistributePolyData();
-  void MakeSchedule(vtkPolyData*, vtkCommSched*);
+  void MakeSchedule(vtkPolyData*, vtkCommSched*) VTK_OVERRIDE;
 
 private:
   vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;

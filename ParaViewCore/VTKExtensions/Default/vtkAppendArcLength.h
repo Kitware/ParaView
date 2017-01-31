@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAppendArcLength : public vtkPolyDataAl
 public:
   static vtkAppendArcLength* New();
   vtkTypeMacro(vtkAppendArcLength, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkAppendArcLength();
@@ -49,7 +49,7 @@ protected:
    * This is the method you should override.
    */
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
   vtkAppendArcLength(const vtkAppendArcLength&) VTK_DELETE_FUNCTION;

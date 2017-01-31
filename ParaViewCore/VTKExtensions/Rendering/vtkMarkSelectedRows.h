@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMarkSelectedRows : public vtkDataObj
 public:
   static vtkMarkSelectedRows* New();
   vtkTypeMacro(vtkMarkSelectedRows, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -62,14 +62,14 @@ protected:
   vtkMarkSelectedRows();
   ~vtkMarkSelectedRows();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Overridden to create a vtkTable or vtkMultiBlockDataSet as the output based
    * on  the input type.
    */
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Operates on vtkTable instances. RequestData() handles composite datasets

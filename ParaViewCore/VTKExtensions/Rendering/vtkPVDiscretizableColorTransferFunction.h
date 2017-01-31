@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVDiscretizableColorTransferFunction
 public:
   static vtkPVDiscretizableColorTransferFunction* New();
   vtkTypeMacro(vtkPVDiscretizableColorTransferFunction, vtkDiscretizableColorTransferFunction);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -76,7 +76,7 @@ public:
   /**
    * Override to set only the active annotations
    */
-  virtual void Build();
+  virtual void Build() VTK_OVERRIDE;
 
 protected:
   vtkPVDiscretizableColorTransferFunction();

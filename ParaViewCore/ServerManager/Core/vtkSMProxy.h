@@ -154,7 +154,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxy : public vtkSMRemoteObject
 public:
   static vtkSMProxy* New();
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Descritpion:
   // Set or override a key/value pair as annotation to that proxy.
@@ -196,7 +196,7 @@ public:
    * Get/Set the location where the underlying VTK-objects are created. The
    * value can be contructed by or-ing vtkSMSession::ServerFlags
    */
-  virtual void SetLocation(vtkTypeUInt32);
+  virtual void SetLocation(vtkTypeUInt32) VTK_OVERRIDE;
 
   /**
    * Return the property with the given name. If no property is found
@@ -517,9 +517,9 @@ public:
    * action. By default, any remote object is Undoable.
    * This override the RemoteObject ones to propagate the flag to the sub-proxy
    */
-  virtual void PrototypeOn();
-  virtual void PrototypeOff();
-  virtual void SetPrototype(bool undo);
+  virtual void PrototypeOn() VTK_OVERRIDE;
+  virtual void PrototypeOff() VTK_OVERRIDE;
+  virtual void SetPrototype(bool undo) VTK_OVERRIDE;
   //@}
 
   /**
@@ -555,13 +555,13 @@ public:
    * particular case, the server is already aware of that new state, so we keep
    * those changes local.
    */
-  virtual void EnableLocalPushOnly();
+  virtual void EnableLocalPushOnly() VTK_OVERRIDE;
 
   /**
    * Enable the given remote object to communicate its state normaly to the
    * server location.
    */
-  virtual void DisableLocalPushOnly();
+  virtual void DisableLocalPushOnly() VTK_OVERRIDE;
 
   /**
    * This method return the full object state that can be used to create that
@@ -569,7 +569,7 @@ public:
    * This method will be used to fill the undo stack.
    * If not overriden this will return NULL.
    */
-  virtual const vtkSMMessage* GetFullState();
+  virtual const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
   /**
    * This method is used to initialise the object to the given state
@@ -578,7 +578,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Returns the property group at \p index for the proxy.

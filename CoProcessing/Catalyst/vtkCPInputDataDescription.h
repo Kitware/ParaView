@@ -30,7 +30,7 @@ class VTKPVCATALYST_EXPORT vtkCPInputDataDescription : public vtkObject
 public:
   static vtkCPInputDataDescription* New();
   vtkTypeMacro(vtkCPInputDataDescription, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Reset the names of the fields that are needed.

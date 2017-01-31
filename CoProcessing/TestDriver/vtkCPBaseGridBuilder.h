@@ -31,7 +31,7 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPBaseGridBuilder : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPBaseGridBuilder, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Return a grid.  BuiltNewGrid is 0 if the grid is the same

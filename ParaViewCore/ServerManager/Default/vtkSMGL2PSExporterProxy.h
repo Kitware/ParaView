@@ -30,24 +30,24 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMGL2PSExporterProxy : public vtkSMRen
 public:
   static vtkSMGL2PSExporterProxy* New();
   vtkTypeMacro(vtkSMGL2PSExporterProxy, vtkSMRenderViewExporterProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns if the view can be exported.
    * Default implementation return true if the view is a render view or a
    * context view.
    */
-  bool CanExport(vtkSMProxy*);
+  bool CanExport(vtkSMProxy*) VTK_OVERRIDE;
 
   /**
    * Export the current view.
    */
-  void Write();
+  void Write() VTK_OVERRIDE;
 
   /**
    * See superclass documentation for description.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 protected:
   vtkSMGL2PSExporterProxy();

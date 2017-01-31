@@ -44,7 +44,7 @@ class PQCORE_EXPORT pqAnimationSceneImageWriter : public vtkSMAnimationSceneImag
 public:
   static pqAnimationSceneImageWriter* New();
   vtkTypeMacro(pqAnimationSceneImageWriter, vtkSMAnimationSceneImageWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   pqAnimationSceneImageWriter();
@@ -55,7 +55,7 @@ protected:
   // returns a new Image data object. May return NULL.
   // Default implementation can only handle vtkSMViewProxy subclasses.
   // Subclassess must override to handle other types of view modules.
-  virtual vtkImageData* CaptureViewImage(vtkSMViewProxy*, int magnification);
+  virtual vtkImageData* CaptureViewImage(vtkSMViewProxy*, int magnification) VTK_OVERRIDE;
 
 private:
   pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;

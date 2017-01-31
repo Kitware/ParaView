@@ -30,14 +30,14 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMultiSliceContextItem : public vtkCo
 public:
   static vtkMultiSliceContextItem* New();
   vtkTypeMacro(vtkMultiSliceContextItem, vtkContextItem);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Paint the texture into a rectangle defined by the bounds. If
    * MaskAboveCurve is true and a shape has been provided by a subclass, it
    * draws the texture into the shape
    */
-  virtual bool Paint(vtkContext2D* painter);
+  virtual bool Paint(vtkContext2D* painter) VTK_OVERRIDE;
 
   /**
    * Return the Axis on which that ContextItem is based.
@@ -66,35 +66,35 @@ public:
   /**
    * Return true if the supplied x, y coordinate is inside the item.
    */
-  virtual bool Hit(const vtkContextMouseEvent& mouse);
+  virtual bool Hit(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
    * Mouse button down event
    * Return true if the item holds the event, false if the event can be
    * propagated to other items.
    */
-  virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse);
+  virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
    * Mouse button release event.
    * Return true if the item holds the event, false if the event can be
    * propagated to other items.
    */
-  virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse);
+  virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
    * Mouse button double click event.
    * Return true if the item holds the event, false if the event can be
    * propagated to other items.
    */
-  virtual bool MouseDoubleClickEvent(const vtkContextMouseEvent& mouse);
+  virtual bool MouseDoubleClickEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
    * Mouse move event.
    * Return true if the item holds the event, false if the event can be
    * propagated to other items.
    */
-  virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
+  virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
    * Get access to the data model. Return a pointer array to the differents

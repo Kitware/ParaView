@@ -58,7 +58,7 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaLayerRepresentation : public vtkPVDataRe
 public:
   static vtkCinemaLayerRepresentation* New();
   vtkTypeMacro(vtkCinemaLayerRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void SetVisibility(bool) VTK_OVERRIDE;
   void MarkModified() VTK_OVERRIDE;

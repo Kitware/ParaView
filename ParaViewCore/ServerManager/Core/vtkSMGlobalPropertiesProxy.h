@@ -57,7 +57,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMGlobalPropertiesProxy : public vtkSMPro
 public:
   static vtkSMGlobalPropertiesProxy* New();
   vtkTypeMacro(vtkSMGlobalPropertiesProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Set up a property link with the given property on the proxy with the
@@ -87,14 +87,14 @@ public:
   /**
    * Overridden to save link state.
    */
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
   using Superclass::SaveXMLState;
   //@}
 
   /**
    * Overridden to load links state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMGlobalPropertiesProxy();
@@ -103,7 +103,7 @@ protected:
   /**
    * Overridden to propagate the modification to the linked properties.
    */
-  virtual void SetPropertyModifiedFlag(const char* name, int flag);
+  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
   /**
    * Called when a target properties is modified.

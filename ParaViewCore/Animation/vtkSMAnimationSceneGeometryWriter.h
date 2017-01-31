@@ -35,7 +35,7 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnim
 public:
   static vtkSMAnimationSceneGeometryWriter* New();
   vtkTypeMacro(vtkSMAnimationSceneGeometryWriter, vtkSMAnimationSceneWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Get/Set the View Module from which we are writing the
   // geometry.
@@ -49,17 +49,17 @@ protected:
   /**
    * Called to initialize saving.
    */
-  virtual bool SaveInitialize(int startCount);
+  virtual bool SaveInitialize(int startCount) VTK_OVERRIDE;
 
   /**
    * Called to save a particular frame.
    */
-  virtual bool SaveFrame(double time);
+  virtual bool SaveFrame(double time) VTK_OVERRIDE;
 
   /**
    * Called to finalize saving.
    */
-  virtual bool SaveFinalize();
+  virtual bool SaveFinalize() VTK_OVERRIDE;
 
   vtkSMProxy* GeometryWriter;
   vtkSMProxy* ViewModule;

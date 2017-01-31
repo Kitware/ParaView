@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVGeneralSettings : public vtkObject
 public:
   static vtkPVGeneralSettings* New();
   vtkTypeMacro(vtkPVGeneralSettings, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Access the singleton.

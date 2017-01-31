@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModule : public vtkObject
 public:
   static vtkProcessModule* New();
   vtkTypeMacro(vtkProcessModule, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum ProcessTypes
   {

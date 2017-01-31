@@ -34,16 +34,16 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballMoveActor : public vtkCam
 public:
   static vtkPVTrackballMoveActor* New();
   vtkTypeMacro(vtkPVTrackballMoveActor, vtkCameraManipulator);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
-  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
-  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren);
+  virtual void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  virtual void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  virtual void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
   //@}
 
 protected:

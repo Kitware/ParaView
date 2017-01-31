@@ -48,7 +48,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
 public:
   static vtkSMViewProxy* New();
   vtkTypeMacro(vtkSMViewProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -230,12 +230,12 @@ protected:
   /**
    * Called at the end of CreateVTKObjects().
    */
-  virtual void CreateVTKObjects();
+  virtual void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Convenience method to call

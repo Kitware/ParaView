@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation
 public:
   static vtkPVCompositeRepresentation* New();
   vtkTypeMacro(vtkPVCompositeRepresentation, vtkCompositeRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * These must only be set during initialization before adding the
@@ -58,13 +58,13 @@ public:
   /**
    * Propagate the modification to all internal representations.
    */
-  virtual void MarkModified();
+  virtual void MarkModified() VTK_OVERRIDE;
 
   /**
    * Set visibility of the representation.
    * Overridden to update the cube-axes and selection visibilities.
    */
-  virtual void SetVisibility(bool visible);
+  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
 
   /**
    * Set the selection visibility.
@@ -80,9 +80,9 @@ public:
   /**
    * Passed on to internal representations as well.
    */
-  virtual void SetUpdateTime(double time);
-  virtual void SetForceUseCache(bool val);
-  virtual void SetForcedCacheKey(double val);
+  virtual void SetUpdateTime(double time) VTK_OVERRIDE;
+  virtual void SetForceUseCache(bool val) VTK_OVERRIDE;
+  virtual void SetForcedCacheKey(double val) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -97,7 +97,7 @@ public:
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeRepresentation();
@@ -108,14 +108,14 @@ protected:
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkSelectionRepresentation* SelectionRepresentation;
   bool SelectionVisibility;

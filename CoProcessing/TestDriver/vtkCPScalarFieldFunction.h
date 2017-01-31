@@ -29,19 +29,19 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPScalarFieldFunction : public vtkCPTens
 {
 public:
   vtkTypeMacro(vtkCPScalarFieldFunction, vtkCPTensorFieldFunction);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Get the NumberOfComponents.  This is abstract to make sure
    * that the value for the NumberOfComponents cannot be changed.
    */
-  virtual unsigned int GetNumberOfComponents() { return 1; };
+  virtual unsigned int GetNumberOfComponents() VTK_OVERRIDE { return 1; };
 
   /**
    * Compute the field value at Point.
    */
   virtual double ComputeComponenentAtPoint(
-    unsigned int component, double point[3], unsigned long timeStep, double time) = 0;
+    unsigned int component, double point[3], unsigned long timeStep, double time) VTK_OVERRIDE = 0;
 
 protected:
   vtkCPScalarFieldFunction();

@@ -44,7 +44,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy
 public:
   static vtkSMPVRepresentationProxy* New();
   vtkTypeMacro(vtkSMPVRepresentationProxy, vtkSMRepresentationProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns true if scalar coloring is enabled. This checks whether a property
@@ -312,7 +312,7 @@ public:
    * colors, scalar coloring it setup properly. Currently this is hard-coded for
    * Volume and Slice representation types.
    */
-  virtual bool SetRepresentationType(const char* type);
+  virtual bool SetRepresentationType(const char* type) VTK_OVERRIDE;
 
 protected:
   vtkSMPVRepresentationProxy();
@@ -328,7 +328,7 @@ protected:
    * Overridden to ensure that the RepresentationTypesInfo and
    * Representations's domain are up-to-date.
    */
-  virtual void CreateVTKObjects();
+  virtual void CreateVTKObjects() VTK_OVERRIDE;
 
   // Whenever the "Representation" property is modified, we ensure that the
   // this->InvalidateDataInformation() is called.
@@ -339,12 +339,12 @@ protected:
    * "Input" properties for all internal representations (including setting up
    * of the link to the extract-selection representation).
    */
-  virtual void SetPropertyModifiedFlag(const char* name, int flag);
+  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
   /**
    * Overridden to process "RepresentationType" elements.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Internal method to set scalar coloring, do not use directly.

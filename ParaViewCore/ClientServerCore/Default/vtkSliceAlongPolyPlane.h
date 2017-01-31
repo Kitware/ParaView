@@ -49,9 +49,9 @@ public:
   virtual ~vtkSliceAlongPolyPlane();
 
   virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * The actual algorithm for slice a dataset along a polyline.

@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVPLYWriter : public vtkWriter
 public:
   static vtkPVPLYWriter* New();
   vtkTypeMacro(vtkPVPLYWriter, vtkWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -72,8 +72,8 @@ protected:
   vtkPVPLYWriter();
   ~vtkPVPLYWriter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual void WriteData();
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual void WriteData() VTK_OVERRIDE;
 
   bool EnableColoring;
   vtkNew<vtkPLYWriter> Writer;

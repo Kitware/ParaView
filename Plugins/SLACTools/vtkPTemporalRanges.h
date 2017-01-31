@@ -38,7 +38,7 @@ class vtkPTemporalRanges : public vtkTemporalRanges
 public:
   vtkTypeMacro(vtkPTemporalRanges, vtkTemporalRanges);
   static vtkPTemporalRanges* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
@@ -49,7 +49,7 @@ protected:
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual void Reduce(vtkTable* table);
 

@@ -38,7 +38,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionRepresentation
 public:
   static vtkSelectionRepresentation* New();
   vtkTypeMacro(vtkSelectionRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * One must change the internal representations only before the representation
@@ -52,12 +52,12 @@ public:
    * won't need this if vtkPVDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void SetInputConnection(vtkAlgorithmOutput* input);
-  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void AddInputConnection(vtkAlgorithmOutput* input);
-  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
-  virtual void RemoveInputConnection(int port, int idx);
+  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  virtual void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
   //@}
 
   /**
@@ -66,15 +66,15 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  virtual void MarkModified();
+  virtual void MarkModified() VTK_OVERRIDE;
 
   //@{
   /**
    * Passed on to internal representations as well.
    */
-  virtual void SetUpdateTime(double time);
-  virtual void SetForceUseCache(bool val);
-  virtual void SetForcedCacheKey(double val);
+  virtual void SetUpdateTime(double time) VTK_OVERRIDE;
+  virtual void SetForceUseCache(bool val) VTK_OVERRIDE;
+  virtual void SetForcedCacheKey(double val) VTK_OVERRIDE;
   //@}
 
   /**
@@ -82,7 +82,7 @@ public:
    * representation of false, all view passes are ignored.
    * Overridden to propagate to the active representation.
    */
-  virtual void SetVisibility(bool val);
+  virtual void SetVisibility(bool val) VTK_OVERRIDE;
 
   //@{
   /**
@@ -119,27 +119,27 @@ public:
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkSelectionRepresentation();
   ~vtkSelectionRepresentation();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Fires UpdateDataEvent

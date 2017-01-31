@@ -56,7 +56,7 @@ public:
   };
 
   vtkTypeMacro(vtkPVGlyphFilter, vtkGlyph3D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVGlyphFilter* New();
 
   //@{
@@ -106,7 +106,7 @@ public:
   /**
    * Overridden to create output data of appropriate type.
    */
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkPVGlyphFilter();
@@ -114,15 +114,15 @@ protected:
   //@}
 
   // Standard Pipeline methods
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int, vtkInformation*);
-  virtual int FillOutputPortInformation(int, vtkInformation*);
+  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * Returns 1 if point is to be glyped, otherwise returns 0.
    */
-  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
+  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
 
   /**
    * Returns true if input Scalars and Vectors are compatible, otherwise returns 0.

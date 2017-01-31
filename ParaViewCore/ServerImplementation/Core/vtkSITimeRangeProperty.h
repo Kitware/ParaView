@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeRangeProperty : public vtkSI
 public:
   static vtkSITimeRangeProperty* New();
   vtkTypeMacro(vtkSITimeRangeProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSITimeRangeProperty();
@@ -40,7 +40,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;

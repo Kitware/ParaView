@@ -46,9 +46,9 @@ public:
   vtkTypeMacro(vtkPVImageReader, vtkImageReader);
 #endif
 
-  virtual int CanReadFile(const char*) { return 1; }
+  virtual int CanReadFile(const char*) VTK_OVERRIDE { return 1; }
 
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkPVImageReader();

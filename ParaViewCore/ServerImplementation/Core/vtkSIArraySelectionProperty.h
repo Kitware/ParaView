@@ -30,7 +30,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIArraySelectionProperty : public 
 public:
   static vtkSIArraySelectionProperty* New();
   vtkTypeMacro(vtkSIArraySelectionProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSIArraySelectionProperty();
@@ -41,7 +41,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;

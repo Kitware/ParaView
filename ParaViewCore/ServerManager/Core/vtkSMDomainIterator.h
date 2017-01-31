@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDomainIterator : public vtkSMObject
 public:
   static vtkSMDomainIterator* New();
   vtkTypeMacro(vtkSMDomainIterator, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * A property must be assigned before iteration is performed.

@@ -39,7 +39,7 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaDatabaseReader : public vtkPolyDataAlgor
 public:
   static vtkCinemaDatabaseReader* New();
   vtkTypeMacro(vtkCinemaDatabaseReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

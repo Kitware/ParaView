@@ -39,7 +39,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCaveSynchronizedRenderers
 public:
   static vtkCaveSynchronizedRenderers* New();
   vtkTypeMacro(vtkCaveSynchronizedRenderers, vtkSynchronizedRenderers);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkCaveSynchronizedRenderers();
@@ -49,7 +49,7 @@ protected:
    * Called at the start of each render. Overridden to ensure that the camera is
    * updated based on the configuration.
    */
-  virtual void HandleStartRender();
+  virtual void HandleStartRender() VTK_OVERRIDE;
 
   /**
    * During constructor, processes the configuration file to setup the display

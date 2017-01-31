@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDReader : public vtkXMLCollectionRea
 public:
   static vtkPVDReader* New();
   vtkTypeMacro(vtkPVDReader, vtkXMLCollectionReader);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -40,8 +40,8 @@ public:
    * value will be read.  An out-of-range index will remove the
    * restriction.
    */
-  void SetTimeStep(int index);
-  int GetTimeStep();
+  void SetTimeStep(int index) VTK_OVERRIDE;
+  int GetTimeStep() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -56,13 +56,13 @@ protected:
   vtkPVDReader();
   ~vtkPVDReader();
 
-  void ReadXMLData();
+  void ReadXMLData() VTK_OVERRIDE;
 
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Set TimeStepRange
-  virtual void SetupOutputInformation(vtkInformation* outInfo);
+  virtual void SetupOutputInformation(vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Save the range of valid timestep index values.
   int TimeStepRange[2];
