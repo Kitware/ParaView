@@ -28,8 +28,8 @@ class VTK_EXPORT vtkUncertaintySurfacePainter : public vtkPainter
 {
 public:
   static vtkUncertaintySurfacePainter* New();
-  vtkTypeMacro(vtkUncertaintySurfacePainter, vtkPainter) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkUncertaintySurfacePainter, vtkPainter);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Release any graphics resources that are being consumed by this mapper.

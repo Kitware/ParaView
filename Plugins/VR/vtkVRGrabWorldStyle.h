@@ -46,7 +46,8 @@ class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
 public:
   static vtkVRGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle) void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkVRGrabWorldStyle();

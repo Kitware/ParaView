@@ -32,8 +32,8 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation
 {
 public:
   static vtkMoleculeRepresentation* New();
-  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual int ProcessViewRequest(
     vtkInformationRequestKey* requestType, vtkInformation* inputInfo, vtkInformation* outputInfo) VTK_OVERRIDE;

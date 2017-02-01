@@ -38,8 +38,8 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkSliceAlongPolyPlane : public vtkDat
 {
 public:
   static vtkSliceAlongPolyPlane* New();
-  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   vtkSetMacro(Tolerance, double) vtkGetMacro(Tolerance, double)

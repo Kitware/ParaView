@@ -31,8 +31,8 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGL2PSExporter : public vtkOpenGLGL
 {
 public:
   static vtkPVGL2PSExporter* New();
-  vtkTypeMacro(vtkPVGL2PSExporter, vtkOpenGLGL2PSExporter) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkPVGL2PSExporter, vtkOpenGLGL2PSExporter);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

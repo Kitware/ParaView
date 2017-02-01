@@ -35,8 +35,8 @@
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInSituPParticlePathFilter : public vtkPParticlePathFilter
 {
 public:
-  vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter)
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkInSituPParticlePathFilter* New();
 
