@@ -334,10 +334,14 @@ class LayerDataSetBuilder(DataSetBuilder):
 # -----------------------------------------------------------------------------
 
 class CompositeDataSetBuilder(DataSetBuilder):
-    def __init__(self, location, sceneConfig, cameraInfo, metadata={}, sections={}):
+    def __init__(self, location, sceneConfig, cameraInfo, metadata={}, sections={}, view=None):
         DataSetBuilder.__init__(self, location, cameraInfo, metadata, sections)
 
-        self.view = simple.CreateView('RenderView')
+        if view:
+            self.view = view
+        else:
+            self.view = simple.CreateView('RenderView')
+
         self.view.ViewSize = sceneConfig['size']
         self.view.CenterAxesVisibility = 0
         self.view.OrientationAxesVisibility = 0
@@ -571,7 +575,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                         image.UnRegister(None)
 
                     if lightType == 'normal':
-                        if rep.Representation == 'Point Gaussian' or rep.Representation == 'Points':
+                        if rep.Representation in ['Point Gaussian', 'Points', 'Outline', 'Wireframe']:
                             uniqNormal = [(camPos['position'][i] - camPos['focalPoint'][i]) for i in range(3)]
                             tmpNormalArray = vtkFloatArray()
                             tmpNormalArray.SetNumberOfComponents(1)
