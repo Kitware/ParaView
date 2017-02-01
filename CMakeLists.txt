@@ -603,6 +603,16 @@ mark_as_advanced(PARAVIEW_EXTERNAL_MODULE_ROOTS)
 include(ParaViewModuleTop)
 
 #----------------------------------------------------------------------------------
+# Sanity check: OpenGL2 backend is required for Qt 5.
+if(PARAVIEW_BUILD_QT_GUI
+    AND PARAVIEW_QT_VERSION VERSION_GREATER "4"
+    AND VTK_RENDERING_BACKEND STREQUAL "OpenGL")
+  message(SEND_ERROR
+    "ParaView requires 'OpenGL2' rendering backend when building with Qt 5. "
+    "Please set VTK_RENDERING_BACKEND to 'OpenGL2' (recommended) or build with Qt 4.")
+endif()
+
+#----------------------------------------------------------------------------------
 # keep VTK cmake variables from polluting the non-advanced space.
 mark_as_advanced(
   VTK_EXTRA_COMPILER_WARNINGS
