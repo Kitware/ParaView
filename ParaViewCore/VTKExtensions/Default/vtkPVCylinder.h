@@ -29,7 +29,8 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVCylinder : public vtkCylinder
 {
 public:
   static vtkPVCylinder* New();
-  vtkTypeMacro(vtkPVCylinder, vtkCylinder) void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkPVCylinder, vtkCylinder)
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**

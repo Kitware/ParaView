@@ -25,8 +25,8 @@
  * what is requested.
 */
 
-#ifndef vtkPointAccumulator_hxx
-#define vtkPointAccumulator_hxx
+#ifndef vtkPointAccumulator_h
+#define vtkPointAccumulator_h
 
 #include "vtkPoints.h"
 #include <exception>
@@ -192,3 +192,4 @@ private:
   vtkIdType NPts;
 };
 #endif
+// VTK-HeaderTest-Exclude: vtkPointAccumulator.h
