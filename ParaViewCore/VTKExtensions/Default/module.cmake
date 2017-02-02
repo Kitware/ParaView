@@ -28,6 +28,8 @@ vtk_module(vtkPVVTKExtensionsDefault
     vtksys
     vtkChartsCore
     vtkIOPLY
+  TEST_LABELS
+    PARAVIEW
   KIT
     vtkPVExtensions
 )

@@ -3,6 +3,8 @@ vtk_module(vtkPVVTKExtensionsPoints
     vtkFiltersPoints
   PRIVATE_DEPENDS
     vtkFiltersCore
+  TEST_LABELS
+    PARAVIEW
   KIT
     vtkPVExtensions
 )
