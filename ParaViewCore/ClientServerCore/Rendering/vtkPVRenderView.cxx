@@ -144,6 +144,7 @@ public:
   bool IsInCapture;
   bool IsInOSPRay;
   bool OSPRayShadows;
+  int OSPRayCount;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
 
@@ -357,6 +358,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->IsInCapture = false;
   this->Internals->IsInOSPRay = false;
   this->Internals->OSPRayShadows = false;
+  this->Internals->OSPRayCount = 0;
 
   // non-reference counted, so no worries about reference loops.
   this->Internals->DeliveryManager->SetRenderView(this);
@@ -1400,6 +1402,7 @@ void vtkPVRenderView::InteractiveRender()
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
 
+  this->Internals->OSPRayCount = 0;
   this->Internals->PreRender(this->RenderView);
 
   this->Render(true, false);
@@ -3186,6 +3189,21 @@ double vtkPVRenderView::GetLightScale()
   return vtkOSPRayLightNode::GetLightScale();
 #else
   return 0.5;
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetOSPRayContinueStreaming()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (!this->Internals->IsInOSPRay)
+  {
+    return false;
+  }
+  this->Internals->OSPRayCount++;
+  return this->Internals->OSPRayCount < this->GetMaxFrames();
+#else
+  return false;
 #endif
 }
 

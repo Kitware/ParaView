@@ -888,6 +888,10 @@ public:
   void SetMaxFrames(int);
   int GetMaxFrames();
   //@}
+  /**
+   * Has OSPRay reached the max frames?
+   */
+  bool GetOSPRayContinueStreaming();
   //@{
   /**
    * Dimish or Amplify all lights in the scene.
