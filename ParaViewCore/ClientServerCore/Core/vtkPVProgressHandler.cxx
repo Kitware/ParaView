@@ -123,7 +123,8 @@ vtkPVProgressHandler::~vtkPVProgressHandler()
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
 {
-  if (object && (object->IsA("vtkAlgorithm") || object->IsA("vtkKdTree")))
+  if (object &&
+    (object->IsA("vtkAlgorithm") || object->IsA("vtkKdTree") || object->IsA("vtkExporter")))
   {
     this->Internals->RegisteredObjects[object] = id;
     object->AddObserver(vtkCommand::ProgressEvent, this, &vtkPVProgressHandler::OnProgressEvent);
