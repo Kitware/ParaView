@@ -11,6 +11,8 @@ vtk_module(vtkPVVTKExtensionsCosmoTools
       vtkCosmoHaloFinder
    KIT
       vtkPVExtensions
+   TEST_LABELS
+     PARAVIEW
    TEST_DEPENDS
       vtkTestingCore
       vtkTestingRendering

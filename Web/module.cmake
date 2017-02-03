@@ -5,4 +5,7 @@ vtk_module(vtkParaViewWeb
     vtkWebGLExporter
     vtkParaViewWebCore
     vtkParaViewWebPython
-  EXCLUDE_FROM_WRAPPING)
+  EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW
+)

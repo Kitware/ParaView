@@ -4,4 +4,7 @@ vtk_module(smTestDriver
   DEPENDS
     vtksys
     vtkCommonCore
-  EXCLUDE_FROM_WRAPPING)
+  EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW
+)

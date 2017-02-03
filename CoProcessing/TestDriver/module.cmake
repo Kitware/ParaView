@@ -1,3 +1,6 @@
 vtk_module(vtkPVCatalystTestDriver
   DEPENDS
-    vtkPVCatalyst)
+    vtkPVCatalyst
+  TEST_LABELS
+    PARAVIEW
+)

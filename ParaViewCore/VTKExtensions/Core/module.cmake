@@ -7,6 +7,8 @@ vtk_module(vtkPVVTKExtensionsCore
     vtkPVCommon
   PRIVATE_DEPENDS
     vtksys
+  TEST_LABELS
+    PARAVIEW
   KIT
     vtkPVExtensions
 )

@@ -58,8 +58,8 @@ public:
   };
 
   static vtkPGenericIOMultiBlockReader* New();
-  vtkTypeMacro(vtkPGenericIOMultiBlockReader, vtkMultiBlockDataSetAlgorithm) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkPGenericIOMultiBlockReader, vtkMultiBlockDataSetAlgorithm)
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   //@{
   /**

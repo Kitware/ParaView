@@ -3,4 +3,7 @@ vtk_module(vtkUtilitiesColorSeriesToXML
     vtkCommonCore
     vtkCommonExecutionModel
     vtkCommonColor
-  EXCLUDE_FROM_WRAPPING)
+  EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW
+)
