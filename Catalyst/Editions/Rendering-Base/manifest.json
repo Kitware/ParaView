@@ -937,9 +937,6 @@
     },
     { "name": "vtkgl2ps",
       "path": "VTK/ThirdParty/gl2ps"
-    },
-    { "name": "vtklz4",
-      "path": "ThirdParty/lz4"
     }
   ],
   "proxies":[
