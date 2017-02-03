@@ -322,6 +322,13 @@ class CoProcessor(object):
 
         writer.FileName = filename
         writer.add_attribute("parameters", writerParametersProxy)
+
+        # If we're outputting through the ExodusII writer we want to disable
+        # the warning about not having meta data available since we can
+        # use this writer for vtkDataSets
+        if hasattr(writer, 'IgnoreMetaDataWarning'):
+            writer.IgnoreMetaDataWarning = 1
+
         self.__WritersList.append(writer)
 
         return writer
