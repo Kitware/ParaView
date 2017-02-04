@@ -30,7 +30,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAdditionalFieldReader : public vtkPass
 public:
   vtkTypeMacro(vtkAdditionalFieldReader, vtkPassInputTypeAlgorithm);
   static vtkAdditionalFieldReader* New();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -44,7 +44,7 @@ protected:
   vtkAdditionalFieldReader();
   ~vtkAdditionalFieldReader();
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * The name of the file to be opened.

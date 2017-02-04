@@ -155,7 +155,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProperty : public vtkSMObject
 public:
   static vtkSMProperty* New();
   vtkTypeMacro(vtkSMProperty, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -194,7 +194,7 @@ public:
    * Overloaded to break the reference loop caused by the
    * internal domain iterator.
    */
-  virtual void UnRegister(vtkObjectBase* obj);
+  virtual void UnRegister(vtkObjectBase* obj) VTK_OVERRIDE;
 
   /**
    * Creates, initializes and returns a new domain iterator. The user
@@ -467,7 +467,7 @@ public:
   /**
    * Overridden to support blocking of modified events.
    */
-  virtual void Modified()
+  virtual void Modified() VTK_OVERRIDE
   {
     if (this->BlockModifiedEvents)
     {

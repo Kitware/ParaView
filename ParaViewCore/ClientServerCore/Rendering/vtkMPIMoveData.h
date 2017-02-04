@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMPIMoveData : public vtkPassInput
 public:
   static vtkMPIMoveData* New();
   vtkTypeMacro(vtkMPIMoveData, vtkPassInputTypeAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Use this method to initialize all communicators/sockets using ParaView
@@ -144,10 +144,10 @@ protected:
   ~vtkMPIMoveData();
 
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
   vtkMultiProcessController* ClientDataServerSocketController;

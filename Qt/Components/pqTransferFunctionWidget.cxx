@@ -86,7 +86,7 @@ public:
   // Perform any updates to the item that may be necessary before rendering.
   // The scene should take care of calling this on all items before their
   // Paint function is invoked.
-  virtual void Update()
+  virtual void Update() VTK_OVERRIDE
   {
     if (this->ControlPointsItem)
     {
@@ -105,7 +105,7 @@ public:
     this->Superclass::Update();
   }
 
-  virtual bool PaintChildren(vtkContext2D* painter)
+  virtual bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
   {
     if (this->DataValid)
     {
@@ -115,31 +115,31 @@ public:
     return true;
   }
 
-  virtual bool MouseEnterEvent(const vtkContextMouseEvent& mouse)
+  virtual bool MouseEnterEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
   }
-  virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse)
+  virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
   }
-  virtual bool MouseLeaveEvent(const vtkContextMouseEvent& mouse)
+  virtual bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
   }
-  virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse)
+  virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
   }
-  virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
+  virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
   }
-  virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta)
+  virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
   }
-  virtual bool KeyPressEvent(const vtkContextKeyEvent& key)
+  virtual bool KeyPressEvent(const vtkContextKeyEvent& key) VTK_OVERRIDE
   {
     return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
   }

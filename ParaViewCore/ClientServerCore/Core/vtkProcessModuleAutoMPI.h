@@ -25,7 +25,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModuleAutoMPI : public vtkObjec
 public:
   static vtkProcessModuleAutoMPI* New();
   vtkTypeMacro(vtkProcessModuleAutoMPI, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static bool EnableAutoMPI;
   static int NumberOfCores;

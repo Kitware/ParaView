@@ -46,7 +46,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSelfGeneratingSourceProxy : public vtkS
 public:
   static vtkSMSelfGeneratingSourceProxy* New();
   vtkTypeMacro(vtkSMSelfGeneratingSourceProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -67,12 +67,12 @@ public:
   /**
    * Overridden to process extended definition XML in the state file.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Overridden to push extended definitions to the server side if not already pushed.
    */
-  virtual void CreateVTKObjects();
+  virtual void CreateVTKObjects() VTK_OVERRIDE;
 
 protected:
   vtkSMSelfGeneratingSourceProxy();

@@ -52,20 +52,20 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFieldDataDomain : public vtkSMEnumerati
 public:
   static vtkSMFieldDataDomain* New();
   vtkTypeMacro(vtkSMFieldDataDomain, vtkSMEnumerationDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Check the input and appropriate fields (point data or cell data)
    * to the enumeration. This uses the Input property with a
    * vtkSMInputArrayDomain.
    */
-  virtual void Update(vtkSMProperty* prop);
+  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
   /**
    * Overridden to ensure that the property's default value is valid for the
    * enumeration, if not it will be set to the first enumeration value.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMFieldDataDomain();
@@ -75,7 +75,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;

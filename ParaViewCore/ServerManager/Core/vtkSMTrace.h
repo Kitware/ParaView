@@ -72,7 +72,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTrace : public vtkSMObject
 public:
   static vtkSMTrace* New();
   vtkTypeMacro(vtkSMTrace, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Provides access to the "active" tracer. There can only be one active tracer

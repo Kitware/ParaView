@@ -30,7 +30,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVBox : public vtkBox
 public:
   static vtkPVBox* New();
   vtkTypeMacro(vtkPVBox, vtkBox);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

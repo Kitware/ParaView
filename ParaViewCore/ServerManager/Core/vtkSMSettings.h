@@ -94,7 +94,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettings : public vtkObject
 public:
   static vtkSMSettings* New();
   vtkTypeMacro(vtkSMSettings, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Get singleton instance.

@@ -33,7 +33,7 @@ class VTKPVANIMATION_EXPORT vtkPVServerSideAnimationPlayer : public vtkObject
 public:
   static vtkPVServerSideAnimationPlayer* New();
   vtkTypeMacro(vtkPVServerSideAnimationPlayer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void SetWriter(vtkSMAnimationSceneImageWriter* writer);
   void SetSessionProxyManagerState(const char* xml_state);

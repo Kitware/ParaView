@@ -37,7 +37,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayRangeDomain : public vtkSMDoubleRa
 public:
   static vtkSMArrayRangeDomain* New();
   vtkTypeMacro(vtkSMArrayRangeDomain, vtkSMDoubleRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Updates the range based on the scalar range of the currently selected
@@ -45,7 +45,7 @@ public:
    * (vtkSMStringVectorProperty) properties. Currently, this uses
    * only the first component of the array.
    */
-  virtual void Update(vtkSMProperty* prop);
+  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
 protected:
   vtkSMArrayRangeDomain();

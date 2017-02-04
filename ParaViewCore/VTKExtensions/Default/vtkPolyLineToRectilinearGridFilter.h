@@ -36,19 +36,19 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPolyLineToRectilinearGridFilter
 public:
   static vtkPolyLineToRectilinearGridFilter* New();
   vtkTypeMacro(vtkPolyLineToRectilinearGridFilter, vtkRectilinearGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkPolyLineToRectilinearGridFilter();
   ~vtkPolyLineToRectilinearGridFilter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
   vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;

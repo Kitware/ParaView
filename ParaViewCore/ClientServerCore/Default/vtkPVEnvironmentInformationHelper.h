@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVEnvironmentInformationHelper : pu
 public:
   static vtkPVEnvironmentInformationHelper* New();
   vtkTypeMacro(vtkPVEnvironmentInformationHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

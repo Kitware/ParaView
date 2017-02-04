@@ -29,8 +29,8 @@ class VTK_EXPORT vtkUncertaintySurfaceRepresentation : public vtkGeometryReprese
 {
 public:
   static vtkUncertaintySurfaceRepresentation* New();
-  vtkTypeMacro(vtkUncertaintySurfaceRepresentation, vtkGeometryRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkUncertaintySurfaceRepresentation, vtkGeometryRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Select the uncertainty array.

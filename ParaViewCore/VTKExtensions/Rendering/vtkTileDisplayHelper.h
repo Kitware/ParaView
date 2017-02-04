@@ -47,7 +47,7 @@ public:
    */
   static vtkTileDisplayHelper* New();
   vtkTypeMacro(vtkTileDisplayHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   //@}
 
   /**

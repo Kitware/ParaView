@@ -45,7 +45,7 @@ public:
   static vtkHierarchicalFractal* New();
 
   vtkTypeMacro(vtkHierarchicalFractal, vtkCompositeDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -143,21 +143,21 @@ protected:
   // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
   // the GenerateRectilinearGrids flag.
   virtual int RequestDataObject(
-    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV);
+    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void Traverse(int& blockId, int level, vtkCompositeDataSet* output, int x0, int x1, int y0,
     int y1, int z0, int z1, int onFace[6]);

@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPlotEdges : public vtkMultiBlockDataSe
 {
 public:
   vtkTypeMacro(vtkPlotEdges, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPlotEdges* New();
 
@@ -41,9 +41,9 @@ protected:
   vtkPlotEdges();
   virtual ~vtkPlotEdges();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   // Usual data generation method
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   void Process(vtkPolyData* input, vtkMultiBlockDataSet* output);
   static void ReducePolyData(vtkPolyData* polyData, vtkPolyData* output);

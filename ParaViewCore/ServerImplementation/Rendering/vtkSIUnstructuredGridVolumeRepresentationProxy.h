@@ -33,7 +33,7 @@ class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepre
 public:
   static vtkSIUnstructuredGridVolumeRepresentationProxy* New();
   vtkTypeMacro(vtkSIUnstructuredGridVolumeRepresentationProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();

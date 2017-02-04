@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEquivalenceSet : public vtkObject
 {
 public:
   vtkTypeMacro(vtkEquivalenceSet, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkEquivalenceSet* New();
 
   void Initialize();

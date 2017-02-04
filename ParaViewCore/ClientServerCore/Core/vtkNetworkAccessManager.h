@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkNetworkAccessManager : public vtkObjec
 {
 public:
   vtkTypeMacro(vtkNetworkAccessManager, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Creates a new connection given the url.

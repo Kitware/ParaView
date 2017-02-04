@@ -43,7 +43,7 @@ class vtkSamplePlaneSource : public vtkPolyDataAlgorithm
 public:
   vtkTypeMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
   static vtkSamplePlaneSource* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // The location of the center of the plane.  A point is guaranteed to be here.
@@ -77,10 +77,10 @@ protected:
 
   vtkMultiProcessController* Controller;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Finds the bounds of a data object (can be either a vtkDataSet or

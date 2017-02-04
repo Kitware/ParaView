@@ -32,12 +32,12 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVDefaultPass : public vtkRenderPass
 public:
   static vtkPVDefaultPass* New();
   vtkTypeMacro(vtkPVDefaultPass, vtkRenderPass);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Actual rendering code.
    */
-  virtual void Render(const vtkRenderState* render_state);
+  virtual void Render(const vtkRenderState* render_state) VTK_OVERRIDE;
 
 protected:
   vtkPVDefaultPass();

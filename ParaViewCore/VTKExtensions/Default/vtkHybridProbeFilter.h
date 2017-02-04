@@ -41,7 +41,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkHybridProbeFilter : public vtkDataObje
 public:
   static vtkHybridProbeFilter* New();
   vtkTypeMacro(vtkHybridProbeFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum ModeType
   {
@@ -66,9 +66,9 @@ protected:
   vtkHybridProbeFilter();
   ~vtkHybridProbeFilter();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   bool InterpolateAtLocation(vtkDataObject* input, vtkUnstructuredGrid* output);
   bool ExtractCellContainingLocation(vtkDataObject* input, vtkUnstructuredGrid* output);

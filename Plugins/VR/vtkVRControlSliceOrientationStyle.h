@@ -41,8 +41,8 @@ class vtkVRControlSliceOrientationStyle : public vtkVRInteractorStyle
 {
 public:
   static vtkVRControlSliceOrientationStyle* New();
-  vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual int GetControlledPropertySize() { return 3; }
 

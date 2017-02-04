@@ -35,7 +35,7 @@ class VTKPVANIMATION_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPla
 public:
   static vtkCompositeAnimationPlayer* New();
   vtkTypeMacro(vtkCompositeAnimationPlayer, vtkAnimationPlayer);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum Modes
   {
@@ -79,13 +79,13 @@ protected:
   /**
    * Delegated to the active animation player.
    */
-  virtual void StartLoop(double starttime, double endtime, double* playbackWindow);
-  virtual void EndLoop();
-  virtual double GetNextTime(double currentime);
+  virtual void StartLoop(double starttime, double endtime, double* playbackWindow) VTK_OVERRIDE;
+  virtual void EndLoop() VTK_OVERRIDE;
+  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
   //@}
 
-  virtual double GoToNext(double start, double end, double currenttime);
-  virtual double GoToPrevious(double start, double end, double currenttime);
+  virtual double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
+  virtual double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
 
   vtkAnimationPlayer* GetActivePlayer();
 

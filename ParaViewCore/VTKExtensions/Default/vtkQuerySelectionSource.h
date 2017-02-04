@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkQuerySelectionSource : public vtkSelec
 public:
   static vtkQuerySelectionSource* New();
   vtkTypeMacro(vtkQuerySelectionSource, vtkSelectionAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -87,10 +87,10 @@ protected:
   ~vtkQuerySelectionSource();
 
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int FieldType;
 

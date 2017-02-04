@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkStructuredGridVolumeRepresentatio
 public:
   static vtkStructuredGridVolumeRepresentation* New();
   vtkTypeMacro(vtkStructuredGridVolumeRepresentation, vtkUnstructuredGridVolumeRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -49,7 +49,7 @@ public:
    * compositing. When off we let the view build its own ordering and
    * redistribute data as needed.
    */
-  void SetUseDataPartitions(bool);
+  void SetUseDataPartitions(bool) VTK_OVERRIDE;
   vtkGetMacro(UseDataPartitions, bool);
   //@}
 
@@ -60,7 +60,7 @@ public:
    * PrepareForRendering.
    */
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
 protected:
   vtkStructuredGridVolumeRepresentation();
@@ -69,9 +69,9 @@ protected:
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   bool UseDataPartitions;
   vtkTableExtentTranslator* TableExtentTranslator;

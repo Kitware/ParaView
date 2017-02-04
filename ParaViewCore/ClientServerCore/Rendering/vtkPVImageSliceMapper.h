@@ -48,14 +48,14 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImageSliceMapper : public vtkMa
 public:
   static vtkPVImageSliceMapper* New();
   vtkTypeMacro(vtkPVImageSliceMapper, vtkMapper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * This calls RenderPiece (in a for loop is streaming is necessary).
    */
-  virtual void Render(vtkRenderer* ren, vtkActor* act);
+  virtual void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
 
-  virtual void ReleaseGraphicsResources(vtkWindow*);
+  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -107,13 +107,13 @@ public:
   /**
    * Update that sets the update piece first.
    */
-  virtual void Update(int port);
-  virtual void Update() { this->Superclass::Update(); }
-  virtual int Update(int port, vtkInformationVector* requests)
+  virtual void Update(int port) VTK_OVERRIDE;
+  virtual void Update() VTK_OVERRIDE { this->Superclass::Update(); }
+  virtual int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
   {
     return this->Superclass::Update(port, requests);
   }
-  virtual int Update(vtkInformation* requests) { return this->Superclass::Update(requests); }
+  virtual int Update(vtkInformation* requests) VTK_OVERRIDE { return this->Superclass::Update(requests); }
 
   //@{
   /**
@@ -140,8 +140,8 @@ public:
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
-  virtual double* GetBounds();
-  virtual void GetBounds(double bounds[6]) { this->Superclass::GetBounds(bounds); };
+  virtual double* GetBounds() VTK_OVERRIDE;
+  virtual void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
   //@}
 
   /**
@@ -154,7 +154,7 @@ protected:
   ~vtkPVImageSliceMapper();
 
   // Tell the executive that we accept vtkImageData.
-  virtual int FillInputPortInformation(int, vtkInformation*);
+  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * Perform the actual rendering.

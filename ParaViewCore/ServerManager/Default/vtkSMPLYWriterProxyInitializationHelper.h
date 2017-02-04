@@ -34,9 +34,9 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPLYWriterProxyInitializationHelper
 public:
   static vtkSMPLYWriterProxyInitializationHelper* New();
   vtkTypeMacro(vtkSMPLYWriterProxyInitializationHelper, vtkSMProxyInitializationHelper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, unsigned long);
+  virtual void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, unsigned long) VTK_OVERRIDE;
 
 protected:
   vtkSMPLYWriterProxyInitializationHelper();

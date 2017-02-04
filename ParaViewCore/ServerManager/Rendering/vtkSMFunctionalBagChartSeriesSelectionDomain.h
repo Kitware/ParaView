@@ -33,12 +33,12 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMFunctionalBagChartSeriesSelectionD
 public:
   static vtkSMFunctionalBagChartSeriesSelectionDomain* New();
   vtkTypeMacro(vtkSMFunctionalBagChartSeriesSelectionDomain, vtkSMChartSeriesSelectionDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the default visibility for a series given its name.
    */
-  virtual bool GetDefaultSeriesVisibility(const char*);
+  virtual bool GetDefaultSeriesVisibility(const char*) VTK_OVERRIDE;
 
 protected:
   vtkSMFunctionalBagChartSeriesSelectionDomain();
@@ -48,7 +48,7 @@ protected:
    * Get the default value that will be used for the series with the given name
    * by this domain.
    */
-  virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
+  virtual std::vector<vtkStdString> GetDefaultValue(const char* series) VTK_OVERRIDE;
 
 private:
   vtkSMFunctionalBagChartSeriesSelectionDomain(

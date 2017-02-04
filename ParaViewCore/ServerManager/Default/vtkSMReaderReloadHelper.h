@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMReaderReloadHelper : public vtkObjec
 public:
   static vtkSMReaderReloadHelper* New();
   vtkTypeMacro(vtkSMReaderReloadHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns true if its possible to reload data files for the given proxy i.e.

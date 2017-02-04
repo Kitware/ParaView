@@ -30,7 +30,7 @@ class VTKPVANIMATION_EXPORT vtkAnimationPlayer : public vtkObject
 {
 public:
   vtkTypeMacro(vtkAnimationPlayer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

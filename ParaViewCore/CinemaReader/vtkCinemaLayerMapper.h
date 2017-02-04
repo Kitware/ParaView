@@ -45,7 +45,7 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaLayerMapper : public vtkMapper2D
 public:
   static vtkCinemaLayerMapper* New();
   vtkTypeMacro(vtkCinemaLayerMapper, vtkMapper2D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * We update the rendering objects in this method.

@@ -49,7 +49,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVScalarBarActor : public vtkScalarB
 {
 public:
   vtkTypeMacro(vtkPVScalarBarActor, vtkScalarBarActor);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVScalarBarActor* New();
 
   //@{
@@ -147,17 +147,17 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow*);
+  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   /**
    * Overridden to sync internal variables with renderer state.
    */
-  int RenderOpaqueGeometry(vtkViewport* viewport);
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
 
   /**
    * Draw the scalar bar and annotation text to the screen.
    */
-  virtual int RenderOverlay(vtkViewport* viewport);
+  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
 
 protected:
   vtkPVScalarBarActor();
@@ -167,14 +167,14 @@ protected:
   /**
    * These methods override the subclass implementation.
    */
-  virtual void PrepareTitleText();
-  virtual void ComputeScalarBarThickness();
-  virtual void LayoutTitle();
-  virtual void ComputeScalarBarLength();
-  virtual void LayoutTicks();
-  virtual void ConfigureAnnotations();
-  virtual void ConfigureTitle();
-  virtual void ConfigureTicks();
+  virtual void PrepareTitleText() VTK_OVERRIDE;
+  virtual void ComputeScalarBarThickness() VTK_OVERRIDE;
+  virtual void LayoutTitle() VTK_OVERRIDE;
+  virtual void ComputeScalarBarLength() VTK_OVERRIDE;
+  virtual void LayoutTicks() VTK_OVERRIDE;
+  virtual void ConfigureAnnotations() VTK_OVERRIDE;
+  virtual void ConfigureTitle() VTK_OVERRIDE;
+  virtual void ConfigureTicks() VTK_OVERRIDE;
   //@}
 
   /**
@@ -182,7 +182,7 @@ protected:
 
    * This overrides the subclass implementation.
    */
-  virtual void EditAnnotations();
+  virtual void EditAnnotations() VTK_OVERRIDE;
 
   /**
    * Set up the ScalarBar, ScalarBarMapper, and ScalarBarActor based on the

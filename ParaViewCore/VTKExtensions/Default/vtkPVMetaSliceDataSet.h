@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet
 {
 public:
   vtkTypeMacro(vtkPVMetaSliceDataSet, vtkPVDataSetAlgorithmSelectorFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVMetaSliceDataSet* New();
 
@@ -43,7 +43,7 @@ public:
   /**
    * Override it so we can change the output type of the filter
    */
-  virtual vtkAlgorithm* SetActiveFilter(int index);
+  virtual vtkAlgorithm* SetActiveFilter(int index) VTK_OVERRIDE;
 
   void SetImplicitFunction(vtkImplicitFunction* func);
 

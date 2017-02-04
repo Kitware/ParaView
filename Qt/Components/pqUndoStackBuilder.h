@@ -76,7 +76,7 @@ class PQCOMPONENTS_EXPORT pqUndoStackBuilder : public vtkSMUndoStackBuilder
 public:
   static pqUndoStackBuilder* New();
   vtkTypeMacro(pqUndoStackBuilder, vtkSMUndoStackBuilder);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
   * Get/Set if all modifications triggerred when not within a Begin/End
@@ -91,13 +91,13 @@ public:
   * Overridden to add observers to not record changes when the
   * stack is being undone/redone.
   */
-  virtual void SetUndoStack(vtkSMUndoStack*);
+  virtual void SetUndoStack(vtkSMUndoStack*) VTK_OVERRIDE;
 
   /**
   * Overridden to filter unwanted event and manage auto undoset creation
   */
   virtual void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
-    const vtkSMMessage* previousState, const vtkSMMessage* newState);
+    const vtkSMMessage* previousState, const vtkSMMessage* newState) VTK_OVERRIDE;
 
 protected:
   pqUndoStackBuilder();

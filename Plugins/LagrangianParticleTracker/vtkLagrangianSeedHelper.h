@@ -32,7 +32,7 @@ class vtkLagrangianSeedHelper : public vtkLagrangianHelperBase
 public:
   static vtkLagrangianSeedHelper* New();
   vtkTypeMacro(vtkLagrangianSeedHelper, vtkLagrangianHelperBase);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum FlowOrConstant
   {
@@ -53,18 +53,18 @@ public:
   /**
    * Remove all arrays to generate, no more array will be generated
    */
-  void RemoveAllArraysToGenerate();
+  void RemoveAllArraysToGenerate() VTK_OVERRIDE;
 
   /**
    * Set the number of arrays to generate
    */
-  void SetNumberOfArrayToGenerate(int i);
+  void SetNumberOfArrayToGenerate(int i) VTK_OVERRIDE;
 
   /**
    * Add an array to generate, eiher from a constant value or by interpolation from the flow
    */
   void SetArrayToGenerate(int i, const char* arrayName, int type, int flowOrConstant,
-    int numberOfComponents, const char* arrayValues);
+    int numberOfComponents, const char* arrayValues) VTK_OVERRIDE;
 
 protected:
   vtkLagrangianSeedHelper();
@@ -76,9 +76,9 @@ protected:
    * of the input
    */
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   class vtkInternals;
   vtkInternals* Internals;

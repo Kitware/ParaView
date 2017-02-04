@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPConvertSelection : public vtkConvertS
 public:
   static vtkPConvertSelection* New();
   vtkTypeMacro(vtkPConvertSelection, vtkConvertSelection);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -46,7 +46,7 @@ protected:
   vtkPConvertSelection();
   ~vtkPConvertSelection();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
 

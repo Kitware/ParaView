@@ -48,7 +48,7 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationScene : public vtkAnimationCue
 public:
   static vtkSMAnimationScene* New();
   vtkTypeMacro(vtkSMAnimationScene, vtkAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -192,9 +192,9 @@ protected:
    * Overridden to ensure that caching parameters are passed to the view
    * correctly.
    */
-  virtual void StartCueInternal();
-  virtual void TickInternal(double currenttime, double deltatime, double clocktime);
-  virtual void EndCueInternal();
+  virtual void StartCueInternal() VTK_OVERRIDE;
+  virtual void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
+  virtual void EndCueInternal() VTK_OVERRIDE;
   //@}
 
   //@{

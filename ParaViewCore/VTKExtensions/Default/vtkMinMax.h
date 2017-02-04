@@ -44,7 +44,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMinMax : public vtkPolyDataAlgorithm
 public:
   static vtkMinMax* New();
   vtkTypeMacro(vtkMinMax, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Selects the operation to perform on the data.
@@ -89,11 +89,11 @@ protected:
   ~vtkMinMax();
 
   // overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // run the algorithm
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // helper methods to break up the work
   void OperateOnField(vtkFieldData* id, vtkFieldData* od);

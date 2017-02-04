@@ -39,7 +39,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
 public:
   vtkTypeMacro(vtkPVView, vtkView);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static void SetEnableStreaming(bool);
   static bool GetEnableStreaming();
@@ -177,7 +177,7 @@ public:
    * Overridden to not call Update() directly on the input representations,
    * instead use ProcessViewRequest() for all vtkPVDataRepresentations.
    */
-  virtual void Update();
+  virtual void Update() VTK_OVERRIDE;
 
   /**
    * Returns true if the application is currently in tile display mode.
@@ -216,7 +216,7 @@ protected:
    * call the superclass implementations. We check that that's not the case and
    * warn.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
+  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
 
   // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
   // in tile-display configurations. Even if your view subclass a simple

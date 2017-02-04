@@ -43,20 +43,20 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOrthographicSliceView : public 
 public:
   static vtkPVOrthographicSliceView* New();
   vtkTypeMacro(vtkPVOrthographicSliceView, vtkPVMultiSliceView);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Initialize the view with an identifier. Unless noted otherwise, this method
    * must be called before calling any other methods on this class.
    * @CallOnAllProcessess
    */
-  virtual void Initialize(unsigned int id);
+  virtual void Initialize(unsigned int id) VTK_OVERRIDE;
 
   /**
    * Overridden to ensure that the SlicePositionAxes3D doesn't get used when
    * determine view bounds.
    */
-  virtual void Update();
+  virtual void Update() VTK_OVERRIDE;
 
   enum
   {
@@ -68,12 +68,12 @@ public:
   /**
    * Overridden to add support for new types of renderers.
    */
-  virtual vtkRenderer* GetRenderer(int rendererType = vtkPVRenderView::DEFAULT_RENDERER);
+  virtual vtkRenderer* GetRenderer(int rendererType = vtkPVRenderView::DEFAULT_RENDERER) VTK_OVERRIDE;
 
   virtual void ResetCamera();
   virtual void ResetCamera(double bounds[6]);
-  virtual void SetInteractionMode(int mode);
-  virtual void SetupInteractor(vtkRenderWindowInteractor*);
+  virtual void SetInteractionMode(int mode) VTK_OVERRIDE;
+  virtual void SetupInteractor(vtkRenderWindowInteractor*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -101,31 +101,31 @@ public:
   /**
    * To avoid confusion, we don't show the center axes at all in this view.
    */
-  virtual void SetCenterAxesVisibility(bool) {}
+  virtual void SetCenterAxesVisibility(bool) VTK_OVERRIDE {}
 
   //*****************************************************************
-  virtual void SetBackground(double r, double g, double b);
-  virtual void SetBackground2(double r, double g, double b);
-  virtual void SetBackgroundTexture(vtkTexture* val);
-  virtual void SetGradientBackground(int val);
-  virtual void SetTexturedBackground(int val);
+  virtual void SetBackground(double r, double g, double b) VTK_OVERRIDE;
+  virtual void SetBackground2(double r, double g, double b) VTK_OVERRIDE;
+  virtual void SetBackgroundTexture(vtkTexture* val) VTK_OVERRIDE;
+  virtual void SetGradientBackground(int val) VTK_OVERRIDE;
+  virtual void SetTexturedBackground(int val) VTK_OVERRIDE;
 
 protected:
   vtkPVOrthographicSliceView();
   ~vtkPVOrthographicSliceView();
 
-  virtual void AboutToRenderOnLocalProcess(bool interactive);
-  virtual void UpdateCenterAxes();
+  virtual void AboutToRenderOnLocalProcess(bool interactive) VTK_OVERRIDE;
+  virtual void UpdateCenterAxes() VTK_OVERRIDE;
 
   //*****************************************************************
   // Forward to vtkPVOrthographicSliceView instances.
-  virtual void SetCenterOfRotation(double x, double y, double z);
-  virtual void SetRotationFactor(double factor);
+  virtual void SetCenterOfRotation(double x, double y, double z) VTK_OVERRIDE;
+  virtual void SetRotationFactor(double factor) VTK_OVERRIDE;
 
   /**
    * Set the vtkPVGridAxes3DActor to use for the view.
    */
-  virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*);
+  virtual void SetGridAxes3DActor(vtkPVGridAxes3DActor*) VTK_OVERRIDE;
 
   enum
   {

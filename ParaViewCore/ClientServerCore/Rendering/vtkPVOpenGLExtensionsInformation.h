@@ -36,12 +36,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation
 public:
   static vtkPVOpenGLExtensionsInformation* New();
   vtkTypeMacro(vtkPVOpenGLExtensionsInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Returns if the given extension is supported.
@@ -52,15 +52,15 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*);
-  virtual void CopyFromStream(const vtkClientServerStream*);
+  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*);
+  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
 protected:
   vtkPVOpenGLExtensionsInformation();

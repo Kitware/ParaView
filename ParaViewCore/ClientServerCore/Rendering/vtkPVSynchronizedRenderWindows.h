@@ -55,7 +55,7 @@ public:
   static vtkPVSynchronizedRenderWindows* New(vtkPVSession* session = NULL);
 
   vtkTypeMacro(vtkPVSynchronizedRenderWindows, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns a render window for use (possibly new).

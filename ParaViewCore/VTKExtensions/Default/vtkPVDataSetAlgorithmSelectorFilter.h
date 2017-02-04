@@ -35,7 +35,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDataSetAlgorithmSelectorFilter : pub
 {
 public:
   vtkTypeMacro(vtkPVDataSetAlgorithmSelectorFilter, vtkAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkPVDataSetAlgorithmSelectorFilter* New();
 
@@ -81,13 +81,13 @@ public:
   /**
    * Override GetMTime because we delegate to other filters to do the real work
    */
-  vtkMTimeType GetMTime();
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   /**
    * Forward those methods to the underneath filters
    */
   virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo);
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   /**
    * Forward those methods to the underneath filters
@@ -101,8 +101,8 @@ protected:
 
   virtual int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   vtkGetMacro(OutputType, int);
   vtkSetMacro(OutputType, int);

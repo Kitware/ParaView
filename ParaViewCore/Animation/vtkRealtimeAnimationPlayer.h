@@ -30,7 +30,7 @@ class VTKPVANIMATION_EXPORT vtkRealtimeAnimationPlayer : public vtkAnimationPlay
 public:
   static vtkRealtimeAnimationPlayer* New();
   vtkTypeMacro(vtkRealtimeAnimationPlayer, vtkAnimationPlayer);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -44,16 +44,16 @@ protected:
   vtkRealtimeAnimationPlayer();
   ~vtkRealtimeAnimationPlayer();
 
-  virtual void StartLoop(double, double, double*);
-  virtual void EndLoop() {}
+  virtual void StartLoop(double, double, double*) VTK_OVERRIDE;
+  virtual void EndLoop() VTK_OVERRIDE {}
 
   /**
    * Return the next time given the current time.
    */
-  virtual double GetNextTime(double currentime);
+  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
 
-  virtual double GoToNext(double start, double end, double currenttime);
-  virtual double GoToPrevious(double start, double end, double currenttime);
+  virtual double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
+  virtual double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
 
   unsigned long Duration;
   double StartTime;

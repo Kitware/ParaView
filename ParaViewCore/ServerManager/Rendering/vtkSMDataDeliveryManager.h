@@ -41,7 +41,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMDataDeliveryManager : public vtkSM
 public:
   static vtkSMDataDeliveryManager* New();
   vtkTypeMacro(vtkSMDataDeliveryManager, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Get/Set the view proxy for whom we are delivering the data.

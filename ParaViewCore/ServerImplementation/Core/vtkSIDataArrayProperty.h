@@ -30,7 +30,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIDataArrayProperty : public vtkSI
 public:
   static vtkSIDataArrayProperty* New();
   vtkTypeMacro(vtkSIDataArrayProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSIDataArrayProperty();
@@ -41,7 +41,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;

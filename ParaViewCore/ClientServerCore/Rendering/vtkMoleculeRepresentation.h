@@ -32,13 +32,13 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation
 {
 public:
   static vtkMoleculeRepresentation* New();
-  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* requestType, vtkInformation* inputInfo, vtkInformation* outputInfo);
+    vtkInformationRequestKey* requestType, vtkInformation* inputInfo, vtkInformation* outputInfo) VTK_OVERRIDE;
 
-  virtual void SetVisibility(bool value);
+  virtual void SetVisibility(bool value) VTK_OVERRIDE;
 
   vtkGetMacro(MoleculeRenderMode, int) void SetMoleculeRenderMode(int mode);
 
@@ -53,20 +53,20 @@ public:
 
   // Description:
   // Returns the data object that is rendered from the given input port.
-  virtual vtkDataObject* GetRenderedDataObject(int port);
+  virtual vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
 
-  void MarkModified();
+  void MarkModified() VTK_OVERRIDE;
 
 protected:
   vtkMoleculeRepresentation();
   ~vtkMoleculeRepresentation();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual bool AddToView(vtkView* view);
-  virtual bool RemoveFromView(vtkView* view);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
-  bool IsCached(double cache_key);
+  bool IsCached(double cache_key) VTK_OVERRIDE;
 
   void SyncMapper();
   void UpdateColoringParameters();

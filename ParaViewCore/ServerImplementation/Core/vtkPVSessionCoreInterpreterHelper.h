@@ -38,7 +38,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionCoreInterpreterHelper : p
 public:
   static vtkPVSessionCoreInterpreterHelper* New();
   vtkTypeMacro(vtkPVSessionCoreInterpreterHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the vtkSIObject for the global-id. This is used by SIOBJECT() and

@@ -13,7 +13,7 @@ class vtkPVRandomPointsStreamingSource : public vtkMultiBlockDataSetAlgorithm
 public:
   vtkTypeMacro(vtkPVRandomPointsStreamingSource, vtkMultiBlockDataSetAlgorithm);
   static vtkPVRandomPointsStreamingSource* New();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Sets/Gets the number of levels of detail to create.  Each level will
@@ -37,8 +37,8 @@ protected:
   vtkPVRandomPointsStreamingSource();
   virtual ~vtkPVRandomPointsStreamingSource();
 
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int NumLevels;
   int PointsPerBlock;
   int Seed;

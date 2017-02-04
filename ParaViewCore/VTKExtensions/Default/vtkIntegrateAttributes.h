@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateAttributes : public vtkUnstru
 {
 public:
   vtkTypeMacro(vtkIntegrateAttributes, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkIntegrateAttributes* New();
 
   void SetController(vtkMultiProcessController* controller);
@@ -54,12 +54,12 @@ protected:
   vtkMultiProcessController* Controller;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive();
+  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int, vtkInformation*);
+  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   int CompareIntegrationDimension(vtkDataSet* output, int dim);
   int IntegrationDimension;

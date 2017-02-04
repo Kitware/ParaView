@@ -30,7 +30,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkSession : public vtkObject
 {
 public:
   vtkTypeMacro(vtkSession, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns true is this session is active/alive/valid.

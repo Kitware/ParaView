@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVSynchronizedRenderer : public v
 public:
   static vtkPVSynchronizedRenderer* New();
   vtkTypeMacro(vtkPVSynchronizedRenderer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

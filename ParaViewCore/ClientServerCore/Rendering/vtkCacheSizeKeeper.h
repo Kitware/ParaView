@@ -31,7 +31,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCacheSizeKeeper : public vtkObjec
 {
 public:
   vtkTypeMacro(vtkCacheSizeKeeper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the singleton.

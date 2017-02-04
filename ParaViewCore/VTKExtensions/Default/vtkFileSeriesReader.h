@@ -62,7 +62,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkMetaReade
 public:
   static vtkFileSeriesReader* New();
   vtkTypeMacro(vtkFileSeriesReader, vtkMetaReader);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * All pipeline passes are forwarded to the internal reader. The
@@ -70,7 +70,7 @@ public:
    * updated the file name of the internal in RequestUpdateExtent based
    * on the time step request.
    */
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * CanReadFile is forwarded to the internal reader if it supports it.
@@ -124,8 +124,8 @@ protected:
   ~vtkFileSeriesReader();
 
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
   {
@@ -137,9 +137,9 @@ protected:
     return 1;
   };
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Make sure the reader's output is set to the given index and, if it changed,

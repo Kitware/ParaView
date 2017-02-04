@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonModule : public vtkObject
 public:
   vtkTypeMacro(vtkPVPythonModule, vtkObject);
   static vtkPVPythonModule* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

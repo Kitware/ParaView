@@ -34,7 +34,7 @@ class VTKPVANIMATION_EXPORT vtkTimestepsAnimationPlayer : public vtkAnimationPla
 public:
   static vtkTimestepsAnimationPlayer* New();
   vtkTypeMacro(vtkTimestepsAnimationPlayer, vtkAnimationPlayer);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -80,20 +80,20 @@ protected:
   ~vtkTimestepsAnimationPlayer();
   //@}
 
-  virtual void StartLoop(double, double, double*);
-  virtual void EndLoop(){};
+  virtual void StartLoop(double, double, double*) VTK_OVERRIDE;
+  virtual void EndLoop() VTK_OVERRIDE {};
 
   /**
    * Return the next time given the current time.
    */
-  virtual double GetNextTime(double currentime);
+  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
 
-  virtual double GoToNext(double, double, double currenttime)
+  virtual double GoToNext(double, double, double currenttime) VTK_OVERRIDE
   {
     return this->GetNextTimeStep(currenttime);
   }
 
-  virtual double GoToPrevious(double, double, double currenttime)
+  virtual double GoToPrevious(double, double, double currenttime) VTK_OVERRIDE
   {
     return this->GetPreviousTimeStep(currenttime);
   }

@@ -42,16 +42,16 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTooltipSelectionPipeline
 public:
   static vtkSMTooltipSelectionPipeline* New();
   vtkTypeMacro(vtkSMTooltipSelectionPipeline, vtkSMPreselectionPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkSMTooltipSelectionPipeline* GetInstance();
 
   //@{
   /**
    * Re-implemented from vtkSMPreselectionPipeline
    */
-  virtual void Hide(vtkSMRenderViewProxy* view);
+  virtual void Hide(vtkSMRenderViewProxy* view) VTK_OVERRIDE;
   virtual void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
-    vtkSMRenderViewProxy* view);
+    vtkSMRenderViewProxy* view) VTK_OVERRIDE;
   //@}
 
   /**
@@ -74,7 +74,7 @@ protected:
   /**
    * Re-implemented from vtkSMPreselectionPipeline
    */
-  void ClearCache();
+  void ClearCache() VTK_OVERRIDE;
 
   /**
    * Connect the ClientServerMoveData filter to the pipeline to get

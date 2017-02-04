@@ -38,10 +38,10 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPointGaussianRepresentation
 public:
   vtkTypeMacro(vtkPointGaussianRepresentation,
     vtkPVDataRepresentation) static vtkPointGaussianRepresentation* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * Use to set the color map for the data in this representation
@@ -51,7 +51,7 @@ public:
   /**
    * Use to set whether the data in this representation is visible or not
    */
-  virtual void SetVisibility(bool val);
+  virtual void SetVisibility(bool val) VTK_OVERRIDE;
 
   /**
    * Use to set whether the splat emits light
@@ -169,11 +169,11 @@ protected:
   vtkPointGaussianRepresentation();
   virtual ~vtkPointGaussianRepresentation();
 
-  virtual bool AddToView(vtkView* view);
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkSmartPointer<vtkActor> Actor;
   vtkSmartPointer<vtkPointGaussianMapper> Mapper;

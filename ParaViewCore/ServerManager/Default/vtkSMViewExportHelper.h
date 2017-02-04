@@ -37,7 +37,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMViewExportHelper : public vtkSMObjec
 public:
   static vtkSMViewExportHelper* New();
   vtkTypeMacro(vtkSMViewExportHelper, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns a formatted string with all supported file types for the given

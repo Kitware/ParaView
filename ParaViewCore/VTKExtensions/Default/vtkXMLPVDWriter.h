@@ -34,12 +34,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 public:
   static vtkXMLPVDWriter* New();
   vtkTypeMacro(vtkXMLPVDWriter, vtkXMLWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Get the default file extension for files written by this writer.
    */
-  virtual const char* GetDefaultFileExtension();
+  virtual const char* GetDefaultFileExtension() VTK_OVERRIDE;
 
   //@{
   /**
@@ -82,19 +82,19 @@ public:
   //@}
 
   // See the vtkAlgorithm for a desciption of what these do
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkXMLPVDWriter();
   ~vtkXMLPVDWriter();
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Replace vtkXMLWriter's writing driver method.
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int WriteData();
-  virtual const char* GetDataSetName();
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int WriteData() VTK_OVERRIDE;
+  virtual const char* GetDataSetName() VTK_OVERRIDE;
 
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
@@ -143,7 +143,7 @@ protected:
   vtkCallbackCommand* ProgressObserver;
 
   // Garbage collection support.
-  virtual void ReportReferences(vtkGarbageCollector*);
+  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
 private:
   vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;

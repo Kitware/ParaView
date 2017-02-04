@@ -30,7 +30,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMMapProperty : public vtkSMProperty
 {
 public:
   vtkTypeMacro(vtkSMMapProperty, vtkSMProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns the number of elements for the value type.
@@ -40,19 +40,19 @@ public:
   /**
    * Returns true if the current value is the same as the default value.
    */
-  virtual bool IsValueDefault();
+  virtual bool IsValueDefault() VTK_OVERRIDE;
 
   /**
    * Copy all property values.
    */
-  virtual void Copy(vtkSMProperty* src);
+  virtual void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
 protected:
   vtkSMMapProperty();
   ~vtkSMMapProperty();
 
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
   vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;

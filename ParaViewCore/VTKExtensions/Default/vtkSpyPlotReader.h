@@ -76,7 +76,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotReader : public vtkCompositeDat
 public:
   static vtkSpyPlotReader* New();
   vtkTypeMacro(vtkSpyPlotReader, vtkCompositeDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   void PrintBlockList(vtkNonOverlappingAMR* hbds, int myProcId);
 
   //@{
@@ -284,22 +284,22 @@ protected:
   // The array selections.
   vtkDataArraySelection* CellDataArraySelection;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
   virtual int RequestDataObject(
-    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV);
+    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   // Read the case file and the first binary file do get meta
   // informations (number of files, number of fields, number of timestep).
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * This does the updating of meta data of the dataset from the
@@ -344,7 +344,7 @@ protected:
    * Overwritten to avoid hiding.
    */
   virtual int UpdateTimeStep(
-    double time, int piece = -1, int numPieces = 1, int ghostLevels = 0, const int extents[6] = 0)
+    double time, int piece = -1, int numPieces = 1, int ghostLevels = 0, const int extents[6] = 0) VTK_OVERRIDE
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
   }

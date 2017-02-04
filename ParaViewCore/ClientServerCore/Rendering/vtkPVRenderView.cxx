@@ -203,7 +203,7 @@ public:
   vtkTypeMacro(vtkPVRendererCuller, vtkCuller);
 
   virtual double Cull(
-    vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength, int& initialized)
+    vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength, int& initialized) VTK_OVERRIDE
   {
     double total_time = 0;
     if (listLength <= 0)

@@ -67,7 +67,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVXYChartView : public vtkPVConte
 public:
   static vtkPVXYChartView* New();
   vtkTypeMacro(vtkPVXYChartView, vtkPVContextView);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Set the chart type, defaults to line chart
@@ -431,7 +431,7 @@ public:
   /**
    * Get the context item.
    */
-  virtual vtkAbstractContextItem* GetContextItem();
+  virtual vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
 
   /**
    * Representations can use this method to set the selection for a particular
@@ -440,12 +440,12 @@ public:
    * the local process alone. The view does not manage data movement for the
    * selection.
    */
-  virtual void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection);
+  virtual void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) VTK_OVERRIDE;
 
   /**
    * Overridden to rescale axes range on every update.
    */
-  virtual void Update();
+  virtual void Update() VTK_OVERRIDE;
 
 protected:
   vtkPVXYChartView();
@@ -457,7 +457,7 @@ protected:
   /**
    * Actual rendering implementation.
    */
-  virtual void Render(bool interactive);
+  virtual void Render(bool interactive) VTK_OVERRIDE;
 
   //@{
   /**

@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerOptions : public vtkPVOptions
 public:
   static vtkPVServerOptions* New();
   vtkTypeMacro(vtkPVServerOptions, vtkPVOptions);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -58,7 +58,7 @@ public:
    * Pass in the name and the attributes for all tags that are not Options.
    * If it returns 1, then it is successful, and 0 if it failed.
    */
-  virtual int ParseExtraXMLTag(const char* name, const char** atts);
+  virtual int ParseExtraXMLTag(const char* name, const char** atts) VTK_OVERRIDE;
 
   //@{
   /**
@@ -79,7 +79,7 @@ public:
   // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
   // is to be used.
   int GetStereoType(unsigned int idx);
-  virtual char* GetStereoType() { return this->Superclass::GetStereoType(); }
+  virtual char* GetStereoType() VTK_OVERRIDE { return this->Superclass::GetStereoType(); }
 protected:
   /**
    * Add machine information from the xml tag <Machine ....>
@@ -101,7 +101,7 @@ protected:
    */
   virtual ~vtkPVServerOptions();
 
-  virtual void Initialize();
+  virtual void Initialize() VTK_OVERRIDE;
 
   vtkSetStringMacro(ClientHostName);
   char* ClientHostName;

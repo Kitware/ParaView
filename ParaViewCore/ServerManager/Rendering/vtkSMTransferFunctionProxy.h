@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionProxy : public vtk
 public:
   static vtkSMTransferFunctionProxy* New();
   vtkTypeMacro(vtkSMTransferFunctionProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Rescale the "RGBPoints" for the transfer function to match the new range.

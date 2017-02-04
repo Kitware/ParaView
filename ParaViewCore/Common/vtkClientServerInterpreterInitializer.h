@@ -37,7 +37,7 @@ class VTKPVCOMMON_EXPORT vtkClientServerInterpreterInitializer : public vtkObjec
 {
 public:
   vtkTypeMacro(vtkClientServerInterpreterInitializer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Creates (and registers) a new interpreter.

@@ -31,7 +31,7 @@ class VTKPVCOMMON_EXPORT vtkStringList : public vtkObject
 public:
   static vtkStringList* New();
   vtkTypeMacro(vtkStringList, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

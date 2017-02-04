@@ -71,24 +71,24 @@ public:
 public:
   static vtkPVSystemConfigInformation* New();
   vtkTypeMacro(vtkPVSystemConfigInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject* obj);
+  virtual void CopyFromObject(vtkObject* obj) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation* info);
+  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream* css);
-  virtual void CopyFromStream(const vtkClientServerStream* css);
+  virtual void CopyToStream(vtkClientServerStream* css) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
   //@}
 
   /**

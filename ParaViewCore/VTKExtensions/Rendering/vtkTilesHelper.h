@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkTilesHelper : public vtkObject
 public:
   static vtkTilesHelper* New();
   vtkTypeMacro(vtkTilesHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**

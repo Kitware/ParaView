@@ -104,10 +104,10 @@ private:
   pqOutputWindowAdapter& operator=(const pqOutputWindowAdapter&);
   ~pqOutputWindowAdapter();
 
-  virtual void DisplayText(const char*);
-  virtual void DisplayErrorText(const char*);
-  virtual void DisplayWarningText(const char*);
-  virtual void DisplayGenericWarningText(const char*);
+  virtual void DisplayText(const char*) VTK_OVERRIDE;
+  virtual void DisplayErrorText(const char*) VTK_OVERRIDE;
+  virtual void DisplayWarningText(const char*) VTK_OVERRIDE;
+  virtual void DisplayGenericWarningText(const char*) VTK_OVERRIDE;
 
   bool Active;
 };

@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAttributeDataToTableFilter : public 
 public:
   static vtkAttributeDataToTableFilter* New();
   vtkTypeMacro(vtkAttributeDataToTableFilter, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -92,17 +92,17 @@ protected:
   // Overridden to indicate to the executive that we accept non-composite
   // datasets. We let the executive manage the looping over the composite
   // dataset leaves.
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Perform the data processing
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Create a default executive.
    */
-  virtual vtkExecutive* CreateDefaultExecutive();
+  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Internal method to return the chosen field from the input. May return 0 is

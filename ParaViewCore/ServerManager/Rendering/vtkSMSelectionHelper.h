@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSelectionHelper : public vtkSMObje
 public:
   static vtkSMSelectionHelper* New();
   vtkTypeMacro(vtkSMSelectionHelper, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Given a selection, returns a proxy for a selection source that has

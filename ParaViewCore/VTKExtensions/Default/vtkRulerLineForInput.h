@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRulerLineForInput : public vtkPolyData
 {
 public:
   vtkTypeMacro(vtkRulerLineForInput, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkRulerLineForInput* New();
 
   virtual void SetController(vtkMultiProcessController*);

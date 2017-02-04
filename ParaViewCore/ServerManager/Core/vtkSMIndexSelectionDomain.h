@@ -30,13 +30,14 @@
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIndexSelectionDomain : public vtkSMDomain
 {
 public:
-  vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain) virtual void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+
   static vtkSMIndexSelectionDomain* New();
 
-  virtual int IsInDomain(vtkSMProperty* property);
+  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
-  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values);
+  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
 
   vtkSMProperty* GetInfoProperty() { return this->GetRequiredProperty("Info"); }
 

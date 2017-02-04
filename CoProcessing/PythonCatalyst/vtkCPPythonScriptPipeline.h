@@ -31,7 +31,7 @@ class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipelin
 public:
   static vtkCPPythonScriptPipeline* New();
   vtkTypeMacro(vtkCPPythonScriptPipeline, vtkCPPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /// Initialize this pipeline from given the file name of a
   /// python script. Returns 1 for success and 0 for failure.
@@ -44,14 +44,14 @@ public:
   /// it fills in the FieldNames array that the coprocessor requires
   /// in order to fulfill all the coprocessing requests for this
   /// TimeStep/Time combination.
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription);
+  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) VTK_OVERRIDE;
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* dataDescription);
+  virtual int CoProcess(vtkCPDataDescription* dataDescription) VTK_OVERRIDE;
 
   /// Finalize the pipeline before deleting it. A default no-op implementation
   /// is given. Returns 1 for success and 0 for failure.
-  virtual int Finalize();
+  virtual int Finalize() VTK_OVERRIDE;
 
 protected:
   vtkCPPythonScriptPipeline();

@@ -33,7 +33,7 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPBaseFieldBuilder : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPBaseFieldBuilder, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Return a grid.  BuiltNewField is set to 0 if the grids

@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesWidget : public vtkInteractorO
 public:
   static vtkPVAxesWidget* New();
   vtkTypeMacro(vtkPVAxesWidget, vtkInteractorObserver);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Layer number to use for the internal renderer created by vtkPVAxesWidget.
@@ -56,7 +56,7 @@ public:
   /**
    * Enable the 3D widget.
    */
-  virtual void SetEnabled(int);
+  virtual void SetEnabled(int) VTK_OVERRIDE;
 
   //@{
   /**

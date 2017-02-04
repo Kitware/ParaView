@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkSessionIterator : public vtkObject
 public:
   static vtkSessionIterator* New();
   vtkTypeMacro(vtkSessionIterator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Begin iterating over the composite dataset structure.

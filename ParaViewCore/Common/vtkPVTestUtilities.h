@@ -33,7 +33,7 @@ class VTKPVCOMMON_EXPORT vtkPVTestUtilities : public vtkObject
 public:
   // the usual vtk stuff
   vtkTypeMacro(vtkPVTestUtilities, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVTestUtilities* New();
 
   /**

@@ -35,24 +35,24 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentationPipeline
 public:
   static vtkPVDataRepresentationPipeline* New();
   vtkTypeMacro(vtkPVDataRepresentationPipeline, vtkCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkPVDataRepresentationPipeline();
   ~vtkPVDataRepresentationPipeline();
 
-  virtual int ForwardUpstream(int i, int j, vtkInformation* request);
-  virtual int ForwardUpstream(vtkInformation* request);
+  virtual int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
+  virtual int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
 
   virtual void ExecuteDataEnd(
-    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
+    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   // Override this check to account for update extent.
   virtual int NeedToExecuteData(
-    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec);
+    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
 private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;

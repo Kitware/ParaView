@@ -31,7 +31,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMOb
 public:
   static vtkSMStateVersionController* New();
   vtkTypeMacro(vtkSMStateVersionController, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Called before a state is loaded.

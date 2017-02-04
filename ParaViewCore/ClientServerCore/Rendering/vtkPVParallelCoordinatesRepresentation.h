@@ -34,12 +34,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentati
 public:
   static vtkPVParallelCoordinatesRepresentation* New();
   vtkTypeMacro(vtkPVParallelCoordinatesRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Set visibility of the representation.
    */
-  virtual void SetVisibility(bool visible);
+  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -89,7 +89,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  virtual bool Export(vtkCSVExporter* exporter);
+  virtual bool Export(vtkCSVExporter* exporter) VTK_OVERRIDE;
 
 protected:
   vtkPVParallelCoordinatesRepresentation();
@@ -99,16 +99,16 @@ protected:
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  virtual void PrepareForRendering();
+  virtual void PrepareForRendering() VTK_OVERRIDE;
 
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   int LineThickness;
   int LineStyle;

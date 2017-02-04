@@ -45,7 +45,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkGridAxesPlane2DActor : public vtkProp3
 public:
   static vtkGridAxesPlane2DActor* New();
   vtkTypeMacro(vtkGridAxesPlane2DActor, vtkProp3D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -176,18 +176,18 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double* GetBounds()
+  virtual double* GetBounds() VTK_OVERRIDE
   {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
   }
   //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport*);
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport);
-  virtual int RenderOverlay(vtkViewport* viewport);
-  virtual int HasTranslucentPolygonalGeometry();
-  virtual void ReleaseGraphicsResources(vtkWindow*);
+  virtual int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
+  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
 protected:
   vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = NULL);

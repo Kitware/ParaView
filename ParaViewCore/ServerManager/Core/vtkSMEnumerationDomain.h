@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
 public:
   static vtkSMEnumerationDomain* New();
   vtkTypeMacro(vtkSMEnumerationDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns true if the value of the propery is in the domain.
@@ -46,7 +46,7 @@ public:
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property);
+  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if the int is in the domain. If value is
@@ -106,14 +106,14 @@ public:
    * Update self based on the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty* property);
+  virtual void Update(vtkSMProperty* property) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to ensure that the property's default value is valid for the
    * enumeration, if not it will be set to the first enumeration value.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMEnumerationDomain();
@@ -124,9 +124,9 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  virtual void ChildSaveState(vtkPVXMLElement* domainElement);
+  virtual void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
 
   vtkSMEnumerationDomainInternals* EInternals;
 

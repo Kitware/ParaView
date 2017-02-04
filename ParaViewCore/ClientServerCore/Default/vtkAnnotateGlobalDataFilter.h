@@ -39,7 +39,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateGlobalDataFilter
 public:
   static vtkAnnotateGlobalDataFilter* New();
   vtkTypeMacro(vtkAnnotateGlobalDataFilter, vtkPythonAnnotationFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -69,7 +69,7 @@ protected:
   vtkAnnotateGlobalDataFilter();
   ~vtkAnnotateGlobalDataFilter();
 
-  virtual void EvaluateExpression();
+  virtual void EvaluateExpression() VTK_OVERRIDE;
 
   char* Prefix;
   char* Postfix;

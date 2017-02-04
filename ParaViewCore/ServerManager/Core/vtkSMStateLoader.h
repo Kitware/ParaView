@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateLoader : public vtkSMDeserializerX
 public:
   static vtkSMStateLoader* New();
   vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializerXML);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Load the state from the given root element.
@@ -101,14 +101,14 @@ protected:
    * This order is a dependency order too and hence helps us register proxies in
    * order of dependencies.
    */
-  virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
+  virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Overridden so that when new views are to be created, we create views
    * suitable for the connection.
    */
   virtual vtkSMProxy* CreateProxy(
-    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL);
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) VTK_OVERRIDE;
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
@@ -143,7 +143,7 @@ protected:
    * This is used by NewProxy() when the proxy with the given id
    * is not located in the internal CreatedProxies map.
    */
-  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
+  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
   /**
    * Used by LocateProxyElement(). Recursively tries to locate the

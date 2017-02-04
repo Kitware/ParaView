@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextInteractorStyle
 public:
   static vtkPVContextInteractorStyle* New();
   vtkTypeMacro(vtkPVContextInteractorStyle, vtkContextInteractorStyle);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void OnLeftButtonDown() VTK_OVERRIDE;
   void OnLeftButtonUp() VTK_OVERRIDE;

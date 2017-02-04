@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRFragmentsFilter : public vtkMultiBl
 public:
   static vtkAMRFragmentsFilter* New();
   vtkTypeMacro(vtkAMRFragmentsFilter, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -126,9 +126,9 @@ protected:
   vtkAMRConnectivity* Connectivity;
   vtkPVAMRFragmentIntegration* Integration;
 
-  virtual int FillInputPortInformation(int, vtkInformation*);
-  virtual int FillOutputPortInformation(int, vtkInformation*);
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
   vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;

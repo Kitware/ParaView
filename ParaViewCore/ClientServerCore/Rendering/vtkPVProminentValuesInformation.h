@@ -48,7 +48,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVProminentValuesInformation
 public:
   static vtkPVProminentValuesInformation* New();
   vtkTypeMacro(vtkPVProminentValuesInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -118,7 +118,7 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Transfer information about a single vtkAbstractArray's prominent values into this object.
@@ -131,22 +131,22 @@ public:
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation* other);
+  virtual void AddInformation(vtkPVInformation* other) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*);
-  virtual void CopyFromStream(const vtkClientServerStream*);
+  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Push/pop parameters controlling which array to sample onto/off of the stream.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&);
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&);
+  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
   //@}
 
   /**

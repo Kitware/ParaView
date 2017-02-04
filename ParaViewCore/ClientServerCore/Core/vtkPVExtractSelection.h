@@ -52,7 +52,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVExtractSelection : public vtkExtract
 {
 public:
   vtkTypeMacro(vtkPVExtractSelection, vtkExtractSelection);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static const int OUTPUT_PORT_EXTRACTED_DATASET = 0;
   static const int OUTPUT_PORT_SELECTION_IDS = 1;
@@ -74,12 +74,12 @@ protected:
 
   // sets up empty output dataset
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // runs the algorithm and fills the output with results
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   vtkSelectionNode* LocateSelection(unsigned int level, unsigned int index, vtkSelection* sel);
   vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);

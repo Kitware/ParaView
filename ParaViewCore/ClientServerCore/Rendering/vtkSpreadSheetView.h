@@ -43,25 +43,25 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetView : public vtkPVVie
 public:
   static vtkSpreadSheetView* New();
   vtkTypeMacro(vtkSpreadSheetView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Triggers a high-resolution render.
    * @CallOnAllProcessess
    */
-  virtual void StillRender() { this->StreamToClient(); }
+  virtual void StillRender() VTK_OVERRIDE { this->StreamToClient(); }
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * @CallOnAllProcessess
    */
-  virtual void InteractiveRender() { this->StreamToClient(); }
+  virtual void InteractiveRender() VTK_OVERRIDE { this->StreamToClient(); }
 
   /**
    * Overridden to identify and locate the active-representation.
    */
-  virtual void Update();
+  virtual void Update() VTK_OVERRIDE;
 
   //@{
   /**

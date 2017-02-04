@@ -48,12 +48,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGridAxes3DActor : public vtkGridAxes
 public:
   static vtkPVGridAxes3DActor* New();
   vtkTypeMacro(vtkPVGridAxes3DActor, vtkGridAxes3DActor);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Shallow copy from another vtkPVGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp* prop);
+  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   //@{
   /**
@@ -82,13 +82,13 @@ public:
    * Overridden to ensure that the transform information is passed on the
    * superclass.
    */
-  virtual double* GetBounds();
+  virtual double* GetBounds() VTK_OVERRIDE;
 
 protected:
   vtkPVGridAxes3DActor();
   ~vtkPVGridAxes3DActor();
 
-  virtual void Update(vtkViewport* viewport);
+  virtual void Update(vtkViewport* viewport) VTK_OVERRIDE;
   void UpdateGridBounds();
   void UpdateGridBoundsUsingDataBounds();
   void UpdateGridBoundsUsingModelTransform();

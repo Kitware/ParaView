@@ -59,12 +59,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixRepresentation
 public:
   static vtkPVPlotMatrixRepresentation* New();
   vtkTypeMacro(vtkPVPlotMatrixRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Sets the visibility for the plot matrix representation.
    */
-  virtual void SetVisibility(bool visible);
+  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -124,17 +124,17 @@ protected:
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  virtual void PrepareForRendering();
+  virtual void PrepareForRendering() VTK_OVERRIDE;
 
   /**
    * Add the plot matrix representation to the view.
    */
-  virtual bool AddToView(vtkView* view);
+  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Remove the plot matrix representation from the view.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
   vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;

@@ -35,7 +35,7 @@ class VTKPVCOMMON_EXPORT vtkPVXMLElement : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVXMLElement, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVXMLElement* New();
 
   //@{

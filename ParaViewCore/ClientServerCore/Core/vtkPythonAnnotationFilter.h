@@ -45,7 +45,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnnotationFilter : public vtkTab
 public:
   static vtkPythonAnnotationFilter* New();
   vtkTypeMacro(vtkPythonAnnotationFilter, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -100,9 +100,9 @@ protected:
   vtkPythonAnnotationFilter();
   ~vtkPythonAnnotationFilter();
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   virtual void EvaluateExpression();
 

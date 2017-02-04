@@ -34,7 +34,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgo
 {
 public:
   vtkTypeMacro(vtkCompleteArrays, vtkDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkCompleteArrays* New();
 
   //@{
@@ -50,7 +50,7 @@ protected:
   ~vtkCompleteArrays();
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
   vtkMultiProcessController* Controller;
 
 private:

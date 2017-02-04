@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIWriterProxy : public vtkSISource
 public:
   static vtkSIWriterProxy* New();
   vtkTypeMacro(vtkSIWriterProxy, vtkSISourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -38,8 +38,8 @@ public:
    * insert VTK-algorithms in the input pipeline.
    * Overridden to insert "CompleteArrays" filter in the pipeline.
    */
-  virtual void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method);
-  virtual void CleanInputs(const char* method);
+  virtual void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method) VTK_OVERRIDE;
+  virtual void CleanInputs(const char* method) VTK_OVERRIDE;
   //@}
 
   /**
@@ -62,7 +62,7 @@ protected:
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element);
+  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   char* FileNameMethod;
   vtkSetStringMacro(FileNameMethod);

@@ -40,7 +40,7 @@ class vtkMomentGlyphs : public vtkPolyDataAlgorithm
 public:
   vtkTypeMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);
   static vtkMomentGlyphs* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // These are basically a convenience method that calls SetInputArrayToProcess
@@ -73,10 +73,10 @@ protected:
   int InputMomentIsDensity;
   int ScaleByDensity;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   virtual void MakeMomentVectors(
     vtkSmartPointer<vtkDataSet>& input, vtkSmartPointer<vtkDataArray>& inputArray);

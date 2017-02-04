@@ -41,13 +41,13 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkXYChartRepresentation : public vt
 public:
   static vtkXYChartRepresentation* New();
   vtkTypeMacro(vtkXYChartRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Set visibility of the representation. Overridden to ensure that internally
    * added vtkPlot instances are updated when hiding the representation.
    */
-  virtual void SetVisibility(bool visible);
+  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -132,7 +132,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  virtual bool Export(vtkCSVExporter* exporter);
+  virtual bool Export(vtkCSVExporter* exporter) VTK_OVERRIDE;
 
 protected:
   vtkXYChartRepresentation();
@@ -141,11 +141,11 @@ protected:
   /**
    * Overridden to remove all plots from the view.
    */
-  virtual bool RemoveFromView(vtkView* view);
+  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual void PrepareForRendering();
+  virtual void PrepareForRendering() VTK_OVERRIDE;
 
   class vtkInternals;
   friend class vtkInternals;

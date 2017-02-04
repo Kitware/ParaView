@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVPlotTime : public vtkPlot
 public:
   static vtkPVPlotTime* New();
   vtkTypeMacro(vtkPVPlotTime, vtkPlot);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   enum
   {
@@ -59,12 +59,12 @@ public:
   /**
    * Paint event for the axis, called whenever the axis needs to be drawn
    */
-  virtual bool Paint(vtkContext2D* painter);
+  virtual bool Paint(vtkContext2D* painter) VTK_OVERRIDE;
 
   /**
    * Get the bounds for this plot as (Xmin, Xmax, Ymin, Ymax).
    */
-  virtual void GetBounds(double bounds[4])
+  virtual void GetBounds(double bounds[4]) VTK_OVERRIDE
   {
     bounds[0] = bounds[2] = 1.0;
     bounds[1] = bounds[3] = -1.0;

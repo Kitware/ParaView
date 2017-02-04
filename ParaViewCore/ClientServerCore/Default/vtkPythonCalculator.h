@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPythonCalculator : public vtkProgra
 {
 public:
   vtkTypeMacro(vtkPythonCalculator, vtkProgrammableFilter);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPythonCalculator* New();
 
   //@{
@@ -93,15 +93,15 @@ protected:
    */
   void Exec(const char*);
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // DeExpressionion:
   // Creates whatever output data set type is selected.
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   char* Expression;
   char* ArrayName;

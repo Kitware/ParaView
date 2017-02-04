@@ -34,8 +34,8 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIndexSelectionProperty : public 
 {
 public:
   static vtkSIIndexSelectionProperty* New();
-  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty) void PrintSelf(
-    ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkSIIndexSelectionProperty, vtkSIProperty)
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSIIndexSelectionProperty();
@@ -46,7 +46,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
