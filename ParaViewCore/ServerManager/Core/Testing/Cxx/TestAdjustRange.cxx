@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 #include <cmath>
 #include <float.h> //for msvc _nextafter
+#include <limits>
 #include <sstream>
 
 namespace
@@ -39,11 +40,16 @@ double next_value_after(double value, double direction)
 
 bool valid_range(double range[2])
 {
+  cout.precision(std::numeric_limits<long double>::digits10 + 1);
+
+  cout << "IN: " << std::fixed << range[0] << ", " << range[1] << endl;
   const bool range_spans_pos_neg = (range[0] < 0 && range[1] > 0);
 
   if (range_spans_pos_neg)
   { // if the range spans both positive and negative the Adjustment will fail.
-    return (vtkSMCoreUtilities::AdjustRange(range) == false);
+    bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
+    cout << "OUT: " << range[0] << ", " << range[1] << endl;
+    return (adjusted == false);
   }
 
   // okay lastly we need to determine at least how far the range will move
@@ -52,7 +58,7 @@ bool valid_range(double range[2])
   // past the original range max value
   double original_range[2] = { range[0], range[1] };
   double next_value = original_range[0];
-  for (std::size_t i = 0; i < 65536 && next_value < original_range[1]; ++i)
+  for (std::size_t i = 0; i < 1024 && next_value < original_range[1]; ++i)
   {
     next_value = next_value_after(next_value, original_range[1]);
   }
@@ -64,6 +70,7 @@ bool valid_range(double range[2])
   // values between the min and max. It could be more if the input
   // range had more, or if we started as a denormal value
   const bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
+  cout << "OUT: " << range[0] << ", " << range[1] << endl;
 
   return (adjusted == should_be_adjusted) &&
          (original_range[0] == range[0]) &&
@@ -88,6 +95,10 @@ int TestAdjustRange(int argc, char* argv[])
   double large[2] = { 1e12, 1e12 + 1 };
   double large_exact[2] = { 1e12, 1e12 };
   double real_small[2] = { 1e-20, 1e-19 };
+  double real_world_case1[2] = { 293.88889, 293.90001999999998 };
+  double real_world_case2[2] = { 255, 255 };
+  double real_world_case3[2] = { 255, 255.001 };
+  double real_world_case4[2] = { 441.673, 441.673 };
 
   int exit_code = EXIT_SUCCESS;
   if (!valid_range(zeros))
@@ -135,6 +146,25 @@ int TestAdjustRange(int argc, char* argv[])
     cerr << "Failed at testing real_small" << endl;
     exit_code = EXIT_FAILURE;
   }
-
+  if (!valid_range(real_world_case1))
+  {
+    cerr << "Failed at testing real_world_case1" << endl;
+    exit_code = EXIT_FAILURE;
+  }
+  if (!valid_range(real_world_case2))
+  {
+    cerr << "Failed at testing real_world_case2" << endl;
+    exit_code = EXIT_FAILURE;
+  }
+  if (!valid_range(real_world_case3))
+  {
+    cerr << "Failed at testing real_world_case3" << endl;
+    exit_code = EXIT_FAILURE;
+  }
+  if (!valid_range(real_world_case4))
+  {
+    cerr << "Failed at testing real_world_case4" << endl;
+    exit_code = EXIT_FAILURE;
+  }
   return exit_code;
 }
