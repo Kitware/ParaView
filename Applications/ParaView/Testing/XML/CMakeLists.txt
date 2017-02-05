@@ -127,7 +127,6 @@ SET(TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeScalarBar.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestHiddenLineRemoval.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestOpacityRendering.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/TruchasReader.xml
 )
 
 if(PARAVIEW_USE_VISITBRIDGE)
@@ -141,7 +140,17 @@ if(PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePFLOTRAN.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TruchasReaderWithVisItBridge.xml)
+else()
+  # The TruchasReader test behavior changes depending on whether the
+  # VisItBridge is enabled. A number of VisIt readers support
+  # reading of .h5 files, so when the VisItBridge is enabled,
+  # the test must take extra steps to select the correct reader.
+  # When the VisItBridge is not enabled, there is no need to select
+  # a reader.
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/TruchasReader.xml)
 endif()
 
 if(PARAVIEW_USE_OSPRAY)
