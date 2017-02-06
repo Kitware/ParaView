@@ -1715,15 +1715,17 @@ def _create_func(key, module, skipRegisteration=False):
                     raise RuntimeError ("This function does not accept non-keyword arguments.")
 
         # Assign inputs
-        if px.GetProperty("Input") != None:
+        inputName = servermanager.vtkSMCoreUtilities.GetInputPropertyName(px.SMProxy, 0)
+
+        if px.GetProperty(inputName) != None:
             if len(input) > 0:
-                px.Input = input
+                px.SetPropertyWithName(inputName, input)
             else:
                 # If no input is specified, try the active pipeline object
-                if px.GetProperty("Input").GetRepeatable() and active_objects.get_selected_sources():
-                    px.Input = active_objects.get_selected_sources()
+                if px.GetProperty(inputName).GetRepeatable() and active_objects.get_selected_sources():
+                    px.SetPropertyWithName(inputName, active_objects.get_selected_sources())
                 elif active_objects.source:
-                    px.Input = active_objects.source
+                    px.SetPropertyWithName(inputName, active_objects.source)
         else:
             if len(input) > 0:
                 raise RuntimeError ("This function does not expect an input.")
