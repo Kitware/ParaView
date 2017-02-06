@@ -7,17 +7,19 @@ else()
   include(${PARAVIEW_USE_FILE})
 endif()
 
-# This plugin relies on classes in the vtkAcceleratorsDax VTK module, which
+# This plugin relies on classes in the vtkAcceleratorsVTKm VTK module, which
 # is not built by default because the server manager XML points to classes
 # in this module. Usually you could get this module to build by adding this
 # module to a module.cmake file. However, we are not actually building our
 # own source, so we can't really do it. For now, just instruct the user to
 # turn it on manually.
-if(NOT Module_vtkAcceleratorsDax)
-  message(SEND_ERROR "Dax plugin requires vtkAcceleratorsDax module. Please turn on Module_vtkAcceleratorsDax CMake option.")
+if(NOT Module_vtkAcceleratorsVTKm)
+  message(SEND_ERROR "VTKm plugin requires vtkAcceleratorsVTKm module. Please turn on Module_vtkAcceleratorsVTKm CMake option.")
 endif()
 
-add_paraview_plugin(Dax "0.1"
+add_paraview_plugin(VTKmFilters "0.1"
   REQUIRED_ON_CLIENT
-  SERVER_MANAGER_XML DaxSM.xml
+  REQUIRED_ON_SERVER
+  SERVER_MANAGER_XML VTKmSM.xml
   )
+target_link_libraries(VTKmFilters LINK_PRIVATE vtkAcceleratorsVTKm)
