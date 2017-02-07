@@ -667,6 +667,8 @@ public:
   virtual void SetCamera2DManipulators(const int manipulators[9]);
   virtual void SetCamera3DManipulators(const int manipulators[9]);
   void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
+  virtual void SetCamera2DMouseWheelMotionFactor(double factor);
+  virtual void SetCamera3DMouseWheelMotionFactor(double factor);
 
   /**
    * Overridden to synchronize information among processes whenever data

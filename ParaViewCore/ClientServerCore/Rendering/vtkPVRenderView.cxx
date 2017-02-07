@@ -2640,6 +2640,24 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetCamera2DMouseWheelMotionFactor(double factor)
+{
+  if (this->TwoDInteractorStyle)
+  {
+    this->TwoDInteractorStyle->SetMouseWheelMotionFactor(factor);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCamera3DMouseWheelMotionFactor(double factor)
+{
+  if (this->ThreeDInteractorStyle)
+  {
+    this->ThreeDInteractorStyle->SetMouseWheelMotionFactor(factor);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetShowAnnotation(bool val)
 {
   this->ShowAnnotation = val;
