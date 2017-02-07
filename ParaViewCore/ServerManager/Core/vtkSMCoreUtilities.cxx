@@ -153,16 +153,12 @@ struct MinDelta
 template <>
 struct MinDelta<float>
 {
-  static const int value = 65536;
+  static const int value = 2048;
 };
-// There are 29 more bits in a double's mantissa compared to a float.  Shift the
-// offset so that the 65536 is in the same position relative to the beginning of
-// the mantissa.  This causes the modified range to still be valid when it is
-// downcast to float later on.
 template <>
 struct MinDelta<double>
 {
-  static const vtkTypeInt64 value = static_cast<vtkTypeInt64>(65536) << 29;
+  static const vtkTypeInt64 value = static_cast<vtkTypeInt64>(2048);
 };
 
 // Reperesents the following:
@@ -187,7 +183,7 @@ struct MinRepresentable<double>
 
 //----------------------------------------------------------------------------
 template <typename T, typename EquivSizeIntT>
-bool AdjustTRange(T range[2], EquivSizeIntT)
+bool AdjustTRange(T range[2], EquivSizeIntT, EquivSizeIntT ulpsDiff = MinDelta<T>::value)
 {
   if (range[1] < range[0])
   {
@@ -210,7 +206,7 @@ bool AdjustTRange(T range[2], EquivSizeIntT)
 
   const bool denormal = !std::isnormal(range[0]);
   const EquivSizeIntT minInt = MinRepresentable<T>::value;
-  const EquivSizeIntT minDelta = denormal ? minInt + MinDelta<T>::value : MinDelta<T>::value;
+  const EquivSizeIntT minDelta = denormal ? minInt + ulpsDiff : ulpsDiff;
 
   // determine the absolute delta between these two numbers.
   const EquivSizeIntT delta = std::abs(irange[1] - irange[0]);
@@ -237,26 +233,37 @@ bool AdjustTRange(T range[2], EquivSizeIntT)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMCoreUtilities::AlmostEqual(const double range[2], int ulpsDiff)
+{
+  double trange[2] = { range[0], range[1] };
+  return AdjustTRange(trange, vtkTypeInt64(), vtkTypeInt64(ulpsDiff));
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMCoreUtilities::AdjustRange(double range[2])
 {
-  // when the values are between [-2, 2] and you push the max out you need to
-  // make sure you do it in float space, since if you do it in double space the
-  // values will be truncated downstream and be made equivalent again. Once
-  // you move out of this range the double space is generally not truncated
-  if (range[0] > -2 && range[0] < 2)
+  // If the numbers are not nearly equal, we don't touch them. This avoids running into
+  // pitfalls like BUG #17152.
+  if (!vtkSMCoreUtilities::AlmostEqual(range, 1024))
+  {
+    return false;
+  }
+
+  // Since the range is 0-range, we will offset range[1]. We've found it best to offset
+  // it in float space, if possible.
+  if (range[0] > VTK_FLOAT_MIN && range[0] < VTK_FLOAT_MAX)
   {
     float frange[2] = { static_cast<float>(range[0]), static_cast<float>(range[1]) };
-    bool result = AdjustTRange(frange, int());
+    bool result = AdjustTRange(frange, vtkTypeInt32());
     if (result)
     { // range should be left untouched to avoid loss of precision when no
       // adjustment was needed
-      range[0] = static_cast<double>(frange[0]);
       range[1] = static_cast<double>(frange[1]);
     }
     return result;
   }
-  vtkTypeInt64 intType = 0;
-  return AdjustTRange(range, intType);
+
+  return AdjustTRange(range, vtkTypeInt64());
 }
 
 //----------------------------------------------------------------------------
