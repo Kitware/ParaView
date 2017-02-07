@@ -64,7 +64,6 @@ build_paraview_client(paraview_revised
   GUI_CONFIGURATION_XMLS
     ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
   SOURCES ${ParaView_SOURCE_FILES}
 )
 target_link_libraries(paraview_revised LINK_PRIVATE ${qt_targets})

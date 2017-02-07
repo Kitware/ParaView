@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
+#ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
+#endif
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 
@@ -57,9 +59,10 @@ myMainWindow::myMainWindow()
   this->Internals->comparativePanelDock->hide();
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
 
-  // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget, SIGNAL(helpRequested(QString)), this,
-    SLOT(showHelpForProxy(const QString&)));
+  // Enable help from the properties panel.
+  QObject::connect(this->Internals->proxyTabWidget,
+    SIGNAL(helpRequested(const QString&, const QString&)), this,
+    SLOT(showHelpForProxy(const QString&, const QString&)));
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
@@ -101,7 +104,9 @@ myMainWindow::~myMainWindow()
 }
 
 //-----------------------------------------------------------------------------
-void myMainWindow::showHelpForProxy(const QString& proxyname)
+void myMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
 {
-  pqHelpReaction::showHelp(QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
+#ifdef PARAVIEW_USE_QTHELP
+  pqHelpReaction::showProxyHelp(groupname, proxyname);
+#endif
 }
