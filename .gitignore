@@ -3,3 +3,4 @@
 # creation short of copying the file somewhere.
 *.pyc
 .ExternalData*
+.DS_Store
