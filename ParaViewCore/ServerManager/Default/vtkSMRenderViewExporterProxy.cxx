@@ -18,6 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
 //----------------------------------------------------------------------------
@@ -42,6 +43,8 @@ void vtkSMRenderViewExporterProxy::Write()
   this->CreateVTKObjects();
   vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(this->View);
+
+  this->View->GetSession()->PrepareProgress();
   if (exporter && rv)
   {
     int old_threshold = -1;
@@ -62,6 +65,7 @@ void vtkSMRenderViewExporterProxy::Write()
       vtkSMPropertyHelper(rv, "RemoteRenderThreshold").Set(old_threshold);
     }
   }
+  this->View->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
