@@ -204,17 +204,17 @@ void pqPythonScriptEditor::documentWasModified()
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::createActions()
 {
-  this->newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);
+  this->newAct = new QAction(tr("&New"), this);
   this->newAct->setShortcut(tr("Ctrl+N"));
   this->newAct->setStatusTip(tr("Create a new file"));
   this->connect(this->newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-  this->openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
+  this->openAct = new QAction(tr("&Open..."), this);
   this->openAct->setShortcut(tr("Ctrl+O"));
   this->openAct->setStatusTip(tr("Open an existing file"));
   this->connect(this->openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-  this->saveAct = new QAction(QIcon(":/images/save.png"), tr("&Save"), this);
+  this->saveAct = new QAction(tr("&Save"), this);
   this->saveAct->setShortcut(tr("Ctrl+S"));
   this->saveAct->setStatusTip(tr("Save the document to disk"));
   this->connect(this->saveAct, SIGNAL(triggered()), this, SLOT(save()));
@@ -232,19 +232,19 @@ void pqPythonScriptEditor::createActions()
   this->exitAct->setStatusTip(tr("Close the script editor"));
   this->connect(this->exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  this->cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
+  this->cutAct = new QAction(tr("Cu&t"), this);
   this->cutAct->setShortcut(tr("Ctrl+X"));
   this->cutAct->setStatusTip(tr("Cut the current selection's contents to the "
                                 "clipboard"));
   this->connect(this->cutAct, SIGNAL(triggered()), this->TextEdit, SLOT(cut()));
 
-  this->copyAct = new QAction(QIcon(":/images/copy.png"), tr("&Copy"), this);
+  this->copyAct = new QAction(tr("&Copy"), this);
   this->copyAct->setShortcut(tr("Ctrl+C"));
   this->copyAct->setStatusTip(tr("Copy the current selection's contents to the "
                                  "clipboard"));
   this->connect(this->copyAct, SIGNAL(triggered()), this->TextEdit, SLOT(copy()));
 
-  this->pasteAct = new QAction(QIcon(":/images/paste.png"), tr("&Paste"), this);
+  this->pasteAct = new QAction(tr("&Paste"), this);
   this->pasteAct->setShortcut(tr("Ctrl+V"));
   this->pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                                   "selection"));
