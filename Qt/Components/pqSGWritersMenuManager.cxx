@@ -243,8 +243,8 @@ void pqSGWritersMenuManager::updateEnableState()
       continue;
     }
 
-    vtkSMProxy* output =
-      pxm->GetPrototypeProxy(filterType[0].toLatin1().data(), filterType[1].toLatin1().data());
+    vtkSMProxy* output = pxm->GetPrototypeProxy(
+      filterType[0].toLocal8Bit().data(), filterType[1].toLocal8Bit().data());
     if (!output)
     {
       action->setEnabled(false);
@@ -313,7 +313,7 @@ void pqSGWritersMenuManager::createWriter(const QString& xmlgroup, const QString
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype =
-    pxm->GetPrototypeProxy(xmlgroup.toLatin1().data(), xmlname.toLatin1().data());
+    pxm->GetPrototypeProxy(xmlgroup.toLocal8Bit().data(), xmlname.toLocal8Bit().data());
   if (!prototype)
   {
     qCritical() << "Unknown proxy type: " << xmlname;

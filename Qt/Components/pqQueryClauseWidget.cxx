@@ -802,7 +802,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   {
     case QUERY:
       vtkSMPropertyHelper(selSource, "QueryString")
-        .Set(values[0].toString().toLatin1().constData());
+        .Set(values[0].toString().toLocal8Bit().constData());
       break;
 
     case BLOCK:
@@ -817,7 +817,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     case GLOBALID:
     case THRESHOLD:
       this->LastQuery = query;
-      vtkSMPropertyHelper(selSource, "QueryString").Set(query.toLatin1().constData());
+      vtkSMPropertyHelper(selSource, "QueryString").Set(query.toLocal8Bit().constData());
       break;
     case AMR_LEVEL:
     {

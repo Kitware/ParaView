@@ -431,7 +431,7 @@ bool pqView::writeImage(const QString& filename, const QSize& fullsize, int qual
 
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
   bool status = controller->WriteImage(
-    this->getViewProxy(), filename.toLatin1().data(), magnification, quality);
+    this->getViewProxy(), filename.toLocal8Bit().data(), magnification, quality);
   if (fullsize.isValid())
   {
     vtkwidget->resize(newsize);

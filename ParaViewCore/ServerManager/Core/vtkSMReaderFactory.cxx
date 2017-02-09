@@ -599,12 +599,18 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   // ensure that VTK objects are created.
   proxy->UpdateVTKObjects();
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "CanReadFile" << filename
-         << vtkClientServerStream::End;
-
-  session->ExecuteStream(proxy->GetLocation(), stream, /*ignore_error*/ true);
-  session->GetLastResult(proxy->GetLocation()).GetArgument(0, 0, &canRead);
+  // creat a helper for calling CanReadFile on vtk objects
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+  vtkSmartPointer<vtkSMProxy> helper;
+  helper.TakeReference(pxm->NewProxy("misc", "FilePathEncodingHelper"));
+  helper->UpdateVTKObjects();
+  vtkSMPropertyHelper(helper->GetProperty("ActiveFileName")).Set(filename);
+  vtkSMPropertyHelper(helper->GetProperty("ActiveGlobalId")).
+    Set(static_cast<vtkIdType>(proxy->GetGlobalID()));
+  helper->UpdateVTKObjects();
+  helper->UpdatePropertyInformation(helper->GetProperty("ActiveFileIsReadable"));
+  canRead = vtkSMPropertyHelper(helper->GetProperty("ActiveFileIsReadable")).GetAsInt();
   return (canRead != 0);
 }
 

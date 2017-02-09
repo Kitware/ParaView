@@ -104,7 +104,7 @@ void pqColorPaletteSelectorWidget::setCurrentIndex(int index)
   QString name = this->ComboBox->itemData(index).toString();
 
   vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
-  vtkSMProxy* paletteProxy = pxm->GetPrototypeProxy("palettes", name.toLatin1().data());
+  vtkSMProxy* paletteProxy = pxm->GetPrototypeProxy("palettes", name.toLocal8Bit().data());
   Q_ASSERT(paletteProxy);
 
   smproxy->Copy(paletteProxy);

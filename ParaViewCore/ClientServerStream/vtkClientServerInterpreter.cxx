@@ -798,7 +798,6 @@ int vtkClientServerInterpreter::CallCommandFunction(const char* cname, vtkObject
 
   vtkClientServerCommandFunction function = n->Function;
   void* ctx = n->Context ? n->Context->Context : 0;
-
   return function(this, ptr, method, msg, result, ctx);
 }
 

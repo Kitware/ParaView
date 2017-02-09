@@ -54,7 +54,7 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(QObject* qobject, const cha
   if (this->ObjectQt && !this->SignalQt.isEmpty())
   {
     QObject::connect(
-      this->ObjectQt, this->SignalQt.toLatin1().data(), this, SIGNAL(qtpropertyModified()));
+      this->ObjectQt, this->SignalQt.toLocal8Bit().data(), this, SIGNAL(qtpropertyModified()));
   }
 }
 
@@ -94,7 +94,7 @@ bool pqPropertyLinksConnection::operator==(const pqPropertyLinksConnection& othe
 //-----------------------------------------------------------------------------
 QVariant pqPropertyLinksConnection::currentQtValue() const
 {
-  return this->ObjectQt->property(this->PropertyQt.toLatin1().data());
+  return this->ObjectQt->property(this->PropertyQt.toLocal8Bit().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
 //-----------------------------------------------------------------------------
 void pqPropertyLinksConnection::setQtValue(const QVariant& value)
 {
-  this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), value);
+  this->ObjectQt->setProperty(this->PropertyQt.toLocal8Bit().data(), value);
 }
 
 //-----------------------------------------------------------------------------

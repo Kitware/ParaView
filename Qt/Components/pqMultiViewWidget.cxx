@@ -847,7 +847,7 @@ bool pqMultiViewWidget::writeImage(const QString& filename, int dx, int dy, int 
   int magnification = this->prepareForCapture(dx, dy);
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
   bool status = controller->WriteImage(
-    this->layoutManager(), filename.toLatin1().data(), magnification, quality);
+    this->layoutManager(), filename.toLocal8Bit().data(), magnification, quality);
   this->cleanupAfterCapture();
   return status;
 }

@@ -709,14 +709,14 @@ void pqSMAdaptor::setSelectionProperty(
     int status = value[1].toInt();
     if (StringDomain)
     {
-      smValueStrings->AddString(name.toLatin1().data());
-      smValueStrings->AddString(QString::number(status).toLatin1().data());
+      smValueStrings->AddString(name.toUtf8().data());
+      smValueStrings->AddString(QString::number(status).toUtf8().data());
     }
     else if (EnumerationDomain)
     {
-      if (status && EnumerationDomain->HasEntryText(name.toLatin1().data()))
+      if (status && EnumerationDomain->HasEntryText(name.toUtf8().data()))
       {
-        int entryValue = EnumerationDomain->GetEntryValueForText(name.toLatin1().data());
+        int entryValue = EnumerationDomain->GetEntryValueForText(name.toUtf8().data());
         smValueInts.push_back(entryValue);
       }
     }
@@ -724,7 +724,7 @@ void pqSMAdaptor::setSelectionProperty(
     {
       if (status)
       {
-        smValueStrings->AddString(name.toLatin1().data());
+        smValueStrings->AddString(name.toUtf8().data());
       }
     }
   }
@@ -1049,7 +1049,7 @@ void pqSMAdaptor::setEnumerationProperty(
   else if (ProxyGroupDomain && pp)
   {
     QString str = Value.toString();
-    vtkSMProxy* toadd = ProxyGroupDomain->GetProxy(str.toLatin1().data());
+    vtkSMProxy* toadd = ProxyGroupDomain->GetProxy(str.toUtf8().data());
     if (pp->GetNumberOfProxies() < 1)
     {
       if (Type == CHECKED)

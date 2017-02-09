@@ -142,7 +142,7 @@ QWidget* pqMultiSliceAxisWidget::getVTKWidget()
 // ----------------------------------------------------------------------------
 void pqMultiSliceAxisWidget::setTitle(const QString& newTitle)
 {
-  this->Internal->SliceItem->GetAxis()->SetTitle(newTitle.toLatin1().data());
+  this->Internal->SliceItem->GetAxis()->SetTitle(newTitle.toLocal8Bit().data());
   emit this->titleChanged(newTitle);
 }
 

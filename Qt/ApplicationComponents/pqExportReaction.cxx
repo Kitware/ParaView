@@ -136,7 +136,7 @@ QString pqExportReaction::exportActiveView()
   {
     QString filename = file_dialog.getSelectedFiles().first();
     vtkSmartPointer<vtkSMExporterProxy> proxy;
-    proxy.TakeReference(helper->CreateExporter(filename.toLatin1().data(), viewProxy));
+    proxy.TakeReference(helper->CreateExporter(filename.toLocal8Bit().data(), viewProxy));
     if (!proxy)
     {
       qCritical("Couldn't handle export filename");
@@ -173,7 +173,7 @@ QString pqExportReaction::exportActiveView()
       SM_SCOPED_TRACE(ExportView)
         .arg("view", viewProxy)
         .arg("exporter", proxy)
-        .arg("filename", filename.toLatin1().data());
+        .arg("filename", filename.toLocal8Bit().data());
       proxy->Write();
       return filename;
     }

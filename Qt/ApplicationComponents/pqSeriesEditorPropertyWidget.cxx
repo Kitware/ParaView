@@ -92,7 +92,7 @@ class pqSeriesParametersModel : public QAbstractTableModel
   bool isSeriesInDomain(const QString& _seriesName) const
   {
     unsigned int unused = 0;
-    if (this->Domain && this->Domain->IsInDomain(_seriesName.toLatin1().data(), unused) != 0)
+    if (this->Domain && this->Domain->IsInDomain(_seriesName.toLocal8Bit().data(), unused) != 0)
     {
       return true;
     }

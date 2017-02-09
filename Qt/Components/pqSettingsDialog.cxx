@@ -239,7 +239,7 @@ void pqSettingsDialog::onAccepted()
         smproperty->GetHints()->FindNestedElementByName("SaveInQSettings"))
       {
         QString key = QString("%1.%2").arg(iter->GetKey()).arg(iter2->GetKey());
-        qSettings->saveInQSettings(key.toLatin1().data(), smproperty);
+        qSettings->saveInQSettings(key.toLocal8Bit().data(), smproperty);
       }
     }
   }

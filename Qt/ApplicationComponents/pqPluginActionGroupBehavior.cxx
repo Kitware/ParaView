@@ -157,7 +157,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
   else if (splitName.size())
   {
     QString msg = QString("Do not know what action group \"%1\" is").arg(splitName[0]);
-    qWarning("%s", msg.toLatin1().data());
+    qWarning("%s", msg.toLocal8Bit().data());
   }
   else
   {

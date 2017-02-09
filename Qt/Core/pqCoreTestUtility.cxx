@@ -96,7 +96,7 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
   WriterT* const writer = WriterT::New();
   writer->SetInputConnection(Capture->GetOutputPort());
-  writer->SetFileName(File.filePath().toLatin1().data());
+  writer->SetFileName(File.filePath().toLocal8Bit().data());
   writer->Write();
   const bool result = writer->GetErrorCode() == vtkErrorCode::NoError;
   writer->Delete();
@@ -261,9 +261,9 @@ bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow, const QStrin
 {
   vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
   testing->AddArgument("-T");
-  testing->AddArgument(TempDirectory.toLatin1().data());
+  testing->AddArgument(TempDirectory.toLocal8Bit().data());
   testing->AddArgument("-V");
-  testing->AddArgument(ReferenceImage.toLatin1().data());
+  testing->AddArgument(ReferenceImage.toLocal8Bit().data());
   testing->SetRenderWindow(RenderWindow);
   if (testing->RegressionTest(Threshold) == vtkTesting::PASSED)
   {
@@ -278,9 +278,9 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage, const QString& Ref
 {
   vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
   testing->AddArgument("-T");
-  testing->AddArgument(TempDirectory.toLatin1().data());
+  testing->AddArgument(TempDirectory.toLocal8Bit().data());
   testing->AddArgument("-V");
-  testing->AddArgument(ReferenceImage.toLatin1().data());
+  testing->AddArgument(ReferenceImage.toLocal8Bit().data());
   vtkSmartPointer<vtkTrivialProducer> tp = vtkSmartPointer<vtkTrivialProducer>::New();
   tp->SetOutput(testImage);
   if (testing->RegressionTest(tp, Threshold) == vtkTesting::PASSED)
@@ -434,12 +434,12 @@ bool pqCoreTestUtility::CompareImage(const QString& testPNGImage, const QString&
   double threshold, ostream& output, const QString& tempDirectory)
 {
   vtkNew<vtkPNGReader> reader;
-  if (!reader->CanReadFile(testPNGImage.toLatin1().data()))
+  if (!reader->CanReadFile(testPNGImage.toLocal8Bit().data()))
   {
-    output << "Cannot read file : " << testPNGImage.toLatin1().data() << endl;
+    output << "Cannot read file : " << testPNGImage.toLocal8Bit().data() << endl;
     return false;
   }
-  reader->SetFileName(testPNGImage.toLatin1().data());
+  reader->SetFileName(testPNGImage.toLocal8Bit().data());
   reader->Update();
   return pqCoreTestUtility::CompareImage(
     reader->GetOutput(), referenceImage, threshold, output, tempDirectory);

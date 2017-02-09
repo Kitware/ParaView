@@ -148,11 +148,11 @@ void pqWidgetRangeDomain::setRange(QVariant min, QVariant max)
   {
     if (!this->Internal->MinProp.isEmpty())
     {
-      range->setProperty(this->Internal->MinProp.toLatin1().data(), min);
+      range->setProperty(this->Internal->MinProp.toLocal8Bit().data(), min);
     }
     if (!this->Internal->MaxProp.isEmpty())
     {
-      range->setProperty(this->Internal->MaxProp.toLatin1().data(), max);
+      range->setProperty(this->Internal->MaxProp.toLocal8Bit().data(), max);
     }
   }
 }

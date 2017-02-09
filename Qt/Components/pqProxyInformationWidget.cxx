@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView core includes
 #include "pqActiveObjects.h"
 #include "pqNonEditableStyledItemDelegate.h"
+#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
@@ -199,11 +200,11 @@ void pqProxyInformationWidget::updateInformation()
             source->getProxy()->UpdatePropertyInformation(smprop);
           }
           QString filename = pqSMAdaptor::getElementProperty(smprop).toString();
-          QString path = vtksys::SystemTools::GetFilenamePath(filename.toLatin1().data()).c_str();
+          QString path = vtksys::SystemTools::GetFilenamePath(filename.toUtf8().data()).c_str();
 
           this->Ui->properties->show();
           this->Ui->filename->setText(
-            vtksys::SystemTools::GetFilenameName(filename.toLatin1().data()).c_str());
+            vtksys::SystemTools::GetFilenameName(filename.toUtf8().data()).c_str());
           this->Ui->filename->setToolTip(filename);
           this->Ui->filename->setStatusTip(filename);
           this->Ui->path->setText(path);

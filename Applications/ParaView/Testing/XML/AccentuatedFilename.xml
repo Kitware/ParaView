@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/blow.vtk" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveData" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/WriterSettingsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Information" />
+  <pqcheck object="pqClientMainWindow/informationDock/informationWidgetFrame/informationScrollArea/qt_scrollarea_viewport/informationWidget/properties/filename" property="text" arguments="test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMenu0" command="activate" arguments="Statistics Inspector" />
+  <pqcheck object="pqClientMainWindow/statisticsDock/statisticsView/1QTableView0" property="modelItemData" arguments="0.0,test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMenu0" command="activate" arguments="Statistics Inspector" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMenu0" command="activate" arguments="Animation View" />
+   <pqcheck object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/ProxyCombo" property="currentText" arguments="test-éàô.vtk" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMenu0" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+</pqevents>

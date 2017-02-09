@@ -116,16 +116,14 @@ void pqUndoRedoReaction::setLabel(const QString& label)
 {
   if (this->Undo)
   {
-    this->parentAction()->setText(
-      label.isEmpty() ? tr("Can't Undo") : QString(tr("&Undo %1")).arg(label));
+    this->parentAction()->setText(label.isEmpty() ? tr("Can't Undo") : (tr("&Undo") + " " + label));
     this->parentAction()->setStatusTip(
-      label.isEmpty() ? tr("Can't Undo") : QString(tr("Undo %1")).arg(label));
+      label.isEmpty() ? tr("Can't Undo") : (tr("Undo") + " " + label));
   }
   else
   {
-    this->parentAction()->setText(
-      label.isEmpty() ? tr("Can't Redo") : QString(tr("&Redo %1")).arg(label));
+    this->parentAction()->setText(label.isEmpty() ? tr("Can't Redo") : (tr("&Redo") + " " + label));
     this->parentAction()->setStatusTip(
-      label.isEmpty() ? tr("Can't Redo") : QString(tr("Redo %1")).arg(label));
+      label.isEmpty() ? tr("Can't Redo") : (tr("Redo") + " " + label));
   }
 }

@@ -94,9 +94,9 @@ void pqQVTKWidget::updateSizeProperties()
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
 #endif
-    vtkSMPropertyHelper(this->ViewProxy, this->SizePropertyName.toLatin1().data())
+    vtkSMPropertyHelper(this->ViewProxy, this->SizePropertyName.toLocal8Bit().data())
       .Set(view_size, 2);
-    this->ViewProxy->UpdateProperty(this->SizePropertyName.toLatin1().data());
+    this->ViewProxy->UpdateProperty(this->SizePropertyName.toLocal8Bit().data());
     END_UNDO_EXCLUDE();
   }
 

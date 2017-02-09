@@ -134,20 +134,20 @@ void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
   vtkSMSourceProxy::SafeDownCast(groupDS->getProxy())->UpdatePipeline();
 
   // Setup annotations:
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
-  clip1->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
-  clip2->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(1).toLocal8Bit().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(1).toLocal8Bit().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(1).toLocal8Bit().data(), "-");
 
-  append->getProxy()->SetAnnotation(this->FilterNames.at(2).toLatin1().data(), "-");
-  groupDS->getProxy()->SetAnnotation(this->FilterNames.at(2).toLatin1().data(), "-");
+  append->getProxy()->SetAnnotation(this->FilterNames.at(2).toLocal8Bit().data(), "-");
+  groupDS->getProxy()->SetAnnotation(this->FilterNames.at(2).toLocal8Bit().data(), "-");
 
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
-  clip1->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
-  clip2->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
-  append->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(3).toLocal8Bit().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(3).toLocal8Bit().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(3).toLocal8Bit().data(), "-");
+  append->getProxy()->SetAnnotation(this->FilterNames.at(3).toLocal8Bit().data(), "-");
 
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toLatin1().data(), "-");
-  cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toLatin1().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toLocal8Bit().data(), "-");
+  cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toLocal8Bit().data(), "-");
 
   // Tooltip
   wavelet->getProxy()->SetAnnotation("tooltip", "1+3+4");

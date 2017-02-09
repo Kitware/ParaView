@@ -278,7 +278,7 @@ void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
     {
       vtkPVXMLElement* interLinkXML = vtkPVXMLElement::New();
       interLinkXML->SetName("InteractiveViewLink");
-      interLinkXML->AddAttribute("name", linkName.toLatin1().data());
+      interLinkXML->AddAttribute("name", linkName.toLocal8Bit().data());
       interLink->saveXMLState(interLinkXML);
       tempParent->AddNestedElement(interLinkXML);
       interLinkXML->Delete();
@@ -527,7 +527,7 @@ vtkSMLink* pqLinksModel::getLink(const QString& name) const
   if (this->Internal->Server)
   {
     vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
-    vtkSMLink* link = pxm->GetRegisteredLink(name.toLatin1().data());
+    vtkSMLink* link = pxm->GetRegisteredLink(name.toLocal8Bit().data());
     return link;
   }
   return NULL;
@@ -570,7 +570,7 @@ void pqLinksModel::addProxyLink(
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMProxyLink* link = vtkSMProxyLink::New();
-  pxm->RegisterLink(name.toLatin1().data(), link);
+  pxm->RegisterLink(name.toLocal8Bit().data(), link);
 
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
@@ -600,7 +600,7 @@ void pqLinksModel::addCameraLink(
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
-  pxm->RegisterLink(name.toLatin1().data(), link);
+  pxm->RegisterLink(name.toLocal8Bit().data(), link);
 
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
@@ -662,13 +662,13 @@ void pqLinksModel::addPropertyLink(const QString& name, vtkSMProxy* inputProxy,
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-  pxm->RegisterLink(name.toLatin1().data(), link);
+  pxm->RegisterLink(name.toLocal8Bit().data(), link);
 
   // bi-directional link
-  link->AddLinkedProperty(inputProxy, inputProp.toLatin1().data(), vtkSMLink::INPUT);
-  link->AddLinkedProperty(outputProxy, outputProp.toLatin1().data(), vtkSMLink::OUTPUT);
-  link->AddLinkedProperty(outputProxy, outputProp.toLatin1().data(), vtkSMLink::INPUT);
-  link->AddLinkedProperty(inputProxy, inputProp.toLatin1().data(), vtkSMLink::OUTPUT);
+  link->AddLinkedProperty(inputProxy, inputProp.toLocal8Bit().data(), vtkSMLink::INPUT);
+  link->AddLinkedProperty(outputProxy, outputProp.toLocal8Bit().data(), vtkSMLink::OUTPUT);
+  link->AddLinkedProperty(outputProxy, outputProp.toLocal8Bit().data(), vtkSMLink::INPUT);
+  link->AddLinkedProperty(inputProxy, inputProp.toLocal8Bit().data(), vtkSMLink::OUTPUT);
   link->Delete();
   emit this->linkAdded(pqLinksModel::Property);
   CLEAR_UNDO_STACK();
@@ -679,7 +679,7 @@ void pqLinksModel::addSelectionLink(
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMSelectionLink* link = vtkSMSelectionLink::New();
-  pxm->RegisterLink(name.toLatin1().data(), link);
+  pxm->RegisterLink(name.toLocal8Bit().data(), link);
 
   // bi-directional link
   link->AddLinkedSelection(inputProxy, vtkSMLink::OUTPUT);
@@ -712,7 +712,7 @@ void pqLinksModel::removeLink(const QString& name)
   if (name != QString::null)
   {
     vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
-    pxm->UnRegisterLink(name.toLatin1().data());
+    pxm->UnRegisterLink(name.toLocal8Bit().data());
     this->emitLinkRemoved(name);
     CLEAR_UNDO_STACK();
   }
@@ -792,7 +792,7 @@ pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p, pqServ
   this->Internal->Server = server;
   this->Internal->Name = linkName;
   vtkSMSessionProxyManager* pxm = server->proxyManager();
-  this->Internal->Link = pxm->GetRegisteredLink(linkName.toLatin1().data());
+  this->Internal->Link = pxm->GetRegisteredLink(linkName.toLocal8Bit().data());
   this->Internal->Setting = false;
   this->Internal->Connection->Connect(
     this->Internal->Link, vtkCommand::ModifiedEvent, this, SLOT(refresh()));
@@ -853,7 +853,7 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
 void pqLinksModelObject::remove()
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
-  pxm->UnRegisterLink(this->name().toLatin1().data());
+  pxm->UnRegisterLink(this->name().toLocal8Bit().data());
 }
 
 void pqLinksModelObject::unlinkUndoStacks(pqRenderView* ren)

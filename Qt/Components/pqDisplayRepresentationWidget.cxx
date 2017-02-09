@@ -69,7 +69,8 @@ protected:
 
     BEGIN_UNDO_SET("Change representation type");
     vtkSMProxy* reprProxy = this->proxySM();
-    vtkSMRepresentationProxy::SetRepresentationType(reprProxy, value.toString().toLatin1().data());
+    vtkSMRepresentationProxy::SetRepresentationType(
+      reprProxy, value.toString().toLocal8Bit().data());
     END_UNDO_SET();
   }
 

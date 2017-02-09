@@ -79,7 +79,7 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
   if (filename.endsWith(".pvsm"))
   {
     vtkNew<vtkPVXMLParser> xmlParser;
-    xmlParser->SetFileName(filename.toLatin1().data());
+    xmlParser->SetFileName(filename.toLocal8Bit().data());
     xmlParser->Parse();
 
     vtkPVXMLElement* root = xmlParser->GetRootElement();

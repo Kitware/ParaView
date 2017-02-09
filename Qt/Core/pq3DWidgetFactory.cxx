@@ -100,7 +100,7 @@ vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(
   // is never saved in state
   vtkSMNewWidgetRepresentationProxy* proxy =
     vtkSMNewWidgetRepresentationProxy::SafeDownCast(builder->createProxy(
-      "representations", name.toLatin1().data(), server, "3d_widgets_prototypes"));
+      "representations", name.toLocal8Bit().data(), server, "3d_widgets_prototypes"));
   if (!proxy)
   {
     qDebug() << "Could not create the 3D widget with name: " << name;

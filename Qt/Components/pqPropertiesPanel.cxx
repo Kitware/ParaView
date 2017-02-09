@@ -499,7 +499,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource* source)
   if (source)
   {
     this->Internals->Ui.PropertiesButton->setText(
-      QString("Properties (%1)").arg(source->getSMName()));
+      tr("Properties") + QString(" (%1)").arg(source->getSMName()));
     this->Internals->SourceWidgets[source]->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
@@ -511,7 +511,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource* source)
   }
   else
   {
-    this->Internals->Ui.PropertiesButton->setText("Properties");
+    this->Internals->Ui.PropertiesButton->setText(tr("Properties"));
   }
   this->updateButtonEnableState();
 }
@@ -565,7 +565,7 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
   if (repr)
   {
     this->Internals->Ui.DisplayButton->setText(
-      QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
+      tr("Display") + QString(" (%1)").arg(repr->getProxy()->GetXMLName()));
     this->Internals->DisplayWidgets->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
@@ -617,14 +617,14 @@ void pqPropertiesPanel::updateViewPanel(pqView* argView)
     vtkSMViewProxy* proxy = _view->getViewProxy();
     const char* label = proxy->GetXMLLabel();
     this->Internals->Ui.ViewButton->setText(
-      QString("View (%1)").arg(label != 0 ? label : _view->getViewType()));
+      tr("View") + QString(" (%1)").arg(label != 0 ? label : _view->getViewType()));
     this->Internals->ViewWidgets->showWidgets(
       this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
       this->Internals->Ui.SearchBox->text());
   }
   else
   {
-    this->Internals->Ui.ViewButton->setText("View");
+    this->Internals->Ui.ViewButton->setText(tr("View"));
   }
 
   this->updateButtonEnableState();
@@ -862,7 +862,7 @@ void pqPropertiesPanel::deleteProxy()
 {
   if (this->Internals->Source)
   {
-    BEGIN_UNDO_SET(QString("Delete %1").arg(this->Internals->Source->getSMName()));
+    BEGIN_UNDO_SET(tr("Delete") + " " + this->Internals->Source->getSMName());
     emit this->deleteRequested(this->Internals->Source);
     END_UNDO_SET();
   }

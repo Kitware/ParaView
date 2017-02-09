@@ -319,7 +319,7 @@ bool pqSGExportStateWizard::validateCurrentPage()
   {
     // ensure Python in initialized.
     vtkPythonInterpreter::Initialize();
-    vtkPythonInterpreter::RunSimpleString(command.toLatin1().data());
+    vtkPythonInterpreter::RunSimpleString(command.toLocal8Bit().data());
     return true;
   }
   return false;

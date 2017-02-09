@@ -223,7 +223,7 @@ void pqOutputWindow::onDisplayText(const QString& text)
   ui.consoleWidget->setFormat(format);
 
   ui.consoleWidget->printString(text + "\n");
-  cerr << text.toLatin1().data() << endl;
+  cerr << text.toLocal8Bit().data() << endl;
   if (!text.trimmed().isEmpty())
   {
     this->show();
@@ -247,7 +247,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   ui.consoleWidget->setFormat(format);
 
   ui.consoleWidget->printString(text + "\n");
-  cerr << text.toLatin1().data() << endl;
+  cerr << text.toLocal8Bit().data() << endl;
 
   if (!text.trimmed().isEmpty())
   {
@@ -271,7 +271,7 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
   ui.consoleWidget->setFormat(format);
 
   ui.consoleWidget->printString(text + "\n");
-  cerr << text.toLatin1().data() << endl;
+  cerr << text.toLocal8Bit().data() << endl;
 
   if (!text.trimmed().isEmpty())
   {
@@ -296,7 +296,7 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   ui.consoleWidget->setFormat(format);
 
   ui.consoleWidget->printString(text + "\n");
-  cerr << text.toLatin1().data() << endl;
+  cerr << text.toLocal8Bit().data() << endl;
 
   if (!text.trimmed().isEmpty())
   {

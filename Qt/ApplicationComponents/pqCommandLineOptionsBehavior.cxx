@@ -143,7 +143,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
       tr("Internal Open File"), QString(), QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
-    if (!dialog.selectFile(options->GetParaViewDataName()))
+    if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
     {
       qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
     }
@@ -240,7 +240,7 @@ void pqCommandLineOptionsBehavior::playTests()
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
     options->SetCurrentImageThreshold(options->GetTestImageThreshold(cc));
-    cout << "Playing: " << options->GetTestScript(cc).toLatin1().data() << endl;
+    cout << "Playing: " << options->GetTestScript(cc).toLocal8Bit().data() << endl;
     success = testUtility->playTests(options->GetTestScript(cc));
 
     if (success && !options->GetTestBaseline(cc).isEmpty())

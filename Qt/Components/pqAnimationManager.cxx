@@ -599,7 +599,7 @@ bool pqAnimationManager::saveAnimation()
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);
-    vtkSMPropertyHelper(writer, "FileName").Set(filename.toLatin1().data());
+    vtkSMPropertyHelper(writer, "FileName").Set(filename.toLocal8Bit().data());
     vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
     vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
     vtkSMPropertyHelper(writer, "Compression").Set(compression);
@@ -658,7 +658,7 @@ bool pqAnimationManager::saveAnimation()
   emit this->writeAnimation(filename, magnification, dialogUI.frameRate->value());
 
   vtkSMAnimationSceneImageWriter* writer = pqAnimationSceneImageWriter::New();
-  writer->SetFileName(filename.toLatin1().data());
+  writer->SetFileName(filename.toLocal8Bit().data());
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.frameRate->value());
@@ -669,7 +669,7 @@ bool pqAnimationManager::saveAnimation()
   SM_SCOPED_TRACE(SaveCameras).arg("proxy", sceneProxy);
   SM_SCOPED_TRACE(CallFunction)
     .arg("WriteAnimation")
-    .arg(filename.toLatin1().data())
+    .arg(filename.toLocal8Bit().data())
     .arg("Magnification", magnification)
     .arg("Compression", writer->GetCompression())
     .arg("FrameRate", writer->GetFrameRate())
@@ -735,13 +735,13 @@ bool pqAnimationManager::saveGeometry(const QString& filename, pqView* view)
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("WriteAnimationGeometry")
-    .arg(filename.toLatin1().data())
+    .arg(filename.toLocal8Bit().data())
     .arg("view", view->getProxy())
     .arg("comment", "save animation geometry from a view");
 
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
-  writer->SetFileName(filename.toLatin1().data());
+  writer->SetFileName(filename.toLocal8Bit().data());
   writer->SetAnimationScene(sceneProxy);
   writer->SetViewModule(view->getProxy());
   bool status = writer->Save();

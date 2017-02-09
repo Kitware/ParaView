@@ -28,6 +28,7 @@ paraview_test_load_data(""
   ,REGEX:tensors_.*\\.vti
   artifact.dta
   "blow data.myvtk"
+  blow.vtk
   bluntfin.vts
   can.ex2
   comb.q
@@ -233,6 +234,7 @@ if (NOT PARAVIEW_ENABLE_XDMF3)
 endif()
 
 list(APPEND TESTS_WITH_BASELINES
+  ${CMAKE_CURRENT_SOURCE_DIR}/AccentuatedFilename.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Annotations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CopyPasteProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
