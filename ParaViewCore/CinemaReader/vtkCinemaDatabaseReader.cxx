@@ -222,6 +222,25 @@ int vtkCinemaDatabaseReader::RequestData(
     }
   }
 
+  if (fields.size() == 0)
+  {
+    fields = this->Helper->GetFieldValues(this->PipelineObject, "lut");
+    // TODO: handle multi-component fields.
+    for (std::vector<std::string>::iterator iter = fields.begin(); iter != fields.end(); ++iter)
+    {
+      double range[2];
+      if (this->Helper->GetFieldValueRange(this->PipelineObject, *iter, range))
+      {
+        vtkNew<vtkDoubleArray> array;
+        array->SetName(iter->c_str());
+        array->SetNumberOfTuples(2);
+        array->SetTypedComponent(0, 0, range[0]);
+        array->SetTypedComponent(1, 0, range[1]);
+        pd->AddArray(array.Get());
+      }
+    }
+  }
+
   // Now add cinema database information. The representation will use this
   // information to extract layers for the current view.
   vtkNew<vtkStringArray> sa;

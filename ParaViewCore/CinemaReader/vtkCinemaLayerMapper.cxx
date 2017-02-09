@@ -147,8 +147,12 @@ public:
 
       vtkSmartPointer<vtkDataArray> darray =
         layer->GetPointData()->GetArray(vtkGetArrayName(ttype));
-      if (ttype == VALUES)
+      if (!darray)
       {
+        continue;
+      }
+      if (ttype == VALUES)
+      {        
         if (mapper->GetScalarVisibility() && (lut != NULL))
         {
           double prev = lut->GetAlpha();
@@ -311,16 +315,22 @@ public:
       // Prep fragment shader source:
       std::string fragShader = GLUtil::GetFullScreenQuadFragmentShaderTemplate();
       vtkShaderProgram::Substitute(fragShader, "//VTK::FSQ::Decl",
-        "uniform sampler2D texColors;\n"
-        "uniform sampler2D texLuminance;\n"
-        "uniform sampler2D texDepth;\n");
+        "uniform bool hasLUT;\n"
+        "uniform sampler2D texDepth;\n"
+        "uniform sampler2D texLUTs;\n"
+        "uniform sampler2D texValues;\n"
+        "uniform sampler2D texLuminance;\n");
       vtkShaderProgram::Substitute(fragShader, "//VTK::FSQ::Impl",
         "vec2 tc = vec2(texCoord.x, 1.0 - texCoord.y);\n"
-        "vec4 rgba = texture2D(texColors, tc.xy).rgba;\n"
-        "vec3 luminance = texture2D(texLuminance, tc.xy).xyz;\n"
         "float depth = texture2D(texDepth, tc.xy).x;\n"
+        "vec3 luminance = texture2D(texLuminance, tc.xy).xyz;\n"
         "if (depth >= 256.0){discard;}\n"
-        "gl_FragData[0] = vec4(vec3(rgba.xyz * luminance.xyz), rgba.a);\n"
+        "if (hasLUT) {\n"
+        "  gl_FragData[0] = texture2D(texLUTs, tc.xy).rgba;\n"
+        "} else {\n"
+        "  vec4 valueMapped = texture2D(texValues, tc.xy).rgba;\n"
+        "  gl_FragData[0] = vec4(vec3(valueMapped.xyz * luminance.xyz), valueMapped.a);\n"
+        "}\n"
         "gl_FragDepth = depth/256.0;\n;");
 
       std::string vertexShader =
@@ -382,20 +392,36 @@ public:
       vtkTextureObject* values = layerTexture.GetTextureObject(VALUES);
       vtkTextureObject* depth = layerTexture.GetTextureObject(DEPTH);
       vtkTextureObject* luminance = layerTexture.GetTextureObject(LUMINANCE);
-
-      if (!values || !depth || !luminance)
+      vtkTextureObject* luts = layerTexture.GetTextureObject(COLORS);
+      if (!depth || (!(values && luminance) && !luts))
       {
         cerr << "Unsupported case encountered. Skipping for now.";
         continue;
       }
 
-      values->Activate();
       depth->Activate();
-      luminance->Activate();
-
-      this->ShaderProgram->SetUniformi("texColors", values->GetTextureUnit());
-      this->ShaderProgram->SetUniformi("texLuminance", luminance->GetTextureUnit());
       this->ShaderProgram->SetUniformi("texDepth", depth->GetTextureUnit());
+      if (values)
+      {
+        values->Activate();
+        this->ShaderProgram->SetUniformi("texValues", values->GetTextureUnit());
+      }
+      if (luminance)
+      {
+        luminance->Activate();
+        this->ShaderProgram->SetUniformi("texLuminance", luminance->GetTextureUnit());
+      }
+      if (luts)
+      {
+        luts->Activate();
+        this->ShaderProgram->SetUniformi("hasLUT", true);
+        this->ShaderProgram->SetUniformi("texLUTs", luts->GetTextureUnit());
+      }
+      else
+      {
+        this->ShaderProgram->SetUniformi("hasLUT", false);
+      }
+
       this->ShaderProgram->SetUniformi(
         "plopPixels", (this->Mapper->GetRenderLayersAsImage() == true) ? 1 : 0);
       this->ShaderProgram->SetUniformMatrix("invProjMat", this->InverseProjMat.Get());
@@ -404,9 +430,19 @@ public:
 
       GLUtil::DrawFullScreenQuad();
 
-      values->Deactivate();
       depth->Deactivate();
-      luminance->Deactivate();
+      if (values)
+      {
+        values->Deactivate();
+      }
+      if (luminance)
+      {
+        luminance->Deactivate();
+      }
+      if (luts)
+      {
+        luts->Deactivate();
+      }
     }
     this->VAO->Release();
   }
