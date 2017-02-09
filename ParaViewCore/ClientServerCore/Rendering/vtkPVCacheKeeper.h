@@ -45,7 +45,7 @@ public:
    * Methods for saving, clearing and updating flip books.
    * This removes all saved cache.
    */
-  void RemoveAllCaches();
+  virtual void RemoveAllCaches();
 
   //@{
   /**
@@ -59,8 +59,8 @@ public:
    * Returns if the given \c cacheTime is available in the cache.
    * Does not cause any updates.
    */
-  bool IsCached(double cacheTime);
-  bool IsCached() { return this->IsCached(this->CacheTime); }
+  virtual bool IsCached(double cacheTime);
+  virtual bool IsCached() { return this->IsCached(this->CacheTime); }
 
   //@{
   /**
@@ -106,7 +106,7 @@ protected:
    * Called to save the data in cache. Returns true if data is saved otherwise
    * false.
    */
-  bool SaveData(vtkDataObject*);
+  virtual bool SaveData(vtkDataObject*);
 
   bool CachingEnabled;
   double CacheTime;
