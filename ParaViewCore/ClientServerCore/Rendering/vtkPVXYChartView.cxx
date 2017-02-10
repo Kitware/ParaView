@@ -69,6 +69,7 @@ vtkPVXYChartView::vtkPVXYChartView()
   this->InternalTitle = NULL;
   this->PlotTime = vtkPVPlotTime::New();
   this->HideTimeMarker = false;
+  this->SortByXAxis = false;
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);

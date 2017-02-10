@@ -94,6 +94,16 @@ public:
 
   //@{
   /**
+   * Get/set whether the points in the chart should be sorted by their x-axis value.
+   * Points are connected in line plots in the order they are in the table.  Sorting
+   * by the x-axis allows the line to have no cycles.
+   */
+  void SetSortDataByXAxis(bool val);
+  vtkGetMacro(SortDataByXAxis, bool);
+  //@}
+
+  //@{
+  /**
    * Set/Clear the properties for Y series/columns.
    */
   void SetSeriesVisibility(const char* seriesname, bool visible);
@@ -141,15 +151,22 @@ protected:
   /**
    * Overridden to remove all plots from the view.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
-  virtual void PrepareForRendering() VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+
+  vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject>) VTK_OVERRIDE;
+
+  void PrepareForRendering() VTK_OVERRIDE;
 
   class vtkInternals;
   friend class vtkInternals;
   vtkInternals* Internals;
+
+  class SortTableFilter;
 
 private:
   vtkXYChartRepresentation(const vtkXYChartRepresentation&) VTK_DELETE_FUNCTION;
@@ -158,6 +175,7 @@ private:
   int ChartType;
   char* XAxisSeriesName;
   bool UseIndexForXAxis;
+  bool SortDataByXAxis;
   bool PlotDataHasChanged;
   double SelectionColor[3];
   char* SeriesLabelPrefix;
