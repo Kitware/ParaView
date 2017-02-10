@@ -195,7 +195,7 @@
       <!-- End 3DText -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVArrowSource"
+    <SourceProxy class="vtkArrowSource"
                  label="Arrow"
                  name="ArrowSource">
       <Documentation long_help="3D arrow with a long cylindrical shaft and a cone for the tip"

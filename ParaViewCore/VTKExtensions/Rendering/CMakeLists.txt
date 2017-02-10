@@ -46,7 +46,6 @@ set(Module_SRCS
   vtkOrderedCompositeDistributor.cxx
   vtkPartitionOrdering.cxx
   vtkPartitionOrderingInterface.cxx
-  vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVCameraCollection.cxx
@@ -75,10 +74,8 @@ set(Module_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVTrackballZoomToMouse.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkReductionFilter.cxx
   vtkResampledAMRImageSource.cxx
   vtkSelectionConverter.cxx
-  vtkSelectionSerializer.cxx
   vtkSortedTableStreamer.cxx
   vtkSquirtCompressor.cxx
   vtkTileDisplayHelper.cxx

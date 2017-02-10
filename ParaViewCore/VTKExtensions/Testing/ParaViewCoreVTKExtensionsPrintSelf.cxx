@@ -83,7 +83,6 @@
 #include "vtkPSciVizPCAStats.h"
 #include "vtkPVAMRDualClip.h"
 #include "vtkPVArrayCalculator.h"
-#include "vtkPVArrowSource.h"
 #include "vtkPVAxesActor.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVBox.h"
@@ -273,7 +272,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkPSciVizPCAStats);
   PRINT_SELF(vtkPVAMRDualClip);
   PRINT_SELF(vtkPVArrayCalculator);
-  PRINT_SELF(vtkPVArrowSource);
   PRINT_SELF(vtkPVAxesActor);
   PRINT_SELF(vtkPVAxesWidget);
   PRINT_SELF(vtkPVBox);
