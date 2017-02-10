@@ -7,9 +7,9 @@ index 4f283bd..f05aa2b 100644
    vtkPVDisableStackTraceSignalHandler.cxx
    vtkPVEnableStackTraceSignalHandler.cxx
 +  vtkPVExtractSelection.cxx
+   vtkPVFileInformationHelper.cxx
    vtkPVGenericAttributeInformation.cxx
    vtkPVInformation.cxx
-   vtkPVMemoryUseInformation.cxx
 diff --git a/ParaViewCore/ClientServerCore/Core/module.cmake b/ParaViewCore/ClientServerCore/Core/module.cmake
 index f17c4df..f0db074 100644
 --- a/ParaViewCore/ClientServerCore/Core/module.cmake
