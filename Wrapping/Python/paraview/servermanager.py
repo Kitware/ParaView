@@ -90,6 +90,12 @@ def _wrap_property(proxy, smproperty):
         elif  al and al.IsA("vtkSMChartSeriesSelectionDomain") and \
             smproperty.GetRepeatable() and al.GetDefaultMode() == 1:
             property = ArrayListProperty(proxy, smproperty)
+        elif al and al.IsA("vtkSMArrayListDomain") and \
+            smproperty.GetRepeatable():
+            # if it is repeatable, then it is not a single array selection... and if it happens
+            # to have 5 elements in the repeatable proxy, avoid an exception by testing this case
+            # first.
+            property = VectorProperty(proxy, smproperty)
         elif al and al.IsA("vtkSMArrayListDomain") and smproperty.GetNumberOfElements() == 5:
             property = ArraySelectionProperty(proxy, smproperty)
         else:
