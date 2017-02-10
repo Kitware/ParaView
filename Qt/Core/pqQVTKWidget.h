@@ -91,11 +91,6 @@ protected:
   */
   virtual void resizeEvent(QResizeEvent* event);
 
-  /**
-  * overloaded move handler
-  */
-  virtual void moveEvent(QMoveEvent* event);
-
   // method called in paintEvent() to render the image cache on to the device.
   // return false, if cache couldn;t be used for painting. In that case, the
   // paintEvent() method will continue with the default painting code.

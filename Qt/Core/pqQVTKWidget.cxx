@@ -66,6 +66,10 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
 
   // Save the loaded image
   this->MousePointerToDraw = image.mirrored();
+
+#if QT_VERSION >= 0x050000
+  this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -77,7 +81,9 @@ pqQVTKWidget::~pqQVTKWidget()
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
   this->Superclass::resizeEvent(e);
+#if QT_VERSION < 0x050000
   this->updateSizeProperties();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -100,18 +106,14 @@ void pqQVTKWidget::updateSizeProperties()
     END_UNDO_EXCLUDE();
   }
 
+#if QT_VERSION < 0x050000
+  // all of this is not needed for Qt 5 since updateSizeProperties() is called
+  // after resize but before `paintGL`.
   this->markCachedImageAsDirty();
 
   // need to request a render after the "resizing" is done.
   this->update();
-}
-
-//----------------------------------------------------------------------------
-// moveEvent doesn't help us, since this is fired when the pqQVTKWidget is moved
-// inside its parent, which rarely happens.
-void pqQVTKWidget::moveEvent(QMoveEvent* e)
-{
-  this->Superclass::moveEvent(e);
+#endif
 }
 
 //----------------------------------------------------------------------------
