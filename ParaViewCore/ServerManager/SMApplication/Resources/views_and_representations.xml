@@ -1878,7 +1878,8 @@
       <DoubleVectorProperty command="SetCamera2DMouseWheelMotionFactor"
                             default_values="1"
                             name="Camera2DMouseWheelMotionFactor"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <DoubleRangeDomain max="10"
                            min="0"
                            name="range"
@@ -1893,7 +1894,8 @@
       <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
                             default_values="1"
                             name="Camera3DMouseWheelMotionFactor"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <DoubleRangeDomain max="10"
                            min="0"
                            name="range"
