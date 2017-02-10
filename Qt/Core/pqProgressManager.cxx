@@ -58,6 +58,7 @@ pqProgressManager::pqProgressManager(QObject* _parent)
   this->EnableProgress = false;
   this->ReadyEnableProgress = false;
   this->LastProgressTime = 0;
+  this->UnblockEvents = false;
 
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerAdded(pqServer*)));
@@ -84,7 +85,7 @@ void pqProgressManager::onServerAdded(pqServer* server)
 //-----------------------------------------------------------------------------
 bool pqProgressManager::eventFilter(QObject* obj, QEvent* evt)
 {
-  if (this->ProgressCount != 0)
+  if (this->ProgressCount != 0 && !this->UnblockEvents)
   {
     if (dynamic_cast<QKeyEvent*>(evt) || dynamic_cast<QMouseEvent*>(evt))
     {
@@ -96,6 +97,14 @@ bool pqProgressManager::eventFilter(QObject* obj, QEvent* evt)
   }
 
   return QObject::eventFilter(obj, evt);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProgressManager::unblockEvents(bool val)
+{
+  bool prev = this->UnblockEvents;
+  this->UnblockEvents = val;
+  return prev;
 }
 
 //-----------------------------------------------------------------------------

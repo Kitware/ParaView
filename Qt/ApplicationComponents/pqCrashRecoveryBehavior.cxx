@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqProgressManager.h"
 #include "pqSaveStateReaction.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -42,8 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPushButton>
 
 #define CrashRecoveryStateFile ".PVCrashRecoveryState.pvsm"
+#include <stdlib.h> /* EXIT_FAILURE */
+#if !defined(_WIN32)
+#include <unistd.h> /* _exit */
+#endif
 
 //-----------------------------------------------------------------------------
 pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
@@ -134,14 +140,33 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
   }
   inQuit = true;
 
-  // Try to handle recovery
-  int recover = QMessageBox::question(pqCoreUtilities::mainWidget(), "ParaView",
-    "The server side has disconnected.\n"
-    "Would you like to save a ParaView state file?",
-    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-  if (recover == QMessageBox::Yes)
+  if (getenv("DASHBOARD_TEST_FROM_CTEST") == NULL)
   {
-    pqSaveStateReaction::saveState();
+    // enable user interaction (BUG #17155).
+    pqProgressManager* pgm = pqApplicationCore::instance()->getProgressManager();
+    bool prev = pgm->unblockEvents(true);
+
+    // Try to handle recovery
+    QMessageBox mbox(QMessageBox::Critical, tr("Server disconnected!"),
+      tr("The server side has disconnected. "
+         "The application will now quit since it may be in an unrecoverable state.\n\n"
+         "Would you like to save a ParaView state file?"),
+      QMessageBox::NoButton, pqCoreUtilities::mainWidget());
+    mbox.addButton(QMessageBox::Yes)->setText("Save state and exit");
+    mbox.addButton(QMessageBox::No)->setText("Exit without saving state");
+    mbox.setDefaultButton(QMessageBox::Yes);
+    if (mbox.exec() == QMessageBox::Yes)
+    {
+      pqSaveStateReaction::saveState();
+    }
+    // restore.
+    pgm->unblockEvents(prev);
   }
-  QApplication::instance()->quit();
+
+  // It's tempting to think that we shouldn't exit here, but simply disconnect
+  // from the server. However, more often then not, the server may disconnect in
+  // middle of some communication in which case there may be other asserts or
+  // checks that would fail causing the application to end up in a weird state.
+  // Hence, we simply _exit().
+  _exit(-1);
 }
