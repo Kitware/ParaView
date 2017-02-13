@@ -65,6 +65,7 @@ vtkPVArrayInformation::vtkPVArrayInformation()
   this->ComponentNames = 0;
   this->DefaultComponentName = 0;
   this->InformationKeys = 0;
+  this->IsPartial = 0;
   this->Initialize();
 }
 
@@ -419,6 +420,7 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* info)
   this->DataType = info->GetDataType();
   this->SetNumberOfComponents(info->GetNumberOfComponents());
   this->SetNumberOfTuples(info->GetNumberOfTuples());
+  this->IsPartial = info->IsPartial;
 
   num = 2 * this->NumberOfComponents;
   if (this->NumberOfComponents > 1)
