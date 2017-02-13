@@ -45,7 +45,6 @@
 #include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkPVInformation.h"
 #include "vtkPVLastSelectionInformation.h"
-#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVOptionsXMLParser.h"
 #include "vtkPVParallelCoordinatesRepresentation.h"
@@ -148,7 +147,6 @@ int ParaViewCoreClientServerCorePrintSelf(int, char* [])
   PRINT_SELF(vtkPVImplicitPlaneRepresentation);
   PRINT_SELF(vtkPVInformation);
   PRINT_SELF(vtkPVLastSelectionInformation);
-  PRINT_SELF(vtkPVOpenGLExtensionsInformation);
   PRINT_SELF(vtkPVOptions);
   PRINT_SELF(vtkPVOptionsXMLParser);
   PRINT_SELF(vtkPVParallelCoordinatesRepresentation);

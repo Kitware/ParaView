@@ -1,13 +1,21 @@
-#include "vtkOpenGLExtensionManager.h"
-#include "vtkOpenGLRenderWindow.h"
+#ifdef VTKGL2
+#include "vtk_glew.h"
+#else
+#include "vtkgl.h"
+#endif
+
+#include "vtkNew.h"
 #include "vtkRenderWindow.h"
 #include "vtkSetGet.h"
+
 #if defined(TEST_MPI_CAPS)
 #include "vtkMPI.h"
 #endif
+
 #if defined(TEST_PY_CAPS)
 #include "patchlevel.h"
 #endif
+
 #include <sstream>
 #include <string>
 #include <vtksys/SystemInformation.hxx>
@@ -91,21 +99,24 @@ string GetMPILibraryVersion()
 }
 #endif
 
+#define safes(arg) (arg ? ((const char*)arg) : "<null>")
+
+string GetOpenGLInfo()
+{
+  ostringstream oss;
+  vtkNew<vtkRenderWindow> rwin;
+  rwin->SetOffScreenRendering(1);
+  rwin->Render();
+  oss << "DriverGLVersion = " << safes(glGetString(GL_VERSION)) << endl
+      << "DriverGLVendor = " << safes(glGetString(GL_VENDOR)) << endl
+      << "DriverGLRenderer = " << safes(glGetString(GL_RENDERER)) << endl;
+  return oss.str();
+}
+
 int TestSystemCaps(int argc, char* argv[])
 {
   (void)argc;
   (void)argv;
-
-  // for info about the Open GL
-  vtkRenderWindow* rwin = vtkRenderWindow::New();
-  rwin->Render();
-  vtkOpenGLRenderWindow* context = vtkOpenGLRenderWindow::SafeDownCast(rwin);
-  if (!context)
-  {
-    vtkGenericWarningMacro(<< "ERROR: Implement support for" << rwin->GetClassName());
-    return 1;
-  }
-  vtkOpenGLExtensionManager* extensions = context->GetExtensionManager();
 
   // for info about the host
   vtksys::SystemInformation sysinfo;
@@ -132,13 +143,7 @@ int TestSystemCaps(int argc, char* argv[])
        << endl
 #endif
        << "OpenGL:" << endl
-       << "DriverGLVersion = " << extensions->GetDriverGLVersion() << endl
-       << "DriverGLVendor = " << extensions->GetDriverGLVendor() << endl
-       << "DriverGLRenderer = " << extensions->GetDriverGLRenderer() << endl
-       << "Extensions = " << extensions->GetExtensionsString() << endl
-       << endl;
-
-  rwin->Delete();
+       << GetOpenGLInfo() << endl;
 
   // always pass
   return 0;
