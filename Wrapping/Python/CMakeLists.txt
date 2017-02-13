@@ -44,8 +44,8 @@ set(_vtkpy_modules
   ${CMAKE_BINARY_DIR}/VTK/Wrapping/Python/vtk_compile_complete
   vtkpython_pyc
   )
-if (TARGET vtkWebPython)
-  list(APPEND _vtkpy_modules vtkWebPython)
+if (TARGET vtkWebPythonCommon)
+  list(APPEND _vtkpy_modules vtkWebPythonCommon)
 endif()
 
 #------------------------------------------------------------------------------
