@@ -7365,9 +7365,11 @@
                          command="AddCompositeDataSetIndex"
                          name="CompositeDataSetIndex"
                          number_of_elements_per_command="1"
+                         number_of_elements="1"
+                         default_values="0"
                          panel_visibility="default"
                          repeat_command="1">
-        <CompositeTreeDomain mode="all" name="tree" default_mode="nonempty-leaf">
+        <CompositeTreeDomain mode="all" name="tree">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
