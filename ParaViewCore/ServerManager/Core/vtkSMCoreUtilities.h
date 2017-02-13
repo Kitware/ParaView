@@ -102,6 +102,13 @@ public:
   }
   //@}
 
+  //@{
+  /**
+   * Given a proxy and a port number get the name of the input.
+   */
+  static const char* GetInputPropertyName(vtkSMProxy* proxy, int port=0);
+  //@}
+
 protected:
   vtkSMCoreUtilities();
   ~vtkSMCoreUtilities();

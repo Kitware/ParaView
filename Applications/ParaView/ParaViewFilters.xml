@@ -65,6 +65,7 @@
     <Proxy group="filters" name="ParticlePath" />
     <Proxy group="filters" name="ParticleTracer" />
     <Proxy group="filters" name="StreakLine" />
+    <Proxy group="filters" name="SynchronizeTime" />
     <Proxy group="filters" name="TemporalCache" />
     <Proxy group="filters" name="TemporalInterpolator" />
     <Proxy group="filters" name="TemporalShiftScale" />

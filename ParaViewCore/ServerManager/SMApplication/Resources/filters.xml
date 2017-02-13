@@ -15152,5 +15152,60 @@ source.</Documentation>
       </Hints>
       <!-- End vtkRulerLineForInput -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSynchronizeTimeFilter"
+                 label="Synchronize Time"
+                 name="SynchronizeTime">
+      <Documentation short_help="Set 'close' time step values from the source to the input">
+        Synchronize time step values in the first input (Input) to time step
+        values in the second input (Source) that are considered close enough.
+        The outputted data set is from the first input and the number of
+        output time steps is also equal to the number of time steps in
+        the first input. Time step values in the first input that are
+        "close" to time step values in the second input are replaced
+        with the value from the second input. Close is determined to
+        be if the difference is less than RelativeTolerance multiplied
+        by the time range of the first input.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="DataToPass">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose geometry and
+        fields will be output.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection" name="TimeToSync">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset from which to obtain
+        the time step values.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty
+          name="RelativeTolerance"
+          command="SetRelativeTolerance"
+          number_of_elements="1"
+          default_values="0.00001"
+          panel_visibility="advanced">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility RelativeTolerance="1" />
+      </Hints>
+      <!-- End vtkSynchronizeTimeFilter -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -14,10 +14,13 @@
 =========================================================================*/
 #include "vtkSMCoreUtilities.h"
 
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -264,6 +267,32 @@ bool vtkSMCoreUtilities::AdjustRange(double range[2])
   }
 
   return AdjustTRange(range, vtkTypeInt64());
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMCoreUtilities::GetInputPropertyName(vtkSMProxy* proxy, int port)
+{
+  if (!proxy)
+  {
+    return NULL;
+  }
+
+  vtkNew<vtkSMOrderedPropertyIterator> piter;
+  piter->SetProxy(proxy);
+  piter->Begin();
+  while (!piter->IsAtEnd())
+  {
+    if (vtkSMInputProperty* ip =
+        vtkSMInputProperty::SafeDownCast(piter->GetProperty()))
+    {
+      if (ip->GetPortIndex() == port)
+      {
+        return ip->GetXMLName();
+      }
+    }
+    piter->Next();
+  }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
