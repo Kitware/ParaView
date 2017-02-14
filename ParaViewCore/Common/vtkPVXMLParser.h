@@ -47,14 +47,6 @@ public:
 
   //@{
   /**
-   * Get/Set the file from which to read the configuration.
-   */
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
-  //@}
-
-  //@{
-  /**
    * If on, then the Parse method will NOT report an error using vtkErrorMacro.
    * Rather, it will just return false.  This feature is useful when simply
    * checking to see if a file is a valid XML file or there is otherwise a way

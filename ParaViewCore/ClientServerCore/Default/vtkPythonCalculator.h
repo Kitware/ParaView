@@ -55,16 +55,6 @@ public:
 
   //@{
   /**
-   * Controls whether the input arrays are copied to the output.
-   * True by default.
-   */
-  vtkSetMacro(CopyArrays, bool);
-  vtkGetMacro(CopyArrays, bool);
-  vtkBooleanMacro(CopyArrays, bool);
-  //@}
-
-  //@{
-  /**
    * Set the text of the python expression to execute. This expression
    * must return a scalar value (which is converted to an array) or a
    * numpy array.
@@ -106,7 +96,6 @@ protected:
   char* Expression;
   char* ArrayName;
   int ArrayAssociation;
-  bool CopyArrays;
 
 private:
   vtkPythonCalculator(const vtkPythonCalculator&) VTK_DELETE_FUNCTION;

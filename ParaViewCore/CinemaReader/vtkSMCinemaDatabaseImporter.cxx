@@ -18,13 +18,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCinemaDatabaseInformation.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSelfGeneratingSourceProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMViewProxy.h"
 
 #include <cassert>
 #include <map>

@@ -54,15 +54,6 @@ public:
   virtual void OnKeyDown(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
   //@}
 
-  //@{
-  /**
-   * For setting the center of rotation.
-   */
-  vtkSetVector3Macro(Center, double);
-  vtkGetVector3Macro(Center, double);
-  //@}
-
-  //@{
   /**
    * Returns the currently pressed key code.
    */
@@ -71,13 +62,8 @@ public:
 protected:
   vtkPVTrackballRotate();
   ~vtkPVTrackballRotate();
-  //@}
-
-  double Center[3];
-  double DisplayCenter[2];
 
   char KeyCode;
-
   vtkPVTrackballRotate(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
 };
