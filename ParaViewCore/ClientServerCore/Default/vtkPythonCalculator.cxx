@@ -43,7 +43,6 @@ vtkPythonCalculator::vtkPythonCalculator()
   this->SetArrayName("result");
   this->SetExecuteMethod(vtkPythonCalculator::ExecuteScript, this);
   this->ArrayAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-  this->CopyArrays = true;
 }
 
 //----------------------------------------------------------------------------

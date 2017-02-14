@@ -24,7 +24,6 @@ vtkStandardNewMacro(vtkPVXMLParser);
 //----------------------------------------------------------------------------
 vtkPVXMLParser::vtkPVXMLParser()
 {
-  this->FileName = 0;
   this->InputString = 0;
   this->NumberOfOpenElements = 0;
   this->OpenElementsSize = 10;
@@ -47,14 +46,12 @@ vtkPVXMLParser::~vtkPVXMLParser()
   {
     this->RootElement->Delete();
   }
-  this->SetFileName(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXMLParser::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << (this->FileName ? this->FileName : "(none)") << "\n";
   os << indent << "SuppressErrorMessages: " << this->SuppressErrorMessages << "\n";
 }
 

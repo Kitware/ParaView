@@ -29,11 +29,6 @@ vtkStandardNewMacro(vtkPVTrackballRotate);
 //-------------------------------------------------------------------------
 vtkPVTrackballRotate::vtkPVTrackballRotate()
 {
-  this->Center[0] = 0;
-  this->Center[1] = 0;
-  this->Center[2] = 0;
-  this->DisplayCenter[0] = 0;
-  this->DisplayCenter[1] = 0;
   this->KeyCode = 0;
 }
 
