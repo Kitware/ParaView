@@ -101,7 +101,6 @@ public:
   public:
     vtkOrderedCompositingInfo OrderedCompositingInfo;
 
-    vtkWeakPointer<vtkPVDataRepresentation> Representation;
     bool CloneDataToAllNodes;
     bool DeliverToClientAndRenderingProcesses;
     bool GatherBeforeDeliveringToClient;
@@ -131,6 +130,7 @@ public:
     }
 
     void SetActualMemorySize(unsigned long size) { this->ActualMemorySize = size; }
+    unsigned long GetActualMemorySize() const { return this->ActualMemorySize; }
 
     void SetDeliveredDataObject(vtkDataObject* data) { this->DeliveredDataObject = data; }
 
@@ -158,16 +158,6 @@ public:
 
     vtkDataObject* GetDataObject() const { return this->DataObject.GetPointer(); }
     unsigned long GetTimeStamp() const { return this->TimeStamp; }
-
-    unsigned long GetVisibleDataSize()
-    {
-      if (this->Representation && this->Representation->GetVisibility())
-      {
-        return this->ActualMemorySize;
-      }
-      return 0;
-    }
-
     void SetNextStreamedPiece(vtkDataObject* data) { this->StreamedPiece = data; }
     vtkDataObject* GetStreamedPiece() { return this->StreamedPiece; }
   };
@@ -176,7 +166,10 @@ public:
   typedef std::pair<unsigned int, int> ReprPortType;
   typedef std::map<ReprPortType, std::pair<vtkItem, vtkItem> > ItemsMapType;
 
-  vtkItem* GetItem(unsigned int index, bool use_second, int port = 0)
+  // Keep track of representation and its uid.
+  typedef std::map<unsigned int, vtkWeakPointer<vtkPVDataRepresentation> > RepresentationsMapType;
+
+  vtkItem* GetItem(unsigned int index, bool use_second, int port, bool create_if_needed = false)
   {
     ReprPortType key(index, port);
     ItemsMapType::iterator items = this->ItemsMap.find(key);
@@ -184,12 +177,18 @@ public:
     {
       return use_second ? &(items->second.second) : &(items->second.first);
     }
+    else if (create_if_needed)
+    {
+      std::pair<vtkItem, vtkItem>& itemsPair = this->ItemsMap[key];
+      return use_second ? &(itemsPair.second) : &(itemsPair.first);
+    }
     return NULL;
   }
 
-  vtkItem* GetItem(vtkPVDataRepresentation* repr, bool use_second, int port = 0)
+  vtkItem* GetItem(
+    vtkPVDataRepresentation* repr, bool use_second, int port, bool create_if_needed = false)
   {
-    return this->GetItem(repr->GetUniqueIdentifier(), use_second, port);
+    return this->GetItem(repr->GetUniqueIdentifier(), use_second, port, create_if_needed);
   }
 
   unsigned long GetVisibleDataSize(bool use_second_if_available)
@@ -198,19 +197,34 @@ public:
     ItemsMapType::iterator iter;
     for (iter = this->ItemsMap.begin(); iter != this->ItemsMap.end(); ++iter)
     {
+      const ReprPortType& key = iter->first;
+      if (!this->IsRepresentationVisible(key.first))
+      {
+        // skip hidden representations.
+        continue;
+      }
+
       if (use_second_if_available && iter->second.second.GetDataObject())
       {
-        size += iter->second.second.GetVisibleDataSize();
+        size += iter->second.second.GetActualMemorySize();
       }
       else
       {
-        size += iter->second.first.GetVisibleDataSize();
+        size += iter->second.first.GetActualMemorySize();
       }
     }
     return size;
   }
 
+  bool IsRepresentationVisible(unsigned int id) const
+  {
+    RepresentationsMapType::const_iterator riter = this->RepresentationsMap.find(id);
+    return (riter != this->RepresentationsMap.end() && riter->second.GetPointer() != NULL &&
+      riter->second->GetVisibility());
+  }
+
   ItemsMapType ItemsMap;
+  RepresentationsMapType RepresentationsMap;
 };
 
 //*****************************************************************************
@@ -251,47 +265,46 @@ unsigned long vtkPVDataDeliveryManager::GetVisibleDataSize(bool low_res)
 void vtkPVDataDeliveryManager::RegisterRepresentation(vtkPVDataRepresentation* repr)
 {
   assert("A representation must have a valid UniqueIdentifier" && repr->GetUniqueIdentifier());
-
-  int numPorts = repr->GetNumberOfInputPorts();
-
-  for (int port = 0; port < numPorts; ++port)
-  {
-    vtkInternals::ReprPortType key(repr->GetUniqueIdentifier(), port);
-
-    vtkInternals::vtkItem item;
-    item.Representation = repr;
-    this->Internals->ItemsMap[key].first = item;
-
-    vtkInternals::vtkItem item2;
-    item2.Representation = repr;
-    this->Internals->ItemsMap[key].second = item2;
-  }
+  this->Internals->RepresentationsMap[repr->GetUniqueIdentifier()] = repr;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::UnRegisterRepresentation(vtkPVDataRepresentation* repr)
 {
-  int numPorts = repr->GetNumberOfInputPorts();
+  unsigned int rid = repr->GetUniqueIdentifier();
+  this->Internals->RepresentationsMap.erase(rid);
 
-  for (int port = 0; port < numPorts; ++port)
+  vtkInternals::ItemsMapType::iterator iter = this->Internals->ItemsMap.begin();
+  while (iter != this->Internals->ItemsMap.end())
   {
-    vtkInternals::ReprPortType key(repr->GetUniqueIdentifier(), port);
-    this->Internals->ItemsMap.erase(key);
+    const vtkInternals::ReprPortType& key = iter->first;
+    if (key.first == rid)
+    {
+      vtkInternals::ItemsMapType::iterator toerase = iter;
+      ++iter;
+      this->Internals->ItemsMap.erase(toerase);
+    }
+    else
+    {
+      ++iter;
+    }
   }
 }
 
 //----------------------------------------------------------------------------
 vtkPVDataRepresentation* vtkPVDataDeliveryManager::GetRepresentation(unsigned int index)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(index, false);
-  return item ? item->Representation : NULL;
+  vtkInternals::RepresentationsMapType::const_iterator iter =
+    this->Internals->RepresentationsMap.find(index);
+  return iter != this->Internals->RepresentationsMap.end() ? iter->second.GetPointer() : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::SetDeliverToAllProcesses(
   vtkPVDataRepresentation* repr, bool mode, bool low_res, int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res, port);
+  vtkInternals::vtkItem* item =
+    this->Internals->GetItem(repr, low_res, port, /*create_if_needed=*/true);
   if (item)
   {
     item->CloneDataToAllNodes = mode;
@@ -307,7 +320,8 @@ void vtkPVDataDeliveryManager::SetDeliverToClientAndRenderingProcesses(
   vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery, bool low_res,
   int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res, port);
+  vtkInternals::vtkItem* item =
+    this->Internals->GetItem(repr, low_res, port, /*create_if_needed=*/true);
   if (item)
   {
     item->DeliverToClientAndRenderingProcesses = deliver_to_client;
@@ -323,8 +337,8 @@ void vtkPVDataDeliveryManager::SetDeliverToClientAndRenderingProcesses(
 void vtkPVDataDeliveryManager::MarkAsRedistributable(
   vtkPVDataRepresentation* repr, bool value /*=true*/, int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port);
-  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true, port);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port, true);
+  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true, port, true);
   if (item)
   {
     item->Redistributable = value;
@@ -339,8 +353,8 @@ void vtkPVDataDeliveryManager::MarkAsRedistributable(
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::SetStreamable(vtkPVDataRepresentation* repr, bool val, int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port);
-  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true, port);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port, true);
+  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true, port, true);
   if (item)
   {
     item->Streamable = val;
@@ -356,7 +370,8 @@ void vtkPVDataDeliveryManager::SetStreamable(vtkPVDataRepresentation* repr, bool
 void vtkPVDataDeliveryManager::SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data,
   bool low_res, unsigned long trueSize, int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res, port);
+  vtkInternals::vtkItem* item =
+    this->Internals->GetItem(repr, low_res, port, /*create_if_needed=*/true);
   if (item)
   {
     unsigned long data_time = 0;
@@ -397,7 +412,7 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
 void vtkPVDataDeliveryManager::SetPiece(
   unsigned int id, vtkDataObject* data, bool low_res, int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res, port);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res, port, true);
   if (item)
   {
     item->SetDataObject(data);
@@ -413,7 +428,7 @@ void vtkPVDataDeliveryManager::SetOrderedCompositingInformation(vtkPVDataReprese
   vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
   const double spacing[3], int port)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port, true);
   if (item)
   {
     vtkInternals::vtkOrderedCompositingInfo info;
@@ -450,11 +465,15 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
-    vtkInternals::vtkItem& item = use_low ? iter->second.second : iter->second.first;
-    if (item.Representation && item.Representation->GetVisibility() &&
-      item.GetTimeStamp() > timestamp)
+    if (this->Internals->IsRepresentationVisible(iter->first.first))
     {
-      keys_to_deliver.push_back(iter->first.first);
+      vtkInternals::vtkItem& item = use_low ? iter->second.second : iter->second.first;
+      if (item.GetTimeStamp() > timestamp)
+      {
+        // FIXME: convert keys_to_deliver to a vector of pairs.
+        keys_to_deliver.push_back(iter->first.first);
+        keys_to_deliver.push_back(static_cast<unsigned int>(iter->first.second));
+      }
     }
   }
   return keys_to_deliver.size() > 0;
@@ -476,6 +495,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
   // This method will be implemented in "view-specific" subclasses since how the
   // data is delivered is very view specific.
 
+  assert(size % 2 == 0);
+
   vtkTimerLog::MarkStartEvent(use_lod ? "LowRes Data Migration" : "FullRes Data Migration");
 
   bool using_remote_rendering = use_lod
@@ -483,68 +504,61 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     : this->RenderView->GetUseDistributedRenderingForStillRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
-  for (unsigned int cc = 0; cc < size; cc++)
+  for (unsigned int cc = 0; cc < size; cc += 2)
   {
-    // Get the repr so we can loop over input ports:
-    // TODO Both this method and NeedsDelivery should be updated to use
-    // port information so we don't copy unneccesarily.
-    vtkPVDataRepresentation* repr = this->GetRepresentation(values[cc]);
-    int numPorts = repr->GetNumberOfInputPorts();
+    unsigned int rid = values[cc];
+    int port = static_cast<int>(values[cc + 1]);
 
-    for (int port = 0; port < numPorts; ++port)
+    vtkPVDataRepresentation* repr = this->GetRepresentation(rid);
+    vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod != 0, port);
+    vtkDataObject* data = item ? item->GetDataObject() : NULL;
+    if (!data)
     {
-      vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod != 0, port);
+      continue;
+    }
 
-      vtkDataObject* data = item ? item->GetDataObject() : NULL;
+    //    if (data != NULL && data->IsA("vtkUniformGridAMR"))
+    //      {
+    //      // we are dealing with AMR datasets.
+    //      // We assume for now we're not running in render-server mode. We can
+    //      // ensure that at some point in future.
+    //      // So we are either in pass-through or collect mode.
 
-      if (!data)
+    //      // FIXME: check that the mode flags are "suitable" for AMR.
+    //      }
+
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(data ? data->GetDataObjectType() : VTK_POLY_DATA);
+    dataMover->SetMoveMode(mode);
+    if (item->CloneDataToAllNodes)
+    {
+      dataMover->SetMoveModeToClone();
+    }
+    else if (item->DeliverToClientAndRenderingProcesses)
+    {
+      if (mode == vtkMPIMoveData::PASS_THROUGH)
       {
-        continue;
+        dataMover->SetMoveMode(vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
       }
-
-      //    if (data != NULL && data->IsA("vtkUniformGridAMR"))
-      //      {
-      //      // we are dealing with AMR datasets.
-      //      // We assume for now we're not running in render-server mode. We can
-      //      // ensure that at some point in future.
-      //      // So we are either in pass-through or collect mode.
-
-      //      // FIXME: check that the mode flags are "suitable" for AMR.
-      //      }
-
-      vtkNew<vtkMPIMoveData> dataMover;
-      dataMover->InitializeForCommunicationForParaView();
-      dataMover->SetOutputDataType(data ? data->GetDataObjectType() : VTK_POLY_DATA);
-      dataMover->SetMoveMode(mode);
-      if (item->CloneDataToAllNodes)
+      else
       {
-        dataMover->SetMoveModeToClone();
+        // nothing to do, since the data is going to be delivered to the client
+        // anyways.
       }
-      else if (item->DeliverToClientAndRenderingProcesses)
-      {
-        if (mode == vtkMPIMoveData::PASS_THROUGH)
-        {
-          dataMover->SetMoveMode(vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
-        }
-        else
-        {
-          // nothing to do, since the data is going to be delivered to the client
-          // anyways.
-        }
-        dataMover->SetSkipDataServerGatherToZero(item->GatherBeforeDeliveringToClient == false);
-      }
-      dataMover->SetInputData(data);
+      dataMover->SetSkipDataServerGatherToZero(item->GatherBeforeDeliveringToClient == false);
+    }
+    dataMover->SetInputData(data);
 
-      if (dataMover->GetOutputGeneratedOnProcess())
-      {
-        // release old memory (not necessarily, but try).
-        item->SetDeliveredDataObject(NULL);
-      }
-      dataMover->Update();
-      if (item->GetDeliveredDataObject() == NULL)
-      {
-        item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
-      }
+    if (dataMover->GetOutputGeneratedOnProcess())
+    {
+      // release old memory (not necessarily, but try).
+      item->SetDeliveredDataObject(NULL);
+    }
+    dataMover->Update();
+    if (item->GetDeliveredDataObject() == NULL)
+    {
+      item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
     }
   }
 
@@ -565,7 +579,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
     for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
     {
       vtkInternals::vtkItem& item = iter->second.first;
-      if (item.Representation && item.Representation->GetVisibility())
+      if (this->Internals->IsRepresentationVisible(iter->first.first))
       {
         if (item.OrderedCompositingInfo.Translator)
         {
@@ -596,11 +610,14 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
+    if (!this->Internals->IsRepresentationVisible(iter->first.first))
+    {
+      // skip hidden representations;
+      continue;
+    }
+
     vtkInternals::vtkItem& item = use_lod ? iter->second.second : iter->second.first;
-
-    if (!item.Redistributable || item.Representation == NULL ||
-      item.Representation->GetVisibility() == false ||
-
+    if (!item.Redistributable ||
       // delivered object can be null in case we're updating lod and the
       // representation doeesn't have any LOD data.
       item.GetDeliveredDataObject() == NULL)
@@ -644,11 +661,12 @@ void vtkPVDataDeliveryManager::ClearRedistributedData(bool use_lod)
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
+    if (!this->Internals->IsRepresentationVisible(iter->first.first))
+    {
+      continue;
+    }
     vtkInternals::vtkItem& item = use_lod ? iter->second.second : iter->second.first;
-
-    if (!item.Redistributable || item.Representation == NULL ||
-      item.Representation->GetVisibility() == false ||
-
+    if (!item.Redistributable ||
       // delivered object can be null in case we're updating lod and the
       // representation doeesn't have any LOD data.
       item.GetDeliveredDataObject() == NULL)
@@ -670,7 +688,7 @@ void vtkPVDataDeliveryManager::SetNextStreamedPiece(
   vtkPVDataRepresentation* repr, vtkDataObject* data, int port)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr,
-    /*low_res=*/false, port);
+    /*low_res=*/false, port, true);
   if (item == NULL)
   {
     vtkErrorMacro("Invalid argument.");
@@ -718,11 +736,15 @@ bool vtkPVDataDeliveryManager::GetRepresentationsReadyToStreamPieces(
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
-    vtkInternals::vtkItem& item = iter->second.first;
-    if (item.Representation && item.Representation->GetVisibility() && item.Streamable &&
-      item.GetStreamedPiece())
+    if (this->Internals->IsRepresentationVisible(iter->first.first))
     {
-      keys.push_back(iter->first.first);
+      vtkInternals::vtkItem& item = iter->second.first;
+      if (item.Streamable && item.GetStreamedPiece())
+      {
+        // FIXME: make keys a vector<pair<unsigned int, int> >.
+        keys.push_back(iter->first.first);
+        keys.push_back(static_cast<unsigned int>(iter->first.second));
+      }
     }
   }
   return (keys.size() > 0);
@@ -734,43 +756,39 @@ void vtkPVDataDeliveryManager::DeliverStreamedPieces(unsigned int size, unsigned
   // This method gets called on all processes to deliver any streamed pieces
   // currently available. This is similar to Deliver(...) except that this deals
   // with only delivering pieces for streaming.
+  assert(size % 2 == 0);
 
   bool using_remote_rendering = this->RenderView->GetUseDistributedRenderingForStillRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
   for (unsigned int cc = 0; cc < size; cc++)
   {
-    // Get the repr so we can loop over input ports:
-    // TODO Both this method and GetRepresentationsReadyToStreamPieces should be
-    // updated to use port information so we don't copy unneccesarily.
-    vtkPVDataRepresentation* repr = this->GetRepresentation(values[cc]);
-    int numPorts = repr->GetNumberOfInputPorts();
+    unsigned int rid = values[cc];
+    int port = static_cast<int>(values[cc + 1]);
+    vtkPVDataRepresentation* repr = this->GetRepresentation(rid);
 
-    for (int port = 0; port < numPorts; ++port)
+    vtkInternals::vtkItem* item = this->Internals->GetItem(rid, false, port);
+
+    // FIXME: we need information about the datatype on all processes. For now
+    // we assume that the data type is same as the full-data (which is not
+    // really necessary). We can API to allow representations to be able to
+    // specify the data type.
+    vtkDataObject* data = item->GetDataObject();
+    vtkDataObject* piece = item->GetStreamedPiece();
+
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(data->GetDataObjectType());
+    dataMover->SetMoveMode(mode);
+    if (item->CloneDataToAllNodes)
     {
-      vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], false, port);
-
-      // FIXME: we need information about the datatype on all processes. For now
-      // we assume that the data type is same as the full-data (which is not
-      // really necessary). We can API to allow representations to be able to
-      // specify the data type.
-      vtkDataObject* data = item->GetDataObject();
-      vtkDataObject* piece = item->GetStreamedPiece();
-
-      vtkNew<vtkMPIMoveData> dataMover;
-      dataMover->InitializeForCommunicationForParaView();
-      dataMover->SetOutputDataType(data->GetDataObjectType());
-      dataMover->SetMoveMode(mode);
-      if (item->CloneDataToAllNodes)
-      {
-        dataMover->SetMoveModeToClone();
-      }
-      dataMover->SetInputData(piece);
-      dataMover->Update();
-      if (dataMover->GetOutputGeneratedOnProcess())
-      {
-        item->SetNextStreamedPiece(dataMover->GetOutputDataObject(0));
-      }
+      dataMover->SetMoveModeToClone();
+    }
+    dataMover->SetInputData(piece);
+    dataMover->Update();
+    if (dataMover->GetOutputGeneratedOnProcess())
+    {
+      item->SetNextStreamedPiece(dataMover->GetOutputDataObject(0));
     }
   }
 }
@@ -790,8 +808,7 @@ int vtkPVDataDeliveryManager::GetSynchronizationMagicNumber()
   vtkInternals::ItemsMapType::iterator iter = this->Internals->ItemsMap.begin();
   for (; iter != this->Internals->ItemsMap.end(); iter++)
   {
-    result = prime * result + static_cast<int>(iter->first.first);
+    result = prime * result + static_cast<int>(iter->first.first) + iter->first.second;
   }
-
   return result;
 }
