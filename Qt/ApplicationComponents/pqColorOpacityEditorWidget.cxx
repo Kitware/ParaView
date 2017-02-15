@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
-#include "pqRescaleRange.h"
 #include "pqResetScalarRangeReaction.h"
 #include "pqSettings.h"
 #include "pqTransferFunctionWidget.h"
@@ -238,12 +237,6 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   else
   {
     qCritical("Missing 'XRGBPoints' property. Widget may not function correctly.");
-  }
-
-  smproperty = smproxy->GetProperty("LockScalarRange");
-  if (smproperty)
-  {
-    this->addPropertyLink(this, "lockScalarRange", SIGNAL(lockScalarRangeChanged()), smproperty);
   }
 
   ui.OpacityEditor->hide();
@@ -519,19 +512,6 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
 }
 
 //-----------------------------------------------------------------------------
-bool pqColorOpacityEditorWidget::lockScalarRange() const
-{
-  return vtkSMPropertyHelper(this->proxy(), "LockScalarRange").GetAsInt() ? true : false;
-}
-
-//-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::setLockScalarRange(bool val)
-{
-  vtkSMPropertyHelper(this->proxy(), "LockScalarRange").Set(val ? 1 : 0);
-  this->proxy()->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setXvmsPoints(const QList<QVariant>& values)
 {
   Q_UNUSED(values);
@@ -646,34 +626,11 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToCustom()
 {
-  vtkDiscretizableColorTransferFunction* stc =
-    vtkDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
-  double range[2];
-  stc->GetRange(range);
-
-  pqRescaleRange dialog(this);
-  dialog.setRange(range[0], range[1]);
-  if (dialog.exec() == QDialog::Accepted)
+  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(this->proxy()))
   {
-    this->resetRangeToCustom(dialog.getMinimum(), dialog.getMaximum());
+    this->Internals->render();
+    emit this->changeFinished();
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqColorOpacityEditorWidget::resetRangeToCustom(double min, double max)
-{
-  BEGIN_UNDO_SET("Reset transfer function ranges");
-  vtkSMTransferFunctionProxy::RescaleTransferFunction(this->proxy(), min, max);
-  if (vtkSMProxy* sofProxy = this->scalarOpacityFunctionProxy())
-  {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, min, max);
-  }
-  // disable auto-rescale of transfer function since the user has set on
-  // explicitly (BUG #14371).
-  this->setLockScalarRange(true);
-  this->Internals->render();
-  emit this->changeFinished();
-  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

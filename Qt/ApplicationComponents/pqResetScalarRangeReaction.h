@@ -41,6 +41,7 @@ class pqPipelineRepresentation;
 class pqDataRepresentation;
 class pqServer;
 class vtkEventQtSlotConnect;
+class vtkSMProxy;
 
 /**
 * @ingroup Reactions
@@ -79,16 +80,40 @@ public:
 
   /**
   * Reset to current data range.
+  *
+  * @param[in] repr The data representation to use to determine the data range.
+  *                 If `nullptr`, then the active representation is used, if
+  *                 available.
+  * @returns `true` if the operation was successful, otherwise `false`.
   */
   static bool resetScalarRangeToData(pqPipelineRepresentation* repr = NULL);
 
   /**
   * Reset range to a custom range.
+  *
+  * @param[in] repr The representation used to determine the transfer function
+  *                 to change range on. If \c repr is `nullptr`, then the active
+  *                 representation is used, if available.
+  * @returns `true` if the operation was successful, otherwise `false`.
   */
   static bool resetScalarRangeToCustom(pqPipelineRepresentation* repr = NULL);
 
   /**
+   * Reset range to a custom range.
+   *
+   * @param[in] tfProxy The transfer function proxy to reset the range on.
+   *
+   * @returns `true` if the operation was successful, otherwise `false`.
+   */
+  static bool resetScalarRangeToCustom(vtkSMProxy* tfProxy);
+
+  /**
   * Reset range to data range over time.
+  *
+  * @param[in] repr The data representation to use to determine the data range.
+  *                 If `nullptr`, then the active representation is used, if
+  *                 available.
+  * @returns `true` if the operation was successful, otherwise `false`.
   */
   static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = NULL);
 

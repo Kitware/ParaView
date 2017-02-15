@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
-#include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -174,23 +173,34 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
   }
 
   vtkSMProxy* lut = lutProxy(repr);
-  if (!lut)
+  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut))
+  {
+    repr->renderViewEventually();
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
+{
+  vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
+  if (!tfProxy)
   {
     return false;
   }
 
-  vtkDiscretizableColorTransferFunction* stc =
-    vtkDiscretizableColorTransferFunction::SafeDownCast(lut->GetClientSideObject());
   double range[2];
-  stc->GetRange(range);
+  if (!tfProxy->GetRange(range))
+  {
+    range[0] = 0;
+    range[1] = 1.0;
+  }
 
   pqRescaleRange dialog(pqCoreUtilities::mainWidget());
   dialog.setRange(range[0], range[1]);
   if (dialog.exec() == QDialog::Accepted)
   {
     BEGIN_UNDO_SET("Reset transfer function ranges");
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(
-      lut, dialog.getMinimum(), dialog.getMaximum());
+    tfProxy->RescaleTransferFunction(dialog.getMinimum(), dialog.getMaximum());
     if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy())
     {
       vtkSMTransferFunctionProxy::RescaleTransferFunction(
@@ -200,7 +210,6 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
     // explicitly (BUG #14371).
     vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
     lut->UpdateVTKObjects();
-    repr->renderViewEventually();
     END_UNDO_SET();
     return true;
   }

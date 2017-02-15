@@ -58,9 +58,6 @@ class pqColorMapModel;
 *                                checkbox in the Widget.
 * \li "UseLogScale"           :- (optional) property used to enable/disable log mapping
 *                                for colors.
-* \li "LockScalarRange"       :- (optional) property used to control if the application
-*                                resets transfer function as and when needed.
-* UseLogScale.
 * Caveats:
 * \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
 * Typically, opacity function is optional and used only when
@@ -73,7 +70,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
   Q_PROPERTY(QList<QVariant> xrgbPoints READ xrgbPoints WRITE setXrgbPoints)
   Q_PROPERTY(QList<QVariant> xvmsPoints READ xvmsPoints WRITE setXvmsPoints)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
-  Q_PROPERTY(bool lockScalarRange READ lockScalarRange WRITE setLockScalarRange)
   Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
       setScalarOpacityFunctionProxy)
   typedef pqPropertyWidget Superclass;
@@ -100,11 +96,6 @@ public:
   bool useLogScale() const;
 
   /**
-  * Returns true if the color map range is locked.
-  */
-  bool lockScalarRange() const;
-
-  /**
   * Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
   * used, if any.
   */
@@ -127,11 +118,6 @@ public slots:
   void setUseLogScale(bool value);
 
   /**
-  * Set whether the color map range should be locked.
-  */
-  void setLockScalarRange(bool val);
-
-  /**
   * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
   */
   void setScalarOpacityFunctionProxy(pqSMProxy sofProxy);
@@ -145,7 +131,6 @@ public slots:
   * Reset the transfer function ranges to custom values.
   */
   void resetRangeToCustom();
-  void resetRangeToCustom(double min, double max);
 
   /**
   * Reset the transfer function ranges to temporal range for active data
@@ -189,11 +174,6 @@ signals:
   * Signal fired when useLogScale changes.
   */
   void useLogScaleChanged();
-
-  /**
-  * Signal fired when lockScalarRange changes.
-  */
-  void lockScalarRangeChanged();
 
   /**
   * This signal is never really fired since this
