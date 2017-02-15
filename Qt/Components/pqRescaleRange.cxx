@@ -43,7 +43,7 @@ class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog
 };
 
 pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
-  : QDialog(widgetParent)
+  : QDialog(widgetParent), Lock(false)
 {
   this->Form = new pqRescaleRangeForm();
 
@@ -61,8 +61,9 @@ pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
   this->connect(
     this->Form->MaximumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
 
-  this->connect(this->Form->RescaleButton, SIGNAL(clicked()), this, SLOT(accept()));
-  this->connect(this->Form->CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  this->connect(this->Form->RescaleOnlyButton, SIGNAL(clicked()), SLOT(accept()));
+  this->connect(this->Form->RescaleButton, SIGNAL(clicked()), SLOT(rescaleAndLock()));
+  this->connect(this->Form->CancelButton, SIGNAL(clicked()), SLOT(reject()));
 }
 
 pqRescaleRange::~pqRescaleRange()
@@ -84,12 +85,12 @@ void pqRescaleRange::setRange(double min, double max)
   this->Form->MaximumScalar->setText(QString::number(max, 'g', 6));
 }
 
-double pqRescaleRange::getMinimum() const
+double pqRescaleRange::minimum() const
 {
   return this->Form->MinimumScalar->text().toDouble();
 }
 
-double pqRescaleRange::getMaximum() const
+double pqRescaleRange::maximum() const
 {
   return this->Form->MaximumScalar->text().toDouble();
 }
@@ -105,9 +106,17 @@ void pqRescaleRange::validate()
     tmp1.toDouble() <= tmp2.toDouble())
   {
     this->Form->RescaleButton->setEnabled(true);
+    this->Form->RescaleOnlyButton->setEnabled(true);
   }
   else
   {
     this->Form->RescaleButton->setEnabled(false);
+    this->Form->RescaleOnlyButton->setEnabled(false);
   }
+}
+
+void pqRescaleRange::rescaleAndLock()
+{
+  this->Lock = true;
+  this->accept();
 }

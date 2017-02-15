@@ -206,16 +206,19 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
   if (dialog.exec() == QDialog::Accepted)
   {
     BEGIN_UNDO_SET("Reset transfer function ranges");
-    tfProxy->RescaleTransferFunction(dialog.getMinimum(), dialog.getMaximum());
+    tfProxy->RescaleTransferFunction(dialog.minimum(), dialog.maximum());
     if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy())
     {
       vtkSMTransferFunctionProxy::RescaleTransferFunction(
-        sofProxy, dialog.getMinimum(), dialog.getMaximum());
+        sofProxy, dialog.minimum(), dialog.maximum());
     }
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
-    vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
-    lut->UpdateVTKObjects();
+    if (dialog.lock())
+    {
+      vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
+      lut->UpdateVTKObjects();
+    }
     END_UNDO_SET();
     return true;
   }

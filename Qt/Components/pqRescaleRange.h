@@ -46,20 +46,22 @@ class pqRescaleRangeForm;
 class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
 {
   Q_OBJECT
-
 public:
   pqRescaleRange(QWidget* parent = 0);
   virtual ~pqRescaleRange();
 
-  double getMinimum() const;
-  double getMaximum() const;
+  double minimum() const;
+  double maximum() const;
   void setRange(double min, double max);
+  bool lock() const { return this->Lock; }
 
 protected slots:
   void validate();
+  void rescaleAndLock();
 
 protected:
   pqRescaleRangeForm* Form;
+  bool Lock;
 };
 
 #endif
