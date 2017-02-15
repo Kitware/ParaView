@@ -1043,6 +1043,12 @@ class RegisterLayoutProxy(TraceItem):
             "%s = CreateLayout()" % accessor])
         TraceItem.finalize(self)
 
+class LoadPlugin(TraceItem):
+    def __init__(self, filename, remote):
+        Trace.Output.append_separated([\
+                "# load plugin",
+                "LoadPlugin('%s', remote=%s, ns=globals())" % (filename, remote)])
+
 class CreateAnimationTrack(TraceItem):
     # FIXME: animation tracing support in general needs to be revamped after moving
     # animation control logic to the server manager from Qt layer.
