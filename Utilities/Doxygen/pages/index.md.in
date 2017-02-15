@@ -25,7 +25,7 @@ Design/Implementation Details
 Page | Description
 -----|---------------------------------------------------------------
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
-[String Encoding](@ref StringEncoding) | How to encode string when developing for ParaView
+[String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
 
 Developer notes
 ----------------
