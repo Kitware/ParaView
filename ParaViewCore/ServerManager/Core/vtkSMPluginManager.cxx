@@ -134,9 +134,7 @@ vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(vtkSMSession* 
 //----------------------------------------------------------------------------
 bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
-  SM_SCOPED_TRACE(CallFunction).arg("LoadPlugin").arg(filename).arg("remote", false);
-  //    .arg("ns=globals()"); <== FIXME
-
+  SM_SCOPED_TRACE(LoadPlugin).arg(filename).arg("remote", false);
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
   vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
@@ -166,8 +164,7 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename, vtkSMSession* se
 {
   assert("Session cannot be NULL" && session != NULL);
 
-  SM_SCOPED_TRACE(CallFunction).arg("LoadPlugin").arg(filename).arg("remote", true);
-  //    .arg("ns=globals()"); <== FIXME
+  SM_SCOPED_TRACE(LoadPlugin).arg(filename).arg("remote", true);
 
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
