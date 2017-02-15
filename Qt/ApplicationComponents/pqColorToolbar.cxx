@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqDisplayColorWidget.h"
 #include "pqEditColorMapReaction.h"
-#include "pqRescaleCustomScalarRangeReaction.h"
-#include "pqRescaleVisibleScalarRangeReaction.h"
 #include "pqResetScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSetName.h"
@@ -49,11 +47,13 @@ void pqColorToolbar::constructor()
 
   new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
   new pqEditColorMapReaction(ui.actionEditColorMap);
-  new pqResetScalarRangeReaction(ui.actionResetRange);
-  new pqRescaleCustomScalarRangeReaction(ui.actionRescaleCustomRange);
+  new pqResetScalarRangeReaction(ui.actionResetRange, true, pqResetScalarRangeReaction::DATA);
+  new pqResetScalarRangeReaction(
+    ui.actionRescaleCustomRange, true, pqResetScalarRangeReaction::CUSTOM);
   new pqResetScalarRangeReaction(
     ui.actionRescaleTemporalRange, true, pqResetScalarRangeReaction::TEMPORAL);
-  new pqRescaleVisibleScalarRangeReaction(ui.actionRescaleVisibleRange);
+  new pqResetScalarRangeReaction(
+    ui.actionRescaleVisibleRange, true, pqResetScalarRangeReaction::VISIBLE);
 
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this) << pqSetName("displayColor");
   this->addWidget(display_color);

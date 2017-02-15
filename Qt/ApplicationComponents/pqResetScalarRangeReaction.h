@@ -60,7 +60,8 @@ public:
   {
     DATA,
     CUSTOM,
-    TEMPORAL
+    TEMPORAL,
+    VISIBLE
   };
 
   /**
@@ -116,6 +117,16 @@ public:
   * @returns `true` if the operation was successful, otherwise `false`.
   */
   static bool resetScalarRangeToDataOverTime(pqPipelineRepresentation* repr = NULL);
+
+  /**
+  * Reset range to data range for data visible in the view.
+  *
+  * @param[in] repr The data representation to use to determine the data range.
+  *                 If `nullptr`, then the active representation is used, if
+  *                 available.
+  * @returns `true` if the operation was successful, otherwise `false`.
+  */
+  static bool resetScalarRangeToVisible(pqPipelineRepresentation* repr = NULL);
 
 public slots:
   /**

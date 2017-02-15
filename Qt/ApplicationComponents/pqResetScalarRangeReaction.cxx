@@ -134,6 +134,10 @@ void pqResetScalarRangeReaction::onTriggered()
     case TEMPORAL:
       pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(this->Representation);
       break;
+
+    case VISIBLE:
+      pqResetScalarRangeReaction::resetScalarRangeToVisible(this->Representation);
+      break;
   }
 }
 
@@ -176,7 +180,9 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
   if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut))
   {
     repr->renderViewEventually();
+    return true;
   }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -250,6 +256,35 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     return true;
   }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqResetScalarRangeReaction::resetScalarRangeToVisible(pqPipelineRepresentation* repr)
+{
+  if (repr == NULL)
+  {
+    repr =
+      qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
+    if (!repr)
+    {
+      qCritical() << "No representation provided.";
+      return false;
+    }
+  }
+
+  pqView* view = repr->getView();
+  if (!view)
+  {
+    qCritical() << "No view found.";
+    return false;
+  }
+
+  BEGIN_UNDO_SET("Reset transfer function ranges to visible data range");
+  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+    repr->getProxy(), view->getProxy());
+  repr->renderViewEventually();
+  END_UNDO_SET();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
