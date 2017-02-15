@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqResetScalarRangeReaction.h"
+#include "ui_pqResetScalarRangeToDataOverTime.h"
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
@@ -46,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
-#include <QMessageBox>
+#include <QSignalMapper>
 
 namespace
 {
@@ -158,6 +159,12 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
   BEGIN_UNDO_SET("Reset transfer function ranges using data range");
   repr->resetLookupTableScalarRange();
   repr->renderViewEventually();
+  if (vtkSMProxy* lut = lutProxy(repr))
+  {
+    // See BUG #17144. We unset LockScalarRange when resetting to data range.
+    vtkSMPropertyHelper(lut, "LockScalarRange").Set(0);
+    lut->UpdateVTKObjects();
+  }
   END_UNDO_SET();
   return true;
 }
@@ -239,20 +246,36 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     }
   }
 
-  if (QMessageBox::warning(pqCoreUtilities::mainWidget(), "Potentially slow operation",
-        "This can potentially take a long time to complete. \n"
-        "Are you sure you want to continue?",
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  Ui::ResetScalarRangeToDataOverTime ui;
+  ui.setupUi(&dialog);
+
+  QSignalMapper smapper;
+  smapper.setMapping(ui.RescaleButton, QDialog::Accepted);
+  smapper.connect(ui.RescaleButton, SIGNAL(clicked()), SLOT(map()));
+
+  smapper.setMapping(ui.RescaleAndLockButton, static_cast<int>(QDialog::Accepted) + 1);
+  smapper.connect(ui.RescaleAndLockButton, SIGNAL(clicked()), SLOT(map()));
+
+  smapper.setMapping(ui.CancelButton, QDialog::Rejected);
+  smapper.connect(ui.CancelButton, SIGNAL(clicked()), SLOT(map()));
+
+  dialog.connect(&smapper, SIGNAL(mapped(int)), SLOT(done(int)));
+  int retcode = dialog.exec();
+  if (retcode != QDialog::Rejected)
   {
     BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
-    if (vtkSMProxy* lut = lutProxy(repr))
+    if (retcode == static_cast<int>(QDialog::Accepted) + 1)
     {
-      vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
-      lut->UpdateVTKObjects();
+      if (vtkSMProxy* lut = lutProxy(repr))
+      {
+        vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
+        lut->UpdateVTKObjects();
+      }
     }
     repr->renderViewEventually();
     END_UNDO_SET();
