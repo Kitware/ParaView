@@ -118,6 +118,23 @@ public slots:
   * abort.
   */
   void triggerAbort();
+
+  /**
+   * While progress is enabled, pqProgressManager blocks key/mouse events,
+   * except for objects added using `addNonBlockableObject`. Sometimes it's not
+   * possible to add objects explicitly and we may want to temporarily skip
+   * blocking of events. This methods can be used for that e.g.
+   *
+   * @code{cpp}
+   *  bool prev = progressManager->unblockEvents(true);
+   *  QMessageBox::question(....);
+   *  progressManager->unblockEvents(prev);
+   * @endcode
+   *
+   * @returns previous value.
+   */
+  bool unblockEvents(bool val);
+
 signals:
   /**
   * Emitted to trigger an abort.
@@ -152,6 +169,7 @@ protected:
   double LastProgressTime;
   bool EnableProgress;
   bool ReadyEnableProgress;
+  bool UnblockEvents;
 
 private:
   Q_DISABLE_COPY(pqProgressManager)
