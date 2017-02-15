@@ -506,10 +506,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
   for (unsigned int cc = 0; cc < size; cc += 2)
   {
-    unsigned int rid = values[cc];
     int port = static_cast<int>(values[cc + 1]);
 
-    vtkPVDataRepresentation* repr = this->GetRepresentation(rid);
     vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod != 0, port);
     vtkDataObject* data = item ? item->GetDataObject() : NULL;
     if (!data)
@@ -765,7 +763,6 @@ void vtkPVDataDeliveryManager::DeliverStreamedPieces(unsigned int size, unsigned
   {
     unsigned int rid = values[cc];
     int port = static_cast<int>(values[cc + 1]);
-    vtkPVDataRepresentation* repr = this->GetRepresentation(rid);
 
     vtkInternals::vtkItem* item = this->Internals->GetItem(rid, false, port);
 
