@@ -180,6 +180,12 @@ int vtkGlyph3DRepresentation::RequestData(
 
   this->GlyphMultiBlockMaker->SetInputConnection(glyphSourcePort);
 
+  // This is needed as for some reason when the input connection is changed,
+  // in client-server mode, the GlyphMultiBlockMaker decides not to reexecute on
+  // the client. That's throws of all logic to determine if data needs to be
+  // delivered etc.
+  this->GlyphMultiBlockMaker->Modified();
+
   this->GlyphCacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->GlyphCacheKeeper->SetCacheTime(this->GetCacheKey());
   this->GlyphCacheKeeper->Update();
