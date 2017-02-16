@@ -10,13 +10,9 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          When enabled, data range is locked, meaning that the
-          application will not be permitted to automatically update
-          the color map to fit the data range. To change when the
-          application will update the color map, see the application
-          setting General -> Transfer Function Reset Mode.
+          Uncheck to automatically update color map to fit data range for all
+          filters.
         </Documentation>
-
       </IntVectorProperty>
       <IntVectorProperty name="IndexedLookup"
                          command="SetIndexedLookup"
