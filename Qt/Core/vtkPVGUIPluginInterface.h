@@ -30,5 +30,5 @@ public:
   virtual ~vtkPVGUIPluginInterface();
   virtual QObjectList interfaces() = 0;
 };
-
+Q_DECLARE_INTERFACE(vtkPVGUIPluginInterface, "com.kitware/paraview/guiplugin")
 #endif

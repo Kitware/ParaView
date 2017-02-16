@@ -931,12 +931,17 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   endif()
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
+    if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    else()
+      set(plugin_type_gui_qt4 TRUE)
+    endif()
     CONFIGURE_FILE(
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h @ONLY)
     CONFIGURE_FILE(
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx @ONLY)
+    unset(plugin_type_gui_qt4)
 
     SET (plugin_sources
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx
