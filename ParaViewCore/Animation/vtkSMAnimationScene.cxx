@@ -50,6 +50,11 @@ public:
 
   void UpdateAllViews()
   {
+    if (this->ViewModules.size() == 0)
+    {
+      return;
+    }
+
     vtkSMSessionProxyManager* pxm = NULL;
     for (VectorOfViews::iterator iter = this->ViewModules.begin(); iter != this->ViewModules.end();
          ++iter)
