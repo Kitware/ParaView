@@ -445,16 +445,16 @@
                proxyname="ScalarBarRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" panel_visibility="never"/>
-          <Property name="Position" panel_visibility="never"/>
-          <Property name="Position2" panel_visibility="never"/>
-          <Property name="AutoOrientInfo" />
-          <Property name="PositionInfo" />
-          <Property name="Position2Info" />
-          <Property name="OrientationInfo" />
           <PropertyGroup label="Layout">
             <Property name="AutoOrient" />
+            <Property name="AutoOrientInfo" />
             <Property name="Orientation" />
+            <Property name="OrientationInfo" />
           </PropertyGroup>
+          <Property name="Position" panel_visibility="never"/>
+          <Property name="Position2" panel_visibility="never"/>
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1395,34 +1395,6 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetPosition"
-                            default_values="0.85 0.05"
-                            information_property="PositionInfo"
-                            name="Position"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPosition"
-                            information_only="1"
-                            name="PositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetPosition2"
-                            default_values="0.12 0.43"
-                            information_property="Position2Info"
-                            name="Position2"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPosition2"
-                            information_only="1"
-                            name="Position2Info">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
       <IntVectorProperty command="SetAutoOrient"
                          default_values="1"
                          name="AutoOrient"
@@ -1460,6 +1432,35 @@
                          name="OrientationInfo">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.85 0.05"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.12 0.43"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
       <ProxyProperty command="SetScalarBarActor"
                      name="ScalarBarActor">
         <ProxyGroupDomain name="groups">
