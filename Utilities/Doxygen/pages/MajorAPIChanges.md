@@ -4,6 +4,21 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.4
+--------------
+
+###Removed pqRescaleCustomScalarRangeReaction, pqRescaleVisibleScalarRangeReaction###
+
+`pqRescaleCustomScalarRangeReaction` and `pqRescaleVisibleScalarRangeReaction`
+have been removed and replaced by the more
+generic `pqResetScalarRangeReaction`. Set mode
+to`pqResetScalarRangeReaction::CUSTOM` when instantiating
+`pqResetScalarRangeReaction` to make it behave as
+`pqRescaleCustomScalarRangeReaction`. The mode can be set to
+`pqResetScalarRangeReaction::VISIBLE`, for
+`pqRescaleVisibleScalarRangeReaction`.
+
+
 Changes in 5.3
 --------------
 

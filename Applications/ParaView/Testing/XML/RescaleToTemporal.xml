@@ -12,15 +12,11 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.51,0.196667,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.526667,0.493333,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.526667,0.493333,1,0,0)" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="2" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="2" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="20" />
-  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="20" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="20" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="key" arguments="16777221" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleTemporalRange" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ResetScalarRangeToDataOverTime/RescaleAndLockButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
   <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton4" property="enabled" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />

@@ -246,10 +246,6 @@ set (Module_SRCS
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.cxx
   pqRepresentationToolbar.h
-  pqRescaleCustomScalarRangeReaction.cxx
-  pqRescaleCustomScalarRangeReaction.h
-  pqRescaleVisibleScalarRangeReaction.cxx
-  pqRescaleVisibleScalarRangeReaction.h
   pqResetScalarRangeReaction.cxx
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.cxx
@@ -434,8 +430,6 @@ set (Module_MOC_HDRS
   pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
-  pqRescaleCustomScalarRangeReaction.h
-  pqRescaleVisibleScalarRangeReaction.h
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.h
   pqSaveAnimationReaction.h
@@ -515,6 +509,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqSpherePropertyWidget.ui
