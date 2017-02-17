@@ -79,8 +79,8 @@ void pqScalarBarRepresentation::startInteraction()
 void pqScalarBarRepresentation::endInteraction()
 {
   vtkSMProxy* proxy = this->getProxy();
+  PUSH_PROPERTY("Orientation");
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
-  PUSH_PROPERTY("Orientation");
   END_UNDO_SET();
 }
