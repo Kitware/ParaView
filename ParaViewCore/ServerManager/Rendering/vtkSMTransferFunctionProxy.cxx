@@ -358,7 +358,7 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
       }
 
       double cur_range[2];
-      arrayInfo->GetComponentRange(component, cur_range);
+      arrayInfo->GetComponentFiniteRange(component, cur_range);
       if (cur_range[0] <= cur_range[1])
       {
         range[0] = cur_range[0] < range[0] ? cur_range[0] : range[0];

@@ -100,6 +100,21 @@ public:
   double* GetComponentRange(int component);
   void GetComponentRange(int comp, double* range);
   //@}
+    
+  //@{
+  /**
+   * There is a range for each component.
+   * Range for component -1 is the range of the vector magnitude.
+   * The number of components should be set before these ranges.
+   */
+  void SetComponentFiniteRange(int comp, double min, double max);
+  void SetComponentFiniteRange(int comp, double* range)
+  {
+    this->SetComponentFiniteRange(comp, range[0], range[1]);
+  }
+  double* GetComponentFiniteRange(int component);
+  void GetComponentFiniteRange(int comp, double* range);
+  //@}
 
   /**
    * This method return the Min and Max possible range of the native
@@ -119,6 +134,7 @@ public:
    * Merge (union) ranges into this object.
    */
   void AddRanges(vtkPVArrayInformation* info);
+  void AddFiniteRanges(vtkPVArrayInformation* info);
 
   void DeepCopy(vtkPVArrayInformation* info);
 
@@ -184,6 +200,7 @@ protected:
   vtkTypeInt64 NumberOfTuples;
   char* Name;
   double* Ranges;
+  double* FiniteRanges;
 
   // this array is used to store existing information keys (location/name pairs)
 
