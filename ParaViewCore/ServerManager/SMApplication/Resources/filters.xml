@@ -11622,6 +11622,45 @@ source.</Documentation>
         <Documentation>Set the input to the Texture Map to Plane
         filter.</Documentation>
       </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for the
+        origin of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for
+        Point1 of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for
+        Point2 of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAutomaticPlaneGeneration"
+                         default_values="1"
+                         name="Automatic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If set the plane values will be automatically generated.
+        Note that for this to work all the Origin, Point1 and Point2 must all
+        be set to zero.</Documentation>
+      </IntVectorProperty>
       <!-- End TextureMapToPlane -->
     </SourceProxy>
     <!-- ==================================================================== -->
