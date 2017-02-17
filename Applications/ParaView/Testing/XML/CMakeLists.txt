@@ -324,6 +324,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/QuadraticGhostCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ResampleWithDataset.xml
