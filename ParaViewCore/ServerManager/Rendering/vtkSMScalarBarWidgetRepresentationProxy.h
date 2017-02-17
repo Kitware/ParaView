@@ -24,6 +24,7 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMTrace.h" // needed for vtkSMTrace::TraceItem
 
 class vtkSMViewProxy;
 class vtkPVArrayInformation;
@@ -80,6 +81,20 @@ protected:
   virtual void ExecuteEvent(unsigned long event) VTK_OVERRIDE;
 
   vtkSMProxy* ActorProxy;
+
+private:
+  //@{
+  /**
+   * Called when user starts/stops interacting with the scalar bar to move it.
+   * We handle tracking of the property so that we can trace the changes to its
+   * properties in Python.
+   */
+  void BeginTrackingPropertiesForTrace();
+  void EndTrackingPropertiesForTrace();
+  //@}
+
+  // Used in StartTrackingPropertiesForTrace/EndTrackingPropertiesForTrace.
+  vtkSMTrace::TraceItem* TraceItem;
 
 private:
   vtkSMScalarBarWidgetRepresentationProxy(
