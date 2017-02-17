@@ -855,6 +855,28 @@ class PropertiesModified(NestableTraceItem):
             del self.ScalarOpacityFunctionHack
         except AttributeError: pass
 
+class ScalarBarInteraction(NestableTraceItem):
+    """Traces scalar bar interations"""
+    def __init__(self, proxy, comment=None):
+        TraceItem.__init__(self)
+        proxy = sm._getPyProxy(proxy)
+        self.ProxyAccessor = Trace.get_accessor(proxy)
+        self.MTime = vtkTimeStamp()
+        self.MTime.Modified()
+        self.Comment = "#%s" % comment if not comment is None else \
+            "# Properties modified on %s" % str(self.ProxyAccessor)
+
+    def finalize(self):
+        props = self.ProxyAccessor.get_properties()
+        props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
+        afilter = ScalarBarProxyFilter()
+        props_to_trace = [k for k in props_to_trace if not afilter.should_never_trace(k)]
+        if props_to_trace:
+            Trace.Output.append_separated([
+                self.Comment,
+                self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
+
+
 class Show(TraceItem):
     """Traces Show"""
     def __init__(self, producer, port, view, display, comment=None):

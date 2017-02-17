@@ -35,12 +35,14 @@ vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = NULL;
+  this->TraceItem = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::~vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = NULL;
+  delete this->TraceItem;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,7 +83,11 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 {
-  if (event == vtkCommand::InteractionEvent)
+  if (event == vtkCommand::StartInteractionEvent)
+  {
+    this->BeginTrackingPropertiesForTrace();
+  }
+  else if (event == vtkCommand::InteractionEvent)
   {
     // BUG #5399. If the widget's position is beyond the viewport, fix it.
     vtkScalarBarRepresentation* repr =
@@ -112,7 +118,29 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     // user interacted. lock the position.
     vtkSMPropertyHelper(this, "LockPosition").Set(1);
   }
+
   this->Superclass::ExecuteEvent(event);
+
+  if (event == vtkCommand::EndInteractionEvent)
+  {
+    this->EndTrackingPropertiesForTrace();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::BeginTrackingPropertiesForTrace()
+{
+  assert(this->TraceItem == NULL);
+  this->TraceItem = new vtkSMTrace::TraceItem("ScalarBarInteraction");
+  (*this->TraceItem) =
+    vtkSMTrace::TraceItemArgs().arg("proxy", this).arg("comment", " change scalar bar placement");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::EndTrackingPropertiesForTrace()
+{
+  delete this->TraceItem;
+  this->TraceItem = NULL;
 }
 
 //----------------------------------------------------------------------------
