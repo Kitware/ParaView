@@ -13,8 +13,28 @@
 
 =========================================================================*/
 /**
- * @class   vtkSMParaViewPipelineController
+ * @class vtkSMParaViewPipelineController
+ * @brief Controller that encapsulates control logic for typical ParaView
+ * applications.
  *
+ * ParaView's ServerManager, together with it's proxies and properties provides
+ * a mechanism to create visualization and data processing pipelines. However,
+ * for a complex application like ParaView, there is considerable control logic
+ * to manage these proxies, set them up, etc. for common operations supported by
+ * the application. vtkSMParaViewPipelineController provides us a mechanism to
+ * encapsulate just control logic with ability to customize and extend for
+ * custom applications, similar to ParaView.
+ *
+ * vtkSMParaViewPipelineController has no state of itself. When needed, one
+ * should simply create an instance of vtkSMParaViewPipelineController and
+ * release it once done.
+ *
+ * vtkSMParaViewPipelineController uses the vtkObjectFactory mechanism.
+ * Custom application developers can provide subclasses and override the
+ * behaviour (see vtkSMParaViewPipelineControllerWithRender).
+ *
+ * For an example of using vtkSMParaViewPipelineController in your application,
+ * see `ParaView/ParaViewCore/ServerManager/Core/Testing/Cxx/TestParaViewPipelineController.cxx`.
  *
 */
 
@@ -296,16 +316,6 @@ private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
   //@}
-
-  /**
-   * We added support for LZ4 in ParaView 5.0.1. LZ4 is a good default
-   * compression algo to use for client-server images. However since the
-   * implementation is not present in 5.0.0, we have to change the explicitly
-   * avoid choosing LZ4 when connected to ParaView 5.0.0 server using a ParaView
-   * 5.0.1 client. This code does that. We can remove this when we change
-   * version to 5.1 or later.
-   */
-  void HandleLZ4Issue(vtkSMProxy* renderViewSettings);
 
   class vtkInternals;
   vtkInternals* Internals;

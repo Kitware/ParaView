@@ -913,10 +913,6 @@ void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* sessio
       if (proxy)
       {
         this->InitializeProxy(proxy);
-        if (strcmp(iter->GetProxyName(), "RenderViewSettings") == 0)
-        {
-          this->HandleLZ4Issue(proxy);
-        }
         pxm->RegisterProxy(iter->GetGroupName(), iter->GetProxyName(), proxy);
         proxy->UpdateVTKObjects();
         proxy->Delete();
@@ -1217,42 +1213,6 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
     }
   }
   return false;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::HandleLZ4Issue(vtkSMProxy* renderViewSettings)
-{
-  vtkSMProperty* compressorConfig = renderViewSettings->GetProperty("CompressorConfig");
-  if (!compressorConfig)
-  {
-    return;
-  }
-
-  if (vtkPVXMLElement* hints = compressorConfig->GetHints())
-  {
-    if (hints->FindNestedElementByName("SupportsLZ4") != NULL)
-    {
-      return;
-    }
-  }
-
-  // We're dealing with an server that doesn't support LZ4. If the default is to
-  // use LZ4 change it to not use LZ4.
-  vtkSMPropertyHelper helper(compressorConfig);
-  if (strncmp(helper.GetAsString(), "vtkLZ4Compressor", strlen("vtkLZ4Compressor")) != 0)
-  {
-    return;
-  }
-  std::string newvalue("vtkSquirtCompressor");
-  newvalue += helper.GetAsString() + strlen("vtkLZ4Compressor");
-  helper.Set(newvalue.c_str());
-  vtkWarningMacro(
-    "You have connected to a server that doesn't support 'LZ4' compression for delivering "
-    "remotely rendered images to the client. 'LZ4' is your current default "
-    "(and recommended) compression mode. Switching to 'SQUIRT'. "
-    "Remote rendering that uses translucent surfaces or volumes will have artifacts "
-    "with SQUIRT. Switch to zlib or no compression to avoid those, if needed.");
-  renderViewSettings->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

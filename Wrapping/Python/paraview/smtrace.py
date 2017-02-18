@@ -674,6 +674,13 @@ class RepresentationProxyFilter(PipelineProxyFilter):
             "SelectionPointFieldDataArrayName"] : return True
         return False
 
+    def should_trace_in_create(self, prop):
+        """for representations, we always trace the 'Representation' property,
+        even when it's same as the default value (see issue #17196)."""
+        if prop.get_object().FindDomain("vtkSMRepresentationTypeDomain"):
+            return True
+        return PipelineProxyFilter.should_trace_in_create(self, prop)
+
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         # skip "Representations" property and others.
