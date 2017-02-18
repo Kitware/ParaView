@@ -13,8 +13,28 @@
 
 =========================================================================*/
 /**
- * @class   vtkSMParaViewPipelineController
+ * @class vtkSMParaViewPipelineController
+ * @brief Controller that encapsulates control logic for typical ParaView
+ * applications.
  *
+ * ParaView's ServerManager, together with it's proxies and properties provides
+ * a mechanism to create visualization and data processing pipelines. However,
+ * for a complex application like ParaView, there is considerable control logic
+ * to manage these proxies, set them up, etc. for common operations supported by
+ * the application. vtkSMParaViewPipelineController provides us a mechanism to
+ * encapsulate just control logic with ability to customize and extend for
+ * custom applications, similar to ParaView.
+ *
+ * vtkSMParaViewPipelineController has no state of itself. When needed, one
+ * should simply create an instance of vtkSMParaViewPipelineController and
+ * release it once done.
+ *
+ * vtkSMParaViewPipelineController uses the vtkObjectFactory mechanism.
+ * Custom application developers can provide subclasses and override the
+ * behaviour (see vtkSMParaViewPipelineControllerWithRender).
+ *
+ * For an example of using vtkSMParaViewPipelineController in your application,
+ * see `ParaView/ParaViewCore/ServerManager/Core/Testing/Cxx/TestParaViewPipelineController.cxx`.
  *
 */
 
