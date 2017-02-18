@@ -297,16 +297,6 @@ private:
   void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
   //@}
 
-  /**
-   * We added support for LZ4 in ParaView 5.0.1. LZ4 is a good default
-   * compression algo to use for client-server images. However since the
-   * implementation is not present in 5.0.0, we have to change the explicitly
-   * avoid choosing LZ4 when connected to ParaView 5.0.0 server using a ParaView
-   * 5.0.1 client. This code does that. We can remove this when we change
-   * version to 5.1 or later.
-   */
-  void HandleLZ4Issue(vtkSMProxy* renderViewSettings);
-
   class vtkInternals;
   vtkInternals* Internals;
 };
