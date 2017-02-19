@@ -174,12 +174,17 @@ void @PLUGIN_NAME@_Plugin::GetPythonSourceList(std::vector<std::string>& modules
 //-----------------------------------------------------------------------------
 @PLUGIN_NAME@_Plugin::@PLUGIN_NAME@_Plugin()
 {
-#ifndef BUILD_SHARED_LIBS
-# ifdef plugin_type_gui
+#if !defined(BUILD_SHARED_LIBS) && defined(plugin_type_gui)
   // For static builds, initialize the Qt resources as well as the Qt plugin.
   @QRC_RESOURCES_INIT@
+#ifdef plugin_type_gui_qt4
+  // Qt 4
   Q_IMPORT_PLUGIN(@PLUGIN_NAME@)
-# endif
+#else
+  // Qt 5
+  Q_IMPORT_PLUGIN(@PLUGIN_NAME@_Plugin)
+#endif
+
 #endif
 }
 
@@ -188,12 +193,7 @@ void @PLUGIN_NAME@_Plugin::GetPythonSourceList(std::vector<std::string>& modules
 PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
 
 //-----------------------------------------------------------------------------
-#ifdef plugin_type_gui
+#if defined(plugin_type_gui) && defined(plugin_type_gui_qt4)
 // Required to mark this as a Qt plugin.
-#if QT_VERSION >= 0x050000
-Q_DECLARE_INTERFACE(@PLUGIN_NAME@_Plugin, "com.kitware/paraview/@PLUGIN_NAME@")
-Q_PLUGIN_METADATA(IID "com.kitware/paraview/@PLUGIN_NAME@")
-#else
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
-#endif
 #endif
