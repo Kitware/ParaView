@@ -42,7 +42,7 @@ endif()
 add_custom_command(
   OUTPUT "${ParaView_BINARY_DIR}/ParaViewExamples.done"
   COMMAND ${CMAKE_CTEST_COMMAND}
-  ARGS ${build_config_arg}
+       ${build_config_arg}
        --build-and-test
        ${ParaView_SOURCE_DIR}/Examples
        ${ParaView_BINARY_DIR}/Examples/All

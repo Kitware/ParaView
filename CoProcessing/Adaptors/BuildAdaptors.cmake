@@ -54,7 +54,6 @@ function(build_adaptor name languages)
     OUTPUT "${BINARY_DIR}/${lname}.done"
     COMMAND ${CMAKE_CTEST_COMMAND}
             ${build_config_arg}
-            --no-warn-unused-cli
             --build-and-test ${SOURCE_DIR}/${name}
                              ${BINARY_DIR}/${name}
             --build-noclean
@@ -72,6 +71,7 @@ function(build_adaptor name languages)
                             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                             ${language_options}
                             ${extra_params}
+                            --no-warn-unused-cli
     COMMAND ${CMAKE_COMMAND}
             -E touch "${BINARY_DIR}/${lname}.done"
 
