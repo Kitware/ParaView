@@ -1408,6 +1408,13 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->UnstructuredGridGeometryFilter->SetPassThroughCellIds(this->PassThroughCellIds);
       this->UnstructuredGridGeometryFilter->SetPassThroughPointIds(this->PassThroughPointIds);
 
+      // Turn off ghost cell clipping. This ensures that ghost cells are retained
+      // and handed to the DataSetSurfaceFilter to ensure only valid faces are
+      // generated. If this weren't here, then the DataSetSurfaceFilter would
+      // generate boundary faces between normal cells and where the ghost cells
+      // used to be, which is not correct.
+      this->UnstructuredGridGeometryFilter->DuplicateGhostCellClippingOff();
+
       // Observe the progress of the internal filter.
       // TODO: Make the consecutive internal filter execution have monotonically
       // increasing progress rather than restarting for every internal filter.
