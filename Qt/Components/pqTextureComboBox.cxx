@@ -407,11 +407,11 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
   // texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename);
+  pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename.toUtf8());
   pqSMAdaptor::setEnumerationProperty(texture->GetProperty("SourceProcess"), "Client");
   texture->UpdateVTKObjects();
   pxm->RegisterProxy(TEXTURESGROUP,
-    vtksys::SystemTools::GetFilenameName(filename.toLocal8Bit().data()).c_str(), texture);
+    vtksys::SystemTools::GetFilenameName(filename.toUtf8().data()).c_str(), texture);
   texture->Delete();
 
   int index = this->findData(DATA(texture));
