@@ -45,6 +45,7 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStructuredGrid.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkUndirectedGraph.h"
@@ -279,6 +280,14 @@ int vtkMPIMoveData::RequestDataObject(
       return 1;
     }
     outputCopy = vtkNonOverlappingAMR::New();
+  }
+  else if (this->OutputDataType == VTK_STRUCTURED_GRID)
+  {
+    if (output && output->IsA("vtkStructuredGrid"))
+    {
+      return 1;
+    }
+    outputCopy = vtkStructuredGrid::New();
   }
   else
   {
