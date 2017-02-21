@@ -4,7 +4,7 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
-Changes in 5.4
+Changes in 5.3
 --------------
 
 ###Removed pqRescaleCustomScalarRangeReaction, pqRescaleVisibleScalarRangeReaction###
@@ -17,10 +17,6 @@ to`pqResetScalarRangeReaction::CUSTOM` when instantiating
 `pqRescaleCustomScalarRangeReaction`. The mode can be set to
 `pqResetScalarRangeReaction::VISIBLE`, for
 `pqRescaleVisibleScalarRangeReaction`.
-
-
-Changes in 5.3
---------------
 
 ###Dropped support for pqProxyPanel and subclasses (Legacy Panels)###
 
