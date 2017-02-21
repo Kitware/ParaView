@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pq3DWidgetFactory.h"
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
@@ -186,8 +185,6 @@ void pqApplicationCore::constructor()
   this->PluginManager = new pqPluginManager(this);
 
   // * Create various factories.
-  this->WidgetFactory = new pq3DWidgetFactory(this);
-
   this->DisplayPolicy = new pqDisplayPolicy(this);
 
   this->ProgressManager = new pqProgressManager(this);
@@ -229,10 +226,6 @@ pqApplicationCore::~pqApplicationCore()
   // give chance to save before pqApplicationCore is gone
   delete this->ServerConfigurations;
   this->ServerConfigurations = 0;
-
-  // Ensure that all managers are deleted.
-  delete this->WidgetFactory;
-  this->WidgetFactory = 0;
 
   delete this->LinksModel;
   this->LinksModel = 0;

@@ -29,8 +29,6 @@
 #
 #=========================================================================
 set(Module_SRCS
-  pq3DWidgetFactory.cxx
-  pq3DWidgetFactory.h
   pqAnimationCue.cxx
   pqAnimationCue.h
   pqAnimationScene.cxx
@@ -229,7 +227,6 @@ set(Module_SRCS
 )
 
 set (Module_MOC_HDRS
-  pq3DWidgetFactory.h
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
