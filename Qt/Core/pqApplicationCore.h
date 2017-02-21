@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
-class pq3DWidgetFactory;
 class pqDisplayPolicy;
 class pqInterfaceTracker;
 class pqLinksModel;
@@ -165,8 +164,6 @@ public:
   * on their functionality/type.
   */
   pqServerManagerModel* getServerManagerModel() const { return this->ServerManagerModel; }
-
-  pq3DWidgetFactory* get3DWidgetFactory() const { return this->WidgetFactory; }
 
   /**
   * Locates the interface tracker for the application. pqInterfaceTracker is
@@ -383,7 +380,6 @@ protected:
   pqOutputWindowAdapter* OutputWindowAdapter;
   pqOptions* Options;
 
-  pq3DWidgetFactory* WidgetFactory;
   pqDisplayPolicy* DisplayPolicy;
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
