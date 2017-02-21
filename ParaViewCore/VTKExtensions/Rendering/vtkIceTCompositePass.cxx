@@ -265,8 +265,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     if (this->EnableFloatValuePass)
     {
       vtkValuePass* valuePass = vtkValuePass::SafeDownCast(this->RenderPass);
-      vtkRenderWindow* context = render_state->GetRenderer()->GetRenderWindow();
-      bool supported = valuePass->IsFloatingPointModeSupported(context);
+      bool supported = valuePass->IsFloatingPointModeSupported();
       if (!supported)
       {
         vtkWarningMacro("Disabling FloatValuePass!");
