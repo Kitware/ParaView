@@ -634,6 +634,238 @@ class CompositeDataSetBuilder(DataSetBuilder):
                     image.UnRegister(None)
 
 # -----------------------------------------------------------------------------
+# VTKGeometryDataSetBuilder Dataset Builder
+# -----------------------------------------------------------------------------
+
+def writeCellArray(dataHandler, currentData, cellName, inputCellArray):
+    nbValues = inputCellArray.GetNumberOfTuples()
+    if nbValues == 0:
+        return
+
+    outputCells = vtkTypeUInt32Array()
+    outputCells.SetNumberOfTuples(nbValues)
+
+    for valueIdx in range(nbValues):
+        outputCells.SetValue(valueIdx, inputCellArray.GetValue(valueIdx))
+
+    iBuffer = buffer(outputCells)
+    iMd5 = hashlib.md5(iBuffer).hexdigest()
+    iPath = os.path.join(dataHandler.getBasePath(), 'data',"%s.Uint32Array" % iMd5)
+    currentData['polys'] = 'data/%s.Uint32Array' % iMd5
+    with open(iPath, 'wb') as f:
+        f.write(iBuffer)
+
+class VTKGeometryDataSetBuilder(DataSetBuilder):
+    def __init__(self, location, sceneConfig, metadata={}, sections={}):
+        DataSetBuilder.__init__(self, location, None, metadata, sections)
+
+        # Update data type
+        self.dataHandler.addTypes('vtk-geometry');
+
+        # Create a representation for all scene sources
+        self.config = sceneConfig
+
+        # Processing pipeline
+        self.surfaceExtract = None
+
+        # Add directory path
+        self.dataHandler.registerData(priority=0, name='scene', rootFile=True, fileName='scene.json', type='json')
+
+        # Create directory containers
+        dataPath = os.path.join(location, 'data')
+        for p in [dataPath]:
+            if not os.path.exists(p):
+                os.makedirs(p)
+
+        # Create metadata structure
+        colorToCodeMap = {}
+        parentNodes = {}
+        pipelineMeta = {
+            'layers': [],
+            'pipeline': [],
+            'layer_fields': {},
+            'fields': {}
+        }
+        geometryMeta = {
+            'ranges': {},
+            'layer_map': {},
+        }
+        self.ranges = geometryMeta['ranges']
+        for item in sceneConfig['scene']:
+            # Handle layer
+            layerCode = encode_codes[len(pipelineMeta['layers'])]
+            pipelineMeta['layers'].append(layerCode)
+            geometryMeta['layer_map'][layerCode] = item['name']
+
+            # Handle colors
+            pipelineMeta['layer_fields'][layerCode] = []
+            for fieldName in item['colors']:
+                colorCode = None
+                if fieldName in colorToCodeMap:
+                    colorCode = colorToCodeMap[fieldName]
+                else:
+                    colorCode = encode_codes[len(colorToCodeMap)]
+                    colorToCodeMap[fieldName] = colorCode
+                    geometryMeta['ranges'][fieldName] = [1, -1] # FIXME we don't know the range
+
+                pipelineMeta['layer_fields'][layerCode].append(colorCode)
+                pipelineMeta['fields'][colorCode] = fieldName
+
+            # Handle pipeline
+            if 'parent' in item:
+                # Need to handle hierarchy
+                if item['parent'] in parentNodes:
+                    # Fill children
+                    rootNode = parentNodes[item['parent']]
+                    rootNode['ids'].append(layerCode)
+                    rootNode['children'].append({
+                        'name': item['name'],
+                        'ids': [layerCode]
+                    })
+                else:
+                    # Create root + register
+                    rootNode = {
+                        'name': item['parent'],
+                        'ids': [ layerCode ],
+                        'children': [
+                            {
+                                'name': item['name'],
+                                'ids': [ layerCode ]
+                            }
+                        ]
+                    }
+                    parentNodes[item['parent']] = rootNode
+                    pipelineMeta['pipeline'].append(rootNode)
+            else:
+                # Add item info as a new pipeline node
+                pipelineMeta['pipeline'].append({
+                    'name': item['name'],
+                    'ids': [layerCode]
+                })
+
+        # Register metadata to be written in index.json
+        self.dataHandler.addSection('Geometry', geometryMeta)
+        self.dataHandler.addSection('CompositePipeline', pipelineMeta)
+
+    def writeData(self, time=0):
+        if not self.dataHandler.can_write:
+            return
+
+        currentScene = [];
+        for data in self.config['scene']:
+            currentData = {
+                'name': data['name'],
+                'fields': {},
+                'cells': {}
+            }
+            currentScene.append(currentData)
+            if self.surfaceExtract:
+                self.merge.Input = data['source']
+            else:
+                self.merge = simple.MergeBlocks(Input=data['source'], MergePoints=0)
+                self.surfaceExtract = simple.ExtractSurface(Input=self.merge)
+
+
+            # Extract surface
+            self.surfaceExtract.UpdatePipeline(time)
+            ds = self.surfaceExtract.SMProxy.GetClientSideObject().GetOutputDataObject(0)
+            originalDS = data['source'].SMProxy.GetClientSideObject().GetOutputDataObject(0)
+
+            originalPoints = ds.GetPoints()
+
+            # Points
+            points = vtkFloatArray()
+            nbPoints = originalPoints.GetNumberOfPoints()
+            points.SetNumberOfComponents(3)
+            points.SetNumberOfTuples(nbPoints)
+            for idx in range(nbPoints):
+                coord = originalPoints.GetPoint(idx)
+                points.SetTuple3(idx, coord[0], coord[1], coord[2])
+
+            pBuffer = buffer(points)
+            pMd5 = hashlib.md5(pBuffer).hexdigest()
+            pPath = os.path.join(self.dataHandler.getBasePath(), 'data',"%s.Float32Array" % pMd5)
+            currentData['points'] = 'data/%s.Float32Array' % pMd5
+            with open(pPath, 'wb') as f:
+                f.write(pBuffer)
+
+            # Handle cells
+            writeCellArray(self.dataHandler, currentData['cells'], 'verts', ds.GetVerts().GetData())
+            writeCellArray(self.dataHandler, currentData['cells'], 'lines', ds.GetLines().GetData())
+            writeCellArray(self.dataHandler, currentData['cells'], 'polys', ds.GetPolys().GetData())
+            writeCellArray(self.dataHandler, currentData['cells'], 'strips', ds.GetStrips().GetData())
+
+            # Fields
+            for fieldName, fieldInfo in data['colors'].iteritems():
+                array = None
+                if 'constant' in fieldInfo:
+                    currentData['fields'][fieldName] = fieldInfo
+                    continue
+                elif 'POINT_DATA' in fieldInfo['location']:
+                    array = ds.GetPointData().GetArray(fieldName)
+                elif 'CELL_DATA' in fieldInfo['location']:
+                    array = ds.GetCellData().GetArray(fieldName)
+                jsType = jsMapping[arrayTypesMapping[array.GetDataType()]]
+                arrayRange = array.GetRange(-1)
+                tupleSize = array.GetNumberOfComponents()
+                arraySize = array.GetNumberOfTuples()
+                if tupleSize == 1:
+                    outputField = array
+                else:
+                    # compute magnitude
+                    outputField = array.NewInstance()
+                    outputField.SetNumberOfTuples(arraySize)
+                    tupleIdxs = range(tupleSize)
+                    for i in range(arraySize):
+                        magnitude = 0
+                        for j in tupleIdxs:
+                            magnitude += math.pow(array.GetValue(i * tupleSize + j), 2)
+
+                        outputField.SetValue(i, math.sqrt(magnitude))
+
+                fBuffer = buffer(outputField)
+                fMd5 = hashlib.md5(fBuffer).hexdigest()
+                fPath = os.path.join(self.dataHandler.getBasePath(), 'data',"%s_%s.%s" % (fieldName, fMd5, jsType))
+                with open(fPath, 'wb') as f:
+                    f.write(fBuffer)
+
+                currentRange = self.ranges[fieldName]
+                if currentRange[1] < currentRange[0]:
+                    currentRange[0] = arrayRange[0];
+                    currentRange[1] = arrayRange[1];
+                else:
+                    currentRange[0] = arrayRange[0] if arrayRange[0] < currentRange[0] else currentRange[0];
+                    currentRange[1] = arrayRange[1] if arrayRange[1] > currentRange[1] else currentRange[1];
+
+                currentData['fields'][fieldName] = {
+                    'array' : 'data/%s_%s.%s' % (fieldName, fMd5, jsType),
+                    'location': fieldInfo['location'],
+                    'range': outputField.GetRange()
+                }
+
+        # Write scene
+        with open(self.dataHandler.getDataAbsoluteFilePath('scene'), 'w') as f:
+            f.write(json.dumps(currentScene, indent=4))
+
+
+    def stop(self, compress=True, clean=True):
+        if not self.dataHandler.can_write:
+            return
+
+        DataSetBuilder.stop(self)
+
+        if compress:
+            for dirName in ['fields', 'index', 'points']:
+                for root, dirs, files in os.walk(os.path.join(self.dataHandler.getBasePath(), dirName)):
+                    print ('Compress', root)
+                    for name in files:
+                        if 'Array' in name and '.gz' not in name:
+                            with open(os.path.join(root, name), 'rb') as f_in:
+                                with gzip.open(os.path.join(root, name + '.gz'), 'wb') as f_out:
+                                    shutil.copyfileobj(f_in, f_out)
+                            os.remove(os.path.join(root, name))
+
+# -----------------------------------------------------------------------------
 # GeometryDataSetBuilder Dataset Builder
 # -----------------------------------------------------------------------------
 
@@ -841,7 +1073,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
 
         # Write scene
         with open(self.dataHandler.getDataAbsoluteFilePath('scene'), 'w') as f:
-            f.write(json.dumps(currentScene, indent=4))
+            f.write(json.dumps(currentScene, indent=2))
 
 
     def stop(self, compress=True, clean=True):
