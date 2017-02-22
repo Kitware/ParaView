@@ -507,11 +507,13 @@ void vtkPVFileInformation::GetSpecialDirectories()
   // Return favorite directories ...
 
   TCHAR szPath[MAX_PATH];
+  std::string tmp;
 
   if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, false)))
   {
+    tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(szPath);
+    info->SetFullPath(vtkPVFileInformationHelper::LocalToUtf8Win32(tmp).c_str());
     info->SetName("My Documents");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
@@ -519,8 +521,9 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
   if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_DESKTOPDIRECTORY, false)))
   {
+    tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(szPath);
+    info->SetFullPath(vtkPVFileInformationHelper::LocalToUtf8Win32(tmp).c_str());
     info->SetName("Desktop");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
@@ -528,8 +531,9 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
   if (SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_FAVORITES, false)))
   {
+    tmp = szPath;
     vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<vtkPVFileInformation>::New();
-    info->SetFullPath(szPath);
+    info->SetFullPath(vtkPVFileInformationHelper::LocalToUtf8Win32(tmp).c_str());
     info->SetName("Favorites");
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
