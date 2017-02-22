@@ -4311,6 +4311,17 @@ array.
         point data is passed through to the output; otherwise, only generated
         cell data is placed into the output.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetCategoricalData"
+                         default_values="0"
+                         name="CategoricalData"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Control whether the input point data is to be
+        treated as categorical. If  the data is categorical, then the
+        resultant cell data will be determined by  a majority rules
+        vote, with ties going to the smaller value.</Documentation>
+      </IntVectorProperty>
       <!-- End PointDataToCellData -->
     </SourceProxy>
     <!--
