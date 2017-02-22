@@ -8,19 +8,6 @@
         Collection of general setting for ParaView.
       </Documentation>
 
-      <IntVectorProperty name="ShowSplashScreen"
-        number_of_elements="1"
-        default_values="1"
-        panel_visibility="advanced">
-        <Documentation>
-          Show splash screen at startup.
-        </Documentation>
-        <BooleanDomain name="bool" />
-        <Hints>
-          <SaveInQSettings />
-        </Hints>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ShowWelcomeDialog"
         number_of_elements="1"
         default_values="1"
@@ -344,7 +331,6 @@
 
 
       <PropertyGroup label="General Options">
-        <Property name="ShowSplashScreen" />
         <Property name="ShowWelcomeDialog" />
         <Property name="CrashRecovery" />
       </PropertyGroup>
