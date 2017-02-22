@@ -633,6 +633,24 @@ bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int
     .arg("quality", quality)
     .arg("comment", "save screenshot");
 
+  if (magnification > 1)
+  {
+    // An interim fix for this bug BUG #17205 is to simply change magnification
+    // to 1 when running in multi-rank non-symmetric batch mode and complain about
+    // it. Long term, we need to stop sharing render windows in batch mode and
+    // simply let interactors be created for the ranks as needed.
+
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+      pm->GetNumberOfLocalPartitions() > 1 && pm->GetSymmetricMPIMode() == false)
+    {
+      vtkGenericWarningMacro(
+        "`Magnification` > 1 is currently not supported with `pvbatch` due a known issue. "
+        "Forcing `magnification` to 1 till the issue is resolved.");
+      magnification = 1;
+    }
+  }
+
   vtkSmartPointer<vtkImageData> img;
   img.TakeReference(viewOrLayout->CaptureWindow(magnification));
   if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
