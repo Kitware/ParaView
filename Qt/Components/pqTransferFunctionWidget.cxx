@@ -61,6 +61,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <algorithm>
 
+#if QT_VERSION >= 0x050000
+#include <QSurfaceFormat>
+#endif
+
+
 //-----------------------------------------------------------------------------
 // We extend vtkChartXY to add logic to reset view bounds automatically. This
 // ensures that when LUT changes, we are always showing the complete LUT.
@@ -185,6 +190,11 @@ public:
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
+#if QT_VERSION >= 0x050000
+    QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
+    fmt.setSamples(8);
+    this->Widget->setFormat(fmt);
+#endif
     this->Widget->setObjectName("1QVTKWidget0");
     this->Widget->SetRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
