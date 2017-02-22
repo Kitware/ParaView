@@ -17,8 +17,8 @@
 #   # This is the organization name.
 #   ORGANIZATION "Kitware Inc."
 #
-#   # PNG Image to be used for the Splash screen. If none is provided, default
-#   # ParaView splash screen will be shown.
+#   # PNG Image to be used for the Splash screen. If none is provided,
+#   # splash screen is not shown/used.
 #   SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/Splash.png"
 #
 #   # Provide version information for the client.
@@ -186,14 +186,6 @@ FUNCTION(build_paraview_client BPC_NAME)
     set (executable_flags WIN32)
   ENDIF()
 
-  # If splash image is not specified, use the standard ParaView splash image.
-  pv_set_if_not_set(BPC_SPLASH_IMAGE "${branding_source_dir}/branded_splash.png")
-  CONFIGURE_FILE("${BPC_SPLASH_IMAGE}"
-                  ${CMAKE_CURRENT_BINARY_DIR}/SplashImage.img COPYONLY)
-  SET (BPC_SPLASH_IMAGE ${CMAKE_CURRENT_BINARY_DIR}/SplashImage.img)
-  GET_FILENAME_COMPONENT(BPC_SPLASH_RESOURCE ${BPC_SPLASH_IMAGE} NAME)
-  SET (BPC_SPLASH_RESOURCE ":/${BPC_NAME}/${BPC_SPLASH_RESOURCE}")
-
   pv_set_if_not_set(BPC_PVMAIN_WINDOW "QMainWindow")
   pv_set_if_not_set(BPC_PVMAIN_WINDOW_INCLUDE "QMainWindow")
 
@@ -205,15 +197,18 @@ FUNCTION(build_paraview_client BPC_NAME)
   set (ui_resources)
   set (ui_resource_init "")
 
-  if (BPC_SPLASH_IMAGE)
-    # Generate a resource file out of the splash image.
-    set (outfile "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc")
-    GENERATE_QT_RESOURCE_FROM_FILES("${outfile}"
-      "/${BPC_NAME}" ${BPC_SPLASH_IMAGE})
-    list(APPEND ui_resources "${outfile}")
+  # If a splash image is specified, put that in a Qt resource file
+  # and pass the name along to branded_paraview_initializer.cxx.
+  if(DEFINED BPC_SPLASH_IMAGE)
+    get_filename_component(splash_image_name "${BPC_SPLASH_IMAGE}" NAME)
+    set(BPC_SPLASH_RESOURCE ":/${BPC_NAME}/${splash_image_name}")
+    # Generate a resource file for the splash image.
+    set(splash_qrc "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_splash.qrc")
+    generate_qt_resource_from_files("${splash_qrc}" "/${BPC_NAME}" ${BPC_SPLASH_IMAGE})
+    list(APPEND ui_resources "${splash_qrc}")
     set(ui_resource_init
-      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_generated);\n")
-  endif ()
+      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_splash);\n")
+  endif()
 
   if (BPC_GUI_CONFIGURATION_XMLS)
     set (outfile "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc")

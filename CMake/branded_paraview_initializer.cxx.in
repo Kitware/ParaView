@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVConfig.h"
 
+#cmakedefine BPC_SPLASH_RESOURCE "@BPC_SPLASH_RESOURCE@"
+
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
 {
@@ -95,22 +97,18 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
 @ui_resource_init@
 #endif
 
+#ifdef BPC_SPLASH_RESOURCE
   pqSettings *settings = this->PVApp->settings();
-  bool show_splash = false;
-  if (!this->PVApp->getOptions()->GetDisableRegistry())
-    {
-    show_splash = settings->value(
-      "GeneralSettings.ShowSplashScreen", true).toBool();
-    }
-
-  if(show_splash)
+  if (this->PVApp->getOptions()->GetDisableRegistry() == false &&
+    settings->value("GeneralSettings.ShowSplashScreen", true).toBool())
     {
     // Create and show the splash screen as the main window is being created.
-    QPixmap pixmap("@BPC_SPLASH_RESOURCE@");
+    QPixmap pixmap(BPC_SPLASH_RESOURCE);
     this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
     this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
     this->Splash->show();
     }
+#endif
 
   // Not sure why this is needed. Andy added this ages ago with comment saying
   // needed for Mac apps. Need to check that it's indeed still required.
@@ -169,7 +167,7 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
   // causes test failures. Any case, the UI will update when the main event loop
   // resumes hence these processEvents are fairly useless.
   this->MainWindow->show();
-  if (show_splash)
+  if (this->Splash)
     {
     this->Splash->finish(this->MainWindow);
     }
