@@ -811,7 +811,7 @@
     <SettingsProxy name="RenderViewInteractionSettings" label="Camera"
       processes="client|dataserver|renderserver">
       <IntVectorProperty name="Camera3DManipulators"
-        label="Camera 3D Manipulator"
+        label="Camera 3D Manipulators"
         number_of_elements="9"
         default_values="4 1 2 3 4 1 2 4 6"
         panel_widget="camera_manipulator">
@@ -842,7 +842,7 @@
         <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty name="Camera2DManipulators"
-        label="Camera 2D Manipulator"
+        label="Camera 2D Manipulators"
         number_of_elements="9"
         default_values="1 3 2 2 2 6 3 1 4"
         panel_widget="camera_manipulator">
