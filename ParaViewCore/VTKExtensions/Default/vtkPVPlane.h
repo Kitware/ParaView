@@ -57,6 +57,7 @@ public:
    * any derived class.
    */
   virtual double EvaluateFunction(double x[3]) VTK_OVERRIDE;
+  using Superclass::EvaluateFunction;
   double EvaluateFunction(double x, double y, double z)
   {
     return this->Superclass::EvaluateFunction(x, y, z);
