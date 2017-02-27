@@ -1,6 +1,6 @@
 {
     "name"          : "paraview",
-    "version"       : "5.3",
+    "version"       : "@PARAVIEW_VERSION@",
     "description"   : "Data analysis and visualization framework for large data.",
     "author"        : "Kitware Inc.",
     "repository"    : {
