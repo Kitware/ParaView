@@ -399,6 +399,14 @@ cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${parav
 mark_as_advanced(PARAVIEW_ENABLE_WEB)
 
 if (PARAVIEW_ENABLE_WEB)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/package.json.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/package.json"
+    @ONLY)
+  install(
+    FILES       "${CMAKE_CURRENT_BINARY_DIR}/package.json"
+    DESTINATION ""
+    COMPONENT   "web")
   # Request vtkParaViewWeb module
   list(APPEND vtkParaViewWeb_REQUEST_BY "Option PARAVIEW_ENABLE_WEB")
 endif()
