@@ -42,6 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVXMLParser.h"
 
+#include "pqProxyWidgetDialog.h"
+#include "vtkSMLoadStateOptionsProxy.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMSessionProxyManager.h"
+
 #include <QFileInfo>
 
 //-----------------------------------------------------------------------------
@@ -76,6 +81,35 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
     return;
   }
 
+  /// code similar to pqTraceReaction::start().
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSmartPointer<vtkSMProxy> aproxy;
+  aproxy.TakeReference(pxm->NewProxy("options", "LoadStateOptions"));
+  vtkSMLoadStateOptionsProxy* proxy = vtkSMLoadStateOptionsProxy::SafeDownCast(aproxy);
+  if (proxy && proxy->PrepareToLoad(filename.toLocal8Bit().data()))
+  {
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    controller->InitializeProxy(proxy);
+
+    if (proxy->HasDataFiles())
+    {
+      pqProxyWidgetDialog dialog(proxy);
+      dialog.setWindowTitle("Load State Options");
+      dialog.setObjectName("LoadStateOptionsDialog");
+      dialog.setApplyChangesImmediately(true);
+      if (dialog.exec() != QDialog::Accepted)
+      {
+        return;
+      }
+    }
+    if (proxy->Load())
+    {
+      pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+        server, filename);
+    }
+  }
+
+#if 0
   if (filename.endsWith(".pvsm"))
   {
     vtkNew<vtkPVXMLParser> xmlParser;
@@ -101,6 +135,8 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
     qWarning("ParaView was not built with Python support so it cannot open a python file");
 #endif
   }
+
+#endif
 }
 
 //-----------------------------------------------------------------------------

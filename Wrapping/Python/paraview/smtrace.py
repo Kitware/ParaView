@@ -1095,6 +1095,24 @@ class SaveScreenshotOrAnimation(TraceItem):
         del helper
         Trace.Output.append_separated(trace.raw_data())
 
+class LoadState(TraceItem):
+    def __init__(self, filename, options):
+        TraceItem.__init__(self)
+
+        options = sm._getPyProxy(options)
+        optionsAccessor = ProxyAccessor("temporaryOptions", options)
+
+        trace = TraceOutput()
+        trace.append("# save state")
+        trace.append(\
+            optionsAccessor.trace_ctor("LoadState", ExporterProxyFilter(),
+              ctor_args="'%s'" % filename,
+              skip_assignment=True))
+        optionsAccessor.finalize() # so that it will get deleted.
+        del optionsAccessor
+        del options
+        Trace.Output.append_separated(trace.raw_data())
+
 class RegisterLayoutProxy(TraceItem):
     def __init__(self, layout):
         TraceItem.__init__(self)
