@@ -2625,6 +2625,7 @@
       </IntVectorProperty>
       <IntVectorProperty
           name="MaxFrames"
+          label="Progressive Passes"
           command="SetMaxFrames"
           default_values="1"
           animateable="0"
@@ -2633,7 +2634,8 @@
             min="1"
             name="range"/>
         <Documentation>Set the number of render passes OSPRay takes to
-        accumulate subsampled color results.</Documentation>
+        improve image quality. Has no effect unless ParaView
+        is started with the --enable-streaming option.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>

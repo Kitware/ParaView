@@ -3202,7 +3202,12 @@ bool vtkPVRenderView::GetOSPRayContinueStreaming()
     return false;
   }
   this->Internals->OSPRayCount++;
-  return this->Internals->OSPRayCount < this->GetMaxFrames();
+  bool keep_going = this->Internals->OSPRayCount < this->GetMaxFrames();
+  if (!keep_going)
+  {
+    this->Internals->OSPRayCount = 0;
+  }
+  return keep_going;
 #else
   return false;
 #endif
