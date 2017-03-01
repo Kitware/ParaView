@@ -4,7 +4,7 @@ from paraview.web import data_converter
 
 from vtk.web.query_data_model import *
 from paraview.web.camera import *
-
+from vtk.web import iteritems
 from paraview import simple
 from paraview import servermanager
 from vtk import *
@@ -37,10 +37,10 @@ class DataSetBuilder(object):
         self.cameraDescription = camera_data
         self.camera = None
 
-        for key, value in metadata.iteritems():
+        for key, value in iteritems(metadata):
             self.dataHandler.addMetaData(key, value)
 
-        for key, value in sections.iteritems():
+        for key, value in iteritems(sections):
             self.dataHandler.addSection(key, value)
 
         # Update the can_write flag for MPI
@@ -350,7 +350,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
             self.view.CenterOfRotation = sceneConfig['camera']['CameraFocalPoint']
 
         # Initialize camera
-        for key, value in sceneConfig['camera'].iteritems():
+        for key, value in iteritems(sceneConfig['camera']):
             self.view.GetProperty(key).SetData(value)
 
         # Create a representation for all scene sources
@@ -606,7 +606,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
                                 image.UnRegister(None)
 
                 # Handle color by
-                for fieldName, fieldConfig in self.config['scene'][compositeIdx]['colors'].iteritems():
+                for fieldName, fieldConfig in iteritems(self.config['scene'][compositeIdx]['colors']):
                     if 'constant' in fieldConfig:
                         # Skip nothing to render
                         continue
@@ -796,7 +796,7 @@ class VTKGeometryDataSetBuilder(DataSetBuilder):
             writeCellArray(self.dataHandler, currentData['cells'], 'strips', ds.GetStrips().GetData())
 
             # Fields
-            for fieldName, fieldInfo in data['colors'].iteritems():
+            for fieldName, fieldInfo in iteritems(data['colors']):
                 array = None
                 if 'constant' in fieldInfo:
                     currentData['fields'][fieldName] = fieldInfo
@@ -1044,7 +1044,7 @@ class GeometryDataSetBuilder(DataSetBuilder):
             self.objSize[data['name']]['index'] = max(self.objSize[data['name']]['index'], topo.GetNumberOfTuples())
 
             # Colors / FIXME
-            for fieldName, fieldInfo in data['colors'].iteritems():
+            for fieldName, fieldInfo in iteritems(data['colors']):
                 array = ds.GetPointData().GetArray(fieldName)
                 tupleSize = array.GetNumberOfComponents()
                 arraySize = array.GetNumberOfTuples()

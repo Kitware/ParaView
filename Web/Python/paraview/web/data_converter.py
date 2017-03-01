@@ -1,6 +1,7 @@
 from vtk import *
 
 from vtk.web.camera import *
+from vtk.web import iteritems
 
 import json, os, math, gzip, shutil, array
 
@@ -142,7 +143,7 @@ class ConvertCompositeSpriteToSortedStack(object):
 
         with open(os.path.join(directory, "offset.json"), "r") as f:
             offsets = json.load(f)
-            for key, value in offsets.iteritems():
+            for key, value in iteritems(offsets):
                 meta = key.split('|')
                 if len(meta) == 2:
                     self.layers[int(meta[0])][meta[1]] = value
