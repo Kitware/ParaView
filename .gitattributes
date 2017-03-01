@@ -7,7 +7,7 @@ pvblot.in        crlf=input
 pre-commit       crlf=input
 
 # Custom attribute to mark sources as using our C code style.
-[attr]our-c-style  whitespace=tab-in-indent,-blank-at-eol
+[attr]our-c-style  whitespace=tab-in-indent,-blank-at-eol  format.clang-format
 
 *.c              our-c-style
 *.h              our-c-style
@@ -23,3 +23,5 @@ pre-commit       crlf=input
 *.c              hooks-max-size=0
 
 *.md             whitespace=tab-in-indent conflict-marker-size=30
+
+ThirdParty/**    -format.clang-format

@@ -106,24 +106,12 @@ case "$mode" in
     *) die "invalid mode: $mode" ;;
 esac
 
-# Filter sources to which our style should apply.
-$git_ls -z -- '*.c' '*.cc' '*.cpp' '*.cxx' '*.h' '*.hh' '*.hpp' '*.hxx' '*.glsl' |
+# List files as selected above.
+$git_ls |
 
-  # Exclude VTK.
-  egrep -z -v '^VTK/' |
-
-  # Exclude third-party sources.
-  egrep -z -v '^ThirdParty/' |
-  egrep -z -v '^Utilities/VisItBridge/' |
-
-  # Plugin third-party sources.
-  egrep -z -v '^Plugins/GeodesicMeasurementPlugin/FmmMesh/' |
-  egrep -z -v '^Plugins/H5PartReader/H5Part/' |
-  egrep -z -v '^Plugins/SciberQuestToolKit/eigen-.*/' |
-  egrep -z -v '^Plugins/SciberQuestToolKit/SciberQuest/' |
-  egrep -z -v '^Plugins/CDIReader/cdi*' |
-  egrep -z -v '^Plugins/AnalyzeNIfTIReaderWriter/vtknifti*' |
-  egrep -z -v '^Plugins/AnalyzeNIfTIReaderWriter/vtkznzlib*' |
+  # Select sources with our attribute.
+  git check-attr --stdin format.clang-format |
+  sed -n '/: format\.clang-format: set$/ {s/:[^:]*:[^:]*$//p}'  |
 
   # Update sources in-place.
-  xargs -0 "$clang_format" -i
+  xargs -d '\n' "$clang_format" -i
