@@ -39,13 +39,16 @@ protected:
   ~vtkAppendRectilinearGrid();
 
   // Propagate UPDATE_EXTENT up to the inputs.
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Tell the output information about the data this filter will produce.
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Perform actual execution.
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 

@@ -61,10 +61,8 @@ vtkLagrangianSurfaceHelper::~vtkLagrangianSurfaceHelper()
 }
 
 //---------------------------------------------------------------------------
-int vtkLagrangianSurfaceHelper::RequestInformation(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **inputVector,
-  vtkInformationVector *vtkNotUsed(outputVector))
+int vtkLagrangianSurfaceHelper::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
   // Add input to the model so it will be able to use it to compute default values
   this->IntegrationModel->ClearDataSets(true);

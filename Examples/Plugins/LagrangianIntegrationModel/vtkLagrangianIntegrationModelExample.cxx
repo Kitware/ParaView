@@ -267,7 +267,7 @@ bool vtkLagrangianIntegrationModelExample::CheckFreeFlightTermination(
 
 //----------------------------------------------------------------------------
 bool vtkLagrangianIntegrationModelExample::InteractWithSurface(int vtkNotUsed(surfaceType),
-  vtkLagrangianParticle* particle, vtkDataSet* surface, vtkIdType cellId, 
+  vtkLagrangianParticle* particle, vtkDataSet* surface, vtkIdType cellId,
   std::queue<vtkLagrangianParticle*>& vtkNotUsed(particles))
 {
   // Surface Interaction example, depending of the variable diameter of the

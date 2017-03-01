@@ -121,8 +121,8 @@ bool pqImportCinemaReaction::loadCinemaDatabase(const QString& dbase, pqServer* 
   pqView* view = pqActiveObjects::instance().activeView();
 
   vtkNew<vtkSMCinemaDatabaseImporter> importer;
-  if (!importer->ImportCinema(dbase.toLatin1().data(), server->session(),
-        (view ? view->getViewProxy() : NULL)))
+  if (!importer->ImportCinema(
+        dbase.toLatin1().data(), server->session(), (view ? view->getViewProxy() : NULL)))
   {
     qCritical("Failed to import Cinema database.");
     return false;

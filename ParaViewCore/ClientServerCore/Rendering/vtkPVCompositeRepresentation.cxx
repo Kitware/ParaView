@@ -170,5 +170,5 @@ unsigned int vtkPVCompositeRepresentation::Initialize(
   {
     minId = this->PolarAxesRepresentation->Initialize(minId, maxIdAvailable);
   }
-  return  this->Superclass::Initialize(minId, maxIdAvailable);
+  return this->Superclass::Initialize(minId, maxIdAvailable);
 }

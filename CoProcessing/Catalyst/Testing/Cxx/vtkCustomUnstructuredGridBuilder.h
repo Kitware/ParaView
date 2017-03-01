@@ -44,7 +44,8 @@ public:
    * that were returned were already built before.
    * vtkCustomUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
+  virtual vtkDataObject* GetGrid(
+    unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
 
   /**
    * Customized function to build UnstructuredGrid.

@@ -74,8 +74,8 @@ public:
    * Add validation for active filter so that the vtkExtractGeometry
    * won't be used without ImplicifFuntion being set.
    */
-  virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
+  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+    vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   // Add validation for active filter so that the vtkExtractGeometry
   // won't be used without ImplicifFuntion being set.

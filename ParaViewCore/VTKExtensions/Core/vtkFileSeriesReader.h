@@ -70,7 +70,8 @@ public:
    * updated the file name of the internal in RequestUpdateExtent based
    * on the time step request.
    */
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int ProcessRequest(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * CanReadFile is forwarded to the internal reader if it supports it.
@@ -125,7 +126,8 @@ protected:
 
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
   {

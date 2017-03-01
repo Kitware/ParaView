@@ -96,7 +96,8 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  virtual void UpdateValue(
+    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeKeyFrame();

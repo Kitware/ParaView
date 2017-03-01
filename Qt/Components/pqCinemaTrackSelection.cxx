@@ -107,17 +107,14 @@ public:
 
         QTreeWidgetItem* item = new QTreeWidgetItem();
         item->setData(0, Qt::DisplayRole, arrInfo->GetName());
-        //item->setData(0, Qt::DecorationRole, pixmaps[align]);
+        // item->setData(0, Qt::DecorationRole, pixmaps[align]);
         QString dataType = vtkImageScalarTypeNameMacro(arrInfo->GetDataType());
         item->setData(1, Qt::DisplayRole, dataType);
-        item->setFlags(Qt::ItemIsEnabled |
-                       Qt::ItemIsUserCheckable |
-                       Qt::ItemIsSelectable);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
 
         // Ignore Normals arrays by default
         Qt::CheckState check =
-          QString(arrInfo->GetName()) == QString("Normals") ?
-            Qt::Unchecked : Qt::Checked;
+          QString(arrInfo->GetName()) == QString("Normals") ? Qt::Unchecked : Qt::Checked;
         item->setCheckState(0, check);
 
         newItems.append(item);
@@ -267,9 +264,9 @@ void pqCinemaTrackSelection::onPipelineItemChanged(
 
     // array selection is disabled, so set jump to the 'controls' tab
     if (!this->Ui->tabProxyProperties->isTabEnabled(0))
-      {
-        this->Ui->tabProxyProperties->setCurrentIndex(1);
-      }
+    {
+      this->Ui->tabProxyProperties->setCurrentIndex(1);
+    }
   }
   else
   {

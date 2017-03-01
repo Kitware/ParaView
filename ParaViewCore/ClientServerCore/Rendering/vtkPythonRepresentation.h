@@ -43,8 +43,8 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   //@{
   /**

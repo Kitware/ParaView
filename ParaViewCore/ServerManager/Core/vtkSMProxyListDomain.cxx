@@ -112,15 +112,16 @@ public:
         vtkSMProxy* src_subproxy = parent->GetSubProxy(name);
         if (!src_subproxy)
         {
-          vtkErrorWithObjectMacro(parent, "Subproxy " << name << " must be defined before "
-            "its properties can be shared with another subproxy.");
+          vtkErrorWithObjectMacro(parent, "Subproxy "
+              << name << " must be defined before "
+                         "its properties can be shared with another subproxy.");
           continue;
         }
         vtkNew<vtkSMProxyLink> sharingLink;
         sharingLink->PropagateUpdateVTKObjectsOff();
 
         // Read the exceptions.
-        for (unsigned int j=0; j < child->GetNumberOfNestedElements(); j++)
+        for (unsigned int j = 0; j < child->GetNumberOfNestedElements(); j++)
         {
           vtkPVXMLElement* exceptionProp = child->GetNestedElement(j);
           if (strcmp(exceptionProp->GetName(), "Exception") != 0)

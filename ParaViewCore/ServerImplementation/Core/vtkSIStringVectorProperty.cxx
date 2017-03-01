@@ -122,7 +122,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
   {
     if (this->NeedReencoding)
     {
-      // certain type of string needs to be converted to utf8 
+      // certain type of string needs to be converted to utf8
       // to be sent back to client
       var->add_txt(vtkPVFileInformationHelper::LocalToUtf8Win32(arg).c_str());
     }
@@ -185,7 +185,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
       values[0] = tmp;
     }
   }
-  
+
   // Detect if this property needs utf8 -> Local encoding conversion
   // Only filenames or filepaths need it.
   // It can be a StringVectorProperty called FileName (all writers, see writers.xml)
@@ -318,9 +318,9 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings& values)
             if (this->NeedReencoding)
             {
               // Some received strings are UTF8 encoded and need conversion to local
-              stream << 
-                vtkPVFileInformationHelper::Utf8ToLocalWin32(
-                  values[i * this->NumberOfElementsPerCommand + j]).c_str();
+              stream << vtkPVFileInformationHelper::Utf8ToLocalWin32(
+                          values[i * this->NumberOfElementsPerCommand + j])
+                          .c_str();
             }
             else
             {

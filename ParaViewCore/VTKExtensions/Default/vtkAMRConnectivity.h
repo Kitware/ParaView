@@ -105,7 +105,8 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int DoRequestData(vtkNonOverlappingAMR*, const char*);
   int WavePropagation(vtkIdType cellIdStart, vtkUniformGrid* grid, vtkIdTypeArray* regionId,

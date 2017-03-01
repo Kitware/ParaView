@@ -53,9 +53,7 @@ bool vtkSIUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
   stream << vtkClientServerStream::Invoke << self << "AddVolumeMapper"
          << "Bunyk ray cast" << this->GetSubSIProxy("VolumeBunykMapper")->GetVTKObject()
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << self
-         << "AddVolumeMapper"
+  stream << vtkClientServerStream::Invoke << self << "AddVolumeMapper"
          << "Resample To Image"
          << this->GetSubSIProxy("VolumeResampleToImageMapper")->GetVTKObject()
          << vtkClientServerStream::End;

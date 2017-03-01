@@ -35,8 +35,8 @@ public:
   vtkTypeMacro(vtkGeometrySliceRepresentation, vtkGeometryRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   enum
   {

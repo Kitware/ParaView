@@ -172,7 +172,10 @@ public:
    * internal pipeline.
    * Overridden to use vtkPVTrivialProducer instead of vtkTrivialProducer
    */
-  virtual vtkAlgorithmOutput* GetInternalOutputPort() VTK_OVERRIDE { return this->GetInternalOutputPort(0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort() VTK_OVERRIDE
+  {
+    return this->GetInternalOutputPort(0);
+  }
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port) VTK_OVERRIDE
   {
     return this->GetInternalOutputPort(port, 0);
@@ -206,12 +209,14 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateTime(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   double UpdateTime;
   bool UpdateTimeValid;

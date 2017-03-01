@@ -90,7 +90,8 @@ protected:
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkNew<vtkCleanArrays> CleanArrays;
   vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;

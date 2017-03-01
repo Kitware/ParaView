@@ -109,8 +109,10 @@ protected:
     GlyphNPointsScatter = 738234
   };
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);

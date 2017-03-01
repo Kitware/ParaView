@@ -40,8 +40,8 @@ public:
     vtkPVDataRepresentation) static vtkPointGaussianRepresentation* New();
   virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * Use to set the color map for the data in this representation
@@ -173,7 +173,8 @@ protected:
   virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkSmartPointer<vtkActor> Actor;
   vtkSmartPointer<vtkPointGaussianMapper> Mapper;

@@ -259,7 +259,7 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
     if (q < bestQ)
     {
       bestQ = q;
-      best = Nh-1;
+      best = Nh - 1;
     }
     Nh = best;
   }

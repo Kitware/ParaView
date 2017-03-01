@@ -74,11 +74,11 @@ bool vtkPVFilePathEncodingHelper::GetActiveFileIsReadable()
 //-----------------------------------------------------------------------------
 bool vtkPVFilePathEncodingHelper::CallObjectMethod(const char* method, bool ignoreErrors)
 {
-  vtkPVSessionBase* session = 
+  vtkPVSessionBase* session =
     vtkPVSessionBase::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
-  vtkObject* object = 
-    vtkObject::SafeDownCast(vtkSIProxy::SafeDownCast(
-      session->GetSessionCore()->GetSIObject(this->ActiveGlobalId))->GetVTKObject());
+  vtkObject* object = vtkObject::SafeDownCast(
+    vtkSIProxy::SafeDownCast(session->GetSessionCore()->GetSIObject(this->ActiveGlobalId))
+      ->GetVTKObject());
   vtkClientServerInterpreter* interpreter =
     vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
 
@@ -108,6 +108,7 @@ void vtkPVFilePathEncodingHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Path: " << (this->Path ? this->Path : "(null)") << endl;
-  os << indent << "SecondaryPath: " << (this->SecondaryPath ? this->SecondaryPath : "(null)") << endl;
+  os << indent << "SecondaryPath: " << (this->SecondaryPath ? this->SecondaryPath : "(null)")
+     << endl;
   os << indent << "ActiveGlobalId: " << this->ActiveGlobalId << endl;
 }

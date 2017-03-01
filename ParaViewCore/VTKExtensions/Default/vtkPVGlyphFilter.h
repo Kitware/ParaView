@@ -106,7 +106,8 @@ public:
   /**
    * Overridden to create output data of appropriate type.
    */
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int ProcessRequest(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkPVGlyphFilter();
@@ -114,7 +115,8 @@ protected:
   //@}
 
   // Standard Pipeline methods
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
   virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;

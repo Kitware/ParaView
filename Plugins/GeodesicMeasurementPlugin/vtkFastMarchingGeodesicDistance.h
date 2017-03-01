@@ -149,7 +149,8 @@ protected:
   vtkFastMarchingGeodesicDistance();
   ~vtkFastMarchingGeodesicDistance();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Create GW_GeodesicMesh given an instance of a vtkPolyData
   void SetupGeodesicMesh(vtkPolyData* in);

@@ -130,7 +130,7 @@ std::string getModuleAttrAsString(const char* module, const char* attribute)
 #else
   const char* cdata = PyBytes_AsString(attr);
 #endif
-  std::string result(cdata? cdata : "");
+  std::string result(cdata ? cdata : "");
   return result;
 }
 

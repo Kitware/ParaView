@@ -76,7 +76,8 @@ protected:
    * This implementation returns true if the array name matches
    * an expression in the vtkPVColorArrayListSettings singleton.
    */
-  virtual bool IsFilteredArray(vtkPVDataInformation* info, int association, const char* arrayName) VTK_OVERRIDE;
+  virtual bool IsFilteredArray(
+    vtkPVDataInformation* info, int association, const char* arrayName) VTK_OVERRIDE;
 
   /**
    * HACK: Provides a temporary mechanism for subclasses to provide an

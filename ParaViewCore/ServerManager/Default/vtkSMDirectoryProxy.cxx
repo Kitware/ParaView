@@ -20,7 +20,6 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
-
 vtkStandardNewMacro(vtkSMDirectoryProxy);
 //----------------------------------------------------------------------------
 vtkSMDirectoryProxy::vtkSMDirectoryProxy()
@@ -56,7 +55,8 @@ bool vtkSMDirectoryProxy::Rename(const char* oldname, const char* newname)
   return this->CallDirectoryMethod("RenameDirectory", oldname, newname);
 }
 
-bool vtkSMDirectoryProxy::CallDirectoryMethod(const char* method, const char* path, const char* secondaryPath)
+bool vtkSMDirectoryProxy::CallDirectoryMethod(
+  const char* method, const char* path, const char* secondaryPath)
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated)
@@ -75,8 +75,8 @@ bool vtkSMDirectoryProxy::CallDirectoryMethod(const char* method, const char* pa
   {
     vtkSMPropertyHelper(helper->GetProperty("SecondaryFileName")).Set(secondaryPath);
   }
-  vtkSMPropertyHelper(helper->GetProperty("ActiveGlobalId")).
-    Set(static_cast<vtkIdType>(this->GetGlobalID()));
+  vtkSMPropertyHelper(helper->GetProperty("ActiveGlobalId"))
+    .Set(static_cast<vtkIdType>(this->GetGlobalID()));
   helper->UpdateVTKObjects();
   helper->UpdatePropertyInformation(helper->GetProperty(method));
 

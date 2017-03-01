@@ -166,7 +166,7 @@ myMainWindow::myMainWindow()
   new pqAlwaysConnectedBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
-  
+
   // Register panels
   foreach (pqPropertiesPanel* ppanel, this->findChildren<pqPropertiesPanel*>())
   {

@@ -55,8 +55,8 @@ static QString userServers()
   const char* serversFileName =
     vtkProcessModule::GetProcessModule()->GetOptions()->GetServersFileName();
 
-  return serversFileName ? serversFileName :
-    pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
+  return serversFileName ? serversFileName
+                         : pqCoreUtilities::getParaViewUserDirectory() + "/servers.pvsc";
 }
 
 // get path to shared system servers.

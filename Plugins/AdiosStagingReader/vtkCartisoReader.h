@@ -17,7 +17,6 @@
 
 #include "vtkAlgorithm.h"
 
-
 class vtkMultiProcessController;
 
 class vtkCartisoReader : public vtkAlgorithm
@@ -26,7 +25,7 @@ public:
   vtkTypeMacro(vtkCartisoReader, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkCartisoReader *New();
+  static vtkCartisoReader* New();
 
   //@{
   /**
@@ -36,7 +35,6 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   //@}
-
 
   //@{
   /**
@@ -75,28 +73,24 @@ protected:
   ~vtkCartisoReader();
 
   // Usual data generation methods
-  int ProcessRequest(vtkInformation*, vtkInformationVector**,
-                     vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation *, vtkInformationVector **,
-                          vtkInformationVector *);
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
-                                 vtkInformationVector *);
-  int FillOutputPortInformation(int, vtkInformation *) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   void Initialize();
   void Finalize();
 
+  vtkMultiProcessController* Controller;
 
-  vtkMultiProcessController *Controller;
-
-  char *StreamName;
+  char* StreamName;
   float TimeOut;
 
   int Step;
   bool StreamEnded;
 
   struct Internals;
-  Internals *Internal;
+  Internals* Internal;
 
 private:
   vtkCartisoReader(const vtkCartisoReader&) VTK_DELETE_FUNCTION;

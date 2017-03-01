@@ -113,7 +113,10 @@ public:
   {
     return this->Superclass::Update(port, requests);
   }
-  virtual int Update(vtkInformation* requests) VTK_OVERRIDE { return this->Superclass::Update(requests); }
+  virtual int Update(vtkInformation* requests) VTK_OVERRIDE
+  {
+    return this->Superclass::Update(requests);
+  }
 
   //@{
   /**

@@ -148,7 +148,10 @@ public:
   /**
    * Sends the message to all clients.
    */
-  virtual void NotifyAllClients(const vtkSMMessage* msg) VTK_OVERRIDE { this->ProcessNotification(msg); }
+  virtual void NotifyAllClients(const vtkSMMessage* msg) VTK_OVERRIDE
+  {
+    this->ProcessNotification(msg);
+  }
 
   /**
    * Sends the message to all but the active client-session.

@@ -282,8 +282,8 @@ void vtkPVOptions::Initialize()
   // out. The options are actually only available when built against a suitable
   // mesa and ParaView is told that they exist. They are parsed in the forward
   // executable infrastructure.
-  this->AddBooleanArgument("--native", 0, &this->DummyMesaFlag,
-    "Use the system-provided OpenGL implementation.");
+  this->AddBooleanArgument(
+    "--native", 0, &this->DummyMesaFlag, "Use the system-provided OpenGL implementation.");
   this->AddBooleanArgument("--mesa", 0, &this->DummyMesaFlag,
     "Use the provided Mesa build and its default rendering "
     "backend.");
@@ -291,8 +291,8 @@ void vtkPVOptions::Initialize()
     "Use the provided Mesa build and the software renderer "
     "(softpipe).");
 #if defined(PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
-  this->AddBooleanArgument("--mesa-swr", 0, &this->DummyMesaFlag,
-    "Use the provided Mesa build and the SWR renderer.");
+  this->AddBooleanArgument(
+    "--mesa-swr", 0, &this->DummyMesaFlag, "Use the provided Mesa build and the SWR renderer.");
 #endif
 #endif
 }

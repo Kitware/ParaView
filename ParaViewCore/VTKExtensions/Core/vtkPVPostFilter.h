@@ -53,8 +53,10 @@ protected:
   ~vtkPVPostFilter();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int DoAnyNeededConversions(vtkDataObject* output);
   int DoAnyNeededConversions(vtkDataSet* output, const char* requested_name, int fieldAssociation,

@@ -57,7 +57,8 @@ protected:
    */
   virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;

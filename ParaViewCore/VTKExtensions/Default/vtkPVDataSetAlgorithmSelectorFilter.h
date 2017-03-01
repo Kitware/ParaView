@@ -86,8 +86,8 @@ public:
   /**
    * Forward those methods to the underneath filters
    */
-  virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
+  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+    vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   /**
    * Forward those methods to the underneath filters

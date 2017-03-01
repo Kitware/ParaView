@@ -56,7 +56,7 @@ public:
    * from seed data
    */
   virtual void InitializeParticle(vtkLagrangianParticle* particle);
-  
+
   /**
    * This method is called when initializing output point data
    * It should be inherited when there is some variables data needed to be put
@@ -107,7 +107,7 @@ protected:
    * velocity,
    * create new particle...
    */
-  virtual bool InteractWithSurface(int surfaceType, vtkLagrangianParticle* particle, 
+  virtual bool InteractWithSurface(int surfaceType, vtkLagrangianParticle* particle,
     vtkDataSet* surface, vtkIdType cellId, std::queue<vtkLagrangianParticle*>& particles);
 
   /**

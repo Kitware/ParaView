@@ -163,8 +163,8 @@ protected:
    * code so we override this method to store request for later use
    * since otherwise we won't have access to it.
    */
-  virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
+  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+    vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   char* Script;
   char* InformationScript;

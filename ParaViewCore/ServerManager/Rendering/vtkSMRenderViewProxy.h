@@ -188,7 +188,8 @@ public:
    * Overridden to check through the various representations that this view can
    * create.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Returns the render window used by this view.

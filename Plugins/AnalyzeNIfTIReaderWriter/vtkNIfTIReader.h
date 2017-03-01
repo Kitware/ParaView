@@ -62,7 +62,8 @@ protected:
   ~vtkNIfTIReader();
 
   virtual void ExecuteInformation() VTK_OVERRIDE;
-  virtual void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual void ExecuteDataWithInformation(
+    vtkDataObject* output, vtkInformation* outInfo) VTK_OVERRIDE;
 
 private:
   vtkNIfTIReader(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;

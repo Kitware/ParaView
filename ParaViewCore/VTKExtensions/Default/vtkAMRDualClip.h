@@ -103,7 +103,8 @@ protected:
   // Needed for copying cell data to point data.
   vtkUnstructuredGrid* Mesh;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
 

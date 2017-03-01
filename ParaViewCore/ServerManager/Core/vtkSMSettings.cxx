@@ -1420,7 +1420,7 @@ Json::Value vtkConvertXMLElementToJSON(
 // See: https://gitlab.kitware.com/paraview/paraview/issues/16938
 #ifdef VTK_USE_64BIT_IDS
 template <>
-Json::Value vtkConvertXMLElementToJSON <vtkIdType>(
+Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
 {
   // Since we need to handle enumeration domain :/.

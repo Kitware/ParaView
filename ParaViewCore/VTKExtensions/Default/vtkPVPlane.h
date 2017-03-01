@@ -48,7 +48,10 @@ public:
    * executing the implicit function.
    */
   virtual void SetTransform(vtkAbstractTransform*) VTK_OVERRIDE;
-  virtual void SetTransform(const double elements[16]) VTK_OVERRIDE { this->Superclass::SetTransform(elements); }
+  virtual void SetTransform(const double elements[16]) VTK_OVERRIDE
+  {
+    this->Superclass::SetTransform(elements);
+  }
 
   /**
    * Evaluate function at position x-y-z and return value.  You should

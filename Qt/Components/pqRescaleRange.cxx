@@ -43,7 +43,8 @@ class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog
 };
 
 pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
-  : QDialog(widgetParent), Lock(false)
+  : QDialog(widgetParent)
+  , Lock(false)
 {
   this->Form = new pqRescaleRangeForm();
 

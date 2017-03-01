@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSurfaceFormat>
 #endif
 
-
 //-----------------------------------------------------------------------------
 // We extend vtkChartXY to add logic to reset view bounds automatically. This
 // ensures that when LUT changes, we are always showing the complete LUT.

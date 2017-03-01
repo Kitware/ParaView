@@ -43,7 +43,8 @@ protected:
   vtkMergeArrays();
   ~vtkMergeArrays();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // see algorithm for more info
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;

@@ -126,7 +126,8 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
           possible_names.insert(name);
           possible_names.insert(vtkQuoteString(name).c_str());
         }
-        std::string name(vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
+        std::string name(
+          vtkJoinToString(array_name, vtkPVPostFilter::DefaultComponentName(i, numberComps)));
         possible_names.insert(name);
         possible_names.insert(vtkQuoteString(name).c_str());
 

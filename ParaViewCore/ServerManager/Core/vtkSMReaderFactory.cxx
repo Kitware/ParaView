@@ -606,8 +606,8 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   helper.TakeReference(pxm->NewProxy("misc", "FilePathEncodingHelper"));
   helper->UpdateVTKObjects();
   vtkSMPropertyHelper(helper->GetProperty("ActiveFileName")).Set(filename);
-  vtkSMPropertyHelper(helper->GetProperty("ActiveGlobalId")).
-    Set(static_cast<vtkIdType>(proxy->GetGlobalID()));
+  vtkSMPropertyHelper(helper->GetProperty("ActiveGlobalId"))
+    .Set(static_cast<vtkIdType>(proxy->GetGlobalID()));
   helper->UpdateVTKObjects();
   helper->UpdatePropertyInformation(helper->GetProperty("ActiveFileIsReadable"));
   canRead = vtkSMPropertyHelper(helper->GetProperty("ActiveFileIsReadable")).GetAsInt();

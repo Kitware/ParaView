@@ -802,8 +802,8 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
     return;
   }
 
-  if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 &&
-      this->NumberOfDataSets == 0 && this->FieldDataInformation->GetNumberOfArrays() == 0)
+  if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 && this->NumberOfDataSets == 0 &&
+    this->FieldDataInformation->GetNumberOfArrays() == 0)
   {
     // Just copy the other array information.
     this->DeepCopy(info, !addingParts);
@@ -821,8 +821,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
       this->DataSetType = info->GetDataSetType();
       this->SetDataClassName(info->GetDataClassName());
     }
-    else if (this->DataSetType == VTK_IMAGE_DATA ||
-      this->DataSetType == VTK_RECTILINEAR_GRID ||
+    else if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_RECTILINEAR_GRID ||
       this->DataSetType == VTK_DATA_SET || info->GetDataSetType() == VTK_IMAGE_DATA ||
       info->GetDataSetType() == VTK_RECTILINEAR_GRID || info->GetDataSetType() == VTK_DATA_SET)
     {

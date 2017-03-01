@@ -59,7 +59,8 @@ protected:
   /**
    * Read the geometry file.  If an error occurred, 0 is returned; otherwise 1.
    */
-  virtual int ReadGeometryFile(const char* fileName, int timeStep, vtkMultiBlockDataSet* output) VTK_OVERRIDE;
+  virtual int ReadGeometryFile(
+    const char* fileName, int timeStep, vtkMultiBlockDataSet* output) VTK_OVERRIDE;
 
   /**
    * Read the measured geometry file.  If an error occurred, 0 is returned;
@@ -74,7 +75,8 @@ protected:
    * the data array, it is assumed that 0 is the first component added.
    */
   virtual int ReadScalarsPerNode(const char* fileName, const char* description, int timeStep,
-    vtkMultiBlockDataSet* output, int measured = 0, int numberOfComponents = 1, int component = 0) VTK_OVERRIDE;
+    vtkMultiBlockDataSet* output, int measured = 0, int numberOfComponents = 1,
+    int component = 0) VTK_OVERRIDE;
 
   /**
    * Read vectors per node for this dataset.  If an error occurred, 0 is
@@ -87,8 +89,8 @@ protected:
    * Read tensors per node for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadTensorsPerNode(
-    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output) VTK_OVERRIDE;
+  virtual int ReadTensorsPerNode(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output) VTK_OVERRIDE;
 
   /**
    * Read scalars per element for this dataset.  If an error occurred, 0 is
@@ -102,15 +104,15 @@ protected:
    * Read vectors per element for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadVectorsPerElement(
-    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output) VTK_OVERRIDE;
+  virtual int ReadVectorsPerElement(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output) VTK_OVERRIDE;
 
   /**
    * Read tensors per element for this dataset.  If an error occurred, 0 is
    * returned; otherwise 1.
    */
-  virtual int ReadTensorsPerElement(
-    const char* fileName, const char* description, int timeStep, vtkMultiBlockDataSet* output) VTK_OVERRIDE;
+  virtual int ReadTensorsPerElement(const char* fileName, const char* description, int timeStep,
+    vtkMultiBlockDataSet* output) VTK_OVERRIDE;
 
   /**
    * Read an unstructured part (partId) from the geometry file and create a

@@ -30,7 +30,8 @@ protected:
   virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateTime(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateTimeDependentInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

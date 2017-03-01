@@ -41,7 +41,8 @@ public:
    * Return a grid.  BuiltNewGrid is 0 if the grid is the same
    * as the last time step.
    */
-  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
+  virtual vtkDataObject* GetGrid(
+    unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
 
   /**
    * Get the Grid.

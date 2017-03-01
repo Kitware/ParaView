@@ -31,8 +31,7 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSCORE_EXPORT vtkAttributeDataReductionFilter
-  : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkAttributeDataReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAttributeDataReductionFilter* New();
@@ -93,7 +92,8 @@ protected:
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int ReductionType;

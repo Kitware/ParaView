@@ -226,7 +226,8 @@ protected:
 
   vtkCallbackCommand* SelectionObserver;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   static void SelectionCallback(
     vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 

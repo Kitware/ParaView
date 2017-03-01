@@ -63,13 +63,15 @@ protected:
   ~vtkMarkSelectedRows();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Overridden to create a vtkTable or vtkMultiBlockDataSet as the output based
    * on  the input type.
    */
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Operates on vtkTable instances. RequestData() handles composite datasets

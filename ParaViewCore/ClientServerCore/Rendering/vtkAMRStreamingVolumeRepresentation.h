@@ -73,8 +73,8 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -195,7 +195,8 @@ protected:
    * When not in StreamingUpdate, this also initializes the priority queue since
    * the input AMR may have totally changed, including its structure.
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   //@{
   /**

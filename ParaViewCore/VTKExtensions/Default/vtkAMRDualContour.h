@@ -129,7 +129,8 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * This should be called before any number of calls to DoRequestData

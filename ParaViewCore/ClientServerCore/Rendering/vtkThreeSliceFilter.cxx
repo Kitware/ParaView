@@ -221,10 +221,15 @@ int vtkThreeSliceFilter::RequestData(
   return 1;
 }
 
-namespace {
-class CutWorker {
+namespace
+{
+class CutWorker
+{
 public:
-  CutWorker(vtkCutter *slices[3]) : Slices(slices) {}
+  CutWorker(vtkCutter* slices[3])
+    : Slices(slices)
+  {
+  }
   void operator()(vtkIdType begin, vtkIdType end)
   {
     for (vtkIdType idx = begin; idx < end; ++idx)
@@ -232,6 +237,7 @@ public:
       Slices[idx]->Update();
     }
   }
+
 private:
   vtkCutter** Slices;
 };
@@ -272,10 +278,10 @@ void vtkThreeSliceFilter::Process(
   this->Slices[1]->SetInputData(input);
   this->Slices[2]->SetInputData(input);
 
-  //Update components in parallel
+  // Update components in parallel
   CutWorker worker(this->Slices);
-  vtkSMPTools::For(0,3,1,worker);
-  
+  vtkSMPTools::For(0, 3, 1, worker);
+
   // Update the internal pipeline
   this->CombinedFilteredInput->Update();
 

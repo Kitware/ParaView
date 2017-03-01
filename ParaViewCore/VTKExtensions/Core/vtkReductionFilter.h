@@ -35,8 +35,8 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
-#include "vtkSmartPointer.h"                   // needed for vtkSmartPointer.
-#include <vector>                              //  needed for std::vector
+#include "vtkSmartPointer.h"              // needed for vtkSmartPointer.
+#include <vector>                         //  needed for std::vector
 
 class vtkMultiProcessController;
 class vtkSelection;
@@ -47,8 +47,7 @@ public:
   vtkTypeMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  typedef enum ReductionModeType
-  {
+  typedef enum ReductionModeType {
     REDUCE_ALL_TO_ONE = 0,
     MOVE_ALL_TO_ONE = 1,
     REDUCE_ALL_TO_ALL = 2
@@ -63,7 +62,7 @@ public:
    * ALL NODES Reduce all data on all nodes.
    */
   vtkSetClampMacro(ReductionMode, int, vtkReductionFilter::REDUCE_ALL_TO_ONE,
-                   vtkReductionFilter::REDUCE_ALL_TO_ALL);
+    vtkReductionFilter::REDUCE_ALL_TO_ALL);
   vtkGetMacro(ReductionMode, int);
   //@}
 

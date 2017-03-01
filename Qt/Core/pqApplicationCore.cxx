@@ -100,7 +100,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSurfaceFormat>
 #endif
 
-
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {

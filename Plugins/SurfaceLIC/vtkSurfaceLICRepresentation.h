@@ -43,8 +43,8 @@ public:
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Description:
   // Indicates whether LIC should be used when doing LOD rendering.

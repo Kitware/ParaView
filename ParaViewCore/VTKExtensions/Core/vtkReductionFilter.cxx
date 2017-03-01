@@ -351,15 +351,18 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   {
     if (this->ReductionProcessId < 0)
     {
-      vtkWarningMacro("Cannot reduce to process:"  << this->ReductionProcessId <<
-        " it is not a valid process id. Please use a value between 0 and " << numProcs - 1 << " .Reducing to process 0 instead");
-      this->ReductionProcessId = 0; 
+      vtkWarningMacro("Cannot reduce to process:"
+        << this->ReductionProcessId
+        << " it is not a valid process id. Please use a value between 0 and " << numProcs - 1
+        << " .Reducing to process 0 instead");
+      this->ReductionProcessId = 0;
     }
     if (this->ReductionProcessId > numProcs - 1)
     {
-      vtkWarningMacro("Cannot reduce to process:"  << this->ReductionProcessId <<
-        " as there is only " << numProcs << " processes. Reducing to process 0 instead");
-      this->ReductionProcessId = 0; 
+      vtkWarningMacro("Cannot reduce to process:" << this->ReductionProcessId
+                                                  << " as there is only " << numProcs
+                                                  << " processes. Reducing to process 0 instead");
+      this->ReductionProcessId = 0;
     }
   }
 
@@ -379,7 +382,6 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     {
       this->GatherSelection(sel, receiveData, this->ReductionProcessId);
     }
-
   }
   else
   {
@@ -400,7 +402,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   // So, we need to handle receiveData having NULLs.
   assert(static_cast<int>(receiveData.size()) == numProcs);
   if (myId == this->ReductionProcessId ||
-      this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ALL)
+    this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ALL)
   {
     if (this->PassThrough >= 0 && receiveData[this->PassThrough] != NULL)
     {
@@ -417,14 +419,15 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
       }
     }
   }
-  else if (myId != this->ReductionProcessId && preOutput && 
-           this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ONE)
+  else if (myId != this->ReductionProcessId && preOutput &&
+    this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ONE)
   {
     data_sets.push_back(preOutput);
   }
 
   // Now run the PostGatherHelper.
-  // If myId==this->ReductionProcessId or this->ReductionMode == vtkReductionFilter::REDUCE_ALL_TO_ALL
+  // If myId==this->ReductionProcessId or this->ReductionMode ==
+  // vtkReductionFilter::REDUCE_ALL_TO_ALL
   // data_sets has datasets collected from all satellites otherwise
   // it contains the current process's result.
   if (data_sets.size() > 0)

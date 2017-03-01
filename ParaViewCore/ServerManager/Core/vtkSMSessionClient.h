@@ -86,7 +86,10 @@ public:
    * Overridden to provide return the information gathered from data-server and
    * render-server.
    */
-  virtual vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE { return this->ServerInformation; }
+  virtual vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE
+  {
+    return this->ServerInformation;
+  }
 
   /**
    * Called to do any initializations after a successful session has been
@@ -101,8 +104,8 @@ public:
    */
   virtual void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
   virtual void PullState(vtkSMMessage* message) VTK_OVERRIDE;
-  virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream, bool ignore_errors = false) VTK_OVERRIDE;
+  virtual void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignore_errors = false) VTK_OVERRIDE;
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location) VTK_OVERRIDE;
   //@}
 
@@ -250,7 +253,8 @@ protected:
    * Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
    * Return true if the event was handle locally.
    */
-  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE;
+  virtual bool OnWrongTagEvent(
+    vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE;
 
   /**
    * Callback when any vtkMultiProcessController subclass fires a ErrorEvent.

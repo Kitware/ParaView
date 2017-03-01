@@ -122,14 +122,15 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
 protected:
   vtkRulerSourceRepresentation();
   ~vtkRulerSourceRepresentation();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Fill input port information.

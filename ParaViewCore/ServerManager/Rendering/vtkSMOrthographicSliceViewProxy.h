@@ -35,14 +35,16 @@ public:
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Overridden to set initial default slices when a representation is created.
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
 
 protected:
   vtkSMOrthographicSliceViewProxy();

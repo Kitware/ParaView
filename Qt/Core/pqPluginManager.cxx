@@ -244,7 +244,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   }
   else
   {
-    // All Load*Plugin* call need a utf8 encoded filename or 
+    // All Load*Plugin* call need a utf8 encoded filename or
     // xmlcontent, since vtksys::DynamicLoader itself takes care
     // Of converting to local8bit, even locally.
     ret_val = mgr->LoadLocalPlugin(lib.toUtf8().data());

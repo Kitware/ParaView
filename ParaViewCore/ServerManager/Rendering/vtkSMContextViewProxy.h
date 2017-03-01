@@ -127,7 +127,8 @@ protected:
   /**
    * Overridden to process the "skip_plotable_check" attribute.
    */
-  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  virtual int ReadXMLAttributes(
+    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * The context view that is used for all context derived charts.

@@ -97,7 +97,8 @@ protected:
   /**
    * Perform the data processing
    */
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Create a default executive.

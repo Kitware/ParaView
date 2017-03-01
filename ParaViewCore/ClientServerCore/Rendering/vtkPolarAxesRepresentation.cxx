@@ -152,15 +152,15 @@ bool vtkPolarAxesRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
-    {
+  {
     if (vtkRenderer* renderer = pvview->GetRenderer(this->RendererType))
-      {
+    {
       renderer->AddActor(this->PolarAxesActor);
       this->PolarAxesActor->SetCamera(renderer->GetActiveCamera());
       this->RenderView = pvview;
       return this->Superclass::AddToView(view);
-      }
     }
+  }
   return false;
 }
 
@@ -169,22 +169,21 @@ bool vtkPolarAxesRepresentation::RemoveFromView(vtkView* view)
 {
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
-    {
+  {
     if (vtkRenderer* renderer = pvview->GetRenderer(this->RendererType))
-      {
+    {
       renderer->RemoveActor(this->PolarAxesActor);
       this->PolarAxesActor->SetCamera(NULL);
       this->RenderView = NULL;
       return this->Superclass::RemoveFromView(view);
-      }
     }
+  }
   this->RenderView = NULL;
   return false;
 }
 
 //----------------------------------------------------------------------------
-int vtkPolarAxesRepresentation::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkPolarAxesRepresentation::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
@@ -194,61 +193,60 @@ int vtkPolarAxesRepresentation::FillInputPortInformation(
 
 //----------------------------------------------------------------------------
 int vtkPolarAxesRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-  vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
+  {
     return 0;
-    }
+  }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
+  {
     vtkPVRenderView::SetPiece(inInfo, this, this->OutlineGeometry.Get());
     vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
-    }
+  }
   else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
+  {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
     if (producerPort)
-      {
+    {
       vtkAlgorithm* producer = producerPort->GetProducer();
-      vtkDataObject* data = vtkDataObject::SafeDownCast(producer->GetOutputDataObject(
-        producerPort->GetIndex()));
+      vtkDataObject* data =
+        vtkDataObject::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
       if ((data && data->GetMTime() > this->DataBoundsTime.GetMTime()) ||
         this->GetMTime() > this->DataBoundsTime.GetMTime())
-        {
+      {
         this->InitializeDataBoundsFromData(data);
         this->UpdateBounds();
-        }
       }
     }
+  }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPolarAxesRepresentation::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector, vtkInformationVector*)
+int vtkPolarAxesRepresentation::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-    {
+  {
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
     this->InitializeDataBoundsFromData(input);
-    }
+  }
 
   if (vtkMath::AreBoundsInitialized(this->DataBounds))
-    {
+  {
     vtkNew<vtkOutlineSource> outlineSource;
     outlineSource->SetBoxTypeToAxisAligned();
     outlineSource->SetBounds(this->DataBounds);
     outlineSource->Update();
     this->OutlineGeometry->ShallowCopy(outlineSource->GetOutput());
-    }
+  }
   else
-    {
+  {
     this->OutlineGeometry->Initialize();
-    }
+  }
 
   // We fire UpdateDataEvent to notify the representation proxy that the
   // representation was updated. The representation proxty will then call
@@ -265,47 +263,45 @@ void vtkPolarAxesRepresentation::InitializeDataBoundsFromData(vtkDataObject* dat
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(data);
   if (ds)
-    {
+  {
     ds->GetBounds(this->DataBounds);
-    }
+  }
   else if (cd)
-    {
+  {
     vtkCompositeDataIterator* iter = cd->NewIterator();
     vtkBoundingBox bbox;
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-         iter->GoToNextItem())
-      {
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
       ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (ds)
-        {
+      {
         double bds[6];
         ds->GetBounds(bds);
         if (vtkMath::AreBoundsInitialized(bds))
-          {
+        {
           bbox.AddBounds(bds);
-          }
         }
       }
+    }
     iter->Delete();
     bbox.GetBounds(this->DataBounds);
-    }
+  }
   this->DataBoundsTime.Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkPolarAxesRepresentation::UpdateBounds()
 {
-  double *scale = this->Scale;
-  double *position = this->Position;
-  double *rotation = this->Orientation;
+  double* scale = this->Scale;
+  double* position = this->Position;
+  double* rotation = this->Orientation;
   double bds[6];
-  if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
-    position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
-    rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
-    {
-    const double *bounds = this->DataBounds;
-    vtkSmartPointer<vtkTransform> transform =
-      vtkSmartPointer<vtkTransform>::New();
+  if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 || position[0] != 0.0 ||
+    position[1] != 0.0 || position[2] != 0.0 || rotation[0] != 0.0 || rotation[1] != 0.0 ||
+    rotation[2] != 0.0)
+  {
+    const double* bounds = this->DataBounds;
+    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
     transform->Translate(position);
     transform->RotateZ(rotation[2]);
     transform->RotateX(rotation[0]);
@@ -316,60 +312,60 @@ void vtkPolarAxesRepresentation::UpdateBounds()
     double origX[3], x[3];
 
     for (i = 0; i < 2; i++)
-      {
+    {
       origX[0] = bounds[i];
       for (j = 0; j < 2; j++)
-        {
+      {
         origX[1] = bounds[2 + j];
         for (k = 0; k < 2; k++)
-          {
+        {
           origX[2] = bounds[4 + k];
           transform->TransformPoint(origX, x);
           bbox.AddPoint(x);
-          }
         }
       }
+    }
     bbox.GetBounds(bds);
-    }
+  }
   else
-    {
-    memcpy(bds, this->DataBounds, sizeof(double)*6);
-    }
+  {
+    memcpy(bds, this->DataBounds, sizeof(double) * 6);
+  }
 
-  //overload bounds with the active custom bounds
+  // overload bounds with the active custom bounds
   for (int i = 0; i < 3; ++i)
-    {
+  {
     int pos = i * 2;
     if (this->EnableCustomBounds[i])
-      {
+    {
       bds[pos] = this->CustomBounds[pos];
       bds[pos + 1] = this->CustomBounds[pos + 1];
-      }
     }
+  }
   this->PolarAxesActor->SetBounds(bds);
 
-  //calcul du pole
-  this->PolarAxesActor->SetPole((bds[0] + bds[1])*0.5, (bds[2] + bds[3])*0.5, 0);
+  // calcul du pole
+  this->PolarAxesActor->SetPole((bds[0] + bds[1]) * 0.5, (bds[2] + bds[3]) * 0.5, 0);
 
   double maxradius = 0.0;
   double pole[3];
   this->PolarAxesActor->GetPole(pole);
-  for (int i = 0; i<2 ;i++)
+  for (int i = 0; i < 2; i++)
   {
     double currentradius = 0.0;
-    currentradius = sqrt(pow(bds[i] -pole[0], 2) + pow(bds[i + 2] -pole[1], 2));
+    currentradius = sqrt(pow(bds[i] - pole[0], 2) + pow(bds[i + 2] - pole[1], 2));
     maxradius = (maxradius < currentradius) ? currentradius : maxradius;
   }
   this->PolarAxesActor->SetMaximumRadius(maxradius);
 
   if (this->EnableCustomRange)
-    {
+  {
     this->PolarAxesActor->SetRange(this->CustomRange);
-    }
+  }
   else
-    {
+  {
     this->PolarAxesActor->SetRange(0, maxradius);
-    }
+  }
 }
 
 //----------------------------------------------------------------------------

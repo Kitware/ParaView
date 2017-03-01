@@ -128,7 +128,8 @@ protected:
 
   virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
   virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
   vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;

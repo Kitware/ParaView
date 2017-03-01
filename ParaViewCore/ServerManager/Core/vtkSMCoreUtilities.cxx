@@ -282,8 +282,7 @@ const char* vtkSMCoreUtilities::GetInputPropertyName(vtkSMProxy* proxy, int port
   piter->Begin();
   while (!piter->IsAtEnd())
   {
-    if (vtkSMInputProperty* ip =
-        vtkSMInputProperty::SafeDownCast(piter->GetProperty()))
+    if (vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(piter->GetProperty()))
     {
       if (ip->GetPortIndex() == port)
       {

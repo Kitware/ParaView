@@ -990,7 +990,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       foreach (pqPropertyWidgetInterface* interface,
         interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
       {
-        QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(groupHints[property_group_tag]);
+        QMap<QString, vtkPVXMLElement*> decoratorTypes =
+          getDecorators(groupHints[property_group_tag]);
         foreach (const QString& type, decoratorTypes.keys())
         {
           if (interface->createWidgetDecorator(type, decoratorTypes[type], propertyWidget))
