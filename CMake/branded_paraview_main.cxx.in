@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // It will be replaced next time you rebuild.
 
 #include <QApplication>
+#include <QLocale>
 #include <QStyleFactory>
 
 #include "pq@BPC_NAME@Initializer.h"
@@ -104,12 +105,13 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-  // We force LC_NUMERIC to C - it is important as Qt sets locale to the user's
-  // environment locale value and this might break some basic features like
-  // the calls to atof() that are locale dependent.
-  vtksys::SystemTools::PutEnv("LC_NUMERIC=C");
-
   QApplication qtapp(argc, argv);
+  // QApplication docs suggest resetting to "C" after the QApplication
+  // is initialized.
+  setlocale(LC_NUMERIC, "C");
+
+  // However, this is needed to address BUG #17225, #17226.
+  QLocale::setDefault(QLocale::c());
 
   pq@BPC_NAME@Initializer pvInitializer;
   pq@BPC_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
