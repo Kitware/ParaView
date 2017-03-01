@@ -20,9 +20,9 @@
 #include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
 
-#include <vector>
 #include <assert.h>
 #include <sstream>
+#include <vector>
 
 namespace
 {

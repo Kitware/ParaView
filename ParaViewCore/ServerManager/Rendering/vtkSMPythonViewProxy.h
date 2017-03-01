@@ -23,7 +23,8 @@
 #define vtkSMPythonViewProxy_h
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
-#include "vtkNew.h"                            // needed for vtkNew.
+
+#include "vtkNew.h" // needed for vtkNew.
 #include "vtkSMViewProxy.h"
 
 class vtkImageData;

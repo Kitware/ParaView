@@ -96,8 +96,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // these includes cause build errors with pqOutputWindow, pqRenderView etc.
 // due to some leaked through #define's (is my guess).
 #if QT_VERSION >= 0x050000
-#include <QSurfaceFormat>
 #include "QVTKOpenGLWidget.h"
+#include <QSurfaceFormat>
 #endif
 
 

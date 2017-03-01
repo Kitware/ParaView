@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkPVConfig.h"
 #include "pqImportCinemaReaction.h"
+#include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"

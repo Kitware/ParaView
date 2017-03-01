@@ -21,9 +21,10 @@
 #define vtkPolarAxesRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+
+#include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include "vtkNew.h" // needed for vtkNew.
 
 class vtkPolarAxesActor;
 class vtkPolyData;

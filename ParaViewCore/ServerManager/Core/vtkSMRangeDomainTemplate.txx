@@ -21,8 +21,8 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <assert.h>
+#include <vtksys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------
 template <class T>

@@ -15,10 +15,10 @@
 #include "vtkSMDirectoryProxy.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMPropertyHelper.h"
 
 
 vtkStandardNewMacro(vtkSMDirectoryProxy);

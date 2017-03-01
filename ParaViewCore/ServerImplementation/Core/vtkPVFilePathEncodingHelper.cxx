@@ -18,10 +18,10 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkPVSessionBase.h"
 #include "vtkPVSessionCore.h"
+#include "vtkProcessModule.h"
 #include "vtkSIProxy.h"
 
 vtkStandardNewMacro(vtkPVFilePathEncodingHelper);

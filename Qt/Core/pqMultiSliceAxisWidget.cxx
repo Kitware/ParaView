@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqQVTKWidgetBase.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "vtkAxis.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
@@ -47,9 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes
 #include <QMouseEvent>
