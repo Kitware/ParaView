@@ -1914,7 +1914,7 @@
         </BoundsDomain>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetResolution"
-                         default_values="100"
+                         default_values="1000"
                          name="Resolution"
                          number_of_elements="1">
         <IntRangeDomain min="1"
