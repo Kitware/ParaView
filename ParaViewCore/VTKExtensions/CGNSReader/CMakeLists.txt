@@ -9,14 +9,6 @@ if (WIN32)
     # -------------------------------------------------------------------------
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   endif ()
-elseif (UNIX)
-  if (CMAKE_COMPILER_IS_GNUCXX)
-    include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG(-Wno-unused-result Wno-unused-result)
-    if (Wno-unused-result)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result")
-    endif()
-  endif()
 endif()
 
 set(Module_SRCS
