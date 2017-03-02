@@ -128,7 +128,6 @@ protected:
     vtkObject* object, unsigned long event, void* clientdata, void* calldata);
 
   vtkPVAxesWidgetObserver* Observer;
-  int StartTag;
 
   int MouseCursorState;
   int Moving;

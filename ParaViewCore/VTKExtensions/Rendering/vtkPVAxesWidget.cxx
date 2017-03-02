@@ -82,8 +82,6 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
 
-  this->StartTag = 0;
-
   this->Interactive = 1;
 
   this->Outline = vtkPolyData::New();
