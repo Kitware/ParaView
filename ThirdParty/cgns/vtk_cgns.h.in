@@ -20,8 +20,8 @@
 # include <cgnslib.h> // DataType, and other definition
 # include <cgns_io.h> // Low level IO for fast parsing
 #else
-# include <vtkcgns/cgnslib.h> // DataType, and other definition
-# include <vtkcgns/cgns_io.h> // Low level IO for fast parsing
+# include <vtkcgns/src/cgnslib.h> // DataType, and other definition
+# include <vtkcgns/src/cgns_io.h> // Low level IO for fast parsing
 #endif
 
 #endif
