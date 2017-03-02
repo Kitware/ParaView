@@ -39,9 +39,8 @@
 #include <vector>
 
 #include "vtkIdTypeArray.h"
-#include "vtkPoints.h"
-
 #include "vtkMultiProcessController.h"
+#include "vtkPoints.h"
 
 namespace CGNSRead
 {
