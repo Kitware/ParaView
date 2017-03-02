@@ -32,27 +32,6 @@
 vtkStandardNewMacro(vtkPVAxesWidget);
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
-vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
-
-//----------------------------------------------------------------------------
-class vtkPVAxesWidgetObserver : public vtkCommand
-{
-public:
-  static vtkPVAxesWidgetObserver* New() { return new vtkPVAxesWidgetObserver; };
-
-  vtkPVAxesWidgetObserver() { this->AxesWidget = 0; }
-
-  virtual void Execute(vtkObject* wdg, unsigned long event, void* calldata)
-  {
-    if (this->AxesWidget)
-    {
-      this->AxesWidget->ExecuteEvent(wdg, event, calldata);
-    }
-  }
-
-  vtkPVAxesWidget* AxesWidget;
-};
-
 //----------------------------------------------------------------------------
 vtkPVAxesWidget::vtkPVAxesWidget()
 {
@@ -60,8 +39,6 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 
   this->EventCallbackCommand->SetCallback(vtkPVAxesWidget::ProcessEvents);
 
-  this->Observer = vtkPVAxesWidgetObserver::New();
-  this->Observer->AxesWidget = this;
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport(0.0, 0.0, 0.2, 0.2);
 
@@ -75,14 +52,13 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Renderer->InteractiveOff();
   this->Priority = 0.55;
   this->AxesActor = vtkPVAxesActor::New();
+  this->AxesActor->SetVisibility(1);
   this->Renderer->AddActor(this->AxesActor);
 
   this->ParentRenderer = NULL;
 
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
-
-  this->Interactive = 1;
 
   this->Outline = vtkPolyData::New();
   this->Outline->Allocate();
@@ -103,6 +79,8 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->OutlineActor->SetMapper(mapper);
   this->OutlineActor->SetPosition(0, 0);
   this->OutlineActor->SetPosition2(1, 1);
+  this->Renderer->AddActor(this->OutlineActor);
+  this->OutlineActor->SetVisibility(0);
 
   points->Delete();
   mapper->Delete();
@@ -112,95 +90,71 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 //----------------------------------------------------------------------------
 vtkPVAxesWidget::~vtkPVAxesWidget()
 {
-  this->Observer->Delete();
+  this->SetInteractor(NULL);
+  this->SetParentRenderer(NULL);
+
   this->AxesActor->Delete();
   this->OutlineActor->Delete();
   this->Outline->Delete();
-  this->SetParentRenderer(NULL);
   this->Renderer->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::SetEnabled(int enabling)
+void vtkPVAxesWidget::SetInteractor(vtkRenderWindowInteractor* iren)
 {
-  if (!this->Interactor)
+  if (iren == this->GetInteractor())
   {
-    // vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
     return;
   }
 
-  if (enabling)
+  if (vtkRenderWindowInteractor* current = this->GetInteractor())
   {
-    if (this->Enabled)
-    {
-      return;
-    }
-    if (!this->ParentRenderer)
-    {
-      vtkErrorMacro("The parent renderer must be set prior to enabling this widget");
-      return;
-    }
-
-    this->Enabled = 1;
-
-    if (this->EventCallbackCommand)
-    {
-      vtkRenderWindowInteractor* i = this->Interactor;
-      i->AddObserver(vtkCommand::MouseMoveEvent, this->EventCallbackCommand, this->Priority);
-      i->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, this->Priority);
-      i->AddObserver(
-        vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, this->Priority);
-    }
-
-    this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
-    if (this->ParentRenderer->GetRenderWindow()->GetNumberOfLayers() < 2)
-    {
-      this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
-    }
-    this->AxesActor->SetVisibility(1);
-    // We need to copy the camera before the compositing observer is called.
-    // Compositing temporarily changes the camera to display an image.
-    this->StartEventObserverId =
-      this->ParentRenderer->AddObserver(vtkCommand::StartEvent, this->Observer, 1);
-    this->InvokeEvent(vtkCommand::EnableEvent, NULL);
+    current->RemoveObserver(this->EventCallbackCommand);
   }
-  else
+  this->Superclass::SetInteractor(iren);
+  if (iren)
   {
-    if (!this->Enabled)
-    {
-      return;
-    }
-
-    this->Enabled = 0;
-    this->Interactor->RemoveObserver(this->EventCallbackCommand);
-
-    this->AxesActor->SetVisibility(0);
-    if (this->ParentRenderer)
-    {
-      // release the resources of the renderer we own
-      this->Renderer->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
-      if (this->ParentRenderer->GetRenderWindow())
-      {
-        this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
-        this->AxesActor->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
-      }
-      if (this->StartEventObserverId != 0)
-      {
-        this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
-      }
-    }
-    else
-    {
-      vtkErrorMacro("Widget disabled without parent window, this should never happen.");
-    }
-
-    this->InvokeEvent(vtkCommand::DisableEvent, NULL);
+    iren->AddObserver(vtkCommand::MouseMoveEvent, this->EventCallbackCommand, this->Priority);
+    iren->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand, this->Priority);
+    iren->AddObserver(
+      vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, this->Priority);
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::ExecuteEvent(
-  vtkObject* vtkNotUsed(o), unsigned long vtkNotUsed(event), void* vtkNotUsed(calldata))
+void vtkPVAxesWidget::SetParentRenderer(vtkRenderer* ren)
+{
+  if (this->ParentRenderer == ren)
+  {
+    return;
+  }
+
+  if (this->ParentRenderer)
+  {
+    if (this->ParentRenderer->GetRenderWindow())
+    {
+      this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
+    }
+    this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
+  }
+
+  vtkSetObjectBodyMacro(ParentRenderer, vtkRenderer, ren);
+
+  if (this->ParentRenderer)
+  {
+    if (this->ParentRenderer->GetRenderWindow())
+    {
+      this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
+    }
+    this->StartEventObserverId = this->ParentRenderer->AddObserver(
+      vtkCommand::StartEvent, this, &vtkPVAxesWidget::UpdateCameraFromParentRenderer);
+  }
+
+  this->UpdateCameraFromParentRenderer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::UpdateCameraFromParentRenderer()
 {
   if (!this->ParentRenderer)
   {
@@ -222,6 +176,7 @@ void vtkPVAxesWidget::ExecuteEvent(
   this->Renderer->ResetCamera();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVAxesWidget::UpdateCursorIcon()
 {
   if (!this->Enabled)
@@ -279,11 +234,11 @@ void vtkPVAxesWidget::UpdateCursorIcon()
 
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
   {
-    this->Renderer->RemoveActor(this->OutlineActor);
+    this->OutlineActor->SetVisibility(0);
   }
   else
   {
-    this->Renderer->AddActor(this->OutlineActor);
+    this->OutlineActor->SetVisibility(1);
   }
   this->Interactor->Render();
 
@@ -293,6 +248,10 @@ void vtkPVAxesWidget::UpdateCursorIcon()
 //----------------------------------------------------------------------------
 void vtkPVAxesWidget::SetMouseCursor(int cursorState)
 {
+  if (!this->Interactor)
+  {
+    return;
+  }
   switch (cursorState)
   {
     case vtkPVAxesWidget::Outside:
@@ -322,7 +281,7 @@ void vtkPVAxesWidget::ProcessEvents(
 {
   vtkPVAxesWidget* self = reinterpret_cast<vtkPVAxesWidget*>(clientdata);
 
-  if (!self->GetInteractive())
+  if (!self->GetEnabled() || !self->GetVisibility())
   {
     return;
   }
@@ -773,34 +732,43 @@ void vtkPVAxesWidget::SquareRenderer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAxesWidget::SetInteractive(int state)
+void vtkPVAxesWidget::SetEnabled(int state)
 {
-  if (this->Interactive != state)
+  if (this->Enabled != state)
   {
-    this->Interactive = state;
+    this->Enabled = state;
   }
-
+  this->Superclass::SetEnabled(state); // funny, superclass doesn't do anything, but hey.
   if (!state)
   {
     this->OnButtonRelease();
-    this->Renderer->RemoveActor(this->OutlineActor);
-    if (this->Interactor && this->MouseCursorState != vtkPVAxesWidget::Outside)
-    {
-      this->MouseCursorState = vtkPVAxesWidget::Outside;
-      this->SetMouseCursor(this->MouseCursorState);
-      // this->Interactor->Render();
-    }
+    this->UpdateCursorIcon();
+    this->OutlineActor->SetVisibility(0);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAxesWidget::SetVisibility(bool val)
+{
+  this->AxesActor->SetVisibility(val);
+  if (this->Enabled && !val)
+  {
+    // ensures that the outline actor's visibility is updated correctly
+    this->SetEnabled(false);
+    this->SetEnabled(true);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVAxesWidget::GetVisibility()
+{
+  return (this->AxesActor->GetVisibility() != 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAxesWidget::SetOutlineColor(double r, double g, double b)
 {
   this->OutlineActor->GetProperty()->SetColor(r, g, b);
-  if (this->Interactor)
-  {
-    //    this->Interactor->Render();
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -845,7 +813,5 @@ double* vtkPVAxesWidget::GetViewport()
 void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
   os << indent << "AxesActor: " << this->AxesActor << endl;
-  os << indent << "Interactive: " << this->Interactive << endl;
 }

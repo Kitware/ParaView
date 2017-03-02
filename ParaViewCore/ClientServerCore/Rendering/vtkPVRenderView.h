@@ -1154,8 +1154,6 @@ private:
 
   vtkNew<vtkPartitionOrderingInterface> PartitionOrdering;
 
-  bool OrientationWidgetVisibility;
-
   int StereoType;
   int ServerStereoType;
   void UpdateStereoProperties();

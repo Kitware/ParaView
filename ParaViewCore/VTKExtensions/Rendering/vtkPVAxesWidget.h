@@ -14,10 +14,16 @@
 =========================================================================*/
 /**
  * @class   vtkPVAxesWidget
- * @brief   A widget to manipulate an axe
+ * @brief   A widget to manipulate vtkPVAxesWidget.
  *
  *
- * This widget creates and manages its own vtkPVAxesActor.
+ * This widget creates and manages its own vtkPVAxesActor. To use this widget,
+ * make sure you call SetParentRenderer and SetInteractor (if interactivity is
+ * needed). Use `SetEnabled` to enable/disable interactivity and `SetVisibility`
+ * to show/hide the axes.
+ *
+ * @note This is an old class that uses old style for create widgets. Please
+ * don't use it as a reference for creating similar elements.
 */
 
 #ifndef vtkPVAxesWidget_h
@@ -30,7 +36,6 @@ class vtkActor2D;
 class vtkKWApplication;
 class vtkPolyData;
 class vtkPVAxesActor;
-class vtkPVAxesWidgetObserver;
 class vtkRenderer;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
@@ -53,11 +58,6 @@ public:
   vtkGetObjectMacro(AxesActor, vtkPVAxesActor);
   //@}
 
-  /**
-   * Enable the 3D widget.
-   */
-  virtual void SetEnabled(int) VTK_OVERRIDE;
-
   //@{
   /**
    * Set the renderer this 3D widget will be contained in.
@@ -66,26 +66,29 @@ public:
   vtkRenderer* GetParentRenderer();
   //@}
 
-  //@{
+  /**
+   * Overridden to add interaction observers.
+   */
+  void SetInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+
   /**
    * Get the renderer.
    */
   vtkGetObjectMacro(Renderer, vtkRenderer);
-  //@}
 
   /**
-   * Callback to keep the camera for the axes actor up to date with the
-   * camera in the parent renderer
+   * Overridden to update this->Enabled and hide outline when disabled.
+   * Use this method to enable/disable interactivity.
    */
-  void ExecuteEvent(vtkObject* o, unsigned long event, void* calldata);
+  void SetEnabled(int) VTK_OVERRIDE;
 
   //@{
   /**
-   * Set/get whether to allow this 3D widget to be interactively moved/scaled.
+   * Get/Set the visibility. Note if visibility is off, Enabled state is ignored
+   * and assumed off.
    */
-  void SetInteractive(int state);
-  vtkGetMacro(Interactive, int);
-  vtkBooleanMacro(Interactive, int);
+  void SetVisibility(bool val);
+  bool GetVisibility();
   //@}
 
   //@{
@@ -127,18 +130,18 @@ protected:
   static void ProcessEvents(
     vtkObject* object, unsigned long event, void* clientdata, void* calldata);
 
-  vtkPVAxesWidgetObserver* Observer;
+  /**
+   * Callback to keep the camera for the axes actor up to date with the
+   * camera in the parent renderer
+   */
+  void UpdateCameraFromParentRenderer();
 
   int MouseCursorState;
   int Moving;
   int StartPosition[2];
 
-  int Interactive;
-
   void UpdateCursorIcon();
   void SetMouseCursor(int cursorState);
-
-  int State;
 
   enum AxesWidgetState
   {
@@ -153,13 +156,11 @@ protected:
   void OnButtonPress();
   void OnMouseMove();
   void OnButtonRelease();
-
   void MoveWidget();
   void ResizeTopLeft();
   void ResizeTopRight();
   void ResizeBottomLeft();
   void ResizeBottomRight();
-
   void SquareRenderer();
 
   unsigned long StartEventObserverId;
