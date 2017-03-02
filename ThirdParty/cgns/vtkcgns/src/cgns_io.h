@@ -29,6 +29,7 @@
 #ifndef CGNS_IO_H
 #define CGNS_IO_H
 
+#include "cgnsconfig.h"
 #include "cgnstypes.h"
 
 #if defined(_WIN32) && defined(BUILD_DLL)
