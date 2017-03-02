@@ -70,8 +70,8 @@ public:
   vtkTypeMacro(vtkGeometryRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm);
 
 protected:
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE
+  virtual int RequestData(vtkInformation*, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE
   {
     vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::GetData(inputVector[0], 0);
     vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::GetData(outputVector, 0);
@@ -115,16 +115,11 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->InternalProgressObserver->SetCallback(
     &vtkGeometryRepresentation::InternalProgressCallbackFunction);
   this->InternalProgressObserver->SetClientData(this);
-  this->GeometryFilter->AddObserver(
-    vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->CacheKeeper->AddObserver(
-    vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->MultiBlockMaker->AddObserver(
-    vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->Decimator->AddObserver(
-    vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->LODOutlineFilter->AddObserver(
-    vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  this->GeometryFilter->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  this->CacheKeeper->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  this->MultiBlockMaker->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  this->Decimator->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  this->LODOutlineFilter->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
 
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
@@ -212,23 +207,23 @@ void vtkGeometryRepresentation::InternalProgressCallback(vtkAlgorithm* algorithm
   float progress = algorithm->GetProgress();
   if (progress > 0.f && progress < 1.f)
   {
-    if(algorithm == this->GeometryFilter)
+    if (algorithm == this->GeometryFilter)
     {
       this->UpdateProgress(progress * 0.8f);
     }
-    else if(algorithm == this->MultiBlockMaker)
+    else if (algorithm == this->MultiBlockMaker)
     {
       this->UpdateProgress(0.8f + progress * 0.05f);
     }
-    else if(algorithm == this->CacheKeeper)
+    else if (algorithm == this->CacheKeeper)
     {
       this->UpdateProgress(0.85f + progress * 0.05f);
     }
-    else if(algorithm == this->Decimator)
+    else if (algorithm == this->Decimator)
     {
       this->UpdateProgress(0.90f + progress * 0.05f);
     }
-    else if(algorithm == this->LODOutlineFilter)
+    else if (algorithm == this->LODOutlineFilter)
     {
       this->UpdateProgress(0.95f + progress * 0.05f);
     }
@@ -424,9 +419,8 @@ bool vtkGeometryRepresentation::DoRequestGhostCells(vtkInformation* info)
     return false;
   }
 
-  if (vtkUnstructuredGrid::GetData(info) != NULL
-    || vtkCompositeDataSet::GetData(info) != NULL
-    || vtkPolyData::GetData(info) != NULL)
+  if (vtkUnstructuredGrid::GetData(info) != NULL || vtkCompositeDataSet::GetData(info) != NULL ||
+    vtkPolyData::GetData(info) != NULL)
   {
     // ensure that there's no WholeExtent to ensure
     // that this UG was never born out of a structured dataset.

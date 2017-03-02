@@ -373,7 +373,6 @@ protected slots:
 protected:
   void clearViewsForLoadingState(pqServer* server);
 
-
   bool LoadingState;
 
   pqOutputWindow* OutputWindow;

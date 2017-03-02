@@ -55,9 +55,8 @@ public:
 protected:
   vtkSMDirectoryProxy();
   ~vtkSMDirectoryProxy();
-  
-  bool CallDirectoryMethod(const char* method, const char* path, 
-    const char* secondaryPath = NULL);
+
+  bool CallDirectoryMethod(const char* method, const char* path, const char* secondaryPath = NULL);
 
 private:
   vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;

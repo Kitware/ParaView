@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVFilePathEncodingHelper
  * @brief   server side object used to check if manipulate a directory
- *  
+ *
  * Server side object to list, create and remove directory
  * the main reason for this helper to exist is to convert
  * the file path from utf8 to locale encoding
@@ -48,11 +48,11 @@ public:
    */
   vtkSetStringMacro(SecondaryPath);
   vtkGetStringMacro(SecondaryPath);
- 
+
   //@}
   //@{
   /**
-   * Get/Set the globalId of the vtkDirectory present of the server 
+   * Get/Set the globalId of the vtkDirectory present of the server
    * that we will use to manipulate directories.
    */
   vtkGetMacro(ActiveGlobalId, int);
@@ -87,7 +87,7 @@ public:
 protected:
   vtkPVFilePathEncodingHelper();
   ~vtkPVFilePathEncodingHelper();
-  
+
   bool CallObjectMethod(const char* method, bool ignoreError = false);
 
   char* Path;

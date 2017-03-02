@@ -74,7 +74,8 @@ public:
   /**
    * The iterator is use to filter the property available on the given proxy
    */
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
+  virtual vtkPVXMLElement* SaveXMLState(
+    vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
 
   /**
    * Loads the proxy state from the XML element. Returns 0 on failure.

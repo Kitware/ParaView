@@ -214,7 +214,8 @@ protected:
    * Overridden to create vtkMultiBlockDataSet when input is a
    * composite-dataset and vtkPolyData when input is a vtkDataSet.
    */
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestAMRData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
@@ -308,7 +309,8 @@ protected:
    * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
    * don't generate internal surfaces.
    */
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Convenience method to purge ghost cells.
   void RemoveGhostCells(vtkPolyData*);

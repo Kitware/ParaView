@@ -90,7 +90,7 @@ public:
     this->ShowingAdvancedProperties = showing_advanced_properties;
     if (this->ProxyWidget)
     {
-      if (this->HideProxyWidgets || 
+      if (this->HideProxyWidgets ||
         (!showing_advanced_properties && this->HideProxyWidgetsInDefaultView))
       {
         this->ProxyWidget->hide();

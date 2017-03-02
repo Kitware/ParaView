@@ -118,8 +118,8 @@ public:
   // Set the icet composite pass.
   vtkSetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 
-  virtual void GetTiledSizeAndOrigin(
-    const vtkRenderState* render_state, int* width, int* height, int* originX, int* originY) VTK_OVERRIDE
+  virtual void GetTiledSizeAndOrigin(const vtkRenderState* render_state, int* width, int* height,
+    int* originX, int* originY) VTK_OVERRIDE
   {
     assert(this->IceTCompositePass != NULL);
     int tile_dims[2];

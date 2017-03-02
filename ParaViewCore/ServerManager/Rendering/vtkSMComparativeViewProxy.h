@@ -78,7 +78,8 @@ public:
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Returns the render-window used by the root view, if any.

@@ -45,12 +45,14 @@ public:
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Fetchs data bounds from the client-side object. We simply fetch the

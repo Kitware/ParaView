@@ -28,14 +28,13 @@ namespace
 double next_value_after(double value, double direction)
 {
 #if __cplusplus >= 201103L
-  return std::nextafter(value,direction);
+  return std::nextafter(value, direction);
 #elif defined(_MSC_VER)
-  return _nextafter(value,direction);
+  return _nextafter(value, direction);
 #else
-  //we hope they have C99 support
-  return nextafter(value,direction);
+  // we hope they have C99 support
+  return nextafter(value, direction);
 #endif
-
 }
 
 bool valid_range(double range[2])
@@ -63,7 +62,7 @@ bool valid_range(double range[2])
     next_value = next_value_after(next_value, original_range[1]);
   }
 
-  //Determine if adjust range should return true or false.
+  // Determine if adjust range should return true or false.
   const bool should_be_adjusted = next_value >= original_range[1];
 
   // verify that AdjustRange range has at least 65k different valid
@@ -72,16 +71,15 @@ bool valid_range(double range[2])
   const bool adjusted = vtkSMCoreUtilities::AdjustRange(range);
   cout << "OUT: " << range[0] << ", " << range[1] << endl;
 
-  return (adjusted == should_be_adjusted) &&
-         (original_range[0] == range[0]) &&
-         (next_value <= range[1]);
+  return (adjusted == should_be_adjusted) && (original_range[0] == range[0]) &&
+    (next_value <= range[1]);
 }
 }
 
 int TestAdjustRange(int argc, char* argv[])
 {
-  (void) argc;
-  (void) argv;
+  (void)argc;
+  (void)argv;
   // Simple set of tests to validate that vtkSMCoreUtilities::AdjustRange
   // behaves as we expect
 

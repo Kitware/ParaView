@@ -68,7 +68,8 @@ public:
   /**
    * Overridden to add support for new types of renderers.
    */
-  virtual vtkRenderer* GetRenderer(int rendererType = vtkPVRenderView::DEFAULT_RENDERER) VTK_OVERRIDE;
+  virtual vtkRenderer* GetRenderer(
+    int rendererType = vtkPVRenderView::DEFAULT_RENDERER) VTK_OVERRIDE;
 
   virtual void ResetCamera();
   virtual void ResetCamera(double bounds[6]);

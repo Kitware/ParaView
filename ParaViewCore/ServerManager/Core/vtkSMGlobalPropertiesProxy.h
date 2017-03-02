@@ -87,7 +87,8 @@ public:
   /**
    * Overridden to save link state.
    */
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
+  virtual vtkPVXMLElement* SaveXMLState(
+    vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
   using Superclass::SaveXMLState;
   //@}
 

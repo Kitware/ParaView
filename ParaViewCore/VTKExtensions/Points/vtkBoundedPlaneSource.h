@@ -70,7 +70,8 @@ protected:
   vtkBoundedPlaneSource();
   ~vtkBoundedPlaneSource();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   double Center[3];
   double Normal[3];

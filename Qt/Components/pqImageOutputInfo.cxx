@@ -346,7 +346,7 @@ void pqImageOutputInfo::updateComposite(int choseComposite)
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::endisAbleDirectFloat(int choseDisable)
 {
-  this->Ui->cbUseFloatValues->setEnabled(choseDisable==0);
+  this->Ui->cbUseFloatValues->setEnabled(choseDisable == 0);
 }
 
 //------------------------------------------------------------------------------

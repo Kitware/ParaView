@@ -46,7 +46,6 @@
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
-
 //#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)
 
@@ -255,8 +254,7 @@ void NotifyClientDataInformationNextTimestep(vtkWeakPointer<vtkPVSessionBase> li
 
 //----------------------------------------------------------------------------
 std::string CommunicateString(
-  vtkMultiProcessController* controller, const char* value,
-  int sourceProc, int targetProc, int tag)
+  vtkMultiProcessController* controller, const char* value, int sourceProc, int targetProc, int tag)
 {
   int myId = controller->GetLocalProcessId();
   if (myId == sourceProc)
@@ -273,8 +271,7 @@ std::string CommunicateString(
   return retValue;
 }
 //----------------------------------------------------------------------------
-void CommunicateString(
-  vtkMultiProcessController* controller, std::vector<std::string>& values,
+void CommunicateString(vtkMultiProcessController* controller, std::vector<std::string>& values,
   int sourceProc, int targetProc, int tag)
 {
   int myId = controller->GetLocalProcessId();
@@ -282,8 +279,7 @@ void CommunicateString(
   {
     vtkMultiProcessStream s;
     s << static_cast<unsigned int>(values.size());
-    for (std::vector<std::string>::iterator iter=values.begin();
-         iter!=values.end();iter++)
+    for (std::vector<std::string>::iterator iter = values.begin(); iter != values.end(); iter++)
     {
       s << *iter;
     }
@@ -296,7 +292,7 @@ void CommunicateString(
   unsigned int numValues;
   s >> numValues;
   values.resize(numValues);
-  for (unsigned int i=0;i<numValues;i++)
+  for (unsigned int i = 0; i < numValues; i++)
   {
     s >> values[i];
   }
@@ -564,8 +560,7 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
 void vtkLiveInsituLink::OnConnectionClosedEvent(vtkObject*, unsigned long, void* calldata)
 {
   vtkObject* object = reinterpret_cast<vtkObject*>(calldata);
-  vtkMultiProcessController* proc0NodesController =
-    vtkMultiProcessController::SafeDownCast(object);
+  vtkMultiProcessController* proc0NodesController = vtkMultiProcessController::SafeDownCast(object);
   if (proc0NodesController && this->Proc0NodesController == proc0NodesController)
   {
     // drop connection.
@@ -667,19 +662,19 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
       // wait for each of the sim processes to setup a socket connection to the
       // vis nodes for data x'fer.
       if (myId < std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                          this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
+                   this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
       {
         vtksys::SystemInformation sysinfo;
         const char* hostname = sysinfo.GetHostname();
         this->SetHostname(hostname);
         int numCommunicationProcs =
           std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                   this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
+            this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
         std::vector<std::string> liveHostnames(numCommunicationProcs);
         if (myId == 0)
         {
           liveHostnames[0] = this->Hostname;
-          for (int i=1;i<numCommunicationProcs;i++)
+          for (int i = 1; i < numCommunicationProcs; i++)
           {
             liveHostnames[i] = CommunicateString(parallelController, NULL, i, 0, 8877);
           }
@@ -738,17 +733,18 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
       }
       // connect to the sim-nodes for data x'fer.
       if (myId < std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                          this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
+                   this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
       {
         std::vector<std::string> liveHostnames;
         std::string liveHostname; // the hostname that this proc needs to connect to
         if (myId == 0)
         {
           CommunicateString(proc0NodesController, liveHostnames, 1, 0, 8888);
-          int numCommunicationProcs = std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                                               this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
+          int numCommunicationProcs =
+            std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
+              this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
           liveHostname = liveHostnames[0];
-          for (int i=1;i<numCommunicationProcs;i++)
+          for (int i = 1; i < numCommunicationProcs; i++)
           {
             CommunicateString(parallelController, liveHostnames[i].c_str(), 0, i, 8899);
           }

@@ -58,7 +58,8 @@ bool vtkPVFileInformationHelper::GetActiveFileIsReadable()
 //-----------------------------------------------------------------------------
 bool vtkPVFileInformationHelper::GetActiveFileIsDirectory()
 {
-  return vtksys::SystemTools::FileIsDirectory(vtkPVFileInformationHelper::Utf8ToLocalWin32(this->Path));
+  return vtksys::SystemTools::FileIsDirectory(
+    vtkPVFileInformationHelper::Utf8ToLocalWin32(this->Path));
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +103,7 @@ std::string vtkPVFileInformationHelper::LocalToUtf8Win32(const std::string& path
   int wlen = static_cast<int>(path.length()) * 2 + 1;
   WCHAR* wpath = new WCHAR[wlen];
   char* lpath = new char[wlen];
-  // We may want a stronger implementation , 
+  // We may want a stronger implementation ,
   // see vtksys::Encoding way of recovering converted string size
   // TODO
   int err = MultiByteToWideChar(CP_ACP, 0, path.c_str(), -1, wpath, wlen);

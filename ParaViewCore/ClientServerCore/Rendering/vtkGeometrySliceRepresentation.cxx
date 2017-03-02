@@ -123,8 +123,8 @@ public:
   static vtkGSRGeometryFilter* New();
   vtkTypeMacro(vtkGSRGeometryFilter, vtkPVGeometryFilter);
 
-  virtual int RequestData(
-    vtkInformation* req, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE
+  virtual int RequestData(vtkInformation* req, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE
   {
     vtkSmartPointer<vtkDataObject> inputDO = vtkDataObject::GetData(inputVector[0]);
     vtkSmartPointer<vtkMatrix4x4> changeOfBasisMatrix =

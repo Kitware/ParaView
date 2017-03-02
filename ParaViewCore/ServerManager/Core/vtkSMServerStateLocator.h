@@ -52,7 +52,8 @@ public:
    * successfully filled.
    * In that case useParent is not used and is set to false.
    */
-  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent) VTK_OVERRIDE;
+  virtual bool FindState(
+    vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent) VTK_OVERRIDE;
 
 protected:
   vtkSMServerStateLocator();

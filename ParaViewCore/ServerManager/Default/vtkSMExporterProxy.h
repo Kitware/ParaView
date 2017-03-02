@@ -66,7 +66,8 @@ protected:
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  virtual int ReadXMLAttributes(
+    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   vtkSetStringMacro(FileExtension);
   vtkSMViewProxy* View;

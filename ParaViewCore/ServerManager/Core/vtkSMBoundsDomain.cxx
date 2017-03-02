@@ -300,8 +300,7 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchec
         int numCells = dataInfo->GetNumberOfCells();
         double linearNumCells = pow((double)numCells, (1.0 / 3.0));
         unitDistance = diameter;
-        if (linearNumCells != 0.0 &&
-          !vtkMath::IsNan(linearNumCells) &&
+        if (linearNumCells != 0.0 && !vtkMath::IsNan(linearNumCells) &&
           !vtkMath::IsInf(linearNumCells))
         {
           unitDistance = diameter / linearNumCells;

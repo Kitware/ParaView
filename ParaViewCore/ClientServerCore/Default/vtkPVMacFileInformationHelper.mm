@@ -42,21 +42,22 @@ std::string vtkPVMacFileInformationHelper::GetHomeDirectory()
 }
 
 //-----------------------------------------------------------------------------
-std::vector< vtkPVMacFileInformationHelper::NamePath > vtkPVMacFileInformationHelper::GetMountedVolumes()
+std::vector<vtkPVMacFileInformationHelper::NamePath>
+vtkPVMacFileInformationHelper::GetMountedVolumes()
 {
-  std::vector< vtkPVMacFileInformationHelper::NamePath > volumes;
-  NSArray *urls = [[NSFileManager defaultManager]
-                    mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeNameKey]
-                    options:0];
-  for (NSURL *url in urls)
-    {
+  std::vector<vtkPVMacFileInformationHelper::NamePath> volumes;
+  NSArray* urls = [[NSFileManager defaultManager]
+    mountedVolumeURLsIncludingResourceValuesForKeys:@[ NSURLVolumeNameKey ]
+                                            options:0];
+  for (NSURL* url in urls)
+  {
     NSString* path = [url path];
     std::string pathStr([path UTF8String]);
-    NSString *name = nil;
+    NSString* name = nil;
     [url getResourceValue:&name forKey:NSURLLocalizedNameKey error:NULL];
     std::string nameStr([name UTF8String]);
     volumes.push_back(std::make_pair(nameStr, pathStr));
-    }
+  }
 
   return volumes;
 }
@@ -72,31 +73,29 @@ std::string vtkPVMacFileInformationHelper::GetBundleDirectory()
 }
 
 //-----------------------------------------------------------------------------
-namespace {
+namespace
+{
 std::string GetUserDomainDirectory(NSSearchPathDirectory userDirectory)
 {
   std::string directory;
-  NSArray* urls = [[NSFileManager defaultManager]
-                    URLsForDirectory:userDirectory
-                    inDomains:NSUserDomainMask];
-  for (NSURL *url in urls)
-    {
+  NSArray* urls =
+    [[NSFileManager defaultManager] URLsForDirectory:userDirectory inDomains:NSUserDomainMask];
+  for (NSURL* url in urls)
+  {
     NSString* path = [url path];
 
     // Double check that directory exists
     BOOL isDirectory = false;
-    BOOL exists = [[NSFileManager defaultManager]
-                    fileExistsAtPath:path
-                    isDirectory:&isDirectory];
+    BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
 
     if (exists && isDirectory)
-      {
-      directory = [path UTF8String];\
+    {
+      directory = [path UTF8String];
 
       // There should be at most one such user directory, so exit early
       break;
-      }
     }
+  }
 
   return directory;
 }

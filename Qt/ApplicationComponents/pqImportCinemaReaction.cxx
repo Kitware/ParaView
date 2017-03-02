@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkPVConfig.h"
 #include "pqImportCinemaReaction.h"
+#include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
@@ -121,8 +121,8 @@ bool pqImportCinemaReaction::loadCinemaDatabase(const QString& dbase, pqServer* 
   pqView* view = pqActiveObjects::instance().activeView();
 
   vtkNew<vtkSMCinemaDatabaseImporter> importer;
-  if (!importer->ImportCinema(dbase.toLatin1().data(), server->session(),
-        (view ? view->getViewProxy() : NULL)))
+  if (!importer->ImportCinema(
+        dbase.toLatin1().data(), server->session(), (view ? view->getViewProxy() : NULL)))
   {
     qCritical("Failed to import Cinema database.");
     return false;

@@ -77,7 +77,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // runs the algorithm and fills the output with results
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 

@@ -565,15 +565,17 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
     "mpirun can *only* be used with MPI programs", "due to signal", "failure",
     "bnormal termination", "failed", "FAILED", "Failed", 0 };
 
-  const char* nonErrors[] = { "Memcheck, a memory error detector", // valgrind
-    "error in locking authority file",                             // IceT
-    "WARNING: Far depth failed sanity check, resetting.",          // IceT
+  const char* nonErrors[] = {
+    "Memcheck, a memory error detector",                  // valgrind
+    "error in locking authority file",                    // IceT
+    "WARNING: Far depth failed sanity check, resetting.", // IceT
 
 #if defined(__APPLE__)
     // reported as https://bugreports.qt.io/browse/QTBUG-58699
     "Layout still needs update after calling -[QNSPanelContentsWrapper layout]",
 #endif
-    0 };
+    0
+  };
 
   if (this->AllowErrorInOutput)
   {

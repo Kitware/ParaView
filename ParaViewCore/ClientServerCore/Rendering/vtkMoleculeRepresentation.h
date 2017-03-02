@@ -35,8 +35,8 @@ public:
   vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* requestType, vtkInformation* inputInfo, vtkInformation* outputInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* requestType, vtkInformation* inputInfo,
+    vtkInformation* outputInfo) VTK_OVERRIDE;
 
   virtual void SetVisibility(bool value) VTK_OVERRIDE;
 
@@ -62,7 +62,8 @@ protected:
   ~vtkMoleculeRepresentation();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
   virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 

@@ -17,31 +17,29 @@
 #include "vtkExtentTranslator.h"
 #include "vtkFieldData.h"
 #include "vtkFloatArray.h"
-#include "vtkNew.h"
-#include "vtkMultiProcessController.h"
-#include "vtkMPI.h"
-#include "vtkMPICommunicator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMPI.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <adios.h>
-#include <adios_read.h>
 #include <adios_error.h>
+#include <adios_read.h>
 
 #include <string>
-
 
 vtkStandardNewMacro(vtkCartisoReader);
 vtkCxxSetObjectMacro(vtkCartisoReader, Controller, vtkMultiProcessController);
 
-
 struct vtkCartisoReader::Internals
 {
   std::string StreamName;
-  ADIOS_FILE *File;
+  ADIOS_FILE* File;
   ADIOS_READ_METHOD ReadMethod;
   MPI_Comm Comm;
 
@@ -50,9 +48,12 @@ struct vtkCartisoReader::Internals
   vtkNew<vtkImageData> Data;
 };
 
-
 vtkCartisoReader::vtkCartisoReader()
-  : Controller(NULL), StreamName(NULL), TimeOut(300.0f), Step(-1), StreamEnded(false)
+  : Controller(NULL)
+  , StreamName(NULL)
+  , TimeOut(300.0f)
+  , Step(-1)
+  , StreamEnded(false)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -63,7 +64,7 @@ vtkCartisoReader::vtkCartisoReader()
   this->Internal = new Internals;
   this->Internal->File = NULL;
   this->Internal->ReadMethod = ADIOS_READ_METHOD_FLEXPATH;
-  //this->Internal->ReadMethod = ADIOS_READ_METHOD_BP;
+  // this->Internal->ReadMethod = ADIOS_READ_METHOD_BP;
 
   this->Internal->Cached = false;
   this->Internal->GlobalDim[0] = this->Internal->GlobalDim[1] = this->Internal->GlobalDim[2] = 0;
@@ -80,11 +81,13 @@ vtkCartisoReader::~vtkCartisoReader()
 //----------------------------------------------------------------------------
 void vtkCartisoReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "Controller: " << "\n";
+  os << indent << "Controller: "
+     << "\n";
   this->Controller->PrintSelf(os, indent.GetNextIndent());
   os << indent << "Stream name: " << this->StreamName << "\n";
   os << indent << "Timeout: " << this->TimeOut << "\n";
-  os << indent << "Image Data Cache: " << "\n";
+  os << indent << "Image Data Cache: "
+     << "\n";
   this->Internal->Data->PrintSelf(os, indent.GetNextIndent());
 }
 
@@ -93,7 +96,8 @@ void vtkCartisoReader::Initialize()
 {
   if (!this->Internal->File)
   {
-    vtkMPICommunicator *mpiComm = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
+    vtkMPICommunicator* mpiComm =
+      vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
     this->Internal->Comm = *mpiComm->GetMPIComm()->GetHandle();
 
     std::string sn(this->StreamName);
@@ -109,10 +113,7 @@ void vtkCartisoReader::Initialize()
 
     adios_read_init_method(this->Internal->ReadMethod, this->Internal->Comm, "");
     this->Internal->File = adios_read_open_stream(this->Internal->StreamName.c_str(),
-                                                  this->Internal->ReadMethod,
-                                                  this->Internal->Comm,
-                                                  ADIOS_LOCKMODE_CURRENT,
-                                                  this->TimeOut);
+      this->Internal->ReadMethod, this->Internal->Comm, ADIOS_LOCKMODE_CURRENT, this->TimeOut);
     this->Step = this->Internal->File->current_step;
   }
 }
@@ -129,13 +130,12 @@ void vtkCartisoReader::Finalize()
   }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkCartisoReader::AdvanceStep()
 {
   if (this->Internal->File)
   {
-    if(adios_advance_step(this->Internal->File, 0, 2.0f) == 0)
+    if (adios_advance_step(this->Internal->File, 0, 2.0f) == 0)
     {
       this->Step = this->Internal->File->current_step;
       this->Internal->Cached = false;
@@ -157,20 +157,19 @@ void vtkCartisoReader::AdvanceStep()
 }
 
 //----------------------------------------------------------------------------
-int vtkCartisoReader::ProcessRequest(vtkInformation* request,
-                                     vtkInformationVector** inputVector,
-                                     vtkInformationVector* outputVector)
+int vtkCartisoReader::ProcessRequest(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   this->Initialize();
 
   // generate the data
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
   {
     return this->RequestData(request, inputVector, outputVector);
   }
 
   // execute information
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
   {
     return this->RequestInformation(request, inputVector, outputVector);
   }
@@ -179,9 +178,8 @@ int vtkCartisoReader::ProcessRequest(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkCartisoReader::RequestInformation(vtkInformation *,
-                                         vtkInformationVector **,
-                                         vtkInformationVector *outputVector)
+int vtkCartisoReader::RequestInformation(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   if (this->Internal->File && !this->Internal->Cached)
   {
@@ -192,7 +190,7 @@ int vtkCartisoReader::RequestInformation(vtkInformation *,
     adios_perform_reads(this->Internal->File, 1);
 
     int wholeExtent[6] = { 0, ni - 1, 0, nj - 1, 0, nk - 1 };
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent, 6);
     outInfo->Set(CAN_PRODUCE_SUB_EXTENT(), 1);
 
@@ -204,23 +202,19 @@ int vtkCartisoReader::RequestInformation(vtkInformation *,
   return 1;
 }
 
-
 //----------------------------------------------------------------------------
-int vtkCartisoReader::FillOutputPortInformation(int vtkNotUsed(port),
-                                                vtkInformation *info)
+int vtkCartisoReader::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkCartisoReader::RequestData(vtkInformation *vtkNotUsed(request),
-                                  vtkInformationVector **vtkNotUsed(inputVector),
-                                  vtkInformationVector *outputVector)
+int vtkCartisoReader::RequestData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkImageData *output = vtkImageData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkImageData* output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   if (this->Internal->File && !this->Internal->Cached)
   {
@@ -255,7 +249,7 @@ int vtkCartisoReader::RequestData(vtkInformation *vtkNotUsed(request),
     adios_schedule_read(this->Internal->File, NULL, "deltay", 0, 1, &deltay);
     adios_schedule_read(this->Internal->File, NULL, "deltaz", 0, 1, &deltaz);
 
-    ADIOS_SELECTION *sel = adios_selection_boundingbox(3, start, count);
+    ADIOS_SELECTION* sel = adios_selection_boundingbox(3, start, count);
     adios_schedule_read(this->Internal->File, sel, "value", 0, 1, value->GetPointer(0));
     adios_schedule_read(this->Internal->File, sel, "noise", 0, 1, noise->GetPointer(0));
 

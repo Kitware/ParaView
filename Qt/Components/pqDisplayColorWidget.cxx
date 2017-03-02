@@ -571,8 +571,7 @@ void pqDisplayColorWidget::componentNumberChanged()
 
     // Update scalar bars.
     vtkNew<vtkSMTransferFunctionManager> tmgr;
-    tmgr->UpdateScalarBarsComponentTitle(this->ColorTransferFunction->getProxy(),
-      reprProxy);
+    tmgr->UpdateScalarBarsComponentTitle(this->ColorTransferFunction->getProxy(), reprProxy);
 
     END_UNDO_SET();
 

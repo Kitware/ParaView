@@ -1283,7 +1283,7 @@ int vtkSMRenderViewProxy::GetValueRenderingMode()
 {
   vtkSMPropertyHelper helper(this, "ValueRenderingModeGet");
   helper.UpdateValueFromServer();
-  return  helper.GetAsInt();
+  return helper.GetAsInt();
 }
 
 //------------------------------------------------------------------------------

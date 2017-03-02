@@ -125,7 +125,7 @@ void vtkPVGridAxes3DActor::UpdateGridBoundsUsingDataBounds()
     {
       this->SetScale(1, 1, 1);
     }
-    
+
     bbox.Inflate(bbox.GetDiagonalLength() * this->DataBoundsInflateFactor);
 
     double bds[6];

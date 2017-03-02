@@ -474,7 +474,8 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
   {
     return 0;
   }
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy(pgroup.toLocal8Bit().data(), pname.toLocal8Bit().data());
+  vtkSMProxy* prototype =
+    pxm->GetPrototypeProxy(pgroup.toLocal8Bit().data(), pname.toLocal8Bit().data());
   if (prototype)
   {
     QString label = prototype->GetXMLLabel() ? prototype->GetXMLLabel() : pname;

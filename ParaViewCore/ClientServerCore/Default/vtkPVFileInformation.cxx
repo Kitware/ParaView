@@ -423,7 +423,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   std::string path = helper->GetPath();
   std::string lpath = vtkPVFileInformationHelper::Utf8ToLocalWin32(path);
   this->SetName(path.c_str());
-  
+
   if (!vtksys::SystemTools::FileIsFullPath(path))
   {
     lpath = MakeAbsolutePath(lpath, lworking_directory);
@@ -449,7 +449,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   this->SetFullPath(vtkPVFileInformationHelper::LocalToUtf8Win32(lpath).c_str());
 
-  this->Type = vtkPVFileInformationGetType(lpath.c_str());//this->FullPath);
+  this->Type = vtkPVFileInformationGetType(lpath.c_str()); // this->FullPath);
   if (isLink && this->Type == SINGLE_FILE)
   {
     this->Type = SINGLE_FILE_LINK;
@@ -664,8 +664,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       {
         vtkPVFileInformation* info = vtkPVFileInformation::New();
         info->SetName(vtkPVFileInformationHelper::LocalToUtf8Win32(shares[i]).c_str());
-        std::string fullpath =
-          vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), lfullPath);
+        std::string fullpath = vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), lfullPath);
         info->SetFullPath(vtkPVFileInformationHelper::LocalToUtf8Win32(fullpath).c_str());
         info->Type = type;
         info->FastFileTypeDetection = this->FastFileTypeDetection;
@@ -950,8 +949,9 @@ void vtkPVFileInformation::SetHiddenFlag()
     this->Hidden = false;
     return;
   }
-  //LPCSTR fp = this->FullPath;
-  DWORD flags = GetFileAttributes(vtkPVFileInformationHelper::Utf8ToLocalWin32(this->FullPath).c_str());
+  // LPCSTR fp = this->FullPath;
+  DWORD flags =
+    GetFileAttributes(vtkPVFileInformationHelper::Utf8ToLocalWin32(this->FullPath).c_str());
   this->Hidden = (flags & FILE_ATTRIBUTE_HIDDEN) ? true : false;
 #else
   if (!this->Name)

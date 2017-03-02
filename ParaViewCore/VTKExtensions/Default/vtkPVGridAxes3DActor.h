@@ -69,7 +69,7 @@ public:
   //@{
   /**
    * Specify the inflate factor used to proportionally
-   * inflates the bounds of the axes grid using the diagonal length 
+   * inflates the bounds of the axes grid using the diagonal length
    * of the bounding box multiplied by this factor, when using data bounds.
    */
   vtkSetMacro(DataBoundsInflateFactor, double);
@@ -111,7 +111,6 @@ protected:
   bool UseModelTransform;
   double ModelBounds[6];
   vtkNew<vtkMatrix4x4> ModelTransformMatrix;
-
 
 private:
   vtkPVGridAxes3DActor(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;

@@ -86,7 +86,8 @@ protected:
    * probably were already reinjected before the restart files
    * were written.
    */
-  virtual std::vector<vtkDataSet*> GetSeedSources(vtkInformationVector* inputVector, int timeStep) VTK_OVERRIDE;
+  virtual std::vector<vtkDataSet*> GetSeedSources(
+    vtkInformationVector* inputVector, int timeStep) VTK_OVERRIDE;
 
   /**
    * We add in a third, optional port for adding in particles for a
@@ -114,7 +115,8 @@ protected:
    * particles.
    */
   virtual void AssignSeedsToProcessors(double time, vtkDataSet* source, int sourceID, int ptId,
-    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints, int& localAssignedCount) VTK_OVERRIDE;
+    vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints,
+    int& localAssignedCount) VTK_OVERRIDE;
 
 private:
   vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;

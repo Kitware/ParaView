@@ -463,8 +463,8 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequestResampleToImage(
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
 
     // Pass partitioning information to the render view.
-    vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-      this->PExtentTranslator, this->WholeExtent, this->Origin, this->Spacing);
+    vtkPVRenderView::SetOrderedCompositingInformation(
+      inInfo, this, this->PExtentTranslator, this->WholeExtent, this->Origin, this->Spacing);
 
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
     this->Actor->SetMapper(NULL);
@@ -501,7 +501,7 @@ int vtkUnstructuredGridVolumeRepresentation::RequestDataResampleToImage(
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
-  vtkAbstractVolumeMapper *volumeMapper = this->GetActiveVolumeMapper();
+  vtkAbstractVolumeMapper* volumeMapper = this->GetActiveVolumeMapper();
 
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {

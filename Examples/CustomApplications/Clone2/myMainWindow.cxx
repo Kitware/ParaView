@@ -32,17 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "myMainWindow.h"
 #include "ui_myMainWindow.h"
 
-#include "pqApplyBehavior.h"
 #include "pqAlwaysConnectedBehavior.h"
+#include "pqApplyBehavior.h"
 #include "pqDefaultViewBehavior.h"
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
 #endif
-#include "pqParaViewBehaviors.h"
-#include "pqParaViewMenuBuilders.h"
 #include "pqApplicationCore.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqInterfaceTracker.h"
+#include "pqParaViewBehaviors.h"
+#include "pqParaViewMenuBuilders.h"
 #include "pqStandardViewFrameActionsImplementation.h"
 
 #include <QAction>
@@ -166,7 +166,7 @@ myMainWindow::myMainWindow()
   new pqAlwaysConnectedBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
-  
+
   // Register panels
   foreach (pqPropertiesPanel* ppanel, this->findChildren<pqPropertiesPanel*>())
   {

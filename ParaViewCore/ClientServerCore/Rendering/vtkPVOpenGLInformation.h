@@ -59,8 +59,8 @@ public:
    * information itself. For example, PortNumber on vtkPVDataInformation
    * controls what output port the data-information is gathered from.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE {};
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE {};
+  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE{};
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE{};
   //@}
 
   const std::string& GetVendor();

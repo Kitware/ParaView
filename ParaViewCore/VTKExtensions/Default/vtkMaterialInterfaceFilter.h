@@ -332,7 +332,8 @@ protected:
   vtkMaterialInterfaceFilter();
   ~vtkMaterialInterfaceFilter();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 

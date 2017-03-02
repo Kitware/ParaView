@@ -15,6 +15,7 @@
 #include "vtkGlyph3DRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkArrowSource.h"
 #include "vtkDataObject.h"
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"
@@ -23,7 +24,6 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkArrowSource.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"

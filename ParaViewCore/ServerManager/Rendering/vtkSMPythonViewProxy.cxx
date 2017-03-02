@@ -21,8 +21,8 @@
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonView.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkSMViewProxyInteractorHelper.h"
 #include "vtkWindowToImageFilter.h"
 

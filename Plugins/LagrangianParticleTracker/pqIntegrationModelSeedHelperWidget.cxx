@@ -118,7 +118,7 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
       }
 
       // Recover potential optional flow input
-      vtkSMSourceProxy* flowProxy = 
+      vtkSMSourceProxy* flowProxy =
         vtkSMSourceProxy::SafeDownCast(this->FlowInputProperty->GetProxy(0));
 
       // Create main layout
@@ -287,8 +287,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
     gb->setChecked(false);
   }
 
-  for (QList<QVariant>::const_iterator i = values.begin();
-       i != values.end(); i += 5)
+  for (QList<QVariant>::const_iterator i = values.begin(); i != values.end(); i += 5)
   {
     // Incremental python filling value check
     // When using python, this method is called incrementally,

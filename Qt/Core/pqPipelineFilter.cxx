@@ -306,7 +306,7 @@ pqOutputPort* pqPipelineFilter::getInput(const QString& portname, int index) con
     qCritical() << "Invalid index: " << index;
     return 0;
   }
-  
+
   return iter.value()[index];
 }
 

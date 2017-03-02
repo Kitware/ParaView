@@ -53,7 +53,7 @@ class vtkPythonView::vtkInternals
 
       // import the wrapping module.
       this->WrappingModule.TakeReference(
-          PyImport_ImportModule("paraview.vtk.vtkPVClientServerCoreRendering"));
+        PyImport_ImportModule("paraview.vtk.vtkPVClientServerCoreRendering"));
       if (!this->WrappingModule)
       {
         vtkGenericWarningMacro("Failed to import `vtkPVClientServerCoreRendering`.");
@@ -65,8 +65,7 @@ class vtkPythonView::vtkInternals
         }
       }
 
-      this->PythonViewModule.TakeReference(
-          PyImport_ImportModule("paraview.python_view"));
+      this->PythonViewModule.TakeReference(PyImport_ImportModule("paraview.python_view"));
       if (!this->PythonViewModule)
       {
         vtkGenericWarningMacro("Failed to import 'paraview.python_view' module.");
@@ -84,7 +83,7 @@ class vtkPythonView::vtkInternals
   /**
    * Compile and build a Python module object from the given code.
    */
-  vtkSmartPyObject BuildModule(const std::string& code, const std::string &fname="Script")
+  vtkSmartPyObject BuildModule(const std::string& code, const std::string& fname = "Script")
   {
     if (!this->InitializePython() || code.empty())
     {
@@ -92,8 +91,7 @@ class vtkPythonView::vtkInternals
     }
 
     vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject codeObj(Py_CompileString(
-          code.c_str(), fname.c_str(), Py_file_input));
+    vtkSmartPyObject codeObj(Py_CompileString(code.c_str(), fname.c_str(), Py_file_input));
     if (!codeObj)
     {
       PyErr_Print();
@@ -105,9 +103,11 @@ class vtkPythonView::vtkInternals
   }
 
 public:
-  vtkInternals() : Initialized(false) {}
+  vtkInternals()
+    : Initialized(false)
+  {
+  }
   ~vtkInternals() {}
-
 
   bool Prepare(const std::string& script)
   {
@@ -135,8 +135,8 @@ public:
     vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject methodName(PyString_FromString("setup_data"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
-    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->ScriptModule,
-          methodName.GetPointer(), view.GetPointer(), NULL));
+    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
+      this->ScriptModule, methodName.GetPointer(), view.GetPointer(), NULL));
     return retVal;
   }
 
@@ -161,14 +161,9 @@ public:
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
     vtkSmartPyObject widthObj(PyInt_FromLong(width));
     vtkSmartPyObject heightObj(PyInt_FromLong(height));
-    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
-          this->PythonViewModule,
-          methodName.GetPointer(),
-          renderFunction.GetPointer(),
-          view.GetPointer(),
-          widthObj.GetPointer(),
-          heightObj.GetPointer(),
-          NULL));
+    vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(this->PythonViewModule,
+      methodName.GetPointer(), renderFunction.GetPointer(), view.GetPointer(),
+      widthObj.GetPointer(), heightObj.GetPointer(), NULL));
     if (PyErr_Occurred())
     {
       PyErr_Print();
@@ -212,7 +207,7 @@ vtkInformationKeyMacro(vtkPythonView, REQUEST_DELIVER_DATA_TO_CLIENT, Request);
 //----------------------------------------------------------------------------
 void vtkPythonView::Update()
 {
-  if (!this->Internals->Prepare(this->Script? this->Script : ""))
+  if (!this->Internals->Prepare(this->Script ? this->Script : ""))
   {
     return;
   }
@@ -226,7 +221,7 @@ void vtkPythonView::Update()
     this->Internals->CallSetupData(this);
   }
   this->CallProcessViewRequest(vtkPythonView::REQUEST_DELIVER_DATA_TO_CLIENT(),
-      this->RequestInformation, this->ReplyInformationVector);
+    this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPythonView::Update");
 }
 

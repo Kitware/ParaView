@@ -97,17 +97,19 @@ protected:
   /**
    * Not implemented
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)) VTK_OVERRIDE {};
+  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)) VTK_OVERRIDE{};
 
   /**
    * Not implemented
    */
-  virtual void PropertyModified(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE {};
+  virtual void PropertyModified(
+    vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE{};
 
   /**
    * Not implemented
    */
-  virtual void UpdateProperty(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE {};
+  virtual void UpdateProperty(
+    vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE{};
 
   /**
    * This method find the caller in the link and update selection output accordingly

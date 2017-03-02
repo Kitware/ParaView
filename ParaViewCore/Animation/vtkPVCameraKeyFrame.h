@@ -43,7 +43,8 @@ public:
    * this method is called to allow the key frame to use vtkCameraInterpolator2
    * to do path-based interpolations for the camera.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  virtual void UpdateValue(
+    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
 
   // Overridden, since these methods are not supported by this class.
   virtual void SetKeyValue(unsigned int, double) VTK_OVERRIDE {}

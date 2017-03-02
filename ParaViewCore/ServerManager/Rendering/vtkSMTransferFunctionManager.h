@@ -94,7 +94,7 @@ public:
   virtual bool UpdateScalarBars(vtkSMProxy* viewProxy, unsigned int mode);
 
   /**
-   * Updates all scalar bars using provided lutProxy, the representation 
+   * Updates all scalar bars using provided lutProxy, the representation
    * is used to recover the component title
    */
   virtual bool UpdateScalarBarsComponentTitle(vtkSMProxy* lutProxy, vtkSMProxy* representation);

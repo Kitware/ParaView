@@ -38,8 +38,8 @@ public:
    * Generalized interface for asking the executive to fullfill update
    * requests.
    */
-  virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
+  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+    vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   //@{
   /**

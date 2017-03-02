@@ -152,7 +152,7 @@ public:
         continue;
       }
       if (ttype == VALUES)
-      {        
+      {
         if (mapper->GetScalarVisibility() && (lut != NULL))
         {
           double prev = lut->GetAlpha();

@@ -38,7 +38,8 @@ public:
    * insert VTK-algorithms in the input pipeline.
    * Overridden to insert "CompleteArrays" filter in the pipeline.
    */
-  virtual void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method) VTK_OVERRIDE;
+  virtual void AddInput(
+    int input_port, vtkAlgorithmOutput* connection, const char* method) VTK_OVERRIDE;
   virtual void CleanInputs(const char* method) VTK_OVERRIDE;
   //@}
 

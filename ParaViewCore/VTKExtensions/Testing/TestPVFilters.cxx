@@ -89,8 +89,6 @@ int TestPVFilters(int argc, char* argv[])
   ribbon->SetWidth(0.1);
   ribbon->SetWidthFactor(5);
 
-
-
   vtkThreshold* threshold = vtkThreshold::New();
   threshold->SetInputConnection(ribbon->GetOutputPort());
   threshold->ThresholdBetween(0.25, 0.75);

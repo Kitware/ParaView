@@ -45,10 +45,7 @@ public:
   QPoint MouseOrigin;
   bool InitializedWidgets;
 
-  pqInternal()
-  {
-    this->InitializedWidgets = false;
-  }
+  pqInternal() { this->InitializedWidgets = false; }
   ~pqInternal() {}
 };
 

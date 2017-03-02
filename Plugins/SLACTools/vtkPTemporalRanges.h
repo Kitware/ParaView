@@ -49,7 +49,8 @@ protected:
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual void Reduce(vtkTable* table);
 

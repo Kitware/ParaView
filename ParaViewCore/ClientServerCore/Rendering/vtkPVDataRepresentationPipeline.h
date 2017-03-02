@@ -44,15 +44,15 @@ protected:
   virtual int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
   virtual int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
 
-  virtual void ExecuteDataEnd(
-    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  virtual void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   // Override this check to account for update extent.
-  virtual int NeedToExecuteData(
-    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  virtual int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
-  virtual int ProcessRequest(
-    vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
 private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;

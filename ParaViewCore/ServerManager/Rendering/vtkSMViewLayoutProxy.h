@@ -215,7 +215,8 @@ public:
   {
     return this->Superclass::SaveXMLState(root);
   }
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
+  virtual vtkPVXMLElement* SaveXMLState(
+    vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
 
   /**
    * Overridden to load custom XML state.

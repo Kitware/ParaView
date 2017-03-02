@@ -58,7 +58,8 @@ protected:
   ~vtkIsoVolume();
 
   // Usual data generation methods.
-  virtual int RequestData(vtkInformation* request, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation* request, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * This filter produces a vtkMultiBlockDataSet when the input is a

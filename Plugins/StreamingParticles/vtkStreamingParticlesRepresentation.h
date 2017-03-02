@@ -64,8 +64,8 @@ public:
 
   // Description:
   // Overridden to handle various view passes.
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
@@ -140,8 +140,8 @@ protected:
   // Overridden to check if the input pipeline is streaming capable. This method
   // should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
   // and the input pipeline provides necessary AMR meta-data.
-  virtual int RequestInformation(
-    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int RequestInformation(vtkInformation* rqst, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Setup the block request. During StreamingUpdate, this will request the
@@ -156,8 +156,8 @@ protected:
   // Generate the outline for the current input.
   // When not in StreamingUpdate, this also initializes the priority queue since
   // the input AMR may have totally changed, including its structure.
-  virtual int RequestData(
-    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation* rqst, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Description:
   // Returns true when the input pipeline supports streaming. It is set in

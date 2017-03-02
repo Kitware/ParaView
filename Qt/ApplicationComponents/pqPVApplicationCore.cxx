@@ -237,8 +237,8 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   this->LoadingState = false;
 #else
   // Avoid unused parameter warnings
-  (void) filename;
-  (void) server;
+  (void)filename;
+  (void)server;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
 }

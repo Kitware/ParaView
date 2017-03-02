@@ -170,7 +170,8 @@ protected:
   vtkH5PartReader();
   ~vtkH5PartReader();
   //
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int OpenFile();
   void CloseFile();

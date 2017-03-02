@@ -69,8 +69,8 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -98,7 +98,6 @@ public:
     this->SetSamplingDimensions(dims[0], dims[1], dims[2]);
   }
   void SetSamplingDimensions(int xdim, int ydim, int zdim);
-
 
   //***************************************************************************
   // Forwarded to Actor.
@@ -140,7 +139,8 @@ protected:
    */
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
@@ -166,10 +166,10 @@ protected:
    */
   virtual void UpdateMapperParameters();
 
-  int ProcessViewRequestResampleToImage(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
-  int RequestDataResampleToImage(vtkInformation* request,
-    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  int ProcessViewRequestResampleToImage(
+    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+  int RequestDataResampleToImage(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   vtkVolumeRepresentationPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
@@ -177,9 +177,9 @@ protected:
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
 
-  vtkResampleToImage *ResampleToImageFilter;
+  vtkResampleToImage* ResampleToImageFilter;
   unsigned long DataSize;
-  vtkPExtentTranslator *PExtentTranslator;
+  vtkPExtentTranslator* PExtentTranslator;
   double Origin[3];
   double Spacing[3];
   int WholeExtent[6];

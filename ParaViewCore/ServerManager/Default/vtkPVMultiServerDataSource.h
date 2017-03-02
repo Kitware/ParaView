@@ -58,7 +58,8 @@ protected:
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // call 3
-  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // call 4
   virtual int RequestData(

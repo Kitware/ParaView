@@ -505,10 +505,10 @@ QWidget* pqMultiViewWidget::createWidget(
         splitter->setOpaqueResize(false);
         splitter->setOrientation(
           direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
-        splitter->insertWidget(0,
-            this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
-        splitter->insertWidget(1,
-            this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
+        splitter->insertWidget(
+          0, this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
+        splitter->insertWidget(
+          1, this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
 
         // set the sizes are percentage. QSplitter uses the initially specified
         // sizes as reference.
@@ -533,13 +533,13 @@ QWidget* pqMultiViewWidget::createWidget(
         QWidget* container = this->Internals->Widgets[index];
         // since old widget may be a splitter, which is a QWidget too, we
         // compare with className rather than using a `qobject_cast`.
-        if (strcmp(container->metaObject()->className(),"QWidget") != 0)
+        if (strcmp(container->metaObject()->className(), "QWidget") != 0)
         {
           container = new QWidget(parentWdg);
           new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
               ? pqSplitterLayout::TopToBottom
               : pqSplitterLayout::LeftToRight,
-              container);
+            container);
         }
         Q_ASSERT(container);
         container->setObjectName(QString("Container.%1").arg(index));
@@ -753,8 +753,9 @@ void pqMultiViewWidget::standardButtonPressed(int button)
         if (!frameToActivate)
         {
           QSplitter* splitter = qobject_cast<QSplitter*>(widgetToActivate);
-          frameToActivate = splitter && splitter->count() > 0 ?
-            qobject_cast<pqViewFrame*>(splitter->widget(0)) : NULL;
+          frameToActivate = splitter && splitter->count() > 0
+            ? qobject_cast<pqViewFrame*>(splitter->widget(0))
+            : NULL;
         }
         this->makeActive(frameToActivate);
       }

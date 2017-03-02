@@ -40,10 +40,10 @@ public:
   void SetAxis(double x, double y, double z);
   void SetAxis(const double axis[3]);
   vtkGetVector3Macro(Axis, double);
-    //@}
+  //@}
 
-    // Reimplemented to update transform on change:
-    virtual void SetCenter(double x, double y, double z) VTK_OVERRIDE;
+  // Reimplemented to update transform on change:
+  virtual void SetCenter(double x, double y, double z) VTK_OVERRIDE;
   virtual void SetCenter(double xyz[3]) VTK_OVERRIDE;
 
 protected:

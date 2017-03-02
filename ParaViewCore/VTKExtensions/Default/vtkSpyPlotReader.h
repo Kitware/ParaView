@@ -343,8 +343,8 @@ protected:
   /**
    * Overwritten to avoid hiding.
    */
-  virtual int UpdateTimeStep(
-    double time, int piece = -1, int numPieces = 1, int ghostLevels = 0, const int extents[6] = 0) VTK_OVERRIDE
+  virtual int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
+    const int extents[6] = 0) VTK_OVERRIDE
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
   }

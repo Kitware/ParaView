@@ -1464,7 +1464,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
         vtkCommand::ProgressEvent, this->InternalProgressObserver);
 
       this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
-      
+
       this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
     }
 

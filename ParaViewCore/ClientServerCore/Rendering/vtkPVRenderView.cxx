@@ -185,8 +185,8 @@ public:
   static vtkPVRendererCuller* New();
   vtkTypeMacro(vtkPVRendererCuller, vtkCuller);
 
-  virtual double Cull(
-    vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength, int& initialized) VTK_OVERRIDE
+  virtual double Cull(vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength,
+    int& initialized) VTK_OVERRIDE
   {
     double total_time = 0;
     if (listLength <= 0)
@@ -516,13 +516,13 @@ vtkPVRenderView::vtkPVRenderView()
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  #if defined(VTKGL2)
+#if defined(VTKGL2)
   vtkRenderWindow* win = this->RenderView->GetRenderWindow();
   if (win)
   {
     this->Internals->ValuePasses->ReleaseGraphicsResources(win);
   }
-  #endif
+#endif
 
   // this ensure that the renderer releases graphics resources before the window
   // is destroyed.
@@ -3048,7 +3048,7 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
     return;
   }
   this->Internals->IsInOSPRay = v;
-  vtkRenderer *ren = this->GetRenderer();
+  vtkRenderer* ren = this->GetRenderer();
   if (this->Internals->IsInOSPRay)
   {
     ren->SetUseShadows(this->Internals->OSPRayShadows);

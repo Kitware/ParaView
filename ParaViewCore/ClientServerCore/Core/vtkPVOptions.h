@@ -71,14 +71,16 @@ public:
   /**
    * State file to load on startup.
    */
-  vtkGetStringMacro(StateFileName); // Bug #5711
-                                    //@}
+  // See Bug #5711
+  vtkGetStringMacro(StateFileName);
+  //@}
+
   //@{
   /**
    * Servers file to load on startup.
    */
   vtkGetStringMacro(ServersFileName);
-                                    //@}
+  //@}
 
   //@{
   /**

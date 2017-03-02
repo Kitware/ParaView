@@ -46,7 +46,8 @@ protected:
   vtkMergeCompositeDataSet();
   virtual ~vtkMergeCompositeDataSet();
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
 private:

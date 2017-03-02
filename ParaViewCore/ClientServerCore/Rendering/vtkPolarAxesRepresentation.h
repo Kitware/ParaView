@@ -21,16 +21,18 @@
 #define vtkPolarAxesRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+
+#include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include "vtkNew.h" // needed for vtkNew.
 
 class vtkPolarAxesActor;
 class vtkPolyData;
 class vtkPVRenderView;
 class vtkTextProperty;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPolarAxesRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPolarAxesRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkPolarAxesRepresentation* New();
@@ -95,16 +97,15 @@ public:
   // Description:
   // This needs to be called on all instances of vtkPolarAxesRepresentation when
   // the input is modified.
-  virtual void MarkModified() VTK_OVERRIDE
-    { this->Superclass::MarkModified(); }
+  virtual void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo) VTK_OVERRIDE;
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Description:
   // Set visibility of the representation.
@@ -182,8 +183,8 @@ protected:
   ~vtkPolarAxesRepresentation();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector** inputVector, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual void InitializeDataBoundsFromData(vtkDataObject* data);
   virtual void UpdateBounds();

@@ -74,7 +74,8 @@ protected:
   char* CellArrayNameToProcess;
   vtkSetStringMacro(CellArrayNameToProcess);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   void PropogateNeighbors(int neighbors[3][3][3], int x, int y, int z);

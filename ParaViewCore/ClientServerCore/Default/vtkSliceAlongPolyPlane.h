@@ -48,9 +48,10 @@ public:
     protected : vtkSliceAlongPolyPlane();
   virtual ~vtkSliceAlongPolyPlane();
 
-  virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestDataObject(vtkInformation*, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  virtual int RequestData(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**

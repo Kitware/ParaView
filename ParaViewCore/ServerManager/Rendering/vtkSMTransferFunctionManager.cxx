@@ -324,15 +324,16 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(vtkSMProxy* viewProxy, unsig
   return modified;
 }
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionManager::UpdateScalarBarsComponentTitle(vtkSMProxy* lutProxy, vtkSMProxy* representation)
+bool vtkSMTransferFunctionManager::UpdateScalarBarsComponentTitle(
+  vtkSMProxy* lutProxy, vtkSMProxy* representation)
 {
   if (!lutProxy || !representation)
   {
     return false;
   }
 
-  bool ret = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(lutProxy,
-    vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representation));
+  bool ret = vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
+    lutProxy, vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representation));
   SM_SCOPED_TRACE(CallFunction)
     .arg("UpdateScalarBarsComponentTitle")
     .arg(lutProxy)

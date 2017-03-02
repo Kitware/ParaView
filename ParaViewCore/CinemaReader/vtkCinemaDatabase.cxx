@@ -124,10 +124,12 @@ public:
       this->Initialized = true;
       vtkPythonInterpreter::Initialize();
       vtkPythonScopeGilEnsurer gilEnsurer;
-      this->CinemaReaderModule.TakeReference(PyImport_ImportModule("cinema_python.adaptors.paraview.cinemareader"));
+      this->CinemaReaderModule.TakeReference(
+        PyImport_ImportModule("cinema_python.adaptors.paraview.cinemareader"));
       if (!this->CinemaReaderModule)
       {
-        vtkGenericWarningMacro("Failed to import 'cinema_python.adaptors.paraview.cinemareader' module.");
+        vtkGenericWarningMacro(
+          "Failed to import 'cinema_python.adaptors.paraview.cinemareader' module.");
         if (PyErr_Occurred())
         {
           PyErr_Print();
@@ -158,12 +160,11 @@ public:
       {
         if (PyErr_ExceptionMatches(PyExc_RuntimeError))
         {
-          vtkGenericWarningMacro(
-              "This Cinema store is not supported. "
-              "Only 'composite-image-stack' aka Spec-C file stores "
-              "with 'azimuth-elevation-roll' aka inward facing pose cameras "
-              "are supported.")
-       }
+          vtkGenericWarningMacro("This Cinema store is not supported. "
+                                 "Only 'composite-image-stack' aka Spec-C file stores "
+                                 "with 'azimuth-elevation-roll' aka inward facing pose cameras "
+                                 "are supported.")
+        }
         else
         {
           vtkGenericWarningMacro("Failed to instantiate a 'FileStore'.");

@@ -59,8 +59,8 @@ protected:
   ~vtkPVPostFilterExecutive();
 
   // Overriden to always return true
-  virtual int NeedToExecuteData(
-    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  virtual int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
 

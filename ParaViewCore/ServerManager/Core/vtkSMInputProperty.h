@@ -107,7 +107,8 @@ protected:
   /**
    * Fill state property/proxy XML element with output port attribute
    */
-  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement* propertyElement, unsigned int idx) VTK_OVERRIDE;
+  virtual vtkPVXMLElement* AddProxyElementState(
+    vtkPVXMLElement* propertyElement, unsigned int idx) VTK_OVERRIDE;
 
   int MultipleInput;
   int PortIndex;

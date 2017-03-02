@@ -3,23 +3,25 @@
 
 *.sh             crlf=input
 *.sh.in          crlf=input
-newalpha         crlf=input
-newversion       crlf=input
 pvblot.in        crlf=input
 pre-commit       crlf=input
 
-*.bat            whitespace=-tab-in-indent,-blank-at-eol
-*.sln            whitespace=-tab-in-indent,-blank-at-eol
-*.vcproj         whitespace=-tab-in-indent,-blank-at-eol
+# Custom attribute to mark sources as using our C code style.
+[attr]our-c-style  whitespace=tab-in-indent,-blank-at-eol  format.clang-format
 
-*.c              whitespace=tab-in-indent,-blank-at-eol
-*.h              whitespace=tab-in-indent,-blank-at-eol
-*.cxx            whitespace=tab-in-indent,-blank-at-eol
-*.hxx            whitespace=tab-in-indent,-blank-at-eol
-*.txx            whitespace=tab-in-indent,-blank-at-eol
+*.c              our-c-style
+*.h              our-c-style
+*.cpp            our-c-style
+*.cxx            our-c-style
+*.hxx            our-c-style
+*.txx            our-c-style
+*.glsl           our-c-style
+*.mm             our-c-style
 *.txt            whitespace=tab-in-indent,-blank-at-eol
 *.cmake          whitespace=tab-in-indent,-blank-at-eol
 
-*.c              hooks.MaxObjectKiB=0
+*.c              hooks-max-size=0
 
 *.md             whitespace=tab-in-indent conflict-marker-size=30
+
+ThirdParty/**    -format.clang-format

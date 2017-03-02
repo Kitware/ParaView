@@ -20,9 +20,9 @@
  * a type of data-set in the render view. It is a composite-representation with
  * some fixed representations for showing things like selection and polar axes.
  * This representation has 1 input port and it ensures that that input is passed
- * on to the internal representations 
+ * on to the internal representations
  * (except SelectionRepresentation and PolarAxesRepresentation) properly.
- * For SelectionRepresentation and PolarAxesRepresentation the client is expected 
+ * For SelectionRepresentation and PolarAxesRepresentation the client is expected
  * to setup the input (look at vtkSMPVRepresentationProxy).
 */
 
@@ -97,7 +97,8 @@ public:
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  virtual unsigned int Initialize(
+    unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeRepresentation();
