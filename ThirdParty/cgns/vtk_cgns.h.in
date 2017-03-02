@@ -17,9 +17,11 @@
 
 #cmakedefine VTK_USE_SYSTEM_CGNS
 #ifdef VTK_USE_SYSTEM_CGNS
-# include <cgnslib.h>
+# include <cgnslib.h> // DataType, and other definition
+# include <cgns_io.h> // Low level IO for fast parsing
 #else
-# include <vtkcgns/cgnslib.h>
+# include <vtkcgns/cgnslib.h> // DataType, and other definition
+# include <vtkcgns/cgns_io.h> // Low level IO for fast parsing
 #endif
 
 #endif
