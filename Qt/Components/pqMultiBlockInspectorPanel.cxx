@@ -237,11 +237,17 @@ void pqMultiBlockInspectorPanel::onRepresentationChanged(pqRepresentation* repre
         visibilityProperty, vtkCommand::ModifiedEvent, &this->UpdateUITimer, SLOT(start()));
     }
 
-    vtkSMProperty* colorProperty = proxy->GetProperty("BlockColors");
+    vtkSMProperty* colorProperty = proxy->GetProperty("BlockColor");
     if (colorProperty)
     {
       this->PropertyListener->Connect(
         colorProperty, vtkCommand::ModifiedEvent, &this->UpdateUITimer, SLOT(start()));
+    }
+    vtkSMProperty* opacityProperty = proxy->GetProperty("BlockOpacity");
+    if (opacityProperty)
+    {
+      this->PropertyListener->Connect(
+        opacityProperty, vtkCommand::ModifiedEvent, &this->UpdateUITimer, SLOT(start()));
     }
     vtkSMProperty* colorArrayNameProperty = proxy->GetProperty("ColorArrayName");
     if (colorArrayNameProperty)
