@@ -1,0 +1,282 @@
+<ServerManagerConfiguration>
+  <!--======================================================================-->
+  <ProxyGroup name="representations">
+    <RepresentationProxy name="StreamLinesRepresentation"
+                         class="vtkStreamLinesRepresentation"
+                         processes="client|dataserver|renderserver"
+                         si_class="vtkSIProxy">
+      <Documentation>
+        Representation proxy for StreamLines.
+      </Documentation>
+
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkMultiBlockDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_vectors"
+                          number_of_components="3">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="InputVectors"
+                            command="SetInputVectors"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Vectors">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Vectors"
+                         input_domain_name="input_vectors">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+
+        <Documentation>
+          This property specifies the name of the input vector array to process.
+        </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     skip_dependency="1">
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1"
+                         force_point_cell_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetDiffuseColor"
+                            default_values="0.0 1.0 0.0"
+                            name="DiffuseColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetLineWidth"
+                            default_values="1.0"
+                            name="LineWidth"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="1"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Alpha"
+                            command="SetAlpha"
+                            number_of_elements="1"
+                            default_values="0.1">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>Blending factor applied each frame is done with the
+          formula: 1 - 1 / (Alpha * MaxTimeToLive).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="StepLength"
+                            command="SetStepLength"
+                            number_of_elements="1"
+                            default_values="0.005">
+        <DoubleRangeDomain name="range" min="0.0" />
+        <Documentation>Normalized integration step - allow to adjust particle
+          speed.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NumberOfParticles"
+                         command="SetNumberOfParticles"
+                         number_of_elements="1"
+                         default_values="1000">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>Number of simulated particles in the flow.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaxTimeToLive"
+                         command="SetMaxTimeToLive"
+                         number_of_elements="1"
+                         default_values="600">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>Maximum number of iteration a particle is followed before
+        it dies.
+        </Documentation>
+      </IntVectorProperty>
+    </RepresentationProxy>
+
+    <!--======================================================================-->
+    <Extension name="UniformGridRepresentation">
+      <RepresentationType subproxy="StreamLinesRepresentation"
+                          text="Stream Lines" />
+      <SubProxy>
+        <Proxy name="StreamLinesRepresentation"
+               proxygroup="representations"
+               proxyname="StreamLinesRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Stream Lines">
+            <Property name="InputVectors"/>
+            <Property name="Alpha"/>
+            <Property name="StepLength"/>
+            <Property name="NumberOfParticles" />
+            <Property name="MaxTimeToLive" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Stream Lines" />
+           </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="GeometryRepresentation">
+      <RepresentationType subproxy="StreamLinesRepresentation"
+                          text="Stream Lines" />
+      <SubProxy>
+        <Proxy name="StreamLinesRepresentation"
+               proxygroup="representations"
+               proxyname="StreamLinesRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Stream Lines">
+            <Property name="InputVectors"/>
+            <Property name="Alpha"/>
+            <Property name="StepLength"/>
+            <Property name="NumberOfParticles" />
+            <Property name="MaxTimeToLive" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Stream Lines" />
+           </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="UnstructuredGridRepresentation">
+      <RepresentationType subproxy="StreamLinesRepresentation"
+                          text="Stream Lines" />
+      <SubProxy>
+        <Proxy name="StreamLinesRepresentation"
+               proxygroup="representations"
+               proxyname="StreamLinesRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Stream Lines">
+            <Property name="InputVectors"/>
+            <Property name="Alpha"/>
+            <Property name="StepLength"/>
+            <Property name="NumberOfParticles" />
+            <Property name="MaxTimeToLive" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Stream Lines" />
+           </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <!--======================================================================-->
+    <Extension name="StructuredGridRepresentation">
+      <RepresentationType subproxy="StreamLinesRepresentation"
+                          text="Stream Lines" />
+      <SubProxy>
+        <Proxy name="StreamLinesRepresentation"
+               proxygroup="representations"
+               proxyname="StreamLinesRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+          <PropertyGroup label="Stream Lines">
+            <Property name="InputVectors"/>
+            <Property name="Alpha"/>
+            <Property name="StepLength"/>
+            <Property name="NumberOfParticles" />
+            <Property name="MaxTimeToLive" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Stream Lines" />
+           </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
