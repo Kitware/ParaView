@@ -30,10 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include <QApplication>
 #include <QDebug>
 #include <QIcon>
+#include <QStyle>
 #include <QStyleFactory>
-#include <QTableView>
 
 #include "pqCheckBoxDelegate.h"
 #include "pqOutputWindow.h"
@@ -57,14 +58,12 @@ enum ColumnLocation
 //-----------------------------------------------------------------------------
 struct pqOutputWindowModel::pqInternals
 {
-  QList<QIcon> Icons;
 };
 
 //-----------------------------------------------------------------------------
 pqOutputWindowModel::pqOutputWindowModel(QObject* _parent, const QList<MessageT>& messages)
   : QAbstractTableModel(_parent)
   , Messages(messages)
-  , View(NULL)
   , Internals(new pqInternals())
 {
   Q_ASSERT(EXPANDED_ROW_EXTRA == 1);
@@ -147,11 +146,6 @@ QVariant pqOutputWindowModel::data(const QModelIndex& index_, int role) const
     }
     case Qt::DecorationRole:
     {
-      if ((r - EXPANDED_ROW_EXTRA < 0 || this->Rows[r] != this->Rows[r - EXPANDED_ROW_EXTRA]) &&
-        (index_.column() == COLUMN_TYPE))
-      {
-        return this->Internals->Icons[this->Messages[this->Rows[r]].Type];
-      }
       break;
     }
   }
@@ -192,11 +186,8 @@ void pqOutputWindowModel::appendLastRow()
   this->beginInsertRows(QModelIndex(), this->Rows.size(), this->Rows.size());
   this->Rows.push_back(this->Messages.size() - 1);
   this->endInsertRows();
-  if (this->Rows.size() == 1)
-  {
-    this->resizeColumnsToContents();
-  }
-  this->View->resizeRowToContents(this->Rows.size() - 1);
+  emit this->resizeRowsToContents();
+  emit this->resizeColumnsToContents();
 }
 
 //-----------------------------------------------------------------------------
@@ -205,7 +196,7 @@ void pqOutputWindowModel::expandRow(int r)
   this->beginInsertRows(QModelIndex(), r + 1, r + 1);
   this->Rows.insert(r + 1, this->Rows[r]);
   this->endInsertRows();
-  this->View->resizeRowToContents(r + 1);
+  emit this->resizeRowsToContents();
 }
 
 //-----------------------------------------------------------------------------
@@ -257,32 +248,7 @@ void pqOutputWindowModel::ShowMessages(bool* show)
     }
   }
   this->endInsertRows();
-  this->View->resizeRowsToContents();
-}
-
-//-----------------------------------------------------------------------------
-void pqOutputWindowModel::setView(QTableView* view)
-{
-  Q_ASSERT(this->View == NULL);
-  this->View = view;
-  QStyle* style = this->View->style();
-  // WARNING: the order has to match pqOutputWindow::MessageType
-  // error
-  this->Internals->Icons.push_back(style->standardIcon(QStyle::SP_MessageBoxCritical));
-  // warning; warning looks similar with error (also red), so we use a different
-  // icon
-  this->Internals->Icons.push_back(QIcon(":/pqWidgets/Icons/warning.png"));
-  // debug
-  this->Internals->Icons.push_back(style->standardIcon(QStyle::SP_MessageBoxInformation));
-}
-
-//-----------------------------------------------------------------------------
-void pqOutputWindowModel::resizeColumnsToContents()
-{
-  for (int i = 0; i < NUMBER_OF_COLUMNS - 1; ++i)
-  {
-    this->View->resizeColumnToContents(i);
-  }
+  emit this->resizeRowsToContents();
 }
 
 //-----------------------------------------------------------------------------
@@ -293,7 +259,7 @@ void pqOutputWindowModel::updateCount(int messageIndex)
     if (this->Rows[i] == messageIndex)
     {
       emit this->dataChanged(this->createIndex(i, 0), this->createIndex(i, NUMBER_OF_COLUMNS - 1));
-      this->resizeColumnsToContents();
     }
   }
+  emit this->resizeColumnsToContents();
 }
