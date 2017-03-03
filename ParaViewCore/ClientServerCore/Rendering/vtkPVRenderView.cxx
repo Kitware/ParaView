@@ -326,7 +326,6 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
   : Annotation()
-  , OrientationWidgetVisibility(false)
   , StereoType(VTK_STEREO_RED_BLUE)
   , ServerStereoType(VTK_STEREOTYPE_SAME_AS_CLIENT)
 {
@@ -491,7 +490,6 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
   this->OrientationWidget->SetViewport(0, 0, 0.25, 0.25);
-  //  this->OrientationWidget->SetInteractor(this->Interactor);
 
   this->GetRenderer()->AddActor(this->CenterAxes);
 
@@ -733,13 +731,6 @@ void vtkPVRenderView::SetupInteractor(vtkRenderWindowInteractor* iren)
   {
     this->Interactor = iren;
     this->OrientationWidget->SetInteractor(this->Interactor);
-    if (this->OrientationWidgetVisibility)
-    {
-      // don't ask! vtkPVAxesWidget must die!
-      this->OrientationWidget->SetEnabled(0);
-      this->OrientationWidget->SetEnabled(1);
-    }
-
     if (this->Interactor)
     {
       this->Interactor->SetRenderWindow(this->GetRenderWindow());
@@ -2230,14 +2221,13 @@ void vtkPVRenderView::InvalidateCachedSelection()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOrientationAxesInteractivity(bool v)
 {
-  this->OrientationWidget->SetInteractive(v);
+  this->OrientationWidget->SetEnabled(v);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOrientationAxesVisibility(bool v)
 {
-  this->OrientationWidget->SetEnabled(v);
-  this->OrientationWidgetVisibility = v;
+  this->OrientationWidget->SetVisibility(v);
 }
 
 //----------------------------------------------------------------------------

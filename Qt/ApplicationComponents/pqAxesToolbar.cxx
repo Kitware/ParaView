@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMTrace.h"
 
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
 {
@@ -111,6 +112,10 @@ void pqAxesToolbar::showOrientationAxes(bool show_axes)
     return;
   }
 
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", renderView->getProxy())
+    .arg(
+      "comment", QString(" %1 orientation axes").arg(show_axes ? "Show" : "Hide").toUtf8().data());
   renderView->setOrientationAxesVisibility(show_axes);
   renderView->render();
 }
@@ -124,6 +129,9 @@ void pqAxesToolbar::showCenterAxes(bool show_axes)
     return;
   }
 
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", renderView->getProxy())
+    .arg("comment", QString(" %1 center axes").arg(show_axes ? "Show" : "Hide").toUtf8().data());
   renderView->setCenterAxesVisibility(show_axes);
   renderView->render();
 }
@@ -138,6 +146,10 @@ void pqAxesToolbar::resetCenterOfRotationToCenterOfCurrentData()
     // qDebug() << "Active source not shown in active view. Cannot set center.";
     return;
   }
+
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg("proxy", renderView->getProxy())
+    .arg("comment", " update center of rotation");
 
   double bounds[6];
   if (repr->getDataBounds(bounds))
@@ -161,6 +173,9 @@ void pqAxesToolbar::pickCenterOfRotation(int posx, int posy)
     double center[3];
 
     vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg("proxy", proxy)
+      .arg("comment", " update center of rotation");
     if (proxy->ConvertDisplayToPointOnSurface(posxy, center))
     {
       rm->setCenterOfRotation(center);
