@@ -702,13 +702,67 @@ void pqPipelineContextMenuBehavior::unsetBlockOpacity()
   this->PickedRepresentation->renderViewEventually();
 }
 
+namespace
+{
+const char* findBlockName(
+  int flatIndexTarget, int& flatIndexCurrent, vtkPVCompositeDataInformation* currentInfo)
+{
+  // An interior block shouldn't be selected, only blocks with geometry can be
+  if (flatIndexCurrent == flatIndexTarget)
+  {
+    return nullptr;
+  }
+  for (unsigned int i = 0; i < currentInfo->GetNumberOfChildren(); i++)
+  {
+    ++flatIndexCurrent;
+    if (flatIndexCurrent == flatIndexTarget)
+    {
+      return currentInfo->GetName(i);
+    }
+    else if (flatIndexCurrent > flatIndexTarget)
+    {
+      return nullptr;
+    }
+    vtkPVDataInformation* childInfo = currentInfo->GetDataInformation(i);
+    if (childInfo)
+    {
+      vtkPVCompositeDataInformation* compositeChildInfo = childInfo->GetCompositeDataInformation();
+
+      // recurse down through child blocks only if the child block
+      // is composite and is not a multi-piece data set
+      if (compositeChildInfo->GetDataIsComposite() && !compositeChildInfo->GetDataIsMultiPiece())
+      {
+        const char* result = findBlockName(flatIndexTarget, flatIndexCurrent, compositeChildInfo);
+        if (result)
+        {
+          return result;
+        }
+      }
+      else if (compositeChildInfo && compositeChildInfo->GetDataIsMultiPiece())
+      {
+        flatIndexCurrent += compositeChildInfo->GetNumberOfChildren();
+      }
+    }
+  }
+  return nullptr;
+}
+}
+
 //-----------------------------------------------------------------------------
 QString pqPipelineContextMenuBehavior::lookupBlockName(unsigned int flatIndex) const
 {
-  pqMultiBlockInspectorPanel* panel = getMultiBlockInspectorPanel();
-  if (panel)
+  vtkPVDataInformation* info = this->PickedRepresentation->getRepresentedDataInformation();
+  if (!info)
   {
-    return panel->lookupBlockName(flatIndex);
+    return QString();
+  }
+  vtkPVCompositeDataInformation* compositeInfo = info->GetCompositeDataInformation();
+
+  int myIdx = 0;
+  const char* name = findBlockName(flatIndex, myIdx, compositeInfo);
+  if (name)
+  {
+    return QString(name);
   }
   else
   {
