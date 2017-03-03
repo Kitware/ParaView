@@ -649,11 +649,10 @@ void pqPipelineContextMenuBehavior::setBlockOpacity()
   {
     vtkSMDoubleMapProperty* dmp = vtkSMDoubleMapProperty::SafeDownCast(property);
     // Hope this works?
-    double* opacityptr = dmp->GetElements(this->PickedBlocks[0]);
     double current_opacity = 1;
-    if (opacityptr)
+    if (dmp->HasElement(this->PickedBlocks[0]))
     {
-      current_opacity = opacityptr[0];
+      current_opacity = dmp->GetElement(this->PickedBlocks[0]);
     }
 
     pqMultiBlockInspectorPanel* panel = getMultiBlockInspectorPanel();
