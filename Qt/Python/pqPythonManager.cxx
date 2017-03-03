@@ -92,11 +92,7 @@ class pqPythonManager::pqInternal
       }
       else
       {
-        pqOutputWindowAdapter* window = pqApplicationCore::instance()->outputWindowAdapter();
-        if (window)
-        {
-          window->DisplayErrorTextInWindow(message);
-        }
+        qCritical() << message;
       }
     }
     else if (eventid == vtkCommand::SetOutputEvent)
@@ -108,11 +104,11 @@ class pqPythonManager::pqInternal
       }
       else
       {
-        pqOutputWindowAdapter* window = pqApplicationCore::instance()->outputWindowAdapter();
-        if (window)
-        {
-          window->DisplayTextInWindow(message);
-        }
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        vtkOutputWindow::GetInstance()->DisplayText(message);
+#else
+        qInfo() << message;
+#endif
       }
     }
   }

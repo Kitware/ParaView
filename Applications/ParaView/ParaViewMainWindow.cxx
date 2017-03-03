@@ -120,6 +120,11 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+  this->Internals->outputWidgetDock->hide();
+
+  // show output widget if we received an error message.
+  this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
+    SLOT(showOutputWidget()));
 
   // Setup default GUI layout.
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -146,6 +151,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->timeInspectorDock->hide();
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
@@ -349,4 +355,25 @@ void ParaViewMainWindow::showWelcomeDialog()
 {
   pqWelcomeDialog dialog(this);
   dialog.exec();
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::showOutputWidget()
+{
+  QDockWidget* dock = this->Internals->outputWidgetDock;
+  if (!dock->isVisible())
+  {
+    // if dock is not visible, we always pop it up as a floating dialog. This
+    // avoids causing re-renders which may cause more errors and more confusion.
+    QRect rectApp = this->geometry();
+
+    QRect rectDock(
+      QPoint(0, 0), QSize(static_cast<int>(rectApp.width() * 0.4), dock->sizeHint().height()));
+    rectDock.moveCenter(
+      QPoint(rectApp.center().x(), rectApp.bottom() - dock->sizeHint().height() / 2));
+    dock->setFloating(true);
+    dock->setGeometry(rectDock);
+  }
+  dock->show();
+  dock->raise();
 }

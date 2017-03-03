@@ -238,10 +238,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqTestingReaction::LOCK_VIEW_SIZE_CUSTOM);
   menu.addSeparator();
   new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
-  QAction* action = menu.addAction("&Output Window") << pqSetName("actionToolsOutputWindow");
-  QObject::connect(
-    action, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(showOutputWindow()));
-
   menu.addSeparator(); // --------------------------------------------------
 
   new pqPythonShellReaction(menu.addAction("Python Shell") << pqSetName("actionToolsPythonShell"));

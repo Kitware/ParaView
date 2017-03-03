@@ -109,6 +109,8 @@ set(Module_SRCS
   pqOptions.h
   pqOutputPort.cxx
   pqOutputPort.h
+  pqOutputWidget.cxx
+  pqOutputWidget.h
   pqOutputWindowAdapter.cxx
   pqOutputWindowAdapter.h
   pqOutputWindow.cxx
@@ -257,6 +259,7 @@ set (Module_MOC_HDRS
   pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.h
   pqOutputPort.h
+  pqOutputWidget.h
   pqOutputWindowAdapter.h
   pqOutputWindow.h
   pqOutputWindowModel.h
@@ -305,6 +308,7 @@ set (Module_MOC_HDRS
 )
 
 set (Module_UI_FILES
+  Resources/UI/pqOutputWidget.ui
   Resources/UI/pqOutputWindow.ui
   Resources/UI/pqFileDialog.ui
 )
