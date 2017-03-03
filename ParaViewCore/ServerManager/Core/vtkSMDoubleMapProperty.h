@@ -91,6 +91,11 @@ public:
   virtual vtkIdType GetNumberOfElements() VTK_OVERRIDE;
 
   /**
+   * Returns true if the property has an element with the given index
+   */
+  bool HasElement(vtkIdType index);
+
+  /**
    * Clears all of the elements from the property.
    */
   void ClearElements();
