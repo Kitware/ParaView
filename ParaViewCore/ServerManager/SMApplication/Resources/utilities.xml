@@ -4049,6 +4049,20 @@
         Options proxy used to prompt user for options when loading a pvsm state files.
       </Documentation>
 
+      <IntVectorProperty name="LoadStateDateFileOptions"
+        default_values="0"
+        number_of_elements="1">
+        <Documentation>
+          Decide how to locate data files in loaded state.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use File Names From State" value="0" />
+          <Entry text="Use **Data Directory** to search for all data files." value="1" />
+          <Entry text="Choose File Names" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+<!--
       <IntVectorProperty name="UseFileNamesFromState" number_of_elements="1" default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -4062,6 +4076,7 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+-->
 
       <StringVectorProperty name="DataDirectory" number_of_elements="1" default_values="">
         <FileListDomain name="files" />
@@ -4069,19 +4084,22 @@
           Directory to look for data files under.
         </Documentation>
         <Hints>
-          <UseDirectoryName />
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseDataDirectory" />
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="1">
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
 
-      <IntVectorProperty name="ChooseFileNames" number_of_elements="1" default_values="0">
-        <BooleanDomain name="bool" />
+      <StringVectorProperty name="DataFilePaths" number_of_elements="2" default_values="">
+        <FileListDomain name="files" />
         <Documentation>
-          Explicitly choose data filenames for all readers in the state file.
+          New paths for the data files.
         </Documentation>
-      </IntVectorProperty>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="2">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
       <Hints>
         <UseDocumentationForLabels />
       </Hints>

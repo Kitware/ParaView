@@ -43,7 +43,7 @@ public:
     bool IsDirectory;
     bool AcceptAnyFile;
     bool SupportsMultiple;
-    std::vector<std::string> Values;
+    std::vector<std::string> Values; // TODO: why does this need to be a vector?
     bool Modified;
     vtkSmartPointer<vtkSMProxy> Prototype;
     PropertyInfo()
@@ -260,6 +260,76 @@ public:
     piter->Delete();
     return fileNameProperties;
   }
+
+  void replaceDataFilePaths(vtkPVXMLElement* xml)
+  {
+    vtkInternals::PropertiesMapType::iterator iter;
+    for (iter = this->PropertiesMap.begin(); iter != this->PropertiesMap.end(); ++iter)
+    {
+      std::map<std::string, PropertyInfo>::iterator iter2 = iter->second.begin();
+      for (; iter2 != iter->second.end(); ++iter2)
+      {
+        vtkInternals::PropertyInfo& info = iter2->second;
+        if (!info.Modified)
+        {
+          continue;
+        }
+
+        // Update XML Element using new values.
+        std::ostringstream sstream(info.Values.size());
+        info.XMLElement->SetAttribute("number_of_elements", sstream.str().c_str());
+        for (int cc = info.XMLElement->GetNumberOfNestedElements() - 1; cc >= 0; cc--)
+        {
+          // remove old "Element" elements.
+          vtkPVXMLElement* child = info.XMLElement->GetNestedElement(cc);
+          if (strcmp(child->GetName(), "Element") == 0)
+          {
+            info.XMLElement->RemoveNestedElement(child);
+          }
+        }
+        int index = 0;
+        for (std::vector<std::string>::iterator it = info.Values.begin(); it != info.Values.end();
+             it++)
+        {
+          vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+          elementElement->SetName("Element");
+          elementElement->AddAttribute("index", index++);
+          elementElement->AddAttribute("value", it->c_str());
+          info.XMLElement->AddNestedElement(elementElement);
+          elementElement->Delete();
+        }
+
+        // Also fix up sources proxy collection
+        int id = iter->first;
+        std::map<int, vtkPVXMLElement*>::iterator proxyCollectionIter =
+          this->CollectionsMap.begin();
+        vtkPVXMLElement* proxyCollectionXML = proxyCollectionIter->second;
+        for (unsigned int cc = 0; cc < proxyCollectionXML->GetNumberOfNestedElements(); cc++)
+        {
+          // locate and remove old element.
+          vtkPVXMLElement* itemXML = proxyCollectionXML->GetNestedElement(cc);
+          int itemId = std::atoi(itemXML->GetAttribute("id"));
+          if (id == itemId)
+          {
+            proxyCollectionXML->RemoveNestedElement(itemXML);
+
+            // create a new element with new source name
+            vtkPVXMLElement* newItemXML = vtkPVXMLElement::New();
+            newItemXML->SetName("Item");
+            newItemXML->AddAttribute("id", itemId);
+
+            vtkGenericWarningMacro("info.Values = " << info.Values[0]);
+            // TODO: Need to work out how to port from Qt code
+            // newItemXML->AddAttribute(
+            //   "name", this->ConstructPipelineName(info.Values).toLocal8Bit().data());
+            // proxyCollectionXML->AddNestedElement(newItemXML);
+            newItemXML->Delete();
+            break;
+          }
+        }
+      }
+    }
+  }
 };
 
 vtkStandardNewMacro(vtkSMLoadStateOptionsProxy);
@@ -272,6 +342,7 @@ vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 //----------------------------------------------------------------------------
 vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 {
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -284,9 +355,9 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     xmlParser->SetFileName(statefilename);
     xmlParser->Parse();
 
-    vtkPVXMLElement* stateXML = xmlParser->GetRootElement();
+    this->StateXML = xmlParser->GetRootElement();
 
-    this->Internals->processStateFile(stateXML);
+    this->Internals->processStateFile(this->StateXML);
   }
   else
   { // python file
@@ -311,6 +382,44 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 bool vtkSMLoadStateOptionsProxy::Load()
 {
   SM_SCOPED_TRACE(LoadState).arg("filename", "todo: the filename").arg("options", this);
+
+  int dataFileOptions = vtkSMPropertyHelper(this, "LoadStateDateFileOptions").GetAsInt();
+  switch (dataFileOptions)
+  {
+    case 0:
+    {
+      // Nothing to do
+      break;
+    }
+    case 1:
+    {
+      // TODO: Deal with data directory
+      break;
+    }
+    case 2:
+    {
+      // TODO: Replace individual files
+      std::string dateFilePath = vtkSMPropertyHelper(this, "DataFilePaths").GetAsString();
+      std::vector<std::string> filenames;
+      filenames.push_back(dateFilePath);
+
+      // Hard coded for Disk.pvsm for now
+      int key1 = 8817;
+      std::string key2 = "FileName";
+      vtkInternals::PropertyInfo& info = this->Internals->PropertiesMap[key1][key2];
+
+      if (info.Values != filenames)
+      {
+        info.Values = filenames;
+        info.Modified = true;
+      }
+      break;
+    }
+  }
+
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  pxm->LoadXMLState(this->StateXML);
 
   return true;
 }
