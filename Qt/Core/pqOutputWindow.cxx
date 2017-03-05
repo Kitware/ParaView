@@ -29,26 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqOutputWindow.h"
+#include "ui_pqOutputWindow.h"
 
 #include <QAction>
 #include <QList>
 #include <QMenu>
-#include <QMessageBox>
 
 #include "pqApplicationCore.h"
 #include "pqCheckBoxDelegate.h"
-#include "pqOutputWindow.h"
 #include "pqOutputWindowModel.h"
 #include "pqSettings.h"
-
+#include "pqTimer.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-
-#include "ui_pqOutputWindow.h"
 
 namespace
 {
@@ -102,12 +100,21 @@ struct pqOutputWindow::pqImplementation
   {
     // pqOutputWindow is the parent, so this object is deleted then.
     this->TableModel = new pqOutputWindowModel(parent, Messages);
+
+    this->ResizeRowsTimer.setInterval(100);
+    this->ResizeRowsTimer.setSingleShot(true);
+
+    this->ResizeColumnsTimer.setInterval(100);
+    this->ResizeColumnsTimer.setSingleShot(true);
   }
 
   Ui::pqOutputWindow Ui;
   QStringList SuppressionExpressions;
   QList<MessageT> Messages;
   pqOutputWindowModel* TableModel;
+
+  pqTimer ResizeRowsTimer;
+  pqTimer ResizeColumnsTimer;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -126,7 +133,6 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent)
   }
   Ui::pqOutputWindow& ui = this->Implementation->Ui;
   ui.setupUi(this);
-  this->Implementation->TableModel->setView(ui.tableView);
   this->setObjectName("outputDialog");
   this->setWindowTitle(tr("Output Messages"));
 
@@ -159,6 +165,18 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent)
   ui.tableView->setFocusPolicy(Qt::NoFocus);
   ui.tableView->setItemDelegateForColumn(0, new pqCheckBoxDelegate(ui.tableView));
   ui.tableView->setModel(this->Implementation->TableModel);
+
+  this->Implementation->ResizeRowsTimer.connect(
+    this->Implementation->TableModel, SIGNAL(resizeRowsToContents()), SLOT(start()));
+
+  ui.tableView->connect(
+    &this->Implementation->ResizeRowsTimer, SIGNAL(timeout()), SLOT(resizeRowsToContents()));
+
+  this->Implementation->ResizeColumnsTimer.connect(
+    this->Implementation->TableModel, SIGNAL(resizeColumnsToContents()), SLOT(start()));
+
+  ui.tableView->connect(
+    &this->Implementation->ResizeColumnsTimer, SIGNAL(timeout()), SLOT(resizeColumnsToContents()));
 }
 
 //-----------------------------------------------------------------------------

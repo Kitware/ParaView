@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOutputWindow.h
+   Module:  pqOutputWindowModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,16 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqOutputWindowModel_h
-#define _pqOutputWindowModel_h
+#ifndef pqOutputWindowModel_h
+#define pqOutputWindowModel_h
 
 #include "pqCoreModule.h"
 
 #include <QAbstractTableModel>
 
-class QTableView;
-
-struct MessageT
+struct PQCORE_EXPORT MessageT
 {
   MessageT(int type, int count, const QString& location, const QString& message)
     : Type(type)
@@ -75,8 +73,6 @@ public:
 
   virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
-  void setView(QTableView* view);
-
   /**
   * Appends the last message to the table
   */
@@ -106,20 +102,16 @@ public:
   */
   void updateCount(int messageIndex);
 
-private:
-  /**
-  * Resize all columns but the last to fit the contents.
-  */
+signals:
+  void resizeRowsToContents();
   void resizeColumnsToContents();
 
 private:
   const QList<MessageT>& Messages;
   QList<int> Rows; // element is index in Messages,
                    // when an element is expanded, the index is duplicated
-  QTableView* View;
-
   struct pqInternals;
   QScopedPointer<pqInternals> Internals;
 };
 
-#endif // !_pqOutputWindowModel_h
+#endif // !pqOutputWindowModel_h
