@@ -234,6 +234,11 @@ void pqOutputWindowModel::ShowMessages(bool* show)
       }
     }
   }
+  if (_rowCount == 0)
+  {
+    return;
+  }
+
   this->Rows.reserve(_rowCount);
   this->beginInsertRows(QModelIndex(), 0, _rowCount - 1);
   for (int i = 0; i < this->Messages.size(); ++i)
