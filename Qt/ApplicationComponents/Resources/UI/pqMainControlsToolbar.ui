@@ -67,15 +67,6 @@
     <string>Disconnect</string>
    </property>
   </action>
-  <action name="actionHelp">
-   <property name="icon">
-    <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqHelp24.png</normaloff>:/pqWidgets/Icons/pqHelp24.png</iconset>
-   </property>
-   <property name="text">
-    <string>Help</string>
-   </property>
-  </action>
   <action name="actionUndo">
    <property name="icon">
     <iconset>
@@ -147,8 +138,6 @@
   <addaction name="separator"/>
   <addaction name="actionUndo"/>
   <addaction name="actionRedo"/>
-  <addaction name="separator"/>
-  <addaction name="actionHelp"/>
   <addaction name="separator"/>
   <addaction name="actionAutoApply"/>
   <addaction name="actionQuery"/>

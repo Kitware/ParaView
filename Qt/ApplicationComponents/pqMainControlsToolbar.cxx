@@ -34,9 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAutoApplyReaction.h"
 #include "pqDataQueryReaction.h"
-#ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
-#endif
 #include "pqLoadDataReaction.h"
 #include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
@@ -57,9 +54,6 @@ void pqMainControlsToolbar::constructor()
   new pqServerDisconnectReaction(ui.actionServerDisconnect);
   new pqUndoRedoReaction(ui.actionUndo, true);
   new pqUndoRedoReaction(ui.actionRedo, false);
-#ifdef PARAVIEW_USE_QTHELP
-  new pqHelpReaction(ui.actionHelp);
-#endif
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
   new pqLoadPaletteReaction(ui.actionLoadPalette);
