@@ -690,8 +690,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
 
     vtkSMPropertyHelper inputHelper(repr, "Input");
     // get representation input data
-    vtkSMSourceProxy* reprInput =
-      vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    vtkSMSourceProxy* reprInput = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
 
     // convert cell selection to block selection
     vtkSMProxy* blockSelection = vtkSMSelectionHelper::ConvertSelection(

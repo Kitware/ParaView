@@ -87,7 +87,7 @@ public:
    * WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
    * DO NOT USE THIS METHOD OUTSIDE OF THE RENDERING PROCESS
    */
-  void Render(vtkRenderer *ren, vtkActor *vol) VTK_OVERRIDE;
+  void Render(vtkRenderer* ren, vtkActor* vol) VTK_OVERRIDE;
 
   /**
    * WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
@@ -106,7 +106,7 @@ protected:
   int MaxTimeToLive;
   int NumberOfParticles;
   class Private;
-  Private *Internal;
+  Private* Internal;
 
   friend class Private;
 

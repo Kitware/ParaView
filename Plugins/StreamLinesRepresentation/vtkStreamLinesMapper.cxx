@@ -33,9 +33,9 @@
 #include "vtkOpenGLCamera.h"
 #include "vtkOpenGLError.h"
 #include "vtkOpenGLFramebufferObject.h"
-#include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderWindow.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLShaderCache.h"
 #include "vtkOpenGLTexture.h"
 #include "vtkOpenGLVertexArrayObject.h"
@@ -50,7 +50,7 @@
 #include "vtkShaderProgram.h"
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
-#include "vtkTextureObjectVS.h"  // a pass through shader
+#include "vtkTextureObjectVS.h" // a pass through shader
 
 #include "vtk_glew.h"
 
@@ -63,19 +63,19 @@ extern const char* vtkStreamLines_fs;
 extern const char* vtkStreamLines_vs;
 
 //----------------------------------------------------------------------------
-#define RELEASE_VTKGL_OBJECT(_x) \
-  if (_x) \
-  { \
-    _x->ReleaseGraphicsResources(renWin); \
-    _x->Delete(); \
-    _x = 0; \
+#define RELEASE_VTKGL_OBJECT(_x)                                                                   \
+  if (_x)                                                                                          \
+  {                                                                                                \
+    _x->ReleaseGraphicsResources(renWin);                                                          \
+    _x->Delete();                                                                                  \
+    _x = 0;                                                                                        \
   }
-#define RELEASE_VTKGL_OBJECT2(_x) \
-  if (_x) \
-  { \
-    _x->ReleaseGraphicsResources(); \
-    _x->Delete(); \
-    _x = 0; \
+#define RELEASE_VTKGL_OBJECT2(_x)                                                                  \
+  if (_x)                                                                                          \
+  {                                                                                                \
+    _x->ReleaseGraphicsResources();                                                                \
+    _x->Delete();                                                                                  \
+    _x = 0;                                                                                        \
   }
 
 //----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ class vtkStreamLinesMapper::Private : public vtkObject
 public:
   static Private* New();
 
-  void ReleaseGraphicsResources(vtkWindow *renWin)
+  void ReleaseGraphicsResources(vtkWindow* renWin)
   {
     RELEASE_VTKGL_OBJECT(this->VBOs);
     RELEASE_VTKGL_OBJECT(this->BlendingProgram);
@@ -97,10 +97,7 @@ public:
     RELEASE_VTKGL_OBJECT2(this->IndexBufferObject);
   }
 
-  void SetMapper(vtkStreamLinesMapper* mapper)
-  {
-    this->Mapper = mapper;
-  }
+  void SetMapper(vtkStreamLinesMapper* mapper) { this->Mapper = mapper; }
 
   void SetNumberOfParticles(int);
 
@@ -163,14 +160,13 @@ private:
 
 vtkStandardNewMacro(vtkStreamLinesMapper::Private)
 
-//----------------------------------------------------------------------------
-vtkStreamLinesMapper::Private::Private()
+  //----------------------------------------------------------------------------
+  vtkStreamLinesMapper::Private::Private()
 {
   this->Mapper = 0;
-  this->RandomNumberSequence =
-    vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
+  this->RandomNumberSequence = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
   this->RandomNumberSequence->SetSeed(1);
-  this->VBOs =  vtkOpenGLVertexBufferObjectGroup::New();
+  this->VBOs = vtkOpenGLVertexBufferObjectGroup::New();
   this->ShaderCache = 0;
   this->CurrentBuffer = 0;
   this->FrameBuffer = 0;
@@ -244,13 +240,11 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   vtkIdType cellId = 0;
   if (!this->Locator)
   {
-    cellId =
-      this->DataSet->FindCell(pos, 0, -1, 1e-10, subId, pcoords, weights);
+    cellId = this->DataSet->FindCell(pos, 0, -1, 1e-10, subId, pcoords, weights);
   }
   else
   {
-    cellId =
-      this->Locator->FindCell(pos, 0., this->GenericCell.Get(), pcoords, weights);
+    cellId = this->Locator->FindCell(pos, 0., this->GenericCell.Get(), pcoords, weights);
   }
 
   if (cellId < 0)
@@ -272,8 +266,7 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
     }
     else
     {
-      this->InterpolationArray->InterpolateTuple(
-        0, this->IdList.Get(), this->Vectors, weights);
+      this->InterpolationArray->InterpolateTuple(0, this->IdList.Get(), this->Vectors, weights);
       this->InterpolationArray->GetTuple(0, outSpeed);
     }
     double speed = vtkMath::Norm(outSpeed);
@@ -288,8 +281,7 @@ bool vtkStreamLinesMapper::Private::InterpolateSpeedAndColor(
   {
     if (this->AreCellScalars)
     {
-      this->InterpolationScalarArray->SetTuple(
-        pid, this->Scalars->GetTuple(cellId));
+      this->InterpolationScalarArray->SetTuple(pid, this->Scalars->GetTuple(cellId));
     }
     else
     {
@@ -319,14 +311,13 @@ void vtkStreamLinesMapper::Private::InitParticle(int pid)
     double speedVec[9];
     if (this->InterpolateSpeedAndColor(pos, speedVec, pid * 2))
     {
-      this->InterpolationScalarArray->SetTuple(pid * 2 + 1,
-        this->InterpolationScalarArray->GetTuple(pid * 2));
+      this->InterpolationScalarArray->SetTuple(
+        pid * 2 + 1, this->InterpolationScalarArray->GetTuple(pid * 2));
       double speed = vtkMath::Norm(speedVec);
-     // Do not sample in no-speed areas
+      // Do not sample in no-speed areas
       added = (speed != 0. && !vtkMath::IsInf(speed) && !vtkMath::IsNan(speed));
     }
-  }
-  while (!added);
+  } while (!added);
 }
 
 //----------------------------------------------------------------------------
@@ -353,9 +344,7 @@ void vtkStreamLinesMapper::Private::UpdateParticles()
       double speedVec[3];
       if (this->InterpolateSpeedAndColor(pos, speedVec, i * 2 + 1))
       {
-        this->Particles->SetPoint(2 * i + 1,
-          pos[0] + dt * speedVec[0],
-          pos[1] + dt * speedVec[1],
+        this->Particles->SetPoint(2 * i + 1, pos[0] + dt * speedVec[0], pos[1] + dt * speedVec[1],
           pos[2] + dt * speedVec[2]);
       }
       else
@@ -372,12 +361,11 @@ void vtkStreamLinesMapper::Private::UpdateParticles()
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *actor)
+void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* actor)
 {
   this->PrepareGLBuffers(ren);
 
-  vtkOpenGLRenderWindow* renWin =
-    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
+  vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
 
   int nbParticles = static_cast<int>(this->ParticlesTTL.size());
 
@@ -397,8 +385,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
     this->CurrentBuffer->GetBothMode(), 0, this->CurrentTexture);
   this->CurrentBuffer->AddDepthAttachment(); // auto create depth buffer
   this->CurrentBuffer->ActivateBuffer(0);
-  this->CurrentBuffer->Start(
-    this->CurrentTexture->GetWidth(), this->CurrentTexture->GetHeight());
+  this->CurrentBuffer->Start(this->CurrentTexture->GetWidth(), this->CurrentTexture->GetHeight());
 
   this->ShaderCache->ReadyShaderProgram(this->Program);
   if (this->Program->IsUniformUsed("MCDCMatrix"))
@@ -420,17 +407,16 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
   if (this->RebuildBufferObjects)
   {
     // We upload the indices only when number of particles changed
-    this->IndexBufferObject->Upload(&this->Indices[0], nbParticles * 2,
-      vtkOpenGLBufferObject::ElementArrayBuffer);
+    this->IndexBufferObject->Upload(
+      &this->Indices[0], nbParticles * 2, vtkOpenGLBufferObject::ElementArrayBuffer);
     this->RebuildBufferObjects = false;
   }
 
   vtkSmartPointer<vtkUnsignedCharArray> colors = 0;
   if (useScalars)
   {
-    colors.TakeReference(this->Mapper->GetLookupTable()->MapScalars(
-      this->InterpolationScalarArray, this->Mapper->GetColorMode(),
-      this->Mapper->GetArrayComponent()));
+    colors.TakeReference(this->Mapper->GetLookupTable()->MapScalars(this->InterpolationScalarArray,
+      this->Mapper->GetColorMode(), this->Mapper->GetArrayComponent()));
   }
 
   this->VBOs->ClearAllVBOs();
@@ -438,11 +424,9 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
 
   // Create the VBOs
   // Note: we provide dummy colors in case scalars are not visible
+  this->VBOs->AppendDataArray("vertexMC", this->Particles->GetData(), VTK_FLOAT);
   this->VBOs->AppendDataArray(
-    "vertexMC", this->Particles->GetData(), VTK_FLOAT);
-  this->VBOs->AppendDataArray(
-    "scalarColor", colors ? colors : this->Particles->GetData(),
-    VTK_UNSIGNED_CHAR);
+    "scalarColor", colors ? colors : this->Particles->GetData(), VTK_UNSIGNED_CHAR);
   this->VBOs->BuildAllVBOs(ren);
 
   // Setup the VAO
@@ -464,29 +448,20 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
   this->CurrentBuffer->UnBind();
   this->CurrentBuffer->RestorePreviousBindingsAndBuffers();
 
-  static float s_quadTCoords[8] =
-  {
-    0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f
-  };
-  static float s_quadVerts[12] =
-  {
-    -1.f, -1.f, 0.f,  1.f, -1.f, 0.f,  1.f, 1.f, 0.f,  -1.f, 1.f, 0.f
-  };
+  static float s_quadTCoords[8] = { 0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f };
+  static float s_quadVerts[12] = { -1.f, -1.f, 0.f, 1.f, -1.f, 0.f, 1.f, 1.f, 0.f, -1.f, 1.f, 0.f };
 
   ////////////////////////////////////////////////////////////////////
   // Pass 2: Blend current and previous frame in the frame buffer FBO
   this->FrameBuffer->SetContext(renWin);
   this->FrameBuffer->SaveCurrentBindingsAndBuffers();
   this->FrameBuffer->Bind();
-  this->FrameBuffer->AddColorAttachment(
-    this->FrameBuffer->GetBothMode(), 0, this->FrameTexture);
+  this->FrameBuffer->AddColorAttachment(this->FrameBuffer->GetBothMode(), 0, this->FrameTexture);
   this->FrameBuffer->AddDepthAttachment(); // auto create depth buffer
   this->FrameBuffer->ActivateBuffer(0);
-  this->FrameBuffer->Start(
-    this->FrameTexture->GetWidth(), this->FrameTexture->GetHeight());
+  this->FrameBuffer->Start(this->FrameTexture->GetWidth(), this->FrameTexture->GetHeight());
 
-  if (this->CameraMTime < cam->GetMTime() ||
-    this->ClearFlag || this->Mapper->Alpha == 0.)
+  if (this->CameraMTime < cam->GetMTime() || this->ClearFlag || this->Mapper->Alpha == 0.)
   {
     // Clear frame buffer if camera changed
     glClear(GL_COLOR_BUFFER_BIT);
@@ -499,13 +474,10 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
   vaotb->Bind();
   this->FrameTexture->Activate();
   this->CurrentTexture->Activate();
-  double alpha = 1.0 -
-    1.0 / (this->Mapper->MaxTimeToLive * std::max(0.00001, this->Mapper->Alpha));
+  double alpha = 1.0 - 1.0 / (this->Mapper->MaxTimeToLive * std::max(0.00001, this->Mapper->Alpha));
   this->BlendingProgram->SetUniformf("alpha", alpha);
-  this->BlendingProgram->SetUniformi("prev",
-    this->FrameTexture->GetTextureUnit());
-  this->BlendingProgram->SetUniformi("current",
-    this->CurrentTexture->GetTextureUnit());
+  this->BlendingProgram->SetUniformi("prev", this->FrameTexture->GetTextureUnit());
+  this->BlendingProgram->SetUniformi("current", this->CurrentTexture->GetTextureUnit());
   vtkOpenGLRenderUtilities::RenderQuad(
     s_quadVerts, s_quadTCoords, this->BlendingProgram, vaotb.Get());
   this->CurrentTexture->Deactivate();
@@ -520,8 +492,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
   vtkNew<vtkOpenGLVertexArrayObject> vaot;
   vaot->Bind();
   this->FrameTexture->Activate();
-  this->TextureProgram->SetUniformi("source",
-    this->FrameTexture->GetTextureUnit());
+  this->TextureProgram->SetUniformi("source", this->FrameTexture->GetTextureUnit());
   // Setup blending equation
   int prevBlendParams[4];
   glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendParams[0]);
@@ -536,8 +507,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer *ren, vtkActor *ac
 
   // Restore blending equation state
   glBlendFuncSeparate(
-    prevBlendParams[0], prevBlendParams[1],
-    prevBlendParams[2], prevBlendParams[3]);
+    prevBlendParams[0], prevBlendParams[1], prevBlendParams[2], prevBlendParams[3]);
 
   this->FrameTexture->Deactivate();
 
@@ -556,8 +526,7 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
     this->FrameBuffer = vtkOpenGLFramebufferObject::New();
   }
 
-  vtkOpenGLRenderWindow *renWin =
-    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
+  vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
   const int* size = renWin->GetSize();
   unsigned int width = static_cast<unsigned int>(size[0]);
   unsigned int height = static_cast<unsigned int>(size[1]);
@@ -568,8 +537,7 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
     this->CurrentTexture->SetContext(renWin);
   }
 
-  if (this->CurrentTexture->GetWidth() != width ||
-    this->CurrentTexture->GetHeight() != height)
+  if (this->CurrentTexture->GetWidth() != width || this->CurrentTexture->GetHeight() != height)
   {
     this->CurrentTexture->Create2D(width, height, 4, VTK_FLOAT, false);
     this->ClearFlag = true;
@@ -581,8 +549,7 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
     this->FrameTexture->SetContext(renWin);
   }
 
-  if (this->FrameTexture->GetWidth() != width ||
-    this->FrameTexture->GetHeight() != height)
+  if (this->FrameTexture->GetWidth() != width || this->FrameTexture->GetHeight() != height)
   {
     this->FrameTexture->Create2D(width, height, 4, VTK_FLOAT, false);
     this->ClearFlag = true;
@@ -595,22 +562,21 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
 
   if (!this->Program)
   {
-    this->Program = this->ShaderCache->ReadyShaderProgram(
-      vtkStreamLines_vs, vtkStreamLines_fs, "");
+    this->Program = this->ShaderCache->ReadyShaderProgram(vtkStreamLines_vs, vtkStreamLines_fs, "");
     this->Program->Register(this);
   }
 
   if (!this->BlendingProgram)
   {
-    this->BlendingProgram = this->ShaderCache->ReadyShaderProgram(
-      vtkTextureObjectVS, vtkStreamLinesBlending_fs, "");
+    this->BlendingProgram =
+      this->ShaderCache->ReadyShaderProgram(vtkTextureObjectVS, vtkStreamLinesBlending_fs, "");
     this->BlendingProgram->Register(this);
   }
 
   if (!this->TextureProgram)
   {
-    this->TextureProgram = this->ShaderCache->ReadyShaderProgram(
-      vtkTextureObjectVS, vtkStreamLinesCopy_fs, "");
+    this->TextureProgram =
+      this->ShaderCache->ReadyShaderProgram(vtkTextureObjectVS, vtkStreamLinesCopy_fs, "");
     this->TextureProgram->Register(this);
   }
 
@@ -681,14 +647,12 @@ void vtkStreamLinesMapper::Private::SetData(
     }
     if (scalars)
     {
-      this->InterpolationScalarArray =
-        vtkDataArray::CreateDataArray(scalars->GetDataType());
+      this->InterpolationScalarArray = vtkDataArray::CreateDataArray(scalars->GetDataType());
       this->AreCellScalars = ::HaveArray(inData->GetCellData(), scalars);
     }
     else
     {
-      this->InterpolationScalarArray =
-        vtkUnsignedCharArray::New();
+      this->InterpolationScalarArray = vtkUnsignedCharArray::New();
     }
     this->InterpolationScalarArray->SetNumberOfComponents(
       scalars ? scalars->GetNumberOfComponents() : 1);
@@ -697,16 +661,16 @@ void vtkStreamLinesMapper::Private::SetData(
     this->ClearFlag = true;
   }
 
-  if (!this->InterpolationArray || (this->InterpolationArray &&
-    this->InterpolationArray->GetDataType() != speedField->GetDataType()))
+  if (!this->InterpolationArray ||
+    (this->InterpolationArray &&
+      this->InterpolationArray->GetDataType() != speedField->GetDataType()))
   {
     if (this->InterpolationArray)
     {
       this->InterpolationArray->Delete();
       this->InterpolationArray = 0;
     }
-    this->InterpolationArray =
-      vtkDataArray::CreateDataArray(speedField->GetDataType());
+    this->InterpolationArray = vtkDataArray::CreateDataArray(speedField->GetDataType());
     this->InterpolationArray->SetNumberOfComponents(3);
     this->InterpolationArray->SetNumberOfTuples(1);
   }
@@ -715,8 +679,8 @@ void vtkStreamLinesMapper::Private::SetData(
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStreamLinesMapper)
 
-//-----------------------------------------------------------------------------
-vtkStreamLinesMapper::vtkStreamLinesMapper()
+  //-----------------------------------------------------------------------------
+  vtkStreamLinesMapper::vtkStreamLinesMapper()
 {
   this->Internal = Private::New();
   this->Internal->SetMapper(this);
@@ -726,10 +690,10 @@ vtkStreamLinesMapper::vtkStreamLinesMapper()
   this->NumberOfParticles = 0;
   this->SetNumberOfParticles(1000);
 
-  this->SetInputArrayToProcess(0, 0, 0,
-    vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::SCALARS);
-  this->SetInputArrayToProcess(1, 0, 0,
-    vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::VECTORS);
+  this->SetInputArrayToProcess(
+    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::SCALARS);
+  this->SetInputArrayToProcess(
+    1, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::VECTORS);
 }
 
 //-----------------------------------------------------------------------------
@@ -751,10 +715,9 @@ void vtkStreamLinesMapper::SetNumberOfParticles(int nbParticles)
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesMapper::Render(vtkRenderer *ren, vtkActor *actor)
+void vtkStreamLinesMapper::Render(vtkRenderer* ren, vtkActor* actor)
 {
-  vtkDataSet* inData =
-    vtkDataSet::SafeDownCast(this->GetInput());
+  vtkDataSet* inData = vtkDataSet::SafeDownCast(this->GetInput());
 
   if (!inData || inData->GetNumberOfCells() == 0)
   {
@@ -769,7 +732,7 @@ void vtkStreamLinesMapper::Render(vtkRenderer *ren, vtkActor *actor)
 
   if (!inVectors || inVectors->GetNumberOfComponents() != 3)
   {
-    vtkDebugMacro(<<"No speed field vector to process!");
+    vtkDebugMacro(<< "No speed field vector to process!");
     return;
   }
 
@@ -784,14 +747,13 @@ void vtkStreamLinesMapper::Render(vtkRenderer *ren, vtkActor *actor)
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesMapper::ReleaseGraphicsResources(vtkWindow *renWin)
+void vtkStreamLinesMapper::ReleaseGraphicsResources(vtkWindow* renWin)
 {
   this->Internal->ReleaseGraphicsResources(renWin);
 }
 
 //----------------------------------------------------------------------------
-int vtkStreamLinesMapper::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkStreamLinesMapper::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
@@ -800,7 +762,7 @@ int vtkStreamLinesMapper::FillInputPortInformation(
 //----------------------------------------------------------------------------
 void vtkStreamLinesMapper::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Alpha : " << this->Alpha << endl;
   os << indent << "StepLength : " << this->StepLength << endl;
