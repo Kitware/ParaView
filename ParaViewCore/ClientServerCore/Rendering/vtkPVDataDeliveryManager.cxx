@@ -512,6 +512,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     vtkDataObject* data = item ? item->GetDataObject() : NULL;
     if (!data)
     {
+      // ideally, we want to sync this info between all ranks some other rank
+      // doesn't deadlock (esp. in collaboration mode).
       continue;
     }
 
@@ -799,13 +801,17 @@ void vtkPVDataDeliveryManager::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 int vtkPVDataDeliveryManager::GetSynchronizationMagicNumber()
 {
+  // The synchronization magic number is used to ensure that both the server and
+  // the client know of have identical representations, because if they don't,
+  // there may be a mismatch between the states of the two processes and it's
+  // best to skip delivery to avoid deadlocks.
   const int prime = 31;
   int result = 1;
-  result = prime * result + static_cast<int>(this->Internals->ItemsMap.size());
-  vtkInternals::ItemsMapType::iterator iter = this->Internals->ItemsMap.begin();
-  for (; iter != this->Internals->ItemsMap.end(); iter++)
+  result = prime * result + static_cast<int>(this->Internals->RepresentationsMap.size());
+  for (auto iter = this->Internals->RepresentationsMap.begin();
+       iter != this->Internals->RepresentationsMap.end(); ++iter)
   {
-    result = prime * result + static_cast<int>(iter->first.first) + iter->first.second;
+    result = prime * result + static_cast<int>(iter->first);
   }
   return result;
 }
