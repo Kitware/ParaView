@@ -25,8 +25,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
-class vtkPVXMLElement;
-
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
 public:
@@ -54,8 +52,6 @@ public:
 protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy();
-
-  vtkSmartPointer<vtkPVXMLElement> StateXML;
 
 private:
   class vtkInternals;
