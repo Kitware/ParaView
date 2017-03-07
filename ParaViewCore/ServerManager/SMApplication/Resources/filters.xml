@@ -5992,6 +5992,15 @@ array.
                             name="ScaleFactor"
                             number_of_elements="1"
                             panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputScalars" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
         <Documentation>The scalar value at a given point is multiplied by the
         value of this property to determine the magnitude of the change vector
         for that point.</Documentation>
@@ -6081,6 +6090,15 @@ array.
                             name="ScaleFactor"
                             number_of_elements="1"
                             panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputVectors" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
         <Documentation>Each component of the selected vector array will be
         multiplied by the value of this property before being used to compute
         new point coordinates.</Documentation>
