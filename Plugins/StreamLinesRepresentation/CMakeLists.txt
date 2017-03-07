@@ -34,10 +34,11 @@ if(PARAVIEW_BUILD_QT_GUI)
 endif()
 
 encode_files_as_strings(ENCODED_STRING_FILES
+  shaders/vtkStreamLines_fs.glsl
+  shaders/vtkStreamLines_gs.glsl
+  shaders/vtkStreamLines_vs.glsl
   shaders/vtkStreamLinesBlending_fs.glsl
   shaders/vtkStreamLinesCopy_fs.glsl
-  shaders/vtkStreamLines_fs.glsl
-  shaders/vtkStreamLines_vs.glsl
   )
 
 add_paraview_plugin(
@@ -58,4 +59,8 @@ vtk_opengl_link(StreamLinesRepresentation)
 
 if(PARAVIEW_BUILD_QT_GUI)
   target_link_libraries(StreamLinesRepresentation LINK_PRIVATE pqApplicationComponents)
+
+  if (BUILD_TESTING)
+    add_subdirectory(Testing)
+  endif()
 endif()
