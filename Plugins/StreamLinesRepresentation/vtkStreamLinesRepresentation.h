@@ -24,8 +24,8 @@
 #ifndef vtkStreamLinesRepresentation_h
 #define vtkStreamLinesRepresentation_h
 
+#include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
-#include "vtkNew.h"  // needed for vtkNew.
 
 class vtkColorTransferFunction;
 class vtkExtentTranslator;
@@ -40,7 +40,6 @@ class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkStreamLinesMapper;
 
-
 class VTK_EXPORT vtkStreamLinesRepresentation : public vtkPVDataRepresentation
 {
 public:
@@ -54,8 +53,7 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  int ProcessViewRequest(
-    vtkInformationRequestKey*, vtkInformation*, vtkInformation*) VTK_OVERRIDE;
+  int ProcessViewRequest(vtkInformationRequestKey*, vtkInformation*, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -70,7 +68,6 @@ public:
    * representation of false, all view passes are ignored.
    */
   void SetVisibility(bool val) VTK_OVERRIDE;
-
 
   //***************************************************************************
   // Forwarded to vtkProperty.
@@ -139,8 +136,8 @@ public:
   {
     this->Superclass::SetInputArrayToProcess(idx, info);
   }
-  void SetInputArrayToProcess(int idx, int port, int connection,
-    const char* fieldAssociation, const char* attributeTypeorName) VTK_OVERRIDE
+  void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldAssociation,
+    const char* attributeTypeorName) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
