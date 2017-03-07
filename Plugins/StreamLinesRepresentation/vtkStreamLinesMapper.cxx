@@ -29,6 +29,7 @@
 #include "vtkMinimalStandardRandomSequence.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLActor.h"
 #include "vtkOpenGLBufferObject.h"
 #include "vtkOpenGLCamera.h"
 #include "vtkOpenGLError.h"
@@ -60,6 +61,7 @@
 extern const char* vtkStreamLinesBlending_fs;
 extern const char* vtkStreamLinesCopy_fs;
 extern const char* vtkStreamLines_fs;
+extern const char* vtkStreamLines_gs;
 extern const char* vtkStreamLines_vs;
 
 //----------------------------------------------------------------------------
@@ -103,7 +105,7 @@ public:
 
   void SetData(vtkDataSet*, vtkDataArray*, vtkDataArray*);
 
-  void DrawParticles(vtkRenderer*, vtkActor*);
+  void DrawParticles(vtkRenderer*, vtkActor*, bool);
 
   void UpdateParticles();
 
@@ -112,7 +114,7 @@ protected:
   ~Private();
 
   void InitParticle(int);
-  void PrepareGLBuffers(vtkRenderer*);
+  bool PrepareGLBuffers(vtkRenderer*, vtkActor*);
   bool InterpolateSpeedAndColor(double[3], double[3], vtkIdType);
 
   inline double Rand(double vmin = 0., double vmax = 1.)
@@ -134,6 +136,7 @@ protected:
   vtkStreamLinesMapper* Mapper;
   vtkTextureObject* CurrentTexture;
   vtkTextureObject* FrameTexture;
+  vtkNew<vtkMatrix4x4> TempMatrix4;
 
   double Bounds[6];
   std::vector<int> Indices;
@@ -146,12 +149,14 @@ protected:
   vtkNew<vtkIdList> IdList;
   vtkNew<vtkPoints> Particles;
   vtkSmartPointer<vtkDataArray> InterpolationScalarArray;
+  vtkMTimeType ActorMTime;
   vtkMTimeType CameraMTime;
 
   bool AreCellScalars;
   bool AreCellVectors;
   bool ClearFlag;
   bool RebuildBufferObjects;
+  bool CreateWideLines;
 
 private:
   Private(const Private&) VTK_DELETE_FUNCTION;
@@ -166,7 +171,7 @@ vtkStandardNewMacro(vtkStreamLinesMapper::Private)
   this->Mapper = 0;
   this->RandomNumberSequence = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
   this->RandomNumberSequence->SetSeed(1);
-  this->VBOs = vtkOpenGLVertexBufferObjectGroup::New();
+  this->VBOs = 0;
   this->ShaderCache = 0;
   this->CurrentBuffer = 0;
   this->FrameBuffer = 0;
@@ -186,8 +191,11 @@ vtkStandardNewMacro(vtkStreamLinesMapper::Private)
   this->ClearFlag = true;
   this->RebuildBufferObjects = true;
   this->Locator = 0;
+  this->ActorMTime = 0;
+  this->CameraMTime = 0;
   this->AreCellVectors = false;
   this->AreCellScalars = false;
+  this->CreateWideLines = false;
 }
 
 //----------------------------------------------------------------------------
@@ -361,20 +369,33 @@ void vtkStreamLinesMapper::Private::UpdateParticles()
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* actor)
+void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* actor, bool animate)
 {
-  this->PrepareGLBuffers(ren);
+  if (!this->PrepareGLBuffers(ren, actor))
+  {
+    return;
+  }
+
+  vtkOpenGLCamera* cam = vtkOpenGLCamera::SafeDownCast(ren->GetActiveCamera());
+
+  this->ClearFlag = this->ClearFlag || this->Mapper->Alpha == 0. ||
+    this->ActorMTime < actor->GetMTime() || this->CameraMTime < cam->GetMTime();
+
+  if (this->ClearFlag && !animate)
+  {
+    return;
+  }
 
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
 
   int nbParticles = static_cast<int>(this->ParticlesTTL.size());
 
-  vtkOpenGLCamera* cam = vtkOpenGLCamera::SafeDownCast(ren->GetActiveCamera());
   vtkMatrix4x4* wcdc;
   vtkMatrix4x4* wcvc;
   vtkMatrix3x3* norms;
   vtkMatrix4x4* vcdc;
   cam->GetKeyMatrices(ren, wcvc, norms, vcdc, wcdc);
+  this->ActorMTime = actor->GetMTime();
 
   ////////////////////////////////////////////////
   // Pass 1: Render segment to current buffer FBO
@@ -390,7 +411,19 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   this->ShaderCache->ReadyShaderProgram(this->Program);
   if (this->Program->IsUniformUsed("MCDCMatrix"))
   {
-    this->Program->SetUniformMatrix("MCDCMatrix", wcdc);
+    actor->ComputeMatrix();
+    if (!actor->GetIsIdentity())
+    {
+      vtkMatrix4x4* mcwc;
+      vtkMatrix3x3* anorms;
+      static_cast<vtkOpenGLActor*>(actor)->GetKeyMatrices(mcwc, anorms);
+      vtkMatrix4x4::Multiply4x4(mcwc, wcdc, this->TempMatrix4.Get());
+      this->Program->SetUniformMatrix("MCDCMatrix", this->TempMatrix4.Get());
+    }
+    else
+    {
+      this->Program->SetUniformMatrix("MCDCMatrix", wcdc);
+    }
   }
 
   bool useScalars = this->Scalars && this->Mapper->GetScalarVisibility();
@@ -401,6 +434,16 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   color[2] = static_cast<double>(col[2]);
   this->Program->SetUniform3f("color", color);
   this->Program->SetUniformi("scalarVisibility", useScalars);
+
+  if (this->CreateWideLines && this->Program->IsUniformUsed("lineWidthNVC"))
+  {
+    int vp[4];
+    glGetIntegerv(GL_VIEWPORT, vp);
+    float lineWidth[2];
+    lineWidth[0] = 2.0 * actor->GetProperty()->GetLineWidth() / vp[2];
+    lineWidth[1] = 2.0 * actor->GetProperty()->GetLineWidth() / vp[3];
+    this->Program->SetUniform2f("lineWidthNVC", lineWidth);
+  }
 
   // Setup the IBO
   this->IndexBufferObject->Bind();
@@ -438,7 +481,10 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
-  glLineWidth(actor->GetProperty()->GetLineWidth());
+  if (!this->CreateWideLines)
+  {
+    glLineWidth(actor->GetProperty()->GetLineWidth());
+  }
   glDrawArrays(GL_LINES, 0, nbParticles * 2);
   vtkOpenGLCheckErrorMacro("Failed after rendering");
 
@@ -453,70 +499,81 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
 
   ////////////////////////////////////////////////////////////////////
   // Pass 2: Blend current and previous frame in the frame buffer FBO
-  this->FrameBuffer->SetContext(renWin);
-  this->FrameBuffer->SaveCurrentBindingsAndBuffers();
-  this->FrameBuffer->Bind();
-  this->FrameBuffer->AddColorAttachment(this->FrameBuffer->GetBothMode(), 0, this->FrameTexture);
-  this->FrameBuffer->AddDepthAttachment(); // auto create depth buffer
-  this->FrameBuffer->ActivateBuffer(0);
-  this->FrameBuffer->Start(this->FrameTexture->GetWidth(), this->FrameTexture->GetHeight());
-
-  if (this->CameraMTime < cam->GetMTime() || this->ClearFlag || this->Mapper->Alpha == 0.)
+  if (animate)
   {
-    // Clear frame buffer if camera changed
-    glClear(GL_COLOR_BUFFER_BIT);
-    this->CameraMTime = cam->GetMTime();
-    this->ClearFlag = false;
+    this->FrameBuffer->SetContext(renWin);
+    this->FrameBuffer->SaveCurrentBindingsAndBuffers();
+    this->FrameBuffer->Bind();
+    this->FrameBuffer->AddColorAttachment(this->FrameBuffer->GetBothMode(), 0, this->FrameTexture);
+    this->FrameBuffer->AddDepthAttachment(); // auto create depth buffer
+    this->FrameBuffer->ActivateBuffer(0);
+    this->FrameBuffer->Start(this->FrameTexture->GetWidth(), this->FrameTexture->GetHeight());
+
+    if (this->ClearFlag)
+    {
+      // Clear frame buffer if camera changed
+      glClear(GL_COLOR_BUFFER_BIT);
+      this->CameraMTime = cam->GetMTime();
+      this->ClearFlag = false;
+    }
+
+    this->ShaderCache->ReadyShaderProgram(this->BlendingProgram);
+    vtkNew<vtkOpenGLVertexArrayObject> vaotb;
+    vaotb->Bind();
+    this->FrameTexture->Activate();
+    this->CurrentTexture->Activate();
+    double alpha =
+      1.0 - (1.0 / (this->Mapper->MaxTimeToLive * std::max(0.00001, this->Mapper->Alpha)));
+    this->BlendingProgram->SetUniformf("alpha", alpha);
+    this->BlendingProgram->SetUniformi("prev", this->FrameTexture->GetTextureUnit());
+    this->BlendingProgram->SetUniformi("current", this->CurrentTexture->GetTextureUnit());
+    vtkOpenGLRenderUtilities::RenderQuad(
+      s_quadVerts, s_quadTCoords, this->BlendingProgram, vaotb.Get());
+    this->CurrentTexture->Deactivate();
+    vaotb->Release();
+
+    this->FrameBuffer->UnBind();
+    this->FrameBuffer->RestorePreviousBindingsAndBuffers();
   }
 
-  this->ShaderCache->ReadyShaderProgram(this->BlendingProgram);
-  vtkNew<vtkOpenGLVertexArrayObject> vaotb;
-  vaotb->Bind();
-  this->FrameTexture->Activate();
-  this->CurrentTexture->Activate();
-  double alpha = 1.0 - 1.0 / (this->Mapper->MaxTimeToLive * std::max(0.00001, this->Mapper->Alpha));
-  this->BlendingProgram->SetUniformf("alpha", alpha);
-  this->BlendingProgram->SetUniformi("prev", this->FrameTexture->GetTextureUnit());
-  this->BlendingProgram->SetUniformi("current", this->CurrentTexture->GetTextureUnit());
-  vtkOpenGLRenderUtilities::RenderQuad(
-    s_quadVerts, s_quadTCoords, this->BlendingProgram, vaotb.Get());
-  this->CurrentTexture->Deactivate();
-  vaotb->Release();
+  ////////////////////////////////////////////////
+  // Pass 3: Finally draw the FBO onto the screen
+  if (!this->ClearFlag)
+  {
+    this->ShaderCache->ReadyShaderProgram(this->TextureProgram);
+    vtkNew<vtkOpenGLVertexArrayObject> vaot;
+    vaot->Bind();
+    this->FrameTexture->Activate();
+    this->TextureProgram->SetUniformi("source", this->FrameTexture->GetTextureUnit());
+    // Setup blending equation
+    int prevBlendParams[4];
+    glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendParams[0]);
+    glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendParams[1]);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &prevBlendParams[2]);
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &prevBlendParams[3]);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-  this->FrameBuffer->UnBind();
-  this->FrameBuffer->RestorePreviousBindingsAndBuffers();
+    vtkOpenGLRenderUtilities::RenderQuad(
+      s_quadVerts, s_quadTCoords, this->TextureProgram, vaot.Get());
 
-  ////////////////////////////////////////////////////////////
-  // Pass 3: Finally draw the framebuffer FBO onto the screen
-  this->ShaderCache->ReadyShaderProgram(this->TextureProgram);
-  vtkNew<vtkOpenGLVertexArrayObject> vaot;
-  vaot->Bind();
-  this->FrameTexture->Activate();
-  this->TextureProgram->SetUniformi("source", this->FrameTexture->GetTextureUnit());
-  // Setup blending equation
-  int prevBlendParams[4];
-  glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendParams[0]);
-  glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendParams[1]);
-  glGetIntegerv(GL_BLEND_SRC_ALPHA, &prevBlendParams[2]);
-  glGetIntegerv(GL_BLEND_DST_ALPHA, &prevBlendParams[3]);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
+    // Restore blending equation state
+    glBlendFuncSeparate(
+      prevBlendParams[0], prevBlendParams[1], prevBlendParams[2], prevBlendParams[3]);
 
-  vtkOpenGLRenderUtilities::RenderQuad(
-    s_quadVerts, s_quadTCoords, this->TextureProgram, vaot.Get());
-
-  // Restore blending equation state
-  glBlendFuncSeparate(
-    prevBlendParams[0], prevBlendParams[1], prevBlendParams[2], prevBlendParams[3]);
-
-  this->FrameTexture->Deactivate();
-
-  vaot->Release();
+    this->FrameTexture->Deactivate();
+    vaot->Release();
+  }
+  glEnable(GL_DEPTH_TEST);
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
+bool vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren, vtkActor* actor)
 {
+  if (!this->VBOs)
+  {
+    this->VBOs = vtkOpenGLVertexBufferObjectGroup::New();
+  }
   if (!this->CurrentBuffer)
   {
     this->CurrentBuffer = vtkOpenGLFramebufferObject::New();
@@ -560,9 +617,20 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
     this->ShaderCache = renWin->GetShaderCache();
   }
 
-  if (!this->Program)
+  bool prevCreateWideLines = this->CreateWideLines;
+  this->CreateWideLines = actor->GetProperty()->GetLineWidth() > 1.0 &&
+    vtkOpenGLRenderWindow::GetContextSupportsOpenGL32() &&
+    actor->GetProperty()->GetLineWidth() > renWin->GetMaximumHardwareLineWidth();
+
+  if (!this->Program || (prevCreateWideLines != this->CreateWideLines))
   {
-    this->Program = this->ShaderCache->ReadyShaderProgram(vtkStreamLines_vs, vtkStreamLines_fs, "");
+    this->ShaderCache->ReleaseCurrentShader();
+    if (this->Program)
+    {
+      RELEASE_VTKGL_OBJECT(this->Program);
+    }
+    this->Program = this->ShaderCache->ReadyShaderProgram(
+      vtkStreamLines_vs, vtkStreamLines_fs, this->CreateWideLines ? vtkStreamLines_gs : "");
     this->Program->Register(this);
   }
 
@@ -585,6 +653,9 @@ void vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren)
     this->IndexBufferObject = vtkOpenGLBufferObject::New();
     this->IndexBufferObject->SetType(vtkOpenGLBufferObject::ElementArrayBuffer);
   }
+
+  return this->CurrentTexture && this->FrameTexture && this->ShaderCache && this->Program &&
+    this->BlendingProgram && this->TextureProgram && this->IndexBufferObject;
 }
 
 namespace
@@ -684,10 +755,13 @@ vtkStandardNewMacro(vtkStreamLinesMapper)
 {
   this->Internal = Private::New();
   this->Internal->SetMapper(this);
+  this->Animate = true;
   this->Alpha = 0.95;
   this->StepLength = 0.01;
   this->MaxTimeToLive = 600;
   this->NumberOfParticles = 0;
+  this->NumberOfAnimationSteps = 1;
+  this->AnimationSteps = 0;
   this->SetNumberOfParticles(1000);
 
   this->SetInputArrayToProcess(
@@ -715,6 +789,17 @@ void vtkStreamLinesMapper::SetNumberOfParticles(int nbParticles)
 }
 
 //----------------------------------------------------------------------------
+void vtkStreamLinesMapper::SetAnimate(bool animate)
+{
+  if (this->Animate != animate)
+  {
+    this->Animate = animate;
+    this->AnimationSteps = 0;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkStreamLinesMapper::Render(vtkRenderer* ren, vtkActor* actor)
 {
   vtkDataSet* inData = vtkDataSet::SafeDownCast(this->GetInput());
@@ -739,11 +824,25 @@ void vtkStreamLinesMapper::Render(vtkRenderer* ren, vtkActor* actor)
   // Set processing dataset and arrays
   this->Internal->SetData(inData, inVectors, inScalars);
 
-  // Move particles
-  this->Internal->UpdateParticles();
+  bool animate = true;
+  for (int i = 0; i < this->NumberOfAnimationSteps && animate; i++)
+  {
+    animate = this->Animate &&
+      (this->NumberOfAnimationSteps == 1 || (this->NumberOfAnimationSteps > 1 &&
+                                              this->AnimationSteps < this->NumberOfAnimationSteps));
+    if (animate)
+    {
+      // Move particles
+      this->Internal->UpdateParticles();
+      if (this->NumberOfAnimationSteps > 1)
+      {
+        this->AnimationSteps++;
+      }
+    }
 
-  // Draw updated particles in a buffer
-  this->Internal->DrawParticles(ren, actor);
+    // Draw updated particles in a buffer
+    this->Internal->DrawParticles(ren, actor, animate);
+  }
 }
 
 //----------------------------------------------------------------------------

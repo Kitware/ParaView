@@ -83,11 +83,22 @@ public:
   virtual void SetSpecularPower(double val);
 
   //***************************************************************************
+  // Forwarded to Actor.
+  virtual void SetOrientation(double, double, double);
+  virtual void SetOrigin(double, double, double);
+  virtual void SetPickable(int val);
+  virtual void SetPosition(double, double, double);
+  virtual void SetScale(double, double, double);
+  virtual void SetUserTransform(const double[16]);
+
+  //***************************************************************************
   // Forwarded to vtkStreamLinesMapper
+  virtual void SetAnimate(bool val);
   virtual void SetAlpha(double val);
   virtual void SetStepLength(double val);
   virtual void SetNumberOfParticles(int val);
   virtual void SetMaxTimeToLive(int val);
+  virtual void SetNumberOfAnimationSteps(int val);
 
   virtual void SetInputVectors(int, int, int, int attributeMode, const char* name);
 

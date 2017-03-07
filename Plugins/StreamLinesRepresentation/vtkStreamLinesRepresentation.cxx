@@ -38,6 +38,7 @@
 #include "vtkStreamLinesMapper.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredData.h"
+#include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
@@ -141,8 +142,8 @@ vtkStreamLinesRepresentation::~vtkStreamLinesRepresentation()
   this->Property->Delete();
   this->Actor->Delete();
   this->CacheKeeper->Delete();
-
   this->Cache->Delete();
+  this->MBMerger->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -399,6 +400,52 @@ void vtkStreamLinesRepresentation::SetVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetOrientation(double x, double y, double z)
+{
+  this->Actor->SetOrientation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetOrigin(double x, double y, double z)
+{
+  this->Actor->SetOrigin(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetPickable(int val)
+{
+  this->Actor->SetPickable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetPosition(double x, double y, double z)
+{
+  this->Actor->SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetScale(double x, double y, double z)
+{
+  this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->Actor->SetUserTransform(transform.GetPointer());
+}
+
+//***************************************************************************
+// Forwarded to StreamLinesMapper.
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetAnimate(bool val)
+{
+  this->StreamLinesMapper->SetAnimate(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkStreamLinesRepresentation::SetAlpha(double val)
 {
   this->StreamLinesMapper->SetAlpha(val);
@@ -420,6 +467,12 @@ void vtkStreamLinesRepresentation::SetNumberOfParticles(int val)
 void vtkStreamLinesRepresentation::SetMaxTimeToLive(int val)
 {
   this->StreamLinesMapper->SetMaxTimeToLive(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetNumberOfAnimationSteps(int val)
+{
+  this->StreamLinesMapper->SetNumberOfAnimationSteps(val);
 }
 
 //----------------------------------------------------------------------------
