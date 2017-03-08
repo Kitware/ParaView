@@ -4062,22 +4062,6 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-<!--
-      <IntVectorProperty name="UseFileNamesFromState" number_of_elements="1" default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Keep data filenames as specified in the state file.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="UseDataDirectory" number_of_elements="1" default_values="0">
-        <Documentation>
-          Use **Data Directory** to search for all data files.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
--->
-
       <StringVectorProperty name="DataDirectory" number_of_elements="1" default_values="">
         <FileListDomain name="files" />
         <Documentation>
@@ -4086,6 +4070,7 @@
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="1">
           </PropertyWidgetDecorator>
+          <UseDirectoryName />
         </Hints>
       </StringVectorProperty>
 

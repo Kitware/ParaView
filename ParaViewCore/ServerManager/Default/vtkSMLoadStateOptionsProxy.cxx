@@ -38,7 +38,7 @@ public:
   struct PropertyInfo
   {
     pugi::xml_node XMLElement;
-    std::string Filename;
+    std::string FilePath;
     bool Modified;
     PropertyInfo()
       : Modified(false)
@@ -108,7 +108,7 @@ public:
         {
           PropertyInfo info;
           info.XMLElement = *it;
-          info.Filename = it->child("Element").attribute("value").value();
+          info.FilePath = it->child("Element").attribute("value").value();
           this->PropertiesMap[it->attribute("id").value()] = info;
         }
       }
@@ -137,7 +137,7 @@ public:
       if (strcmp(it->name(), "Item") == 0)
       {
         int itemId = it->attribute("id").as_int();
-        this->CollectionsMap[itemId];
+        this->CollectionsMap[itemId] = *it;
       }
     }
   }
@@ -227,23 +227,38 @@ bool vtkSMLoadStateOptionsProxy::Load()
     }
     case 1:
     {
-      // TODO: Deal with data directory
+      std::string directoryPath = vtkSMPropertyHelper(this, "DataDirectory").GetAsString();
+
+      vtkInternals::PropertiesMapType::iterator iter;
+      for (iter = this->Internals->PropertiesMap.begin();
+           iter != this->Internals->PropertiesMap.end(); ++iter)
+      {
+        vtkInternals::PropertyInfo& info = iter->second;
+        std::string newPath;
+
+        if (iter->first.find("FilePattern") == std::string::npos)
+        {
+          if (vtksys::SystemTools::LocateFileInDir(
+                info.FilePath.c_str(), directoryPath.c_str(), newPath))
+          {
+            info.FilePath = newPath;
+            info.Modified = true;
+          }
+          else
+          {
+            vtkErrorMacro("Cannot find " << info.FilePath << " in " << directoryPath << ".");
+            return false;
+          }
+        }
+      }
+
       break;
     }
     case 2:
     {
-      // TODO: Replace individual files
-      std::string dateFilePath = vtkSMPropertyHelper(this, "DataFilePaths").GetAsString();
-
-      // Hard coded for Disk.pvsm for now
-      std::string key = "8817.FileName";
-      vtkInternals::PropertyInfo& info = this->Internals->PropertiesMap[key];
-
-      if (info.Filename != dateFilePath)
-      {
-        info.Filename = dateFilePath;
-        info.Modified = true;
-      }
+      // TODO: Find a way to get Proxies to reproduce old Qt dialog
+      vtkWarningMacro("Explicitly specifying file paths not implemented yet.");
+      return false;
       break;
     }
   }
@@ -253,15 +268,19 @@ bool vtkSMLoadStateOptionsProxy::Load()
        ++iter)
   {
     vtkInternals::PropertyInfo& info = iter->second;
-    if (info.Modified)
+    if (!info.Modified)
     {
-      info.XMLElement.child("Element").attribute("value").set_value(info.Filename.c_str());
-      ;
+      continue;
     }
+
+    info.XMLElement.child("Element").attribute("value").set_value(info.FilePath.c_str());
 
     // Also fix up sources proxy collection
     std::string fullId = iter->first;
     int id = std::atoi(fullId.substr(0, fullId.find(".")).c_str());
+
+    std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePath);
+    this->Internals->CollectionsMap[id].attribute("name").set_value(filename.c_str());
   }
 
   // Convert back to vtkPVXMLElement for now
