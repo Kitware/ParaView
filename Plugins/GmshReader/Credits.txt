@@ -1,0 +1,24 @@
+GmshReader Plugin for ParaView
+ParaView/VTK reader for visualization of high-order polynomial solutions under the GMSH format.
+Version: 1.0
+
+GmshReader Plugin is copyright (C) 2015 Cenaero, belgium
+<http://www.cenaero.be>
+
+The main author of GmshReader Plugin is
+Michel Rasquin
+Cenaero
+Rue des Frères Wright, 29
+6041 Gosselies
+Belgium
+michel.rasquin@cenaero.be
+
+This plugin was further integrated in the ParaView sources with the help of
+Joachim Pouderoux (joachim.pouderoux@kitware.com) and
+Mathieu Westphal (mathieu.westphal@kitware.com) from Kitware.
+
+GmshReader Plugin is inspired from an existing ParaView reader able to
+read unstructured grid data under the PHASTA format. See the original version
+of this reader already implemented in the ParaView source code (.pht extension),
+or a second version currently implemented as an external plugin (.phts extension)
+and available from https://github.com/PHASTA/ParaViewSyncIOReaderPlugin.

@@ -1,0 +1,85 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkGmshMetaReader"
+                 label="Gmsh Reader"
+                 name="GmshReader">
+      <Documentation long_help="Reads the parallel Gmsh meta-file and the underlying *.msh files."
+                     short_help="Read datasets stored in the Gmsh format.">
+                     This Gmsh reader reads files stored in the .msh format.
+                     The expected file extension is .mshi.
+                     The output of this reader is a multipiece data set. </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Gmsh reader. </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayStatus"
+                            command="SetPointArrayStatus"
+                            number_of_elements="2"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property contains a list of the point-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="AdaptationLevel"
+                         command="SetAdaptationLevel"
+                         default_values="0"
+                         information_property="AdaptationLevelInfo"
+                         number_of_elements="1">
+        <Documentation>Adaptation level.</Documentation>
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+      <IntVectorProperty information_only="1"
+                         name="AdaptationLevelInfo"
+                         command="GetAdaptationLevelInfo" >
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="AdaptationTolerance"
+                            command="SetAdaptationTolerance"
+                            default_values="0.1"
+                            information_property="AdaptationToleranceInfo"
+                            number_of_elements="1">
+        <Documentation>Adaptation tolerance.</Documentation>
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="AdaptationToleranceInfo"
+                            command="GetAdaptationToleranceInfo" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="mshi"
+                       file_description="Gmsh Files" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
