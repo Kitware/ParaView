@@ -814,6 +814,15 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each time step available from the
+        reader.</Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
