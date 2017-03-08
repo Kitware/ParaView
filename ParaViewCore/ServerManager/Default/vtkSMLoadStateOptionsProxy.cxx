@@ -180,28 +180,16 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
-  // TODO: ....
-  if (vtksys::SystemTools::StringEndsWith(statefilename, ".pvsm"))
+  pugi::xml_parse_result result = this->Internals->StateXML.load_file(statefilename);
+
+  if (!result)
   {
-    pugi::xml_parse_result result = this->Internals->StateXML.load_file(statefilename);
-
-    if (!result)
-    {
-      vtkErrorMacro(
-        "Error parsing state file XML from " << statefilename << ": " << result.description());
-    }
-
-    this->Internals->processStateFile(this->Internals->StateXML);
-  }
-  else
-  { // python file
-#ifdef PARAVIEW_ENABLE_PYTHON
-// TODO: ....
-#else
-    vtkWarningMacro("ParaView was not built with Python support so it cannot open a python file");
+    vtkErrorMacro(
+      "Error parsing state file XML from " << statefilename << ": " << result.description());
     return false;
-#endif
   }
+
+  this->Internals->processStateFile(this->Internals->StateXML);
   return true;
 }
 
