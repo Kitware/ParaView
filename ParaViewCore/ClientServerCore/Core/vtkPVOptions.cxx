@@ -142,12 +142,12 @@ void vtkPVOptions::Initialize()
     "--cslog", 0, &this->LogFileName, "ClientServerStream log file.", vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--multi-clients", 0, &this->MultiClientMode,
-    "Allow server to keep listening for serveral client to"
+    "Allow server to keep listening for several clients to"
     "connect to it and share the same visualization session.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--multi-clients-debug", 0, &this->MultiClientModeWithErrorMacro,
-    "Allow server to keep listening for serveral client to"
+    "Allow server to keep listening for several clients to"
     "connect to it and share the same visualization session."
     "While keeping the error macro on the server session for debug.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
@@ -162,8 +162,8 @@ void vtkPVOptions::Initialize()
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
   this->AddArgument("--server-url", "-url", &this->ServerURL,
-    "Set the server-url to connect with when the client starts. "
-    "--server (-s) option supersedes this option, hence one should only use "
+    "Set the server-url to connect to when the client starts. "
+    "The --server (-s) option supersedes this option, hence use only "
     "one of the two options.",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
@@ -174,7 +174,7 @@ void vtkPVOptions::Initialize()
       vtkPVOptions::PVDATA_SERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
     "Render offscreen on the satellite processes."
-    " This option only works with software rendering or mangled mesa on Unix.",
+    " This option only works with software rendering or mangled Mesa on Unix.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
 #ifdef VTK_USE_OFFSCREEN_EGL
   this->AddArgument("--egl-device-index", NULL, &this->EGLDeviceIndex,
@@ -203,10 +203,10 @@ void vtkPVOptions::Initialize()
     "Size of tile display in the number of displays in each column of the display.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
   this->AddArgument("--tile-mullion-x", "-tmx", this->TileMullions,
-    "Size of the gap between columns in the tile display, in Pixels.",
+    "Size of the gap between columns in the tile display, in pixels.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
   this->AddArgument("--tile-mullion-y", "-tmy", this->TileMullions + 1,
-    "Size of the gap between rows in the tile display, in Pixels.",
+    "Size of the gap between rows in the tile display, in pixels.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
 
   this->AddArgument("--timeout", 0, &this->Timeout,
@@ -219,8 +219,8 @@ void vtkPVOptions::Initialize()
     "--version", "-V", &this->TellVersion, "Give the version number and exit.");
 
   this->AddArgument("--servers-file", 0, &this->ServersFileName,
-    "Load the specified configuration servers file (.pvsc). This option replace "
-    "the default user's configuration servers file",
+    "Load the specified configuration servers file (.pvsc). This option replaces "
+    "the default user's configuration servers file.",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
   // add new Command Option for loading StateFile (Bug #5711)
@@ -261,7 +261,7 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument("--disable-xdisplay-test", 0, &this->DisableXDisplayTests,
     "When specified, all X-display tests and OpenGL version checks are skipped. Use this option if "
     "you are getting remote-rendering disabled errors and you are positive that "
-    "the X environment is setup properly and your OpenGL support is adequate (experimental).",
+    "the X environment is set up properly and your OpenGL support is adequate (experimental).",
     vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
 
 #if defined(PARAVIEW_USE_MPI)
@@ -412,7 +412,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   if (this->MultiClientMode)
   {
-    os << indent << "Allow several client to connect to that server.\n";
+    os << indent << "Allow several clients to connect to a server.\n";
   }
   if (this->MultiServerMode)
   {
