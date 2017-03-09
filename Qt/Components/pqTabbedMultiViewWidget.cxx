@@ -280,6 +280,18 @@ bool pqTabbedMultiViewWidget::readOnly() const
 }
 
 //-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setTabVisibility(bool visible)
+{
+  this->Internals->TabWidget->tabBar()->setVisible(visible);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::tabVisibility() const
+{
+  return this->Internals->TabWidget->tabBar()->isVisible();
+}
+
+//-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::toggleFullScreen()
 {
   if (this->Internals->FullScreenWindow)
