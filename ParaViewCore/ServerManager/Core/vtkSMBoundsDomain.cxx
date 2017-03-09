@@ -250,11 +250,19 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
   else if (this->Mode == vtkSMBoundsDomain::ARRAY_SCALED_EXTENT)
   {
     this->ArrayRangeDomain->Update(NULL);
-    double arrayScaleFactor =
-      this->ArrayRangeDomain->GetMaximum(this->ArrayRangeDomain->GetNumberOfEntries() - 1);
+    double arrayScaleFactor = 0;
+    for (unsigned int i = 0; i < this->ArrayRangeDomain->GetNumberOfEntries(); i++)
+    {
+      arrayScaleFactor +=
+        (this->ArrayRangeDomain->GetMaximum(i) - this->ArrayRangeDomain->GetMinimum(i)) / 2;
+    }
     if (arrayScaleFactor == 0)
     {
       arrayScaleFactor = 1;
+    }
+    else
+    {
+      arrayScaleFactor /= this->ArrayRangeDomain->GetNumberOfEntries();
     }
     vtkBoundingBox box(bounds);
     double maxbounds = box.GetMaxLength();
