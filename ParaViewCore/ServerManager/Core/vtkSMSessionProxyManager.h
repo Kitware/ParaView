@@ -425,6 +425,11 @@ public:
   vtkPVXMLElement* SaveXMLState();
 
   /**
+   * Save/Load registered link states.
+   */
+  void SaveRegisteredLinks(vtkPVXMLElement* root);
+
+  /**
    * Given a group name, create prototypes and store them
    * in a instance group called groupName_prototypes.
    * Prototypes have their ConnectionID set to the SelfConnection.
@@ -592,11 +597,6 @@ protected:
   void MarkProxyAsModified(vtkSMProxy*);
   void UnMarkProxyAsModified(vtkSMProxy*);
   //@}
-
-  /**
-   * Save/Load registered link states.
-   */
-  void SaveRegisteredLinks(vtkPVXMLElement* root);
 
   /**
    * Internal method to save server manager state in an XML
