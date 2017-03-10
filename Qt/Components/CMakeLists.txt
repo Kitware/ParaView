@@ -225,8 +225,6 @@ set (Module_SRCS
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.cxx
   pqSampleScalarWidget.h
-  pqSaveSnapshotDialog.cxx
-  pqSaveSnapshotDialog.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.cxx
@@ -394,7 +392,6 @@ set (Module_MOC_HDRS
   pqRescaleRange.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
-  pqSaveSnapshotDialog.h
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.h
   pqSearchBox.h
@@ -475,7 +472,6 @@ set (Module_UI_FILES
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
-  Resources/UI/pqSaveSnapshotDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectionInputWidget.ui
