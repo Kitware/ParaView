@@ -4044,7 +4044,8 @@
   </ProxyGroup>
 
   <ProxyGroup name="options">
-    <LoadStateOptionsProxy name="LoadStateOptions">
+    <LoadStateOptionsProxy class="vtkLoadStateOptions"
+                           name="LoadStateOptions">
       <Documentation>
         Options proxy used to prompt user for options when loading a pvsm state files.
       </Documentation>
@@ -4062,7 +4063,10 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <StringVectorProperty name="DataDirectory" number_of_elements="1" default_values="">
+      <StringVectorProperty name="DataDirectory"
+                            command="SetDataDirectory"
+                            number_of_elements="1"
+                            default_values="">
         <FileListDomain name="files" />
         <Documentation>
           Directory to look for data files under.

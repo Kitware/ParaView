@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkLoadStateOptions.cxx
   vtkPVGeneralSettings.cxx
   vtkPVMultiServerDataSource.cxx
   vtkSMCameraConfigurationReader.cxx

@@ -14,8 +14,12 @@
 =========================================================================*/
 /**
  * @class vtkSMLoadStateOptionsProxy
- * @brief
+ * @brief proxy for managing data files when loading a state file.
  *
+ *
+ * vtkSMLoadStateOptionsProxy provides a dialog to allow a user to change the
+ * locations of data files when loading a state file. The user can give a data
+ * where the data files reside or explicitly change the path for each data file.
  */
 
 #ifndef vtkSMLoadStateOptionsProxy_h
@@ -52,6 +56,9 @@ public:
 protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy();
+
+  vtkSetStringMacro(StateFileName);
+  char* StateFileName;
 
 private:
   class vtkInternals;

@@ -14,8 +14,10 @@
 =========================================================================*/
 #include "vtkSMLoadStateOptionsProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSession.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMFileListDomain.h"
@@ -169,17 +171,20 @@ vtkStandardNewMacro(vtkSMLoadStateOptionsProxy);
 vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 {
   this->Internals = new vtkInternals();
+  this->StateFileName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 {
   delete this->Internals;
+  this->SetStateFileName(0);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
+  this->SetStateFileName(statefilename);
   pugi::xml_parse_result result = this->Internals->StateXML.load_file(statefilename);
 
   if (!result)
@@ -203,7 +208,7 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::Load()
 {
-  SM_SCOPED_TRACE(LoadState).arg("filename", "todo: the filename").arg("options", this);
+  SM_SCOPED_TRACE(LoadState).arg("filename", this->StateFileName).arg("options", this);
 
   int dataFileOptions = vtkSMPropertyHelper(this, "LoadStateDateFileOptions").GetAsInt();
   switch (dataFileOptions)
@@ -222,14 +227,23 @@ bool vtkSMLoadStateOptionsProxy::Load()
            iter != this->Internals->PropertiesMap.end(); ++iter)
       {
         vtkInternals::PropertyInfo& info = iter->second;
-        std::string newPath;
 
         if (iter->first.find("FilePattern") == std::string::npos)
         {
-          if (vtksys::SystemTools::LocateFileInDir(
-                info.FilePath.c_str(), directoryPath.c_str(), newPath))
+          vtkClientServerStream stream;
+          stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
+                 << info.FilePath << vtkClientServerStream::End;
+          this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
+          vtkClientServerStream result = this->GetLastResult();
+          std::string locatedPath = "";
+          if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
           {
-            info.FilePath = newPath;
+            result.GetArgument(0, 0, &locatedPath);
+          }
+
+          if (!locatedPath.empty())
+          {
+            info.FilePath = locatedPath;
             info.Modified = true;
           }
           else
