@@ -126,6 +126,8 @@
     <file>Icons/pqPaste22.png</file>
     <file>Icons/pqPalette32.png</file>
     <file>Icons/pqPickCenter24.png</file>
+    <file>Icons/pqPickCenter.png</file>
+    <file>Icons/pqPickCenter@2x.png</file>
     <file>Icons/pqPipelineList22.png</file>
     <file>Icons/pqPlotCellOverTime24.png</file>
     <file>Icons/pqPlotGlobalOverTime24.png</file>
@@ -156,6 +158,8 @@
     <file>Icons/pqResetCamera32.png</file>
     <file>Icons/pqResetCenter24.png</file>
     <file>Icons/pqResetCenter32.png</file>
+    <file>Icons/pqResetCenter.png</file>
+    <file>Icons/pqResetCenter@2x.png</file>
     <file>Icons/pqResetRange24.png</file>
     <file>Icons/pqResetRangeCustom24.png</file>
     <file>Icons/pqResetRangeTemporal24.png</file>
@@ -193,8 +197,12 @@
     <file>Icons/pqInsituBreakpoint16.png</file>
     <file>Icons/pqShowCenterAxes24.png</file>
     <file>Icons/pqShowCenterAxes32.png</file>
+    <file>Icons/pqShowCenterAxes.png</file>
+    <file>Icons/pqShowCenterAxes@2x.png</file>
     <file>Icons/pqShowOrientationAxes24.png</file>
     <file>Icons/pqShowOrientationAxes32.png</file>
+    <file>Icons/pqShowOrientationAxes.png</file>
+    <file>Icons/pqShowOrientationAxes@2x.png</file>
     <file>Icons/pqSideSetData16.png</file>
     <file>Icons/pqSinusoidal16.png</file>
     <file>Icons/pqSinusoidal24.png</file>
