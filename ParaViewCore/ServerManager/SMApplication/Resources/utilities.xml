@@ -2573,8 +2573,15 @@
     </Proxy>
     <ViewLayoutProxy name="ViewLayout"
                      processes="client">
-      <Documentation>Proxy used to manage layout for mutliple
-      views.</Documentation>
+      <Documentation>Proxy used to manage layout for mutliple views.</Documentation>
+      <IntVectorProperty name="ShowWindowDecorations"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Set whether the UI should show extra decorations for the layout
+          e.g. view frames, view toolbars etc.
+        </Documentation>
+      </IntVectorProperty>
     </ViewLayoutProxy>
     <Proxy class="vtkViewLayout"
            name="InternalViewLayoutHelper"

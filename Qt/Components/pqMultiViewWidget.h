@@ -54,7 +54,8 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
-
+  Q_PROPERTY(bool decorationsVisibility READ isDecorationsVisible WRITE setDecorationsVisible NOTIFY
+      decorationsVisibilityChanged)
 public:
   pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqMultiViewWidget();
@@ -116,6 +117,12 @@ signals:
   * fired when a frame in this widget becomes active.
   */
   void frameActivated();
+
+  /**
+   * fired when the decorations visibility is changed (by calling
+   * setDecorationsVisible).
+   */
+  void decorationsVisibilityChanged(bool visible);
 
 public slots:
   /**

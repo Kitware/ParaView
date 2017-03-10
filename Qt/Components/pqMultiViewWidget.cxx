@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
+#include "pqPropertyLinks.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
@@ -77,6 +78,8 @@ public:
   bool Popout;
   QWidget PopoutFrame;
   bool DecorationsVisibleBeforeCapture;
+
+  pqPropertyLinks Links;
 
   pqInternals(QWidget* self)
     : ObserverId(0)
@@ -247,19 +250,27 @@ void pqMultiViewWidget::viewAdded(pqView* view)
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
 {
-  if (this->Internals->LayoutManager != vlayout)
+  pqInternals& internals = (*this->Internals);
+  if (internals.LayoutManager != vlayout)
   {
-    if (this->Internals->LayoutManager)
+    if (internals.LayoutManager)
     {
-      this->Internals->LayoutManager->RemoveObserver(this->Internals->ObserverId);
+      internals.LayoutManager->RemoveObserver(this->Internals->ObserverId);
     }
-    this->Internals->ObserverId = 0;
-    this->Internals->LayoutManager = vlayout;
+    internals.Links.clear();
+    internals.ObserverId = 0;
     if (vlayout)
     {
-      this->Internals->ObserverId =
+      internals.ObserverId =
         vlayout->AddObserver(vtkCommand::ConfigureEvent, this, &pqMultiViewWidget::reload);
+      internals.Links.addPropertyLink(this, "decorationsVisibility",
+        SIGNAL(decorationsVisibilityChanged(bool)), vlayout,
+        vlayout->GetProperty("ShowWindowDecorations"));
     }
+    // we delay the setting of the LayoutManager to avoid the duplicate `reload`
+    // call when `addPropertyLink` is called if the window decorations
+    // visibility changed.
+    internals.LayoutManager = vlayout;
     this->reload();
   }
 }
@@ -809,6 +820,7 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 
   this->DecorationsVisible = val;
   this->reload();
+  emit this->decorationsVisibilityChanged(val);
 }
 
 //-----------------------------------------------------------------------------
