@@ -23,6 +23,12 @@ SaveScreenshot)** proxy. See `pqSaveScreenshotReaction` for details.
 for views for saving screenshots and animations. All of that logic is now
 encapsulated in `vtkSMSaveScreenshotProxy`.
 
+`pqMultiViewWidget::captureImage`, `pqMultiViewWidget::writeImage`,
+`pqTabbedMultiViewWidget::captureImage`, `pqTabbedMultiViewWidget::writeImage`,
+`pqView::captureImage`, `pqView::writeImage` have been deprecated and will be removed in
+future releases. Saving and capturing images now goes through pqSaveScreenshotReaction
+(or **vtkSMScreenshotOptions** proxy).
+
 Changes in 5.3
 --------------
 

@@ -43,10 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrame.h"
 #include "pqViewFrameActionsInterface.h"
 #include "vtkCommand.h"
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
+#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
@@ -77,7 +81,6 @@ public:
   // Set to true to place views in a separate popout widget.
   bool Popout;
   QWidget PopoutFrame;
-  bool DecorationsVisibleBeforeCapture;
 
   pqPropertyLinks Links;
 
@@ -89,7 +92,6 @@ public:
   {
     this->PopoutFrame.setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
       Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    this->DecorationsVisibleBeforeCapture = false;
   }
 
   ~pqInternals()
@@ -824,48 +826,6 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 }
 
 //-----------------------------------------------------------------------------
-int pqMultiViewWidget::prepareForCapture(int dx, int dy)
-{
-  QSize requestedSize(dx, dy);
-  QSize mySize = this->size();
-
-  int magnification = pqView::computeMagnification(requestedSize, mySize);
-  this->setMaximumSize(mySize);
-  this->resize(mySize);
-  this->Internals->DecorationsVisibleBeforeCapture = this->isDecorationsVisible();
-  this->setDecorationsVisible(false);
-  pqEventDispatcher::processEventsAndWait(1);
-  return magnification;
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::cleanupAfterCapture()
-{
-  this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-  this->setDecorationsVisible(this->Internals->DecorationsVisibleBeforeCapture);
-}
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
-{
-  int magnification = this->prepareForCapture(dx, dy);
-  vtkImageData* image = this->layoutManager()->CaptureWindow(magnification);
-  this->cleanupAfterCapture();
-  return image;
-}
-
-//-----------------------------------------------------------------------------
-bool pqMultiViewWidget::writeImage(const QString& filename, int dx, int dy, int quality)
-{
-  int magnification = this->prepareForCapture(dx, dy);
-  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-  bool status = controller->WriteImage(
-    this->layoutManager(), filename.toLocal8Bit().data(), magnification, quality);
-  this->cleanupAfterCapture();
-  return status;
-}
-
-//-----------------------------------------------------------------------------
 void pqMultiViewWidget::swapPositions(const QString& uid_str)
 {
   QUuid other(uid_str);
@@ -928,3 +888,48 @@ bool pqMultiViewWidget::togglePopout()
   this->reload();
   return this->Internals->Popout;
 }
+
+//=================================================================================
+// LEGACY METHODS
+//=================================================================================
+#if !defined(VTK_LEGACY_REMOVE)
+vtkImageData* pqMultiViewWidget::captureImage(int width, int height)
+{
+  VTK_LEGACY_BODY(pqMultiViewWidget::captureImage, "ParaView 5.4");
+  vtkSmartPointer<vtkImageData> img =
+    vtkSMSaveScreenshotProxy::CaptureImage(this->layoutManager(), vtkVector2i(width, height));
+  if (img)
+  {
+    img->Register(nullptr);
+    return img.GetPointer();
+  }
+  return nullptr;
+}
+
+int pqMultiViewWidget::prepareForCapture(int, int)
+{
+  VTK_LEGACY_BODY(pqMultiViewWidget::prepareForCapture, "ParaView 5.4");
+  return 0;
+}
+
+void pqMultiViewWidget::cleanupAfterCapture()
+{
+  VTK_LEGACY_BODY(pqMultiViewWidget::cleanupAfterCapture, "ParaView 5.4");
+}
+
+bool pqMultiViewWidget::writeImage(
+  const QString& filename, int width, int height, int quality /*=-1*/)
+{
+  VTK_LEGACY_BODY(pqMultiViewWidget::writeImage, "ParaView 5.4");
+  vtkSmartPointer<vtkImageData> img =
+    vtkSMSaveScreenshotProxy::CaptureImage(this->layoutManager(), vtkVector2i(width, height));
+  if (img)
+  {
+    return vtkSMUtilities::SaveImage(img.GetPointer(), filename.toLocal8Bit().data(), quality) ==
+      vtkErrorCode::NoError;
+  }
+  return false;
+}
+
+#endif // !defined(VTK_LEGACY_REMOVE)
+//=================================================================================
