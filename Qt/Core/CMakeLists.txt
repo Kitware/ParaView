@@ -194,8 +194,6 @@ set(Module_SRCS
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.cxx
   pqStandardServerManagerModelInterface.h
-  pqStereoModeHelper.cxx
-  pqStereoModeHelper.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
   pqTreeLayoutStrategyInterface.cxx
