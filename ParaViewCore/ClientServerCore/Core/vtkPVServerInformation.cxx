@@ -44,6 +44,7 @@ vtkPVServerInformation::vtkPVServerInformation()
 {
   this->MultiClientsEnable = 0;
   this->ClientId = 0;
+  this->IdTypeSize = 0;
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   this->NumberOfProcesses = controller ? controller->GetNumberOfProcesses() : 1;
   this->MPIInitialized = controller ? controller->IsA("vtkMPIController") != 0 : false;
@@ -98,6 +99,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MPIInitialized: " << this->MPIInitialized << endl;
   os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
+  os << indent << "IdTypeSize: " << this->IdTypeSize << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +107,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
 {
   this->MultiClientsEnable = info->GetMultiClientsEnable();
   this->ClientId = info->GetClientId();
+  this->IdTypeSize = info->GetIdTypeSize();
   this->RemoteRendering = info->GetRemoteRendering();
   info->GetTileDimensions(this->TileDimensions);
   info->GetTileMullions(this->TileMullions);
@@ -182,6 +185,8 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   {
     this->ClientId = 0;
   }
+
+  this->IdTypeSize = static_cast<int>(8 * sizeof(vtkIdType));
 }
 
 //----------------------------------------------------------------------------
@@ -256,6 +261,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       this->ClientId = serverInfo->ClientId;
     }
+    this->SetIdTypeSize(serverInfo->GetIdTypeSize());
   }
 }
 
@@ -294,6 +300,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->GetEyeSeparation();
   *css << this->MultiClientsEnable;
   *css << this->ClientId;
+  *css << this->IdTypeSize;
   *css << vtkClientServerStream::End;
 }
 
@@ -466,6 +473,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, epilogueOffset + 2, &this->ClientId))
   {
     vtkErrorMacro("Error parsing ClientId from message.");
+    return;
+  }
+  if (!css->GetArgument(0, epilogueOffset + 3, &this->IdTypeSize))
+  {
+    vtkErrorMacro("Error parsing IdTypeSize from message.");
     return;
   }
 }

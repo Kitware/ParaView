@@ -227,6 +227,14 @@ public:
   vtkGetMacro(ClientId, int);
   //@}
 
+  //@{
+  /**
+   * Set/Get vtkIdType size, which can be 32 or 64
+   */
+  vtkSetMacro(IdTypeSize, int);
+  vtkGetMacro(IdTypeSize, int);
+  //@}
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
@@ -243,6 +251,7 @@ protected:
   int UseOffscreenRendering;
   int MultiClientsEnable;
   int ClientId;
+  int IdTypeSize;
 
   vtkPVServerOptionsInternals* MachinesInternals;
 
