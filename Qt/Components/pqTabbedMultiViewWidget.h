@@ -95,6 +95,13 @@ public:
   void setReadOnly(bool val);
   bool readOnly() const;
 
+  /**
+  * Set the tab visibility. To save some screen space when only one tab is
+  * needed, this can be set to false. True by default.
+  */
+  void setTabVisibility(bool visible);
+  bool tabVisibility() const;
+
 signals:
   /**
   * fired when lockViewSize() is called.
