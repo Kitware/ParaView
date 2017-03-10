@@ -156,6 +156,8 @@
     <file>Icons/pqResetCamera16.png</file>
     <file>Icons/pqResetCamera24.png</file>
     <file>Icons/pqResetCamera32.png</file>
+    <file>Icons/pqResetCamera.png</file>
+    <file>Icons/pqResetCamera@2x.png</file>
     <file>Icons/pqResetCenter24.png</file>
     <file>Icons/pqResetCenter32.png</file>
     <file>Icons/pqResetCenter.png</file>
@@ -168,7 +170,11 @@
     <file>Icons/pqRotate24.png</file>
     <file>Icons/pqRotate32.png</file>
     <file>Icons/pqRotateCameraCCW24.png</file>
+    <file>Icons/pqRotateCameraCCW.png</file>
+    <file>Icons/pqRotateCameraCCW@2x.png</file>
     <file>Icons/pqRotateCameraCW24.png</file>
+    <file>Icons/pqRotateCameraCW.png</file>
+    <file>Icons/pqRotateCameraCW@2x.png</file>
     <file>Icons/pqRuler16.png</file>
     <file>Icons/pqSave16.png</file>
     <file>Icons/pqSave24.png</file>
@@ -286,23 +292,39 @@
     <file>Icons/pqXMinus16.png</file>
     <file>Icons/pqXMinus24.png</file>
     <file>Icons/pqXMinus32.png</file>
+    <file>Icons/pqXMinus.png</file>
+    <file>Icons/pqXMinus@2x.png</file>
     <file>Icons/pqXPlus16.png</file>
     <file>Icons/pqXPlus24.png</file>
     <file>Icons/pqXPlus32.png</file>
+    <file>Icons/pqXPlus.png</file>
+    <file>Icons/pqXPlus@2x.png</file>
     <file>Icons/pqYMinus16.png</file>
     <file>Icons/pqYMinus24.png</file>
     <file>Icons/pqYMinus32.png</file>
+    <file>Icons/pqYMinus.png</file>
+    <file>Icons/pqYMinus@2x.png</file>
     <file>Icons/pqYPlus16.png</file>
     <file>Icons/pqYPlus24.png</file>
     <file>Icons/pqYPlus32.png</file>
+    <file>Icons/pqYPlus.png</file>
+    <file>Icons/pqYPlus@2x.png</file>
     <file>Icons/pqZMinus16.png</file>
     <file>Icons/pqZMinus24.png</file>
     <file>Icons/pqZMinus32.png</file>
+    <file>Icons/pqZMinus.png</file>
+    <file>Icons/pqZMinus@2x.png</file>
     <file>Icons/pqZPlus16.png</file>
     <file>Icons/pqZPlus24.png</file>
     <file>Icons/pqZPlus32.png</file>
+    <file>Icons/pqZPlus.png</file>
+    <file>Icons/pqZPlus@2x.png</file>
     <file>Icons/pqZoomToData24.png</file>
+    <file>Icons/pqZoomToData.png</file>
+    <file>Icons/pqZoomToData@2x.png</file>
     <file>Icons/pqZoomToSelection24.png</file>
+    <file>Icons/pqZoomToSelection.png</file>
+    <file>Icons/pqZoomToSelection@2x.png</file>
     <file>Icons/SplitViewHorizontal.png</file>
     <file>Icons/SplitViewVertical.png</file>
     <file>Icons/warning.png</file>
