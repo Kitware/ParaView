@@ -15,6 +15,7 @@
 #include "vtkSMLoadStateOptionsProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkFileSequenceParser.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
@@ -40,7 +41,7 @@ public:
   struct PropertyInfo
   {
     pugi::xml_node XMLElement;
-    std::string FilePath;
+    std::vector<std::string> FilePaths;
     bool Modified;
     PropertyInfo()
       : Modified(false)
@@ -110,7 +111,10 @@ public:
         {
           PropertyInfo info;
           info.XMLElement = *it;
-          info.FilePath = it->child("Element").attribute("value").value();
+          for (pugi::xml_node_iterator it2 = it->begin(); it2 != it->end(); ++it2)
+          {
+            info.FilePaths.push_back(it->child("Element").attribute("value").value());
+          }
           this->PropertiesMap[it->attribute("id").value()] = info;
         }
       }
@@ -172,6 +176,7 @@ vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 {
   this->Internals = new vtkInternals();
   this->StateFileName = 0;
+  this->SequenceParser = vtkFileSequenceParser::New();
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +184,7 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 {
   delete this->Internals;
   this->SetStateFileName(0);
+  this->SequenceParser->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -230,26 +236,31 @@ bool vtkSMLoadStateOptionsProxy::Load()
 
         if (iter->first.find("FilePattern") == std::string::npos)
         {
-          vtkClientServerStream stream;
-          stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
-                 << info.FilePath << vtkClientServerStream::End;
-          this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
-          vtkClientServerStream result = this->GetLastResult();
-          std::string locatedPath = "";
-          if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+          std::vector<std::string>::iterator fIter;
+          for (fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
           {
-            result.GetArgument(0, 0, &locatedPath);
-          }
+            // TODO: Inefficient - need vtkPVInfomation class to bundle file paths
+            vtkClientServerStream stream;
+            stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
+                   << *fIter << vtkClientServerStream::End;
+            this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
+            vtkClientServerStream result = this->GetLastResult();
+            std::string locatedPath = "";
+            if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+            {
+              result.GetArgument(0, 0, &locatedPath);
+            }
 
-          if (!locatedPath.empty())
-          {
-            info.FilePath = locatedPath;
-            info.Modified = true;
-          }
-          else
-          {
-            vtkErrorMacro("Cannot find " << info.FilePath << " in " << directoryPath << ".");
-            return false;
+            if (!locatedPath.empty())
+            {
+              *fIter = locatedPath;
+              info.Modified = true;
+            }
+            else
+            {
+              vtkErrorMacro("Cannot find " << *fIter << " in " << directoryPath << ".");
+              return false;
+            }
           }
         }
       }
@@ -275,13 +286,25 @@ bool vtkSMLoadStateOptionsProxy::Load()
       continue;
     }
 
-    info.XMLElement.child("Element").attribute("value").set_value(info.FilePath.c_str());
+    std::vector<std::string>::iterator fIter;
+    for (fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
+    {
+      info.XMLElement.child("Element").attribute("value").set_value(fIter->c_str());
+    }
 
     // Also fix up sources proxy collection
-    std::string fullId = iter->first;
-    int id = std::atoi(fullId.substr(0, fullId.find(".")).c_str());
+    int id = std::atoi(iter->first.substr(0, iter->first.find(".")).c_str());
 
-    std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePath);
+    // Get sequence basename if needed
+    std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePaths[0]);
+    char* cstr = new char[filename.length() + 1];
+    strcpy(cstr, filename.c_str());
+    if (this->SequenceParser->ParseFileSequence(cstr))
+    {
+      filename = this->SequenceParser->GetSequenceName();
+    }
+    delete[] cstr;
+
     this->Internals->CollectionsMap[id].attribute("name").set_value(filename.c_str());
   }
 

@@ -29,6 +29,8 @@
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
+class vtkFileSequenceParser;
+
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
 public:
@@ -63,6 +65,7 @@ protected:
 private:
   class vtkInternals;
   vtkInternals* Internals;
+  vtkFileSequenceParser* SequenceParser;
 
   vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
