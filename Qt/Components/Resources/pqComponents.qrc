@@ -248,6 +248,23 @@
     <file>Icons/pqVcrPlay16.png</file>
     <file>Icons/pqVcrPlay24.png</file>
     <file>Icons/pqVcrPlay32.png</file>
+    <file>Icons/pqVcrBack16.png</file>
+    <file>Icons/pqVcrBack24.png</file>
+    <file>Icons/pqVcrBack32.png</file>
+    <file>Icons/pqVcrBack.png</file>
+    <file>Icons/pqVcrBack@2x.png</file>
+    <file>Icons/pqVcrFirst.png</file>
+    <file>Icons/pqVcrFirst@2x.png</file>
+    <file>Icons/pqVcrForward.png</file>
+    <file>Icons/pqVcrForward@2x.png</file>
+    <file>Icons/pqVcrLast.png</file>
+    <file>Icons/pqVcrLast@2x.png</file>
+    <file>Icons/pqVcrLoop.png</file>
+    <file>Icons/pqVcrLoop@2x.png</file>
+    <file>Icons/pqVcrPause.png</file>
+    <file>Icons/pqVcrPause@2x.png</file>
+    <file>Icons/pqVcrPlay.png</file>
+    <file>Icons/pqVcrPlay@2x.png</file>
     <file>Icons/pqView22.png</file>
     <file>Icons/pqVolumeData16.png</file>
     <file>Icons/pqWarp24.png</file>
