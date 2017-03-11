@@ -932,21 +932,8 @@ def SaveData(filename, proxy=None, **extraArgs):
 # -----------------------------------------------------------------------------
 
 def WriteImage(filename, view=None, **params):
-    """Saves the given view (or the active one if none is given) as an
-    image. Optionally, you can specify the writer and the magnification
-    using the Writer and Magnification named arguments. For example::
-
-        WriteImage("foo.mypng", aview, Writer=vtkPNGWriter, Magnification=2)
-
-    If no writer is provided, the type is determined from the file extension.
-    Currently supported extensions are png, bmp, ppm, tif, tiff, jpg and jpeg.
-    The writer is a VTK class that is capable of writing images.
-    Magnification is used to determine the size of the written image. The size
-    is obtained by multiplying the size of the view with the magnification.
-    Rendering may be done using tiling to obtain the correct size without
-    resizing the view.
-
-    ** DEPRECATED: Use SaveScreenshot() instead. **
+    """::deprecated:: 4.2
+    Use :func:`SaveScreenshot` instead.
     """
     if not view:
         view = active_objects.view
@@ -961,9 +948,9 @@ def WriteImage(filename, view=None, **params):
     view.WriteImage(filename, writer, mag)
 
 # -----------------------------------------------------------------------------
-def SaveScreenshot(filename,
+def _SaveScreenshotLegacy(filename,
     view=None, layout=None, magnification=None, quality=None, **params):
-    if not view is None and not layout is None:
+    if view is not None and layout is not None:
         raise ValueError ("both view and layout cannot be specified")
 
     viewOrLayout = view if view else layout
@@ -979,9 +966,116 @@ def SaveScreenshot(filename,
     except TypeError:
         quality = -1
 
+    # convert magnification to image resolution.
+    if viewOrLayout.IsA("vtkSMViewProxy"):
+        size = viewOrLayout.ViewSize
+    else:
+        assert(viewOrLayout.IsA("vtkSMViewLayoutProxy"))
+        exts = [0] * 4
+        viewOrLayout.GetLayoutExtent(exts)
+        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
+
+    imageResolution = (size[0]*magnification, size[1]*magnification)
+
+    # convert quality to ImageQuality
+    imageQuality = quality
+
+    # now, call the new API
+    return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution,
+            ImageQuality=imageQuality)
+
+def SaveScreenshot(filename, viewOrLayout=None, **params):
+    """Save screenshot for a view or layout (collection of views) to an image.
+
+    `SaveScreenshot` is used to save the rendering results to an image.
+
+    Parameters:
+    -----------
+        filename (str): name of the image file to save to. The filename extension
+            is used to determine the type of image file generated. Supported
+            extensions are `png`, `jpg`, `tif`, `bmp`, and `ppm`.
+        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
+            from, defaults to None. If None, then the active view is used, if
+            available. To save image from a single view, this must be set to a
+            view, to save an image from all views in a layout, pass the layout.
+
+    Keyword Parameters (optional):
+    ------------------------------
+        ImageResolution (tuple(int, int)): a 2-tuple to specify the
+            output image resolution in pixels as `(width, height)`. If not
+            specified, the view (or layout) size is used.
+        FontScaling (str): specify whether to scale fonts
+            proportionally (`"Scale fonts proportionally"`) or
+            not (`"Do not scale fonts"`). Defaults to `"Scale fonts
+            proportionally"`.
+        SeparatorWidth (int): when saving multiple views in a
+            layout, specify the width (in approximate pixels) for a spearator
+            between views in the generated image.
+        SeparatorColor (tuple(float, float, float)): specify the
+            color for separator between views, if applicable.
+        OverrideColorPalette (:obj:str, optional): name of the color palette to
+            use, if any. If none specified, current color palette remains
+            unchanged.
+        StereoMode (str): stereo mode to use, if any. Available
+            values are `"No stereo"`,`"Red-Blue"`, `"Interlaced"`,
+            `"Left Eye Only"`, `"Right Eye Only"`, `"Dresden"`,
+            `"Anaglyph"`, `"Checkerboard"`, `"Side-by-Side Horizontal"`, and the
+            default `"No change"`.
+        TransparentBackground (int): set to 1 (or True) to save
+            an image with background set to alpha=0, if supported by the output
+            image format.
+        ImageQuality (int): set a number in the range [0, 100] to
+            specify the output image quality/compression. 0 is least
+            quality/most compressed, while 100 means best quality/least
+            compressed.
+
+    Legacy Parameters:
+    ------------------
+        Prior to ParaView version 5.4, the following parameters were available
+        and are still supported. However, cannot be used together with other
+        keyword parameters documented earlier.
+
+        view (proxy): single view to save image from.
+        layout (proxy): layout to save image from.
+        magnification (int): magnification factor to use to save the output
+            image. The current view (or layout) size is scaled by the
+            magnification factor provided.
+        quality (int): output image quality, a number in the range [0, 100].
+    """
+    # Let's handle backwards compatibility.
+    # Previous API for this method took the following arguments:
+    # SaveScreenshot(filename, view=None, layout=None, magnification=None, quality=None)
+    # If we notice any of the old arguments, call legacy method.
+    if "view" in params or "layout" in params or \
+            "magnification" in params or \
+            "quality" in params:
+                # since in previous variant, view was a positional param,
+                # we handle that too.
+                if "view" in params:
+                    view = params.get("view")
+                    del params["view"]
+                else:
+                    view = viewOrLayout
+                return _SaveScreenshotLegacy(filename, view=view, **params)
+
+    # use active view if no view or layout is specified.
+    viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
+
+    if not viewOrLayout:
+        raise ValueError("A view or layout must be specified.")
+
     controller = servermanager.ParaViewPipelineController()
-    return controller.WriteImage(\
-        viewOrLayout, filename, magnification, quality)
+    options = servermanager.misc.SaveScreenshot()
+    controller.PreInitializeProxy(options)
+
+    options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
+    options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
+    options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
+
+    SetProperties(options, **params)
+    controller.PostInitializeProxy(options)
+    return options.WriteImage(filename)
 
 # -----------------------------------------------------------------------------
 
