@@ -1078,46 +1078,121 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
     return options.WriteImage(filename)
 
 # -----------------------------------------------------------------------------
+def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
+    """Save animation as a movie file or series of images.
+
+    `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
+    a series of images.
+
+    Parameters:
+    -----------
+        filename (str): name of the output file. The extension is used to
+            determine the type of the output. Supported extensions are `png`,
+            `jpg`, `tif`, `bmp`, and `ppm`. Based on platform (and build)
+            configuration, `avi` and `ogv` may be supported as well.
+        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
+            from, defaults to None. If None, then the active view is used, if
+            available. To save image from a single view, this must be set to a
+            view, to save an image from all views in a layout, pass the layout.
+        scene (:obj:`proxy`, optional): animation scene to save. If None, then
+            the active scene returned by `GetAnimationScene` is used.
+
+    Keyword Parameters (optional):
+    ------------------------------
+        `SaveAnimation` supports all keyword parameters suppored by
+        `SaveScreenshot`. In addition, the following parameters are supported:
+
+        DisconnectAndSave (int): in client-server mode (with rendering-capable
+            server), set this to 1 to disconnect from the server and let the
+            server save the animation out before terminating. In that case, the
+            filename specifies a path on the server. Defaults to 0, in which
+            case the animation is saved on the client.
+
+        FrameRate (int): frame rate in frames per second for the output. This
+            only affects the output when generated movies (`avi` or `ogv`), and
+            not when saving the animation out as a series of images.
+
+        FrameWindow (tuple(int,int)):  to save a part of the animation,
+            provide the range in frames or timesteps index.
+    """
+    # use active view if no view or layout is specified.
+    viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
+
+    if not viewOrLayout:
+        raise ValueError("A view or layout must be specified.")
+
+    scene = scene if scene else GetAnimationScene()
+    if not scene:
+        raise RuntimeError("Missing animation scene.")
+
+    controller = servermanager.ParaViewPipelineController()
+    options = servermanager.misc.SaveAnimation()
+    controller.PreInitializeProxy(options)
+
+    options.AnimationScene = scene
+    options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
+    options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
+    options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
+
+    SetProperties(options, **params)
+    controller.PostInitializeProxy(options)
+
+    return options.WriteAnimation(filename)
 
 def WriteAnimation(filename, **params):
-    """Writes the current animation as a file. Optionally one can specify
-    arguments that qualify the saved animation files as keyword arguments.
-    Accepted options are as follows:
-
-    * **Magnification** *(integer)* : set the maginification factor for the saved
-      animation.
-    * **Quality** *(0 [worst] or 1 or 2 [best])* : set the quality of the generated
-      movie (if applicable).
-    * **Subsampling** *(integer)* : setting whether the movie encoder should use
-      subsampling of the chrome planes or not, if applicable. Since the human
-      eye is more sensitive to brightness than color variations, subsampling
-      can be useful to reduce the bitrate. Default value is 0.
-    * **BackgroundColor** *(3-tuple of doubles)* : set the RGB background color to
-      use to fill empty spaces in the image.
-    * **FrameRate** *(double)*: set the frame rate (if applicable).
-    * **StartFileCount** *(int)*: set the first number used for the file name
-      (23 => i.e. image-0023.png).
-    * **PlaybackTimeWindow** *([double, double])*: set the time range that
-      should be used to play a subset of the total animation time.
-      (By default the whole application will play).
     """
+    ::deprecated:: 5.3
+    Use :func:`SaveAnimation` instead.
+
+    This function can still be used to save an animation, but using
+    `SaveAnimation` is strongly recommended as it provides more flexibility.
+
+    The following parameters are currently supported.
+
+    Parameters
+    ----------
+        filename (str): name of the output file.
+
+    Keyword Parameters (optional):
+    ------------------------------
+
+        Magnification (int): magnification factor for the saved animation.
+
+        Quality (int): int in range [0,2].
+
+        FrameRate (int): frame rate.
+
+    The following parameters are no longer supported and are ignored:
+    Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
+    """
+    newparams = {}
+
+    # this method simply tries to provide legacy behavior.
     scene = GetAnimationScene()
-    # ensures that the TimeKeeper track is created.
-    GetTimeTrack()
-    iw = servermanager.vtkSMAnimationSceneImageWriter()
-    iw.SetAnimationScene(scene.SMProxy)
-    iw.SetFileName(filename)
+    newparams["scene"] = scene
+
+    # previously, scene saved all views and only worked well if there was 1
+    # layout, so do that.
+    layout = GetLayout()
+    newparams["viewOrLayout"] = layout
+
     if "Magnification" in params:
-        iw.SetMagnification(int(params["Magnification"]))
+        magnification = params["Magnification"]
+        exts = [0] * 4
+        layout.GetLayoutExtent(exts)
+        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
+        imageResolution = (size[0]*magnification, size[1]*magnification)
+        newparams["ImageResolution"] = imageResolution
+
     if "Quality" in params:
-        iw.SetQuality(int(params["Quality"]))
-    if "Subsampling" in params:
-        iw.SetSubsampling(int(params["Subsampling"]))
-    if "BackgroundColor" in params:
-        iw.SetBackgroundColor(params["BackgroundColor"])
+        # convert quality (0=worst, 2=best) to imageQuality (0 = worst, 100 = best)
+        quality = int(params["Quality"])
+        imageQuality = int(100 * quality/2.0)
+        newparams["ImageQuality"] = imageQuality
+
     if "FrameRate" in params:
-        iw.SetFrameRate(float(params["FrameRate"]))
-    iw.Save()
+        newparams["FrameRate"] = int(params["FrameRate"])
+    return SaveAnimation(filename, **newparams)
 
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
