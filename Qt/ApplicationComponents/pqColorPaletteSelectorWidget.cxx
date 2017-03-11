@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqColorPaletteSelectorWidget.h"
 
-#include "pqPropertyWidget.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <QComboBox>
@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
-  vtkSMProxy* smproxy, vtkSMProperty* vtkNotUsed(smproperty), QWidget* parentObject)
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
   PV_DEBUG_PANELS() << "pqColorPaletteSelectorWidget for a property with "
@@ -81,8 +81,19 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   cbbox->setCurrentIndex(0);
   vbox->addWidget(cbbox);
 
-  this->connect(cbbox, SIGNAL(currentIndexChanged(int)), SLOT(setCurrentIndex(int)));
   this->ComboBox = cbbox;
+
+  // If a SVP is provided, then we will simply change is value to the selected palette,
+  // otherwise we'll act as a "loader".
+  if (vtkSMStringVectorProperty::SafeDownCast(smproperty))
+  {
+    this->addPropertyLink(this, "paletteName", SIGNAL(paletteNameChanged()), smproperty);
+    this->connect(cbbox, SIGNAL(currentIndexChanged(int)), SIGNAL(paletteNameChanged()));
+  }
+  else
+  {
+    this->connect(cbbox, SIGNAL(currentIndexChanged(int)), SLOT(loadPalette(int)));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +102,26 @@ pqColorPaletteSelectorWidget::~pqColorPaletteSelectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqColorPaletteSelectorWidget::setCurrentIndex(int index)
+QString pqColorPaletteSelectorWidget::paletteName() const
+{
+  int index = this->ComboBox->currentIndex();
+  if (index <= 0)
+  {
+    return QString(); // none selected.
+  }
+
+  return this->ComboBox->itemData(index).toString();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorPaletteSelectorWidget::setPaletteName(const QString& pname)
+{
+  int index = this->ComboBox->findData(QVariant(pname));
+  this->ComboBox->setCurrentIndex(index <= 0 ? 0 : index);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorPaletteSelectorWidget::loadPalette(int index)
 {
   vtkSMProxy* smproxy = this->proxy();
   Q_ASSERT(this->ComboBox);
