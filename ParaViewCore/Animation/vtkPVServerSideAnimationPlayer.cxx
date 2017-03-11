@@ -15,155 +15,125 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVServerSideAnimationPlayer.h"
 
 #include "vtkCommand.h"
-#include "vtkMultiProcessController.h"
-#include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
-#include "vtkSMAnimationScene.h"
-#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyIterator.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSaveAnimationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
-#include <string>
 
-//****************************************************************************
-class vtkPVServerSideAnimationPlayer::vtkInternals
+class vtkPVServerSideAnimationPlayerObserver : public vtkCommand
 {
 public:
-  vtkInternals(vtkPVServerSideAnimationPlayer* parent)
-    : ObserverId(0)
-    , WatchSessionID(0)
+  static vtkPVServerSideAnimationPlayerObserver* New()
   {
-    this->Owner = parent;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (!pm)
+    return new vtkPVServerSideAnimationPlayerObserver;
+  }
+  vtkBaseTypeMacro(vtkPVServerSideAnimationPlayerObserver, vtkCommand);
+
+  void SetStateXML(vtkPVXMLElement* xml) { this->StateXML = xml; }
+  void SetFileName(const std::string& str) { this->FileName = str; }
+  void SetSession(vtkSMSession* session) { this->Session = session; }
+  void SetTargetSessionID(vtkIdType id) { this->TargetSessionID = id; }
+
+  void Execute(vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE
+  {
+    assert(vtkProcessModule::SafeDownCast(caller) != NULL);
+    if (eventid != vtkCommand::ConnectionClosedEvent)
     {
       return;
     }
 
-    if (pm->GetPartitionId() == 0)
+    // Check if the session being cleaned up is indeed the one we were
+    // observing.
+    vtkIdType sessionId = *(reinterpret_cast<vtkIdType*>(calldata));
+    if (sessionId <= 0 || sessionId != this->TargetSessionID)
     {
-      // Root node
-      // Grab SessionServer and attach the session core to our vtkObject which
-      // is a SMSession.
-      vtkPVSessionBase* serverSession = vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
-      this->WatchSessionID = pm->GetSessionID(serverSession);
-
-      assert("Server session were find" && serverSession);
-      this->Session.TakeReference(vtkSMSession::New(serverSession));
-
-      // Make sure the proxy definition manager will use the proper session core
-      // Only for Root node, satelites don't have SessionProxyManager
-      if (this->Session->GetSessionProxyManager())
-      {
-        vtkSMProxyDefinitionManager* definitionManager =
-          this->Session->GetSessionProxyManager()->GetProxyDefinitionManager();
-        definitionManager->SetSession(
-          NULL); // This will force the session to be properly set later on
-        definitionManager->SetSession(this->Session.GetPointer());
-
-        // Attach to unregister event, so that when the "active" session is unregistered, we can
-        // do the cleanup.
-        this->ObserverId = pm->AddObserver(vtkCommand::ConnectionClosedEvent, this,
-          &vtkPVServerSideAnimationPlayer::vtkInternals::OnUnRegisterSession);
-      }
+      return;
     }
-    else
-    {
-      // Satellite
-      vtkProcessModule::GetProcessModule()->UpdateProcessType(
-        vtkProcessModule::PROCESS_BATCH, false);
-    }
+
+    this->TargetSessionID = -1;
+    this->SaveAnimation();
+
+    // We no longer need to handle any events.
+    caller->RemoveObserver(this);
   }
 
-  ~vtkInternals()
+protected:
+  vtkPVServerSideAnimationPlayerObserver()
+    : TargetSessionID(-1)
   {
-    if (this->ObserverId != 0)
-    {
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      pm->RemoveObserver(this->ObserverId);
-      this->ObserverId = 0;
-    }
   }
+  ~vtkPVServerSideAnimationPlayerObserver() {}
 
-public:
-  vtkWeakPointer<vtkPVServerSideAnimationPlayer> Owner;
-  vtkSmartPointer<vtkSMSession> Session;
-  vtkSmartPointer<vtkSMAnimationSceneImageWriter> Writer;
-  vtkSmartPointer<vtkPVXMLElement> XMLState;
+  void SaveAnimation()
+  {
+    assert(!this->FileName.empty() && this->StateXML != NULL && this->Session != NULL);
+
+    // Switch process type to Batch mode
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    assert(pm->GetPartitionId() == 0);
+
+    pm->UpdateProcessType(vtkProcessModule::PROCESS_BATCH, false);
+
+    // Make sure our internal session will be used across rendering calls and
+    // proxy management
+    vtkIdType tmpSessionID = pm->RegisterSession(this->Session);
+    this->Session->Activate();
+
+    // Update our local SessionProxyManager state
+    vtkSMSessionProxyManager* spxm = this->Session->GetSessionProxyManager();
+    spxm->LoadXMLState(this->StateXML);
+
+    // FIXME:
+    // Mark all views so that they render offscreen.
+    // BUG #10159.
+
+    // Write any animations.
+    if (vtkSMSaveAnimationProxy* options =
+          vtkSMSaveAnimationProxy::SafeDownCast(spxm->FindProxy("misc", "misc", "SaveAnimation")))
+    {
+      vtkSMPropertyHelper(options, "DisconnectAndSave").Set(0);
+      options->WriteAnimation(this->FileName.c_str());
+    }
+
+    // Disconnect our session from process module
+    this->Session->DeActivate();
+    pm->UnRegisterSession(tmpSessionID);
+    spxm->UnRegisterProxies();
+  }
 
 private:
-  unsigned long ObserverId;
-  vtkIdType WatchSessionID;
-
-  void OnUnRegisterSession(vtkObject* caller, unsigned long eventid, void* calldata)
-  {
-    assert(vtkProcessModule::SafeDownCast(caller) != NULL &&
-      eventid == vtkCommand::ConnectionClosedEvent);
-    (void)caller;
-    (void)eventid;
-    vtkIdType sessionId = *(reinterpret_cast<vtkIdType*>(calldata));
-    if (sessionId <= 0 || sessionId != this->WatchSessionID)
-    {
-      return;
-    }
-
-    caller->RemoveObserver(this->ObserverId);
-    this->ObserverId = 0;
-    this->WatchSessionID = 0;
-    if (this->Owner)
-    {
-      this->Owner->TriggerExecution();
-    }
-  }
+  std::string FileName;
+  vtkSmartPointer<vtkPVXMLElement> StateXML;
+  vtkSmartPointer<vtkSMSession> Session;
+  vtkIdType TargetSessionID;
 };
 
 //****************************************************************************
 vtkStandardNewMacro(vtkPVServerSideAnimationPlayer);
 //----------------------------------------------------------------------------
 vtkPVServerSideAnimationPlayer::vtkPVServerSideAnimationPlayer()
+  : SessionProxyManagerState(NULL)
+  , FileName(NULL)
 {
-  this->Internals = new vtkInternals(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerSideAnimationPlayer::~vtkPVServerSideAnimationPlayer()
 {
-  delete this->Internals;
-  this->Internals = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVServerSideAnimationPlayer::SetWriter(vtkSMAnimationSceneImageWriter* writer)
-{
-  this->Internals->Writer = writer;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVServerSideAnimationPlayer::SetSessionProxyManagerState(const char* xml_state_content)
-{
-  if (xml_state_content == NULL || strlen(xml_state_content) == 0)
-  {
-    this->Internals->XMLState = NULL;
-  }
-  else
-  {
-    vtkNew<vtkPVXMLParser> parser;
-    parser->Parse(xml_state_content);
-    this->Internals->XMLState = parser->GetRootElement();
-  }
+  this->SetSessionProxyManagerState(NULL);
+  this->SetFileName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -173,72 +143,67 @@ void vtkPVServerSideAnimationPlayer::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerSideAnimationPlayer::TriggerExecution()
+void vtkPVServerSideAnimationPlayer::Activate()
 {
-  // Ensure only one execution
-  if (this->Internals->Session)
+  if (!this->SessionProxyManagerState)
   {
-    // Switch process type to Batch mode
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkProcessModule::GetProcessModule()->UpdateProcessType(vtkProcessModule::PROCESS_BATCH, false);
-
-    // Make sure our internal session will be used across rendering calls and
-    // proxy management
-    vtkIdType tmpSessionID = pm->RegisterSession(this->Internals->Session);
-    this->Internals->Session->Activate();
-
-    // Update our local SessionProxyManager state
-    vtkSMSessionProxyManager* spxm = this->Internals->Session->GetSessionProxyManager();
-    spxm->LoadXMLState(this->Internals->XMLState, NULL, true);
-
-    vtkNew<vtkSMProxyIterator> proxyIter;
-    proxyIter->SetSession(this->Internals->Session);
-
-    // Mark all views so that they render offscreen.
-    // BUG #10159.
-    for (proxyIter->Begin(); !proxyIter->IsAtEnd(); proxyIter->Next())
-    {
-      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxyIter->GetProxy());
-      // We need to ensure that we skip prototypes.
-      if (view && !view->IsPrototype())
-      {
-        if (vtkSMPropertyHelper(view, "UseOffscreenRenderingForScreenshots", true).GetAsInt() == 1)
-        {
-          vtkSMPropertyHelper(view, "UseOffscreenRendering", true).Set(1);
-          view->UpdateVTKObjects();
-        }
-      }
-    }
-
-    // Write any animations.
-    for (proxyIter->Begin(); !proxyIter->IsAtEnd(); proxyIter->Next())
-    {
-      vtkSMAnimationScene* scene =
-        vtkSMAnimationScene::SafeDownCast(proxyIter->GetProxy()->GetClientSideObject());
-      if (scene)
-      {
-        if (!this->Internals->Writer)
-        {
-          scene->Play();
-        }
-        else
-        {
-          this->Internals->Writer->SetAnimationScene(scene);
-          if (!this->Internals->Writer->Save())
-          {
-            vtkErrorMacro("Failed to save animation.");
-          }
-          break;
-        }
-      }
-    }
-
-    // Disconnect our session from process module
-    this->Internals->Session->DeActivate();
-    pm->UnRegisterSession(tmpSessionID);
-    this->Internals->Session->GetSessionProxyManager()->UnRegisterProxies();
+    vtkErrorMacro("No `SessionProxyManagerState` specified.");
+    return;
   }
 
-  // Clean up memory
-  this->Internals->Session = NULL;
+  if (!this->FileName)
+  {
+    vtkErrorMacro("No `FileName` specified.");
+    return;
+  }
+
+  vtkSmartPointer<vtkPVXMLElement> pxmState =
+    vtkPVXMLParser::ParseXML(this->SessionProxyManagerState);
+  if (!pxmState)
+  {
+    vtkErrorMacro("Failed to parse `SessionProxyManagerState`.");
+    return;
+  }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  assert(pm != NULL);
+  if (pm->GetPartitionId() == 0)
+  {
+    vtkNew<vtkPVServerSideAnimationPlayerObserver> observer;
+    observer->SetStateXML(pxmState);
+    observer->SetFileName(this->FileName);
+
+    // Root node: monitor the process module till when the active session gets
+    // disconnected.
+    vtkPVSessionBase* serverSession = vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
+    observer->SetTargetSessionID(pm->GetSessionID(serverSession));
+    assert("Server session were found" && serverSession);
+
+    // Create a new session that re-uses the existing session's parallel
+    // communication infrastructure.
+    vtkSmartPointer<vtkSMSession> session;
+    session.TakeReference(vtkSMSession::New(serverSession));
+    observer->SetSession(session);
+
+    // Make sure the proxy definition manager will use the proper session core
+    // Only for Root node, satellites don't have SessionProxyManager
+    if (session->GetSessionProxyManager())
+    {
+      vtkSmartPointer<vtkSMProxyDefinitionManager> definitionManager;
+      definitionManager = session->GetSessionProxyManager()->GetProxyDefinitionManager();
+
+      definitionManager->SetSession(
+        NULL); // This will force the session to be properly set later on
+      definitionManager->SetSession(session.GetPointer());
+
+      // Attach to unregister event, so that when the "active" session is unregistered, we can
+      // do the cleanup.
+      pm->AddObserver(vtkCommand::ConnectionClosedEvent, observer.Get());
+    }
+  }
+  else
+  {
+    // Satellite
+    pm->UpdateProcessType(vtkProcessModule::PROCESS_BATCH, false);
+  }
 }

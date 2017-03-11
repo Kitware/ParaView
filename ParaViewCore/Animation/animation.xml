@@ -509,17 +509,19 @@
   <ProxyGroup name="remote_player">
     <!-- .................................................................. -->
     <!-- Proxy used to save animation remotely when the client disconnect -->
-    <Proxy class="vtkPVServerSideAnimationPlayer"
-           name="AnimationPlayer">
-      <ProxyProperty command="SetWriter"
-                     name="Writer"></ProxyProperty>
+    <Proxy class="vtkPVServerSideAnimationPlayer" name="AnimationPlayer">
       <StringVectorProperty command="SetSessionProxyManagerState"
                             default_values=""
-                            name="XMLState"
+                            name="SessionProxyManagerState"
                             number_of_elements="1">
         <Documentation>Set the XML content of the vtkSMSessionProxyManager
         state.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetFileName"
+                            default_values=""
+                            name="FileName"
+                            number_of_elements="1" />
+      <Property name="Activate" command="Activate" />
     </Proxy>
   </ProxyGroup>
   <!-- ==================================================================== -->
@@ -551,5 +553,62 @@
       </DoubleVectorProperty>
       <!-- End of RepresentationAnimationHelper -->
     </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="misc">
+    <!-- .................................................................. -->
+    <SaveAnimationProxy name="SaveAnimation" processes="client"
+      base_proxygroup="misc"
+      base_proxyname="SaveScreenshot">
+      <IntVectorProperty name="DisconnectAndSave"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Disconnect from the remote server and save animation on server before
+          terminating.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <ProxyProperty name="AnimationScene" panel_visibility="never" />
+
+      <IntVectorProperty name="FrameRate"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Frame rate in frames-per-second (FPS).
+          (todo: only show when not saving images).
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="ImageQuality" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Animation Options">
+        <Property name="DisconnectAndSave" />
+        <Property name="FrameRate" />
+      </PropertyGroup>
+
+    </SaveAnimationProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

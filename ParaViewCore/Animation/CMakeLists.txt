@@ -55,6 +55,7 @@ set (Module_SRCS
   vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
+  vtkSMSaveAnimationProxy.cxx
   vtkTimestepsAnimationPlayer.cxx
   vtkXMLPVAnimationWriter.cxx
 )
