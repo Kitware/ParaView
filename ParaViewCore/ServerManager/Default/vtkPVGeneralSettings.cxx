@@ -179,33 +179,6 @@ void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetMultiViewImageBorderColor(double r, double g, double b)
-{
-  vtkSMViewLayoutProxy::SetMultiViewImageBorderColor(r, g, b);
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetMultiViewImageBorderWidth(int width)
-{
-  if (width != vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth())
-  {
-    vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetTransparentBackground(bool val)
-{
-  if (val != vtkSMViewProxy::GetTransparentBackground())
-  {
-    vtkSMViewProxy::SetTransparentBackground(val);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetLoadAllVariables(bool val)
 {
   if (val != vtkSMArraySelectionDomain::GetLoadAllVariables())

@@ -1,4 +1,4 @@
-r"""smtrace module is used along with vtkSMTrace to generate Python trace for
+"""smtrace module is used along with vtkSMTrace to generate Python trace for
 ParaView. While this module is primarily designed to be used from the ParaView
 GUI, Python scripts can use this module too to generate trace from the script
 executed.
@@ -715,6 +715,10 @@ class WriterProxyFilter(ProxyFilter):
         if prop.get_property_name() in ["FileName", "Input"] : return True
         return False
 
+class ScreenShotHelperProxyFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop):
+        return not self.should_never_trace(prop) and self.should_trace_in_create(prop)
+
 class TransferFunctionProxyFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop): return False
     def should_never_trace(self, prop):
@@ -1058,6 +1062,37 @@ class SaveData(TraceItem):
         writerAccessor.finalize() # so that it will get deleted.
         del writerAccessor
         del writer
+        Trace.Output.append_separated(trace.raw_data())
+
+class SaveScreenshotOrAnimation(TraceItem):
+    def __init__(self, helper, filename, view, layout, mode_screenshot=False):
+        TraceItem.__init__(self)
+        assert(view != None or layout != None)
+
+        helper = sm._getPyProxy(helper)
+        helperAccessor = ProxyAccessor("temporaryHelper", helper)
+
+        if view:
+            view = sm._getPyProxy(view)
+            ctor_args_1 = "%s" % Trace.get_accessor(view)
+        elif layout:
+            layout = sm._getPyProxy(layout)
+            ctor_args_1 = "%s" % Trace.get_accessor(layout)
+
+        trace = TraceOutput()
+        if mode_screenshot:
+            trace.append("# save screenshot")
+        else:
+            trace.append("# save animation")
+        trace.append(\
+                helperAccessor.trace_ctor(\
+                "SaveScreenshot" if mode_screenshot else "SaveAnimation",
+                    ScreenShotHelperProxyFilter(),
+                    ctor_args="'%s', %s" % (filename, ctor_args_1),
+                    skip_assignment=True))
+        helperAccessor.finalize()
+        del helperAccessor
+        del helper
         Trace.Output.append_separated(trace.raw_data())
 
 class RegisterLayoutProxy(TraceItem):

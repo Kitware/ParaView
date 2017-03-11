@@ -21,6 +21,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkRect.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -32,11 +33,12 @@
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkVector.h"
+#include "vtkVectorOperators.h"
 #include "vtkWeakPointer.h"
 
 #include <algorithm>
 #include <assert.h>
-#include <vector>
 
 class vtkSMViewLayoutProxy::vtkInternals
 {
@@ -203,58 +205,17 @@ private:
 };
 
 //============================================================================
-double vtkSMViewLayoutProxy::MultiViewImageBorderColor[3] = { 0.0, 0.0, 0.0 };
-int vtkSMViewLayoutProxy::MultiViewImageBorderWidth = 0;
-
-//----------------------------------------------------------------------------
-void vtkSMViewLayoutProxy::SetMultiViewImageBorderColor(double r, double g, double b)
-{
-  vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] = std::max(0.0, std::min(1.0, r));
-  vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] = std::max(0.0, std::min(1.0, g));
-  vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] = std::max(0.0, std::min(1.0, b));
-}
-//----------------------------------------------------------------------------
-void vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(int width)
-{
-  vtkSMViewLayoutProxy::MultiViewImageBorderWidth = std::max(0, width);
-}
-
-//----------------------------------------------------------------------------
-const double* vtkSMViewLayoutProxy::GetMultiViewImageBorderColor()
-{
-  return vtkSMViewLayoutProxy::MultiViewImageBorderColor;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(unsigned char rgb[3])
-{
-  rgb[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] * 0xff);
-  rgb[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] * 0xff);
-  rgb[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] * 0xff);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(double rgb[3])
-{
-  rgb[0] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[0];
-  rgb[1] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[1];
-  rgb[2] = vtkSMViewLayoutProxy::MultiViewImageBorderColor[2];
-}
-
-//----------------------------------------------------------------------------
-int vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth()
-{
-  return vtkSMViewLayoutProxy::MultiViewImageBorderWidth;
-}
-
-//============================================================================
 vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::vtkSMViewLayoutProxy()
   : MaximizedCell(-1)
+  , SeparatorWidth(0)
   , Internals(new vtkInternals())
   , BlockUpdate(false)
+  , BlockUpdateViewPositions(false)
 {
+  this->SeparatorColor[0] = this->SeparatorColor[1] = this->SeparatorColor[2] = 0;
+
   this->Internals->Observer =
     vtkMakeMemberFunctionCommand(*this, &vtkSMViewLayoutProxy::UpdateViewPositions);
 
@@ -270,6 +231,13 @@ vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
   this->Internals->Observer = NULL;
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SetSeparatorColor(unsigned char r, unsigned char g, unsigned char b)
+{
+  double rgb[3] = { r / 255.0, g / 255.0, b / 255.0 };
+  this->SetSeparatorColor(rgb);
 }
 
 //----------------------------------------------------------------------------
@@ -903,6 +871,11 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 //----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::UpdateViewPositions()
 {
+  if (this->BlockUpdateViewPositions)
+  {
+    return;
+  }
+
   if (this->MaximizedCell == -1)
   {
     this->Internals->UpdateViewPositions();
@@ -921,6 +894,71 @@ void vtkSMViewLayoutProxy::UpdateViewPositions()
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::GetLayoutExtent(int extent[4])
+{
+  vtkRecti rect(0, 0, 0, 0);
+  bool first = true;
+  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
+       iter != this->Internals->KDTree.end(); ++iter)
+  {
+    if (iter->ViewProxy.GetPointer() != NULL)
+    {
+      int vpos[2] = { 0, 0 };
+      vtkSMPropertyHelper(iter->ViewProxy, "ViewPosition").Get(vpos, 2);
+
+      int vsize[2] = { 0, 0 };
+      vtkSMPropertyHelper(iter->ViewProxy, "ViewSize").Get(vsize, 2);
+
+      if (first)
+      {
+        rect = vtkRecti(vpos[0], vpos[1], vsize[0], vsize[1]);
+        first = false;
+      }
+      else
+      {
+        rect.AddRect(vtkRecti(vpos[0], vpos[1], vsize[0], vsize[1]));
+      }
+    }
+  }
+  extent[0] = rect.GetLeft();
+  extent[1] = rect.GetRight() - 1;
+  extent[2] = rect.GetBottom();
+  extent[3] = rect.GetTop() - 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SetSize(const int size[2])
+{
+  int ext[4];
+  this->GetLayoutExtent(ext);
+
+  vtkVector2i osize;
+  osize[0] = ext[1] - ext[0] + 1;
+  osize[1] = ext[3] - ext[2] + 1;
+
+  const vtkVector2i newsize(size);
+
+  const bool prev = this->SetBlockUpdateViewPositions(true);
+
+  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
+       iter != this->Internals->KDTree.end(); ++iter)
+  {
+    if (iter->ViewProxy.GetPointer() != NULL)
+    {
+      vtkVector2i vsize;
+      vtkSMPropertyHelper(iter->ViewProxy, "ViewSize").Get(vsize.GetData(), 2);
+
+      vsize = (vsize * newsize) / osize;
+      vtkSMPropertyHelper(iter->ViewProxy, "ViewSize").Set(vsize.GetData(), 2);
+      iter->ViewProxy->UpdateProperty("ViewSize");
+    }
+  }
+
+  this->SetBlockUpdateViewPositions(prev);
+  this->UpdateViewPositions();
 }
 
 //----------------------------------------------------------------------------
@@ -1008,10 +1046,11 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     return NULL;
   }
 
-  unsigned char color[3];
-  vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(color);
+  unsigned char separatorColor[3] = { static_cast<unsigned char>(255 * this->SeparatorColor[0]),
+    static_cast<unsigned char>(255 * this->SeparatorColor[1]),
+    static_cast<unsigned char>(255 * this->SeparatorColor[2]) };
   vtkSmartPointer<vtkImageData> img =
-    vtkSMUtilities::MergeImages(images, vtkSMViewLayoutProxy::MultiViewImageBorderWidth, color);
+    vtkSMUtilities::MergeImages(images, this->SeparatorWidth, separatorColor);
   if (img)
   {
     img->Register(this);
@@ -1043,7 +1082,35 @@ vtkSMViewLayoutProxy* vtkSMViewLayoutProxy::FindLayout(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::ContainsView(vtkSMProxy* proxy)
+{
+  if (vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxy))
+  {
+    return this->ContainsView(view);
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkSMViewProxy*> vtkSMViewLayoutProxy::GetViews()
+{
+  std::vector<vtkSMViewProxy*> views;
+  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
+       iter != this->Internals->KDTree.end(); ++iter)
+  {
+    if (iter->ViewProxy.GetPointer())
+    {
+      views.push_back(iter->ViewProxy);
+    }
+  }
+  return views;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SeparatorColor: " << this->SeparatorColor[0] << ", " << this->SeparatorColor[1]
+     << ", " << this->SeparatorColor[2] << endl;
+  os << indent << "SeparatorWidth: " << this->SeparatorWidth << endl;
 }

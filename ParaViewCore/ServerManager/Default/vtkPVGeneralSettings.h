@@ -201,19 +201,6 @@ public:
 
   //@{
   /**
-   * Forwarded to vtkSMViewLayoutProxy.
-   */
-  void SetMultiViewImageBorderColor(double r, double g, double b);
-  void SetMultiViewImageBorderWidth(int width);
-  //@}
-
-  /**
-   * Forwarded to vtkSMViewProxy.
-   */
-  void SetTransparentBackground(bool val);
-
-  //@{
-  /**
    * Load all variables when loading a data set.
    */
   void SetLoadAllVariables(bool val);

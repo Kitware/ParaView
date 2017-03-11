@@ -30,7 +30,6 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
-#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkVectorOperators.h"
@@ -941,9 +940,8 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
     return NULL;
   }
 
-  unsigned char color[3];
-  vtkSMViewLayoutProxy::GetMultiViewImageBorderColor(color);
-  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(images, 0, color);
+  const unsigned char color[3] = { 0, 0, 0 };
+  vtkSmartPointer<vtkImageData> img = vtkSMUtilities::MergeImages(images, /*borderWidth=*/0, color);
   if (img)
   {
     img->Register(this);

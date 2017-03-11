@@ -42,6 +42,7 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
+#include <vector> // needed for std::vector.
 
 class vtkSMViewProxy;
 class vtkImageData;
@@ -189,6 +190,14 @@ public:
    */
   int GetViewLocation(vtkSMViewProxy*);
 
+  //@{
+  /**
+   * Returns if a view is contained in this layout.
+   */
+  bool ContainsView(vtkSMViewProxy* view) { return this->GetViewLocation(view) != -1; }
+  bool ContainsView(vtkSMProxy* view);
+  //@}
+
   /**
    * Updates positions for all views using the layout and current sizes.
    * This method is called automatically when the layout changes or the
@@ -229,21 +238,55 @@ public:
   void Reset();
 
   /**
+   * Returns the extents for all views in the layout.
+   */
+  void GetLayoutExtent(int extent[4]);
+
+  /**
+   * Update the size for all the views in the layout assuming the new size
+   * provided for the whole layout.
+   */
+  void SetSize(const int size[2]);
+
+  /**
    * Helper method to locate a layout, if any that contains the specified view
    * proxy.
    */
   static vtkSMViewLayoutProxy* FindLayout(vtkSMViewProxy*, const char* reggroup = "layouts");
 
+  /**
+   * Returns a vector of the view proxies added to his layout.
+   */
+  std::vector<vtkSMViewProxy*> GetViews();
+
+  /**
+   * Set the color to use for separator between views in multi-view
+   * configurations when saving images.
+   * @param[in] r Red component value in range (0, 255);
+   * @param[in] g Green component value in range (0, 255);
+   * @param[in] b Blue component value in range (0, 255);
+   */
+  void SetSeparatorColor(unsigned char r, unsigned char g, unsigned char b);
+
   //@{
   /**
-   * Set border size/color to use when capturing multiview images.
+   * Set the color to use for separator between views in multi-view
+   * configurations when saving images.
+   * @param[in] r Red component value in range (0, 1.0);
+   * @param[in] g Green component value in range (0, 1.0);
+   * @param[in] b Blue component value in range (0, 1.0);
    */
-  static void SetMultiViewImageBorderColor(double r, double g, double b);
-  static void SetMultiViewImageBorderWidth(int width);
-  static const double* GetMultiViewImageBorderColor();
-  static void GetMultiViewImageBorderColor(unsigned char rgb[3]);
-  static void GetMultiViewImageBorderColor(double rgb[3]);
-  static int GetMultiViewImageBorderWidth();
+  vtkSetVector3Macro(SeparatorColor, double);
+  vtkGetVector3Macro(SeparatorColor, double);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the separator width (in pixels) to use for separator between views
+   * in multi-view configurations.
+   */
+  vtkSetClampMacro(SeparatorWidth, int, 0, VTK_INT_MAX);
+  vtkGetMacro(SeparatorWidth, int);
   //@}
 
 protected:
@@ -276,6 +319,9 @@ protected:
 
   int MaximizedCell;
 
+  double SeparatorColor[3];
+  int SeparatorWidth;
+
 private:
   vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
@@ -292,8 +338,13 @@ private:
 
   bool BlockUpdate;
 
-  static double MultiViewImageBorderColor[3];
-  static int MultiViewImageBorderWidth;
+  bool SetBlockUpdateViewPositions(bool val)
+  {
+    bool temp = this->BlockUpdateViewPositions;
+    this->BlockUpdateViewPositions = val;
+    return temp;
+  }
+  bool BlockUpdateViewPositions;
 };
 
 #endif

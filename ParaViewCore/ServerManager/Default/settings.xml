@@ -287,44 +287,6 @@
         <IntRangeDomain min="1" max="17" />
       </IntVectorProperty>
 
-      <DoubleVectorProperty name="MultiViewImageBorderColor"
-        command="SetMultiViewImageBorderColor"
-        number_of_elements="3"
-        default_values="0 0 0"
-        panel_visibility="advanced"
-        panel_widget="color_selector_with_palette">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-        <Documentation>
-          Select the color to use for the separator between views when saving screenshots
-          and animation images with multiple views.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="MultiViewImageBorderWidth"
-        command="SetMultiViewImageBorderWidth"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="advanced">
-        <IntRangeDomain name="range" min="0" max="10" />
-        <Documentation>
-          Specify the width of border (in pixels) to use around views when saving screenshots
-          and animation images with multiple views.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="TransparentBackground"
-        command="SetTransparentBackground"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-           Set whether screenshots use an alpha channel to make the background
-           transparent.
-        </Documentation>
-      </IntVectorProperty>
-
-
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -379,11 +341,6 @@
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
         <Property name="AnimationTimePrecision" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Screenshot Options">
-        <Property name="MultiViewImageBorderColor" />
-        <Property name="MultiViewImageBorderWidth" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">

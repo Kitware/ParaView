@@ -3864,6 +3864,7 @@
       </Hints>
     </Proxy>
   </ProxyGroup>
+
   <ProxyGroup name="seed_sources">
     <Proxy group="extended_sources"
            name="PointSource"/>
@@ -3883,5 +3884,158 @@
            name="RungeKutta45"
            label="Runge Kutta 4/5">
     </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="misc">
+    <SaveScreenshotProxy name="SaveScreenshot" processes="client">
+      <Documentation>
+        Proxy used to save screenshots from view(s) or layouts.
+      </Documentation>
+      <ProxyProperty name="Layout" panel_visibility="never" />
+      <ProxyProperty name="View" panel_visibility="never" />
+
+      <IntVectorProperty name="SaveAllViews"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, all views in the active layout will be saved in the image.
+          Otherwise only the active view will be saved.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImageResolution"
+        number_of_elements="2"
+        default_values="none"
+        panel_widget="view_resolution" >
+        <ViewResolutionDomain name="range" default_mode="max">
+          <RequiredProperties>
+            <Property name="SaveAllViews" function="UseLayout" />
+            <Property name="Layout"       function="Layout" />
+            <Property name="View"         function="View" />
+          </RequiredProperties>
+        </ViewResolutionDomain>
+        <Documentation>
+          Choose the image resolution in pixels.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FontScaling"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Scale fonts proportionally" />
+          <Entry value="1" text="Do not scale fonts" />
+        </EnumerationDomain>
+        <Documentation>
+          Select how fonts are to be scaled when saving images at different
+          resolution than the current size.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SeparatorWidth"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Specify the width of border (in pixels) to use around views when
+          **Save All Views** is checked.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SaveAllViews"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="SeparatorColor"
+        number_of_elements="3"
+        default_values="0 0 0"
+        panel_widget="color_selector_with_palette" >
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          Select the separator color.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SaveAllViews"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="OverrideColorPalette"
+        number_of_elements="1"
+        default_values=""
+        panel_widget="color_palette_selector">
+        <StringListDomain name="list" />
+        <Documentation>
+          Choose the color palette to load before saving the image.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="StereoMode"
+        number_of_elements="1"
+        default_values="-1">
+        <Documentation>
+          Select a stereo mode, as needed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="No change" value="-1" />
+          <Entry text="No stereo" value="0" />
+          <Entry text="Red-Blue" value="2" />
+          <Entry text="Interlaced" value="3" />
+          <Entry text="Left Eye Only" value="4" />
+          <Entry text="Right Eye Only" value="5" />
+          <Entry text="Dresden" value="6" />
+          <Entry text="Anaglyph" value="7" />
+          <Entry text="Checkerboard" value="8" />
+          <Entry text="Side-by-Side Horizontal" value="9" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TransparentBackground"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           Set whether to use a transparent background.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImageQuality"
+        number_of_elements="1"
+        default_values="100">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Specify output image quality (or compression), if applicable.
+          **0** - low quality, **100** - high quality.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="ImageQuality" />
+      </PropertyGroup>
+
+    </SaveScreenshotProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
