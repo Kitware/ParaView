@@ -126,6 +126,8 @@
     <file>Icons/pqPaste22.png</file>
     <file>Icons/pqPalette32.png</file>
     <file>Icons/pqPickCenter24.png</file>
+    <file>Icons/pqPickCenter.png</file>
+    <file>Icons/pqPickCenter@2x.png</file>
     <file>Icons/pqPipelineList22.png</file>
     <file>Icons/pqPlotCellOverTime24.png</file>
     <file>Icons/pqPlotGlobalOverTime24.png</file>
@@ -154,8 +156,12 @@
     <file>Icons/pqResetCamera16.png</file>
     <file>Icons/pqResetCamera24.png</file>
     <file>Icons/pqResetCamera32.png</file>
+    <file>Icons/pqResetCamera.png</file>
+    <file>Icons/pqResetCamera@2x.png</file>
     <file>Icons/pqResetCenter24.png</file>
     <file>Icons/pqResetCenter32.png</file>
+    <file>Icons/pqResetCenter.png</file>
+    <file>Icons/pqResetCenter@2x.png</file>
     <file>Icons/pqResetRange24.png</file>
     <file>Icons/pqResetRangeCustom24.png</file>
     <file>Icons/pqResetRangeTemporal24.png</file>
@@ -164,7 +170,11 @@
     <file>Icons/pqRotate24.png</file>
     <file>Icons/pqRotate32.png</file>
     <file>Icons/pqRotateCameraCCW24.png</file>
+    <file>Icons/pqRotateCameraCCW.png</file>
+    <file>Icons/pqRotateCameraCCW@2x.png</file>
     <file>Icons/pqRotateCameraCW24.png</file>
+    <file>Icons/pqRotateCameraCW.png</file>
+    <file>Icons/pqRotateCameraCW@2x.png</file>
     <file>Icons/pqRuler16.png</file>
     <file>Icons/pqSave16.png</file>
     <file>Icons/pqSave24.png</file>
@@ -193,8 +203,12 @@
     <file>Icons/pqInsituBreakpoint16.png</file>
     <file>Icons/pqShowCenterAxes24.png</file>
     <file>Icons/pqShowCenterAxes32.png</file>
+    <file>Icons/pqShowCenterAxes.png</file>
+    <file>Icons/pqShowCenterAxes@2x.png</file>
     <file>Icons/pqShowOrientationAxes24.png</file>
     <file>Icons/pqShowOrientationAxes32.png</file>
+    <file>Icons/pqShowOrientationAxes.png</file>
+    <file>Icons/pqShowOrientationAxes@2x.png</file>
     <file>Icons/pqSideSetData16.png</file>
     <file>Icons/pqSinusoidal16.png</file>
     <file>Icons/pqSinusoidal24.png</file>
@@ -248,6 +262,20 @@
     <file>Icons/pqVcrPlay16.png</file>
     <file>Icons/pqVcrPlay24.png</file>
     <file>Icons/pqVcrPlay32.png</file>
+    <file>Icons/pqVcrBack.png</file>
+    <file>Icons/pqVcrBack@2x.png</file>
+    <file>Icons/pqVcrFirst.png</file>
+    <file>Icons/pqVcrFirst@2x.png</file>
+    <file>Icons/pqVcrForward.png</file>
+    <file>Icons/pqVcrForward@2x.png</file>
+    <file>Icons/pqVcrLast.png</file>
+    <file>Icons/pqVcrLast@2x.png</file>
+    <file>Icons/pqVcrLoop.png</file>
+    <file>Icons/pqVcrLoop@2x.png</file>
+    <file>Icons/pqVcrPause.png</file>
+    <file>Icons/pqVcrPause@2x.png</file>
+    <file>Icons/pqVcrPlay.png</file>
+    <file>Icons/pqVcrPlay@2x.png</file>
     <file>Icons/pqView22.png</file>
     <file>Icons/pqVolumeData16.png</file>
     <file>Icons/pqWarp24.png</file>
@@ -261,23 +289,39 @@
     <file>Icons/pqXMinus16.png</file>
     <file>Icons/pqXMinus24.png</file>
     <file>Icons/pqXMinus32.png</file>
+    <file>Icons/pqXMinus.png</file>
+    <file>Icons/pqXMinus@2x.png</file>
     <file>Icons/pqXPlus16.png</file>
     <file>Icons/pqXPlus24.png</file>
     <file>Icons/pqXPlus32.png</file>
+    <file>Icons/pqXPlus.png</file>
+    <file>Icons/pqXPlus@2x.png</file>
     <file>Icons/pqYMinus16.png</file>
     <file>Icons/pqYMinus24.png</file>
     <file>Icons/pqYMinus32.png</file>
+    <file>Icons/pqYMinus.png</file>
+    <file>Icons/pqYMinus@2x.png</file>
     <file>Icons/pqYPlus16.png</file>
     <file>Icons/pqYPlus24.png</file>
     <file>Icons/pqYPlus32.png</file>
+    <file>Icons/pqYPlus.png</file>
+    <file>Icons/pqYPlus@2x.png</file>
     <file>Icons/pqZMinus16.png</file>
     <file>Icons/pqZMinus24.png</file>
     <file>Icons/pqZMinus32.png</file>
+    <file>Icons/pqZMinus.png</file>
+    <file>Icons/pqZMinus@2x.png</file>
     <file>Icons/pqZPlus16.png</file>
     <file>Icons/pqZPlus24.png</file>
     <file>Icons/pqZPlus32.png</file>
+    <file>Icons/pqZPlus.png</file>
+    <file>Icons/pqZPlus@2x.png</file>
     <file>Icons/pqZoomToData24.png</file>
+    <file>Icons/pqZoomToData.png</file>
+    <file>Icons/pqZoomToData@2x.png</file>
     <file>Icons/pqZoomToSelection24.png</file>
+    <file>Icons/pqZoomToSelection.png</file>
+    <file>Icons/pqZoomToSelection@2x.png</file>
     <file>Icons/SplitViewHorizontal.png</file>
     <file>Icons/SplitViewVertical.png</file>
     <file>Icons/warning.png</file>
