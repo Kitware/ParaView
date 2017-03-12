@@ -578,7 +578,20 @@
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Frame rate in frames-per-second (FPS).
-          (todo: only show when not saving images).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FrameWindow"
+        number_of_elements="2"
+        default_values="none">
+        <AnimationFrameWindowDomain name="range" default_mode="min,max">
+          <RequiredProperties>
+            <Property name="AnimationScene" function="AnimationScene" />
+            <Property name="FrameRate" function="FrameRate" />
+          </RequiredProperties>
+        </AnimationFrameWindowDomain>
+        <Documentation>
+          Specify a window to save only a part of the animation.
         </Documentation>
       </IntVectorProperty>
 
@@ -606,6 +619,7 @@
       <PropertyGroup label="Animation Options">
         <Property name="DisconnectAndSave" />
         <Property name="FrameRate" />
+        <Property name="FrameWindow" />
       </PropertyGroup>
 
     </SaveAnimationProxy>

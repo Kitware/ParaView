@@ -50,6 +50,7 @@ set (Module_SRCS
   vtkRealtimeAnimationPlayer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSIXMLAnimationWriterRepresentationProperty.cxx
+  vtkSMAnimationFrameWindowDomain.cxx
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
