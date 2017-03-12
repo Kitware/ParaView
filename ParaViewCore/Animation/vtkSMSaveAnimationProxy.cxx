@@ -312,8 +312,9 @@ bool vtkSMSaveAnimationProxy::Prepare()
   {
     playModeHelper.Set(vtkCompositeAnimationPlayer::SEQUENCE);
     // change length of seq. animation to match the length in real-time mode.
+    // (see #17031)
     vtkSMPropertyHelper(scene, "NumberOfFrames")
-      .Set(frameRate * vtkSMPropertyHelper(scene, "Duration").GetAsInt());
+      .Set(1 + frameRate * vtkSMPropertyHelper(scene, "Duration").GetAsInt());
   }
   else
   {
