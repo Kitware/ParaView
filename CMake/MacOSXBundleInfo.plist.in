@@ -32,6 +32,8 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 
 <!-- File type associations -->
 <key>CFBundleDocumentTypes</key>

@@ -98,6 +98,7 @@ int main(int argc, char* argv[])
   QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
   QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
   QApplication::setOrganizationName("@BPC_ORGANIZATION@");
+  QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 #ifdef SUPPORT_STATIC_PLUGINS
 #ifndef BUILD_SHARED_LIBS
