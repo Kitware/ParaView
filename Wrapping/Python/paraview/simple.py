@@ -398,9 +398,19 @@ def RemoveViewsAndLayouts():
 # XML State management
 #==============================================================================
 
-def LoadState(filename, connection=None):
+def LoadState(filename, connection=None, **extraArgs):
     RemoveViewsAndLayouts()
-    servermanager.LoadState(filename, connection)
+
+    pxm = servermanager.ProxyManager()
+    proxy = pxm.NewProxy('options', 'LoadStateOptions')
+
+    if ((proxy is not None) & proxy.PrepareToLoad(filename)):
+        if (proxy.HasDataFiles() and (extraArgs is not None)):
+            pyproxy = servermanager._getPyProxy(proxy)
+            SetProperties(pyproxy, **extraArgs)
+
+        proxy.Load()
+
     # Try to set the new view active
     if len(GetRenderViews()) > 0:
         SetActiveView(GetRenderViews()[0])

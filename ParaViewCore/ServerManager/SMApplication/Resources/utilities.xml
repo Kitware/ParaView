@@ -4078,7 +4078,7 @@
         </Hints>
       </StringVectorProperty>
 
-      <StringVectorProperty name="DataFilePaths" number_of_elements="2" default_values="">
+      <StringVectorProperty name="DataFilePaths" number_of_elements="1" default_values="">
         <FileListDomain name="files" />
         <Documentation>
           New paths for the data files.
