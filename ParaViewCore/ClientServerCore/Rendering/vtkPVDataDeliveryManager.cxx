@@ -761,7 +761,7 @@ void vtkPVDataDeliveryManager::DeliverStreamedPieces(unsigned int size, unsigned
   bool using_remote_rendering = this->RenderView->GetUseDistributedRenderingForStillRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
-  for (unsigned int cc = 0; cc < size; cc++)
+  for (unsigned int cc = 0; cc < size; cc += 2)
   {
     unsigned int rid = values[cc];
     int port = static_cast<int>(values[cc + 1]);
