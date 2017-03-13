@@ -479,6 +479,7 @@ void ludcmp(GW_Float **a, GW_I32 n, GW_I32 *indx, GW_Float *d)
     GW_Float *vv;
     vv = fvector(1,n);
     *d=1.0;
+    imax = 0;
     for (i=1;i<=n;i++)
     {
         big=0.0;

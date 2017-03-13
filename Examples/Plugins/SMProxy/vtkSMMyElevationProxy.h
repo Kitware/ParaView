@@ -10,7 +10,7 @@ class vtkSMMyElevationProxy : public vtkSMSourceProxy
 public:
   static vtkSMMyElevationProxy* New();
   vtkTypeMacro(vtkSMMyElevationProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkSMMyElevationProxy();

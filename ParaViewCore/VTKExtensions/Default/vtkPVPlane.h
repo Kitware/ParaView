@@ -59,12 +59,8 @@ public:
    * FunctionValue() instead.  This method must be implemented by
    * any derived class.
    */
-  virtual double EvaluateFunction(double x[3]) VTK_OVERRIDE;
   using Superclass::EvaluateFunction;
-  double EvaluateFunction(double x, double y, double z)
-  {
-    return this->Superclass::EvaluateFunction(x, y, z);
-  }
+  virtual double EvaluateFunction(double x[3]) VTK_OVERRIDE;
 
   /**
    * Evaluate function gradient at position x-y-z and pass back vector.
