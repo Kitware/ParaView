@@ -8743,6 +8743,22 @@ source.</Documentation>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="0"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0" />
+          <Entry text="Interpolator with Cell Locator"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property determines which interpolator to use for
+        evaluating the velocity vector field. The first is faster though the
+        second is more robust in locating cells during streamline
+        integration.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
