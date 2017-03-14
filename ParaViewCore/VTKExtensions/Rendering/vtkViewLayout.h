@@ -17,7 +17,13 @@
  * @brief   used by vtkSMViewLayoutProxy.
  *
  * vtkViewLayout is the server-side object corresponding to
- * vtkSMViewLayoutProxy.
+ * vtkSMViewLayoutProxy. vtkSMViewLayoutProxy corresponds to a single layout
+ * of views. In ParaView UI, this corresponds to a single tab. In tile-display
+ * mode, the server-side only has "1 tab", in a manner of speaking. Thus, we
+ * need to ensure that the server shows the views laid out in the active tab.
+ * This class helps vtkSMViewLayoutProxy do that.
+ * `vtkSMViewLayoutProxy:ShowViewsOnTileDisplay` calls methods on this object on
+ * the server side to activate it.
 */
 
 #ifndef vtkViewLayout_h
