@@ -2471,9 +2471,9 @@ int vtkCGNSReader::CanReadFile(const char* name)
 {
   // return value 0: can not read
   // return value 1: can read
-  int cgioNum;
+  int cgioFile;
   int ierr = 1;
-  double rootId;
+  double rootNodeId;
   double childId;
   float FileVersion = 0.0;
   int intFileVersion = 0;
@@ -2483,17 +2483,17 @@ int vtkCGNSReader::CanReadFile(const char* name)
   cgsize_t dimVals[12];
   int fileType = CG_FILE_NONE;
 
-  if (cgio_open_file(name, CG_MODE_READ, CG_FILE_NONE, &cgioNum) != CG_OK)
+  if (cgio_open_file(name, CG_MODE_READ, CG_FILE_NONE, &cgioFile) != CG_OK)
   {
     cgio_error_message(errmsg);
     vtkErrorMacro(<< "vtkCGNSReader::CanReadFile : " << errmsg);
     return 0;
   }
 
-  cgio_get_root_id(cgioNum, &rootId);
-  cgio_get_file_type(cgioNum, &fileType);
+  cgio_get_root_id(cgioFile, &rootNodeId);
+  cgio_get_file_type(cgioFile, &fileType);
 
-  if (cgio_get_node_id(cgioNum, rootId, "CGNSLibraryVersion", &childId))
+  if (cgio_get_node_id(cgioFile, rootNodeId, "CGNSLibraryVersion", &childId))
   {
     cgio_error_message(errmsg);
     vtkErrorMacro(<< "vtkCGNSReader::CanReadFile : " << errmsg);
@@ -2501,14 +2501,14 @@ int vtkCGNSReader::CanReadFile(const char* name)
     goto CanReadError;
   }
 
-  if (cgio_get_data_type(cgioNum, childId, dataType))
+  if (cgio_get_data_type(cgioFile, childId, dataType))
   {
     vtkErrorMacro(<< "CGNS Version data type");
     ierr = 0;
     goto CanReadError;
   }
 
-  if (cgio_get_dimensions(cgioNum, childId, &ndim, dimVals))
+  if (cgio_get_dimensions(cgioFile, childId, &ndim, dimVals))
   {
     vtkErrorMacro(<< "cgio_get_dimensions");
     ierr = 0;
@@ -2532,7 +2532,7 @@ int vtkCGNSReader::CanReadFile(const char* name)
   }
 
   // read data
-  if (cgio_read_all_data(cgioNum, childId, &FileVersion))
+  if (cgio_read_all_data(cgioFile, childId, &FileVersion))
   {
     vtkErrorMacro(<< "read CGNS version number");
     ierr = 0;
@@ -2571,7 +2571,7 @@ int vtkCGNSReader::CanReadFile(const char* name)
   vtkDebugMacro(<< "FileVersion=" << FileVersion << "\n");
 
 CanReadError:
-  cgio_close_file(cgioNum);
+  cgio_close_file(cgioFile);
   return ierr ? 1 : 0;
 }
 
