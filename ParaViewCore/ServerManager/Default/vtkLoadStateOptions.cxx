@@ -38,6 +38,10 @@ void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)
 std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath)
 {
   std::string result = "";
-  vtksys::SystemTools::LocateFileInDir(filepath.c_str(), this->DataDirectory.c_str(), result);
+  std::string collapsedPath = vtksys::SystemTools::CollapseFullPath(this->DataDirectory);
+  if (!vtksys::SystemTools::LocateFileInDir(filepath.c_str(), collapsedPath.c_str(), result))
+  {
+    vtkErrorMacro("Cannot find " << filepath << " in " << this->DataDirectory.c_str() << ".");
+  }
   return result;
 }

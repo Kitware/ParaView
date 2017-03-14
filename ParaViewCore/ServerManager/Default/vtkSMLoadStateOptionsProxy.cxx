@@ -226,7 +226,14 @@ bool vtkSMLoadStateOptionsProxy::Load()
     }
     case 1:
     {
-      std::string directoryPath = vtkSMPropertyHelper(this, "DataDirectory").GetAsString();
+      vtkSMPropertyHelper propertyHelper(this, "DataDirectory");
+
+      // Default to state file directory
+      if (strlen(propertyHelper.GetAsString()) == 0)
+      {
+        propertyHelper.Set(vtksys::SystemTools::GetParentDirectory(this->StateFileName).c_str());
+        this->UpdateVTKObjects();
+      }
 
       vtkInternals::PropertiesMapType::iterator iter;
       for (iter = this->Internals->PropertiesMap.begin();
@@ -258,7 +265,6 @@ bool vtkSMLoadStateOptionsProxy::Load()
             }
             else
             {
-              vtkErrorMacro("Cannot find " << *fIter << " in " << directoryPath << ".");
               return false;
             }
           }

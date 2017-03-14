@@ -4069,7 +4069,7 @@
                             default_values="">
         <FileListDomain name="files" />
         <Documentation>
-          Directory to look for data files under.
+          Directory to look for data files under. Defaults to the state file's directory.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="1">
