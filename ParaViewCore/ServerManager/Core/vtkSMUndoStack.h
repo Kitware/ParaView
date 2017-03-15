@@ -101,8 +101,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
-  vtkSMUndoStackObserver* Observer;
 };
 
 #endif

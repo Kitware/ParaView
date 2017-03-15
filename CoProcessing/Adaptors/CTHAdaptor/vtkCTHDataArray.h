@@ -11,23 +11,23 @@ class VTK_EXPORT vtkCTHDataArray : public vtkDataArray
 public:
   static vtkCTHDataArray* New();
   vtkTypeMacro(vtkCTHDataArray, vtkDataArray);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // Prepares for new data
-  void Initialize();
+  void Initialize() VTK_OVERRIDE;
 
   // Description:
   // Get the data type
-  int GetDataType() { return VTK_DOUBLE; }
+  int GetDataType() VTK_OVERRIDE { return VTK_DOUBLE; }
 
-  int GetDataTypeSize() { return static_cast<int>(sizeof(double)); }
+  int GetDataTypeSize() VTK_OVERRIDE { return static_cast<int>(sizeof(double)); }
 
   // Description:
   // Return the size, in bytes, of the lowest-level element of an
   // array.  For vtkDataArray and subclasses this is the size of the
   // data type.
-  virtual int GetElementComponentSize() { return this->GetDataTypeSize(); }
+  virtual int GetElementComponentSize() VTK_OVERRIDE { return this->GetDataTypeSize(); }
 
   // Description:
   // Set the dimensions the data will be contained within
@@ -52,31 +52,32 @@ public:
 
   // Description:
   // Copy the tuple value into a user-provided array.
-  void GetTuple(vtkIdType i, double* tuple);
-  double* GetTuple(vtkIdType i);
+  void GetTuple(vtkIdType i, double* tuple) VTK_OVERRIDE;
+  double* GetTuple(vtkIdType i) VTK_OVERRIDE;
 
   // Description:
   // Returns an ArrayIterator over doubles, this will end up with a deep copy
-  vtkArrayIterator* NewIterator();
+  vtkArrayIterator* NewIterator() VTK_OVERRIDE;
 
-  vtkIdType LookupValue(vtkVariant value);
-  void LookupValue(vtkVariant value, vtkIdList* ids);
-  void SetVariantValue(vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) { /* TODO */}
+  vtkIdType LookupValue(vtkVariant value) VTK_OVERRIDE;
+  void LookupValue(vtkVariant value, vtkIdList* ids) VTK_OVERRIDE;
+  void SetVariantValue(vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) VTK_OVERRIDE
+  { /* TODO */}
 
   // Description:
   // Get the address of a particular data index. Performs no checks
   // to verify that the memory has been allocated etc.
   double* GetPointer(vtkIdType id);
-  void* GetVoidPointer(vtkIdType id) { return this->GetPointer(id); }
-  void ExportToVoidPointer(void* out_ptr);
+  void* GetVoidPointer(vtkIdType id) VTK_OVERRIDE { return this->GetPointer(id); }
+  void ExportToVoidPointer(void* out_ptr) VTK_OVERRIDE;
 
-  int Allocate(vtkIdType sz, vtkIdType ext = 1000)
+  int Allocate(vtkIdType sz, vtkIdType ext = 1000) VTK_OVERRIDE
   {
     BuildFallback();
     return Fallback->Allocate(sz, ext);
   }
 
-  void SetNumberOfComponents(int number)
+  void SetNumberOfComponents(int number) VTK_OVERRIDE
   {
     this->Superclass::SetNumberOfComponents(number);
     if (this->Fallback)
@@ -85,7 +86,7 @@ public:
     }
   }
 
-  void SetNumberOfTuples(vtkIdType number)
+  void SetNumberOfTuples(vtkIdType number) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->SetNumberOfTuples(number);
@@ -95,50 +96,50 @@ public:
 
   // Description:
   // A number of abstract functions from the super class that must not be called
-  void SetTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa)
+  void SetTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->SetTuple(i, j, aa);
   }
-  void SetTuple(vtkIdType i, const float* f)
+  void SetTuple(vtkIdType i, const float* f) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->SetTuple(i, f);
   }
-  void SetTuple(vtkIdType i, const double* d)
+  void SetTuple(vtkIdType i, const double* d) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->SetTuple(i, d);
   }
 
-  void InsertTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa)
+  void InsertTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->InsertTuple(i, j, aa);
   }
-  void InsertTuple(vtkIdType i, const float* f)
+  void InsertTuple(vtkIdType i, const float* f) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->InsertTuple(i, f);
   }
-  void InsertTuple(vtkIdType i, const double* d)
+  void InsertTuple(vtkIdType i, const double* d) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->InsertTuple(i, d);
   }
-  void InsertTuples(vtkIdList* dstIds, vtkIdList* srcIds, vtkAbstractArray* source)
+  void InsertTuples(vtkIdList* dstIds, vtkIdList* srcIds, vtkAbstractArray* source) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->InsertTuples(dstIds, srcIds, source);
   }
   virtual void InsertTuples(
-    vtkIdType dstStart, vtkIdType n, vtkIdType srcStart, vtkAbstractArray* source)
+    vtkIdType dstStart, vtkIdType n, vtkIdType srcStart, vtkAbstractArray* source) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->InsertTuples(dstStart, n, srcStart, source);
   }
 
-  vtkIdType InsertNextTuple(vtkIdType i, vtkAbstractArray* aa)
+  vtkIdType InsertNextTuple(vtkIdType i, vtkAbstractArray* aa) VTK_OVERRIDE
   {
     this->BuildFallback();
     vtkIdType ret = this->Fallback->InsertNextTuple(i, aa);
@@ -146,7 +147,7 @@ public:
     this->MaxId = this->Fallback->GetMaxId();
     return ret;
   }
-  vtkIdType InsertNextTuple(const float* f)
+  vtkIdType InsertNextTuple(const float* f) VTK_OVERRIDE
   {
     this->BuildFallback();
     vtkIdType ret = this->Fallback->InsertNextTuple(f);
@@ -154,7 +155,7 @@ public:
     this->MaxId = this->Fallback->GetMaxId();
     return ret;
   }
-  vtkIdType InsertNextTuple(const double* d)
+  vtkIdType InsertNextTuple(const double* d) VTK_OVERRIDE
   {
     this->BuildFallback();
     vtkIdType ret = this->Fallback->InsertNextTuple(d);
@@ -163,48 +164,51 @@ public:
     return ret;
   }
 
-  void InsertVariantValue(vtkIdType idx, vtkVariant value)
+  void InsertVariantValue(vtkIdType idx, vtkVariant value) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->InsertVariantValue(idx, value);
   }
 
-  void RemoveTuple(vtkIdType id)
+  void RemoveTuple(vtkIdType id) VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->RemoveTuple(id);
   }
-  void RemoveFirstTuple()
+  void RemoveFirstTuple() VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->RemoveFirstTuple();
   }
-  void RemoveLastTuple()
+  void RemoveLastTuple() VTK_OVERRIDE
   {
     this->BuildFallback();
     this->Fallback->RemoveLastTuple();
   }
 
-  void* WriteVoidPointer(vtkIdType i, vtkIdType j)
+  void* WriteVoidPointer(vtkIdType i, vtkIdType j) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->WriteVoidPointer(i, j);
   }
 
-  virtual void DeepCopy(vtkAbstractArray* aa)
+  virtual void DeepCopy(vtkAbstractArray* aa) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->DeepCopy(aa);
   }
 
-  virtual void DeepCopy(vtkDataArray* da) { return this->DeepCopy((vtkAbstractArray*)da); }
+  virtual void DeepCopy(vtkDataArray* da) VTK_OVERRIDE
+  {
+    return this->DeepCopy((vtkAbstractArray*)da);
+  }
 
-  void SetVoidArray(void* p, vtkIdType id, int i, int j)
+  void SetVoidArray(void* p, vtkIdType id, int i, int j) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->SetVoidArray(p, id, i, j);
   }
-  void SetVoidArray(void* p, vtkIdType id, int i)
+  void SetVoidArray(void* p, vtkIdType id, int i) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->SetVoidArray(p, id, i);
@@ -213,7 +217,7 @@ public:
   // Description:
   // Since we don't allocate, this does nothing
   // unless we're already falling back
-  void Squeeze()
+  void Squeeze() VTK_OVERRIDE
   {
     if (this->Fallback)
     {
@@ -224,19 +228,19 @@ public:
   }
 
   // Description:
-  int Resize(vtkIdType numTuples)
+  int Resize(vtkIdType numTuples) VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->Resize(numTuples);
   }
 
-  void DataChanged()
+  void DataChanged() VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->DataChanged();
   }
 
-  void ClearLookup()
+  void ClearLookup() VTK_OVERRIDE
   {
     this->BuildFallback();
     return this->Fallback->ClearLookup();

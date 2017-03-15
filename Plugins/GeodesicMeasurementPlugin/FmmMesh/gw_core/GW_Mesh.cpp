@@ -505,6 +505,7 @@ GW_Vertex* GW_Mesh::InsertVertexInEdge( GW_Vertex& Vert1, GW_Vertex& Vert2, GW_F
     GW_I32 nVert1Num1, nVert1Num2, nVert1Num3, nVert2Num1, nVert2Num2, nVert2Num3;
     GW_Face* pNewFace1 = NULL;
     GW_Face* pNewFace2 = NULL;
+    nVert1Num3 = nVert2Num3 = 0;
     if( pFace1!=NULL )
     {
         nVert1Num1 = pFace1->GetEdgeNumber( Vert1 );
@@ -780,10 +781,9 @@ void GW_Mesh::CheckIntegrity()
     {
         GW_Vertex* pVert = this->GetVertex(i); GW_ASSERT( pVert!=NULL );
         GW_Face* pFace = pVert->GetFace();    GW_ASSERT( pFace!=NULL );
-        if( pFace!=NULL && pFace->GetVertex(0)!=pVert &&
+        GW_ASSERT(!(pFace!=NULL && pFace->GetVertex(0)!=pVert &&
             pFace->GetVertex(1)!=pVert &&
-            pFace->GetVertex(2)!=pVert )
-            GW_ASSERT( GW_False );
+            pFace->GetVertex(2)!=pVert));
     }
     for( GW_U32 i=0; i<this->GetNbrFace(); ++i )
     {
