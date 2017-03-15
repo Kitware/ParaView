@@ -557,12 +557,12 @@ install(FILES
 	cgns_mangle.h
 	cgnslib.h
 	cgns_io.h
-	cgnswin_f.h
+	#cgnswin_f.h
 	${CMAKE_CURRENT_BINARY_DIR}/cgnsconfig.h
 	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
         DESTINATION ${cgns_include_directory})
 
 if (CGNS_ENABLE_FORTRAN)
