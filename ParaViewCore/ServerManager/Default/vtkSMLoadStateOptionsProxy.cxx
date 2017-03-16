@@ -301,13 +301,10 @@ bool vtkSMLoadStateOptionsProxy::Load()
 
     // Get sequence basename if needed
     std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePaths[0]);
-    char* cstr = new char[filename.length() + 1];
-    strcpy(cstr, filename.c_str());
-    if (this->SequenceParser->ParseFileSequence(cstr))
+    if (this->SequenceParser->ParseFileSequence(filename.c_str()))
     {
       filename = this->SequenceParser->GetSequenceName();
     }
-    delete[] cstr;
 
     this->Internals->CollectionsMap[id].attribute("name").set_value(filename.c_str());
   }
