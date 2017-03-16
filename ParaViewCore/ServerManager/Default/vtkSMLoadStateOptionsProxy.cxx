@@ -53,7 +53,7 @@ public:
   std::map<int, pugi::xml_node> CollectionsMap;
   pugi::xml_document StateXML;
 
-  void processStateFile(pugi::xml_node node)
+  void ProcessStateFile(pugi::xml_node node)
   {
     if (strcmp(node.name(), "ServerManagerState") == 0)
     {
@@ -61,11 +61,11 @@ public:
       {
         if (strcmp(it->name(), "Proxy") == 0)
         {
-          this->processProxy(*it);
+          this->ProcessProxy(*it);
         }
         else if (strcmp(it->name(), "ProxyCollection") == 0)
         {
-          this->processProxyCollection(*it);
+          this->ProcessProxyCollection(*it);
         }
       }
     }
@@ -73,12 +73,12 @@ public:
     {
       for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
       {
-        this->processStateFile(*it);
+        this->ProcessStateFile(*it);
       }
     }
   }
 
-  void processProxy(pugi::xml_node node)
+  void ProcessProxy(pugi::xml_node node)
   {
     pugi::xml_attribute group = node.attribute("group");
     pugi::xml_attribute type = node.attribute("type");
@@ -97,7 +97,7 @@ public:
       return;
     }
 
-    std::set<std::string> filenameProperties = this->locateFileNameProperties(prototype);
+    std::set<std::string> filenameProperties = this->LocateFileNameProperties(prototype);
     if (filenameProperties.size() == 0)
     {
       return;
@@ -121,7 +121,7 @@ public:
     }
   }
 
-  void processProxyCollection(pugi::xml_node node)
+  void ProcessProxyCollection(pugi::xml_node node)
   {
     pugi::xml_attribute name = node.attribute("name");
     if (name.empty())
@@ -148,7 +148,7 @@ public:
     }
   }
 
-  std::set<std::string> locateFileNameProperties(vtkSMProxy* proxy)
+  std::set<std::string> LocateFileNameProperties(vtkSMProxy* proxy)
   {
     std::set<std::string> fileNameProperties;
     vtkSMPropertyIterator* piter = proxy->NewPropertyIterator();
@@ -176,7 +176,6 @@ vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 {
   this->Internals = new vtkInternals();
   this->StateFileName = 0;
-  this->SequenceParser = vtkFileSequenceParser::New();
 }
 
 //----------------------------------------------------------------------------
@@ -184,7 +183,6 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 {
   delete this->Internals;
   this->SetStateFileName(0);
-  this->SequenceParser->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -200,7 +198,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     return false;
   }
 
-  this->Internals->processStateFile(this->Internals->StateXML);
+  this->Internals->ProcessStateFile(this->Internals->StateXML);
   return true;
 }
 

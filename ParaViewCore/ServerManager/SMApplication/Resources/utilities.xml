@@ -4047,7 +4047,7 @@
     <LoadStateOptionsProxy class="vtkLoadStateOptions"
                            name="LoadStateOptions">
       <Documentation>
-        Options proxy used to prompt user for options when loading a pvsm state files.
+        Options proxy used to prompt user for options when loading pvsm state files.
       </Documentation>
 
       <IntVectorProperty name="LoadStateDateFileOptions"

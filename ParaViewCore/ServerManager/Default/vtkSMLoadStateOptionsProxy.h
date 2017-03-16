@@ -18,13 +18,14 @@
  *
  *
  * vtkSMLoadStateOptionsProxy provides a dialog to allow a user to change the
- * locations of data files when loading a state file. The user can give a data
+ * locations of data files when loading a state file. The user can give a directory
  * where the data files reside or explicitly change the path for each data file.
  */
 
 #ifndef vtkSMLoadStateOptionsProxy_h
 #define vtkSMLoadStateOptionsProxy_h
 
+#include "vtkNew.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
@@ -46,7 +47,7 @@ public:
 
   /**
    * Check if state file has any data files.
-   * @returns ...
+   * @returns whether the state file refers to any data files to be loaded.
    */
   virtual bool HasDataFiles();
 
@@ -65,7 +66,7 @@ protected:
 private:
   class vtkInternals;
   vtkInternals* Internals;
-  vtkFileSequenceParser* SequenceParser;
+  vtkNew<vtkFileSequenceParser> SequenceParser;
 
   vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
