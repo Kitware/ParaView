@@ -47,14 +47,17 @@ Learning Resources
 Building
 ========
 
-The easiest method for beginners to build ParaView from source is using the
-[ParaView Superbuild][sbrepo].  It is possible to build ParaView without using the
-superbuild as well. A little dated version of those instructions are
-available [here][buildinstall].  These will be updated in near future
-(contributions are welcome).
+There are two ways to build ParaView:
+
+* Perhaps the easiest method for beginners to build ParaView from source is
+using the [ParaView Superbuild][sbrepo]. The superbuild downloads and builds all
+of ParaView's dependencies as well as ParaView itself.
+
+* It is also possible to [build ParaView][build] without using the superbuild.
+ParaView's dependencies must be available on the system.
 
 [sbrepo]: https://gitlab.kitware.com/paraview/paraview-superbuild
-[buildinstall]: http://www.paraview.org/Wiki/ParaView:Build_And_Install
+[build]: Documentation/dev/build.md
 
 Reporting Bugs
 ==============
