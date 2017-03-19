@@ -13,9 +13,6 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
-  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation" />
-  <pqevent object="pqAnimationSettingsDialog/cancelButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveGeometry" />
   <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
   <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
