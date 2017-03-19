@@ -266,6 +266,8 @@ void vtkSMViewLayoutProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLoca
     return;
   }
 
+  const bool prev = this->SetBlockUpdateViewPositions(true);
+
   this->Internals->KDTree.clear();
   this->Internals->KDTree.resize(user_data.variant_size());
 
@@ -300,7 +302,16 @@ void vtkSMViewLayoutProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLoca
       cell.ViewProxy =
         vtkSMViewProxy::SafeDownCast(this->GetSession()->GetRemoteObject(value.proxy_global_id(0)));
     }
+    if (cell.ViewProxy && cell.ViewProxy->GetProperty("ViewSize"))
+    {
+      // every time view-size changes, we update the view positions for all views.
+      cell.ViewProxy->GetProperty("ViewSize")
+        ->AddObserver(vtkCommand::ModifiedEvent, this->Internals->Observer);
+    }
   }
+
+  this->SetBlockUpdateViewPositions(prev);
+  this->UpdateViewPositions();
 
   // let the world know that the layout has been reconfigured.
   this->InvokeEvent(vtkCommand::ConfigureEvent);
@@ -432,6 +443,12 @@ int vtkSMViewLayoutProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocat
     {
       cell.ViewProxy = NULL;
     }
+    if (cell.ViewProxy && cell.ViewProxy->GetProperty("ViewSize"))
+    {
+      // every time view-size changes, we update the view positions for all views.
+      cell.ViewProxy->GetProperty("ViewSize")
+        ->AddObserver(vtkCommand::ModifiedEvent, this->Internals->Observer);
+    }
   }
 
   this->UpdateViewPositions();
@@ -530,7 +547,7 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
     .arg("AssignView")
     .arg(location)
     .arg(view)
-    .arg("assign view to a paricular cell in the layout");
+    .arg("assign view to a particular cell in the layout");
 
   if (cell.ViewProxy == view)
   {
