@@ -43,3 +43,4 @@ LoadStateMultiView_1.png - bigmac-osx-shared-debug+clang+gui+opengl2+python
 LoadStateMultiView_2.png - nemesis-windows-shared-release+gui+mpi+opengl2
 AxesGridTestLines_1.png  - amber8-linux-static-release+mpi+offscreen+osmesa+python
 TestSubhaloFinder_1.png  - vall-linux-shared-debug+doc+extdeps+gui+mpi+python+python3
+SaveLargeScreenshot_1.png - nemesis-windows-shared-release+gui+kits+mpi+python
