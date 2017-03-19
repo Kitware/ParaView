@@ -1948,14 +1948,23 @@ def _func_name_valid(name):
     return valid
 
 # -----------------------------------------------------------------------------
+def _get_proxymodules_to_import(connection):
+    """
+    used in _add_functions, _get_generated_proxies, and _remove_functions to get
+    modules to import proxies from.
+    """
+    if connection and connection.Modules:
+        modules = connection.Modules
+        return [modules.filters, modules.sources, modules.writers, modules.animation]
+    else:
+        return []
 
 def _add_functions(g):
     if not servermanager.ActiveConnection:
         return
 
     activeModule = servermanager.ActiveConnection.Modules
-    for m in [activeModule.filters, activeModule.sources,
-              activeModule.writers, activeModule.animation]:
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         # Skip registering proxies in certain modules (currently only writers)
         skipRegisteration = m is activeModule.writers
         dt = m.__dict__
@@ -1970,10 +1979,8 @@ def _add_functions(g):
 # -----------------------------------------------------------------------------
 
 def _get_generated_proxies():
-    activeModule = servermanager.ActiveConnection.Modules
     proxies = []
-    for m in [activeModule.filters, activeModule.sources,
-              activeModule.writers, activeModule.animation]:
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
@@ -1984,12 +1991,8 @@ def _get_generated_proxies():
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):
-    list = []
-    if servermanager.ActiveConnection:
-       list = [m for m in dir(servermanager.ActiveConnection.Modules) if m[0] != '_']
-
-    for m in list:
-        dt = servermanager.ActiveConnection.Modules.__dict__[m].__dict__
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
+        dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str) and key in g:
