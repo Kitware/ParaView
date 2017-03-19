@@ -18,6 +18,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLElement.h"
@@ -221,8 +222,12 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
   imageWriter->SetStartFileCount(frameWindow[0]);
   imageWriter->SetPlaybackTimeWindow(playbackTimeWindow);
 
-  // TODO: handle progress.
+  // register with progress handler so we monitor progress events.
+  this->GetSession()->GetProgressHandler()->RegisterProgressEvent(
+    imageWriter.Get(), static_cast<int>(this->GetGlobalID()));
+  this->GetSession()->PrepareProgress();
   bool status = imageWriter->Save();
+  this->GetSession()->CleanupPendingProgress();
 
   this->Cleanup();
   return status;
