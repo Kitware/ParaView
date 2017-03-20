@@ -742,6 +742,34 @@
     </SourceProxy>
 
     <!-- =================================================================== -->
+    <SourceProxy name="SPHDatasetInterpolator" class="vtkSPHInterpolator"
+                 label="SPH Dataset Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="SPHInterpolatorBase">
+      <Documentation>
+        This filter uses SPH (smooth particle hydrodynamics) kernels to
+        interpolate a data source onto an input structure. For example, while the
+        data source is a set of particles, the data from these particles can be
+        interpolated onto an input volume. Then
+        the output (which consists of the input structure plus interpolated data)
+        can then be visualized using classical visualization techniques such as
+        isocontouring, slicing, heat maps and so on.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
     <SourceProxy name="PointInterpolatorBase" class="vtkPointInterpolator"
       label="Point Interpolator"
       multiprocess_support="single_process">
@@ -974,6 +1002,33 @@
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources" name="BoundedVolumeSource" />
         </ProxyListDomain>
+        <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- =================================================================== -->
+    <SourceProxy name="PointDatasetInterpolator" class="vtkPointInterpolator"
+                 label="Point Dataset Interpolator"
+                 multiprocess_support="single_process"
+                 base_proxygroup="filters"
+                 base_proxyname="PointInterpolatorBase">
+      <Documentation>
+        This probes a point cloud `PC` on the *Input* with a
+        set of points `P` (the filter *Source*), interpolating the data values from `PC`
+        onto `P`. Note however that the descriptive phrase "point cloud" is a
+        misnomer: PC can be represented by any dataset type, with the points of
+        the dataset forming PC. Similary, the output P can also be represented by
+        any vtkDataSet type; and the topology/geometry structure of P is passed
+        through to the output along with the newly interpolated arrays.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Source" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
         <Documentation>The data source that provides the structure to be interpolated on.</Documentation>
       </InputProperty>
     </SourceProxy>

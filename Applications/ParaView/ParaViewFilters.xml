@@ -127,9 +127,11 @@
     <Proxy group="filters" name="PointLineInterpolator" />
     <Proxy group="filters" name="PointPlaneInterpolator" />
     <Proxy group="filters" name="PointVolumeInterpolator" />
+    <Proxy group="filters" name="PointDatasetInterpolator" />
     <Proxy group="filters" name="SPHLineInterpolator" />
     <Proxy group="filters" name="SPHPlaneInterpolator" />
     <Proxy group="filters" name="SPHVolumeInterpolator" />
+    <Proxy group="filters" name="SPHDatasetInterpolator" />
   </Category>
 
   <Proxy group="filters" name="AggregateDataSet" />
