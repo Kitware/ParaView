@@ -29,6 +29,7 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
+#include <map>
 
 class vtkFileSequenceParser;
 
@@ -60,8 +61,22 @@ protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy();
 
+  /**
+   * Locates the files in the user specified directory and updates the paths
+   * in the state file XML.
+   *
+   * @returns false if any of the files where not found
+   */
+  bool LocateFilesInDirectory(std::map<int, std::string>& filepaths);
+
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
+
+  /**
+   * When the number of parent directories for a file series reaches this number assume it will
+   * match for the rest of the file series.
+   */
+  int PathMatchingThreshold;
 
 private:
   class vtkInternals;

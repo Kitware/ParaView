@@ -38,10 +38,24 @@ void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)
 std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath)
 {
   std::string result = "";
-  std::string collapsedPath = vtksys::SystemTools::CollapseFullPath(this->DataDirectory);
-  if (!vtksys::SystemTools::LocateFileInDir(filepath.c_str(), collapsedPath.c_str(), result))
+  std::vector<std::string> directoryPathComponents;
+  vtksys::SystemTools::SplitPath(
+    vtksys::SystemTools::CollapseFullPath(this->DataDirectory), directoryPathComponents);
+  std::vector<std::string> pathComponents;
+  vtksys::SystemTools::SplitPath(vtksys::SystemTools::GetParentDirectory(filepath), pathComponents);
+  int insertIndex = directoryPathComponents.size();
+
+  while (pathComponents.size() > 1)
   {
-    vtkErrorMacro("Cannot find " << filepath << " in " << this->DataDirectory.c_str() << ".");
+    std::string searchPath = vtksys::SystemTools::JoinPath(directoryPathComponents);
+    if (vtksys::SystemTools::LocateFileInDir(filepath.c_str(), searchPath.c_str(), result))
+    {
+      return result;
+    }
+    directoryPathComponents.insert(
+      directoryPathComponents.begin() + insertIndex, pathComponents.back());
+    pathComponents.pop_back();
   }
+  vtkErrorMacro("Cannot find " << filepath << " in " << this->DataDirectory.c_str() << ".");
   return result;
 }

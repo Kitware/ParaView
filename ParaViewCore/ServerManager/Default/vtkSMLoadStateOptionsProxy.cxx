@@ -31,7 +31,6 @@
 #include "vtksys/SystemTools.hxx"
 #include <set>
 #include <sstream>
-#include <vector>
 #include <vtk_pugixml.h>
 
 //---------------------------------------------------------------------------
@@ -41,7 +40,7 @@ public:
   struct PropertyInfo
   {
     pugi::xml_node XMLElement;
-    std::vector<std::string> FilePaths;
+    std::map<int, std::string> FilePaths;
     bool Modified;
     PropertyInfo()
       : Modified(false)
@@ -113,7 +112,11 @@ public:
           info.XMLElement = *it;
           for (pugi::xml_node_iterator it2 = it->begin(); it2 != it->end(); ++it2)
           {
-            info.FilePaths.push_back(it->child("Element").attribute("value").value());
+            if (strcmp(it2->name(), "Element") == 0)
+            {
+              info.FilePaths.insert(std::map<int, std::string>::value_type(
+                it2->attribute("index").as_int(), it2->attribute("value").value()));
+            }
           }
           this->PropertiesMap[it->attribute("id").value()] = info;
         }
@@ -176,6 +179,7 @@ vtkSMLoadStateOptionsProxy::vtkSMLoadStateOptionsProxy()
 {
   this->Internals = new vtkInternals();
   this->StateFileName = 0;
+  this->PathMatchingThreshold = 3;
 }
 
 //----------------------------------------------------------------------------
@@ -210,6 +214,59 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::map<int, std::string>& filepaths)
+{
+  std::string lastLocatedPath = "";
+  int numOfPathMatches = 0;
+  std::map<int, std::string>::iterator fIter;
+  for (fIter = filepaths.begin(); fIter != filepaths.end(); ++fIter)
+  {
+    // TODO: Inefficient - need vtkPVInfomation class to bundle file paths
+    if (numOfPathMatches < this->PathMatchingThreshold)
+    {
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
+             << fIter->second << vtkClientServerStream::End;
+      this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
+      vtkClientServerStream result = this->GetLastResult();
+      std::string locatedPath = "";
+      if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
+      {
+        result.GetArgument(0, 0, &locatedPath);
+      }
+
+      if (!locatedPath.empty())
+      {
+        fIter->second = locatedPath;
+        if (vtksys::SystemTools::GetParentDirectory(locatedPath) ==
+          vtksys::SystemTools::GetParentDirectory(lastLocatedPath))
+        {
+          numOfPathMatches++;
+        }
+        else
+        {
+          numOfPathMatches = 0;
+        }
+        lastLocatedPath = locatedPath;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else
+    {
+      std::vector<std::string> directoryPathComponents;
+      vtksys::SystemTools::SplitPath(
+        vtksys::SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
+      directoryPathComponents.push_back(vtksys::SystemTools::GetFilenameName(fIter->second));
+      fIter->second = vtksys::SystemTools::JoinPath(directoryPathComponents);
+    }
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::Load()
 {
   SM_SCOPED_TRACE(LoadState).arg("filename", this->StateFileName).arg("options", this);
@@ -241,30 +298,13 @@ bool vtkSMLoadStateOptionsProxy::Load()
 
         if (iter->first.find("FilePattern") == std::string::npos)
         {
-          std::vector<std::string>::iterator fIter;
-          for (fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
+          if (this->LocateFilesInDirectory(info.FilePaths))
           {
-            // TODO: Inefficient - need vtkPVInfomation class to bundle file paths
-            vtkClientServerStream stream;
-            stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
-                   << *fIter << vtkClientServerStream::End;
-            this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
-            vtkClientServerStream result = this->GetLastResult();
-            std::string locatedPath = "";
-            if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1)
-            {
-              result.GetArgument(0, 0, &locatedPath);
-            }
-
-            if (!locatedPath.empty())
-            {
-              *fIter = locatedPath;
-              info.Modified = true;
-            }
-            else
-            {
-              return false;
-            }
+            info.Modified = true;
+          }
+          else
+          {
+            return false;
           }
         }
       }
@@ -290,17 +330,21 @@ bool vtkSMLoadStateOptionsProxy::Load()
       continue;
     }
 
-    std::vector<std::string>::iterator fIter;
+    std::map<int, std::string>::iterator fIter;
     for (fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
     {
-      info.XMLElement.child("Element").attribute("value").set_value(fIter->c_str());
+      std::stringstream ss;
+      ss << fIter->first;
+      info.XMLElement.find_child_by_attribute("Element", "index", ss.str().c_str())
+        .attribute("value")
+        .set_value(fIter->second.c_str());
     }
 
     // Also fix up sources proxy collection
     int id = std::atoi(iter->first.substr(0, iter->first.find(".")).c_str());
 
     // Get sequence basename if needed
-    std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePaths[0]);
+    std::string filename = vtksys::SystemTools::GetFilenameName(info.FilePaths.at(0));
     if (this->SequenceParser->ParseFileSequence(filename.c_str()))
     {
       filename = this->SequenceParser->GetSequenceName();
