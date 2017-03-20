@@ -102,6 +102,44 @@ vtkStandardNewMacro(vtkGeometryRepresentationMultiBlockMaker);
 
 vtkStandardNewMacro(vtkGeometryRepresentation);
 //----------------------------------------------------------------------------
+
+void vtkGeometryRepresentation::HandleGeometryRepresentationProgress(
+  vtkObject* caller, unsigned long, void*)
+{
+  vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(caller);
+  if (algorithm)
+  {
+    double progress = algorithm->GetProgress();
+    if (progress > 0.0 && progress < 1.0)
+    {
+      if (algorithm == this->GeometryFilter)
+      {
+        this->UpdateProgress(progress * 0.8);
+      }
+      else if (algorithm == this->MultiBlockMaker)
+      {
+        this->UpdateProgress(0.8 + progress * 0.05);
+      }
+      else if (algorithm == this->CacheKeeper)
+      {
+        this->UpdateProgress(0.85 + progress * 0.05);
+      }
+      else if (algorithm == this->Decimator)
+      {
+        this->UpdateProgress(0.90 + progress * 0.05);
+      }
+      else if (algorithm == this->LODOutlineFilter)
+      {
+        this->UpdateProgress(0.95 + progress * 0.05);
+      }
+    }
+    if (this->AbortExecute)
+    {
+      algorithm->SetAbortExecute(1);
+    }
+  }
+}
+
 vtkGeometryRepresentation::vtkGeometryRepresentation()
 {
   this->GeometryFilter = vtkPVGeometryFilter::New();
@@ -110,16 +148,17 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Decimator = vtkQuadricClustering::New();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
-  // Setup a callback for the internal filters to report progress.
-  this->InternalProgressObserver = vtkCallbackCommand::New();
-  this->InternalProgressObserver->SetCallback(
-    &vtkGeometryRepresentation::InternalProgressCallbackFunction);
-  this->InternalProgressObserver->SetClientData(this);
-  this->GeometryFilter->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->CacheKeeper->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->MultiBlockMaker->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->Decimator->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
-  this->LODOutlineFilter->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+  // connect progress bar
+  this->GeometryFilter->AddObserver(vtkCommand::ProgressEvent, this,
+    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
+  this->CacheKeeper->AddObserver(vtkCommand::ProgressEvent, this,
+    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
+  this->MultiBlockMaker->AddObserver(vtkCommand::ProgressEvent, this,
+    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
+  this->Decimator->AddObserver(vtkCommand::ProgressEvent, this,
+    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
+  this->LODOutlineFilter->AddObserver(vtkCommand::ProgressEvent, this,
+    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
 
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
@@ -174,13 +213,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 //----------------------------------------------------------------------------
 vtkGeometryRepresentation::~vtkGeometryRepresentation()
 {
-  this->GeometryFilter->RemoveObserver(this->InternalProgressObserver);
-  this->CacheKeeper->RemoveObserver(this->InternalProgressObserver);
-  this->MultiBlockMaker->RemoveObserver(this->InternalProgressObserver);
-  this->Decimator->RemoveObserver(this->InternalProgressObserver);
-  this->LODOutlineFilter->RemoveObserver(this->InternalProgressObserver);
-  this->InternalProgressObserver->Delete();
-
   this->SetDebugString(0);
   this->CacheKeeper->Delete();
   this->GeometryFilter->Delete();
@@ -191,47 +223,6 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->LODMapper->Delete();
   this->Actor->Delete();
   this->Property->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::InternalProgressCallbackFunction(
-  vtkObject* arg, unsigned long, void* clientdata, void*)
-{
-  reinterpret_cast<vtkGeometryRepresentation*>(clientdata)
-    ->InternalProgressCallback(static_cast<vtkAlgorithm*>(arg));
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::InternalProgressCallback(vtkAlgorithm* algorithm)
-{
-  float progress = algorithm->GetProgress();
-  if (progress > 0.f && progress < 1.f)
-  {
-    if (algorithm == this->GeometryFilter)
-    {
-      this->UpdateProgress(progress * 0.8f);
-    }
-    else if (algorithm == this->MultiBlockMaker)
-    {
-      this->UpdateProgress(0.8f + progress * 0.05f);
-    }
-    else if (algorithm == this->CacheKeeper)
-    {
-      this->UpdateProgress(0.85f + progress * 0.05f);
-    }
-    else if (algorithm == this->Decimator)
-    {
-      this->UpdateProgress(0.90f + progress * 0.05f);
-    }
-    else if (algorithm == this->LODOutlineFilter)
-    {
-      this->UpdateProgress(0.95f + progress * 0.05f);
-    }
-  }
-  if (this->AbortExecute)
-  {
-    algorithm->SetAbortExecute(1);
-  }
 }
 
 //----------------------------------------------------------------------------

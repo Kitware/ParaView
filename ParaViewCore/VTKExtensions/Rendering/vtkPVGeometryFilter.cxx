@@ -160,10 +160,14 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
 
   // Setup a callback for the internal readers to report progress.
-  this->InternalProgressObserver = vtkCallbackCommand::New();
-  this->InternalProgressObserver->SetCallback(
-    &vtkPVGeometryFilter::InternalProgressCallbackFunction);
-  this->InternalProgressObserver->SetClientData(this);
+  this->DataSetSurfaceFilter->AddObserver(
+    vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
+  this->GenericGeometryFilter->AddObserver(
+    vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
+  this->UnstructuredGridGeometryFilter->AddObserver(
+    vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
+  this->RecoverWireframeFilter->AddObserver(
+    vtkCommand::ProgressEvent, this, &vtkPVGeometryFilter::HandleGeometryFilterProgress);
 
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
@@ -210,7 +214,6 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
     tmp->Delete();
   }
   this->OutlineSource->Delete();
-  this->InternalProgressObserver->Delete();
   this->SetController(0);
 }
 
@@ -281,25 +284,21 @@ vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::InternalProgressCallbackFunction(
-  vtkObject* arg, unsigned long, void* clientdata, void*)
+void vtkPVGeometryFilter::HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*)
 {
-  reinterpret_cast<vtkPVGeometryFilter*>(clientdata)
-    ->InternalProgressCallback(static_cast<vtkAlgorithm*>(arg));
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::InternalProgressCallback(vtkAlgorithm* algorithm)
-{
+  vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(caller);
   // This limits progress for only the DataSetSurfaceFilter.
-  float progress = algorithm->GetProgress();
-  if (progress > 0 && progress < 1)
+  if (algorithm)
   {
-    this->UpdateProgress(progress);
-  }
-  if (this->AbortExecute)
-  {
-    algorithm->SetAbortExecute(1);
+    double progress = algorithm->GetProgress();
+    if (progress > 0.0 && progress < 1.0)
+    {
+      this->UpdateProgress(progress);
+    }
+    if (this->AbortExecute)
+    {
+      algorithm->SetAbortExecute(1);
+    }
   }
 }
 
@@ -1183,14 +1182,7 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 
     // Geometry filter
     this->GenericGeometryFilter->SetInputData(input);
-
-    // Observe the progress of the internal filter.
-    this->GenericGeometryFilter->AddObserver(
-      vtkCommand::ProgressEvent, this->InternalProgressObserver);
     this->GenericGeometryFilter->Update();
-    // The internal filter is finished.  Remove the observer.
-    this->GenericGeometryFilter->RemoveObserver(this->InternalProgressObserver);
-
     output->ShallowCopy(this->GenericGeometryFilter->GetOutput());
 
     return;
@@ -1415,20 +1407,13 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // used to be, which is not correct.
       this->UnstructuredGridGeometryFilter->DuplicateGhostCellClippingOff();
 
-      // Observe the progress of the internal filter.
-      // TODO: Make the consecutive internal filter execution have monotonically
-      // increasing progress rather than restarting for every internal filter.
-      this->UnstructuredGridGeometryFilter->AddObserver(
-        vtkCommand::ProgressEvent, this->InternalProgressObserver);
-
       // Disable point merging as it may prevent the correct visualization
       // of non-continuous attributes.
       this->UnstructuredGridGeometryFilter->MergingOff();
 
+      // TODO: Make the consecutive internal filter execution have monotonically
+      // increasing progress rather than restarting for every internal filter.
       this->UnstructuredGridGeometryFilter->Update();
-
-      // The internal filter finished.  Remove the observer.
-      this->UnstructuredGridGeometryFilter->RemoveObserver(this->InternalProgressObserver);
 
       this->UnstructuredGridGeometryFilter->SetInputData(NULL);
 
@@ -1460,12 +1445,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     if (input->GetNumberOfCells() > 0)
     {
-      this->DataSetSurfaceFilter->AddObserver(
-        vtkCommand::ProgressEvent, this->InternalProgressObserver);
-
       this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
-
-      this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
     }
 
     if (this->Triangulate && (output->GetNumberOfPolys() > 0))
@@ -1490,16 +1470,9 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       vtkNew<vtkPolyData> nextStageInput;
       nextStageInput->ShallowCopy(output); // Yes output is correct.
       this->RecoverWireframeFilter->SetInputData(nextStageInput.Get());
-
-      // Observe the progress of the internal filter.
       // TODO: Make the consecutive internal filter execution have monotonically
       // increasing progress rather than restarting for every internal filter.
-      this->RecoverWireframeFilter->AddObserver(
-        vtkCommand::ProgressEvent, this->InternalProgressObserver);
       this->RecoverWireframeFilter->Update();
-      // The internal filter finished.  Remove the observer.
-      this->RecoverWireframeFilter->RemoveObserver(this->InternalProgressObserver);
-
       this->RecoverWireframeFilter->SetInputData(NULL);
 
       // Get what should be the final output.
@@ -1621,16 +1594,9 @@ void vtkPVGeometryFilter::PolyDataExecute(
         // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
         // that will cause the wireframe to be rendered correctly.
         this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
-
-        // Observe the progress of the internal filter.
         // TODO: Make the consecutive internal filter execution have monotonically
         // increasing progress rather than restarting for every internal filter.
-        this->RecoverWireframeFilter->AddObserver(
-          vtkCommand::ProgressEvent, this->InternalProgressObserver);
         this->RecoverWireframeFilter->Update();
-        // The internal filter finished.  Remove the observer.
-        this->RecoverWireframeFilter->RemoveObserver(this->InternalProgressObserver);
-
         this->RecoverWireframeFilter->SetInputData(NULL);
 
         // Get what should be the final output.
