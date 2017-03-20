@@ -184,9 +184,29 @@ class CoProcessor(object):
                 writer.FileName = fileName.replace("%t", str(timestep))
                 writer.UpdatePipeline(datadescription.GetTime())
 
-    def WriteImages(self, datadescription, rescale_lookuptable=False):
+    def WriteImages(self, datadescription, rescale_lookuptable=False, image_quality=None):
         """This method will update all views, if present and write output
-            images, as needed."""
+        images, as needed.
+
+        Parameters:
+        ----------
+            datadescription : Catalyst data-description object
+
+            rescale_lookuptable (bool, optional): If True, when all lookup tables
+                are rescaled using current data ranges before saving the images.
+                Defaults to False.
+
+            image_quality (int, optional): If specified, should be a value in
+                the range (0, 100) that specifies the image quality. For JPEG, 0
+                is low quality i.e. max compression, 100 is best quality i.e.
+                least compression. For legacy reasons, this is inverted for PNG
+                (which uses lossless compression). For PNG, 0 is no compression
+                i.e maximum image size, while 100 is most compressed and hence
+                least image size.
+
+                If not specified, for saving PNGs 0 is assumed to minimize
+                preformance impact.
+        """
         timestep = datadescription.GetTimeStep()
 
         cinema_dirs = []
@@ -216,12 +236,18 @@ class CoProcessor(object):
                     if dirname:
                         cinema_dirs.append(dirname)
                 else:
-                    # for png quality = 0 means no compression. compression can be a potentially
-                    # very costly serial operation on process 0
-                    if fname.endswith('png'):
-                        simple.SaveScreenshot(fname, view, magnification=view.cpMagnification, quality=0)
+                    if image_quality is None and fname.endswith('png'):
+                        # for png quality = 0 means no compression. compression can be a potentially
+                        # very costly serial operation on process 0
+                        quality = 0
+                    elif image_quality is not None:
+                        quality = int(image_quality)
                     else:
-                        simple.SaveScreenshot(fname, view, magnification=view.cpMagnification)
+                        # let simple.SaveScreenshot pick a default.
+                        quality = None
+
+                    simple.SaveScreenshot(fname, view,
+                            magnification=view.cpMagnification, quality=quality)
 
         if len(cinema_dirs) > 1:
             import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
