@@ -38,13 +38,13 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
 #include "vtkSmartPointer.h"
+#include "vtkWindowToImageFilter.h"
 
 #include <assert.h>
 
-namespace
+namespace vtkSMViewProxyNS
 {
-const char* vtkGetRepresentationNameFromHints(
-  const char* viewType, vtkPVXMLElement* hints, int port)
+const char* GetRepresentationNameFromHints(const char* viewType, vtkPVXMLElement* hints, int port)
 {
   if (!hints)
   {
@@ -86,6 +86,39 @@ const char* vtkGetRepresentationNameFromHints(
   }
   return NULL;
 }
+
+/**
+ * Extends vtkWindowToImageFilter to call
+ * `vtkSMViewProxy::RenderForImageCapture()` when the filter wants to request a
+ * render.
+ */
+class WindowToImageFilter : public vtkWindowToImageFilter
+{
+public:
+  static WindowToImageFilter* New();
+  vtkTypeMacro(WindowToImageFilter, vtkWindowToImageFilter);
+
+  void SetParent(vtkSMViewProxy* view) { this->Parent = view; }
+
+protected:
+  WindowToImageFilter() {}
+  ~WindowToImageFilter() {}
+
+  void Render() VTK_OVERRIDE
+  {
+    if (this->Parent)
+    {
+      this->Parent->RenderForImageCapture();
+    }
+  }
+
+  vtkWeakPointer<vtkSMViewProxy> Parent;
+
+private:
+  WindowToImageFilter(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
+  void operator=(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
+};
+vtkStandardNewMacro(WindowToImageFilter);
 };
 
 bool vtkSMViewProxy::TransparentBackground = false;
@@ -323,8 +356,8 @@ const char* vtkSMViewProxy::GetRepresentationType(vtkSMSourceProxy* producer, in
 
   // Process producer hints to see if indicates what type of representation
   // to create for this view.
-  if (const char* reprName =
-        vtkGetRepresentationNameFromHints(this->GetXMLName(), producer->GetHints(), outputPort))
+  if (const char* reprName = vtkSMViewProxyNS::GetRepresentationNameFromHints(
+        this->GetXMLName(), producer->GetHints(), outputPort))
   {
     return reprName;
   }
@@ -618,6 +651,42 @@ vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
     }
     capture->SetExtent(extents);
   }
+  return capture;
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
+{
+  vtkRenderWindow* renWin = this->GetRenderWindow();
+  if (!renWin)
+  {
+    return nullptr;
+  }
+
+  int swapBuffers = renWin->GetSwapBuffers();
+  renWin->SwapBuffersOff();
+
+  // this is needed to ensure that view gets setup correctly before go ahead to
+  // capture the image.
+  this->RenderForImageCapture();
+
+  vtkNew<vtkSMViewProxyNS::WindowToImageFilter> w2i;
+  w2i->SetInput(renWin);
+  w2i->SetParent(this);
+  w2i->SetMagnification(magnification);
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff(); // WindowToImageFilter can re-render as needed too,
+                            // we just don't require the first render.
+
+  // Note how we simply called `Update` here. Since `WindowToImageFilter` calls
+  // this->RenderForImageCapture() we don't have to worry too much even if it
+  // gets called only on the client side (or root node in batch mode).
+  w2i->Update();
+
+  renWin->SetSwapBuffers(swapBuffers);
+
+  vtkImageData* capture = vtkImageData::New();
+  capture->ShallowCopy(w2i->GetOutput());
   return capture;
 }
 

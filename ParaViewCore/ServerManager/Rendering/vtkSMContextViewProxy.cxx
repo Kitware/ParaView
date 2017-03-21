@@ -38,7 +38,6 @@
 #include "vtkSMViewProxyInteractorHelper.h"
 #include "vtkStructuredData.h"
 #include "vtkWeakPointer.h"
-#include "vtkWindowToImageFilter.h"
 
 //****************************************************************************
 
@@ -153,59 +152,7 @@ vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
   return pvview ? pvview->GetContextItem() : NULL;
 }
 
-//-----------------------------------------------------------------------------
-vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
-{
-  vtkRenderWindow* window = this->GetRenderWindow();
-
-// Offscreen rendering is not functioning properly on the mac.
-// Do not use it.
-#if !defined(__APPLE__)
-  int prevOffscreen = window->GetOffScreenRendering();
-
-  vtkPVContextView* view = vtkPVContextView::SafeDownCast(this->GetClientSideObject());
-  bool use_offscreen =
-    view->GetUseOffscreenRendering() || view->GetUseOffscreenRenderingForScreenshots();
-  window->SetOffScreenRendering(use_offscreen ? 1 : 0);
-#endif
-
-  window->SwapBuffersOff();
-
-  this->StillRender();
-
-  // This is a hack. The only reason we do this is so that in symmetric-batch
-  // mode, when the vtkWindowToImageFilter tries to grab frame buffers on the
-  // satellites, it doesn't die. In reality, we shouldn't grab the frame buffers
-  // at all on satellites. We still need to call
-  // vtkWindowToImageFilter::Update() otherwise we can end up with mismatched
-  // renders esp when magnification > 1.
-  this->GetContextView()->Render();
-
-  vtkSmartPointer<vtkWindowToImageFilter> w2i = vtkSmartPointer<vtkWindowToImageFilter>::New();
-  w2i->SetInput(window);
-  w2i->SetMagnification(magnification);
-  w2i->ReadFrontBufferOff();
-  w2i->ShouldRerenderOff();
-  w2i->FixBoundaryOff();
-
-  // BUG #8715: We go through this indirection since the active connection needs
-  // to be set during update since it may request re-renders if magnification >1.
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << w2i.GetPointer() << "Update"
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
-
-  window->SwapBuffersOn();
-#if !defined(__APPLE__)
-  window->SetOffScreenRendering(prevOffscreen);
-#endif
-
-  vtkImageData* capture = vtkImageData::New();
-  capture->ShallowCopy(w2i->GetOutput());
-  window->Frame();
-  return capture;
-}
-
+//----------------------------------------------------------------------------
 static void update_property(vtkAxis* axis, vtkSMProperty* propMin, vtkSMProperty* propMax)
 {
   if (axis && propMin && propMax)

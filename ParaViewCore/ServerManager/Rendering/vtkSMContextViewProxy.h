@@ -30,7 +30,6 @@
 class vtkAbstractContextItem;
 class vtkContextView;
 class vtkEventForwarderCommand;
-class vtkImageData;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkSelection;
@@ -91,11 +90,6 @@ public:
 protected:
   vtkSMContextViewProxy();
   ~vtkSMContextViewProxy();
-
-  /**
-   * Subclasses should override this method to do the actual image capture.
-   */
-  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
 
   virtual void CreateVTKObjects() VTK_OVERRIDE;
 
