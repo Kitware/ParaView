@@ -20,32 +20,33 @@ paraview_test_load_data(""
 #
 # Add python script names here.
 set(PY_TESTS
-  Animation.py
   AnimationCache.py,NO_VALID
+  Animation.py
   AxesGridTestGridLines.py
+  CellIntegrator.py,NO_VALID
+  ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
+  CSVWriterReader.py,NO_VALID
+  GhostCellsInMergeBlocks.py
+  IntegrateAttributes.py,NO_VALID
+  MultiServer.py,NO_VALID
+  ProgrammableFilterProperties.py,NO_VALID
+  ProgrammableFilter.py,NO_VALID
+  ProxyBackwardsCompatibilityTest.py,NO_VALID
+  ProxyManager.py,NO_VALID
   ProxyPropertyLinks.py
+  PythonAnimationTrack.py
+  PythonProgrammableFilterParameters.py,NO_VALID
   PythonPVSimpleCone.py
   PythonPVSimpleExII.py
   PythonPVSimpleSphere.py
   PythonSMTraceTest1.py
   PythonSMTraceTest2.py,NO_VALID
   PythonTestBenchmark.py,NO_VALID
-  PythonAnimationTrack.py
-  GhostCellsInMergeBlocks.py
-  CellIntegrator.py,NO_VALID
-  CSVWriterReader.py,NO_VALID
-  IntegrateAttributes.py,NO_VALID
-  ProgrammableFilter.py,NO_VALID
-  ProgrammableFilterProperties.py,NO_VALID
-  ProxyManager.py,NO_VALID
-  VRMLSource.py,NO_VALID
-  MultiServer.py,NO_VALID
-  ValidateSources.py,NO_VALID
-  ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
-  RepresentationTypeHint.py,NO_VALID
-  PythonProgrammableFilterParameters.py,NO_VALID
-  ProxyBackwardsCompatibilityTest.py,NO_VALID
   ReaderReload.py,NO_VALID
+  RepresentationTypeHint.py,NO_VALID
+  SaveScreenshot.py,NO_VALID
+  ValidateSources.py,NO_VALID
+  VRMLSource.py,NO_VALID
   )
 
 include(FindPythonModules)
@@ -79,12 +80,13 @@ paraview_add_test_python(
 
 set(PVBATCH_TESTS
   AnnotationVisibility.py
+  LinePlotInScripts.py,NO_VALID
   MultiView.py
   ParallelImageWriter.py,NO_VALID
   ParallelSerialWriter.py
+  SaveScreenshot.py,NO_VALID
   Simple.py
   UserTransformOnRepresentation.py
-  LinePlotInScripts.py,NO_VALID
   )
 
 IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
