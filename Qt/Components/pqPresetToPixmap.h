@@ -35,11 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QObject>
 #include <QScopedPointer>
-
-namespace Json
-{
-class Value;
-}
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPiecewiseFunction;
 class vtkScalarsToColors;

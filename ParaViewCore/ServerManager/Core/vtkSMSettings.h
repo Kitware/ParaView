@@ -80,11 +80,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkStdString.h"                 // needed for vtkStdString.
 #include <vector>                         // needed for vector.
-
-namespace Json
-{
-class Value;
-}
+#include <vtk_jsoncpp_fwd.h>              // for forward declarations
 
 class vtkSMProperty;
 class vtkSMProxy;
