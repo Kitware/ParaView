@@ -68,7 +68,7 @@
          <normaloff>:/pqWidgets/Icons/pqHelp16.png</normaloff>:/pqWidgets/Icons/pqHelp16.png</iconset>
        </property>
        <property name="shortcut">
-        <string>Ctrl+S</string>
+        <string>Ctrl+H</string>
        </property>
       </widget>
      </item>
