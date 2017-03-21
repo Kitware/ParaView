@@ -40,7 +40,7 @@ public:
   struct PropertyInfo
   {
     pugi::xml_node XMLElement;
-    std::map<int, std::string> FilePaths;
+    std::vector<std::string> FilePaths;
     bool Modified;
     PropertyInfo()
       : Modified(false)
@@ -54,26 +54,17 @@ public:
 
   void ProcessStateFile(pugi::xml_node node)
   {
-    if (strcmp(node.name(), "ServerManagerState") == 0)
+    pugi::xpath_node_set proxies =
+      node.select_nodes("//ServerManagerState/Proxy[@group and @type]");
+    for (auto iter = proxies.begin(); iter != proxies.end(); ++iter)
     {
-      for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
-      {
-        if (strcmp(it->name(), "Proxy") == 0)
-        {
-          this->ProcessProxy(*it);
-        }
-        else if (strcmp(it->name(), "ProxyCollection") == 0)
-        {
-          this->ProcessProxyCollection(*it);
-        }
-      }
+      this->ProcessProxy(iter->node());
     }
-    else
+    pugi::xpath_node_set collections =
+      node.select_nodes("//ServerManagerState/ProxyCollection[@name='sources']");
+    for (auto iter = collections.begin(); iter != collections.end(); ++iter)
     {
-      for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
-      {
-        this->ProcessStateFile(*it);
-      }
+      this->ProcessProxyCollection(iter->node());
     }
   }
 
@@ -102,24 +93,23 @@ public:
       return;
     }
 
-    for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
+    pugi::xpath_variable_set vars;
+    vars.add("propertyname", pugi::xpath_type_string);
+    for (auto iter = filenameProperties.begin(); iter != filenameProperties.end(); ++iter)
     {
-      if (strcmp(it->name(), "Property") == 0)
+      vars.set("propertyname", iter->c_str());
+      pugi::xpath_node_set properties =
+        node.select_nodes("./Property[@name = string($propertyname)]", &vars);
+      for (auto pIter = properties.begin(); pIter != properties.end(); ++pIter)
       {
-        if (filenameProperties.find(it->attribute("name").value()) != filenameProperties.end())
+        PropertyInfo info;
+        info.XMLElement = pIter->node();
+        pugi::xpath_node_set elements = info.XMLElement.select_nodes("./Element");
+        for (auto eIter = elements.begin(); eIter != elements.end(); ++eIter)
         {
-          PropertyInfo info;
-          info.XMLElement = *it;
-          for (pugi::xml_node_iterator it2 = it->begin(); it2 != it->end(); ++it2)
-          {
-            if (strcmp(it2->name(), "Element") == 0)
-            {
-              info.FilePaths.insert(std::map<int, std::string>::value_type(
-                it2->attribute("index").as_int(), it2->attribute("value").value()));
-            }
-          }
-          this->PropertiesMap[it->attribute("id").value()] = info;
+          info.FilePaths.push_back(eIter->node().attribute("value").value());
         }
+        this->PropertiesMap[pIter->node().attribute("id").value()] = info;
       }
     }
   }
@@ -134,20 +124,11 @@ public:
       return;
     }
 
-    if (strcmp(name.value(), "sources") != 0)
+    pugi::xpath_node_set items = node.select_nodes("./Item");
+    for (auto iter = items.begin(); iter != items.end(); ++iter)
     {
-      return;
-    }
-
-    // iterate over all property xmls in the proxyXML and add those xmls which
-    // are in the filenameProperties set.
-    for (pugi::xml_node_iterator it = node.begin(); it != node.end(); ++it)
-    {
-      if (strcmp(it->name(), "Item") == 0)
-      {
-        int itemId = it->attribute("id").as_int();
-        this->CollectionsMap[itemId] = *it;
-      }
+      int itemId = iter->node().attribute("id").as_int();
+      this->CollectionsMap[itemId] = iter->node();
     }
   }
 
@@ -214,11 +195,11 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::map<int, std::string>& filepaths)
+bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::vector<std::string>& filepaths)
 {
   std::string lastLocatedPath = "";
   int numOfPathMatches = 0;
-  std::map<int, std::string>::iterator fIter;
+  std::vector<std::string>::iterator fIter;
   for (fIter = filepaths.begin(); fIter != filepaths.end(); ++fIter)
   {
     // TODO: Inefficient - need vtkPVInfomation class to bundle file paths
@@ -226,7 +207,7 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::map<int, std::strin
     {
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
-             << fIter->second << vtkClientServerStream::End;
+             << *fIter << vtkClientServerStream::End;
       this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
       vtkClientServerStream result = this->GetLastResult();
       std::string locatedPath = "";
@@ -237,7 +218,7 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::map<int, std::strin
 
       if (!locatedPath.empty())
       {
-        fIter->second = locatedPath;
+        *fIter = locatedPath;
         if (vtksys::SystemTools::GetParentDirectory(locatedPath) ==
           vtksys::SystemTools::GetParentDirectory(lastLocatedPath))
         {
@@ -259,8 +240,8 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::map<int, std::strin
       std::vector<std::string> directoryPathComponents;
       vtksys::SystemTools::SplitPath(
         vtksys::SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
-      directoryPathComponents.push_back(vtksys::SystemTools::GetFilenameName(fIter->second));
-      fIter->second = vtksys::SystemTools::JoinPath(directoryPathComponents);
+      directoryPathComponents.push_back(vtksys::SystemTools::GetFilenameName(*fIter));
+      *fIter = vtksys::SystemTools::JoinPath(directoryPathComponents);
     }
   }
   return true;
@@ -281,15 +262,6 @@ bool vtkSMLoadStateOptionsProxy::Load()
     }
     case 1:
     {
-      vtkSMPropertyHelper propertyHelper(this, "DataDirectory");
-
-      // Default to state file directory
-      if (strlen(propertyHelper.GetAsString()) == 0)
-      {
-        propertyHelper.Set(vtksys::SystemTools::GetParentDirectory(this->StateFileName).c_str());
-        this->UpdateVTKObjects();
-      }
-
       vtkInternals::PropertiesMapType::iterator iter;
       for (iter = this->Internals->PropertiesMap.begin();
            iter != this->Internals->PropertiesMap.end(); ++iter)
@@ -330,14 +302,14 @@ bool vtkSMLoadStateOptionsProxy::Load()
       continue;
     }
 
-    std::map<int, std::string>::iterator fIter;
+    std::vector<std::string>::iterator fIter;
     for (fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
     {
-      std::stringstream ss;
-      ss << fIter->first;
-      info.XMLElement.find_child_by_attribute("Element", "index", ss.str().c_str())
+      std::stringstream idx;
+      idx << std::distance(info.FilePaths.begin(), fIter);
+      info.XMLElement.find_child_by_attribute("Element", "index", idx.str().c_str())
         .attribute("value")
-        .set_value(fIter->second.c_str());
+        .set_value(fIter->c_str());
     }
 
     // Also fix up sources proxy collection

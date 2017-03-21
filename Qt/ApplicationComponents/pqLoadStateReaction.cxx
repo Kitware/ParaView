@@ -45,7 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "vtkSMLoadStateOptionsProxy.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <QFileInfo>
 
@@ -87,6 +89,9 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
     vtkSmartPointer<vtkSMProxy> aproxy;
     aproxy.TakeReference(pxm->NewProxy("options", "LoadStateOptions"));
     vtkSMLoadStateOptionsProxy* proxy = vtkSMLoadStateOptionsProxy::SafeDownCast(aproxy);
+    vtkSMPropertyHelper(proxy, "DataDirectory")
+      .Set(vtksys::SystemTools::GetParentDirectory(filename.toLocal8Bit().data()).c_str());
+
     if (proxy && proxy->PrepareToLoad(filename.toLocal8Bit().data()))
     {
       vtkNew<vtkSMParaViewPipelineController> controller;

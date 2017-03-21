@@ -29,7 +29,7 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
-#include <map>
+#include <vector>
 
 class vtkFileSequenceParser;
 
@@ -67,7 +67,7 @@ protected:
    *
    * @returns false if any of the files where not found
    */
-  bool LocateFilesInDirectory(std::map<int, std::string>& filepaths);
+  bool LocateFilesInDirectory(std::vector<std::string>& filepaths);
 
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
