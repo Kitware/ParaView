@@ -15,6 +15,7 @@
 #include "vtkSMSaveAnimationProxy.h"
 
 #include "vtkCompositeAnimationPlayer.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayInformation.h"
@@ -52,7 +53,21 @@ protected:
 
   vtkSmartPointer<vtkImageData> CaptureFrame() VTK_OVERRIDE
   {
-    return this->Helper ? this->Helper->CapturePreppedImage() : vtkSmartPointer<vtkImageData>();
+    vtkSmartPointer<vtkImageData> image =
+      this->Helper ? this->Helper->CapturePreppedImage() : vtkSmartPointer<vtkImageData>();
+    // Now, in symmetric batch mode, while this method will get called on all
+    // ranks, we really only to save the image on root node.
+    // Note, the call to CapturePreppedImage() still needs to happen on all
+    // ranks, since otherwise we may get mismatched renders.
+    vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+    if (controller && controller->GetLocalProcessId() == 0)
+    {
+      return image;
+    }
+    else
+    {
+      return vtkSmartPointer<vtkImageData>();
+    }
   }
 
 private:

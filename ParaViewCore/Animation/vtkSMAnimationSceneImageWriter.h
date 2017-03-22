@@ -98,6 +98,8 @@ protected:
 
   /**
    * Capture and return an image for the current frame.
+   * If nullptr is returned, then the frame is skipped. If all frames are empty,
+   * then no output is generated.
    */
   virtual vtkSmartPointer<vtkImageData> CaptureFrame() = 0;
 

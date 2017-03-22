@@ -89,6 +89,11 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize(int startCount)
 bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
 {
   vtkSmartPointer<vtkImageData> frame = this->CaptureFrame();
+  if (!frame)
+  {
+    // skip empty frames.
+    return true;
+  }
   if (this->ImageWriter)
   {
     char number[1024];
