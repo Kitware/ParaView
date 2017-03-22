@@ -1050,23 +1050,17 @@ int vtkCGNSReader::GetUnstructuredZone(
 {
   cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
 
-  //========================================================================
-  // Test at compilation time with static assert ...
-  // In case  cgsize_t < vtkIdType one could try to start from the array end
-  // Next line is commented since static_assert requires c++11
-  // static_assert(!(sizeof(cgsize_t) > sizeof(vtkIdType)),
-  //              "Impossible to load data with sizeof cgsize_t bigger than sizeof vtkIdType\n");
-  typedef int static_assert_sizeOfvtkIdType[!(sizeof(cgsize_t) > sizeof(vtkIdType)) ? 1 : -1];
-  //=========================================================================
-  // TODO Warning at compilation time ??
-  const bool warningIdTypeSize = sizeof(cgsize_t) != sizeof(vtkIdType);
+  ////=========================================================================
+  const bool warningIdTypeSize = sizeof(cgsize_t) > sizeof(vtkIdType);
   if (warningIdTypeSize == true)
   {
-    vtkDebugMacro(<< "Warning cgsize_t do not have same size as vtkIdType\n"
-                  << "sizeof vtkIdType = " << sizeof(vtkIdType) << "\n"
-                  << "sizeof cgsize_t = " << sizeof(cgsize_t) << "\n");
+    vtkWarningMacro(<< "Warning cgsize_t is larger than the size as vtkIdType\n"
+                    << "  sizeof vtkIdType = " << sizeof(vtkIdType) << "\n"
+                    << "  sizeof cgsize_t = " << sizeof(cgsize_t) << "\n"
+                    << "This may cause unexpected issues. If so, please recompile with "
+                    << "VTK_USE_64BIT_IDS=ON.");
   }
-  //========================================================================
+  ////========================================================================
 
   int rind[6];
   // source layout
@@ -1102,7 +1096,16 @@ int vtkCGNSReader::GetUnstructuredZone(
   memDims[0] = zsize[0];
 
   // Compute number of points
+  if ((sizeof(vtkIdType) < sizeof(cgsize_t)) &&
+    (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < zsize[0]))
+  {
+    // overflow! cannot open the file in current configuration.
+    vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
+    return 1;
+  }
+
   nPts = static_cast<vtkIdType>(zsize[0]);
+  assert(nPts == zsize[0]);
 
   // Set up points
   vtkPoints* points = vtkPoints::New();
@@ -1297,6 +1300,12 @@ int vtkCGNSReader::GetUnstructuredZone(
     sizeSec.push_back(eDataSize);
     startSec.push_back(sectionInfoList[sec].range[0] - 1);
     elementCoreSize += (eDataSize);
+
+    if (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < (elementSize + numCoreCells))
+    {
+      vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
+      return 1;
+    }
     numCoreCells += elementSize;
     coreSec.push_back(sec);
     //
