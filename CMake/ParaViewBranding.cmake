@@ -311,6 +311,11 @@ FUNCTION(build_paraview_client BPC_NAME)
         pq${BPC_NAME}Initializer)
   ENDIF ()
 
+  if (MINGW)
+    # needed for dupenv_s
+    target_link_libraries (${BPC_NAME} LINK_PRIVATE msvcr90)
+  endif ()
+
   if (pv_exe_suffix)
     install(TARGETS ${BPC_NAME}
             RUNTIME DESTINATION "${BPC_INSTALL_LIBRARY_DIR}"
