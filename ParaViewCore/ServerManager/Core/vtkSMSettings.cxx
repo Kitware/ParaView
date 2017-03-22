@@ -150,7 +150,7 @@ public:
       }
     }
 
-    return Json::Value::nullRef;
+    return Json::Value::nullSingleton();
   }
 
   //----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ public:
       }
     }
 
-    return Json::Value::nullRef;
+    return Json::Value::nullSingleton();
   }
 
   //----------------------------------------------------------------------------
@@ -503,7 +503,7 @@ public:
 
     Json::Path settingPath(root.c_str());
     Json::Value& jsonValue = settingPath.make(this->SettingCollections[0].Value);
-    jsonValue[leaf] = Json::Value::nullRef;
+    jsonValue[leaf] = Json::Value::nullSingleton();
 
     if (values.size() > 1)
     {
@@ -538,7 +538,7 @@ public:
       if (jsonValue.isArray())
       {
         // Reset to null so that we aren't setting a value on a Json::Value array
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
@@ -553,7 +553,7 @@ public:
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
         // Reset to null so that the jsonValue.resize() operation works
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
@@ -581,7 +581,7 @@ public:
       if (jsonValue.isArray())
       {
         // Reset to null so that we aren't setting a value on a Json::Value array
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
@@ -596,7 +596,7 @@ public:
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
         // Reset to null so that the jsonValue.resize() operation works
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
@@ -624,7 +624,7 @@ public:
       if (jsonValue.isArray())
       {
         // Reset to null so that we aren't setting a value on a Json::Value array
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
@@ -639,7 +639,7 @@ public:
       if (!jsonValue.isArray() && !jsonValue.isNull())
       {
         // Reset to null so that the jsonValue.resize() operation works
-        jsonValue = Json::Value::nullRef;
+        jsonValue = Json::Value::nullSingleton();
         this->Modified();
       }
 
