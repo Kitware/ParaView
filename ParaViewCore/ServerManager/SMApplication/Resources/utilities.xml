@@ -4050,7 +4050,7 @@
         Options proxy used to prompt user for options when loading pvsm state files.
       </Documentation>
 
-      <IntVectorProperty name="LoadStateDateFileOptions"
+      <IntVectorProperty name="LoadStateDataFileOptions"
         default_values="0"
         number_of_elements="1">
         <Documentation>
@@ -4072,7 +4072,7 @@
           Directory to look for data files under. Defaults to the state file's directory.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="1">
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="1">
           </PropertyWidgetDecorator>
           <UseDirectoryName />
         </Hints>
@@ -4084,7 +4084,7 @@
           New paths for the data files.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDateFileOptions" value="2">
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="2">
           </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>

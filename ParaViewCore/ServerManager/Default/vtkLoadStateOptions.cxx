@@ -51,7 +51,6 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
   {
     modifiedDataDirectory.replace(0, 4, ".");
   }
-  vtkWarningMacro("modifiedDataDirectory = " << modifiedDataDirectory);
 
   std::vector<std::string> directoryPathComponents;
   vtksys::SystemTools::SplitPath(
