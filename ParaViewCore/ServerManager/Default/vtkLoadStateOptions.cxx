@@ -38,9 +38,24 @@ void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)
 std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath)
 {
   std::string result = "";
+  std::string modifiedDataDirectory = this->DataDirectory;
+
+  // Check for $HOME/$PWD/$CWD/$EXE
+  if (modifiedDataDirectory.compare(0, 5, "$HOME") == 0)
+  {
+    modifiedDataDirectory.replace(0, 5, "~");
+  }
+  else if (modifiedDataDirectory.compare(0, 4, "$PWD") == 0 ||
+    modifiedDataDirectory.compare(0, 4, "$CWD") == 0 ||
+    modifiedDataDirectory.compare(0, 4, "$EXE") == 0) // Should this be $PATH
+  {
+    modifiedDataDirectory.replace(0, 4, ".");
+  }
+  vtkWarningMacro("modifiedDataDirectory = " << modifiedDataDirectory);
+
   std::vector<std::string> directoryPathComponents;
   vtksys::SystemTools::SplitPath(
-    vtksys::SystemTools::CollapseFullPath(this->DataDirectory), directoryPathComponents);
+    vtksys::SystemTools::CollapseFullPath(modifiedDataDirectory), directoryPathComponents);
   std::vector<std::string> pathComponents;
   vtksys::SystemTools::SplitPath(vtksys::SystemTools::GetParentDirectory(filepath), pathComponents);
   int insertIndex = directoryPathComponents.size();
