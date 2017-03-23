@@ -41,16 +41,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqUndoStack.h"
 #include "vtkRenderWindow.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 
 #include "QVTKInteractorAdapter.h"
 
+/**
+ * Note on Qt 4 resizing:
+ *
+ * With Qt 4, if one directly changed the size of a View proxy using the "ViewSize" property
+ * it has no effect on OsX (and may be other platforms too). With new screenshot saving mechanism,
+ * we rely on changing the ViewSize property during saving of images. If it won't get respected,
+ * we have a problem!
+ *
+ * We handle that by observing modified events from "ViewSize" property. When the property
+ * is modified outsize the pqQVTKWidget code itself, we explicitly call `pqQVTKWidget::resize`
+ * with the requested size. Thus request Qt to resize the widget to the requested size.
+ *
+ * This is not needed for Qt 5 and hence this entire commit should be reverted once we drop
+ * Qt 4 support.
+ */
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , SizePropertyName("ViewSize")
+  , SkipHandleViewSizeForModifiedQt4(false)
 {
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST") == NULL);
 
@@ -91,6 +108,9 @@ void pqQVTKWidget::updateSizeProperties()
 {
   if (this->ViewProxy)
   {
+    // see comment at the top on Qt 4 resizing
+    bool prev = this->SkipHandleViewSizeForModifiedQt4;
+    this->SkipHandleViewSizeForModifiedQt4 = true;
     BEGIN_UNDO_EXCLUDE();
     int view_size[2];
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -104,6 +124,7 @@ void pqQVTKWidget::updateSizeProperties()
       .Set(view_size, 2);
     this->ViewProxy->UpdateProperty(this->SizePropertyName.toLocal8Bit().data());
     END_UNDO_EXCLUDE();
+    this->SkipHandleViewSizeForModifiedQt4 = prev;
   }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
@@ -117,9 +138,31 @@ void pqQVTKWidget::updateSizeProperties()
 }
 
 //----------------------------------------------------------------------------
+void pqQVTKWidget::handleViewSizeForModifiedQt4()
+{
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  // see comment at the top on Qt 4 resizing
+  if (!this->SkipHandleViewSizeForModifiedQt4)
+  {
+    vtkSMPropertyHelper h(this->ViewProxy, this->SizePropertyName.toLocal8Bit().data());
+    this->resize(QSize(h.GetAsInt(0), h.GetAsInt(1)));
+  }
+#endif
+}
+//----------------------------------------------------------------------------
 void pqQVTKWidget::setViewProxy(vtkSMProxy* view)
 {
   this->ViewProxy = view;
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  // see comment at the top on Qt 4 resizing
+  this->VTKConnect->Disconnect();
+  if (vtkSMProperty* prop =
+        (view ? view->GetProperty(this->SizePropertyName.toLocal8Bit().data()) : nullptr))
+  {
+    this->VTKConnect->Connect(
+      prop, vtkCommand::ModifiedEvent, this, SLOT(handleViewSizeForModifiedQt4()));
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------
