@@ -106,7 +106,6 @@ set (Module_SRCS
   vtkSMRemoteObjectUpdateUndoElement.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
-  vtkSMSelectionLink.cxx
   vtkSMSelfGeneratingSourceProxy.cxx
   vtkSMServerStateLocator.cxx
   vtkSMSession.cxx

@@ -353,10 +353,13 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkBasic.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkConverted.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkHistogram.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkInitial.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkMultiple.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReactionNonConverted.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SortLineChartData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StockColors.xml

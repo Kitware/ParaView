@@ -239,6 +239,8 @@ set (Module_SRCS
   pqSelectionAdaptor.h
   pqSelectionInputWidget.cxx
   pqSelectionInputWidget.h
+  pqSelectionLinkDialog.cxx
+  pqSelectionLinkDialog.h
   pqSelectionManager.cxx
   pqSelectionManager.h
   pqSelectReaderDialog.cxx
@@ -403,6 +405,7 @@ set (Module_MOC_HDRS
   pqSearchBox.h
   pqSelectionAdaptor.h
   pqSelectionInputWidget.h
+  pqSelectionLinkDialog.h
   pqSelectionManager.h
   pqSelectReaderDialog.h
   pqServerConfigurationImporter.h
@@ -481,6 +484,7 @@ set (Module_UI_FILES
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectionInputWidget.ui
+  Resources/UI/pqSelectionLinkDialog.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui

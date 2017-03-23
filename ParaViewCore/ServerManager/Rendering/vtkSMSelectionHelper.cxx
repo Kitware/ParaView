@@ -470,6 +470,11 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   vtkSMIntVectorProperty* ivp =
     vtkSMIntVectorProperty::SafeDownCast(convertor->GetProperty("OutputType"));
   ivp->SetElement(0, outputType);
+
+  vtkSMIntVectorProperty* ivp2 =
+    vtkSMIntVectorProperty::SafeDownCast(convertor->GetProperty("AllowMissingArray"));
+  ivp2->SetElement(0, true);
+
   convertor->UpdateVTKObjects();
 
   // * Request conversion.

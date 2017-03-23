@@ -23,8 +23,10 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSelectionNode.h"
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
@@ -102,6 +104,7 @@ vtkSMSelectionLink::vtkSMSelectionLink()
   this->Internals->SelectionObserver = vtkSMSelectionLinkObserver::New();
   this->Internals->SelectionObserver->Link = this;
   this->ModifyingSelection = false;
+  this->ConvertToIndices = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -420,30 +423,48 @@ void vtkSMSelectionLink::SelectionModified(vtkSMSourceProxy* caller, unsigned in
     {
       if (iter->UpdateDirection & INPUT)
       {
-        selectionInput = caller->GetSelectionInput(portIndex);
         callerFound = true;
+        break;
       }
     }
   }
-  if (selectionInput != NULL)
+  if (callerFound)
   {
-    for (iter = this->Internals->LinkedSelections.begin();
-         iter != this->Internals->LinkedSelections.end(); iter++)
+    selectionInput = caller->GetSelectionInput(portIndex);
+    if (this->ConvertToIndices && selectionInput)
     {
-      if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+      // Convert selection input to indices based selection
+      vtkSMSourceProxy* newSelectionInput =
+        vtkSMSourceProxy::SafeDownCast(vtkSMSelectionHelper::ConvertSelection(
+          vtkSelectionNode::INDICES, selectionInput, caller, portIndex));
+      selectionInput = newSelectionInput;
+    }
+    if (selectionInput == NULL)
+    {
+      for (iter = this->Internals->LinkedSelections.begin();
+           iter != this->Internals->LinkedSelections.end(); iter++)
       {
-        iter->Proxy->SetSelectionInput(portIndex, selectionInput, 0);
+        if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+        {
+          iter->Proxy->CleanSelectionInputs(portIndex);
+        }
       }
     }
-  }
-  else if (callerFound)
-  {
-    for (iter = this->Internals->LinkedSelections.begin();
-         iter != this->Internals->LinkedSelections.end(); iter++)
+    else
     {
-      if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+      for (iter = this->Internals->LinkedSelections.begin();
+           iter != this->Internals->LinkedSelections.end(); iter++)
       {
-        iter->Proxy->CleanSelectionInputs(portIndex);
+        if (iter->UpdateDirection & OUTPUT && iter->Proxy != caller)
+        {
+          iter->Proxy->SetSelectionInput(portIndex, selectionInput, 0);
+        }
+      }
+
+      // Delete registered proxy
+      if (this->ConvertToIndices)
+      {
+        selectionInput->Delete();
       }
     }
   }

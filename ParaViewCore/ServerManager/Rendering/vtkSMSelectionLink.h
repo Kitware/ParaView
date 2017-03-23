@@ -23,14 +23,14 @@
 #ifndef vtkSMSelectionLink_h
 #define vtkSMSelectionLink_h
 
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMLink.h"
 
 class vtkSMSourceProxy;
 class vtkSMSelectionLinkInternals;
 class vtkSMSelectionLinkObserver;
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSelectionLink : public vtkSMLink
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSelectionLink : public vtkSMLink
 {
 public:
   static vtkSMSelectionLink* New();
@@ -76,6 +76,14 @@ public:
    * This method is used to initialize the object to the given protobuf state
    */
   virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+
+  /**
+   * Set/Get the convert to indices flag. When on, the input selection
+   * will always be converted into an indices based selection
+   * before being applied to outputs
+   */
+  vtkSetMacro(ConvertToIndices, bool);
+  vtkGetMacro(ConvertToIndices, bool);
 
 protected:
   vtkSMSelectionLink();
@@ -126,6 +134,7 @@ private:
 
   // lock flag to prevent multiple selection modification at the same time
   bool ModifyingSelection;
+  bool ConvertToIndices;
 
   vtkSMSelectionLink(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
