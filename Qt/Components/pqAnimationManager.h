@@ -145,11 +145,6 @@ protected slots:
   void onProxyRemoved(pqProxy*);
 
   /**
-  * Update the ViewModules property in the active scene.
-  */
-  void updateViewModules();
-
-  /**
   * Called on every tick while saving animation.
   */
   void onTick(int);

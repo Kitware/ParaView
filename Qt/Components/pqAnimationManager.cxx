@@ -111,9 +111,6 @@ pqAnimationManager::pqAnimationManager(QObject* _parent /*=0*/)
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)), this, SLOT(onProxyAdded(pqProxy*)));
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)), this, SLOT(onProxyRemoved(pqProxy*)));
 
-  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)), this, SLOT(updateViewModules()));
-  QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)), this, SLOT(updateViewModules()));
-
   QObject::connect(this, SIGNAL(beginPlay()), this, SLOT(onBeginPlay()));
   QObject::connect(this, SIGNAL(endPlay()), this, SLOT(onEndPlay()));
 }
@@ -122,34 +119,6 @@ pqAnimationManager::pqAnimationManager(QObject* _parent /*=0*/)
 pqAnimationManager::~pqAnimationManager()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::updateViewModules()
-{
-  pqAnimationScene* scene = this->getActiveScene();
-  if (!scene)
-  {
-    return;
-  }
-
-  QList<pqView*> viewModules =
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>(
-      this->Internals->ActiveServer);
-
-  QList<pqSMProxy> viewList;
-  foreach (pqView* view, viewModules)
-  {
-    viewList.push_back(pqSMProxy(view->getProxy()));
-  }
-
-  emit this->beginNonUndoableChanges();
-
-  vtkSMProxy* sceneProxy = scene->getProxy();
-  pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"), viewList);
-  sceneProxy->UpdateProperty("ViewModules");
-
-  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------
