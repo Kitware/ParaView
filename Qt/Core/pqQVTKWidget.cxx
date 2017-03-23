@@ -67,7 +67,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   // Save the loaded image
   this->MousePointerToDraw = image.mirrored();
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
 #endif
 }
@@ -81,7 +81,7 @@ pqQVTKWidget::~pqQVTKWidget()
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
   this->Superclass::resizeEvent(e);
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   this->updateSizeProperties();
 #endif
 }
@@ -93,7 +93,7 @@ void pqQVTKWidget::updateSizeProperties()
   {
     BEGIN_UNDO_EXCLUDE();
     int view_size[2];
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     view_size[0] = this->size().width() * this->InteractorAdaptor->GetDevicePixelRatio();
     view_size[1] = this->size().height() * this->InteractorAdaptor->GetDevicePixelRatio();
 #else
@@ -106,7 +106,7 @@ void pqQVTKWidget::updateSizeProperties()
     END_UNDO_EXCLUDE();
   }
 
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // all of this is not needed for Qt 5 since updateSizeProperties() is called
   // after resize but before `paintGL`.
   this->markCachedImageAsDirty();
@@ -169,7 +169,7 @@ vtkTypeUInt32 pqQVTKWidget::getProxyId()
 //----------------------------------------------------------------------------
 void pqQVTKWidget::paintMousePointer(int xLocation, int yLocation)
 {
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   Q_UNUSED(xLocation);
   Q_UNUSED(yLocation);
 #else
