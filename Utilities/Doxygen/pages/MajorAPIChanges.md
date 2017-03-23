@@ -4,6 +4,11 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+### Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
+
+As a result of this change, `vtkAppendArcLength` was moved from
+the `internal_filters` to the `filters` group.
+
 Changes in 5.3
 --------------
 
