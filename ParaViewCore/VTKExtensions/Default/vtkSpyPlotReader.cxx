@@ -56,7 +56,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <map>
 #include <set>
 #include <string>
-#include <sys/stat.h>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
 
@@ -236,8 +235,8 @@ int vtkSpyPlotReader::RequestInformation(
     return 0;
   }
 
-  struct stat fs;
-  if (stat(this->FileName, &fs) != 0)
+  vtksys::SystemTools::Stat_t fs;
+  if (vtksys::SystemTools::Stat(this->FileName, &fs) != 0)
   {
     vtkErrorMacro("Cannot find file " << this->FileName);
     return 0;

@@ -14,9 +14,10 @@
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include <ctype.h>
 #include <string>
-#include <sys/stat.h>
 
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader);
 
@@ -77,8 +78,8 @@ int vtkPEnSightGoldBinaryReader::OpenFile(const char* filename)
 
   // Open the new file
   vtkDebugMacro(<< "Opening file " << filename);
-  struct stat fs;
-  if (!stat(filename, &fs))
+  vtksys::SystemTools::Stat_t fs;
+  if (!vtksys::SystemTools::Stat(filename, &fs))
   {
     // Find out how big the file is.
     this->FileSize = (long)(fs.st_size);
