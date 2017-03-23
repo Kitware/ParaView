@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include <vtksys/SystemTools.hxx>
+using namespace vtksys;
 
 vtkStandardNewMacro(vtkLoadStateOptions);
 //----------------------------------------------------------------------------
@@ -39,30 +40,42 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
 {
   std::string result = "";
   std::string modifiedDataDirectory = this->DataDirectory;
-
-  // Check for $HOME/$PWD/$CWD/$EXE
-  if (modifiedDataDirectory.compare(0, 5, "$HOME") == 0)
-  {
-    modifiedDataDirectory.replace(0, 5, "~");
-  }
-  else if (modifiedDataDirectory.compare(0, 4, "$PWD") == 0 ||
-    modifiedDataDirectory.compare(0, 4, "$CWD") == 0 ||
-    modifiedDataDirectory.compare(0, 4, "$EXE") == 0) // Should this be $PATH
-  {
-    modifiedDataDirectory.replace(0, 4, ".");
-  }
-
   std::vector<std::string> directoryPathComponents;
-  vtksys::SystemTools::SplitPath(
-    vtksys::SystemTools::CollapseFullPath(modifiedDataDirectory), directoryPathComponents);
+
+  // Replace any environment variable defined locations
+  if (modifiedDataDirectory.compare(0, 1, "$") == 0)
+  {
+    SystemTools::SplitPath(modifiedDataDirectory, directoryPathComponents);
+    std::string variablePath;
+    if (SystemTools::GetEnv(directoryPathComponents[1].erase(0, 1), variablePath))
+    {
+      directoryPathComponents.erase(
+        directoryPathComponents.begin(), directoryPathComponents.begin() + 2);
+      std::vector<std::string> variablePathComponents;
+      SystemTools::SplitPath(variablePath, variablePathComponents);
+      directoryPathComponents.insert(directoryPathComponents.begin(),
+        variablePathComponents.begin(), variablePathComponents.end());
+    }
+    else
+    {
+      vtkErrorMacro("Environment variable " << directoryPathComponents[1] << " is not set.");
+      return result;
+    }
+  }
+  else
+  {
+    SystemTools::SplitPath(
+      SystemTools::CollapseFullPath(modifiedDataDirectory), directoryPathComponents);
+  }
+
   std::vector<std::string> pathComponents;
-  vtksys::SystemTools::SplitPath(vtksys::SystemTools::GetParentDirectory(filepath), pathComponents);
+  SystemTools::SplitPath(SystemTools::GetParentDirectory(filepath), pathComponents);
   int insertIndex = directoryPathComponents.size();
 
   while (pathComponents.size() > 1)
   {
-    std::string searchPath = vtksys::SystemTools::JoinPath(directoryPathComponents);
-    if (vtksys::SystemTools::LocateFileInDir(filepath.c_str(), searchPath.c_str(), result))
+    std::string searchPath = SystemTools::JoinPath(directoryPathComponents);
+    if (SystemTools::LocateFileInDir(filepath.c_str(), searchPath.c_str(), result))
     {
       return result;
     }

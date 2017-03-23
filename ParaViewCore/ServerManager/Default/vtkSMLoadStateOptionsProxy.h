@@ -30,8 +30,10 @@
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 #include <vector>
+#include <vtk_pugixml.h>
 
 class vtkFileSequenceParser;
+class vtkPVXMLParser;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
@@ -69,6 +71,11 @@ protected:
    */
   bool LocateFilesInDirectory(std::vector<std::string>& filepaths);
 
+  /**
+   * Converts pugixml to vtkPVXMLElement
+   */
+  vtkPVXMLElement* ConvertXML(pugi::xml_node& node);
+
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
 
@@ -82,6 +89,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   vtkNew<vtkFileSequenceParser> SequenceParser;
+  vtkNew<vtkPVXMLParser> XMLParser;
 
   vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;

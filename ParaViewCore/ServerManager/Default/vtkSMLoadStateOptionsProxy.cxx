@@ -19,6 +19,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
+#include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMFileListDomain.h"
@@ -31,7 +32,6 @@
 #include "vtksys/SystemTools.hxx"
 #include <set>
 #include <sstream>
-#include <vtk_pugixml.h>
 
 //---------------------------------------------------------------------------
 class vtkSMLoadStateOptionsProxy::vtkInternals
@@ -173,6 +173,15 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 }
 
 //----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMLoadStateOptionsProxy::ConvertXML(pugi::xml_node& node)
+{
+  std::stringstream ss;
+  node.print(ss);
+  this->XMLParser->Parse(ss.str().c_str());
+  return XMLParser->GetRootElement();
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
   this->SetStateFileName(statefilename);
@@ -186,6 +195,65 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
   }
 
   this->Internals->ProcessStateFile(this->Internals->StateXML);
+
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  // Setup proxies for for explict file change dialog
+  for (auto idIter = this->Internals->PropertiesMap.begin();
+       idIter != this->Internals->PropertiesMap.end(); idIter++)
+  {
+    pugi::xml_node proxyXML = idIter->second.begin()->second.XMLElement.parent();
+    vtkSmartPointer<vtkSMProxy> newReaderProxy =
+      pxm->NewProxy(proxyXML.attribute("group").value(), proxyXML.attribute("type").value());
+    newReaderProxy->PrototypeOn();
+
+    // Property group to group properties by source
+    pugi::xml_document propertyGroup;
+    pugi::xml_node propertyGroupElement = propertyGroup.append_child("PropertyGroup");
+    propertyGroupElement.append_attribute("label").set_value(proxyXML.attribute("type").value());
+    propertyGroupElement.append_attribute("panel_widget").set_value("LoadStateOptionsDialog");
+
+    newReaderProxy->LoadXMLState(this->ConvertXML(proxyXML), nullptr);
+    std::string newProxyName = std::to_string(idIter->first);
+    this->vtkSMProxy::AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
+
+    for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
+    {
+      vtkSmartPointer<vtkSMProperty> property = newReaderProxy->GetProperty(pIter->first.c_str());
+      property->SetPanelVisibility("default");
+
+      // Hints to insure explicit file property only show up for that mode
+      pugi::xml_document hints;
+      pugi::xml_node widgetDecorator =
+        hints.append_child("Hints").append_child("PropertyWidgetDecorator");
+      widgetDecorator.append_attribute("type").set_value("GenericDecorator");
+      widgetDecorator.append_attribute("mode").set_value("visibility");
+      widgetDecorator.append_attribute("property").set_value("LoadStateDataFileOptions");
+      widgetDecorator.append_attribute("value").set_value("2");
+
+      property->SetHints(this->ConvertXML(hints));
+
+      pugi::xml_node propertyXML = pIter->second.XMLElement;
+      std::string exposedName = vtksys::SystemTools::GetFilenameName(
+        propertyXML.child("Element").attribute("value").value());
+
+      if (this->SequenceParser->ParseFileSequence(exposedName.c_str()))
+      {
+        exposedName = this->SequenceParser->GetSequenceName();
+      }
+
+      exposedName.append(".").append(propertyXML.attribute("name").value());
+      this->ExposeSubProxyProperty(
+        newProxyName.c_str(), propertyXML.attribute("name").value(), exposedName.c_str());
+      propertyGroupElement.append_child("Property")
+        .append_attribute("name")
+        .set_value(exposedName.c_str());
+    }
+
+    this->NewPropertyGroup(this->ConvertXML(propertyGroup));
+  }
+
   return true;
 }
 
@@ -289,9 +357,36 @@ bool vtkSMLoadStateOptionsProxy::Load()
     }
     case 2:
     {
-      // TODO: Find a way to get Proxies to reproduce old Qt dialog
-      vtkWarningMacro("Explicitly specifying file paths not implemented yet.");
-      return false;
+      for (auto idIter = this->Internals->PropertiesMap.begin();
+           idIter != this->Internals->PropertiesMap.end(); idIter++)
+      {
+        vtkSMProxy* subProxy = this->GetSubProxy(std::to_string(idIter->first).c_str());
+        for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
+        {
+          std::string propertyValue =
+            vtkSMPropertyHelper(subProxy, pIter->first.c_str()).GetAsString();
+          vtkInternals::PropertyInfo& info = pIter->second;
+          if (info.FilePaths.size() == 1)
+          {
+            info.FilePaths[0] = propertyValue;
+            info.Modified = true;
+          }
+          else if (info.FilePaths.size() > 1)
+          {
+            // Assume the filename will be unchanged so just add the new path the file
+            std::vector<std::string> newPathCompenents;
+            vtksys::SystemTools::SplitPath(
+              vtksys::SystemTools::GetFilenamePath(propertyValue), newPathCompenents);
+            for (auto fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); fIter++)
+            {
+              newPathCompenents.push_back(vtksys::SystemTools::GetFilenameName(*fIter));
+              *fIter = vtksys::SystemTools::JoinPath(newPathCompenents);
+              newPathCompenents.pop_back();
+            }
+            info.Modified = true;
+          }
+        }
+      }
       break;
     }
   }
@@ -310,7 +405,6 @@ bool vtkSMLoadStateOptionsProxy::Load()
       }
       else
       {
-
         propertiesModified = true;
       }
 
@@ -342,15 +436,9 @@ bool vtkSMLoadStateOptionsProxy::Load()
     }
   }
 
-  // Convert back to vtkPVXMLElement for now
-  std::ostringstream sstream;
-  this->Internals->StateXML.save(sstream, "  ");
-  vtkNew<vtkPVXMLParser> parser;
-  parser->Parse(sstream.str().c_str());
-
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  pxm->LoadXMLState(parser->GetRootElement());
+  pxm->LoadXMLState(this->ConvertXML(this->Internals->StateXML));
 
   return true;
 }

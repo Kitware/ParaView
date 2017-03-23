@@ -4078,17 +4078,6 @@
         </Hints>
       </StringVectorProperty>
 
-      <StringVectorProperty name="DataFilePaths" number_of_elements="1" default_values="">
-        <FileListDomain name="files" />
-        <Documentation>
-          New paths for the data files.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="2">
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
-
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
