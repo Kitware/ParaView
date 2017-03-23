@@ -186,8 +186,8 @@ public:
   /**
   * This method returns is any pqPipelineSource can be dislayed in this
   * view. NOTE: This is no longer virtual. Simply forwards to
+  * vtkSMViewProxy::CanDisplayData().
   */
-  // vtkSMViewProxy::CanDisplayData().
   bool canDisplay(pqOutputPort* opPort) const;
 
   /**
