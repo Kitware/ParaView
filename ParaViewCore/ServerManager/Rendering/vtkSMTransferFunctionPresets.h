@@ -30,16 +30,12 @@
 #ifndef vtkSMTransferFunctionPresets_h
 #define vtkSMTransferFunctionPresets_h
 
-#include "vtkPVServerManagerRenderingModule.h" // needed for exports
 #include "vtkSMObject.h"
-#include "vtkStdString.h" // needed for vtkStdString.
 
-// forward declare Json::Value
-namespace Json
-{
-class Value;
-class ValueConstIterator;
-}
+#include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkStdString.h"                      // needed for vtkStdString.
+#include <vtk_jsoncpp_fwd.h>                   // for forward declarations
+
 class vtkPVXMLElement;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
 {

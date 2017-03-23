@@ -26,11 +26,7 @@
 
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
 #include "vtkSMProxy.h"
-
-namespace Json
-{
-class Value;
-}
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPVArrayInformation;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy

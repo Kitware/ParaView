@@ -234,6 +234,12 @@ protected:
   ~vtkSMRenderViewProxy();
 
   /**
+   * Overridden to call this->InteractiveRender() if
+   * "UseInteractiveRenderingForScreenshots" is true.
+   */
+  void RenderForImageCapture() VTK_OVERRIDE;
+
+  /**
    * Calls UpdateLOD() on the vtkPVRenderView.
    */
   void UpdateLOD();
@@ -243,14 +249,6 @@ protected:
    * side.
    */
   virtual void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
-
-  //@{
-  /**
-   * Subclasses should override this method to do the actual image capture.
-   */
-  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
-  virtual void CaptureWindowInternalRender();
-  //@}
 
   bool SelectFrustumInternal(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);

@@ -226,7 +226,14 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
 
   // Call Render() on local render window only on the client (or root node in
   // batch mode).
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver() || this->InTileDisplayMode())
+  //
+  // In symmetric mode, we call render on all ranks for one reason only:
+  // when the vtkWindowToImageFilter tries to grab frame buffers on the
+  // satellites, it doesn't die. In reality, we shouldn't grab the frame buffers
+  // at all on satellites at all, but that needs some refactoring in
+  // vtkWindowToImageFilter.
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver() || this->InTileDisplayMode() ||
+    vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
   {
     vtkTimerLog::MarkStartEvent("vtkPVContextView::PrepareForRender");
     // on rendering-nodes call Render-pass so that representations can update the

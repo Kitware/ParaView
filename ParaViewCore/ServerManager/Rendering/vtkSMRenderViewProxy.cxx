@@ -23,7 +23,6 @@
 #include "vtkExtractSelectedFrustum.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
-#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
@@ -63,31 +62,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
-#include "vtkWindowToImageFilter.h"
 
 #include <cassert>
 #include <map>
-
-namespace
-{
-
-#if !defined(__APPLE__)
-bool vtkIsImageEmpty(vtkImageData* image)
-{
-  vtkDataArray* scalars = image->GetPointData()->GetScalars();
-  for (int comp = 0; comp < scalars->GetNumberOfComponents(); comp++)
-  {
-    double range[2];
-    scalars->GetRange(range, comp);
-    if (range[0] != 0.0 || range[1] != 0.0)
-    {
-      return false;
-    }
-  }
-  return true;
-}
-#endif
-};
 
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
@@ -1169,10 +1146,9 @@ bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::CaptureWindowInternalRender()
+void vtkSMRenderViewProxy::RenderForImageCapture()
 {
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  if (view->GetUseInteractiveRenderingForScreenshots())
+  if (vtkSMPropertyHelper(this, "UseInteractiveRenderingForScreenshots", /*quiet=*/true).GetAsInt())
   {
     this->InteractiveRender();
   }
@@ -1180,72 +1156,6 @@ void vtkSMRenderViewProxy::CaptureWindowInternalRender()
   {
     this->StillRender();
   }
-}
-
-//----------------------------------------------------------------------------
-vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
-{
-#if !defined(__APPLE__)
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-#endif
-
-// Offscreen rendering is not functioning properly on the mac.
-// Do not use it.
-#if !defined(__APPLE__)
-  vtkRenderWindow* window = this->GetRenderWindow();
-  int prevOffscreen = window->GetOffScreenRendering();
-  bool use_offscreen =
-    view->GetUseOffscreenRendering() || view->GetUseOffscreenRenderingForScreenshots();
-  window->SetOffScreenRendering(use_offscreen ? 1 : 0);
-#endif
-
-  this->GetRenderWindow()->SwapBuffersOff();
-
-  this->CaptureWindowInternalRender();
-
-  vtkSmartPointer<vtkWindowToImageFilter> w2i = vtkSmartPointer<vtkWindowToImageFilter>::New();
-  w2i->SetInput(this->GetRenderWindow());
-  w2i->SetMagnification(magnification);
-  w2i->ReadFrontBufferOff();
-  w2i->ShouldRerenderOff();
-#ifdef VTKGL2
-  // we don't need the boundary fix for GL2. The boundary issue
-  // was an OpenGL fixed pipeline artifact. (See paraview/paraview#16813).
-  w2i->FixBoundaryOff();
-#else
-  w2i->FixBoundaryOn();
-#endif
-
-  // BUG #8715: We go through this indirection since the active connection needs
-  // to be set during update since it may request re-renders if magnification >1.
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << w2i.GetPointer() << "Update"
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
-
-  this->GetRenderWindow()->SwapBuffersOn();
-
-#if !defined(__APPLE__)
-  window->SetOffScreenRendering(prevOffscreen);
-
-  if (view->GetUseOffscreenRenderingForScreenshots() && vtkIsImageEmpty(w2i->GetOutput()))
-  {
-    // ensure that some image was capture. Due to buggy offscreen rendering
-    // support on some drivers, we may end up with black images, in which case
-    // we force on-screen rendering.
-    if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() == 1)
-    {
-      vtkWarningMacro("Disabling offscreen rendering since empty image was detected.");
-      view->SetUseOffscreenRenderingForScreenshots(false);
-      return this->CaptureWindowInternal(magnification);
-    }
-  }
-#endif
-
-  vtkImageData* capture = vtkImageData::New();
-  capture->ShallowCopy(w2i->GetOutput());
-  this->GetRenderWindow()->Frame();
-  return capture;
 }
 
 //----------------------------------------------------------------------------
