@@ -279,34 +279,6 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqRenderViewBase::setStereo(int mode)
-{
-  VTK_LEGACY_BODY(pqRenderViewBase::setStereo, "ParaView 5.1");
-  QList<pqView*> views =
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
-  foreach (pqView* view, views)
-  {
-    vtkSMProxy* viewProxy = view->getProxy();
-    if (mode >= VTK_STEREO_CRYSTAL_EYES && mode <= VTK_STEREO_SPLITVIEWPORT_HORIZONTAL)
-    {
-      vtkSMPropertyHelper(viewProxy, "StereoType", /*quiet*/ true).Set(mode);
-      vtkSMPropertyHelper(viewProxy, "StereoRender", /*quiet*/ true).Set(1);
-    }
-    else
-    {
-      vtkSMPropertyHelper(viewProxy, "StereoRender", /*quiet*/ true).Set(0);
-    }
-    viewProxy->UpdateVTKObjects();
-    if (mode != 0)
-    {
-      view->forceRender();
-    }
-  }
-}
-#endif
-
-//-----------------------------------------------------------------------------
 void pqRenderViewBase::beginDelayInteractiveRender()
 {
   vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
