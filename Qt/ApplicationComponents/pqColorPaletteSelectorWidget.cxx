@@ -89,6 +89,7 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   {
     this->addPropertyLink(this, "paletteName", SIGNAL(paletteNameChanged()), smproperty);
     this->connect(cbbox, SIGNAL(currentIndexChanged(int)), SIGNAL(paletteNameChanged()));
+    cbbox->setItemText(0, "No change");
   }
   else
   {

@@ -175,7 +175,7 @@ void pqSaveAnimationReaction::saveAnimation()
     dialog.setApplyChangesImmediately(true);
     dialog.setWindowTitle("Save Animation Options");
     dialog.setEnableSearchBar(true);
-    dialog.setHideAdvancedProperties(true);
+    dialog.setSettingsKey("SaveAnimationDialog");
     if (dialog.exec() != QDialog::Accepted)
     {
       if (layout)

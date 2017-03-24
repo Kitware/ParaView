@@ -148,7 +148,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
   dialog.setApplyChangesImmediately(true);
   dialog.setWindowTitle("Save Screenshot Options");
   dialog.setEnableSearchBar(true);
-  dialog.setHideAdvancedProperties(true);
+  dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
     QString filename = pqSaveScreenshotReaction::promptFileName();

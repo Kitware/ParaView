@@ -562,7 +562,8 @@
       base_proxyname="SaveScreenshot">
       <IntVectorProperty name="DisconnectAndSave"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="advanced">
         <Documentation>
           Disconnect from the remote server and save animation on server before
           terminating.
@@ -574,7 +575,8 @@
 
       <IntVectorProperty name="FrameRate"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Frame rate in frames-per-second (FPS).
@@ -583,7 +585,8 @@
 
       <IntVectorProperty name="FrameWindow"
         number_of_elements="2"
-        default_values="none">
+        default_values="none"
+        panel_visibility="advanced">
         <AnimationFrameWindowDomain name="range" default_mode="min,max">
           <RequiredProperties>
             <Property name="AnimationScene" function="AnimationScene" />
@@ -612,7 +615,7 @@
         <Property name="TransparentBackground" />
       </PropertyGroup>
 
-      <PropertyGroup label="Image Options">
+      <PropertyGroup label="Compression Options">
         <Property name="ImageQuality" />
       </PropertyGroup>
 

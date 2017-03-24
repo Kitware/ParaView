@@ -3922,7 +3922,8 @@
 
       <IntVectorProperty name="FontScaling"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Scale fonts proportionally" />
           <Entry value="1" text="Do not scale fonts" />
@@ -3935,7 +3936,8 @@
 
       <IntVectorProperty name="SeparatorWidth"
         number_of_elements="1"
-        default_values="0" >
+        default_values="0"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
           Specify the width of border (in pixels) to use around views when
@@ -3952,7 +3954,8 @@
       <DoubleVectorProperty name="SeparatorColor"
         number_of_elements="3"
         default_values="0 0 0"
-        panel_widget="color_selector_with_palette" >
+        panel_widget="color_selector_with_palette"
+        panel_visibility="advanced">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
         <Documentation>
           Select the separator color.
@@ -3968,7 +3971,7 @@
       <StringVectorProperty name="OverrideColorPalette"
         number_of_elements="1"
         default_values=""
-        panel_widget="color_palette_selector">
+        panel_widget="color_palette_selector" >
         <StringListDomain name="list" />
         <Documentation>
           Choose the color palette to load before saving the image.
@@ -3977,7 +3980,8 @@
 
       <IntVectorProperty name="StereoMode"
         number_of_elements="1"
-        default_values="-1">
+        default_values="-1"
+        panel_visibility="advanced">
         <Documentation>
           Select a stereo mode, as needed.
         </Documentation>
@@ -4006,7 +4010,8 @@
 
       <IntVectorProperty name="ImageQuality"
         number_of_elements="1"
-        default_values="100">
+        default_values="100"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" max="100" />
         <Documentation>
           Specify output image quality (or compression), if applicable.
@@ -4031,7 +4036,7 @@
         <Property name="TransparentBackground" />
       </PropertyGroup>
 
-      <PropertyGroup label="Image Options">
+      <PropertyGroup label="Compression Options">
         <Property name="ImageQuality" />
       </PropertyGroup>
 
