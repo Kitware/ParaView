@@ -7,6 +7,7 @@ vtk_module(pqComponents
     ParaViewQt
   DEPENDS
     pqCore
+    vtkjsoncpp
     ${__depends}
   PRIVATE_DEPENDS
     vtkChartsCore
@@ -15,7 +16,6 @@ vtk_module(pqComponents
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys
-    vtkjsoncpp
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

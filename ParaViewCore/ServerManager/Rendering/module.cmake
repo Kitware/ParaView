@@ -6,14 +6,13 @@ vtk_module(vtkPVServerManagerRendering
   DEPENDS
     vtkPVServerImplementationRendering
     vtkPVServerManagerCore
+    vtkjsoncpp
   PRIVATE_DEPENDS
     vtkCommonColor
-    vtkjsoncpp
     vtksys
   COMPILE_DEPENDS
     vtkUtilitiesProcessXML
   TEST_DEPENDS
-    vtkjsoncpp
     vtkPVServerManagerApplication
   TEST_LABELS
     PARAVIEW
