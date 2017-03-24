@@ -2526,6 +2526,102 @@ array.
       <!-- End ForceTime -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy name="TemporalArrayOperator"
+                 label="Temporal Array Operator"
+                 class="vtkTemporalArrayOperatorFilter">
+      <Documentation>
+        Filter used to perform an operation on a data array at 2 different timesteps.
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array"/>
+        <Documentation>
+          This property specifies the input to the TemporalArrayOperator filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property lists the name of the array from which to
+        use.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="FirstTimeStepIndex"
+        command="SetFirstTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the first part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOperator"
+                         default_values="0"
+                         name="Operator"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="+"
+                 value="0" />
+          <Entry text="-"
+                 value="1" />
+          <Entry text="*"
+                 value="2" />
+          <Entry text="/"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>The property determines the operation to compute
+        between the first and second timestep data.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="SecondTimeStepIndex"
+        command="SetSecondTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the second part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOutputArrayNameSuffix"
+                            name="OutputArrayNameSuffix"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>This property set the suffix to be append to the output array name.
+        If empty, output will be suffixed with '_' and the operation type.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ShowInMenu category="Temporal" />
+      </Hints>
+      <!-- End TemporalArrayOperator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkImageGradient"
                  label="Gradient"
                  name="Gradient">
