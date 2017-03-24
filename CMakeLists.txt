@@ -194,9 +194,8 @@ option(PARAVIEW_USE_VTKM "Build ParaView with VTKm many-core filters" OFF)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_OSPRAY "Build ParaView with OSPRay Ray Traced rendering" OFF)
 option(PARAVIEW_USE_OPENVR "Build ParaView with OpenVR rendering" OFF)
-if (VTK_OPENVR_OBJECT_FACTORY)
-  message(FATAL_ERROR "You must turn off VTK_OPENVR_OBJECT_FACTORY when building paraview")
-endif()
+set(VTK_OPENVR_OBJECT_FACTORY OFF
+    CACHE INTERNAL "ParaView requires the OpenVR factory be disabled" FORCE)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 
 # Xdmf3 is not ON by default since it depends on Boost.

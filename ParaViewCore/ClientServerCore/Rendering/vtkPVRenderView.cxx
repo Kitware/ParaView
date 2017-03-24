@@ -3144,9 +3144,13 @@ void vtkPVRenderView::SendToOpenVR()
       pdm->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::AUTO_SHIFT_SCALE);
     }
   }
-  renWin->Render();
-  ren->ResetCamera();
-  iren->Start();
+  renWin->Initialize();
+  if (renWin->GetHMD())
+  {
+    renWin->Render();
+    ren->ResetCamera();
+    iren->Start();
+  }
   for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
   {
     actor->ReleaseGraphicsResources(renWin);
