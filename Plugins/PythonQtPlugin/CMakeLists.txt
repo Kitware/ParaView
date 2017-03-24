@@ -7,6 +7,8 @@ else()
   include(${PARAVIEW_USE_FILE})
 endif()
 
+include(ParaViewQt)
+pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(PythonQt REQUIRED)
@@ -23,17 +25,7 @@ set(PythonQtPlugin_MOC_SRCS
   pqPythonEventFilter.h
   )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(MOC_SRCS
-    ${PythonQtPlugin_MOC_SRCS}
-    ${decorator_file}
-    )
-else ()
-  qt4_wrap_cpp(MOC_SRCS
-    ${PythonQtPlugin_MOC_SRCS}
-    ${decorator_file}
-    )
-endif ()
+pv_qt_wrap_cpp(MOC_SRCS ${PythonQtPlugin_MOC_SRCS} ${decorator_file})
 
 set(srcs
   pqPythonQtPlugin.cxx
