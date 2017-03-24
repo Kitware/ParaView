@@ -2594,6 +2594,14 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </IntVectorProperty>
+      <Property name="Send to OpenVR"
+          command="SendToOpenVR"
+          >
+        <Documentation>Sends the scene to OpenVR virtual reality.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OpenVRHidingDecorator" />
+        </Hints>
+      </Property>
       <IntVectorProperty
           name="Shadows"
           command="SetShadows"

@@ -107,6 +107,16 @@
 #include "vtkOSPRayRendererNode.h"
 #endif
 
+#ifdef PARAVIEW_USE_OPENVR
+#include "vtkCullerCollection.h"
+#include "vtkOpenGLPolyDataMapper.h"
+#include "vtkOpenGLVertexBufferObject.h"
+#include "vtkOpenVRCamera.h"
+#include "vtkOpenVRRenderWindow.h"
+#include "vtkOpenVRRenderWindowInteractor.h"
+#include "vtkOpenVRRenderer.h"
+#endif
+
 #include <cassert>
 #include <map>
 #include <set>
@@ -3064,6 +3074,89 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
 bool vtkPVRenderView::GetEnableOSPRay()
 {
   return this->Internals->IsInOSPRay;
+}
+
+void vtkPVRenderView::SendToOpenVR()
+{
+#ifdef PARAVIEW_USE_OPENVR
+  vtkOpenVRRenderWindow* renWin = vtkOpenVRRenderWindow::New();
+  renWin->SetMultiSamples(8);
+  vtkOpenVRRenderer* ren = vtkOpenVRRenderer::New();
+  renWin->AddRenderer(ren);
+  vtkOpenVRRenderWindowInteractor* iren = vtkOpenVRRenderWindowInteractor::New();
+  renWin->SetInteractor(iren);
+  vtkOpenVRCamera* cam = vtkOpenVRCamera::New();
+  ren->SetActiveCamera(cam);
+  cam->Delete();
+
+  ren->RemoveCuller(ren->GetCullers()->GetLastItem());
+  ren->SetBackground(this->RenderView->GetRenderer()->GetBackground());
+
+  // create 4 lights for even lighting
+  {
+    vtkLight* light = vtkLight::New();
+    light->SetPosition(0.0, 1.0, 0.0);
+    light->SetIntensity(1.0);
+    light->SetLightTypeToSceneLight();
+    ren->AddLight(light);
+    light->Delete();
+  }
+  {
+    vtkLight* light = vtkLight::New();
+    light->SetPosition(0.8, -0.2, 0.0);
+    light->SetIntensity(0.8);
+    light->SetLightTypeToSceneLight();
+    ren->AddLight(light);
+    light->Delete();
+  }
+  {
+    vtkLight* light = vtkLight::New();
+    light->SetPosition(-0.3, -0.2, 0.7);
+    light->SetIntensity(0.6);
+    light->SetLightTypeToSceneLight();
+    ren->AddLight(light);
+    light->Delete();
+  }
+  {
+    vtkLight* light = vtkLight::New();
+    light->SetPosition(-0.3, -0.2, -0.7);
+    light->SetIntensity(0.4);
+    light->SetLightTypeToSceneLight();
+    ren->AddLight(light);
+    light->Delete();
+  }
+
+  // send the first renderer to openVR
+  vtkRenderer* ren2 = this->RenderView->GetRenderer();
+  renWin->InitializeViewFromCamera(ren2->GetActiveCamera());
+
+  vtkActorCollection* acol = ren2->GetActors();
+  vtkCollectionSimpleIterator pit;
+  vtkActor* actor;
+  for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
+  {
+    actor->ReleaseGraphicsResources(NULL);
+    ren->AddActor(actor);
+    // always use shift scale, everyone should
+    vtkOpenGLPolyDataMapper* pdm = vtkOpenGLPolyDataMapper::SafeDownCast(actor->GetMapper());
+    if (pdm)
+    {
+      pdm->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::AUTO_SHIFT_SCALE);
+    }
+  }
+  renWin->Render();
+  ren->ResetCamera();
+  iren->Start();
+  for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
+  {
+    actor->ReleaseGraphicsResources(renWin);
+  }
+  ren->Delete();
+  iren->Delete();
+  renWin->Delete();
+#else
+  vtkWarningMacro("Refusing to switch to OpenVR since it is not built into this copy of ParaView");
+#endif
 }
 
 //----------------------------------------------------------------------------
