@@ -37,7 +37,6 @@ set(Module_SRCS
   vtkAMRFileSeriesReader.cxx
   vtkAMRFragmentIntegration.cxx
   vtkAMRFragmentsFilter.cxx
-  vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
   vtkCellIntegrator.cxx
   vtkCleanUnstructuredGridCells.cxx

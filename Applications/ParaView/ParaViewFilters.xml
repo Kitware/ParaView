@@ -135,6 +135,7 @@
   </Category>
 
   <Proxy group="filters" name="AggregateDataSet" />
+  <Proxy group="filters" name="AppendArcLength" />
   <Proxy group="filters" name="AddFieldArrays" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
