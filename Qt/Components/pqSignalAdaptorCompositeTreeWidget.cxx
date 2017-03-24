@@ -521,7 +521,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
   else if (this->IndexMode == INDEX_MODE_LEVEL_INDEX)
   {
     QSet<QPair<unsigned int, unsigned int> > pairs;
-    for (int cc = 0; cc < new_values.size(); cc += 2)
+    for (int cc = 0; (cc + 1) < new_values.size(); cc += 2)
     {
       unsigned int level = new_values[cc].toUInt();
       unsigned int index = new_values[cc + 1].toUInt();
