@@ -12,9 +12,9 @@ vtk_module(vtkPVServerManagerCore
     # of vtkPVServerImplementationCore off but still satisfy API dependcy.
     vtkCommonCore
     vtkPVServerImplementationCore
+    vtkjsoncpp
   PRIVATE_DEPENDS
     vtksys
-    vtkjsoncpp
     vtkpugixml
     ${__dependencies}
   TEST_LABELS
