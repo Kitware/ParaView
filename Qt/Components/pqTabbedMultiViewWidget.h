@@ -33,10 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqTabbedMultiViewWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkType.h"  // needed for vtkIdType
-#include <QStyle>     // needed for QStyle:StandardPixmap
-#include <QTabBar>    // needed for QTabBar::ButtonPosition
-#include <QTabWidget> // needed for QTabWidget.
+#include "vtkSetGet.h" // needed for VTK_LEGACY
+#include "vtkType.h"   // needed for vtkIdType
+#include <QStyle>      // needed for QStyle:StandardPixmap
+#include <QTabBar>     // needed for QTabBar::ButtonPosition
+#include <QTabWidget>  // needed for QTabWidget.
 
 class pqMultiViewWidget;
 class pqProxy;
@@ -67,28 +68,6 @@ public:
   virtual QSize clientSize() const;
 
   /**
-  * Captures an image for the views in the layout. Note that there must be
-  * at least one valid view in the widget, otherwise returns NULL.
-  */
-  virtual vtkImageData* captureImage(int width, int height);
-
-  /**
-  * setups up the environment for capture. Returns the magnification that can
-  * be used to capture the image for required size.
-  */
-  virtual int prepareForCapture(int width, int height);
-
-  /**
-  * cleans up the environment after image capture.
-  */
-  virtual void cleanupAfterCapture();
-
-  /**
-  * Capture an image and saves it out to a file.
-  */
-  virtual bool writeImage(const QString& filename, int width, int height, int quality = -1);
-
-  /**
   * When set to true (off by default), the widget will not allow
   * adding/removing tabs trough user interactions.
   */
@@ -101,6 +80,18 @@ public:
   */
   void setTabVisibility(bool visible);
   bool tabVisibility() const;
+
+  //@{
+  /**
+   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
+   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
+   * using it.
+   */
+  VTK_LEGACY(vtkImageData* captureImage(int width, int height));
+  VTK_LEGACY(int prepareForCapture(int width, int height));
+  VTK_LEGACY(void cleanupAfterCapture());
+  VTK_LEGACY(bool writeImage(const QString& filename, int width, int height, int quality = -1));
+  //@}
 
 signals:
   /**

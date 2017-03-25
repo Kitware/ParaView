@@ -41,7 +41,6 @@ paraview_test_load_data(""
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
   "iron protein.vtk"
-  LoadStateMultiView.pvsm
   LoadState.pvsm
   minimal.nii
   MultiBlockWithPieces_0_0.vtp
@@ -796,7 +795,7 @@ SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
-SET(SaveLargeScreenshot_THRESHOLD 10000)
+SET(SaveLargeScreenshot_THRESHOLD 40)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)

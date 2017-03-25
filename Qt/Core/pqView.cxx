@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 // ParaView Server Manager includes.
+#include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
@@ -40,8 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 
@@ -394,95 +397,6 @@ QSize pqView::getSize()
 }
 
 //-----------------------------------------------------------------------------
-int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
-{
-  int magnification = 1;
-
-  // If fullsize > viewsize, then magnification is involved.
-  int temp = std::ceil(fullsize.width() / static_cast<double>(viewsize.width()));
-  magnification = (temp > magnification) ? temp : magnification;
-
-  temp = std::ceil(fullsize.height() / static_cast<double>(viewsize.height()));
-  magnification = (temp > magnification) ? temp : magnification;
-
-  viewsize = fullsize / magnification;
-  return magnification;
-}
-
-//-----------------------------------------------------------------------------
-bool pqView::writeImage(const QString& filename, const QSize& fullsize, int quality)
-{
-  // FIXME: code duplicated with pqView::captureImage(). Fix it :).
-  if (!this->widget()->isVisible())
-  {
-    return false;
-  }
-
-  QWidget* vtkwidget = this->widget();
-  QSize cursize = vtkwidget->size();
-  QSize newsize = cursize;
-  int magnification = 1;
-  if (fullsize.isValid())
-  {
-    magnification = pqView::computeMagnification(fullsize, newsize);
-    vtkwidget->resize(newsize);
-  }
-  this->render();
-
-  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-  bool status = controller->WriteImage(
-    this->getViewProxy(), filename.toLocal8Bit().data(), magnification, quality);
-  if (fullsize.isValid())
-  {
-    vtkwidget->resize(newsize);
-    vtkwidget->resize(cursize);
-    this->render();
-  }
-  return status;
-}
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqView::captureImage(const QSize& fullsize)
-{
-  if (!this->widget()->isVisible())
-  {
-    return NULL;
-  }
-
-  QWidget* vtkwidget = this->widget();
-  QSize cursize = vtkwidget->size();
-  QSize newsize = cursize;
-  int magnification = 1;
-  if (fullsize.isValid())
-  {
-    magnification = pqView::computeMagnification(fullsize, newsize);
-    vtkwidget->resize(newsize);
-  }
-  this->render();
-
-  vtkImageData* vtkimage = this->captureImage(magnification);
-  if (fullsize.isValid())
-  {
-    vtkwidget->resize(newsize);
-    vtkwidget->resize(cursize);
-    this->render();
-  }
-  return vtkimage;
-}
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqView::captureImage(int magnification)
-{
-  if (this->widget() && this->widget()->isVisible())
-  {
-    vtkSMViewProxy* view = this->getViewProxy();
-    Q_ASSERT(view);
-    return view->CaptureWindow(magnification);
-  }
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
 bool pqView::canDisplay(pqOutputPort* opPort) const
 {
   pqPipelineSource* source = opPort ? opPort->getSource() : 0;
@@ -508,3 +422,50 @@ void pqView::onEndRender()
   emit this->endRender();
   END_UNDO_EXCLUDE();
 }
+
+//=================================================================================
+// LEGACY METHODS
+//=================================================================================
+#if !defined(VTK_LEGACY_REMOVE)
+vtkImageData* pqView::captureImage(int magnification)
+{
+  VTK_LEGACY_BODY(pqView::captureImage, "ParaView 5.4");
+
+  QSize mysize = this->getSize();
+  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(this->getViewProxy(),
+    vtkVector2i(mysize.width() * magnification, mysize.height() * magnification));
+  if (img)
+  {
+    img->Register(nullptr);
+    return img;
+  }
+  return nullptr;
+}
+vtkImageData* pqView::captureImage(const QSize& asize)
+{
+  VTK_LEGACY_BODY(pqView::captureImage, "ParaView 5.4");
+  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(
+    this->getViewProxy(), vtkVector2i(asize.width(), asize.height()));
+  if (img)
+  {
+    img->Register(nullptr);
+    return img;
+  }
+  return nullptr;
+}
+
+bool pqView::writeImage(const QString& filename, const QSize& asize, int quality)
+{
+  VTK_LEGACY_BODY(pqView::writeImage, "ParaView 5.4");
+  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(
+    this->getViewProxy(), vtkVector2i(asize.width(), asize.height()));
+  if (img)
+  {
+    return vtkSMUtilities::SaveImage(img.GetPointer(), filename.toLocal8Bit().data(), quality) ==
+      vtkErrorCode::NoError;
+  }
+  return false;
+}
+
+#endif // !defined(VTK_LEGACY_REMOVE)
+//=================================================================================

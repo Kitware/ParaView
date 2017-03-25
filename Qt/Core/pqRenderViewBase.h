@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h" //needed for pqSMProxy.
 #include "pqView.h"
-#include "vtkSetGet.h" // needed for VTK_LEGACY.
 class pqTimer;
 
 /**
@@ -73,18 +72,6 @@ public:
   * Called to reset the view's display.  This method calls resetCamera().
   */
   virtual void resetDisplay();
-
-  /**
-  * Convenience method to enable stereo rendering on all views that support
-  * stereo rendering. If mode==0, stereo rendering is disabled. mode is same
-  * that used for vtkRenderWindow::SetStereoType.
-  * This does not request a render, the caller must explicitly call render on
-  * the views.
-  * @deprecated Use pqStereoModeHelper instead, which provides a more
-  * convenient mechanism for application code to temporarily change stereo
-  * mode on all render views.
-  */
-  VTK_LEGACY(static void setStereo(int mode));
 
 protected slots:
   virtual void initializeAfterObjectsCreated();

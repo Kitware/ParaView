@@ -932,21 +932,8 @@ def SaveData(filename, proxy=None, **extraArgs):
 # -----------------------------------------------------------------------------
 
 def WriteImage(filename, view=None, **params):
-    """Saves the given view (or the active one if none is given) as an
-    image. Optionally, you can specify the writer and the magnification
-    using the Writer and Magnification named arguments. For example::
-
-        WriteImage("foo.mypng", aview, Writer=vtkPNGWriter, Magnification=2)
-
-    If no writer is provided, the type is determined from the file extension.
-    Currently supported extensions are png, bmp, ppm, tif, tiff, jpg and jpeg.
-    The writer is a VTK class that is capable of writing images.
-    Magnification is used to determine the size of the written image. The size
-    is obtained by multiplying the size of the view with the magnification.
-    Rendering may be done using tiling to obtain the correct size without
-    resizing the view.
-
-    ** DEPRECATED: Use SaveScreenshot() instead. **
+    """::deprecated:: 4.2
+    Use :func:`SaveScreenshot` instead.
     """
     if not view:
         view = active_objects.view
@@ -961,9 +948,9 @@ def WriteImage(filename, view=None, **params):
     view.WriteImage(filename, writer, mag)
 
 # -----------------------------------------------------------------------------
-def SaveScreenshot(filename,
+def _SaveScreenshotLegacy(filename,
     view=None, layout=None, magnification=None, quality=None, **params):
-    if not view is None and not layout is None:
+    if view is not None and layout is not None:
         raise ValueError ("both view and layout cannot be specified")
 
     viewOrLayout = view if view else layout
@@ -979,51 +966,233 @@ def SaveScreenshot(filename,
     except TypeError:
         quality = -1
 
+    # convert magnification to image resolution.
+    if viewOrLayout.IsA("vtkSMViewProxy"):
+        size = viewOrLayout.ViewSize
+    else:
+        assert(viewOrLayout.IsA("vtkSMViewLayoutProxy"))
+        exts = [0] * 4
+        viewOrLayout.GetLayoutExtent(exts)
+        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
+
+    imageResolution = (size[0]*magnification, size[1]*magnification)
+
+    # convert quality to ImageQuality
+    imageQuality = quality
+
+    # now, call the new API
+    return SaveScreenshot(filename, viewOrLayout,
+            ImageResolution=imageResolution,
+            ImageQuality=imageQuality)
+
+def SaveScreenshot(filename, viewOrLayout=None, **params):
+    """Save screenshot for a view or layout (collection of views) to an image.
+
+    `SaveScreenshot` is used to save the rendering results to an image.
+
+    Parameters:
+    -----------
+        filename (str): name of the image file to save to. The filename extension
+            is used to determine the type of image file generated. Supported
+            extensions are `png`, `jpg`, `tif`, `bmp`, and `ppm`.
+        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
+            from, defaults to None. If None, then the active view is used, if
+            available. To save image from a single view, this must be set to a
+            view, to save an image from all views in a layout, pass the layout.
+
+    Keyword Parameters (optional):
+    ------------------------------
+        ImageResolution (tuple(int, int)): a 2-tuple to specify the
+            output image resolution in pixels as `(width, height)`. If not
+            specified, the view (or layout) size is used.
+        FontScaling (str): specify whether to scale fonts
+            proportionally (`"Scale fonts proportionally"`) or
+            not (`"Do not scale fonts"`). Defaults to `"Scale fonts
+            proportionally"`.
+        SeparatorWidth (int): when saving multiple views in a
+            layout, specify the width (in approximate pixels) for a spearator
+            between views in the generated image.
+        SeparatorColor (tuple(float, float, float)): specify the
+            color for separator between views, if applicable.
+        OverrideColorPalette (:obj:str, optional): name of the color palette to
+            use, if any. If none specified, current color palette remains
+            unchanged.
+        StereoMode (str): stereo mode to use, if any. Available
+            values are `"No stereo"`,`"Red-Blue"`, `"Interlaced"`,
+            `"Left Eye Only"`, `"Right Eye Only"`, `"Dresden"`,
+            `"Anaglyph"`, `"Checkerboard"`, `"Side-by-Side Horizontal"`, and the
+            default `"No change"`.
+        TransparentBackground (int): set to 1 (or True) to save
+            an image with background set to alpha=0, if supported by the output
+            image format.
+        ImageQuality (int): set a number in the range [0, 100] to
+            specify the output image quality/compression. 0 is least
+            quality/most compressed, while 100 means best quality/least
+            compressed.
+
+    Legacy Parameters:
+    ------------------
+        Prior to ParaView version 5.4, the following parameters were available
+        and are still supported. However, cannot be used together with other
+        keyword parameters documented earlier.
+
+        view (proxy): single view to save image from.
+        layout (proxy): layout to save image from.
+        magnification (int): magnification factor to use to save the output
+            image. The current view (or layout) size is scaled by the
+            magnification factor provided.
+        quality (int): output image quality, a number in the range [0, 100].
+    """
+    # Let's handle backwards compatibility.
+    # Previous API for this method took the following arguments:
+    # SaveScreenshot(filename, view=None, layout=None, magnification=None, quality=None)
+    # If we notice any of the old arguments, call legacy method.
+    if "view" in params or "layout" in params or \
+            "magnification" in params or \
+            "quality" in params:
+                # since in previous variant, view was a positional param,
+                # we handle that too.
+                if "view" in params:
+                    view = params.get("view")
+                    del params["view"]
+                else:
+                    view = viewOrLayout
+                return _SaveScreenshotLegacy(filename, view=view, **params)
+
+    # use active view if no view or layout is specified.
+    viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
+
+    if not viewOrLayout:
+        raise ValueError("A view or layout must be specified.")
+
     controller = servermanager.ParaViewPipelineController()
-    return controller.WriteImage(\
-        viewOrLayout, filename, magnification, quality)
+    options = servermanager.misc.SaveScreenshot()
+    controller.PreInitializeProxy(options)
+
+    options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
+    options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
+    options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
+
+    SetProperties(options, **params)
+    controller.PostInitializeProxy(options)
+    return options.WriteImage(filename)
 
 # -----------------------------------------------------------------------------
+def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
+    """Save animation as a movie file or series of images.
+
+    `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
+    a series of images.
+
+    Parameters:
+    -----------
+        filename (str): name of the output file. The extension is used to
+            determine the type of the output. Supported extensions are `png`,
+            `jpg`, `tif`, `bmp`, and `ppm`. Based on platform (and build)
+            configuration, `avi` and `ogv` may be supported as well.
+        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
+            from, defaults to None. If None, then the active view is used, if
+            available. To save image from a single view, this must be set to a
+            view, to save an image from all views in a layout, pass the layout.
+        scene (:obj:`proxy`, optional): animation scene to save. If None, then
+            the active scene returned by `GetAnimationScene` is used.
+
+    Keyword Parameters (optional):
+    ------------------------------
+        `SaveAnimation` supports all keyword parameters suppored by
+        `SaveScreenshot`. In addition, the following parameters are supported:
+
+        DisconnectAndSave (int): in client-server mode (with rendering-capable
+            server), set this to 1 to disconnect from the server and let the
+            server save the animation out before terminating. In that case, the
+            filename specifies a path on the server. Defaults to 0, in which
+            case the animation is saved on the client.
+
+        FrameRate (int): frame rate in frames per second for the output. This
+            only affects the output when generated movies (`avi` or `ogv`), and
+            not when saving the animation out as a series of images.
+
+        FrameWindow (tuple(int,int)):  to save a part of the animation,
+            provide the range in frames or timesteps index.
+    """
+    # use active view if no view or layout is specified.
+    viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
+
+    if not viewOrLayout:
+        raise ValueError("A view or layout must be specified.")
+
+    scene = scene if scene else GetAnimationScene()
+    if not scene:
+        raise RuntimeError("Missing animation scene.")
+
+    controller = servermanager.ParaViewPipelineController()
+    options = servermanager.misc.SaveAnimation()
+    controller.PreInitializeProxy(options)
+
+    options.AnimationScene = scene
+    options.Layout = viewOrLayout if viewOrLayout.IsA("vtkSMViewLayoutProxy") else None
+    options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
+    options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
+
+    SetProperties(options, **params)
+    controller.PostInitializeProxy(options)
+
+    return options.WriteAnimation(filename)
 
 def WriteAnimation(filename, **params):
-    """Writes the current animation as a file. Optionally one can specify
-    arguments that qualify the saved animation files as keyword arguments.
-    Accepted options are as follows:
-
-    * **Magnification** *(integer)* : set the maginification factor for the saved
-      animation.
-    * **Quality** *(0 [worst] or 1 or 2 [best])* : set the quality of the generated
-      movie (if applicable).
-    * **Subsampling** *(integer)* : setting whether the movie encoder should use
-      subsampling of the chrome planes or not, if applicable. Since the human
-      eye is more sensitive to brightness than color variations, subsampling
-      can be useful to reduce the bitrate. Default value is 0.
-    * **BackgroundColor** *(3-tuple of doubles)* : set the RGB background color to
-      use to fill empty spaces in the image.
-    * **FrameRate** *(double)*: set the frame rate (if applicable).
-    * **StartFileCount** *(int)*: set the first number used for the file name
-      (23 => i.e. image-0023.png).
-    * **PlaybackTimeWindow** *([double, double])*: set the time range that
-      should be used to play a subset of the total animation time.
-      (By default the whole application will play).
     """
+    ::deprecated:: 5.3
+    Use :func:`SaveAnimation` instead.
+
+    This function can still be used to save an animation, but using
+    `SaveAnimation` is strongly recommended as it provides more flexibility.
+
+    The following parameters are currently supported.
+
+    Parameters
+    ----------
+        filename (str): name of the output file.
+
+    Keyword Parameters (optional):
+    ------------------------------
+
+        Magnification (int): magnification factor for the saved animation.
+
+        Quality (int): int in range [0,2].
+
+        FrameRate (int): frame rate.
+
+    The following parameters are no longer supported and are ignored:
+    Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
+    """
+    newparams = {}
+
+    # this method simply tries to provide legacy behavior.
     scene = GetAnimationScene()
-    # ensures that the TimeKeeper track is created.
-    GetTimeTrack()
-    iw = servermanager.vtkSMAnimationSceneImageWriter()
-    iw.SetAnimationScene(scene.SMProxy)
-    iw.SetFileName(filename)
+    newparams["scene"] = scene
+
+    # previously, scene saved all views and only worked well if there was 1
+    # layout, so do that.
+    layout = GetLayout()
+    newparams["viewOrLayout"] = layout
+
     if "Magnification" in params:
-        iw.SetMagnification(int(params["Magnification"]))
+        magnification = params["Magnification"]
+        exts = [0] * 4
+        layout.GetLayoutExtent(exts)
+        size = [exts[1]-exts[0]+1, exts[3]-exts[2]+1]
+        imageResolution = (size[0]*magnification, size[1]*magnification)
+        newparams["ImageResolution"] = imageResolution
+
     if "Quality" in params:
-        iw.SetQuality(int(params["Quality"]))
-    if "Subsampling" in params:
-        iw.SetSubsampling(int(params["Subsampling"]))
-    if "BackgroundColor" in params:
-        iw.SetBackgroundColor(params["BackgroundColor"])
+        # convert quality (0=worst, 2=best) to imageQuality (0 = worst, 100 = best)
+        quality = int(params["Quality"])
+        imageQuality = int(100 * quality/2.0)
+        newparams["ImageQuality"] = imageQuality
+
     if "FrameRate" in params:
-        iw.SetFrameRate(float(params["FrameRate"]))
-    iw.Save()
+        newparams["FrameRate"] = int(params["FrameRate"])
+    return SaveAnimation(filename, **newparams)
 
 def WriteAnimationGeometry(filename, view=None):
     """Save the animation geometry from a specific view to a file specified.
@@ -1779,14 +1948,23 @@ def _func_name_valid(name):
     return valid
 
 # -----------------------------------------------------------------------------
+def _get_proxymodules_to_import(connection):
+    """
+    used in _add_functions, _get_generated_proxies, and _remove_functions to get
+    modules to import proxies from.
+    """
+    if connection and connection.Modules:
+        modules = connection.Modules
+        return [modules.filters, modules.sources, modules.writers, modules.animation]
+    else:
+        return []
 
 def _add_functions(g):
     if not servermanager.ActiveConnection:
         return
 
     activeModule = servermanager.ActiveConnection.Modules
-    for m in [activeModule.filters, activeModule.sources,
-              activeModule.writers, activeModule.animation]:
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         # Skip registering proxies in certain modules (currently only writers)
         skipRegisteration = m is activeModule.writers
         dt = m.__dict__
@@ -1801,10 +1979,8 @@ def _add_functions(g):
 # -----------------------------------------------------------------------------
 
 def _get_generated_proxies():
-    activeModule = servermanager.ActiveConnection.Modules
     proxies = []
-    for m in [activeModule.filters, activeModule.sources,
-              activeModule.writers, activeModule.animation]:
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
@@ -1815,12 +1991,8 @@ def _get_generated_proxies():
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):
-    list = []
-    if servermanager.ActiveConnection:
-       list = [m for m in dir(servermanager.ActiveConnection.Modules) if m[0] != '_']
-
-    for m in list:
-        dt = servermanager.ActiveConnection.Modules.__dict__[m].__dict__
+    for m in _get_proxymodules_to_import(servermanager.ActiveConnection):
+        dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str) and key in g:

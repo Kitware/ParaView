@@ -69,6 +69,20 @@
                      repeatable="1">
         <Documentation>Representations in this view.</Documentation>
       </ProxyProperty>
+      <IntVectorProperty command="SetPPI"
+                         default_values="96"
+                         name="PPI"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>Set the screen ppi (pixels per inch). This is used
+                       when mapping font sizes in points to screen pixels.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="GeneralSettings"
+                        property="ScreenPixelsPerInch"/>
+        </Hints>
+      </IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================== -->

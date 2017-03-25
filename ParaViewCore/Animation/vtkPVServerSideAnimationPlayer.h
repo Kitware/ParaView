@@ -1,4 +1,3 @@
-
 /*=========================================================================
 
   Program:   ParaView
@@ -25,9 +24,6 @@
 #include "vtkObject.h"
 #include "vtkPVAnimationModule.h" //needed for exports
 
-class vtkSMAnimationSceneImageWriter;
-class vtkPVXMLElement;
-
 class VTKPVANIMATION_EXPORT vtkPVServerSideAnimationPlayer : public vtkObject
 {
 public:
@@ -35,25 +31,25 @@ public:
   vtkTypeMacro(vtkPVServerSideAnimationPlayer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  void SetWriter(vtkSMAnimationSceneImageWriter* writer);
-  void SetSessionProxyManagerState(const char* xml_state);
+  vtkSetStringMacro(SessionProxyManagerState);
+  vtkSetStringMacro(FileName);
+
+  /**
+   * Call this method to setup the handlers to observer client being
+   * disconnected from the server to save animation.
+   */
+  void Activate();
 
 protected:
   vtkPVServerSideAnimationPlayer();
   virtual ~vtkPVServerSideAnimationPlayer();
 
-  /**
-   * Callback that is used to trigger the execution of the animation writing.
-   */
-  void TriggerExecution();
+  char* SessionProxyManagerState;
+  char* FileName;
 
 private:
   vtkPVServerSideAnimationPlayer(const vtkPVServerSideAnimationPlayer&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVServerSideAnimationPlayer&) VTK_DELETE_FUNCTION;
-
-  class vtkInternals;
-  vtkInternals* Internals;
-  friend class vtkInternals;
 };
 
 #endif

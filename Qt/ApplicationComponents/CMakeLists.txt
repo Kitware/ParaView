@@ -312,6 +312,8 @@ set (Module_SRCS
   pqVerifyRequiredPluginBehavior.h
   pqViewMenuManager.cxx
   pqViewMenuManager.h
+  pqViewResolutionPropertyWidget.cxx
+  pqViewResolutionPropertyWidget.h
   pqViewStreamingBehavior.cxx
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.cxx
@@ -463,6 +465,7 @@ set (Module_MOC_HDRS
   pqVCRToolbar.h
   pqVerifyRequiredPluginBehavior.h
   pqViewMenuManager.h
+  pqViewResolutionPropertyWidget.h
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.h
   pqWelcomeDialog.h
@@ -518,6 +521,7 @@ set (Module_UI_FILES
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
+  Resources/UI/pqViewResolutionPropertyWidget.ui
   Resources/UI/pqVCRToolbar.ui
   Resources/UI/pqWelcomeDialog.ui
   Resources/UI/pqYoungsMaterialPropertyWidget.ui

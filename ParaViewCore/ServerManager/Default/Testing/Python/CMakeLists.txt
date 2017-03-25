@@ -1,19 +1,22 @@
 paraview_test_load_data(""
   "blow data.myvtk"
-  "iron protein.vtk"
-  SPCTH/ball_and_box.spcth
   blow.vtk
   bot2.wrl
   can.ex2
   disk_out_ref.ex2
+  dualSphereAnimation4.pvd
   elements.vtu
+  "iron protein.vtk"
   multicomb_0.vts
   poisson_3dall_2.xmf
+  PythonProgrammableFilterParameters.xml
   quadraticTetra01.vtu
   sonic.pht
+  SPCTH/ball_and_box.spcth
   TestRepresentationTypePlugin.xml
-  PythonProgrammableFilterParameters.xml
   )
+paraview_test_load_data_dirs(""
+  dualSphereAnimation)
 
 ###############################################################################
 # For python scripts for testing.
@@ -44,6 +47,7 @@ set(PY_TESTS
   PythonTestBenchmark.py,NO_VALID
   ReaderReload.py,NO_VALID
   RepresentationTypeHint.py,NO_VALID
+  SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ValidateSources.py,NO_VALID
   VRMLSource.py,NO_VALID
@@ -89,11 +93,17 @@ set(PVBATCH_TESTS
   UserTransformOnRepresentation.py
   )
 
+# Saving animation currently doesn't work in symmetric mode.
+# paraview/paraview#17329
+set(PVBATCH_NO_SYMMETRIC_TESTS
+  SaveAnimation.py
+  )
 IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
   set(${vtk-module}_NUMPROCS 2)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
+    ${PVBATCH_NO_SYMMETRIC_TESTS}
     )
   set(PARAVIEW_PVBATCH_ARGS
     --symmetric)
@@ -109,6 +119,7 @@ else ()
   paraview_add_test_pvbatch(
     JUST_VALID
     ${PVBATCH_TESTS}
+    ${PVBATCH_NO_SYMMETRIC_TESTS}
     )
   set(PARAVIEW_PVBATCH_ARGS
     --symmetric)

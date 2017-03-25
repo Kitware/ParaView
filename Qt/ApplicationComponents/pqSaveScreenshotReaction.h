@@ -55,8 +55,6 @@ public:
   * having to create a reaction instance.
   */
   static void saveScreenshot();
-  static void saveScreenshot(
-    const QString& filename, const QSize& size, int quality, bool all_views = false);
 
 public slots:
   /**
@@ -70,6 +68,10 @@ protected:
   * Called when the action is triggered.
   */
   virtual void onTriggered() { pqSaveScreenshotReaction::saveScreenshot(); }
+
+  /// Prompt for a filename. Will return empty string if user cancelled the
+  /// operation.
+  static QString promptFileName();
 
 private:
   Q_DISABLE_COPY(pqSaveScreenshotReaction)

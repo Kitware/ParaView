@@ -39,20 +39,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 
 /**
-* pqColorPaletteSelectorWidget is used on a ColorPalette proxy to load a
-* specific color palette.
-*/
+ * @class pqColorPaletteSelectorWidget
+ * @brief widget to choose a color palette to load/select.
+ *
+ * pqColorPaletteSelectorWidget is a pqPropertyWidget intended to be used in two
+ * roles:
+ * 1. To load a specific color palette.
+ * 2. To select a specific color palette.
+ *
+ * Mode (1) is used when the widget is used for a `vtkSMProperty` e.g. **'Load
+ * Palette'** property on the **ColorPalette** proxy. In that case, the
+ * user's action is expected to update the proxy with the chosen palette.
+ *
+ * Mode (2) is used when the widget is used for a `vtkSMStringVectorProperty`
+ * e.g. **OverrideColorPalette** property on **ImageOptions** proxy. In that
+ * case, the selected palette name is simply set on the
+ * vtkSMStringVectorProperty.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorPaletteSelectorWidget : public pqPropertyWidget
 {
   Q_OBJECT
+  Q_PROPERTY(QString paletteName READ paletteName WRITE setPaletteName)
   typedef pqPropertyWidget Superclass;
 
 public:
   pqColorPaletteSelectorWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   virtual ~pqColorPaletteSelectorWidget();
 
+  QString paletteName() const;
+  void setPaletteName(const QString& name);
+
+signals:
+  void paletteNameChanged();
+
 private slots:
-  void setCurrentIndex(int);
+  void loadPalette(int);
 
 private:
   Q_DISABLE_COPY(pqColorPaletteSelectorWidget)

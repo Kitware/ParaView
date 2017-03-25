@@ -126,13 +126,13 @@ public:
   //@}
 
   //@{
-  /**
-   * Methods to save/capture images from views.
+  /*
+   * @deprecated since ParaView 5.4. Use vtkSMSaveScreenshotProxy instead.
    */
-  virtual bool WriteImage(
-    vtkSMViewProxy* view, const char* filename, int magnification, int quality);
-  virtual bool WriteImage(
-    vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality);
+  VTK_LEGACY(virtual bool WriteImage(
+    vtkSMViewProxy* view, const char* filename, int magnification, int quality) VTK_FINAL);
+  VTK_LEGACY(virtual bool WriteImage(
+    vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality) VTK_FINAL);
   //@}
 
   /**
