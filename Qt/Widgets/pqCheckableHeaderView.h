@@ -29,14 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/**
-* \file pqCheckableHeaderView.h
-* \date 03/04/2014
-*/
-
-#ifndef _pqCheckableHeaderView_h
-#define _pqCheckableHeaderView_h
+#ifndef pqCheckableHeaderView_h
+#define pqCheckableHeaderView_h
 
 #include "pqWidgetsModule.h"
 #include <QHeaderView>
@@ -48,15 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCheckableHeaderViewInternal;
 
 /**
-* \class pqCheckableHeaderView
-* \brief
-*   A convenience QHeaderView painted with a QCheckBox.
-*   This allows for providing a global checkbox when the model items are
-*   user checkable.
-*   The checkbox is painted per section with one of the three states
-*   (checked, partially checked, unchecked) depending on the check state
-*   of individual items.
-*   Currently used in pqTreeView.
+* @class pqCheckableHeaderView
+* @brief A convenience QHeaderView painted with a QCheckBox.
+*
+* This allows for providing a global checkbox when the model items are
+* user checkable.  The checkbox is painted per section with one of the
+* three states (checked, partially checked, unchecked) depending on
+* the check state of individual items. Currently used in pqTreeView.
 */
 class PQWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
 {
@@ -64,9 +56,10 @@ class PQWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
 
 public:
   /**
-  * \brief
-  *   Constructs the pqCheckableHeaderView class.
-  * \param parent The parent object
+  * Constructs the pqCheckableHeaderView class.
+  *
+  * @param[in] orientation Orientation for the header.
+  * @param[in] parent The parent object
   */
   pqCheckableHeaderView(Qt::Orientation orientation, QWidget* parent = 0);
   virtual ~pqCheckableHeaderView();

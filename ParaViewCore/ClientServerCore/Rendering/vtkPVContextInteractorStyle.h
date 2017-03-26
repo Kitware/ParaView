@@ -13,16 +13,14 @@
 
 =========================================================================*/
 /**
- * @class vtkPVContextInteractorStyle - extends vtkContextInteractorStyle to
- * fire start/end interaction events.
- * @brief
+ * @class vtkPVContextInteractorStyle
+ * @brief extends vtkContextInteractorStyle to fire start/end interaction events.
+ *
  * vtkPVContextInteractorStyle simply extends vtkContextInteractorStyle to fire
  * vtkCommand::StartInteractionEvent and vtkCommand::EndInteractionEvent to mark
  * the beginning and end of the interaction consistent with
  * vtkPVInteractorStyle (used for render views).
- *
  */
-
 #ifndef vtkPVContextInteractorStyle_h
 #define vtkPVContextInteractorStyle_h
 

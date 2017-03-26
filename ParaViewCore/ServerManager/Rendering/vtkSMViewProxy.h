@@ -195,11 +195,12 @@ public:
   //@{
   /**
    * Method used to hide other representations if the view has a
-   * <ShowOneRepresentationAtATime/> hint.
+   * `<ShowOneRepresentationAtATime/>` hint.
    * This only affects other representations that have data inputs, not non-data
    * representations.
-   * Returns true if any representations were hidden by this call, otherwise
-   * returns false.
+   *
+   * @returns true if any representations were hidden by this call, otherwise
+   *         returns false.
    */
   virtual bool HideOtherRepresentationsIfNeeded(vtkSMProxy* repr);
   static bool HideOtherRepresentationsIfNeeded(vtkSMViewProxy* self, vtkSMProxy* repr)

@@ -51,10 +51,12 @@ class PQCOMPONENTS_EXPORT pqPropertyWidgetDecorator : public QObject
 
 public:
   /**
-  * Constructor. \c parent cannot be NULL.
-  * \c xml is the XML element from the <Hints/> section for the proxy/property that
+  * Constructor.
+  *
+  * @param xml The XML element from the `<Hints/>` section for the proxy/property that
   * resulted in the creation of the decorator. Decorators can be provided
   * configuration parameters from the XML.
+  * @param parent Parent widget, cannot be NULL.
   */
   pqPropertyWidgetDecorator(vtkPVXMLElement* xml, pqPropertyWidget* parent);
   virtual ~pqPropertyWidgetDecorator();
