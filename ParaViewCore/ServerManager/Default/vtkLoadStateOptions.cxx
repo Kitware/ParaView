@@ -70,7 +70,7 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
 
   std::vector<std::string> pathComponents;
   SystemTools::SplitPath(SystemTools::GetParentDirectory(filepath), pathComponents);
-  int insertIndex = directoryPathComponents.size();
+  size_t insertIndex = directoryPathComponents.size();
 
   while (pathComponents.size() > 1)
   {
@@ -83,6 +83,7 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
       directoryPathComponents.begin() + insertIndex, pathComponents.back());
     pathComponents.pop_back();
   }
-  vtkErrorMacro("Cannot find " << filepath << " in " << this->DataDirectory.c_str() << ".");
+  vtkErrorMacro("Cannot find " << SystemTools::GetFilenameName(filepath) << " in "
+                               << this->DataDirectory.c_str() << ".");
   return result;
 }

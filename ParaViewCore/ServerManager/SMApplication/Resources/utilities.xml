@@ -4077,10 +4077,6 @@
           <UseDirectoryName />
         </Hints>
       </StringVectorProperty>
-
-      <Hints>
-        <UseDocumentationForLabels />
-      </Hints>
     </LoadStateOptionsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

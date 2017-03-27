@@ -30,6 +30,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtksys/SystemTools.hxx"
+using namespace vtksys;
+
 #include <set>
 #include <sstream>
 
@@ -216,7 +218,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 
     newReaderProxy->LoadXMLState(this->ConvertXML(proxyXML), nullptr);
     std::string newProxyName = std::to_string(idIter->first);
-    this->vtkSMProxy::AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
+    this->AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
 
     for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
     {
@@ -235,8 +237,8 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
       property->SetHints(this->ConvertXML(hints));
 
       pugi::xml_node propertyXML = pIter->second.XMLElement;
-      std::string exposedName = vtksys::SystemTools::GetFilenameName(
-        propertyXML.child("Element").attribute("value").value());
+      std::string exposedName =
+        SystemTools::GetFilenameName(propertyXML.child("Element").attribute("value").value());
 
       if (this->SequenceParser->ParseFileSequence(exposedName.c_str()))
       {
@@ -289,8 +291,8 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::vector<std::string>
       if (!locatedPath.empty())
       {
         *fIter = locatedPath;
-        if (vtksys::SystemTools::GetParentDirectory(locatedPath) ==
-          vtksys::SystemTools::GetParentDirectory(lastLocatedPath))
+        if (SystemTools::GetParentDirectory(locatedPath) ==
+          SystemTools::GetParentDirectory(lastLocatedPath))
         {
           numOfPathMatches++;
         }
@@ -308,10 +310,10 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(std::vector<std::string>
     else
     {
       std::vector<std::string> directoryPathComponents;
-      vtksys::SystemTools::SplitPath(
-        vtksys::SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
-      directoryPathComponents.push_back(vtksys::SystemTools::GetFilenameName(*fIter));
-      *fIter = vtksys::SystemTools::JoinPath(directoryPathComponents);
+      SystemTools::SplitPath(
+        SystemTools::GetParentDirectory(lastLocatedPath), directoryPathComponents);
+      directoryPathComponents.push_back(SystemTools::GetFilenameName(*fIter));
+      *fIter = SystemTools::JoinPath(directoryPathComponents);
     }
   }
   return true;
@@ -322,15 +324,15 @@ bool vtkSMLoadStateOptionsProxy::Load()
 {
   SM_SCOPED_TRACE(LoadState).arg("filename", this->StateFileName).arg("options", this);
 
-  int dataFileOptions = vtkSMPropertyHelper(this, "LoadStateDataFileOptions").GetAsInt();
-  switch (dataFileOptions)
+  this->SetDataFileOptions(vtkSMPropertyHelper(this, "LoadStateDataFileOptions").GetAsInt());
+  switch (this->DataFileOptions)
   {
-    case 0:
+    case USE_FILES_FROM_STATE:
     {
       // Nothing to do
       break;
     }
-    case 1:
+    case USE_DATA_DIRECTORY:
     {
       for (auto idIter = this->Internals->PropertiesMap.begin();
            idIter != this->Internals->PropertiesMap.end(); idIter++)
@@ -345,17 +347,13 @@ bool vtkSMLoadStateOptionsProxy::Load()
             {
               info.Modified = true;
             }
-            else
-            {
-              return false;
-            }
           }
         }
       }
 
       break;
     }
-    case 2:
+    case CHOOSE_FILES_EXPLICITLY:
     {
       for (auto idIter = this->Internals->PropertiesMap.begin();
            idIter != this->Internals->PropertiesMap.end(); idIter++)
@@ -375,12 +373,11 @@ bool vtkSMLoadStateOptionsProxy::Load()
           {
             // Assume the filename will be unchanged so just add the new path the file
             std::vector<std::string> newPathCompenents;
-            vtksys::SystemTools::SplitPath(
-              vtksys::SystemTools::GetFilenamePath(propertyValue), newPathCompenents);
+            SystemTools::SplitPath(SystemTools::GetFilenamePath(propertyValue), newPathCompenents);
             for (auto fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); fIter++)
             {
-              newPathCompenents.push_back(vtksys::SystemTools::GetFilenameName(*fIter));
-              *fIter = vtksys::SystemTools::JoinPath(newPathCompenents);
+              newPathCompenents.push_back(SystemTools::GetFilenameName(*fIter));
+              *fIter = SystemTools::JoinPath(newPathCompenents);
               newPathCompenents.pop_back();
             }
             info.Modified = true;
@@ -426,7 +423,7 @@ bool vtkSMLoadStateOptionsProxy::Load()
     // Get sequence basename if needed
     if (propertiesModified)
     {
-      std::string filename = vtksys::SystemTools::GetFilenameName(primaryFilename);
+      std::string filename = SystemTools::GetFilenameName(primaryFilename);
       if (this->SequenceParser->ParseFileSequence(filename.c_str()))
       {
         filename = this->SequenceParser->GetSequenceName();

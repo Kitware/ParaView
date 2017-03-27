@@ -59,6 +59,15 @@ public:
    */
   virtual bool Load();
 
+  enum
+  {
+    USE_FILES_FROM_STATE = 0,
+    USE_DATA_DIRECTORY = 1,
+    CHOOSE_FILES_EXPLICITLY = 2
+  };
+
+  vtkSetClampMacro(DataFileOptions, int, USE_FILES_FROM_STATE, CHOOSE_FILES_EXPLICITLY);
+
 protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy();
@@ -78,6 +87,11 @@ protected:
 
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
+
+  /**
+   * The three options for how to specify the data file locations.
+   */
+  int DataFileOptions;
 
   /**
    * When the number of parent directories for a file series reaches this number assume it will
