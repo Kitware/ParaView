@@ -143,14 +143,14 @@ of input ports is defined in the XML plugin file with the *input_ports* attribut
 The different input ports are then defined with InputProperty having each a
 different *port_index*:
 
-   <SourceProxy name="Name" class="vtkPythonProgrammableFilter" label="label" input_ports="2">
-      <InputProperty name="Source" command="SetInputConnection" port_index="0">
-        [...]
-      </InputProperty>
-      <InputProperty name="Target" command="SetInputConnection" port_index="1">
-        [...]
-      </InputProperty>
-   </SourceProxy>
+    <SourceProxy name="Name" class="vtkPythonProgrammableFilter" label="label" input_ports="2">
+       <InputProperty name="Source" command="SetInputConnection" port_index="0">
+         [...]
+       </InputProperty>
+       <InputProperty name="Target" command="SetInputConnection" port_index="1">
+         [...]
+       </InputProperty>
+    </SourceProxy>
 
 Changes in 5.1
 --------------

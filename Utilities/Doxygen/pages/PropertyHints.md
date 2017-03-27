@@ -143,8 +143,8 @@ described in [ProxyHints](@ref ProxyHints). Multiple `FileChooser` hints may be
 specified to show multiple extensions with different description texts.
 
 By default, the file chooser widget will accept only existing files.
-It is possible to add <UseDirectoryName/> in the <Hints> section to accept only directories,
-or <AcceptAnyFile/> to accept any filename to export data.
+It is possible to add `<UseDirectoryName/>` in the `<Hints>` section to accept only directories,
+or `<AcceptAnyFile/>` to accept any filename to export data.
 
     <StringVectorProperty animateable="0"
                           command="SetQFileName"
@@ -193,4 +193,4 @@ user can still manually select these values to be loaded.
         <Hints>
           <OmitFromLoadAllVariables />
         </Hints>
-      </StringVectorProperty>
+    </StringVectorProperty>

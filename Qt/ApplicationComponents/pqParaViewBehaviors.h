@@ -43,8 +43,13 @@ class QMainWindow;
 * Behaviors are classes that manage certain behaviors in the application.
 * Developers should simply instantiate behaviors if the expect that
 * behavior in their client.
-*
+*/
+
+/**
+* @class pqParaViewBehaviors
+* @brief creates all standard ParaView behaviours
 * @ingroup Behaviors
+*
 * pqParaViewBehaviors creates all the behaviors used by ParaView. If your
 * client is merely a branded version of ParaView, then you may want to simply
 * use this behavior. You can also enable/disable behaviors created by

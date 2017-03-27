@@ -137,6 +137,7 @@ possible values are:
 2. *short_help*: to use vtkSMDocumentation::GetShortHelp(), and
 3. *long_help*: to use vtkSMDocumentation::GetLongHelp().
 
+
     <SourceProxy ...>
       <Documentation>
         Some text that will be shown in the label.
@@ -146,7 +147,6 @@ possible values are:
         <ShowProxyDocumentationInPanel type="description"/>
       </Hints>
     </SourceProxy>
-
 
 ReloadFiles
 -----------
