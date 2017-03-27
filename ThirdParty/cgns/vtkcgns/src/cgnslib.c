@@ -48,6 +48,7 @@ freely, subject to the following restrictions:
 # define UNLINK unlink
 #endif
 
+#include "cgnsconfig.h"
 #include "cgnslib.h"
 #include "cgns_header.h"
 #include "cgns_io.h"
