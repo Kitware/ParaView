@@ -242,24 +242,33 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   int wmp = size.width() - PQ_SWATCH_PAD, hmp = size.height() - PQ_SWATCH_PAD;
 
   // I. Determine the maximum number of rows and columns of swatches
+  // Maximum if we constrain height:
   int Nvmax = hmp / (PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD);
+  // Maximum if we don't constrain height:
+  int NvUnconstrained = static_cast<int>(ceil(sqrt(numSwatches)));
 
   // II. Determine the actual number of rows and columns
   int N = numSwatches, Nh = N, Nv = 1;
-  while ((wmp / Nh < PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD) ||
-    ((hmp * Nh * 10) / (Nv * wmp) > 15 &&
-           Nv < Nvmax)) // aspect ratio < 2/3 (integer math) and we have headroom.
+  while (((wmp / Nh < PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD) ||
+           // aspect ratio < 2/3 (integer math) and we have headroom.
+           ((hmp * Nh * 10) / (Nv * wmp) > 15 && Nv < Nvmax)) &&
+    Nv < NvUnconstrained)
   {
     ++Nv;
-    // Now determine best value for Nh in [Nh/2,Nh-1]
+    // Now determine the value for Nh that makes the swatch
+    // aspect ratio as near to square as possible:
     double bestQ = vtkMath::Inf();
     int best = -1;
-    double ar = Nv * wmp / static_cast<double>(hmp * Nh);
-    double q = (ar >= 1.0) ? ar : 1. / ar;
-    if (q < bestQ)
+    int searchNh;
+    for (searchNh = Nh; searchNh * Nv >= N; --searchNh)
     {
-      bestQ = q;
-      best = Nh - 1;
+      double ar = Nv * wmp / static_cast<double>(hmp * searchNh);
+      double q = (ar >= 1.0) ? ar : 1. / ar;
+      if (q < bestQ)
+      {
+        bestQ = q;
+        best = searchNh;
+      }
     }
     Nh = best;
   }
@@ -267,6 +276,10 @@ QPixmap pqPresetToPixmap::renderIndexedColorTransferFunction(
   // III. Determine swatch size and number of swatches that can actually be displayed
   int ws = wmp / Nh - PQ_SWATCH_PAD;
   int hs = hmp / Nv - PQ_SWATCH_PAD;
+  if (ws < 0)
+    ws = PQ_MIN_SWATCH_DIM;
+  if (hs < 0)
+    hs = PQ_MIN_SWATCH_DIM;
   int Nd =
     Nh * Nv; // This may be more or less than N, but no more than this many swatches will be drawn.
   int ss = ws < hs ? ws : hs; // Force aspect ratio to 1 and then update Nh, Nv, Nd
