@@ -15,8 +15,8 @@ pre-commit       crlf=input
 *.cxx            our-c-style
 *.hxx            our-c-style
 *.txx            our-c-style
-*.glsl           our-c-style
 *.mm             our-c-style
+*.glsl           whitespace=tab-in-indent,-blank-at-eol
 *.txt            whitespace=tab-in-indent,-blank-at-eol
 *.cmake          whitespace=tab-in-indent,-blank-at-eol
 
