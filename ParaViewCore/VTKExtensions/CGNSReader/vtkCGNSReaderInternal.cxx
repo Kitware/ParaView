@@ -315,40 +315,40 @@ int GetVTKElemType(
 //                                  16,17,18,19,20,21,22,23,24,25,26};
 
 // CGNS --> VTK ordering of Elements
-static const int NODE_ToVTK[1] = { 0 };
-
-static const int BAR_2_ToVTK[2] = { 0, 1 };
-
-static const int BAR_3_ToVTK[3] = { 0, 1, 2 };
-
-static const int BAR_4_ToVTK[4] = { 0, 1, 2, 3 };
-
-static const int TRI_3_ToVTK[3] = { 0, 1, 2 };
-
-static const int TRI_6_ToVTK[6] = { 0, 1, 2, 3, 4, 5 };
-
-static const int QUAD_4_ToVTK[4] = { 0, 1, 2, 3 };
-
-static const int QUAD_8_ToVTK[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-
-static const int QUAD_9_ToVTK[9] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-
-static const int TETRA_4_ToVTK[4] = { 0, 1, 2, 3 };
-
-static const int TETRA_10_ToVTK[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-
-static const int PYRA_5_ToVTK[5] = { 0, 1, 2, 3, 4 };
-
-static const int PYRA_14_ToVTK[14] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-
-static const int PENTA_6_ToVTK[6] = { 0, 1, 2, 3, 4, 5 };
+// static const int NODE_ToVTK[1] = { 0 };
+//
+// static const int BAR_2_ToVTK[2] = { 0, 1 };
+//
+// static const int BAR_3_ToVTK[3] = { 0, 1, 2 };
+//
+// static const int BAR_4_ToVTK[4] = { 0, 1, 2, 3 };
+//
+// static const int TRI_3_ToVTK[3] = { 0, 1, 2 };
+//
+// static const int TRI_6_ToVTK[6] = { 0, 1, 2, 3, 4, 5 };
+//
+// static const int QUAD_4_ToVTK[4] = { 0, 1, 2, 3 };
+//
+// static const int QUAD_8_ToVTK[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+//
+// static const int QUAD_9_ToVTK[9] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+//
+// static const int TETRA_4_ToVTK[4] = { 0, 1, 2, 3 };
+//
+// static const int TETRA_10_ToVTK[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//
+// static const int PYRA_5_ToVTK[5] = { 0, 1, 2, 3, 4 };
+//
+// static const int PYRA_14_ToVTK[14] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+//
+// static const int PENTA_6_ToVTK[6] = { 0, 1, 2, 3, 4, 5 };
 
 static const int PENTA_15_ToVTK[15] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 9, 10, 11 };
 
 static const int PENTA_18_ToVTK[18] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 9, 10, 11, 15, 16,
   17 };
 
-static const int HEXA_8_ToVTK[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+// static const int HEXA_8_ToVTK[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
 static const int HEXA_20_ToVTK[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 12, 13,
   14, 15 };
@@ -853,7 +853,7 @@ static void BroadcastSelection(
       CGNSRead::BroadcastString(controller, key, rank);
       selection[key] = false;
       controller->Broadcast(&tmp, 1, 0);
-      selection[key] = (bool)tmp;
+      selection[key] = (tmp != 0);
     }
   }
 }

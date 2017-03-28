@@ -1168,7 +1168,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   //---------------------------------------------------------------------
   // Read the number of sections, for the zone.
   int nsections = 0;
-  nsections = elemIdList.size();
+  nsections = static_cast<int>(elemIdList.size());
 
   std::vector<SectionInformation> sectionInfoList(nsections);
 
@@ -1741,7 +1741,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     mzone->SetBlock(0, ugrid);
     ugrid->Delete();
     vtkMultiBlockDataSet* mpatch = vtkMultiBlockDataSet::New();
-    mpatch->SetNumberOfBlocks(bndSec.size());
+    mpatch->SetNumberOfBlocks(static_cast<unsigned int>(bndSec.size()));
 
     int bndNum = 0;
     for (std::vector<int>::iterator iter = bndSec.begin(); iter != bndSec.end(); ++iter)
@@ -2128,7 +2128,7 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
   nSelectedBases = this->BaseSelection->GetNumberOfArraysEnabled();
   rootNode->SetNumberOfBlocks(nSelectedBases);
   blockIndex = 0;
-  for (int numBase = 0; numBase < baseIds.size(); numBase++)
+  for (int numBase = 0; numBase < static_cast<int>(baseIds.size()); numBase++)
   {
     int cellDim = 0;
     int physicalDim = 0;
@@ -2367,7 +2367,7 @@ errorData:
 }
 
 //------------------------------------------------------------------------------
-int vtkCGNSReader::RequestInformation(vtkInformation* request,
+int vtkCGNSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
 
