@@ -349,7 +349,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     else
     {
       double range[2];
-      info->GetComponentRange(component, range);
+      info->GetComponentFiniteRange(component, range);
       if (range[1] >= range[0])
       {
         // the range must be large enough, compared to values order of magnitude
