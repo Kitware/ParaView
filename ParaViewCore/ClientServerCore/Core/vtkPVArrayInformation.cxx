@@ -114,7 +114,7 @@ void vtkPVArrayInformation::Initialize()
     delete[] this->FiniteRanges;
     this->FiniteRanges = NULL;
   }
-    
+
   this->IsPartial = 0;
 
   if (this->InformationKeys)
@@ -392,7 +392,6 @@ void vtkPVArrayInformation::GetComponentFiniteRange(int comp, double* range)
   range[0] = ptr[0];
   range[1] = ptr[1];
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::GetDataTypeRange(double range[2])
@@ -812,7 +811,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
   {
     num++;
   }
-  
+
   // Is Partial
   if (!css->GetArgument(0, 4, &this->IsPartial))
   {
@@ -829,7 +828,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
       return;
     }
   }
-    
+
   // Range of each component.
   for (int i = 0; i < num; ++i)
   {

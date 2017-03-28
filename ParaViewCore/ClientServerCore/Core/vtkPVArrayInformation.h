@@ -100,7 +100,7 @@ public:
   double* GetComponentRange(int component);
   void GetComponentRange(int comp, double* range);
   //@}
-    
+
   //@{
   /**
    * There is a range for each component.
