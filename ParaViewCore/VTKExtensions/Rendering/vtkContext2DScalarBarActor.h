@@ -49,7 +49,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkContext2DScalarBarActor : public vtk
 {
 public:
   vtkTypeMacro(vtkContext2DScalarBarActor, vtkScalarBarActor);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkContext2DScalarBarActor* New();
 
   // Description:
@@ -61,12 +61,12 @@ public:
 
   // Description:
   // Set/Get the title text property.
-  virtual void SetTitleTextProperty(vtkTextProperty* p);
+  virtual void SetTitleTextProperty(vtkTextProperty* p) VTK_OVERRIDE;
   vtkGetObjectMacro(TitleTextProperty, vtkTextProperty);
 
   // Description:
   // Set/Get the labels text property.
-  virtual void SetLabelTextProperty(vtkTextProperty* p);
+  virtual void SetLabelTextProperty(vtkTextProperty* p) VTK_OVERRIDE;
   vtkGetObjectMacro(LabelTextProperty, vtkTextProperty);
 
   // Description:
@@ -100,11 +100,11 @@ public:
   // is vertical. Precede is the opposite.
   vtkSetClampMacro(TextPosition, int, PrecedeScalarBar, SucceedScalarBar);
   vtkGetMacro(TextPosition, int);
-  virtual void SetTextPositionToPrecedeScalarBar()
+  virtual void SetTextPositionToPrecedeScalarBar() VTK_OVERRIDE
   {
     this->SetTextPosition(vtkContext2DScalarBarActor::PrecedeScalarBar);
   }
-  virtual void SetTextPositionToSucceedScalarBar()
+  virtual void SetTextPositionToSucceedScalarBar() VTK_OVERRIDE
   {
     this->SetTextPosition(vtkContext2DScalarBarActor::SucceedScalarBar);
   }
@@ -184,17 +184,17 @@ public:
 
   // Description:
   // We only render in the overlay for the context scene.
-  virtual int RenderOverlay(vtkViewport* viewport);
+  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
 
   // Description:
   // Draw the scalar bar and annotation text to the screen.
-  int RenderOpaqueGeometry(vtkViewport* viewport);
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
 
   // Description:
   // Release any graphics resources that are being consumed by this actor.
   // The parameter window could be used to determine which graphic
   // resources to release.
-  virtual void ReleaseGraphicsResources(vtkWindow* window);
+  virtual void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE;
 
   // Description:
   // Responsible for actually drawing the scalar bar.
