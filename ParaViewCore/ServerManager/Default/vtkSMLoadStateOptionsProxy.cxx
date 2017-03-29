@@ -364,6 +364,29 @@ bool vtkSMLoadStateOptionsProxy::Load()
           std::string propertyValue =
             vtkSMPropertyHelper(subProxy, pIter->first.c_str()).GetAsString();
           vtkInternals::PropertyInfo& info = pIter->second;
+
+          // First check if environment variable shows up in user specified path
+          if (propertyValue.compare(0, 1, "$") == 0)
+          {
+            std::vector<std::string> pathComponents;
+            SystemTools::SplitPath(propertyValue, pathComponents);
+            std::string variablePath;
+            if (SystemTools::GetEnv(pathComponents[1].erase(0, 1), variablePath))
+            {
+              pathComponents.erase(pathComponents.begin(), pathComponents.begin() + 2);
+              std::vector<std::string> variablePathComponents;
+              SystemTools::SplitPath(variablePath, variablePathComponents);
+              pathComponents.insert(pathComponents.begin(), variablePathComponents.begin(),
+                variablePathComponents.end());
+              propertyValue = SystemTools::JoinPath(pathComponents);
+            }
+            else
+            {
+              vtkWarningMacro("Environment variable " << pathComponents[1] << " is not set.");
+              continue;
+            }
+          }
+
           if (info.FilePaths.size() == 1)
           {
             info.FilePaths[0] = propertyValue;
