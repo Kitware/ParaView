@@ -22,12 +22,13 @@
  * statement of authorship are reproduced on all copies.
  */
 
-// .NAME vtkPVScalarBarRepresentation - represent scalar bar for vtkScalarBarWidget
-//
-// .SECTION Description
-//
-// Subclass of vtkScalarBarRepresentation that provides convenience functions
-// for placing the scalar bar widget in the scene.
+/**
+ * @class   vtkPVScalarBarRepresentation
+ * @brief   Represent scalar bar for vtkScalarBarWidget.
+ *
+ * Subclass of vtkScalarBarRepresentation that provides convenience functions
+ * for placing the scalar bar widget in the scene.
+ */
 
 #ifndef vtkPVScalarBarRepresentation_h
 #define vtkPVScalarBarRepresentation_h
@@ -55,22 +56,26 @@ public:
     UpperCenter
   };
 
-  // Description:
-  // Set the scalar bar position, by enumeration (
-  // AnyLocation = 0,
-  // LowerLeftCorner,
-  // LowerRightCorner,
-  // LowerCenter,
-  // UpperLeftCorner,
-  // UpperRightCorner,
-  // UpperCenter)
-  // related to the render window
+  //@{
+  /**
+   * Set the scalar bar position, by enumeration (
+   * AnyLocation = 0,
+   * LowerLeftCorner,
+   * LowerRightCorner,
+   * LowerCenter,
+   * UpperLeftCorner,
+   * UpperRightCorner,
+   * UpperCenter)
+   * related to the render window.
+   */
   vtkSetMacro(WindowLocation, int);
   vtkGetMacro(WindowLocation, int);
+  //@}
 
-  // Description:
-  // Override to obtain viewport size and potentially adjust placement
-  // of the representation.
+  /**
+   * Override to obtain viewport size and potentially adjust placement
+   * of the representation.
+   */
   virtual int RenderOverlay(vtkViewport*) VTK_OVERRIDE;
 
 protected:
