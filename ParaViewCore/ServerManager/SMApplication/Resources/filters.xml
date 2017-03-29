@@ -193,6 +193,39 @@
       </DoubleVectorProperty>
       <!-- End ExtractSelectionRange -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPassThrough"
+                 name="PipelineConnection"
+                 label="Pipeline Connection">
+      <Documentation>
+        This proxy provides UI for selecting an existing pipeline connection.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_widget="input_selector"
+                     null_on_empty="1"
+                     panel_visibility="always">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetAllowNullInput"
+                         name="AllowNullInput"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Allow the filter to execute successful, producing an empty polydata,
+          when the input is not specified.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End PipelineConnection -->
+    </SourceProxy>
     <!-- End of internal_filters -->
   </ProxyGroup>
   <ProxyGroup name="filters">

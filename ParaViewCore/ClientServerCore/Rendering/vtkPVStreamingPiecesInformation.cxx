@@ -23,7 +23,8 @@
 #include <set>
 #include <vector>
 
-class vtkPVStreamingPiecesInformation::vtkInternals : public std::set<unsigned int>
+class vtkPVStreamingPiecesInformation::vtkInternals
+  : public std::set<std::pair<unsigned int, unsigned int> >
 {
 };
 
@@ -56,7 +57,11 @@ void vtkPVStreamingPiecesInformation::CopyFromObject(vtkObject* object)
   vtkPVDataDeliveryManager* mgr = view->GetDeliveryManager();
   std::vector<unsigned int> keys;
   mgr->GetRepresentationsReadyToStreamPieces(keys);
-  this->Internals->insert(keys.begin(), keys.end());
+
+  for (size_t cc = 0, max = keys.size(); (cc + 1) < max; cc += 2)
+  {
+    this->Internals->insert(std::pair<unsigned int, unsigned int>(keys[cc], keys[cc + 1]));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -79,7 +84,8 @@ void vtkPVStreamingPiecesInformation::CopyToStream(vtkClientServerStream* css)
   for (vtkInternals::iterator iter = this->Internals->begin(); iter != this->Internals->end();
        ++iter)
   {
-    *css << (*iter);
+    *css << (iter->first);
+    *css << (iter->second);
   }
   *css << vtkClientServerStream::End;
 }
@@ -93,16 +99,21 @@ void vtkPVStreamingPiecesInformation::CopyFromStream(const vtkClientServerStream
   css->GetArgument(0, 0, &num_items);
   for (int cc = 0; cc < num_items; cc++)
   {
-    unsigned int value;
-    css->GetArgument(0, 1 + cc, &value);
-    this->Internals->insert(value);
+    unsigned int first, second;
+    css->GetArgument(0, 1 + 2 * cc, &first);
+    css->GetArgument(0, 1 + 2 * cc + 1, &second);
+    this->Internals->insert(std::pair<unsigned int, unsigned int>(first, second));
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVStreamingPiecesInformation::GetKeys(std::vector<unsigned int>& keys) const
 {
-  keys.insert(keys.end(), this->Internals->begin(), this->Internals->end());
+  for (auto iter = this->Internals->begin(); iter != this->Internals->end(); ++iter)
+  {
+    keys.push_back(iter->first);
+    keys.push_back(iter->second);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +124,6 @@ void vtkPVStreamingPiecesInformation::PrintSelf(ostream& os, vtkIndent indent)
   for (vtkInternals::iterator iter = this->Internals->begin(); iter != this->Internals->end();
        ++iter)
   {
-    os << indent.GetNextIndent() << (*iter) << endl;
+    os << indent.GetNextIndent() << (iter->first) << ", " << (iter->second) << endl;
   }
 }

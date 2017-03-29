@@ -1631,7 +1631,7 @@ int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr,
-  vtkDataObject* data, unsigned long trueSize /*=0*/)
+  vtkDataObject* data, unsigned long trueSize /*=0*/, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1640,12 +1640,12 @@ void vtkPVRenderView::SetPiece(vtkInformation* info, vtkPVDataRepresentation* re
     return;
   }
 
-  view->GetDeliveryManager()->SetPiece(repr, data, false, trueSize);
+  view->GetDeliveryManager()->SetPiece(repr, data, false, trueSize, port);
 }
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(
-  vtkInformation* info, vtkPVDataRepresentation* repr)
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1654,12 +1654,12 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(
     return NULL;
   }
 
-  return view->GetDeliveryManager()->GetProducer(repr, false);
+  return view->GetDeliveryManager()->GetProducer(repr, false, port);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPieceLOD(
-  vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data)
+  vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1668,12 +1668,12 @@ void vtkPVRenderView::SetPieceLOD(
     return;
   }
 
-  view->GetDeliveryManager()->SetPiece(repr, data, true);
+  view->GetDeliveryManager()->SetPiece(repr, data, true, port);
 }
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(
-  vtkInformation* info, vtkPVDataRepresentation* repr)
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1682,12 +1682,12 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(
     return NULL;
   }
 
-  return view->GetDeliveryManager()->GetProducer(repr, true);
+  return view->GetDeliveryManager()->GetProducer(repr, true, port);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::MarkAsRedistributable(
-  vtkInformation* info, vtkPVDataRepresentation* repr, bool value /*=true*/)
+  vtkInformation* info, vtkPVDataRepresentation* repr, bool value /*=true*/, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1696,7 +1696,7 @@ void vtkPVRenderView::MarkAsRedistributable(
     return;
   }
 
-  view->GetDeliveryManager()->MarkAsRedistributable(repr, value);
+  view->GetDeliveryManager()->MarkAsRedistributable(repr, value, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1763,7 +1763,7 @@ void vtkPVRenderView::SetDeliverToAllProcesses(
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(vtkInformation* info,
-  vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery)
+  vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery, int port)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1773,7 +1773,7 @@ void vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(vtkInformation* in
   }
 
   view->GetDeliveryManager()->SetDeliverToClientAndRenderingProcesses(
-    repr, deliver_to_client, gather_before_delivery, false);
+    repr, deliver_to_client, gather_before_delivery, false, port);
 }
 
 //----------------------------------------------------------------------------

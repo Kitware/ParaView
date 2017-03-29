@@ -4,6 +4,7 @@ paraview_test_load_data_dirs(""
   "Iron Xdmf"
   amr
   ANALYZE
+  CompositeGlyphTree
   dualSphereAnimation
   ensemble-wavelet
   EnSight
@@ -33,6 +34,8 @@ paraview_test_load_data(""
   can.ex2
   comb.q
   combxyz.bin
+  CompositeGlyphInput.vtp
+  CompositeGlyphTree.vtm
   CubeStringArray.vtk
   cylinder_run1.e
   cylinder_run2.e
@@ -409,6 +412,9 @@ if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
 
     # PlotMatrixView is bugging in OpenGL1
     ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
+
+    # Composite Glyph Trees are only implemented in OpenGL2
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompositeGlyphTree.xml
     )
 endif()
 

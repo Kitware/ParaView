@@ -194,6 +194,11 @@ int vtkPointGaussianRepresentation::RequestData(
     this->ProcessedData = unstructuredToPolyData->GetOutput();
   }
 
+  if (this->ProcessedData == NULL)
+  {
+    this->ProcessedData = vtkSmartPointer<vtkPolyData>::New();
+  }
+
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -219,12 +224,7 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
       vtkPVRenderView::SetPiece(inInfo, this, this->ProcessedData);
       this->ProcessedData->GetBounds(bounds);
     }
-    else
-    {
-      // the mapper doesn't handle NULL input data, so don't pass NULL
-      vtkNew<vtkPolyData> tmpData;
-      vtkPVRenderView::SetPiece(inInfo, this, tmpData.GetPointer());
-    }
+
     // 2. Provide the bounds.
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());

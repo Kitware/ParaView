@@ -124,6 +124,8 @@ set (Module_SRCS
   pqImageTip.h
   pqIndexSelectionWidget.cxx
   pqIndexSelectionWidget.h
+  pqInputSelectorWidget.cxx
+  pqInputSelectorWidget.h
   pqIntMaskPropertyWidget.cxx
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.cxx
@@ -166,6 +168,8 @@ set (Module_SRCS
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.cxx
   pqPipelineBrowserWidget.h
+  pqPipelineInputComboBox.cxx
+  pqPipelineInputComboBox.h
   pqPipelineModel.cxx
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx
@@ -342,6 +346,7 @@ set (Module_MOC_HDRS
   pqHighlightItemDelegate.h
   pqImageTip.h
   pqIndexSelectionWidget.h
+  pqInputSelectorWidget.h
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
@@ -363,6 +368,7 @@ set (Module_MOC_HDRS
   pqOutputPortComboBox.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
+  pqPipelineInputComboBox.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
