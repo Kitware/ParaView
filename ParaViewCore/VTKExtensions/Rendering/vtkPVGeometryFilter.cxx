@@ -220,18 +220,11 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::SetTriangulate(int val)
 {
-#ifndef VTKGL2
   if (this->Triangulate != val)
   {
     this->Triangulate = val;
     this->Modified();
   }
-#else
-  // OpenGL2 doesn't need to triangulate in the geometry filter. The mapper does
-  // it.
-  (void)val;
-  this->Triangulate = 0;
-#endif
 }
 
 //----------------------------------------------------------------------------
