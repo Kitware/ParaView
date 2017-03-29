@@ -67,7 +67,7 @@ struct LayoutStruct
 void vtkGeomCalc(
   std::vector<LayoutStruct>& chain, int start, int count, int pos, int space, int spacing)
 {
-  assert(start == 0 && count > 1 && pos >= 0 && space >= 0 && space >= 0);
+  assert(start == 0 && count >= 1 && pos >= 0 && space >= 0 && spacing >= 0);
   // amount of space left after borders are added between views.
   int space_left = space - (count > 1 ? count - 1 : 0) * spacing;
 
