@@ -31,7 +31,7 @@ vtkSmartPointer<vtkFloatArray> GetPolyData()
   return array;
 }
 
-int TestPVArrayInformation(int, char*[])
+int TestPVArrayInformation(int, char* [])
 {
 
   vtkSmartPointer<vtkFloatArray> array = GetPolyData();
@@ -39,8 +39,8 @@ int TestPVArrayInformation(int, char*[])
   vtkNew<vtkPVArrayInformation> info;
   info->CopyFromObject(array.Get());
 
-  //Verify minimum and maximum
-  double *range = info->GetComponentRange(0);
+  // Verify minimum and maximum
+  double* range = info->GetComponentRange(0);
   if (!vtkMathUtilities::FuzzyCompare(range[0], 0.0))
   {
     cerr << "ERROR: failed to find range minimum: " << range[0] << " " << 0.0 << endl;
@@ -64,7 +64,7 @@ int TestPVArrayInformation(int, char*[])
   }
 
   double rangeArray[2];
-  info->GetComponentRange(0,rangeArray);
+  info->GetComponentRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
     cerr << "ERROR: failed to find range minimum: " << rangeArray[0] << " " << 0.0 << endl;
@@ -73,9 +73,9 @@ int TestPVArrayInformation(int, char*[])
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[1], 100.0))
   {
     cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << 100.0 << endl;
-   return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
-  info->GetComponentFiniteRange(0,rangeArray);
+  info->GetComponentFiniteRange(0, rangeArray);
   if (!vtkMathUtilities::FuzzyCompare(rangeArray[0], 0.0))
   {
     cerr << "ERROR: failed to find finite range minimum: " << rangeArray[0] << " " << 0.0 << endl;
@@ -122,7 +122,8 @@ int TestPVArrayInformation(int, char*[])
   }
   if (rangeArray[1] != vtkMath::Inf())
   {
-    cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << vtkMath::Inf() << endl;
+    cerr << "ERROR: failed to find range maximum: " << rangeArray[1] << " " << vtkMath::Inf()
+         << endl;
     return EXIT_FAILURE;
   }
   info->GetComponentFiniteRange(0, rangeArray);

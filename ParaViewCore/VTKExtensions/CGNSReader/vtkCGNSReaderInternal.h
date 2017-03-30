@@ -275,16 +275,6 @@ private:
 };
 
 //------------------------------------------------------------------------------
-// sort variables by name helper function
-static int sortVariablesByName(const void* vOne, const void* vTwo)
-{
-  Variable* varOne = (Variable*)vOne;
-  Variable* varTwo = (Variable*)vTwo;
-
-  return (strcmp(varOne->name, varTwo->name));
-}
-
-//------------------------------------------------------------------------------
 // compare name return true if name1 == name2
 inline bool compareName(const char_33 nameOne, const char_33 nameTwo)
 {

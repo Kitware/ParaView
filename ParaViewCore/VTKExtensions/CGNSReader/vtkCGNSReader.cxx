@@ -135,6 +135,9 @@ public:
 
     const double* lbptr = std::lower_bound(timesteps, timesteps + num_timesteps, time);
     int index = static_cast<int>(lbptr - timesteps);
+
+    // clamp to last timestep if beyond the range.
+    index = (index >= num_timesteps) ? (num_timesteps - 1) : index;
     assert(index >= 0 && index < num_timesteps);
     return index;
   }
@@ -152,6 +155,7 @@ vtkCGNSReader::vtkCGNSReader()
   this->DoublePrecisionMesh = 1;
   this->CreateEachSolutionAsBlock = 0;
   this->IgnoreFlowSolutionPointers = false;
+  this->DistributeBlocks = true;
 
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -1168,7 +1172,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   //---------------------------------------------------------------------
   // Read the number of sections, for the zone.
   int nsections = 0;
-  nsections = elemIdList.size();
+  nsections = static_cast<int>(elemIdList.size());
 
   std::vector<SectionInformation> sectionInfoList(nsections);
 
@@ -1741,7 +1745,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     mzone->SetBlock(0, ugrid);
     ugrid->Delete();
     vtkMultiBlockDataSet* mpatch = vtkMultiBlockDataSet::New();
-    mpatch->SetNumberOfBlocks(bndSec.size());
+    mpatch->SetNumberOfBlocks(static_cast<unsigned int>(bndSec.size()));
 
     int bndNum = 0;
     for (std::vector<int>::iterator iter = bndSec.begin(); iter != bndSec.end(); ++iter)
@@ -2002,6 +2006,11 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
   // just a division of zones between processors
   processNumber = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   numProcessors = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+  if (!this->DistributeBlocks)
+  {
+    processNumber = 0;
+    numProcessors = 1;
+  }
 
   int numBases = this->Internal->GetNumberOfBaseNodes();
   int numZones = 0;
@@ -2128,7 +2137,7 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
   nSelectedBases = this->BaseSelection->GetNumberOfArraysEnabled();
   rootNode->SetNumberOfBlocks(nSelectedBases);
   blockIndex = 0;
-  for (int numBase = 0; numBase < baseIds.size(); numBase++)
+  for (int numBase = 0; numBase < static_cast<int>(baseIds.size()); numBase++)
   {
     int cellDim = 0;
     int physicalDim = 0;
@@ -2367,7 +2376,7 @@ errorData:
 }
 
 //------------------------------------------------------------------------------
-int vtkCGNSReader::RequestInformation(vtkInformation* request,
+int vtkCGNSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
 
@@ -2472,6 +2481,7 @@ void vtkCGNSReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LoadBndPatch: " << this->LoadBndPatch << endl;
   os << indent << "CreateEachSolutionAsBlock: " << this->CreateEachSolutionAsBlock << endl;
   os << indent << "IgnoreFlowSolutionPointers: " << this->IgnoreFlowSolutionPointers << endl;
+  os << indent << "DistributeBlocks: " << this->DistributeBlocks << endl;
   os << indent << "Controller: " << this->Controller << endl;
 }
 

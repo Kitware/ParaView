@@ -5718,7 +5718,7 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+        <ReaderFactory extensions="g e ex2 ex2v2 exo gen exoII exii"
                        file_description="ExodusII"
                        filename_patterns="*e-s*" />
       </Hints>

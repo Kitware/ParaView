@@ -170,10 +170,8 @@
   <ProxyGroup name="sources">
     <!-- Begin CGNSSeriesReader -->
     <SourceProxy name="CGNSSeriesReader"
-                 class="vtkFileSeriesReader"
-                 label="CGNS Series Reader"
-                 si_class="vtkSIMetaReaderProxy"
-                 file_name_method="SetFileName">
+                 class="vtkCGNSFileSeriesReader"
+                 label="CGNS Series Reader">
       <Documentation
          short_help="Read a dataset in CGNS format."
          long_help="Read binary files stored in CGNS format.">
@@ -182,21 +180,16 @@
         a multi-block dataset.
         This reader also supports file series.
       </Documentation>
-      <Hints>
-        <ReaderFactory extensions="cgns"
-           file_description="CGNS Files" />
-      </Hints>
 
       <StringVectorProperty name="FileNameInfo"
                             command="GetCurrentFileName"
                             information_only="1" >
       <SimpleStringInformationHelper />
-      </StringVectorProperty>
+    </StringVectorProperty>
 
       <StringVectorProperty name="FileNames"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
-                            animateable="0"
                             number_of_elements="0"
                             repeat_command="1"
                             information_property="FileNameInfo">
@@ -208,7 +201,7 @@
         </Documentation>
       </StringVectorProperty>
 
-      <SubProxy>
+      <SubProxy command="SetReader">
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="CGNSReader">
@@ -227,8 +220,20 @@
         </ExposedProperties>
       </SubProxy>
 
+      <IntVectorProperty name="IgnoreReaderTime"
+                         command="SetIgnoreReaderTime"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <Documentation>
+          When reading a file-series, if each file in the series does not provide correct time
+          information, the reader will not be able to animate through the file series correctly.
+          Check this to ignore the time information provided by each file.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
 
-     <DoubleVectorProperty name="TimestepValues"
+      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
                            information_only="1">
         <TimeStepsInformationHelper/>
@@ -236,6 +241,11 @@
           Available time step values.
         </Documentation>
       </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="cgns"
+           file_description="CGNS Files" />
+      </Hints>
 
       <!-- End of CGNSSeriesReader -->
     </SourceProxy>
