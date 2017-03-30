@@ -442,7 +442,7 @@ namespace
 {
 void readVisibilityMap(vtkSMIntVectorProperty* ivp, QMap<unsigned int, int>& visibilities)
 {
-  for (int i = 0; i + 1 < ivp->GetNumberOfElements(); i += 2)
+  for (unsigned i = 0; i + 1 < ivp->GetNumberOfElements(); i += 2)
   {
     visibilities[ivp->GetElement(i)] = ivp->GetElement(i + 1);
   }
