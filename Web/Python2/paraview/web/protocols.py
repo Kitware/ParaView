@@ -2280,6 +2280,7 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
             currentPath = normBase
 
         self.directory_proxy.List(currentPath)
+        self.directory_proxy.UpdatePropertyInformation()
 
         # build file/dir lists
         files = []
