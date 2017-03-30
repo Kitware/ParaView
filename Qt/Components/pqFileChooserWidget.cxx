@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 
 // ParaView
+#include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
@@ -171,32 +172,32 @@ void pqFileChooserWidget::chooseFile()
     title = tr("Open File:");
   }
 
-  pqFileDialog* dialog = new pqFileDialog(this->Server, this, title, QString(), filters);
+  pqFileDialog dialog(this->Server, this, title, QString(), filters);
 
   if (this->UseDirectoryMode)
   {
-    dialog->setFileMode(pqFileDialog::Directory);
+    dialog.setFileMode(pqFileDialog::Directory);
   }
   else if (this->AcceptAnyFile)
   {
-    dialog->setFileMode(pqFileDialog::AnyFile);
+    dialog.setFileMode(pqFileDialog::AnyFile);
   }
   else if (this->forceSingleFile())
   {
-    dialog->setFileMode(pqFileDialog::ExistingFile);
+    dialog.setFileMode(pqFileDialog::ExistingFile);
   }
   else
   {
-    dialog->setFileMode(pqFileDialog::ExistingFiles);
+    dialog.setFileMode(pqFileDialog::ExistingFiles);
   }
 
-  if (QDialog::Accepted == dialog->exec())
+  if (QDialog::Accepted == dialog.exec())
   {
     QStringList files;
     // The file browser has a list of selected files, each of which could
     // be a group of files.  Condense them all into a single list.
     QStringList selectedFiles;
-    foreach (selectedFiles, dialog->getAllSelectedFiles())
+    foreach (selectedFiles, dialog.getAllSelectedFiles())
     {
       files << selectedFiles;
     }
