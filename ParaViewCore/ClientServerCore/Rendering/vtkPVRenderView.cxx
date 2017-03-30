@@ -3051,7 +3051,6 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
     this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
   }
   this->Modified();
-  this->Render(false, false);
 #else
   if (v)
   {
