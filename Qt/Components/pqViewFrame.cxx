@@ -120,6 +120,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   this->ContextMenu->addAction(this->StandardToolButtons[Close]->defaultAction());
 
   this->setBorderColor(QColor("blue"));
+  this->Internals->Ui.TitleLabel->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
