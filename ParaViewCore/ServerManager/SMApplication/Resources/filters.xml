@@ -11902,6 +11902,60 @@ source.</Documentation>
         180-&gt;0 degrees. Otherwise, the s-coordinate ranges from 0-&gt;1
         between 0-&gt;360 degrees.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateCylinderAutomatically"
+        command="SetAutomaticCylinderGeneration"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the filter will try to determine the size and orientation of the cylinder
+          used for texture mapping using data bounds.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Point1"
+        command="SetPoint1"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,min">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the first point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Point2"
+        command="SetPoint2"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,max">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the second point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <!-- End TextureMapToCylinder -->
     </SourceProxy>
     <!-- ==================================================================== -->
