@@ -47,7 +47,7 @@ void vtkRulerLineForInput::PrintSelf(ostream& os, vtkIndent indent)
 
 int vtkRulerLineForInput::FillInputPortInformation(int, vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
   return 1;
 }
@@ -78,7 +78,7 @@ int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
     assert(multiBlock);
     vtkSmartPointer<vtkCompositeDataIterator> itr =
       vtkSmartPointer<vtkCompositeDataIterator>::Take(multiBlock->NewIterator());
-    for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToFirstItem())
+    for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
     {
       vtkDataObject* block = itr->GetCurrentDataObject();
       vtkDataSet* blockAsDataset = vtkDataSet::SafeDownCast(block);
