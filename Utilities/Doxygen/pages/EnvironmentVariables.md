@@ -19,4 +19,5 @@ PV_ALLOW_BATCH_INTERACTION | Allow interactions in batch mode.
 PV_PLUGIN_CONFIG_FILE | XML Plugin Configuration Files to specify which plugin to load on startup.
 PV_PLUGIN_DEBUG | Prints debugging information when loading plugins into ParaView.
 PV_PLUGIN_PATH | Directories containing plugins to be loaded on startup.
+PV_SETTINGS_DEBUG | When set, debugging text will be printed out to assist developers debug settings.
 QT_MAC_NO_NATIVE_MENUBAR | Qt flag to force the Qt menu bar rather than the native mac menu bar.
