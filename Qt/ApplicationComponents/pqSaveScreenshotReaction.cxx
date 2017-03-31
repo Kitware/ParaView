@@ -39,12 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqView.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
@@ -110,7 +112,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
   {
-    qDebug() << "Cannnot save image. No active view.";
+    qDebug() << "Cannot save image. No active view.";
     return;
   }
 
@@ -154,7 +156,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
     QString filename = pqSaveScreenshotReaction::promptFileName();
     if (!filename.isEmpty())
     {
-      shProxy->WriteImage(filename.toLatin1().data());
+      shProxy->WriteImage(filename.toLocal8Bit().data());
     }
   }
 
@@ -168,4 +170,36 @@ void pqSaveScreenshotReaction::saveScreenshot()
   // however it is currently needed due to paraview/paraview#17256. Once that's
   // fixed, we should remove this.
   pqApplicationCore::instance()->render();
+}
+
+//-----------------------------------------------------------------------------
+bool pqSaveScreenshotReaction::saveScreenshot(
+  const QString& filename, const QSize& size, int quality, bool all_views)
+{
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (!view)
+  {
+    qDebug() << "Cannot save image. No active view.";
+    return false;
+  }
+
+  vtkSMViewProxy* viewProxy = view->getViewProxy();
+
+  vtkSmartPointer<vtkImageData> image;
+  const vtkVector2i isize(size.width(), size.height());
+  if (all_views)
+  {
+    vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
+    image = vtkSMSaveScreenshotProxy::CaptureImage(layout, isize);
+  }
+  else
+  {
+    image = vtkSMSaveScreenshotProxy::CaptureImage(viewProxy, isize);
+  }
+
+  if (image)
+  {
+    return vtkSMUtilities::SaveImage(image, filename.toLocal8Bit().data(), quality) != 0;
+  }
+  return false;
 }
