@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
+#include "pqLoadDataReaction.h"
 #include "pqOptions.h"
 #include "pqPropertiesPanel.h"
 #include "pqQuickLaunchDialog.h"
@@ -59,7 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QShortcut>
 
-#include "pqLoadDataReaction.h"
+#if !defined(VTK_LEGACY_REMOVE)
+#include "pqSaveAnimationReaction.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
@@ -83,6 +86,9 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* opti
 
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
     this->AnimationManager, SLOT(onActiveServerChanged(pqServer*)));
+
+  this->connect(this->AnimationManager, SIGNAL(deprecatedSaveAnimationCalled()),
+    SLOT(deprecatedSaveAnimationCalled()));
 }
 
 //-----------------------------------------------------------------------------
@@ -240,5 +246,13 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   (void)filename;
   (void)server;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::deprecatedSaveAnimationCalled()
+{
+#if !defined(VTK_LEGACY_REMOVE)
+  pqSaveAnimationReaction::saveAnimation();
 #endif
 }

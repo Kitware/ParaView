@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPVApplicationCore_h
 #define pqPVApplicationCore_h
 
-#include "pqApplicationComponentsModule.h"
 #include "pqApplicationCore.h"
 
+#include "pqApplicationComponentsModule.h" // for exports
 #include <QList>
 #include <QPointer>
 
@@ -132,6 +132,9 @@ protected:
 
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget> > QuickLaunchMenus;
+
+private slots:
+  void deprecatedSaveAnimationCalled();
 
 private:
   Q_DISABLE_COPY(pqPVApplicationCore)
