@@ -56,7 +56,7 @@ public:
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
   */
-  void saveAnimation();
+  static void saveAnimation();
 
 public slots:
   /**
