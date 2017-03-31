@@ -34,6 +34,9 @@ void init@BARE_TARGET@Python()
 extern "C" void VTK_WRAP_CS_EXPORT @CS_TARGET@_Initialize(
   vtkClientServerInterpreter *csi)
 {
+  // silence unreferenced var warning.
+  (void) csi;
+
 #ifdef PARAVIEW_USE_UNIFIED_BINDINGS
   if (!vtkPythonInterpreter::IsInitialized())
     {
