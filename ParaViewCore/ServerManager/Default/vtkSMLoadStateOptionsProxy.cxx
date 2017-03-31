@@ -16,7 +16,6 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkFileSequenceParser.h"
-#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"

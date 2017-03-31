@@ -25,12 +25,11 @@
 #ifndef vtkSMLoadStateOptionsProxy_h
 #define vtkSMLoadStateOptionsProxy_h
 
-#include "vtkNew.h"
+#include "vtkNew.h"                          // for vtkNew
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
-#include <vector>
-#include <vtk_pugixml.h>
+#include <vector>        // needed for std::vector
+#include <vtk_pugixml.h> // for pugi::xml_node
 
 class vtkFileSequenceParser;
 class vtkPVXMLParser;

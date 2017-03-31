@@ -25,7 +25,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
-#include <string>
+#include <string>                            // needed for std::string
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkLoadStateOptions : public vtkObject
 {
