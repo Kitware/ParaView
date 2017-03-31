@@ -66,7 +66,6 @@ vtkPEnSightReader::vtkPEnSightReader()
   this->MeasuredFileName = NULL;
   this->MatchFileName = NULL;
 
-  this->ParticleCoordinatesByIndex = 0;
   this->IS = NULL;
 
   this->VariableMode = -1;
@@ -2572,7 +2571,6 @@ void vtkPEnSightReader::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "MatchFileName: " << (this->MatchFileName ? this->MatchFileName : "(none)")
      << endl;
-  os << indent << "ParticleCoordinatesByIndex: " << this->ParticleCoordinatesByIndex << endl;
   os << indent << "UseTimeSets: " << this->UseTimeSets << endl;
   os << indent << "UseFileSets: " << this->UseFileSets << endl;
 }
