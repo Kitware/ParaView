@@ -33,7 +33,7 @@ class ParsePyDocOutput:
                 continue
             break
         if not func:
-            raise Exception, 'Proxy not found: %s %s' % (function, modul)
+            raise Exception('Proxy not found: %s %s' % (function, modul))
         doc_to_parse = pydoc.render_doc(func)
         doc_to_parse = re.sub(r'\x08.', '', doc_to_parse)
         # Append a block completion line at the very end for easier regex matches
