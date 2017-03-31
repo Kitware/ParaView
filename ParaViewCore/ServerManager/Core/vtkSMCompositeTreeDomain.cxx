@@ -14,8 +14,10 @@
 =========================================================================*/
 #include "vtkSMCompositeTreeDomain.h"
 
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
@@ -178,16 +180,22 @@ int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property, bool use
   {
     if (this->Mode == LEAVES || this->DefaultMode == NONEMPTY_LEAF)
     {
-      // change the property default to be the first non-empty leaf.
-      vtkPVDataInformation* info = this->Information;
-      int index = 0;
-      while (info && info->GetCompositeDataClassName() &&
-        !info->GetCompositeDataInformation()->GetDataIsMultiPiece())
+      vtkNew<vtkPVCompositeDataInformationIterator> iter;
+      iter->SetDataInformation(this->Information);
+      int index = -1;
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
         index++;
-        info = this->Information->GetDataInformationForCompositeIndex(index);
+        if (vtkPVDataInformation* info = iter->GetCurrentDataInformation())
+        {
+          vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
+          if (!cinfo->GetDataIsComposite() || cinfo->GetDataIsMultiPiece())
+          {
+            break;
+          }
+        }
       }
-      if (info)
+      if (index != -1)
       {
         const bool repeatable = (ivp->GetRepeatCommand() == 1);
         const int num_elements_per_command = ivp->GetNumberOfElementsPerCommand();
