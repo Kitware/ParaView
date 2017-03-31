@@ -82,7 +82,7 @@ int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
     {
       vtkDataObject* block = itr->GetCurrentDataObject();
       vtkDataSet* blockAsDataset = vtkDataSet::SafeDownCast(block);
-      if (dataset)
+      if (blockAsDataset)
       {
         double tmpBounds[6];
         blockAsDataset->GetBounds(tmpBounds);
