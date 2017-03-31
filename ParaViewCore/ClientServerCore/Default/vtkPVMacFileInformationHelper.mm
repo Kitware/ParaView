@@ -49,12 +49,31 @@ vtkPVMacFileInformationHelper::GetMountedVolumes()
   NSArray* urls = [[NSFileManager defaultManager]
     mountedVolumeURLsIncludingResourceValuesForKeys:@[ NSURLVolumeNameKey ]
                                             options:0];
+
+  if (!urls)
+  {
+    return volumes;
+  }
+
   for (NSURL* url in urls)
   {
+    if (!url)
+    {
+      continue;
+    }
+
     NSString* path = [url path];
+    if (!path || ![path UTF8String])
+    {
+      continue;
+    }
     std::string pathStr([path UTF8String]);
     NSString* name = nil;
     [url getResourceValue:&name forKey:NSURLLocalizedNameKey error:NULL];
+    if (![name UTF8String])
+    {
+      continue;
+    }
     std::string nameStr([name UTF8String]);
     volumes.push_back(std::make_pair(nameStr, pathStr));
   }
