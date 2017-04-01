@@ -7,7 +7,7 @@ set(PVW_DEPENDS
 )
 
 if(VTK_PYTHON_VERSION VERSION_LESS 3)
-    list(APPEND PVW_DEPENDS vtkWebPython2 vtkParaViewWebPython2)
+    list(APPEND PVW_DEPENDS vtkParaViewWebPython2)
 endif()
 
 vtk_module(vtkParaViewWeb

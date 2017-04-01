@@ -19,6 +19,10 @@ from vtk.vtkPVServerManagerCore import *
 #    vtkSMPVRepresentationProxy
 from vtk.vtkPVServerManagerRendering import *
 
+import six
+if six.PY3:
+    xrange = range
+
 # =============================================================================
 # Pipeline management
 # =============================================================================
@@ -56,7 +60,7 @@ class Pipeline:
         nid = str(node_id)
 
         # Add child
-        if self.children_ids.has_key(pid):
+        if pid in self.children_ids:
             self.children_ids[pid].append(nid)
         else:
             self.children_ids[pid] = [nid]
@@ -98,12 +102,12 @@ class Pipeline:
             node = getProxyAsPipelineNode(id, view)
             nid = str(node['proxy_id'])
 
-            if nodeToFill.has_key('children'):
+            if 'children' in nodeToFill:
                 nodeToFill['children'].append(node)
             else:
                 nodeToFill['children'] = [ node ]
 
-            if self.children_ids.has_key(nid):
+            if nid in self.children_ids:
                 self.__fill_children(node, self.children_ids[nid]);
 
 # =============================================================================
@@ -312,6 +316,8 @@ def updateProxyProperties(proxy, properties):
 # --------------------------------------------------------------------------
 
 def removeUnicode(value):
+    # python 3 is using str everywhere already.
+    if six.PY3: return value
     if type(value) == unicode:
         return str(value)
     if type(value) == list:

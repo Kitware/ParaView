@@ -19,7 +19,8 @@ from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
-from decorators import *
+from vtk.web import iteritems
+from paraview.web.decorators import *
 
 from vtk.vtkWebCore import vtkWebInteractionEvent
 
@@ -41,6 +42,9 @@ from vtk.vtkPVServerManagerCore import *
 #    vtkDataObject
 from vtk.vtkCommonDataModel import *
 
+import six
+if six.PY3:
+    xrange = range
 # =============================================================================
 # Helper methods
 # =============================================================================
@@ -130,7 +134,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
                     self.baseDirectoryMap[basePair[0]] = basePair[1]
 
             # Check if we ended up with just a single directory
-            bdKeys = self.baseDirectoryMap.keys()
+            bdKeys = list(self.baseDirectoryMap)
             if len(bdKeys) == 1:
                 self.baseDirectory = self.baseDirectoryMap[bdKeys[0]]
                 self.overrideDataDirKey = bdKeys[0]
@@ -152,7 +156,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
         # Make sure the cleanedPath is part of the allowed ones
         if self.multiRoot:
-            for key, value in self.baseDirectoryMap.iteritems():
+            for key, value in iteritems(self.baseDirectoryMap):
                 if cleanedPath.startswith(value):
                     return cleanedPath
         elif cleanedPath.startswith(self.baseDirectory):
@@ -352,13 +356,13 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
             size = options["size"]
             view.ViewSize = size
         t = 0
-        if options and options.has_key("mtime"):
+        if options and "mtime" in options:
             t = options["mtime"]
         quality = 100
-        if options and options.has_key("quality"):
+        if options and "quality" in options:
             quality = options["quality"]
         localTime = 0
-        if options and options.has_key("localTime"):
+        if options and "localTime" in options:
             localTime = options["localTime"]
         reply = {}
         app = self.getApplication()
@@ -373,7 +377,7 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
             reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
             tries -= 1
 
-        if not resize and options and options.has_key("clearCache") and options["clearCache"]:
+        if not resize and options and ("clearCache" in options) and options["clearCache"]:
             app.InvalidateCache(view.SMProxy)
             reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
 
@@ -1571,7 +1575,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             arrayData.append(data)
 
         # Time data
-        timeKeeper = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+        timeKeeper = next(iter(servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()))
         tsVals = timeKeeper.TimestepValues
         if tsVals:
             if isinstance(tsVals, float):
@@ -2141,13 +2145,13 @@ class ParaViewWebRemoteConnection(ParaViewWebProtocol):
 
 
         if options:
-            if options.has_key("host"):
+            if "host" in options:
                 ds_host = options["host"]
-            if options.has_key("port"):
+            if "port" in options:
                 ds_port = options["port"]
-            if options.has_key("rs_host"):
+            if "rs_host" in options:
                 rs_host = options["rs_host"]
-            if options.has_key("rs_port"):
+            if "rs_port" in options:
                 rs_host = options["rs_port"]
 
         simple.Connect(ds_host, ds_port, rs_host, rs_port)
@@ -2313,7 +2317,7 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
             if len(fileSplit) == 2:
                 filesToRemove.append(file)
                 gName = '*.'.join(fileSplit)
-                if groupIdx.has_key(gName):
+                if gName in groupIdx:
                     groupIdx[gName]['files'].append(file['label'])
                 else:
                     groupIdx[gName] = { 'files' : [file['label']], 'label': gName }
@@ -2329,7 +2333,7 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 
     def handleMultiRoot(self, relativeDir):
         if relativeDir == '.':
-            return { 'label': self.rootName, 'files': [], 'dirs': self.baseDirectoryMap.keys(), 'groups': [], 'path': [ self.rootName ] }
+            return { 'label': self.rootName, 'files': [], 'dirs': list(self.baseDirectoryMap), 'groups': [], 'path': [ self.rootName ] }
 
         pathList = relativeDir.replace('\\', '/').split('/')
         currentBaseDir = self.baseDirectoryMap[pathList[1]]

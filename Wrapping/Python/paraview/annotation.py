@@ -25,6 +25,9 @@ except ImportError:
 from paraview import calculator
 from vtk import vtkDataObject
 from vtk.numpy_interface import dataset_adapter as dsa
+import sys
+if sys.version_info >= (3,):
+    xrange = range
 
 def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
@@ -90,7 +93,7 @@ def execute(self):
             "The following exception stack should provide additional "\
             "developer specific information. This typically implies a malformed "\
             "expression. Verify that the expression is valid.\n\n" \
-            "Variables in current scope are %s \n" % (expression, ns.keys()), file=sys.stderr)
+            "Variables in current scope are %s \n" % (expression, list(ns)), file=sys.stderr)
         raise
     self.SetComputedAnnotationValue("%s" % result)
     return True
