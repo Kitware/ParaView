@@ -17,15 +17,10 @@
  * @brief   helper class to write animation
  * images/movies.
  *
- * vtkSMAnimationSceneImageWriter is a concrete implementation of
- * vtkSMAnimationSceneWriter that can write movies or images. The generated
- * output's size and alignment is exactly as specified on the GUISize,
- * WindowPosition properties of the view modules. One can optionally specify
- * Magnification to scale the output.
- * @attention
- * This class does not support changing the dimensions of the view, one has to
- * do that before calling Save(). It only provides Magnification which can scale
- * the size using integral scale factor.
+ * vtkSMAnimationSceneImageWriter is a subclass of
+ * vtkSMAnimationSceneWriter that can write movies or images. This is not
+ * intended to be used directly.
+ * @sa vtkSMSaveAnimationProxy.
 */
 
 #ifndef vtkSMAnimationSceneImageWriter_h
