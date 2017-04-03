@@ -6,7 +6,7 @@ set(PVW_DEPENDS
     vtkParaViewWebPython
 )
 
-if(VTK_PYTHON_VERSION EQUAL 2)
+if(VTK_PYTHON_VERSION VERSION_LESS 3)
     list(APPEND PVW_DEPENDS vtkWebPython2 vtkParaViewWebPython2)
 endif()
 
