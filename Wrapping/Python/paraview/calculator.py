@@ -129,5 +129,11 @@ def execute(self, expression):
                        "t_index": inputs[0].t_index })
     retVal = compute(inputs, expression, ns=variables)
     if retVal is not None:
-        output.GetAttributes(self.GetArrayAssociation()).append(\
-            retVal, self.GetArrayName())
+        if hasattr(retVal, "Association"):
+            output.GetAttributes(retVal.Association).append(\
+              retVal, self.GetArrayName())
+        else:
+            # if somehow the association was removed we
+            # fall back to the input array association
+            output.GetAttributes(self.GetArrayAssociation()).append(\
+              retVal, self.GetArrayName())
