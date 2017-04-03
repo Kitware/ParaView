@@ -46,15 +46,15 @@ def get_arrays(attribs, controller=None):
 
         # reduce the array names across processes to ensure arrays missing on
         # certain ranks are handled correctly.
-        arraynames = arrays.keys()
+        arraynames = list(arrays)  # get keys from the arrays as a list.
         # gather to root and then broadcast
         # I couldn't get Allgather/Allreduce to work properly with strings.
         gathered_names = comm.gather(arraynames, root=0)
           # gathered_names is a list of lists.
         if rank == 0:
             result = set()
-            for list in gathered_names:
-                for val in list: result.add(val)
+            for alist in gathered_names:
+                for val in alist: result.add(val)
             gathered_names = [x for x in result]
         arraynames = comm.bcast(gathered_names, root=0)
         for name in arraynames:
@@ -84,7 +84,7 @@ def get_data_time(self, do, ininfo):
     key = vtk.vtkStreamingDemandDrivenPipeline.TIME_STEPS()
     t_index = None
     if ininfo.Has(key):
-        tsteps = [ininfo.Get(key, x) for x in xrange(ininfo.Length(key))]
+        tsteps = [ininfo.Get(key, x) for x in range(ininfo.Length(key))]
         try:
             t_index = tsteps.index(t)
         except ValueError:
