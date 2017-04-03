@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkIntArray.h"
 #include "vtkNew.h"
 #include "vtkPVRenderView.h"
@@ -263,6 +264,21 @@ void pqRenderViewSelectionReaction::beginSelection()
       vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
       break;
 
+    case SELECT_SURFACE_CELLS_TOOLTIP:
+      pqCoreUtilities::promptUser("pqTooltipSelection", QMessageBox::Information,
+        "Tooltip Selection Information",
+        "You are entering tooltip selection mode to display cell information. "
+        "Simply move the mouse point over the dataset to interactively highlight "
+        "points and display a tooltip with cell information.\n\n"
+        "Use the 'Esc' key or the same toolbar button to exit this mode.",
+        QMessageBox::Ok | QMessageBox::Save);
+      // switch the interaction mode to selection mode even though we're no making
+      // selections. This ensures that the render view realizes it's being used
+      // for selection and will not release cached selection render buffers as the
+      // selection interaction progresses (BUG #0015882).
+      vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_SELECTION);
+      break;
+
     case ZOOM_TO_BOX:
       this->View->setCursor(this->ZoomCursor);
       vtkSMPropertyHelper(rmp, "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_ZOOM);
@@ -316,6 +332,7 @@ void pqRenderViewSelectionReaction::beginSelection()
       break;
 
     case SELECT_SURFACE_POINTS_TOOLTIP:
+    case SELECT_SURFACE_CELLS_TOOLTIP:
       this->ObservedObject = rmp->GetInteractor();
       this->ObserverIds[0] = this->ObservedObject->AddObserver(
         vtkCommand::MouseMoveEvent, this, &pqRenderViewSelectionReaction::onMouseMove);
@@ -436,6 +453,7 @@ void pqRenderViewSelectionReaction::onMouseMove()
   switch (this->Mode)
   {
     case SELECT_SURFACE_POINTS_TOOLTIP:
+    case SELECT_SURFACE_CELLS_TOOLTIP:
       this->MouseMovingTimer.start(TOOLTIP_WAITING_TIME);
       this->MouseMoving = true;
 
@@ -475,6 +493,7 @@ void pqRenderViewSelectionReaction::preSelection()
       break;
 
     case SELECT_SURFACE_POINTS_TOOLTIP:
+    case SELECT_SURFACE_CELLS_TOOLTIP:
       pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
       break;
 
@@ -514,6 +533,11 @@ void pqRenderViewSelectionReaction::preSelection()
         region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
       break;
 
+    case SELECT_SURFACE_CELLS_TOOLTIP:
+      status = rmp->SelectSurfaceCells(
+        region, selectedRepresentations.GetPointer(), selectionSources.GetPointer());
+      break;
+
     default:
       qCritical("Invalid call to pqRenderViewSelectionReaction::preSelection");
       return;
@@ -543,19 +567,25 @@ void pqRenderViewSelectionReaction::onMouseStop()
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::UpdateTooltip()
 {
-  if (this->Mode != SELECT_SURFACE_POINTS_TOOLTIP)
+  if (this->Mode != SELECT_SURFACE_POINTS_TOOLTIP && this->Mode != SELECT_SURFACE_CELLS_TOOLTIP)
   {
     return;
   }
 
   vtkSMTooltipSelectionPipeline* pipeline = vtkSMTooltipSelectionPipeline::GetInstance();
 
+  int association = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+  if (this->Mode == SELECT_SURFACE_CELLS_TOOLTIP)
+  {
+    association = vtkDataObject::FIELD_ASSOCIATION_CELLS;
+  }
   bool showTooltip;
   if (pipeline->CanDisplayTooltip(showTooltip))
   {
     double tooltipPos[2];
     std::string tooltipText;
-    if (showTooltip && !this->MouseMoving && pipeline->GetTooltipInfo(tooltipPos, tooltipText))
+    if (showTooltip && !this->MouseMoving &&
+      pipeline->GetTooltipInfo(association, tooltipPos, tooltipText))
     {
       QWidget* widget = this->View->widget();
       // Convert renderer based position to a global position

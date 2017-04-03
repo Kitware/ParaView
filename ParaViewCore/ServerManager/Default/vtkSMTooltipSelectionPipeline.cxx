@@ -15,6 +15,7 @@
 
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCoordinate.h"
@@ -201,7 +202,8 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::string& tooltipText)
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
+  int association, double tooltipPos[2], std::string& tooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
   unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
@@ -211,7 +213,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::st
   bool compositeFound;
   std::string compositeName;
   vtkDataSet* ds = this->FindDataSet(dataObject, compositeFound, compositeName);
-  if (!ds || ds->GetNumberOfPoints() != 1)
+  if (!ds)
   {
     return false;
   }
@@ -233,26 +235,49 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::st
     tooltipTextStream << std::endl << "Block: " << compositeName;
   }
 
-  // point index
-  vtkPointData* pointData = ds->GetPointData();
-  vtkDataArray* originalPointIds = pointData->GetArray("vtkOriginalPointIds");
-  if (originalPointIds)
+  vtkFieldData* fieldData = nullptr;
+  vtkDataArray* originalIds = nullptr;
+  double point[3];
+  if (association == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
-    tooltipTextStream << std::endl << "Id: " << originalPointIds->GetTuple1(0);
+    // point index
+    vtkPointData* pointData = ds->GetPointData();
+    fieldData = pointData;
+    originalIds = pointData->GetArray("vtkOriginalPointIds");
+    if (originalIds)
+    {
+      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+    }
+
+    // point coords
+    ds->GetPoint(0, point);
+    tooltipTextStream << std::endl
+                      << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
+  }
+  else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  {
+    // cell index
+    vtkCellData* cellData = ds->GetCellData();
+    fieldData = cellData;
+    originalIds = cellData->GetArray("vtkOriginalCellIds");
+    if (originalIds)
+    {
+      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+    }
+    // cell type? cell points?
   }
 
-  // point coords
-  double point[3];
-  ds->GetPoint(0, point);
-  tooltipTextStream << std::endl
-                    << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
+  if (!fieldData)
+  {
+    return false;
+  }
 
   // point attributes
-  vtkIdType nbArrays = pointData->GetNumberOfArrays();
+  vtkIdType nbArrays = fieldData->GetNumberOfArrays();
   for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
   {
-    vtkDataArray* array = pointData->GetArray(i_arr);
-    if (!array || originalPointIds == array)
+    vtkDataArray* array = fieldData->GetArray(i_arr);
+    if (!array || originalIds == array)
     {
       continue;
     }
