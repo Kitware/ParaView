@@ -12,10 +12,10 @@ def setup_data(view):
 
 def render(view, width, height):
   cb = numpy.zeros((height, width, 3), dtype=numpy.uint8)
-  for i in xrange(width):
+  for i in range(width):
     cb[:,i,0] = i%255
 
-  for i in xrange(height):
+  for i in range(height):
     cb[i,:,1] = i%255
 
   from paraview.python_view import numpy_to_image

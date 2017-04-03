@@ -25,7 +25,7 @@ def render(view,width,height):
   ax.hold = True
   numObjects = view.GetNumberOfVisibleDataObjects()
   print ("num visible objects: ", numObjects)
-  for i, color in zip(xrange(0,numObjects), getNextColor()):
+  for i, color in zip(range(0,numObjects), getNextColor()):
     dataObject = view.GetVisibleDataObjectForRendering(i)
     if dataObject:
       vtk_points = dataObject.GetPoints()

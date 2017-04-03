@@ -55,7 +55,7 @@ def _get_ns(self, do, association):
         ns["t_value"] = ns["time_value"]
 
     if self.GetNumberOfTimeSteps() > 0:
-        ns["time_steps"] = [self.GetTimeStep(x) for x in xrange(self.GetNumberOfTimeSteps())]
+        ns["time_steps"] = [self.GetTimeStep(x) for x in range(self.GetNumberOfTimeSteps())]
         ns["t_steps"] = ns["time_steps"]
 
     if self.GetTimeRangeValid():
