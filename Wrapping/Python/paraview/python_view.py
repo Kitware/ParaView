@@ -17,25 +17,7 @@ convenience classes in Python.
 #
 #==============================================================================
 import paraview
-import vtk
-
-from vtk.vtkPVServerImplementationCore import *
-from vtk.vtkPVClientServerCoreCore import *
-from vtk.vtkPVServerManagerCore import *
-
-try:
-  from vtk.vtkPVServerManagerDefault import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerDefault")
-try:
-  from vtk.vtkPVServerManagerRendering import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerRendering")
-try:
-  from vtk.vtkPVServerManagerApplication import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
-from vtk.vtkPVCommon import *
+from paraview import vtk
 
 
 def numpy_to_image(numpy_array):
@@ -63,7 +45,7 @@ def numpy_to_image(numpy_array):
   linear_array = numpy.reshape(numpy_array, (w*h, c))
 
   try:
-    from vtk.util import numpy_support
+    from paraview.vtk.util import numpy_support
   except:
     paraview.print_error("Error: Cannot import vtk.util.numpy_support")
 
