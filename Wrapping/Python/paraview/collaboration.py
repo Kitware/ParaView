@@ -23,13 +23,7 @@ A simple example:
 #==============================================================================
 
 import paraview, re, types, sys, vtk
-import simple
 from paraview import servermanager
-
-from paraview.vtk import vtkPVClientServerCoreCore
-from paraview.vtk import vtkPVServerManagerCore
-from paraview.vtk import vtkPVServerImplementationCore
-from paraview.vtk import vtkCommonCore
 
 def processServerEvents():
   """Update the local state based on the notifications received from the server
