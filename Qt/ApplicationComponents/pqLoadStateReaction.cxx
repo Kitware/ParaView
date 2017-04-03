@@ -71,7 +71,7 @@ void pqLoadStateReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
+void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked, pqServer* server)
 {
   if (server == NULL)
   {
@@ -97,7 +97,7 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
       vtkNew<vtkSMParaViewPipelineController> controller;
       controller->InitializeProxy(proxy);
 
-      if (proxy->HasDataFiles())
+      if (proxy->HasDataFiles() && !dialogBlocked)
       {
         pqProxyWidgetDialog dialog(proxy);
         dialog.setWindowTitle("Load State Options");

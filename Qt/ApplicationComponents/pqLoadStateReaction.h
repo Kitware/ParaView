@@ -58,7 +58,8 @@ public:
   * having to create a reaction instance.
   * If no server is specified, active server is used.
   */
-  static void loadState(const QString& filename, pqServer* server = NULL);
+  static void loadState(
+    const QString& filename, bool dialogBlocked = false, pqServer* server = NULL);
   static void loadState();
 
 public slots:

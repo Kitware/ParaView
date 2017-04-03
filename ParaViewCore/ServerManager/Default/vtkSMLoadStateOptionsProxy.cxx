@@ -205,8 +205,9 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
        idIter != this->Internals->PropertiesMap.end(); idIter++)
   {
     pugi::xml_node proxyXML = idIter->second.begin()->second.XMLElement.parent();
-    vtkSmartPointer<vtkSMProxy> newReaderProxy =
-      pxm->NewProxy(proxyXML.attribute("group").value(), proxyXML.attribute("type").value());
+    vtkSmartPointer<vtkSMProxy> newReaderProxy;
+    newReaderProxy.TakeReference(
+      pxm->NewProxy(proxyXML.attribute("group").value(), proxyXML.attribute("type").value()));
     newReaderProxy->PrototypeOn();
 
     // Property group to group properties by source
