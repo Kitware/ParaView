@@ -108,11 +108,14 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
           return;
         }
       }
+      pqPVApplicationCore::instance()->clearViewsForLoadingState(server);
+      pqPVApplicationCore::instance()->setLoadingState(true);
       if (proxy->Load())
       {
         pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
           server, filename);
       }
+      pqPVApplicationCore::instance()->setLoadingState(false);
     }
   }
   else

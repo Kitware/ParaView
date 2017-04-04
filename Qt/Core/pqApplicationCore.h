@@ -259,6 +259,8 @@ public:
   void loadStateFromString(
     const char* xmlcontents, pqServer* server, vtkSMStateLoader* loader = NULL);
 
+  void clearViewsForLoadingState(pqServer* server);
+
   /**
   * Same as loadState() except that it doesn't clear the current visualization
   * state.
@@ -269,9 +271,14 @@ public:
     const QString& filename, pqServer* server, vtkSMStateLoader* loader = NULL);
 
   /**
+  * Set the loading state flag
+  */
+  void setLoadingState(bool value) { this->LoadingState = value; };
+
+  /**
   * Check to see if its in the process of loading a state
   * Reliance on this flag is chimerical since we cannot set this ivar when
-  * state file is  being loaded from python shell.
+  * state file is being loaded from python shell.
   */
   bool isLoadingState() { return this->LoadingState; };
 
@@ -371,8 +378,6 @@ protected slots:
   void onStateSaved(vtkPVXMLElement* root);
 
 protected:
-  void clearViewsForLoadingState(pqServer* server);
-
   bool LoadingState;
 
   pqOutputWindow* OutputWindow;
