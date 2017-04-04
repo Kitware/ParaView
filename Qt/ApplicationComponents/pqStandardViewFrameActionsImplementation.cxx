@@ -450,6 +450,20 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
   }
 
+  if (this->isButtonVisible("HoveringSurfaceCells", renderView))
+  {
+    QAction* hoveringSurfaceCellsAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringCell.png"), "Hover Cells On");
+    hoveringSurfaceCellsAction->setObjectName("actionHoveringSurfaceCells");
+    hoveringSurfaceCellsAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(hoveringSurfaceCellsAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_TOOLTIP);
+    this->connect(
+      hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
+    this->connect(
+      hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
+  }
+
   if (this->isButtonVisible("ClearSelection", renderView))
   {
     QStyle* style = qApp->style();
