@@ -42,9 +42,9 @@ from vtk.vtkPVServerManagerCore import *
 #    vtkDataObject
 from vtk.vtkCommonDataModel import *
 
-import six
-if six.PY3:
+if sys.version_info >= (3,):
     xrange = range
+
 # =============================================================================
 # Helper methods
 # =============================================================================

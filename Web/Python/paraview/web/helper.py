@@ -19,9 +19,9 @@ from vtk.vtkPVServerManagerCore import *
 #    vtkSMPVRepresentationProxy
 from vtk.vtkPVServerManagerRendering import *
 
-import six
-if six.PY3:
+if sys.version_info >= (3,):
     xrange = range
+    PY3 = true
 
 # =============================================================================
 # Pipeline management
@@ -317,7 +317,7 @@ def updateProxyProperties(proxy, properties):
 
 def removeUnicode(value):
     # python 3 is using str everywhere already.
-    if six.PY3: return value
+    if PY3: return value
     if type(value) == unicode:
         return str(value)
     if type(value) == list:
