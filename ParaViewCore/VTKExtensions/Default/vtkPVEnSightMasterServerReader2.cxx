@@ -344,17 +344,17 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation* vtkNotUs
     }
   }
 
-  if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->CumulativeTimeSetSizes.at(0),
-        static_cast<int>(this->Internal->TimeSetValues.size()),
-        this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
-  {
-    vtkErrorMacro("Time set values do not match on all nodes.");
-    this->InformationError = 1;
-    return 0;
-  }
-
   if (this->Internal->TimeSetValues.size() >= 1)
   {
+    if (vtkPVEnSightMasterServerReader2SyncValues(&this->Internal->TimeSetValues.at(0),
+          static_cast<int>(this->Internal->TimeSetValues.size()),
+          this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
+    {
+      vtkErrorMacro("Time set values do not match on all nodes.");
+      this->InformationError = 1;
+      return 0;
+    }
+
     int nTimes = static_cast<int>(this->Internal->TimeSetValues.size());
     double timeRange[2];
     double* timeSteps = new double[nTimes];
