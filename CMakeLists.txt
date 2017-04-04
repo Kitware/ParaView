@@ -453,7 +453,7 @@ endif()
 # Setup Qt state. We just do a quick top level check for Qt's exisiting here.
 # We let individual modules find_package(Qt..) as needed.
 if(PARAVIEW_ENABLE_QT_SUPPORT)
-  set(PARAVIEW_QT_VERSION "4" CACHE STRING  "Select Qt verision to use 4 or 5")
+  set(PARAVIEW_QT_VERSION "5" CACHE STRING  "Select Qt verision to use 4 or 5")
   set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS 4 5)
   # Force VTK to use the same Qt version as ParaView.
   set(VTK_QT_VERSION "${PARAVIEW_QT_VERSION}" CACHE INTERNAL "")
