@@ -15,6 +15,7 @@
 
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include "vtkCell.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
@@ -265,6 +266,15 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
       tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
     }
     // cell type? cell points?
+    vtkCell* cell = ds->GetCell(0);
+    tooltipTextStream << std::endl << "Type: " << cell->GetClassName();
+
+    for (vtkIdType i = 0; i < ds->GetNumberOfPoints(); ++i)
+    {
+      tooltipTextStream << std::endl << "Point " << i << ": (";
+      ds->GetPoint(i, point);
+      tooltipTextStream << point[0] << ", " << point[1] << ", " << point[2] << ")";
+    }
   }
 
   if (!fieldData)
