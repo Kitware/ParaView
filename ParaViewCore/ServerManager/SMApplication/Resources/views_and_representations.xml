@@ -3941,8 +3941,7 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
-            <Property name="ScalarOpacityFunction"
-                      panel_visibility="never" />
+            <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
@@ -4009,8 +4008,7 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
-            <Property name="ScalarOpacityFunction"
-                      panel_visibility="never" />
+            <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
@@ -4074,8 +4072,7 @@
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
-            <Property name="ScalarOpacityFunction"
-                      panel_visibility="never" />
+            <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
@@ -4144,8 +4141,7 @@
           <PropertyGroup label="Volume Rendering">
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
-            <Property name="ScalarOpacityFunction"
-                      panel_visibility="never" />
+            <Property name="ScalarOpacityFunction" />
             <Property name="VolumeRenderingMode"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
