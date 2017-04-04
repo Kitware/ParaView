@@ -318,12 +318,14 @@ void pqSelectionInputWidget::copyActiveSelection()
   pqOutputPort* port = selMan->getSelectedPort();
   if (!port)
   {
+    this->setSelection(nullptr);
     return;
   }
 
   vtkSMProxy* activeSelection = port->getSelectionInput();
   if (!activeSelection)
   {
+    this->setSelection(nullptr);
     return;
   }
 
