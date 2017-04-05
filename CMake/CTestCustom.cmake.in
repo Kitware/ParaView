@@ -119,6 +119,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # ignore warnings from cdilib.c
   "CDIReader.cdilib.c"
   "netcdf.h.* warning: shadowed declaration is here"
+
+  # ignore warnings (paraview/paraview#17282)
+  "QtCore.* warning C4127"
+
 )
 
 #------------------------------------------------------------------------------
