@@ -25,7 +25,7 @@ except ImportError:
 from paraview import calculator
 from vtk import vtkDataObject
 from vtk.numpy_interface import dataset_adapter as dsa
-import sys
+import sys # also for sys.stderr
 if sys.version_info >= (3,):
     xrange = range
 
@@ -88,7 +88,6 @@ def execute(self):
     try:
         result = calculator.compute(inputs, expression, ns=ns)
     except:
-        from sys import stderr
         print("Failed to evaluate expression '%s'. "\
             "The following exception stack should provide additional "\
             "developer specific information. This typically implies a malformed "\
