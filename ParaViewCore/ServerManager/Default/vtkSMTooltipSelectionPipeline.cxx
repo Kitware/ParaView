@@ -270,39 +270,40 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
     vtkCell* cell = ds->GetCell(0);
     tooltipTextStream << std::endl
                       << "Type: " << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
+
+    // needed to position the tooltip
+    ds->GetPoint(0, point);
   }
 
-  if (!fieldData)
+  if (fieldData)
   {
-    return false;
-  }
-
-  // point attributes
-  vtkIdType nbArrays = fieldData->GetNumberOfArrays();
-  for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
-  {
-    vtkDataArray* array = fieldData->GetArray(i_arr);
-    if (!array || originalIds == array)
+    // point attributes
+    vtkIdType nbArrays = fieldData->GetNumberOfArrays();
+    for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
     {
-      continue;
-    }
-    tooltipTextStream << std::endl << array->GetName() << ": ";
-    if (array->GetNumberOfComponents() > 1)
-    {
-      tooltipTextStream << "(";
-    }
-    vtkIdType nbComps = array->GetNumberOfComponents();
-    for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
-    {
-      tooltipTextStream << array->GetTuple(0)[i_comp];
-      if (i_comp + 1 < nbComps)
+      vtkDataArray* array = fieldData->GetArray(i_arr);
+      if (!array || originalIds == array)
       {
-        tooltipTextStream << ", ";
+        continue;
       }
-    }
-    if (array->GetNumberOfComponents() > 1)
-    {
-      tooltipTextStream << ")";
+      tooltipTextStream << std::endl << array->GetName() << ": ";
+      if (array->GetNumberOfComponents() > 1)
+      {
+        tooltipTextStream << "(";
+      }
+      vtkIdType nbComps = array->GetNumberOfComponents();
+      for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
+      {
+        tooltipTextStream << array->GetTuple(0)[i_comp];
+        if (i_comp + 1 < nbComps)
+        {
+          tooltipTextStream << ", ";
+        }
+      }
+      if (array->GetNumberOfComponents() > 1)
+      {
+        tooltipTextStream << ")";
+      }
     }
   }
 
