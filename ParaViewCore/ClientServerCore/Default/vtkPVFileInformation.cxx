@@ -31,7 +31,6 @@
 #include <direct.h>         // _getcwd
 #include <shlobj.h>         // SHGetFolderPath
 #include <string.h>         // for strcasecmp
-#include <sys/stat.h>       // stat
 #include <windows.h>        // FindFirstFile, FindNextFile, FindClose, ...
 #define vtkPVServerFileListingGetCWD _getcwd
 #else
@@ -39,8 +38,7 @@
 #include <errno.h>     // errno
 #include <stdlib.h>    // getenv
 #include <string.h>    // strerror
-#include <sys/stat.h>  // stat
-#include <sys/types.h> // DIR, struct dirent, struct stat
+#include <sys/types.h> // DIR, struct dirent
 #include <unistd.h>    // access, getcwd
 #define vtkPVServerFileListingGetCWD getcwd
 #endif
@@ -875,8 +873,8 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->SetHiddenFlag();
 
     // Recover status info
-    struct stat status;
-    int res = stat(info->FullPath, &status);
+    vtksys::SystemTools::Stat_t status;
+    int res = vtksys::SystemTools::Stat(info->FullPath, &status);
     if (res != -1)
     {
       if (!S_ISDIR(status.st_mode))

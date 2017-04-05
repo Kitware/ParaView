@@ -10,6 +10,8 @@ vtk_module(vtkClientServer
   DEPENDS
     vtkCommonCore
     ${_dependencies}
+  PRIVATE_DEPENDS
+    vtksys
   TEST_DEPENDS
     vtkCommonCore
     vtkTestingCore

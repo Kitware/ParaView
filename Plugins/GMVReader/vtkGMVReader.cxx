@@ -39,6 +39,7 @@
 #include "vtkVertex.h"
 #include <algorithm>
 #include <set>
+#include <vtksys/SystemTools.hxx>
 
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMultiProcessController.h"
@@ -2601,8 +2602,8 @@ int vtkGMVReader::CanReadFile(const char* name)
 
   // First make sure the file exists. This prevents an empty file
   // from being created on older compilers.
-  struct stat fs;
-  if (stat(name, &fs) != 0)
+  vtksys::SystemTools::Stat_t fs;
+  if (vtksys::SystemTools::Stat(name, &fs) != 0)
   {
     return 0;
   }

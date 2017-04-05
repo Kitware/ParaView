@@ -55,7 +55,7 @@ if(PARAVIEW_USE_MPI)
          )
 
       TARGET_LINK_LIBRARIES( Adios
-              LINK_PRIVATE ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})
+              LINK_PRIVATE ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES} vtksys)
 
    ENDIF()
 

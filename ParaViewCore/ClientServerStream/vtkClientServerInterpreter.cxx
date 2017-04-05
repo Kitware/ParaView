@@ -19,10 +19,11 @@
 #include "vtkDynamicLoader.h"
 #include "vtkObjectFactory.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include <map>
 #include <sstream>
 #include <string>
-#include <sys/stat.h>
 #include <vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
@@ -915,7 +916,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName, const char* const* 
   libName += vtkDynamicLoader::LibExtension();
   for (PathsType::iterator p = paths.begin(); p != paths.end(); ++p)
   {
-    struct stat data;
+    vtksys::SystemTools::Stat_t data;
     std::string fullPath = *p;
 
 #if defined(CMAKE_INTDIR)
@@ -924,7 +925,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName, const char* const* 
     std::string fullPathWithIntDir = fullPath;
     fullPathWithIntDir += CMAKE_INTDIR "/";
     fullPathWithIntDir += libName;
-    if (stat(fullPathWithIntDir.c_str(), &data) == 0)
+    if (vtksys::SystemTools::Stat(fullPathWithIntDir.c_str(), &data) == 0)
     {
       return this->LoadInternal(moduleName, fullPathWithIntDir.c_str());
     }
@@ -935,7 +936,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName, const char* const* 
 
     // Look in the directory specified.
     fullPath += libName;
-    if (stat(fullPath.c_str(), &data) == 0)
+    if (vtksys::SystemTools::Stat(fullPath.c_str(), &data) == 0)
     {
       return this->LoadInternal(moduleName, fullPath.c_str());
     }
