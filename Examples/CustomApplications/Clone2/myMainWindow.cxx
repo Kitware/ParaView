@@ -136,7 +136,6 @@ myMainWindow::myMainWindow()
   pqParaViewBehaviors::setEnablePluginDockWidgetsBehavior(false);
   pqParaViewBehaviors::setEnableVerifyRequiredPluginBehavior(false);
   pqParaViewBehaviors::setEnablePluginActionGroupBehavior(false);
-  pqParaViewBehaviors::setEnableFixPathsInStateFilesBehavior(false);
   pqParaViewBehaviors::setEnableCommandLineOptionsBehavior(false);
   pqParaViewBehaviors::setEnablePersistentMainWindowStateBehavior(false);
   pqParaViewBehaviors::setEnableCollaborationBehavior(false);

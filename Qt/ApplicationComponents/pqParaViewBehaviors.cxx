@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCrashRecoveryBehavior.h"
 #include "pqDataTimeStepBehavior.h"
 #include "pqDefaultViewBehavior.h"
-#include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
 #include "pqLockPanelsBehavior.h"
 #include "pqObjectPickingBehavior.h"
@@ -82,7 +81,6 @@ PQ_BEHAVIOR_DEFINE_FLAG(AutoLoadPluginXMLBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginDockWidgetsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(VerifyRequiredPluginBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginActionGroupBehavior, true);
-PQ_BEHAVIOR_DEFINE_FLAG(FixPathsInStateFilesBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CommandLineOptionsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PersistentMainWindowStateBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CollaborationBehavior, true);
@@ -175,10 +173,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(PluginActionGroupBehavior))
   {
     new pqPluginActionGroupBehavior(mainWindow);
-  }
-  if (PQ_IS_BEHAVIOR_ENABLED(FixPathsInStateFilesBehavior))
-  {
-    new pqFixPathsInStateFilesBehavior(this);
   }
   if (PQ_IS_BEHAVIOR_ENABLED(CommandLineOptionsBehavior))
   {

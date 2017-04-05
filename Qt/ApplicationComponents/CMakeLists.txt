@@ -146,8 +146,6 @@ set (Module_SRCS
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.cxx
   pqFiltersMenuReaction.h
-  pqFixPathsInStateFilesBehavior.cxx
-  pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.cxx
   pqFontPropertyWidget.h
   pqGenericPropertyWidgetDecorator.cxx
@@ -383,7 +381,6 @@ set (Module_MOC_HDRS
   pqExportReaction.h
   pqFileNamePropertyWidget.h
   pqFiltersMenuReaction.h
-  pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.h
   pqGenericPropertyWidgetDecorator.h
   pqGlyphScaleFactorPropertyWidget.h
