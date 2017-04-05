@@ -109,6 +109,8 @@ public:
   static const char* GetInputPropertyName(vtkSMProxy* proxy, int port = 0);
   //@}
 
+  static const char* GetStringForCellType(int cellType);
+
 protected:
   vtkSMCoreUtilities();
   ~vtkSMCoreUtilities();
