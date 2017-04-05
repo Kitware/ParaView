@@ -193,6 +193,9 @@ public:
           }
           results << PyString_AsString(key);
           Py_DECREF(value);
+
+          // Clear out any errors that may have occurred.
+          PyErr_Clear();
         }
         Py_DECREF(keys);
       }
