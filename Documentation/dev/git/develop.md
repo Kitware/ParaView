@@ -462,8 +462,18 @@ Contribute VTK Changes
 
 If you have any VTK changes, then you are required to get your changes
 incorporated into VTK using [VTK's development workflow][]. Once your VTK topic has
-been approved and merged into VTK, add your VTK topic head (or the latest VTK
-origin/master which includes your VTK topic head) to commit in a
-[ParaView topic](#create-a-topic) and follow the process documented earlier.
+been approved and merged into VTK, then:
+
+1. Create a [ParaView topic](#create-a-topic) if you haven't already.
+2. Add your VTK topic head (or the latest VTK
+   origin/master which includes your VTK topic head).
+
+        $ cd VTK
+        $ git checkout master
+        $ cd ..
+        $ git add VTK
+        $ git commit
+
+3. Follow the merge process documented earlier.
 
 [VTK's development workflow]: https://gitlab.kitware.com/vtk/vtk/tree/master/Documentation/dev/git

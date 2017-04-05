@@ -14,6 +14,9 @@ from paraview import vtk
 import vtk.numpy_interface.dataset_adapter as dsa
 from vtk.numpy_interface.algorithms import *
     # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
+import sys
+if sys.version_info >= (3,):
+    xrange = range
 
 def get_arrays(attribs, controller=None):
     """Returns a 'dict' referring to arrays in dsa.DataSetAttributes or

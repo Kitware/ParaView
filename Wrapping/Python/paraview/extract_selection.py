@@ -78,7 +78,7 @@ def execute(self):
         print ("Error: Failed to evaluate Expression '%s'. "\
             "The following exception stack should provide additional developer "\
             "specific information. This typically implies a malformed "\
-            "expression. Verify that the expression is valid.\n" % query, file=sys.stderr)
+            "expression. Verify that the expression is valid.\n" % query, file=stderr)
         raise
 
     if not maskarray_is_valid(maskArray):
