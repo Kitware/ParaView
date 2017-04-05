@@ -159,6 +159,12 @@ vtkIdType vtkSMDoubleMapProperty::GetNumberOfElements()
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMDoubleMapProperty::HasElement(vtkIdType index)
+{
+  return this->Private->Map.find(index) != this->Private->Map.end();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleMapProperty::ClearElements()
 {
   if (!this->Private->Map.empty())
