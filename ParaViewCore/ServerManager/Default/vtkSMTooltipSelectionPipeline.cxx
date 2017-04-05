@@ -36,6 +36,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
@@ -267,14 +268,8 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
     }
     // cell type? cell points?
     vtkCell* cell = ds->GetCell(0);
-    tooltipTextStream << std::endl << "Type: " << cell->GetClassName();
-
-    for (vtkIdType i = 0; i < ds->GetNumberOfPoints(); ++i)
-    {
-      tooltipTextStream << std::endl << "Point " << i << ": (";
-      ds->GetPoint(i, point);
-      tooltipTextStream << point[0] << ", " << point[1] << ", " << point[2] << ")";
-    }
+    tooltipTextStream << std::endl
+                      << "Type: " << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
   }
 
   if (!fieldData)
