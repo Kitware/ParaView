@@ -222,13 +222,15 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
 
   std::ostringstream tooltipTextStream;
 
+  tooltipTextStream << "<p style='white-space:pre'>";
+
   // name of the filter which generated the selected dataset
   if (this->PreviousRepresentation)
   {
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(representationHelper.GetAsProxy());
     vtkSMSessionProxyManager* proxyManager = source->GetSessionProxyManager();
-    tooltipTextStream << proxyManager->GetProxyName("sources", source);
+    tooltipTextStream << "<b>" << proxyManager->GetProxyName("sources", source) << "</b>";
   }
 
   // composite name
@@ -306,6 +308,8 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
       }
     }
   }
+
+  tooltipTextStream << "</p>";
 
   // tooltip position
   double pos[3] = { point[0], point[1], point[2] };
