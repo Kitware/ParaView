@@ -26,9 +26,9 @@ Mark a proxy as reader proxy so that it's used to open files from the **File |
 Open** dialog.
 
 This hint is used to mark a proxy as a reader. It provides the ParaView
-applicaiton with information about extensions supported by this reader.
+application with information about extensions supported by this reader.
 **extensions** attribute to list the supported extensions e.g. "foo foo.bar" for
-files named as somename.foo or somename.foo.bar.
+files named as `somename.foo` or `somename.foo.bar`.
 **filename_patterns** attribute is used to list the filename patterns to match.
 The format is similar to what one would use for `ls` or `dir` using wildcards e.g.
 spcth\* to match spcta, spctb etc.
@@ -49,7 +49,7 @@ Specify the default view to use for showing the output produced by a
 source/filter.
 
 This hint is used to indicate the name of the view to use by default for showing
-the output of this source/filter on first *Apply*. To sepecify the view type for
+the output of this source/filter on first *Apply*. To specify the view type for
 a specific output port, you can use the optional attribute **port**.
 
     <SourceProxy ...>
@@ -87,7 +87,7 @@ Likewise, **port** attribute is optional. When not specified it matches all
 output ports. The hints are processed in order. Hence when specifying multiple
 Representation elements, start with most restrictive to least restrictive.
 
-Note, this hint doesn't control which representaton proxy gets created, but the
+Note, this hint doesn't control which representation proxy gets created, but the
 default value for the "Representation" property on the representation proxy
 set using `vtkSMRepresentationProxy::SetRepresentationType()`.
 
@@ -105,7 +105,7 @@ Specify the representation proxy to create to show the output from a
 source/filter in a particular view.
 
 This hint is used to indicate the representation proxy to create to show the
-output from a source/filter in a paritcular view, rather than letting the view
+output from a source/filter in a particular view, rather than letting the view
 determine which representation proxy to create. This is rare. The more common
 use-case of picking the default representation type is satisfied by
 **RepresentationType** XML hint documented above.
