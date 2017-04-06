@@ -59,6 +59,30 @@ a specific output port, you can use the optional attribute **port**.
       </Hints>
     </SourceProxy>
 
+In certain cases, in addition to showing the data in the "preferred" default
+view, you may want to show the result in the current view as well e.g. when
+**Plot Over Line** filter is created, while the result is shown in the
+**XYChartView**, we want to show the line representation for the data being
+plotted in the current Render View too. For that one can add the
+`also_show_in_current_view` attribute to the `<View/>` tag.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <View type="XYChartView" also_show_in_current_view="1" />
+      </Hints>
+    </SourceProxy>
+
+If the source/filter has more than 1 output ports, you can choose which port the
+hint corresponds to by using the optional `port` attribute.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <View type="XYChartView" port="1" />
+      </Hints>
+    </SourceProxy>
+
 Plotable
 --------
 Mark output data as plotable in 2D chart views.

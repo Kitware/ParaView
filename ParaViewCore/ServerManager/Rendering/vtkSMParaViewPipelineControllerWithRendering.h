@@ -87,17 +87,53 @@ public:
   virtual bool GetVisibility(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
-   * Same as Show() except that if the \c view is NULL or not the "preferred"
+   * Same as Show() except that if the \c view is NULL or not the preferred
    * view for the producer's output, this method will create a new view and show
-   * the data in that new view. Returns the view in which the data ends up being
-   * shown, if any. It may return NULL if the \c view is not the "preferred"
-   * view and "preferred" view could not be determined or created.
+   * the data in that new view.
+   *
+   * There are several different strategies employed to determine the preferred
+   * view for the producer's output. See
+   * vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType() for
+   * details.
+   *
+   * @note if the source's hint indicates so, the data may also be
+   *       shown in the \c view passed in, in addition to the preferred view.
+   *       This is done by using the `also_show_in_current_view` attribute to
+   *       the `<View />` hint.
+   *
+   * @returns the view in which the data ends up being shown, if any.
+   *          It may return nullptr if the \c view is not the preferred type
+   *          or the preferred cannot be determined or created.
    */
   virtual vtkSMViewProxy* ShowInPreferredView(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
-   * Returns the name for the preferred view type, if there is any.
+   * Returns the name for the preferred view type, if there is any. There are
+   * several strategies employed by the default implementation to determine the
+   * preferred view type.
+   *
+   * -# Using XML hints.\n
+   *    A producer proxy can provide XML hints to define the preferred view type
+   *    of each (or all) of its output ports. This is done as follows:
+   *
+   *    @code{xml}
+   *      <SourceProxy>
+   *        <Hints>
+   *          <View type="<view name>" port="<output port number" />
+   *        </Hints>
+   *      </SourceProxy>
+   *    @endcode
+   *
+   *    Attribute `port` is optional and only needed to explicitly specify
+   *    different view types for different output ports.
+   *
+   * -# Using data type.\n
+   *    If the data type for the generated data is `vtkTable`, then the
+   *    preferred view (if none provided) is assumed to be `SpreadSheetView`.
+   *
+   * @returns XML name for the preferred view proxy. It is assumed to be defined
+   *          in the "views" group.
    */
   virtual const char* GetPreferredViewType(vtkSMSourceProxy* producer, int outputPort);
 
@@ -159,6 +195,13 @@ protected:
 
   virtual void UpdatePipelineBeforeDisplay(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
+
+  /**
+   * Checks if the output from producer needs to be shown in the current view
+   * also.
+   */
+  virtual bool AlsoShowInCurrentView(
+    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* currentView);
 
 private:
   vtkSMParaViewPipelineControllerWithRendering(

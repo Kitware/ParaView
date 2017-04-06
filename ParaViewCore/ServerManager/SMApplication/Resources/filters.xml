@@ -8398,7 +8398,7 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="0" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYChartView" />
+        <View type="XYChartView" also_show_in_current_view="1" />
         <Plotable />
       </Hints>
       <!-- End ProbeLine -->
