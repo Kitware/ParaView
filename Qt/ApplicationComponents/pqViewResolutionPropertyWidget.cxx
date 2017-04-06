@@ -96,7 +96,7 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   ui.reset->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
   pqCoreUtilities::connect(
-    smproperty, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));
+    smproperty, vtkCommand::DomainModifiedEvent, this, SLOT(resetButtonClicked()));
   pqCoreUtilities::connect(
     smproperty, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(highlightResetButton()));
 }
