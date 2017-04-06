@@ -109,6 +109,14 @@ public:
   static const char* GetInputPropertyName(vtkSMProxy* proxy, int port = 0);
   //@}
 
+  /**
+   * Given a VTK cell type value from the enum in vtkCellTypes.h,
+   * returns a string describing that cell type for use if ParaView's GUI.
+   * For example it pasesd VTK_TRIANGLE it will return "Triangle".
+   * If an unknown cell type is passed to this it returns the string "Unknown".
+   */
+  static const char* GetStringForCellType(int cellType);
+
 protected:
   vtkSMCoreUtilities();
   ~vtkSMCoreUtilities();

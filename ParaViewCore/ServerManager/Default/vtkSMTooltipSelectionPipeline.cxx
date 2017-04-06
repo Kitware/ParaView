@@ -15,6 +15,8 @@
 
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include "vtkCell.h"
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCoordinate.h"
@@ -34,6 +36,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
@@ -201,7 +204,8 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::string& tooltipText)
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
+  int association, double tooltipPos[2], std::string& tooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
   unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
@@ -211,12 +215,14 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::st
   bool compositeFound;
   std::string compositeName;
   vtkDataSet* ds = this->FindDataSet(dataObject, compositeFound, compositeName);
-  if (!ds || ds->GetNumberOfPoints() != 1)
+  if (!ds)
   {
     return false;
   }
 
   std::ostringstream tooltipTextStream;
+
+  tooltipTextStream << "<p style='white-space:pre'>";
 
   // name of the filter which generated the selected dataset
   if (this->PreviousRepresentation)
@@ -224,7 +230,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::st
     vtkSMPropertyHelper representationHelper(this->PreviousRepresentation, "Input", true);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(representationHelper.GetAsProxy());
     vtkSMSessionProxyManager* proxyManager = source->GetSessionProxyManager();
-    tooltipTextStream << proxyManager->GetProxyName("sources", source);
+    tooltipTextStream << "<b>" << proxyManager->GetProxyName("sources", source) << "</b>";
   }
 
   // composite name
@@ -233,48 +239,77 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(double tooltipPos[2], std::st
     tooltipTextStream << std::endl << "Block: " << compositeName;
   }
 
-  // point index
-  vtkPointData* pointData = ds->GetPointData();
-  vtkDataArray* originalPointIds = pointData->GetArray("vtkOriginalPointIds");
-  if (originalPointIds)
+  vtkFieldData* fieldData = nullptr;
+  vtkDataArray* originalIds = nullptr;
+  double point[3];
+  if (association == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
-    tooltipTextStream << std::endl << "Id: " << originalPointIds->GetTuple1(0);
+    // point index
+    vtkPointData* pointData = ds->GetPointData();
+    fieldData = pointData;
+    originalIds = pointData->GetArray("vtkOriginalPointIds");
+    if (originalIds)
+    {
+      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+    }
+
+    // point coords
+    ds->GetPoint(0, point);
+    tooltipTextStream << std::endl
+                      << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
+  }
+  else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  {
+    // cell index
+    vtkCellData* cellData = ds->GetCellData();
+    fieldData = cellData;
+    originalIds = cellData->GetArray("vtkOriginalCellIds");
+    if (originalIds)
+    {
+      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+    }
+    // cell type? cell points?
+    vtkCell* cell = ds->GetCell(0);
+    tooltipTextStream << std::endl
+                      << "Type: " << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
+
+    // needed to position the tooltip
+    ds->GetPoint(0, point);
   }
 
-  // point coords
-  double point[3];
-  ds->GetPoint(0, point);
-  tooltipTextStream << std::endl
-                    << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
-
-  // point attributes
-  vtkIdType nbArrays = pointData->GetNumberOfArrays();
-  for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
+  if (fieldData)
   {
-    vtkDataArray* array = pointData->GetArray(i_arr);
-    if (!array || originalPointIds == array)
+    // point attributes
+    vtkIdType nbArrays = fieldData->GetNumberOfArrays();
+    for (vtkIdType i_arr = 0; i_arr < nbArrays; i_arr++)
     {
-      continue;
-    }
-    tooltipTextStream << std::endl << array->GetName() << ": ";
-    if (array->GetNumberOfComponents() > 1)
-    {
-      tooltipTextStream << "(";
-    }
-    vtkIdType nbComps = array->GetNumberOfComponents();
-    for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
-    {
-      tooltipTextStream << array->GetTuple(0)[i_comp];
-      if (i_comp + 1 < nbComps)
+      vtkDataArray* array = fieldData->GetArray(i_arr);
+      if (!array || originalIds == array)
       {
-        tooltipTextStream << ", ";
+        continue;
+      }
+      tooltipTextStream << std::endl << array->GetName() << ": ";
+      if (array->GetNumberOfComponents() > 1)
+      {
+        tooltipTextStream << "(";
+      }
+      vtkIdType nbComps = array->GetNumberOfComponents();
+      for (vtkIdType i_comp = 0; i_comp < nbComps; i_comp++)
+      {
+        tooltipTextStream << array->GetTuple(0)[i_comp];
+        if (i_comp + 1 < nbComps)
+        {
+          tooltipTextStream << ", ";
+        }
+      }
+      if (array->GetNumberOfComponents() > 1)
+      {
+        tooltipTextStream << ")";
       }
     }
-    if (array->GetNumberOfComponents() > 1)
-    {
-      tooltipTextStream << ")";
-    }
   }
+
+  tooltipTextStream << "</p>";
 
   // tooltip position
   double pos[3] = { point[0], point[1], point[2] };

@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMCoreUtilities.h"
 
+#include "vtkCellTypes.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -298,4 +299,114 @@ const char* vtkSMCoreUtilities::GetInputPropertyName(vtkSMProxy* proxy, int port
 void vtkSMCoreUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+const char* vtkSMCoreUtilities::GetStringForCellType(int cellType)
+{
+  switch (cellType)
+  {
+    case VTK_EMPTY_CELL:
+      return "Empty";
+    case VTK_VERTEX:
+      return "Vertex";
+    case VTK_POLY_VERTEX:
+      return "Poly-Vertex";
+    case VTK_LINE:
+      return "Line";
+    case VTK_POLY_LINE:
+      return "Poly-Line";
+    case VTK_TRIANGLE:
+      return "Triangle";
+    case VTK_TRIANGLE_STRIP:
+      return "Triangle-Strip";
+    case VTK_POLYGON:
+      return "Polygon";
+    case VTK_PIXEL:
+      return "Pixel";
+    case VTK_QUAD:
+      return "Quad";
+    case VTK_TETRA:
+      return "Tetrahedron";
+    case VTK_VOXEL:
+      return "Voxel";
+    case VTK_HEXAHEDRON:
+      return "Hexahedron";
+    case VTK_WEDGE:
+      return "Wedge";
+    case VTK_PYRAMID:
+      return "Pyramid";
+    case VTK_PENTAGONAL_PRISM:
+      return "Pentagonal-Prism";
+    case VTK_HEXAGONAL_PRISM:
+      return "Hexagonal-Prism";
+
+    case VTK_QUADRATIC_EDGE:
+      return "Quadratic-Edge";
+    case VTK_QUADRATIC_TRIANGLE:
+      return "Quadratic-Triangle";
+    case VTK_QUADRATIC_QUAD:
+      return "Quadratic-Quad";
+    case VTK_QUADRATIC_TETRA:
+      return "Quadratic-Tetrahedron";
+    case VTK_QUADRATIC_HEXAHEDRON:
+      return "Quadratic Hexahedron";
+    case VTK_QUADRATIC_WEDGE:
+      return "Quadratic Wedge";
+    case VTK_QUADRATIC_PYRAMID:
+      return "Quadratic Pyramid";
+    case VTK_QUADRATIC_POLYGON:
+      return "Quadratic Polygon";
+    case VTK_BIQUADRATIC_QUAD:
+      return "Bi-Quadratic-Quad";
+    case VTK_TRIQUADRATIC_HEXAHEDRON:
+      return "Tri-Quadratic-Hexahedron";
+    case VTK_QUADRATIC_LINEAR_QUAD:
+      return "Quadratice-Linear-Quad";
+    case VTK_QUADRATIC_LINEAR_WEDGE:
+      return "Quadratic-Linear-Wedge";
+    case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
+      return "Bi-Quadratic-Wedge";
+    case VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON:
+      return "Bi-Quadratic-Quadratic-Hexahedron";
+    case VTK_BIQUADRATIC_TRIANGLE:
+      return "Bi-Quadratic-Triangle";
+    case VTK_CUBIC_LINE:
+      return "Cubic-Line";
+
+    case VTK_CONVEX_POINT_SET:
+      return "Convex-Point-Set";
+
+    case VTK_POLYHEDRON:
+      return "Polyhedron";
+    case VTK_PARAMETRIC_CURVE:
+      return "Parametric-Curve";
+    case VTK_PARAMETRIC_SURFACE:
+      return "Parametric-Surface";
+    case VTK_PARAMETRIC_TRI_SURFACE:
+      return "Parametric-Tri-Surface";
+    case VTK_PARAMETRIC_QUAD_SURFACE:
+      return "Parametric-Quad-Surface";
+    case VTK_PARAMETRIC_TETRA_REGION:
+      return "Parametric-Tetra-Region";
+    case VTK_PARAMETRIC_HEX_REGION:
+      return "Parametric-Hex-Region";
+
+    case VTK_HIGHER_ORDER_EDGE:
+      return "Higher-Order-Edge";
+    case VTK_HIGHER_ORDER_TRIANGLE:
+      return "Higher-Order-Triangle";
+    case VTK_HIGHER_ORDER_QUAD:
+      return "Higher-Order-Quad";
+    case VTK_HIGHER_ORDER_POLYGON:
+      return "Higher-Order-Polygon";
+    case VTK_HIGHER_ORDER_TETRAHEDRON:
+      return "Higher-Order-Tetrahedron";
+    case VTK_HIGHER_ORDER_WEDGE:
+      return "Higher-Order-Wedge";
+    case VTK_HIGHER_ORDER_PYRAMID:
+      return "Higher-Order-Pyramid";
+    case VTK_HIGHER_ORDER_HEXAHEDRON:
+      return "Higher-Order-Hexahedron";
+  }
+  return "Unknown";
 }
