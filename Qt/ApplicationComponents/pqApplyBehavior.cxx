@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
@@ -181,6 +182,10 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   // properties like color transfer functions before the actual render.
   foreach (pqView* view, dirty_views)
   {
+    SM_SCOPED_TRACE(CallMethod)
+      .arg(view->getViewProxy())
+      .arg("Update")
+      .arg("comment", "update the view to ensure updated data information");
     view->getViewProxy()->Update();
   }
 
