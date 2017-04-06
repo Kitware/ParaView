@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Volume" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mousePress" arguments="(0.528875,0.465909,1,1,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseMove" arguments="(0.544073,0.897727,1,0,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseRelease" arguments="(0.544073,0.897727,1,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <!-- remove old state file -->
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/ScalarOpacityFunctionPythonState-StateFile.py" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ScalarOpacityFunctionPythonState-StateFile.py" />
+  <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
+</pqevents>

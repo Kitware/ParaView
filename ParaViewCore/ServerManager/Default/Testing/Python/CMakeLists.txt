@@ -165,6 +165,7 @@ endif()
 # generates the trace and a <TEST>.png file for comparison to a baseline.
 set(paraview_python_state_tests
   SavePythonState
+  ScalarOpacityFunctionPythonState
 )
 foreach(python_state_test ${paraview_python_state_tests})
   if (PARAVIEW_BUILD_QT_GUI)
