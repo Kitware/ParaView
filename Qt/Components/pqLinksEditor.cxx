@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSelectionLink.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
@@ -502,6 +503,11 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       {
         this->Ui->interactiveViewLinkCheckBox->setChecked(true);
       }
+      if (model->getLinkType(idx) == pqLinksModel::Selection)
+      {
+        this->Ui->convertToIndicesCheckBox->setChecked(
+          vtkSMSelectionLink::SafeDownCast(model->getLink(idx))->GetConvertToIndices());
+      }
     }
   }
   else
@@ -703,9 +709,19 @@ void pqLinksEditor::updateEnabledState()
     vtkSMViewProxy::SafeDownCast(this->SelectedProxy1) != NULL &&
     vtkSMViewProxy::SafeDownCast(this->SelectedProxy2) != NULL &&
     this->SelectedProxy1 != this->SelectedProxy2 && this->linkType() == pqLinksModel::Proxy);
+
+  this->Ui->convertToIndicesCheckBox->setVisible(
+    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) != NULL &&
+    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy2) != NULL &&
+    this->SelectedProxy1 != this->SelectedProxy2 && this->linkType() == pqLinksModel::Selection);
 }
 
 bool pqLinksEditor::interactiveViewLinkChecked()
 {
   return this->Ui->interactiveViewLinkCheckBox->isChecked();
+}
+
+bool pqLinksEditor::convertToIndicesChecked()
+{
+  return this->Ui->convertToIndicesCheckBox->isChecked();
 }

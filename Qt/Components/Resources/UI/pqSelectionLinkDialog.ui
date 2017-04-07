@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SelectionLinkDialog</class>
+ <widget class="QDialog" name="SelectionLinkDialog">
+  <property name="windowTitle">
+   <string>Selection Link Mode</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QRadioButton" name="convertToIndicesRadioButton">
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="convertToIndicesLabel">
+     <property name="text">
+      <string>&lt;b&gt;Link Selected Elements:&lt;/b&gt; link selection by evaluating the&lt;br/&gt;selection on the data source and select corresponding&lt;br/&gt;elements based on their indices on other linked data sources.</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QRadioButton" name="selectionSharingRadioButton">
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="selectionSharingLabel">
+     <property name="text">
+      <string>&lt;b&gt;Link Selection:&lt;/b&gt; link selection by sharing the actual selection&lt;br/&gt;between the data sources. The selection is then evaluated for&lt;br/&gt;each linked sources separatly.</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SelectionLinkDialog</receiver>
+   <slot>accept()</slot>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SelectionLinkDialog</receiver>
+   <slot>reject()</slot>
+  </connection>
+ </connections>
+</ui>

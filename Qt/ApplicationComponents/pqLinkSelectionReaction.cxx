@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqLinksModel.h"
+#include "pqSelectionLinkDialog.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "vtkSMSourceProxy.h"
@@ -79,6 +81,12 @@ void pqLinkSelectionReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqLinkSelectionReaction::linkSelection()
 {
+  pqSelectionLinkDialog slDialog(pqCoreUtilities::mainWidget());
+  if (slDialog.exec() != QDialog::Accepted)
+  {
+    return;
+  }
+
   pqSelectionManager* selectionManager =
     qobject_cast<pqSelectionManager*>(pqApplicationCore::instance()->manager("SelectionManager"));
 
@@ -91,6 +99,6 @@ void pqLinkSelectionReaction::linkSelection()
   }
 
   pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
-  model->addSelectionLink(
-    name, activeSource->getProxy(), selectionManager->getSelectedPort()->getSourceProxy());
+  model->addSelectionLink(name, selectionManager->getSelectedPort()->getSourceProxy(),
+    activeSource->getProxy(), slDialog.convertToIndices());
 }

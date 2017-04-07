@@ -59,6 +59,7 @@ set (Module_SRCS
   vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSaveScreenshotProxy.cxx
   vtkSMSelectionHelper.cxx
+  vtkSMSelectionLink.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTransferFunctionManager.cxx

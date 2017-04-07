@@ -177,7 +177,8 @@ public:
   /**
   * add a selection based link
   */
-  void addSelectionLink(const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2);
+  void addSelectionLink(
+    const QString& name, vtkSMProxy* proxy1, vtkSMProxy* proxy2, bool convertToIndices = true);
 
   /**
   * remove a link by index

@@ -103,7 +103,8 @@ void pqLinksManager::addLink()
     }
     else if (editor.linkType() == pqLinksModel::Selection)
     {
-      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2(),
+        editor.convertToIndicesChecked());
     }
   }
 }
@@ -140,7 +141,8 @@ void pqLinksManager::editLink()
     }
     else if (editor.linkType() == pqLinksModel::Selection)
     {
-      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2());
+      model->addSelectionLink(editor.linkName(), editor.selectedProxy1(), editor.selectedProxy2(),
+        editor.convertToIndicesChecked());
     }
   }
 }

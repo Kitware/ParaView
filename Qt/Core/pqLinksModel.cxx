@@ -675,10 +675,11 @@ void pqLinksModel::addPropertyLink(const QString& name, vtkSMProxy* inputProxy,
 }
 
 void pqLinksModel::addSelectionLink(
-  const QString& name, vtkSMProxy* inputProxy, vtkSMProxy* outputProxy)
+  const QString& name, vtkSMProxy* inputProxy, vtkSMProxy* outputProxy, bool convertToIndices)
 {
   vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMSelectionLink* link = vtkSMSelectionLink::New();
+  link->SetConvertToIndices(convertToIndices);
   pxm->RegisterLink(name.toLocal8Bit().data(), link);
 
   // bi-directional link
