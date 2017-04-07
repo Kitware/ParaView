@@ -82,6 +82,10 @@ protected:
   bool AverageVisibility;
   bool MedianVisibility;
 
+  bool HasOnlyOnePoint;
+
+  void PrepareForRendering() VTK_OVERRIDE;
+
 private:
   vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;

@@ -112,10 +112,10 @@ protected:
     vtkPlot* plot)
   {
     vtkQuartileChartRepresentation* qcr = vtkQuartileChartRepresentation::SafeDownCast(self);
-    if ((role == "minmax" && qcr->GetRangeVisibility() == false) ||
-      (role == "q1q3" && qcr->GetQuartileVisibility() == false) ||
+    if ((role == "minmax" && (qcr->GetRangeVisibility() == false || qcr->HasOnlyOnePoint)) ||
+      (role == "q1q3" && (qcr->GetQuartileVisibility() == false || qcr->HasOnlyOnePoint)) ||
       (role == "avg" && qcr->GetAverageVisibility() == false) ||
-      (role == "med" && qcr->GetMedianVisibility() == false))
+      (role == "med" && (qcr->GetMedianVisibility() == false || qcr->HasOnlyOnePoint)))
     {
       plot->SetVisible(false);
       return false;
@@ -143,7 +143,10 @@ protected:
         plot->GetBrush()->SetOpacityF(0.3);
         plot->GetPen()->SetOpacityF(0.3);
       }
-      plot->SetLabel(role + " " + plot->GetLabel());
+      if (!qcr->HasOnlyOnePoint)
+      {
+        plot->SetLabel(role + " " + plot->GetLabel());
+      }
     }
     return true;
   }
@@ -156,6 +159,7 @@ vtkQuartileChartRepresentation::vtkQuartileChartRepresentation()
   , RangeVisibility(true)
   , AverageVisibility(true)
   , MedianVisibility(true)
+  , HasOnlyOnePoint(false)
 {
   delete this->Internals;
   this->Internals = new vtkQCRInternals();
@@ -176,6 +180,36 @@ vtkStdString vtkQuartileChartRepresentation::GetDefaultSeriesLabel(
     return this->Superclass::GetDefaultSeriesLabel(tableName, StatsArrayRe.match(2));
   }
   return this->Superclass::GetDefaultSeriesLabel(tableName, columnName);
+}
+
+//----------------------------------------------------------------------------
+void vtkQuartileChartRepresentation::PrepareForRendering()
+{
+  vtkChartRepresentation::MapOfTables tables;
+  if (!this->GetLocalOutput(tables))
+  {
+    this->Internals->HideAllPlots();
+    return;
+  }
+
+  this->HasOnlyOnePoint = false;
+  for (auto itr = tables.begin(); itr != tables.end(); ++itr)
+  {
+    vtkTable* table = itr->second;
+    vtkAbstractArray* column = table->GetColumnByName("N");
+    if (column)
+    {
+      vtkDataArray* narray = vtkDataArray::SafeDownCast(column);
+      double range[2];
+      narray->GetRange(range);
+      if (range[0] == range[1] && range[0] == 1)
+      {
+        this->HasOnlyOnePoint = true;
+      }
+    }
+  }
+
+  this->Superclass::PrepareForRendering();
 }
 
 //----------------------------------------------------------------------------
