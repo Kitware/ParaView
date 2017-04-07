@@ -141,13 +141,20 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
     {
       this->Mode = LEAVES;
     }
+    else if (strcmp(mode, "amr") == 0)
+    {
+      this->Mode = AMR;
+    }
     else if (strcmp(mode, "non-leaves") == 0)
     {
-      this->Mode = NON_LEAVES;
+      vtkWarningMacro("Obsolete 'non-leaves' mode detected. Using 'all' instead.");
+      this->Mode = ALL;
     }
     else if (strcmp(mode, "none") == 0)
     {
-      this->Mode = NONE;
+      // not sure why this mode was ever added or what it stood for <|:0).
+      vtkWarningMacro("Obsolete 'none' mode detected. Using 'all' instead.");
+      this->Mode = ALL;
     }
     else
     {
@@ -155,6 +162,7 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
       return 0;
     }
   }
+
   if (const char* default_mode = element->GetAttribute("default_mode"))
   {
     if (strcmp(default_mode, "nonempty-leaf") == 0)
@@ -165,6 +173,18 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEle
     {
       vtkErrorMacro("Unrecognized 'default_mode': " << mode);
       return 0;
+    }
+  }
+
+  if (vtkPVXMLElement* hints = prop->GetHints())
+  {
+    vtkPVXMLElement* useFlatIndex = hints->FindNestedElementByName("UseFlatIndex");
+    if (useFlatIndex && useFlatIndex->GetAttribute("value") &&
+      strcmp(useFlatIndex->GetAttribute("value"), "0") == 0)
+    {
+      this->Mode = AMR;
+      vtkWarningMacro("'UseFlatIndex' index hint is deprecated. You may simply want "
+                      "to set the 'mode' for the domain to 'amr' in the XML configuration.");
     }
   }
   return 1;
@@ -231,8 +251,8 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
     case NON_LEAVES:
       os << "NON_LEAVES";
       break;
-    case NONE:
-      os << "NONE";
+    case AMR:
+      os << "AMR";
     default:
       os << "UNKNOWN";
   }

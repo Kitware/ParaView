@@ -21,20 +21,42 @@
  * vtkSMCompositeTreeDomain can be added to a vtkSMIntVectorProperty. This
  * domain requires a vtkSMInputProperty which is used to provide the input to
  * the filter. This domain obtains data information from the input selected on
- * the required input property and then decides the range for the flat-index. A
- * flat index for a tree is obtained by performing a pre-order traversal of the
- * tree eg. A ( B ( D, E), C (F, G)) becomes: [A,B,D,E,C,F,G], so flat-index of A is
- * 0, while flat-index of C is 4.
+ * the required input property and then decides the range for values the
+ * property can have.
  *
- * vtkSMCompositeTreeDomain can be used in multiple modes.
- * \li ALL : This mode is used if the property can accept any type of node index.
- *           To select this mode in XML, use the `mode="all"`.
- * \li LEAVES: This mode is used if the property can only accept leaf nodes i.e.
- *             indices for non-composite datasets. This is specified in XML
- *             using `mode="leaves"`.
- * \li NON_LEAVES: This mode is used if the property can only accept non-leaf
- *                 node indices, specified using `mode="non-leaves"` in XML
- *                 configuration.
+ * Broadly speaking, there are two ways of identifying unique node in a
+ * composite dataset: `flat-index` (also called `composite-index`) and
+ * `level-block-index`. `flat-index` applies to all types of composite
+ * datasets while `level-block-index` (or just `level-index`) applies only to AMR
+ * datasets. `flat-index` for any node in an arbitrary composite-dataset
+ * is simply the index of that node in a pre-order traversal of the tree with
+ * the root composite-dataset getting the index 0. `level-index` for an AMR
+ * dataset is the AMR level number while `level-block-index` is a pair of
+ * the AMR level number and block number for the node in that level.
+ *
+ * The type of index the property expects, is defined by the domain's mode.
+ * Supported modes are:
+ *  -# vtkSMCompositeTreeDomain::ALL: (default) \n
+ *     The property uses `flat-index` and can accept index for any node (leaf or non-leaf).
+ *     This can be specified in XML using the `mode="all"`.
+ *
+ *  -# vtkSMCompositeTreeDomain::LEAVES:\n
+ *     The property uses `flat-index` however can only accept flat-indices for
+ *     leaf-nodes.
+ *     This can be specified in XML using the `mode="leaves"`.
+ *
+ *  -# vtkSMCompositeTreeDomain::AMR: \n
+ *     The property uses `level-index` i.e. AMR level number or
+ *     `level-block-index`. If the property has 2 elements (or for repeatable
+ *     properties, if number of elements per command is 2) then
+ *     `level-block-index` is used, otherwise simply the `level-index` is used.
+ *     This only makes sense for filters dealing with AMR datasets.
+ *     This can be specified in XML using the `mode="amr"`.
+ *
+ *  -# vtkSMCompositeTreeDomain::NON_LEAVES: (deprecated)\n
+ *     No longer supported (as of ParaView 5.4) and simply interpreted as
+ *     vtkSMCompositeTreeDomain::ALL.
+ *     This used to be specified in XML using the `mode="non-leaves"`.
  *
  * vtkSMCompositeTreeDomain also provides ability to set default value on the
  * property. If mode is LEAVES, then the default value selected is the first
@@ -61,7 +83,6 @@ class vtkPVDataInformation;
 class vtkSMInputProperty;
 class vtkSMSourceProxy;
 
-// TODO: CHANGE NAME OF THIS CLASS
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
 {
 public:
@@ -119,7 +140,8 @@ public:
     ALL = 0,
     LEAVES = 1,
     NON_LEAVES = 2,
-    NONE = 3
+    NONE = 3,
+    AMR = 4,
   };
 
   enum DefaultModes

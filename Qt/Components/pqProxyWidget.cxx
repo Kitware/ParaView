@@ -1047,7 +1047,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   }
   else if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty))
   {
-    widget = new pqIntVectorPropertyWidget(ivp, smproxy, parentObj);
+    widget = pqIntVectorPropertyWidget::createWidget(ivp, smproxy, parentObj);
   }
   else if (vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(smproperty))
   {

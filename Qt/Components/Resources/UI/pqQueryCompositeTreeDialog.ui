@@ -15,15 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="pqTreeWidget" name="Blocks">
+    <widget class="pqTreeView" name="Blocks">
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
-     <column>
-      <property name="text">
-       <string>Structure (Flat Index)</string>
-      </property>
-     </column>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
@@ -40,9 +38,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
+   <class>pqTreeView</class>
+   <extends>QTreeView</extends>
+   <header>pqTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

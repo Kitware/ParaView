@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
-#include "pqPropertyLinks.h"
+class vtkSMIntVectorProperty;
 
 class PQCOMPONENTS_EXPORT pqIntVectorPropertyWidget : public pqPropertyWidget
 {
@@ -43,6 +43,16 @@ class PQCOMPONENTS_EXPORT pqIntVectorPropertyWidget : public pqPropertyWidget
 
 public:
   pqIntVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  virtual ~pqIntVectorPropertyWidget();
+
+  /**
+   * Creates known pqPropertyWidget subclasses for vtkSMIntVectorProperty property.
+   */
+  static pqPropertyWidget* createWidget(
+    vtkSMIntVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent);
+
+private:
+  Q_DISABLE_COPY(pqIntVectorPropertyWidget);
 };
 
 #endif // _pqIntVectorPropertyWidget_h
