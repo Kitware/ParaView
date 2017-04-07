@@ -1,12 +1,7 @@
 Proxy Documentation Formatting             {#ProxyDocumentationFormatting}
 ==============================
 
-This page describes formatting options for proxy documentation in
-different ParaView versions (since we started tracking these after
-version 4.2).
-
-Changes in 4.3
---------------
+This page describes formatting options for proxy documentation.
 
 ###Formatting options are added for proxy documentation###
 Documentation for proxies (and for input properties for proxies)

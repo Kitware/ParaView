@@ -42,12 +42,13 @@
 namespace
 {
 //---------------------------------------------------------------------------
-const char* vtkFindTypeFromHints(vtkPVXMLElement* hints, const int outputPort, const char* xmlTag,
-  const char* xmlAttributeName = NULL, const char* xmlAttributeValue = NULL)
+vtkPVXMLElement* vtkFindChildFromHints(vtkPVXMLElement* hints, const int outputPort,
+  const char* xmlTag, const char* xmlAttributeName = nullptr,
+  const char* xmlAttributeValue = nullptr)
 {
   if (!hints)
   {
-    return NULL;
+    return nullptr;
   }
   for (unsigned int cc = 0, max = hints->GetNumberOfNestedElements(); cc < max; cc++)
   {
@@ -69,13 +70,10 @@ const char* vtkFindTypeFromHints(vtkPVXMLElement* hints, const int outputPort, c
           continue;
         }
       }
-      if (const char* type = child->GetAttribute("type"))
-      {
-        return type;
-      }
+      return child;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -202,14 +200,16 @@ void vtkPickRepresentationType(vtkSMRepresentationProxy* repr, vtkSMSourceProxy*
   (void)outputPort;
 
   // Check if there's a hint for the producer. If so, use that.
-  if (const char* reprtype = vtkFindTypeFromHints(
-        producer->GetHints(), outputPort, "RepresentationType", "view", view->GetXMLName()))
+  vtkPVXMLElement* hint = vtkFindChildFromHints(
+    producer->GetHints(), outputPort, "RepresentationType", "view", view->GetXMLName());
+  if (const char* reprtype = hint ? hint->GetAttribute("type") : nullptr)
   {
     if (repr->SetRepresentationType(reprtype))
     {
       return;
     }
   }
+
   // currently, this just ensures that the "Representation" type chosen has
   // proper color type etc. setup. At some point, we could deprecate
   // vtkSMRepresentationTypeDomain and let this logic pick the default
@@ -484,10 +484,10 @@ bool vtkSMParaViewPipelineControllerWithRendering::GetVisibility(
 vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredView(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
-  if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
+  if (producer == nullptr || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
   {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort (" << outputPort << ")");
-    return NULL;
+    return nullptr;
   }
 
   if (strcmp(producer->GetXMLGroup(), "insitu_writer_parameters") == 0)
@@ -495,87 +495,81 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     // This is a proxy for the Catalyst writers which isn't a real filter
     // but a placeholder for a writer during the Catalyst script export
     // process. We don't need to do anything with the views.
-    return NULL;
+    return nullptr;
   }
 
   this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
   vtkSMSessionProxyManager* pxm = producer->GetSessionProxyManager();
-  if (const char* preferredViewType = this->GetPreferredViewType(producer, outputPort))
+
+  std::string preferredViewType;
+  if (const char* xmlPreferredViewType = this->GetPreferredViewType(producer, outputPort))
   {
-    if ( // no view is specified.
-      view == NULL ||
-      // the "view" is not of the preferred type.
-      strcmp(preferredViewType, view->GetXMLName()) != 0)
-    {
-      vtkSmartPointer<vtkSMProxy> targetView;
-      targetView.TakeReference(pxm->NewProxy("views", preferredViewType));
-      if (vtkSMViewProxy* preferredView = vtkSMViewProxy::SafeDownCast(targetView))
-      {
-        this->InitializeProxy(preferredView);
-        this->RegisterViewProxy(preferredView);
-        if (this->Show(producer, outputPort, preferredView) == NULL)
-        {
-          vtkErrorMacro("Data cannot be shown in the preferred view!!");
-          return NULL;
-        }
-        return preferredView;
-      }
-      else
-      {
-        vtkErrorMacro("Failed to create preferred view (" << preferredViewType << ")");
-        return NULL;
-      }
-    }
-    else
-    {
-      assert(view);
-      if (!this->Show(producer, outputPort, view))
-      {
-        vtkErrorMacro("Data cannot be shown in the preferred view!!");
-        return NULL;
-      }
-      return view;
-    }
+    // let's use the preferred view from XML hints, if available.
+    preferredViewType = xmlPreferredViewType;
   }
-  else if (view)
+  else if (view && view->CanDisplayData(producer, outputPort))
   {
-    // If there's no preferred view, check if active view can show the data. If
-    // so, show it in that view.
-    if (view->CanDisplayData(producer, outputPort))
+    // when not, the active is used if it can show the data.
+    preferredViewType = view->GetXMLName();
+  }
+  else if (view == nullptr || strcmp(view->GetXMLName(), "RenderView") == 0)
+  {
+    // if no view was provided, or it cannot show the data
+    // we create render view by default (unless of course, the current view was
+    // render view itself).
+    preferredViewType = "RenderView";
+  }
+  else
+  {
+    return nullptr;
+  }
+
+  if (view != nullptr)
+  {
+    if (preferredViewType == view->GetXMLName())
     {
-      if (this->Show(producer, outputPort, view))
+      if (view->CanDisplayData(producer, outputPort) &&
+        this->Show(producer, outputPort, view) != nullptr)
       {
         return view;
       }
-
-      vtkErrorMacro("View should have been able to show the data, "
-                    "but it failed to do so. This may point to a development bug.");
-      return NULL;
+      return nullptr;
     }
-  }
-
-  // No preferred view is found and "view" is NULL or cannot show the data.
-  // ParaView's default behavior is to create a render view, in that case, if the
-  // render view can show the data.
-  if (view == NULL || strcmp(view->GetXMLName(), "RenderView") != 0)
-  {
-    vtkSmartPointer<vtkSMProxy> renderView;
-    renderView.TakeReference(pxm->NewProxy("views", "RenderView"));
-    if (vtkSMViewProxy* preferredView = vtkSMViewProxy::SafeDownCast(renderView))
+    else if (this->AlsoShowInCurrentView(producer, outputPort, view))
     {
-      this->InitializeProxy(preferredView);
-      this->RegisterViewProxy(preferredView);
-      if (this->Show(producer, outputPort, preferredView) == NULL)
+      // The current view is non-null and the preferred view type is not the
+      // current view,  in that case, let's see if we should still show the result
+      // in the current view (see paraview/paraview#17146).
+      if (view->CanDisplayData(producer, outputPort))
       {
-        vtkErrorMacro("Data cannot be shown in the defaulted render view!!");
-        return NULL;
+        this->Show(producer, outputPort, view);
       }
-      return preferredView;
     }
   }
 
-  return NULL;
+  // create the preferred view.
+  assert(!preferredViewType.empty());
+
+  vtkSmartPointer<vtkSMProxy> targetView;
+  targetView.TakeReference(pxm->NewProxy("views", preferredViewType.c_str()));
+  if (vtkSMViewProxy* preferredView = vtkSMViewProxy::SafeDownCast(targetView))
+  {
+    this->InitializeProxy(preferredView);
+    this->RegisterViewProxy(preferredView);
+    if (this->Show(producer, outputPort, preferredView) == nullptr)
+    {
+      vtkErrorMacro("Data cannot be shown in the preferred view!!");
+      return nullptr;
+    }
+    return preferredView;
+  }
+  else
+  {
+    vtkErrorMacro("Failed to create preferred view (" << preferredViewType.c_str() << ")");
+    return nullptr;
+  }
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -583,9 +577,10 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
   vtkSMSourceProxy* producer, int outputPort)
 {
   // 1. Check if there's a hint for the producer. If so, use that.
-  if (const char* viewType = vtkFindTypeFromHints(producer->GetHints(), outputPort, "View"))
+  vtkPVXMLElement* hint = vtkFindChildFromHints(producer->GetHints(), outputPort, "View");
+  if (hint && hint->GetAttribute("type"))
   {
-    return viewType;
+    return hint->GetAttribute("type");
   }
 
   vtkPVDataInformation* dataInfo = producer->GetDataInformation(outputPort);
@@ -596,6 +591,20 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
   }
 
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::AlsoShowInCurrentView(
+  vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* vtkNotUsed(currentView))
+{
+  vtkPVXMLElement* hint = vtkFindChildFromHints(producer->GetHints(), outputPort, "View");
+  int also_show_in_current_view = 0;
+  if (hint && hint->GetScalarAttribute("also_show_in_current_view", &also_show_in_current_view))
+  {
+    return also_show_in_current_view != 0;
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
