@@ -1,7 +1,8 @@
-# this cmake script tests python state file saving and loading. it
-# first launches paraview, runs an xml test, and save the resulting
-# state file. it then launches pvpython with a small test driver
-# which loads the state file and then compares the resulting image.
+# This cmake script tests python state file saving and loading. It
+# first launches paraview, runs an XML test, and saves the resulting
+# state file. It then launches pvpython with a small test driver
+# that loads the state file and then compares the resulting image to the
+# baseline.
 
 # run paraview to setup and save the python state file
 execute_process(
