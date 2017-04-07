@@ -127,7 +127,7 @@ public:
   * "Replace input" is a hint given to the GUI to turn off input visibility
   * when the filter is created.
   * Returns if this proxy replaces input on creation.
-  * This checks the "Hints" for the proxy, if any. If a <Visibility>
+  * This checks the "Hints" for the proxy, if any. If a `<Visibility>`
   * element is present with replace_input="0", then this method
   * returns false, otherwise true.
   */

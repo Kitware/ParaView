@@ -29,14 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/**
-* \file pqPipelineModel.h
-* \date 4/14/2006
-*/
-
-#ifndef _pqPipelineModel_h
-#define _pqPipelineModel_h
+#ifndef pqPipelineModel_h
+#define pqPipelineModel_h
 
 #include "pqComponentsModule.h"
 
@@ -310,7 +304,7 @@ public:
   *   Store the annotation key that will be used when
   *   "this->data( ... , pqPipelineMode::AnnotationFilterRole)"
   *   get called.
-  * \param annotation key that will be lookup inside the above code.
+  * \param expectedAnnotation key that will be lookup inside the above code.
   */
   void enableFilterAnnotationKey(const QString& expectedAnnotation);
 

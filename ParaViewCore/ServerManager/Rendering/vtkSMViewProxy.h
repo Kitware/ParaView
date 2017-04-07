@@ -43,6 +43,11 @@ class vtkSMRepresentationProxy;
 class vtkSMSourceProxy;
 class vtkView;
 
+namespace vtkSMViewProxyNS
+{
+class WindowToImageFilter;
+}
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
 {
 public:
@@ -190,11 +195,12 @@ public:
   //@{
   /**
    * Method used to hide other representations if the view has a
-   * <ShowOneRepresentationAtATime/> hint.
+   * `<ShowOneRepresentationAtATime/>` hint.
    * This only affects other representations that have data inputs, not non-data
    * representations.
-   * Returns true if any representations were hidden by this call, otherwise
-   * returns false.
+   *
+   * @returns true if any representations were hidden by this call, otherwise
+   *         returns false.
    */
   virtual bool HideOtherRepresentationsIfNeeded(vtkSMProxy* repr);
   static bool HideOtherRepresentationsIfNeeded(vtkSMViewProxy* self, vtkSMProxy* repr)
@@ -207,11 +213,22 @@ protected:
   vtkSMViewProxy();
   ~vtkSMViewProxy();
 
-  //
   /**
-   * Subclasses should override this method to do the actual image capture.
+   * Capture an image from the view's render window. Default implementation
+   * simply captures the image from the render window for the view. Subclasses
+   * may override this for cases where that's not sufficient.
+   *
+   * @param[in] magnification The magnification factor to use for generating the image.
+   * @returns A new vtkImageData instance or nullptr. Caller is responsible for
+   *          calling `vtkImageData::Delete()` on the returned non-null value.
    */
-  virtual vtkImageData* CaptureWindowInternal(int vtkNotUsed(magnification)) { return NULL; }
+  virtual vtkImageData* CaptureWindowInternal(int magnification);
+
+  /**
+   * This method is called whenever the view wants to render to during image
+   * capture. The default implementation simply calls this->StillRender().
+   */
+  virtual void RenderForImageCapture() { this->StillRender(); }
 
   virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive)) { return this->GetLocation(); }
   virtual void PostRender(bool vtkNotUsed(interactive)) {}
@@ -265,6 +282,8 @@ private:
   class vtkRendererSaveInfo;
   vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
   void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);
+
+  friend class vtkSMViewProxyNS::WindowToImageFilter;
 };
 
 #endif

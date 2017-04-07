@@ -352,12 +352,15 @@ set(_vtk_modules
 
   vtkPVVTKExtensionsPoints
   # Needed for SPH filters.
-  
+
   vtkIOTecplotTable
   # needed for vtkTecplotReader
 
   vtkIOTRUCHAS
   # needed for GE/LANL vtkTRUCHASReader
+
+  vtkPVVTKExtensionsCGNSReader
+  # needed for CGNS reader support.
   )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
@@ -378,10 +381,6 @@ endif()
 
 if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
-endif()
-
-if(PARAVIEW_ENABLE_CGNS)
-  list(APPEND _vtk_modules vtkPVVTKExtensionsCGNSReader)
 endif()
 
 if (PARAVIEW_ENABLE_MATPLOTLIB)

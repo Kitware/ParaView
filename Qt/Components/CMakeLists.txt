@@ -124,6 +124,8 @@ set (Module_SRCS
   pqImageTip.h
   pqIndexSelectionWidget.cxx
   pqIndexSelectionWidget.h
+  pqInputSelectorWidget.cxx
+  pqInputSelectorWidget.h
   pqIntMaskPropertyWidget.cxx
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.cxx
@@ -166,6 +168,8 @@ set (Module_SRCS
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.cxx
   pqPipelineBrowserWidget.h
+  pqPipelineInputComboBox.cxx
+  pqPipelineInputComboBox.h
   pqPipelineModel.cxx
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx
@@ -225,8 +229,6 @@ set (Module_SRCS
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.cxx
   pqSampleScalarWidget.h
-  pqSaveSnapshotDialog.cxx
-  pqSaveSnapshotDialog.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.cxx
@@ -344,6 +346,7 @@ set (Module_MOC_HDRS
   pqHighlightItemDelegate.h
   pqImageTip.h
   pqIndexSelectionWidget.h
+  pqInputSelectorWidget.h
   pqIntMaskPropertyWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
@@ -365,6 +368,7 @@ set (Module_MOC_HDRS
   pqOutputPortComboBox.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
+  pqPipelineInputComboBox.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
@@ -394,7 +398,6 @@ set (Module_MOC_HDRS
   pqRescaleRange.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
-  pqSaveSnapshotDialog.h
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.h
   pqSearchBox.h
@@ -434,7 +437,6 @@ set (Module_MOC_HDRS
 set (Module_UI_FILES
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
-  Resources/UI/pqAnimationSettings.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui
@@ -476,7 +478,6 @@ set (Module_UI_FILES
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
-  Resources/UI/pqSaveSnapshotDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectionInputWidget.ui

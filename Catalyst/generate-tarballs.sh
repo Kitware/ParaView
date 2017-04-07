@@ -12,9 +12,15 @@ die () {
 [ "$#" -lt 1 ] && \
     die "$usage"
 
+readlink_cmd="readlink"
+if [[ $OSTYPE == darwin* ]]; then
+  # Use greadlink on the mac
+  readlink_cmd="greadlink"
+fi
+
 scriptdir="$0"
 scriptdir="$( dirname "$scriptdir" )"
-scriptdir="$( readlink -f "$scriptdir" )"
+scriptdir="$( "${readlink_cmd}" -f "$scriptdir" )"
 
 suffix="$1"
 src_output="$( pwd )"

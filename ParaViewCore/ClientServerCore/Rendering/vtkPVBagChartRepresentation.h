@@ -215,7 +215,6 @@ private:
   int LineStyle;
   double LineColor[3];
   vtkScalarsToColors* LookupTable;
-  int BagVisibility;
   double BagColor[3];
   double SelectionColor[3];
   double Opacity;

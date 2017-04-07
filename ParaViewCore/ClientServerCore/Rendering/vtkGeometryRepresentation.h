@@ -338,11 +338,8 @@ protected:
    */
   virtual bool IsCached(double cache_key) VTK_OVERRIDE;
 
-  // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void* clientdata, void*);
-  void InternalProgressCallback(vtkAlgorithm* algorithm);
-  // The observer to report progress from the internal filters.
-  vtkCallbackCommand* InternalProgressObserver;
+  // Progress Callback
+  void HandleGeometryRepresentationProgress(vtkObject* caller, unsigned long, void*);
 
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;

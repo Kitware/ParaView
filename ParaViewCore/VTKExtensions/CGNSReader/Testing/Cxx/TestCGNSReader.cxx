@@ -30,7 +30,7 @@
 
 int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type)
 {
-  int nBlocks = mb->GetNumberOfBlocks();
+  unsigned int nBlocks = mb->GetNumberOfBlocks();
   vtk_assert(nBlocks > 0);
   for (unsigned int i = 0; i < nBlocks; ++i)
   {

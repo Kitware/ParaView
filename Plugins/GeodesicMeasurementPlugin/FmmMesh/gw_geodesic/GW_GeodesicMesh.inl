@@ -272,7 +272,9 @@ GW_Bool GW_GeodesicMesh::PerformFastMarchingOneStep()
                     pNewVert->GetFrontOverlapInfo().RecordOverlap( *pCurVert->GetFront(), rNewDistance );
                 break;
             default:
-                GW_ASSERT( GW_False );
+                ;
+                // Commented out to avoid warnings
+                // GW_ASSERT( GW_False );
             }
         }
     }

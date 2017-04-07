@@ -33,8 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqMultiViewWidget_h
 
 #include "pqComponentsModule.h"
-#include <QUuid>
 #include <QWidget>
+
+#include "vtkSetGet.h" // for VTK_LEGACY
 
 class pqProxy;
 class pqView;
@@ -54,7 +55,8 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
-
+  Q_PROPERTY(bool decorationsVisibility READ isDecorationsVisible WRITE setDecorationsVisible NOTIFY
+      decorationsVisibilityChanged)
 public:
   pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   virtual ~pqMultiViewWidget();
@@ -70,28 +72,6 @@ public:
   * Returns whether window decorations and splitter handles are visible.
   */
   bool isDecorationsVisible() const { return this->DecorationsVisible; }
-
-  /**
-  * Captures an image for the views in the layout. Note that there must be
-  * at least one valid view in the widget, otherwise returns NULL.
-  */
-  vtkImageData* captureImage(int width, int height);
-
-  /**
-  * setups up the environment for capture. Returns the magnification that can
-  * be used to capture the image for required size.
-  */
-  int prepareForCapture(int width, int height);
-
-  /**
-  * cleans up the environment after image capture.
-  */
-  void cleanupAfterCapture();
-
-  /**
-  * Capture an image and saves it out to a file.
-  */
-  bool writeImage(const QString& filename, int width, int height, int quality = -1);
 
   /**
   * Returns list of views assigned to frames in this widget.
@@ -111,11 +91,29 @@ public:
   */
   bool togglePopout();
 
+  //@{
+  /**
+   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
+   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
+   * using it.
+   */
+  VTK_LEGACY(vtkImageData* captureImage(int width, int height));
+  VTK_LEGACY(int prepareForCapture(int width, int height));
+  VTK_LEGACY(void cleanupAfterCapture());
+  VTK_LEGACY(bool writeImage(const QString& filename, int width, int height, int quality = -1));
+  //@}
+
 signals:
   /**
   * fired when a frame in this widget becomes active.
   */
   void frameActivated();
+
+  /**
+   * fired when the decorations visibility is changed (by calling
+   * setDecorationsVisible).
+   */
+  void decorationsVisibilityChanged(bool visible);
 
 public slots:
   /**

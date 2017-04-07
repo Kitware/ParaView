@@ -106,16 +106,16 @@ void pqOptions::Initialize()
     "Set the temporary directory where test-case output will be stored.");
 
   this->AddArgument("--tile-image-prefix", NULL, &this->TileImagePath,
-    "Set the temporary directory with file name prefix for tile display image dump.");
+    "Set the temporary directory with file name prefix for the tile display image dump.");
 
   this->AddArgument("--data-directory", NULL, &this->DataDirectory,
-    "Set the data directory where test-case data are.");
+    "Set the data directory where test-case data are located.");
 
   this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
     "Exit application when testing is done. Use for testing.");
 
   this->AddArgument("--server", "-s", &this->ServerResourceName,
-    "Set the name of the server resource to connect with when the client starts.");
+    "Set the name of the server resource to connect to when the client starts.");
 
   this->AddCallback("--test-script", NULL, &::AddTestScript, this,
     "Add test script. Can be used multiple times to "

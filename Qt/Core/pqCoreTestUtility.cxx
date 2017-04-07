@@ -373,7 +373,7 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
   Q_ASSERT(curView != NULL);
   pqCoreTestUtilityInternal::WidgetSizer sizer(curView->widget(), size);
 
-  vtkImageData* test_image = curView->captureImage(1);
+  vtkImageData* test_image = curView->getViewProxy()->CaptureWindow(1);
   if (!test_image)
   {
     qCritical() << "ERROR: Failed to capture snapshot.";

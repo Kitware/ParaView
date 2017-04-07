@@ -29,9 +29,6 @@
 #ifndef vtkCGNSReaderInternal_h
 #define vtkCGNSReaderInternal_h
 
-#include <cgns_io.h> // Low level IO for fast parsing
-#include <cgnslib.h> // DataType, and other definition
-
 #include <iostream>
 #include <map>
 #include <string.h> // for inline strcmp
@@ -39,9 +36,9 @@
 #include <vector>
 
 #include "vtkIdTypeArray.h"
-#include "vtkPoints.h"
-
 #include "vtkMultiProcessController.h"
+#include "vtkPoints.h"
+#include "vtk_cgns.h"
 
 namespace CGNSRead
 {
@@ -276,16 +273,6 @@ private:
   // Not very elegant :
   std::vector<double> GlobalTime;
 };
-
-//------------------------------------------------------------------------------
-// sort variables by name helper function
-static int sortVariablesByName(const void* vOne, const void* vTwo)
-{
-  Variable* varOne = (Variable*)vOne;
-  Variable* varTwo = (Variable*)vTwo;
-
-  return (strcmp(varOne->name, varTwo->name));
-}
 
 //------------------------------------------------------------------------------
 // compare name return true if name1 == name2

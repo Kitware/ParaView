@@ -139,10 +139,12 @@ For properties using FileListDomain to show a file chooser widget on the
 Properties panel, sometimes we want to provide a list of extensions expected. In
 that case, one can use this hint. Note, this is not intended for specifying
 extensions that a reader supports. For that one uses the `<ReaderFactory>` hint
-descriped in [ProxyHints](@ref ProxyHints).
+described in [ProxyHints](@ref ProxyHints). Multiple `FileChooser` hints may be
+specified to show multiple extensions with different description texts.
+
 By default, the file chooser widget will accept only existing files.
-It is possible to add <UseDirectoryName/> in the <Hints> section to accept only directories,
-or <AcceptAnyFile/> to accept any filename to export data.
+It is possible to add `<UseDirectoryName/>` in the `<Hints>` section to accept only directories,
+or `<AcceptAnyFile/>` to accept any filename to export data.
 
     <StringVectorProperty animateable="0"
                           command="SetQFileName"
@@ -191,4 +193,4 @@ user can still manually select these values to be loaded.
         <Hints>
           <OmitFromLoadAllVariables />
         </Hints>
-      </StringVectorProperty>
+    </StringVectorProperty>

@@ -47,6 +47,8 @@ public:
   virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
+  virtual void MarkModified() VTK_OVERRIDE;
+
   /**
    * Toggle the visibility of the original mesh.
    * If this->GetVisibility() is false, then this has no effect.
@@ -64,12 +66,15 @@ public:
   void SetMaskArray(const char* val);
   void SetScaleArray(const char* val);
   void SetOrientationArray(const char* val);
+  void SetSourceIndexArray(const char* val);
   void SetScaling(bool val);
   void SetScaleMode(int val);
   void SetScaleFactor(double val);
   void SetOrient(bool val);
   void SetOrientationMode(int val);
   void SetMasking(bool val);
+  void SetSourceIndexing(bool val);
+  void SetUseSourceTableTree(bool val);
 
   //***************************************************************************
   // Overridden to forward to the vtkGlyph3DMapper.
@@ -135,6 +140,11 @@ protected:
    * Determines bounds using the vtkGlyph3DMapper.
    */
   void ComputeGlyphBounds(double bounds[6]);
+
+  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
+
+  vtkAlgorithm* GlyphMultiBlockMaker;
+  vtkPVCacheKeeper* GlyphCacheKeeper;
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;

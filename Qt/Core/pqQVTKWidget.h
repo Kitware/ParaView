@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include "pqQVTKWidgetBase.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 #include <QPointer>
@@ -98,6 +100,7 @@ protected:
 
 private slots:
   void updateSizeProperties();
+  void handleViewSizeForModifiedQt4();
 
 private:
   Q_DISABLE_COPY(pqQVTKWidget)
@@ -105,6 +108,9 @@ private:
   vtkWeakPointer<vtkSMSession> Session;
   QImage MousePointerToDraw;
   QString SizePropertyName;
+
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
+  bool SkipHandleViewSizeForModifiedQt4;
 };
 
 #endif

@@ -26,7 +26,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../pqComponents.qrc">:/pqWidgets/Icons/pqShowOrientationAxes24.png</iconset>
+    <iconset resource="../pqComponents.qrc">:/pqWidgets/Icons/pqShowOrientationAxes.png</iconset>
    </property>
    <property name="text" >
     <string>Show Orientation Axes</string>
@@ -44,7 +44,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqShowCenterAxes24.png</iconset>
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqShowCenterAxes.png</iconset>
    </property>
    <property name="text" >
     <string>Show Center</string>
@@ -61,7 +61,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPickCenter24.png</iconset>
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPickCenter.png</iconset>
    </property>
    <property name="text" >
     <string>Pick Center</string>
@@ -81,7 +81,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqResetCenter24.png</iconset>
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqResetCenter.png</iconset>
    </property>
    <property name="text" >
     <string>Reset Center</string>

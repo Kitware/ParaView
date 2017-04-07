@@ -29,12 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/**
-* \file pqHighlightItemDelegate.h
-* \date 02/20/2014
-*/
-
 #ifndef _pqHighlightRowItemDelegate_h
 #define _pqHighlightRowItemDelegate_h
 
@@ -54,9 +48,9 @@ class PQCOMPONENTS_EXPORT pqHighlightItemDelegate : public QStyledItemDelegate
 
 public:
   /**
-  * Constructor the pqHighlightItemDelegate
-  * The variable color is used to specify the highlight color
-  * \default QColor(Qt::white)
+  * Construct the pqHighlightItemDelegate
+  * The variable color is used to specify the highlight color,
+  * defaults to QColor(Qt::white)
   */
   pqHighlightItemDelegate(QColor color = QColor(Qt::white), QObject* parentObject = 0)
     : QStyledItemDelegate(parentObject)

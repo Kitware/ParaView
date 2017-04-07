@@ -135,6 +135,9 @@ public:
 
     const double* lbptr = std::lower_bound(timesteps, timesteps + num_timesteps, time);
     int index = static_cast<int>(lbptr - timesteps);
+
+    // clamp to last timestep if beyond the range.
+    index = (index >= num_timesteps) ? (num_timesteps - 1) : index;
     assert(index >= 0 && index < num_timesteps);
     return index;
   }
@@ -152,6 +155,7 @@ vtkCGNSReader::vtkCGNSReader()
   this->DoublePrecisionMesh = 1;
   this->CreateEachSolutionAsBlock = 0;
   this->IgnoreFlowSolutionPointers = false;
+  this->DistributeBlocks = true;
 
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -1050,23 +1054,17 @@ int vtkCGNSReader::GetUnstructuredZone(
 {
   cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
 
-  //========================================================================
-  // Test at compilation time with static assert ...
-  // In case  cgsize_t < vtkIdType one could try to start from the array end
-  // Next line is commented since static_assert requires c++11
-  // static_assert(!(sizeof(cgsize_t) > sizeof(vtkIdType)),
-  //              "Impossible to load data with sizeof cgsize_t bigger than sizeof vtkIdType\n");
-  typedef int static_assert_sizeOfvtkIdType[!(sizeof(cgsize_t) > sizeof(vtkIdType)) ? 1 : -1];
-  //=========================================================================
-  // TODO Warning at compilation time ??
-  const bool warningIdTypeSize = sizeof(cgsize_t) != sizeof(vtkIdType);
+  ////=========================================================================
+  const bool warningIdTypeSize = sizeof(cgsize_t) > sizeof(vtkIdType);
   if (warningIdTypeSize == true)
   {
-    vtkDebugMacro(<< "Warning cgsize_t do not have same size as vtkIdType\n"
-                  << "sizeof vtkIdType = " << sizeof(vtkIdType) << "\n"
-                  << "sizeof cgsize_t = " << sizeof(cgsize_t) << "\n");
+    vtkWarningMacro(<< "Warning cgsize_t is larger than the size as vtkIdType\n"
+                    << "  sizeof vtkIdType = " << sizeof(vtkIdType) << "\n"
+                    << "  sizeof cgsize_t = " << sizeof(cgsize_t) << "\n"
+                    << "This may cause unexpected issues. If so, please recompile with "
+                    << "VTK_USE_64BIT_IDS=ON.");
   }
-  //========================================================================
+  ////========================================================================
 
   int rind[6];
   // source layout
@@ -1102,7 +1100,16 @@ int vtkCGNSReader::GetUnstructuredZone(
   memDims[0] = zsize[0];
 
   // Compute number of points
+  if ((sizeof(vtkIdType) < sizeof(cgsize_t)) &&
+    (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < zsize[0]))
+  {
+    // overflow! cannot open the file in current configuration.
+    vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
+    return 1;
+  }
+
   nPts = static_cast<vtkIdType>(zsize[0]);
+  assert(nPts == zsize[0]);
 
   // Set up points
   vtkPoints* points = vtkPoints::New();
@@ -1165,7 +1172,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   //---------------------------------------------------------------------
   // Read the number of sections, for the zone.
   int nsections = 0;
-  nsections = elemIdList.size();
+  nsections = static_cast<int>(elemIdList.size());
 
   std::vector<SectionInformation> sectionInfoList(nsections);
 
@@ -1297,6 +1304,12 @@ int vtkCGNSReader::GetUnstructuredZone(
     sizeSec.push_back(eDataSize);
     startSec.push_back(sectionInfoList[sec].range[0] - 1);
     elementCoreSize += (eDataSize);
+
+    if (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < (elementSize + numCoreCells))
+    {
+      vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
+      return 1;
+    }
     numCoreCells += elementSize;
     coreSec.push_back(sec);
     //
@@ -1732,7 +1745,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     mzone->SetBlock(0, ugrid);
     ugrid->Delete();
     vtkMultiBlockDataSet* mpatch = vtkMultiBlockDataSet::New();
-    mpatch->SetNumberOfBlocks(bndSec.size());
+    mpatch->SetNumberOfBlocks(static_cast<unsigned int>(bndSec.size()));
 
     int bndNum = 0;
     for (std::vector<int>::iterator iter = bndSec.begin(); iter != bndSec.end(); ++iter)
@@ -1993,6 +2006,11 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
   // just a division of zones between processors
   processNumber = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   numProcessors = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+  if (!this->DistributeBlocks)
+  {
+    processNumber = 0;
+    numProcessors = 1;
+  }
 
   int numBases = this->Internal->GetNumberOfBaseNodes();
   int numZones = 0;
@@ -2119,7 +2137,7 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
   nSelectedBases = this->BaseSelection->GetNumberOfArraysEnabled();
   rootNode->SetNumberOfBlocks(nSelectedBases);
   blockIndex = 0;
-  for (int numBase = 0; numBase < baseIds.size(); numBase++)
+  for (int numBase = 0; numBase < static_cast<int>(baseIds.size()); numBase++)
   {
     int cellDim = 0;
     int physicalDim = 0;
@@ -2358,7 +2376,7 @@ errorData:
 }
 
 //------------------------------------------------------------------------------
-int vtkCGNSReader::RequestInformation(vtkInformation* request,
+int vtkCGNSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
 
@@ -2463,6 +2481,7 @@ void vtkCGNSReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LoadBndPatch: " << this->LoadBndPatch << endl;
   os << indent << "CreateEachSolutionAsBlock: " << this->CreateEachSolutionAsBlock << endl;
   os << indent << "IgnoreFlowSolutionPointers: " << this->IgnoreFlowSolutionPointers << endl;
+  os << indent << "DistributeBlocks: " << this->DistributeBlocks << endl;
   os << indent << "Controller: " << this->Controller << endl;
 }
 
@@ -2471,9 +2490,9 @@ int vtkCGNSReader::CanReadFile(const char* name)
 {
   // return value 0: can not read
   // return value 1: can read
-  int cgioNum;
+  int cgioFile;
   int ierr = 1;
-  double rootId;
+  double rootNodeId;
   double childId;
   float FileVersion = 0.0;
   int intFileVersion = 0;
@@ -2483,17 +2502,17 @@ int vtkCGNSReader::CanReadFile(const char* name)
   cgsize_t dimVals[12];
   int fileType = CG_FILE_NONE;
 
-  if (cgio_open_file(name, CG_MODE_READ, CG_FILE_NONE, &cgioNum) != CG_OK)
+  if (cgio_open_file(name, CG_MODE_READ, CG_FILE_NONE, &cgioFile) != CG_OK)
   {
     cgio_error_message(errmsg);
     vtkErrorMacro(<< "vtkCGNSReader::CanReadFile : " << errmsg);
     return 0;
   }
 
-  cgio_get_root_id(cgioNum, &rootId);
-  cgio_get_file_type(cgioNum, &fileType);
+  cgio_get_root_id(cgioFile, &rootNodeId);
+  cgio_get_file_type(cgioFile, &fileType);
 
-  if (cgio_get_node_id(cgioNum, rootId, "CGNSLibraryVersion", &childId))
+  if (cgio_get_node_id(cgioFile, rootNodeId, "CGNSLibraryVersion", &childId))
   {
     cgio_error_message(errmsg);
     vtkErrorMacro(<< "vtkCGNSReader::CanReadFile : " << errmsg);
@@ -2501,14 +2520,14 @@ int vtkCGNSReader::CanReadFile(const char* name)
     goto CanReadError;
   }
 
-  if (cgio_get_data_type(cgioNum, childId, dataType))
+  if (cgio_get_data_type(cgioFile, childId, dataType))
   {
     vtkErrorMacro(<< "CGNS Version data type");
     ierr = 0;
     goto CanReadError;
   }
 
-  if (cgio_get_dimensions(cgioNum, childId, &ndim, dimVals))
+  if (cgio_get_dimensions(cgioFile, childId, &ndim, dimVals))
   {
     vtkErrorMacro(<< "cgio_get_dimensions");
     ierr = 0;
@@ -2532,7 +2551,7 @@ int vtkCGNSReader::CanReadFile(const char* name)
   }
 
   // read data
-  if (cgio_read_all_data(cgioNum, childId, &FileVersion))
+  if (cgio_read_all_data(cgioFile, childId, &FileVersion))
   {
     vtkErrorMacro(<< "read CGNS version number");
     ierr = 0;
@@ -2571,7 +2590,7 @@ int vtkCGNSReader::CanReadFile(const char* name)
   vtkDebugMacro(<< "FileVersion=" << FileVersion << "\n");
 
 CanReadError:
-  cgio_close_file(cgioNum);
+  cgio_close_file(cgioFile);
   return ierr ? 1 : 0;
 }
 

@@ -26,7 +26,7 @@ class VTK_EXPORT vtkMySpecialRepresentation : public vtkGeometryRepresentationWi
 public:
   static vtkMySpecialRepresentation* New();
   vtkTypeMacro(vtkMySpecialRepresentation, vtkGeometryRepresentationWithFaces);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkMySpecialRepresentation();

@@ -1,3 +1,7 @@
+#if defined(TEST_MPI_CAPS)
+#include "vtkMPI.h"
+#endif
+
 #ifdef VTKGL2
 #include "vtk_glew.h"
 #else
@@ -7,10 +11,6 @@
 #include "vtkNew.h"
 #include "vtkRenderWindow.h"
 #include "vtkSetGet.h"
-
-#if defined(TEST_MPI_CAPS)
-#include "vtkMPI.h"
-#endif
 
 #if defined(TEST_PY_CAPS)
 #include "patchlevel.h"

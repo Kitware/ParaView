@@ -1,8 +1,8 @@
 import datetime as dt
 from paraview import servermanager
 from paraview.simple import *
-#from paraview.benchmark import *
-import logbase, logparser
+from paraview.benchmark import *
+#import logbase, logparser
 
 logbase.maximize_logs()
 records = []
@@ -81,7 +81,7 @@ def memtime_stamp():
 
 def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
         resolution=725, view_size=(1920, 1080), num_frames=10, save_logs=True,
-        color=False, OSPRay=False):
+        transparency=False, ospray=False):
     if num_spheres_in_scene is None:
         num_spheres_in_scene = num_spheres
 
@@ -89,7 +89,7 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     controller = vtk.vtkMultiProcessController.GetGlobalController()
 
     view = get_render_view(view_size)
-    if OSPRay:
+    if ospray:
         view.EnableOSPRay = 1
 
     print('Generating bounding box')
@@ -167,13 +167,15 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
     paramprop.SetElement(4, 'res')
     paramprop.SetElement(5, str(resolution))
     gen.UpdateProperty('Parameters')
-    genDisplay = Show()
-    genDisplay.SetRepresentationType('Surface')
 
-    if color:
-        print('Assigning colors')
-        pidScale = ProcessIdScalars()
-        pidScaleDisplay = Show()
+    print('Assigning colors')
+    pidScale = ProcessIdScalars()
+    pidScaleDisplay = Show()
+    pidScaleDisplay.SetRepresentationType('Surface')
+
+    if transparency:
+        print('Enabling 50% transparency')
+        pidScaleDisplay.Opacity = 0.5
 
     print('Repositioning initial camera')
     c = GetActiveCamera()
@@ -220,7 +222,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
                     'num_spheres_in_scene': num_spheres_in_scene,
                     'resolution': resolution, 'view_size': view_size,
                     'num_frames': num_frames, 'save_logs': save_logs,
-                    'color': color}))
+                    'transparency': transparency, 'ospray': ospray}))
 
             # Save the memory statistics collected
             with open(output_basename + '.mem.txt', 'w') as ofile:
@@ -230,7 +232,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
         logparser.summarize_results(num_frames, (fpsT1-fpsT0).total_seconds(),
                                     num_polys, 'Polys', save_logs,
                                     output_basename)
-        print('Points / Frame:', num_points)
+        print('Points / Frame: %d' % (num_points))
 
 
 def main(argv):
@@ -250,9 +252,9 @@ def main(argv):
                         help='View size used to render')
     parser.add_argument('-f', '--frames', default=10, type=int,
                         help='Number of frames')
-    parser.add_argument('-c', '--color', action='store_true',
-                        help='Enable color renderings')
-    parser.add_argument('-y', '--OSPRay', action='store_true',
+    parser.add_argument('-t', '--transparency', action='store_true',
+                        help='Enable transparency')
+    parser.add_argument('-y', '--ospray', action='store_true',
                         help='Use OSPRAY to render')
 
     args = parser.parse_args(argv)
@@ -269,8 +271,8 @@ def main(argv):
 
     run(output_basename=args.output_basename, num_spheres=args.spheres,
         num_spheres_in_scene=args.spheres_in_scene, resolution=args.resolution,
-        view_size=args.view_size, num_frames=args.frames, color=args.color,
-        OSPRay=args.OSPRay)
+        view_size=args.view_size, num_frames=args.frames,
+        transparency=args.transparency, ospray=args.ospray)
 
 if __name__ == "__main__":
     import sys

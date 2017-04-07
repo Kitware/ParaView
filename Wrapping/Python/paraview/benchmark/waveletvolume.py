@@ -1,8 +1,8 @@
 import datetime as dt
 from paraview import servermanager
 from paraview.simple import *
-#from paraview.benchmark import *
-import logbase, logparser
+from paraview.benchmark import *
+#import logbase, logparser
 
 logbase.maximize_logs()
 records = []
@@ -80,13 +80,13 @@ def memtime_stamp():
 
 
 def run(output_basename='log', dimension=100, view_size=(1920, 1080),
-        num_frames=10, save_logs=True, OSPRay=False):
+        num_frames=10, save_logs=True, ospray=False):
 
     import vtk
     controller = vtk.vtkMultiProcessController.GetGlobalController()
 
     view = get_render_view(view_size)
-    if OSPRay:
+    if ospray:
         view.EnableOSPRay = 1
 
     print('Generating wavelet')
@@ -140,6 +140,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
                     'dimension': dimension,
                     'view_size': view_size,
                     'num_frames': num_frames,
+                    'ospray' : ospray,
                     'save_logs': save_logs}))
 
             # Save the memory statistics collected
@@ -165,7 +166,7 @@ def main(argv):
                         help='View size used to render')
     parser.add_argument('-f', '--frames', default=10, type=int,
                         help='Number of frames')
-    parser.add_argument('-y', '--OSPRay', action='store_true',
+    parser.add_argument('-y', '--ospray', action='store_true',
                         help='Use OSPRAY to render')
 
     args = parser.parse_args(argv)
@@ -181,7 +182,7 @@ def main(argv):
             Connect(m.group(2))
 
     run(output_basename=args.output_basename, dimension=args.dimension,
-        view_size=args.view_size, num_frames=args.frames, OSPRay=args.OSPRay)
+        view_size=args.view_size, num_frames=args.frames, ospray=args.ospray)
 
 if __name__ == "__main__":
     import sys

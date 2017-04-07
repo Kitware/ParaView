@@ -77,6 +77,15 @@ public:
   //@}
 
   /**
+   * Description:
+   * Set the screen PPI.
+   * This can be called only after Initialize().
+   * @CallOnAllProcessess
+   */
+  virtual void SetPPI(int);
+  vtkGetMacro(PPI, int);
+
+  /**
    * Triggers a high-resolution render.
    * @CallOnAllProcessess
    */
@@ -260,6 +269,7 @@ protected:
 
   int Size[2];
   int Position[2];
+  int PPI;
 
 private:
   vtkPVView(const vtkPVView&) VTK_DELETE_FUNCTION;

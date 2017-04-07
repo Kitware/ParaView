@@ -28,16 +28,17 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPExtentTranslator.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStreamLinesMapper.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredData.h"
+#include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
@@ -123,7 +124,7 @@ vtkStreamLinesRepresentation::vtkStreamLinesRepresentation()
 
   this->MBMerger = vtkCompositeDataToUnstructuredGridFilter::New();
 
-  this->CacheKeeper->SetInputData(this->Cache);;
+  this->CacheKeeper->SetInputData(this->Cache);
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
@@ -141,13 +142,12 @@ vtkStreamLinesRepresentation::~vtkStreamLinesRepresentation()
   this->Property->Delete();
   this->Actor->Delete();
   this->CacheKeeper->Delete();
-
   this->Cache->Delete();
+  this->MBMerger->Delete();
 }
 
 //----------------------------------------------------------------------------
-int vtkStreamLinesRepresentation::FillInputPortInformation(int,
-  vtkInformation* info)
+int vtkStreamLinesRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
@@ -157,8 +157,7 @@ int vtkStreamLinesRepresentation::FillInputPortInformation(int,
 
 //----------------------------------------------------------------------------
 int vtkStreamLinesRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-  vtkInformation* outInfo)
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
   {
@@ -197,8 +196,8 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-int vtkStreamLinesRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkStreamLinesRepresentation::RequestData(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
@@ -239,7 +238,7 @@ int vtkStreamLinesRepresentation::RequestData(vtkInformation* request,
       inputImage->GetOrigin(this->Origin);
       inputImage->GetSpacing(this->Spacing);
       vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-      inputVector[0]->GetInformationObject(0), this->WholeExtent);
+        inputVector[0]->GetInformationObject(0), this->WholeExtent);
     }
     else if (inputDS)
     {
@@ -250,8 +249,7 @@ int vtkStreamLinesRepresentation::RequestData(vtkInformation* request,
     }
     else if (inputMB)
     {
-      vtkCompositeDataToUnstructuredGridFilter::SafeDownCast(this->MBMerger)->
-        SetInputData(inputMB);
+      vtkCompositeDataToUnstructuredGridFilter::SafeDownCast(this->MBMerger)->SetInputData(inputMB);
       if (!this->GetUsingCacheForUpdate())
       {
         this->CacheKeeper->SetInputConnection(this->MBMerger->GetOutputPort());
@@ -259,11 +257,9 @@ int vtkStreamLinesRepresentation::RequestData(vtkInformation* request,
     }
 
     this->CacheKeeper->Update();
-    this->StreamLinesMapper->SetInputConnection(
-      this->CacheKeeper->GetOutputPort());
+    this->StreamLinesMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
 
-    vtkDataSet* output =
-      vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
+    vtkDataSet* output = vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
     this->DataSize = output->GetActualMemorySize();
   }
   else
@@ -404,6 +400,52 @@ void vtkStreamLinesRepresentation::SetVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetOrientation(double x, double y, double z)
+{
+  this->Actor->SetOrientation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetOrigin(double x, double y, double z)
+{
+  this->Actor->SetOrigin(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetPickable(int val)
+{
+  this->Actor->SetPickable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetPosition(double x, double y, double z)
+{
+  this->Actor->SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetScale(double x, double y, double z)
+{
+  this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->Actor->SetUserTransform(transform.GetPointer());
+}
+
+//***************************************************************************
+// Forwarded to StreamLinesMapper.
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetAnimate(bool val)
+{
+  this->StreamLinesMapper->SetAnimate(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkStreamLinesRepresentation::SetAlpha(double val)
 {
   this->StreamLinesMapper->SetAlpha(val);
@@ -428,11 +470,16 @@ void vtkStreamLinesRepresentation::SetMaxTimeToLive(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamLinesRepresentation::SetInputVectors(int vtkNotUsed(idx), int port,
-  int connection, int fieldAssociation, const char* name)
+void vtkStreamLinesRepresentation::SetNumberOfAnimationSteps(int val)
 {
-  this->StreamLinesMapper->SetInputArrayToProcess(
-    1, port, connection, fieldAssociation, name);
+  this->StreamLinesMapper->SetNumberOfAnimationSteps(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamLinesRepresentation::SetInputVectors(
+  int vtkNotUsed(idx), int port, int connection, int fieldAssociation, const char* name)
+{
+  this->StreamLinesMapper->SetInputArrayToProcess(1, port, connection, fieldAssociation, name);
 }
 
 //----------------------------------------------------------------------------
@@ -462,7 +509,8 @@ void vtkStreamLinesRepresentation::SetMapScalars(int val)
 {
   if (val < 0 || val > 1)
   {
-    vtkWarningMacro(<< "Invalid parameter for vtkStreamLinesRepresentation::SetMapScalars: " << val);
+    vtkWarningMacro(<< "Invalid parameter for vtkStreamLinesRepresentation::SetMapScalars: "
+                    << val);
     val = 0;
   }
   int mapToColorMode[] = { VTK_COLOR_MODE_DIRECT_SCALARS, VTK_COLOR_MODE_MAP_SCALARS };

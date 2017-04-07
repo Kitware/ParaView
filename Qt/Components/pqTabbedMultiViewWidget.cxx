@@ -40,10 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 
 #include <QEvent>
@@ -277,6 +280,18 @@ void pqTabbedMultiViewWidget::setReadOnly(bool val)
 bool pqTabbedMultiViewWidget::readOnly() const
 {
   return this->Internals->TabWidget->readOnly();
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setTabVisibility(bool visible)
+{
+  this->Internals->TabWidget->tabBar()->setVisible(visible);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::tabVisibility() const
+{
+  return this->Internals->TabWidget->tabBar()->isVisible();
 }
 
 //-----------------------------------------------------------------------------
@@ -561,55 +576,6 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject* obj, QEvent* evt)
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
-{
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    return widget->captureImage(dx, dy);
-  }
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
-int pqTabbedMultiViewWidget::prepareForCapture(int dx, int dy)
-{
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    return widget->prepareForCapture(dx, dy);
-  }
-
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::cleanupAfterCapture()
-{
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    widget->cleanupAfterCapture();
-  }
-}
-
-//-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::writeImage(const QString& filename, int dx, int dy, int quality)
-{
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    return widget->writeImage(filename, dx, dy, quality);
-  }
-
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::toggleWidgetDecoration()
 {
   pqMultiViewWidget* widget =
@@ -757,3 +723,65 @@ void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item
     }
   }
 }
+
+//=================================================================================
+// LEGACY METHODS
+//=================================================================================
+#if !defined(VTK_LEGACY_REMOVE)
+//-----------------------------------------------------------------------------
+vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
+{
+  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::captureImage, "ParaView 5.4");
+
+  pqMultiViewWidget* widget =
+    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
+  if (widget)
+  {
+    vtkSmartPointer<vtkImageData> img =
+      vtkSMSaveScreenshotProxy::CaptureImage(widget->layoutManager(), vtkVector2i(dx, dy));
+    if (img)
+    {
+      img->Register(nullptr);
+      return img.GetPointer();
+    }
+    return nullptr;
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+int pqTabbedMultiViewWidget::prepareForCapture(int, int)
+{
+  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::prepareForCapture, "ParaView 5.4");
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::cleanupAfterCapture()
+{
+  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::cleanupAfterCapture, "ParaView 5.4");
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::writeImage(const QString& filename, int dx, int dy, int quality)
+{
+  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::writeImage, "ParaView 5.4");
+
+  pqMultiViewWidget* widget =
+    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
+  if (widget)
+  {
+    vtkSmartPointer<vtkImageData> img =
+      vtkSMSaveScreenshotProxy::CaptureImage(widget->layoutManager(), vtkVector2i(dx, dy));
+    if (img)
+    {
+      return vtkSMUtilities::SaveImage(img.GetPointer(), filename.toLocal8Bit().data(), quality) ==
+        vtkErrorCode::NoError;
+    }
+  }
+
+  return true;
+}
+
+#endif // !defined(VTK_LEGACY_REMOVE)
+//=================================================================================

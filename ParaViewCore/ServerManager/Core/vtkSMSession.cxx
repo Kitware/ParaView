@@ -249,9 +249,12 @@ void vtkSMSession::Disconnect(vtkSMSession* session)
     return;
   }
 
-  // Ensure that the session no longer sends state updates to the server-side.
-  // This is critical to ensure we don't mess up the collaboration state.
-  session->PreDisconnection();
+  if (session->IsMultiClients())
+  {
+    // Ensure that the session no longer sends state updates to the server-side.
+    // This is critical to ensure we don't mess up the collaboration state.
+    session->PreDisconnection();
+  }
 
   // Unregister all proxies.
   session->GetSessionProxyManager()->UnRegisterProxies();

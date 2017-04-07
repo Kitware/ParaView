@@ -19,7 +19,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Play</string>
@@ -31,7 +31,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack.png</iconset>
    </property>
    <property name="text" >
     <string>Pre&amp;vious Frame</string>
@@ -45,7 +45,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;First Frame</string>
@@ -56,7 +56,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Next Frame</string>
@@ -67,7 +67,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Last Frame</string>
@@ -81,7 +81,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLoop24.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLoop.png</iconset>
    </property>
    <property name="text" >
     <string>L&amp;oop</string>

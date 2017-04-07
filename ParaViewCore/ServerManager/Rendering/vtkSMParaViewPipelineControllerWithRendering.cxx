@@ -615,6 +615,7 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   producer->UpdatePipeline(time);
 }
 
+#if !defined(VTK_LEGACY_REMOVE)
 //----------------------------------------------------------------------------
 template <class T>
 bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int quality)
@@ -623,34 +624,6 @@ bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int
   {
     return false;
   }
-  SM_SCOPED_TRACE(SaveCameras).arg("proxy", viewOrLayout);
-
-  SM_SCOPED_TRACE(CallFunction)
-    .arg("SaveScreenshot")
-    .arg(filename)
-    .arg((vtkSMViewProxy::SafeDownCast(viewOrLayout) ? "view" : "layout"), viewOrLayout)
-    .arg("magnification", magnification)
-    .arg("quality", quality)
-    .arg("comment", "save screenshot");
-
-  if (magnification > 1)
-  {
-    // An interim fix for this bug BUG #17205 is to simply change magnification
-    // to 1 when running in multi-rank non-symmetric batch mode and complain about
-    // it. Long term, we need to stop sharing render windows in batch mode and
-    // simply let interactors be created for the ranks as needed.
-
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-      pm->GetNumberOfLocalPartitions() > 1 && pm->GetSymmetricMPIMode() == false)
-    {
-      vtkGenericWarningMacro(
-        "`Magnification` > 1 is currently not supported with `pvbatch` due a known issue. "
-        "Forcing `magnification` to 1 till the issue is resolved.");
-      magnification = 1;
-    }
-  }
-
   vtkSmartPointer<vtkImageData> img;
   img.TakeReference(viewOrLayout->CaptureWindow(magnification));
   if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
@@ -664,6 +637,7 @@ bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int
 bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
   vtkSMViewProxy* view, const char* filename, int magnification, int quality)
 {
+  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
   return vtkWriteImage<vtkSMViewProxy>(view, filename, magnification, quality);
 }
 
@@ -671,8 +645,10 @@ bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
 bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
   vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
 {
+  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
   return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
 }
+#endif // !defined(VTK_LEGACY_REMOVE)
 
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(

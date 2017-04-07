@@ -81,7 +81,7 @@ public:
   /**
   * When this is true, the panel uses a descriptive layout where the
   * documentation for properties is used instead of their labels. pqProxyWidget
-  * automatically adopts this style of layout if <UseDocumentationForLabels />
+  * automatically adopts this style of layout if `<UseDocumentationForLabels />`
   * hint is present in the proxy.
   */
   bool useDocumentationForLabels() const { return this->UseDocumentationForLabels; }
@@ -124,7 +124,7 @@ public:
   /**
   * Returns true if the proxy has XML hints indicating that the panel should
   * show a header label for the documentation. pqProxyWidget uses the
-  * <ShowProxyDocumentationInPanel /> hint for this purpose.
+  * `<ShowProxyDocumentationInPanel />` hint for this purpose.
   */
   static DocumentationType showProxyDocumentationInPanel(vtkSMProxy* proxy);
 

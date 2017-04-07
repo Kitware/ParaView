@@ -295,11 +295,8 @@ protected:
    */
   int CheckAttributes(vtkDataObject* input);
 
-  // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void* clientdata, void*);
-  void InternalProgressCallback(vtkAlgorithm* algorithm);
-  // The observer to report progress from the internal readers.
-  vtkCallbackCommand* InternalProgressObserver;
+  // Callback for recording progress of internal filters.
+  void HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*);
 
   virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
@@ -321,7 +318,6 @@ protected:
   int ForceUseStrips;
   vtkTimeStamp StripSettingMTime;
   int StripModFirstPass;
-
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
 

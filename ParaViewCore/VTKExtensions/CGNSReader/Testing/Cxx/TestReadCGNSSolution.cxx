@@ -34,7 +34,7 @@ int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type);
 
 int TestOutputData(vtkMultiBlockDataSet* mb, int nCells, int nArrays)
 {
-  int nBlocks = mb->GetNumberOfBlocks();
+  unsigned int nBlocks = mb->GetNumberOfBlocks();
   vtk_assert(nBlocks > 0);
   for (unsigned int i = 0; i < nBlocks; ++i)
   {
@@ -64,14 +64,10 @@ int TestReadCGNSSolution(int argc, char* argv[])
 
   const char* solution = argv[2];
   vtkNew<vtkCGNSReader> reader;
-  vtkInformation* inf = reader->GetInformation();
-
   reader->SetFileName(solution);
-  reader->Update();
-
+  reader->UpdateInformation();
   reader->EnableAllCellArrays();
   reader->EnableAllPointArrays();
-
   reader->Update();
 
   vtkMultiBlockDataSet* mb = reader->GetOutput();

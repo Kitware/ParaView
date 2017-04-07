@@ -69,6 +69,20 @@
                      repeatable="1">
         <Documentation>Representations in this view.</Documentation>
       </ProxyProperty>
+      <IntVectorProperty command="SetPPI"
+                         default_values="96"
+                         name="PPI"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>Set the screen ppi (pixels per inch). This is used
+                       when mapping font sizes in points to screen pixels.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="GeneralSettings"
+                        property="ScreenPixelsPerInch"/>
+        </Hints>
+      </IntVectorProperty>
     </Proxy>
 
     <!-- ================================================================== -->
@@ -3779,6 +3793,12 @@
             <Property name="GlyphType"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="3d glyphs"/>
+            <Property name="UseGlyphTable"
+                      panel_visibility="advanced"/>
+            <Property name="GlyphTableIndexArray"
+                      panel_visibility="advanced"/>
+            <Property name="UseCompositeGlyphTable"
+                      panel_visibility="advanced"/>
             <Hints>
                 <PropertyWidgetDecorator type="GenericDecorator"
                                          mode="visibility"
@@ -4792,6 +4812,7 @@
         <Documentation>Specify the source objects.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
+          <DataType value="vtkDataObjectTree" />
         </DataTypeDomain>
         <ProxyListDomain name="proxy_list">
           <Proxy group="sources" name="ArrowSource" />
@@ -4801,6 +4822,7 @@
           <Proxy group="sources" name="LineSource" />
           <Proxy group="sources" name="SphereSource" />
           <Proxy group="sources" name="GlyphSource2D" />
+          <Proxy group="internal_filters" name="PipelineConnection" />
         </ProxyListDomain>
         <Hints>
           <ProxyPropertyWidget selected_proxy_panel_visibility="advanced" />
@@ -4936,6 +4958,38 @@
         access mode is set and there is no such id, or array name access mode
         is set and the there is no such name), masking is silently ignored. A
         mask array is a vtkBitArray with only one component.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSourceIndexing"
+                         default_values="0"
+                         name="UseGlyphTable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When true, the glyph data is expected to be a multiblock
+        dataset, where each top-level node contains a separate glyph which may
+        be selected by a point data array on the input dataset.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetSourceIndexArray"
+                            default_values=""
+                            name="GlyphTableIndexArray"
+                            number_of_elements="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="input_array_point"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseSourceTableTree"
+                         default_values="0"
+                         name="UseCompositeGlyphTable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When true, the glyph data is expected to be a multiblock
+        dataset, where each top-level node contains a separate glyph which may
+        be selected by a point data array on the input dataset.</Documentation>
       </IntVectorProperty>
       <!-- end of Glyph3DRepresentation -->
     </RepresentationProxy>

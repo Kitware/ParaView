@@ -124,6 +124,7 @@ public:
   /**
    * Creates a new instance for the class specified using the interpreter.
    */
+  VTK_NEWINSTANCE
   vtkObjectBase* NewInstance(const char* classname);
 
   /**

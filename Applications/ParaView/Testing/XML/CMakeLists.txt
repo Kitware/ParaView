@@ -4,6 +4,7 @@ paraview_test_load_data_dirs(""
   "Iron Xdmf"
   amr
   ANALYZE
+  CompositeGlyphTree
   dualSphereAnimation
   ensemble-wavelet
   EnSight
@@ -33,6 +34,8 @@ paraview_test_load_data(""
   can.ex2
   comb.q
   combxyz.bin
+  CompositeGlyphInput.vtp
+  CompositeGlyphTree.vtm
   CubeStringArray.vtk
   cylinder_run1.e
   cylinder_run2.e
@@ -41,7 +44,6 @@ paraview_test_load_data(""
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
   "iron protein.vtk"
-  LoadStateMultiView.pvsm
   LoadState.pvsm
   minimal.nii
   MultiBlockWithPieces_0_0.vtp
@@ -410,6 +412,9 @@ if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
 
     # PlotMatrixView is bugging in OpenGL1
     ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
+
+    # Composite Glyph Trees are only implemented in OpenGL2
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompositeGlyphTree.xml
     )
 endif()
 
@@ -474,12 +479,8 @@ if (PARAVIEW_USE_MPI)
       )
 
   endif()
-  if (PARAVIEW_ENABLE_CGNS)
-    list(APPEND TESTS_WITH_BASELINES
-      ${CMAKE_CURRENT_SOURCE_DIR}/CGNSReader-5blocks_cgns.xml
-    )
-    set(CGNSReader-5blocks_cgns_DISABLE_CRS TRUE)
-  endif()
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/CGNSReader-5blocks_cgns.xml)
 
   # PointInterpolator only works in non-distributed modes.
   set(PointInterpolator_DISABLE_CRS TRUE)
@@ -796,7 +797,7 @@ SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
-SET(SaveLargeScreenshot_THRESHOLD 10000)
+SET(SaveLargeScreenshot_THRESHOLD 40)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)

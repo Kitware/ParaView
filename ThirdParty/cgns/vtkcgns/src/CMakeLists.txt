@@ -9,10 +9,10 @@ endif (WIN32)
 
 # Include the local directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-# XXX(kitware): Handled by ParaView.
-if (FALSE)
 if (CGNS_ENABLE_HDF5)
   add_definitions(-DBUILD_HDF5)
+  # XXX(kitware): Handled by ParaView.
+  if (FALSE)
   if (WIN32)
     if (HDF5_LIBRARY)
       file(STRINGS ${HDF5_LIBRARY} HDF5isDLL REGEX "__imp__H5close")
@@ -25,11 +25,11 @@ if (CGNS_ENABLE_HDF5)
   if(HDF5_NEED_MPI AND MPI_INC)
     include_directories(${MPI_INC})
   endif(HDF5_NEED_MPI AND MPI_INC)
+  endif ()
   if (CGNS_ENABLE_PARALLEL)
     add_definitions(-DBUILD_PARALLEL)
   endif (CGNS_ENABLE_PARALLEL)
 endif (CGNS_ENABLE_HDF5)
-endif ()
 
 ################################
 # create configed header files #
@@ -557,12 +557,12 @@ install(FILES
 	cgns_mangle.h
 	cgnslib.h
 	cgns_io.h
-	cgnswin_f.h
+	#cgnswin_f.h
 	${CMAKE_CURRENT_BINARY_DIR}/cgnsconfig.h
 	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
+	#${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
         DESTINATION ${cgns_include_directory})
 
 if (CGNS_ENABLE_FORTRAN)

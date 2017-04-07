@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqStandardPropertyWidgetInterface.h"
+
+#include "vtkPVConfig.h"
+
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
 #include "pqBoxPropertyWidget.h"
@@ -55,10 +58,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlanePropertyWidget.h"
 #include "pqIndexSelectionWidget.h"
 #include "pqInputDataTypeDecorator.h"
+#include "pqInputSelectorWidget.h"
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLightsEditor.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
+#include "pqOSPRayHidingDecorator.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
@@ -68,15 +73,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextLocationWidget.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
+#include "pqViewResolutionPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
-#include "vtkPVConfig.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
+
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqCinemaConfiguration.h"
 #endif
-#include "pqOSPRayHidingDecorator.h"
 
 #include <QtDebug>
 
@@ -155,6 +160,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   {
     return new pqIndexSelectionWidget(smProxy, smProperty);
   }
+  else if (name == "input_selector")
+  {
+    return new pqInputSelectorWidget(smProxy, smProperty);
+  }
   else if (name == "camera_manipulator")
   {
     return new pqCameraManipulatorWidget(smProxy, smProperty);
@@ -178,6 +187,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "filename_widget")
   {
     return new pqFileNamePropertyWidget(smProxy, smProperty);
+  }
+  else if (name == "view_resolution")
+  {
+    return new pqViewResolutionPropertyWidget(smProxy, smProperty);
   }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

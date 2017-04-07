@@ -32,17 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStreamLinesAnimationManager.h"
 
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqView.h"
 #include "pqRenderView.h"
 #include "pqRepresentation.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
 
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <QtDebug>
-
 
 //-----------------------------------------------------------------------------
 pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=0*/)
@@ -65,8 +64,7 @@ void pqStreamLinesAnimationManager::onRenderEnded()
   QList<pqRepresentation*> reprs = view->getRepresentations();
   for (int i = 0; i < reprs.count(); ++i)
   {
-    vtkSMRepresentationProxy* repr =
-      vtkSMRepresentationProxy::SafeDownCast(reprs[i]->getProxy());
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(reprs[i]->getProxy());
     if (repr && repr->GetProperty("Representation"))
     {
       const char* rs = vtkSMPropertyHelper(repr, "Representation").GetAsString();

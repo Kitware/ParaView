@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 // Windows-only helper functionality:
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 namespace

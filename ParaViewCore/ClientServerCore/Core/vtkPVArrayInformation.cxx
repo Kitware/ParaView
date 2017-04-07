@@ -60,11 +60,12 @@ vtkStandardNewMacro(vtkPVArrayInformation);
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
 {
-  this->Name = 0;
-  this->Ranges = 0;
-  this->ComponentNames = 0;
-  this->DefaultComponentName = 0;
-  this->InformationKeys = 0;
+  this->Name = NULL;
+  this->Ranges = NULL;
+  this->FiniteRanges = NULL;
+  this->ComponentNames = NULL;
+  this->DefaultComponentName = NULL;
+  this->InformationKeys = NULL;
   this->IsPartial = 0;
   this->Initialize();
 }
@@ -106,8 +107,14 @@ void vtkPVArrayInformation::Initialize()
   if (this->Ranges)
   {
     delete[] this->Ranges;
-    this->Ranges = 0;
+    this->Ranges = NULL;
   }
+  if (this->FiniteRanges)
+  {
+    delete[] this->FiniteRanges;
+    this->FiniteRanges = NULL;
+  }
+
   this->IsPartial = 0;
 
   if (this->InformationKeys)
@@ -181,6 +188,11 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     delete[] this->Ranges;
     this->Ranges = NULL;
   }
+  if (this->FiniteRanges)
+  {
+    delete[] this->FiniteRanges;
+    this->FiniteRanges = NULL;
+  }
   this->NumberOfComponents = numComps;
   if (numComps <= 0)
   {
@@ -192,12 +204,14 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     numComps = numComps + 1;
   }
 
-  int idx;
   this->Ranges = new double[numComps * 2];
-  for (idx = 0; idx < numComps; ++idx)
+  this->FiniteRanges = new double[numComps * 2];
+  for (int idx = 0; idx < numComps; ++idx)
   {
     this->Ranges[2 * idx] = VTK_DOUBLE_MAX;
     this->Ranges[2 * idx + 1] = -VTK_DOUBLE_MAX;
+    this->FiniteRanges[2 * idx] = VTK_DOUBLE_MAX;
+    this->FiniteRanges[2 * idx + 1] = -VTK_DOUBLE_MAX;
   }
 }
 
@@ -326,6 +340,60 @@ void vtkPVArrayInformation::GetComponentRange(int comp, double* range)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVArrayInformation::SetComponentFiniteRange(int comp, double min, double max)
+{
+  if (comp >= this->NumberOfComponents || this->NumberOfComponents <= 0)
+  {
+    vtkErrorMacro("Bad component");
+  }
+  if (this->NumberOfComponents > 1)
+  { // Shift over vector mag range.
+    ++comp;
+  }
+  if (comp < 0)
+  { // anything less than 0 just defaults to the vector mag.
+    comp = 0;
+  }
+  this->FiniteRanges[comp * 2] = min;
+  this->FiniteRanges[comp * 2 + 1] = max;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVArrayInformation::GetComponentFiniteRange(int comp)
+{
+  if (comp >= this->NumberOfComponents || this->NumberOfComponents <= 0)
+  {
+    vtkErrorMacro("Bad component");
+    return NULL;
+  }
+  if (this->NumberOfComponents > 1)
+  { // Shift over vector mag range.
+    ++comp;
+  }
+  if (comp < 0)
+  { // anything less than 0 just defaults to the vector mag.
+    comp = 0;
+  }
+  return this->FiniteRanges + comp * 2;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::GetComponentFiniteRange(int comp, double* range)
+{
+  double* ptr = this->GetComponentFiniteRange(comp);
+
+  if (ptr == NULL)
+  {
+    range[0] = VTK_DOUBLE_MAX;
+    range[1] = -VTK_DOUBLE_MAX;
+    return;
+  }
+
+  range[0] = ptr[0];
+  range[1] = ptr[1];
+}
+
+//----------------------------------------------------------------------------
 void vtkPVArrayInformation::GetDataTypeRange(double range[2])
 {
   int dataType = this->GetDataType();
@@ -412,6 +480,35 @@ void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation* info)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVArrayInformation::AddFiniteRanges(vtkPVArrayInformation* info)
+{
+  const double* range;
+  double* ptr = this->FiniteRanges;
+  int idx;
+
+  if (this->NumberOfComponents != info->GetNumberOfComponents())
+  {
+    vtkErrorMacro("Component mismatch.");
+  }
+
+  if (this->NumberOfComponents > 1)
+  {
+    range = info->GetComponentFiniteRange(-1);
+    ptr[0] = std::min(ptr[0], range[0]);
+    ptr[1] = std::max(ptr[1], range[1]);
+    ptr += 2;
+  }
+
+  for (idx = 0; idx < this->NumberOfComponents; ++idx)
+  {
+    range = info->GetComponentFiniteRange(idx);
+    ptr[0] = std::min(ptr[0], range[0]);
+    ptr[1] = std::max(ptr[1], range[1]);
+    ptr += 2;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* info)
 {
   int num, idx;
@@ -431,7 +528,10 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation* info)
   {
     this->Ranges[idx] = info->Ranges[idx];
   }
-
+  for (idx = 0; idx < num; ++idx)
+  {
+    this->FiniteRanges[idx] = info->FiniteRanges[idx];
+  }
   // clear the vector of old data
   if (this->ComponentNames)
   {
@@ -553,6 +653,20 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
       *ptr++ = range[0];
       *ptr++ = range[1];
     }
+    ptr = this->FiniteRanges;
+    if (this->NumberOfComponents > 1)
+    {
+      // First store range of vector magnitude.
+      data_array->GetFiniteRange(range, -1);
+      *ptr++ = range[0];
+      *ptr++ = range[1];
+    }
+    for (idx = 0; idx < this->NumberOfComponents; ++idx)
+    {
+      data_array->GetFiniteRange(range, idx);
+      *ptr++ = range[0];
+      *ptr++ = range[1];
+    }
   }
 
   if (this->InformationKeys)
@@ -602,6 +716,7 @@ void vtkPVArrayInformation::AddInformation(vtkPVInformation* info)
     {
       // Leave everything but ranges and unique values as original, add ranges and unique values.
       this->AddRanges(aInfo);
+      this->AddFiniteRanges(aInfo);
       this->AddInformationKeys(aInfo);
     }
   }
@@ -631,7 +746,10 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
   {
     *css << vtkClientServerStream::InsertArray(this->Ranges + 2 * i, 2);
   }
-
+  for (int i = 0; i < num; ++i)
+  {
+    *css << vtkClientServerStream::InsertArray(this->FiniteRanges + 2 * i, 2);
+  }
   // add in the component names
   num = static_cast<int>(this->ComponentNames ? this->ComponentNames->size() : 0);
   *css << num;
@@ -710,7 +828,17 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
       return;
     }
   }
-  int pos = 5 + num;
+
+  // Range of each component.
+  for (int i = 0; i < num; ++i)
+  {
+    if (!css->GetArgument(0, 5 + num + i, this->FiniteRanges + 2 * i, 2))
+    {
+      vtkErrorMacro("Error parsing range of component.");
+      return;
+    }
+  }
+  int pos = 5 + 2 * num;
   int numOfComponentNames;
   if (!css->GetArgument(0, pos++, &numOfComponentNames))
   {

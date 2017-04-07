@@ -113,7 +113,7 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflow")
   if(rv)
     message(FATAL_ERROR "vtkpython return value was = '${rv}' ")
   endif()
-endif("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflow")
+endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
   message("${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0_0.png -V
@@ -135,7 +135,7 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
   if(rv)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
-endif("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
+endif()
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithOnlyPlots")
   message("${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png -V
@@ -147,4 +147,4 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithOnlyPlots")
   if(rv)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
-endif("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithPlots")
+endif()

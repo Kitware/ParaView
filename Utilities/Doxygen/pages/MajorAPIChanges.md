@@ -4,6 +4,31 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.4
+--------------
+
+### Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
+
+As a result of this change, `vtkAppendArcLength` was moved from
+the `internal_filters` to the `filters` group.
+
+###Changes to Save Screenshot / Save Animation###
+
+`pqSaveSnapshotDialog` is removed. This class was used by
+`pqSaveScreenshotReaction` to present user with options to control the saved
+image. This is now done using `pqProxyWidgetDialog` for the **(misc,
+SaveScreenshot)** proxy. See `pqSaveScreenshotReaction` for details.
+
+`pqStereoModeHelper` has been removed. It was to help save/restore stereo mode
+for views for saving screenshots and animations. All of that logic is now
+encapsulated in `vtkSMSaveScreenshotProxy`.
+
+`pqMultiViewWidget::captureImage`, `pqMultiViewWidget::writeImage`,
+`pqTabbedMultiViewWidget::captureImage`, `pqTabbedMultiViewWidget::writeImage`,
+`pqView::captureImage`, `pqView::writeImage` have been deprecated and will be removed in
+future releases. Saving and capturing images now goes through pqSaveScreenshotReaction
+(or **vtkSMScreenshotOptions** proxy).
+
 Changes in 5.3
 --------------
 
@@ -118,14 +143,14 @@ of input ports is defined in the XML plugin file with the *input_ports* attribut
 The different input ports are then defined with InputProperty having each a
 different *port_index*:
 
-   <SourceProxy name="Name" class="vtkPythonProgrammableFilter" label="label" input_ports="2">
-      <InputProperty name="Source" command="SetInputConnection" port_index="0">
-        [...]
-      </InputProperty>
-      <InputProperty name="Target" command="SetInputConnection" port_index="1">
-        [...]
-      </InputProperty>
-   </SourceProxy>
+    <SourceProxy name="Name" class="vtkPythonProgrammableFilter" label="label" input_ports="2">
+       <InputProperty name="Source" command="SetInputConnection" port_index="0">
+         [...]
+       </InputProperty>
+       <InputProperty name="Target" command="SetInputConnection" port_index="1">
+         [...]
+       </InputProperty>
+    </SourceProxy>
 
 Changes in 5.1
 --------------

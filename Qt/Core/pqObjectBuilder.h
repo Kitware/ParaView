@@ -214,7 +214,7 @@ public:
   * If no such property exists, this retruns a null string.
   * If there are more than 1 properties with FileListDomain, then it looks at
   * the Hints for the proxy for the XML of the form
-  * <DefaultFileNameProperty name="<propertyname>" /> and uses that property
+  * `<DefaultFileNameProperty name="<propertyname>" />` and uses that property
   * otherwise simply returns the first one encountered.
   */
   static QString getFileNamePropertyName(vtkSMProxy*);

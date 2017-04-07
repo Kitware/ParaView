@@ -80,18 +80,27 @@
         </FieldDataDomain>
       </StringVectorProperty>
 
-      <IntVectorProperty command="SetVisibility"
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
                          default_values="1"
-                         name="Visibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set the visibility for this representation.
         </Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty command="SetDiffuseColor"
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DiffuseColor"
+                            command="SetDiffuseColor"
                             default_values="0.0 1.0 0.0"
-                            name="DiffuseColor"
                             number_of_elements="3"
                             panel_widget="color_selector_with_palette">
         <DoubleRangeDomain max="1 1 1"
@@ -102,9 +111,9 @@
         </Hints>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty command="SetLineWidth"
+      <DoubleVectorProperty name="LineWidth"
+                            command="SetLineWidth"
                             default_values="1.0"
-                            name="LineWidth"
                             number_of_elements="1">
         <DoubleRangeDomain min="1"
                            name="range" />
@@ -119,6 +128,68 @@
           formula: 1 - 1 / (Alpha * MaxTimeToLive).
         </Documentation>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 0"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1 1 1"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetOrientation"
+                            default_values="0 0 0"
+                            name="Orientation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0 0 0"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetUserTransform"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="UserTransform"
+                            number_of_elements="16">
+        <Documentation>
+          In addition to the instance variables such as position and
+          orientation, you can add an additional transformation for your own
+          use. This transformation is concatenated with the actor's internal
+          transformation, which you implicitly create through the use of
+          Position, Origin, Orientation. The value is 4x4 matrix for the linear
+          tranform to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Animate"
+                         command="SetAnimate"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn the animation ON or OFF.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfAnimationSteps"
+                         command="SetNumberOfAnimationSteps"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Specify the maximum number of steps before the
+        animation stops. This feature is for testing purposes only!
+        </Documentation>
+      </IntVectorProperty>
 
       <DoubleVectorProperty name="StepLength"
                             command="SetStepLength"
@@ -166,9 +237,11 @@
 
         <ExposedProperties>
           <PropertyGroup label="Stream Lines">
-            <Property name="InputVectors"/>
-            <Property name="Alpha"/>
-            <Property name="StepLength"/>
+            <Property name="Animate" />
+            <Property name="NumberOfAnimationSteps" />
+            <Property name="InputVectors" />
+            <Property name="Alpha" />
+            <Property name="StepLength" />
             <Property name="NumberOfParticles" />
             <Property name="MaxTimeToLive" />
             <Hints>
@@ -198,9 +271,11 @@
 
         <ExposedProperties>
           <PropertyGroup label="Stream Lines">
-            <Property name="InputVectors"/>
-            <Property name="Alpha"/>
-            <Property name="StepLength"/>
+            <Property name="Animate" />
+            <Property name="NumberOfAnimationSteps" />
+            <Property name="InputVectors" />
+            <Property name="Alpha" />
+            <Property name="StepLength" />
             <Property name="NumberOfParticles" />
             <Property name="MaxTimeToLive" />
             <Hints>
@@ -230,9 +305,11 @@
 
         <ExposedProperties>
           <PropertyGroup label="Stream Lines">
-            <Property name="InputVectors"/>
-            <Property name="Alpha"/>
-            <Property name="StepLength"/>
+            <Property name="Animate" />
+            <Property name="NumberOfAnimationSteps" />
+            <Property name="InputVectors" />
+            <Property name="Alpha" />
+            <Property name="StepLength" />
             <Property name="NumberOfParticles" />
             <Property name="MaxTimeToLive" />
             <Hints>
@@ -262,9 +339,11 @@
 
         <ExposedProperties>
           <PropertyGroup label="Stream Lines">
-            <Property name="InputVectors"/>
-            <Property name="Alpha"/>
-            <Property name="StepLength"/>
+            <Property name="Animate" />
+            <Property name="NumberOfAnimationSteps" />
+            <Property name="InputVectors" />
+            <Property name="Alpha" />
+            <Property name="StepLength" />
             <Property name="NumberOfParticles" />
             <Property name="MaxTimeToLive" />
             <Hints>

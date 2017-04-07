@@ -21,6 +21,8 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 
+#include <algorithm>
+
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
 {
@@ -81,13 +83,34 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(
 
   if (eventid == vtkCommand::AnimationCueTickEvent)
   {
-    vtkAnimationCue::AnimationCueInfo* cueInfo =
+    const vtkAnimationCue::AnimationCueInfo* cueInfo =
       reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(calldata);
     if (!this->SaveFrame(cueInfo->AnimationTime))
     {
       // Save failed, abort.
       this->AnimationScene->Stop();
       this->SaveFailed = true;
+
+      double progress = 1.0;
+      this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
+    }
+    else
+    {
+      // invoke progress event.
+      // use playback window, if valid, else  use the animation time to convert
+      // current time to progress in range [0, 1].
+      double window[2];
+      this->GetPlaybackTimeWindow(window);
+      if (window[0] <= window[1])
+      {
+        window[0] = cueInfo->StartTime;
+        window[1] = cueInfo->EndTime;
+      }
+
+      double progress = (cueInfo->AnimationTime - window[0]) / (window[1] - window[0]);
+      progress = std::max(0.0, progress);
+      progress = std::min(progress, 1.0);
+      this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
     }
   }
 }

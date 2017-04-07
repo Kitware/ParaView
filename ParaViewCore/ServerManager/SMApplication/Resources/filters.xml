@@ -1,34 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_filters">
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkAppendArcLength"
-                 label="Append Arc-Length"
-                 name="AppendArcLength">
-      <Documentation long_help="Appends Arc length for input poly lines."
-                     short_help="Appends Arc length for input poly lines.">
-                     Internal filter used by (filters, ProbeLine).
-                     vtkAppendArcLength is used for filter such as
-                     plot-over-line. In such cases, we need to add an attribute
-                     array that is the arc_length over the length of the probed
-                     line. That's when vtkAppendArcLength can be used. It adds
-                     a new point-data array named "arc_length" with the
-                     computed arc length for each of the polylines in the
-                     input. For all other cell types, the arc length is set to
-                     0.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <Documentation>The input.</Documentation>
-      </InputProperty>
-      <!-- End of AppendArcLength -->
-    </SourceProxy>
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  name="ProbeLine">
       <Documentation>Internal filter used by (filters, ProbeLine). The Plot
@@ -221,9 +193,69 @@
       </DoubleVectorProperty>
       <!-- End ExtractSelectionRange -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPassThrough"
+                 name="PipelineConnection"
+                 label="Pipeline Connection">
+      <Documentation>
+        This proxy provides UI for selecting an existing pipeline connection.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_widget="input_selector"
+                     null_on_empty="1"
+                     panel_visibility="always">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetAllowNullInput"
+                         name="AllowNullInput"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Allow the filter to execute successful, producing an empty polydata,
+          when the input is not specified.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End PipelineConnection -->
+    </SourceProxy>
     <!-- End of internal_filters -->
   </ProxyGroup>
   <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendArcLength"
+                 label="Append Arc-Length"
+                 name="AppendArcLength">
+      <Documentation long_help="Appends Arc length for input poly lines."
+                     short_help="Appends Arc length for input poly lines.">
+                     vtkAppendArcLength is used for filter such as
+                     plot-over-line. In such cases, we need to add an attribute
+                     array that is the arc_length over the length of the probed
+                     line. That's when vtkAppendArcLength can be used. It adds
+                     a new point-data array named "arc_length" with the
+                     computed arc length for each of the polylines in the
+                     input. For all other cell types, the arc length is set to
+                     0.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <!-- End of AppendArcLength -->
+    </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPassThrough" label="Pass Through" name="PassThrough">
       <Documentation>
@@ -2525,6 +2557,102 @@ array.
       </Hints>
       <!-- End ForceTime -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy name="TemporalArrayOperator"
+                 label="Temporal Array Operator"
+                 class="vtkTemporalArrayOperatorFilter">
+      <Documentation>
+        Filter used to perform an operation on a data array at 2 different timesteps.
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array"/>
+        <Documentation>
+          This property specifies the input to the TemporalArrayOperator filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property lists the name of the array from which to
+        use.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="FirstTimeStepIndex"
+        command="SetFirstTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the first part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOperator"
+                         default_values="0"
+                         name="Operator"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="+"
+                 value="0" />
+          <Entry text="-"
+                 value="1" />
+          <Entry text="*"
+                 value="2" />
+          <Entry text="/"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>The property determines the operation to compute
+        between the first and second timestep data.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="SecondTimeStepIndex"
+        command="SetSecondTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the second part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOutputArrayNameSuffix"
+                            name="OutputArrayNameSuffix"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>This property set the suffix to be append to the output array name.
+        If empty, output will be suffixed with '_' and the operation type.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ShowInMenu category="Temporal" />
+      </Hints>
+      <!-- End TemporalArrayOperator -->
+    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkImageGradient"
                  label="Gradient"
@@ -5992,6 +6120,15 @@ array.
                             name="ScaleFactor"
                             number_of_elements="1"
                             panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputScalars" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
         <Documentation>The scalar value at a given point is multiplied by the
         value of this property to determine the magnitude of the change vector
         for that point.</Documentation>
@@ -6081,6 +6218,15 @@ array.
                             name="ScaleFactor"
                             number_of_elements="1"
                             panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputVectors" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
         <Documentation>Each component of the selected vector array will be
         multiplied by the value of this property before being used to compute
         new point coordinates.</Documentation>
@@ -8218,7 +8364,7 @@ source.</Documentation>
              servers="1"
              type="ProbeLine" />
       <Proxy compound_name="AppendArcLength1"
-             group="internal_filters"
+             group="filters"
              id="588"
              servers="1"
              type="AppendArcLength">
@@ -8725,6 +8871,22 @@ source.</Documentation>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="0"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0" />
+          <Entry text="Interpolator with Cell Locator"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property determines which interpolator to use for
+        evaluating the velocity vector field. The first is faster though the
+        second is more robust in locating cells during streamline
+        integration.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetSurfaceStreamlines"
                          default_values="0"
                          name="Surface Streamlines"
@@ -11740,6 +11902,60 @@ source.</Documentation>
         180-&gt;0 degrees. Otherwise, the s-coordinate ranges from 0-&gt;1
         between 0-&gt;360 degrees.</Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateCylinderAutomatically"
+        command="SetAutomaticCylinderGeneration"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the filter will try to determine the size and orientation of the cylinder
+          used for texture mapping using data bounds.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Point1"
+        command="SetPoint1"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,min">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the first point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Point2"
+        command="SetPoint2"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,max">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the second point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <!-- End TextureMapToCylinder -->
     </SourceProxy>
     <!-- ==================================================================== -->

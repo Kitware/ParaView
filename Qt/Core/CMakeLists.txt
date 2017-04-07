@@ -33,8 +33,6 @@ set(Module_SRCS
   pqAnimationCue.h
   pqAnimationScene.cxx
   pqAnimationScene.h
-  pqAnimationSceneImageWriter.cxx
-  pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
   pqAutoStartInterface.cxx
@@ -196,8 +194,6 @@ set(Module_SRCS
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.cxx
   pqStandardServerManagerModelInterface.h
-  pqStereoModeHelper.cxx
-  pqStereoModeHelper.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
   pqTreeLayoutStrategyInterface.cxx

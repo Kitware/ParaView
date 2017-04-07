@@ -47,7 +47,7 @@ public:
    * Returns true if a sequence is detected and
    * sets SequenceName and SequenceIndex.
    */
-  bool ParseFileSequence(char* file);
+  bool ParseFileSequence(const char* file);
 
   vtkGetStringMacro(SequenceName);
   vtkGetMacro(SequenceIndex, int);
@@ -61,7 +61,6 @@ protected:
   vtksys::RegularExpression* reg_ex3;
   vtksys::RegularExpression* reg_ex4;
   vtksys::RegularExpression* reg_ex5;
-  vtksys::RegularExpression* reg_ex_last;
 
   // Used internall so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);

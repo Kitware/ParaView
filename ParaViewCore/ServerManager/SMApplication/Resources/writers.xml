@@ -814,6 +814,15 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each time step available from the
+        reader.</Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -1270,69 +1279,7 @@
       </Hints>
       <!-- End of EnSightWriter -->
     </PWriterProxy>
-    <Proxy class="vtkSMAnimationSceneImageWriter"
-           name="AnimationSceneImageWriter">
-      <Documentation>Internal writer to used paraview uses when it disconnects
-      the GUI.</Documentation>
-      <IntVectorProperty command="SetMagnification"
-                         default_values="1"
-                         name="Magnification"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
-        <Documentation>The magnification factor to use for the saved
-        animation.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <Documentation>The name of the file to save the animation
-        into.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="SetFrameRate"
-                            default_values="0"
-                            name="FrameRate"
-                            number_of_elements="1">
-        <Documentation>Get/Set the frame rate to use for saving the animation.
-        This frame rate is the frame rate that gets saved in the movie file
-        generated, if applicable. If does not affect the FrameRate set on the
-        animation scene at all. In other words, this is the playback frame rate
-        and not the animation generation frame rate.</Documentation>
-      </DoubleVectorProperty>
 
-      <DoubleVectorProperty command="SetPlaybackTimeWindow"
-                            default_values="-1 1"
-                            name="PlaybackTimeWindow"
-                            number_of_elements="2">
-        <Documentation>Time range to write</Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty command="SetCompression"
-                         default_values="1"
-                         name="Compression"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation> Turns on(the default) or off compression for FFMEG
-         (AVI on Linux and Mac) backend.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetStartFileCount"
-                         default_values="0"
-                         name="StartFileCount"
-                         number_of_elements="1">
-      </IntVectorProperty>
-
-      <Hints>
-        <Property name="Input"
-                  show="0" />
-        <Property name="FileName"
-                  show="0" />
-        <Property name="Compression"
-                  show="0" />
-      </Hints>
-      <!-- End of AnimationSceneImageWriter -->
-    </Proxy>
     <!-- ================================================================= -->
     <SourceProxy class="vtkXMLPVAnimationWriter"
                  name="XMLPVAnimationWriter">

@@ -1,5 +1,7 @@
+// clang-format off
 //VTK::System::Dec
 //VTK::Output::Dec
+// clang-format on
 
 uniform vec3 color;
 uniform int scalarVisibility;

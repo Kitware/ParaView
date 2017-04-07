@@ -136,6 +136,8 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
 #endif
 
+  ::addItem(tree, "vtkIdType size", QString("%1bits").arg(8 * sizeof(vtkIdType)));
+
   vtkNew<vtkPVPythonInformation> pythonInfo;
   pythonInfo->CopyFromObject(NULL);
 
@@ -251,6 +253,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
 
   ::addItem(tree, "Write Ogg/Theora Animations", serverInfo->GetOGVSupport() ? "On" : "Off");
   ::addItem(tree, "Write AVI Animations", serverInfo->GetAVISupport() ? "On" : "Off");
+  ::addItem(tree, "vtkIdType size", QString("%1bits").arg(serverInfo->GetIdTypeSize()));
 
   vtkSMSession* session = server->session();
   vtkNew<vtkPVPythonInformation> pythonInfo;

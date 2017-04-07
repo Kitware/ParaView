@@ -22,7 +22,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqResetCamera24.png</normaloff>:/pqWidgets/Icons/pqResetCamera24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqResetCamera.png</normaloff>:/pqWidgets/Icons/pqResetCamera.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Reset</string>
@@ -40,7 +40,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqXPlus24.png</normaloff>:/pqWidgets/Icons/pqXPlus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqXPlus.png</normaloff>:/pqWidgets/Icons/pqXPlus.png</iconset>
    </property>
    <property name="text">
     <string>+X</string>
@@ -61,7 +61,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqXMinus24.png</normaloff>:/pqWidgets/Icons/pqXMinus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqXMinus.png</normaloff>:/pqWidgets/Icons/pqXMinus.png</iconset>
    </property>
    <property name="text">
     <string>-X</string>
@@ -82,7 +82,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqYPlus24.png</normaloff>:/pqWidgets/Icons/pqYPlus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqYPlus.png</normaloff>:/pqWidgets/Icons/pqYPlus.png</iconset>
    </property>
    <property name="text">
     <string>+Y</string>
@@ -103,7 +103,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqYMinus24.png</normaloff>:/pqWidgets/Icons/pqYMinus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqYMinus.png</normaloff>:/pqWidgets/Icons/pqYMinus.png</iconset>
    </property>
    <property name="text">
     <string>-Y</string>
@@ -124,7 +124,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZPlus24.png</normaloff>:/pqWidgets/Icons/pqZPlus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZPlus.png</normaloff>:/pqWidgets/Icons/pqZPlus.png</iconset>
    </property>
    <property name="text">
     <string>+Z</string>
@@ -145,7 +145,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZMinus24.png</normaloff>:/pqWidgets/Icons/pqZMinus24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZMinus.png</normaloff>:/pqWidgets/Icons/pqZMinus.png</iconset>
    </property>
    <property name="text">
     <string>-Z</string>
@@ -166,7 +166,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRotateCameraCW24.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCW24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCW.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCW.png</iconset>
    </property>
    <property name="text">
     <string></string>
@@ -187,7 +187,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRotateCameraCCW24.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCCW24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.png</iconset>
    </property>
    <property name="text">
     <string></string>
@@ -208,7 +208,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZoomToSelection24.png</normaloff>:/pqWidgets/Icons/pqZoomToSelection24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZoomToSelection.png</normaloff>:/pqWidgets/Icons/pqZoomToSelection.png</iconset>
    </property>
    <property name="text">
     <string>Zoom to Box</string>
@@ -226,7 +226,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZoomToData24.png</normaloff>:/pqWidgets/Icons/pqZoomToData24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZoomToData.png</normaloff>:/pqWidgets/Icons/pqZoomToData.png</iconset>
    </property>
   </action>
   <addaction name="actionResetCamera"/>

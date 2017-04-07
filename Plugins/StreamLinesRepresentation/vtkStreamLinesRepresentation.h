@@ -24,8 +24,8 @@
 #ifndef vtkStreamLinesRepresentation_h
 #define vtkStreamLinesRepresentation_h
 
+#include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
-#include "vtkNew.h"  // needed for vtkNew.
 
 class vtkColorTransferFunction;
 class vtkExtentTranslator;
@@ -40,7 +40,6 @@ class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkStreamLinesMapper;
 
-
 class VTK_EXPORT vtkStreamLinesRepresentation : public vtkPVDataRepresentation
 {
 public:
@@ -54,8 +53,7 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  int ProcessViewRequest(
-    vtkInformationRequestKey*, vtkInformation*, vtkInformation*) VTK_OVERRIDE;
+  int ProcessViewRequest(vtkInformationRequestKey*, vtkInformation*, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -71,7 +69,6 @@ public:
    */
   void SetVisibility(bool val) VTK_OVERRIDE;
 
-
   //***************************************************************************
   // Forwarded to vtkProperty.
   virtual void SetAmbientColor(double r, double g, double b);
@@ -86,11 +83,22 @@ public:
   virtual void SetSpecularPower(double val);
 
   //***************************************************************************
+  // Forwarded to Actor.
+  virtual void SetOrientation(double, double, double);
+  virtual void SetOrigin(double, double, double);
+  virtual void SetPickable(int val);
+  virtual void SetPosition(double, double, double);
+  virtual void SetScale(double, double, double);
+  virtual void SetUserTransform(const double[16]);
+
+  //***************************************************************************
   // Forwarded to vtkStreamLinesMapper
+  virtual void SetAnimate(bool val);
   virtual void SetAlpha(double val);
   virtual void SetStepLength(double val);
   virtual void SetNumberOfParticles(int val);
   virtual void SetMaxTimeToLive(int val);
+  virtual void SetNumberOfAnimationSteps(int val);
 
   virtual void SetInputVectors(int, int, int, int attributeMode, const char* name);
 
@@ -139,8 +147,8 @@ public:
   {
     this->Superclass::SetInputArrayToProcess(idx, info);
   }
-  void SetInputArrayToProcess(int idx, int port, int connection,
-    const char* fieldAssociation, const char* attributeTypeorName) VTK_OVERRIDE
+  void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldAssociation,
+    const char* attributeTypeorName) VTK_OVERRIDE
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);

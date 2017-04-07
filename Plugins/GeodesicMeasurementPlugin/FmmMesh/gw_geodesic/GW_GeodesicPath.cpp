@@ -295,7 +295,6 @@ GW_I32 GW_GeodesicPath::AddNewPoint()
 
         SubPointVector.push_back( GW_Vector3D(x,y,1-x-y) );
     }
-    GW_ASSERT( GW_False );
     GW_GeodesicVertex* pSelectedVert = pVert1;
     if( pVert2->GetDistance()<pSelectedVert->GetDistance() )
         pSelectedVert = pVert2;

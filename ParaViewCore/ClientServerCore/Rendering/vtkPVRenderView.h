@@ -462,13 +462,15 @@ public:
    * about LOD/remote rendering etc and not the actual size of the dataset.
    */
   static void SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
-    unsigned long trueSize = 0);
-  static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info, vtkPVDataRepresentation* repr);
-  static void SetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data);
+    unsigned long trueSize = 0, int port = 0);
+  static vtkAlgorithmOutput* GetPieceProducer(
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+  static void SetPieceLOD(
+    vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data, int port = 0);
   static vtkAlgorithmOutput* GetPieceProducerLOD(
-    vtkInformation* info, vtkPVDataRepresentation* repr);
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static void MarkAsRedistributable(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true);
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true, int port = 0);
   static void SetGeometryBounds(
     vtkInformation* info, double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
@@ -511,7 +513,8 @@ public:
    * root node will be sent to the client without any parallel communication.
    */
   static void SetDeliverToClientAndRenderingProcesses(vtkInformation* info,
-    vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery);
+    vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery,
+    int port = 0);
 
   //@{
   /**

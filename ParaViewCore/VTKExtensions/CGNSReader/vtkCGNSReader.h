@@ -53,7 +53,7 @@ class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDa
 public:
   static vtkCGNSReader* New();
   vtkTypeMacro(vtkCGNSReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -130,6 +130,15 @@ public:
   vtkGetMacro(IgnoreFlowSolutionPointers, bool);
   vtkBooleanMacro(IgnoreFlowSolutionPointers, bool);
 
+  /**
+   * This reader can support piece requests by distributing each block in each
+   * zone across ranks (default). To make the reader disregard piece request and
+   * read all blocks in the zone, set this to false (default is true).
+   */
+  vtkSetMacro(DistributeBlocks, bool);
+  vtkGetMacro(DistributeBlocks, bool);
+  vtkBooleanMacro(DistributeBlocks, bool);
+
   //@{
   /**
    * Set/get the communication object used to relay a list of files
@@ -150,10 +159,10 @@ protected:
   vtkCGNSReader();
   ~vtkCGNSReader();
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
-
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkDataArraySelection* BaseSelection;
   vtkDataArraySelection* PointDataArraySelection;
@@ -187,6 +196,7 @@ private:
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;
+  bool DistributeBlocks;
 
   // For internal cgio calls (low level IO)
   int cgioNum;      // cgio file reference
