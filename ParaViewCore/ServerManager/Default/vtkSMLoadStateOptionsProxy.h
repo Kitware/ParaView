@@ -75,7 +75,7 @@ protected:
    * Locates the files in the user specified directory and updates the paths
    * in the state file XML.
    *
-   * @returns false if any of the files where not found
+   * @returns false if any of the files were not found
    */
   bool LocateFilesInDirectory(std::vector<std::string>& filepaths);
 

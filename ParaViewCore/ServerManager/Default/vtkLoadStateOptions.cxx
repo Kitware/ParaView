@@ -83,7 +83,7 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
       directoryPathComponents.begin() + insertIndex, pathComponents.back());
     pathComponents.pop_back();
   }
-  vtkErrorMacro("Cannot find " << SystemTools::GetFilenameName(filepath) << " in "
-                               << this->DataDirectory.c_str() << ".");
+  vtkErrorMacro("Cannot find '" << SystemTools::GetFilenameName(filepath) << " in '"
+                                << this->DataDirectory.c_str() << "'. Using '" << filepath << "'.");
   return result;
 }

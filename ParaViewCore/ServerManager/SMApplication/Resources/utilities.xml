@@ -4058,7 +4058,7 @@
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Use File Names From State" value="0" />
-          <Entry text="Use **Data Directory** to search for all data files." value="1" />
+          <Entry text="Search files under specified directory" value="1" />
           <Entry text="Choose File Names" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>

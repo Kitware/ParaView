@@ -1103,7 +1103,7 @@ class LoadState(TraceItem):
         optionsAccessor = ProxyAccessor("temporaryOptions", options)
 
         trace = TraceOutput()
-        trace.append("# save state")
+        trace.append("# load state")
         trace.append(\
             optionsAccessor.trace_ctor("LoadState", ExporterProxyFilter(),
               ctor_args="'%s'" % filename,

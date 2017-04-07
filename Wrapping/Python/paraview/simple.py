@@ -572,10 +572,11 @@ def SetProperties(proxy=None, **params):
     """
     if not proxy:
         proxy = active_objects.source
+    properties = proxy.ListProperties()
     for param in params.keys():
-        if not hasattr(proxy, param):
+        if param not in properties:
             raise AttributeError("object has no property %s" % param)
-        setattr(proxy, param, params[param])
+        proxy.SetPropertyWithName(param, params[param])
 
 # -----------------------------------------------------------------------------
 
