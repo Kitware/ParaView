@@ -72,8 +72,8 @@ ColorBy(calculator1Display, ('POINTS', 'Result'))
 # rescale color and/or opacity maps used to include current data range
 calculator1Display.RescaleTransferFunctionToDataRange(True)
 
-# show color bar/color legend
-calculator1Display.SetScalarBarVisibility(renderView1, True)
+# hide color bar/color legend
+calculator1Display.SetScalarBarVisibility(renderView1, False)
 
 # get color transfer function/color map for 'Result'
 ResultLUT = GetColorTransferFunction('Result')
@@ -93,8 +93,8 @@ ColorBy(calculator1Display, ('POINTS', 'Result', 'X'))
 # rescale color and/or opacity maps used to include current data range
 calculator1Display.RescaleTransferFunctionToDataRange(True)
 
-# show color bar/color legend
-calculator1Display.SetScalarBarVisibility(renderView1, True)
+# hide color bar/color legend
+calculator1Display.SetScalarBarVisibility(renderView1, False)
 
 # Update a scalar bar component title.
 UpdateScalarBarsComponentTitle(ResultLUT, calculator1Display)
