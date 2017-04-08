@@ -277,7 +277,7 @@
 
       <IntVectorProperty name="AnimationTimePrecision"
         number_of_elements="1"
-        default_values="17"
+        default_values="6"
         command="SetAnimationTimePrecision"
         panel_visibility="advanced">
         <Documentation>
