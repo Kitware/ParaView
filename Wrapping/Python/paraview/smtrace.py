@@ -613,7 +613,6 @@ class ProxyFilter(object):
         # should we hide properties hidden from panels? yes, generally, except
         # Views.
         if hide_gui_hidden == True and prop.get_object().GetPanelVisibility() == "never":
-            if prop.get_property_name() == "ViewSize": print ("skipping hidden")
             return True
         # if a property is "linked" to settings, then skip it here too. We
         # should eventually add an option for user to save, yes, save these too.

@@ -161,19 +161,30 @@ if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
   set(PARAVIEW_PVBATCH_ARGS)
 endif()
 
-# SavePythonState test
-if (PARAVIEW_BUILD_QT_GUI)
-  if(BUILD_SHARED_LIBS)
-    add_test(NAME SavePythonState
-      COMMAND ${CMAKE_COMMAND}
-      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
-      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
-      -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
-      -DPARAVIEW_TEST_OUTPUT_BASELINE_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
-      -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.py
-      -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.xml
-      -DTEMPORARY_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
-      -P ${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.cmake)
-    set_tests_properties(SavePythonState PROPERTIES LABELS "PARAVIEW")
+# Python state tests. Each test executes an XML test in the ParaView UI, saves
+# the state as a Python state file, runs the Python state file script in
+# pvpython, then checks that the same image is generated in both the UI and
+# pvpython. Each <TEST> list here requires a <TEST>.xml that generates the
+# trace and a <TEST>.png file for comparison to a baseline.
+set(paraview_python_state_tests
+  SavePythonState
+  ScalarOpacityFunctionPythonState
+)
+foreach(python_state_test ${paraview_python_state_tests})
+  if (PARAVIEW_BUILD_QT_GUI)
+    if(BUILD_SHARED_LIBS)
+      add_test(NAME ${python_state_test}
+        COMMAND ${CMAKE_COMMAND}
+        -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+        -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+        -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+        -DPARAVIEW_TEST_OUTPUT_BASELINE_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
+        -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.py
+        -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${python_state_test}.xml
+        -DTEMPORARY_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+        -DPYTHON_STATE_TEST_NAME:STRING=${python_state_test}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.cmake)
+      set_tests_properties(${python_state_test} PROPERTIES LABELS "PARAVIEW")
+    endif()
   endif()
-endif()
+endforeach()

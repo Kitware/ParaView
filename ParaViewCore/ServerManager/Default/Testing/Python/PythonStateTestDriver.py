@@ -1,6 +1,6 @@
-# test driver for the second half of the SavePythonState test. it
+# Test driver for the second half of the PythonStateTestDriver test. It
 # sets up the testing environment, loads the state file (passed
-# on the command line), and verifys the resulting image
+# on the command line), and verifies the resulting image.
 
 import sys
 from paraview import smtesting
