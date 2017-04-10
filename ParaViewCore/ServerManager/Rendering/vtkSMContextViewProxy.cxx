@@ -43,7 +43,7 @@
 
 namespace
 {
-const char* XY_CHART_VIEW = "XYChartView";
+const char XY_CHART_VIEW[] = "XYChartView";
 }
 
 vtkStandardNewMacro(vtkSMContextViewProxy);
@@ -174,7 +174,7 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
       this->GetProperty("LeftAxisRangeMaximum"));
     update_property(chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRangeMinimum"),
       this->GetProperty("BottomAxisRangeMaximum"));
-    if (this->GetXMLName() == XY_CHART_VIEW)
+    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
     {
       update_property(chartXY->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRangeMinimum"),
         this->GetProperty("RightAxisRangeMaximum"));
@@ -203,7 +203,7 @@ void vtkSMContextViewProxy::OnInteractionEvent()
     this->CopyAxisRangesFromChart();
     vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
     vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
-    if (this->GetXMLName() == XY_CHART_VIEW)
+    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
     {
       vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
       vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
@@ -250,7 +250,7 @@ void vtkSMContextViewProxy::ResetDisplay()
     // new ranges to use in the Update call.
     vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
     vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
-    if (this->GetXMLName() == XY_CHART_VIEW)
+    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
     {
       vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
       vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
