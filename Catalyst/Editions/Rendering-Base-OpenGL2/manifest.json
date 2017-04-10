@@ -309,6 +309,7 @@
         { "class": "vtkMergeCells" },
         { "class": "vtkMultiBlockDataGroupFilter" },
         { "class": "vtkPassArrays" },
+        { "class": "vtkPassThrough" },
         { "class": "vtkSplitColumnComponents" },
         { "class": "vtkTransformPolyDataFilter" }
       ],
@@ -962,6 +963,7 @@
         "DataSetSurfaceFilter",
         "ExtractHistogram",
         "IntegrateAttributes",
+        "PipelineConnection",
         "WarpScalar",
         "WarpVector"
       ]
