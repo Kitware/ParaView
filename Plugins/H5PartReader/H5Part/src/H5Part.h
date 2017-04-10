@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include <hdf5.h>
+#include <vtk_hdf5.h>
 
 #ifdef H5PART_HAS_MPI
 #include <mpi.h>

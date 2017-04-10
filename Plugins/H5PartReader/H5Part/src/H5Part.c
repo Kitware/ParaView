@@ -80,7 +80,7 @@ Last modified on April 19, 2007.
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <hdf5.h>
+#include <vtk_hdf5.h>
 
 #ifndef _WIN32
 #include <unistd.h>
