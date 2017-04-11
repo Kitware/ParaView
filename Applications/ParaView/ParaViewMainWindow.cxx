@@ -49,6 +49,7 @@ void vtkPVInitializePythonModules();
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqSaveStateReaction.h"
 #include "pqSettings.h"
 #include "pqTimer.h"
 #include "pqWelcomeDialog.h"
@@ -63,6 +64,7 @@ void vtkPVInitializePythonModules();
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QTextCodec>
 #include <QUrl>
@@ -312,6 +314,34 @@ void ParaViewMainWindow::showEvent(QShowEvent* evt)
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::closeEvent(QCloseEvent* evt)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core->settings()->value("GeneralSettings.ShowSaveStateOnExit", false).toBool())
+  {
+    switch (QMessageBox::question(this, "Exit ParaView?",
+      "Do you want to save the state before exiting ParaView?",
+      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel))
+    {
+      case QMessageBox::Save:
+        if (pqSaveStateReaction::saveState())
+        {
+          evt->accept();
+          return;
+        }
+      default:
+      case QMessageBox::Cancel:
+        evt->ignore();
+        return;
+      case QMessageBox::Discard:
+        evt->accept();
+        break;
+    }
+  }
+  evt->accept();
 }
 
 //-----------------------------------------------------------------------------

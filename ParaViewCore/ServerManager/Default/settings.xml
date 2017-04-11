@@ -21,6 +21,19 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ShowSaveStateOnExit"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Prompt to save state when exiting ParaView.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="CrashRecovery"
         number_of_elements="1"
         default_values="0"
