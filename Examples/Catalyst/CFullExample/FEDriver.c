@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
   InitializeAttributes(&attributes, &grid);
 
 #ifdef USE_CATALYST
-  CatalystInitialize(argc, argv);
+  // The first argument is the program name
+  CatalystInitialize(argc - 1, argv + 1);
 #endif
   unsigned int numberOfTimeSteps = 100;
   unsigned int timeStep;

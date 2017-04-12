@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
   attributes.Initialize(&grid);
 
 #ifdef USE_CATALYST
-  FEAdaptor::Initialize(argc, argv);
+  // The first argument is the program name
+  FEAdaptor::Initialize(argc - 1, argv + 1);
 #endif
   unsigned int numberOfTimeSteps = 100;
   for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)

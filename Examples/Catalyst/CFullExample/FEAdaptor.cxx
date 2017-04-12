@@ -106,7 +106,7 @@ void CatalystInitialize(int numScripts, char* scripts[])
   {
     Processor->RemoveAllPipelines();
   }
-  for (int i = 1; i < numScripts; i++)
+  for (int i = 0; i < numScripts; i++)
   {
     vtkNew<vtkCPPythonScriptPipeline> pipeline;
     pipeline->Initialize(scripts[i]);
