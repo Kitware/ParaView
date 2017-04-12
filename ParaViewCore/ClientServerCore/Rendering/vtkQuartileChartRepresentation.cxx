@@ -106,6 +106,71 @@ public:
     return this->Superclass::GetInputArrayIndex(tableName, columnName, role);
   }
 
+  //---------------------------------------------------------------------------
+  // Export visible plots to a CSV file.
+  virtual bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter)
+  {
+    for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
+         ++iter1)
+    {
+      for (PlotsMapItem::const_iterator iter2 = iter1->second.begin(); iter2 != iter1->second.end();
+           ++iter2)
+      {
+        const PlotInfo& plotInfo = iter2->second;
+        vtkPlot* plot = plotInfo.Plot;
+        if (!plot->GetVisible())
+        {
+          continue;
+        }
+        std::string columnName = plotInfo.ColumnName;
+        vtkTable* table = plot->GetInput();
+        vtkDataArray* xarray = self->GetUseIndexForXAxis()
+          ? NULL
+          : vtkDataArray::SafeDownCast(table->GetColumnByName(self->GetXAxisSeriesName()));
+        if (StatsArrayRe.find(columnName))
+        {
+          std::string fn = StatsArrayRe.match(1);
+          if (fn == "max" || fn == "q3")
+          {
+            const std::string& tableName = plotInfo.TableName;
+            const std::string role = this->GetSeriesRole(tableName, columnName);
+            std::string default_label = self->GetDefaultSeriesLabel(tableName, columnName);
+            std::string label = this->GetSeriesParameter(
+              self, tableName, columnName, role, this->Labels, default_label);
+
+            std::vector<std::pair<std::string, std::string> > yNames;
+            yNames.push_back(std::make_pair(columnName, fn + " " + label));
+            if (fn == "max")
+            {
+              yNames.push_back(std::make_pair(columnName.replace(0, 3, "min"), "min " + label));
+            }
+            else
+            {
+              yNames.push_back(std::make_pair(columnName.replace(0, 2, "q1"), "q1 " + label));
+            }
+
+            for (auto iter3 = yNames.rbegin(); iter3 != yNames.rend(); ++iter3)
+            {
+              vtkAbstractArray* yarray = table->GetColumnByName(iter3->first.c_str());
+              if (yarray != NULL)
+              {
+                exporter->AddColumn(yarray, iter3->second.c_str(), xarray);
+              }
+            }
+            continue;
+          }
+        }
+
+        vtkAbstractArray* yarray = table->GetColumnByName(columnName.c_str());
+        if (yarray != NULL)
+        {
+          exporter->AddColumn(yarray, plot->GetLabel().c_str(), xarray);
+        }
+      }
+    }
+    return true;
+  }
+
 protected:
   virtual bool UpdateSinglePlotProperties(vtkXYChartRepresentation* self,
     const std::string& tableName, const std::string& columnName, const std::string& role,
