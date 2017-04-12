@@ -19,9 +19,10 @@ from vtk.vtkPVServerManagerCore import *
 #    vtkSMPVRepresentationProxy
 from vtk.vtkPVServerManagerRendering import *
 
+PY3 = False
 if sys.version_info >= (3,):
     xrange = range
-    PY3 = true
+    PY3 = True
 
 # =============================================================================
 # Pipeline management
