@@ -29,6 +29,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtksys/SystemTools.hxx"
+#include <vtk_pugixml.h>
+
 using namespace vtksys;
 
 #include <set>
@@ -174,12 +176,20 @@ vtkSMLoadStateOptionsProxy::~vtkSMLoadStateOptionsProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMLoadStateOptionsProxy::ConvertXML(pugi::xml_node& node)
+namespace
+{
+
+/**
+ * Converts pugixml to vtkPVXMLElement
+ */
+vtkPVXMLElement* ConvertXML(vtkPVXMLParser* parser, pugi::xml_node& node)
 {
   std::stringstream ss;
   node.print(ss);
-  this->XMLParser->Parse(ss.str().c_str());
-  return XMLParser->GetRootElement();
+
+  parser->Parse(ss.str().c_str());
+  return parser->GetRootElement();
+}
 }
 
 //----------------------------------------------------------------------------
@@ -216,7 +226,8 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     propertyGroupElement.append_attribute("label").set_value(proxyXML.attribute("type").value());
     propertyGroupElement.append_attribute("panel_widget").set_value("LoadStateOptionsDialog");
 
-    newReaderProxy->LoadXMLState(this->ConvertXML(proxyXML), nullptr);
+    vtkNew<vtkPVXMLParser> XMLParser;
+    newReaderProxy->LoadXMLState(ConvertXML(XMLParser.Get(), proxyXML), nullptr);
     std::string newProxyName = std::to_string(idIter->first);
     this->AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
 
@@ -234,15 +245,16 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
       widgetDecorator.append_attribute("property").set_value("LoadStateDataFileOptions");
       widgetDecorator.append_attribute("value").set_value("2");
 
-      property->SetHints(this->ConvertXML(hints));
+      property->SetHints(ConvertXML(XMLParser.Get(), hints));
 
       pugi::xml_node propertyXML = pIter->second.XMLElement;
       std::string exposedName =
         SystemTools::GetFilenameName(propertyXML.child("Element").attribute("value").value());
 
-      if (this->SequenceParser->ParseFileSequence(exposedName.c_str()))
+      vtkNew<vtkFileSequenceParser> sequenceParser;
+      if (sequenceParser->ParseFileSequence(exposedName.c_str()))
       {
-        exposedName = this->SequenceParser->GetSequenceName();
+        exposedName = sequenceParser->GetSequenceName();
       }
 
       exposedName.append(".").append(propertyXML.attribute("name").value());
@@ -253,7 +265,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
         .set_value(exposedName.c_str());
     }
 
-    this->NewPropertyGroup(this->ConvertXML(propertyGroup));
+    this->NewPropertyGroup(ConvertXML(XMLParser.Get(), propertyGroup));
   }
 
   return true;
@@ -447,9 +459,10 @@ bool vtkSMLoadStateOptionsProxy::Load()
     if (propertiesModified)
     {
       std::string filename = SystemTools::GetFilenameName(primaryFilename);
-      if (this->SequenceParser->ParseFileSequence(filename.c_str()))
+      vtkNew<vtkFileSequenceParser> sequenceParser;
+      if (sequenceParser->ParseFileSequence(filename.c_str()))
       {
-        filename = this->SequenceParser->GetSequenceName();
+        filename = sequenceParser->GetSequenceName();
       }
 
       this->Internals->CollectionsMap[idIter->first].attribute("name").set_value(filename.c_str());
@@ -458,7 +471,8 @@ bool vtkSMLoadStateOptionsProxy::Load()
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  pxm->LoadXMLState(this->ConvertXML(this->Internals->StateXML));
+  vtkNew<vtkPVXMLParser> XMLParser;
+  pxm->LoadXMLState(ConvertXML(XMLParser.Get(), this->Internals->StateXML));
 
   return true;
 }

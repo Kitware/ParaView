@@ -28,11 +28,7 @@
 #include "vtkNew.h"                          // for vtkNew
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
-#include <vector>        // needed for std::vector
-#include <vtk_pugixml.h> // for pugi::xml_node
-
-class vtkFileSequenceParser;
-class vtkPVXMLParser;
+#include <vector> // needed for std::vector
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
@@ -79,11 +75,6 @@ protected:
    */
   bool LocateFilesInDirectory(std::vector<std::string>& filepaths);
 
-  /**
-   * Converts pugixml to vtkPVXMLElement
-   */
-  vtkPVXMLElement* ConvertXML(pugi::xml_node& node);
-
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
 
@@ -101,8 +92,6 @@ protected:
 private:
   class vtkInternals;
   vtkInternals* Internals;
-  vtkNew<vtkFileSequenceParser> SequenceParser;
-  vtkNew<vtkPVXMLParser> XMLParser;
 
   vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
