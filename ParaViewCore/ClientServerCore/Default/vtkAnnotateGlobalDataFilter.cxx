@@ -43,6 +43,8 @@ vtkAnnotateGlobalDataFilter::vtkAnnotateGlobalDataFilter()
   this->Prefix = 0;
   this->Postfix = 0;
   this->FieldArrayName = 0;
+  this->Format = 0;
+  this->SetFormat("%7.5g");
   this->SetArrayAssociation(vtkDataObject::FIELD);
 }
 

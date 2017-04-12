@@ -65,6 +65,14 @@ public:
   vtkGetStringMacro(Postfix);
   //@}
 
+  //@{
+  /**
+   * Set the format to use when displaying the field value
+   */
+  vtkSetStringMacro(Format);
+  vtkGetStringMacro(Format);
+  //@}
+
 protected:
   vtkAnnotateGlobalDataFilter();
   ~vtkAnnotateGlobalDataFilter();
@@ -74,6 +82,7 @@ protected:
   char* Prefix;
   char* Postfix;
   char* FieldArrayName;
+  char* Format;
 
 private:
   vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;

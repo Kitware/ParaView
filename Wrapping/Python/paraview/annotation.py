@@ -139,7 +139,7 @@ def execute_on_global_data(self):
             chosen_element = chosen_element.GetValue(0)
     except: pass
     expression = self.GetPrefix() if self.GetPrefix() else ""
-    expression += str(chosen_element)
+    expression += self.GetFormat() % (chosen_element,)
     expression += self.GetPostfix() if self.GetPostfix() else ""
     self.SetComputedAnnotationValue(expression)
     return True
