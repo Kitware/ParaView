@@ -934,7 +934,10 @@ class FileNameProperty(VectorProperty):
     def _UpdateProperty(self):
         "Pushes the value of this property to the server."
         VectorProperty._UpdateProperty(self)
-        self.Proxy.FileNameChanged()
+        try:
+            self.Proxy.FileNameChanged()
+        except AttributeError:
+            pass
 
 class ArraySelectionProperty(VectorProperty):
     "Property to select an array to be processed by a filter."

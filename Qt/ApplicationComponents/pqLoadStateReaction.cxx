@@ -42,6 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVXMLParser.h"
 
+#include "pqProxyWidgetDialog.h"
+#include "vtkSMLoadStateOptionsProxy.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtksys/SystemTools.hxx"
+
 #include <QFileInfo>
 
 //-----------------------------------------------------------------------------
@@ -64,7 +71,7 @@ void pqLoadStateReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
+void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked, pqServer* server)
 {
   if (server == NULL)
   {
@@ -78,17 +85,37 @@ void pqLoadStateReaction::loadState(const QString& filename, pqServer* server)
 
   if (filename.endsWith(".pvsm"))
   {
-    vtkNew<vtkPVXMLParser> xmlParser;
-    xmlParser->SetFileName(filename.toLocal8Bit().data());
-    xmlParser->Parse();
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
+    vtkSmartPointer<vtkSMProxy> aproxy;
+    aproxy.TakeReference(pxm->NewProxy("options", "LoadStateOptions"));
+    vtkSMLoadStateOptionsProxy* proxy = vtkSMLoadStateOptionsProxy::SafeDownCast(aproxy);
+    vtkSMPropertyHelper(proxy, "DataDirectory")
+      .Set(vtksys::SystemTools::GetParentDirectory(filename.toLocal8Bit().data()).c_str());
 
-    vtkPVXMLElement* root = xmlParser->GetRootElement();
-    if (root)
+    if (proxy && proxy->PrepareToLoad(filename.toLocal8Bit().data()))
     {
-      pqApplicationCore::instance()->loadState(root, server);
-      // Add this to the list of recent server resources ...
-      pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
-        server, filename);
+      vtkNew<vtkSMParaViewPipelineController> controller;
+      controller->InitializeProxy(proxy);
+
+      if (proxy->HasDataFiles() && !dialogBlocked)
+      {
+        pqProxyWidgetDialog dialog(proxy);
+        dialog.setWindowTitle("Load State Options");
+        dialog.setObjectName("LoadStateOptionsDialog");
+        dialog.setApplyChangesImmediately(true);
+        if (dialog.exec() != QDialog::Accepted)
+        {
+          return;
+        }
+      }
+      pqPVApplicationCore::instance()->clearViewsForLoadingState(server);
+      pqPVApplicationCore::instance()->setLoadingState(true);
+      if (proxy->Load())
+      {
+        pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
+          server, filename);
+      }
+      pqPVApplicationCore::instance()->setLoadingState(false);
     }
   }
   else

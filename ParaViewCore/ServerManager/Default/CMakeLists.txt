@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkLoadStateOptions.cxx
   vtkPVGeneralSettings.cxx
   vtkPVMultiServerDataSource.cxx
   vtkSMCameraConfigurationReader.cxx
@@ -40,6 +41,7 @@ set (Module_SRCS
   vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMInteractiveSelectionPipeline.cxx
+  vtkSMLoadStateOptionsProxy.cxx
   vtkSMMultiServerSourceProxy.cxx
   vtkSMPLYWriterProxyInitializationHelper.cxx
   vtkSMPreselectionPipeline.cxx

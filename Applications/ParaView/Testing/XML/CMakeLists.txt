@@ -45,6 +45,7 @@ paraview_test_load_data(""
   dualSphereAnimation.pvd
   "iron protein.vtk"
   LoadState.pvsm
+  LoadStateDialog.pvsm
   minimal.nii
   MultiBlockWithPieces_0_0.vtp
   MultiBlockWithPieces_1_0.vtp
@@ -300,6 +301,9 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateChooseDirectory.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateChooseFiles.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateUseExisting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockSingleBlock.xml

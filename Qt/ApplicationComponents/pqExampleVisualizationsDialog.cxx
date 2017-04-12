@@ -5,7 +5,6 @@
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqEventDispatcher.h"
-#include "pqFixPathsInStateFilesBehavior.h"
 #include "vtkPVConfig.h"
 
 #include <QFile>
@@ -91,7 +90,6 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     this->hide();
     Q_ASSERT(stateFile != NULL);
 
-    bool prev = pqFixPathsInStateFilesBehavior::blockDialog(true);
     QFile qfile(stateFile);
     if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -112,6 +110,5 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     {
       qCritical("Failed to open resource");
     }
-    pqFixPathsInStateFilesBehavior::blockDialog(prev);
   }
 }

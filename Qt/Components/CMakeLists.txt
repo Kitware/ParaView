@@ -29,7 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
-  
+
   pqAboutDialog.cxx
   pqAboutDialog.h
   pqActionGroupInterface.cxx
@@ -116,8 +116,6 @@ set (Module_SRCS
   pqFindDataSelectionDisplayFrame.h
   pqFindDataDialog.cxx
   pqFindDataDialog.h
-  pqFixStateFilenamesDialog.cxx
-  pqFixStateFilenamesDialog.h
   pqHighlightItemDelegate.cxx
   pqHighlightItemDelegate.h
   pqImageTip.cxx
@@ -344,7 +342,6 @@ set (Module_MOC_HDRS
   pqFindDataCurrentSelectionFrame.h
   pqFindDataDialog.h
   pqFindDataSelectionDisplayFrame.h
-  pqFixStateFilenamesDialog.h
   pqHighlightItemDelegate.h
   pqImageTip.h
   pqIndexSelectionWidget.h
@@ -457,7 +454,6 @@ set (Module_UI_FILES
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataDialog.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
-  Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui

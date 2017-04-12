@@ -3,6 +3,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerManagerRendering
   PRIVATE_DEPENDS
     vtksys
+    vtkpugixml
     vtkRenderingVolume${VTK_RENDERING_BACKEND}
     vtkTestingRendering
     vtkPVClientServerCoreDefault

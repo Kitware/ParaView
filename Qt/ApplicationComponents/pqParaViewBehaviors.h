@@ -89,7 +89,6 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(PluginDockWidgetsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(VerifyRequiredPluginBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PluginActionGroupBehavior);
-  PQ_BEHAVIOR_DEFINE_METHODS(FixPathsInStateFilesBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CommandLineOptionsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PersistentMainWindowStateBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CollaborationBehavior);
@@ -121,7 +120,6 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(PluginDockWidgetsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(VerifyRequiredPluginBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PluginActionGroupBehavior);
-  PQ_BEHAVIOR_DECLARE_FLAG(FixPathsInStateFilesBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CommandLineOptionsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PersistentMainWindowStateBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CollaborationBehavior);

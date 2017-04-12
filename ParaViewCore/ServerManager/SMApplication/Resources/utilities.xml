@@ -4041,6 +4041,42 @@
       </PropertyGroup>
 
     </SaveScreenshotProxy>
+  </ProxyGroup>
 
+  <ProxyGroup name="options">
+    <LoadStateOptionsProxy class="vtkLoadStateOptions"
+                           name="LoadStateOptions">
+      <Documentation>
+        Options proxy used to prompt user for options when loading pvsm state files.
+      </Documentation>
+
+      <IntVectorProperty name="LoadStateDataFileOptions"
+        default_values="0"
+        number_of_elements="1">
+        <Documentation>
+          Decide how to locate data files in loaded state.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use File Names From State" value="0" />
+          <Entry text="Search files under specified directory" value="1" />
+          <Entry text="Choose File Names" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="DataDirectory"
+                            command="SetDataDirectory"
+                            number_of_elements="1"
+                            default_values="">
+        <FileListDomain name="files" />
+        <Documentation>
+          Directory to look for data files under. Defaults to the state file's directory.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="1">
+          </PropertyWidgetDecorator>
+          <UseDirectoryName />
+        </Hints>
+      </StringVectorProperty>
+    </LoadStateOptionsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

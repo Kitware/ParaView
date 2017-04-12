@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeleteReaction.h"
 #include "pqEventDispatcher.h"
 #include "pqFileDialog.h"
-#include "pqFixPathsInStateFilesBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqObjectBuilder.h"
@@ -162,11 +161,8 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     // check for --state option. (Bug #5711)
     // NOTE: --data and --state cannnot be specifed at the same time.
 
-    // HACK: We need to disable popping up of the fix-filenames dialog when
-    // loading a state file from the command line.
-    bool prev = pqFixPathsInStateFilesBehavior::blockDialog(true);
-    pqLoadStateReaction::loadState(options->GetStateFileName());
-    pqFixPathsInStateFilesBehavior::blockDialog(prev);
+    // Load state file without fix-filenames dialog.
+    pqLoadStateReaction::loadState(options->GetStateFileName(), true);
   }
 
   if (options->GetPythonScript())
