@@ -2790,13 +2790,8 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
     {
 #ifdef PARAVIEW_USE_ICE_T
       IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
-      this->Internals->ValuePasses->SetRenderingMode(mode);
-#else
-      vtkWarningMacro("vtkValuePass::FLOATING_POINT mode is only supported in IceT"
-                      " enabled builds. Falling back to INVERTIBLE_LUT.");
-
-      this->Internals->ValuePasses->SetRenderingMode(vtkValuePass::INVERTIBLE_LUT);
 #endif
+      this->Internals->ValuePasses->SetRenderingMode(mode);
     }
     break;
 
@@ -2821,11 +2816,7 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 int vtkPVRenderView::GetValueRenderingModeCommand()
 {
 #ifdef VTKGL2
-#ifdef PARAVIEW_USE_ICE_T
   return this->Internals->ValuePasses->GetRenderingMode();
-#else
-  return vtkValuePass::INVERTIBLE_LUT;
-#endif
 #else
   return 1; // vtkValuePass::INVERTIBLE_LUT
 #endif
@@ -2975,12 +2966,12 @@ vtkFloatArray* vtkPVRenderView::GetCapturedZBuffer()
 void vtkPVRenderView::CaptureValuesFloat()
 {
 #ifdef VTKGL2
+  vtkFloatArray* values = NULL;
 #ifdef PARAVIEW_USE_ICE_T
   vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers =
     vtkIceTSynchronizedRenderers::SafeDownCast(
       this->SynchronizedRenderers->GetParallelSynchronizer());
 
-  vtkFloatArray* values = NULL;
   if (IceTSynchronizedRenderers)
   {
     vtkIceTCompositePass* iceTPass = IceTSynchronizedRenderers->GetIceTCompositePass();
@@ -2990,6 +2981,7 @@ void vtkPVRenderView::CaptureValuesFloat()
     }
   }
   else
+#endif
   {
     if (this->GetUseDistributedRenderingForStillRender() &&
       vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
@@ -3012,17 +3004,13 @@ void vtkPVRenderView::CaptureValuesFloat()
     this->Internals->ArrayHolder->SetNumberOfTuples(values->GetNumberOfTuples());
     this->Internals->ArrayHolder->CopyComponent(0, values, 0);
   }
-#else
-  vtkErrorMacro("vtkValuePass::FLOATING_POINT mode is only supported in IceT enabled"
-                " builds.");
-#endif
 #endif
 }
 
 //-----------------------------------------------------------------------------
 vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 {
-#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+#ifdef VTKGL2
   return this->Internals->ArrayHolder.GetPointer();
 #else
   return NULL;
