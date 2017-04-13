@@ -3601,6 +3601,8 @@
                       panel_visibility="advanced" />
             <Property name="SpecularPower"
                       panel_visibility="advanced" />
+            <Property name="Luminosity"
+                      panel_visibility="advanced" />
             <Property name="Ambient" panel_visibility="advanced"/>
             <Property name="Diffuse" panel_visibility="advanced"/>
           </PropertyGroup>
@@ -9724,7 +9726,7 @@
     </RepresentationProxy>
 
     <!-- ================================================================== -->
-    <RepresentationProxy class="vtkGeometryRepresentation"
+    <RepresentationProxy class="vtkGeometrypresentation"
                          name="SurfaceRepresentationBase"
                          processes="client|renderserver|dataserver">
       <Documentation>Representation to show any dataset in a 3D render
@@ -9914,6 +9916,14 @@
                             name="SpecularPower"
                             number_of_elements="1">
         <DoubleRangeDomain max="100"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLuminosity"
+                            default_values="0.0"
+                            name="Luminosity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100.0"
                            min="0"
                            name="range" />
       </DoubleVectorProperty>

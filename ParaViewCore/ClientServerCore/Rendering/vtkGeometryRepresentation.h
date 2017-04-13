@@ -168,6 +168,7 @@ public:
   virtual void SetPointSize(double val);
   virtual void SetSpecularColor(double r, double g, double b);
   virtual void SetSpecularPower(double val);
+  virtual void SetLuminosity(double val);
 
   //***************************************************************************
   // Forwarded to Actor.
