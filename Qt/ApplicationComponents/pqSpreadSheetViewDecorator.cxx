@@ -122,7 +122,18 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
   new pqExportReaction(this->Internal->ExportSpreadsheet->defaultAction());
 
   layout->insertWidget(0, header);
-  this->showing(0); // TODO: get the actual repr currently shown by the view.
+
+  // get the actual repr currently shown by the view.
+  QList<pqRepresentation*> reprs = this->Spreadsheet->getRepresentations();
+  foreach (pqRepresentation* repr, reprs)
+  {
+    pqDataRepresentation* drepr = qobject_cast<pqDataRepresentation*>(repr);
+    if (repr->isVisible())
+    {
+      this->showing(drepr);
+      break; // since only 1 repr can be visible at a time.
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -155,6 +166,13 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
       this->Spreadsheet->getProxy()->GetProperty("SelectionOnly"));
     QObject::connect(this->Internal->AttributeAdaptor, SIGNAL(currentTextChanged(const QString&)),
       this, SLOT(resetColumnVisibility()));
+
+    this->Internal->Links.addPropertyLink(this->Internal->ToggleCellConnectivity, "checked",
+      SIGNAL(toggled(bool)), this->Spreadsheet->getProxy(),
+      this->Spreadsheet->getProxy()->GetProperty("GenerateCellConnectivity"));
+    vtkSMPropertyHelper(reprProxy, "GenerateCellConnectivity")
+      .Set(this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
+    reprProxy->UpdateVTKObjects();
   }
   else
   {
@@ -312,18 +330,24 @@ void pqSpreadSheetViewDecorator::resetColumnVisibility()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewDecorator::toggleCellConnectivity()
 {
-  if (vtkSMProxy* proxy = this->Spreadsheet->getRepresentation(0)->getProxy())
+  QList<pqRepresentation*> reprs = this->Spreadsheet->getRepresentations();
+  foreach (pqRepresentation* repr, reprs)
   {
-    vtkSMPropertyHelper(proxy, "GenerateCellConnectivity")
-      .Set(this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
-    proxy->UpdateVTKObjects();
-    if (vtkSpreadSheetView* view =
-          vtkSpreadSheetView::SafeDownCast(this->Spreadsheet->getViewProxy()->GetClientSideView()))
+    if (vtkSMProxy* proxy = repr->getProxy())
     {
-      view->ClearCache();
+      vtkSMPropertyHelper(proxy, "GenerateCellConnectivity")
+        .Set(this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
+      proxy->UpdateVTKObjects();
     }
-    this->Spreadsheet->render();
   }
+
+  if (vtkSpreadSheetView* view =
+        vtkSpreadSheetView::SafeDownCast(this->Spreadsheet->getViewProxy()->GetClientSideView()))
+  {
+    view->ClearCache();
+  }
+  this->Spreadsheet->render();
+
   this->resetColumnVisibility();
 }
 

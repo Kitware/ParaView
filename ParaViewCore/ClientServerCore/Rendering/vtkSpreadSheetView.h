@@ -76,6 +76,15 @@ public:
 
   //@{
   /**
+   * Allow user to enable/disable cell connectivity generation in the datamodel
+   */
+  vtkSetMacro(GenerateCellConnectivity, bool);
+  vtkGetMacro(GenerateCellConnectivity, bool);
+  vtkBooleanMacro(GenerateCellConnectivity, bool);
+  //@}
+
+  //@{
+  /**
    * Manage column visibilities, used only for export
    */
   void SetColumnVisibility(int fieldAssociation, const char* column, int visibility);
@@ -178,6 +187,7 @@ protected:
   vtkTable* FetchBlock(vtkIdType blockindex, bool filterColumnForExport = false);
 
   bool ShowExtractedSelection;
+  bool GenerateCellConnectivity;
   vtkSortedTableStreamer* TableStreamer;
   vtkMarkSelectedRows* TableSelectionMarker;
   vtkReductionFilter* ReductionFilter;
