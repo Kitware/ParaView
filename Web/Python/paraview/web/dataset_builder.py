@@ -4,7 +4,7 @@ from paraview.web import data_converter
 
 from vtk.web.query_data_model import *
 from paraview.web.camera import *
-from vtk.web import iteritems
+from vtk.web import iteritems, buffer
 from paraview import simple
 from paraview import servermanager
 from vtk import *
