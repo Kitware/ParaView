@@ -1053,3 +1053,36 @@ if (TARGET paraview)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoSplitViewportHorizontal.xml)
 endif()
+
+#----------------------------------------------------------------------
+# Tests that produce some output (other than rendered images) from ParaView
+# that should be checked for correctness. These work by executing an XML
+# test in the UI that produces some output, then pvpython runs a Python script
+# that checks the file for correctness. Example use: checking a CSV
+# file for expected content.
+#
+# Tests listed here are required to define the following files:
+# - <test>.xml - XML test script to play in the uI
+# - <test>Verify.py - Python code to verify output saved out in the XML
+#   script
+#----------------------------------------------------------------------
+set(paraview_python_verify_tests
+  ExportSceneSpreadSheetView
+)
+
+if (PARAVIEW_ENABLE_PYTHON)
+  foreach(test_name ${paraview_python_verify_tests})
+    add_test(NAME ${test_name}
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+      -DTEST_NAME:STRING=${test_name}
+      -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.xml
+      -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${test_name}Verify.py
+      -DTEMPORARY_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTestDriver.cmake
+    )
+    set_tests_properties(${python_state_test} PROPERTIES LABELS "PARAVIEW")
+  endforeach()
+endif()
