@@ -588,14 +588,6 @@ int vtkSMArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
       {
         this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG_LONG);
       }
-      else if (thisType == "VTK___INT64")
-      {
-        this->ALDInternals->DataTypes.push_back(VTK___INT64);
-      }
-      else if (thisType == "VTK_UNSIGNED___INT64")
-      {
-        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED___INT64);
-      }
       else if (thisType == "VTK_DATA_ARRAY")
       {
         this->ALDInternals->DataTypes.push_back(VTK_BIT);
@@ -613,8 +605,6 @@ int vtkSMArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
         this->ALDInternals->DataTypes.push_back(VTK_LONG_LONG);
         this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG);
         this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG_LONG);
-        this->ALDInternals->DataTypes.push_back(VTK___INT64);
-        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED___INT64);
       }
       else
       {
