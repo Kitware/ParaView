@@ -108,6 +108,8 @@ int word2int(unsigned wordin);
 
 
 
+int chk_gmvend(FILE *gmvchk);
+
 /* Mark C. Miller, Wed Aug 22, 2012: fix leak of filnam */
 int gmvread_checkfile(char *filnam)
 {
@@ -119,8 +121,6 @@ int gmvread_checkfile(char *filnam)
    FILE *gmvchk;
    char* slash;
    int alloc_filnam = 0;
-
-   int chk_gmvend(FILE *gmvchk);
 
    /* check for the path - if include open and save if not append */
 #ifdef _WIN32
@@ -272,8 +272,6 @@ int gmvread_open(char *filnam)
    char* slash;
    int alloc_filnam = 0;
 
-   int chk_gmvend(FILE *gmvinGlobal);
-    
    /* check for the path - if include open and save if not append */
 #ifdef _WIN32
    slash = strrchr( filnam,  '\\' );
@@ -517,13 +515,14 @@ void gmvread_printoff()
 }
 
 
+int fromfilecheck(int keyword);
+
 void gmvread_data()
 {
   char keyword[MAXKEYWORDLENGTH+64], tmpchar[20];
   double ptime;
   float tmptime;
   int cycleno, before_nodes_ok;
-  int fromfilecheck(int keyword);
 
    /*  Zero gmv_data and free structure arrays.  */
    gmv_data.keyword = 0;
@@ -1203,11 +1202,12 @@ int rdcellkeyword(FILE* gmvin, int ftype, char* keystring)
 }
 
 
+int checkfromfile();
+
 int fromfilecheck(int fkeyword)
 {
   long pos_after_keyword;
   int base_ftype;
-  int checkfromfile();
   FILE *basefile;  
 
    basefile = gmvinGlobal;
@@ -5253,13 +5253,14 @@ long *celltoface, *cell_faces, cellfaces_alloc, totfaces,
 static short vfacetype;
 
 
+void rdcells(int nodetype_in);
+void rdfaces(), rdxfaces();
+
 void gmvread_mesh()
 {
   int nxv, nyv, nzv, nodetype_in, j, k;
   long nn, i, ip;
   double *xin = NULL, *yin = NULL, *zin = NULL, x0, y0, z0, dx, dy, dz; /* TODO: check fix for uninitialized pointers */
-  void rdcells(int nodetype_in);
-  void rdfaces(), rdxfaces();
 
    /*  Read and return mesh info. from a gmv input file.  */
    gmv_meshdata.celltoface = NULL;
@@ -5420,16 +5421,17 @@ void gmvread_mesh()
 }
 
 
+void gencell(long icell, long nc);
+void regcell(long icell, long nc);
+void vfacecell(long icell, long nc), rdvfaces(long nc);
+void fillmeshdata(long nc);
+void structmesh();
+
 void rdcells(int nodetype_in)
 {
   static long icell;
   int i, nfa, nna;
   long nc;
-  void gencell(long icell, long nc);
-  void regcell(long icell, long nc);
-  void vfacecell(long icell, long nc), rdvfaces(long nc);
-  void fillmeshdata(long nc);
-  void structmesh();
 
    /*  Get first cell info.  */
    gmv_meshdata.ncells = gmv_data.num;
@@ -6036,13 +6038,14 @@ void fillmeshdata(long nc)
 }
 
 
+void fillmeshdata(long nc);
+void fillcellinfo(long nc, long *facecell1, long *facecell2);
+
 void rdfaces()
 {
   static long iface, *facecell1, *facecell2;
   long nc, i, k;
   int nverts;
-  void fillmeshdata(long nc);
-  void fillcellinfo(long nc, long *facecell1, long *facecell2);
 
    /*  Get first face info.  */
    gmv_meshdata.nfaces = gmv_data.num;
@@ -6113,7 +6116,6 @@ void rdvfaces(long nc)
   static long *facepe, *oppface, *oppfacepe;
   long i, k;
   int nverts;
-  void fillmeshdata(long nc);
 
    /*  Get first vface info.  */
    gmv_meshdata.nfaces = gmv_data.num;
@@ -6220,8 +6222,6 @@ void rdxfaces()
   static long *facepe, *oppface, *oppfacepe;
   long nc, i, k, totverts;
   int maxnvert;
-  void fillmeshdata(long nc);
-  void fillcellinfo(long nc, long *facecell1, long *facecell2);
 
    /*  Get info for first xfaces read.  */
    gmv_meshdata.nfaces = gmv_data.num;
@@ -6926,6 +6926,8 @@ static FILE *gmvrayinGlobal;
 void readrays(FILE* gmvrayin, int ftype);
 void readrayids(FILE* gmvrayin, int ftype);
 
+int chk_rayend(FILE *gmvrayin);
+
 /* Mark C. Miller, Wed Aug 22, 2012: fix leak of filnam */
 int gmvrayread_open(char *filnam)
 {
@@ -6936,8 +6938,6 @@ int gmvrayread_open(char *filnam)
    char magic[MAXKEYWORDLENGTH+64], filetype[MAXKEYWORDLENGTH+64];
    char * slash;
    int alloc_filnam = 0;
-
-   int chk_rayend(FILE *gmvrayin);
 
    /* check for the path - if include open and save if not append */
 #ifdef _WIN32
