@@ -31,6 +31,11 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
 //----------------------------------------------------------------------------
 vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
@@ -107,12 +112,13 @@ int vtkAttributeDataToTableFilter::RequestData(vtkInformation* vtkNotUsed(reques
           if (this->GenerateCellConnectivity)
           {
             vtkIdTypeArray** indices = new vtkIdTypeArray*[maxpoints];
-            char arrayname[128];
+            int w = 1 + log10(maxpoints);
             for (vtkIdType i = 0; i < maxpoints; i++)
             {
+              std::stringstream arrayname;
+              arrayname << "Point Index " << std::setw(w) << std::setfill('0') << i;
               indices[i] = vtkIdTypeArray::New();
-              sprintf(arrayname, "Point Index %ld", (long int)i);
-              indices[i]->SetName(arrayname);
+              indices[i]->SetName(arrayname.str().c_str());
               indices[i]->SetNumberOfTuples(numcells);
             }
             for (vtkIdType cc = 0; cc < numcells; cc++)
