@@ -23,7 +23,7 @@ struct gmvray
           double *field[NRAYVARS];
          };
 
-EXTERN struct 
+EXTERN struct gmvray_data_type
          {
           int     nrays;    /*  Number of rays in the file.  */
           int     nvars;    /*  Number of ray variable fields.  */
