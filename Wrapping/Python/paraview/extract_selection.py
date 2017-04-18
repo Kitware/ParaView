@@ -103,9 +103,10 @@ def execute(self):
         # Note: we must force the data type to VTK_SIGNED_CHAR or the array will
         # be ignored by the freeze selection operation
         from vtk.util.numpy_support import numpy_to_vtk
-        insidedness = numpy_to_vtk(maskArray, deep=1, array_type=vtk.VTK_SIGNED_CHAR)
-        insidedness.SetName("vtkInsidedness")
-        output.GetAttributes(attributeType).VTKObject.AddArray(insidedness)
+        if type(maskArray) is not vtk.numpy_interface.dataset_adapter.VTKNoneArray:
+            insidedness = numpy_to_vtk(maskArray, deep=1, array_type=vtk.VTK_SIGNED_CHAR)
+            insidedness.SetName("vtkInsidedness")
+            output.GetAttributes(attributeType).VTKObject.AddArray(insidedness)
     else:
         # handle extraction.
         # flatnonzero() will give is array of indices where the arrays is
