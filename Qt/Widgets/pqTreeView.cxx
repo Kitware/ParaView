@@ -43,6 +43,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMimeData>
 #include <QScrollBar>
 
+namespace
+{
+int pqCountItems(QAbstractItemModel* model, const QModelIndex& idx, int max)
+{
+  if (!model)
+  {
+    return 0;
+  }
+  int numItems = model->rowCount(idx);
+  int count = numItems;
+  for (int cc = 0; cc < numItems; ++cc)
+  {
+    if (count >= max)
+    {
+      return count;
+    }
+    count += pqCountItems(model, model->index(cc, 0, idx), max - numItems);
+  }
+  return count;
+}
+}
+
 pqTreeView::pqTreeView(QWidget* widgetParent)
   : QTreeView(widgetParent)
   , ScrollPadding(0)
@@ -120,14 +142,7 @@ QSize pqTreeView::sizeHint() const
   int minItemHeight = 20;
   // add padding for the scrollbar
   int extra = this->ScrollPadding;
-
-  int num = 0;
-  QAbstractItemModel* current = this->model();
-  if (current)
-  {
-    num = current->rowCount(this->rootIndex());
-  }
-
+  int num = pqCountItems(this->model(), this->rootIndex(), maxItemHint);
   if (num >= maxItemHint)
   {
     extra = 0;
