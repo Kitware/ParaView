@@ -950,6 +950,18 @@
         <Documentation>This property specifies the input to the Integrate
         Attributes filter.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetDivideAllCellDataByVolume"
+                         name="DivideCellDataByVolume"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          This property specifies if the output data will be divided by the
+          volume/area computed for the integrated cells.  If it is on, then each
+          value in the output cell data will be divided by the area/volume.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
       <Hints>
         <Visibility replace_input="0" />
         <!-- View can be used to specify the preferred view for the proxy -->
