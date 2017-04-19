@@ -16,24 +16,6 @@ ENDIF()
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 
 # -----------------------------------------------------------------------------
-# Where are gmvread.c, gmvread.h and gmvrayread.h stored?
-# -----------------------------------------------------------------------------
-SET(GMVReader_GMVREAD_LIB_DIR "GMVREAD-NOTFOUND" CACHE PATH "The directory containing gmvread.c, gmvread.h and gmvrayread.h")
-MARK_AS_ADVANCED(GMVReader_GMVREAD_LIB_DIR)
-FIND_PATH(GMVReader_GMVREAD_LIB_DIR
-  NAMES gmvread.c gmvread.h gmvrayread.h
-  PATHS ${vtkIOVisItBridge_INCLUDE_DIRS} ${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases
-  PATH_SUFFIXES GMV
-  DOC "The directory containing gmvread.c, gmvread.h and gmvrayread.h"
-  )
-IF (GMVReader_GMVREAD_LIB_DIR)
-  INCLUDE_DIRECTORIES("${GMVReader_GMVREAD_LIB_DIR}")
-  INCLUDE_DIRECTORIES("${ParaView_SOURCE_DIR}/Utilities/VisItBridge/Library/VisItLib/common/utility")
-ELSE ()
-  MESSAGE(FATAL_ERROR "Please set GMVReader_GMVREAD_LIB_DIR to where gmvread.c, gmvread.h and gmvrayread.h in the VisItBridge source tree can be found.")
-ENDIF ()
-
-# -----------------------------------------------------------------------------
 # Disable some warnings
 # -----------------------------------------------------------------------------
 IF (WIN32)

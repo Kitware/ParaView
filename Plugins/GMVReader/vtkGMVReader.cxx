@@ -55,7 +55,6 @@ namespace GMVRead
 // import it from VisItBridge's include directories
 extern "C" {
 #include "gmvread.c"
-#include "snprintf.c"
 }
 
 template <class C>

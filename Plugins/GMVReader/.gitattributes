@@ -1,0 +1,2 @@
+gmvread.*       -format.clang-format -whitespace
+gmvrayread.h    -format.clang-format -whitespace
