@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqOutputPort;
-class QTreeWidgetItem;
+class QModelIndex;
 class vtkEventQtSlotConnect;
 class vtkPVDataInformation;
 
@@ -63,10 +63,6 @@ public:
   pqOutputPort* getOutputPort();
 
 public slots:
-  /**
-  * TODO: have this become automatic instead of relying on
-  * the accept button in case another client modifies the pipeline.
-  */
   void updateInformation();
 
   /**
@@ -75,15 +71,9 @@ public slots:
   void setOutputPort(pqOutputPort* outputport);
 
 private slots:
-  void onCurrentItemChanged(QTreeWidgetItem* item);
+  void onCurrentChanged(const QModelIndex& item);
 
 private:
-  /**
-  * builds the composite tree structure.
-  */
-  QTreeWidgetItem* fillCompositeInformation(
-    vtkPVDataInformation* info, QTreeWidgetItem* parent = 0);
-
   void fillDataInformation(vtkPVDataInformation* info);
 
 private:
