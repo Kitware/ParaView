@@ -74,6 +74,7 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
 
   // Change the default header view to a checkable one.
   pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
+  checkable->setStretchLastSection(this->header()->stretchLastSection());
   this->setHeader(checkable);
   this->installEventFilter(checkable);
 #if QT_VERSION >= 0x050000
