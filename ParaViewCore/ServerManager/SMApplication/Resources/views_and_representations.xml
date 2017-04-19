@@ -2394,7 +2394,7 @@
                          ignore_synchronization="1"
                          name="CameraParallelProjection"
                          number_of_elements="1"
-                         panel_visibility="advanced">
+                         panel_visibility="default">
         <BooleanDomain name="bool" />
         <Documentation>
           Enable/disable parallel projection mode.
