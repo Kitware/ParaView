@@ -139,7 +139,13 @@ def execute_on_global_data(self):
             chosen_element = chosen_element.GetValue(0)
     except: pass
     expression = self.GetPrefix() if self.GetPrefix() else ""
-    expression += str(chosen_element)
+    try:
+        import vtk
+        if type(chosen_element) is not vtk.numpy_interface.dataset_adapter.VTKNoneArray:
+            expression += self.GetFormat() % (chosen_element,)
+    except TypeError:
+        expression += chosen_element
+        print("Warning: invalid format for Annotate Global Data")
     expression += self.GetPostfix() if self.GetPostfix() else ""
     self.SetComputedAnnotationValue(expression)
     return True

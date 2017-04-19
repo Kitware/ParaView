@@ -116,6 +116,14 @@ timestep.
         <Documentation>Text that is used as a prefix to the field
         value</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetFormat"
+                            default_values="%7.5g"
+                            name="Format"
+                            number_of_elements="1">
+        <Documentation>Text that is used as a format string passed
+          to the Python string formatter (% operator).  Used to format
+          the data.</Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetPostfix"
                             default_values=""
                             name="Suffix"
