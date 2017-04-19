@@ -79,6 +79,25 @@ public:
     }
   }
 };
+
+bool isAMR(vtkPVDataInformation* dinfo)
+{
+  switch (dinfo->GetCompositeDataSetType())
+  {
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+    case VTK_HIERARCHICAL_DATA_SET:
+    case VTK_UNIFORM_GRID_AMR:
+    case VTK_NON_OVERLAPPING_AMR:
+    case VTK_OVERLAPPING_AMR:
+      return true;
+  }
+  return false;
+}
+
+bool isMultiBlock(vtkPVDataInformation* dinfo)
+{
+  return dinfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET;
+}
 }
 
 // BUG #13806, remove collective operations temporarily since they don't work
@@ -258,14 +277,14 @@ void pqQueryClauseWidget::populateSelectionCriteria(pqQueryClauseWidget::Criteri
     this->Internals->criteria->addItem("Query", QUERY);
   }
 
-  if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
+  if (isMultiBlock(dataInfo))
   {
     if (type_flags & BLOCK)
     {
       this->Internals->criteria->addItem("Block ID", BLOCK);
     }
   }
-  else if (dataInfo->GetCompositeDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
+  else if (isAMR(dataInfo))
   {
     if (type_flags & AMR_LEVEL)
     {
@@ -415,14 +434,8 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
 #endif
 
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
-  if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
-  {
-    multi_block = true;
-  }
-  else if (dataInfo->GetCompositeDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
-  {
-    amr = true;
-  }
+  multi_block = isMultiBlock(dataInfo);
+  amr = isAMR(dataInfo);
 
   QVBoxLayout* vbox = qobject_cast<QVBoxLayout*>(this->layout());
 
