@@ -49,7 +49,7 @@
 #include <string>
 #include <vector>
 
-#include "vtkPVVTKExtensionsH5PartReaderModule.h"
+#include "vtkPVVTKExtensionsH5PartReaderModule.h" // for export macro
 
 class vtkDataArraySelection;
 class vtkMultiProcessController;

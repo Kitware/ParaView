@@ -44,8 +44,3 @@ SET_SOURCE_FILES_PROPERTIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/H5Part/src/H5Block.c
   PROPERTIES LANGUAGE CXX
 )
-
-# Add testing if necessary
-if (BUILD_TESTING)
-  add_subdirectory(Testing)
-endif ()
