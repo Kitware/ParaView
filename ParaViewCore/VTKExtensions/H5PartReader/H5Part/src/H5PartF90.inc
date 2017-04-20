@@ -1,5 +1,5 @@
 ! Declaration of subroutines for Fortran Bindings
-! open/close interface 
+! open/close interface
 
       INTERFACE
         INTEGER*8 FUNCTION h5pt_openr ( filename )
@@ -40,12 +40,12 @@
           INTEGER*8, INTENT(IN) :: filehandle
           INTEGER*8, INTENT(IN) :: npoints              ! The number of particles on *this* processor
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_setstep (filehandle,step)
           INTEGER*8, INTENT(IN) :: filehandle
           INTEGER*8, INTENT(IN) :: step                 ! Set the current timestep in the file to this
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_writedata_r8 ( filehandle, name, data )
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: name          ! The name of the data we are writing
@@ -62,10 +62,10 @@
 
 !==============Reading Data Characteristics============
 
-        INTEGER*8 FUNCTION h5pt_getnsteps (filehandle)      
+        INTEGER*8 FUNCTION h5pt_getnsteps (filehandle)
           INTEGER*8, INTENT(IN) :: filehandle
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_getndatasets (filehandle)
           INTEGER*8, INTENT(IN) :: filehandle
         END FUNCTION
@@ -83,18 +83,18 @@
           INTEGER*8, INTENT(IN) :: index                ! Index for a given dataset name
           CHARACTER(LEN=*), INTENT(OUT) :: name         ! returns the name of the dataset at that index
         END FUNCTION
-      
+
 !=============Setting and getting views================
         INTEGER*8 FUNCTION h5pt_setview (filehandle,start,end)
           INTEGER*8, INTENT(IN) :: filehandle
           INTEGER*8, INTENT(IN) :: start                ! offset of the first particle in the view
           INTEGER*8, INTENT(IN) :: end                  ! offset of the first particle after the end of the view
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_resetview (filehandle)
           INTEGER*8, INTENT(IN) :: filehandle           ! reset the view on this filehandle to default
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_hasview (filehandle)
           INTEGER*8, INTENT(IN) :: filehandle
         END FUNCTION
@@ -127,7 +127,7 @@
 
 
 !=================== Attributes ================
-      
+
         INTEGER*8 FUNCTION h5pt_writefileattrib_r8 (filehandle,attrib_name,attrib_value,attrib_nelem)
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: attrib_name   ! The name of the attribute
@@ -141,7 +141,7 @@
           INTEGER*8, INTENT(IN) :: attrib_value(*)      ! The array of data to write into the attribute
           INTEGER*8, INTENT(IN) :: attrib_nelem         ! Number of elements in the attrib array
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_writefileattrib_string (filehandle,attrib_name,attrib_value)
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: attrib_name   ! The name of the attribute
@@ -154,7 +154,7 @@
           REAL*8, INTENT(IN) :: attrib_value(*)         ! The array of data to write into the attribute
           INTEGER*8, INTENT(IN) :: attrib_nelem         ! Number of elements in the attrib array
         END FUNCTION
-         
+
         INTEGER*8 FUNCTION h5pt_writestepattrib_i8 (filehandle,attrib_name,attrib_value,attrib_nelem)
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: attrib_name   ! The name of the attribute
@@ -208,7 +208,7 @@
           CHARACTER(LEN=*), INTENT(IN) :: attrib_name   ! name of the attribute to read
           INTEGER*8, INTENT(OUT) :: attrib_value(*)     ! the attribute data will be read into this array
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5pt_readfileattrib_r8 (filehandle, attrib_name, attrib_value )
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: attrib_name   ! name of the attribute to read
@@ -219,5 +219,5 @@
  INTEGER*8 FUNCTION h5pt_set_verbosity_level ( level )
    INTEGER*8, INTENT(IN) :: level
  END FUNCTION
-  
+
       END INTERFACE

@@ -361,6 +361,9 @@ set(_vtk_modules
 
   vtkPVVTKExtensionsCGNSReader
   # needed for CGNS reader support.
+
+  vtkPVVTKExtensionsH5PartReader
+  # needed for H5PartReader support
   )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")

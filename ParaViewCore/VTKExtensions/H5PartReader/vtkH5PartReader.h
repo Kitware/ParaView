@@ -49,12 +49,14 @@
 #include <string>
 #include <vector>
 
+#include "vtkPVVTKExtensionsH5PartReaderModule.h"
+
 class vtkDataArraySelection;
 class vtkMultiProcessController;
 
 struct H5PartFile;
 
-class vtkH5PartReader : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSH5PARTREADER_EXPORT vtkH5PartReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkH5PartReader* New();

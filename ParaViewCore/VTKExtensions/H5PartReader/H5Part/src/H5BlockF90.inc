@@ -57,7 +57,7 @@
    REAL*8, INTENT(OUT) :: y(*)
    REAL*8, INTENT(OUT) :: z(*)
  END FUNCTION
- 
+
 
         INTEGER*8 FUNCTION h5bl_3d_write_3dvector_field ( filehandle, name, x, y, z )
           INTEGER*8, INTENT(IN) :: filehandle
@@ -66,7 +66,7 @@
    REAL*8, INTENT(IN) :: y(*)
    REAL*8, INTENT(IN) :: z(*)
  END FUNCTION
- 
+
         INTEGER*8 FUNCTION h5bl_getnumfields ( filehandle )
           INTEGER*8, INTENT(IN) :: filehandle
         END FUNCTION
@@ -95,7 +95,7 @@
           INTEGER*8, INTENT(IN) :: attrib_value(*)      ! The array of data to write into the attribute
           INTEGER*8, INTENT(IN) :: attrib_nelem         ! Number of elements in the attrib array
         END FUNCTION
-      
+
         INTEGER*8 FUNCTION h5bl_writefieldattrib_string ( filehandle, field_name, attrib_name, attrib_value )
           INTEGER*8, INTENT(IN) :: filehandle
           CHARACTER(LEN=*), INTENT(IN) :: field_name    ! The name of the field

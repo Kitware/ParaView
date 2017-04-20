@@ -10,7 +10,7 @@
        number_of_elements="1">
        <FileListDomain name="files"/>
      </StringVectorProperty>
-      
+
      <IntVectorProperty name="MaskOutOfTimeRangeOutput"
         command="SetMaskOutOfTimeRangeOutput"
         number_of_elements="1"
@@ -22,7 +22,7 @@
        information_only="1">
       <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
-     
+
      <StringVectorProperty
         name="Xarray"
         command="SetXarray"
