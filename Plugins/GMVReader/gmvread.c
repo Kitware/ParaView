@@ -4398,19 +4398,19 @@ void readcomments(FILE* gmvin, int ftype)
          firstNonWS++;
        else
          break;
-       ioerrtst(gmvin);
-       if (strncmp(&varname[firstNonWS],"endcomm",7) == 0)
-          rdcomms = 0;
-       else
-        {
-          /* Only support "endcomm" with leading blanks, if any.
-             Read reminder of comment line, in chunks. */
-          while (varname[strlen(varname)-1] != '\n')
-            {
-              fgets(varname, MAXCOMMENTLINELENGTH, gmvin);
-              ioerrtst(gmvin);
-            }
-        }
+      ioerrtst(gmvin);
+      if (strncmp(&varname[firstNonWS],"endcomm",7) == 0)
+         rdcomms = 0;
+      else
+      {
+         /* Only support "endcomm" with leading blanks, if any.
+            Read reminder of comment line, in chunks. */
+         while (varname[strlen(varname)-1] != '\n')
+         {
+            fgets(varname, MAXCOMMENTLINELENGTH, gmvin);
+            ioerrtst(gmvin);
+         }
+      }
      }
 
    /*  If binary file, read space after endcomm.  */
