@@ -1,7 +1,9 @@
 INCLUDE(ParaViewTestingMacros)
 
 set(MODULE_TESTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKmClip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKmContour.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKmExternalFaces.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKmGradient.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKmGradientUG.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKmThreshold.xml
