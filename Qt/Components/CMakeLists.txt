@@ -62,8 +62,8 @@ set (Module_SRCS
   pqColorChooserButtonWithPalettes.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
-  pqCommandPropertyWidget.h
   pqCommandPropertyWidget.cxx
+  pqCommandPropertyWidget.h
   pqComparativeCueWidget.cxx
   pqComparativeCueWidget.h
   pqComparativeVisPanel.cxx
@@ -72,6 +72,10 @@ set (Module_SRCS
   pqComponentsInit.h
   pqComponentsTestUtility.cxx
   pqComponentsTestUtility.h
+  pqCompositeDataInformationTreeModel.cxx
+  pqCompositeDataInformationTreeModel.h
+  pqCompositeTreePropertyWidget.cxx
+  pqCompositeTreePropertyWidget.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx
@@ -253,8 +257,6 @@ set (Module_SRCS
   pqSetBreakpointDialog.h
   pqSettingsDialog.cxx
   pqSettingsDialog.h
-  pqSignalAdaptorCompositeTreeWidget.cxx
-  pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.cxx
@@ -323,6 +325,8 @@ set (Module_MOC_HDRS
   pqComparativeCueWidget.h
   pqComparativeVisPanel.h
   pqComponentsTestUtility.h
+  pqCompositeDataInformationTreeModel.h
+  pqCompositeTreePropertyWidget.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
@@ -410,7 +414,6 @@ set (Module_MOC_HDRS
   pqServerLauncher.h
   pqSetBreakpointDialog.h
   pqSettingsDialog.h
-  pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h

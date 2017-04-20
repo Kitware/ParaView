@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqQueryClauseWidget.h"
 #include "ui_pqQueryCompositeTreeDialog.h"
 
+#include "pqCompositeDataInformationTreeModel.h"
 #include "pqHelpWindow.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -79,6 +79,25 @@ public:
     }
   }
 };
+
+bool isAMR(vtkPVDataInformation* dinfo)
+{
+  switch (dinfo->GetCompositeDataSetType())
+  {
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+    case VTK_HIERARCHICAL_DATA_SET:
+    case VTK_UNIFORM_GRID_AMR:
+    case VTK_NON_OVERLAPPING_AMR:
+    case VTK_OVERLAPPING_AMR:
+      return true;
+  }
+  return false;
+}
+
+bool isMultiBlock(vtkPVDataInformation* dinfo)
+{
+  return dinfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET;
+}
 }
 
 // BUG #13806, remove collective operations temporarily since they don't work
@@ -258,14 +277,14 @@ void pqQueryClauseWidget::populateSelectionCriteria(pqQueryClauseWidget::Criteri
     this->Internals->criteria->addItem("Query", QUERY);
   }
 
-  if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
+  if (isMultiBlock(dataInfo))
   {
     if (type_flags & BLOCK)
     {
       this->Internals->criteria->addItem("Block ID", BLOCK);
     }
   }
-  else if (dataInfo->GetCompositeDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
+  else if (isAMR(dataInfo))
   {
     if (type_flags & AMR_LEVEL)
     {
@@ -415,14 +434,8 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
 #endif
 
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
-  if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
-  {
-    multi_block = true;
-  }
-  else if (dataInfo->GetCompositeDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
-  {
-    amr = true;
-  }
+  multi_block = isMultiBlock(dataInfo);
+  amr = isAMR(dataInfo);
 
   QVBoxLayout* vbox = qobject_cast<QVBoxLayout*>(this->layout());
 
@@ -513,53 +526,74 @@ void pqQueryClauseWidget::showCompositeTree()
     ui.Blocks->setSelectionMode(QAbstractItemView::ExtendedSelection);
   }
 
-  pqSignalAdaptorCompositeTreeWidget adaptor(
-    ui.Blocks, this->producer()->getOutputPortProxy(), vtkSMCompositeTreeDomain::NONE);
+  pqCompositeDataInformationTreeModel dmodel;
+  if (criteria_type == AMR_BLOCK)
+  {
+    // if selecting AMR_BLOCK, we need to expand multipiece nodes.
+    dmodel.setExpandMultiPiece(true);
+  }
+
+  ui.Blocks->setModel(&dmodel);
+  dmodel.reset(this->producer()->getDataInformation());
+  ui.Blocks->expandAll();
   if (dialog.exec() != QDialog::Accepted)
   {
     return;
   }
 
-  QStringList values;
-  QList<QTreeWidgetItem*> selItems = ui.Blocks->selectedItems();
-  foreach (QTreeWidgetItem* item, selItems)
+  // to convert selected indexes to flat or amr ids, we use a trick. We make the
+  // model check the selected indexes and then use existing API on the model to
+  // access the indexes for the checked nodes.
+  QModelIndexList selIndexes = ui.Blocks->selectionModel()->selectedIndexes();
+  foreach (const QModelIndex& idx, selIndexes)
   {
-    int current_flat_index = adaptor.flatIndex(item);
-    switch (criteria_type)
+    if (idx.isValid())
     {
-      case BLOCK:
-        if (this->Internals->criteria->currentText() == "Block ID")
-        {
-          values << QString("%1").arg(current_flat_index);
-        }
-        else
-        {
-          // name.
-          QString blockName = adaptor.blockName(item);
-          if (blockName.isEmpty())
-          {
-            qWarning("Data block doesn't have a name assigned to it. Query may"
-                     " not work. Use 'Block ID' based criteria instead.");
-          }
-          else
-          {
-            values << blockName;
-          }
-        }
-        break;
-
-      case AMR_LEVEL:
-        values << QString("%1").arg(adaptor.hierarchicalLevel(item));
-        break;
-
-      case AMR_BLOCK:
-        values << QString("%1").arg(adaptor.hierarchicalBlockIndex(item));
-        break;
-
-      default:
-        qCritical("Invalid criteria_type.");
+      dmodel.setData(idx, Qt::Checked, Qt::CheckStateRole);
     }
   }
+
+  QStringList values;
+  switch (criteria_type)
+  {
+    case BLOCK:
+    {
+      const QList<unsigned int> findexes = dmodel.checkedNodes();
+      foreach (unsigned int idx, findexes)
+      {
+        values << QString::number(idx);
+      }
+    }
+    break;
+    case AMR_LEVEL:
+    {
+      const QList<unsigned int> levels = dmodel.checkedLevels();
+      foreach (unsigned int idx, levels)
+      {
+        values << QString::number(idx);
+      }
+    }
+    break;
+    case AMR_BLOCK:
+    {
+      typedef QPair<unsigned int, unsigned int> UIPair;
+      const QList<UIPair> amrIndexes = dmodel.checkedLevelDatasets();
+      QSet<unsigned int> uniq;
+      foreach (const UIPair& idx, amrIndexes)
+      {
+        uniq.insert(idx.second);
+      }
+      foreach (unsigned int idx, uniq)
+      {
+        values << QString::number(idx);
+      }
+    }
+    break;
+
+    default:
+      qCritical("Invalid criteria_type.");
+  }
+
   this->Internals->value_block->setText(values.join(","));
 }
 

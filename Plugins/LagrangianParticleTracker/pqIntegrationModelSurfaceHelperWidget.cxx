@@ -158,7 +158,7 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
         gb->setProperty("name", arrayName);
         gb->setProperty("type", type);
         QObject::connect(gb, SIGNAL(toggled(bool)), this, SIGNAL(arrayToGenerateChanged()));
-        delete labelName;
+        delete[] labelName;
 
         // And associated layout
         QGridLayout* gbLayout = new QGridLayout(gb);

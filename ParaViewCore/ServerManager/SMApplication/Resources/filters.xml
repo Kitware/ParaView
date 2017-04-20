@@ -11146,16 +11146,8 @@ source.</Documentation>
                          number_of_elements_per_command="1"
                          panel_visibility="default"
                          repeat_command="1">
-        <Hints>
-          <!-- Tells the widget not to use flat-indicies for this property.
-                Only needed when number_of_elements_per_command==1
-          -->
-          <UseFlatIndex value="0" />
-        </Hints>
-        <CompositeTreeDomain mode="leaves"
+        <CompositeTreeDomain mode="amr"
                              name="tree">
-          <!-- mode="leaves" since multi-pieces are treated as a single leaf
-               node wth the exception of vtkExtractDataSets -->
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -11317,7 +11309,7 @@ source.</Documentation>
                          name="SelectedDataSets"
                          number_of_elements_per_command="2"
                          repeat_command="1">
-        <CompositeTreeDomain mode="leaves"
+        <CompositeTreeDomain mode="amr"
                              name="tree">
           <RequiredProperties>
             <Property function="Input"
@@ -15030,7 +15022,7 @@ source.</Documentation>
                          number_of_elements_per_command="1"
                          panel_visibility="default"
                          repeat_command="1">
-        <CompositeTreeDomain mode="all"
+        <CompositeTreeDomain mode="leaves"
                              name="tree">
           <RequiredProperties>
             <Property function="Input"
