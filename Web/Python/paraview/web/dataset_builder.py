@@ -66,6 +66,8 @@ class DataSetBuilder(object):
                     self.camera = camera.SphericalCamera(self.dataHandler, view.CenterOfRotation, view.CameraPosition, view.CameraViewUp, self.cameraDescription['phi'], self.cameraDescription['theta'])
                 elif self.cameraDescription['type'] == 'cylindrical':
                     self.camera = camera.CylindricalCamera(self.dataHandler, view.CenterOfRotation, view.CameraPosition, view.CameraViewUp, self.cameraDescription['phi'], self.cameraDescription['translation'])
+                elif self.cameraDescription['type'] == 'cube':
+                    self.camera = camera.CubeCamera(self.dataHandler, self.cameraDescription['viewForward'], self.cameraDescription['viewUp'], self.cameraDescription['positions'])
 
             # Update background color
             bgColor = view.Background

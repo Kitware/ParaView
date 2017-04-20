@@ -12,3 +12,6 @@ def create_spherical_camera(viewProxy, dataHandler, phiValues, thetaValues):
 
 def create_cylindrical_camera(viewProxy, dataHandler, phiValues, translationValues):
     return camera.CylindricalCamera(dataHandler, viewProxy.CenterOfRotation, viewProxy.CameraPosition, viewProxy.CameraViewUp, phiValues, translationValues)
+
+def create_cube_camera(viewProxy, dataHandler, viewForward, viewUp, positions):
+    return camera.CubeCamera(dataHandler, viewForward, viewUp, positions)
