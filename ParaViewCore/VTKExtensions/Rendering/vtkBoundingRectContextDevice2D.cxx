@@ -57,7 +57,8 @@ void vtkBoundingRectContextDevice2D::DrawString(float* point, const vtkUnicodeSt
 {
   if (!this->DelegateDevice)
   {
-    vtkWarningMacro(<< "No DelegateDevice defined") return;
+    vtkWarningMacro(<< "No DelegateDevice defined");
+    return;
   }
 
   float bounds[4];
