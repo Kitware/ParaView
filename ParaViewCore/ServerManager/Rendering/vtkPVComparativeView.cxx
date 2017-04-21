@@ -28,6 +28,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
+#include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -215,6 +216,27 @@ public:
 
       this->Link->AddLinkedProxy(clone, vtkSMLink::OUTPUT);
       this->Items.push_back(clone);
+
+      // Handle proxy-list domain proxies. Link proxies in the proxy list domains on the clone
+      // with those in the corresponding domains on the root.
+      for (auto iter = this->PLDLinks.begin(); iter != this->PLDLinks.end(); ++iter)
+      {
+        vtkSMProperty* prop = clone->GetProperty(iter->first.c_str());
+        vtkSMProxyListDomain* pld = prop
+          ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
+          : nullptr;
+        if (pld)
+        {
+          for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
+          {
+            if (cc < static_cast<int>(iter->second.size()))
+            {
+              this->Copy(iter->second[cc]->GetLinkedProxy(0), pld->GetProxy(cc));
+              iter->second[cc]->AddLinkedProxy(pld->GetProxy(cc), vtkSMLink::OUTPUT);
+            }
+          }
+        }
+      }
     }
 
     return clone;
@@ -232,7 +254,30 @@ public:
       return;
     }
 
-    this->Link->RemoveLinkedProxy(this->Items.back());
+    vtkSmartPointer<vtkSMProxy> back = this->Items.back();
+    assert(back);
+
+    // Handle proxy-list domain. Remove proxies in proxy-list-domain on the proxy being removed
+    // from the PLDLinks.
+    for (auto iter = this->PLDLinks.begin(); iter != this->PLDLinks.end(); ++iter)
+    {
+      vtkSMProperty* prop = back->GetProperty(iter->first.c_str());
+      vtkSMProxyListDomain* pld = prop
+        ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
+        : nullptr;
+      if (pld)
+      {
+        for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
+        {
+          if (cc < static_cast<int>(iter->second.size()))
+          {
+            iter->second[cc]->RemoveLinkedProxy(pld->GetProxy(cc));
+          }
+        }
+      }
+    }
+
+    this->Link->RemoveLinkedProxy(back);
     this->Items.pop_back();
   }
 
@@ -258,6 +303,31 @@ protected:
     }
     this->Link->AddLinkedProxy(root, vtkSMLink::INPUT);
     this->Exceptions = exceptions;
+
+    // For all properties with proxy-list domains, we have to link the
+    // proxies in those domains too.
+    vtkSmartPointer<vtkSMPropertyIterator> iter =
+      vtkSmartPointer<vtkSMPropertyIterator>::Take(root->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+      vtkSMProperty* prop = iter->GetProperty();
+      vtkSMProxyListDomain* pld = prop
+        ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
+        : nullptr;
+      if (!pld)
+      {
+        continue;
+      }
+
+      std::vector<vtkSmartPointer<vtkSMProxyLink> >& links = this->PLDLinks[iter->GetKey()];
+      links.resize(pld->GetNumberOfProxies());
+      for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
+      {
+        vtkNew<vtkSMProxyLink> alink;
+        alink->AddLinkedProxy(pld->GetProxy(cc), vtkSMLink::INPUT);
+        links[cc] = alink.Get();
+      }
+    }
   }
 
 private:
@@ -304,6 +374,9 @@ private:
   std::vector<vtkSmartPointer<vtkSMProxy> > Items;
   vtkNew<vtkSMProxyLink> Link;
   std::set<std::string> Exceptions;
+  // key: property name
+  // value: ordered list of vtkSMProxyLinks for each of the proxies in the proxy list domain.
+  std::map<std::string, std::vector<vtkSmartPointer<vtkSMProxyLink> > > PLDLinks;
 };
 
 //----------------------------------------------------------------------------
