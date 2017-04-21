@@ -55,6 +55,12 @@ public:
       // this will copy both checked and unchecked property values.
       this->Output->Copy(input);
     }
+    vtkSMProxy* parent = vtkSMProxy::SafeDownCast(caller);
+    if (parent && this->Output)
+    {
+      // this will update the output object.
+      this->Output->GetParent()->UpdateVTKObjects();
+    }
   }
 };
 }
@@ -97,6 +103,8 @@ public:
               input->AddObserver(vtkCommand::PropertyModifiedEvent, observer));
             this->ObserverIds.push_back(
               input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer));
+            this->ObserverIds.push_back(
+              parent->AddObserver(vtkCommand::UpdatePropertyEvent, observer));
             observer->FastDelete();
             output->Copy(input);
           }
@@ -326,6 +334,22 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
 const char* vtkSMProxyListDomain::GetProxyName(vtkSMProxy* proxy)
 {
   return proxy ? proxy->GetXMLName() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyListDomain::GetProxyWithName(const char* pname)
+{
+  vtkSMProxyListDomainInternals::VectorOfProxies::const_iterator iter;
+  const vtkSMProxyListDomainInternals::VectorOfProxies& proxies = this->Internals->GetProxies();
+  for (iter = proxies.begin(); pname != NULL && iter != proxies.end(); iter++)
+  {
+    if (iter->Proxy && iter->Proxy->GetXMLName() && strcmp(iter->Proxy->GetXMLName(), pname) == 0)
+    {
+      return iter->Proxy;
+    }
+  }
+
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

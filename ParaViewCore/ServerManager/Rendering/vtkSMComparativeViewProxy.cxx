@@ -158,29 +158,6 @@ void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::GetRepresentationsForView(
-  vtkSMViewProxy* view, vtkCollection* collection)
-{
-  if (!collection)
-  {
-    return;
-  }
-
-  GET_PV_COMPARATIVE_VIEW()->GetRepresentationsForView(view, collection);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::GetRepresentations(int x, int y, vtkCollection* collection)
-{
-  if (!collection)
-  {
-    return;
-  }
-
-  GET_PV_COMPARATIVE_VIEW()->GetRepresentations(x, y, collection);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::SetupInteractor(vtkRenderWindowInteractor*)
 {
   vtkErrorMacro("vtkSMComparativeViewProxy doesn't support SetupInteractor. "

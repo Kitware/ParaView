@@ -327,82 +327,6 @@ vtkProperty* vtkGridAxes3DActor::GetProperty()
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxes3DActor::SetEnableLayerSupport(bool val)
-{
-  if (this->GetEnableLayerSupport() != val)
-  {
-    for (int cc = 0; cc < 6; cc++)
-    {
-      this->GridAxes2DActors[cc]->SetEnableLayerSupport(val);
-    }
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkGridAxes3DActor::GetEnableLayerSupport()
-{
-  return this->GridAxes2DActors[0]->GetEnableLayerSupport();
-}
-
-//----------------------------------------------------------------------------
-void vtkGridAxes3DActor::SetBackgroundLayer(int val)
-{
-  if (this->GetBackgroundLayer() != val)
-  {
-    for (int cc = 0; cc < 6; cc++)
-    {
-      this->GridAxes2DActors[cc]->SetBackgroundLayer(val);
-    }
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-int vtkGridAxes3DActor::GetBackgroundLayer()
-{
-  return this->GridAxes2DActors[0]->GetBackgroundLayer();
-}
-
-//----------------------------------------------------------------------------
-void vtkGridAxes3DActor::SetGeometryLayer(int val)
-{
-  if (this->GetGeometryLayer() != val)
-  {
-    for (int cc = 0; cc < 6; cc++)
-    {
-      this->GridAxes2DActors[cc]->SetGeometryLayer(val);
-    }
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-int vtkGridAxes3DActor::GetGeometryLayer()
-{
-  return this->GridAxes2DActors[0]->GetGeometryLayer();
-}
-
-//----------------------------------------------------------------------------
-void vtkGridAxes3DActor::SetForegroundLayer(int val)
-{
-  if (this->GetForegroundLayer() != val)
-  {
-    for (int cc = 0; cc < 6; cc++)
-    {
-      this->GridAxes2DActors[cc]->SetForegroundLayer(val);
-    }
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-int vtkGridAxes3DActor::GetForegroundLayer()
-{
-  return this->GridAxes2DActors[0]->GetForegroundLayer();
-}
-
-//----------------------------------------------------------------------------
 double* vtkGridAxes3DActor::GetBounds()
 {
   vtkMTimeType mtime = this->GetMTime();
@@ -441,18 +365,25 @@ double* vtkGridAxes3DActor::GetBounds()
 }
 
 //----------------------------------------------------------------------------
+void vtkGridAxes3DActor::GetRenderedBounds(double bounds[6])
+{
+  this->GetBounds(bounds);
+
+  // Use the same trick as the old vtkCubeAxesActor:
+  vtkBoundingBox bbox(bounds);
+  bbox.Inflate(bbox.GetMaxLength());
+  bbox.GetBounds(bounds);
+}
+
+//----------------------------------------------------------------------------
 int vtkGridAxes3DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
-  vtkRenderer* renderer = vtkRenderer::SafeDownCast(viewport);
-  assert(renderer != NULL);
+  this->Update(viewport);
 
-  if (this->GetEnableLayerSupport() == false || renderer->GetLayer() == this->GetBackgroundLayer())
-  {
-    this->Update(viewport);
-  }
   int counter = 0;
   for (int cc = 0; cc < 6; cc++)
   {
+    this->GridAxes2DActors[cc]->SetPropertyKeys(this->GetPropertyKeys());
     counter += this->GridAxes2DActors[cc]->GetVisibility()
       ? this->GridAxes2DActors[cc]->RenderOpaqueGeometry(viewport)
       : 0;
@@ -466,6 +397,7 @@ int vtkGridAxes3DActor::RenderTranslucentPolygonalGeometry(vtkViewport* viewport
   int counter = 0;
   for (int cc = 0; cc < 6; cc++)
   {
+    this->GridAxes2DActors[cc]->SetPropertyKeys(this->GetPropertyKeys());
     counter += this->GridAxes2DActors[cc]->GetVisibility()
       ? this->GridAxes2DActors[cc]->RenderTranslucentPolygonalGeometry(viewport)
       : 0;
@@ -479,6 +411,7 @@ int vtkGridAxes3DActor::RenderOverlay(vtkViewport* viewport)
   int counter = 0;
   for (int cc = 0; cc < 6; cc++)
   {
+    this->GridAxes2DActors[cc]->SetPropertyKeys(this->GetPropertyKeys());
     counter += this->GridAxes2DActors[cc]->GetVisibility()
       ? this->GridAxes2DActors[cc]->RenderOverlay(viewport)
       : 0;
@@ -524,6 +457,7 @@ void vtkGridAxes3DActor::Update(vtkViewport* viewport)
 
     this->GridAxes2DActors[cc]->SetGridBounds(this->GridBounds);
     this->GridAxes2DActors[cc]->SetUserMatrix(this->GetMatrix());
+    this->GridAxes2DActors[cc]->SetForceOpaque(this->ForceOpaque);
     this->GridAxes2DActors[cc]->Helper->SetLabelVisibilityOverrides(vtkTuple<bool, 4>(true));
     if (this->GetMTime() > this->CustomLabelsMTime)
     {
@@ -634,10 +568,6 @@ void vtkGridAxes3DActor::ShallowCopy(vtkProp* prop)
     this->SetNotation(cc, other->GetNotation(cc));
     this->SetPrecision(cc, other->GetPrecision(cc));
   }
-  this->SetEnableLayerSupport(other->GetEnableLayerSupport());
-  this->SetBackgroundLayer(other->GetBackgroundLayer());
-  this->SetGeometryLayer(other->GetGeometryLayer());
-  this->SetForegroundLayer(other->GetForegroundLayer());
 }
 
 //----------------------------------------------------------------------------

@@ -94,46 +94,6 @@ public:
 
   //@{
   /**
-   * Enable/Disable layer support. Default is off. When enabled, the prop can
-   * render in there separate layers:
-   * \li \c BackgroundLayer for all text labels and titles on the back faces,
-   * \li \c GeometryLayer for all 3D geometry e.g the grid wireframe, and
-   * \li \c ForegroundLayer for all text labels and titles on the front faces.
-   */
-  vtkSetMacro(EnableLayerSupport, bool);
-  vtkGetMacro(EnableLayerSupport, bool);
-  vtkBooleanMacro(EnableLayerSupport, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the layer in which to render all background actors/text when
-   * EnableLayerSupport is ON. Default is 0.
-   */
-  vtkSetMacro(BackgroundLayer, int);
-  vtkGetMacro(BackgroundLayer, int);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the layer in which to render all 3D actors when
-   * EnableLayerSupport is ON. Default is 0.
-   */
-  vtkSetMacro(GeometryLayer, int);
-  vtkGetMacro(GeometryLayer, int);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the layer in which to render all foreground actors/text when
-   * EnableLayerSupport is ON. Default is 0.
-   */
-  vtkSetMacro(ForegroundLayer, int);
-  vtkGetMacro(ForegroundLayer, int);
-  //@}
-
-  //@{
-  /**
    * Get/Set the property used to control the appearance of the rendered grid.
    */
   void SetProperty(vtkProperty*);
@@ -230,11 +190,18 @@ public:
   }
   //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  //@{
+  /**
+   * If true, the actor will always be rendered during the opaque pass.
+   */
+  vtkSetMacro(ForceOpaque, bool) vtkGetMacro(ForceOpaque, bool) vtkBooleanMacro(ForceOpaque, bool)
+    //@}
+
+    int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
+  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
+  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   /**
    * Overridden to include the mtime for the text properties.
@@ -255,11 +222,6 @@ protected:
   int Face;
   unsigned int LabelMask;
 
-  bool EnableLayerSupport;
-  int BackgroundLayer;
-  int ForegroundLayer;
-  int GeometryLayer;
-
   vtkTuple<vtkSmartPointer<vtkTextProperty>, 3> TitleTextProperty;
   vtkTuple<vtkSmartPointer<vtkTextProperty>, 3> LabelTextProperty;
   vtkTuple<vtkStdString, 3> Titles;
@@ -269,6 +231,8 @@ protected:
   vtkNew<vtkAxis> AxisHelpers[3];
   vtkNew<vtkContextScene> AxisHelperScene;
   vtkTimeStamp UpdateLabelTextPropertiesMTime;
+
+  bool ForceOpaque;
 
 private:
   vtkGridAxes2DActor(const vtkGridAxes2DActor&) VTK_DELETE_FUNCTION;

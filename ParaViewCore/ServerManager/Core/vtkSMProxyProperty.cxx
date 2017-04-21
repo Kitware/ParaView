@@ -34,6 +34,25 @@
 
 #include <assert.h>
 
+namespace
+{
+template <class T>
+void vtkGetProxyListValues(
+  T& tvalues, vtkSMProxyListDomain* tpld, const T& svalues, vtkSMProxyListDomain* spld)
+{
+  for (typename T::const_iterator siter = svalues.begin(); siter != svalues.end(); ++siter)
+  {
+    vtkSMProxy* svalue = siter->GetPointer();
+    vtkSMProxy* tvalue = tpld->GetProxyWithName(spld->GetProxyName(svalue));
+    if (tvalue && svalue)
+    {
+      tvalue->Copy(svalue);
+    }
+    tvalues.push_back(tvalue);
+  }
+}
+}
+
 bool vtkSMProxyProperty::CreateProxyAllowed = false; // static init
 
 //***************************************************************************
@@ -304,10 +323,33 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     return;
   }
 
-  bool modified =
-    this->PPInternals->SetProxies(psrc->PPInternals->GetProxies(), psrc->PPInternals->GetPorts());
-  bool unchecked_modified = this->PPInternals->SetUncheckedProxies(
-    psrc->PPInternals->GetUncheckedProxies(), psrc->PPInternals->GetUncheckedPorts());
+  vtkSMProxyListDomain* spld =
+    vtkSMProxyListDomain::SafeDownCast(src->FindDomain("vtkSMProxyListDomain"));
+  vtkSMProxyListDomain* tpld =
+    vtkSMProxyListDomain::SafeDownCast(this->FindDomain("vtkSMProxyListDomain"));
+
+  bool modified = false;
+  bool unchecked_modified = false;
+
+  if (spld && tpld && psrc->GetNumberOfProxies() > 0)
+  {
+    vtkPPInternals::SmartVectorOfProxies tvalues;
+    vtkGetProxyListValues(tvalues, tpld, psrc->PPInternals->GetProxies(), spld);
+    modified = this->PPInternals->SetProxies(tvalues, psrc->PPInternals->GetPorts());
+
+    vtkPPInternals::WeakVectorOfProxies tuvalues;
+    vtkGetProxyListValues(tuvalues, tpld, psrc->PPInternals->GetUncheckedProxies(), spld);
+    unchecked_modified =
+      this->PPInternals->SetUncheckedProxies(tuvalues, psrc->PPInternals->GetUncheckedPorts());
+  }
+  else
+  {
+    modified =
+      this->PPInternals->SetProxies(psrc->PPInternals->GetProxies(), psrc->PPInternals->GetPorts());
+    unchecked_modified = this->PPInternals->SetUncheckedProxies(
+      psrc->PPInternals->GetUncheckedProxies(), psrc->PPInternals->GetUncheckedPorts());
+  }
+
   if (modified)
   {
     this->Modified();

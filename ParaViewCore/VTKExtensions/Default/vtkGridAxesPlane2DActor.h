@@ -143,25 +143,6 @@ public:
 
   //@{
   /**
-   * Enable/Disable layer support. Default is off. When enabled, the prop will
-   * only render when the viewport's layer matches the Layer set on this prop.
-   */
-  vtkSetMacro(EnableLayerSupport, bool);
-  vtkGetMacro(EnableLayerSupport, bool);
-  vtkBooleanMacro(EnableLayerSupport, bool);
-  //@}
-
-  //@{
-  /**
-   * Set the layer to render this prop under when EnableLayerSupport is true.
-   * Default is 0.
-   */
-  vtkSetMacro(Layer, int);
-  vtkGetMacro(Layer, int);
-  //@}
-
-  //@{
-  /**
    * Get/Set the property used to control the appearance of the rendered grid.
    */
   void SetProperty(vtkProperty*);
@@ -204,11 +185,6 @@ protected:
   friend class vtkGridAxes2DActor;
   //@}
 
-  /**
-   * Returns true if the actor must render in the viewport.
-   */
-  bool IsLayerActive(vtkViewport* viewport);
-
   //@{
   /**
    * Update's the polydata.
@@ -227,9 +203,6 @@ protected:
   bool GenerateTicks;
   unsigned int TickDirection;
   std::deque<double> TickPositions[3];
-
-  bool EnableLayerSupport;
-  int Layer;
 
   vtkNew<vtkPolyData> PolyData;
   vtkNew<vtkPoints> PolyDataPoints;

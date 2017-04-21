@@ -190,8 +190,11 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(vtkSMProx
         if (vtkSMProxy* dproxy = pld->GetProxy(cc))
         {
           // it makes sense to have all proxies in the ProxyListDomain have the
-          // same location as the parent proxy.
-          dproxy->SetLocation(proxy->GetLocation());
+          // same location as the proxy to which the property belongs. Note this
+          // may be different that proxy for cases where it's a property exposed
+          // from a subproxy.
+          vtkSMProxy* parentProxy = iter->GetProperty()->GetParent();
+          dproxy->SetLocation(parentProxy->GetLocation());
           this->PreInitializeProxy(dproxy);
         }
       }

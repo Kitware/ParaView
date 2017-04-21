@@ -34,6 +34,7 @@
 
 class vtkPolarAxesRepresentation;
 class vtkSelectionRepresentation;
+class vtkPVGridAxes3DRepresentation;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation
   : public vtkCompositeRepresentation
@@ -48,6 +49,7 @@ public:
    * representation to any views or calling Update().
    */
   void SetSelectionRepresentation(vtkSelectionRepresentation*);
+  void SetGridAxesRepresentation(vtkPVGridAxes3DRepresentation*);
 
   /**
    * This must only be set during initialization before adding the
@@ -80,9 +82,15 @@ public:
   /**
    * Passed on to internal representations as well.
    */
-  virtual void SetUpdateTime(double time) VTK_OVERRIDE;
-  virtual void SetForceUseCache(bool val) VTK_OVERRIDE;
-  virtual void SetForcedCacheKey(double val) VTK_OVERRIDE;
+  void SetUpdateTime(double time) VTK_OVERRIDE;
+  void SetForceUseCache(bool val) VTK_OVERRIDE;
+  void SetForcedCacheKey(double val) VTK_OVERRIDE;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -119,8 +127,10 @@ protected:
   virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkSelectionRepresentation* SelectionRepresentation;
-  bool SelectionVisibility;
+  vtkPVGridAxes3DRepresentation* GridAxesRepresentation;
   vtkPolarAxesRepresentation* PolarAxesRepresentation;
+
+  bool SelectionVisibility;
 
 private:
   vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
