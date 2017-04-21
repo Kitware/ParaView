@@ -56,48 +56,6 @@ public:
 
   //@{
   /**
-   * Control the orientation of the scalar bar.
-   */
-  vtkSetClampMacro(Orientation, int, VTK_ORIENT_HORIZONTAL, VTK_ORIENT_VERTICAL);
-  vtkGetMacro(Orientation, int);
-  void SetOrientationToHorizontal() { this->SetOrientation(VTK_ORIENT_HORIZONTAL); }
-  void SetOrientationToVertical() { this->SetOrientation(VTK_ORIENT_VERTICAL); }
-  //@}
-
-  //@{
-  /**
-   * Set/Get the title text property.
-   */
-  virtual void SetTitleTextProperty(vtkTextProperty* p) VTK_OVERRIDE;
-  vtkGetObjectMacro(TitleTextProperty, vtkTextProperty);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the labels text property.
-   */
-  virtual void SetLabelTextProperty(vtkTextProperty* p) VTK_OVERRIDE;
-  vtkGetObjectMacro(LabelTextProperty, vtkTextProperty);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the title of the scalar bar actor.
-   */
-  vtkSetStringMacro(Title);
-  vtkGetStringMacro(Title);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the title for the component that is selected.
-   */
-  vtkSetStringMacro(ComponentTitle);
-  vtkGetStringMacro(ComponentTitle);
-  //@}
-
-  //@{
-  /**
    * Set the title justification. Valid values are VTK_TEXT_LEFT,
    * VTK_TEXT_CENTERED, and VTK_TEXT_RIGHT.
    */
@@ -110,42 +68,6 @@ public:
     PrecedeScalarBar = 0,
     SucceedScalarBar
   };
-
-  //@{
-  /**
-   * Should the title and tick marks precede the scalar bar or succeed it?
-   * This is measured along the viewport coordinate direction perpendicular
-   * to the long axis of the scalar bar, not the reading direction.
-   * Thus, succeed implies the that the text is above scalar bar if
-   * the orientation is horizontal or right of scalar bar if the orientation
-   * is vertical. Precede is the opposite.
-   */
-  vtkSetClampMacro(TextPosition, int, PrecedeScalarBar, SucceedScalarBar);
-  vtkGetMacro(TextPosition, int);
-  virtual void SetTextPositionToPrecedeScalarBar() VTK_OVERRIDE
-  {
-    this->SetTextPosition(vtkContext2DScalarBarActor::PrecedeScalarBar);
-  }
-  virtual void SetTextPositionToSucceedScalarBar() VTK_OVERRIDE
-  {
-    this->SetTextPosition(vtkContext2DScalarBarActor::SucceedScalarBar);
-  }
-  //@}
-
-  /**
-   * Get the PositionCoordinate instance of vtkCoordinate.
-   * This is used for complicated or relative positioning.
-   * The position variable controls the lower left corner of the Actor2D.
-   */
-  vtkViewportCoordinateMacro(Position);
-
-  /**
-   * Access the Position2 instance variable. This variable controls
-   * the upper right corner of the Actor2D. It is by default
-   * relative to Position and in normalized viewport coordinates.
-   * Some 2D actor subclasses ignore the position2 variable.
-   */
-  vtkViewportCoordinateMacro(Position2);
 
   //@{
   /**
@@ -278,29 +200,14 @@ private:
   vtkContextActor* ActorDelegate;
 
   /**
-   * Vertical or horizontal orientation.
-   */
-  int Orientation;
-
-  /**
    * Location of window, such as a corner or middle side position.
    */
   int WindowLocation;
 
-  /**
-   * Title properties.
-   */
-  char* Title;
-  char* ComponentTitle;
   int TitleJustification;
 
   /**
-   * Designates on which side of the color bar the labels/annotations appear.
-   */
-  int TextPosition;
-
-  /**
-   * Thickenss of the color bar.
+   * Thickness of the color bar.
    */
   int ScalarBarThickness;
 
@@ -308,16 +215,6 @@ private:
   * Length of the color bar.
   */
   int ScalarBarLength;
-
-  /**
-   * Font for the legend title.
-   */
-  vtkTextProperty* TitleTextProperty;
-
-  /**
-   * Font for tick+annotation labels.
-   */
-  vtkTextProperty* LabelTextProperty;
 
   int AutomaticLabelFormat;
 

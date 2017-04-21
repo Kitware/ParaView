@@ -72,7 +72,7 @@ public:
   static vtkScalarBarItem* New() { VTK_OBJECT_FACTORY_NEW_BODY(vtkScalarBarItem); }
 
   // Forward calls to vtkContextItem::Paint to vtkContext2DScalarBarActor
-  bool Paint(vtkContext2D* painter)
+  bool Paint(vtkContext2D* painter) VTK_OVERRIDE
   {
     bool somethingRendered = false;
     if (this->Actor)
@@ -102,12 +102,6 @@ class vtkContext2DScalarBarActor::vtkAnnotationMap : public std::map<double, vtk
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkContext2DScalarBarActor);
-
-//----------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkContext2DScalarBarActor, LabelTextProperty, vtkTextProperty);
-
-//----------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkContext2DScalarBarActor, TitleTextProperty, vtkTextProperty);
 
 //----------------------------------------------------------------------------
 vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
