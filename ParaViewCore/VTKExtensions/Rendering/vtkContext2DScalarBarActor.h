@@ -152,10 +152,20 @@ public:
    * Set the scalar bar thickness. When the orientation is
    * VTK_ORIENT_VERTICAL, this sets the scalar bar width.  When the
    * orientation is VTK_ORIENT_HORIZONTAL, this sets the scalar bar
-   * height.
+   * height. Specified in pixels.
    */
   vtkSetMacro(ScalarBarThickness, int);
   vtkGetMacro(ScalarBarThickness, int);
+  //@}
+
+  //@{
+  /**
+   * Set the scalar bar length. When the orientation is VTK_ORIENT_VERTICAL,
+   * this sets the scalar bar  height. When the orientation is
+   * VTK_ORIENT_HORIZONTAL, this sets the scalar bar width. Specified in pixels.
+   */
+  vtkSetMacro(ScalarBarLength, int);
+  vtkGetMacro(ScalarBarLength, int);
   //@}
 
   //@{
@@ -290,9 +300,14 @@ private:
   int TextPosition;
 
   /**
-   * Thickenss of the color bar, specified in pixels.
+   * Thickenss of the color bar.
    */
   int ScalarBarThickness;
+
+  /**
+  * Length of the color bar.
+  */
+  int ScalarBarLength;
 
   /**
    * Font for the legend title.

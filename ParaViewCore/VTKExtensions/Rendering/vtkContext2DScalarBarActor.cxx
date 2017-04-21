@@ -125,6 +125,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->TextPosition = vtkContext2DScalarBarActor::SucceedScalarBar;
 
   this->ScalarBarThickness = 20;
+  this->ScalarBarLength = 100;
 
   this->TitleTextProperty = NULL;
   this->LabelTextProperty = NULL;
@@ -308,27 +309,14 @@ void vtkContext2DScalarBarActor::GetSize(double size[2])
     return;
   }
 
-  int* displayPosition = this->PositionCoordinate->GetComputedDisplayValue(this->CurrentViewport);
-  int* displayPosition2 = this->Position2Coordinate->GetComputedDisplayValue(this->CurrentViewport);
-
-  size[0] = displayPosition2[0] - displayPosition[0];
-  if (size[0] < 0.0)
-  {
-    size[0] = -size[0];
-  }
-
-  size[1] = displayPosition2[1] - displayPosition[1];
-  if (size[1] < 0.0)
-  {
-    size[1] = -size[1];
-  }
-
   if (this->Orientation == VTK_ORIENT_VERTICAL)
   {
     size[0] = this->ScalarBarThickness;
+    size[1] = this->ScalarBarLength;
   }
   else
   {
+    size[0] = this->ScalarBarLength;
     size[1] = this->ScalarBarThickness;
   }
 }
