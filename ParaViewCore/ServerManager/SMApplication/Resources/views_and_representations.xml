@@ -9074,6 +9074,7 @@
           <Property name="HiddenProps" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
+          <Property name="AxesGrid" />
 
           <Property name="CenterAxesVisibility" />
           <PropertyGroup label="Orientation Axes">
