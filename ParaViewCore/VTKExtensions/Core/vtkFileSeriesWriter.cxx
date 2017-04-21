@@ -80,6 +80,10 @@ vtkFileSeriesWriter::vtkFileSeriesWriter()
   this->FileNameSuffix = nullptr;
 
   this->WriteAllTimeSteps = 0;
+  this->MinTimeStep = 0;
+  this->MaxTimeStep = -1;
+  this->TimeStepStride = 1;
+
   this->NumberOfTimeSteps = 1;
   this->CurrentTimeIndex = 0;
   this->Interpreter = nullptr;
@@ -145,6 +149,14 @@ int vtkFileSeriesWriter::RequestInformation(vtkInformation* vtkNotUsed(request),
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
   {
     this->NumberOfTimeSteps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    // if the number of time steps is less than the min time step then we just write out the
+    // current time step assuming that's better than nothing but we'll give a warning
+    if (this->NumberOfTimeSteps < this->MinTimeStep)
+    {
+      vtkWarningMacro("There are less time steps ("
+        << this->NumberOfTimeSteps << ") than the minimum requested time step ("
+        << this->MinTimeStep << ") so the current time step will be written out instead.\n");
+    }
   }
   else
   {
@@ -161,10 +173,18 @@ int vtkFileSeriesWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request)
 
   // Piece request etc. has already been set by this->CallWriter(), just set the
   // time request if needed.
+  if (this->NumberOfTimeSteps < this->MinTimeStep)
+  {
+    return 1;
+  }
   double* inTimes =
     inputVector[0]->GetInformationObject(0)->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   if (inTimes && this->WriteAllTimeSteps)
   {
+    if (this->CurrentTimeIndex < this->MinTimeStep)
+    {
+      this->CurrentTimeIndex = this->MinTimeStep;
+    }
     double timeReq = inTimes[this->CurrentTimeIndex];
     inputVector[0]->GetInformationObject(0)->Set(
       vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
@@ -180,7 +200,8 @@ int vtkFileSeriesWriter::RequestData(vtkInformation* request, vtkInformationVect
   // this->Writer has already written out the file, just manage the looping for
   // timesteps.
 
-  if (this->CurrentTimeIndex == 0 && this->WriteAllTimeSteps)
+  if (this->WriteAllTimeSteps && this->MinTimeStep <= this->NumberOfTimeSteps &&
+    (this->CurrentTimeIndex == 0 || (this->CurrentTimeIndex == this->MinTimeStep)))
   {
     // Tell the pipeline to start looping.
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
@@ -196,8 +217,9 @@ int vtkFileSeriesWriter::RequestData(vtkInformation* request, vtkInformationVect
 
   if (this->WriteAllTimeSteps)
   {
-    this->CurrentTimeIndex++;
-    if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
+    this->CurrentTimeIndex += this->TimeStepStride;
+    if ((this->CurrentTimeIndex >= this->NumberOfTimeSteps) ||
+      (this->MaxTimeStep > this->MinTimeStep && this->CurrentTimeIndex > this->MaxTimeStep))
     {
       // Tell the pipeline to stop looping.
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());

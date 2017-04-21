@@ -72,14 +72,51 @@ public:
 
   //@{
   /**
-   * Must be set to true to write all timesteps, otherwise only the current
-   * timestep will be written out. Off by default.
+   * If Off, which is the default, only the current timestep is written.
+   * If true the writer will write every timestep, or at least those
+   * within the range of min to max.
    */
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
+  //@}
+
+  //@{
+  /**
+   * Provides an option to pad the time step when writing out time series data.
+   * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
+   * or may not exist and d must exist and d must be the last character
+   * '.' and X may or may not exist, X must be an integer if it exists.
+   * Default is nullptr.
+   */
   vtkGetStringMacro(FileNameSuffix);
   vtkSetStringMacro(FileNameSuffix);
+  //@}
+
+  //@{
+  /**
+   * Sets a minimum timestep constraint on WriteAllTimeSteps.
+   */
+  vtkGetMacro(MinTimeStep, int);
+  vtkSetClampMacro(MinTimeStep, int, 0, VTK_INT_MAX);
+  //@}
+
+  //@{
+  /**
+   * Sets a maximum timestep constraint on WriteAllTimeSteps. If less than
+   * MinTimeStep, then the MaxTimeStep constraint is ignored (i.e. all time steps
+   * from MinTimeStep to the actual last time step are written out).
+   */
+  vtkGetMacro(MaxTimeStep, int);
+  vtkSetMacro(MaxTimeStep, int);
+  //@}
+
+  //@{
+  /**
+   * Sets a stride to write out time series.
+   */
+  vtkGetMacro(TimeStepStride, int);
+  vtkSetClampMacro(TimeStepStride, int, 1, VTK_INT_MAX);
   //@}
 
   /**
@@ -119,6 +156,9 @@ private:
   char* FileNameSuffix;
   int NumberOfTimeSteps;
   int CurrentTimeIndex;
+  int MinTimeStep;
+  int MaxTimeStep;
+  int TimeStepStride;
 
   // The name of the output file.
   char* FileName;

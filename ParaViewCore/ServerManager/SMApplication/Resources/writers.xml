@@ -690,12 +690,11 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
@@ -750,12 +749,11 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
@@ -822,12 +820,11 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each time step available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each time step available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
@@ -881,14 +878,13 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="WriteAllTimeSteps"
+      <IntVectorProperty name="WriteTimeSteps"
                          command="SetWriteAllTimeSteps"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the reader.
-        </Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
@@ -929,13 +925,13 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="WriteAllTimeSteps"
+      <IntVectorProperty name="WriteTimeSteps"
                          command="SetWriteAllTimeSteps"
                          number_of_elements="1"
                          default_values="0">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the reader.
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.
         </Documentation>
       </IntVectorProperty>
       <SubProxy>
@@ -1175,8 +1171,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each time step available from the
-        reader.</Documentation>
+        executed once for each time step available from its input.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetIgnoreMetaDataWarning"
                          default_values="0"
@@ -1329,12 +1324,11 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each time step available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each time step available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy class="vtkPVMergeTables"
@@ -1400,12 +1394,11 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy class="vtkAttributeDataToTableFilter"
