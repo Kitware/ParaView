@@ -47,6 +47,13 @@ public:
 
   void SetController(vtkMultiProcessController* controller);
 
+  /**
+   * If set to true then the filter will divide all output cell data arrays (the integrated values)
+   * by the computed volume/area of the dataset.  Defaults to false.
+   */
+  vtkSetMacro(DivideAllCellDataByVolume, bool);
+  vtkGetMacro(DivideAllCellDataByVolume, bool);
+
 protected:
   vtkIntegrateAttributes();
   ~vtkIntegrateAttributes();
@@ -68,6 +75,8 @@ protected:
   double Sum;
   // ToCompute the location of the output point.
   double SumCenter[3];
+
+  bool DivideAllCellDataByVolume;
 
   void IntegratePolyLine(
     vtkDataSet* input, vtkUnstructuredGrid* output, vtkIdType cellId, vtkIdList* cellPtIds);
@@ -94,6 +103,13 @@ protected:
   int PieceNodeMinToNode0(vtkUnstructuredGrid* data);
   void SendPiece(vtkUnstructuredGrid* src);
   void ReceivePiece(vtkUnstructuredGrid* mergeTo, int fromId);
+
+  // This function assumes the data is in the format of the output of this filter with one
+  // point/cell having the value computed as its only tuple.  It divides each value by sum,
+  // skipping the last data array if requested (so the volume doesn't get divided by itself
+  // and set to 1).
+  static void DivideDataArraysByConstant(
+    vtkDataSetAttributes* data, bool skipLastArray, double sum);
 
 private:
   vtkIntegrateAttributes(const vtkIntegrateAttributes&) VTK_DELETE_FUNCTION;

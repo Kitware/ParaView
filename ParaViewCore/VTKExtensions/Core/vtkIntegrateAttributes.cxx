@@ -81,6 +81,8 @@ vtkIntegrateAttributes::vtkIntegrateAttributes()
   this->CellFieldList = 0;
   this->FieldListIndex = 0;
 
+  this->DivideAllCellDataByVolume = false;
+
   SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -510,6 +512,10 @@ int vtkIntegrateAttributes::RequestData(
   if (globalMin == numProcs)
   {
     // there is no data in any of the processors
+    if (this->Sum != 0.0 && this->DivideAllCellDataByVolume)
+    {
+      DivideDataArraysByConstant(output->GetCellData(), true, this->Sum);
+    }
     return 1;
   }
   if (processId > 0)
@@ -536,6 +542,10 @@ int vtkIntegrateAttributes::RequestData(
       pt[0] = this->SumCenter[0] / this->Sum;
       pt[1] = this->SumCenter[1] / this->Sum;
       pt[2] = this->SumCenter[2] / this->Sum;
+      if (this->DivideAllCellDataByVolume)
+      {
+        DivideDataArraysByConstant(output->GetCellData(), true, this->Sum);
+      }
     }
     else
     {
@@ -1197,6 +1207,24 @@ void vtkIntegrateAttributes::IntegrateGeneral3DCell(
     pt3Id = ptIds->GetId(tetIdx++);
     pt4Id = ptIds->GetId(tetIdx++);
     this->IntegrateTetrahedron(input, output, cellId, pt1Id, pt2Id, pt3Id, pt4Id);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkIntegrateAttributes::DivideDataArraysByConstant(
+  vtkDataSetAttributes* data, bool skipLastArray, double sum)
+{
+  const int offset = skipLastArray ? -1 : 0;
+  for (int i = 0; i < data->GetNumberOfArrays() + offset; ++i)
+  {
+    vtkDataArray* arr = data->GetArray(i);
+    if (arr)
+    {
+      for (int j = 0; j < arr->GetNumberOfComponents(); ++j)
+      {
+        arr->SetComponent(0, j, arr->GetComponent(0, j) / sum);
+      }
+    }
   }
 }
 
