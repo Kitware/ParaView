@@ -106,23 +106,12 @@ vtkStandardNewMacro(vtkContext2DScalarBarActor);
 //----------------------------------------------------------------------------
 vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 {
-  this->LookupTable = NULL;
-
   this->ActorDelegate = vtkContextActor::New();
 
-  this->Orientation = VTK_ORIENT_VERTICAL;
-
-  this->Title = NULL;
-  this->ComponentTitle = NULL;
   this->TitleJustification = VTK_TEXT_LEFT;
-
-  this->TextPosition = vtkContext2DScalarBarActor::SucceedScalarBar;
 
   this->ScalarBarThickness = 20;
   this->ScalarBarLength = 100;
-
-  this->TitleTextProperty = NULL;
-  this->LabelTextProperty = NULL;
 
   this->AutomaticLabelFormat = 1;
 
@@ -944,7 +933,7 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   vtkPen* pen = painter->GetPen();
   vtkBrush* brush = painter->GetBrush();
 
-  // Save prevoous settings
+  // Save previous settings
   vtkNew<vtkPen> savePen;
   savePen->DeepCopy(pen);
   vtkNew<vtkBrush> saveBrush;
