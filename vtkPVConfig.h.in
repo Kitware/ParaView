@@ -100,6 +100,8 @@
 
 #cmakedefine PARAVIEW_USE_OSPRAY
 
+#cmakedefine PARAVIEW_USE_OPENVR
+
 #cmakedefine PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
 
 #endif
