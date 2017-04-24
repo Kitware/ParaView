@@ -17,9 +17,12 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLContextDevice2D.h"
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkPen.h"
 #include "vtkPointData.h"
 #include "vtkPoints2D.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkScalarsToColors.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform2D.h"
@@ -950,6 +953,19 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   double size[2];
   this->GetSize(size);
+
+  vtkContextDevice2D* device = painter->GetDevice();
+  vtkOpenGLContextDevice2D* oglDevice = vtkOpenGLContextDevice2D::SafeDownCast(device);
+  if (oglDevice)
+  {
+    vtkOpenGLRenderWindow* renWin = oglDevice->GetRenderWindow();
+    if (renWin)
+    {
+      std::cout << "renWin dpi: " << renWin->GetDPI() << std::endl;
+      size[0] *= (renWin->GetDPI() / 72);
+      size[1] *= (renWin->GetDPI() / 72);
+    }
+  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;
