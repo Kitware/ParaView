@@ -20,6 +20,7 @@ from paraview.servermanager import ProxyProperty, InputProperty
 from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
 from vtk.web import iteritems
+from vtk.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance
 from paraview.web.decorators import *
 
 from vtk.vtkWebCore import vtkWebInteractionEvent
@@ -491,6 +492,96 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 
         return { 'success': True, 'metaDataList': returnToClient }
 
+# =============================================================================
+#
+# Provide an updated geometry delivery mechanism which better matches the
+# client-side rendering capability we have in vtk.js
+#
+# =============================================================================
+
+class ParaViewWebLocalRendering(ParaViewWebProtocol):
+    def __init__(self):
+        super(ParaViewWebLocalRendering, self).__init__()
+        self.context = SynchronizationContext()
+        self.trackingViews = {}
+        self.mtime = 0
+
+        initializeSerializers()
+
+    # RpcName: getArray => viewport.geometry.array.get
+    @exportRpc("viewport.geometry.array.get")
+    def getArray(self, dataHash):
+        return self.context.getCachedDataArray(dataHash)
+
+    # RpcName: addViewObserver => viewport.geometry.view.observer.add
+    @exportRpc("viewport.geometry.view.observer.add")
+    def addViewObserver(self, viewId):
+        sView = self.getView(viewId)
+
+        def pushGeometry(newSubscription=False):
+            simple.Render(sView)
+            stateToReturn = self.getViewState(viewId, newSubscription)
+            stateToReturn['mtime'] = 0 if newSubscription else self.mtime
+            self.mtime += 1
+            return stateToReturn
+
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        if not viewId in self.trackingViews:
+            observerCallback = lambda *args, **kwargs: self.publish('viewport.geometry.view.subscription', pushGeometry())
+            tag = sView.AddObserver('UpdateDataEvent', observerCallback)
+            self.trackingViews[viewId] = { 'tag': tag, 'observerCount': 1 }
+        else:
+            # There is an observer on this view already
+            self.trackingViews[viewId]['observerCount'] += 1
+
+        self.publish('viewport.geometry.view.subscription', pushGeometry(True))
+        return { 'success': True }
+
+    # RpcName: removeViewObserver => viewport.geometry.view.observer.remove
+    @exportRpc("viewport.geometry.view.observer.remove")
+    def removeViewObserver(self, viewId):
+        sView = self.getView(viewId)
+
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        observerInfo = self.trackingViews[viewId]
+
+        if not observerInfo:
+            return { 'error': 'Unable to find subscription for view %s' % viewId }
+
+        observerInfo['observerCount'] -= 1
+
+        if observerInfo['observerCount'] <= 0:
+            sView.RemoveObserver(observerInfo['tag'])
+            del self.trackingViews[viewId]
+
+        return { 'result': 'success' }
+
+    # RpcName: getViewState => viewport.geometry.view.get.state
+    @exportRpc("viewport.geometry.view.get.state")
+    def getViewState(self, viewId, newSubscription=False):
+        sView = self.getView(viewId)
+
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        self.context.setIgnoreLastDependencies(newSubscription)
+
+        # Get the active view and render window, use it to iterate over renderers
+        renderWindow = sView.GetRenderWindow()
+        renderWindowId = sView.GetGlobalIDAsString()
+        viewInstance = serializeInstance(None, renderWindow, renderWindowId, self.context, 1)
+
+        self.context.setIgnoreLastDependencies(False)
+        self.context.checkForArraysToRelease()
+
+        if viewInstance:
+            return viewInstance
+
+        return None
 
 # =============================================================================
 #
