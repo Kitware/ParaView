@@ -47,6 +47,10 @@ public:
 
   void SetController(vtkMultiProcessController* controller);
 
+  /**
+   * If set to true then the filter will divide all output cell data arrays (the integrated values)
+   * by the computed volume/area of the dataset.  Defaults to false.
+   */
   vtkSetMacro(DivideAllCellDataByVolume, bool);
   vtkGetMacro(DivideAllCellDataByVolume, bool);
 
