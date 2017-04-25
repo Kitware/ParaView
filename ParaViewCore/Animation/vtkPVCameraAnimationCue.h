@@ -55,6 +55,14 @@ public:
    */
   void SetMode(int mode);
 
+  //@{
+  /**
+   * Get/Set the animation timekeeper
+   */
+  vtkGetObjectMacro(TimeKeeper, vtkSMProxy);
+  void SetTimeKeeper(vtkSMProxy*);
+  //@}
+
   virtual void BeginUpdateAnimationValues() VTK_OVERRIDE {}
   virtual void SetAnimationValue(int, double) VTK_OVERRIDE {}
   virtual void EndUpdateAnimationValues() VTK_OVERRIDE;
@@ -67,6 +75,7 @@ protected:
 
   vtkPVRenderView* View;
   vtkSMProxy* DataSourceProxy;
+  vtkSMProxy* TimeKeeper;
 
 private:
   vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&) VTK_DELETE_FUNCTION;

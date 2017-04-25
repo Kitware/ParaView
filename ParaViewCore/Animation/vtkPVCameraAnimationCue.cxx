@@ -17,13 +17,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraCueManipulator.h"
 #include "vtkPVRenderView.h"
+#include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkPVCameraAnimationCue);
 vtkCxxSetObjectMacro(vtkPVCameraAnimationCue, View, vtkPVRenderView);
+vtkCxxSetObjectMacro(vtkPVCameraAnimationCue, TimeKeeper, vtkSMProxy);
 //----------------------------------------------------------------------------
 vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 {
   this->View = 0;
+  this->TimeKeeper = nullptr;
   vtkPVCameraCueManipulator* manip = vtkPVCameraCueManipulator::New();
   this->SetManipulator(manip);
   manip->Delete();
@@ -33,6 +36,7 @@ vtkPVCameraAnimationCue::vtkPVCameraAnimationCue()
 vtkPVCameraAnimationCue::~vtkPVCameraAnimationCue()
 {
   this->SetView(NULL);
+  this->SetTimeKeeper(nullptr);
 }
 
 //----------------------------------------------------------------------------
