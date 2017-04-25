@@ -83,8 +83,6 @@ public:
 #if defined(Q_WS_WIN) || defined(Q_OS_WIN)
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 #endif
-    this->View->setAutomaticImageCacheEnabled(true);
-
     this->ContextView->GetScene()->AddItem(this->SliceItem.GetPointer());
 
     this->SliceItem->GetAxis()->SetPoint1(10, 10);

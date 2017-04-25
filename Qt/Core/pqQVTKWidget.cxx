@@ -69,7 +69,10 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   , SizePropertyName("ViewSize")
   , SkipHandleViewSizeForModifiedQt4(false)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  // caching only support for QVTKWidget (Qt 4), and not for QVTKOpenGLWidget (Qt 5).
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST") == NULL);
+#endif
 
   // Tmp objects
   QPixmap mousePixmap(":/pqCore/Icons/pqMousePick15.png");
@@ -172,17 +175,8 @@ void pqQVTKWidget::setSession(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-bool pqQVTKWidget::paintCachedImage()
+void pqQVTKWidget::doDeferredRender()
 {
-  // In future we can update this code to ensure that view->Render() is never
-  // called from the pqQVTKWidget. For now, we are letting the default path
-  // execute when not resizing.
-
-  if (this->Superclass::paintCachedImage())
-  {
-    return true;
-  }
-
   // despite our best efforts, it's possible that the paint event happens while
   // the server manager is busy processing some other request that yields
   // progress (e.g. pvcrs.UndoRedo2 test).
@@ -190,15 +184,17 @@ bool pqQVTKWidget::paintCachedImage()
   // rendering in those cases.
   if (this->ViewProxy && this->ViewProxy->GetSession()->GetPendingProgress())
   {
-    return true;
+    return;
   }
 
   if (this->Session && this->Session->GetPendingProgress())
   {
-    return true;
+    return;
   }
-  return false;
+
+  this->Superclass::doDeferredRender();
 }
+
 //----------------------------------------------------------------------------
 vtkTypeUInt32 pqQVTKWidget::getProxyId()
 {
