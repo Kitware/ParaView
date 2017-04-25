@@ -951,21 +951,12 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   int* displayPosition = this->PositionCoordinate->GetComputedDisplayValue(this->CurrentViewport);
 
+  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+
   double size[2];
   this->GetSize(size);
-
-  vtkContextDevice2D* device = painter->GetDevice();
-  vtkOpenGLContextDevice2D* oglDevice = vtkOpenGLContextDevice2D::SafeDownCast(device);
-  if (oglDevice)
-  {
-    vtkOpenGLRenderWindow* renWin = oglDevice->GetRenderWindow();
-    if (renWin)
-    {
-      std::cout << "renWin dpi: " << renWin->GetDPI() << std::endl;
-      size[0] *= (renWin->GetDPI() / 72);
-      size[1] *= (renWin->GetDPI() / 72);
-    }
-  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;
