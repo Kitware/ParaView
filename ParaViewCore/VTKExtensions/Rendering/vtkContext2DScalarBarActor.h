@@ -235,11 +235,6 @@ private:
   double Spacer;
 
   /**
-   * Size of ticks in terms of display coordinates.
-   */
-  double TickSize;
-
-  /**
    * Should ticks be drawn?
    */
   bool DrawTickMarks;

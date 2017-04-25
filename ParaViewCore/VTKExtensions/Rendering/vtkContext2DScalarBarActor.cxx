@@ -127,7 +127,6 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->OutlineScalarBar = 0;
 
   this->Spacer = 4.0;
-  this->TickSize = 8;
 
   this->DrawTickMarks = true;
 
