@@ -40,6 +40,7 @@ class vtkCellCenters;
 class vtkCallbackCommand;
 class vtkCompositeDataToUnstructuredGridFilter;
 class vtkLabeledDataMapper;
+class vtkMaskPoints;
 class vtkProp3D;
 class vtkPVCacheKeeper;
 class vtkTextProperty;
@@ -68,6 +69,15 @@ public:
    */
   virtual void SetVisibility(bool val) VTK_OVERRIDE;
   virtual bool GetVisibility() VTK_OVERRIDE;
+  //@}
+
+  //@{
+  /**
+   * Get/Set the maximum number of points/cells that will be labeled.  Too many labels
+   * is difficult to read so this may help with large datasets.  Default: 100.
+   */
+  void SetMaximumNumberOfLabels(int numLabels);
+  int GetMaximumNumberOfLabels();
   //@}
 
   //***************************************************************************
@@ -164,11 +174,13 @@ protected:
   vtkCompositeDataToUnstructuredGridFilter* MergeBlocks;
   vtkPVCacheKeeper* CacheKeeper;
 
+  vtkSmartPointer<vtkMaskPoints> PointMask;
   vtkLabeledDataMapper* PointLabelMapper;
   vtkTextProperty* PointLabelProperty;
   vtkActor2D* PointLabelActor;
 
   vtkCellCenters* CellCenters;
+  vtkSmartPointer<vtkMaskPoints> CellMask;
   vtkLabeledDataMapper* CellLabelMapper;
   vtkTextProperty* CellLabelProperty;
   vtkActor2D* CellLabelActor;
@@ -184,6 +196,7 @@ protected:
 
   int PointLabelVisibility;
   int CellLabelVisibility;
+  int MaximumNumberOfLabels;
 
 private:
   vtkDataLabelRepresentation(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;

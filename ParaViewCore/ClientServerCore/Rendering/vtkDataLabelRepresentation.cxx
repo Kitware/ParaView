@@ -23,6 +23,7 @@
 #include "vtkInformationVector.h"
 #include "vtkLabeledDataMapper.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMaskPoints.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
@@ -38,10 +39,13 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
 {
   this->PointLabelVisibility = 0;
   this->CellLabelVisibility = 0;
+  this->MaximumNumberOfLabels = 100;
 
   this->MergeBlocks = vtkCompositeDataToUnstructuredGridFilter::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
+  this->PointMask = vtkSmartPointer<vtkMaskPoints>::New();
+  this->PointMask->SetOnRatio(1);
   this->PointLabelMapper = vtkLabeledDataMapper::New();
   this->PointLabelActor = vtkActor2D::New();
   this->PointLabelProperty = vtkTextProperty::New();
@@ -50,15 +54,24 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->Transform->Identity();
 
   this->CellCenters = vtkCellCenters::New();
+  this->CellMask = vtkSmartPointer<vtkMaskPoints>::New();
+  this->CellMask->SetOnRatio(1);
   this->CellLabelMapper = vtkLabeledDataMapper::New();
   this->CellLabelActor = vtkActor2D::New();
   this->CellLabelProperty = vtkTextProperty::New();
 
   this->CacheKeeper->SetInputConnection(this->MergeBlocks->GetOutputPort());
 
+  this->PointMask->SetMaximumNumberOfPoints(this->MaximumNumberOfLabels);
+  this->PointMask->RandomModeOn();
+  this->CellMask->SetMaximumNumberOfPoints(this->MaximumNumberOfLabels);
+  this->CellMask->RandomModeOn();
+
+  this->PointLabelMapper->SetInputConnection(this->PointMask->GetOutputPort());
   // this->PointLabelMapper->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
   // this->CellCenters->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
-  this->CellLabelMapper->SetInputConnection(this->CellCenters->GetOutputPort());
+  this->CellMask->SetInputConnection(this->CellCenters->GetOutputPort());
+  this->CellLabelMapper->SetInputConnection(this->CellMask->GetOutputPort());
 
   this->PointLabelActor->SetMapper(this->PointLabelMapper);
   this->CellLabelActor->SetMapper(this->CellLabelMapper);
@@ -113,6 +126,22 @@ bool vtkDataLabelRepresentation::GetVisibility()
     (this->PointLabelVisibility || this->CellLabelVisibility);
 }
 
+//----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetMaximumNumberOfLabels(int numLabels)
+{
+  if (this->MaximumNumberOfLabels != numLabels)
+  {
+    this->MaximumNumberOfLabels = numLabels;
+    this->PointMask->SetMaximumNumberOfPoints(numLabels);
+    this->CellMask->SetMaximumNumberOfPoints(numLabels);
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkDataLabelRepresentation::GetMaximumNumberOfLabels()
+{
+  return this->MaximumNumberOfLabels;
+}
 //----------------------------------------------------------------------------
 void vtkDataLabelRepresentation::SetPointLabelVisibility(int val)
 {
@@ -365,7 +394,7 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-    this->PointLabelMapper->SetInputConnection(producerPort);
+    this->PointMask->SetInputConnection(producerPort);
     this->CellCenters->SetInputConnection(producerPort);
   }
 
