@@ -48,6 +48,7 @@ protected:
   void dragEnterEvent(QDragEnterEvent* evt);
   void dropEvent(QDropEvent* evt);
   void showEvent(QShowEvent* evt);
+  void closeEvent(QCloseEvent* evt);
 
 protected slots:
   void showHelpForProxy(const QString& groupname, const QString& proxyname);
