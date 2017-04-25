@@ -140,7 +140,7 @@ void pqTimerLogDisplay::refresh()
     timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
     timerInfo->SetLogThreshold(this->LogThreshold);
     server->session()->GatherInformation(vtkPVSession::RENDER_SERVER, timerInfo, 0);
-    if (server->isRenderServerSeparate())
+    if (!server->isRenderServerSeparate())
     {
       this->addToLog("Server", timerInfo);
     }

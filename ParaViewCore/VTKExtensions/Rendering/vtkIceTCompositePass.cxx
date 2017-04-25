@@ -34,6 +34,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
 #include "vtkTilesHelper.h"
+#include "vtkTimerLog.h"
 
 #include "vtk_icet.h"
 #include <assert.h>
@@ -583,6 +584,22 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   }
 
   this->CleanupContext(render_state);
+
+  double val = 0.;
+  icetGetDoublev(ICET_COMPOSITE_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_COMPOSITE_TIME", val, 0);
+  icetGetDoublev(ICET_BLEND_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_BLEND_TIME", val, 0);
+  icetGetDoublev(ICET_COMPRESS_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_COMPRESS_TIME", val, 0);
+  icetGetDoublev(ICET_COLLECT_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_COLLECT_TIME", val, 0);
+  icetGetDoublev(ICET_RENDER_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_RENDER_TIME", val, 0);
+  icetGetDoublev(ICET_BUFFER_READ_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_BUFFER_READ_TIME", val, 0);
+  icetGetDoublev(ICET_BUFFER_WRITE_TIME, &val);
+  vtkTimerLog::InsertTimedEvent("ICET_BUFFER_WRITE_TIME", val, 0);
 }
 
 // ----------------------------------------------------------------------------

@@ -29,13 +29,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
-#include "vtkTimerLog.h"
 
-#include <IceT.h>
 #include <IceTGL.h>
 #include <assert.h>
-
-#include <map>
 
 // This pass is used to simply render an image onto the frame buffer. Used when
 // an ImageProcessingPass is set to paste the IceT composited image into the
