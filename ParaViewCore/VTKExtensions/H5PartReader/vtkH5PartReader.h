@@ -46,8 +46,8 @@
 
 #include "vtkPVConfig.h" // For PARAVIEW_USE_MPI
 #include "vtkPolyDataAlgorithm.h"
-#include <string>
-#include <vector>
+#include <string> // for string
+#include <vector> // for vector
 
 #include "vtkPVVTKExtensionsH5PartReaderModule.h" // for export macro
 
