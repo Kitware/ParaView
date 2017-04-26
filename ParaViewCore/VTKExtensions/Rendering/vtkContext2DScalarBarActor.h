@@ -82,16 +82,6 @@ public:
 
   //@{
   /**
-   * Set the scalar bar length. When the orientation is VTK_ORIENT_VERTICAL,
-   * this sets the scalar bar  height. When the orientation is
-   * VTK_ORIENT_HORIZONTAL, this sets the scalar bar width. Specified in pixels.
-   */
-  vtkSetMacro(ScalarBarLength, int);
-  vtkGetMacro(ScalarBarLength, int);
-  //@}
-
-  //@{
-  /**
    * If true (the default), the printf format used for the labels will be
    * automatically generated to make the numbers best fit within the widget.  If
    * false, the LabelFormat ivar will be used.
@@ -207,14 +197,9 @@ private:
   int TitleJustification;
 
   /**
-   * Thickness of the color bar.
+   * Thickness of the color bar in points.
    */
   int ScalarBarThickness;
-
-  /**
-  * Length of the color bar.
-  */
-  int ScalarBarLength;
 
   int AutomaticLabelFormat;
 

@@ -953,15 +953,6 @@
           and the height when horizontally oriented.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetScalarBarLength"
-                         default_values="100"
-                         name="ScalarBarLength"
-                         label="Color Bar Length"
-                         number_of_elements="1">
-        <Documentation>
-          Sets the length of the scalar bar.
-        </Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetAutomaticLabelFormat"
                          default_values="1"
                          name="AutomaticLabelFormat"
