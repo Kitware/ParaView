@@ -287,22 +287,34 @@ void vtkContext2DScalarBarActor::UpdateScalarBarTexture(vtkImageData* image)
 }
 
 //----------------------------------------------------------------------------
-void vtkContext2DScalarBarActor::GetSize(double size[2])
+void vtkContext2DScalarBarActor::GetSize(double size[2], vtkContext2D* painter)
 {
   if (!this->CurrentViewport)
   {
     return;
   }
 
+  // The scalar bar thickness is defined in terms of points. That is,
+  // if the thickness size is 12, that matches the height of a "|"
+  // character in a 12 point font.
+  vtkNew<vtkTextProperty> textProp;
+  textProp->SetFontSize(this->ScalarBarThickness);
+  vtkTextProperty* previousProperty = painter->GetTextProp();
+  painter->ApplyTextProp(textProp.Get());
+
+  float bounds[4];
+  painter->ComputeStringBounds("|", bounds);
+  double thickness = bounds[3];
+
   if (this->Orientation == VTK_ORIENT_VERTICAL)
   {
-    size[0] = this->ScalarBarThickness;
+    size[0] = thickness;
     size[1] = this->ScalarBarLength;
   }
   else
   {
     size[0] = this->ScalarBarLength;
-    size[1] = this->ScalarBarThickness;
+    size[1] = thickness;
   }
 }
 
@@ -959,10 +971,17 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   renWin->GetTileScale(tileScale);
 
   double size[2];
-  this->GetSize(size);
+  this->GetSize(size, painter);
 
-  size[0] *= tileScale[0];
-  size[1] *= tileScale[1];
+  // Scale only the scalar bar length.
+  if (this->Orientation == VTK_ORIENT_VERTICAL)
+  {
+    size[1] *= tileScale[1];
+  }
+  else
+  {
+    size[0] *= tileScale[0];
+  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;

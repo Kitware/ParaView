@@ -74,7 +74,7 @@ public:
    * Set the scalar bar thickness. When the orientation is
    * VTK_ORIENT_VERTICAL, this sets the scalar bar width.  When the
    * orientation is VTK_ORIENT_HORIZONTAL, this sets the scalar bar
-   * height. Specified in pixels.
+   * height. Specified in points akin to font size.
    */
   vtkSetMacro(ScalarBarThickness, int);
   vtkGetMacro(ScalarBarThickness, int);
@@ -271,9 +271,10 @@ private:
 
   /**
    * Get the size of the color bar area as determined by the position
-   * coordinates.
+   * coordinates. The painter parameter is needed to calculate the thickness
+   * of the scalar bar in terms of the selected font size.
    */
-  void GetSize(double size[2]);
+  void GetSize(double size[2], vtkContext2D* painter);
 
   /**
    * Compute the rect where the color bar will be displayed. This is
