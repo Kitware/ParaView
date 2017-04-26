@@ -950,9 +950,9 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   int* displayPosition = this->PositionCoordinate->GetComputedDisplayValue(this->CurrentViewport);
 
-  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-  int tileScale[2];
-  renWin->GetTileScale(tileScale);
+  // Ensure that the scene held by the Axis is the current renderer
+  // so that things like tile scale and DPI are correct.
+  this->Axis->GetScene()->SetRenderer(vtkRenderer::SafeDownCast(this->CurrentViewport));
 
   double size[2];
   this->GetSize(size);
@@ -1120,15 +1120,19 @@ void vtkContext2DScalarBarActor::PaintAnnotationsVertically(
     annotations.push_back(p);
   }
 
+  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+
   // Calculate the annotation labels
-  const float spacer = 1; // vertical space between annotations
+  const float spacer = 1 * tileScale[0]; // vertical space between annotations
   DistributeAnnotations(annotations, spacer);
 
   // Iterate over anchors and draw annotations
   std::vector<AnnotationInfo>::iterator vectorIter;
   for (vectorIter = annotations.begin(); vectorIter != annotations.end(); ++vectorIter)
   {
-    const int annotationLeader = 8;
+    const int annotationLeader = 8 * tileScale[0];
     double anchorPt[2] = { barRect.GetX(), vectorIter->Anchor };
     double labelPt[2] = { anchorPt[0] - annotationLeader, vectorIter->Position };
 
@@ -1176,11 +1180,15 @@ void vtkContext2DScalarBarActor::PaintAnnotationsHorizontally(
     annotations.push_back(p);
   }
 
+  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+
   // Get horizontal spacing distance as a function of the font
   // properties. Use width of '-' as spacing between annotations.
   float bounds[4];
   painter->ComputeStringBounds("-", bounds);
-  const float spacer = bounds[2];
+  const float spacer = bounds[2] * tileScale[0];
 
   // Calculate the annotation labels
   DistributeAnnotations(annotations, spacer);
@@ -1189,7 +1197,7 @@ void vtkContext2DScalarBarActor::PaintAnnotationsHorizontally(
   std::vector<AnnotationInfo>::iterator vectorIter;
   for (vectorIter = annotations.begin(); vectorIter != annotations.end(); ++vectorIter)
   {
-    const int annotationLeader = 8;
+    const int annotationLeader = 8 * tileScale[0];
     double anchorPt[2] = { vectorIter->Anchor, barRect.GetY() };
     double labelPt[2] = { vectorIter->Position, anchorPt[1] - annotationLeader };
     double labelOffset = 3;
