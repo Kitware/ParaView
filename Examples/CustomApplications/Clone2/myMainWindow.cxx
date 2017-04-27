@@ -126,7 +126,6 @@ myMainWindow::myMainWindow()
   // only the components we want
   pqParaViewBehaviors::setEnableStandardPropertyWidgets(false);
   pqParaViewBehaviors::setEnableStandardRecentlyUsedResourceLoader(false);
-  pqParaViewBehaviors::setEnableQtMessageHandlerBehavior(false);
   pqParaViewBehaviors::setEnableDataTimeStepBehavior(false);
   pqParaViewBehaviors::setEnableSpreadSheetVisibilityBehavior(false);
   pqParaViewBehaviors::setEnablePipelineContextMenuBehavior(false);

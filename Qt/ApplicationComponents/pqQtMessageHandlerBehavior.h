@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqQtMessageHandlerBehavior_h
 
 #include "pqApplicationComponentsModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QObject>
 
 /**
@@ -40,6 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * pqQtMessageHandlerBehavior install a message handler to capture Qt
 * error/debug messages i.e. install a event handler using qInstallMsgHandler
 * and post them as VTK messages.
+*
+* @deprecated ParaView 5.4. No longer necessary if using pqOutputWidget.
+* Please consider using pqOutputWidget in your application to capture
+* and display Qt messages.
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqQtMessageHandlerBehavior : public QObject
 {

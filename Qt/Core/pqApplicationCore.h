@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QObject>
 #include <QPointer>
 
@@ -41,8 +42,6 @@ class pqInterfaceTracker;
 class pqLinksModel;
 class pqObjectBuilder;
 class pqOptions;
-class pqOutputWindow;
-class pqOutputWindowAdapter;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
@@ -63,6 +62,11 @@ class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMStateLoader;
+
+#if !defined(VTK_LEGACY_REMOVE)
+class pqOutputWindow;
+class pqOutputWindowAdapter;
+#endif
 
 /**
 * This class is the crux of the ParaView application. It creates
@@ -200,10 +204,10 @@ public:
 
   /**
   * Returns the output window.
+  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
   */
-  pqOutputWindowAdapter* outputWindowAdapter() { return this->OutputWindowAdapter; }
-
-  pqOutputWindow* outputWindow() { return this->OutputWindow; }
+  VTK_LEGACY(pqOutputWindowAdapter* outputWindowAdapter() { return this->OutputWindowAdapter; });
+  VTK_LEGACY(pqOutputWindow* outputWindow() { return this->OutputWindow; });
 
   /**
   * It is possible to change the display policy used by
@@ -313,6 +317,7 @@ public slots:
 
   /**
   * Causes the output window to be shown.
+  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
   */
   void showOutputWindow();
 
@@ -376,12 +381,15 @@ signals:
 protected slots:
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
   void onStateSaved(vtkPVXMLElement* root);
+  void onHelpEngineWarning(const QString&);
 
 protected:
   bool LoadingState;
 
+#if !defined(VTK_LEGACY_REMOVE)
   pqOutputWindow* OutputWindow;
   pqOutputWindowAdapter* OutputWindowAdapter;
+#endif
   pqOptions* Options;
 
   pqDisplayPolicy* DisplayPolicy;
@@ -408,7 +416,10 @@ private:
   pqInternals* Internal;
   static pqApplicationCore* Instance;
   void constructor();
+
+#if !defined(VTK_LEGACY_REMOVE)
   void createOutputWindow();
+#endif
 };
 
 #endif
