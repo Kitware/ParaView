@@ -117,6 +117,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     }
     // user interacted. lock the position.
     vtkSMPropertyHelper(this, "LockPosition").Set(1);
+    vtkSMPropertyHelper(this, "WindowLocation").Set(0);
   }
 
   this->Superclass::ExecuteEvent(event);
