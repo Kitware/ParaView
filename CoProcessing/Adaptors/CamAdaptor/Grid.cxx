@@ -906,7 +906,7 @@ void Grid<gridType>::SetCubeGridPoints(
     }
     of << ostr.str();
   }
-  assert(impl->CubeCoordinates.size() == this->NLon);
+  assert(impl->CubeCoordinates.size() == static_cast<size_t>(this->NLon));
 }
 
 template <GridType gridType>

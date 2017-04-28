@@ -571,7 +571,6 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(const char* groupname,
 
   vtkErrorMacro("Failed to come up with a unique name!");
   abort();
-  return vtkStdString(prefix);
 }
 
 //---------------------------------------------------------------------------
