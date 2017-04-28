@@ -340,5 +340,186 @@
       </Hints>
       <!-- End Level Of Detail -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmAverageToPoints"
+                 label="VTKm Cell Data to Point Data"
+                 name="VTKmAverageToPoints">
+      <Documentation long_help="Create point attributes by averaging cell attributes."
+                     short_help="Convert cell data to point data.">The Cell
+                     Data to Point Data filter averages the values of the cell
+                     attributes of the cells surrounding a point to compute
+                     point attributes.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array" />
+        <Documentation>This property specifies the input to the Cell Data to
+        Point Data filter.</Documentation>
+      </InputProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKmAverageToPoints -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmCleanGrid"
+                 label="VTKm Clean Unstructured Grid"
+                 name="VTKmCleanGrid">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Clean to Grid
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetCompactPoints"
+                         default_values="0"
+                         name="CompactPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Remove points that are not part of any cell.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKmCleanGrid -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmClip"
+                 label="VTKm Clip"
+                 name="VTKmClip">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the VTKm Clip
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetClipValue"
+                            default_values="0.0"
+                            name="ClipValue"
+                            number_of_elements="1">
+        <Documentation>The scalar value to use when clipping the dataset.
+        Values greater than ClipValue are preserved in the output dataset.
+        </Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeScalars"
+                         name="ComputeScalars"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Map all point data arrays onto the output dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKmClip -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmExternalFaces"
+                 label="VTKm External Faces"
+                 name="VTKmExternalFaces">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetCompactPoints"
+                         default_values="0"
+                         name="CompactPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Remove points that are not part of any output cell.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKmExternalFaces -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmAverageToCells"
+                 label="VTKm Point Data to Cell Data"
+                 name="VTKmAverageToCells">
+      <Documentation long_help="Create cell attributes by averaging point attributes."
+                     short_help="Convert point data to cell data.">The Point
+                     Data to Cell Data filter averages the values of the point
+                     attributes of the points defining a cell to compute
+                     cell attributes.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array" />
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKmAverageToCells -->
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
