@@ -50,6 +50,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRendering${VTK_RENDERING_BACKEND}
+    vtkRenderingContext${VTK_RENDERING_BACKEND}
     vtkRenderingParallel
     vtkIOExport
     vtkIOExport${VTK_RENDERING_BACKEND}

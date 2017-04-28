@@ -36,6 +36,7 @@ set(Module_SRCS
   vtkCameraManipulatorGUIHelper.cxx
   vtkCleanArrays.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
+  vtkContext2DScalarBarActor.cxx
   vtkCSVExporter.cxx
   vtkImageCompressor.cxx
   vtkKdTreeGenerator.cxx
@@ -50,6 +51,7 @@ set(Module_SRCS
   vtkPVAxesWidget.cxx
   vtkPVCameraCollection.cxx
   vtkPVCenterAxesActor.cxx
+  vtkBoundingRectContextDevice2D.cxx
   vtkPVDefaultPass.cxx
   vtkPVDiscretizableColorTransferFunction.cxx
   vtkPVGeometryFilter.cxx
@@ -66,6 +68,7 @@ set(Module_SRCS
   vtkPVPlotTime.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPVScalarBarActor.cxx
+  vtkPVScalarBarRepresentation.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
   vtkPVTrackballPan.cxx

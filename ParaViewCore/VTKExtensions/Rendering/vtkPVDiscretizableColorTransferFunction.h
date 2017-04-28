@@ -87,19 +87,30 @@ private:
     const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
 
-  // All annotations.
+  //@{
+  /**
+   * All annotations.
+   */
   vtkAbstractArray* AnnotatedValuesInFullSet;
   vtkStringArray* AnnotationsInFullSet;
+  //@}
 
   vtkDoubleArray* IndexedColorsInFullSet;
 
-  // Set of active annotations
+  /**
+   * Set of active annotations.
+   */
   vtkVariantArray* ActiveAnnotatedValues;
 
-  // Set whether only "active" annotations should be display. If off, show all annotations.
+  /**
+   * Set whether only "active" annotations should be display. If off, show all
+   * annotations.
+   */
   bool UseActiveValues;
 
-  // Build time for this subclass
+  /**
+   * Build time for this subclass.
+   */
   vtkTimeStamp BuildTime;
 };
 

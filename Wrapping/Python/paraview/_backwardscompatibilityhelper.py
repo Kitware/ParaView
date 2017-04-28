@@ -68,7 +68,7 @@ def getattr(proxy, pname):
     Attempts to emulate getattr() when called using a deprecated property name
     for a proxy.
 
-    Will return a *resonable* standin if the property was
+    Will return a *reasonable* stand-in if the property was
     deprecated and the paraview compatibility version was set to a version older
     than when the property was deprecated.
 
@@ -114,6 +114,14 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                     'Cube Axes and related properties are now obsolete. Please '\
                     'remove them from your script.')
+
+    if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
+        if version <= 5.3:
+            raise NotSupportedException(
+                    'The AspectRatio property has been removed in ParaView '\
+                    '5.4. Please use the ScalarBarThickness property instead '\
+                    'to set the thickness in terms of points.')
+
     raise Continue()
 
 def GetProxy(module, key):

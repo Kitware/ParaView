@@ -450,6 +450,7 @@
             <Property name="AutoOrientInfo" />
             <Property name="Orientation" />
             <Property name="OrientationInfo" />
+            <Property name="WindowLocation" />
           </PropertyGroup>
           <Property name="Position" panel_visibility="never"/>
           <Property name="Position2" panel_visibility="never"/>
@@ -461,6 +462,7 @@
         <Proxy name="Prop2DActor"
                proxygroup="annotations"
                proxyname="ScalarBarActor"></Proxy>
+
         <ExposedProperties>
           <Property name="LookupTable" panel_visibility="never"/>
           <PropertyGroup label="Title Texts">
@@ -479,10 +481,11 @@
             <Property name="TitleItalic" function="Italics"/>
             <Property name="TitleShadow" function="Shadow" />
             <Property name="TitleFontSize" function="Size"
-                      number_of_elements="1" default_values="7" />
+                      number_of_elements="1" default_values="16" />
           </PropertyGroup>
 
           <!-- properties for Label -->
+
           <PropertyGroup label="Text/Annotation Font Properties"
                          panel_widget="FontEditor">
             <Property name="LabelColor" function="Color"/>
@@ -492,31 +495,29 @@
             <Property name="LabelItalic" function="Italics" />
             <Property name="LabelShadow" function="Shadow" />
             <Property name="LabelFontSize" function="Size"
-                      number_of_elements="1" default_values="7"/>
+                      number_of_elements="1" default_values="16"/>
           </PropertyGroup>
 
           <PropertyGroup label="Labels">
-            <Property name="AutomaticLabelFormat" />
-            <Property name="LabelFormat" />
-            <Property name="NumberOfLabels" />
-            <Property name="DrawTickMarks" />
-            <Property name="DrawSubTickMarks" />
-            <Property name="DrawTickLabels" />
-            <Property name="AddRangeLabels" />
-            <Property name="RangeLabelFormat" />
+            <Property name="AutomaticLabelFormat" panel_visibility="advanced" />
+            <Property name="LabelFormat" panel_visibility="advanced" />
+            <Property name="DrawTickMarks" panel_visibility="advanced" />
+            <Property name="DrawTickLabels" panel_visibility="advanced" />
+            <Property name="UseCustomLabels" panel_visibility="advanced" />
+            <Property name="CustomLabels" panel_visibility="advanced" />
+            <Property name="AddRangeLabels" panel_visibility="advanced" />
+            <Property name="RangeLabelFormat" panel_visibility="advanced" />
+
           </PropertyGroup>
 
           <PropertyGroup label="Annotations">
             <Property name="DrawAnnotations" />
-            <Property name="AddRangeAnnotations" />
-            <Property name="AutomaticAnnotations" />
-            <Property name="DrawNanAnnotation" />
-            <Property name="NanAnnotation" />
+            <Property name="AddRangeAnnotations" panel_visibility="advanced" />
+            <Property name="AutomaticAnnotations" panel_visibility="advanced" />
+            <Property name="DrawNanAnnotation" panel_visibility="advanced" />
+            <Property name="NanAnnotation" panel_visibility="advanced" />
             <Property name="TextPosition" />
-          </PropertyGroup>
-
-          <PropertyGroup label="Miscellaneous">
-            <Property name="AspectRatio" />
+            <Property name="ScalarBarThickness" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -1386,7 +1387,7 @@
       </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
-    <Proxy class="vtkScalarBarRepresentation"
+    <Proxy class="vtkPVScalarBarRepresentation"
            name="ScalarBarRepresentation">
       <IntVectorProperty animateable="1"
                          command="SetVisibility"
@@ -1395,6 +1396,34 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.89 0.02"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.07 0.35"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetAutoOrient"
                          default_values="1"
                          name="AutoOrient"
@@ -1432,35 +1461,28 @@
                          name="OrientationInfo">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
-
-      <DoubleVectorProperty command="SetPosition"
-                            default_values="0.85 0.05"
-                            information_property="PositionInfo"
-                            name="Position"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPosition"
-                            information_only="1"
-                            name="PositionInfo">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetPosition2"
-                            default_values="0.12 0.43"
-                            information_property="Position2Info"
-                            name="Position2"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="GetPosition2"
-                            information_only="1"
-                            name="Position2Info">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
+      <IntVectorProperty command="SetWindowLocation"
+                         default_values="2"
+                         name="WindowLocation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Any Location"
+                 value="0" />
+          <Entry text="Lower Left Corner"
+                 value="1" />
+          <Entry text="Lower Right Corner"
+                 value="2" />
+          <Entry text="Lower Center"
+                 value="3" />
+          <Entry text="Upper Left Corner"
+                 value="4" />
+          <Entry text="Upper Right Corner"
+                 value="5" />
+          <Entry text="Upper Center"
+                 value="6" />
+        </EnumerationDomain>
+        <Documentation>Specify placement of the scalar bar actor.</Documentation>
+      </IntVectorProperty>
       <ProxyProperty command="SetScalarBarActor"
                      name="ScalarBarActor">
         <ProxyGroupDomain name="groups">
