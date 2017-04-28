@@ -114,6 +114,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->TitleJustification = VTK_TEXT_LEFT;
 
   this->ScalarBarThickness = 20;
+  this->ScalarBarLength = 100;
 
   this->AutomaticLabelFormat = 1;
 
@@ -304,27 +305,14 @@ void vtkContext2DScalarBarActor::GetSize(double size[2], vtkContext2D* painter)
   painter->ComputeStringBounds("|", bounds);
   double thickness = bounds[3];
 
-  int* displayPosition = this->PositionCoordinate->GetComputedDisplayValue(this->CurrentViewport);
-  int* displayPosition2 = this->Position2Coordinate->GetComputedDisplayValue(this->CurrentViewport);
-
-  size[0] = displayPosition2[0] - displayPosition[0];
-  if (size[0] < 0.0)
-  {
-    size[0] = -size[0];
-  }
-
-  size[1] = displayPosition2[1] - displayPosition[1];
-  if (size[1] < 0.0)
-  {
-    size[1] = -size[1];
-  }
-
   if (this->Orientation == VTK_ORIENT_VERTICAL)
   {
     size[0] = thickness;
+    size[1] = this->ScalarBarLength;
   }
   else
   {
+    size[0] = this->ScalarBarLength;
     size[1] = thickness;
   }
 }
@@ -983,6 +971,16 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   double size[2];
   this->GetSize(size, painter);
+
+  // Scale only the scalar bar length.
+  if (this->Orientation == VTK_ORIENT_VERTICAL)
+  {
+    size[1] *= tileScale[1];
+  }
+  else
+  {
+    size[0] *= tileScale[0];
+  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;

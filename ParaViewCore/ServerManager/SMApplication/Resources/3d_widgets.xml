@@ -518,6 +518,7 @@
             <Property name="NanAnnotation" panel_visibility="advanced" />
             <Property name="TextPosition" />
             <Property name="ScalarBarThickness" />
+            <Property name="ScalarBarLength" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
