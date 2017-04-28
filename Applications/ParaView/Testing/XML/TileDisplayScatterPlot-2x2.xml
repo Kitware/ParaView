@@ -6,7 +6,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/PlotMatrixView" command="activate" arguments="" />
-  <pqevent object="outputDialog/closeButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,13,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,13,/0:0/0:1" />
 
