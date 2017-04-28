@@ -298,7 +298,6 @@ void vtkContext2DScalarBarActor::GetSize(double size[2], vtkContext2D* painter)
   // character in a 12 point font.
   vtkNew<vtkTextProperty> textProp;
   textProp->SetFontSize(this->ScalarBarThickness);
-  vtkTextProperty* previousProperty = painter->GetTextProp();
   painter->ApplyTextProp(textProp.Get());
 
   float bounds[4];
