@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1152</width>
-    <height>768</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -185,7 +185,7 @@
           <x>0</x>
           <y>0</y>
           <width>78</width>
-          <height>188</height>
+          <height>189</height>
          </rect>
         </property>
        </widget>
@@ -314,6 +314,22 @@
    </attribute>
    <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
   </widget>
+  <widget class="QDockWidget" name="outputWidgetDock">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Output Messages</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="pqOutputWidget" name="outputWidget">
+    <property name="settingsKey" stdset="0">
+     <string>OutputMessages</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -397,6 +413,12 @@
    <class>pqTimeInspectorWidget</class>
    <extends>QWidget</extends>
    <header>pqTimeInspectorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqOutputWidget</class>
+   <extends>QWidget</extends>
+   <header>pqOutputWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -89,6 +89,16 @@ bool parseVtkMessage(int messageType, const QString& text, QString* location, QS
   }
   return false;
 }
+
+void warnOnce()
+{
+  static bool warned = false;
+  if (!warned)
+  {
+    warned = true;
+    VTK_LEGACY_BODY(pqOutputWindow, "ParaView 5.4");
+  }
+}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -349,6 +359,7 @@ void pqOutputWindow::clear()
 //-----------------------------------------------------------------------------
 void pqOutputWindow::showEvent(QShowEvent* e)
 {
+  warnOnce();
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core)
   {

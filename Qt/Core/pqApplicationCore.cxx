@@ -58,8 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqOutputWindow.h"
-#include "pqOutputWindowAdapter.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
@@ -91,6 +89,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
+
+#if !defined(VTK_LEGACY_REMOVE)
+#include "pqOutputWindow.h"
+#include "pqOutputWindowAdapter.h"
+#endif
 
 // Do this after all above includes. On a VS2015 with Qt 5,
 // these includes cause build errors with pqOutputWindow, pqRenderView etc.
@@ -140,14 +143,20 @@ pqApplicationCore::pqApplicationCore(
   }
   this->Options = options;
 
-  // Create output window before initializing server manager.
+// Create output window before initializing server manager.
+#if !defined(VTK_LEGACY_REMOVE)
   this->createOutputWindow();
+#endif
+
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();
+
+#if !defined(VTK_LEGACY_REMOVE)
   QObject::connect(this->ProgressManager, SIGNAL(progressStartEvent()), this->OutputWindow,
     SLOT(onProgressStartEvent()));
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -275,14 +284,20 @@ pqApplicationCore::~pqApplicationCore()
   }
 
   vtkInitializationHelper::Finalize();
-  vtkOutputWindow::SetInstance(NULL);
+#if !defined(VTK_LEGACY_REMOVE)
+  if (vtkOutputWindow::GetInstance() == this->OutputWindowAdapter)
+  {
+    vtkOutputWindow::SetInstance(NULL);
+  }
   delete this->OutputWindow;
   this->OutputWindow = NULL;
   this->OutputWindowAdapter->Delete();
   this->OutputWindowAdapter = 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void pqApplicationCore::createOutputWindow()
 {
   // Set up error window.
@@ -304,6 +319,7 @@ void pqApplicationCore::createOutputWindow()
   vtkOutputWindow::SetInstance(owAdapter);
   this->OutputWindowAdapter = owAdapter;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
@@ -612,9 +628,12 @@ void pqApplicationCore::quit()
 //-----------------------------------------------------------------------------
 void pqApplicationCore::showOutputWindow()
 {
+#if !defined(VTK_LEGACY_REMOVE)
+  VTK_LEGACY_BODY(pqApplicationCore::showOutputWindow, "ParaView 5.4");
   this->OutputWindow->show();
   this->OutputWindow->raise();
   this->OutputWindow->activateWindow();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -678,6 +697,12 @@ pqTestUtility* pqApplicationCore::testUtility()
   return this->TestUtility;
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::onHelpEngineWarning(const QString& msg)
+{
+  qWarning() << msg;
+}
+
 #ifdef PARAVIEW_USE_QTHELP
 //-----------------------------------------------------------------------------
 QHelpEngine* pqApplicationCore::helpEngine()
@@ -687,8 +712,8 @@ QHelpEngine* pqApplicationCore::helpEngine()
     QTemporaryFile tFile;
     tFile.open();
     this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
-    QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)), this->OutputWindow,
-      SLOT(onDisplayGenericWarningText(const QString&)));
+    this->connect(
+      this->HelpEngine, SIGNAL(warning(const QString&)), SLOT(onHelpEngineWarning(const QString&)));
     this->HelpEngine->setupData();
     // register the application's qch file. An application specific qch file can
     // be compiled into the executable in the build_paraview_client() cmake

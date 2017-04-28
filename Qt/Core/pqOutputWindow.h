@@ -38,12 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 /**
-Provides an output dialog that will display all VTK/ParaView debug/warning/error output.
-
-To use, create an instance of pqOutputWindowAdapter and connect its output signals
-to the corresponding pqOutputWindow slots.
-
-\sa pqOutputWindowAdapter
+ * @class pqOutputWindow
+ * @brief deprecated as of ParaView 5.4. Please consider using pqOutputWidget.
+ *
+ * @deprecated ParaView 5.4. Please use pqOutputWidget in your application
+ * instead.
+ * @sa pqOutputWindowAdapter
 */
 class PQCORE_EXPORT pqOutputWindow : public QDialog
 {

@@ -25,9 +25,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 
-  <pqevent object="outputDialog/closeButton" command="activate" arguments="" />
-
-
   <!-- To minimise tiny picture norm deviations among platforms: -->
   <!-- a) disable orientation axes actor -->
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />

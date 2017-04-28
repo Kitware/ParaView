@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtMessageHandlerBehavior.h"
 
 #include "vtkOutputWindow.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 
 #if QT_VERSION >= 0x050000
-
+#if !defined(VTK_LEGACY_REMOVE)
 static void QtMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
   QByteArray localMsg = msg.toLocal8Bit();
@@ -61,20 +62,32 @@ static void QtMessageOutput(QtMsgType type, const QMessageLogContext& context, c
       break;
   }
 }
+#endif
 
 //-----------------------------------------------------------------------------
 pqQtMessageHandlerBehavior::pqQtMessageHandlerBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  qInstallMessageHandler(::QtMessageOutput);
+#if !defined(VTK_LEGACY_REMOVE)
+  auto oldHandler = qInstallMessageHandler(::QtMessageOutput);
+  // don't replace handler setup by pqOutputWidget as that's the newer/better code.
+  // this class is deprecated.
+  if (oldHandler != nullptr)
+  {
+    qInstallMessageHandler(oldHandler);
+  }
+#endif
 }
 pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
 {
+#if !defined(VTK_LEGACY_REMOVE)
   qInstallMessageHandler(0);
+#endif
 }
 
 #else
 
+#if !defined(VTK_LEGACY_REMOVE)
 static void QtMessageOutput(QtMsgType type, const char* msg)
 {
   switch (type)
@@ -93,16 +106,27 @@ static void QtMessageOutput(QtMsgType type, const char* msg)
       break;
   }
 }
+#endif
 
 //-----------------------------------------------------------------------------
 pqQtMessageHandlerBehavior::pqQtMessageHandlerBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  qInstallMsgHandler(::QtMessageOutput);
+#if !defined(VTK_LEGACY_REMOVE)
+  auto oldHandler = qInstallMsgHandler(::QtMessageOutput);
+  // don't replace handler setup by pqOutputWidget as that's the newer code.
+  // this class is deprecated.
+  if (oldHandler != nullptr)
+  {
+    qInstallMsgHandler(oldHandler);
+  }
+#endif
 }
 pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
 {
+#if !defined(VTK_LEGACY_REMOVE)
   qInstallMsgHandler(0);
+#endif
 }
 
 #endif
