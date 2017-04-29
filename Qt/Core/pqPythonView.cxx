@@ -55,7 +55,6 @@ pqPythonView::pqPythonView(const QString& type, const QString& group, const QStr
   : Superclass(type, group, name, renViewProxy, server, _parent)
 {
   this->Internal = new pqPythonView::pqInternal();
-  this->AllowCaching = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,26 +96,6 @@ QWidget* pqPythonView::createWidget()
 
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
   vtkwidget->setViewProxy(viewProxy);
-
-// do image caching for performance
-// For now, we are doing this only on Apple because it can render
-// and capture a frame buffer even when it is obstructred by a
-// window. This does not work as well on other platforms.
-
-#if defined(__APPLE__)
-  if (this->AllowCaching)
-  {
-    // Don't override the caching flag here. It is set correctly by
-    // pqQVTKWidget.  I don't know why this explicit marking cached dirty was
-    // done. But in case it's needed for streaming view, I am letting it be.
-    // vtkwidget->setAutomaticImageCacheEnabled(true);
-
-    // help the pqQVTKWidget know when to clear the cache
-    this->getConnector()->Connect(
-      this->getProxy(), vtkCommand::ModifiedEvent, vtkwidget, SLOT(markCachedImageAsDirty()));
-  }
-#endif
-
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);
 

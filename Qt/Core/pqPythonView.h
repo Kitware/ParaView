@@ -65,12 +65,6 @@ protected:
   */
   virtual QWidget* createWidget();
 
-  /**
-  * On Mac, we usually try to cache the front buffer to avoid unecessary
-  */
-  //  updates.
-  bool AllowCaching;
-
 private:
   Q_DISABLE_COPY(pqPythonView)
 
