@@ -93,11 +93,10 @@ protected:
   */
   virtual void resizeEvent(QResizeEvent* event);
 
-  // method called in paintEvent() to render the image cache on to the device.
-  // return false, if cache couldn;t be used for painting. In that case, the
-  // paintEvent() method will continue with the default painting code.
-  virtual bool paintCachedImage();
-
+  /**
+   * skip rendering is not ready for it.
+   */
+  virtual void doDeferredRender();
 private slots:
   void updateSizeProperties();
   void handleViewSizeForModifiedQt4();

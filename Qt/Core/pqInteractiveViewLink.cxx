@@ -69,8 +69,10 @@ public:
     , FinalRender(false)
     , Rendering(false)
     , LinkedWindowRendered(false)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     , DisplayUsedCache(false)
     , LinkedUsedCache(false)
+#endif
     , HideLinkedViewBackground(false)
   {
     this->ViewLinkRepresentation->ProportionalResizeOff();
@@ -114,8 +116,10 @@ public:
   bool FinalRender;
   bool Rendering;
   bool LinkedWindowRendered;
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   bool DisplayUsedCache;
   bool LinkedUsedCache;
+#endif
   bool HideLinkedViewBackground;
 };
 
@@ -147,11 +151,13 @@ pqInteractiveViewLink::pqInteractiveViewLink(pqRenderView* displayView, pqRender
     return;
   }
 
-  // Disable cache on widgets
+// Disable cache on widgets
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   this->Internal->DisplayUsedCache = this->Internal->DisplayWidget->isAutomaticImageCacheEnabled();
   this->Internal->DisplayWidget->setAutomaticImageCacheEnabled(false);
   this->Internal->LinkedUsedCache = this->Internal->LinkedWidget->isAutomaticImageCacheEnabled();
   this->Internal->LinkedWidget->setAutomaticImageCacheEnabled(false);
+#endif
 
   // Initialize link widget interactor and renderer
   this->Internal->LinkWidget->SetInteractor(
@@ -197,6 +203,7 @@ pqInteractiveViewLink::~pqInteractiveViewLink()
     this->Internal->DisplayWindow->RemoveObserver(this->Internal->RenderedTag);
   }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   if (this->Internal->DisplayWidget)
   {
     this->Internal->DisplayWidget->setAutomaticImageCacheEnabled(this->Internal->DisplayUsedCache);
@@ -205,6 +212,7 @@ pqInteractiveViewLink::~pqInteractiveViewLink()
   {
     this->Internal->LinkedWidget->setAutomaticImageCacheEnabled(this->Internal->LinkedUsedCache);
   }
+#endif
 
   if (this->Internal->DisplayView)
   {
