@@ -126,7 +126,7 @@ public:
    * Can set to true if all rendered data sets are based on the same
    * data partitioning in order to save on the data redistribution.
    */
-  vtkSetMacro(UseDataPartitions, bool);
+  virtual void SetUseDataPartitions(bool);
   vtkGetMacro(UseDataPartitions, bool);
   //@}
 

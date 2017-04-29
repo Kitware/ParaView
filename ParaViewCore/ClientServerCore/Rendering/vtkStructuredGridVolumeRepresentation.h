@@ -42,17 +42,6 @@ public:
   vtkTypeMacro(vtkStructuredGridVolumeRepresentation, vtkUnstructuredGridVolumeRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  //@{
-  /**
-   * When on (default), the representation tells the view to use the
-   * partitioning information from the input structured grid for ordered
-   * compositing. When off we let the view build its own ordering and
-   * redistribute data as needed.
-   */
-  void SetUseDataPartitions(bool) VTK_OVERRIDE;
-  vtkGetMacro(UseDataPartitions, bool);
-  //@}
-
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
    * typically called by the vtkView to request meta-data from the
