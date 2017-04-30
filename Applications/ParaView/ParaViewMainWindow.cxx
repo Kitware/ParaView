@@ -124,7 +124,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // show output widget if we received an error message.
   this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
-    SLOT(showOutputWidget()));
+    SLOT(handleMessage(const QString&, int)));
 
   // Setup default GUI layout.
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -358,10 +358,10 @@ void ParaViewMainWindow::showWelcomeDialog()
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::showOutputWidget()
+void ParaViewMainWindow::handleMessage(const QString&, int type)
 {
   QDockWidget* dock = this->Internals->outputWidgetDock;
-  if (!dock->isVisible())
+  if (!dock->isVisible() && (type == pqOutputWidget::ERROR || type == pqOutputWidget::WARNING))
   {
     // if dock is not visible, we always pop it up as a floating dialog. This
     // avoids causing re-renders which may cause more errors and more confusion.
@@ -373,7 +373,10 @@ void ParaViewMainWindow::showOutputWidget()
       QPoint(rectApp.center().x(), rectApp.bottom() - dock->sizeHint().height() / 2));
     dock->setFloating(true);
     dock->setGeometry(rectDock);
+    dock->show();
   }
-  dock->show();
-  dock->raise();
+  if (dock->isVisible())
+  {
+    dock->raise();
+  }
 }
