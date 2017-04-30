@@ -32,7 +32,6 @@ vtkStandardNewMacro(vtkStructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation()
 {
-  this->UseDataPartitions = false;
   this->TableExtentTranslator = vtkTableExtentTranslator::New();
 }
 
@@ -40,16 +39,6 @@ vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation()
 vtkStructuredGridVolumeRepresentation::~vtkStructuredGridVolumeRepresentation()
 {
   this->TableExtentTranslator->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkStructuredGridVolumeRepresentation::SetUseDataPartitions(bool val)
-{
-  if (this->UseDataPartitions != val)
-  {
-    this->UseDataPartitions = val;
-    this->MarkModified();
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -190,5 +179,4 @@ int vtkStructuredGridVolumeRepresentation::ProcessViewRequest(
 void vtkStructuredGridVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "UseDataPartitions: " << this->UseDataPartitions << endl;
 }

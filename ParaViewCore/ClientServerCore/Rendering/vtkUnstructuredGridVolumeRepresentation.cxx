@@ -155,6 +155,16 @@ void vtkUnstructuredGridVolumeRepresentation::MarkModified()
 }
 
 //----------------------------------------------------------------------------
+void vtkUnstructuredGridVolumeRepresentation::SetUseDataPartitions(bool val)
+{
+  if (this->UseDataPartitions != val)
+  {
+    this->UseDataPartitions = val;
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
 int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGridBase");
