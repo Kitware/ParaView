@@ -665,4 +665,13 @@ int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo
   }
   return 0;
 }
+
+//------------------------------------------------------------------------------
+void releaseIds(int cgioNum, const std::vector<double>& ids)
+{
+  for (auto iter = ids.begin(); iter != ids.end(); ++iter)
+  {
+    cgio_release_id(cgioNum, *iter);
+  }
+}
 }

@@ -9,6 +9,7 @@ vtk_module(vtkPVVTKExtensionsCGNSReader
       vtkcgns
       vtksys
       vtkParallelCore
+      vtkFiltersExtraction
     TEST_DEPENDS
       vtkInteractionStyle
       vtkTestingCore
