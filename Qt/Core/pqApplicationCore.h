@@ -206,8 +206,8 @@ public:
   * Returns the output window.
   * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
   */
-  VTK_LEGACY(pqOutputWindowAdapter* outputWindowAdapter() { return this->OutputWindowAdapter; });
-  VTK_LEGACY(pqOutputWindow* outputWindow() { return this->OutputWindow; });
+  VTK_LEGACY(pqOutputWindowAdapter* outputWindowAdapter());
+  VTK_LEGACY(pqOutputWindow* outputWindow());
 
   /**
   * It is possible to change the display policy used by
@@ -421,5 +421,17 @@ private:
   void createOutputWindow();
 #endif
 };
+
+#if !defined(VTK_LEGACY_REMOVE)
+pqOutputWindowAdapter* pqApplicationCore::outputWindowAdapter()
+{
+  return this->OutputWindowAdapter;
+}
+
+pqOutputWindow* pqApplicationCore::outputWindow()
+{
+  return this->OutputWindow;
+}
+#endif
 
 #endif
