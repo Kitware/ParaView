@@ -148,6 +148,8 @@ pqSGExportStateWizard::pqSGExportStateWizard(QWidget* parentObject, Qt::WindowFl
   // this->setWizardStyle(ModernStyle);
   this->setOption(QWizard::NoCancelButton, false);
   this->Internals->wViewSelection->hide();
+  this->Internals->fileNamePaddingAmountLabel->hide();
+  this->Internals->fileNamePaddingAmountSpinBox->hide();
   this->Internals->rescaleDataRange->hide();
   this->Internals->laRescaleDataRange->hide();
 
@@ -167,6 +169,11 @@ pqSGExportStateWizard::pqSGExportStateWizard(QWidget* parentObject, Qt::WindowFl
 
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
     this->Internals->wViewSelection, SLOT(setVisible(bool)));
+
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+    this->Internals->fileNamePaddingAmountSpinBox, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+    this->Internals->fileNamePaddingAmountLabel, SLOT(setVisible(bool)));
 
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
     this->Internals->rescaleDataRange, SLOT(setVisible(bool)));

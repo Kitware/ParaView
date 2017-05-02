@@ -3436,6 +3436,12 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
      <Hints>
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
@@ -3470,6 +3476,12 @@
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
      <Hints>
@@ -3508,6 +3520,12 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
      <Hints>
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
@@ -3542,6 +3560,12 @@
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
      <Hints>
@@ -3580,6 +3604,12 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
      <Hints>
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
@@ -3614,6 +3644,12 @@
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
      <Hints>
@@ -3652,6 +3688,12 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
      <Hints>
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
@@ -3686,6 +3728,12 @@
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
      <Hints>
@@ -3727,6 +3775,12 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
       <Hints>
         <!-- TODO: this doesn't work yet -->
         <PipelineIcon name=":pqComponents/pqSave32.png" />
@@ -3758,12 +3812,18 @@
 
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="filename.e-s.%t">
+                            default_values="filename.e-s">
       </StringVectorProperty>
       <IntVectorProperty name="WriteFrequency"
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
       <Hints>

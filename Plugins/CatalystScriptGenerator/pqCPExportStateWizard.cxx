@@ -58,12 +58,13 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
                                            "cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
                                            "   simulation_input_map={%2},\n"
                                            "   screenshot_info={%3},\n"
-                                           "   rescale_data_range=%4,\n"
-                                           "   enable_live_viz=%5,\n"
-                                           "   live_viz_frequency=%6,\n"
-                                           "   cinema_tracks={%7},\n"
-                                           "   array_selection = {%9},\n"
-                                           "   filename='%8')\n";
+                                           "   padding_amount=%4,\n"
+                                           "   rescale_data_range=%5,\n"
+                                           "   enable_live_viz=%6,\n"
+                                           "   live_viz_frequency=%7,\n"
+                                           "   cinema_tracks={%8},\n"
+                                           "   array_selection = {%10},\n"
+                                           "   filename='%9')\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -190,6 +191,8 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
   // remove last ","
   sim_inputs_map.chop(1);
 
+  QString paddingAmount = this->Internals->fileNamePaddingAmountSpinBox->cleanText();
+
   QString rescale_data_range =
     (this->Internals->rescaleDataRange->isChecked() == true ? "True" : "False");
 
@@ -201,6 +204,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
   command = command.arg(export_rendering)
               .arg(sim_inputs_map)
               .arg(rendering_info)
+              .arg(paddingAmount)
               .arg(rescale_data_range)
               .arg(live_visualization)
               .arg(live_visualization_frequency)

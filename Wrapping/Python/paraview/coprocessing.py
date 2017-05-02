@@ -5,6 +5,8 @@ pipeline. Additionally, this module has several other utility functions that are
 approriate for co-processing.
 """
 
+# for Python2 print statmements to output like Python3 print statements
+from __future__ import print_function
 from paraview import simple, servermanager
 from vtk.vtkPVVTKExtensionsCore import *
 import math
@@ -60,6 +62,13 @@ class CoProcessor(object):
         self.__CinemaTracksList = []
         self.__CinemaTracks = {}
         self.__InitialFrequencies = {}
+        self.__PrintEnsightFormatString = False
+
+    def SetPrintEnsightFormatString(self, enable):
+        """If outputting ExodusII files with the purpose of reading them into
+           Ensight, print a message on process 0 on what to use for the 'Set string'
+           input to properly read the generated files into Ensight."""
+        self.__PrintEnsightFormatString = enable
 
     def SetUpdateFrequencies(self, frequencies):
         """Set the frequencies at which the pipeline needs to be updated.
@@ -181,10 +190,18 @@ class CoProcessor(object):
             if (timestep % frequency) == 0 or \
                     datadescription.GetForceOutput() == True:
                 fileName = writer.parameters.GetProperty("FileName").GetElement(0)
-                writer.FileName = fileName.replace("%t", str(timestep))
+                paddingamount = writer.parameters.GetProperty("PaddingAmount").GetElement(0)
+                helperName = writer.GetXMLName()
+                if helperName == "ExodusIIWriter":
+                    ts = "."+str(timestep).rjust(paddingamount, '0')
+                    writer.FileName = fileName + ts
+                else:
+                    ts = str(timestep).rjust(paddingamount, '0')
+                    writer.FileName = fileName.replace("%t", ts)
                 writer.UpdatePipeline(datadescription.GetTime())
 
-    def WriteImages(self, datadescription, rescale_lookuptable=False, image_quality=None):
+    def WriteImages(self, datadescription, rescale_lookuptable=False,
+                    image_quality=None, padding_amount=0):
         """This method will update all views, if present and write output
         images, as needed.
 
@@ -206,6 +223,9 @@ class CoProcessor(object):
 
                 If not specified, for saving PNGs 0 is assumed to minimize
                 preformance impact.
+
+            padding_amount (int, optional): Amount to pad the time index by.
+
         """
         timestep = datadescription.GetTimeStep()
 
@@ -214,7 +234,8 @@ class CoProcessor(object):
             if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
                datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
-                fname = fname.replace("%t", str(timestep))
+                ts = str(timestep).rjust(padding_amount, '0')
+                fname = fname.replace("%t", ts)
                 if view.cpFitToScreen != 0:
                     if view.IsA("vtkSMRenderViewProxy") == True:
                         view.ResetCamera()
@@ -339,27 +360,45 @@ class CoProcessor(object):
         producer.UpdatePipeline(datadescription.GetTime())
         return producer
 
-    def RegisterWriter(self, writer, filename, freq):
+    def ProcessExodusIIWriter(self, writer):
+        """Extra work for the ExodusII writer to avoid undesired warnings
+           and print out a message on how to read the files into Ensight."""
+        # Disable the warning about not having meta data available since we can
+        # use this writer for vtkDataSets
+        writer.IgnoreMetaDataWarning = 1
+
+        # optionally print message so that people know what file string to use to open in Ensight
+        if self.__PrintEnsightFormatString:
+            import paraview.servermanager as pvsm
+            pm = pvsm.vtkProcessModule.GetProcessModule()
+            pid = pm.GetGlobalController().GetLocalProcessId()
+            if pid == 0:
+                nump = pm.GetGlobalController().GetNumberOfProcesses()
+                if nump == 1:
+                    print("Ensight 'Set string' input is '", writer.FileName, ".*'", sep="")
+                else:
+                    print("Ensight 'Set string' input is '", writer.FileName, ".*."+str(nump)+ \
+                          ".<"+str(nump)+":%0."+str(len(str(nump-1)))+"d>'", sep="")
+
+    def RegisterWriter(self, writer, filename, freq, paddingamount=0):
         """Registers a writer proxy. This method is generally used in
            CreatePipeline() to register writers. All writes created as such will
            write the output files appropriately in WriteData() is called."""
         writerParametersProxy = self.WriterParametersProxy(
-            writer, filename, freq)
+            writer, filename, freq, paddingamount)
 
         writer.FileName = filename
         writer.add_attribute("parameters", writerParametersProxy)
 
-        # If we're outputting through the ExodusII writer we want to disable
-        # the warning about not having meta data available since we can
-        # use this writer for vtkDataSets
-        if hasattr(writer, 'IgnoreMetaDataWarning'):
-            writer.IgnoreMetaDataWarning = 1
-
         self.__WritersList.append(writer)
+
+        helperName = writer.GetXMLName()
+        if helperName == "ExodusIIWriter":
+            self.ProcessExodusIIWriter(writer)
 
         return writer
 
-    def WriterParametersProxy(self, writer, filename, freq):
+    def WriterParametersProxy(self, writer, filename, freq, paddingamount):
         """Creates a client only proxy that will be synchronized with ParaView
         Live, allowing a user to set the filename and frequency.
         """
@@ -379,7 +418,7 @@ class CoProcessor(object):
         if writerIsProxy:
             # it's possible that the writer can take in multiple input connections
             # so we need to go through all of them. the try/except block seems
-            # to be the best way to figure out if there are multipel input connections
+            # to be the best way to figure out if there are multiple input connections
             try:
                 length = len(writer.Input)
                 for i in range(length):
@@ -390,6 +429,8 @@ class CoProcessor(object):
                     0, writer.Input.SMProxy, 0)
         proxy.GetProperty("FileName").SetElement(0, filename)
         proxy.GetProperty("WriteFrequency").SetElement(0, freq)
+
+        proxy.GetProperty("PaddingAmount").SetElement(0, paddingamount)
         controller.PostInitializeProxy(proxy)
         controller.RegisterPipelineProxy(proxy)
         return proxy
@@ -416,14 +457,14 @@ class CoProcessor(object):
         self.__CinemaTracks[proxy] = proxyDefinitions
         return proxy
 
-    def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height, cinema=None):
+    def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height,
+                     cinema=None):
         """Register a view for image capture with extra meta-data such
         as magnification, size and frequency."""
         if not isinstance(view, servermanager.Proxy):
             raise RuntimeError ("Invalid 'view' argument passed to RegisterView.")
         view.add_attribute("cpFileName", filename)
         view.add_attribute("cpFrequency", freq)
-        view.add_attribute("cpFileName", filename)
         view.add_attribute("cpFitToScreen", fittoscreen)
         view.add_attribute("cpMagnification", magnification)
         view.add_attribute("cpCinemaOptions", cinema)

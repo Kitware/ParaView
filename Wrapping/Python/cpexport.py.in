@@ -22,18 +22,23 @@ from paraview import coprocessing
 # Code generated from cpstate.py to create the CoProcessor.
 # ParaView @PARAVIEW_VERSION_FULL@ @PARAVIEW_BUILD_ARCHITECTURE@ bits
 
-%s
 #--------------------------------------------------------------
-# Global variables that will hold the pipeline for each timestep
+# Global screenshot output options
+imageFileNamePadding=%s
+rescale_lookuptable=%s
+
+%s
+
+#--------------------------------------------------------------
+# Global variable that will hold the pipeline for each timestep
 # Creating the CoProcessor object, doesn't actually create the ParaView pipeline.
 # It will be automatically setup when coprocessor.UpdateProducers() is called the
 # first time.
 coprocessor = CreateCoProcessor()
 
 #--------------------------------------------------------------
-# Enable Live-Visualizaton with ParaView
+# Enable Live-Visualizaton with ParaView and the update frequency
 coprocessor.EnableLiveVisualization(%s, %s)
-
 
 # ---------------------- Data Selection method ----------------------
 
@@ -66,7 +71,8 @@ def DoCoProcessing(datadescription):
     coprocessor.WriteData(datadescription);
 
     # Write image capture (Last arg: rescale lookup table), if appropriate.
-    coprocessor.WriteImages(datadescription, rescale_lookuptable=%s)
+    coprocessor.WriteImages(datadescription, rescale_lookuptable=rescale_lookuptable,
+        image_quality=0, padding_amount=imageFileNamePadding)
 
     # Live Visualization, if enabled.
     coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
@@ -75,7 +81,7 @@ def DoCoProcessing(datadescription):
 from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
-    rescale_data_range, enable_live_viz, live_viz_frequency,
+    padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
     cinema_tracks, array_selection, filename=None):
     """Returns a string with the generated CoProcessing script based on the
         options specified.
@@ -83,6 +89,7 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
         First three arguments are same as those expected by
         cpstate.DumpPipeline() function.
 
+        padding_amount     :- integer (0-10) to set image output filename padding
         rescale_data_range :- boolean set to true if the LUTs must be scaled on
                               each timestep
         enable_live_viz    :- boolean set to true if the generated script should
@@ -95,9 +102,9 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     """
     pipeline_script = cpstate.DumpPipeline(\
         export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
-    script = __output_contents % (pipeline_script,
-                                  enable_live_viz, live_viz_frequency,
-                                  rescale_data_range)
+    script = __output_contents % (padding_amount, rescale_data_range,
+                                  pipeline_script,
+                                  enable_live_viz, live_viz_frequency)
     if filename:
         outFile = open(filename, "w")
         outFile.write(script)
@@ -114,6 +121,7 @@ def run(filename=None):
     script = DumpCoProcessingScript(export_rendering=False,
         simulation_input_map={"Wavelet1" : "input"},
         screenshot_info={},
+        padding_amount=0,
         rescale_data_range=True,
         enable_live_viz=True,
         live_viz_frequency=1,
