@@ -517,24 +517,25 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
     @exportRpc("viewport.geometry.view.observer.add")
     def addViewObserver(self, viewId):
         sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
 
         def pushGeometry(newSubscription=False):
             simple.Render(sView)
-            stateToReturn = self.getViewState(viewId, newSubscription)
+            stateToReturn = self.getViewState(realViewId, newSubscription)
             stateToReturn['mtime'] = 0 if newSubscription else self.mtime
             self.mtime += 1
             return stateToReturn
 
-        if not sView:
-            return { 'error': 'Unable to get view with id %s' % viewId }
-
-        if not viewId in self.trackingViews:
+        if not realViewId in self.trackingViews:
             observerCallback = lambda *args, **kwargs: self.publish('viewport.geometry.view.subscription', pushGeometry())
-            tag = sView.AddObserver('UpdateDataEvent', observerCallback)
-            self.trackingViews[viewId] = { 'tag': tag, 'observerCount': 1 }
+            tag = self.Application.AddObserver('PushRender', observerCallback)
+            self.trackingViews[realViewId] = { 'tag': tag, 'observerCount': 1 }
         else:
             # There is an observer on this view already
-            self.trackingViews[viewId]['observerCount'] += 1
+            self.trackingViews[realViewId]['observerCount'] += 1
 
         self.publish('viewport.geometry.view.subscription', pushGeometry(True))
         return { 'success': True }
@@ -543,20 +544,20 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
     @exportRpc("viewport.geometry.view.observer.remove")
     def removeViewObserver(self, viewId):
         sView = self.getView(viewId)
-
         if not sView:
             return { 'error': 'Unable to get view with id %s' % viewId }
 
-        observerInfo = self.trackingViews[viewId]
+        realViewId = sView.GetGlobalIDAsString()
+        observerInfo = self.trackingViews[realViewId]
 
         if not observerInfo:
-            return { 'error': 'Unable to find subscription for view %s' % viewId }
+            return { 'error': 'Unable to find subscription for view %s' % realViewId }
 
         observerInfo['observerCount'] -= 1
 
         if observerInfo['observerCount'] <= 0:
-            sView.RemoveObserver(observerInfo['tag'])
-            del self.trackingViews[viewId]
+            self.Application.RemoveObserver(observerInfo['tag'])
+            del self.trackingViews[realViewId]
 
         return { 'result': 'success' }
 
@@ -564,7 +565,6 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
     @exportRpc("viewport.geometry.view.get.state")
     def getViewState(self, viewId, newSubscription=False):
         sView = self.getView(viewId)
-
         if not sView:
             return { 'error': 'Unable to get view with id %s' % viewId }
 
