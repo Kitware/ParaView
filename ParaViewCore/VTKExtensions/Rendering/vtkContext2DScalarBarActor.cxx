@@ -294,6 +294,13 @@ void vtkContext2DScalarBarActor::GetSize(double size[2], vtkContext2D* painter)
     return;
   }
 
+  // Convert scalar bar length from normalized viewport coordinates to pixels
+  vtkNew<vtkCoordinate> lengthCoord;
+  lengthCoord->SetCoordinateSystemToNormalizedViewport();
+  lengthCoord->SetValue(this->Orientation == VTK_ORIENT_VERTICAL ? 0.0 : this->ScalarBarLength,
+    this->Orientation == VTK_ORIENT_VERTICAL ? this->ScalarBarLength : 0.0);
+  int* lengthOffset = lengthCoord->GetComputedDisplayValue(this->CurrentViewport);
+
   // The scalar bar thickness is defined in terms of points. That is,
   // if the thickness size is 12, that matches the height of a "|"
   // character in a 12 point font.
@@ -308,11 +315,11 @@ void vtkContext2DScalarBarActor::GetSize(double size[2], vtkContext2D* painter)
   if (this->Orientation == VTK_ORIENT_VERTICAL)
   {
     size[0] = thickness;
-    size[1] = this->ScalarBarLength;
+    size[1] = lengthOffset[1];
   }
   else
   {
-    size[0] = this->ScalarBarLength;
+    size[0] = lengthOffset[0];
     size[1] = thickness;
   }
 }

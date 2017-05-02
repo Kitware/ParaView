@@ -83,11 +83,14 @@ public:
   //@{
   /**
    * Set the scalar bar length. When the orientation is VTK_ORIENT_VERTICAL,
-   * this sets the scalar bar  height. When the orientation is
-   * VTK_ORIENT_HORIZONTAL, this sets the scalar bar width. Specified in pixels.
+   * this sets the scalar bar height. When the orientation is
+   * VTK_ORIENT_HORIZONTAL, this sets the scalar bar width. Specified in
+   * normalized viewport coordinates, meaning the value is the fractional span
+   * of the viewport's width or height in the range [0, 1], depending on
+   * orientation.
    */
-  vtkSetMacro(ScalarBarLength, int);
-  vtkGetMacro(ScalarBarLength, int);
+  vtkSetMacro(ScalarBarLength, double);
+  vtkGetMacro(ScalarBarLength, double);
   //@}
 
   //@{
@@ -214,7 +217,7 @@ private:
   /**
   * Length of the color bar.
   */
-  int ScalarBarLength;
+  double ScalarBarLength;
 
   int AutomaticLabelFormat;
 

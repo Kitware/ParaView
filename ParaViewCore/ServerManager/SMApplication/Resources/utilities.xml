@@ -953,15 +953,17 @@
           and the height when horizontally oriented.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetScalarBarLength"
-                         default_values="100"
+      <DoubleVectorProperty command="SetScalarBarLength"
+                         default_values="0.33"
                          name="ScalarBarLength"
                          label="Color Bar Length"
                          number_of_elements="1">
         <Documentation>
-          Sets the length of the scalar bar.
+          Sets the length of the scalar bar. The length is defined as a
+          fraction of window width or height when the color legend is
+          horizontal or vertical, respectively.
         </Documentation>
-      </IntVectorProperty>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetAutomaticLabelFormat"
                          default_values="1"
                          name="AutomaticLabelFormat"
