@@ -314,6 +314,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="MaximumNumberOfDataRepresentationLabels"
+        number_of_elements="1"
+        default_values="100"
+        panel_visibility="advanced">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>
+          Set how many points should be labeled when labeling points with data.  If there
+          are more point than this then only a subset will be labeled.  This helps when many
+          points are selected and the number of labels would make then unreadable.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
         <Property name="CrashRecovery" />

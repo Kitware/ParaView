@@ -3873,6 +3873,7 @@
           </PropertyGroup>
           <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
           <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
+          <Property exposed_name="SelectionMaximumNumberOfLabels" name="MaximumNumberOfLabels"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
             <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
@@ -5065,6 +5066,18 @@
                  value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfLabels"
+                         default_values="100"
+                         name="MaximumNumberOfLabels"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="GeneralSettings"
+                        property="MaximumNumberOfDataRepresentationLabels"/>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetPointLabelBold"
                          default_values="0"
                          name="PointLabelBold"
@@ -5442,6 +5455,7 @@
           <Property name="PointLabelOpacity" />
           <Property name="PointLabelShadow" />
           <Property name="PointLabelVisibility" />
+          <Property name="MaximumNumberOfLabels" />
         </ExposedProperties>
       </SubProxy>
 
