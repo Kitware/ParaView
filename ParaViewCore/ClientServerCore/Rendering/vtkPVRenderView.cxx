@@ -3150,7 +3150,10 @@ void vtkPVRenderView::SetShadows(bool v)
 #ifdef PARAVIEW_USE_OSPRAY
   this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
-  ren->SetUseShadows(v);
+  if (this->Internals->IsInOSPRay)
+  {
+    ren->SetUseShadows(v);
+  }
 #else
   (void)v;
 #endif
