@@ -300,7 +300,9 @@ annotation text.
                      output dataset. The filter keeps a copy of the python
                      script in Script, and creates Interpretor, a python
                      interpretor to run the script upon the first
-                     execution.</Documentation>
+                     execution. To execute external python scripts on the ParaView server, use:
+                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+                     chapter of the ParaView Guide.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -365,7 +367,9 @@ annotation text.
           <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property contains the text of a python program that
-        the programmable filter runs.</Documentation>
+        the programmable filter runs. To execute external python scripts on the ParaView server, use:
+        execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+        chapter of the ParaView Guide.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetInformationScript"
                             label="RequestInformation Script"
@@ -435,7 +439,9 @@ annotation text.
                      output dataset. The source keeps a copy of the python
                      script in Script, and creates Interpretor, a python
                      interpretor to run the script upon the first
-                     execution.</Documentation>
+                     execution. To execute external python scripts on the ParaView server, use:
+                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+                     chapter of the ParaView Guide.</Documentation>
       <IntVectorProperty command="SetOutputDataSetType"
                          default_values="0"
                          name="OutputDataSetType"
@@ -486,7 +492,9 @@ annotation text.
           <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property contains the text of a python program that
-        the programmable source runs.</Documentation>
+        the programmable source runs. To execute external python scripts on the ParaView server, use:
+        execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+        chapter of the ParaView Guide.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetInformationScript"
                             label="Script (RequestInformation)"
