@@ -135,10 +135,10 @@ static void vtkRemoveRepresentation(vtkSMProxy* view, vtkSMProxy* repr)
  *
  */
 //----------------------------------------------------------------------------
-class vtkCloningVector : public vtkObjectBase
+class vtkCloningVector : public vtkObject
 {
 public:
-  vtkBaseTypeMacro(vtkCloningVector, vtkObjectBase);
+  vtkTypeMacro(vtkCloningVector, vtkObject);
 
   /**
    * @returns item at a given index, if valid, else nullptr is returned.
@@ -389,7 +389,7 @@ private:
 class vtkCloningVectorOfRepresentations : public vtkCloningVector
 {
 public:
-  vtkBaseTypeMacro(vtkCloningVectorOfRepresentations, vtkCloningVector);
+  vtkTypeMacro(vtkCloningVectorOfRepresentations, vtkCloningVector);
   static vtkCloningVectorOfRepresentations* New()
   {
     VTK_STANDARD_NEW_BODY(vtkCloningVectorOfRepresentations);
@@ -446,7 +446,7 @@ private:
 class vtkCloningVectorOfViews : public vtkCloningVector
 {
 public:
-  vtkBaseTypeMacro(vtkCloningVectorOfViews, vtkCloningVector);
+  vtkTypeMacro(vtkCloningVectorOfViews, vtkCloningVector);
   static vtkCloningVectorOfViews* New() { VTK_STANDARD_NEW_BODY(vtkCloningVectorOfViews); }
 
   /*
