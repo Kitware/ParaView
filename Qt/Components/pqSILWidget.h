@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSILModel;
 class pqTreeView;
 class pqProxySILModel;
+class QSortFilterProxyModel;
 
 /**
 * pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
@@ -80,6 +81,7 @@ protected:
   QPointer<pqSILModel> Model;
   QList<pqTreeView*> Trees;
   pqProxySILModel* ActiveModel;
+  QSortFilterProxyModel* SortModel;
   QString ActiveCategory;
 
 private:
