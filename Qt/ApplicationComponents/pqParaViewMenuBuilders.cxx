@@ -101,6 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTraceReaction.h"
 #endif
 
+#include <QApplication>
 #include <QDockWidget>
 #include <QFileInfo>
 #include <QKeySequence>
@@ -118,7 +119,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   menu.setObjectName(objectName);
 
   QObject::connect(
-    ui.actionFileExit, SIGNAL(triggered()), pqApplicationCore::instance(), SLOT(quit()));
+    ui.actionFileExit, SIGNAL(triggered()), QApplication::instance(), SLOT(closeAllWindows()));
 
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);

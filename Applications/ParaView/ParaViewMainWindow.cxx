@@ -328,23 +328,11 @@ void ParaViewMainWindow::closeEvent(QCloseEvent* evt)
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->settings()->value("GeneralSettings.ShowSaveStateOnExit", false).toBool())
   {
-    switch (QMessageBox::question(this, "Exit ParaView?",
-      "Do you want to save the state before exiting ParaView?",
-      QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel))
+    if (QMessageBox::question(this, "Exit ParaView?",
+          "Do you want to save the state before exiting ParaView?",
+          QMessageBox::Save | QMessageBox::Discard) == QMessageBox::Save)
     {
-      case QMessageBox::Save:
-        if (pqSaveStateReaction::saveState())
-        {
-          evt->accept();
-          return;
-        }
-      default:
-      case QMessageBox::Cancel:
-        evt->ignore();
-        return;
-      case QMessageBox::Discard:
-        evt->accept();
-        break;
+      pqSaveStateReaction::saveState();
     }
   }
   evt->accept();
