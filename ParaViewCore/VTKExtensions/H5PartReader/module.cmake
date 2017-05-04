@@ -18,6 +18,7 @@ vtk_module(vtkPVVTKExtensionsH5PartReader
       PARAVIEW
     KIT
       vtkPVExtensions
+    TCL_NAME HFivePartReader
 )
 
 set_property(GLOBAL PROPERTY
