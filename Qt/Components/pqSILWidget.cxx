@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 
 #include "pqApplicationCore.h"
@@ -83,6 +84,8 @@ pqSILWidget::pqSILWidget(const QString& activeCategory, QWidget* parentObject)
 
   // setup model
   this->ActiveModel = new pqProxySILModel(activeCategory, this);
+  this->SortModel = new QSortFilterProxyModel(this);
+  this->SortModel->setSourceModel(this->ActiveModel);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,7 +143,7 @@ void pqSILWidget::onModelReset()
 
   QObject::connect(activeTree->header(), SIGNAL(sectionClicked(int)), this->ActiveModel,
     SLOT(toggleRootCheckState()), Qt::QueuedConnection);
-  activeTree->setModel(this->ActiveModel);
+  activeTree->setModel(this->SortModel);
   activeTree->expandAll();
   this->TabWidget->addTab(activeTree, this->ActiveCategory);
   new pqTreeViewSelectionHelper(activeTree);

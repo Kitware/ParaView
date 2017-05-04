@@ -134,8 +134,20 @@ void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
     menu.setObjectName("TreeViewCheckMenu");
     QAction* check = new QAction("Check", &menu);
     QAction* uncheck = new QAction("Uncheck", &menu);
+    QAction* sort = new QAction("Sort by Name", &menu);
+    QAction* unsort = new QAction("Sort by Block Index", &menu);
     menu.addAction(check);
     menu.addAction(uncheck);
+    menu.addAction(sort);
+    menu.addAction(unsort);
+    if (this->TreeView->isSortingEnabled())
+    {
+      sort->setEnabled(false);
+    }
+    else
+    {
+      unsort->setEnabled(false);
+    }
     QAction* result = menu.exec(this->TreeView->mapToGlobal(pos));
     if (result == check)
     {
@@ -144,6 +156,16 @@ void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
     else if (result == uncheck)
     {
       this->setSelectedItemsCheckState(Qt::Unchecked);
+    }
+    else if (result == sort)
+    {
+      this->TreeView->setSortingEnabled(true);
+      this->TreeView->sortByColumn(0, Qt::AscendingOrder);
+    }
+    else if (result == unsort)
+    {
+      this->TreeView->sortByColumn(-1);
+      this->TreeView->setSortingEnabled(false);
     }
   }
 }
