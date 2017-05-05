@@ -553,6 +553,37 @@ struct Process_5_1_to_5_4
       std::string id_string(proxy_node.attribute("id").value());
 
       //--------------------------
+      // Handle Position property
+      // We don't change the Position property here as its purpose remains the
+      // same (determining the lower left position of the scalar bar). However,
+      // we do change the "Window Location" property from the default
+      // "Lower Right" to "Any Location" so that the scalar bar will appear
+      // approximately where it was. It is a new property, so we need to
+      // add an XML node.
+      pugi::xml_node location_node = proxy_node.append_child();
+      location_node.set_name("Property");
+      location_node.append_attribute("name").set_value("WindowLocation");
+      location_node.append_attribute("id").set_value((id_string + ".WindowLocation").c_str());
+      location_node.append_attribute("number_of_elements").set_value("1");
+      pugi::xml_node element_node = location_node.append_child();
+      element_node.set_name("Element");
+      element_node.append_attribute("index").set_value("0");
+      element_node.append_attribute("value").set_value("0");
+      pugi::xml_node domain_node = location_node.append_child();
+      domain_node.set_name("Domain");
+      domain_node.append_attribute("name").set_value("enum");
+      domain_node.append_attribute("id").set_value((id_string + ".WindowLocation.enum").c_str());
+      std::string entry_buffer("<Entry value=\"0\" text=\"Any Location\"/>"
+                               "<Entry value=\"1\" text=\"Lower Left Corner\"/>"
+                               "<Entry value=\"2\" text=\"Lower Right Corner\"/>"
+                               "<Entry value=\"3\" text=\"Lower Center\"/>"
+                               "<Entry value=\"4\" text=\"Upper Left Corner\"/>"
+                               "<Entry value=\"5\" text=\"Upper Right Corner\"/>"
+                               "<Entry value=\"6\" text=\"Upper Center\"/>");
+      domain_node.append_buffer(entry_buffer.c_str(), entry_buffer.size());
+      location_node.print(std::cout);
+
+      //--------------------------
       // Handle Position2 property
       pugi::xml_node pos2_node =
         proxy_node.find_child_by_attribute("Property", "name", "Position2");
