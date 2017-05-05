@@ -46,15 +46,17 @@
 
 #include "vtkPVConfig.h" // For PARAVIEW_USE_MPI
 #include "vtkPolyDataAlgorithm.h"
-#include <string>
-#include <vector>
+#include <string> // for string
+#include <vector> // for vector
+
+#include "vtkPVVTKExtensionsH5PartReaderModule.h" // for export macro
 
 class vtkDataArraySelection;
 class vtkMultiProcessController;
 
 struct H5PartFile;
 
-class vtkH5PartReader : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSH5PARTREADER_EXPORT vtkH5PartReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkH5PartReader* New();

@@ -57,7 +57,7 @@ H5Part.inc: H5PartF90.inc
 # ------------ Serial Lib build commands ------------
 libH5Part.a: H5Part.o H5Block.o
  ${AR} rucs $@ $^
- 
+
 libH5PartF.a: H5Part.o H5PartF.o H5Block.o H5BlockF.o
  ${AR} rucs $@ $^
 

@@ -11,7 +11,7 @@ number (which is always negative).
  For functions returning a pointer the NULL-pointer is used to indicate
 an error. You can call the function H5PartGetErrno() to get the error
 number.  For the time being there is no strerror(3) or perror(3)
-equivalent. 
+equivalent.
 
 
 API Changes
@@ -26,7 +26,7 @@ soon as an error occured.
  The next "biggest" change is the use of H5Part types instead of "long
 long" and "double". The replacement of "long long" is "h5part_int64_t"
 and for "double" "h5part_float64_t". This change has now effect in
-Fortran.  
+Fortran.
 
  In some functions the argument type changed from "int" to
 "h5part_int64_t". Since on most systems "int" is a 32bit integer,
@@ -48,7 +48,7 @@ type changed from any to "h5part_int64_t"):
  h5part_int64_t    int
  H5PartWriteDataFloat64 (
   H5PartFile *f,
-  char *name, 
+  char *name,
   h5part_float64_t *dta  double
   );
 
@@ -92,9 +92,9 @@ type changed from any to "h5part_int64_t"):
   char *name,
   h5part_int64_t *dta  long long
   );
-    
+
  h5part_int64_t    void
- H5PartReadParticleStep (  
+ H5PartReadParticleStep (
   H5PartFile *f,
   h5part_int64_t step,  int
   h5part_float64_t *x,  double
@@ -114,7 +114,7 @@ New functions:
   );
 
  h5part_int64_t
- H5PartSetErrorHandler ( 
+ H5PartSetErrorHandler (
   h5part_error_handler handler
   );
 

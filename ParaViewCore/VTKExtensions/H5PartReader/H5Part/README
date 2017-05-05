@@ -13,8 +13,8 @@ library download the sources from http://hdf.ncsa.uiuc.edu/HDF5/
 ----------------------------------------
 
 For many platforms, where compilers are installed in the "default" location
-and all the environment variables are set correctly, it should be sufficient 
-to type: 
+and all the environment variables are set correctly, it should be sufficient
+to type:
 
 ./configure [OPTIONS] && make [install]
 
@@ -75,7 +75,7 @@ to have the proper compilers set up for use.
 
 module load hdf5_par
 
-[NOTE: module load hdf5 does not work at this moment. 
+[NOTE: module load hdf5 does not work at this moment.
 Possible installation error of HDF5 on Davinci.]
 
 
@@ -89,7 +89,7 @@ MPIFC = ifort
 
 If default doesn't work, try:
 
-For C shell: 
+For C shell:
 env CC=icc CXX=icc FC=ifort MPICC=icc MPICXX=icc MPIFC=ifort ./configure && make install
 
 For Korn or Bourne shell:
@@ -100,7 +100,7 @@ And, of course, you should add configure options, such as --enable-fortran --ena
 
 On this host, executing:
 
-For C shell: 
+For C shell:
 env CC=icc CXX=icc FC=ifort MPICC=icc MPICXX=icc MPIFC=ifort ./configure --enable-fortran --enable-parallel && make install
 
 For Korn or Bourne shell:
@@ -141,7 +141,7 @@ MPIFC = mpif90
 
 If default doesn't work, try:
 
-For C shell: 
+For C shell:
 env CC=pathcc CXX=pathCC FC=pathf90 MPICC=mpicc MPICXX=mpicxx MPIFC=mpif90 ./configure && make install
 
 For Korn or Bourne shell:
@@ -153,7 +153,7 @@ And, of course, you should add configure options, such as --enable-fortran --ena
 
 On this host, executing:
 
-For C shell: 
+For C shell:
 env CC=pathcc CXX=pathCC FC=pathf90 MPICC=mpicc MPICXX=mpicxx MPIFC=mpif90 ./configure --enable-fortran --enable-parallel && make install
 
 For Korn or Bourne shell:
@@ -219,7 +219,7 @@ MPIFC = mpxlf_r
 
 If default doesn't work, try:
 
-For C shell: 
+For C shell:
 env CC=cc_r CXX=cc_r FC=xlf_r MPICC=mpcc_r MPICXX=mpcc_r MPIFC=mpxlf_r ./configure && make install
 
 For Korn or Bourne shell:
@@ -231,7 +231,7 @@ And, of course, you should add configure options, such as --enable-fortran --ena
 
 On this host, executing:
 
-For C shell: 
+For C shell:
 env CC=cc_r CXX=cc_r FC=xlf_r MPICC=mpcc_r MPICXX=mpcc_r MPIFC=mpxlf_r ./configure --enable-fortran --enable-parallel && make install
 
 For Korn or Bourne shell:
@@ -280,7 +280,7 @@ FC = g95
 
 If default doesn't work, try:
 
-For C shell: 
+For C shell:
 env CC=gcc CXX=g++ FC=g95 ./configure && make install
 
 For Korn or Bourne shell:
@@ -292,7 +292,7 @@ And, of course, you should add configure options, such as --enable-fortran --ena
 
 On this host, executing:
 
-For C shell: 
+For C shell:
 env CC=gcc CXX=g++ FC=g95 ./configure --enable-fortran && make install
 
 For Korn or Bourne shell:
@@ -324,7 +324,7 @@ FC = g95
 
 If default doesn't work, try:
 
-For C shell: 
+For C shell:
 env CC=gcc CXX=g++ FC=g95 ./configure && make install
 
 For Korn or Bourne shell:
@@ -336,7 +336,7 @@ And, of course, you should add configure options, such as --enable-fortran --ena
 
 On this host, executing:
 
-For C shell: 
+For C shell:
 env CC=gcc CXX=g++ FC=g95 ./configure --enable-fortran && make install
 
 For Korn or Bourne shell:
@@ -369,7 +369,7 @@ run:
 CFLAGS="-I$H5HOME/include -DF77_SINGLE_UNDERSCORE" LDFLAGS="-L$H5HOME/lib -L$ZHOME/lib" ./configure --enable-parallel --enable-fortran
 
 
-(7) merlin00 / merlin3 
+(7) merlin00 / merlin3
 
 Currently Loaded Modulefiles:
   1) hdf5/hdf5-1.6.5            2) root/root-5.10.00          3) mpi/mpich2-1.0.3-pgi-6.1   4) pgi/pgi_64-6.1
@@ -406,13 +406,11 @@ Not properly set LD_LIBRARY_PATH value may result in a runtime error:
 
 ./H5PartTest: error while loading shared libraries: libhdf5.so.0: cannot open shared object file: No such file or directory
 
-(1) Are the compilers set correctly? 
+(1) Are the compilers set correctly?
 ---Check with: which COMPILER
 
 (2) Have you installed HDF5?
 ---You can get it at: http://vis.lbl.gov/Research/AcceleratorSAPP/index.html
 
-(3) Have you loaded the proper modules? 
+(3) Have you loaded the proper modules?
 ---It is necessary in Davinci & Bassi, and configure && make install may not work without it.
-
-

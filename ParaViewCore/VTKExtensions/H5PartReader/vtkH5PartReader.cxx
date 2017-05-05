@@ -438,11 +438,19 @@ int GetVTKDataType(int datatype)
   }
   else if (H5Tequal(datatype, H5T_NATIVE_LONG))
   {
-    return VTK_LONG;
+#if VTK_SIZEOF_LONG == VTK_SIZEOF_INT
+    return VTK_INT;
+#else
+    return VTK_LONG_LONG;
+#endif
   }
   else if (H5Tequal(datatype, H5T_NATIVE_ULONG))
   {
-    return VTK_UNSIGNED_LONG;
+#if VTK_SIZEOF_LONG == VTK_SIZEOF_INT
+    return VTK_UNSIGNED_INT;
+#else
+    return VTK_UNSIGNED_LONG_LONG;
+#endif
   }
   else if (H5Tequal(datatype, H5T_NATIVE_LLONG))
   {
