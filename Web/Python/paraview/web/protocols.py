@@ -538,7 +538,7 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
             self.trackingViews[realViewId]['observerCount'] += 1
 
         self.publish('viewport.geometry.view.subscription', pushGeometry(True))
-        return { 'success': True }
+        return { 'success': True, 'viewId': realViewId }
 
     # RpcName: removeViewObserver => viewport.geometry.view.observer.remove
     @exportRpc("viewport.geometry.view.observer.remove")
