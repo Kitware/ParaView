@@ -591,12 +591,12 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
 //----------------------------------------------------------------------------
 namespace
 {
-static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
+static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
 {
   unsigned int num_pieces = mp->GetNumberOfPieces();
   if (num_pieces == 0)
   {
-    return;
+    return nullptr;
   }
 
   std::vector<vtkPolyData*> inputs;
@@ -627,7 +627,7 @@ static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
   if (inputs.size() == 0)
   {
     // not much to do, this is an empty multi-piece.
-    return;
+    return nullptr;
   }
 
   vtkPolyData* output = vtkPolyData::New();
@@ -675,6 +675,7 @@ static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
     vtkPVGeometryFilter::POLYS_OFFSETS(), &polys_offsets[0], static_cast<int>(num_pieces));
   metadata->Set(
     vtkPVGeometryFilter::STRIPS_OFFSETS(), &strips_offsets[0], static_cast<int>(num_pieces));
+  return output;
 }
 };
 
@@ -857,9 +858,10 @@ int vtkPVGeometryFilter::RequestAMRData(
 
         this->CleanupOutputData(outputBlock.GetPointer(), /*doCommunicate=*/0);
         this->AddCompositeIndex(outputBlock.GetPointer(), amr->GetCompositeIndex(level, dataIdx));
-        // we'll use block_id since that matches the index for each leaf node.
-        this->AddBlockColors(outputBlock.GetPointer(), block_id);
         this->AddHierarchicalIndex(outputBlock.GetPointer(), level, dataIdx);
+        // we don't call this->AddBlockColors() for AMR dataset since it doesn't
+        // make sense,  nor can be supported since all datasets merged into a
+        // single polydata for rendering.
       }
       amrDatasets->SetPiece(block_id, outputBlock.GetPointer());
     }
@@ -969,6 +971,7 @@ int vtkPVGeometryFilter::RequestCompositeData(
   }
 
   std::vector<vtkMultiPieceDataSet*> pieces_to_merge;
+  std::vector<unsigned int> ids_for_pieces_to_merge;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkDataObject* curNode = iter->GetCurrentDataObject();
@@ -976,11 +979,16 @@ int vtkPVGeometryFilter::RequestCompositeData(
     {
       vtkMultiPieceDataSet* piece = vtkMultiPieceDataSet::SafeDownCast(curNode);
       pieces_to_merge.push_back(piece);
+      ids_for_pieces_to_merge.push_back(iter->GetCurrentFlatIndex());
     }
   }
   for (size_t cc = 0; cc < pieces_to_merge.size(); cc++)
   {
-    vtkPVGeometryFilterMergePieces(pieces_to_merge[cc]);
+    if (vtkPolyData* mergedPD = vtkPVGeometryFilterMergePieces(pieces_to_merge[cc]))
+    {
+      // We need to add vtkBlockColors to the merged dataset.
+      this->AddBlockColors(mergedPD, ids_for_pieces_to_merge[cc]);
+    }
   }
 
   // Now, when running in parallel, processes may have NULL-leaf nodes at
