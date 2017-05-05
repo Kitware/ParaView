@@ -15392,7 +15392,7 @@ source.</Documentation>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkRulerLineForInput"
                  name="RulerFilter"
-                 label="Ruler">
+                 label="Bounding Ruler">
       <Documentation short_help="Create a line along the input to use as a ruler">
         This filter creates a line along the object and defaults its
         representation to showing a ruler along that line.
