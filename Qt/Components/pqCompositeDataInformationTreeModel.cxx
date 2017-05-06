@@ -69,7 +69,6 @@ public:
     int NumberOfPieces;
     CNode* Parent;
     std::vector<CNode> Children;
-    bool Checked;
     Qt::CheckState CheckState;
 
     QModelIndex createIndex(pqCompositeDataInformationTreeModel* dmodel)
@@ -169,7 +168,6 @@ public:
       , DataType(0)
       , NumberOfPieces(-1)
       , Parent(nullptr)
-      , Checked(false)
       , CheckState(Qt::Unchecked)
     {
     }
