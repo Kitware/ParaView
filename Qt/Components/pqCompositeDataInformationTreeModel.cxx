@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QList>
 #include <QSet>
+#include <QStringList>
+#include <QtDebug>
 
 #include <cassert>
 #include <vector>
@@ -59,31 +61,34 @@ class CNode
 {
   QString Name;
   unsigned int Index;
+  unsigned int LeafIndex;
   int DataType;
   int NumberOfPieces;
   CNode* Parent;
   std::vector<CNode> Children;
-  Qt::CheckState CheckState;
 
-  QModelIndex createIndex(pqCompositeDataInformationTreeModel* dmodel)
-  {
-    if (this->Parent)
-    {
-      return dmodel->createIndex(
-        this->Parent->childIndex(*this), 0, static_cast<qindexdatatype>(this->flatIndex()));
-    }
-    else
-    {
-      return dmodel->createIndex(0, 0, static_cast<qindexdatatype>(0));
-    }
-  }
+  std::pair<Qt::CheckState, bool> CheckState; // bool is true if value was explicitly set,
+                                              // false, if value is inherited.
+  Qt::CheckState
+    ForceSetState; // for non-leaf nodes, since check-state changes based on children state,
+                   // we may loose the value that was explicitly
+                   // set. This helps us keep track of it. This is
+                   // only needed to supported `checkStates()` API.
+  std::vector<std::pair<QVariant, bool> >
+    CustomColumnState; // bool is true if value was explicitly set,
+                       // false, if value is inherited.
 
-  void setChildrenCheckState(Qt::CheckState state, pqCompositeDataInformationTreeModel* dmodel)
+  void setChildrenCheckState(
+    Qt::CheckState state, bool force, pqCompositeDataInformationTreeModel* dmodel)
   {
     for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
     {
-      iter->CheckState = state;
-      iter->setChildrenCheckState(state, dmodel);
+      if (force == true || iter->CheckState.second == false)
+      {
+        iter->CheckState.first = state;
+        iter->CheckState.second = false; // flag value as inherited.
+        iter->setChildrenCheckState(state, force, dmodel);
+      }
     }
     if (this->Children.size() > 0)
     {
@@ -97,7 +102,7 @@ class CNode
     int state = 0;
     for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
     {
-      switch (iter->CheckState)
+      switch (iter->CheckState.first)
       {
         case Qt::Unchecked:
           state |= 0x01;
@@ -127,9 +132,9 @@ class CNode
       default:
         target = Qt::PartiallyChecked;
     }
-    if (this->CheckState != target)
+    if (this->CheckState.first != target)
     {
-      this->CheckState = target;
+      this->CheckState.first = target;
       if (this->Parent)
       {
         this->Parent->updateCheckState(dmodel);
@@ -142,10 +147,13 @@ class CNode
 public:
   CNode()
     : Index(VTK_UNSIGNED_INT_MAX)
+    , LeafIndex(VTK_UNSIGNED_INT_MAX)
     , DataType(0)
     , NumberOfPieces(-1)
     , Parent(nullptr)
-    , CheckState(Qt::Unchecked)
+    , CheckState(Qt::Unchecked, false)
+    , ForceSetState(Qt::Unchecked)
+    , CustomColumnState()
   {
   }
   ~CNode() {}
@@ -172,8 +180,22 @@ public:
                                      : static_cast<int>(this->Children.size());
   }
 
-  unsigned int flatIndex() const { return this->Index; }
-  const QString& name() const { return this->Name; }
+  QModelIndex createIndex(const pqCompositeDataInformationTreeModel* dmodel, int col = 0) const
+  {
+    if (this->Parent)
+    {
+      return dmodel->createIndex(
+        this->Parent->childIndex(*this), col, static_cast<qindexdatatype>(this->flatIndex()));
+    }
+    else
+    {
+      return dmodel->createIndex(0, col, static_cast<qindexdatatype>(0));
+    }
+  }
+
+  inline unsigned int flatIndex() const { return this->Index; }
+  inline unsigned int leafIndex() const { return this->LeafIndex; }
+  inline const QString& name() const { return this->Name; }
   QString dataTypeAsString() const
   {
     return this->DataType == -1 ? "Unknown"
@@ -202,26 +224,33 @@ public:
   }
   const CNode& parent() const { return this->Parent ? *this->Parent : CNode::nullNode(); }
 
-  Qt::CheckState checkState() const { return this->CheckState; }
+  Qt::CheckState checkState() const { return this->CheckState.first; }
 
-  bool setChecked(bool val, pqCompositeDataInformationTreeModel* dmodel)
+  bool setChecked(bool val, bool force, pqCompositeDataInformationTreeModel* dmodel)
   {
-    if ((val == true && this->CheckState != Qt::Checked) ||
-      (val == false && this->CheckState != Qt::Unchecked))
+    if ((val == true && this->CheckState.first != Qt::Checked) ||
+      (val == false && this->CheckState.first != Qt::Unchecked))
     {
-      this->CheckState = val ? Qt::Checked : Qt::Unchecked;
-      this->setChildrenCheckState(this->CheckState, dmodel);
-      if (this->Parent)
+      if (force == true || this->CheckState.second == false)
       {
-        this->Parent->updateCheckState(dmodel);
-      }
+        this->CheckState.first = val ? Qt::Checked : Qt::Unchecked;
+        this->ForceSetState = this->CheckState.first;
+        this->CheckState.second = true;
+        this->setChildrenCheckState(this->CheckState.first, force, dmodel);
+        if (this->Parent)
+        {
+          this->Parent->updateCheckState(dmodel);
+        }
 
-      QModelIndex idx = this->createIndex(dmodel);
-      dmodel->dataChanged(idx, idx);
-      return true;
+        QModelIndex idx = this->createIndex(dmodel);
+        dmodel->dataChanged(idx, idx);
+        return true;
+      }
     }
     return false;
   }
+
+  void markCheckedStateAsInherited() { this->CheckState.second = false; }
 
   void checkedNodes(QSet<unsigned int>& set, bool leaves_only) const
   {
@@ -244,14 +273,101 @@ public:
     }
   }
 
+  void checkStates(QList<QPair<unsigned int, bool> >& states) const
+  {
+    // add any explicitly toggled nodes to the "states".
+    if (this->CheckState.second)
+    {
+      states.push_back(QPair<unsigned int, bool>(this->flatIndex(), this->ForceSetState));
+    }
+    for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
+    {
+      iter->checkStates(states);
+    }
+  }
+
+  const QVariant& customColumnState(int col) const
+  {
+    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    return this->CustomColumnState[col].first;
+  }
+
+  bool isCustomColumnStateInherited(int col) const
+  {
+    if (col >= 0 && col < static_cast<int>(this->CustomColumnState.size()))
+    {
+      return (this->CustomColumnState[col].second == false);
+    }
+    return true;
+  }
+
+  // Set custom column state for a specific node. If `value` is invalid, then
+  // it's treated as unset (or default). Setting a value will propagate the
+  // value to all children who haven't explicitly overridden the value
+  // themselves. To force set on all children, pass `force` as true. If value it
+  // set to `invalid` it acts are clearing the column state.
+  void setCustomColumnState(
+    int col, const QVariant& value, bool force, pqCompositeDataInformationTreeModel* dmodel)
+  {
+    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    std::pair<QVariant, bool>& value_pair = this->CustomColumnState[col];
+    if (value_pair.first != value)
+    {
+      value_pair.first = value;
+      QModelIndex idx = this->createIndex(dmodel, col + 1);
+      dmodel->dataChanged(idx, idx);
+    }
+
+    // flag that this value was explicitly set, unless value is invalid -- which
+    // acts as value being cleared.
+    value_pair.second = value.isValid() ? true : false;
+
+    // now, propagate over all children and pass this value.
+    for (auto citer = this->Children.begin(); citer != this->Children.end(); ++citer)
+    {
+      CNode& child = (*citer);
+      if (force == true || child.CustomColumnState[col].second == false)
+      {
+        child.setCustomColumnState(col, value, force, dmodel);
+        child.CustomColumnState[col].second = false; // since the value is inherited.
+      }
+    }
+  }
+
+  void customColumnStates(int col, QList<QPair<unsigned int, QVariant> >& values) const
+  {
+    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    const std::pair<QVariant, bool>& value_pair = this->CustomColumnState[col];
+
+    // add explicitly set values.
+    if (value_pair.first.isValid() && value_pair.second)
+    {
+      values.push_back(QPair<unsigned int, QVariant>(this->flatIndex(), value_pair.first));
+    }
+
+    // iterate over children to do the same.
+    for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
+    {
+      iter->customColumnStates(col, values);
+    }
+  }
+
   CNode& find(unsigned int findex)
   {
     if (this->Index == findex)
     {
       return (*this);
     }
+
     for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
     {
+      auto next_sibling = (iter + 1);
+      if (next_sibling != this->Children.end() && next_sibling->Index <= findex)
+      {
+        // skip this sub-tree. We're not going to find what we're looking for.
+        continue;
+      }
+
       CNode& found = iter->find(findex);
       if (found != CNode::nullNode())
       {
@@ -261,7 +377,8 @@ public:
     return CNode::nullNode();
   }
 
-  bool build(vtkPVDataInformation* info, bool expand_multi_piece, unsigned int& index)
+  bool build(vtkPVDataInformation* info, bool expand_multi_piece, unsigned int& index,
+    unsigned int& leaf_index, int custom_column_count)
   {
     this->reset();
     this->Index = index++;
@@ -269,11 +386,14 @@ public:
     {
       this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "";
       this->DataType = info != nullptr ? info->GetDataSetType() : -1;
+      this->CustomColumnState.resize(custom_column_count);
+      this->LeafIndex = leaf_index++;
       return false;
     }
 
     this->Name = info->GetPrettyDataTypeString();
     this->DataType = info->GetCompositeDataSetType();
+    this->CustomColumnState.resize(custom_column_count);
 
     vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
 
@@ -287,7 +407,8 @@ public:
       for (unsigned int cc = 0, max = cinfo->GetNumberOfChildren(); cc < max; ++cc)
       {
         CNode& childNode = this->Children[cc];
-        childNode.build(cinfo->GetDataInformation(cc), expand_multi_piece, index);
+        childNode.build(cinfo->GetDataInformation(cc), expand_multi_piece, index, leaf_index,
+          custom_column_count);
         // note:  build() will reset childNode, so don't set any ivars before calling it.
         childNode.Parent = this;
         // if Name for block was provided, use that instead of the data type.
@@ -309,6 +430,7 @@ public:
     else if (is_multipiece)
     {
       index += cinfo->GetNumberOfChildren();
+      this->LeafIndex = leaf_index++; // TODO: not sure what's the best thing here.
     }
     return true;
   }
@@ -356,16 +478,34 @@ public:
    * @returns true if the info refers to a composite dataset otherwise returns
    * false.
    */
-  bool build(vtkPVDataInformation* info, bool expand_multi_piece = false)
+  bool build(vtkPVDataInformation* info, bool expand_multi_piece)
   {
     unsigned int index = 0;
-    return this->Root.build(info, expand_multi_piece, index);
+    unsigned int leaf_index = 0;
+    return this->Root.build(
+      info, expand_multi_piece, index, leaf_index, this->CustomColumns.size());
   }
 
   CNode& rootNode() { return this->Root; }
 
+  void clearCheckState(pqCompositeDataInformationTreeModel* dmodel)
+  {
+    this->Root.setChecked(dmodel->defaultCheckState(), true, dmodel);
+    this->Root
+      .markCheckedStateAsInherited(); // this avoid us interpreting the value as explicitly set.
+  }
+
+  int addColumn(const QString& propertyName)
+  {
+    this->CustomColumns.push_back(propertyName);
+    return this->CustomColumns.size() - 1;
+  }
+  const QStringList& customColumns() const { return this->CustomColumns; }
+  void clearColumns() { this->CustomColumns.clear(); }
+  int customColumnIndex(const QString& pname) const { return this->CustomColumns.indexOf(pname); }
 private:
   CNode Root;
+  QStringList CustomColumns;
 };
 
 //-----------------------------------------------------------------------------
@@ -375,6 +515,7 @@ pqCompositeDataInformationTreeModel::pqCompositeDataInformationTreeModel(QObject
   , UserCheckable(false)
   , ExpandMultiPiece(false)
   , Exclusivity(false)
+  , DefaultCheckState(false)
 {
 }
 
@@ -386,7 +527,8 @@ pqCompositeDataInformationTreeModel::~pqCompositeDataInformationTreeModel()
 //-----------------------------------------------------------------------------
 int pqCompositeDataInformationTreeModel::columnCount(const QModelIndex&) const
 {
-  return 1;
+  pqInternals& internals = (*this->Internals);
+  return 1 + internals.customColumns().size();
 }
 
 //-----------------------------------------------------------------------------
@@ -407,9 +549,9 @@ int pqCompositeDataInformationTreeModel::rowCount(const QModelIndex& parentIdx) 
 QModelIndex pqCompositeDataInformationTreeModel::index(
   int row, int column, const QModelIndex& parentIdx) const
 {
-  if (!parentIdx.isValid() && row == 0 && column == 0)
+  if (!parentIdx.isValid() && row == 0)
   {
-    return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+    return this->createIndex(0, column, static_cast<qindexdatatype>(0));
   }
 
   if (row < 0 || column < 0 || column >= this->columnCount())
@@ -445,7 +587,7 @@ QModelIndex pqCompositeDataInformationTreeModel::parent(const QModelIndex& idx) 
   }
 
   const CNode& parentsParentNode = parentNode.parent();
-  return this->createIndex(parentsParentNode.childIndex(parentNode), idx.column(),
+  return this->createIndex(parentsParentNode.childIndex(parentNode), 0,
     static_cast<qindexdatatype>(parentNode.flatIndex()));
 }
 
@@ -457,6 +599,23 @@ QVariant pqCompositeDataInformationTreeModel::data(const QModelIndex& idx, int r
     return QVariant();
   }
 
+  // short-circuit roles we don't care about.
+  switch (role)
+  {
+    case Qt::DisplayRole:
+    case Qt::ToolTipRole:
+    case Qt::CheckStateRole:
+    case ValueInheritedRole:
+    case LeafIndexRole:
+      break;
+
+    case CompositeIndexRole:
+      return this->compositeIndex(idx);
+
+    default:
+      return QVariant();
+  }
+
   pqInternals& internals = (*this->Internals);
   const CNode& node = internals.find(idx);
   if (node == CNode::nullNode())
@@ -464,20 +623,41 @@ QVariant pqCompositeDataInformationTreeModel::data(const QModelIndex& idx, int r
     return QVariant();
   }
 
-  switch (role)
+  int col = idx.column();
+  if (col == 0)
   {
-    case Qt::DisplayRole:
-      return node.name();
+    switch (role)
+    {
+      case Qt::DisplayRole:
+        return node.name();
 
-    case Qt::ToolTipRole:
-      return QString("<b>Name</b>: %1<br/><b>Type</b>: %2")
-        .arg(node.name())
-        .arg(node.dataTypeAsString());
+      case Qt::ToolTipRole:
+        return QString("<b>Name</b>: %1<br/><b>Type</b>: %2")
+          .arg(node.name())
+          .arg(node.dataTypeAsString());
 
-    case Qt::CheckStateRole:
-      return this->UserCheckable ? QVariant(node.checkState()) : QVariant();
+      case Qt::CheckStateRole:
+        return this->UserCheckable ? QVariant(node.checkState()) : QVariant();
+
+      case LeafIndexRole:
+        return node.leafIndex() != VTK_UNSIGNED_INT_MAX ? QVariant(node.leafIndex()) : QVariant();
+    }
   }
+  else
+  {
+    col--; // since 0 is non-custom column.
+    switch (role)
+    {
+      case Qt::DisplayRole:
+        return node.customColumnState(col);
 
+      case ValueInheritedRole:
+        return node.isCustomColumnStateInherited(col);
+
+      case LeafIndexRole:
+        return node.leafIndex() != VTK_UNSIGNED_INT_MAX ? QVariant(node.leafIndex()) : QVariant();
+    }
+  }
   return QVariant();
 }
 
@@ -503,7 +683,8 @@ bool pqCompositeDataInformationTreeModel::setData(
     return false;
   }
 
-  if (role != Qt::CheckStateRole)
+  if ((idx.column() == 0 && role != Qt::CheckStateRole) ||
+    (idx.column() > 0 && role != Qt::DisplayRole))
   {
     return false;
   }
@@ -515,17 +696,26 @@ bool pqCompositeDataInformationTreeModel::setData(
     return false;
   }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  int checkState = value.value<int>();
-#else
-  Qt::CheckState checkState = value.value<Qt::CheckState>();
-#endif
-  if (checkState == Qt::Checked && this->exclusivity())
+  if (idx.column() == 0 && role == Qt::CheckStateRole)
   {
-    internals.rootNode().setChecked(false, this);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    int checkState = value.value<int>();
+#else
+    Qt::CheckState checkState = value.value<Qt::CheckState>();
+#endif
+    if (checkState == Qt::Checked && this->exclusivity())
+    {
+      internals.clearCheckState(this);
+    }
+    node.setChecked(checkState == Qt::Checked, true, this);
+    return true;
   }
-  node.setChecked(checkState == Qt::Checked, this);
-  return true;
+  else if (idx.column() > 0 && role == Qt::DisplayRole)
+  {
+    int col = idx.column() - 1;
+    node.setCustomColumnState(col, value, /*force=*/false, this);
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -559,6 +749,7 @@ bool pqCompositeDataInformationTreeModel::reset(vtkPVDataInformation* info)
 
   this->beginResetModel();
   bool retVal = internals.build(info, this->ExpandMultiPiece);
+  internals.clearCheckState(this);
   this->endResetModel();
   return retVal;
 }
@@ -567,13 +758,12 @@ bool pqCompositeDataInformationTreeModel::reset(vtkPVDataInformation* info)
 void pqCompositeDataInformationTreeModel::setChecked(const QList<unsigned int>& indices)
 {
   pqInternals& internals = (*this->Internals);
-  CNode& root = internals.rootNode();
-  root.setChecked(false, this);
+  internals.clearCheckState(this);
 
   foreach (unsigned int findex, indices)
   {
     CNode& node = internals.find(findex);
-    node.setChecked(true, this);
+    node.setChecked(true, true, this);
   }
 }
 
@@ -596,6 +786,32 @@ QList<unsigned int> pqCompositeDataInformationTreeModel::checkedLeaves() const
 }
 
 //-----------------------------------------------------------------------------
+QList<QPair<unsigned int, bool> > pqCompositeDataInformationTreeModel::checkStates() const
+{
+  QList<QPair<unsigned int, bool> > states;
+  pqInternals& internals = (*this->Internals);
+  internals.rootNode().checkStates(states);
+  return states;
+}
+
+//-----------------------------------------------------------------------------
+void pqCompositeDataInformationTreeModel::setCheckStates(
+  const QList<QPair<unsigned int, bool> >& states)
+{
+  pqInternals& internals = (*this->Internals);
+  internals.clearCheckState(this);
+
+  for (auto iter = states.begin(); iter != states.end(); ++iter)
+  {
+    CNode& node = internals.find(iter->first);
+    if (node != CNode::nullNode())
+    {
+      node.setChecked(iter->second, /*force=*/false, this);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 QList<unsigned int> pqCompositeDataInformationTreeModel::checkedLevels() const
 {
   QList<unsigned int> indices;
@@ -615,15 +831,15 @@ QList<unsigned int> pqCompositeDataInformationTreeModel::checkedLevels() const
 void pqCompositeDataInformationTreeModel::setCheckedLevels(const QList<unsigned int>& indices)
 {
   pqInternals& internals = (*this->Internals);
-  CNode& root = internals.rootNode();
-  root.setChecked(false, this);
+  internals.clearCheckState(this);
 
+  CNode& root = internals.rootNode();
   unsigned int childrenCount = static_cast<unsigned int>(root.childrenCount());
   foreach (unsigned int idx, indices)
   {
     if (idx < childrenCount)
     {
-      root.child(idx).setChecked(true, this);
+      root.child(idx).setChecked(true, true, this);
     }
   }
 }
@@ -654,9 +870,9 @@ void pqCompositeDataInformationTreeModel::setCheckedLevelDatasets(
   const QList<QPair<unsigned int, unsigned int> >& indices)
 {
   pqInternals& internals = (*this->Internals);
-  CNode& root = internals.rootNode();
-  root.setChecked(false, this);
+  internals.clearCheckState(this);
 
+  CNode& root = internals.rootNode();
   unsigned int numLevels = static_cast<unsigned int>(root.childrenCount());
 
   typedef QPair<unsigned int, unsigned int> IdxPair;
@@ -667,7 +883,7 @@ void pqCompositeDataInformationTreeModel::setCheckedLevelDatasets(
       CNode& level = root.child(idx.first);
       if (idx.second < static_cast<unsigned int>(level.childrenCount()))
       {
-        level.child(idx.second).setChecked(true, this);
+        level.child(idx.second).setChecked(true, true, this);
       }
     }
   }
@@ -684,7 +900,91 @@ unsigned int pqCompositeDataInformationTreeModel::compositeIndex(const QModelInd
 }
 
 //-----------------------------------------------------------------------------
+QModelIndex pqCompositeDataInformationTreeModel::find(unsigned int idx) const
+{
+  pqInternals& internals = (*this->Internals);
+  CNode& node = internals.find(idx);
+
+  if (node != CNode::nullNode())
+  {
+    return node.createIndex(this);
+  }
+  return QModelIndex();
+}
+
+//-----------------------------------------------------------------------------
 const QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
 {
   return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+}
+
+//-----------------------------------------------------------------------------
+int pqCompositeDataInformationTreeModel::addColumn(const QString& propertyName)
+{
+  pqInternals& internals = (*this->Internals);
+  // since 1st column on the model is non-custom, we offset by 1.
+  return internals.addColumn(propertyName) + 1;
+}
+
+//-----------------------------------------------------------------------------
+int pqCompositeDataInformationTreeModel::columnIndex(const QString& propertyName)
+{
+  pqInternals& internals = (*this->Internals);
+  int idx = internals.customColumnIndex(propertyName);
+  return idx >= 0 ? (idx + 1) : -1;
+}
+
+//-----------------------------------------------------------------------------
+void pqCompositeDataInformationTreeModel::clearColumns()
+{
+  pqInternals& internals = (*this->Internals);
+  internals.clearColumns();
+}
+
+//-----------------------------------------------------------------------------
+void pqCompositeDataInformationTreeModel::setColumnStates(
+  const QString& pname, const QList<QPair<unsigned int, QVariant> >& values)
+{
+  pqInternals& internals = (*this->Internals);
+  int col = internals.customColumnIndex(pname);
+  if (col < 0)
+  {
+    qCritical() << "Unknown property: " << pname;
+    return;
+  }
+
+  typedef QPair<unsigned int, QVariant> PairT;
+
+  CNode& root = internals.rootNode();
+
+  // clear all values.
+  root.setCustomColumnState(col, QVariant(), /*force=*/true, this);
+  foreach (const PairT& pair, values)
+  {
+    CNode& node = internals.find(pair.first);
+    if (node != CNode::nullNode())
+    {
+      if (pair.second.isValid()) // invalid value is treated as cleared.
+      {
+        node.setCustomColumnState(col, pair.second, /*force=*/false, this);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+QList<QPair<unsigned int, QVariant> > pqCompositeDataInformationTreeModel::columnStates(
+  const QString& pname) const
+{
+  QList<QPair<unsigned int, QVariant> > value;
+
+  pqInternals& internals = (*this->Internals);
+  int col = internals.customColumnIndex(pname);
+  if (col < 0)
+  {
+    qCritical() << "Unknown property: " << pname;
+    return value;
+  }
+  internals.rootNode().customColumnStates(col, value);
+  return value;
 }
