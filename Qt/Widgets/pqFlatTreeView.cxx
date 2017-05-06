@@ -52,12 +52,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QTime>
 #include <QToolTip>
+#include <QVector>
 #include <QtDebug>
 
 class pqFlatTreeViewColumn
 {
 public:
-  pqFlatTreeViewColumn();
+  pqFlatTreeViewColumn()
+    : Width(0)
+    , Selected(false)
+  {
+  }
   ~pqFlatTreeViewColumn() {}
 
 public:
@@ -71,11 +76,14 @@ public:
   pqFlatTreeViewItem();
   ~pqFlatTreeViewItem();
 
+  // ensures that the item has columns matching count.
+  void ensureCells(int count) { this->Cells.resize(count); }
+
 public:
   pqFlatTreeViewItem* Parent;
   QList<pqFlatTreeViewItem*> Items;
   QPersistentModelIndex Index;
-  QList<pqFlatTreeViewColumn*> Cells;
+  QVector<pqFlatTreeViewColumn> Cells;
   int ContentsY;
   int Height;
   int Indent;
@@ -100,13 +108,6 @@ public:
   QString KeySearch;
   QWidget* Editor;
 };
-
-//----------------------------------------------------------------------------
-pqFlatTreeViewColumn::pqFlatTreeViewColumn()
-{
-  this->Width = 0;
-  this->Selected = false;
-}
 
 //----------------------------------------------------------------------------
 pqFlatTreeViewItem::pqFlatTreeViewItem()
@@ -134,15 +135,6 @@ pqFlatTreeViewItem::~pqFlatTreeViewItem()
 
   this->Items.clear();
   this->Parent = 0;
-
-  // Clean up the cells.
-  QList<pqFlatTreeViewColumn*>::Iterator jter = this->Cells.begin();
-  for (; jter != this->Cells.end(); ++jter)
-  {
-    delete *jter;
-  }
-
-  this->Cells.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -1155,10 +1147,10 @@ void pqFlatTreeView::collapse(const QModelIndex& index)
         }
         else
         {
-          QList<pqFlatTreeViewColumn*>::Iterator iter = next->Cells.begin();
+          QVector<pqFlatTreeViewColumn>::Iterator iter = next->Cells.begin();
           for (; iter != next->Cells.end(); ++iter)
           {
-            if ((*iter)->Selected)
+            if (iter->Selected)
             {
               // Put the whole row in the selection.
               int row = next->Index.row();
@@ -1277,21 +1269,18 @@ void pqFlatTreeView::insertRows(const QModelIndex& parentIndex, int start, int e
     // a temporary list.
     QModelIndex index;
     QList<pqFlatTreeViewItem*> newItems;
-    pqFlatTreeViewItem* child = 0;
     int count = item->Items.size() + end - start + 1;
     for (; end >= start; end--)
     {
       index = this->Model->index(end, 0, parentIndex);
       if (index.isValid())
       {
-        child = new pqFlatTreeViewItem();
-        if (child)
-        {
-          child->Parent = item;
-          child->Index = index;
-          newItems.prepend(child);
-          this->addChildItems(child, count);
-        }
+        pqFlatTreeViewItem* child = new pqFlatTreeViewItem();
+        child->Parent = item;
+        child->Index = index;
+        child->ensureCells(this->Root->Cells.size());
+        newItems.prepend(child);
+        this->addChildItems(child, count);
       }
     }
 
@@ -1508,7 +1497,7 @@ void pqFlatTreeView::updateData(const QModelIndex& topLeft, const QModelIndex& b
 
         for (int j = start; j <= end && j < item->Cells.size(); j++)
         {
-          item->Cells[j]->Width = 0;
+          item->Cells[j].Width = 0;
         }
 
         // If the items are visible, update the layout.
@@ -2296,7 +2285,7 @@ void pqFlatTreeView::mousePressEvent(QMouseEvent* e)
       int columnStart = this->HeaderView->sectionPosition(index.column());
       if (px < columnStart + itemWidth)
       {
-        columnStart += itemWidth - item->Cells[index.column()]->Width + this->DoubleTextMargin;
+        columnStart += itemWidth - item->Cells[index.column()].Width + this->DoubleTextMargin;
         if (px >= columnStart)
         {
           sendClicked = !this->startEditing(index);
@@ -2511,7 +2500,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
 
   for (i = 0; i < this->Root->Cells.size(); i++)
   {
-    if (this->Root->Cells[i]->Selected)
+    if (this->Root->Cells[i].Selected)
     {
       px = this->HeaderView->sectionPosition(i);
       columnWidth = this->HeaderView->sectionSize(i);
@@ -2560,7 +2549,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
           QRect highlightRect;
           index = item->Index.sibling(item->Index.row(), i);
           if (this->Behavior == pqFlatTreeView::SelectItems &&
-            (item->Cells[i]->Selected || index == this->Selection->currentIndex()))
+            (item->Cells[i].Selected || index == this->Selection->currentIndex()))
           {
             int ox = 0;
             itemWidth = this->getWidthSum(item, i);
@@ -2568,7 +2557,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
             {
               // If the decoration is not supposed to be selected,
               // adjust the position and width of the highlight.
-              ox = itemWidth - item->Cells[i]->Width - this->DoubleTextMargin;
+              ox = itemWidth - item->Cells[i].Width - this->DoubleTextMargin;
             }
 
             if (itemWidth > columnWidth)
@@ -2579,7 +2568,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
             // Add a little length to the highlight rectangle to see
             // the text better.
             highlightRect.setRect(px + ox, py, itemWidth - ox + 2, itemHeight);
-            if (item->Cells[i]->Selected)
+            if (item->Cells[i].Selected)
             {
               painter.fillRect(highlightRect, options.palette.highlight());
             }
@@ -2615,9 +2604,9 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
             px += this->TextMargin;
 
             // Draw in the display data.
-            this->drawData(painter, px, py, index, options, itemHeight, item->Cells[i]->Width,
+            this->drawData(painter, px, py, index, options, itemHeight, item->Cells[i].Width,
               columnWidth,
-              item->RowSelected || this->Root->Cells[i]->Selected || item->Cells[i]->Selected);
+              item->RowSelected || this->Root->Cells[i].Selected || item->Cells[i].Selected);
           }
 
           // If this is the current index, draw the focus rectangle.
@@ -2625,7 +2614,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent* e)
           if (this->Behavior == pqFlatTreeView::SelectItems &&
             index == this->Selection->currentIndex())
           {
-            this->drawFocus(painter, highlightRect, options, item->Cells[i]->Selected);
+            this->drawFocus(painter, highlightRect, options, item->Cells[i].Selected);
           }
         }
 
@@ -2844,7 +2833,7 @@ void pqFlatTreeView::changeSelection(
         end = (*iter).right();
         for (start = (*iter).left(); start <= end; start++)
         {
-          this->Root->Cells[start]->Selected = false;
+          this->Root->Cells[start].Selected = false;
         }
       }
       else if (parentItem->Items.size() > 0)
@@ -2877,7 +2866,7 @@ void pqFlatTreeView::changeSelection(
             column = (*iter).right();
             for (; i <= column; i++)
             {
-              item->Cells[i]->Selected = false;
+              item->Cells[i].Selected = false;
             }
           }
         }
@@ -2904,7 +2893,7 @@ void pqFlatTreeView::changeSelection(
         end = (*iter).right();
         for (start = (*iter).left(); start <= end; start++)
         {
-          this->Root->Cells[start]->Selected = true;
+          this->Root->Cells[start].Selected = true;
         }
       }
       else if (parentItem->Items.size() > 0)
@@ -2937,7 +2926,7 @@ void pqFlatTreeView::changeSelection(
             column = (*iter).right();
             for (; i <= column && i < item->Cells.size(); i++)
             {
-              item->Cells[i]->Selected = true;
+              item->Cells[i].Selected = true;
             }
           }
         }
@@ -2972,12 +2961,6 @@ void pqFlatTreeView::resetRoot()
   this->Root->Items.clear();
 
   // Clean up the cells.
-  QList<pqFlatTreeViewColumn*>::Iterator jter = this->Root->Cells.begin();
-  for (; jter != this->Root->Cells.end(); ++jter)
-  {
-    delete *jter;
-  }
-
   this->Root->Cells.clear();
   if (this->Root->Index.isValid())
   {
@@ -2987,10 +2970,9 @@ void pqFlatTreeView::resetRoot()
 
 void pqFlatTreeView::resetPreferredSizes()
 {
-  QList<pqFlatTreeViewColumn*>::Iterator iter = this->Root->Cells.begin();
-  for (; iter != this->Root->Cells.end(); ++iter)
+  for (int cc = 0; cc < this->Root->Cells.size(); ++cc)
   {
-    (*iter)->Width = 0;
+    this->Root->Cells[cc].Width = 0;
   }
 }
 
@@ -3015,7 +2997,7 @@ void pqFlatTreeView::layoutEditor()
     }
 
     // Figure out how much space is taken up by decoration.
-    int indent = itemWidth - item->Cells[column]->Width - this->DoubleTextMargin;
+    int indent = itemWidth - item->Cells[column].Width - this->DoubleTextMargin;
     if (indent > 0)
     {
       ex += indent;
@@ -3054,11 +3036,7 @@ void pqFlatTreeView::layoutItems()
     }
 
     // Make sure the preferred size array is allocated.
-    int columnCount = this->Model->columnCount(this->Root->Index) - this->Root->Cells.size();
-    for (int i = 0; i < columnCount; i++)
-    {
-      this->Root->Cells.append(new pqFlatTreeViewColumn());
-    }
+    this->Root->ensureCells(this->Model->columnCount(this->Root->Index));
 
     // Reset the preferred column sizes.
     this->resetPreferredSizes();
@@ -3104,21 +3082,15 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem* item, int& point, const QFon
     }
 
     // Make sure the text width list is allocated.
-    int i = 0;
-    if (item->Cells.size() == 0)
-    {
-      for (i = 0; i < this->Root->Cells.size(); i++)
-      {
-        item->Cells.append(new pqFlatTreeViewColumn());
-      }
-    }
+    item->ensureCells(this->Root->Cells.size());
 
+    int i = 0;
     int preferredWidth = 0;
     // default to the maximum of the height by the font metrics, and the indent width
     int preferredHeight = std::max(fm.height(), this->IndentWidth);
     for (i = 0; i < item->Cells.size(); i++)
     {
-      if (item->Cells[i]->Width == 0 || this->FontChanged)
+      if (item->Cells[i].Width == 0 || this->FontChanged)
       {
         // If the cell has a font hint, use that font to determine
         // the height.
@@ -3127,7 +3099,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem* item, int& point, const QFon
         if (value.isValid())
         {
           QFontMetrics indexFont(qvariant_cast<QFont>(value));
-          item->Cells[i]->Width = this->getDataWidth(index, indexFont);
+          item->Cells[i].Width = this->getDataWidth(index, indexFont);
           if (indexFont.height() > preferredHeight)
           {
             preferredHeight = indexFont.height();
@@ -3135,16 +3107,16 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem* item, int& point, const QFon
         }
         else
         {
-          item->Cells[i]->Width = this->getDataWidth(index, fm);
+          item->Cells[i].Width = this->getDataWidth(index, fm);
         }
       }
 
       // The text width, the indent, the icon width, and the padding
       // between the icon and the item all factor into the desired width.
       preferredWidth = this->getWidthSum(item, i);
-      if (preferredWidth > this->Root->Cells[i]->Width)
+      if (preferredWidth > this->Root->Cells[i].Width)
       {
-        this->Root->Cells[i]->Width = preferredWidth;
+        this->Root->Cells[i].Width = preferredWidth;
       }
     }
 
@@ -3190,7 +3162,7 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
 
 int pqFlatTreeView::getWidthSum(pqFlatTreeViewItem* item, int column) const
 {
-  int total = item->Cells[column]->Width + this->DoubleTextMargin;
+  int total = item->Cells[column].Width + this->DoubleTextMargin;
   QModelIndex index = item->Index;
   if (column == 0)
   {
@@ -3227,9 +3199,9 @@ bool pqFlatTreeView::updateContentsWidth()
       {
         oldWidth = this->HeaderView->sectionSize(i);
         newWidth = this->HeaderView->sectionSizeHint(i);
-        if (newWidth < this->Root->Cells[i]->Width)
+        if (newWidth < this->Root->Cells[i].Width)
         {
-          newWidth = this->Root->Cells[i]->Width;
+          newWidth = this->Root->Cells[i].Width;
         }
 
         if (newWidth != oldWidth)
@@ -3292,13 +3264,11 @@ void pqFlatTreeView::addChildItems(pqFlatTreeViewItem* item, int parentChildCoun
         if (index.isValid())
         {
           child = new pqFlatTreeViewItem();
-          if (child)
-          {
-            child->Parent = item;
-            child->Index = index;
-            item->Items.append(child);
-            this->addChildItems(child, count);
-          }
+          child->Parent = item;
+          child->Index = index;
+          child->ensureCells(this->Root->Cells.size());
+          item->Items.append(child);
+          this->addChildItems(child, count);
         }
       }
     }
