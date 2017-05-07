@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MultiBlockInspectorWidget</class>
+ <widget class="QWidget" name="MultiBlockInspectorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Multi-block Inspector</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="pqTreeView" name="treeView">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="uniformRowHeights">
+      <bool>true</bool>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="showHints">
+       <property name="toolTip">
+        <string>Show/Hide legend</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqHelp32.png</normaloff>:/pqWidgets/Icons/pqHelp32.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Color Legend:&lt;/span&gt;&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/no_color.png&quot;/&gt; - using coloring parameters from display&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/inherited_color.png&quot;/&gt; - color is inherited from a parent node or color map&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/explicit_color.png&quot;/&gt; - color explicitly specified for this node&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Opacity Legend:&lt;/span&gt;&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/no_opacity.png&quot;/&gt; - using opacity parameters from display&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/inherited_opacity.png&quot;/&gt; - opacity is inherited from a parent node&lt;br/&gt;&lt;img src=&quot;:/pqWidgets/Icons/explicit_opacity.png&quot;/&gt; - opacity explicity specified for this node&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTreeView</class>
+   <extends>QTreeView</extends>
+   <header>pqTreeView.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>showHints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>431</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>239</x>
+     <y>541</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

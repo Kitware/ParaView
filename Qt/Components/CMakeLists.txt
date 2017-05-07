@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set (Module_SRCS
-
   pqAboutDialog.cxx
   pqAboutDialog.h
   pqActionGroupInterface.cxx
@@ -160,6 +159,8 @@ set (Module_SRCS
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.cxx
   pqMultiBlockInspectorPanel.h
+  pqMultiBlockInspectorWidget.cxx
+  pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqOrbitCreatorDialog.cxx
@@ -366,6 +367,7 @@ set (Module_MOC_HDRS
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.h
+  pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.h
   pqOrbitCreatorDialog.h
   pqOutputPortComboBox.h
@@ -464,6 +466,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
+  Resources/UI/pqMultiBlockInspectorWidget.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui
