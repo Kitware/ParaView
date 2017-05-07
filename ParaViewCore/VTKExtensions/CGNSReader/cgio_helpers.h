@@ -74,6 +74,57 @@ inline int readNodeData(int cgioNum, double nodeId, std::vector<T>& data)
 }
 
 //------------------------------------------------------------------------------
+/*
+ * Converts data read from the file using native type to the type specified
+ * as the template argument. Just uses static_cast to do type conversion.
+ */
+template <typename T>
+inline int readNodeDataAs(int cgioNum, double nodeId, std::vector<T>& data)
+{
+  // let's get type in file.
+  char dtype[CGIO_MAX_DATATYPE_LENGTH + 1];
+  if (cgio_get_data_type(cgioNum, nodeId, dtype) != CG_OK)
+  {
+    cgio_error_exit("cgio_get_data_type");
+    return 1;
+  }
+
+  if (strcmp(dtype, "I4") == 0)
+  {
+    std::vector<vtkTypeInt32> i32vector;
+    readNodeData<vtkTypeInt32>(cgioNum, nodeId, i32vector);
+    data.resize(i32vector.size());
+    std::copy(i32vector.begin(), i32vector.end(), data.begin());
+  }
+  else if (strcmp(dtype, "I8") == 0)
+  {
+    std::vector<vtkTypeInt64> i64vector;
+    readNodeData<vtkTypeInt64>(cgioNum, nodeId, i64vector);
+    data.resize(i64vector.size());
+    std::copy(i64vector.begin(), i64vector.end(), data.begin());
+  }
+  else if (strcmp(dtype, "R4") == 0)
+  {
+    std::vector<float> fvector;
+    readNodeData<float>(cgioNum, nodeId, fvector);
+    data.resize(fvector.size());
+    std::copy(fvector.begin(), fvector.end(), data.begin());
+  }
+  else if (strcmp(dtype, "R8") == 0)
+  {
+    std::vector<double> dvector;
+    readNodeData<double>(cgioNum, nodeId, dvector);
+    data.resize(dvector.size());
+    std::copy(dvector.begin(), dvector.end(), data.begin());
+  }
+  else
+  {
+    return 1;
+  }
+  return CG_OK;
+}
+
+//------------------------------------------------------------------------------
 // Specialize char array
 template <>
 int readNodeData<char>(int cgioNum, double nodeId, std::vector<char>& data);
@@ -107,5 +158,11 @@ int readBaseReferenceState(int cgioNum, double nodeId, CGNSRead::BaseInformation
 
 //------------------------------------------------------------------------------
 int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
+
+//------------------------------------------------------------------------------
+/**
+ * release all ids in the vector.
+ */
+void releaseIds(int cgioNum, const std::vector<double>& ids);
 }
 #endif // cgio_helpers_h

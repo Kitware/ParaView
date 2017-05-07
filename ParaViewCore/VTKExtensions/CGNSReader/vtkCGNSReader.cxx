@@ -24,6 +24,7 @@
 #include "vtkDataArraySelection.h"
 #include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
+#include "vtkExtractGrid.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
@@ -54,6 +55,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string.h>
 #include <string>
 #include <vector>
@@ -89,6 +91,151 @@ public:
   cgsize_t range[2];
   int bound;
   cgsize_t eDataSize;
+};
+
+//------------------------------------------------------------------------------
+/**
+ *
+ * let's throw this for CGNS read errors. This is currently only used by
+ * BCInformation.
+ */
+class CGIOError : public std::runtime_error
+{
+public:
+  CGIOError(const std::string& what_arg)
+    : std::runtime_error(what_arg)
+  {
+  }
+};
+
+class CGIOUnsupported : public std::runtime_error
+{
+public:
+  CGIOUnsupported(const std::string& what_arg)
+    : std::runtime_error(what_arg)
+  {
+  }
+};
+
+#define CGIOErrorSafe(x)                                                                           \
+  if (x != CG_OK)                                                                                  \
+  {                                                                                                \
+    char message[81];                                                                              \
+    cgio_error_message(message);                                                                   \
+    throw CGIOError(message);                                                                      \
+  }
+
+//------------------------------------------------------------------------------
+/**
+ * Class to encapsulate information provided by a BC_t node.
+ * Currently, this is only use for the Structured I/O code.
+ */
+class BCInformation
+{
+public:
+  char Name[CGIO_MAX_NAME_LENGTH + 1];
+  std::string FamilyName;
+  CGNS_ENUMT(GridLocation_t) Location;
+  std::vector<vtkTypeInt64> PointRange;
+
+  /**
+   * Reads info from a BC_t node to initialize the instance.
+   *
+   * @param[in] cgioNum Database identifier.
+   * @param[in] nodeId Node identifier. Must point to a BC_t node.
+   */
+  BCInformation(int cgioNum, double nodeId)
+  {
+    CGIOErrorSafe(cgio_get_name(cgioNum, nodeId, this->Name));
+
+    char dtype[CGIO_MAX_DATATYPE_LENGTH + 1];
+    CGIOErrorSafe(cgio_get_data_type(cgioNum, nodeId, dtype));
+    dtype[CGIO_MAX_DATATYPE_LENGTH] = 0;
+    if (strcmp(dtype, "C1") != 0)
+    {
+      throw CGIOError("Invalid data type for `BC_t` node.");
+    }
+
+    std::string bctype;
+    CGNSRead::readNodeStringData(cgioNum, nodeId, bctype);
+    if (bctype != "FamilySpecified")
+    {
+      throw CGIOUnsupported(
+        std::string("BC_t type '") + bctype + std::string("' not supported yet."));
+    }
+
+    std::vector<double> childrenIds;
+    CGNSRead::getNodeChildrenId(cgioNum, nodeId, childrenIds);
+
+    for (auto iter = childrenIds.begin(); iter != childrenIds.end(); ++iter)
+    {
+      char nodeName[CGIO_MAX_NAME_LENGTH + 1];
+      char nodeLabel[CGIO_MAX_LABEL_LENGTH + 1];
+      CGIOErrorSafe(cgio_get_name(cgioNum, *iter, nodeName));
+      CGIOErrorSafe(cgio_get_label(cgioNum, *iter, nodeLabel));
+      if (strcmp(nodeName, "PointList") == 0)
+      {
+        throw CGIOUnsupported("'PointList' BC is not supported.");
+      }
+      else if (strcmp(nodeName, "PointRange") == 0)
+      {
+        CGNSRead::readNodeDataAs<vtkTypeInt64>(cgioNum, *iter, this->PointRange);
+      }
+      else if (strcmp(nodeLabel, "FamilyName_t") == 0)
+      {
+        CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+      }
+      else if (strcmp(nodeLabel, "GridLocation_t") == 0)
+      {
+        std::string location;
+        CGNSRead::readNodeStringData(cgioNum, *iter, location);
+        if (location == "Vertex")
+        {
+          this->Location = CGNS_ENUMV(Vertex);
+        }
+        else if (location == "CellCenter")
+        {
+          this->Location = CGNS_ENUMV(CellCenter);
+        }
+        else
+        {
+          throw CGIOUnsupported("Unsupported location" + location);
+        }
+      }
+    }
+    CGNSRead::releaseIds(cgioNum, childrenIds);
+  }
+
+  ~BCInformation() {}
+
+  // Create a new dataset that represents the patch for the given zone.
+  vtkSmartPointer<vtkDataSet> CreateDataSet(int cellDim, vtkStructuredGrid* zoneGrid)
+  {
+    int zoneExts[6], origExts[6];
+    zoneGrid->GetExtent(zoneExts);
+    zoneGrid->GetExtent(origExts);
+
+    vtkNew<vtkExtractGrid> extractVOI;
+    for (int cc = 0; cc < cellDim; ++cc)
+    {
+      zoneExts[2 * cc] = this->PointRange[cc] - 1;
+      zoneExts[2 * cc + 1] = this->PointRange[cc + cellDim] - 1;
+      if (this->Location == CGNS_ENUMV(CellCenter))
+      {
+        // convert to pt extents since vtkExtractGrid is given pt-exts to
+        // extract.
+        zoneExts[2 * cc + 1] = std::min(origExts[2 * cc + 1], zoneExts[2 * cc + 1] + 1);
+      }
+    }
+    extractVOI->SetInputDataObject(zoneGrid);
+    extractVOI->SetVOI(zoneExts);
+    extractVOI->Update();
+    return vtkSmartPointer<vtkDataSet>(extractVOI->GetOutput(0));
+  }
+
+private:
+  BCInformation(const BCInformation&) VTK_DELETE_FUNCTION;
+  BCInformation& operator=(const BCInformation&) VTK_DELETE_FUNCTION;
 };
 }
 
@@ -140,6 +287,15 @@ public:
     index = (index >= num_timesteps) ? (num_timesteps - 1) : index;
     assert(index >= 0 && index < num_timesteps);
     return index;
+  }
+
+  static void AddIsPatchArray(vtkDataSet* ds, bool is_patch)
+  {
+    vtkNew<vtkIntArray> iarray;
+    iarray->SetNumberOfTuples(1);
+    iarray->SetValue(0, is_patch ? 1 : 0);
+    iarray->SetName("ispatch");
+    ds->GetFieldData()->AddArray(iarray.Get());
   }
 };
 
@@ -1045,6 +1201,76 @@ int vtkCGNSReader::GetCurvilinearZone(
     mbase->SetBlock(zone, sgrid.Get());
   }
   points->Delete();
+
+  //----------------------------------------------------------------------------
+  // Handle boundary conditions (BC) patches
+  //----------------------------------------------------------------------------
+  if (this->LoadBndPatch && !this->CreateEachSolutionAsBlock)
+  {
+    vtkSmartPointer<vtkStructuredGrid> zoneGrid =
+      vtkStructuredGrid::SafeDownCast(mbase->GetBlock(zone));
+    assert(zoneGrid);
+    vtkPrivate::AddIsPatchArray(zoneGrid, false);
+
+    vtkNew<vtkMultiBlockDataSet> newZoneMB;
+    newZoneMB->SetBlock(0, zoneGrid);
+    newZoneMB->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Internal");
+
+    vtkNew<vtkMultiBlockDataSet> patchesMB;
+    newZoneMB->SetBlock(1, patchesMB.Get());
+    newZoneMB->GetMetaData(1)->Set(vtkCompositeDataSet::NAME(), "Patches");
+
+    std::vector<double> zoneChildren;
+    CGNSRead::getNodeChildrenId(this->cgioNum, this->currentId, zoneChildren);
+    for (auto iter = zoneChildren.begin(); iter != zoneChildren.end(); ++iter)
+    {
+      CGNSRead::char_33 nodeLabel;
+      cgio_get_label(cgioNum, (*iter), nodeLabel);
+      if (strcmp(nodeLabel, "ZoneBC_t") != 0)
+      {
+        continue;
+      }
+
+      const double zoneBCId = (*iter);
+
+      // iterate over all children and read supported BC_t nodes.
+      std::vector<double> zoneBCChildren;
+      CGNSRead::getNodeChildrenId(this->cgioNum, zoneBCId, zoneBCChildren);
+      for (auto bciter = zoneBCChildren.begin(); bciter != zoneBCChildren.end(); ++bciter)
+      {
+        char label[CGIO_MAX_LABEL_LENGTH + 1];
+        cgio_get_label(this->cgioNum, *bciter, label);
+        if (strcmp(label, "BC_t") == 0)
+        {
+          try
+          {
+            BCInformation binfo(this->cgioNum, *bciter);
+
+            const unsigned int idx = patchesMB->GetNumberOfBlocks();
+            vtkSmartPointer<vtkDataSet> ds = binfo.CreateDataSet(cellDim, zoneGrid);
+            vtkPrivate::AddIsPatchArray(ds, true);
+            patchesMB->SetBlock(idx, ds);
+            patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.FamilyName.c_str());
+          }
+          catch (const CGIOUnsupported& ue)
+          {
+            vtkWarningMacro("Skipping BC_t node: " << ue.what());
+          }
+          catch (const CGIOError& e)
+          {
+            vtkErrorMacro("Failed to read BC_t node: " << e.what());
+          }
+        }
+      }
+    }
+    CGNSRead::releaseIds(this->cgioNum, zoneChildren);
+    zoneChildren.clear();
+
+    if (newZoneMB->GetNumberOfBlocks() > 1)
+    {
+      mbase->SetBlock(zone, newZoneMB.Get());
+    }
+  }
   return 0;
 }
 
@@ -1732,12 +1958,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   // Read patch boundary Sections
   //--------------------------------------------------
   // Iterate over bnd sections.
-  vtkIntArray* ugrid_id_arr = vtkIntArray::New();
-  ugrid_id_arr->SetNumberOfTuples(1);
-  ugrid_id_arr->SetValue(0, 0);
-  ugrid_id_arr->SetName("ispatch");
-  ugrid->GetFieldData()->AddArray(ugrid_id_arr);
-  ugrid_id_arr->Delete();
+  vtkPrivate::AddIsPatchArray(ugrid, false);
 
   if (bndSec.size() > 0 && requiredPatch)
   {
@@ -1929,12 +2150,7 @@ int vtkCGNSReader::GetUnstructuredZone(
       //
       // Add ispatch 0=false/1=true as field data
       //
-      vtkIntArray* bnd_id_arr = vtkIntArray::New();
-      bnd_id_arr->SetNumberOfTuples(1);
-      bnd_id_arr->SetValue(0, 1);
-      bnd_id_arr->SetName("ispatch");
-      bndugrid->GetFieldData()->AddArray(bnd_id_arr);
-      bnd_id_arr->Delete();
+      vtkPrivate::AddIsPatchArray(bndugrid, true);
 
       // Handle Ref Values
       vtkPrivate::AttachReferenceValue(base, bndugrid, this);

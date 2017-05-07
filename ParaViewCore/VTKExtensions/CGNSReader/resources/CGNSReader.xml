@@ -104,7 +104,7 @@
                          number_of_elements="1"
                          animateable="0"
                          default_values="0"
-                         label="Load Boundary Elements (Unstructured Grid)"
+                         label="Load Boundary Elements"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>

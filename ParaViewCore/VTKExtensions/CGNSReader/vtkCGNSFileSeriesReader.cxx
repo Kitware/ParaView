@@ -288,160 +288,132 @@ void vtkCGNSFileSeriesReader::ChooseActiveFile(int index)
 
 namespace
 {
+
 /**
  * This helps me sync up the multiblock structure across ranks.
  * This is a little hard-coded to the output of CGNS reader. It may be worthwhile to
  * generalize this to a filter and then simply use that.
  */
-struct vtkCGNSData
+struct ANode
 {
-  typedef std::vector<vtkSmartPointer<vtkDataSet> > DatasetsVector;
-  typedef std::map<std::string, DatasetsVector> ZonesMap;
-  typedef std::map<std::string, ZonesMap> BasesMap;
-
-  BasesMap Bases;
-
-  bool Add(vtkMultiBlockDataSet* mb)
+  std::map<std::string, ANode*> Children;
+  std::vector<vtkSmartPointer<vtkDataSet> > Datasets;
+  ANode() {}
+  ~ANode()
   {
-    vtksys::RegularExpression zoneNameRe("^(.*)_proc-([0-9]+)$");
-    for (unsigned int base = 0, maxbase = mb->GetNumberOfBlocks(); base < maxbase; ++base)
+    for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
     {
-      vtkMultiBlockDataSet* baseMB = vtkMultiBlockDataSet::SafeDownCast(mb->GetBlock(base));
-      const char* baseName = mb->GetMetaData(base)->Get(vtkCompositeDataSet::NAME());
-      ZonesMap& zones = Bases[baseName];
-
-      for (unsigned int zone = 0, maxzone = baseMB->GetNumberOfBlocks(); zone < maxzone; ++zone)
-      {
-        vtkDataSet* zoneDS = vtkDataSet::SafeDownCast(baseMB->GetBlock(zone));
-        if (!zoneDS)
-        {
-          continue;
-        } // raise error.
-
-        std::string zoneName = baseMB->GetMetaData(zone)->Get(vtkCompositeDataSet::NAME());
-        int piece = -1;
-        if (zoneNameRe.find(zoneName))
-        {
-          piece = atoi(zoneNameRe.match(2).c_str());
-          zoneName = zoneNameRe.match(1);
-        }
-
-        DatasetsVector& datasets = zones[zoneName];
-        if (piece >= 0 && static_cast<int>(datasets.size()) <= piece)
-        {
-          datasets.resize(piece + 1);
-        }
-        if (piece >= 0)
-        {
-          if (datasets[piece] != NULL)
-          {
-            vtkGenericWarningMacro(
-              "There may be a mismatch in the block names in partitioned CGNS file. "
-              "Blocks may get overwritten.");
-          }
-          datasets[piece] = zoneDS;
-        }
-        else
-        {
-          datasets.push_back(zoneDS);
-        }
-      }
+      delete iter->second;
     }
-    return true;
   }
 
-  bool Get(vtkMultiBlockDataSet* mb)
+  void Add(vtkMultiBlockDataSet* mb)
   {
-    unsigned int baseBlockId = 0;
-    for (auto baseIter = this->Bases.begin(); baseIter != this->Bases.end();
-         ++baseIter, ++baseBlockId)
+    vtksys::RegularExpression nameRe("^(.*)_proc-([0-9]+)$");
+    for (unsigned int cc = 0, max = mb->GetNumberOfBlocks(); cc < max; ++cc)
     {
-      vtkNew<vtkMultiBlockDataSet> blockMB;
-      blockMB->SetNumberOfBlocks(static_cast<unsigned int>(baseIter->second.size()));
-
-      mb->SetBlock(baseBlockId, blockMB.Get());
-      mb->GetMetaData(baseBlockId)->Set(vtkCompositeDataSet::NAME(), baseIter->first.c_str());
-
-      unsigned int zoneBlockId = 0;
-      for (auto zoneIter = baseIter->second.begin(); zoneIter != baseIter->second.end();
-           ++zoneIter, ++zoneBlockId)
+      std::string name = mb->GetMetaData(cc)->Get(vtkCompositeDataSet::NAME());
+      if (nameRe.find(name))
       {
-        blockMB->GetMetaData(zoneBlockId)
-          ->Set(vtkCompositeDataSet::NAME(), zoneIter->first.c_str());
-        if (zoneIter->second.size() > 1)
-        {
-          vtkNew<vtkMultiPieceDataSet> zoneMB;
-          blockMB->SetBlock(zoneBlockId, zoneMB.Get());
+        name = nameRe.match(1);
+      }
 
-          unsigned int dsBlockId = 0;
-          for (auto dsIter = zoneIter->second.begin(); dsIter != zoneIter->second.end();
-               ++dsIter, ++dsBlockId)
-          {
-            zoneMB->SetPiece(dsBlockId, dsIter->GetPointer());
-          }
-        }
-        else if (zoneIter->second.size() == 1)
-        {
-          blockMB->SetBlock(zoneBlockId, zoneIter->second[0].GetPointer());
-        }
+      auto citer = this->Children.find(name);
+      if (citer == this->Children.end())
+      {
+        ANode* child = new ANode();
+        this->Children[name] = child;
+        child->Add(mb->GetBlock(cc));
+      }
+      else
+      {
+        citer->second->Add(mb->GetBlock(cc));
       }
     }
-    return true;
+  }
+
+  vtkSmartPointer<vtkDataObject> Get() const
+  {
+    if (this->Children.size() == 0)
+    {
+      if (this->Datasets.size() == 1)
+      {
+        return this->Datasets.front();
+      }
+      else if (this->Datasets.size() > 0)
+      {
+        vtkNew<vtkMultiPieceDataSet> mp;
+        mp->SetNumberOfPieces(static_cast<unsigned int>(this->Datasets.size()));
+        for (unsigned int cc = 0; cc < mp->GetNumberOfPieces(); ++cc)
+        {
+          mp->SetPiece(cc, this->Datasets[cc]);
+        }
+        return mp.Get();
+      }
+      return nullptr;
+    }
+    else
+    {
+      vtkNew<vtkMultiBlockDataSet> mb;
+      mb->SetNumberOfBlocks(static_cast<unsigned int>(this->Children.size()));
+      unsigned int blockNo = 0;
+      for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter, ++blockNo)
+      {
+        mb->SetBlock(blockNo, iter->second->Get());
+        mb->GetMetaData(blockNo)->Set(vtkCompositeDataSet::NAME(), iter->first.c_str());
+      }
+      return mb.Get();
+    }
   }
 
   bool SyncMetadata(vtkMultiProcessController* controller)
   {
-    // sync up base names among all ranks.
-    std::set<std::string> bnames;
-    for (auto biter = this->Bases.begin(); biter != this->Bases.end(); ++biter)
+    // note: this is not optimized to deep trees.
+    const unsigned int counts[2] = { static_cast<unsigned int>(this->Children.size()),
+      static_cast<unsigned int>(this->Datasets.size()) };
+    unsigned int max_counts[2];
+    controller->AllReduce(counts, max_counts, 2, vtkCommunicator::MAX_OP);
+    assert(max_counts[0] == 0 || max_counts[1] == 0);
+    if (max_counts[0] > 0)
     {
-      bnames.insert(biter->first);
-    }
-    this->AllReduce(bnames, controller);
-
-    // ensure this->Bases has base for all known base names.
-    for (auto bniter = bnames.begin(); bniter != bnames.end(); ++bniter)
-    {
-      this->Bases[*bniter];
-    }
-
-    // Now do the same for zones under each base.
-    for (auto biter = this->Bases.begin(); biter != this->Bases.end(); ++biter)
-    {
-      std::set<std::string> znames;
-      for (auto ziter = biter->second.begin(); ziter != biter->second.end(); ++ziter)
+      std::set<std::string> cnames;
+      for (auto citer = this->Children.begin(); citer != this->Children.end(); ++citer)
       {
-        znames.insert(ziter->first);
+        cnames.insert(citer->first);
       }
-      this->AllReduce(znames, controller);
-      for (auto zniter = znames.begin(); zniter != znames.end(); ++zniter)
+      this->AllReduce(cnames, controller);
+      for (auto cniter = cnames.begin(); cniter != cnames.end(); ++cniter)
       {
-        biter->second[*zniter];
+        const std::string& name = (*cniter);
+        if (this->Children.find(name) == this->Children.end())
+        {
+          this->Children[name] = new ANode();
+        }
       }
-    }
-
-    // Now sync number of datasets for each zone.
-    std::vector<int> dscounts;
-    for (auto biter = this->Bases.begin(); biter != this->Bases.end(); ++biter)
-    {
-      for (auto ziter = biter->second.begin(); ziter != biter->second.end(); ++ziter)
+      // Sync all children.
+      for (auto citer = this->Children.begin(); citer != this->Children.end(); ++citer)
       {
-        dscounts.push_back(static_cast<int>(ziter->second.size()));
+        citer->second->SyncMetadata(controller);
       }
     }
-    std::vector<int> maxcounts(dscounts.size());
-    controller->AllReduce(&dscounts[0], &maxcounts[0], static_cast<vtkIdType>(dscounts.size()),
-      vtkCommunicator::MAX_OP);
-
-    auto countsiter = maxcounts.begin();
-    for (auto biter = this->Bases.begin(); biter != this->Bases.end(); ++biter)
+    else if (max_counts[1] > 0)
     {
-      for (auto ziter = biter->second.begin(); ziter != biter->second.end(); ++ziter, ++countsiter)
-      {
-        ziter->second.resize(*countsiter);
-      }
+      this->Datasets.resize(max_counts[1]);
     }
     return true;
+  }
+
+private:
+  void Add(vtkDataObject* dobj)
+  {
+    if (vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(dobj))
+    {
+      this->Add(mb);
+    }
+    else
+    {
+      this->Datasets.push_back(vtkDataSet::SafeDownCast(dobj));
+    }
   }
 
   void AllReduce(std::set<std::string>& names, vtkMultiProcessController* controller)
@@ -485,7 +457,7 @@ int vtkCGNSFileSeriesReader::RequestData(
   }
 
   // iterate over all files in the active set and collect the data.
-  vtkCGNSData cgnsdata;
+  ANode hierarchy;
 
   int success = 1;
   for (size_t cc = 0, max = this->ActiveFiles.size(); cc < max; ++cc)
@@ -495,7 +467,7 @@ int vtkCGNSFileSeriesReader::RequestData(
     {
       vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
       assert(output);
-      cgnsdata.Add(output);
+      hierarchy.Add(output);
       output->Initialize();
     }
     else
@@ -519,10 +491,11 @@ int vtkCGNSFileSeriesReader::RequestData(
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
   {
     // Ensure all ranks have same meta-data about the number of bases and zones.
-    cgnsdata.SyncMetadata(this->Controller);
+    hierarchy.SyncMetadata(this->Controller);
   }
 
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
   output->Initialize();
-  return cgnsdata.Get(output) ? 1 : 0;
+  output->ShallowCopy(hierarchy.Get());
+  return 1;
 }
