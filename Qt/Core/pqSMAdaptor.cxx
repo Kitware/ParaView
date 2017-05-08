@@ -208,7 +208,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     {
       type = pqSMAdaptor::MULTIPLE_ELEMENTS;
     }
-    else if (!silDomain && ((VectorProperty && VectorProperty->GetRepeatCommand() &&
+    else if (!silDomain && ((VectorProperty && VectorProperty->GetRepeatable() &&
                              (stringListDomain || enumerationDomain))))
     {
       type = pqSMAdaptor::SELECTION;
@@ -220,7 +220,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     else
     {
       if (VectorProperty &&
-        (VectorProperty->GetNumberOfElements() > 1 || VectorProperty->GetRepeatCommand()))
+        (VectorProperty->GetNumberOfElements() > 1 || VectorProperty->GetRepeatable()))
       {
         type = pqSMAdaptor::MULTIPLE_ELEMENTS;
       }
@@ -788,7 +788,7 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
   }
   iter->Delete();
 
-  if (EnumerationDomain && VProperty->GetRepeatCommand())
+  if (EnumerationDomain && VProperty->GetRepeatable())
   {
     unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
     for (unsigned int i = 0; i < numEntries; i++)
@@ -796,7 +796,7 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
       ret.append(EnumerationDomain->GetEntryText(i));
     }
   }
-  else if (StringListDomain && VProperty->GetRepeatCommand())
+  else if (StringListDomain && VProperty->GetRepeatable())
   {
     unsigned int numEntries = StringListDomain->GetNumberOfStrings();
     for (unsigned int i = 0; i < numEntries; i++)
@@ -1673,7 +1673,7 @@ void pqSMAdaptor::setFileListProperty(
       elementCount = svp->GetNumberOfUncheckedElements();
     }
 
-    if (!svp->GetRepeatCommand() && i >= elementCount)
+    if (!svp->GetRepeatable() && i >= elementCount)
     {
       break;
     }
