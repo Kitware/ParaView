@@ -1541,38 +1541,40 @@ int vtkCGNSReader::GetUnstructuredZone(
     //
   }
   //
-  std::vector<vtkIdType> startArraySec(coreSec.size());
-  for (std::size_t sec = 0; sec < coreSec.size(); sec++)
+  // Detect type of zone elements definition
+  // By Elements --> quad, tri ... mixed
+  // Or by Face Connectivity --> NGON_n, NFACE_n
+  //
+  std::vector<int> ngonSec;
+  std::vector<int> nfaceSec;
+  bool hasNFace = false;
+  bool hasNGon = false;
+  bool hasElemDefinition = false;
+  for (int sec = 0; sec < nsections; ++sec)
   {
-    int curStart = startSec[sec];
-    vtkIdType curArrayStart = 0;
-    for (std::size_t lse = 0; lse < coreSec.size(); lse++)
+    if (sectionInfoList[sec].elemType == CGNS_ENUMV(NFACE_n))
     {
-      if (startSec[lse] < curStart)
-      {
-        curArrayStart += sizeSec[lse];
-      }
+      hasNFace = true;
+      nfaceSec.push_back(sec);
     }
-    startArraySec[sec] = curArrayStart;
+    else if (sectionInfoList[sec].elemType == CGNS_ENUMV(NGON_n))
+    {
+      hasNGon = true;
+      ngonSec.push_back(sec);
+    }
+    else
+    {
+      hasElemDefinition = true;
+    }
   }
-
-  // Create Cell Array
-  vtkNew<vtkCellArray> cells;
-  // Modification for memory reliability
-  vtkNew<vtkIdTypeArray> cellLocations;
-  cellLocations->SetNumberOfValues(elementCoreSize);
-  vtkIdType* elements = cellLocations->GetPointer(0);
-
-  if (elements == 0)
+  if (hasNFace && !hasNGon)
   {
-    vtkErrorMacro(<< "Could not allocate memory for connectivity\n");
+    vtkErrorMacro("NFace_n requires NGon_n definition");
     return 1;
   }
-
-  int* cellsTypes = new int[numCoreCells];
-  if (cellsTypes == 0)
+  if (hasElemDefinition && hasNGon)
   {
-    vtkErrorMacro(<< "Could not allocate memory for connectivity\n");
+    vtkErrorMacro("Mixed definition of unstructured zone by elements and by faces is not valid.");
     return 1;
   }
 
@@ -1581,345 +1583,454 @@ int vtkCGNSReader::GetUnstructuredZone(
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::New();
   ugrid->SetPoints(points);
 
-  bool buildGrid(true);
-  // Iterate over core sections.
-  for (std::vector<int>::iterator iter = coreSec.begin(); iter != coreSec.end(); ++iter)
+  //
+  if (hasNGon)
   {
-    size_t sec = *iter;
-    CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
-    cgsize_t start = 1, end = 1;
-    cgsize_t elementSize = 0;
-
-    start = sectionInfoList[sec].range[0];
-    end = sectionInfoList[sec].range[1];
-    elemType = sectionInfoList[sec].elemType;
-
-    elementSize = end - start + 1; // Interior Volume + Bnd
-
-    double cgioSectionId;
-    cgioSectionId = elemIdList[sec];
-
-    if (elemType != CGNS_ENUMV(MIXED) && elemType != CGNS_ENUMV(NFACE_n) &&
-      elemType != CGNS_ENUMV(NGON_n)) // MDvR: test for NFACE_n, NGON_n too
+    // READ NGON CONNECTIVITY
+    //
+    // Define start of Ngon Connectivity Array for each section
+    std::vector<vtkIdType> startArraySec(ngonSec.size());
+    std::vector<vtkIdType> startRangeSec(ngonSec.size());
+    std::size_t faceElementsSize = 0;
+    vtkIdType numFaces(0);
+    for (std::size_t sec = 0; sec < ngonSec.size(); sec++)
     {
-      // All cells are of the same type.
-      int numPointsPerCell = 0;
-      int cellType;
-      bool higherOrderWarning;
-      bool reOrderElements;
-      //
-      if (cg_npe(elemType, &numPointsPerCell) || numPointsPerCell == 0)
+      int curSec = ngonSec[sec];
+      int curStart = sectionInfoList[curSec].range[0] - 1;
+      numFaces += 1 + sectionInfoList[curSec].range[1] - sectionInfoList[curSec].range[0];
+      vtkIdType curArrayStart = 0;
+      vtkIdType curRangeStart = 0;
+      for (std::size_t lse = 0; lse < ngonSec.size(); lse++)
       {
-        vtkErrorMacro(<< "Invalid numPointsPerCell\n");
-      }
-
-      cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
-      //
-      for (vtkIdType i = start - 1; i < end; i++)
-      {
-        cellsTypes[i] = cellType;
-      }
-      //
-      cgsize_t eDataSize = 0;
-      cgsize_t EltsEnd = elementSize + start - 1;
-      eDataSize = sectionInfoList[sec].eDataSize;
-      vtkDebugMacro(<< "Element data size for sec " << sec << " is: " << eDataSize << "\n");
-
-      if (eDataSize != numPointsPerCell * elementSize)
-      {
-        vtkErrorMacro(<< "FATAL wrong elements dimensions\n");
-      }
-
-      // pointer on start !!
-      vtkIdType* localElements = &(elements[startArraySec[sec]]);
-
-      cgsize_t memDim[2];
-      cgsize_t npe = numPointsPerCell;
-      // How to handle per process reading for unstructured mesh
-      // + npe* ( wantedstartperprocess-start ) ; startoffset
-      srcStart[0] = 1;
-      srcStart[1] = 1;
-
-      srcEnd[0] = (EltsEnd - start + 1) * npe;
-      srcEnd[1] = 1;
-      srcStride[0] = 1;
-      srcStride[1] = 1;
-
-      memStart[0] = 2;
-      memStart[1] = 1;
-      memEnd[0] = npe + 1;
-      memEnd[1] = EltsEnd - start + 1;
-      memStride[0] = 1;
-      memStride[1] = 1;
-      memDim[0] = npe + 1;
-      memDim[1] = EltsEnd - start + 1;
-
-      memset(localElements, 1, sizeof(vtkIdType) * (npe + 1) * (EltsEnd - start + 1));
-
-      CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 2, srcStart, srcEnd,
-        srcStride, memStart, memEnd, memStride, memDim, localElements);
-
-      // Add numptspercell and do -1 on indexes
-      for (vtkIdType icell = 0; icell < elementSize; ++icell)
-      {
-        vtkIdType pos = icell * (numPointsPerCell + 1);
-        localElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
-        for (vtkIdType ip = 0; ip < numPointsPerCell; ++ip)
+        int lseSec = ngonSec[lse];
+        if (sectionInfoList[lseSec].range[0] - 1 < curStart)
         {
-          pos++;
-          localElements[pos] = localElements[pos] - 1;
+          curArrayStart += sectionInfoList[lseSec].eDataSize;
+          curRangeStart += sectionInfoList[lseSec].range[1] - sectionInfoList[lseSec].range[0] + 1;
         }
       }
-      if (reOrderElements == true)
-      {
-        CGNSRead::CGNS2VTKorderMonoElem(elementSize, cellType, localElements);
-      }
+      startArraySec[sec] = curArrayStart;
+      startRangeSec[sec] = curRangeStart;
+      faceElementsSize += sectionInfoList[curSec].eDataSize;
     }
-    else if (elemType == CGNS_ENUMV(MIXED))
+    //
+    std::vector<vtkIdType> faceElements;
+    faceElements.resize(faceElementsSize);
+    // Now load the faces that are in NGON_n format.
+    for (std::size_t sec = 0; sec < ngonSec.size(); sec++)
     {
-      //
-      int numPointsPerCell = 0;
-      int cellType;
-      bool higherOrderWarning;
-      bool reOrderElements;
-      // pointer on start !!
-      vtkIdType* localElements = &(elements[startArraySec[sec]]);
-
-      cgsize_t eDataSize = 0;
-      eDataSize = sectionInfoList[sec].eDataSize;
-
-      cgsize_t memDim[2];
-
-      srcStart[0] = 1;
-      srcEnd[0] = eDataSize;
-      srcStride[0] = 1;
-
-      memStart[0] = 1;
-      memStart[1] = 1;
-      memEnd[0] = eDataSize;
-      memEnd[1] = 1;
-      memStride[0] = 1;
-      memStride[1] = 1;
-      memDim[0] = eDataSize;
-      memDim[1] = 1;
-
-      CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
-        srcStride, memStart, memEnd, memStride, memDim, localElements);
-
-      vtkIdType pos = 0;
-      reOrderElements = false;
-      for (vtkIdType icell = 0, i = start - 1; icell < elementSize; ++icell, ++i)
-      {
-        bool orderFlag;
-        elemType = static_cast<CGNS_ENUMT(ElementType_t)>(localElements[pos]);
-        cg_npe(elemType, &numPointsPerCell);
-        cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, orderFlag);
-        reOrderElements = reOrderElements | orderFlag;
-        cellsTypes[i] = cellType;
-        localElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
-        pos++;
-        for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
-        {
-          localElements[ip + pos] = localElements[ip + pos] - 1;
-        }
-        pos += numPointsPerCell;
-      }
-
-      if (reOrderElements == true)
-      {
-        CGNSRead::CGNS2VTKorder(elementSize, &cellsTypes[start - 1], localElements);
-      }
-    }
-    else if (elemType == CGNS_ENUMV(NFACE_n))
-    {
-      buildGrid = false;
-
-      // the faces are in NGON_n format, and are in another section - or multiple sections!
-      std::vector<vtkIdType> faceElements;
-      vtkIdType numFaces(0);
       cgsize_t fDataSize(0);
-      for (size_t osec = 0, n = 0; osec < sectionInfoList.size(); ++osec)
-      {
-        // the documentation specifies that the faces of NFACE_n are always in NGON_n
-        // format, so look for another section that has that element type.
-        if (osec == sec)
-          continue; // skip self
-        if (sectionInfoList[osec].elemType == CGNS_ENUMV(NGON_n))
-        {
-          fDataSize = sectionInfoList[osec].eDataSize;
-          // resize to fit the next batch of element connectivity values
-          faceElements.resize(faceElements.size() + fDataSize);
 
-          numFaces = 1 + sectionInfoList[osec].range[1] - sectionInfoList[osec].range[0];
+      std::size_t osec = ngonSec[sec];
+      fDataSize = sectionInfoList[osec].eDataSize;
+      vtkIdType* localFaceElements = &(faceElements[startArraySec[sec]]);
 
-          cgsize_t memDim[2];
-
-          srcStart[0] = 1;
-          srcEnd[0] = fDataSize;
-          srcStride[0] = 1;
-
-          memStart[0] = 1;
-          memStart[1] = 1;
-          memEnd[0] = fDataSize;
-          memEnd[1] = 1;
-          memStride[0] = 1;
-          memStride[1] = 1;
-          memDim[0] = fDataSize;
-          memDim[1] = 1;
-
-          if (0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[osec], 1, srcStart,
-                     srcEnd, srcStride, memStart, memEnd, memStride, memDim, &faceElements[n]))
-          {
-            vtkErrorMacro(<< "FAILED to read NGON_n cells\n");
-            return 1;
-          }
-
-          n += fDataSize; // points to next index
-        }
-      }
-
-      vtkNew<vtkIdTypeArray> cellArray;
-      cgsize_t eDataSize(0);
-      eDataSize = sectionInfoList[sec].eDataSize;
-
-      cellArray->SetNumberOfValues(eDataSize);
-      vtkIdType* cellElements = cellArray->GetPointer(0);
       cgsize_t memDim[2];
 
       srcStart[0] = 1;
-      srcEnd[0] = eDataSize;
+      srcEnd[0] = fDataSize;
       srcStride[0] = 1;
 
       memStart[0] = 1;
       memStart[1] = 1;
-      memEnd[0] = eDataSize;
+      memEnd[0] = fDataSize;
       memEnd[1] = 1;
       memStride[0] = 1;
       memStride[1] = 1;
-      memDim[0] = eDataSize;
+      memDim[0] = fDataSize;
       memDim[1] = 1;
 
-      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
-                 srcStride, memStart, memEnd, memStride, memDim, cellElements))
-      {
-        vtkErrorMacro(<< "FAILED to read NFACE_n cells\n");
-        return 1;
-      }
-
-      // ok, now we have the face-to-node connectivity array and the cell-to-face connectivity
-      // array.
-      // VTK, however, has no concept of faces, and uses cell-to-node connectivity, so the
-      // intermediate faces
-      // need to be taken out of the description.
-
-      std::vector<vtkIdType> faceNodeLookupTable(numFaces);
-
-      vtkIdType p(0);
-      for (vtkIdType nf = 0; nf < numFaces; ++nf)
-      {
-        faceNodeLookupTable[nf] = p;
-        p += 1 + faceElements[p];
-      }
-
-      p = 0;
-      for (vtkIdType nc = 0; nc < numCoreCells; ++nc)
-      {
-        int numCellFaces = cellElements[p];
-
-        vtkNew<vtkIdList> faces;
-        faces->InsertNextId(numCellFaces);
-
-        for (vtkIdType nf = 0; nf < numCellFaces; ++nf)
-        {
-          vtkIdType faceId = cellElements[p + nf + 1];
-          bool mustReverse = faceId > 0;
-          faceId = std::abs(faceId);
-
-          // the following is needed because when the NGON_n face data preceeds the
-          // NFACE_n cell data, the indices are continuous, so a "global-to-local" mapping must be
-          // done.
-          faceId -= sectionInfoList[sec].range[1];
-          faceId -= 1; // CGNS uses FORTRAN ID style, starting at 1
-
-          vtkIdType q = faceNodeLookupTable[faceId];
-          vtkIdType numNodes = faceElements[q];
-          faces->InsertNextId(numNodes);
-          if (mustReverse)
-          {
-            for (vtkIdType nn = numNodes - 1; nn >= 0; --nn)
-            {
-              vtkIdType nodeID = faceElements[q + nn + 1] - 1; // AGAIN subtract 1 from node ID
-              faces->InsertNextId(nodeID);
-            }
-          }
-          else
-          {
-            for (vtkIdType nn = 0; nn < numNodes; ++nn)
-            {
-              vtkIdType nodeID = faceElements[q + nn + 1] - 1; // AGAIN subtract 1 from node ID
-              faces->InsertNextId(nodeID);
-            }
-          }
-        }
-        ugrid->InsertNextCell(VTK_POLYHEDRON, faces.GetPointer());
-        p += 1 + numCellFaces; // p now points to the index of the next cell
-      }
-    }
-    else if (elemType == CGNS_ENUMV(NGON_n))
-    {
-      buildGrid = false;
-      vtkNew<vtkIdTypeArray> ngonFaceArray;
-      cgsize_t eDataSize = 0;
-      eDataSize = sectionInfoList[sec].eDataSize;
-
-      ngonFaceArray->SetNumberOfValues(eDataSize);
-      vtkIdType* localElements = ngonFaceArray->GetPointer(0);
-      cgsize_t memDim[2];
-
-      srcStart[0] = 1;
-      srcEnd[0] = eDataSize;
-      srcStride[0] = 1;
-
-      memStart[0] = 1;
-      memStart[1] = 1;
-      memEnd[0] = eDataSize;
-      memEnd[1] = 1;
-      memStride[0] = 1;
-      memStride[1] = 1;
-      memDim[0] = eDataSize;
-      memDim[1] = 1;
-
-      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
-                 srcStride, memStart, memEnd, memStride, memDim, localElements))
+      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[osec], 1, srcStart,
+                 srcEnd, srcStride, memStart, memEnd, memStride, memDim, localFaceElements))
       {
         vtkErrorMacro(<< "FAILED to read NGON_n cells\n");
         return 1;
       }
+    }
+    // Loading Done
+    //
+    // Prepare for CGNS future CPEX change
+    // Store in two separated arrays face connectivities ...
+    // faceElementsIdx is a LookupTable to faceElementsArr
+    // this will allow better scaling in the near future
+    std::vector<vtkIdType> faceElementsIdx;
+    std::vector<vtkIdType> faceElementsArr;
 
-      vtkIdType numFaces = 1 + sectionInfoList[sec].range[1] - sectionInfoList[sec].range[0];
-      int p(0);
+    faceElementsIdx.resize(numFaces + 1);
+    faceElementsArr.resize(faceElementsSize - numFaces);
+
+    vtkIdType curFace = 0;
+    vtkIdType curNodeInFace = 0;
+
+    faceElementsIdx[0] = 0;
+
+    for (vtkIdType idxFace = 0; idxFace < static_cast<vtkIdType>(faceElementsIdx.size() - 1);
+         ++idxFace)
+    {
+      vtkIdType nVertexOnCurFace = faceElements[curFace];
+
+      faceElementsIdx[idxFace + 1] = faceElementsIdx[idxFace] + nVertexOnCurFace;
+
+      for (vtkIdType idxVertex = 0; idxVertex < nVertexOnCurFace; idxVertex++)
+      {
+        faceElementsArr[curNodeInFace] = faceElements[curFace + idxVertex + 1];
+        curNodeInFace++;
+      }
+      curFace += nVertexOnCurFace + 1;
+    }
+    // free faceElements since we are now working with two separated arrays
+    faceElements.clear();
+    //
+    // Now take care of NFACE_n properly
+    //
+    // In case of unordered section :
+    std::vector<vtkIdType> startNFaceArraySec(nfaceSec.size());
+    std::size_t cellElementsSize = 0;
+    vtkIdType numCells(0);
+    for (std::size_t sec = 0; sec < nfaceSec.size(); sec++)
+    {
+      int curSec = nfaceSec[sec];
+      int curStart = sectionInfoList[curSec].range[0] - 1;
+      numCells += 1 + sectionInfoList[curSec].range[1] - sectionInfoList[curSec].range[0];
+      vtkIdType curNFaceArrayStart = 0;
+      for (std::size_t lse = 0; lse < nfaceSec.size(); lse++)
+      {
+        int lseSec = nfaceSec[lse];
+        if (sectionInfoList[lseSec].range[0] - 1 < curStart)
+        {
+          curNFaceArrayStart += sectionInfoList[lseSec].eDataSize;
+        }
+      }
+      startNFaceArraySec[sec] = curNFaceArrayStart;
+      cellElementsSize += sectionInfoList[curSec].eDataSize;
+    }
+    std::vector<vtkIdType> cellElements;
+    cellElements.resize(cellElementsSize);
+    if (hasNFace && numCells < zsize[1])
+    {
+      vtkErrorMacro(<< "number of NFACE_n cells is not coherent with Zone_t declaration \n");
+      return 1;
+    }
+    // Load NFace_n connectivities
+    for (std::size_t sec = 0; sec < nfaceSec.size(); sec++)
+    {
+      cgsize_t eDataSize(0);
+      std::size_t osec = nfaceSec[sec];
+      double cgioSectionId;
+      cgioSectionId = elemIdList[osec];
+      eDataSize = sectionInfoList[osec].eDataSize;
+
+      vtkIdType* localCellElements = &(cellElements[startNFaceArraySec[sec]]);
+      cgsize_t memDim[2];
+
+      srcStart[0] = 1;
+      srcEnd[0] = eDataSize;
+      srcStride[0] = 1;
+
+      memStart[0] = 1;
+      memStart[1] = 1;
+      memEnd[0] = eDataSize;
+      memEnd[1] = 1;
+      memStride[0] = 1;
+      memStride[1] = 1;
+      memDim[0] = eDataSize;
+      memDim[1] = 1;
+
+      if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
+                 srcStride, memStart, memEnd, memStride, memDim, localCellElements))
+      {
+        vtkErrorMacro(<< "FAILED to read NFACE_n cells\n");
+        return 1;
+      }
+      cgio_release_id(this->cgioNum, cgioSectionId);
+    }
+
+    // ok, now we have the face-to-node connectivity array and the cell-to-face connectivity
+    // array.
+    // VTK, however, has no concept of faces, and uses cell-to-node connectivity, so the
+    // intermediate faces
+    // need to be taken out of the description.
+
+    // Will be improved when new CPEX comes out
+
+    vtkIdType curCell = 0;
+    for (vtkIdType nc = 0; nc < numCells; nc++)
+    {
+      int numCellFaces = cellElements[curCell];
+      vtkNew<vtkIdList> faces;
+      faces->InsertNextId(numCellFaces);
+      for (vtkIdType nf = 0; nf < numCellFaces; ++nf)
+      {
+        vtkIdType faceId = cellElements[curCell + nf + 1];
+        bool mustReverse = faceId > 0;
+        faceId = std::abs(faceId);
+
+        // the following is needed because when the NGON_n face data do not preceeds the
+        // NFACE_n cell data, the indices are continuous, so a "global-to-local" mapping must be
+        // done.
+        for (std::size_t sec = 0; sec < ngonSec.size(); sec++)
+        {
+          int curSec = ngonSec[sec];
+          //
+          if (faceId <= sectionInfoList[curSec].range[1] &&
+            faceId >= sectionInfoList[curSec].range[0])
+          {
+            faceId = faceId - sectionInfoList[curSec].range[0] + 1 + startRangeSec[sec];
+            break;
+          }
+        }
+        faceId -= 1; // CGNS uses FORTRAN ID style, starting at 1
+
+        vtkIdType startNode = faceElementsIdx[faceId];
+        vtkIdType endNode = faceElementsIdx[faceId + 1];
+        vtkIdType numNodes = endNode - startNode;
+        faces->InsertNextId(numNodes);
+        /* Each face is composed of multiple vertex */
+        if (mustReverse)
+        {
+          for (vtkIdType nn = numNodes - 1; nn >= 0; --nn)
+          {
+            vtkIdType nodeID = faceElementsArr[startNode + nn] - 1; // AGAIN subtract 1 from node ID
+
+            faces->InsertNextId(nodeID);
+          }
+        }
+        else
+        {
+          for (vtkIdType nn = 0; nn < numNodes; ++nn)
+          {
+            vtkIdType nodeID = faceElementsArr[startNode + nn] - 1; // AGAIN subtract 1 from node ID
+            faces->InsertNextId(nodeID);
+          }
+        }
+      }
+      ugrid->InsertNextCell(VTK_POLYHEDRON, faces.GetPointer());
+      curCell += numCellFaces + 1;
+    }
+
+    // If NGon_n but no NFace_n load POLYGONS
+    if (!hasNFace)
+    {
+
       for (vtkIdType nf = 0; nf < numFaces; ++nf)
       {
-        vtkIdType numNodes = localElements[p];
+
+        vtkIdType startNode = faceElementsIdx[nf];
+        vtkIdType endNode = faceElementsIdx[nf + 1];
+        vtkIdType numNodes = endNode - startNode;
         vtkNew<vtkIdList> nodes;
         // nodes->InsertNextId(numNodes);
         for (vtkIdType nn = 0; nn < numNodes; ++nn)
         {
-          vtkIdType nodeId = localElements[p + nn + 1];
-          nodeId -= 1; // FORTRAN to C-style indexing
-          nodes->InsertNextId(nodeId);
+          vtkIdType nodeID = faceElementsArr[startNode + nn] - 1;
+          nodes->InsertNextId(nodeID);
         }
         ugrid->InsertNextCell(VTK_POLYGON, nodes.GetPointer());
-        p += 1 + numNodes;
       }
     }
-
-    cgio_release_id(this->cgioNum, cgioSectionId);
   }
+  else
+  {
+    // READ ELEMENT CONNECTIVITY
+    //
+    std::vector<vtkIdType> startArraySec(coreSec.size());
+    for (std::size_t sec = 0; sec < coreSec.size(); sec++)
+    {
+      int curStart = startSec[sec];
+      vtkIdType curArrayStart = 0;
+      for (std::size_t lse = 0; lse < coreSec.size(); lse++)
+      {
+        if (startSec[lse] < curStart)
+        {
+          curArrayStart += sizeSec[lse];
+        }
+      }
+      startArraySec[sec] = curArrayStart;
+    }
 
-  if (buildGrid)
+    // Create Cell Array
+    vtkNew<vtkCellArray> cells;
+    // Modification for memory reliability
+    vtkNew<vtkIdTypeArray> cellLocations;
+    cellLocations->SetNumberOfValues(elementCoreSize);
+    vtkIdType* elements = cellLocations->GetPointer(0);
+
+    if (elements == 0)
+    {
+      vtkErrorMacro(<< "Could not allocate memory for connectivity\n");
+      return 1;
+    }
+
+    int* cellsTypes = new int[numCoreCells];
+    if (cellsTypes == 0)
+    {
+      vtkErrorMacro(<< "Could not allocate memory for connectivity\n");
+      return 1;
+    }
+
+    // Iterate over core sections.
+    for (std::vector<int>::iterator iter = coreSec.begin(); iter != coreSec.end(); ++iter)
+    {
+      size_t sec = *iter;
+      CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
+      cgsize_t start = 1, end = 1;
+      cgsize_t elementSize = 0;
+
+      start = sectionInfoList[sec].range[0];
+      end = sectionInfoList[sec].range[1];
+      elemType = sectionInfoList[sec].elemType;
+
+      elementSize = end - start + 1; // Interior Volume + Bnd
+
+      double cgioSectionId;
+      cgioSectionId = elemIdList[sec];
+
+      if (elemType != CGNS_ENUMV(MIXED))
+      {
+        // All cells are of the same type.
+        int numPointsPerCell = 0;
+        int cellType;
+        bool higherOrderWarning;
+        bool reOrderElements;
+        //
+        if (cg_npe(elemType, &numPointsPerCell) || numPointsPerCell == 0)
+        {
+          vtkErrorMacro(<< "Invalid numPointsPerCell\n");
+        }
+
+        cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
+        //
+        for (vtkIdType i = start - 1; i < end; i++)
+        {
+          cellsTypes[i] = cellType;
+        }
+        //
+        cgsize_t eDataSize = 0;
+        cgsize_t EltsEnd = elementSize + start - 1;
+        eDataSize = sectionInfoList[sec].eDataSize;
+        vtkDebugMacro(<< "Element data size for sec " << sec << " is: " << eDataSize << "\n");
+
+        if (eDataSize != numPointsPerCell * elementSize)
+        {
+          vtkErrorMacro(<< "FATAL wrong elements dimensions\n");
+        }
+
+        // pointer on start !!
+        vtkIdType* localElements = &(elements[startArraySec[sec]]);
+
+        cgsize_t memDim[2];
+        cgsize_t npe = numPointsPerCell;
+        // How to handle per process reading for unstructured mesh
+        // + npe* ( wantedstartperprocess-start ) ; startoffset
+        srcStart[0] = 1;
+        srcStart[1] = 1;
+
+        srcEnd[0] = (EltsEnd - start + 1) * npe;
+        srcEnd[1] = 1;
+        srcStride[0] = 1;
+        srcStride[1] = 1;
+
+        memStart[0] = 2;
+        memStart[1] = 1;
+        memEnd[0] = npe + 1;
+        memEnd[1] = EltsEnd - start + 1;
+        memStride[0] = 1;
+        memStride[1] = 1;
+        memDim[0] = npe + 1;
+        memDim[1] = EltsEnd - start + 1;
+
+        memset(localElements, 1, sizeof(vtkIdType) * (npe + 1) * (EltsEnd - start + 1));
+
+        CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 2, srcStart, srcEnd,
+          srcStride, memStart, memEnd, memStride, memDim, localElements);
+
+        // Add numptspercell and do -1 on indexes
+        for (vtkIdType icell = 0; icell < elementSize; ++icell)
+        {
+          vtkIdType pos = icell * (numPointsPerCell + 1);
+          localElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
+          for (vtkIdType ip = 0; ip < numPointsPerCell; ++ip)
+          {
+            pos++;
+            localElements[pos] = localElements[pos] - 1;
+          }
+        }
+        if (reOrderElements == true)
+        {
+          CGNSRead::CGNS2VTKorderMonoElem(elementSize, cellType, localElements);
+        }
+      }
+      else if (elemType == CGNS_ENUMV(MIXED))
+      {
+        //
+        int numPointsPerCell = 0;
+        int cellType;
+        bool higherOrderWarning;
+        bool reOrderElements;
+        // pointer on start !!
+        vtkIdType* localElements = &(elements[startArraySec[sec]]);
+
+        cgsize_t eDataSize = 0;
+        eDataSize = sectionInfoList[sec].eDataSize;
+
+        cgsize_t memDim[2];
+
+        srcStart[0] = 1;
+        srcEnd[0] = eDataSize;
+        srcStride[0] = 1;
+
+        memStart[0] = 1;
+        memStart[1] = 1;
+        memEnd[0] = eDataSize;
+        memEnd[1] = 1;
+        memStride[0] = 1;
+        memStride[1] = 1;
+        memDim[0] = eDataSize;
+        memDim[1] = 1;
+
+        CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
+          srcStride, memStart, memEnd, memStride, memDim, localElements);
+
+        vtkIdType pos = 0;
+        reOrderElements = false;
+        for (vtkIdType icell = 0, i = start - 1; icell < elementSize; ++icell, ++i)
+        {
+          bool orderFlag;
+          elemType = static_cast<CGNS_ENUMT(ElementType_t)>(localElements[pos]);
+          cg_npe(elemType, &numPointsPerCell);
+          cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, orderFlag);
+          reOrderElements = reOrderElements | orderFlag;
+          cellsTypes[i] = cellType;
+          localElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
+          pos++;
+          for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
+          {
+            localElements[ip + pos] = localElements[ip + pos] - 1;
+          }
+          pos += numPointsPerCell;
+        }
+
+        if (reOrderElements == true)
+        {
+          CGNSRead::CGNS2VTKorder(elementSize, &cellsTypes[start - 1], localElements);
+        }
+      }
+      else
+      {
+        vtkErrorMacro(<< "Unsupported element Type\n");
+        return 1;
+      }
+
+      cgio_release_id(this->cgioNum, cgioSectionId);
+    }
+
     cells->SetCells(numCoreCells, cellLocations.GetPointer());
 
+    ugrid->SetCells(cellsTypes, cells.GetPointer());
+
+    delete[] cellsTypes;
+  }
+  //
   //
   bool requiredPatch = (this->LoadBndPatch != 0);
   // SetUp zone Blocks
@@ -1933,11 +2044,6 @@ int vtkCGNSReader::GetUnstructuredZone(
     mzone->SetNumberOfBlocks(1);
   }
   mzone->GetMetaData((unsigned int)0)->Set(vtkCompositeDataSet::NAME(), "Internal");
-
-  if (buildGrid)
-    ugrid->SetCells(cellsTypes, cells.GetPointer());
-
-  delete[] cellsTypes;
 
   //----------------------------------------------------------------------------
   // Handle solutions
@@ -2009,8 +2115,9 @@ int vtkCGNSReader::GetUnstructuredZone(
 
       double cgioSectionId;
       cgioSectionId = elemIdList[sec];
-
-      if (elemType != CGNS_ENUMV(MIXED))
+      //
+      if (elemType != CGNS_ENUMV(MIXED) && elemType != CGNS_ENUMV(NGON_n) &&
+        elemType != CGNS_ENUMV(NFACE_n))
       {
         // All cells are of the same type.
         int numPointsPerCell = 0;
