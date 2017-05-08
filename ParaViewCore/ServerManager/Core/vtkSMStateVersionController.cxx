@@ -569,19 +569,6 @@ struct Process_5_1_to_5_4
       element_node.set_name("Element");
       element_node.append_attribute("index").set_value("0");
       element_node.append_attribute("value").set_value("0");
-      pugi::xml_node domain_node = location_node.append_child();
-      domain_node.set_name("Domain");
-      domain_node.append_attribute("name").set_value("enum");
-      domain_node.append_attribute("id").set_value((id_string + ".WindowLocation.enum").c_str());
-      std::string entry_buffer("<Entry value=\"0\" text=\"Any Location\"/>"
-                               "<Entry value=\"1\" text=\"Lower Left Corner\"/>"
-                               "<Entry value=\"2\" text=\"Lower Right Corner\"/>"
-                               "<Entry value=\"3\" text=\"Lower Center\"/>"
-                               "<Entry value=\"4\" text=\"Upper Left Corner\"/>"
-                               "<Entry value=\"5\" text=\"Upper Right Corner\"/>"
-                               "<Entry value=\"6\" text=\"Upper Center\"/>");
-      domain_node.append_buffer(entry_buffer.c_str(), entry_buffer.size());
-      location_node.print(std::cout);
 
       //--------------------------
       // Handle Position2 property
