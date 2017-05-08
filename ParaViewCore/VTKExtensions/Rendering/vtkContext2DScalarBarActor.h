@@ -76,7 +76,7 @@ public:
    * orientation is VTK_ORIENT_HORIZONTAL, this sets the scalar bar
    * height. Specified in points akin to font size.
    */
-  vtkSetMacro(ScalarBarThickness, int);
+  vtkSetClampMacro(ScalarBarThickness, int, 0, VTK_INT_MAX);
   vtkGetMacro(ScalarBarThickness, int);
   //@}
 
@@ -89,7 +89,7 @@ public:
    * of the viewport's width or height in the range [0, 1], depending on
    * orientation.
    */
-  vtkSetMacro(ScalarBarLength, double);
+  vtkSetClampMacro(ScalarBarLength, double, 0, 1);
   vtkGetMacro(ScalarBarLength, double);
   //@}
 

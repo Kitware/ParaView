@@ -113,8 +113,8 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
 
   this->TitleJustification = VTK_TEXT_LEFT;
 
-  this->ScalarBarThickness = 20;
-  this->ScalarBarLength = 100;
+  this->ScalarBarThickness = 16;
+  this->ScalarBarLength = 0.33;
 
   this->AutomaticLabelFormat = 1;
 
