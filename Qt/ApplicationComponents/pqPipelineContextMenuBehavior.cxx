@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqEditColorMapReaction.h"
-#include "pqMultiBlockInspectorPanel.h"
 #include "pqPVApplicationCore.h"
 #include "pqPipelineRepresentation.h"
 #include "pqRenderView.h"
@@ -95,22 +95,6 @@ QPair<int, QString> convert(const QVariant& val)
     result.second = list[1];
   }
   return result;
-}
-
-pqMultiBlockInspectorPanel* getMultiBlockInspectorPanel()
-{
-  // get multi-block inspector panel
-  pqMultiBlockInspectorPanel* panel = 0;
-  foreach (QWidget* widget, qApp->topLevelWidgets())
-  {
-    panel = widget->findChild<pqMultiBlockInspectorPanel*>();
-
-    if (panel)
-    {
-      break;
-    }
-  }
-  return panel;
 }
 }
 
@@ -570,9 +554,8 @@ void pqPipelineContextMenuBehavior::setBlockColor()
     return;
   }
 
-  pqMultiBlockInspectorPanel* panel = getMultiBlockInspectorPanel();
-  QColor qcolor = QColorDialog::getColor(
-    QColor(), panel, "Choose Block Color", QColorDialog::DontUseNativeDialog);
+  QColor qcolor = QColorDialog::getColor(QColor(), pqCoreUtilities::mainWidget(),
+    "Choose Block Color", QColorDialog::DontUseNativeDialog);
 
   vtkSMProxy* proxy = this->PickedRepresentation->getProxy();
   vtkSMProperty* property = proxy->GetProperty("BlockColor");
@@ -655,8 +638,7 @@ void pqPipelineContextMenuBehavior::setBlockOpacity()
       current_opacity = dmp->GetElement(this->PickedBlocks[0]);
     }
 
-    pqMultiBlockInspectorPanel* panel = getMultiBlockInspectorPanel();
-    pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, panel);
+    pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, pqCoreUtilities::mainWidget());
     dialog.setValue(current_opacity);
     bool ok = dialog.exec();
     if (!ok)
