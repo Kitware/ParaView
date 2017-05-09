@@ -12857,7 +12857,9 @@ int cdiGetFiletype(const char *filename, int *byteorder)
   int filetype = CDI_EUFTYPE;
   int swap = 0;
   int version;
+#if defined (HAVE_LIBCGRIBEX)
   long recpos;
+#endif
   char buffer[8];
 
   int fileID = fileOpen(filename, "r");
@@ -22162,7 +22164,9 @@ int cdfDefVar(stream_t *streamptr, int varID)
   size_t iax = 0;
   char axis[5];
   int ensID, ensCount, forecast_type;
+#if defined (HAVE_NETCDF4)
   int retval;
+#endif
 
   int fileID = streamptr->fileID;
 
