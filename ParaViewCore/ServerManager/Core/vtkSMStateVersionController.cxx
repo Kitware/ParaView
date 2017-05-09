@@ -17,6 +17,7 @@
 // Don't include vtkAxis. Cannot add dependency on vtkChartsCore in
 // vtkPVServerManagerCore.
 // #include "vtkAxis.h"
+#include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -528,6 +529,79 @@ struct Process_4_2_to_5_1
   }
 };
 
+//===========================================================================
+struct Process_5_1_to_5_4
+{
+  bool operator()(xml_document& document) { return ScalarBarLengthToPosition2(document); }
+
+  // Read scalar bar Position2 property and set it as the ScalarBarLength
+  bool ScalarBarLengthToPosition2(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='representations' and "
+                            "@type='ScalarBarWidgetRepresentation']");
+
+    double position2[2];
+
+    // Note: Each property is from a different ScalarBarWidgetRepresentation.
+    for (pugi::xpath_node_set::const_iterator iter = proxy_nodes.begin(); iter != proxy_nodes.end();
+         ++iter)
+    {
+      pugi::xml_node proxy_node = iter->node();
+      std::string id_string(proxy_node.attribute("id").value());
+
+      //--------------------------
+      // Handle Position property
+      // We don't change the Position property here as its purpose remains the
+      // same (determining the lower left position of the scalar bar). However,
+      // we do change the "Window Location" property from the default
+      // "Lower Right" to "Any Location" so that the scalar bar will appear
+      // approximately where it was. It is a new property, so we need to
+      // add an XML node.
+      pugi::xml_node location_node = proxy_node.append_child();
+      location_node.set_name("Property");
+      location_node.append_attribute("name").set_value("WindowLocation");
+      location_node.append_attribute("id").set_value((id_string + ".WindowLocation").c_str());
+      location_node.append_attribute("number_of_elements").set_value("1");
+      pugi::xml_node element_node = location_node.append_child();
+      element_node.set_name("Element");
+      element_node.append_attribute("index").set_value("0");
+      element_node.append_attribute("value").set_value("0");
+
+      //--------------------------
+      // Handle Position2 property
+      pugi::xml_node pos2_node =
+        proxy_node.find_child_by_attribute("Property", "name", "Position2");
+
+      // Change the 'name' attribute
+      pos2_node.attribute("name").set_value("ScalarBarLength");
+
+      // Change the 'id' attribute to be safe.
+      pos2_node.attribute("id").set_value((id_string + ".ScalarBarLength").c_str());
+
+      // Should be just two Element nodes
+      pugi::xml_node first_element = pos2_node.child("Element");
+      position2[0] = first_element.attribute("value").as_double();
+      position2[1] = first_element.next_sibling("Element").attribute("value").as_double();
+
+      // Assume the length is the largest element and ensure its value is the
+      // first Element
+      double length = vtkMath::Max(position2[0], position2[1]);
+      first_element.attribute("value").set_value(length);
+
+      // Position2 had two elements, ScalarBarLength has 1, so delete the
+      // second one.
+      pos2_node.remove_child(first_element.next_sibling());
+
+      // Fix up the 'id' attribute in the Domain node
+      first_element.next_sibling().attribute("id").set_value(
+        (id_string + ".ScalarBarLength").c_str());
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -606,6 +680,12 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
   {
     status = Process_4_2_to_5_1()(document);
     version = vtkSMVersion(5, 1, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 4, 0)))
+  {
+    status = Process_5_1_to_5_4()(document);
+    version = vtkSMVersion(5, 4, 0);
   }
 
   if (status)

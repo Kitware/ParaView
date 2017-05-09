@@ -21,6 +21,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkScalarBarActor.h"
 #include "vtkScalarBarRepresentation.h"
 #include "vtkTuple.h"
 
@@ -78,6 +79,15 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     return;
   }
   tapp->AddProxy(this->ActorProxy);
+
+  // Initialize the scalar bar widget from the ScalarBarLength property.
+  this->ScalarBarLengthToScalarBarWidgetPosition2();
+
+  // Add observer on the ScalarBarLength property to convert its value to
+  // Position2 of the widget.
+  this->GetProperty("ScalarBarLength")
+    ->AddObserver(vtkCommand::ModifiedEvent, this,
+      &vtkSMScalarBarWidgetRepresentationProxy::ScalarBarLengthToScalarBarWidgetPosition2);
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +128,8 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     // user interacted. lock the position.
     vtkSMPropertyHelper(this, "LockPosition").Set(1);
     vtkSMPropertyHelper(this, "WindowLocation").Set(0);
+
+    this->ScalarBarWidgetPosition2ToScalarBarLength();
   }
 
   this->Superclass::ExecuteEvent(event);
@@ -257,4 +269,38 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
   // otherwise just leave the positions unchanged.
   this->UpdateVTKObjects();
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::ScalarBarWidgetPosition2ToScalarBarLength()
+{
+  vtkScalarBarRepresentation* repr =
+    vtkScalarBarRepresentation::SafeDownCast(this->RepresentationProxy->GetClientSideObject());
+  if (!repr)
+  {
+    return;
+  }
+
+  int index = repr->GetOrientation() == VTK_ORIENT_HORIZONTAL ? 0 : 1;
+  double length = repr->GetPosition2Coordinate()->GetValue()[index];
+  vtkSMPropertyHelper(this, "ScalarBarLength").Set(length);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::ScalarBarLengthToScalarBarWidgetPosition2()
+{
+  // Set the scalar bar representation length from the ScalarBarlLength property
+  vtkScalarBarRepresentation* repr =
+    vtkScalarBarRepresentation::SafeDownCast(this->RepresentationProxy->GetClientSideObject());
+  if (!repr)
+  {
+    return;
+  }
+
+  int index = repr->GetOrientation() == VTK_ORIENT_HORIZONTAL ? 0 : 1;
+  double length = vtkSMPropertyHelper(this, "ScalarBarLength").GetAsDouble();
+  double pos2[3];
+  repr->GetPosition2Coordinate()->GetValue(pos2);
+  pos2[index] = length;
+  repr->SetPosition2(pos2);
 }

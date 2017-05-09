@@ -93,6 +93,13 @@ private:
   void EndTrackingPropertiesForTrace();
   //@}
 
+  /**
+   * Synchronizes Position2 length definition of the scalar bar widget with the
+   * ScalarBarLength property.
+   */
+  void ScalarBarWidgetPosition2ToScalarBarLength();
+  void ScalarBarLengthToScalarBarWidgetPosition2();
+
   // Used in StartTrackingPropertiesForTrace/EndTrackingPropertiesForTrace.
   vtkSMTrace::TraceItem* TraceItem;
 

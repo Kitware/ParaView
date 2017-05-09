@@ -76,8 +76,21 @@ public:
    * orientation is VTK_ORIENT_HORIZONTAL, this sets the scalar bar
    * height. Specified in points akin to font size.
    */
-  vtkSetMacro(ScalarBarThickness, int);
+  vtkSetClampMacro(ScalarBarThickness, int, 0, VTK_INT_MAX);
   vtkGetMacro(ScalarBarThickness, int);
+  //@}
+
+  //@{
+  /**
+   * Set the scalar bar length. When the orientation is VTK_ORIENT_VERTICAL,
+   * this sets the scalar bar height. When the orientation is
+   * VTK_ORIENT_HORIZONTAL, this sets the scalar bar width. Specified in
+   * normalized viewport coordinates, meaning the value is the fractional span
+   * of the viewport's width or height in the range [0, 1], depending on
+   * orientation.
+   */
+  vtkSetClampMacro(ScalarBarLength, double, 0, 1);
+  vtkGetMacro(ScalarBarLength, double);
   //@}
 
   //@{
@@ -197,9 +210,14 @@ private:
   int TitleJustification;
 
   /**
-   * Thickness of the color bar in points.
+   * Thickness of the color bar.
    */
   int ScalarBarThickness;
+
+  /**
+  * Length of the color bar.
+  */
+  double ScalarBarLength;
 
   int AutomaticLabelFormat;
 
