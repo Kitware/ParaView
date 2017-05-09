@@ -541,8 +541,6 @@ struct Process_5_1_to_5_4
       document.select_nodes("//ServerManagerState/Proxy[@group='representations' and "
                             "@type='ScalarBarWidgetRepresentation']");
 
-    // Get scalar bar orientation
-    bool horizontal = true;
     double position2[2];
 
     // Note: Each property is from a different ScalarBarWidgetRepresentation.
