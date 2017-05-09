@@ -44,14 +44,6 @@ public:
   int GetTimeStep() VTK_OVERRIDE;
   //@}
 
-  //@{
-  /**
-   * Get the range of index values valid for the TimestepAsIndex
-   * setting.
-   */
-  vtkGetVector2Macro(TimeStepRange, int);
-  //@}
-
 protected:
   vtkPVDReader();
   ~vtkPVDReader();
@@ -63,9 +55,6 @@ protected:
 
   // Set TimeStepRange
   virtual void SetupOutputInformation(vtkInformation* outInfo) VTK_OVERRIDE;
-
-  // Save the range of valid timestep index values.
-  int TimeStepRange[2];
 
 private:
   vtkPVDReader(const vtkPVDReader&) VTK_DELETE_FUNCTION;
