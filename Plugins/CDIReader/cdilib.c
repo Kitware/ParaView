@@ -22643,25 +22643,6 @@ void cdfEndDef(stream_t *streamptr)
     }
 }
 
-static
-void cdfWriteGridTraj(stream_t *streamptr, int gridID)
-{
-  int vlistID = streamptr->vlistID;
-  int fileID = streamptr->fileID;
-
-  int gridindex = vlistGridIndex(vlistID, gridID);
-  int lonID = streamptr->xdimID[gridindex];
-  int latID = streamptr->ydimID[gridindex];
-
-  double xlon = gridInqXval(gridID, 0);
-  double xlat = gridInqYval(gridID, 0);
-  int tsID = streamptr->curTsID;
-  size_t index = (size_t)tsID;
-
-  cdf_put_var1_double(fileID, lonID, &index, &xlon);
-  cdf_put_var1_double(fileID, latID, &index, &xlat);
-}
-
 #endif
 #if defined (HAVE_CONFIG_H)
 #endif
@@ -24168,7 +24149,6 @@ typedef struct
 PAR;
 
 
-static void tableLink(int tableID, const PAR *pars, int npars);
 int tableDef(int modelID, int tablegribID, const char *tablename);
 
 #endif
@@ -24241,22 +24221,6 @@ void tableDefEntry(int tableID, int id, const char *name,
       parTable[tableID].pars[item].units = strdupx(units);
       parTable[tableID].pars[item].dupflags |= TABLE_DUP_UNITS;
     }
-}
-
-static void tableLink(int tableID, const PAR *pars, int npars)
-{
-  int item;
-
-  for ( item = 0; item < npars; item++ )
-    {
-      parTable[tableID].pars[item].id = pars[item].id;
-      parTable[tableID].pars[item].dupflags = 0;
-      parTable[tableID].pars[item].name = pars[item].name;
-      parTable[tableID].pars[item].longname = pars[item].longname;
-      parTable[tableID].pars[item].units = pars[item].units;
-    }
-
-  parTable[tableID].npars = npars;
 }
 
 static void parTableInitEntry(int tableID)
@@ -28520,90 +28484,6 @@ struct vgzSearchState
   int lbounds;
   const double *levels;
 };
-
-static enum cdiApplyRet
-vgzZAxisSearch(int id, void *res, void *data)
-{
-  struct vgzSearchState *state = (struct vgzSearchState *)data;
-  (void)res;
-  if (zaxisCompare(id, state->zaxistype, state->nlevels, state->lbounds,
-                   state->levels, NULL, NULL, 0)
-      == 0)
-    {
-      state->resIDValue = id;
-      return CDI_APPLY_STOP;
-    }
-  else
-    return CDI_APPLY_GO_ON;
-}
-
-
-static
-int vlist_generate_zaxis(int vlistID, int zaxistype, int nlevels, const double *levels,
-                         const double *lbounds, const double *ubounds, int vctsize, const double *vct)
-{
-  int zaxisID = CDI_UNDEFID;
-  int zaxisglobdefined = 0;
-  int has_bounds = FALSE;
-  vlist_t *vlistptr = vlist_to_pointer(vlistID);
-  int zaxisdefined = 0;
-  int nzaxis = vlistptr->nzaxis;
-
-  if ( lbounds && ubounds ) has_bounds = TRUE;
-
-  for ( int index = 0; index < nzaxis; ++index )
-    {
-      zaxisID = vlistptr->zaxisIDs[index];
-
-      if ( zaxisCompare(zaxisID, zaxistype, nlevels, has_bounds, levels, NULL, NULL, 0) == 0 )
-        {
-          zaxisdefined = 1;
-          break;
-        }
-    }
-
-  if ( ! zaxisdefined )
-    {
-      struct vgzSearchState query;
-      query.zaxistype = zaxistype;
-      query.nlevels = nlevels;
-      query.levels = levels;
-      query.lbounds = has_bounds;
-
-      if ((zaxisglobdefined
-           = (cdiResHFilterApply(getZaxisOps(), vgzZAxisSearch, &query)
-              == CDI_APPLY_STOP)))
-        zaxisID = query.resIDValue;
-    }
-
-  if ( ! zaxisdefined )
-    {
-      if ( ! zaxisglobdefined )
-        {
-          zaxisID = zaxisCreate(zaxistype, nlevels);
-          zaxisDefLevels(zaxisID, levels);
-          if ( has_bounds )
-            {
-              zaxisDefLbounds(zaxisID, lbounds);
-              zaxisDefUbounds(zaxisID, ubounds);
-            }
-
-          if ( zaxistype == ZAXIS_HYBRID )
-            {
-              if ( vctsize > 0 )
-                zaxisDefVct(zaxisID, vctsize, vct);
-              else
-                Warning("VCT missing");
-            }
-        }
-
-      nzaxis = vlistptr->nzaxis;
-      vlistptr->zaxisIDs[nzaxis] = zaxisID;
-      vlistptr->nzaxis++;
-    }
-
-  return (zaxisID);
-}
 
 int vlistNvars(int vlistID)
 {
