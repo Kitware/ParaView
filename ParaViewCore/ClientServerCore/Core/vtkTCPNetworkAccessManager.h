@@ -51,13 +51,13 @@ public:
    * Returns the new connection instance on success, otherwise NULL.
 
    * URLs are of the following form:
-   * <transport>://<address>
-   * * tcp://<hostname>:<port>
-   * * tcp://localhost:<port>?listen=true& -- listen for connection on port.
-   * * tcp://localhost:<port>?listen=true&multiple=true -- listen for multiple
+   * \c \<transport\>://\<address\>
+   * * \c tcp://<hostname\>:\<port\>
+   * * \c tcp://localhost:\<port\>?listen=true& -- listen for connection on port.
+   * * \c tcp://localhost:\<port\>?listen=true&multiple=true -- listen for multiple
    * Examples:
-   * * tcp://medea:12345
-   * * tcp://localhost:12345?listen&handshake=3.8.12
+   * * \c tcp://medea:12345
+   * * \c tcp://localhost:12345?listen&handshake=3.8.12
    * Supported parameters:
    * handshake :- specify a message that is matched with the other side
    * listen    :- open a server-socket for a client to connect to

@@ -58,8 +58,8 @@ class pqServerConfiguration;
 * \li \c cdsrs - for client-data-server-render-server connections (pvdataserver, pvrenderserver)
 * \li \c cdsrsrc - for cdsrs with reverse-connect.
 *
-* \c server-details are of the form <serverhost-name>:<port> or
-* <dataserver-hostname>:<dataserver-port>/<renderserver-hostname>:<render-server-port>
+* \c server-details are of the form \c \<serverhost-name\>:\<port\> or
+* \c \<dataserver-hostname\>:\<dataserver-port\>/\<renderserver-hostname\>:\<render-server-port\>
 * as applicable. Port numbers are always optional.
 *
 * Examples:

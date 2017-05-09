@@ -46,14 +46,14 @@ public:
 
   /**
    * Triggers a high-resolution render.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void InteractiveRender() VTK_OVERRIDE;
 
@@ -86,7 +86,7 @@ public:
   /**
    * Initialize the view with an identifier. Unless noted otherwise, this method
    * must be called before calling any other methods on this class.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void Initialize(unsigned int id) VTK_OVERRIDE;
 

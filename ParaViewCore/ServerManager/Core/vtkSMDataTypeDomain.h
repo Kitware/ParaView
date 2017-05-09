@@ -17,7 +17,7 @@
  * @brief   restricts the input proxies to one or more data types
  *
  * vtkSMDataTypeDomain restricts the input proxies to one or more data types.
- * These data types are specified in the XML with the <DataType> element.
+ * These data types are specified in the XML with the \c \<DataType\> element.
  * VTK class names are used. It is possible to specify a superclass
  * (i.e. vtkDataSet) for a more general domain. Works with vtkSMSourceProxy
  * only. Valid XML elements are:

@@ -122,12 +122,12 @@ public:
   pqServerConfiguration clone() const;
 
   /**
-  * returns the <Options> element, if any.
+  * returns the \<Options\> element, if any.
   */
   vtkPVXMLElement* optionsXML() const;
 
   /**
-  * returns the <Hints> element, if any.
+  * returns the \<Hints\> element, if any.
   */
   vtkPVXMLElement* hintsXML() const;
 

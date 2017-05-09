@@ -22,10 +22,14 @@
  * the volume of each particle from the volume fraction.
  *
  * This will turn on validation and debug i/o of the filter.
- *#define vtkMaterialInterfaceFilterDEBUG
+ * \code{.cpp}
+ * #define vtkMaterialInterfaceFilterDEBUG
+ * \endcode
  *
  * This will turn on profiling of how long each part of the filter takes
- *#define vtkMaterialInterfaceFilterPROFILE
+ * \code{.cpp}
+ * #define vtkMaterialInterfaceFilterPROFILE
+ * \endcode
 */
 
 #ifndef vtkMaterialInterfaceFilter_h

@@ -35,7 +35,7 @@ public:
   //@{
   /**
    * Track timesteps provided by a source. If \c suppress_input is true, before
-   * adding the proxy, if the \r proxy has producers those will be removed from
+   * adding the proxy, if the \c proxy has producers those will be removed from
    * the time sources i.e. we'll ignore timesteps from the input.
    */
   virtual bool AddTimeSource(vtkSMProxy* proxy, bool suppress_input);

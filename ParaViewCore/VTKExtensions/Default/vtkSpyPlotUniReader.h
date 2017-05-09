@@ -62,7 +62,7 @@ public:
 
   /**
    * Reads the basic information from the file such as the header, number
-   * of fields, etc..
+   * of fields, etc.
    */
   virtual int ReadInformation();
 

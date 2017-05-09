@@ -77,7 +77,8 @@ public:
    * Enable/disable scalar coloring using the specified array. This will set up a
    * color and opacity transfer functions using vtkSMTransferFunctionProxy
    * instance. If arrayname is NULL, then scalar coloring is turned off.
-   * \c attribute_type must be one of vtkDataObject::AttributeTypes.
+   * \param arrayname the name of the array.
+   * \param attribute_type must be one of vtkDataObject::AttributeTypes.
    * \param component enables choosing a component to color with,
    * -1 will change to Magnitude, >=0 will change to corresponding component.
    */
@@ -125,12 +126,13 @@ public:
   /**
    * Rescales the color transfer function and opacity transfer function using the
    * current data range for the chosen data-array. Returns true if rescale was
-   * successful. \c field_association must be one of
-   * vtkDataObject::AttributeTypes.
+   * successful.
    * If \c extend is true (false by default), the transfer function range will
    * only be extended as needed to fit the data range.
    * If \c force is false (true by default), then the transfer function range is
    * not changed if locked.
+   * @param arrayname the name of the array.
+   * @param attribute_type must be one of vtkDataObject::AttributeTypes.
    * @param[in] extend Extend existing range instead of clamping to the new
    * range (default: false).
    * @param[in] force Update transfer function even if the range is locked

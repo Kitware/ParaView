@@ -36,7 +36,7 @@ public:
   /**
    * Called before a state is loaded.
    * The argument must be the root element for the state being loaded.
-   * eg. for server manager state, it will point to <ServerManagerState />
+   * eg. for server manager state, it will point to \c \<ServerManagerState/\>
    * element.
    * Returns false if the conversion failed, else true.
    */

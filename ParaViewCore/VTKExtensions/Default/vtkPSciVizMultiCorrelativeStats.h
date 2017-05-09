@@ -33,10 +33,10 @@
  * The learned model output format is rather dense and can be confusing,
  * so it is discussed here.
  * The first filter output is a multiblock dataset consisting of 2 tables:
- * <ol>
- * <li> Raw covariance data.
- * <li> Covariance matrix and its Cholesky decomposition.
- * <ol>
+ *
+ * \li Raw covariance data.
+ * \li Covariance matrix and its Cholesky decomposition.
+ *
  * The raw covariance table has 3 meaningful columns: 2 titled "Column1"
  * and "Column2" whose entries generally refer to the N arrays you selected
  * when preparing the filter and 1 column titled "Entries" that contains

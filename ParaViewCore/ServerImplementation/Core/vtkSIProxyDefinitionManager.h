@@ -253,7 +253,7 @@ protected:
   /**
    * Helper method that add a ShowInMenu Hint for any proxy definition that lie
    * in a sources or filters group.
-   * @See method AttachShowInMenuHintsToProxy
+   * @see method AttachShowInMenuHintsToProxy
    */
   void AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root);
 

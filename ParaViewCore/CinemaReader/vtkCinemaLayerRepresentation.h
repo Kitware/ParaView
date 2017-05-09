@@ -29,7 +29,7 @@
  * the camera used when layer was generated is passed on to the
  * vtkCinemaLayerMapper which handles rendering the layers into the view.
  *
- * @warnings Currently vtkCinemaLayerRepresentation is designed for builtin mode
+ * @warning Currently vtkCinemaLayerRepresentation is designed for builtin mode
  * alone. It will need some additional work to support remote rendering.
  */
 

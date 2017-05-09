@@ -194,7 +194,7 @@ protected:
    * min( observations->GetNumberOfRows(), 100 ).
    * Thus, it will require the entire set of observations unless there are more than 100.
 
-   * @params[in] observations - a table containing the full number of available observations (in
+   * @param[in] observations - a table containing the full number of available observations (in
    this process).
    */
   virtual vtkIdType GetNumberOfObservationsForTraining(vtkTable* observations);

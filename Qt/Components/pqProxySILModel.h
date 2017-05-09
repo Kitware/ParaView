@@ -61,7 +61,7 @@ public:
   /**
   * \brief
   *   Gets the number of rows for a given index.
-  * \param parent The parent index.
+  * \param theParent The parent index.
   * \return
   *   The number of rows for the given index.
   */
@@ -73,7 +73,7 @@ public:
   /**
   * \brief
   *   Gets the number of columns for a given index.
-  * \param parent The parent index.
+  * \param theParent The parent index.
   * \return
   *   The number of columns for the given index.
   */
@@ -85,7 +85,7 @@ public:
   /**
   * \brief
   *   Gets whether or not the given index has child items.
-  * \param parent The parent index.
+  * \param theParent The parent index.
   * \return
   *   True if the given index has child items.
   */
@@ -99,7 +99,7 @@ public:
   *   Gets a model index for a given location.
   * \param row The row number.
   * \param column The column number.
-  * \param parent The parent index.
+  * \param theParent The parent index.
   * \return
   *   A model index for the given location.
   */
@@ -112,7 +112,7 @@ public:
   /**
   * \brief
   *   Gets the parent for a given index.
-  * \param index The model index.
+  * \param theIndex The model index.
   * \return
   *   A model index for the parent of the given index.
   */

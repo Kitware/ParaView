@@ -83,9 +83,9 @@ protected:
   //@}
 
   /**
-   * The rootElement must be the <ServerManagerState /> xml element.
-   * If rootElement is not a <ServerManagerState /> element, then we try to
-   * locate the first <ServerManagerState /> nested element and load that.
+   * The rootElement must be the \c \<ServerManagerState/\> xml element.
+   * If rootElement is not a \c \<ServerManagerState/\> element, then we try to
+   * locate the first \c \<ServerManagerState/\> nested element and load that.
    * Load the state from the given root element.
    */
   virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
