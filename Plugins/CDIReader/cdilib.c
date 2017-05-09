@@ -23471,7 +23471,7 @@ static const resOps subtypeOps = {
 };
 
 enum {
-  differ = 1,
+  atts_differ = 1,
 };
 static int attribute_to_index(const char *key)
 {
@@ -23554,19 +23554,19 @@ static int subtypeAttsCompare(struct subtype_attr_t *a1, struct subtype_attr_t *
     return 0;
   else if ((a1 == NULL) && (a2 != NULL))
     {
-      return differ;
+      return atts_differ;
     }
   else if ((a1 != NULL) && (a2 == NULL))
     {
-      return differ;
+      return atts_differ;
     }
 
   if (a1->key != a2->key)
     {
-      return differ;
+      return atts_differ;
     }
   if (a1->val != a2->val)
-    return differ;
+    return atts_differ;
 
   return subtypeAttsCompare(a1->next, a2->next);
 }
@@ -23708,18 +23708,18 @@ static void subtypePrintKernel(subtype_t *subtype_ptr, FILE *fp)
 static int subtypeCompareP(subtype_t *s1, subtype_t *s2)
 {
   xassert(s1 && s2);
-  if (s1->subtype != s2->subtype) return differ;
-  if (subtypeEntryCompare(&s1->globals, &s2->globals) != 0) return differ;
+  if (s1->subtype != s2->subtype) return atts_differ;
+  if (subtypeEntryCompare(&s1->globals, &s2->globals) != 0) return atts_differ;
 
   struct subtype_entry_t *entry1 = s1->entries;
   struct subtype_entry_t *entry2 = s2->entries;
   while ((entry1 != NULL) && (entry2 != NULL)) {
-    if (subtypeEntryCompare(entry1, entry2) != 0) return differ;
+    if (subtypeEntryCompare(entry1, entry2) != 0) return atts_differ;
     entry1 = entry1->next;
     entry2 = entry2->next;
   }
 
-  if ((entry1 != NULL) || (entry2 != NULL)) return differ;
+  if ((entry1 != NULL) || (entry2 != NULL)) return atts_differ;
   return 0;
 }
 
@@ -23929,13 +23929,13 @@ void tilesetInsertP(subtype_t *s1, subtype_t *s2)
 
 
 
-  if (subtypeAttsCompare(s1->globals.atts, s2->globals.atts) != differ)
+  if (subtypeAttsCompare(s1->globals.atts, s2->globals.atts) != atts_differ)
     {
       while (entry1 != NULL) {
         int found = 1;
         entry2 = s2->entries;
         while (entry2 != NULL) {
-          found &= (subtypeAttsCompare(entry1->atts, entry2->atts) != differ);
+          found &= (subtypeAttsCompare(entry1->atts, entry2->atts) != atts_differ);
           entry2 = entry2->next;
         }
         if (found)
@@ -28181,8 +28181,8 @@ vlist_compare(vlist_t *a, vlist_t *b)
     | (a->nzaxis != b->nzaxis) | (a->instID != b->instID)
     | (a->modelID != b->modelID) | (a->tableID != b->tableID)
     | (a->ntsteps != b->ntsteps) | (a->atts.nelems != b->atts.nelems);
-  int nvars = a->nvars;
-  for (int varID = 0; varID < nvars; ++varID)
+  int local_nvars = a->nvars;
+  for (int varID = 0; varID < local_nvars; ++varID)
     diff |= vlistVarCompare(a, varID, b, varID);
   size_t natts = a->atts.nelems;
   for (size_t attID = 0; attID < natts; ++attID)
@@ -28333,10 +28333,10 @@ vlist_delete(vlist_t *vlistptr)
 
   vlistDelAtts(vlistID, CDI_GLOBAL);
 
-  int nvars = vlistptr->nvars;
+  int local_nvars = vlistptr->nvars;
   var_t *vars = vlistptr->vars;
 
-  for ( int varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < local_nvars; varID++ )
     {
       if ( vars[varID].levinfo ) Free(vars[varID].levinfo);
       if ( vars[varID].name ) Free(vars[varID].name);
@@ -28424,7 +28424,7 @@ void vlistCopy(int vlistID2, int vlistID1)
 
   if ( vars1 )
     {
-      int nvars = vlistptr1->nvars;
+      int local_nvars = vlistptr1->nvars;
 
 
       size_t n = (size_t)vlistptr2->varsAllocated;
@@ -28432,7 +28432,7 @@ void vlistCopy(int vlistID2, int vlistID1)
       memcpy(vars2, vars1, n*sizeof(var_t));
       vlistptr2->vars = vars2;
 
-      for ( int varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < local_nvars; varID++ )
         {
           var_copy_entries(&vars2[varID], &vars1[varID]);
 
@@ -28582,7 +28582,7 @@ void vlistPrintKernel(vlist_t *vlistptr, FILE *fp)
 
   fprintf ( fp, "#\n# vlistID %d\n#\n", vlistptr->self);
 
-  int nvars = vlistptr->nvars;
+  int local_nvars = vlistptr->nvars;
 
   fprintf(fp, "nvars    : %d\n"
           "ngrids   : %d\n"
@@ -28592,14 +28592,14 @@ void vlistPrintKernel(vlist_t *vlistptr, FILE *fp)
           "instID   : %d\n"
           "modelID  : %d\n"
           "tableID  : %d\n",
-          nvars, vlistptr->ngrids, vlistptr->nzaxis, vlistptr->nsubtypes, vlistptr->taxisID,
+          local_nvars, vlistptr->ngrids, vlistptr->nzaxis, vlistptr->nsubtypes, vlistptr->taxisID,
           vlistptr->instID, vlistptr->modelID, vlistptr->tableID);
 
-  if ( nvars > 0 )
+  if ( local_nvars > 0 )
     {
       fprintf(fp, " varID param    gridID zaxisID stypeID tsteptype flag iorank"
               " name     longname         units\n");
-      for ( int varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < local_nvars; varID++ )
         {
           int param = vlistptr->vars[varID].param;
           int gridID = vlistptr->vars[varID].gridID;
@@ -28620,7 +28620,7 @@ void vlistPrintKernel(vlist_t *vlistptr, FILE *fp)
 
       fputs("\n"
             " varID  levID fvarID flevID mvarID mlevID  index  dtype  flag  level\n", fp);
-      for ( int varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < local_nvars; varID++ )
         {
           int zaxisID = vlistptr->vars[varID].zaxisID;
           int nlevs = zaxisInqSize(zaxisID);
@@ -28648,7 +28648,7 @@ void vlistPrintKernel(vlist_t *vlistptr, FILE *fp)
 
       fputs("\n"
             " varID  size iorank\n", fp);
-      for ( int varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < local_nvars; varID++ )
         fprintf(fp, "%3d %8d %6d\n", varID,
                 zaxisInqSize(vlistptr->vars[varID].zaxisID)
                 * gridInqSize(vlistptr->vars[varID].gridID),
@@ -28824,8 +28824,8 @@ void vlistChangeGridIndex(int vlistID, int index, int gridID)
     {
       vlistptr->gridIDs[index] = gridID;
 
-      int nvars = vlistptr->nvars;
-      for ( int varID = 0; varID < nvars; varID++ )
+      int local_nvars = vlistptr->nvars;
+      for ( int varID = 0; varID < local_nvars; varID++ )
         if ( vlistptr->vars[varID].gridID == gridIDold )
           vlistptr->vars[varID].gridID = gridID;
       reshSetStatus(vlistID, &vlistOps, RESH_DESYNC_IN_USE);
@@ -28848,8 +28848,8 @@ void vlistChangeGrid(int vlistID, int gridID1, int gridID2)
               break;
             }
         }
-      int nvars = vlistptr->nvars;
-      for ( int varID = 0; varID < nvars; varID++ )
+      int local_nvars = vlistptr->nvars;
+      for ( int varID = 0; varID < local_nvars; varID++ )
         if ( vlistptr->vars[varID].gridID == gridID1 )
           vlistptr->vars[varID].gridID = gridID2;
       reshSetStatus(vlistID, &vlistOps, RESH_DESYNC_IN_USE);
@@ -28894,8 +28894,8 @@ void vlistChangeZaxisIndex(int vlistID, int index, int zaxisID)
 
       int nlevs = zaxisInqSize(zaxisID),
         nlevsOld = zaxisInqSize(zaxisIDold);
-      int nvars = vlistptr->nvars;
-      for ( int varID = 0; varID < nvars; varID++ )
+      int local_nvars = vlistptr->nvars;
+      for ( int varID = 0; varID < local_nvars; varID++ )
         if ( vlistptr->vars[varID].zaxisID == zaxisIDold )
           {
             vlistptr->vars[varID].zaxisID = zaxisID;
@@ -28927,8 +28927,8 @@ void vlistChangeZaxis(int vlistID, int zaxisID1, int zaxisID2)
         }
     }
 
-  int nvars = vlistptr->nvars;
-  for ( int varID = 0; varID < nvars; varID++ )
+  int local_nvars = vlistptr->nvars;
+  for ( int varID = 0; varID < local_nvars; varID++ )
     if ( vlistptr->vars[varID].zaxisID == zaxisID1 )
       {
         vlistptr->vars[varID].zaxisID = zaxisID2;
@@ -29040,7 +29040,7 @@ void vlistUnpack(char * buf, int size, int *position, int originNamespace,
 {
   int tempbuf[vlist_nints];
   serializeUnpack(buf, size, position, tempbuf, vlist_nints, DATATYPE_INT, context);
-  int nvars = tempbuf[1];
+  int local_nvars = tempbuf[1];
   int targetID = namespaceAdaptKey(tempbuf[0], originNamespace);
   vlist_t *p = vlist_new_entry(force_id?targetID:CDI_UNDEFID);
   xassert(!force_id || p->self == targetID);
@@ -29052,7 +29052,7 @@ void vlistUnpack(char * buf, int size, int *position, int originNamespace,
   p->modelID = namespaceAdaptKey(tempbuf[5], originNamespace);
   serializeUnpack(buf, size, position, &p->ntsteps, 1, DATATYPE_LONG, context);
   vlistAttsUnpack(targetID, CDI_GLOBAL, buf, size, position, context);
-  for (int varID = 0; varID < nvars; varID++ )
+  for (int varID = 0; varID < local_nvars; varID++ )
     vlistVarUnpack(targetID, buf, size, position, originNamespace, context);
   reshSetStatus(targetID, &vlistOps,
                 reshGetStatus(targetID, &vlistOps) & ~RESH_SYNC_BIT);
@@ -30630,12 +30630,12 @@ void vlistChangeVarZaxis(int vlistID, int varID, int zaxisID)
 
   if ( nlevs1 != nlevs2 ) Error("Number of levels must not change!");
 
-  int nvars = vlistptr->nvars;
+  int local_nvars = vlistptr->nvars;
   int found = 0;
   int oldZaxisID = vlistptr->vars[varID].zaxisID;
   for ( int i = 0; i < varID; ++i)
     found |= (vlistptr->vars[i].zaxisID == oldZaxisID);
-  for ( int i = varID + 1; i < nvars; ++i)
+  for ( int i = varID + 1; i < local_nvars; ++i)
     found |= (vlistptr->vars[i].zaxisID == oldZaxisID);
 
   if (found)
@@ -30659,13 +30659,13 @@ void vlistChangeVarGrid(int vlistID, int varID, int gridID)
 
   vlistCheckVarID(__func__, vlistID, varID);
 
-  int nvars = vlistptr->nvars;
+  int local_nvars = vlistptr->nvars;
   int index;
-  for ( index = 0; index < nvars; index++ )
+  for ( index = 0; index < local_nvars; index++ )
     if ( index != varID )
       if ( vlistptr->vars[index].gridID == vlistptr->vars[varID].gridID ) break;
 
-  if ( index == nvars )
+  if ( index == local_nvars )
     {
       for ( index = 0; index < vlistptr->ngrids; index++ )
         if ( vlistptr->gridIDs[index] == vlistptr->vars[varID].gridID )
