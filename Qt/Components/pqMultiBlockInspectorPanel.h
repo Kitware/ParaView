@@ -18,7 +18,8 @@
 
 #include "pqComponentsModule.h"
 
-#include "pqTimer.h" // needed for pqTimer.
+#include "pqTimer.h"   // needed for pqTimer.
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QIcon>
 #include <QMap>
 #include <QPointer>
@@ -26,6 +27,7 @@
 
 #include <iostream>
 
+#if !defined(VTK_LEGACY_REMOVE)
 class QModelIndex;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -38,12 +40,22 @@ class vtkPiecewiseFunction;
 class vtkPVCompositeDataInformation;
 class vtkSMProxy;
 
+/**
+ * @class pqMultiBlockInspectorPanel
+ * @brief deprecated panel to view multiblock structure for a dataset.
+ *
+ * @deprecated in ParaView 5.4 and replaced by pqMultiBlockInspectorWidget.
+ *
+ * pqMultiBlockInspectorPanel has been deprecated and replaced by
+ * pqMultiBlockInspectorWidget. Please update to use pqMultiBlockInspectorWidget
+ * in your application instead. This class will be removed in future releases.
+ */
 class PQCOMPONENTS_EXPORT pqMultiBlockInspectorPanel : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqMultiBlockInspectorPanel(QWidget* parent = 0);
+  VTK_LEGACY(pqMultiBlockInspectorPanel(QWidget* parent = 0));
   ~pqMultiBlockInspectorPanel();
 
   pqOutputPort* getOutputPort() const;
@@ -153,4 +165,5 @@ private:
   };
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif // pqMultiBlockInspectorPanel_h
