@@ -61,6 +61,7 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   ".*pqComponentsInit.cxx.*conditional expression is constant"
   ".*pqCoreInit.cxx.*conditional expression is constant"
   ".*pqApplicationComponentsInit.cxx.*conditional expression is constant"
+  ".*ParaViewDocumentationInitializer.cxx.*conditional expression is constant"
 
   # ignore warnings from old plugins
   ".*H5Part.*"
