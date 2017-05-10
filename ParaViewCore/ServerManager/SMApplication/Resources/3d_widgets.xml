@@ -1451,19 +1451,19 @@
                          name="WindowLocation"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Any Location"
+          <Entry text="AnyLocation"
                  value="0" />
-          <Entry text="Lower Left Corner"
+          <Entry text="LowerLeftCorner"
                  value="1" />
-          <Entry text="Lower Right Corner"
+          <Entry text="LoweRightCorner"
                  value="2" />
-          <Entry text="Lower Center"
+          <Entry text="LowerCenter"
                  value="3" />
-          <Entry text="Upper Left Corner"
+          <Entry text="UpperLeftCorner"
                  value="4" />
-          <Entry text="Upper Right Corner"
+          <Entry text="UpperRightCorner"
                  value="5" />
-          <Entry text="Upper Center"
+          <Entry text="UpperCenter"
                  value="6" />
         </EnumerationDomain>
         <Documentation>Specify placement of the scalar bar actor.</Documentation>
