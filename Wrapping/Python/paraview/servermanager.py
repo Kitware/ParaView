@@ -290,32 +290,6 @@ class Proxy(object):
         for prop in self:
             pass
 
-    def __setattr__(self, name, value):
-        try:
-            setter = getattr(self.__class__, name)
-            setter = setter.__set__
-        except AttributeError:
-            if name == "ColorAttributeType" and self.SMProxy.GetProperty("ColorArrayName"):
-                if paraview.compatibility.GetVersion() <= 4.1:
-                    # set ColorAttributeType on ColorArrayName property instead.
-                    caProp = self.GetProperty("ColorArrayName")
-
-                    self.GetProperty("ColorArrayName").SetData((value, caProp[1]))
-                    return
-                else:
-                    # if ColorAttributeType is being used, print debug information.
-                    paraview.print_debug_info(\
-                        "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
-                    # we let the exception be raised as well, hence don't return here.
-            if not hasattr(self, name):
-                raise AttributeError("Attribute %s does not exist. " % name +
-                  " This class does not allow addition of new attributes to avoid " +
-                  "mistakes due to typos. Use add_attribute() if you really want " +
-                  "to add this attribute.")
-            self.__dict__[name] = value
-        else:
-            setter(self, value)
-
     def add_attribute(self, name, value):
         self.__dict__[name] = value
 
@@ -460,6 +434,26 @@ class Proxy(object):
                               _makeUpdateCameraMethod(weakref.ref(self)))
             self.Observed = c
         return c
+
+    def __setattr__(self, name, value):
+        try:
+            setter = getattr(self.__class__, name)
+            paraview.print_debug_info("No attribute %s" % name)
+            setter = setter.__set__
+        except AttributeError:
+            # Let the backwards compatibility helper try to handle this
+            try:
+                _bc.setattr(self, name, value)
+            except _bc.Continue:
+                pass
+            except AttributeError:
+                raise AttributeError("Attribute %s does not exist. " % name +
+                    " This class does not allow addition of new attributes to avoid " +
+                    "mistakes due to typos. Use add_attribute() if you really want " +
+                    "to add this attribute.")
+        else:
+            paraview.print_debug_info(name)
+            setter(self, value)
 
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
