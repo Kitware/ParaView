@@ -430,7 +430,10 @@ public:
     else if (is_multipiece)
     {
       index += cinfo->GetNumberOfChildren();
-      this->LeafIndex = leaf_index++; // TODO: not sure what's the best thing here.
+      this->LeafIndex = leaf_index;
+      // move leaf_index forward by however many pieces this multipiece dataset
+      // has.
+      leaf_index += cinfo->GetNumberOfChildren();
     }
     return true;
   }
