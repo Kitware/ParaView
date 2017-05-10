@@ -84,9 +84,50 @@ def setattr(proxy, pname, value):
             paraview.print_debug_info(\
                 "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
             # we let the exception be raised as well, hence don't return here.
+
+    if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
+        if paraview.compatibility.GetVersion() <= 5.3:
+            # We can't do this perfectly, so we set the ScalarBarThickness
+            # property instead. Assume a reasonable modern screen size of
+            # 1280x1024 with a Render view size of 1000x600. Even if we had
+            # access to the View proxy to get the screen size, there is no
+            # guarantee that the view size will remain the same later on in the
+            # Python script.
+            span = 600 # vertical
+            if proxy.GetProperty("Orientation").GetData() == "Horizontal":
+                span = 1000
+
+            # Assume a scalar bar length 40% of the span.
+            thickness = 0.4 * span / value
+
+            proxy.GetProperty("ScalarBarThickness").SetData(int(thickness))
+            raise Continue()
+        else:
+            #if AspectRatio is being used, print debug info
+            paraview.print_debug_info(\
+                "'AspectRatio' is obsolete. Use the 'ScalarBarThickness' property to set the width instead")
+            # we let the exception be raised as well, hence don't return here.
+
+    if pname == "Position2" and proxy.SMProxy.GetProperty("ScalarBarLength"):
+        if paraview.compatibility.GetVersion() <= 5.3:
+            # The scalar bar length corresponds to Position2[0] when the
+            # orientation is horizontal and Position2[1] when the orientation
+            # is vertical.
+            length = value[0]
+            if proxy.Orientation == "Vertical":
+                length = value[1]
+
+            proxy.GetProperty("ScalarBarLength").SetData(length)
+        else:
+            #if Position2 is being used, print debug info
+            paraview.print_debug_info(\
+                "'Position2' is obsolete. Use the 'ScalarBarLength' property to set the length instead")
+            # we let the exception be raised as well, hence don't return here.
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
+
     raise Continue()
 
 _fgetattr = getattr
@@ -143,12 +184,29 @@ def getattr(proxy, pname):
                     'Cube Axes and related properties are now obsolete. Please '\
                     'remove them from your script.')
 
+    # In 5.4, we removed the AspectRatio property and replaced it with the
+    # ScalarBarThickness property.
     if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
         if version <= 5.3:
+            return 20.0
+        else:
             raise NotSupportedException(
                     'The AspectRatio property has been removed in ParaView '\
                     '5.4. Please use the ScalarBarThickness property instead '\
                     'to set the thickness in terms of points.')
+
+    # In 5.4, we removed the Position2 property and replaced it with the
+    # ScalarBarLength property.
+    if pname == "Position2" and proxy.SMProxy.GetProperty("ScalarBarLength"):
+        if version <= 5.3:
+            if proxy.GetProperty("Orientation").GetData() == "Horizontal":
+                return [0.05, proxy.GetProperty("ScalarBarLength").GetData()]
+            else:
+                return [proxy.GetProperty("ScalarBarLength").GetData(), 0.05]
+        else:
+            raise NotSupportedException(
+                    'The Position2 property has been removed in ParaView '\
+                    '5.4. Please set the ScalarBarLength property instead.')
 
     raise Continue()
 
