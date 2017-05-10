@@ -8591,12 +8591,18 @@ source.</Documentation>
                      Stream Tracer filter generates streamlines in a vector
                      field from a collection of seed points. Production of
                      streamlines terminates if a streamline crosses the
-                     exterior boundary of the input dataset. Other reasons for
-                     termination are listed for the MaximumNumberOfSteps,
-                     TerminalSpeed, and MaximumPropagation properties. This
-                     filter operates on any type of dataset, provided it has
-                     point-centered vectors. The output is polygonal data
-                     containing polylines.</Documentation>
+                     exterior boundary of the input dataset
+                     (ReasonForTermination=1). Other reasons for termination
+                     include an initialization issue (ReasonForTermination=2),
+                     computing an unexpected value (ReasonForTermination=3),
+                     reached the Maximum Streamline Length input value
+                     (ReasonForTermination=4), reached the Maximum Steps
+                     input value (ReasonForTermination=5), and velocity was
+                     lower than the Terminal Speed input value
+                     (ReasonForTermination=6). This filter operates on any
+                     type of dataset, provided it has point-centered vectors.
+                     The output is polygonal data containing polylines.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      name="Input">
@@ -8723,7 +8729,7 @@ source.</Documentation>
                             number_of_elements="1"
                             panel_visibility="advanced" >
         <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
+        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
         specifies the minimum integration step size.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumIntegrationStep"
@@ -8733,7 +8739,7 @@ source.</Documentation>
                             number_of_elements="1"
                             panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
+        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
         specifies the maximum integration step size.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSteps"
@@ -8840,15 +8846,21 @@ source.</Documentation>
                  name="ArbitrarySourceStreamTracer">
       <Documentation long_help="Integrate streamlines in a vector field."
                      short_help="Integrate streamlines in a vector field.">The
-                     Stream Tracer filter generates streamlines in a vector
-                     field from a collection of seed points. Production of
-                     streamlines terminates if a streamline crosses the
-                     exterior boundary of the input dataset. Other reasons for
-                     termination are listed for the MaximumNumberOfSteps,
-                     TerminalSpeed, and MaximumPropagation properties. This
-                     filter operates on any type of dataset, provided it has
-                     point-centered vectors. The output is polygonal data
-                     containing polylines. This filter takes a Source input
+                     Stream Tracer With Custom Source filter generates streamlines
+                     in a vector field from a collection of seed points. Production
+                     of streamlines terminates if a streamline crosses the
+                     exterior boundary of the input dataset
+                     (ReasonForTermination=1). Other reasons for termination
+                     include an initialization issue (ReasonForTermination=2),
+                     computing an unexpected value (ReasonForTermination=3),
+                     reached the Maximum Streamline Length input value
+                     (ReasonForTermination=4), reached the Maximum Steps
+                     input value (ReasonForTermination=5), and velocity was
+                     lower than the Terminal Speed input value
+                     (ReasonForTermination=6). This filter operates on any
+                     type of dataset, provided it has point-centered vectors.
+                     The output is polygonal data containing polylines.
+                     This filter takes a Source input
                      that provides the seed points.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
@@ -8977,7 +8989,7 @@ source.</Documentation>
                             number_of_elements="1"
                             panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
+        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
         specifies the minimum integration step size.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumIntegrationStep"
@@ -8987,7 +8999,7 @@ source.</Documentation>
                             number_of_elements="1"
                             panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
-        <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
+        <Documentation>When using the Runge-Kutta 4-5 integrator, this property
         specifies the maximum integration step size.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSteps"
