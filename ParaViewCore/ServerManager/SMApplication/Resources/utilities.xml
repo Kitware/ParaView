@@ -4146,6 +4146,17 @@
           <UseDirectoryName />
         </Hints>
       </StringVectorProperty>
+      <IntVectorProperty name="OnlyUseFilesInDataDirectory" number_of_elements="1" default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When this is set to true, 'Search files under specified directory' mode will fail when a file is not in the
+          data directory rather than defaulting back to the absolute path in the state file.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="LoadStateDataFileOptions" value="1">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
     </LoadStateOptionsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

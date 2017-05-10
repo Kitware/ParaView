@@ -63,17 +63,21 @@ public:
 
   vtkSetClampMacro(DataFileOptions, int, USE_FILES_FROM_STATE, CHOOSE_FILES_EXPLICITLY);
 
+  vtkSetMacro(OnlyUseFilesInDataDirectory, bool);
+
 protected:
   vtkSMLoadStateOptionsProxy();
   ~vtkSMLoadStateOptionsProxy();
 
   /**
    * Locates the files in the user specified directory and updates the paths
-   * in the state file XML.
+   * in the state file XML.  If the clearFilenameIfNotFound option is set to true
+   * it will set the filenames that are not in the directory to empty string
+   * rather than leave them as the filenames from the state file XML.
    *
    * @returns false if any of the files were not found
    */
-  bool LocateFilesInDirectory(std::vector<std::string>& filepaths);
+  bool LocateFilesInDirectory(std::vector<std::string>& filepaths, bool clearFilenameIfNotFound);
 
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
@@ -88,6 +92,12 @@ protected:
    * match for the rest of the file series.
    */
   int PathMatchingThreshold;
+
+  /**
+   * When this is set to true, USE_DATA_DIRECTORY mode will fail when a file is not in the
+   * data directory rather than defaulting back to the absolute path in the state file.
+   */
+  bool OnlyUseFilesInDataDirectory;
 
 private:
   class vtkInternals;
