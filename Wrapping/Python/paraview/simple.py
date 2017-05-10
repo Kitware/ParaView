@@ -2145,11 +2145,12 @@ class _funcs_internals:
 # Start the session and initialize the ServerManager
 #==============================================================================
 
-active_session_observer = _active_session_observer()
+if not paraview.options.satelite:
+    active_session_observer = _active_session_observer()
 
-if not servermanager.ActiveConnection:
-    Connect()
-else:
-    _add_functions(globals())
+    if not servermanager.ActiveConnection:
+        Connect()
+    else:
+        _add_functions(globals())
 
-active_objects = _active_objects()
+    active_objects = _active_objects()

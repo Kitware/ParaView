@@ -3136,6 +3136,17 @@ if not vtkProcessModule.GetProcessModule():
         pvoptions.SetSymmetricMPIMode(True)
       vtkInitializationHelper.Initialize(sys.executable,
           vtkProcessModule.PROCESS_BATCH, pvoptions)
+
+      # In case of Non-Symetric mode and we are a satelite
+      # We should lock right away and wait for the requests
+      # from master
+      pm = vtkProcessModule.GetProcessModule()
+      if not paraview.options.symmetric and pm.GetPartitionId() != 0:
+        paraview.options.satelite = True
+        sid = vtkSMSession.ConnectToSelf()
+        pm.GetGlobalController().ProcessRMIs()
+        pm.UnRegisterSession(sid)
+
     else:
       vtkInitializationHelper.Initialize(sys.executable,
           vtkProcessModule.PROCESS_CLIENT, pvoptions)
