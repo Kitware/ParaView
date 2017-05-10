@@ -711,10 +711,12 @@ private:
     typedef type SM_TT;                                                                            \
     call;                                                                                          \
   }
+/* clang-format off */
 #define vtkSMVectorPropertyTemplateMacro(prop, call)                                               \
   vtkSMPropertyTemplateMacroCase(vtkSMDoubleVectorProperty, double, prop, call)                    \
-    vtkSMPropertyTemplateMacroCase(vtkSMIntVectorProperty, int, prop, call)                        \
-      vtkSMPropertyTemplateMacroCase(vtkSMIdTypeVectorProperty, vtkIdType, prop, call)             \
-        vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call)
+  vtkSMPropertyTemplateMacroCase(vtkSMIntVectorProperty, int, prop, call)                          \
+  vtkSMPropertyTemplateMacroCase(vtkSMIdTypeVectorProperty, vtkIdType, prop, call)                 \
+  vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call)
+/* clang-format on */
 
 #endif
