@@ -75,7 +75,7 @@ public:
    * ids where expected so the number of reserved ids could be easily adjust.
    * Unless noted otherwise, this method must be called before calling any
    * other methods on this class.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    * Internally you can pick an id that follow that condition
    * minIdAvailable <= id <= maxIdAvailable
    * Return the minIdAvailable after initialization so that new range could be used

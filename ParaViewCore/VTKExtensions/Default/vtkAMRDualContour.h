@@ -22,8 +22,10 @@
  * the volume of each particle from the volume fraction.
  *
  * This will turn on validation and debug i/o of the filter.
- *#define vtkAMRDualContourDEBUG
- *#define vtkAMRDualContourPROFILE
+ * \code{.cpp}
+ * #define vtkAMRDualContourDEBUG
+ * #define vtkAMRDualContourPROFILE
+ * \endcode
 */
 
 #ifndef vtkAMRDualContour_h

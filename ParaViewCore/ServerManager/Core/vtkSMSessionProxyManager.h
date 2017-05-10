@@ -37,17 +37,17 @@
  * Basic XML Proxy definition documentation:
  *
  * @sa
- * <pre>
  * ------------- Proxy definition -------------
+ * \code{.xml}
  *  <SourceProxy                   => Will create vtkSM + SourceProxy class.
  *         name="SphereSource"     => Key used to create the proxy.
  *         class="vtkSphereSource" => Concrete VTK class that does the real job.
  *         label="Sphere">         => Nice name used in menu and python shell.
- * </pre>
+ * \endcode
  *
  * @sa
- * <pre>
  * ----------- Property definition -----------
+ * \code{.xml}
  *    <DoubleVectorProperty        => Will create vtkSM + DoubleVectorProperty
  *                                    and vtkSI + DoubleVectorProperty class by
  *                                    default.
@@ -61,25 +61,24 @@
  *         default_values="0 0 0"> => The value that will be set at the
  *    </DoubleVectorProperty>         construction to the VTK object.
  *  </SourceProxy>
- * </pre>
+ * \endcode
  *
  * @sa
  * For custom behaviour the user can add some extra attributes:
  *
- * @sa
  *  - We can specify a custom SIProperty class to handle in a custom way the
  *    data on the server:
- * <pre>
+ * \code{.xml}
  *      <StringVectorProperty          => vtkSMStringVectorProperty class.
  *         name="ElementBlocksInfo"    => Property name.
  *         information_only="1"        => Can only be used to fetch data.
  *         si_class="vtkSISILProperty" => Class name to instantiate on the other side.
  *         subtree="Blocks"/>          => Extra attribute used by vtkSISILProperty.
- * </pre>
+ * \endcode
  *
  * @sa
  *  - We can trigger after any update a command to be executed:
- * <pre>
+ * \code{.xml}
  *      <Proxy name="LookupTable"
  *             class="vtkLookupTable"
  *             post_push="Build"       => The method Build() will be called each
@@ -90,17 +89,17 @@
  *
  * @sa
  *  - We can force any property to push its value as soon as it is changed:
- * <pre>
+ * \code{.xml}
  *          <Property name="ResetFieldCriteria"
  *             command="ResetFieldCriteria"
  *             immediate_update="1">     => Modifying the property will result
  *                                          in an immediate push of it and the
  *                                          execution of the command on the vtkObject.
- * </pre>
+ * \endcode
  *
  * @sa
  *  - To show a source proxy or a filter inside the menu of ParaView we use a hint:
- * <pre>
+ * \code{.xml}
  *       <SourceProxy ...>
  *           <Hints>
  *              <ShowInMenu                  => The category attribute enables
@@ -108,7 +107,7 @@
  *                                              this proxy should be listed. (optional)
  *           </Hints>
  *       </SourceProxy>
- * </pre>
+ * \endcode
 */
 
 #ifndef vtkSMSessionProxyManager_h
@@ -454,7 +453,7 @@ public:
 
   //@{
   /**
-   * The server manager configuration XML may define <Hints /> element for
+   * The server manager configuration XML may define \c \<Hints/\> element for
    * a proxy/property. Hints are metadata associated with the
    * proxy/property. The Server Manager does not (and should not) interpret
    * the hints. Hints provide a mechanism to add GUI-pertinent information

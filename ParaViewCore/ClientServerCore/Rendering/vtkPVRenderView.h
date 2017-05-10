@@ -94,7 +94,8 @@ public:
    * selected, then whenever the user drags and creates a selection region, this
    * class will fire a vtkCommand::SelectionChangedEvent event with the
    * selection region as the argument.
-   * @CallOnAllProcessess - this must be called on all processes, however it will
+   * \note CallOnAllProcesses
+   * \note this must be called on all processes, however it will
    * have any effect only the driver processes i.e. the process with the
    * interactor.
    */
@@ -105,7 +106,7 @@ public:
   /**
    * Initialize the view with an identifier. Unless noted otherwise, this method
    * must be called before calling any other methods on this class.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void Initialize(unsigned int id) VTK_OVERRIDE;
 
@@ -122,7 +123,7 @@ public:
   /**
    * Gets the non-composited renderer for this view. This is typically used for
    * labels, 2D annotations etc.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkGetObjectMacro(NonCompositedRenderer, vtkRenderer);
   //@}
@@ -158,7 +159,7 @@ public:
   vtkRenderWindow* GetRenderWindow();
 
   /**
-   * Returns the interactor. .
+   * Returns the interactor.
    */
   vtkRenderWindowInteractor* GetInteractor();
 
@@ -179,7 +180,7 @@ public:
   //@{
   /**
    * Resets the active camera using collective prop-bounds.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void ResetCamera();
   void ResetCamera(double bounds[6]);
@@ -187,14 +188,14 @@ public:
 
   /**
    * Triggers a high-resolution render.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   virtual void InteractiveRender() VTK_OVERRIDE;
 
@@ -205,7 +206,7 @@ public:
    * large displays, one may want to use a sub-sampled image even for
    * StillRender(). This is set it number of pixels to be sub-sampled by.
    * Note that image reduction factors have no effect when in built-in mode.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkSetClampMacro(StillRenderImageReductionFactor, int, 1, 20);
   vtkGetMacro(StillRenderImageReductionFactor, int);
@@ -216,7 +217,7 @@ public:
    * Get/Set the reduction-factor to use when for InteractiveRender().
    * This is set it number of pixels to be sub-sampled by.
    * Note that image reduction factors have no effect when in built-in mode.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkSetClampMacro(InteractiveRenderImageReductionFactor, int, 1, 20);
   vtkGetMacro(InteractiveRenderImageReductionFactor, int);
@@ -226,7 +227,7 @@ public:
   /**
    * Get/Set the data-size in megabytes above which remote-rendering should be
    * used, if possible.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkSetMacro(RemoteRenderingThreshold, double);
   vtkGetMacro(RemoteRenderingThreshold, double);
@@ -236,7 +237,7 @@ public:
   /**
    * Get/Set the data-size in megabytes above which LOD rendering should be
    * used, if possible.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkSetMacro(LODRenderingThreshold, double);
   vtkGetMacro(LODRenderingThreshold, double);
@@ -247,7 +248,7 @@ public:
    * Get/Set the LOD resolution. This affects the size of the grid used for
    * quadric clustering, for example. 1.0 implies maximum resolution while 0
    * implies minimum resolution.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   vtkSetClampMacro(LODResolution, double, 0.0, 1.0);
   vtkGetMacro(LODResolution, double);
@@ -270,7 +271,7 @@ public:
    * client.
    * See vtkPVClientServerSynchronizedRenderers::ConfigureCompressor() for
    * details.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void ConfigureCompressor(const char* configuration);
 
@@ -283,7 +284,7 @@ public:
   //@{
   /**
    * Enable/Disable light kit.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void SetUseLightKit(bool enable);
   vtkGetMacro(UseLightKit, bool);
@@ -345,7 +346,7 @@ public:
   /**
    * Make a selection. This will result in setting up of this->LastSelection
    * which can be accessed using GetLastSelection().
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void SelectCells(int region[4]);
   void SelectCells(int region0, int region1, int region2, int region3)
@@ -369,7 +370,7 @@ public:
    * is the total length of polygon2DArray.
    * This will result in setting up of this->LastSelection
    * which can be accessed using GetLastSelection().
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void SelectPolygonPoints(int* polygon2DArray, vtkIdType arrayLen);
   void SelectPolygonCells(int* polygon2DArray, vtkIdType arrayLen);
@@ -445,13 +446,13 @@ public:
   /**
    * Invalidates cached selection. Called explicitly when view proxy thinks the
    * cache may have become obsolete.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void InvalidateCachedSelection();
 
   /**
    * Returns the z-buffer value at the given location.
-   * @CallOnClientOnly
+   * \note CallOnClientOnly
    */
   double GetZbufferDataAtPoint(int x, int y);
 
@@ -991,7 +992,7 @@ protected:
 
   /**
    * Synchronizes bounds information on all nodes.
-   * @CallOnAllProcessess
+   * \note CallOnAllProcesses
    */
   void SynchronizeGeometryBounds();
 

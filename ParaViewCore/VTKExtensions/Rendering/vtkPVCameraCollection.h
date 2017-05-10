@@ -68,7 +68,7 @@ public:
 
   /**
    * Find a camera in the style that's closest to the `target` camera.
-   * @param[in] camera Camera to find the closet camera to.
+   * @param[in] target Camera to find the closet camera to.
    * @returns index of the found camera or -1 if none found.
    */
   int FindClosestCamera(vtkCamera* target);

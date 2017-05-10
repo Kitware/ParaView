@@ -47,10 +47,10 @@ class pqServerConfiguration;
 *
 * During construction, this class attempts to read server-configurations from
 * following locations:
-* \li QApplication::applicationDirPath()/default_servers.pvsc
-* \li ${COMMON_APPDATA}/QApplication::organizationName()/servers.pvsc
-* \li /usr/share/QApplication::organizationName()/servers.pvsc
-* \li ${QSettings INI Path}/servers.pvsc -- User-specific servers.
+* \li \c QApplication\::applicationDirPath()/default_servers.pvsc
+* \li \c ${COMMON_APPDATA}/QApplication\::organizationName()/servers.pvsc
+* \li \c /usr/share/QApplication\::organizationName()/servers.pvsc
+* \li \c ${QSettings INI Path}/servers.pvsc -- User-specific servers.
 *
 * The location marked as "User-specific servers" is the location where any
 * server-configurations created/imported by user are saved. User can only

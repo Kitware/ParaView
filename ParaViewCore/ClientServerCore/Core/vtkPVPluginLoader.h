@@ -68,11 +68,14 @@ public:
    * sperated by env separator.
    * It allow user to fine pick which plugins to load, instead of using PV_PLUGIN_PATH
    * the format a xml plugin file should be the following :
+   *
+   * \code{.xml}
    * <?xml version="1.0"?>
    * <Plugins>
    * <Plugin name="MyPlugin" filename="absolute/path/to/libMyPlugin.so"/>
    * ...
    * </Plugins>
+   * \endcode
    */
   void LoadPluginsFromPluginConfigFile();
 

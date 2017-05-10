@@ -33,7 +33,7 @@ public:
   // Description:
   // Initialize the view with an identifier. Unless noted otherwise, this method
   // must be called before calling any other methods on this class.
-  // @CallOnAllProcessess
+  // \note CallOnAllProcesses
   virtual void Initialize(unsigned int id);
 
 protected:

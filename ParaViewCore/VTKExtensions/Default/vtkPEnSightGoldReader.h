@@ -16,10 +16,10 @@
  * @class   vtkPEnSightGoldReader
  *
  * Parallel version of vtkEnSightGoldReader.
- * @par Thanks:
- * <verbatim>
  *
- * @par Thanks:
+ * \verbatim
+ *
+ * Thanks:
  * This file has been developed as part of the CARRIOCAS (Distributed
  * computation over ultra high optical internet network ) project (
  * http://www.carriocas.org/index.php?lng=ang ) of the SYSTEM@TIC French ICT
@@ -27,11 +27,9 @@
  * supervision of CEA (http://www.cea.fr) and EDF (http://www.edf.fr) by
  * Oxalya (http://www.oxalya.com)
  *
- * @par Thanks:
+ * Thanks:
  *  Copyright (c) CEA
- *
- * @par Thanks:
- * </verbatim>
+ * \endverbatim
 */
 
 #ifndef vtkPEnSightGoldReader_h

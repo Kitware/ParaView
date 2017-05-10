@@ -102,7 +102,7 @@
  * stored under tag ybar at index 4 in phasta files
  * If any Field element is specified then default attribute values are :
  * (phasta_field_tag is mandatory)
- * paraview_field_tag = Field <number>
+ * paraview_field_tag = Field \<number\>
  * start_index_in_phasta_array = 0
  * number_of_components = 1
  * data_dependency = 0

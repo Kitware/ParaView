@@ -439,7 +439,7 @@ public:
 
   //@{
   /**
-   * The server manager configuration XML may define <Hints /> element for a
+   * The server manager configuration XML may define \p \<Hints/\> element for a
    * proxy. Hints are metadata associated with the proxy. The Server Manager
    * does not (and should not) interpret the hints. Hints provide a mechanism
    * to add GUI pertinant information to the server manager XML.
@@ -837,7 +837,7 @@ protected:
 
   /**
    * Parses the XML to create a new property group. This can handle
-   * <PropertyGroup /> elements defined in both regular Proxy section or when
+   * \c \<PropertyGroup/\> elements defined in both regular Proxy section or when
    * exposing properties from sub-proxies.
    */
   vtkSMPropertyGroup* NewPropertyGroup(vtkPVXMLElement* propElement);

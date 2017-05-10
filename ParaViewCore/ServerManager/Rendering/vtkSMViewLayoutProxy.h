@@ -272,9 +272,8 @@ public:
   /**
    * Set the color to use for separator between views in multi-view
    * configurations when saving images.
-   * @param[in] r Red component value in range (0, 1.0);
-   * @param[in] g Green component value in range (0, 1.0);
-   * @param[in] b Blue component value in range (0, 1.0);
+   *
+   * The arguments are the components of the red, green, and blue channels from 0.0 to 1.0.
    */
   vtkSetVector3Macro(SeparatorColor, double);
   vtkGetVector3Macro(SeparatorColor, double);

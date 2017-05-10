@@ -29,7 +29,7 @@
  * proxy gets saved, the extended definitions are also saved in the XML state so
  * that they can be loaded back as well.
  *
- * @warnings
+ * @warning
  * This is only intended for simple source proxies. The `ExtendDefinition()` API
  * is only intended to add new property definitions for the proxy and should not
  * be used for adding other entities in a proxy definition such as sub proxies,

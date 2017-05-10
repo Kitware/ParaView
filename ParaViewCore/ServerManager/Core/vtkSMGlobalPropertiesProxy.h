@@ -31,8 +31,8 @@
  * on all linked properties.
  *
  * vtkSMParaViewPipelineController uses the property level hint
- * <GlobalPropertyLink /> to define such links e.g.
- *    \code
+ * \c \<GlobalPropertyLink/\> to define such links e.g.
+ *    \code{.xml}
  *    <DoubleVectorProperty name="Background" ... >
  *         ...
  *      <Hints>

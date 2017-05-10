@@ -41,7 +41,7 @@ public:
   //@{
   /**
    * Set/Get the name of the element.  This is its XML tag.
-   * (<Name />).
+   * (\c \<Name/\>).
    */
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);

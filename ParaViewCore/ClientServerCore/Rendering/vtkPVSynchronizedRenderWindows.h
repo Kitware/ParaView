@@ -214,7 +214,7 @@ public:
   /**
    * Returns the z-buffer value at the given location. \c id is the view id
    * used in AddRenderWindow()/AddRenderer() etc.
-   * @CallOnClientOnly
+   * \note CallOnClientOnly
    */
   double GetZbufferDataAtPoint(int x, int y, unsigned int id);
 

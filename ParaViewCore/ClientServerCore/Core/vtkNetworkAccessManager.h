@@ -51,14 +51,14 @@ public:
    * Returns the new connection instance on success, otherwise NULL.
 
    * URLs are of the following form:
-   * <transport>://<address>
-   * * tcp://<hostname>:<port>
-   * * tcp://localhost:<port>/listen -- listen for connection on port.
-   * * tcp://localhost:<port>/listenmultiple -- listen for multiple
+   * \p \<transport\>://\<address\>
+   * * \p tcp://\<hostname\>:\<port\>
+   * * \p tcp://localhost:\<port\>/listen -- listen for connection on port.
+   * * \p tcp://localhost:\<port\>/listenmultiple -- listen for multiple
    * Examples:
-   * * tcp://medea:12345
-   * * tcp://localhost:12345/listen
-   * * ssh://utkarsh@medea
+   * * \p tcp://medea:12345
+   * * \p tcp://localhost:12345/listen
+   * * \p ssh://utkarsh\@medea
    * * http://kitware-server/session?id=12322&authorization=12
    */
   virtual vtkMultiProcessController* NewConnection(const char* url) = 0;
