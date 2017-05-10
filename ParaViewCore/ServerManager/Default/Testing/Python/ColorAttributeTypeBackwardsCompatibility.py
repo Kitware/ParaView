@@ -5,15 +5,15 @@ import paraview
 # properties.
 
 assert (paraview.compatibility.GetVersion().GetVersion() == None),\
-    "ParaView modules should never force backwords compatibility to any version"
+    "ParaView modules should never force backwards compatibility to any version"
 assert ((paraview.compatibility.GetVersion() < 4.1) == False),\
     "less-than test should always fail when version is not specified."
 assert ((paraview.compatibility.GetVersion() <= 4.1) == False),\
     "less-equal test should always fail when version is not specified."
 assert ((paraview.compatibility.GetVersion() > 4.1) == True),\
-    "greater-than test should always fail when version is not specified."
+    "greater-than test should always pass when version is not specified."
 assert ((paraview.compatibility.GetVersion() >= 4.1) == True),\
-    "greater-equal test should always fail when version is not specified."
+    "greater-equal test should always pass when version is not specified."
 
 Sphere()
 r = Show()
