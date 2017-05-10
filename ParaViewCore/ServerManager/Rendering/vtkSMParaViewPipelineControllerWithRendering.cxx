@@ -505,6 +505,12 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
   std::string preferredViewType;
   if (const char* xmlPreferredViewType = this->GetPreferredViewType(producer, outputPort))
   {
+    // allow user to prevent automatic display of the representation using "None" view type
+    if (strcmp(xmlPreferredViewType, "None") == 0)
+    {
+      return nullptr;
+    }
+
     // let's use the preferred view from XML hints, if available.
     preferredViewType = xmlPreferredViewType;
   }
