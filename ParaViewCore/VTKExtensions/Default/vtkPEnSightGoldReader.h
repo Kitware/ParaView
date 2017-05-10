@@ -155,30 +155,6 @@ protected:
    */
   int InjectCoordinatesAtEnd(vtkUnstructuredGrid* output, long coordinatesOffset, int partId);
 
-  //@{
-  /**
-   * Set/Get the Model file name.
-   */
-  vtkSetStringMacro(GeometryFileName);
-  vtkGetStringMacro(GeometryFileName);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the Measured file name.
-   */
-  vtkSetStringMacro(MeasuredFileName);
-  vtkGetStringMacro(MeasuredFileName);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the Match file name.
-   */
-  vtkSetStringMacro(MatchFileName);
-  vtkGetStringMacro(MatchFileName);
-  //@}
-
   /**
    * Skip next line in file if the 'undef' or 'partial' keyword was
    * specified after a sectional keyword

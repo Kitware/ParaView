@@ -725,7 +725,7 @@
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetAxis"
+      <DoubleVectorProperty command="SetOrientedAxis"
                             default_values="0. 1. 0."
                             name="Axis"
                             number_of_elements="3">

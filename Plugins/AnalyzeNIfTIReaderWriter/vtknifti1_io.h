@@ -260,6 +260,12 @@ typedef struct nifti_global_options
     int allow_upper_fext;    /*!< allow uppercase file extensions */
 } nifti_global_options;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4610) // struct 'X' can never be instantiated - user defined constructor required
+#pragma warning(disable: 4510) // default constructor could not be generated
+#pragma warning(disable: 4512) // assignment operator could not be generated
+#endif
 typedef struct nifti_type_ele
 {
     int    type;           /* should match the NIFTI_TYPE_ #define */
@@ -267,6 +273,9 @@ typedef struct nifti_type_ele
     int    swapsize;       /* bytes per swap piece, matches nifti_image */
     char const * const name;           /* text string to match #define */
 } nifti_type_ele;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #undef  LNI_FERR /* local nifti file error, to be compact and repetative */
 #define LNI_FERR(func,msg,file)                                      \

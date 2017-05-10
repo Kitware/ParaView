@@ -37,9 +37,9 @@ public:
   /**
    * Get/Set the vector defining the direction of the cylinder.
    */
-  void SetAxis(double x, double y, double z);
-  void SetAxis(const double axis[3]);
-  vtkGetVector3Macro(Axis, double);
+  void SetOrientedAxis(double x, double y, double z);
+  void SetOrientedAxis(const double axis[3]);
+  vtkGetVector3Macro(OrientedAxis, double);
   //@}
 
   // Reimplemented to update transform on change:
@@ -52,17 +52,17 @@ protected:
 
   void UpdateTransform();
 
-  double Axis[3];
+  double OrientedAxis[3];
 
 private:
   vtkPVCylinder(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
 };
 
-inline void vtkPVCylinder::SetAxis(double x, double y, double z)
+inline void vtkPVCylinder::SetOrientedAxis(double x, double y, double z)
 {
   double axis[3] = { x, y, z };
-  this->SetAxis(axis);
+  this->SetOrientedAxis(axis);
 }
 
 #endif

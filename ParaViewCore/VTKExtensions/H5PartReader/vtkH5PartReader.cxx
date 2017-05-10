@@ -314,14 +314,15 @@ int vtkH5PartReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   this->UpdatePiece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
 #endif
 
-  bool NeedToReadInformation = (FileModifiedTime > FileOpenedTime || !this->H5FileId);
-
   if (!this->OpenFile())
   {
     return 0;
   }
 
-  if (1 || NeedToReadInformation)
+  // This block is, and always has been, unconditional. It's previous
+  // "condition" is commented here in case it is needed at some point.
+  // bool NeedToReadInformation = (FileModifiedTime > FileOpenedTime || !this->H5FileId);
+  // if (1 || NeedToReadInformation)
   {
     this->NumberOfTimeSteps = H5PartGetNumSteps(this->H5FileId);
     H5PartSetStep(this->H5FileId, 0);

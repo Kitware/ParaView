@@ -480,8 +480,8 @@ _dissolve_ghostzone (
 
  struct H5BlockPartition p_;
  struct H5BlockPartition q_;
- struct H5BlockPartition p_best;
- struct H5BlockPartition q_best;
+ struct H5BlockPartition p_best = *p;
+ struct H5BlockPartition q_best = *q;
  h5part_int64_t vol;
  h5part_int64_t max_vol = 0;
 

@@ -267,8 +267,8 @@ int main(int argc, char* argv[])
     for (kk = 0; kk < num; kk++)
     {
       lenstr << endl << "    + strlen(" << ot.Prefix << moduleName << ot.Suffix << kk << ")";
-      createstring << "  strcat(res, " << ot.Prefix << moduleName << ot.Suffix << kk << ");"
-                   << endl;
+      createstring << "  strncat(res, " << ot.Prefix << moduleName << ot.Suffix << kk
+                   << ", len + 1 - strlen(res));" << endl;
     }
     ot.Stream << "// Get single string" << endl
               << "char* " << ot.Prefix << moduleName << argv[argv_offset + 4] << "()" << endl

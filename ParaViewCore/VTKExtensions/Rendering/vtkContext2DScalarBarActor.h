@@ -202,11 +202,6 @@ private:
 
   vtkContextActor* ActorDelegate;
 
-  /**
-   * Location of window, such as a corner or middle side position.
-   */
-  int WindowLocation;
-
   int TitleJustification;
 
   /**
