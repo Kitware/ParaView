@@ -61,6 +61,34 @@ class _CubeAxesHelper(object):
         self.CenterStickyAxes = 0
 _ACubeAxesHelper = _CubeAxesHelper()
 
+def setattr(proxy, pname, value):
+    """
+    Attempts to emulate setattr() when called using a deprecated name for a
+    proxy property.
+
+    Will make a reasonable attempt to set the value of the property with the new
+    name if the property was deprecated and the paraview compatibility version
+    was set to a version older than when the property was deprecated.
+    """
+    version = paraview.compatibility.GetVersion()
+
+    if pname == "ColorAttributeType" and proxy.SMProxy.GetProperty("ColorArrayName"):
+        if paraview.compatibility.GetVersion() <= 4.1:
+            # set ColorAttributeType on ColorArrayName property instead.
+            caProp = proxy.GetProperty("ColorArrayName")
+
+            proxy.GetProperty("ColorArrayName").SetData((value, caProp[1]))
+            raise Continue()
+        else:
+            # if ColorAttributeType is being used, print debug information.
+            paraview.print_debug_info(\
+                "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+            # we let the exception be raised as well, hence don't return here.
+    if not hasattr(proxy, pname):
+        raise AttributeError()
+    proxy.__dict__[pname] = value
+    raise Continue()
+
 _fgetattr = getattr
 
 def getattr(proxy, pname):
