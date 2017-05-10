@@ -33,7 +33,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
 	<key>NSHighResolutionCapable</key>
-	<true/>
+	<@MAC_HIGH_RESOLUTION_CAPABLE@/>
 
 <!-- File type associations -->
 <key>CFBundleDocumentTypes</key>
