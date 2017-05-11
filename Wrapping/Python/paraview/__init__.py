@@ -131,6 +131,10 @@ class options:
     suppressed."""
     print_debug_messages = False
 
+    """When True, This mean the current process is a satelite and should not try to
+    connect or do anything else."""
+    satelite = False
+
 def print_warning(text):
    """Print text"""
    print(text)
