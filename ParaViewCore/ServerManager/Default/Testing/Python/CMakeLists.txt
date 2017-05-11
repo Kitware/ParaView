@@ -49,6 +49,7 @@ set(PY_TESTS
   RepresentationTypeHint.py,NO_VALID
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
+  ScalarBarActorBackwardsCompatibility.py,NO_VALID
   ValidateSources.py,NO_VALID
   VRMLSource.py,NO_VALID
   )
