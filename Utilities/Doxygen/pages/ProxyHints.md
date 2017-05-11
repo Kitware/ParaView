@@ -83,6 +83,17 @@ hint corresponds to by using the optional `port` attribute.
       </Hints>
     </SourceProxy>
 
+The `<View/>` hint can also be used to prevent automatic display of an output in
+any view. To do that, use the **None** type. Such source can then still be
+displayed manually by toggling the visibility when an appropriate View is active.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <View type="None" />
+      </Hints>
+    </SourceProxy>
+
 Plotable
 --------
 Mark output data as plotable in 2D chart views.
