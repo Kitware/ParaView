@@ -63,8 +63,31 @@ if (NOT BUILD_SHARED_LIBS)
 endif ()
 
 #-------------------------------------------------------------------------------
+set (ParaView_CMAKE_BINARY_DIR "${ParaView_BINARY_DIR}/CMake")
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
+
+if (APPLE)
+  # Enable high resolution when using Qt5, disable it when using Qt4
+  if (${PARAVIEW_QT_VERSION} EQUAL 5)
+    set(MAC_HIGH_RESOLUTION_CAPABLE "true")
+  else()
+    set(MAC_HIGH_RESOLUTION_CAPABLE "false")
+  endif()
+  file(MAKE_DIRECTORY ${ParaView_CMAKE_BINARY_DIR})
+  configure_file(
+    "${ParaView_CMAKE_DIR}/MacOSXBundleInfo.plist.in.in"
+    "${ParaView_CMAKE_BINARY_DIR}/MacOSXBundleInfo.plist.in"
+    @ONLY
+  )
+endif()
+
+#-------------------------------------------------------------------------------
+# Set up CMAKE_MODULE_PATH
+set (CMAKE_MODULE_PATH
+  ${CMAKE_MODULE_PATH}
+  ${ParaView_CMAKE_BINARY_DIR}
+  ${ParaView_CMAKE_DIR}
+)
 
 # Use the new version of the variable names for output of build process.
 # Make sure these are consistent with what VTK sets.
