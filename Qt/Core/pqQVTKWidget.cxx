@@ -89,6 +89,9 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
+
+  // disable HiDPI if we are running tests
+  this->setEnableHiDPI(getenv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
 #endif
 }
 
