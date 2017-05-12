@@ -93,10 +93,14 @@ protected:
   */
   virtual void resizeEvent(QResizeEvent* event);
 
+  //@{
   /**
-   * skip rendering is not ready for it.
+   * methods that manage skipping of rendering if ParaView is not ready for it.
    */
   virtual void doDeferredRender();
+  virtual bool renderVTK();
+  bool canRender();
+  //@}
 private slots:
   void updateSizeProperties();
   void handleViewSizeForModifiedQt4();
