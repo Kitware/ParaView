@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Multi-block Inspector" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="expand" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="expand" arguments="0.0.4.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="expand" arguments="0.0.7.0" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.0.0,0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.0.0.1.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.7.0.1.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.7.0.1.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.7.0.0.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.7.0.0.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.4.0.0.0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.4.0.0.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0,0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.4.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0,2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.0.0.1.1" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.0.0.1.1,0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="activate" arguments="0.0.0.2" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.0.0.1.0,0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionClearSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+
+</pqevents>

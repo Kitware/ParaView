@@ -925,7 +925,7 @@ int vtkPVGeometryFilter::RequestCompositeData(
   int numInputs = 0;
 
   unsigned int block_id = 0;
-  iter->SkipEmptyNodesOff(); // since we want to a get an accurtate block-id count to
+  iter->SkipEmptyNodesOff(); // since we want to a get an accurate block-id count to
                              // set vtkBlockColors correctly.
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++block_id)
   {
@@ -961,25 +961,35 @@ int vtkPVGeometryFilter::RequestCompositeData(
   }
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
 
-  // Merge mutli-pieces to avoid efficiency setbacks when ordered
+  // Merge multi-pieces to avoid efficiency setbacks when ordered
   // compositing is employed.
   iter.TakeReference(output->NewIterator());
-  vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
-  if (treeIter)
+  iter->SkipEmptyNodesOff(); // since we want to a get an accurate block-id count to
+                             // set vtkBlockColors correctly.
+  if (vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter))
   {
     treeIter->VisitOnlyLeavesOff();
   }
 
   std::vector<vtkMultiPieceDataSet*> pieces_to_merge;
   std::vector<unsigned int> ids_for_pieces_to_merge;
+  block_id = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkDataObject* curNode = iter->GetCurrentDataObject();
-    if (curNode && vtkMultiPieceDataSet::SafeDownCast(curNode))
+    if (vtkMultiPieceDataSet* piece = vtkMultiPieceDataSet::SafeDownCast(curNode))
     {
-      vtkMultiPieceDataSet* piece = vtkMultiPieceDataSet::SafeDownCast(curNode);
       pieces_to_merge.push_back(piece);
-      ids_for_pieces_to_merge.push_back(iter->GetCurrentFlatIndex());
+      // save the current leaf node count. this will be used to decide how to
+      // color the merged pieces. This extra-care is taken to ensure that the
+      // ids are generated in a predictable manner. That way, UI can use that
+      // fact, if needed.
+      ids_for_pieces_to_merge.push_back(block_id);
+    }
+    else if (vtkCompositeDataSet::SafeDownCast(curNode) == nullptr)
+    {
+      // leaf node (null or not, doesn't matter).
+      block_id++;
     }
   }
   for (size_t cc = 0; cc < pieces_to_merge.size(); cc++)
@@ -1014,7 +1024,7 @@ int vtkPVGeometryFilter::RequestCompositeData(
 
       vtkPolyData* trivalInput = vtkPolyData::New();
       iter->SkipEmptyNodesOff();
-      if (treeIter)
+      if (vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter))
       {
         treeIter->VisitOnlyLeavesOff();
       }

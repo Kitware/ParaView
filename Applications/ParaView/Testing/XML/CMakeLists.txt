@@ -309,6 +309,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateUseExisting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockInspector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockSingleBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml

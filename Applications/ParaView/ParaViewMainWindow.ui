@@ -234,7 +234,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqMultiBlockInspectorPanel" name="multiBlockInspectorPanel"/>
+   <widget class="pqMultiBlockInspectorWidget" name="multiBlockInspectorPanel"/>
   </widget>
   <widget class="QDockWidget" name="colorMapEditorDock">
    <property name="allowedAreas">
@@ -392,12 +392,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqMultiBlockInspectorPanel</class>
-   <extends>QWidget</extends>
-   <header>pqMultiBlockInspectorPanel.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqColorMapEditor</class>
    <extends>QWidget</extends>
    <header>pqColorMapEditor.h</header>
@@ -419,6 +413,12 @@
    <class>pqOutputWidget</class>
    <extends>QWidget</extends>
    <header>pqOutputWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqMultiBlockInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqMultiBlockInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

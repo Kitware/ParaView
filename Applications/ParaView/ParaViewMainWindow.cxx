@@ -157,6 +157,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->displayPropertiesDock);
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
+  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->multiBlockInspectorDock);
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 

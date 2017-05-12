@@ -344,5 +344,15 @@
     <file>Icons/pvIcon96.png</file>
     <file>Icons/pvIcon512.png</file>
     <file>Icons/pdf.png</file>
+
+    <!-- these icons are only intended for use
+         in legend for pqMultiBlockInspectorWidget -->
+
+    <file>Icons/explicit_color.png</file>
+    <file>Icons/explicit_opacity.png</file>
+    <file>Icons/inherited_color.png</file>
+    <file>Icons/inherited_opacity.png</file>
+    <file>Icons/no_color.png</file>
+    <file>Icons/no_opacity.png</file>
   </qresource>
 </RCC>

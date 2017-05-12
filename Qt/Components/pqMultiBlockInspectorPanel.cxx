@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "pqMultiBlockInspectorPanel.h"
 
+#if !defined(VTK_LEGACY_REMOVE)
 #include "pqActiveObjects.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqOutputPort.h"
@@ -121,6 +122,8 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget* parent_)
   , BlockColorsDistinctValues(7)
   , CompositeWrap(0)
 {
+  VTK_LEGACY_REPLACED_BODY(pqMultiBlockInspectorPanel, "ParaView 5.4", pqMultiBlockInspectorWidget);
+
   // setup tree widget
   this->TreeWidget = new QTreeWidget(this);
   this->TreeWidget->setColumnCount(COLUMN_COUNT);
@@ -1230,3 +1233,4 @@ QIcon pqMultiBlockInspectorPanel::makeOpacityIcon(
 
   return icon;
 }
+#endif // !defined(VTK_LEGACY_REMOVE)

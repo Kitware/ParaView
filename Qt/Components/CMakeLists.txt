@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set (Module_SRCS
-
   pqAboutDialog.cxx
   pqAboutDialog.h
   pqActionGroupInterface.cxx
@@ -158,8 +157,8 @@ set (Module_SRCS
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.cxx
   pqMemoryInspectorPanel.h
-  pqMultiBlockInspectorPanel.cxx
-  pqMultiBlockInspectorPanel.h
+  pqMultiBlockInspectorWidget.cxx
+  pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqOrbitCreatorDialog.cxx
@@ -365,7 +364,7 @@ set (Module_MOC_HDRS
   pqLiveInsituVisualizationManager.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
-  pqMultiBlockInspectorPanel.h
+  pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.h
   pqOrbitCreatorDialog.h
   pqOutputPortComboBox.h
@@ -437,6 +436,14 @@ set (Module_MOC_HDRS
   pqAbstractItemSelectionModel.h
 )
 
+if (NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS
+    pqMultiBlockInspectorPanel.cxx
+    pqMultiBlockInspectorPanel.h)
+  list(APPEND Module_MOC_HDRS
+    pqMultiBlockInspectorPanel.h)
+endif()
+
 set (Module_UI_FILES
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
@@ -464,6 +471,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
+  Resources/UI/pqMultiBlockInspectorWidget.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui

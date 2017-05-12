@@ -45,23 +45,23 @@ set(Module_SRCS
   pqCollapsedGroup.cxx
   pqCollapsedGroup.h
   pqColorButtonEventPlayer.cxx
-  pqColorDialogEventPlayer.cxx
-  pqColorDialogEventPlayer.h
-  pqColorDialogEventTranslator.cxx
-  pqColorDialogEventTranslator.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
   pqColorButtonEventTranslator.h
   pqColorChooserButton.cxx
   pqColorChooserButton.h
+  pqColorDialogEventPlayer.cxx
+  pqColorDialogEventPlayer.h
+  pqColorDialogEventTranslator.cxx
+  pqColorDialogEventTranslator.h
   pqConnect.cxx
   pqConnect.h
   pqConsoleWidget.cxx
-  pqConsoleWidget.h
   pqConsoleWidgetEventPlayer.cxx
   pqConsoleWidgetEventPlayer.h
   pqConsoleWidgetEventTranslator.cxx
   pqConsoleWidgetEventTranslator.h
+  pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
   pqDoubleRangeDialog.cxx
@@ -79,9 +79,9 @@ set(Module_SRCS
   pqHighlightablePushButton.cxx
   pqHighlightablePushButton.h
   pqLineEdit.cxx
-  pqLineEdit.h
   pqLineEditEventPlayer.cxx
   pqLineEditEventPlayer.h
+  pqLineEdit.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
@@ -107,6 +107,8 @@ set(Module_SRCS
   pqTextEdit.cxx
   pqTextEdit.h
   pqTreeView.cxx
+  pqTreeViewExpandState.cxx
+  pqTreeViewExpandState.h
   pqTreeView.h
   pqTreeViewSelectionHelper.cxx
   pqTreeViewSelectionHelper.h
@@ -143,9 +145,9 @@ set (QtWidgets_SRCS
   pqColorChooserButton.h
   pqColorDialogEventPlayer.h
   pqColorDialogEventTranslator.h
-  pqConsoleWidget.h
   pqConsoleWidgetEventPlayer.h
   pqConsoleWidgetEventTranslator.h
+  pqConsoleWidget.h
   pqDelimitedTextParser.h
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
@@ -154,8 +156,8 @@ set (QtWidgets_SRCS
   pqExpanderButton.h
   pqFlatTreeView.h
   pqHighlightablePushButton.h
-  pqLineEdit.h
   pqLineEditEventPlayer.h
+  pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
   pqProgressBar.h
@@ -166,12 +168,13 @@ set (QtWidgets_SRCS
   pqSpinBox.h
   pqTableView.h
   pqTextEdit.h
+  pqTreeViewExpandState.h
   pqTreeView.h
-  pqTreeWidget.h
+  pqTreeViewSelectionHelper.h
   pqTreeWidgetCheckHelper.h
+  pqTreeWidget.h
   pqTreeWidgetItemObject.h
   pqTreeWidgetSelectionHelper.h
-  pqTreeViewSelectionHelper.h
 )
 
 include(ParaViewQt)
