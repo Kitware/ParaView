@@ -942,6 +942,9 @@
     },
     { "name": "vtkgl2ps",
       "path": "VTK/ThirdParty/gl2ps"
+    },
+    { "name": "vtklibharu",
+      "path": "VTK/ThirdParty/libharu"
     }
   ],
   "proxies":[
