@@ -576,7 +576,8 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
         viewInstance = serializeInstance(None, renderWindow, renderWindowId, self.context, 1)
         viewInstance['extra'] = {
             'vtkRefId': getReferenceId(renderWindow),
-            'centerOfRotation': sView.CenterOfRotation.GetData()
+            'centerOfRotation': sView.CenterOfRotation.GetData(),
+            'camera': getReferenceId(sView.GetActiveCamera())
         }
 
         self.context.setIgnoreLastDependencies(False)
