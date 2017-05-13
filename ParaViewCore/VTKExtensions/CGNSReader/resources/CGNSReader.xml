@@ -25,31 +25,31 @@
         </Documentation>
       </StringVectorProperty>
 
-     <StringVectorProperty
-        name="BaseInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Base"/>
-     </StringVectorProperty>
+      <StringVectorProperty
+         name="BaseInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Base"/>
+      </StringVectorProperty>
 
-     <StringVectorProperty
-        name="BaseStatus"
-        label="Bases"
-        command="SetBaseArrayStatus"
-        number_of_elements="2"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="BaseInfo"
-        >
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="BaseInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         Select the bases to be loaded from the dataset, if any.
-       </Documentation>
-     </StringVectorProperty>
+      <StringVectorProperty
+         name="BaseStatus"
+         label="Bases"
+         command="SetBaseArrayStatus"
+         number_of_elements="2"
+         repeat_command="1"
+         number_of_elements_per_command="2"
+         element_types="2 0"
+         information_property="BaseInfo"
+         >
+        <ArraySelectionDomain name="array_list">
+           <RequiredProperties>
+              <Property name="BaseInfo" function="ArrayList"/>
+           </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Select the bases to be loaded from the dataset, if any.
+        </Documentation>
+      </StringVectorProperty>
 
       <StringVectorProperty name="PointArrayInfo"
                             information_only="1">
@@ -99,7 +99,33 @@
         </Documentation>
       </StringVectorProperty>
 
-       <IntVectorProperty name="LoadBndPatch"
+      <StringVectorProperty
+         name="FamilyInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Family"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+         name="FamilyStatus"
+         label="Families"
+         command="SetFamilyArrayStatus"
+         number_of_elements="2"
+         repeat_command="1"
+         number_of_elements_per_command="2"
+         element_types="2 0"
+         information_property="FamilyInfo"
+         panel_visibility="advanced">
+        <ArraySelectionDomain name="array_list">
+           <RequiredProperties>
+              <Property name="FamilyInfo" function="ArrayList"/>
+           </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          For selected nodes, choose the node families to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="LoadBndPatch"
                          command="SetLoadBndPatch"
                          number_of_elements="1"
                          animateable="0"
@@ -213,6 +239,8 @@
           <Property name="CellArrayStatus" />
           <Property name="PointArrayInfo" />
           <Property name="PointArrayStatus" />
+          <Property name="FamilyInfo" />
+          <Property name="FamilyStatus" />
           <Property name="LoadBndPatch" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CreateEachSolutionAsBlock" />

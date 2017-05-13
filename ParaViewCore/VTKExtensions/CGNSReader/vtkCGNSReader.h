@@ -36,6 +36,7 @@
 #define vtkCGNSReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
 
 class vtkDataSet;
@@ -73,8 +74,20 @@ public:
   void SetBaseArrayStatus(const char* name, int status);
   void DisableAllBases();
   void EnableAllBases();
-
   int GetNumberOfBaseArrays();
+
+  //@{
+  /**
+   * Method that allows setting/getting of node families.
+   */
+  int GetNumberOfFamilyArrays();
+  const char* GetFamilyArrayName(int index);
+  void SetFamilyArrayStatus(const char* name, int status);
+  int GetFamilyArrayStatus(const char* name);
+  void EnableAllFamilies();
+  void DisableAllFamilies();
+  //@}
+
   int GetNumberOfPointArrays();
   int GetNumberOfCellArrays();
 
@@ -164,9 +177,10 @@ protected:
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  vtkDataArraySelection* BaseSelection;
-  vtkDataArraySelection* PointDataArraySelection;
-  vtkDataArraySelection* CellDataArraySelection;
+  vtkNew<vtkDataArraySelection> BaseSelection;
+  vtkNew<vtkDataArraySelection> PointDataArraySelection;
+  vtkNew<vtkDataArraySelection> CellDataArraySelection;
+  vtkNew<vtkDataArraySelection> FamilySelection;
 
   // The observer to modify this object when the array selections are
   // modified.
