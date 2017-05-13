@@ -684,16 +684,26 @@ public:
     {
       this->CDTModel->setUserCheckable(false);
     }
-    this->CDTModel->reset(port != nullptr ? port->getDataInformation() : nullptr);
-    this->Ui.treeView->expandToDepth(1);
 
-    QHeaderView* header = this->Ui.treeView->header();
-    if (header->count() == 3 && header->logicalIndex(2) != 0)
+    bool is_composite =
+      this->CDTModel->reset(port != nullptr ? port->getDataInformation() : nullptr);
+    if (!is_composite)
     {
-      header->moveSection(0, 2);
+      this->Ui.treeView->setModel(nullptr);
     }
-    expandState.restore(this->Ui.treeView);
+    else
+    {
+      this->Ui.treeView->setModel(this->ProxyModel);
+      this->Ui.treeView->expandToDepth(1);
 
+      QHeaderView* header = this->Ui.treeView->header();
+      if (header->count() == 3 && header->logicalIndex(2) != 0)
+      {
+        header->moveSection(0, 2);
+      }
+    }
+
+    expandState.restore(this->Ui.treeView);
     this->SelectionModel->blockSelectionPropagation(prev);
   }
 
