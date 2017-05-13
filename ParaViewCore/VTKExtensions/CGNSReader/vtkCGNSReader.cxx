@@ -300,6 +300,13 @@ public:
     iarray->SetName("ispatch");
     ds->GetFieldData()->AddArray(iarray.Get());
   }
+
+  // Reads a curvilinear zone along with its solution.
+  // If voi is non-null, then a sub-extents (x-min, x-max, y-min,  y-max, z-min,
+  // z-max) can be specified to only read a subset of the zone. Otherwise, the
+  // entire zone is read in.
+  static vtkSmartPointer<vtkDataObject> readCurvilinearZone(int base, int zone, int cellDim,
+    int physicalDim, const cgsize_t* zsize, const int* voi, vtkCGNSReader* self);
 };
 
 //----------------------------------------------------------------------------
@@ -1083,11 +1090,10 @@ int vtkCGNSReader::vtkPrivate::AttachReferenceValue(
 }
 
 //------------------------------------------------------------------------------
-int vtkCGNSReader::GetCurvilinearZone(
-  int base, int zone, int cellDim, int physicalDim, void* v_zsize, vtkMultiBlockDataSet* mbase)
+vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(int base,
+  int vtkNotUsed(zone), int cellDim, int physicalDim, const cgsize_t* zsize, const int* voi,
+  vtkCGNSReader* self)
 {
-  cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
-
   int rind[6];
   int n;
   // int ier;
@@ -1096,13 +1102,12 @@ int vtkCGNSReader::GetCurvilinearZone(
   cgsize_t srcStart[3] = { 1, 1, 1 };
   cgsize_t srcStride[3] = { 1, 1, 1 };
   cgsize_t srcEnd[3];
+
   // Memory Destination Layout
   cgsize_t memStart[3] = { 1, 1, 1 };
   cgsize_t memStride[3] = { 3, 1, 1 };
   cgsize_t memEnd[3] = { 1, 1, 1 };
   cgsize_t memDims[3] = { 1, 1, 1 };
-
-  vtkIdType nPts = 0;
 
   // Get Coordinates and FlowSolution node names
   std::string gridCoordName;
@@ -1111,10 +1116,10 @@ int vtkCGNSReader::GetCurvilinearZone(
   std::vector<double> gridChildId;
   std::size_t nCoordsArray = 0;
 
-  vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, this);
+  vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, self);
 
   vtkPrivate::getCoordsIdAndFillRind(
-    gridCoordName, physicalDim, nCoordsArray, gridChildId, rind, this);
+    gridCoordName, physicalDim, nCoordsArray, gridChildId, rind, self);
 
   // Rind was parsed (or not) then populate dimensions :
   // Compute structured grid coordinate range
@@ -1127,7 +1132,7 @@ int vtkCGNSReader::GetCurvilinearZone(
   }
 
   // Compute number of points
-  nPts = static_cast<vtkIdType>(memEnd[0] * memEnd[1] * memEnd[2]);
+  const vtkIdType nPts = static_cast<vtkIdType>(memEnd[0] * memEnd[1] * memEnd[2]);
 
   // Populate the extent array
   int extent[6] = { 0, 0, 0, 0, 0, 0 };
@@ -1144,11 +1149,11 @@ int vtkCGNSReader::GetCurvilinearZone(
   memEnd[0] *= 3;
 
   // Set up points
-  vtkPoints* points = vtkPoints::New();
+  vtkNew<vtkPoints> points;
   //
   // vtkPoints assumes float data type
   //
-  if (this->DoublePrecisionMesh != 0)
+  if (self->GetDoublePrecisionMesh() != 0)
   {
     points->SetDataTypeToDouble();
   }
@@ -1160,21 +1165,21 @@ int vtkCGNSReader::GetCurvilinearZone(
   //
   // Populate the coordinates.  Put in 3D points with z=0 if the mesh is 2D.
   //
-  if (this->DoublePrecisionMesh != 0) // DOUBLE PRECISION MESHPOINTS
+  if (self->GetDoublePrecisionMesh() != 0) // DOUBLE PRECISION MESHPOINTS
   {
-    CGNSRead::get_XYZ_mesh<double, float>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    CGNSRead::get_XYZ_mesh<double, float>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
   }
   else // SINGLE PRECISION MESHPOINTS
   {
-    CGNSRead::get_XYZ_mesh<float, double>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    CGNSRead::get_XYZ_mesh<float, double>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
   }
 
   //----------------------------------------------------------------------------
   // Handle solutions
   //----------------------------------------------------------------------------
-  if (this->CreateEachSolutionAsBlock)
+  if (self->GetCreateEachSolutionAsBlock())
   {
     // Create separate grid for each solution === debugging mode
     vtkNew<vtkMultiBlockDataSet> mzone;
@@ -1186,44 +1191,51 @@ int vtkCGNSReader::GetCurvilinearZone(
       // read the solution node.
       vtkNew<vtkStructuredGrid> sgrid;
       sgrid->SetExtent(extent);
-      sgrid->SetPoints(points);
-      if (vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), this) ==
+      sgrid->SetPoints(points.Get());
+      if (vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), self) ==
         CG_OK)
       {
-        vtkPrivate::AttachReferenceValue(base, sgrid.Get(), this);
+        vtkPrivate::AttachReferenceValue(base, sgrid.Get(), self);
         mzone->SetBlock(cc, sgrid.Get());
         mzone->GetMetaData(cc)->Set(vtkCompositeDataSet::NAME(), sniter->c_str());
       }
     }
     if (solutionNames.size() > 0)
     {
-      mbase->SetBlock(zone, mzone.Get());
+      return mzone.Get();
     }
   }
-  else
-  {
-    // normal case where we great a vtkStructuredGrid for the entire zone.
-    vtkNew<vtkStructuredGrid> sgrid;
-    sgrid->SetExtent(extent);
-    sgrid->SetPoints(points);
-    for (std::vector<std::string>::const_iterator sniter = solutionNames.begin();
-         sniter != solutionNames.end(); ++sniter)
-    {
-      vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), this);
-    }
 
-    vtkPrivate::AttachReferenceValue(base, sgrid.Get(), this);
-    mbase->SetBlock(zone, sgrid.Get());
+  // normal case where we great a vtkStructuredGrid for the entire zone.
+  vtkNew<vtkStructuredGrid> sgrid;
+  sgrid->SetExtent(extent);
+  sgrid->SetPoints(points.Get());
+  for (std::vector<std::string>::const_iterator sniter = solutionNames.begin();
+       sniter != solutionNames.end(); ++sniter)
+  {
+    vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), self);
   }
-  points->Delete();
+
+  vtkPrivate::AttachReferenceValue(base, sgrid.Get(), self);
+  return sgrid.Get();
+}
+
+//------------------------------------------------------------------------------
+int vtkCGNSReader::GetCurvilinearZone(
+  int base, int zone, int cellDim, int physicalDim, void* v_zsize, vtkMultiBlockDataSet* mbase)
+{
+  cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
+
+  vtkSmartPointer<vtkDataObject> zoneDO =
+    vtkPrivate::readCurvilinearZone(base, zone, cellDim, physicalDim, zsize, nullptr, this);
+  mbase->SetBlock(zone, zoneDO.Get());
 
   //----------------------------------------------------------------------------
   // Handle boundary conditions (BC) patches
   //----------------------------------------------------------------------------
   if (this->LoadBndPatch && !this->CreateEachSolutionAsBlock)
   {
-    vtkSmartPointer<vtkStructuredGrid> zoneGrid =
-      vtkStructuredGrid::SafeDownCast(mbase->GetBlock(zone));
+    vtkSmartPointer<vtkStructuredGrid> zoneGrid = vtkStructuredGrid::SafeDownCast(zoneDO);
     assert(zoneGrid);
     vtkPrivate::AddIsPatchArray(zoneGrid, false);
 
