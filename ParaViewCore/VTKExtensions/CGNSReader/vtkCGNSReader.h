@@ -111,9 +111,25 @@ public:
   vtkGetMacro(DoublePrecisionMesh, int);
   vtkBooleanMacro(DoublePrecisionMesh, int);
 
+  //@{
+  /**
+   * Enable/disable loading of boundary condition patches.
+   * Defaults to off.
+   */
   vtkSetMacro(LoadBndPatch, int);
   vtkGetMacro(LoadBndPatch, int);
   vtkBooleanMacro(LoadBndPatch, int);
+  //@}
+
+  //@{
+  /**
+   * Enable/disable loading of zone mesh. Defaults to on. It may be turned off
+   * to load only boundary patches (when LoadBndPatch if ON), for example.
+   */
+  vtkSetMacro(LoadMesh, bool);
+  vtkGetMacro(LoadMesh, bool);
+  vtkBooleanMacro(LoadMesh, bool);
+  //@}
 
   /**
    * This option is provided for debugging and should not be used for production
@@ -207,6 +223,7 @@ private:
 
   char* FileName;                // cgns file name
   int LoadBndPatch;              // option to set section loading for unstructured grid
+  bool LoadMesh;                 // option to enable/disable mesh loading
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;

@@ -211,28 +211,43 @@ public:
   ~BCInformation() {}
 
   // Create a new dataset that represents the patch for the given zone.
-  vtkSmartPointer<vtkDataSet> CreateDataSet(int cellDim, vtkStructuredGrid* zoneGrid)
+  vtkSmartPointer<vtkDataSet> CreateDataSet(int cellDim, vtkStructuredGrid* zoneGrid) const
   {
-    int zoneExts[6], origExts[6];
-    zoneGrid->GetExtent(zoneExts);
-    zoneGrid->GetExtent(origExts);
+    // We need to extract cells from zoneGrid based on this->PointRange.
 
+    // We'll use vtkExtractGrid, which needs VOI in point extents.
     vtkNew<vtkExtractGrid> extractVOI;
-    for (int cc = 0; cc < cellDim; ++cc)
-    {
-      zoneExts[2 * cc] = this->PointRange[cc] - 1;
-      zoneExts[2 * cc + 1] = this->PointRange[cc + cellDim] - 1;
-      if (this->Location == CGNS_ENUMV(CellCenter))
-      {
-        // convert to pt extents since vtkExtractGrid is given pt-exts to
-        // extract.
-        zoneExts[2 * cc + 1] = std::min(origExts[2 * cc + 1], zoneExts[2 * cc + 1] + 1);
-      }
-    }
+    int voi[6];
+    this->GetVOI(voi, cellDim);
     extractVOI->SetInputDataObject(zoneGrid);
-    extractVOI->SetVOI(zoneExts);
+    extractVOI->SetVOI(voi);
     extractVOI->Update();
     return vtkSmartPointer<vtkDataSet>(extractVOI->GetOutput(0));
+  }
+
+  bool GetVOI(int voi[6], int cellDim) const
+  {
+    // Remember, "the default beginning vertex for the grid in a given zone is
+    // (1,1,1); this means the default beginning cell center of the grid in that
+    // zone is also (1,1,1)" (from CGNS docs:
+    // https://cgns.github.io/CGNS_docs_current/sids/conv.html#structgrid).
+
+    // Hence, convert this->PointRange to 0-based values.
+    int zPointRange[6];
+    for (int cc = 0; cc < 2 * cellDim; ++cc)
+    {
+      zPointRange[cc] = this->PointRange[cc] - 1;
+    }
+
+    // It's a little unclear to me if PointRange is always a range of points,
+    // irrespective of whether the this->Location is CellCenter or Vertex. I am
+    // assuming it as so since that works of the sample data I have.
+    for (int cc = 0; cc < cellDim; ++cc)
+    {
+      voi[2 * cc] = zPointRange[cc];
+      voi[2 * cc + 1] = zPointRange[cc + cellDim];
+    }
+    return true;
   }
 
 private:
@@ -257,8 +272,14 @@ public:
   static int getVarsIdAndFillRind(const double cgioSolId, std::size_t& nVarArray,
     CGNS_ENUMT(GridLocation_t) & varCentering, std::vector<double>& solChildId, int* rind,
     vtkCGNSReader* self);
+
+  /**
+   * `voi` can be used to read a sub-extent. VOI is specified using VTK
+   * conventions i.e. 0-based point extents specified as (x-min,x-max,
+   * y-min,y-max, z-min, z-max).
+   */
   static int readSolution(const std::string& solutionName, const int cellDim, const int physicalDim,
-    const cgsize_t* zsize, vtkDataSet* dataset, vtkCGNSReader* self);
+    const cgsize_t* zsize, vtkDataSet* dataset, const int* voi, vtkCGNSReader* self);
 
   static int fillArrayInformation(const std::vector<double>& solChildId, const int physicalDim,
     std::vector<CGNSRead::CGNSVariable>& cgnsVars, std::vector<CGNSRead::CGNSVector>& cgnsVectors,
@@ -294,11 +315,14 @@ public:
 
   static void AddIsPatchArray(vtkDataSet* ds, bool is_patch)
   {
-    vtkNew<vtkIntArray> iarray;
-    iarray->SetNumberOfTuples(1);
-    iarray->SetValue(0, is_patch ? 1 : 0);
-    iarray->SetName("ispatch");
-    ds->GetFieldData()->AddArray(iarray.Get());
+    if (ds)
+    {
+      vtkNew<vtkIntArray> iarray;
+      iarray->SetNumberOfTuples(1);
+      iarray->SetValue(0, is_patch ? 1 : 0);
+      iarray->SetName("ispatch");
+      ds->GetFieldData()->AddArray(iarray.Get());
+    }
   }
 
   // Reads a curvilinear zone along with its solution.
@@ -307,6 +331,16 @@ public:
   // entire zone is read in.
   static vtkSmartPointer<vtkDataObject> readCurvilinearZone(int base, int zone, int cellDim,
     int physicalDim, const cgsize_t* zsize, const int* voi, vtkCGNSReader* self);
+
+  static vtkSmartPointer<vtkDataSet> readBCDataSet(const BCInformation& bcinfo, int base, int zone,
+    int cellDim, int physicalDim, const cgsize_t* zsize, vtkCGNSReader* self)
+  {
+    int voi[6];
+    bcinfo.GetVOI(voi, cellDim);
+    vtkSmartPointer<vtkDataObject> zoneDO =
+      readCurvilinearZone(base, zone, cellDim, physicalDim, zsize, voi, self);
+    return vtkDataSet::SafeDownCast(zoneDO);
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -320,6 +354,7 @@ vtkCGNSReader::vtkCGNSReader()
   this->FileName = NULL;
 
   this->LoadBndPatch = 0;
+  this->LoadMesh = true;
   this->NumberOfBases = 0;
   this->ActualTimeStep = 0;
   this->DoublePrecisionMesh = 1;
@@ -772,7 +807,8 @@ int vtkCGNSReader::vtkPrivate::getVarsIdAndFillRind(const double cgioSolId, std:
 
 //------------------------------------------------------------------------------
 int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, const int cellDim,
-  const int physicalDim, const cgsize_t* zsize, vtkDataSet* dataset, vtkCGNSReader* self)
+  const int physicalDim, const cgsize_t* zsize, vtkDataSet* dataset, const int* voi,
+  vtkCGNSReader* self)
 {
   if (solutionNameStr.empty())
   {
@@ -834,8 +870,56 @@ int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, 
     fieldMemDims[n] = zsize[n + nsc];
   }
 
+  if (voi != nullptr)
+  {
+    // we are provided a sub-extent to read.
+    // update src and mem pointers.
+    const int* pvoi = voi;
+    int cell_voi[6];
+    if (varCentering == CGNS_ENUMV(CellCenter))
+    {
+      // need to convert pt-extents provided in VOI to cell extents.
+      vtkStructuredData::GetCellExtentFromPointExtent(const_cast<int*>(voi), cell_voi);
+      // if outer edge, the above method doesn't do well. so handle it.
+      for (int n = 0; n < cellDim; ++n)
+      {
+        cell_voi[2 * n] = std::min<int>(cell_voi[2 * n], zsize[n + nsc] - 1);
+        cell_voi[2 * n + 1] = std::min<int>(cell_voi[2 * n + 1], zsize[n + nsc] - 1);
+      }
+      pvoi = cell_voi;
+    }
+
+    // now update the source and dest regions.
+    for (int n = 0; n < cellDim; ++n)
+    {
+      fieldSrcStart[n] += pvoi[2 * n];
+      fieldSrcEnd[n] = fieldSrcStart[n] + (pvoi[2 * n + 1] - pvoi[2 * n]);
+      fieldMemEnd[n] = (pvoi[2 * n + 1] - pvoi[2 * n]) + 1;
+      fieldMemDims[n] = fieldMemEnd[n];
+    }
+  }
+
   // compute number of field values
   nVals = static_cast<vtkIdType>(fieldMemEnd[0] * fieldMemEnd[1] * fieldMemEnd[2]);
+
+  // sanity check: nVals must equal num-points or num-cells.
+  if (varCentering == CGNS_ENUMV(CellCenter) && nVals != dataset->GetNumberOfCells())
+  {
+    vtkErrorWithObjectMacro(self, "Mismatch in number of cells and number of values "
+                                  "being read from Solution '"
+        << solutionNameStr.c_str() << "'. "
+                                      "Skipping reading. Please report as a bug.");
+    return CG_ERROR;
+  }
+  if (varCentering == CGNS_ENUMV(Vertex) && nVals != dataset->GetNumberOfPoints())
+  {
+    vtkErrorWithObjectMacro(self, "Mismatch in number of points and number of values "
+                                  "being read from Solution '"
+        << solutionNameStr.c_str() << "'. "
+                                      "Skipping reading. Please report as a bug.");
+    return CG_ERROR;
+  }
+
   //
   // VECTORS aliasing ...
   // destination
@@ -1131,6 +1215,33 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
     memDims[n] = zsize[n];
   }
 
+  if (voi != nullptr)
+  {
+    // we are provided a sub-extent to read.
+    // First let's assert that the subextent is valid.
+    bool valid = true;
+    for (n = 0; n < cellDim; ++n)
+    {
+      valid &= (voi[2 * n] >= 0 && voi[2 * n] <= memEnd[n] && voi[2 * n + 1] >= 0 &&
+        voi[2 * n + 1] <= memEnd[n] && voi[2 * n] <= voi[2 * n + 1]);
+    }
+    if (!valid)
+    {
+      vtkGenericWarningMacro("Invalid sub-extent specified. Ignoring.");
+    }
+    else
+    {
+      // update src and mem pointers.
+      for (n = 0; n < cellDim; ++n)
+      {
+        srcStart[n] += voi[2 * n];
+        srcEnd[n] = srcStart[n] + (voi[2 * n + 1] - voi[2 * n]);
+        memEnd[n] = (voi[2 * n + 1] - voi[2 * n]) + 1;
+        memDims[n] = memEnd[n];
+      }
+    }
+  }
+
   // Compute number of points
   const vtkIdType nPts = static_cast<vtkIdType>(memEnd[0] * memEnd[1] * memEnd[2]);
 
@@ -1192,7 +1303,7 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
       vtkNew<vtkStructuredGrid> sgrid;
       sgrid->SetExtent(extent);
       sgrid->SetPoints(points.Get());
-      if (vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), self) ==
+      if (vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), voi, self) ==
         CG_OK)
       {
         vtkPrivate::AttachReferenceValue(base, sgrid.Get(), self);
@@ -1213,7 +1324,7 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
   for (std::vector<std::string>::const_iterator sniter = solutionNames.begin();
        sniter != solutionNames.end(); ++sniter)
   {
-    vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), self);
+    vtkPrivate::readSolution(*sniter, cellDim, physicalDim, zsize, sgrid.Get(), voi, self);
   }
 
   vtkPrivate::AttachReferenceValue(base, sgrid.Get(), self);
@@ -1226,8 +1337,9 @@ int vtkCGNSReader::GetCurvilinearZone(
 {
   cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
 
-  vtkSmartPointer<vtkDataObject> zoneDO =
-    vtkPrivate::readCurvilinearZone(base, zone, cellDim, physicalDim, zsize, nullptr, this);
+  vtkSmartPointer<vtkDataObject> zoneDO = this->LoadMesh
+    ? vtkPrivate::readCurvilinearZone(base, zone, cellDim, physicalDim, zsize, nullptr, this)
+    : vtkSmartPointer<vtkDataObject>();
   mbase->SetBlock(zone, zoneDO.Get());
 
   //----------------------------------------------------------------------------
@@ -1235,13 +1347,12 @@ int vtkCGNSReader::GetCurvilinearZone(
   //----------------------------------------------------------------------------
   if (this->LoadBndPatch && !this->CreateEachSolutionAsBlock)
   {
-    vtkSmartPointer<vtkStructuredGrid> zoneGrid = vtkStructuredGrid::SafeDownCast(zoneDO);
-    assert(zoneGrid);
-    vtkPrivate::AddIsPatchArray(zoneGrid, false);
-
     vtkNew<vtkMultiBlockDataSet> newZoneMB;
-    newZoneMB->SetBlock(0, zoneGrid);
+
+    vtkSmartPointer<vtkStructuredGrid> zoneGrid = vtkStructuredGrid::SafeDownCast(zoneDO);
+    newZoneMB->SetBlock(0u, zoneGrid);
     newZoneMB->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Internal");
+    vtkPrivate::AddIsPatchArray(zoneGrid, false);
 
     vtkNew<vtkMultiBlockDataSet> patchesMB;
     newZoneMB->SetBlock(1, patchesMB.Get());
@@ -1275,7 +1386,9 @@ int vtkCGNSReader::GetCurvilinearZone(
             if (vtkPrivate::IsFamilyEnabled(binfo.FamilyName.c_str(), this))
             {
               const unsigned int idx = patchesMB->GetNumberOfBlocks();
-              vtkSmartPointer<vtkDataSet> ds = binfo.CreateDataSet(cellDim, zoneGrid);
+              vtkSmartPointer<vtkDataSet> ds = zoneGrid
+                ? binfo.CreateDataSet(cellDim, zoneGrid)
+                : vtkPrivate::readBCDataSet(binfo, base, zone, cellDim, physicalDim, zsize, this);
               vtkPrivate::AddIsPatchArray(ds, true);
               patchesMB->SetBlock(idx, ds);
               patchesMB->GetMetaData(idx)->Set(
@@ -1319,6 +1432,12 @@ int vtkCGNSReader::GetUnstructuredZone(
                     << "  sizeof cgsize_t = " << sizeof(cgsize_t) << "\n"
                     << "This may cause unexpected issues. If so, please recompile with "
                     << "VTK_USE_64BIT_IDS=ON.");
+  }
+  ////========================================================================
+  if (this->LoadMesh == false)
+  {
+    vtkWarningMacro(<< "Ability to not load mesh is currently only supported"
+                    << "for curvilinear grids and will be ignored.");
   }
   ////========================================================================
 
@@ -2084,7 +2203,8 @@ int vtkCGNSReader::GetUnstructuredZone(
     // cellDim=1 is based on the code that was previously here. With cellDim=1, I was
     // able to share the code between Curlinear and Unstructured grids for reading
     // solutions.
-    vtkPrivate::readSolution(*sniter, /*cellDim=*/1, physicalDim, zsize, ugrid, this);
+    vtkPrivate::readSolution(
+      *sniter, /*cellDim=*/1, physicalDim, zsize, ugrid, /*voi=*/nullptr, this);
   }
 
   // Handle Reference Values (Mach Number, ...)
@@ -2868,6 +2988,7 @@ void vtkCGNSReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "File Name: " << (this->FileName ? this->FileName : "(none)") << "\n";
   os << indent << "LoadBndPatch: " << this->LoadBndPatch << endl;
+  os << indent << "LoadMesh: " << this->LoadMesh << endl;
   os << indent << "CreateEachSolutionAsBlock: " << this->CreateEachSolutionAsBlock << endl;
   os << indent << "IgnoreFlowSolutionPointers: " << this->IgnoreFlowSolutionPointers << endl;
   os << indent << "DistributeBlocks: " << this->DistributeBlocks << endl;

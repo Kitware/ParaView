@@ -142,6 +142,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadMesh"
+        command="SetLoadMesh"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle to control whether the mesh for zones enabled should be read.
+          It can be used together to **Load Boundary Elements** to only load boundary condition
+          patches and not the whole mesh.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="DoublePrecisionMesh"
                          command="SetDoublePrecisionMesh"
                          number_of_elements="1"
@@ -242,6 +255,7 @@
           <Property name="FamilyInfo" />
           <Property name="FamilyStatus" />
           <Property name="LoadBndPatch" />
+          <Property name="LoadMesh" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CreateEachSolutionAsBlock" />
           <Property name="IgnoreFlowSolutionPointers" />
