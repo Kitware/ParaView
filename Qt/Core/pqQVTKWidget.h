@@ -46,7 +46,7 @@ class vtkSMSession;
 /**
 * pqQVTKWidget extends pqQVTKWidgetBase to add awareness for view proxies. The
 * advantage of doing that is that pqQVTKWidget can automatically update the
-* "ViewSize" propertu on the view proxy whenever the
+* "ViewSize" property on the view proxy whenever the
 * widget's size/position changes.
 *
 * This class also enables image-caching by default (image caching support is

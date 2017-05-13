@@ -193,7 +193,9 @@ public:
     QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
     fmt.setSamples(8);
     this->Widget->setFormat(fmt);
+    this->Widget->setEnableHiDPI(true);
 #endif
+
     this->Widget->setObjectName("1QVTKWidget0");
     this->Widget->SetRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
