@@ -1142,13 +1142,22 @@ void pqMultiBlockInspectorWidget::modelDataChanged(const QModelIndex& start, con
 //-----------------------------------------------------------------------------
 void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
 {
+  QMenu menu;
+
   pqInternals& internals = (*this->Internals);
   if (internals.Representation == nullptr || internals.SelectionModel->hasSelection() == false)
   {
+    const QAction* expandAll = menu.addAction("Expand All");
+    if (QAction* selAction = menu.exec(internals.Ui.treeView->mapToGlobal(pos)))
+    {
+      if (selAction == expandAll)
+      {
+        internals.Ui.treeView->expandAll();
+      }
+    }
     return;
   }
 
-  QMenu menu;
   const QAction* showBlocks = menu.addAction("Show Block(s)");
   const QAction* hideBlocks = menu.addAction("Hide Block(s)");
   menu.addSeparator();
@@ -1157,6 +1166,8 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
   menu.addSeparator();
   const QAction* setOpacities = menu.addAction("Set Block Opacities ...");
   const QAction* resetOpacities = menu.addAction("Reset Block Opacities");
+  menu.addSeparator();
+  const QAction* expandAll = menu.addAction("Expand All");
 
   if (QAction* selAction = menu.exec(internals.Ui.treeView->mapToGlobal(pos)))
   {
@@ -1237,6 +1248,10 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
       END_UNDO_SET();
       emit this->blockOpacitiesChanged();
       emit this->requestRender();
+    }
+    else if (selAction == expandAll)
+    {
+      internals.Ui.treeView->expandAll();
     }
   }
 }
