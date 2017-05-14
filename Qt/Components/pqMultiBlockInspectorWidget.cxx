@@ -258,11 +258,21 @@ public:
     , LUT()
     , WrapCount(0)
     , IconSize(16)
+    , RootLabel()
   {
     this->IconSize = std::max(p->style()->pixelMetric(QStyle::PM_SmallIconSize), 16);
   }
   virtual ~MultiBlockInspectorModel() {}
 
+  void setRootLabel(const QString& str)
+  {
+    if (str != this->RootLabel)
+    {
+      this->RootLabel = str;
+      QModelIndex rootIdx = this->index(0, 0, QModelIndex());
+      emit this->dataChanged(rootIdx, rootIdx);
+    }
+  }
   inline const int& iconSize() const { return this->IconSize; }
   void setOpacityColumn(int col) { this->OpacityColumn = col; }
   int opacityColumn() { return this->OpacityColumn; }
@@ -389,6 +399,23 @@ public:
           return QVariant();
       }
     }
+    if (this->RootLabel.isEmpty() == false && idx.column() == 0 && idx.parent().isValid() == false)
+    {
+      switch (role)
+      {
+        case Qt::DisplayRole:
+          return this->RootLabel;
+
+        case Qt::FontRole:
+        {
+          QFont font;
+          font.setBold(true);
+          return font;
+        }
+        default:
+          break;
+      }
+    }
 
     return this->sourceModel()->data(this->mapToSource(idx), role);
   }
@@ -427,6 +454,7 @@ private:
   vtkSmartPointer<vtkScalarsToColors> LUT;
   int WrapCount;
   int IconSize;
+  QString RootLabel;
 };
 
 //-----------------------------------------------------------------------------
@@ -664,6 +692,24 @@ public:
     }
   }
 
+  void updateRootLabel()
+  {
+    QString label;
+    if (pqOutputPort* port = this->OutputPort)
+    {
+      pqPipelineSource* src = port->getSource();
+      if (src->getNumberOfOutputPorts() > 1)
+      {
+        label = QString("%1:%2").arg(src->getSMName()).arg(port->getPortName());
+      }
+      else
+      {
+        label = QString("%1").arg(src->getSMName());
+      }
+    }
+    this->ProxyModel->setRootLabel(label);
+  }
+
   void resetModel()
   {
     pqTreeViewExpandState expandState;
@@ -684,7 +730,7 @@ public:
     {
       this->CDTModel->setUserCheckable(false);
     }
-
+    this->updateRootLabel();
     bool is_composite =
       this->CDTModel->reset(port != nullptr ? port->getDataInformation() : nullptr);
     if (!is_composite)
@@ -883,8 +929,9 @@ void pqMultiBlockInspectorWidget::setOutputPortInternal(pqOutputPort* port)
   internals.OutputPort = port;
   if (internals.OutputPort)
   {
-    this->connect(internals.OutputPort->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)),
-      SLOT(resetEventually()));
+    pqPipelineSource* src = internals.OutputPort->getSource();
+    this->connect(src, SIGNAL(dataUpdated(pqPipelineSource*)), SLOT(resetEventually()));
+    this->connect(src, SIGNAL(nameChanged(pqServerManagerModelItem*)), SLOT(nameChanged()));
   }
 
   this->updateRepresentation();
@@ -951,6 +998,13 @@ void pqMultiBlockInspectorWidget::updateScalarColoring()
     }
   }
   internals.ProxyModel->setScalarColoring(nullptr, 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorWidget::nameChanged()
+{
+  pqInternals& internals = (*this->Internals);
+  internals.updateRootLabel();
 }
 
 //-----------------------------------------------------------------------------

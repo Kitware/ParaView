@@ -162,6 +162,7 @@ private slots:
   void resetNow();
   void itemDoubleClicked(const QModelIndex&);
   void updateRepresentation();
+  void nameChanged();
 
   /**
    * Called when there's a potential for scalar coloring changes.
