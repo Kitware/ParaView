@@ -751,6 +751,71 @@
       <!-- End Line -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkCellTypeSource"
+                 label="Unstructured Cell Types"
+                 name="UnstructuredCellTypes">
+      <Documentation long_help="Generates cells of the specified type."
+                     short_help="Generate cells of the specified type">
+        Generate cells of the specified type. If a 1D cell type is chosen then
+        only the first value of BlocksDimension is used. If a 2D cell type is chosen
+        then only the first and second value of BlocksDimension is used. A cell block
+        may be divided into multiple cells (e.g. 6 pyramids will be in a cell block).
+      </Documentation>
+      <IntVectorProperty command="SetCellType"
+                         default_values="12"
+                         name="CellType"
+                         number_of_elements="1">
+        <Documentation>This property specifies the type of cells to generate.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Line"
+                 value="3" />
+          <Entry text="Quadratic Line"
+                 value="21" />
+          <Entry text="Cubic Line"
+                 value="35" />
+          <Entry text="Triangle"
+                 value="5" />
+          <Entry text="Quad"
+                 value="9" />
+          <Entry text="Quadratic Triangle"
+                 value="22" />
+          <Entry text="Quadratic Quad"
+                 value="23" />
+          <Entry text="Tet"
+                 value="10" />
+          <Entry text="Hex"
+                 value="12" />
+          <Entry text="Wedge"
+                 value="13" />
+          <Entry text="Pyramid"
+                 value="14" />
+          <Entry text="Quadratic Tet"
+                 value="24" />
+          <Entry text="Quadratic Hex"
+                 value="25" />
+          <Entry text="Quadratic Wedge"
+                 value="26" />
+          <Entry text="Quadratic Pyramid"
+                 value="27" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBlocksDimensions"
+                         default_values="10 10 10"
+                         name="BlocksDimensions"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>Sets the number of blocks of cells in each direction.
+        A cell block may be divided into multiple cells (e.g. there will be
+        6 pyramid cells in a cell block). If a 1D cell type is chosen only
+        the first blocks dimension will be used. If a 2D cell type is chosen the
+        first and second blocks dimensinos will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of CellTypeSource -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkLineSource"
                  label="Ruler"
                  name="Ruler">

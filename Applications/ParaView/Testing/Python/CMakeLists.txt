@@ -26,6 +26,10 @@ if (numpy_found)
     TestAnnotateAttributeData.py
     CinemaAERTest.py
     )
+  paraview_add_test_python(
+    NO_VALID NO_OUTPUT NO_RT
+    UnstructuredCellTypePythonCalculator.py
+    )
   set(PARAVIEW_PYTHON_ARGS)
 
   if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
