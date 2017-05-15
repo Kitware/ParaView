@@ -28,6 +28,7 @@ if (numpy_found)
     )
   paraview_add_test_python(
     NO_VALID NO_OUTPUT NO_RT
+    AppendAttributes.py
     UnstructuredCellTypePythonCalculator.py
     )
   set(PARAVIEW_PYTHON_ARGS)
