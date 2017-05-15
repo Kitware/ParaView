@@ -740,6 +740,8 @@ public:
     else
     {
       this->Ui.treeView->setModel(this->ProxyModel);
+      // selection model need to be reset.
+      this->Ui.treeView->setSelectionModel(this->SelectionModel);
       this->Ui.treeView->expandToDepth(1);
 
       QHeaderView* header = this->Ui.treeView->header();
