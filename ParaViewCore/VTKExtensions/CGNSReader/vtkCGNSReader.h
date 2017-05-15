@@ -36,6 +36,7 @@
 #define vtkCGNSReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
 
 class vtkDataSet;
@@ -73,8 +74,20 @@ public:
   void SetBaseArrayStatus(const char* name, int status);
   void DisableAllBases();
   void EnableAllBases();
-
   int GetNumberOfBaseArrays();
+
+  //@{
+  /**
+   * Method that allows setting/getting of node families.
+   */
+  int GetNumberOfFamilyArrays();
+  const char* GetFamilyArrayName(int index);
+  void SetFamilyArrayStatus(const char* name, int status);
+  int GetFamilyArrayStatus(const char* name);
+  void EnableAllFamilies();
+  void DisableAllFamilies();
+  //@}
+
   int GetNumberOfPointArrays();
   int GetNumberOfCellArrays();
 
@@ -98,9 +111,25 @@ public:
   vtkGetMacro(DoublePrecisionMesh, int);
   vtkBooleanMacro(DoublePrecisionMesh, int);
 
+  //@{
+  /**
+   * Enable/disable loading of boundary condition patches.
+   * Defaults to off.
+   */
   vtkSetMacro(LoadBndPatch, int);
   vtkGetMacro(LoadBndPatch, int);
   vtkBooleanMacro(LoadBndPatch, int);
+  //@}
+
+  //@{
+  /**
+   * Enable/disable loading of zone mesh. Defaults to on. It may be turned off
+   * to load only boundary patches (when LoadBndPatch if ON), for example.
+   */
+  vtkSetMacro(LoadMesh, bool);
+  vtkGetMacro(LoadMesh, bool);
+  vtkBooleanMacro(LoadMesh, bool);
+  //@}
 
   /**
    * This option is provided for debugging and should not be used for production
@@ -164,9 +193,10 @@ protected:
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  vtkDataArraySelection* BaseSelection;
-  vtkDataArraySelection* PointDataArraySelection;
-  vtkDataArraySelection* CellDataArraySelection;
+  vtkNew<vtkDataArraySelection> BaseSelection;
+  vtkNew<vtkDataArraySelection> PointDataArraySelection;
+  vtkNew<vtkDataArraySelection> CellDataArraySelection;
+  vtkNew<vtkDataArraySelection> FamilySelection;
 
   // The observer to modify this object when the array selections are
   // modified.
@@ -193,6 +223,7 @@ private:
 
   char* FileName;                // cgns file name
   int LoadBndPatch;              // option to set section loading for unstructured grid
+  bool LoadMesh;                 // option to enable/disable mesh loading
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;
