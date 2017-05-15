@@ -548,7 +548,10 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
             return { 'error': 'Unable to get view with id %s' % viewId }
 
         realViewId = sView.GetGlobalIDAsString()
-        observerInfo = self.trackingViews[realViewId]
+
+        observerInfo = None
+        if realViewId in self.trackingViews:
+            observerInfo = self.trackingViews[realViewId]
 
         if not observerInfo:
             return { 'error': 'Unable to find subscription for view %s' % realViewId }
