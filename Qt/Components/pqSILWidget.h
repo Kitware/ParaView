@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSILWidget_h
 
 #include "pqComponentsModule.h"
+#include "pqTreeViewSelectionHelper.h"
+#include "vtkConfigure.h"
 #include <QList>
 #include <QPointer>
 #include <QTabWidget>

@@ -79,7 +79,7 @@ public:
   */
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const
   {
-    return this->sourceModel()->columnCount(this->mapToSource(theParent));
+    return this->sourceModel()->columnCount(this->mapToSource(theParent)) + 1;
   }
 
   /**
@@ -105,6 +105,10 @@ public:
   */
   virtual QModelIndex index(int row, int column, const QModelIndex& theParent = QModelIndex()) const
   {
+    if (column == this->columnCount(theParent) - 1)
+    {
+      return this->createIndex(row, column);
+    }
     QModelIndex sourceIndex = this->sourceModel()->index(row, column, this->mapToSource(theParent));
     return this->mapFromSource(sourceIndex);
   }

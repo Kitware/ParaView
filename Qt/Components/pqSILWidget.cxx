@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSILWidget.h"
 
 #include <QDebug>
+
+#include <QAction>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>
@@ -140,11 +143,14 @@ void pqSILWidget::onModelReset()
 #else
   activeTree->header()->setClickable(true);
 #endif
+  activeTree->header()->moveSection(0, 1);
 
   QObject::connect(activeTree->header(), SIGNAL(sectionClicked(int)), this->ActiveModel,
     SLOT(toggleRootCheckState()), Qt::QueuedConnection);
   activeTree->setModel(this->SortModel);
   activeTree->expandAll();
+  activeTree->header()->swapSections(0, 1);
+  activeTree->resizeColumnToContents(1);
   this->TabWidget->addTab(activeTree, this->ActiveCategory);
   new pqTreeViewSelectionHelper(activeTree);
 
@@ -164,8 +170,8 @@ void pqSILWidget::onModelReset()
     tree->header()->setStretchLastSection(true);
     tree->setRootIsDecorated(false);
 
-    pqProxySILModel* proxyModel =
-      new pqProxySILModel(this->Model->data(this->Model->index(cc, 0)).toString(), tree);
+    QString category = this->Model->data(this->Model->index(cc, 0)).toString();
+    pqProxySILModel* proxyModel = new pqProxySILModel(category, tree);
     proxyModel->setSourceModel(this->Model);
 
 #if QT_VERSION >= 0x050000
@@ -173,13 +179,19 @@ void pqSILWidget::onModelReset()
 #else
     tree->header()->setClickable(true);
 #endif
+    tree->header()->moveSection(0, 1);
     QObject::connect(tree->header(), SIGNAL(sectionClicked(int)), proxyModel,
       SLOT(toggleRootCheckState()), Qt::QueuedConnection);
-    tree->setModel(proxyModel);
+
+    QSortFilterProxyModel* sortModel = new QSortFilterProxyModel(tree);
+    sortModel->setSourceModel(proxyModel);
+    tree->setModel(sortModel);
     tree->expandAll();
     new pqTreeViewSelectionHelper(tree);
+    tree->header()->swapSections(0, 1);
+    tree->resizeColumnToContents(1);
 
-    this->TabWidget->addTab(tree, proxyModel->headerData(cc, Qt::Horizontal).toString());
+    this->TabWidget->addTab(tree, category);
   }
 }
 
