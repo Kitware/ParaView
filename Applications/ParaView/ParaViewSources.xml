@@ -25,6 +25,7 @@
   <Proxy group="sources" name="SuperquadricSource" />
   <Proxy group="sources" name="TextSource" />
   <Proxy group="sources" name="TimeSource" />
+  <Proxy group="sources" name="UnstructuredCellTypes" />
   <Proxy group="sources" name="RTAnalyticSource" />
   <Proxy group="sources" name="AMRGaussianPulseSource" />
 </ParaViewSources>
