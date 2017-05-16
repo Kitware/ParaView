@@ -84,7 +84,8 @@ signals:
   /**
   * signal the value was edited
   * this means the user is done changing text
-  * or the slider was moved
+  * or the user is done moving the slider. It implies
+  * value was changed and editing has finished.
   */
   void valueEdited(int);
 
@@ -109,6 +110,10 @@ private slots:
   void editingFinished();
   void updateValidator();
   void domainChanged();
+  void emitValueEdited();
+  void emitIfDeferredValueEdited();
+  void sliderPressed();
+  void sliderReleased();
 
 private:
   int Value;
@@ -120,6 +125,8 @@ private:
   bool StrictRange;
   vtkSmartPointer<vtkSMIntRangeDomain> Domain;
   vtkEventQtSlotConnect* DomainConnection;
+  bool InteractingWithSlider;
+  bool DeferredValueEdited;
 };
 
 #endif

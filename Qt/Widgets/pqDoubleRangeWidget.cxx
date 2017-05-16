@@ -49,6 +49,8 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   this->Maximum = 1;
   this->Resolution = 100;
   this->StrictRange = false;
+  this->InteractingWithSlider = false;
+  this->DeferredValueEdited = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -67,6 +69,11 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
     this->LineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
   QObject::connect(
     this->LineEdit, SIGNAL(textChangedAndEditingFinished()), this, SLOT(editingFinished()));
+
+  // let's avoid firing `valueChanged` events until the user has released the
+  // slider.
+  this->connect(this->Slider, SIGNAL(sliderPressed()), SLOT(sliderPressed()));
+  this->connect(this->Slider, SIGNAL(sliderReleased()), SLOT(sliderReleased()));
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +192,7 @@ void pqDoubleRangeWidget::sliderChanged(int val)
     this->BlockUpdate = true;
     this->LineEdit->setTextAndResetCursor(QString().setNum(v));
     this->setValue(v);
-    emit this->valueEdited(v);
+    this->emitValueEdited();
     this->BlockUpdate = false;
   }
 }
@@ -209,7 +216,30 @@ void pqDoubleRangeWidget::textChanged(const QString& text)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::editingFinished()
 {
-  emit this->valueEdited(this->Value);
+  this->emitValueEdited();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::emitValueEdited()
+{
+  if (this->InteractingWithSlider == false)
+  {
+    emit this->valueEdited(this->Value);
+  }
+  else
+  {
+    this->DeferredValueEdited = true;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::emitIfDeferredValueEdited()
+{
+  if (this->DeferredValueEdited)
+  {
+    this->DeferredValueEdited = false;
+    this->emitValueEdited();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -221,4 +251,17 @@ void pqDoubleRangeWidget::updateSlider()
   int v = qRound(fraction * static_cast<double>(this->Resolution));
   this->Slider->setValue(v);
   this->Slider->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::sliderPressed()
+{
+  this->InteractingWithSlider = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::sliderReleased()
+{
+  this->InteractingWithSlider = false;
+  this->emitIfDeferredValueEdited();
 }
