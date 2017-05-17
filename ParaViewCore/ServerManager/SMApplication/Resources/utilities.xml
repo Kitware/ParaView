@@ -944,7 +944,7 @@
         <Documentation>Sets the justification of the title text with respect to the scalar color bar.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetScalarBarThickness"
-                         default_values="10"
+                         default_values="16"
                          name="ScalarBarThickness"
                          label="Color Bar Thickness"
                          number_of_elements="1">
