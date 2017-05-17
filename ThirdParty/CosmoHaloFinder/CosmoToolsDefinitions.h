@@ -85,6 +85,7 @@
 #ifdef TYPE_IDS_64BITS
   typedef int64_t ID_T;
   #define MPI_ID_T MPI_INT64_T
+  #define ID_T_FMT "lld"
 
 #ifndef MPI_INT64_T
 #define MPI_INT64_T (sizeof(long) == 8 ? MPI_LONG : MPI_LONG_LONG)
@@ -97,6 +98,7 @@
 #else
   typedef int32_t ID_T;
   #define MPI_ID_T MPI_INT32_T
+  #define ID_T_FMT "ld"
 
 #ifdef USEDIY
   #define DIY_ID_T DIY_INT
