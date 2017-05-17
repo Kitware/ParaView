@@ -15373,6 +15373,18 @@ source.</Documentation>
         </DataTypeDomain>
       </InputProperty>
 
+      <IntVectorProperty command="SetUseRange"
+                         name="Mode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Select Time Steps"
+                 value="0" />
+          <Entry text="Select Time Range"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty animateable="1"
                          command="AddTimeStepIndex"
                          clean_command="ClearTimeStepIndices"
@@ -15389,11 +15401,41 @@ source.</Documentation>
         <Documentation>
           This property specifies the indices of the time steps to extract.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="0">
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues">
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetRange"
+                         name="TimeStepRange"
+                         number_of_elements="2"
+                         default_values="0 1">
+        <TimeStepIndexDomain name="timestep_index_range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Input" name="Input"/>
+          </RequiredProperties>
+        </TimeStepIndexDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="1">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetTimeStepInterval"
+                         name="TimeStepInterval"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Mode" value="1">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
 
       <PropertyGroup label="Time Step Indices">
         <Property name="TimeStepIndices" />
