@@ -193,6 +193,8 @@ bool pqQVTKWidget::renderVTK()
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   return this->canRender() ? this->Superclass::renderVTK() : false;
+#else
+  return false;
 #endif
 }
 
