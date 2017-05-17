@@ -121,7 +121,7 @@
   <action name="actionLoadPalette">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqPalette32.png</normaloff>:/pqWidgets/Icons/pqPalette32.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqPalette.png</normaloff>:/pqWidgets/Icons/pqPalette.png</iconset>
    </property>
    <property name="text">
     <string>Load Palette</string>
