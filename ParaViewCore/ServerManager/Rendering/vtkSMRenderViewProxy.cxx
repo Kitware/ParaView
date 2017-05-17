@@ -786,7 +786,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
+bool vtkSMRenderViewProxy::SelectInternal(const vtkClientServerStream& csstream,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
 {
   if (!this->IsSelectionAvailable())
@@ -796,31 +796,36 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
 
   this->IsSelectionCached = true;
 
+  // Call PreRender since Select making will cause multiple renders on the
+  // render window. Calling PreRender ensures that the view is ready to render.
+  vtkTypeUInt32 render_location = this->PreRender(/*interactive=*/false);
+  this->ExecuteStream(csstream, false, render_location);
+  bool retVal =
+    this->FetchLastSelection(multiple_selections, selectedRepresentations, selectionSources);
+  this->PostRender(false);
+  return retVal;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
+  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
+{
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SelectCells" << region[0]
          << region[1] << region[2] << region[3] << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-
-  return this->FetchLastSelection(multiple_selections, selectedRepresentations, selectionSources);
+  return this->SelectInternal(
+    stream, selectedRepresentations, selectionSources, multiple_selections);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
 {
-  if (!this->IsSelectionAvailable())
-  {
-    return false;
-  }
-
-  this->IsSelectionCached = true;
-
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SelectPoints" << region[0]
          << region[1] << region[2] << region[3] << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-
-  return this->FetchLastSelection(multiple_selections, selectedRepresentations, selectionSources);
+  return this->SelectInternal(
+    stream, selectedRepresentations, selectionSources, multiple_selections);
 }
 
 namespace
@@ -1107,10 +1112,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
 bool vtkSMRenderViewProxy::SelectPolygonPoints(vtkIntArray* polygonPts,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
 {
-  if (!this->IsSelectionAvailable())
-  {
-    return false;
-  }
   return this->SelectPolygonInternal(polygonPts, selectedRepresentations, selectionSources,
     multiple_selections, "SelectPolygonPoints");
 }
@@ -1119,10 +1120,6 @@ bool vtkSMRenderViewProxy::SelectPolygonPoints(vtkIntArray* polygonPts,
 bool vtkSMRenderViewProxy::SelectPolygonCells(vtkIntArray* polygonPts,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
 {
-  if (!this->IsSelectionAvailable())
-  {
-    return false;
-  }
   return this->SelectPolygonInternal(polygonPts, selectedRepresentations, selectionSources,
     multiple_selections, "SelectPolygonCells");
 }
@@ -1132,17 +1129,14 @@ bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
   const char* method)
 {
-  this->IsSelectionCached = true;
-
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << method
          << vtkClientServerStream::InsertArray(polygonPts->GetPointer(0),
               polygonPts->GetNumberOfTuples() * polygonPts->GetNumberOfComponents())
          << polygonPts->GetNumberOfTuples() * polygonPts->GetNumberOfComponents()
          << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-
-  return this->FetchLastSelection(multiple_selections, selectedRepresentations, selectionSources);
+  return this->SelectInternal(
+    stream, selectedRepresentations, selectionSources, multiple_selections);
 }
 
 //----------------------------------------------------------------------------
