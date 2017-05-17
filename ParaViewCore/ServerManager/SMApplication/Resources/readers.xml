@@ -5550,7 +5550,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="xmf xdmf"
+        <ReaderFactory extensions="xmf xdmf xmf2 xdmf2"
                        file_description="Xdmf Reader" />
       </Hints>
       <!-- End of XdmfReader -->
