@@ -81,7 +81,8 @@ signals:
   /**
   * signal the value was edited
   * this means the user is done changing text
-  * or the slider was moved
+  * or the user is done moving the slider. It implies
+  * value was changed and editing has finished.
   */
   void valueEdited(double);
 
@@ -109,6 +110,10 @@ private slots:
   void editingFinished();
   void updateValidator();
   void updateSlider();
+  void sliderPressed();
+  void sliderReleased();
+  void emitValueEdited();
+  void emitIfDeferredValueEdited();
 
 private:
   int Resolution;
@@ -119,6 +124,8 @@ private:
   pqLineEdit* LineEdit;
   bool BlockUpdate;
   bool StrictRange;
+  bool InteractingWithSlider;
+  bool DeferredValueEdited;
 };
 
 #endif
