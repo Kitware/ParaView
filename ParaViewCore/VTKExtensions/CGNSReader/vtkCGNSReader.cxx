@@ -345,11 +345,11 @@ public:
 
 //----------------------------------------------------------------------------
 vtkCGNSReader::vtkCGNSReader()
-  : Internal(new CGNSRead::vtkCGNSMetaData())
-  , BaseSelection()
+  : BaseSelection()
   , PointDataArraySelection()
   , CellDataArraySelection()
   , FamilySelection()
+  , Internal(new CGNSRead::vtkCGNSMetaData())
 {
   this->FileName = NULL;
 
