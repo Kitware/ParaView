@@ -124,7 +124,8 @@
     <file>Icons/pqOpen32.png</file>
     <file>Icons/pqOptions16.png</file>
     <file>Icons/pqPaste22.png</file>
-    <file>Icons/pqPalette32.png</file>
+    <file>Icons/pqPalette.png</file>
+    <file>Icons/pqPalette@2x.png</file>
     <file>Icons/pqPickCenter24.png</file>
     <file>Icons/pqPickCenter.png</file>
     <file>Icons/pqPickCenter@2x.png</file>
