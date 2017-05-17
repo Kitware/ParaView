@@ -216,6 +216,8 @@ private slots:
 
   void onShowHiddenFiles(const bool& hide);
 
+  void onShowDetailToggled(bool show);
+
   // Called when the user changes the file selection.
   void fileSelectionChanged();
 

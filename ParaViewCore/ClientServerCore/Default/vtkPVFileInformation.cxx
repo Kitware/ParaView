@@ -359,6 +359,7 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Name = NULL;
   this->FullPath = NULL;
   this->FastFileTypeDetection = 0;
+  this->ReadDetailedFileInformation = false;
   this->Hidden = false;
   this->Extension = NULL;
   this->Size = 0;
@@ -410,6 +411,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   }
 
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
+  this->ReadDetailedFileInformation = helper->GetReadDetailedFileInformation();
 
   std::string working_directory = vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
   if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
@@ -872,26 +874,34 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->Type = INVALID;
     info->SetHiddenFlag();
 
-    // Recover status info
     vtksys::SystemTools::Stat_t status;
-    int res = vtksys::SystemTools::Stat(info->FullPath, &status);
-    if (res != -1)
+    int res;
+    if (this->ReadDetailedFileInformation)
     {
-      if (!S_ISDIR(status.st_mode))
+      // Recover status info
+      res = vtksys::SystemTools::Stat(info->FullPath, &status);
+      if (res != -1)
       {
-        std::string::size_type pos = std::string(d->d_name).rfind('.');
-        if (pos != std::string::npos)
+        if (!S_ISDIR(status.st_mode))
         {
-          std::string ext = std::string(d->d_name).substr(pos + 1);
-          info->SetExtension(ext.c_str());
+          std::string::size_type pos = std::string(d->d_name).rfind('.');
+          if (pos != std::string::npos)
+          {
+            std::string ext = std::string(d->d_name).substr(pos + 1);
+            info->SetExtension(ext.c_str());
+          }
         }
+        info->Size = status.st_size;
+        info->ModificationTime = status.st_mtime;
       }
-      info->Size = status.st_size;
-      info->ModificationTime = status.st_mtime;
     }
 // fix to bug #09452 such that directories with trailing names can be
 // shown in the file dialog
 #if defined(__SVR4) && defined(__sun)
+    if (!this->ReadDetailedFileInformation)
+    {
+      res = vtksys::SystemTools::Stat(info->FullPath, &status);
+    }
     if (res != -1 && status.st_mode & S_IFDIR)
     {
       info->Type = DIRECTORY;

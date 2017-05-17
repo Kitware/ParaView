@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QStyle>
 
+#include <pqApplicationCore.h>
 #include <pqServer.h>
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
@@ -50,9 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVFileInformationHelper.h>
 #include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
+#include <vtkSMPropertyHelper.h>
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
+#include <vtkSMSettings.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringList.h>
@@ -274,6 +277,33 @@ private:
   int numPrefix;
 };
 
+bool getShowDetailedInformationSetting()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSMProxy* helperProxy = pxm->NewProxy("misc", "FileInformationHelper");
+  settings->GetProxySettings(helperProxy);
+  bool result = vtkSMPropertyHelper(helperProxy, "ReadDetailedFileInformation").GetAsInt() == 1;
+  helperProxy->Delete();
+  return result;
+}
+
+bool setShowDetailedInformationSetting(pqServer* server, bool show)
+{
+  if (!server)
+  {
+    server = pqApplicationCore::instance()->getActiveServer();
+  }
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSMProxy* helperProxy = pxm->NewProxy("misc", "FileInformationHelper");
+  vtkSMPropertyHelper(helperProxy, "ReadDetailedFileInformation").Set(show ? 1 : 0);
+  helperProxy->UpdateVTKObjects();
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->SetProxySettings(helperProxy);
+  helperProxy->Delete();
+}
+
 } // namespace
 
 /////////////////////////////////////////////////////////////////////////
@@ -300,12 +330,16 @@ public:
       QString separator =
         pqSMAdaptor::getElementProperty(helper->GetProperty("PathSeparator")).toString();
       this->Separator = separator.toLocal8Bit().data()[0];
+      // Since this isn't going through the proxy widget we have to manually restore the setting
+      vtkSMPropertyHelper(helper, "ReadDetailedFileInformation")
+        .Set(getShowDetailedInformationSetting());
     }
     else
     {
       vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
       this->FileInformationHelper = helper;
       helper->Delete();
+      helper->SetReadDetailedFileInformation(getShowDetailedInformationSetting());
       this->Separator = helper->GetPathSeparator()[0];
     }
 
@@ -509,6 +543,36 @@ public:
     return NULL;
   }
 
+  void setShowDetailedInformation(bool show)
+  {
+    if (this->FileInformationHelperProxy)
+    {
+      vtkSMPropertyHelper(this->FileInformationHelperProxy, "ReadDetailedFileInformation")
+        .Set(show);
+    }
+    else if (this->FileInformationHelper)
+    {
+      this->FileInformationHelper->SetReadDetailedFileInformation(show);
+    }
+    setShowDetailedInformationSetting(this->Server, show);
+  }
+
+  bool isShowingDetailedInformation() const
+  {
+    bool currentValue = false;
+    if (this->FileInformationHelperProxy)
+    {
+      currentValue =
+        vtkSMPropertyHelper(this->FileInformationHelperProxy, "ReadDetailedFileInformation")
+          .GetAsInt() == 1;
+    }
+    else if (this->FileInformationHelper)
+    {
+      currentValue = this->FileInformationHelper->GetReadDetailedFileInformation();
+    }
+    return currentValue;
+  }
+
 private:
   // server vs. local implementation private
   pqServer* Server;
@@ -529,6 +593,17 @@ pqFileDialogModel::pqFileDialogModel(pqServer* _server, QObject* Parent)
 pqFileDialogModel::~pqFileDialogModel()
 {
   delete this->Implementation;
+}
+
+bool pqFileDialogModel::isShowingDetailedInfo()
+{
+  return this->Implementation->isShowingDetailedInformation();
+}
+
+void pqFileDialogModel::setShowDetailedInfo(bool show)
+{
+  this->Implementation->setShowDetailedInformation(show);
+  this->setCurrentPath(this->getCurrentPath());
 }
 
 pqServer* pqFileDialogModel::server() const

@@ -318,6 +318,8 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
     style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
   this->Implementation->Ui.CreateFolder->setDisabled(true);
 
+  this->Implementation->Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
+
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -411,6 +413,11 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
 
   // Use saved state if any
   this->restoreState();
+
+  bool showDetail = this->Implementation->Model->isShowingDetailedInfo();
+  this->Implementation->Ui.ShowDetail->setChecked(showDetail);
+  this->Implementation->Ui.Files->setColumnHidden(2, !showDetail);
+  this->Implementation->Ui.Files->setColumnHidden(3, !showDetail);
 }
 
 //-----------------------------------------------------------------------------
@@ -738,6 +745,13 @@ void pqFileDialog::onModelReset()
     this->Implementation->Ui.Parents->addItem(str);
   }
   this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
+  disconnect(this->Implementation->Ui.ShowDetail, SIGNAL(clicked(bool)), NULL, NULL);
+  connect(this->Implementation->Ui.ShowDetail, SIGNAL(clicked(bool)), this,
+    SLOT(onShowDetailToggled(bool)));
+  bool showDetail = this->Implementation->Model->isShowingDetailedInfo();
+  this->Implementation->Ui.ShowDetail->setChecked(showDetail);
+  this->Implementation->Ui.Files->setColumnHidden(2, !showDetail);
+  this->Implementation->Ui.Files->setColumnHidden(3, !showDetail);
 }
 
 //-----------------------------------------------------------------------------
@@ -861,6 +875,14 @@ void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
 void pqFileDialog::onShowHiddenFiles(const bool& hidden)
 {
   this->Implementation->FileFilter.setShowHidden(hidden);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onShowDetailToggled(bool show)
+{
+  this->Implementation->Model->setShowDetailedInfo(show);
+  this->Implementation->Ui.Files->setColumnHidden(2, !show);
+  this->Implementation->Ui.Files->setColumnHidden(3, !show);
 }
 
 //-----------------------------------------------------------------------------
