@@ -67,6 +67,8 @@
                  value="0" />
           <Entry text="ZLib"
                  value="1" />
+          <Entry text="LZ4"
+                 value="2" />
         </EnumerationDomain>
         <Documentation>The compression algorithm used to compress binary data
         (appended mode only).</Documentation>
