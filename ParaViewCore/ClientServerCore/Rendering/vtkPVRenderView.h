@@ -188,14 +188,16 @@ public:
 
   /**
    * Triggers a high-resolution render.
-   * \note CallOnAllProcesses
+   * \note Can be called on processes involved in rendering i.e those returned
+   * by `this->GetStillRenderProcesses()`.
    */
   virtual void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
-   * \note CallOnAllProcesses
+   * \note Can be called on processes involved in rendering i.e those returned
+   * by `this->GetInteractiveRenderProcesses()`.
    */
   virtual void InteractiveRender() VTK_OVERRIDE;
 
@@ -346,7 +348,9 @@ public:
   /**
    * Make a selection. This will result in setting up of this->LastSelection
    * which can be accessed using GetLastSelection().
-   * \note CallOnAllProcesses
+   * \note This method is called on call rendering processes and client (or
+   * driver). Thus, if doing client only rendering, this shouldn't be called on
+   * server nodes.
    */
   void SelectCells(int region[4]);
   void SelectCells(int region0, int region1, int region2, int region3)
@@ -370,7 +374,9 @@ public:
    * is the total length of polygon2DArray.
    * This will result in setting up of this->LastSelection
    * which can be accessed using GetLastSelection().
-   * \note CallOnAllProcesses
+   * \note This method is called on call rendering processes and client (or
+   * driver). Thus, if doing client only rendering, this shouldn't be called on
+   * server nodes.
    */
   void SelectPolygonPoints(int* polygon2DArray, vtkIdType arrayLen);
   void SelectPolygonCells(int* polygon2DArray, vtkIdType arrayLen);
@@ -379,7 +385,8 @@ public:
 
   //@{
   /**
-   * Provides access to the last selection.
+   * Provides access to the last selection. This is valid only on the client or
+   * driver node displaying the composited result.
    */
   vtkGetObjectMacro(LastSelection, vtkSelection);
   //@}

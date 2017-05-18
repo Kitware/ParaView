@@ -292,6 +292,13 @@ private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
 
+  /**
+   * Internal method to execute `cmd` on the rendering processes to do rendering
+   * for selection.
+   */
+  bool SelectInternal(const vtkClientServerStream& cmd, vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, bool multiple_selections);
+
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 };
 
