@@ -665,7 +665,6 @@ public:
 
   {
     this->Ui.setupUi(self);
-    this->ProxyModel->setSourceModel(this->CDTModel);
     this->Ui.treeView->header()->setDefaultSectionSize(this->ProxyModel->iconSize() + 4);
     this->Ui.treeView->header()->setMinimumSectionSize(this->ProxyModel->iconSize() + 4);
     this->Ui.treeView->setModel(this->ProxyModel);
@@ -735,13 +734,11 @@ public:
       this->CDTModel->reset(port != nullptr ? port->getDataInformation() : nullptr);
     if (!is_composite)
     {
-      this->Ui.treeView->setModel(nullptr);
+      this->ProxyModel->setSourceModel(nullptr);
     }
     else
     {
-      this->Ui.treeView->setModel(this->ProxyModel);
-      // selection model need to be reset.
-      this->Ui.treeView->setSelectionModel(this->SelectionModel);
+      this->ProxyModel->setSourceModel(this->CDTModel);
       this->Ui.treeView->expandToDepth(1);
 
       QHeaderView* header = this->Ui.treeView->header();
