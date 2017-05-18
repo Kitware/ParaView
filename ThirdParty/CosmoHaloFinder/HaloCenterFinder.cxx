@@ -290,7 +290,7 @@ int HaloCenterFinder::mostConnectedParticleHist()
      int my_index=(this->xx[i]==x_max) ? bin_size-1: (int) ((this->xx[i]-x_min)/del_x);
      if(my_index < 0 || my_index > bin_size-1){
         printf("\nIncorrect X.  x=%.3e, x_max=%.3e, x_min=%.3e, del_x=%.3e, my_indx=%d",this->xx[i],x_max,x_min,del_x,my_index);
-        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
         return -1;
       }
      x_hist[my_index]++;
@@ -302,7 +302,7 @@ int HaloCenterFinder::mostConnectedParticleHist()
      my_index=(this->yy[i]==y_max) ? bin_size-1: (int) ((this->yy[i]-y_min)/del_y);
      if(my_index < 0 || my_index > bin_size-1){
         printf("\nIncorrect Y. y=%.3e, y_max=%.3e, y_min=%.3e, del_y=%.3e, my_indx=%d",this->yy[i],y_max,y_min,del_y,my_index);
-        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
         return -1;
       }
      y_hist[my_index]++;
@@ -314,7 +314,7 @@ int HaloCenterFinder::mostConnectedParticleHist()
      my_index=(this->zz[i]==z_max) ? bin_size-1: (int) ((this->zz[i]-z_min)/del_z);
      if(my_index < 0 || my_index > bin_size-1){
         printf("\nIncorrect Z. z=%.3e, z_max=%.3e, z_min=%.3e, del_z=%.3e, my_indx=%d",this->zz[i],z_max,z_min,del_z,my_index);
-        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+        printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
         return -1;
       }
      z_hist[my_index]++;
@@ -422,17 +422,17 @@ int HaloCenterFinder::mostConnectedParticleHist()
 
     if(index_x<0 || index_x > bin_size_2d-1){
       printf("\nIncorrect 2dX:%d,%d,%d,%.5e,%.5e,%.5e,%.5f",this->myProc,index_x,bin_size_2d,x_short[i],x_min,del_x,x_max);
-      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
       return -1;
     }
     if(index_y<0 || index_y > bin_size_2d-1){
       printf("\nIncorrect 2dY:%d,%d,%d,%.5e,%.5e,%.5e,%.5f",this->myProc,index_y,bin_size_2d,y_short[i],y_min,del_y,y_max);
-      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
       return -1;
     }
     if(index_z<0 || index_z > bin_size_2d-1){
       printf("\nIncorrect 2dZ:%d,%d,%d,%.5e,%.5e,%.5e,%.5f",this->myProc,index_z,bin_size_2d,z_short[i],z_min,del_z,z_max);
-      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%lld. Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
+      printf("\nWarning, Halo Center Finding Algorithm Error for ID=%" ID_T_FMT ". Dont panic, using MBP algorithm for this Halo.\n",this->tag[i]);
       return -1;
     }
     int hash=bin_size_2d*index_x+index_y;
