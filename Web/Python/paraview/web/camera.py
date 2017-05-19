@@ -15,3 +15,6 @@ def create_cylindrical_camera(viewProxy, dataHandler, phiValues, translationValu
 
 def create_cube_camera(viewProxy, dataHandler, viewForward, viewUp, positions):
     return camera.CubeCamera(dataHandler, viewForward, viewUp, positions)
+
+def create_stereo_cube_camera(viewProxy, dataHandler, viewForward, viewUp, positions, eyeSeparation = 6.5):
+    return camera.StereoCubeCamera(dataHandler, viewForward, viewUp, positions, eyeSeparation)
