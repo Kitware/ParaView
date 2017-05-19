@@ -95,7 +95,7 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="xmf xdmf"
+        <ReaderFactory extensions="xmf xdmf xmf3 xdmf3"
                        file_description="Xdmf3 Reader" />
       </Hints>
       <!-- End of Xdmf3Reader -->
@@ -128,7 +128,7 @@ type, otherwise it's a vtkMultiBlockDataSet.
       </IntVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="xmf xdmf"
+        <ReaderFactory extensions="xmf xdmf xmf3 xdmf3"
                        file_description="Xdmf3 Reader" />
       </Hints>
       <!-- End of Xdmf3ReaderT -->
@@ -158,7 +158,7 @@ type, otherwise it's a vtkMultiBlockDataSet.
       </IntVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="xmf xdmf"
+        <ReaderFactory extensions="xmf xdmf xmf3 xdmf3"
                        file_description="Xdmf3 Reader (Top Level Partition)" />
       </Hints>
       <!-- End of Xdmf3ReaderS -->
