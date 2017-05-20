@@ -1455,7 +1455,7 @@
                  value="0" />
           <Entry text="LowerLeftCorner"
                  value="1" />
-          <Entry text="LoweRightCorner"
+          <Entry text="LowerRightCorner"
                  value="2" />
           <Entry text="LowerCenter"
                  value="3" />
