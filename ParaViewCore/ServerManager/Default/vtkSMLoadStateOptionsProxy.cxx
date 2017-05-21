@@ -258,8 +258,8 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
       }
 
       exposedName.append(".").append(propertyXML.attribute("name").value());
-      this->ExposeSubProxyProperty(
-        newProxyName.c_str(), propertyXML.attribute("name").value(), exposedName.c_str());
+      this->ExposeSubProxyProperty(newProxyName.c_str(), propertyXML.attribute("name").value(),
+        exposedName.c_str(), 1 /*override*/);
       propertyGroupElement.append_child("Property")
         .append_attribute("name")
         .set_value(exposedName.c_str());
