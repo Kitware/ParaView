@@ -115,8 +115,20 @@ protected:
   vtkMultiProcessController* WaitForConnection(
     int port, bool once, const char* handshake, bool nonblocking);
 
-  bool ParaViewHandshake(
+  enum HandshakeErrors
+  {
+    HANDSHAKE_NO_ERROR = 0,
+    HANDSHAKE_SOCKET_COMMUNICATOR_DIFFERENT,
+    HANDSHAKE_DIFFERENT_PV_VERSIONS,
+    HANDSHAKE_DIFFERENT_CONNECTION_IDS,
+    HANDSHAKE_DIFFERENT_RENDERING_BACKENDS,
+    HANDSHAKE_UNKNOWN_ERROR
+  };
+
+  int ParaViewHandshake(
     vtkMultiProcessController* controller, bool server_side, const char* handshake);
+  void PrintHandshakeError(int errorcode);
+  int AnalyzeHandshakeAndGetErrorCode(const char* clientHS, const char* serverHS);
 
   bool AbortPendingConnectionFlag;
 
