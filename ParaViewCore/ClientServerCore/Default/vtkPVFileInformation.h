@@ -157,6 +157,7 @@ protected:
   void GetSpecialDirectories();
   void SetHiddenFlag();
   int FastFileTypeDetection;
+  bool ReadDetailedFileInformation;
 
 private:
   vtkPVFileInformation(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;

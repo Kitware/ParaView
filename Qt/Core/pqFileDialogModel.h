@@ -65,6 +65,17 @@ public:
   pqFileDialogModel(pqServer* server, QObject* Parent = NULL);
   ~pqFileDialogModel();
 
+  //@{
+  /**
+   * Get/Sets whether the dialog shows additional information about the files
+   * like modification time and file size.  This information can be
+   * time consuming to display if the server has many files in one directory
+   * so it is not displayed by default.
+   */
+  void setShowDetailedInfo(bool show);
+  bool isShowingDetailedInfo();
+  //@}
+
   /**
   * Sets the path that the file dialog will display
   */

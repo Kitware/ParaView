@@ -2195,6 +2195,14 @@
         <Documentation>Override the working directory used to resolve relative
         paths.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetReadDetailedFileInformation"
+                         name="ReadDetailedFileInformation"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>Whether to read full file information.  This is slow when there are many files
+        in a directory so this defaults to false.</Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <!-- End of FileInformationHelper -->
     </Proxy>
     <Proxy class="vtkPVFilePathEncodingHelper"
