@@ -38,6 +38,7 @@ class vtkColorLegend;
 class vtkColorTransferFunctionItem;
 class vtkContextActor;
 class vtkContext2D;
+class vtkContextItem;
 class vtkContextScene;
 class vtkDoubleArray;
 class vtkImageData;
@@ -191,6 +192,12 @@ public:
    * Responsible for actually drawing the scalar bar.
    */
   virtual bool Paint(vtkContext2D* painter);
+
+  /**
+   * Get the bounding rectangle of the scalar bar actor contents in display
+   * coordinates.
+   */
+  vtkRectf GetBoundingRect();
 
 protected:
   vtkContext2DScalarBarActor();

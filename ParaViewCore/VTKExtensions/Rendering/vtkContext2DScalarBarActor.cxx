@@ -1008,6 +1008,13 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 }
 
 //----------------------------------------------------------------------------
+vtkRectf vtkContext2DScalarBarActor::GetBoundingRect()
+{
+  return vtkBoundingRectContextDevice2D::GetBoundingRect(
+    this->ScalarBarItem, this->CurrentViewport);
+}
+
+//----------------------------------------------------------------------------
 void vtkContext2DScalarBarActor::PaintAnnotations(
   vtkContext2D* painter, double size[2], const vtkAnnotationMap& annotationAnchors)
 {
