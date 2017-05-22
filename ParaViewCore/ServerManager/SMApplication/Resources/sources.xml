@@ -800,6 +800,29 @@
                  value="27" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetOutputPrecision"
+                         default_values="0"
+                         name="OutputPrecision"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>This property specifies the precision of point locations and fields.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Single"
+                 value="0" />
+          <Entry text="Double"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPolynomialFieldOrder"
+                         default_values="1"
+                         name="PolynomialFieldOrder"
+                         number_of_elements="1">
+        <Documentation>This property specifies the order for the "Polynomial" point data field.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetBlocksDimensions"
                          default_values="10 10 10"
                          name="BlocksDimensions"
