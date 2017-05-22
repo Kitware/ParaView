@@ -1,6 +1,9 @@
 #include "vtkBoundingRectContextDevice2D.h"
 
+#include "vtkAbstractContextItem.h"
+#include "vtkContext2D.h"
 #include "vtkImageData.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkStdString.h"
@@ -38,6 +41,28 @@ void vtkBoundingRectContextDevice2D::Reset()
 {
   this->Initialized = false;
   this->BoundingRect = vtkRectf(0, 0, 0, 0);
+}
+
+//-----------------------------------------------------------------------------
+vtkRectf vtkBoundingRectContextDevice2D::GetBoundingRect(
+  vtkAbstractContextItem* item, vtkViewport* viewport)
+{
+  if (!item || !viewport)
+  {
+    return vtkRectf();
+  }
+
+  vtkNew<vtkContextDevice2D> contextDevice;
+  vtkNew<vtkBoundingRectContextDevice2D> bbDevice;
+  bbDevice->SetDelegateDevice(contextDevice.Get());
+  bbDevice->Begin(viewport);
+  vtkNew<vtkContext2D> context;
+  context->Begin(bbDevice.Get());
+  item->Paint(context.Get());
+  context->End();
+  bbDevice->End();
+
+  return bbDevice->GetBoundingRect();
 }
 
 //-----------------------------------------------------------------------------
