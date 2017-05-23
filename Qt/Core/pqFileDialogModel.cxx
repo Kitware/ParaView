@@ -289,7 +289,7 @@ bool getShowDetailedInformationSetting()
   return result;
 }
 
-bool setShowDetailedInformationSetting(pqServer* server, bool show)
+void setShowDetailedInformationSetting(pqServer* server, bool show)
 {
   if (!server)
   {
