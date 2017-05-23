@@ -18,6 +18,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPTools.h"
 #include "vtkUnsignedCharArray.h"
 #include <cinttypes>
@@ -28,6 +29,27 @@
 vtkStandardNewMacro(vtkNvPipeCompressor);
 
 vtkInformationKeyMacro(vtkNvPipeCompressor, PIXELS_SKIPPED, Integer);
+
+//-----------------------------------------------------------------------------
+static void add_ptx_paths(nvpipe* codec)
+{
+  const std::string argv0dir = vtkProcessModule::GetProcessModule()->GetSelfDir();
+  if (argv0dir.empty())
+  {
+    return;
+  }
+  const std::string dirs[] = {
+    argv0dir + "/../ThirdParty/NvPipe/vtknvpipe/", argv0dir + "/../../",
+  };
+  for (const std::string& d : dirs)
+  {
+    const nvp_err_t nverr = nvpipe_ptx_path(codec, d.c_str());
+    if (NVPIPE_SUCCESS != nverr)
+    {
+      vtkGenericWarningMacro("Error " << nverr << " adding PTX path: " << nvpipe_strerror(nverr));
+    }
+  }
+}
 
 //-----------------------------------------------------------------------------
 vtkNvPipeCompressor::vtkNvPipeCompressor()
@@ -68,6 +90,7 @@ int vtkNvPipeCompressor::Compress()
       vtkErrorMacro("Could not create NvPipe encoder.");
       return VTK_ERROR;
     }
+    add_ptx_paths(this->Pipe);
     this->Bitrate = brate;
   }
 
@@ -139,6 +162,7 @@ int vtkNvPipeCompressor::Decompress()
       vtkErrorMacro("Could not create NvPipe decoder.");
       return VTK_ERROR;
     }
+    add_ptx_paths(this->Pipe);
   }
 
   const uint8_t* strm = this->Input->GetPointer(0);
