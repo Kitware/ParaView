@@ -1004,7 +1004,6 @@
         "SurfaceRepresentationBase",
         "UniformGridBaseRepresentation",
         "UniformGridRepresentation",
-        "UnstructuredGridBaseRepresentation",
         "UnstructuredGridRepresentation",
         "ViewBase"
       ]
