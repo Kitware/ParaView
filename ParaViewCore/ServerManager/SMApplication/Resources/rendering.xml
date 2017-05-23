@@ -109,7 +109,19 @@
   <ProxyGroup name="mappers">
     <Proxy class="vtkProjectedTetrahedraMapper"
            name="ProjectedTetrahedraMapper"
-           processes="client|renderserver|dataserver"></Proxy>
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty name="UseFloatingPointFrameBuffer"
+        command="SetUseFloatingPointFrameBuffer"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable use of floating point frame buffers. If not enabled,
+          you may encounter artifacts when mixing volumes with geometry.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
     <Proxy name="DummyVolumeMapper">
       <ProxyProperty command="SetRayCastFunction"
                      name="RayCastFunction">

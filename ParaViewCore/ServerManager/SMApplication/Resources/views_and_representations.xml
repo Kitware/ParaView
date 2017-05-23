@@ -3981,6 +3981,7 @@
             <Property name="SamplingDimensions"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"/>
+            <Property name="UseFloatingPointFrameBuffer" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -4048,6 +4049,7 @@
             <Property name="SamplingDimensions"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"/>
+            <Property name="UseFloatingPointFrameBuffer" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
