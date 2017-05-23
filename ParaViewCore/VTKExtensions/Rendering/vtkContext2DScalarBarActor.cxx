@@ -775,11 +775,10 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   // vertical.
   float axisShift = 0.25 * pipeHeight;
 
-  // Compute tick lengths and label offsets
-  float tickLength = pipeHeight;
+  // Compute tick lengths and label offsets based on the label font size
+  float tickLength = 0.75 * pipeHeight;
   if (this->Orientation == VTK_ORIENT_VERTICAL)
   {
-    // Make the tick marks half the thickness of the color bar
     this->Axis->SetTickLength(tickLength);
 
     // Offset the labels from the tick marks a bit
@@ -788,10 +787,9 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   }
   else
   {
-    tickLength = 0.70 * pipeHeight;
     this->Axis->SetTickLength(tickLength);
 
-    float labelOffset = tickLength + (0.5 * tickLength);
+    float labelOffset = tickLength + (0.3 * tickLength);
     this->Axis->SetLabelOffset(labelOffset);
   }
 
@@ -951,11 +949,22 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
     }
     else
     {
+      // Handle zero-height axis.
+      if (axisRect.GetHeight() < 1.0)
+      {
+        axisRect.SetHeight(rect.GetHeight());
+      }
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
+      std::cout << axisRect << std::endl;
     }
   }
   else // Vertical orientation
   {
+    // Handle zero-width axis.
+    if (axisRect.GetWidth() < 1.0)
+    {
+      axisRect.SetWidth(0.25 * rect.GetWidth());
+    }
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
       titleY = 0.0;
