@@ -74,6 +74,7 @@ public:
    */
   int SetUncheckedElements(const int* values);
   int SetUncheckedElements(const int* values, unsigned int numValues);
+  int* GetUnCheckedElements();
   //@}
 
   /**

@@ -1010,6 +1010,115 @@ bool vtkSMPropertyHelper::GetStatus(const char* key, double* values, int num_val
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetStatus(const int key, int* values, int num_values)
+{
+  if (this->UseUnchecked)
+  {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return;
+  }
+
+  if (this->Type != vtkSMPropertyHelper::INT)
+  {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMIntVectorProperty.");
+    return;
+  }
+
+  vtkSMIntVectorProperty* svp = vtkSMIntVectorProperty::SafeDownCast(this->Property);
+  if (svp->GetNumberOfElementsPerCommand() != num_values + 1)
+  {
+    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+    return;
+  }
+
+  if (!svp->GetRepeatCommand())
+  {
+    vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
+    return;
+  }
+
+  bool append = true;
+  for (unsigned int cc = 0; (cc + num_values + 1) <= svp->GetNumberOfElements();
+       cc += (num_values + 1))
+  {
+    if (svp->GetElement(cc) == key)
+    {
+      for (int kk = 0; kk < num_values; kk++)
+      {
+        svp->SetElement(cc + kk + 1, values[kk]);
+      }
+      append = false;
+    }
+  }
+
+  if (append)
+  {
+    std::vector<int> list(svp->GetElements(), svp->GetElements() + svp->GetNumberOfElements());
+    list.push_back(key);
+    for (int kk = 0; kk < num_values; kk++)
+    {
+      list.push_back(values[kk]);
+    }
+    svp->SetElements(&list[0]);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPropertyHelper::GetStatus(const int key, int* values, int num_values)
+{
+  if (this->UseUnchecked)
+  {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return false;
+  }
+
+  if (this->Type != vtkSMPropertyHelper::INT)
+  {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMIntVectorProperty.");
+    return false;
+  }
+
+  vtkSMIntVectorProperty* svp = vtkSMIntVectorProperty::SafeDownCast(this->Property);
+
+  while (svp)
+  {
+    if (svp->GetNumberOfElementsPerCommand() != num_values + 1)
+    {
+      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+      return false;
+    }
+
+    if (!svp->GetRepeatCommand())
+    {
+      vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
+      return false;
+    }
+
+    for (unsigned int cc = 0; (cc + num_values + 1) <= svp->GetNumberOfElements();
+         cc += (num_values + 1))
+    {
+      if (svp->GetElement(cc) == key)
+      {
+        for (int kk = 0; kk < num_values; kk++)
+        {
+          values[kk] = svp->GetElement(cc + kk + 1);
+        }
+        return true;
+      }
+    }
+
+    // Now check if the information_property has the value.
+    svp = svp->GetInformationOnly() == 0
+      ? vtkSMIntVectorProperty::SafeDownCast(svp->GetInformationProperty())
+      : 0;
+  }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::SetStatus(const char* key, const char* value)
 {
   if (this->Type != vtkSMPropertyHelper::STRING)
@@ -1124,6 +1233,116 @@ const char* vtkSMPropertyHelper::GetStatus(const char* key, const char* default_
     // Now check if the information_property has the value.
     svp = svp->GetInformationOnly() == 0
       ? vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty())
+      : 0;
+  }
+
+  return default_value;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetStatus(const int key, const int value)
+{
+  if (this->Type != vtkSMPropertyHelper::INT)
+  {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMIntVectorProperty.");
+    return;
+  }
+
+  vtkSMIntVectorProperty* svp = vtkSMIntVectorProperty::SafeDownCast(this->Property);
+  if (svp->GetNumberOfElementsPerCommand() != 2)
+  {
+    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
+    return;
+  }
+
+  if (this->UseUnchecked)
+  {
+    for (unsigned int cc = 0; (cc + 1) < svp->GetNumberOfUncheckedElements(); cc += 2)
+    {
+      if (svp->GetUncheckedElement(cc) == key)
+      {
+        svp->SetUncheckedElement(cc + 1, value);
+        return;
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int cc = 0; (cc + 1) < svp->GetNumberOfElements(); cc += 2)
+    {
+      if (svp->GetElement(cc) == key)
+      {
+        svp->SetElement(cc + 1, value);
+        return;
+      }
+    }
+  }
+
+  std::vector<int> list;
+  if (this->UseUnchecked)
+  {
+    list.assign(
+      svp->GetUnCheckedElements(), svp->GetUnCheckedElements() + svp->GetNumberOfElements());
+  }
+  else
+  {
+    list.assign(svp->GetElements(), svp->GetElements() + svp->GetNumberOfElements());
+  }
+  list.push_back(key);
+  list.push_back(value);
+
+  if (this->UseUnchecked)
+  {
+    svp->SetUncheckedElements(&list[0]);
+  }
+  else
+  {
+    svp->SetElements(&list[0]);
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPropertyHelper::GetStatus(const int key, const int default_value)
+{
+  if (this->Type != vtkSMPropertyHelper::INT)
+  {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMIntVectorProperty.");
+    return default_value;
+  }
+
+  vtkSMIntVectorProperty* svp = vtkSMIntVectorProperty::SafeDownCast(this->Property);
+  while (svp)
+  {
+    if (svp->GetNumberOfElementsPerCommand() != 2)
+    {
+      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
+      return default_value;
+    }
+
+    if (this->UseUnchecked)
+    {
+      for (unsigned int cc = 0; (cc + 1) < svp->GetNumberOfUncheckedElements(); cc += 2)
+      {
+        if (svp->GetUncheckedElement(cc) == key)
+        {
+          return svp->GetUncheckedElement(cc + 1);
+        }
+      }
+    }
+    else
+    {
+      for (unsigned int cc = 0; (cc + 1) < svp->GetNumberOfElements(); cc += 2)
+      {
+        if (svp->GetElement(cc) == key)
+        {
+          return svp->GetElement(cc + 1);
+        }
+      }
+    }
+
+    // Now check if the information_property has the value.
+    svp = svp->GetInformationOnly() == 0
+      ? vtkSMIntVectorProperty::SafeDownCast(svp->GetInformationProperty())
       : 0;
   }
 

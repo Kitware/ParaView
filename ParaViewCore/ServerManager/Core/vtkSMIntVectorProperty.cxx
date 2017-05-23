@@ -185,6 +185,12 @@ int vtkSMIntVectorProperty::SetElements(const int* values, unsigned int numElems
 }
 
 //---------------------------------------------------------------------------
+int* vtkSMIntVectorProperty::GetUnCheckedElements()
+{
+  return this->Internals->GetUncheckedElements();
+}
+
+//---------------------------------------------------------------------------
 int vtkSMIntVectorProperty::SetUncheckedElements(const int* values)
 {
   return this->Internals->SetUncheckedElements(values);
