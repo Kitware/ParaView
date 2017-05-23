@@ -10,7 +10,7 @@ if (PARAVIEW_USE_MPI)
 endif()
 
 if(PARAVIEW_ENABLE_NVPIPE)
-  list(APPEND __dependencies vtknvpipe)
+  list(APPEND __dependencies vtknvpipe vtkPVClientServerCoreCore)
 endif()
 
 if(PARAVIEW_ENABLE_MATPLOTLIB)
