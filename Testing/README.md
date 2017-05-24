@@ -1,5 +1,5 @@
 Baseline images
----------------
+===============
 
 ParaView has a large number of tests that involve executing some ParaView
 functionality and then checking that the resulting image in the RenderView
@@ -9,6 +9,7 @@ cases, there is one baseline image per test. However, some tests generate more
 than one output image. Each output has a distinct baseline image against which
 it is compared.
 
+
 Alternate baselines
 -------------------
 
@@ -17,11 +18,11 @@ To accommodate these differences, ParaView's testing infrastructure
 supports alternate baseline images. Naming alternate baseline images
 follows a simple pattern involving adding an underscore followed by a
 sequentially increasing integer to the end of the test name. For instance,
-for a test named MyTest, the primary and alternate baselines could be:
+for a test named `MyTest`, the primary and alternate baselines could be:
 
-MyTest.png
-MyTest_1.png
-MyTest_2.png
+* `MyTest.png`
+* `MyTest_1.png`
+* `MyTest_2.png`
 
 Unfortunately, this naming scheme does not provide any information
 about which dashboard configuration requires the alternate
@@ -36,13 +37,14 @@ dashboard configuration. In such cases, only one dashboard configuration
 is listed as it should be sufficient to generate the alternate baseline
 for that one machine.
 
+
 Alternate baseline to generating dashboard configuration map
 ------------------------------------------------------------
 
-AxesGridTestLines_1.png  - amber8-linux-static-release+mpi+offscreen+osmesa+python
-ColorOpacityTableEditing_1.png - bigmac-osx-shared-debug+clang+gui+python+qt4]
-LoadStateMultiView_1.png - ista-osx-shared-release+gui+kits+python
-SaveColorMap_1.png - tylo-windows-shared-release+gui+python+python3+tbb]
-SaveLargeScreenshot_1.png - nemesis-windows-shared-release+gui+kits+mpi+python
-ScalarOpacityFunctionPythonState_1.png - tylo-windows-shared-release+gui+python+python3+tbb
-TestSubhaloFinder_1.png  - vall-linux-shared-debug+doc+extdeps+gui+mpi+python+python3
+* `AxesGridTestLines_1.png` -- `amber8-linux-static-release+mpi+offscreen+osmesa+python`
+* `ColorOpacityTableEditing_1.png` -- `bigmac-osx-shared-debug+clang+gui+python+qt4]`
+* `LoadStateMultiView_1.png` -- `ista-osx-shared-release+gui+kits+python`
+* `SaveColorMap_1.png` -- `tylo-windows-shared-release+gui+python+python3+tbb]`
+* `SaveLargeScreenshot_1.png` -- `nemesis-windows-shared-release+gui+kits+mpi+python`
+* `ScalarOpacityFunctionPythonState_1.png` -- `tylo-windows-shared-release+gui+python+python3+tbb`
+* `TestSubhaloFinder_1.png` -- `vall-linux-shared-debug+doc+extdeps+gui+mpi+python+python3`
