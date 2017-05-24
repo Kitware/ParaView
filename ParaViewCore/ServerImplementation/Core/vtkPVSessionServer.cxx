@@ -336,7 +336,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
 
   std::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION;
+  handshake << "handshake=paraview-" << PARAVIEW_VERSION;
   // Add connect-id if needed. The connect-id is added to the handshake that
   // must match on client and server processes.
   if (options->GetConnectID() != 0)
