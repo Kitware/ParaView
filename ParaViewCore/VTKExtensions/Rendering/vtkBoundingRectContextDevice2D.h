@@ -52,6 +52,8 @@
 
 #include "vtkContextDevice2D.h"
 
+class vtkAbstractContextItem;
+
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBoundingRectContextDevice2D : public vtkContextDevice2D
 {
 public:
@@ -71,7 +73,12 @@ public:
   void Reset();
 
   /**
-   * Get the bounding box that contains all the primitive rendered by
+   * Get the bounding rect that contains the given vtkAbstractContextItem.
+   */
+  static vtkRectf GetBoundingRect(vtkAbstractContextItem* item, vtkViewport* viewport);
+
+  /**
+   * Get the bounding rect that contains all the primitives rendered by
    * the device so far.
    */
   vtkRectf GetBoundingRect();

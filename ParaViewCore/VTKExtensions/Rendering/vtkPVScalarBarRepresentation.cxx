@@ -30,12 +30,11 @@
 
 #include "vtkContext2DScalarBarActor.h"
 
-#include "vtkBoundingRectContextDevice2D.h"
-#include "vtkContext2D.h"
-
 //#define DEBUG_BOUNDING_BOX
 #if defined(DEBUG_BOUNDING_BOX)
 #include "vtkBrush.h"
+#include "vtkContext2D.h"
+#include "vtkContextDevice2D.h"
 #include "vtkPen.h"
 #endif
 
@@ -65,21 +64,11 @@ int vtkPVScalarBarRepresentation::RenderOverlay(vtkViewport* viewport)
     return 0;
   }
 
-  vtkNew<vtkContextDevice2D> contextDevice;
-
-  vtkNew<vtkBoundingRectContextDevice2D> bbDevice;
-  bbDevice->SetDelegateDevice(contextDevice.Get());
-  bbDevice->Begin(viewport);
-
-  vtkNew<vtkContext2D> context;
-  context->Begin(bbDevice.Get());
-  actor->Paint(context.Get());
-  context->End();
-  bbDevice->End();
-
-  vtkRectf boundingRect = bbDevice->GetBoundingRect();
+  vtkRectf boundingRect = actor->GetBoundingRect();
 
 #if defined(DEBUG_BOUNDING_BOX)
+  vtkNew<vtkContext2D> context;
+  vtkNew<vtkContextDevice2D> contextDevice;
   contextDevice->Begin(viewport);
   context->Begin(contextDevice.Get());
   vtkPen* pen = context->GetPen();
