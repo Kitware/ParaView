@@ -143,6 +143,11 @@ public:
   T* GetElements() { return (this->Values.size() > 0) ? &this->Values[0] : NULL; }
 
   //---------------------------------------------------------------------------
+  T* GetUncheckedElements()
+  {
+    return (this->UncheckedValues.size() > 0) ? &this->UncheckedValues[0] : NULL;
+  }
+  //---------------------------------------------------------------------------
   T& GetUncheckedElement(unsigned int idx)
   {
     assert(idx < this->UncheckedValues.size());
