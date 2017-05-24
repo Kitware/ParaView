@@ -3936,10 +3936,22 @@
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="representations"
+                           base_proxyname="UnstructuredGridRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           name="UnstructuredGridBaseRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Deprecated deprecated_in="5.4" to_remove_in="5.5">
+          This is no longer needed. Simply use UniformGridVolumeRepresentation.
+      </Deprecated>
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
-                           name="UnstructuredGridBaseRepresentation"
+                           name="UnstructuredGridRepresentation"
                            processes="client|renderserver|dataserver">
       <Documentation>This representation is used to show unstructured grid as
       Surface/Outline/Points/Wireframe/Volume</Documentation>
@@ -3950,6 +3962,7 @@
                      name="Input">
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
           <DataType value="vtkUnstructuredGridBase" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
@@ -3981,73 +3994,7 @@
             <Property name="SamplingDimensions"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"/>
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume" />
-            </Hints>
-          </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-
-      <Hints>
-        <!-- pqDisplayRepresentationWidget respects this hint to put out
-             a warning for the user before switching to this type of Representation.
-             The user can then accept or reject the change.
-             BUG #15117
-        -->
-        <WarnOnRepresentationChange value="Volume" />
-      </Hints>
-      <!-- End of UnstructuredGridBaseRepresentation -->
-    </PVRepresentationProxy>
-    <!-- ================================================================== -->
-
-    <PVRepresentationProxy base_proxygroup="internal_representations"
-                           base_proxyname="PVRepresentationBase"
-                           class="vtkPVCompositeRepresentation"
-                           name="UnstructuredGridRepresentation"
-                           processes="client|renderserver|dataserver">
-      <Documentation>This representation is used to show unstructured grid as
-      Surface/Outline/Points/Wireframe/Volume</Documentation>
-      <!-- this adds to what is already defined in PVRepresentationBase -->
-      <RepresentationType subproxy="VolumeRepresentation"
-                          text="Volume" />
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <DataTypeDomain composite_data_supported="1"
-                        name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
-        </DataTypeDomain>
-        <InputArrayDomain attribute_type="cell"
-                          name="input_array_cell"
-                          optional="1"></InputArrayDomain>
-        <InputArrayDomain attribute_type="point"
-                          name="input_array_point"
-                          optional="1"></InputArrayDomain>
-        <Documentation>Set the input to the representation.</Documentation>
-      </InputProperty>
-      <SubProxy>
-        <Proxy name="VolumeRepresentation"
-               proxygroup="representations"
-               proxyname="UnstructuredGridVolumeRepresentation" />
-        <ShareProperties subproxy="SurfaceRepresentation">
-          <Exception name="Input" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-        <ExposedProperties>
-          <PropertyGroup label="Volume Rendering">
-            <Property name="ScalarOpacityFunction" />
-            <Property name="ScalarOpacityUnitDistance"
-                      panel_visibility="advanced" />
-            <Property name="ExtractedBlockIndex"
-                      panel_visibility="never" />
-            <Property name="SelectMapper"
-                      panel_visibility="advanced"
-                      panel_visibility_default_for_representation="volume" />
-            <Property name="SamplingDimensions"
-                      panel_visibility="advanced"
-                      panel_visibility_default_for_representation="volume"/>
+            <Property name="UseFloatingPointFrameBuffer" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"

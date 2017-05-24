@@ -416,6 +416,7 @@
         { "class": "vtkRendererDelegate" },
         { "class": "vtkRenderPass" },
         { "class": "vtkRenderState" },
+        { "class": "vtkRenderTimerLog" },
         { "class": "vtkRenderWindow" },
         { "class": "vtkRenderWindowInteractor" },
         { "class": "vtkShaderDeviceAdapter2" },
@@ -1004,7 +1005,6 @@
         "SurfaceRepresentationBase",
         "UniformGridBaseRepresentation",
         "UniformGridRepresentation",
-        "UnstructuredGridBaseRepresentation",
         "UnstructuredGridRepresentation",
         "ViewBase"
       ]

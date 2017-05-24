@@ -229,6 +229,9 @@
                proxygroup="mappers"
                proxyname="ProjectedTetrahedraMapper"></Proxy>
         <ShareProperties subproxy="VolumeDummyMapper"></ShareProperties>
+        <ExposedProperties>
+          <Property name="UseFloatingPointFrameBuffer" />
+        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="VolumeHAVSMapper"
