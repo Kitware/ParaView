@@ -6,7 +6,7 @@ be written so it is compatible with Python 2.7 and Python 3.5.
 
 Here are the changes we have needed making the transition to Python 3.
 
-print() is a function
+``print`` is a function
 ---------------------
 ::
 
@@ -14,7 +14,7 @@ print() is a function
 
 should be replaced by::
 
-    print ("helpful message")
+    print("helpful message")
 
 Re-directing to stderr is slightly more complicated. Python 2 did::
 
@@ -24,7 +24,7 @@ To maintain python-2 compatibility, you need the future module::
 
     from __future__ import print_function
     ...
-    print ("Error: Failed to evaluate '%s'. " % query, file=sys.stderr)
+    print("Error: Failed to evaluate '%s'. " % query, file=sys.stderr)
 
 Exceptions
 ----------
@@ -36,32 +36,33 @@ is replaced by::
 
     raise RuntimeError("failed")
 
-Handling exceptions as objects must use the 'as' keyword::
+Handling exceptions as objects must use the ``as`` keyword::
 
    except AttributeError as attrErr:
 
 Iterables
 ---------
 
-To create an iterable, python 3 needs a `__next__()` method.
-Assign the python2 `next()` method to it::
+To create an iterable, Python 3 needs a ``__next__()`` method.
+Assign the Python 2 ``next()`` method to it::
 
-    __next__ = next # Python 3.X compatibility
+    __next__ = next # Python 3.x compatibility
 
 Iterators, not lists
----------------------
+--------------------
+
 Several methods now return an iterable object, not a list. Examples
 include:
 
-	| range(), map(), filter(), zip()
-	| dictionary's .keys() .values() .items() methods
+* ``range()``, ``map()``, ``filter()``, ``zip()``
+* dictionary's ``keys()`` ``values()``, and ``items()`` methods
 
 If you need a list, just wrap the return in a list::
 
 	list(array_colors.keys())
 
-Dictionaries also lost the .iterkeys(), .iteritems() and .itervalues() methods.
-Just use keys to get values instead. ::
+Dictionaries also lost the ``iterkeys()``, ``iteritems()`` and ``itervalues()``
+methods. Simply use keys or ``items()`` to get values instead. ::
 
     for key, value in kwargs.iteritems():
         self.analysis[key] = value
@@ -71,16 +72,23 @@ becomes::
     for key in kwargs:
         self.analysis[key] = kwargs[key]
 
+or::
+
+    for key, value in kwargs.items():
+        self.analysis[key] = value
+
 Submodule import
 ----------------
+
 The only valid syntax in Python 3 for relative submodule import is::
 
-    from .someModule import *
+    from .some_module import *
 
 Be explicit when importing submodules whenever possible.
 
 New modules
 -----------
+
 Any new modules or significant work on old code should add::
 
     from __future__ import absolute_import
