@@ -1,0 +1,2 @@
+* -whitespace
+src/CMakeLists.txt -crlf
