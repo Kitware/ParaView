@@ -4794,11 +4794,11 @@
     </Proxy>
     <Proxy group="sources" type="ExodusIIReader" id="4854" servers="1">
       <Property name="FileName" id="4854.FileName" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
         <Domain name="files" id="4854.FileName.files"/>
       </Property>
       <Property name="FileNameInfo" id="4854.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
       </Property>
       <Property name="TimestepValues" id="4854.TimestepValues" number_of_elements="44">
         <Element index="0" value="0"/>
@@ -4945,13 +4945,13 @@
         <Element index="0" value="%s"/>
       </Property>
       <Property name="FilePrefix" id="4854.FilePrefix" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
         <Domain name="default_value" id="4854.FilePrefix.default_value">
-          <String text="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/can.ex2"/>
+          <String text="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
         </Domain>
       </Property>
       <Property name="FilePrefixInfo" id="4854.FilePrefixInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/can.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/can.ex2"/>
       </Property>
       <Property name="FileRange" id="4854.FileRange" number_of_elements="2">
         <Element index="0" value="0"/>

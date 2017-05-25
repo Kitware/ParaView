@@ -6940,11 +6940,11 @@
     </Proxy>
     <Proxy group="sources" type="ExodusIIReader" id="4846" servers="1">
       <Property name="FileName" id="4846.FileName" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/disk_out_ref.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/disk_out_ref.ex2"/>
         <Domain name="files" id="4846.FileName.files"/>
       </Property>
       <Property name="FileNameInfo" id="4846.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/disk_out_ref.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/disk_out_ref.ex2"/>
       </Property>
       <Property name="TimestepValues" id="4846.TimestepValues"/>
       <Property name="UseMetaFile" id="4846.UseMetaFile" number_of_elements="1">
@@ -7036,13 +7036,13 @@
         <Element index="0" value="%s"/>
       </Property>
       <Property name="FilePrefix" id="4846.FilePrefix" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/disk_out_ref.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/disk_out_ref.ex2"/>
         <Domain name="default_value" id="4846.FilePrefix.default_value">
-          <String text="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/disk_out_ref.ex2"/>
+          <String text="$PARAVIEW_EXAMPLES_DATA/disk_out_ref.ex2"/>
         </Domain>
       </Property>
       <Property name="FilePrefixInfo" id="4846.FilePrefixInfo" number_of_elements="1">
-        <Element index="0" value="/Users/cory.quammen/bin/paraview-debug/bin/paraview.app/Contents/data/disk_out_ref.ex2"/>
+        <Element index="0" value="$PARAVIEW_EXAMPLES_DATA/disk_out_ref.ex2"/>
       </Property>
       <Property name="FileRange" id="4846.FileRange" number_of_elements="2">
         <Element index="0" value="0"/>
