@@ -31,7 +31,6 @@
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"

@@ -32,29 +32,8 @@
 
 #include "ui_pqVariablePlot.h"
 
-#include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkDataSet.h"
-#include "vtkExodusFileSeriesReader.h"
-#include "vtkExodusIIReader.h"
-#include "vtkIdTypeArray.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSelectionNode.h"
-
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -65,10 +44,31 @@
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSetName.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "pqXYChartView.h"
-#include <pqSetName.h>
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataSet.h"
+#include "vtkExodusFileSeriesReader.h"
+#include "vtkExodusIIReader.h"
+#include "vtkIdTypeArray.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSelectionNode.h"
 
 #include <QDockWidget>
 #include <QGridLayout>
@@ -1350,11 +1350,14 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
   pqUndoStack* stack = core->getUndoStack();
-  pqDisplayPolicy* displayPolicy = core->getDisplayPolicy();
+
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   pqPipelineSource* meshReader = this->getMeshReader();
   if (!meshReader)
+  {
     return false;
+  }
 
   if (stack)
     stack->beginUndoSet("Plot Over time");
@@ -1435,9 +1438,7 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
   //
   // Make representation
   //
-  pqDataRepresentation* repr;
-  repr = displayPolicy->setRepresentationVisibility(plotFilter->getOutputPort(0), plotView, true);
-  (void)repr;
+  controller->Show(plotFilter->getSourceProxy(), 0, plotView->getViewProxy());
 
   // UpdateSelfAndAllInputs--
   // Calls UpdateVTKObjects() on self and all proxies that depend on this proxy

@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
-class pqDisplayPolicy;
 class pqInterfaceTracker;
 class pqLinksModel;
 class pqObjectBuilder;
@@ -66,6 +65,7 @@ class vtkSMStateLoader;
 #if !defined(VTK_LEGACY_REMOVE)
 class pqOutputWindow;
 class pqOutputWindowAdapter;
+class pqDisplayPolicy;
 #endif
 
 /**
@@ -200,7 +200,7 @@ public:
   * pqDisplayPolicy defines the policy for creating representations
   * for sources.
   */
-  pqDisplayPolicy* getDisplayPolicy() const { return this->DisplayPolicy; }
+  VTK_LEGACY(pqDisplayPolicy* getDisplayPolicy() const);
 
   /**
   * Returns the output window.
@@ -210,11 +210,9 @@ public:
   VTK_LEGACY(inline pqOutputWindow* outputWindow());
 
   /**
-  * It is possible to change the display policy used by
-  * the application. Used to change the active display
-  * policy. The pqApplicationCore takes over the ownership of the display policy.
+  * @deprecated ParaView 5.5. See vtkSMParaViewPipelineControllerWithRendering.
   */
-  void setDisplayPolicy(pqDisplayPolicy* dp);
+  VTK_LEGACY(void setDisplayPolicy(pqDisplayPolicy* dp));
 
   /**
   * Provides access to the test utility.
@@ -392,7 +390,9 @@ protected:
 #endif
   pqOptions* Options;
 
+#if !defined(VTK_LEGACY_REMOVE)
   pqDisplayPolicy* DisplayPolicy;
+#endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;

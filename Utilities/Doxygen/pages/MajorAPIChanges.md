@@ -43,6 +43,14 @@ As part of this change, the enum values
 
 have been moved from `vtkPVGeneralSettings.h` to `vtkSMTransferFunctionManager.h`.
 
+###Deprecated pqDisplayPolicy###
+
+`pqDisplayPolicy`, a class that has been unofficially deprecated since
+`vtkSMParaViewPipelineControllerWithRendering` was introduced is now officially
+deprecated and will be removed in future. Use
+`vtkSMParaViewPipelineControllerWithRendering` to show/hide data in views
+instead of `pqDisplayPolicy`.
+
 Changes in 5.4
 --------------
 

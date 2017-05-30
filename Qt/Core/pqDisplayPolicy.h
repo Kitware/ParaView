@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqDisplayPolicy_h
 
 #include "pqCoreModule.h" // Needed for PQCORE_EXPORT macro
+#include "vtkSetGet.h"    // needed for VTK_LEGACY
 #include <QObject>
 
 class pqDataRepresentation;
@@ -68,8 +69,8 @@ public:
   * create new views, we provide this as part of display policy which can
   * be easily overridden by creating a new subclass.
   */
-  virtual pqDataRepresentation* setRepresentationVisibility(
-    pqOutputPort* opPort, pqView* view, bool visible) const;
+  VTK_LEGACY(virtual pqDataRepresentation* setRepresentationVisibility(
+    pqOutputPort* opPort, pqView* view, bool visible) const);
 
   /**
   * Returns the type for the view that is indicated as the preferred view
@@ -78,14 +79,15 @@ public:
   * If update_pipeline is set, then the pipeline will be update prior to
   * fetching the data information from the port.
   */
-  virtual QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const;
+  VTK_LEGACY(
+    virtual QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const);
 
   /**
   * Apps can choose whether new filter outputs are hidden upon creation by
   * overriding this method. The default behavior is to create a representation
   * such that it obeys to the Visibility from rendering.xml.
   */
-  virtual bool getHideByDefault() const { return false; }
+  VTK_LEGACY(virtual bool getHideByDefault() const { return false; });
 
   enum VisibilityState
   {
@@ -98,7 +100,7 @@ public:
   * Returns the visibility state for port in the given view (view may be null
   * for an empty view).
   */
-  virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const;
+  VTK_LEGACY(virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const);
 
 private:
   Q_DISABLE_COPY(pqDisplayPolicy)

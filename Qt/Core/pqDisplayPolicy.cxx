@@ -58,9 +58,11 @@ pqDisplayPolicy::~pqDisplayPolicy()
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   pqOutputPort* opPort, pqView* view, bool visible) const
 {
+  VTK_LEGACY_BODY(pqDisplayPolicy, "ParaView 5.5");
   if (!opPort)
   {
     // Cannot really repr a NULL source.
@@ -80,10 +82,13 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   return pqApplicationCore::instance()->getServerManagerModel()->findItem<pqDataRepresentation*>(
     reprProxy);
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* port, bool update_pipeline) const
 {
+  VTK_LEGACY_BODY(pqDisplayPolicy, "ParaView 5.5");
   (void)update_pipeline;
   if (port)
   {
@@ -93,11 +98,14 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* port, bool update_pi
   }
   return QString();
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
   pqView* view, pqOutputPort* port) const
 {
+  VTK_LEGACY_BODY(pqDisplayPolicy, "ParaView 5.5");
   if (view && port)
   {
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
@@ -137,3 +145,4 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
   // Default behavior if no view is present
   return Hidden;
 }
+#endif
