@@ -23,6 +23,8 @@
 # OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+cmake_minimum_required(VERSION 3.2)
+
 set(NVPIPE "nvpipe")
 
 project(${NVPIPE} C)
@@ -33,11 +35,44 @@ set(include_install_dir "include")
 set(project_config "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+set(sdkhelp "Directory where ReadMe.txt from the Video Codec SDK lives.")
+option(NVIDIA_VIDEO_CODEC_SDK ${sdkhelp} "")
+if("${NVIDIA_VIDEO_CODEC_SDK}" STREQUAL "OFF")
+  # We include a copy of the v5 SDK header to use as a fallback.
+  # But to keep our source unchanged, we always include "nvEncodeAPI.h", so
+  # copy the file to that name in our local directory.
+  file(COPY
+    "${PROJECT_SOURCE_DIR}/nvEncodeAPI-v5.h"
+    DESTINATION
+    "${PROJECT_BINARY_DIR}"
+  )
+  # file(COPY) can't rename the file.
+  file(RENAME
+    "${PROJECT_BINARY_DIR}/nvEncodeAPI-v5.h"
+    "${PROJECT_BINARY_DIR}/nvEncodeAPI.h"
+  )
+else()
+  include_directories(AFTER "${NVIDIA_VIDEO_CODEC_SDK}/Samples/common/inc")
+  # If we switched from NOT using an extracted SDK (above) to USING an
+  # extracted SDK, we might inadvertently pick up the old file.  Make sure
+  # it's been cleaned up.
+  file(REMOVE "${PROJECT_BINARY_DIR}/nvEncodeAPI.h")
+endif()
+
 include_directories(BEFORE "${PROJECT_BINARY_DIR}")
 include_directories(AFTER "${PROJECT_SOURCE_DIR}")
 
 find_package(CUDA REQUIRED)
 list(APPEND CUDA_NVCC_FLAGS "--std c++11")
+# CUDA + NvPipe variables that PV does not want exposed.
+mark_as_advanced(
+  CUDA_NVTX_LIB
+  CUDA_SDK_ROOT_DIR
+  CUDA_USE_STATIC_CUDA_RUNTIME
+  CUDA_rt_LIBRARY
+  NVPIPE_LIBRARY_PATH
+  nvpipe_DIR
+)
 
 include_directories(${PROJECT_SOURCE_DIR} ${CUDA_SDK_ROOT_DIR}/common/inc)
 link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")

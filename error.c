@@ -37,8 +37,8 @@ static struct errstr nvp_errors[] = {
 	{ NVPIPE_EMAP, "map resource"},
 	{ NVPIPE_EUNMAP, "unmap resource"},
 	{ NVPIPE_ENOENT, "file or resource not found"},
-	{ NVPIPE_EENCODE, "encode error from NvEnc"},
-	{ NVPIPE_EDECODE, "decode error from cuvid"},
+	{ NVPIPE_EENCODE, "encode error from NvCodec"},
+	{ NVPIPE_EDECODE, "decode error from NvCodec"},
 	{ NVPIPE_EOVERFLOW, "buffer would overflow"},
 	{ NVPIPE_EAGAIN, "not ready yet"},
 };

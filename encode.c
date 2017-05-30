@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include <cuda.h>
+#include <cuda_runtime_api.h>
 #include <nvToolsExt.h>
 #include <nvEncodeAPI.h>
 #include "config.nvp.h"
@@ -83,11 +84,46 @@ struct nvp_encoder {
 		errmsg_ = dlerror(); \
 	} }
 
+// Mappings from NVENCSTATUS error codes to user-readable error messages
+static const char* NvCodecEncErrors[] = {
+	"success", /* NV_ENC_SUCCESS */
+	"no available encode devices", /* NV_ENC_ERR_NO_ENCODE_DEVICE */
+	"available devices do not support encode", /* NV_ENC_ERR_UNSUPPORTED_DEVICE */
+	"invalid encoder device", /* NV_ENC_ERR_INVALID_ENCODERDEVICE */
+	"invalid device", /* NV_ENC_ERR_INVALID_DEVICE */
+	"needs reinitialization", /* NV_ENC_ERR_DEVICE_NOT_EXIST */
+	"invalid pointer", /* NV_ENC_ERR_INVALID_PTR */
+	"invalid completion event", /* NV_ENC_ERR_INVALID_EVENT */
+	"invalid parameter", /* NV_ENC_ERR_INVALID_PARAM */
+	"invalid call", /* NV_ENC_ERR_INVALID_CALL */
+	"out of memory", /* NV_ENC_ERR_OUT_OF_MEMORY */
+	"encoder not initialized", /* NV_ENC_ERR_ENCODER_NOT_INITIALIZED */
+	"unsupported parameter", /* NV_ENC_ERR_UNSUPPORTED_PARAM */
+	"lock busy (try again)", /* NV_ENC_ERR_LOCK_BUSY */
+	"not enough buffer", /* NV_ENC_ERR_NOT_ENOUGH_BUFFER */
+	"invalid version", /* NV_ENC_ERR_INVALID_VERSION */
+	"map (of input buffer) failed", /* NV_ENC_ERR_MAP_FAILED */
+	"need more input (submit more frames!)", /* NV_ENC_ERR_NEED_MORE_INPUT */
+	"encoder busy (wait a few ms, call again)", /* NV_ENC_ERR_ENCODER_BUSY */
+	"event not registered", /* NV_ENC_ERR_EVENT_NOT_REGISTERD */
+	"unknown error", /* NV_ENC_ERR_GENERIC */
+	"invalid client key license", /* NV_ENC_ERR_INCOMPATIBLE_CLIENT_KEY */
+	"unimplemented", /* NV_ENC_ERR_UNIMPLEMENTED */
+	"register resource failed", /* NV_ENC_ERR_RESOURCE_REGISTER_FAILED */
+	"resource is not registered", /* NV_ENC_ERR_RESOURCE_NOT_REGISTERED */
+	"resource not mapped", /* NV_ENC_ERR_RESOURCE_NOT_MAPPED */
+};
+
+static const char*
+nvcodec_strerror(NVENCSTATUS err) {
+	return NvCodecEncErrors[err];
+}
+
 /* Marks the end of stream to the encoder.  This forces data to be ready, and
  * theoretically should be done before killing the encoder context.  Sort of a
  * "glFinish" for the encode.
  *
- * NvEnc assumes the user is going to send down N frames and then request frame
+ * NvCodec assumes the user is going to send down N frames and then request frame
  * 0.  H264 (and other codecs) would then compress using its back- and
  * forward-prediction powers.  However, we are going to compress a single frame
  * and then wait for it, meaning forward-prediction is impossible.
@@ -106,13 +142,14 @@ flush_encoder(struct nvp_encoder* nvp, size_t timestamp) {
 	enc.inputTimeStamp = timestamp;
 	const NVENCSTATUS flsh = nvp->f.nvEncEncodePicture(nvp->encoder, &enc);
 	if(flsh != NV_ENC_SUCCESS) {
-		ERR(enc, "Error %d flushing frame (nvEncEncodePicture)", flsh);
+		ERR(enc, "Error %d flushing frame (nvEncEncodePicture): %s", flsh,
+		    nvcodec_strerror(flsh));
 		return false;
 	}
 	return true;
 }
 
-/* unregister a previously-registered resource.  NvEnc requires one 'register'
+/* unregister a previously-registered resource.  NvCodec requires one 'register'
  * a chunk of memory before it can be used as an input. */
 static void
 unregister_resource(struct nvp_encoder* nvp) {
@@ -125,15 +162,29 @@ unregister_resource(struct nvp_encoder* nvp) {
 	}
 }
 
+#define CHECK_CONTEXT(ctx_, errhandling) \
+	do { \
+		CUcontext current_ = 0x0; \
+		const CUresult res_ = cuCtxGetCurrent(&current_); \
+		if(CUDA_SUCCESS != res_) { \
+			WARN(enc, "Error getting while checking context: %d", res_); \
+			errhandling; \
+		} \
+		if(ctx_ != current_) { \
+			WARN(enc, "Active context (%p) in %s differs from the context that " \
+			     "was active at creation time (%p)!", current_, __FUNCTION__, \
+			     ctx_); \
+			errhandling; \
+		} \
+	} while(0)
+
 /* clean up any memory associated with this instance. */
 void
 nvp_nvenc_destroy(nvpipe* const __restrict cdc) {
 	struct nvp_encoder* nvp = (struct nvp_encoder*)cdc;
 	assert(nvp->impl.type == ENCODER);
 
-	if(cuCtxPushCurrent(nvp->ctx) != CUDA_SUCCESS) {
-		WARN(enc, "Could not make our CUDA context current");
-	}
+	CHECK_CONTEXT(nvp->ctx, {});
 
 	if(nvp->initialized) {
 		flush_encoder(nvp, 0);
@@ -162,12 +213,13 @@ nvp_nvenc_destroy(nvpipe* const __restrict cdc) {
 	if(nvp->encoder) {
 		const NVENCSTATUS nverr = nvp->f.nvEncDestroyEncoder(nvp->encoder);
 		if(nverr != NV_ENC_SUCCESS) {
-			WARN(enc, "error %d closing encoder (nvEncDestroyEncoder)", (int)nverr);
+			WARN(enc, "error %d closing encoder (nvEncDestroyEncoder): %s",
+			     (int)nverr, nvcodec_strerror(nverr));
 		}
 		nvp->encoder = NULL;
 	}
 	if(dlclose(nvp->lib) != 0) {
-		WARN(enc, "Error closing NvEnc library: %s", dlerror());
+		WARN(enc, "Error closing NvCodec encode library: %s", dlerror());
 	}
 	nvp->lib = NULL;
 
@@ -176,9 +228,6 @@ nvp_nvenc_destroy(nvpipe* const __restrict cdc) {
 		nvp->reorg = NULL;
 	}
 
-	if(cuCtxDestroy(nvp->ctx) != CUDA_SUCCESS) {
-		WARN(enc, "Error destroying CUDA context.");
-	}
 	nvp->ctx = 0;
 
 	for(size_t i=0; i < nvp->npaths; ++i) {
@@ -205,7 +254,8 @@ register_resource(struct nvp_encoder* nvp, size_t width, size_t height,
 	const NVENCSTATUS nvres = nvp->f.nvEncRegisterResource(nvp->encoder,
 	                                                       &resc);
 	if(NV_ENC_SUCCESS != nvres) {
-		ERR(enc, "error registering CUDA memory for NvEnc: %d", nvres);
+		ERR(enc, "error %d registering CUDA memory for NvEnc: %s", nvres,
+		    nvcodec_strerror(nvres));
 		return false;
 	}
 	nvp->nv12.registered = resc.registeredResource;
@@ -310,16 +360,16 @@ initialize(struct nvp_encoder* nvp, size_t width, size_t height) {
 	 * Regardless, we don't want async because our contract with clients is to be
 	 * synchronous to allow easy integration into PV/VisIt/VMD/etc. */
 	init.enableEncodeAsync = 0;
-	init.enablePTD = 1; /* let NvEnc choose between I-frame, P-frame. */
+	init.enablePTD = 1; /* let NvCodec choose between I-frame, P-frame. */
 	const NVENCSTATUS nerr = nvp->f.nvEncInitializeEncoder(nvp->encoder, &init);
 	if(NV_ENC_SUCCESS != nerr) {
-		ERR(enc, "error initializing encoder: %d", nerr);
+		ERR(enc, "error %d initializing encoder: %s", nerr, nvcodec_strerror(nerr));
 		return false;
 	}
 	return true;
 }
 
-/* Create a bitstream buffer.  NvEnc requires one to output into; it can't take
+/* Create a bitstream buffer.  NvCodec requires one to output into; it can't take
  * just a raw pointer. */
 static bool
 create_bitstream(struct nvp_encoder* nvp, size_t width, size_t height,
@@ -331,7 +381,8 @@ create_bitstream(struct nvp_encoder* nvp, size_t width, size_t height,
 	bb.memoryHeap = NV_ENC_MEMORY_HEAP_SYSMEM_CACHED; /* sample */
 	const NVENCSTATUS nvbs = nvp->f.nvEncCreateBitstreamBuffer(nvp->encoder, &bb);
 	if(NV_ENC_SUCCESS != nvbs) {
-		ERR(enc, "error creating output bitstream buffer: %d", (int)nvbs);
+		ERR(enc, "error %d creating output bitstream buffer: %s", (int)nvbs,
+		    nvcodec_strerror(nvbs));
 		return false;
 	}
 	*bstream = bb.bitstreamBuffer;
@@ -428,7 +479,7 @@ nvp_resize(struct nvp_encoder* nvp, size_t width, size_t height) {
 	rec.resetEncoder = 1;
 	const NVENCSTATUS nerr = nvp->f.nvEncReconfigureEncoder(nvp->encoder, &rec);
 	if(NV_ENC_SUCCESS != nerr) {
-		ERR(enc, "error re-initializing: %d", nerr);
+		ERR(enc, "error %d re-initializing: %s", nerr, nvcodec_strerror(nerr));
 		return false;
 	}
 
@@ -504,17 +555,13 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 		return NVPIPE_EINVAL;
 	}
 
-	if(cuCtxPushCurrent(nvp->ctx) != CUDA_SUCCESS) {
-		ERR(enc, "Could not make our context current");
-		return NVPIPE_EENCODE;
-	}
+	CHECK_CONTEXT(nvp->ctx, return NVPIPE_EENCODE);
 
 	nvp_err_t errcode = NVPIPE_SUCCESS;
 	if(!nvp->initialized) {
 		if(!enc_initialize(nvp, width, height)) {
 			ERR(enc, "initialization failed");
-			errcode = NVPIPE_EINVAL;
-			goto fail_ctx;
+			return NVPIPE_EINVAL;
 		}
 	}
 	if(width != nvp->width || height != nvp->height) {
@@ -524,8 +571,7 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 	                                     width*height*multiplier);
 	if(cpyimg != CUDA_SUCCESS) {
 		ERR(enc, "error copying RGB[A] input buffer to GPU: %d", cpyimg);
-		errcode = cpyimg;
-		goto fail_ctx;
+		return cpyimg;
 	}
 
 	/* Reorganize the data into nv12 format. */
@@ -535,18 +581,16 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 	CUresult org = nvp->reorg->submit(nvp->reorg, nvp->rgb, width, height,
 	                                  nvp->nv12.buf, nvp->nv12.pitch);
 	if(CUDA_SUCCESS != org) {
-		errcode = org;
-		goto fail_ctx;
+		return org;
 	}
 	/* EncodePicture (or MapInputResource for that matter) does not accept a
 	 * stream, so we force our conversion to finish immediately. */
 	org = nvp->reorg->sync(nvp->reorg);
 	if(CUDA_SUCCESS != org) {
-		errcode = org;
-		goto fail_ctx;
+		return org;
 	}
 
-	/* NvEnc requires one to map the GPU buffer to use it as an encode src. */
+	/* NvCodec requires one to map the GPU buffer to use it as an encode src. */
 	NV_ENC_MAP_INPUT_RESOURCE map = {0};
 	map.version = NV_ENC_MAP_INPUT_RESOURCE_VER;
 	map.registeredResource = nvp->nv12.registered;
@@ -554,9 +598,8 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 	const NVENCSTATUS mapp = nvp->f.nvEncMapInputResource(nvp->encoder, &map);
 	nvtxRangePop();
 	if(mapp != NV_ENC_SUCCESS) {
-		ERR(enc, "Mapping input failed.");
-		errcode = NVPIPE_EMAP;
-		goto fail_ctx;
+		ERR(enc, "Error %d mapping input: %s", mapp, nvcodec_strerror(mapp));
+		return NVPIPE_EMAP;
 	}
 
 	NV_ENC_PIC_PARAMS enc = {0};
@@ -572,12 +615,12 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 
 	nvtxRangePush("EncodePicture");
 	const NVENCSTATUS encst = nvp->f.nvEncEncodePicture(nvp->encoder, &enc);
+	nvtxRangePop();
 	if(encst != NV_ENC_SUCCESS) {
-		ERR(enc, "Error encoding frame: %d", encst);
+		ERR(enc, "Error %d encoding frame: %s", encst, nvcodec_strerror(encst));
 		errcode = NVPIPE_EENCODE;
 		goto fail_map;
 	}
-	nvtxRangePop();
 
 	/* locking the bitstream maps it to host memory; think of it like
 	 * mapping an OptiX buffer. */
@@ -590,7 +633,7 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 	const NVENCSTATUS block = nvp->f.nvEncLockBitstream(nvp->encoder, &bitlock);
 	nvtxRangePop();
 	if(NV_ENC_SUCCESS != block) {
-		ERR(enc, "error mapping output: %d", block);
+		ERR(enc, "error %d mapping output: %s", block, nvcodec_strerror(block));
 		errcode = NVPIPE_EMAP;
 		goto fail_map;
 	}
@@ -618,7 +661,8 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 	const NVENCSTATUS bunlock = nvp->f.nvEncUnlockBitstream(nvp->encoder,
 	                                                        nvp->nv12.bstream);
 	if(NV_ENC_SUCCESS != bunlock) {
-		ERR(enc, "error unmapping bitstream: %d", bunlock);
+		ERR(enc, "error %d unmapping bitstream: %s", bunlock,
+		    nvcodec_strerror(bunlock));
 		errcode = NVPIPE_EUNMAP;
 		goto fail_map;
 	}
@@ -627,13 +671,9 @@ nvp_nvenc_encode(nvpipe * const __restrict codec,
 fail_map:
 	umap = nvp->f.nvEncUnmapInputResource(nvp->encoder, map.mappedResource);
 	if(NV_ENC_SUCCESS != umap) {
-		ERR(enc, "Error unmapping input: %d; previous error: %d", umap, errcode);
+		ERR(enc, "Error %d unmapping input: %s previous error: %s", umap,
+		    nvcodec_strerror(umap), nvcodec_strerror(errcode));
 		errcode = NVPIPE_EUNMAP;
-	}
-	CUcontext dummy;
-fail_ctx:
-	if(cuCtxPopCurrent(&dummy) != CUDA_SUCCESS) {
-		WARN(enc, "Could not pop our CUDA context");
 	}
 
 	return errcode;
@@ -660,10 +700,7 @@ nvp_nvenc_bitrate(nvpipe* codec, uint64_t bitrate) {
 	struct nvp_encoder* nvp = (struct nvp_encoder*)codec;
 	assert(nvp->impl.type == ENCODER);
 
-	if(cuCtxPushCurrent(nvp->ctx) != CUDA_SUCCESS) {
-		ERR(enc, "Could not make our CUDA context current");
-		return NVPIPE_EENCODE;
-	}
+	CHECK_CONTEXT(nvp->ctx, return NVPIPE_EENCODE);
 
 	nvp->bitrate = bitrate;
 	NV_ENC_CONFIG cfg = nvp_config(nvp);
@@ -697,16 +734,10 @@ nvp_nvenc_bitrate(nvpipe* codec, uint64_t bitrate) {
 	nvp_err_t errcode = NVPIPE_SUCCESS;
 	const NVENCSTATUS nerr = nvp->f.nvEncReconfigureEncoder(nvp->encoder, &rec);
 	if(NV_ENC_SUCCESS != nerr) {
-		ERR(enc, "error re-initializing: %d", nerr);
-		errcode = NVPIPE_EENCODE;
-		goto clean;
+		ERR(enc, "error %d re-initializing: %s", nerr, nvcodec_strerror(nerr));
+		return NVPIPE_EENCODE;
 	}
 
-	CUcontext dummy;
-clean:
-	if(cuCtxPopCurrent(&dummy) != CUDA_SUCCESS) {
-		WARN(enc, "Could not pop our CUDA context");
-	}
 	return errcode;
 }
 
@@ -758,21 +789,22 @@ nvp_create_encoder(uint64_t bitrate) {
 #endif
 	const NVENCSTATUS ierr = createNv(&nvp->f);
 	if(NV_ENC_SUCCESS != ierr) {
-		ERR(enc, "error loading NvEnc functions: %d", (int)ierr);
+		ERR(enc, "error %d loading NvCodec encode functions: %s", (int)ierr,
+		    nvcodec_strerror(ierr));
 		dlclose(nvp->lib);
 		free(nvp);
 		return NULL;
 	}
-	const CUresult inierr = cuInit(0);
-	if(CUDA_SUCCESS != inierr) {
-		ERR(enc, "CUDA initialization failed: %d", inierr);
-		dlclose(nvp->lib);
-		free(nvp);
-		return NULL;
+
+	/* ensure that cuda has created the implicit context. */
+	const cudaError_t syncerr = cudaDeviceSynchronize();
+	if(cudaSuccess != syncerr) {
+		WARN(enc, "Pre-existing CUDA error code: %d", syncerr);
+		/* try to continue anyway ... */
 	}
-	const unsigned flags = CU_CTX_SCHED_YIELD | CU_CTX_MAP_HOST;
-	if(cuCtxCreate(&nvp->ctx, flags, 0) != CUDA_SUCCESS) {
-		ERR(enc, "error creating CUDA context");
+	const CUresult currerr = cuCtxGetCurrent(&nvp->ctx);
+	if(CUDA_SUCCESS != currerr) {
+		ERR(enc, "Error getting context: %d", currerr);
 		dlclose(nvp->lib);
 		free(nvp);
 		return NULL;
@@ -794,11 +826,6 @@ nvp_create_encoder(uint64_t bitrate) {
 		return NULL;
 	}
 	assert(nvp->encoder);
-
-	CUcontext dummy;
-	if(cuCtxPopCurrent(&dummy) != CUDA_SUCCESS) {
-		WARN(enc, "Error popping our CUDA context");
-	}
 
 	/* These paths are used to search for PTX files. */
 	assert(nvp->paths == NULL);
