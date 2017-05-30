@@ -955,7 +955,6 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
         axisRect.SetHeight(rect.GetHeight());
       }
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
-      std::cout << axisRect << std::endl;
     }
   }
   else // Vertical orientation
