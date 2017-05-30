@@ -58,15 +58,14 @@ del wavelet1
 
 # create a new 'PLY Reader'
 fooply = PLYReader(FileName=plyfilename)
-fooply.GetXMLName()
 
 # show data in view
 fooplyDisplay = Show(fooply, renderView1)
-fooplyDisplay.ColorArrayName = ['POINTS', 'RGB']
 fooplyDisplay.MapScalars = 0
 
 # reset view to fit data
-renderView1.ResetCamera()
+Render()
+ResetCamera()
 
 if not smtesting.DoRegressionTesting(renderView1.SMProxy):
     raise smtesting.TestError ('Test failed.')

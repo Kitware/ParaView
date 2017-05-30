@@ -97,12 +97,14 @@ void vtkPVPLYWriter::WriteData()
     clone->GetAttributes(fieldAssociation)->AddArray(rgba);
     rgba->FastDelete();
 
+    this->Writer->EnableAlphaOn();
     this->Writer->SetInputDataObject(0, clone.GetPointer());
   }
   else
   {
     this->Writer->SetInputDataObject(0, input);
     this->Writer->SetColorModeToOff();
+    this->Writer->EnableAlphaOff();
   }
   this->Writer->Write();
   this->Writer->SetInputDataObject(0, NULL);
