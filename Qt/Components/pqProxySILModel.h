@@ -40,9 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * pqProxySILModel is a proxy model for pqSILModel. This makes it possible for
-* tree views to show only a sub-tree in the SIL. This also provides API to
+* tree views to show only a sub-tree in the SIL. This provides API to
 * get/set status values which is useful for property linking using
-* pqPropertyManager or pqPropertyLinks.
+* pqPropertyManager or pqPropertyLinks.  This also adds a column onto the
+* underlying pqSILModel.  Each entry in this new column holds the row
+* number (1-based index) to show the block index.  This is useful when wrapping
+* this in a QSortFilterProxyModel so see if the model has been sorted.
 */
 class PQCOMPONENTS_EXPORT pqProxySILModel : public QAbstractProxyModel
 {
@@ -79,7 +82,7 @@ public:
   */
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const
   {
-    return this->sourceModel()->columnCount(this->mapToSource(theParent));
+    return this->sourceModel()->columnCount(this->mapToSource(theParent)) + 1;
   }
 
   /**
@@ -105,6 +108,10 @@ public:
   */
   virtual QModelIndex index(int row, int column, const QModelIndex& theParent = QModelIndex()) const
   {
+    if (column == this->columnCount(theParent) - 1)
+    {
+      return this->createIndex(row, column);
+    }
     QModelIndex sourceIndex = this->sourceModel()->index(row, column, this->mapToSource(theParent));
     return this->mapFromSource(sourceIndex);
   }
