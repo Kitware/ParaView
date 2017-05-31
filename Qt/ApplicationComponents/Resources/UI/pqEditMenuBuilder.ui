@@ -120,7 +120,7 @@
   <action name="actionHide_All">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/pqWidgets/Icons/pqEyeball16.png</normaloff>:/pqWidgets/Icons/pqEyeballd16.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqEyeball.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
    </property>
    <property name="text">
     <string>Hide All</string>
