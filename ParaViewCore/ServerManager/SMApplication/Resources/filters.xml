@@ -15728,6 +15728,19 @@ source.</Documentation>
                  value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetTimeEstimationMode"
+                         name="ApproximationMode"
+                         number_of_elements="1"
+                         default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry text="Previous Time Step"
+                 value="0" />
+          <Entry text="Next Time Step"
+                 value="1" />
+          <Entry text="Nearest Time Step"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
 
       <IntVectorProperty animateable="1"
                          command="AddTimeStepIndex"
