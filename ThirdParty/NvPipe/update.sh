@@ -32,6 +32,7 @@ LICENSE
 mangle_nvpipe.h
 module.c
 module.h
+nvEncodeAPI-v5.h
 nvpipe.h
 yuv.c
 yuv.h
