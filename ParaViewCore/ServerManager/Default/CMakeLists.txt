@@ -55,6 +55,7 @@ set (Module_SRCS
   vtkSMTesting.cxx
   vtkSMTooltipSelectionPipeline.cxx
   vtkSMViewExportHelper.cxx
+  vtkSMXYChartRepresentationInitializationHelper.cxx
 )
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")

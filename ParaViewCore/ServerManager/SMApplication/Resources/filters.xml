@@ -11557,6 +11557,23 @@ source.</Documentation>
         <Documentation>The value of this property specifies the array component
         from which the histogram should be computed.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetCenterBinsAroundMinAndMax"
+                         default_values="0"
+                         name="CenterBinsAroundMinAndMax"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, first and last bin will be centered
+          around the minimum and the maximum values of the data.
+          By default, set to false.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseCustomBinRanges"
+                                   value="0" />
+          <!-- show this widget when UseCustomBinRanges==0 -->
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetCalculateAverages"
                          default_values="0"
                          name="CalculateAverages"

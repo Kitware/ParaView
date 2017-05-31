@@ -2819,7 +2819,7 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
-                      base_proxyname="XYChartViewBase"
+                      base_proxyname="XYChartViewBase4Axes"
                       class="vtkPVXYChartView"
                       name="XYBarChartView"
                       label="Bar Chart View"
@@ -2852,7 +2852,7 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
-                      base_proxyname="XYChartViewBase"
+                      base_proxyname="XYChartViewBase4Axes"
                       class="vtkPVXYChartView"
                       name="XYHistogramChartView"
                       label="Histogram View"
@@ -2862,7 +2862,7 @@
                       skip_plotable_check="1">
       <Documentation>This is the proxy for the histogram chart view.</Documentation>
       <Hints>
-        <ShowOneRepresentationAtATime />
+        <ShowOneRepresentationAtATime type="HistogramChartRepresentation" />
         <!-- When present, vtkSMParaViewPipelineController::Show() will
              result in hiding other representations that are currently visible
              -->
@@ -6002,8 +6002,6 @@
                               name="HistogramChartRepresentation"
                               processes="client|dataserver|renderserver">
       <Documentation>Representation used by XYHistogramChartView.</Documentation>
-            <Documentation>API for representations used by XYChartView and XYBarChartView.
-      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <Documentation>Data input for the representation.</Documentation>
@@ -6141,6 +6139,23 @@
         <Documentation>The value of this property specifies the array component
         from which the histogram should be computed.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetCenterBinsAroundMinAndMax"
+                         default_values="0"
+                         name="CenterBinsAroundMinAndMax"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, first and last bin will be centered
+          around the minimum and the maximum values of the data.
+          By default, set to false.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseCustomBinRanges"
+                                   value="0" />
+          <!-- show this widget when UseCustomBinRanges==0 -->
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseCustomBinRanges"
                          default_values="0"
                          name="UseCustomBinRanges"
@@ -6188,6 +6203,9 @@
           <Entry text="Dash Dot Dot" value="5" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <Hints>
+        <InitializationHelper class="vtkSMXYChartRepresentationInitializationHelper" />
+      </Hints>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
@@ -6684,7 +6702,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetMarkerSize"
-                            default_values="5"
+                            default_values="3"
                             name="ScatterPlotMarkerSize"
                             number_of_elements="1"
                             panel_visibility="advanced">
@@ -6718,7 +6736,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetActivePlotMarkerSize"
-                            default_values="8"
+                            default_values="5"
                             name="ActivePlotMarkerSize"
                             number_of_elements="1"
                             panel_visibility="advanced">
@@ -6836,6 +6854,9 @@
                   function="SeriesPlotCorner"/>
       </PropertyGroup>
 
+      <Hints>
+        <InitializationHelper class="vtkSMXYChartRepresentationInitializationHelper" />
+      </Hints>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->

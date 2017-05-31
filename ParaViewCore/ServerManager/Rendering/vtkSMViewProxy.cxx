@@ -744,6 +744,15 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     return false;
   }
 
+  vtkPVXMLElement* oneRepr =
+    this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime");
+  const char* reprType = oneRepr->GetAttribute("type");
+
+  if (reprType && strcmp(repr->GetXMLName(), reprType))
+  {
+    return false;
+  }
+
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   bool modified = false;
@@ -753,7 +762,8 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     vtkSMRepresentationProxy* arepr = vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
     if (arepr && arepr != repr)
     {
-      if (vtkSMPropertyHelper(arepr, "Visibility", /*quiet*/ true).GetAsInt() == 1)
+      if (vtkSMPropertyHelper(arepr, "Visibility", /*quiet*/ true).GetAsInt() == 1 &&
+        (!reprType || (reprType && !strcmp(arepr->GetXMLName(), reprType))))
       {
         controller->Hide(arepr, this);
         modified = true;

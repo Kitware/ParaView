@@ -202,6 +202,8 @@
   <Proxy group="filters" name="MeshQuality" />
   <Proxy group="filters" name="OctreeDepthLimit" />
   <Proxy group="filters" name="OctreeDepthScalars" />
+  <Proxy group="filters" name="OTKernelSmoothing" />
+  <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OutlineCornerFilter" />
   <Proxy group="filters" name="OutlineFilter" />
   <Proxy group="filters" name="ParticlePathLines" />

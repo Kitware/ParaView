@@ -94,6 +94,22 @@ int vtkPVHistogramChartRepresentation::GetBinCount()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVHistogramChartRepresentation::SetCenterBinsAroundMinAndMax(bool center)
+{
+  if (this->ExtractHistogram->GetCenterBinsAroundMinAndMax() != center)
+  {
+    this->ExtractHistogram->SetCenterBinsAroundMinAndMax(center);
+    this->MarkModified();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVHistogramChartRepresentation::GetCenterBinsAroundMinAndMax()
+{
+  return this->ExtractHistogram->GetCenterBinsAroundMinAndMax();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVHistogramChartRepresentation::SetUseCustomBinRanges(bool b)
 {
   if (this->ExtractHistogram->GetUseCustomBinRanges() != b)

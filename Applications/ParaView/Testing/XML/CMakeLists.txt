@@ -172,6 +172,13 @@ if(PARAVIEW_USE_OSPRAY)
     ${CMAKE_CURRENT_SOURCE_DIR}/OSPRay.xml)
 endif()
 
+if(PARAVIEW_USE_OPENTURNS)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/HistogramKernelSmoothing.xml)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewDensityMaps.xml)
+endif()
+
 # hits OSX bug with FileDialog so exclude test on APPLE
 if (NOT APPLE)
   list (APPEND TESTS_WITH_INLINE_COMPARES

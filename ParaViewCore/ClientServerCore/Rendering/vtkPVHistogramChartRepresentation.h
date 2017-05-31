@@ -59,6 +59,16 @@ public:
 
   //@{
   /**
+   * Get/Set if first and last bins must be centered around the min and max
+   * data. This is only used when UseCustomBinRanges is set to false.
+   * Default is false.
+   */
+  void SetCenterBinsAroundMinAndMax(bool);
+  bool GetCenterBinsAroundMinAndMax();
+  //@}
+
+  //@{
+  /**
    * Get/Set custom bin ranges to use. These are used only when
    * UseCustomBinRanges is set to true.
    */
