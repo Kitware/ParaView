@@ -13,11 +13,7 @@ import paraview
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 
-from vtk.vtkPVServerManagerCore import *
-
-# Needed for:
-#    vtkSMPVRepresentationProxy
-from vtk.vtkPVServerManagerRendering import *
+from paraview.vtk.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy
 
 PY3 = False
 if sys.version_info >= (3,):

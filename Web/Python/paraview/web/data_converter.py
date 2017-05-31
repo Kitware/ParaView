@@ -1,4 +1,7 @@
-from vtk import *
+from paraview.vtk.vtkIOImage import vtkPNGReader
+from paraview.vtk.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
+from paraview.vtk.vtkCommonDataModel import vtkImageData
+from paraview.vtk.vtkIOLegacy import vtkDataSetWriter
 
 from vtk.web.camera import *
 from vtk.web import iteritems, buffer

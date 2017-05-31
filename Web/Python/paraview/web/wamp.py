@@ -3,7 +3,7 @@ r"""paraviewweb_wamp is the paraview-specific subclass
 """
 
 from vtk.web import wamp
-from vtk.vtkParaViewWebCore import vtkPVWebApplication
+from paraview.vtk.vtkParaViewWebCore import vtkPVWebApplication
 
 from paraview.web import protocols as pv_protocols
 
