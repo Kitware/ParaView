@@ -1568,6 +1568,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             if prop_name == 'Input':
                 continue
             try:
+                skipReset = False
                 prop = proxy.GetProperty(prop_name)
                 iter = prop.NewDomainIterator()
                 iter.Begin()
@@ -1579,10 +1580,12 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         if domain.IsA('vtkSMBoundsDomain'):
                             domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
                     except AttributeError as attrErr:
+                        skipReset = True
                         print ('Caught exception setting domain values in apply_domains:')
                         print (attrErr)
 
-                prop.ResetToDefault()
+                if not skipReset:
+                    prop.ResetToDefault()
 
                 # Need to UnRegister to handle the ref count from the NewDomainIterator
                 iter.UnRegister(None)
