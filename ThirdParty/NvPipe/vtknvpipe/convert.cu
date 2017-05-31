@@ -136,11 +136,13 @@ yuv2rgb(const uint8_t* const __restrict yuv,
 	assert(pitch <= 4096);
 	const uint8_t* __restrict Y = yuv;
 	const uint8_t* __restrict uv = yuv + pitch*height;
+	const size_t xx = min(x+1, (size_t)(width-1));
+	const size_t yy = min(y+1, height-1);
 	const size_t idx[4] = {
-		min((y+0)/2*pitch/2 + (x+0)/2, height*pitch),
-		min((y+0)/2*pitch/2 + (x+1)/2, height*pitch),
-		min((y+1)/2*pitch/2 + (x+0)/2, height*pitch),
-		min((y+1)/2*pitch/2 + (x+1)/2, height*pitch),
+		y/2*pitch/2 + x/2,
+		y/2*pitch/2 + xx/2,
+		yy/2*pitch/2 + x/2,
+		yy/2*pitch/2 + xx/2,
 	};
 	const uint8_t u[4] = {
 		uv[idx[0]*2+0], uv[idx[1]*2+0], uv[idx[2]*2+0], uv[idx[3]*2+0]

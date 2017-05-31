@@ -91,7 +91,7 @@ rgb2yuv_submit(void* conv, const CUdeviceptr rgb, size_t width, size_t height,
 	assert(cnv->fqn.mod != NULL);
 	assert(cnv->fqn.func != 0);
 
-	/* NvEnc maxes out at 8k anyway. */
+	/* NvCodec maxes out at 8k anyway. */
 	assert(width <= 8192);
 	assert(height <= 8192);
 	/* We only support RGB and RGBA data. */
@@ -101,7 +101,7 @@ rgb2yuv_submit(void* conv, const CUdeviceptr rgb, size_t width, size_t height,
 		(void*)&rgb, &width, &height, &cnv->components, (void*)&nv12, &pitch, 0
 	};
 	const size_t shmem = 0;
-	/* NvEnc can't give us a height that isn't evenly divisible. */
+	/* NvCodec can't give us a height that isn't evenly divisible. */
 	assert(height%2 == 0);
 	const CUresult exec = cuLaunchKernel(cnv->fqn.func, (width/16)+1,(height/2),1,
 	                                     16,2,1, shmem, cnv->fut.strm,
@@ -126,7 +126,7 @@ rgb2yuv_create(const char* module, const char* fqnname, size_t components,
                const char* paths[], size_t n) {
 	rgb2yuv_t* rv = calloc(1, sizeof(rgb2yuv_t));
 	rv->fut = strm_create();
-	nvtxNameCuStreamA(rv->fut.strm, "encode");
+	nvtxNameCuStream(rv->fut.strm, "encode");
 	rv->fut.submit = rgb2yuv_submit;
 	/* Overwrite destructor with ours. */
 	rv->fut.destroy = rgb2yuv_destroy;
@@ -183,7 +183,7 @@ yuv2rgb_create(const char* module, const char* fqnname, const char* paths[],
                size_t n) {
 	yuv2rgb_t* rv = calloc(1, sizeof(yuv2rgb_t));
 	rv->fut = strm_create();
-	nvtxNameCuStreamA(rv->fut.strm, "decode");
+	nvtxNameCuStream(rv->fut.strm, "decode");
 	rv->fut.submit = yuv2rgb_submit;
 	/* Overwrite destructor with ours. */
 	rv->fut.destroy = yuv2rgb_destroy;

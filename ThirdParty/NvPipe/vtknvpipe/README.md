@@ -178,6 +178,10 @@ Finally build this library while setting the USE_FFMPEG CMake variable to true.
 Supported platforms
 ===================
 
-NVPipe is supported on both Linux and Windows.
+NVPipe is supported on both Linux and Windows.  Kepler-class NVIDIA
+hardware is required, and the NvEnc 5.x or NVIDIA Video Codec SDK (any
+version) is required.
 
-OS X support is unavailable at this time.
+OS X support is not plausible in the short term.  NVPipe uses the
+[NVIDIA Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk)
+under the hood, and the Video Codec SDK is not available on OS X at this time.

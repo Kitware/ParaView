@@ -83,9 +83,9 @@ struct nvp_decoder {
 	CUdeviceptr rgb; /**< temporary buffer to hold converted data. */
 	bool empty;
 	nv_fut_t* reorg; /**< reorganizes data from nv12 to RGB form. */
-	/** cuvid has an internal queue of finished frames, and fires off callbacks
+	/** NvCodec has an internal queue of finished frames, and fires off callbacks
 	 * we give it when a frame is added to that queue.  We use 'idx' to
-	 * communicate (essentially) which cuvid-internal-buffer ID has just
+	 * communicate (essentially) which NvCodec-internal-buffer ID has just
 	 * finished, set in our callback and read in our main code. */
 	unsigned idx;
 	char** paths;
