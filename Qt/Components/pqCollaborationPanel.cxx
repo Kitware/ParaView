@@ -265,7 +265,7 @@ void pqCollaborationPanel::followUserCamera(int userId)
   {
     if (userId == this->Internal->members->item(i, 0)->data(Qt::UserRole).toInt())
     {
-      this->Internal->members->item(i, 1)->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball16.png"));
+      this->Internal->members->item(i, 1)->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball.png"));
     }
     else
     {
@@ -393,7 +393,7 @@ void pqCollaborationPanel::onUserUpdate()
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
     if (userId == this->Internal->CameraToFollowOfUserId)
     {
-      item->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball16.png"));
+      item->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball.png"));
     }
     this->Internal->members->setItem(cc, 1, item);
 

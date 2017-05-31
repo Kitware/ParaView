@@ -478,9 +478,9 @@ void pqPipelineModel::constructor()
   this->PixmapList[pqPipelineModelDataItem::LINECHART].load(":/pqWidgets/Icons/pqLineChart16.png");
   this->PixmapList[pqPipelineModelDataItem::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet16.png");
   this->PixmapList[pqPipelineModelDataItem::INDETERMINATE].load(":/pqWidgets/Icons/pq3DView16.png");
-  this->PixmapList[pqPipelineModelDataItem::EYEBALL].load(":/pqWidgets/Icons/pqEyeball16.png");
+  this->PixmapList[pqPipelineModelDataItem::EYEBALL].load(":/pqWidgets/Icons/pqEyeball.png");
   this->PixmapList[pqPipelineModelDataItem::EYEBALL_GRAY].load(
-    ":/pqWidgets/Icons/pqEyeballd16.png");
+    ":/pqWidgets/Icons/pqEyeballClosed.png");
   this->PixmapList[pqPipelineModelDataItem::INSITU_EXTRACT].load(
     ":/pqWidgets/Icons/pqLinkIn16.png");
   this->PixmapList[pqPipelineModelDataItem::INSITU_EXTRACT_GRAY].load(

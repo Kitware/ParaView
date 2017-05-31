@@ -102,7 +102,7 @@
         </property>
         <property name="icon">
          <iconset resource="../pqComponents.qrc">
-          <normaloff>:/pqWidgets/Icons/pqEyeballd16.png</normaloff>:/pqWidgets/Icons/pqEyeballd16.png</iconset>
+          <normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
         </property>
        </column>
        <item row="0" column="0">
