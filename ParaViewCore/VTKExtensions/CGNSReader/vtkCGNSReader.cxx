@@ -455,7 +455,7 @@ bool vtkCGNSReader::vtkPrivate::IsFamilyEnabled(const char* fname, vtkCGNSReader
     // missing family information.
     fname = NO_FAMILY_TAG;
   }
-  return (self->FamilySelection->GetNumberOfArrays() == 0 ||
+  return (self->FamilySelection->ArrayExists(fname) == 0 ||
     self->FamilySelection->ArrayIsEnabled(fname) == 1);
 }
 
