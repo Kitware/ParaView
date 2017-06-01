@@ -1192,7 +1192,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                    "vtkSMArraySelectionDomain": arraySelectionDomainDecorator,
                                    "vtkSMEnumerationDomain": enumerationDomainDecorator,
                                    "vtkSMCompositeTreeDomain": treeDomainDecorator }
-        self.alwaysIncludeProperties = [ 'CubeAxesVisibility' ]
+        self.alwaysIncludeProperties = [ 'GridAxesVisibility' ]
         self.alwaysExcludeProperties = [ 'LookupTable', 'Texture', 'ColorArrayName',
                                          'Representations', 'HiddenRepresentations',
                                          'HiddenProps', 'UseTexturedBackground',
