@@ -245,11 +245,10 @@ void vtkSMViewProxy::InteractiveRender()
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
   this->GetSession()->PrepareProgress();
 
-  // Interactive render will not call Update() at all. It's expected that you
-  // must have either called a StillRender() or an Update() before triggering an
-  // interactive render. This is critical to keep interactive rates fast when
-  // working over a slow client-server connection.
-  // this->Update();
+  // Ensure that data is up-to-date. This class keeps track of whether an
+  // update is actually needed. If not, the update is essentially a no-op, so
+  // it is fast.
+  this->Update();
 
   vtkTypeUInt32 render_location = this->PreRender(interactive == 1);
 

@@ -161,8 +161,13 @@ int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-    vtkPolyData* dummyDataSet = vtkPolyData::SafeDownCast(
-      producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
+
+    vtkPolyData* dummyDataSet = nullptr;
+    if (producerPort)
+    {
+      dummyDataSet = vtkPolyData::SafeDownCast(
+        producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
+    }
     double bounds[6];
     if (dummyDataSet)
     {
