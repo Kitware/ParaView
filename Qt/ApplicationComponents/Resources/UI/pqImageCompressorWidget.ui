@@ -54,7 +54,7 @@
    <item>
     <widget class="QLabel" name="squirtLabel">
      <property name="text">
-      <string>Set the Squirt/LZ4 compression level. Move to right for better compression ratio at the cost of reduced image quality.</string>
+      <string>Set the Squirt/LZ4/NvPipe compression level. Move to right for better compression ratio at the cost of reduced image quality.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -133,6 +133,33 @@
     <widget class="QCheckBox" name="zlibStripAlpha">
      <property name="text">
       <string>Set whether to strip alpha channel.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="nvpLabel">
+     <property name="text">
+      <string>Set the NvPipe compression level. 1 is low image quality; 5 is high image quality. Even at the highest setting the bandwidth cost is well below LZ4 or Squirt.
+      </string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqIntRangeWidget" name="nvpLevel" native="true">
+     <property name="minimum" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="maximum" stdset="0">
+      <number>5</number>
+     </property>
+     <property name="value" stdset="0">
+      <number>4</number>
+     </property>
+     <property name="strictRange" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
