@@ -23,25 +23,12 @@ from vtk.web import iteritems
 from vtk.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance, getReferenceId
 from paraview.web.decorators import *
 
-from vtk.vtkWebCore import vtkWebInteractionEvent
-
-from vtk import vtkImageData
-from vtk import vtkUnsignedCharArray
-from vtk import vtkDataEncoder
-
-# Needed for:
-#    vtkSMPVRepresentationProxy
-#    vtkSMTransferFunctionProxy
-#    vtkSMTransferFunctionManager
-from vtk.vtkPVServerManagerRendering import *
-
-# Needed for:
-#    vtkSMProxyManager
-from vtk.vtkPVServerManagerCore import *
-
-# Needed for:
-#    vtkDataObject
-from vtk.vtkCommonDataModel import *
+from paraview.vtk.vtkCommonDataModel          import vtkImageData
+from paraview.vtk.vtkCommonCore               import vtkUnsignedCharArray
+from paraview.vtk.vtkWebCore                  import vtkDataEncoder, vtkWebInteractionEvent
+from paraview.vtk.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
+from paraview.vtk.vtkPVServerManagerCore      import vtkSMProxyManager
+from paraview.vtk.vtkCommonDataModel          import vtkDataObject
 
 if sys.version_info >= (3,):
     xrange = range

@@ -7,7 +7,9 @@ from paraview.web.camera import *
 from vtk.web import iteritems, buffer
 from paraview import simple
 from paraview import servermanager
-from vtk import *
+
+from paraview.vtk.vtkCommonCore import vtkFloatArray, vtkIdList, vtkUnsignedCharArray, vtkTypeUInt32Array
+from paraview.vtk.vtkCommonDataModel import vtkDataSetAttributes
 
 import json, os, math, gzip, shutil, hashlib
 
