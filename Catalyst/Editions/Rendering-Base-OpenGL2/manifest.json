@@ -420,6 +420,7 @@
         { "class": "vtkRenderWindow" },
         { "class": "vtkRenderWindowInteractor" },
         { "class": "vtkShaderDeviceAdapter2" },
+        { "class": "vtkSkybox" },
         { "class": "vtkStringToImage" },
         { "class": "vtkTDxInteractorStyle" },
         { "class": "vtkTDxInteractorStyleCamera" },
