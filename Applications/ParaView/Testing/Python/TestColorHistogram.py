@@ -51,7 +51,7 @@ SetActiveView(None)
 
 # Create a new 'Histogram View'
 histogramView1 = CreateView('XYHistogramChartView')
-histogramView1.ViewSize = [503, 781]
+histogramView1.ViewSize = [500, 780]
 
 # place view in the layout
 viewLayout1.AssignView(2, histogramView1)
