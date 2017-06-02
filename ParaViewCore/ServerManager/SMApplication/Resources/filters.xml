@@ -1036,9 +1036,9 @@
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain composite_data_supported="0"
+        <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Append
         Attributes filter.</Documentation>
