@@ -63,7 +63,13 @@ include_directories(BEFORE "${PROJECT_BINARY_DIR}")
 include_directories(AFTER "${PROJECT_SOURCE_DIR}")
 
 find_package(CUDA REQUIRED)
-list(APPEND CUDA_NVCC_FLAGS "--std c++11")
+cmake_policy(SET CMP0057 NEW)
+if(NOT MSVC)
+  if(NOT "--std" IN_LIST CUDA_NVCC_FLAGS)
+    list(APPEND CUDA_NVCC_FLAGS "--std c++11")
+  endif()
+endif()
+
 # CUDA + NvPipe variables that PV does not want exposed.
 mark_as_advanced(
   CUDA_NVTX_LIB
@@ -82,20 +88,19 @@ link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 set(NvPipe_FFMPEG 0)
 
 cuda_compile_ptx(ptxprograms
-	convert.cu
+  convert.cu
 )
 
 cuda_add_library(${NVPIPE} SHARED
-  ${FFMPEG_SOURCES}
-	${PROJECT_SOURCE_DIR}/debug.c
-	${PROJECT_SOURCE_DIR}/decode.c
-	${PROJECT_SOURCE_DIR}/encode.c
-	${PROJECT_SOURCE_DIR}/error.c
-	${PROJECT_SOURCE_DIR}/module.c
-	${PROJECT_SOURCE_DIR}/yuv.c
-	${PROJECT_SOURCE_DIR}/api.c
-	${ptxprograms}
-	SHARED
+  ${PROJECT_SOURCE_DIR}/debug.c
+  ${PROJECT_SOURCE_DIR}/decode.c
+  ${PROJECT_SOURCE_DIR}/encode.c
+  ${PROJECT_SOURCE_DIR}/error.c
+  ${PROJECT_SOURCE_DIR}/module.c
+  ${PROJECT_SOURCE_DIR}/yuv.c
+  ${PROJECT_SOURCE_DIR}/api.c
+  ${ptxprograms}
+  SHARED
 )
 
 # x86-64 libraries always need to be PIC.
@@ -118,8 +123,8 @@ set(NvPipe_DECODE 1)
 set(NvPipe_ENCODE 1)
 set(NvPipe_PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(
-	"${PROJECT_SOURCE_DIR}/config.nvp.h.in"
-	"${PROJECT_BINARY_DIR}/config.nvp.h"
+  "${PROJECT_SOURCE_DIR}/config.nvp.h.in"
+  "${PROJECT_BINARY_DIR}/config.nvp.h"
 )
 export(TARGETS ${NVPIPE}
   FILE "${PROJECT_BINARY_DIR}/nvpipeTargets.cmake"
