@@ -126,6 +126,14 @@ if (PARAVIEW_USE_MPI)
   endif()
 endif()
 
+if (PARAVIEW_ENABLE_NVPIPE)
+  find_package(nvpipe REQUIRED)
+  list(APPEND Module_SRCS
+    vtkNvPipeCompressor.cxx
+    )
+  include_directories(${NVPIPE_INCLUDE_DIRS})
+endif()
+
 #set_source_files_properties(
 #  WRAP_EXCLUDE
 #  )
@@ -170,3 +178,8 @@ if(PARAVIEW_USE_MPI)
 endif()
 include(vtkOpenGL)
 vtk_opengl_link(vtkPVVTKExtensionsRendering)
+
+if(PARAVIEW_ENABLE_NVPIPE)
+  target_link_libraries(vtkPVVTKExtensionsRendering LINK_PRIVATE
+    ${NVPIPE_LIBRARIES})
+endif()

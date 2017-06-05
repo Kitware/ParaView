@@ -9,6 +9,10 @@ if (PARAVIEW_USE_MPI)
   endif()
 endif()
 
+if(PARAVIEW_ENABLE_NVPIPE)
+  list(APPEND __dependencies vtknvpipe vtkPVClientServerCoreCore)
+endif()
+
 if(PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()

@@ -79,6 +79,11 @@ public:
   virtual int Decompress() = 0;
 
   /**
+   * Communicates the next expected image resolution.
+   */
+  virtual void SetImageResolution(int width, int height);
+
+  /**
    * Serialize compressor configuration (but not the data) into the stream.
    */
   virtual void SaveConfiguration(vtkMultiProcessStream* stream);
