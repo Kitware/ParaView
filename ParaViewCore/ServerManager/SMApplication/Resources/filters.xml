@@ -8915,6 +8915,211 @@ source.</Documentation>
       <!-- End StreamTracer -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkEvenlySpacedStreamlines2D"
+                 label="Evenly Spaced Streamlines 2D"
+                 name="EvenlySpacedStreamlines2D">
+      <Documentation long_help="Produce evenly spaced streamlines in a 2D vector field."
+                     short_help="Produce evenly spaced streamlines in a 2D vector field.">
+                     This filter generates evenly spaced streamlines in a 2D
+                     vector field from a start postion. Production of
+                     streamlines terminates if a streamline crosses the
+                     exterior boundary of the input dataset
+                     (ReasonForTermination=1), an initialization issue (ReasonForTermination=2),
+                     computing an unexpected value (ReasonForTermination=3),
+                     reached the Maximum Streamline Length input value
+                     (ReasonForTermination=4), reached the Maximum Steps
+                     input value (ReasonForTermination=5), velocity was
+                     lower than the Terminal Speed input value
+                     (ReasonForTermination=6), a streamline formed a loop
+                     (ReasonForTermination=7), and the streamline was too close to
+                     other streamlines (ReasonForTermination=8). This filter
+                     operates on a 2D dataset alligned with plane XY with
+                     point-centered vectors aligned with plane XY.
+                     The output is polygonal data containing polylines.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="3" />
+        <Documentation>This property specifies the input to the filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Vectors"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the vector array from
+        which to generate streamlines.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetInterpolatorType"
+                         default_values="0"
+                         name="InterpolatorType"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolator with Point Locator"
+                 value="0" />
+          <Entry text="Interpolator with Cell Locator"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property determines which interpolator to use for
+        evaluating the velocity vector field. The first is faster though the
+        second is more robust in locating cells during streamline
+        integration.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIntegratorType"
+                         default_values="1"
+                         name="IntegratorType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Runge-Kutta 2"
+                 value="0" />
+          <Entry text="Runge-Kutta 4"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property determines which integrator (with
+        increasing accuracy) to use for creating streamlines.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIntegrationStepUnit"
+                         default_values="2"
+                         label="Integration Step Unit"
+                         name="IntegrationStepUnit"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Length"
+                 value="1" />
+          <Entry text="Cell Length"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the unit for
+        Initial integration step size. The Length unit refers
+        to the arc length that a particle travels/advects within a single step.
+        The Cell Length unit represents the step size as a number of
+        cells.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetInitialIntegrationStep"
+                            default_values="0.2"
+                            label="Initial Step Length"
+                            name="InitialIntegrationStep"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the initial integration step
+        size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
+        it is fixed (always equal to this initial value) throughout the
+        integration.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfSteps"
+                         default_values="2000"
+                         label="Maximum Steps"
+                         name="MaximumNumberOfSteps"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the maximum number of steps,
+        beyond which streamline integration is terminated.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetSeparatingDistance"
+                            default_values="2"
+                            label="Separating Distance"
+                            name="SeparatingDistance"
+                            number_of_elements="1"
+                            panel_visibility="default" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the separating distance between
+        streamlines expressed in IntegrationStepUnit.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSeparatingDistanceRatio"
+                            default_values="0.4"
+                            label="Separating Distance Ratio"
+                            name="SeparatingDistanceRatio"
+                            number_of_elements="1"
+                            panel_visibility="default" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specifies SeparatingDistanceRatio. If streamlines
+        get closer than SeparatingDistance * SeparatingDistanceRatio to
+        other streamlines integration stops.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetClosedLoopMaximumDistance"
+                            default_values="0.2"
+                            label="Closed Loop Maximum Distance"
+                            name="ClosedLoopMaximumDistance"
+                            number_of_elements="1"
+                            panel_visibility="default" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>Loops are considered closed if the have two points at
+        distance less than this. This is expressed in IntegrationStepUnit.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStartPosition"
+                            default_values="0 0 0 "
+                            label="Start Position"
+                            name="StartPosition"
+                            number_of_elements="3"
+                            panel_visibility="default" >
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>Specify the starting point (seed) of the first streamline
+        in the global coordinate system.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetTerminalSpeed"
+                            default_values="0.000000000001"
+                            label="Terminal Speed"
+                            name="TerminalSpeed"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the terminal speed, below which
+        particle advection/integration is terminated.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetComputeVorticity"
+                         default_values="1"
+                         name="ComputeVorticity"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute
+        vorticity.</Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Streamline Parameters">
+        <Property name="StartPosition" />
+        <Property name="SeparatingDistance" />
+        <Property name="SeparatingDistanceRatio" />
+        <Property name="ClosedLoopMaximumDistance" />
+        <Property name="IntegratorType" />
+        <Property name="IntegrationStepUnit" />
+        <Property name="InitialIntegrationStep" />
+        <Property name="MaximumNumberOfSteps" />
+        <Property name="TerminalSpeed" />
+      </PropertyGroup>
+
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End EvenlySpacedStreamlines2D -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkStreamTracer"
                  label="Stream Tracer With Custom Source"
                  name="ArbitrarySourceStreamTracer">
