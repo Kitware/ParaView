@@ -4057,8 +4057,8 @@
         <Element index="1" value="0"/>
       </Property>
       <Property name="ViewSize" id="4582.ViewSize" number_of_elements="2">
-        <Element index="0" value="694"/>
-        <Element index="1" value="457"/>
+        <Element index="0" value="600"/>
+        <Element index="1" value="400"/>
       </Property>
       <Property name="ViewTime" id="4582.ViewTime" number_of_elements="1">
         <Element index="0" value="0"/>

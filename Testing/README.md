@@ -48,3 +48,4 @@ Alternate baseline to generating dashboard configuration map
 * `SaveLargeScreenshot_1.png` -- `nemesis-windows-shared-release+gui+kits+mpi+python`
 * `ScalarOpacityFunctionPythonState_1.png` -- `tylo-windows-shared-release+gui+python+python3+tbb`
 * `TestSubhaloFinder_1.png` -- `vall-linux-shared-debug+doc+extdeps+gui+mpi+python+python3`
+* `TestColorHistogram_1.png` -- `ista-osx-shared-release+gui+kits+python`, `bigmac-osx-shared-debug+clang+gui+python+qt4`
