@@ -1,9 +1,10 @@
 # TODO: Split these up and put them in the conditional which actually requires
 # the data.
 paraview_test_load_data_dirs(""
-  "Iron Xdmf"
   amr
   ANALYZE
+  cgns_np01
+  cgns_np04
   CompositeGlyphTree
   dualSphereAnimation
   ensemble-wavelet
@@ -16,6 +17,7 @@ paraview_test_load_data_dirs(""
   GMV/invalid
   GMV/partial-pyramid
   GMV/quadratic_cells
+  "Iron Xdmf"
   RodPlate
   singleSphereAnimation
   SLAC/pic-example
@@ -114,6 +116,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Molecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuartilePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ReadPartitionedCGNS.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReloadExodusFile.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RemoteRendering.xml
