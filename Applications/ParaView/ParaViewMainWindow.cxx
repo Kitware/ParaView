@@ -46,6 +46,7 @@ void vtkPVInitializePythonModules();
 #include "pqHelpReaction.h"
 #endif
 #include "pqLoadDataReaction.h"
+#include "pqLoadStateReaction.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
@@ -293,7 +294,15 @@ void ParaViewMainWindow::dropEvent(QDropEvent* evt)
   {
     if (!url.toLocalFile().isEmpty())
     {
-      files.append(url.toLocalFile());
+      QString path = url.toLocalFile();
+      if (path.endsWith(".pvsm", Qt::CaseInsensitive))
+      {
+        pqLoadStateReaction::loadState(path);
+      }
+      else
+      {
+        files.append(url.toLocalFile());
+      }
     }
   }
 
