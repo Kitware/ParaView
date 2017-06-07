@@ -228,7 +228,9 @@ public:
       << "DBusMenuExporterPrivate"
       << "DBusMenuExporterDBus"
       /* Skip XCB errors coming from Qt 5 tests. */
-      << "QXcbConnection: XCB";
+      << "QXcbConnection: XCB"
+      /* This error message appears on some HDPi screens with not clear reasons */
+      << "QWindowsWindow::setGeometry: Unable to set geometry";
   }
 
   void displayMessageInConsole(const QString& message, pqOutputWidget::MessageTypes type)
