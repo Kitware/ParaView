@@ -38,6 +38,9 @@ paraview_test_load_data(""
   combxyz.bin
   CompositeGlyphInput.vtp
   CompositeGlyphTree.vtm
+  cow.vtp
+  cth.vtr
+  cube.vtu
   CubeStringArray.vtk
   cylinder_run1.e
   cylinder_run2.e
@@ -72,9 +75,11 @@ paraview_test_load_data(""
   Test1.h5
   Test1.xmf
   TestMultipleNumberOfComponentsPlugin.xml
+  timestep_0_15.vts
   tube.exo
   vehicle_data.csv
   viscoplastic-ring.h5
+  waveletMaterial.vti
   )
 
 SET (TESTS_WITHOUT_BASELINES
@@ -371,9 +376,11 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReactionNonConverted.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SliceFastWithPlane.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SliceFastWithPlaneMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SortLineChartData.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StockColors.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TensorGlyph.xml
