@@ -420,26 +420,20 @@ void pqOutputWindow::setupSuppressionExpressions()
     << "DBusMenuExporterPrivate"
     << "DBusMenuExporterDBus"
     /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others) */
-    << "QNSView mouseDragged: Internal mouse button tracking invalid";
+    << "QNSView mouseDragged: Internal mouse button tracking invalid"
+    /* Skip XCB errors coming from Qt 5 tests. */
+    << "QXcbConnection: XCB"
+    /* This error message appears on some HDPi screens with not clear reasons */
+    << "QWindowsWindow::setGeometry: Unable to set geometry";
 }
 
 //-----------------------------------------------------------------------------
 bool pqOutputWindow::shouldMessageBeSuppressed(const QString& text)
 {
-  if (text.contains("Unrecognised OpenGL version") ||
-    /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-     * repeated menu actions in the menus. */
-    text.contains("DBusMenuExporterPrivate") || text.contains("DBusMenuExporterDBus") ||
-    /* Skip XCB errors coming from Qt 5 tests. */
-    text.contains("QXcbConnection: XCB"))
-  {
-    return true;
-  }
-
   // See if message should be suppressed
-  for (int i = 0; i < this->Implementation->SuppressionExpressions.size(); ++i)
+  foreach (const QString& expression, this->Implementation->SuppressionExpressions)
   {
-    if (text.contains(this->Implementation->SuppressionExpressions[i]))
+    if (text.contains(expression))
     {
       return true;
     }
