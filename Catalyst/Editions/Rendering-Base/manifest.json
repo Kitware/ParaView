@@ -856,7 +856,8 @@
         { "class": "vtkInteractorStyleRubberBandZoom" },
         { "class": "vtkInteractorStyleSwitch" },
         { "class": "vtkInteractorStyleTrackballActor" },
-        { "class": "vtkInteractorStyleTrackballCamera" }
+        { "class": "vtkInteractorStyleTrackballCamera" },
+        { "class": "vtkInteractorStyleMultiTouchCamera" }
       ],
       "replace": [
         { "path": "VTK/Interaction/Style/CMakeLists.txt" }
