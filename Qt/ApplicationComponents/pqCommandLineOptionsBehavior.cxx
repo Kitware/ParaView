@@ -137,22 +137,33 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // check for --data option.
   if (options->GetParaViewDataName())
   {
-    // We don't directly set the data file name instead use the dialog. This
-    // makes it possible to select a file group.
-    pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-      tr("Internal Open File"), QString(), QString());
-    dialog.setFileMode(pqFileDialog::ExistingFiles);
-    if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
+    QString path = QString::fromLocal8Bit(options->GetParaViewDataName());
+    // Check if dataname has a state file extension.
+    // This allows to pass a state file as last argument without --state option.
+    if (path.endsWith(".pvsm", Qt::CaseInsensitive))
     {
-      qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
+      // Load state file without fix-filenames dialog.
+      pqLoadStateReaction::loadState(path, true);
     }
-    QList<QStringList> files = dialog.getAllSelectedFiles();
-    QStringList file;
-    foreach (file, files)
+    else
     {
-      if (pqLoadDataReaction::loadData(file) == NULL)
+      // We don't directly set the data file name instead use the dialog. This
+      // makes it possible to select a file group.
+      pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
+        tr("Internal Open File"), QString(), QString());
+      dialog.setFileMode(pqFileDialog::ExistingFiles);
+      if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
       {
-        qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
+        qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
+      }
+      QList<QStringList> files = dialog.getAllSelectedFiles();
+      QStringList file;
+      foreach (file, files)
+      {
+        if (pqLoadDataReaction::loadData(file) == NULL)
+        {
+          qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
+        }
       }
     }
   }
