@@ -4,6 +4,7 @@
   Module:    vtkPVServerInformation.cxx
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -25,6 +26,9 @@
 #include "vtkPVServerOptionsInternals.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#ifdef PARAVIEW_ENABLE_NVPIPE
+#include <nvpipe.h>
+#endif
 
 // ------------------------
 // NOTE for OGVSupport
@@ -36,6 +40,21 @@
 // module, that can indeed check is OGGTHEORA support is available. So it's
 // reasonably safe to assume OGGTHEORA is always enabled here.
 // #include "vtkIOMovieConfigure.h"
+
+#ifdef PARAVIEW_ENABLE_NVPIPE
+//----------------------------------------------------------------------------
+// NVPipe requires Kepler-class (or newer) NVIDIA hardware at runtime.  This
+// verifies that such hardware is available.
+static bool NVPipeAvailable()
+{
+  // Instantiate an encoder; this initializes CUDA and the NVEncode side of the
+  // Video SDK, so if it succeeds we are good to go.
+  nvpipe* dummy = nvpipe_create_encoder(NVPIPE_H264_NV, 1024);
+  const bool success = dummy != nullptr;
+  nvpipe_destroy(dummy);
+  return success;
+}
+#endif
 
 vtkStandardNewMacro(vtkPVServerInformation);
 
@@ -69,6 +88,14 @@ vtkPVServerInformation::vtkPVServerInformation()
 #endif
 #endif
 
+  this->NVPipeSupport = false;
+#if defined(PARAVIEW_ENABLE_NVPIPE)
+  if (NVPipeAvailable())
+  {
+    this->NVPipeSupport = true;
+  }
+#endif
+
   // Refer to note at the top of this file abount OGVSupport.
   this->OGVSupport = 1;
 
@@ -100,6 +127,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
   os << indent << "IdTypeSize: " << this->IdTypeSize << endl;
+  os << indent << "NVPipeSupport: " << this->NVPipeSupport << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -130,6 +158,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->SetEyeSeparation(info->GetEyeSeparation());
   this->NumberOfProcesses = info->NumberOfProcesses;
   this->MPIInitialized = info->MPIInitialized;
+  this->NVPipeSupport = info->NVPipeSupport;
 }
 
 //----------------------------------------------------------------------------
@@ -221,6 +250,11 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->Timeout = serverInfo->GetTimeout();
     }
 
+    if (!serverInfo->GetNVPipeSupport())
+    {
+      this->NVPipeSupport = false;
+    }
+
     if (!serverInfo->GetOGVSupport())
     {
       this->OGVSupport = 0;
@@ -301,6 +335,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->MultiClientsEnable;
   *css << this->ClientId;
   *css << this->IdTypeSize;
+  *css << this->NVPipeSupport;
   *css << vtkClientServerStream::End;
 }
 
@@ -478,6 +513,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, epilogueOffset + 3, &this->IdTypeSize))
   {
     vtkErrorMacro("Error parsing IdTypeSize from message.");
+    return;
+  }
+  if (!css->GetArgument(0, epilogueOffset + 4, &this->NVPipeSupport))
+  {
+    vtkErrorMacro("Error parsing NVPipeSupport from message.");
     return;
   }
 }

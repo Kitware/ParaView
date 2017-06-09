@@ -445,6 +445,14 @@ public:
 
   //@{
   /**
+   * Determine if NVPipe is an available compressor option.
+   */
+  void NVPipeAvailableOn();
+  void NVPipeAvailableOff();
+  //@}
+
+  //@{
+  /**
    * Returns true if the most recent render used LOD.
    */
   vtkGetMacro(UsedLODForLastRender, bool);

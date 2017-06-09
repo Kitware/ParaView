@@ -204,21 +204,21 @@ void vtkNvPipeCompressor::SetImageResolution(int w, int h)
 //-----------------------------------------------------------------------------
 void vtkNvPipeCompressor::SaveConfiguration(vtkMultiProcessStream* stream)
 {
-  vtkImageCompressor::SaveConfiguration(stream);
-  *stream << (int)this->Width << (int)this->Height;
+  this->Superclass::SaveConfiguration(stream);
+  *stream << (int)this->Quality;
 }
 
 //-----------------------------------------------------------------------------
 bool vtkNvPipeCompressor::RestoreConfiguration(vtkMultiProcessStream* stream)
 {
-  if (!vtkImageCompressor::RestoreConfiguration(stream))
+  if (!this->Superclass::RestoreConfiguration(stream))
   {
     return false;
   }
-  int w, h;
-  *stream >> w >> h;
-  this->Width = w;
-  this->Height = h;
+
+  int qual;
+  *stream >> qual;
+  this->Quality = qual;
   return true;
 }
 
@@ -226,26 +226,23 @@ bool vtkNvPipeCompressor::RestoreConfiguration(vtkMultiProcessStream* stream)
 const char* vtkNvPipeCompressor::SaveConfiguration()
 {
   std::ostringstream oss;
-  oss << vtkImageCompressor::SaveConfiguration() << " " << this->Width << " " << this->Height;
-
+  oss << vtkImageCompressor::SaveConfiguration() << " " << this->Quality;
   this->SetConfiguration(oss.str().c_str());
-
   return this->Configuration;
 }
 
 //-----------------------------------------------------------------------------
 const char* vtkNvPipeCompressor::RestoreConfiguration(const char* stream)
 {
-  stream = vtkImageCompressor::RestoreConfiguration(stream);
+  stream = this->Superclass::RestoreConfiguration(stream);
   if (stream == NULL)
   {
     return NULL;
   }
   std::istringstream iss(stream);
-  int w, h;
-  iss >> w >> h;
-  this->Width = w;
-  this->Height = h;
+  int qual;
+  iss >> qual;
+  this->SetQuality(qual);
 
   return stream + iss.tellg();
 }
@@ -256,14 +253,4 @@ void vtkNvPipeCompressor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << "using compressor: NvPipe\n";
-}
-
-//-----------------------------------------------------------------------------
-bool vtkNvPipeCompressor::Available()
-{
-  // Instantiate an encoder; this initializes CUDA and the NVEncode side of the
-  // Video SDK, so if it succeeds we are good to go.
-  nvpipe* dummy = nvpipe_create_encoder(NVPIPE_H264_NV, 1024);
-  bool success = dummy != NULL;
-  nvpipe_destroy(dummy);
 }

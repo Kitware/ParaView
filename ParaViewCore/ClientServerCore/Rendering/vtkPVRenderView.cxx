@@ -4,6 +4,7 @@
   Module:    vtkPVRenderView.cxx
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -52,6 +53,7 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraCollection.h"
 #include "vtkPVCenterAxesActor.h"
+#include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
@@ -59,6 +61,7 @@
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
+#include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVSynchronizedRenderWindows.h"
@@ -614,6 +617,18 @@ void vtkPVRenderView::SetEGLDeviceIndex(int deviceIndex)
 {
   this->EGLDeviceIndex = deviceIndex;
   this->GetRenderWindow()->SetDeviceIndex(deviceIndex);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::NVPipeAvailableOn()
+{
+  this->SynchronizedRenderers->SetNVPipeSupport(true);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::NVPipeAvailableOff()
+{
+  this->SynchronizedRenderers->SetNVPipeSupport(false);
 }
 
 //----------------------------------------------------------------------------

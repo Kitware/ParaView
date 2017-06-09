@@ -4,6 +4,7 @@
   Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -414,6 +415,22 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "RemoteRenderingAvailableOff"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
+  }
+
+  const bool enable_nvpipe = this->GetSession()->GetServerInformation()->GetNVPipeSupport();
+  {
+    vtkClientServerStream strm;
+    strm << vtkClientServerStream::Invoke << VTKOBJECT(this);
+    if (enable_nvpipe)
+    {
+      strm << "NVPipeAvailableOn";
+    }
+    else
+    {
+      strm << "NVPipeAvailableOff";
+    }
+    strm << vtkClientServerStream::End;
+    this->ExecuteStream(strm);
   }
 
   // Attach to the collaborative session a callback to clear the selection cache
