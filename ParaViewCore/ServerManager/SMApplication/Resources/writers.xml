@@ -80,6 +80,8 @@
                   show="0" />
         <Property name="HeaderType"
                   show="0" />
+        <Property name="UseSubdirectory"
+                  show="1" />
         <WriterFactory extensions="pvd"
                        file_description="ParaView Data Files" />
       </Hints>
@@ -315,6 +317,7 @@
             <Property name="HeaderType" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
+            <Property name="UseSubdirectory" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -360,6 +363,7 @@
             <Property name="HeaderType" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
+            <Property name="UseSubdirectory" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
