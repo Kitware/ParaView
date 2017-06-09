@@ -218,7 +218,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
 
 //----------------------------------------------------------------------------
 void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentData(
-  vtkSMSessionProxyManager* pxm, bool extend)
+  vtkSMSessionProxyManager* pxm, bool animating)
 {
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSessionProxyManager(pxm);
@@ -227,25 +227,45 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
   {
     vtkSMProxy* lutProxy = iter->GetProxy();
     assert(lutProxy != NULL);
-    if (vtkSMPropertyHelper(lutProxy, "LockScalarRange", true).GetAsInt() == 0)
+
+    int rescaleMode = vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
+
+    bool extend = false;
+
+    if (rescaleMode == 0 /* Grow and update on Apply */ && !animating)
     {
-      if (vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).GetAsInt() == 1)
+      extend = true;
+    }
+    else if (rescaleMode == 1 /* Grow and update every timestep */ && animating)
+    {
+      extend = true;
+    }
+    else if (rescaleMode == 3 /* Clamp and update every timestep */ && animating)
+    {
+      extend = false;
+    }
+    else /*never*/
+    {
+      // Don't do any rescaling
+      continue;
+    }
+
+    if (vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).GetAsInt() == 1)
+    {
+      vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(lutProxy, extend);
+    }
+    else
+    {
+      double range[2] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
+      if (vtkSMTransferFunctionProxy::ComputeDataRange(lutProxy, range))
       {
-        vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(lutProxy, extend);
-      }
-      else
-      {
-        double range[2] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
-        if (vtkSMTransferFunctionProxy::ComputeDataRange(lutProxy, range))
+        vtkSMCoreUtilities::AdjustRange(range);
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(lutProxy, range[0], range[1], extend);
+        // BUG #0015076: Also reset the opacity function, if any.
+        if (vtkSMProxy* sof =
+              vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction", /*quiet*/ true).GetAsProxy())
         {
-          vtkSMCoreUtilities::AdjustRange(range);
-          vtkSMTransferFunctionProxy::RescaleTransferFunction(lutProxy, range[0], range[1], extend);
-          // BUG #0015076: Also reset the opacity function, if any.
-          if (vtkSMProxy* sof =
-                vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction", /*quiet*/ true).GetAsProxy())
-          {
-            vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range[0], range[1], extend);
-          }
+          vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range[0], range[1], extend);
         }
       }
     }
