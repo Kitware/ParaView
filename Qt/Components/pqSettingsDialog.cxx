@@ -136,6 +136,8 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 
     widget->connect(this, SIGNAL(accepted()), SLOT(apply()));
     widget->connect(this, SIGNAL(rejected()), SLOT(reset()));
+    widget->connect(ui.buttonBox->button(QDialogButtonBox::RestoreDefaults), SIGNAL(clicked()),
+      widget, SLOT(restoreDefaults()));
     this->connect(widget, SIGNAL(restartRequired()), SLOT(showRestartRequiredMessage()));
     vbox->addWidget(widget);
 
@@ -158,8 +160,6 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
-  this->connect(ui.buttonBox->button(QDialogButtonBox::RestoreDefaults), SIGNAL(clicked()),
-    SLOT(onRestoreDefaults()));
   this->connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(clicked(QAbstractButton*)));
   this->connect(this, SIGNAL(accepted()), SLOT(onAccepted()));
   this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
@@ -271,31 +271,6 @@ void pqSettingsDialog::onRejected()
   Ui::SettingsDialog& ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqSettingsDialog::onRestoreDefaults()
-{
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMSession* session = server->session();
-
-  vtkNew<vtkSMProxyIterator> iter;
-  iter->SetSession(session);
-  iter->SetModeToOneGroup();
-  for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
-  {
-    vtkSMProxy* proxy = iter->GetProxy();
-    if (proxy)
-    {
-      proxy->ResetPropertiesToXMLDefaults();
-    }
-  }
-
-  vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
-  if (paletteProxy)
-  {
-    paletteProxy->ResetPropertiesToXMLDefaults();
-  }
 }
 
 //-----------------------------------------------------------------------------

@@ -64,7 +64,6 @@ private slots:
   void clicked(QAbstractButton*);
   void onAccepted();
   void onRejected();
-  void onRestoreDefaults();
 
   void onTabIndexChanged(int index);
   void onChangeAvailable();
