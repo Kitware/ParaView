@@ -381,6 +381,9 @@ endif()
 
 if (PARAVIEW_ENABLE_XDMF3)
   list (APPEND _vtk_modules vtkIOXdmf3)
+  if (PARAVIEW_USE_MPI)
+    list (APPEND _vtk_mpi_modules vtkIOParallelXdmf3)
+  endif()
 endif ()
 
 if (PARAVIEW_USE_MPI)
@@ -394,10 +397,6 @@ endif()
 if (PARAVIEW_ENABLE_MATPLOTLIB)
   list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
-
-if (PARAVIEW_ENABLE_XDMF3)
-  list (APPEND _vtk_modules vtkIOXdmf3)
-endif ()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkFiltersPython)
