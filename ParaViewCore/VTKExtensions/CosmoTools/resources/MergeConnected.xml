@@ -2,7 +2,7 @@
   <ProxyGroup name="filters">
     <SourceProxy name="PMergeConnected"
                  class="vtkPMergeConnected"
-                 label="VoronoiMergeConnected">
+                 label="Voronoi Merge Connected">
       <Documentation
          long_help="Use global RegionId and merge cells with the same RegionId to a polyhedron cell"
          short_help="PMergeConnected filter settings">
