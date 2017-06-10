@@ -823,7 +823,7 @@
         <EnumerationDomain name="enum">
           <Entry text="Mask Points" value="0" />
           <Entry text="Null Value" value="1" />
-          <Entry text="Closet Point" value="1" />
+          <Entry text="Closest Point" value="1" />
         </EnumerationDomain>
         <Documentation>
           Specify a strategy to use when encountering a "null" point during the
