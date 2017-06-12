@@ -1146,58 +1146,6 @@
       </Hints>
       <!-- End of vtkJSONImageWriter -->
     </WriterProxy>
-    <!-- ================================================================= -->
-    <WriterProxy class="vtkXdmfWriter"
-                 name="XdmfWriter">
-      <Documentation short_help="Write data in Xdmf files.">Writer to write
-      data in eXtensible Data Model and Format *(XDMF) files.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain composite_data_supported="1"
-                        name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
-        written to the file.</Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <Documentation>The name of the file to be written.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty name="WriteAllTimeSteps"
-                         command="SetWriteAllTimeSteps"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the reader.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty name="MeshStaticOverTime"
-                         command="SetMeshStaticOverTime"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>When MeshStaticOverTime is turned ON, only the mesh
-          topology and geometry at the first time step will be written in the
-          heavy data file. All time steps will reference them in the Xdmf file.
-        </Documentation>
-      </IntVectorProperty>
-      <Hints>
-        <Property name="Input"
-                  show="0" />
-        <Property name="FileName"
-                  show="0" />
-        <WriterFactory extensions="xmf"
-                       file_description="Xdmf Data File" />
-      </Hints>
-      <!-- End of XdmfWriter -->
-    </WriterProxy>
 
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"

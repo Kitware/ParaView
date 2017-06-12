@@ -325,9 +325,6 @@ set(_vtk_modules
   #  vtkXMLMultiBlockDataWriter
   #  vtkXMLHierarchicalBoxDataWriter
 
-  vtkIOXdmf2
-  #  Needed for xdmf support.
-
   vtkIOAMR
   #  Needed for AMR Readers.
 
@@ -377,6 +374,14 @@ else()
     list (APPEND _vtk_modules vtkPVCinemaReader)
   endif()
 endif()
+
+if (PARAVIEW_ENABLE_XDMF2)
+  list (APPEND _vtk_modules vtkIOXdmf2)
+endif()
+
+if (PARAVIEW_ENABLE_XDMF3)
+  list (APPEND _vtk_modules vtkIOXdmf3)
+endif ()
 
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})

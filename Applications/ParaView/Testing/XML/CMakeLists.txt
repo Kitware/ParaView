@@ -227,9 +227,10 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   endforeach()
 endif()
 
-if (NOT PARAVIEW_ENABLE_XDMF3)
-  # Presently, all these tests only work with Xdmf2 and when Xdmf3 is enabled,
-  # the SelectReader dialog confuses these tests. So, we'll disable them for now.
+if (PARAVIEW_ENABLE_XDMF2 AND NOT PARAVIEW_ENABLE_XDMF3)
+  # Xdmf2 is optional.
+  # And when both Xdmf2 and Xdmf3 are enabled, the SelectReader dialog
+  # confuses these tests. So, we'll disable them for now.
   # We need a better mechanism to handle such cases in the testing framework.
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml

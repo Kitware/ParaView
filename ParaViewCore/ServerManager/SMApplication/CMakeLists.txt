@@ -129,6 +129,12 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+list(FIND VTK_MODULES_ENABLED "vtkIOXdmf2" vtkioxdmf2_index)
+if (vtkioxdmf2_index GREATER 0)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_xdmf2.xml)
+endif()
+
 list(FIND VTK_MODULES_ENABLED "vtkIOXdmf3" vtkioxdmf3_index)
 if (vtkioxdmf3_index GREATER 0)
   list(APPEND requestedResourceFiles
