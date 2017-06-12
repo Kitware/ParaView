@@ -514,14 +514,15 @@ class CoProcessor(object):
 
             colorArrayInfo = rep.GetArrayInformationForColorArray()
             if not colorArrayInfo:
-                continue
-
-            if lut.VectorMode != 'Magnitude' or \
-               colorArrayInfo.GetNumberOfComponents() == 1:
-                datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
+                import sys
+                datarange = [sys.float_info.max, sys.float_info.min]
             else:
-                # -1 corresponds to the magnitude.
-                datarange = colorArrayInfo.GetComponentRange(-1)
+                if lut.VectorMode != 'Magnitude' or \
+                   colorArrayInfo.GetNumberOfComponents() == 1:
+                    datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
+                else:
+                    # -1 corresponds to the magnitude.
+                    datarange = colorArrayInfo.GetComponentRange(-1)
 
             import vtkParallelCorePython
             import paraview.vtk as vtk
