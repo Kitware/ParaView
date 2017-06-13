@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
+    <width>627</width>
     <height>32</height>
    </rect>
   </property>
@@ -98,6 +98,29 @@
      </property>
      <property name="maximum">
       <number>32</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="ToggleFixed">
+     <property name="toolTip">
+      <string>Switches between scientific and fixed-point representation</string>
+     </property>
+     <property name="statusTip">
+      <string>Toggle fixed-point representation (always show #Precision digits)</string>
+     </property>
+     <property name="whatsThis">
+      <string>Toggle fixed-point representation (always show #Precision digits)</string>
+     </property>
+     <property name="text">
+      <string>FixedRep</string>
+     </property>
+     <property name="icon">
+      <iconset>
+      <normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

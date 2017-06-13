@@ -53,6 +53,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
 public:
   pqSpreadSheetViewDecorator(pqSpreadSheetView* view);
   ~pqSpreadSheetViewDecorator();
+  void setPrecision(int);
+  void setFixedRepresentation(bool);
 
   /**
   * Returns whether the user should allowed to interactive change the source.
@@ -73,6 +75,7 @@ protected slots:
   void resetColumnVisibility();
   void updateColumnVisibility();
   void toggleCellConnectivity();
+  void toggleFixedRepresentation(bool);
 
 protected:
   pqSpreadSheetView* Spreadsheet;
