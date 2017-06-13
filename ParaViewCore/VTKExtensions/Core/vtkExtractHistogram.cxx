@@ -62,6 +62,7 @@ vtkExtractHistogram::vtkExtractHistogram()
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::SCALARS);
   this->Internal = new vtkEHInternals;
   this->CalculateAverages = 0;
+  this->CenterBinsAroundMinAndMax = false;
   this->UseCustomBinRanges = false;
   this->CustomBinRanges[0] = 0;
   this->CustomBinRanges[1] = 100;
@@ -80,7 +81,8 @@ void vtkExtractHistogram::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Component: " << this->Component << "\n";
   os << indent << "BinCount: " << this->BinCount << "\n";
-  os << indent << "UseCustomBinRanges: " << this->UseCustomBinRanges << endl;
+  os << indent << "CenterBinsAroundMinAndMax: " << this->CenterBinsAroundMinAndMax << "\n";
+  os << indent << "UseCustomBinRanges: " << this->UseCustomBinRanges << "\n";
   os << indent << "CustomBinRanges: " << this->CustomBinRanges[0] << ", "
      << this->CustomBinRanges[1] << endl;
 }
@@ -248,11 +250,13 @@ void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* bin_extents, double min
 
   bin_extents->SetNumberOfComponents(1);
   bin_extents->SetNumberOfTuples(this->BinCount);
-  double bin_delta = (max - min) / this->BinCount;
+  double bin_delta =
+    (max - min) / (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
   double half_delta = bin_delta / 2.0;
   for (int i = 0; i < this->BinCount; ++i)
   {
-    bin_extents->SetValue(i, min + (i * bin_delta) + half_delta);
+    bin_extents->SetValue(
+      i, min + (i * bin_delta) + (this->CenterBinsAroundMinAndMax ? 0. : half_delta));
   }
 }
 
@@ -276,7 +280,10 @@ void vtkExtractHistogram::BinAnArray(
   }
 
   int num_of_tuples = data_array->GetNumberOfTuples();
-  double bin_delta = (max - min) / this->BinCount;
+  double bin_delta =
+    (max - min) / (this->CenterBinsAroundMinAndMax ? (this->BinCount - 1) : this->BinCount);
+  double half_delta = bin_delta / 2.0;
+
   for (int i = 0; i != num_of_tuples; ++i)
   {
     if (i % 1000 == 0)
@@ -284,7 +291,9 @@ void vtkExtractHistogram::BinAnArray(
       this->UpdateProgress(0.10 + 0.90 * i / num_of_tuples);
     }
     const double value = data_array->GetComponent(i, this->Component);
-    int index = static_cast<int>((value - min) / bin_delta);
+    int index = static_cast<int>(
+      (value - min + (this->CenterBinsAroundMinAndMax ? half_delta : 0.)) / bin_delta);
+
     // If the value is equal to max, include it in the last bin.
     index = ::vtkExtractHistogramClamp(index, 0, this->BinCount - 1);
     bin_values->SetValue(index, bin_values->GetValue(index) + 1);

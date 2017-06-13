@@ -96,6 +96,8 @@ public:
   }
   static bool GetLoadNoChartVariables() { return vtkSMChartSeriesSelectionDomain::LoadNoVariables; }
 
+  vtkSetStringMacro(DefaultValue);
+
 protected:
   vtkSMChartSeriesSelectionDomain();
   ~vtkSMChartSeriesSelectionDomain();
@@ -153,7 +155,6 @@ protected:
    * Value used when DefaultMode==VALUE
    */
   char* DefaultValue;
-  vtkSetStringMacro(DefaultValue);
   //@}
 
   /**

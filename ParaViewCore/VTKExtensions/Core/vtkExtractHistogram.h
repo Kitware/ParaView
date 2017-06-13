@@ -61,6 +61,17 @@ public:
 
   //@{
   /**
+   * Get/Set if first and last bins must be centered around the min and max
+   * data. This is only used when UseCustomBinRanges is set to false.
+   * Default is false.
+   */
+  vtkSetMacro(CenterBinsAroundMinAndMax, bool);
+  vtkGetMacro(CenterBinsAroundMinAndMax, bool);
+  vtkBooleanMacro(CenterBinsAroundMinAndMax, bool);
+  //@}
+
+  //@{
+  /**
    * Get/Set custom bin ranges to use. These are used only when
    * UseCustomBinRanges is set to true.
    */
@@ -118,6 +129,7 @@ protected:
   void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
 
   double CustomBinRanges[2];
+  bool CenterBinsAroundMinAndMax;
   bool UseCustomBinRanges;
   int Component;
   int BinCount;

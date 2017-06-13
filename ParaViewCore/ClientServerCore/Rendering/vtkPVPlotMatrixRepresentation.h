@@ -112,6 +112,56 @@ public:
   void SetActivePlotMarkerSize(double size);
 
   /**
+   * Set the scatter plot density map visibility
+   */
+  void SetDensityMapVisibility(bool visible);
+
+  /**
+   * Set the active plot density map visibility
+   */
+  void SetActivePlotDensityMapVisibility(bool visible);
+
+  /**
+   * Sets the line size for the density map in the plot matrix.
+   */
+  void SetDensityLineSize(double size);
+
+  /**
+   * Sets the line size for the density map in the active plot.
+   */
+  void SetActivePlotDensityLineSize(double size);
+
+  /**
+   * Sets the color for the density map first DecileColor in the scatter plots.
+   */
+  void SetDensityMapFirstDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map first DecileColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapFirstDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map MeanColor in the scatter plots.
+   */
+  void SetDensityMapMedianColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map MeanColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapMedianColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map last DecileColor in the scatter plots.
+   */
+  void SetDensityMapLastDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map last DecileColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapLastDecileColor(double r, double g, double b);
+
+  /**
    * Returns the scatter plot matrix.
    */
   vtkScatterPlotMatrix* GetPlotMatrix() const;
@@ -150,6 +200,17 @@ private:
   int ActivePlotMarkerStyle;
   double ScatterPlotMarkerSize;
   double ActivePlotMarkerSize;
+
+  bool ActivePlotDensityMapVisibility;
+  bool ScatterPlotDensityMapVisibility;
+  double ScatterPlotDensityLineSize;
+  double ActivePlotDensityLineSize;
+  vtkColor4ub ScatterPlotDensityMapFirstDecileColor;
+  vtkColor4ub ActivePlotDensityMapFirstDecileColor;
+  vtkColor4ub ScatterPlotDensityMapMedianColor;
+  vtkColor4ub ActivePlotDensityMapMedianColor;
+  vtkColor4ub ScatterPlotDensityMapLastDecileColor;
+  vtkColor4ub ActivePlotDensityMapLastDecileColor;
 };
 
 #endif

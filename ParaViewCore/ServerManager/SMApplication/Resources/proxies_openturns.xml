@@ -1,0 +1,378 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="filters">
+    <!-- ================================================================= -->
+    <SourceProxy name="OTKernelSmoothing" class="vtkOTKernelSmoothing" label="OT Kernel Smoothing">
+      <!-- Begin OTKernelSmoothing -->
+      <Documentation
+        short_help="."
+        long_help=".">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_array"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetGaussianPDF"
+                         default_values="1"
+                         name="Gaussian"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+       <IntVectorProperty command="SetTriangularPDF"
+                         default_values="1"
+                         name="Triangular"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetEpanechnikovPDF"
+                         default_values="1"
+                         name="Epanechnikov"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPointNumber"
+                         default_values="129"
+                         name="PointNumber"
+                         number_of_elements="1">
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetBoundaryCorrection"
+                         default_values="0"
+                         name="BoundaryCorrection"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="PDF Kernels">
+        <Property name="Gaussian" />
+        <Property name="Triangular" />
+        <Property name="Epanechnikov" />
+      </PropertyGroup>
+
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <Hints>
+        <Visibility replace_input="0" />
+        <View type="XYChartView" port="0" />
+        <Representation port="0" view="XYBarChartView" type="XYChartRepresentation" />
+        <Representation port="0" view="XYHistogramChartView" type="XYChartRepresentation" />"
+        <Plotable />
+      </Hints>
+      <!-- End OTKernelSmoothing -->
+    </SourceProxy>
+    <SourceProxy name="OTDensityMap" class="vtkOTDensityMap" label="OT Density Map">
+      <!-- Begin OTDensityMap -->
+      <Documentation
+        short_help="Filter to compute density map on tables using OpenTURNS"
+        long_help="This Filter compute density on point cloud and output density line point as a table.">
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkTable"/>
+           </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.
+        It must be a vtkTable.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetGridSubdivisions"
+                        number_of_elements="1"
+                        default_values="50"
+                        panel_visibility="advanced"
+                        name="GridSubdivisions">
+        <IntRangeDomain min="1" max="500" name="range" />
+        <Documentation>This property specifies the grid subdivisions used for compute
+        the density pdf, aka the number of points or dimensions in the grid. Increasing it
+        will provide a finer discretization of the density but will take a longer time.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetContourApproximationNumberOfPoints"
+                        number_of_elements="1"
+                        default_values="600"
+                        panel_visibility="advanced"
+                        name="ContourApproximationNumberOfPoints">
+        <IntRangeDomain min="1" max="5000" name="range" />
+        <Documentation>This property specifies the sample size of points used
+        to compute the contour density values. Increasing it
+        will provide a better approximation but will take a longer time.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="0;0;0;0;X"
+                            element_types="0 0 0 0 2"
+                            name="XArray"
+                            label="Select X Coords Array"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the X coordinates of the density map.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="1;0;0;0;Y"
+                            element_types="0 0 0 0 2"
+                            name="YArray"
+                            label="Select Y Coords Array"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the Y coordinates of the density map.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Isosurfaces"
+                            name="ContourValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1">
+        <DoubleRangeDomain max="1"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the values at which to compute
+        density lines and also the number of such
+        values.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End OTDensityMap -->
+   </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+    <Extension name="PlotMatrixRepresentation">
+      <IntVectorProperty name="ShowScatterPlotDensityMap"
+                         command="SetDensityMapVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to compute and render density map on all scatter plot.
+          Displayed density line are 10%, 50% and 90%.
+          This can take a long time depending of the number of scatter plots.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDensityLineSize"
+                            default_values="2"
+                            name="ScatterPlotDensityLineSize"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>Set scatter plots density map line size.</Documentation>
+        <DoubleRangeDomain name="range" min="1" max="20" />
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowScatterPlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowScatterPlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDensityMapFirstDecileColor"
+                            default_values="0.75 0.45 0"
+                            name="ScatterPlotDensityMapFirstDecileColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the first decile density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowScatterPlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowScatterPlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDensityMapMedianColor"
+                            default_values="0 0.75 0.75"
+                            name="ScatterPlotDensityMapMedianColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the mean density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowScatterPlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowScatterPlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDensityMapLastDecileColor"
+                            default_values="0.75 0 0.75"
+                            name="ScatterPlotDensityMapLastDecileColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the last decile density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowScatterPlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowScatterPlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ShowActivePlotDensityMap"
+                         command="SetActivePlotDensityMapVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to compute and render density map on the active plot.
+          Displayed density line are 10%, 50% and 90%.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotDensityLineSize"
+                            default_values="3"
+                            name="ActivePlotDensityLineSize"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>Set the active plot density map line size.</Documentation>
+        <DoubleRangeDomain name="range" min="1" max="20" />
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowActivePlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowActivePlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotDensityMapFirstDecileColor"
+                            default_values="0.75 0.45 0"
+                            name="ActivePlotDensityMapFirstDecileColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the first decile density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowActivePlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowActivePlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotDensityMapMedianColor"
+                            default_values="0 0.75 0.75"
+                            name="ActivePlotDensityMapMedianColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the mean density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowActivePlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowActivePlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotDensityMapLastDecileColor"
+                            default_values="0.75 0 0.45"
+                            name="ActivePlotDensityMapLastDecileColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the last decile density line color.</Documentation>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          ShowActivePlotDensityMap is checked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowActivePlotDensityMap" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Density Map">
+        <Property name="ShowScatterPlotDensityMap" />
+        <Property name="ScatterPlotDensityLineSize" />
+        <Property name="ScatterPlotDensityMapFirstDecileColor" />
+        <Property name="ScatterPlotDensityMapMedianColor" />
+        <Property name="ScatterPlotDensityMapLastDecileColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Density Map (Active Plot)">
+        <Property name="ShowActivePlotDensityMap" />
+        <Property name="ActivePlotDensityLineSize" />
+        <Property name="ActivePlotDensityMapFirstDecileColor" />
+        <Property name="ActivePlotDensityMapMedianColor" />
+        <Property name="ActivePlotDensityMapLastDecileColor" />
+      </PropertyGroup>
+      <!-- End of PlotMatrixRepresentation -->
+    </Extension>
+  </ProxyGroup>
+</ServerManagerConfiguration>

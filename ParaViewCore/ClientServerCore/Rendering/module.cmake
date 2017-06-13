@@ -11,6 +11,9 @@ endif()
 if(PARAVIEW_USE_OSPRAY)
   list(APPEND __dependencies vtkRenderingOSPRay)
 endif()
+if(PARAVIEW_USE_OPENTURNS)
+  list(APPEND __dependencies vtkFiltersOpenTurns)
+endif()
 
 vtk_module(vtkPVClientServerCoreRendering
   GROUPS

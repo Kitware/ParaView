@@ -205,6 +205,7 @@ option(PARAVIEW_USE_OPENVR "Build ParaView with OpenVR rendering" OFF)
 set(VTK_OPENVR_OBJECT_FACTORY OFF
     CACHE INTERNAL "ParaView requires the OpenVR factory be disabled" FORCE)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
+option(PARAVIEW_USE_OPENTURNS "Build ParaView with OpenTURNS filters and density maps" OFF)
 
 # NvPipe requires an NVIDIA GPU.
 option(PARAVIEW_ENABLE_NVPIPE

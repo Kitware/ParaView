@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAnnotationLink.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h" // for PARAVIEW_USE_OPENTURNS
 #include "vtkPVContextView.h"
 #include "vtkPlotPoints.h"
 #include "vtkScatterPlotMatrix.h"
@@ -40,6 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
+
+#ifdef PARAVIEW_USE_OPENTURNS
+#include "vtkOTScatterPlotMatrix.h"
+#endif // PARAVIEW_USE_OPENTURNS
 
 #include <set>
 #include <string>
@@ -90,17 +95,33 @@ public:
   }
 };
 
+namespace
+{
+vtkColor4ub MakeColor(double r, double g, double b)
+{
+  return vtkColor4ub(static_cast<unsigned char>(r * 255), static_cast<unsigned char>(g * 255),
+    static_cast<unsigned char>(b * 255));
+}
+}
+
 //----------------------------------------------------------------------------
 vtkPVPlotMatrixRepresentation::vtkPVPlotMatrixRepresentation()
 {
   this->Internals = new vtkInternals();
 
-  // default colors are black (0, 0, 0)
+  // default Colors are black (0, 0, 0)
   for (int i = 0; i < 3; i++)
   {
     this->ScatterPlotColor[i] = 0;
     this->ActivePlotColor[i] = 0;
     this->HistogramColor[i] = 0;
+
+    this->ScatterPlotDensityMapFirstDecileColor[i] = 0;
+    this->ActivePlotDensityMapFirstDecileColor[i] = 0;
+    this->ScatterPlotDensityMapMedianColor[i] = 0;
+    this->ActivePlotDensityMapMedianColor[i] = 0;
+    this->ScatterPlotDensityMapLastDecileColor[i] = 0;
+    this->ActivePlotDensityMapLastDecileColor[i] = 0;
   }
   this->ScatterPlotColor[3] = 255;
   this->ActivePlotColor[3] = 255;
@@ -110,6 +131,17 @@ vtkPVPlotMatrixRepresentation::vtkPVPlotMatrixRepresentation()
   this->ActivePlotMarkerStyle = vtkPlotPoints::CIRCLE;
   this->ScatterPlotMarkerSize = 5.0;
   this->ActivePlotMarkerSize = 8.0;
+
+  this->ActivePlotDensityMapVisibility = false;
+  this->ScatterPlotDensityMapVisibility = false;
+  this->ScatterPlotDensityLineSize = 2.0;
+  this->ActivePlotDensityLineSize = 3.0;
+  this->ScatterPlotDensityMapFirstDecileColor[3] = 255;
+  this->ActivePlotDensityMapFirstDecileColor[3] = 255;
+  this->ScatterPlotDensityMapMedianColor[3] = 255;
+  this->ActivePlotDensityMapMedianColor[3] = 255;
+  this->ScatterPlotDensityMapLastDecileColor[3] = 255;
+  this->ActivePlotDensityMapLastDecileColor[3] = 255;
 }
 
 //----------------------------------------------------------------------------
@@ -162,6 +194,33 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
   plotMatrix->SetPlotMarkerStyle(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerStyle);
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotMarkerSize);
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerSize);
+
+#ifdef PARAVIEW_USE_OPENTURNS
+  vtkOTScatterPlotMatrix* otPlotMatrix = vtkOTScatterPlotMatrix::SafeDownCast(plotMatrix);
+  if (otPlotMatrix)
+  {
+    otPlotMatrix->SetDensityMapVisibility(
+      vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotDensityMapVisibility);
+    otPlotMatrix->SetDensityMapVisibility(
+      vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotDensityMapVisibility);
+    otPlotMatrix->SetDensityLineSize(
+      vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotDensityLineSize);
+    otPlotMatrix->SetDensityLineSize(
+      vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotDensityLineSize);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::SCATTERPLOT, 0, this->ScatterPlotDensityMapFirstDecileColor);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::ACTIVEPLOT, 0, this->ActivePlotDensityMapFirstDecileColor);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::SCATTERPLOT, 1, this->ScatterPlotDensityMapMedianColor);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::ACTIVEPLOT, 1, this->ActivePlotDensityMapMedianColor);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::SCATTERPLOT, 2, this->ScatterPlotDensityMapLastDecileColor);
+    otPlotMatrix->SetDensityMapColor(
+      vtkScatterPlotMatrix::ACTIVEPLOT, 2, this->ActivePlotDensityMapLastDecileColor);
+  }
+#endif // PARAVIEW_USE_OPENTURNS
 
   // vtkPVPlotMatrixRepresentation doesn't support multiblock of tables, so we
   // only consider the first vtkTable.
@@ -224,25 +283,21 @@ void vtkPVPlotMatrixRepresentation::ClearSeriesVisibilities()
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetColor(double r, double g, double b)
 {
-  this->ScatterPlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
-
+  this->ScatterPlotColor = MakeColor(r, g, b);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetActivePlotColor(double r, double g, double b)
 {
-  this->ActivePlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
+  this->ActivePlotColor = MakeColor(r, g, b);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetHistogramColor(double r, double g, double b)
 {
-  this->HistogramColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
-    static_cast<unsigned char>(g * 255), static_cast<unsigned char>(b * 255));
+  this->HistogramColor = MakeColor(r, g, b);
   this->Modified();
 }
 
@@ -271,6 +326,78 @@ void vtkPVPlotMatrixRepresentation::SetMarkerSize(double size)
 void vtkPVPlotMatrixRepresentation::SetActivePlotMarkerSize(double size)
 {
   this->ActivePlotMarkerSize = size;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetDensityMapVisibility(bool visible)
+{
+  this->ScatterPlotDensityMapVisibility = visible;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotDensityMapVisibility(bool visible)
+{
+  this->ActivePlotDensityMapVisibility = visible;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetDensityLineSize(double size)
+{
+  this->ScatterPlotDensityLineSize = size;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotDensityLineSize(double size)
+{
+  this->ActivePlotDensityLineSize = size;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetDensityMapFirstDecileColor(double r, double g, double b)
+{
+  this->ScatterPlotDensityMapFirstDecileColor = MakeColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotDensityMapFirstDecileColor(
+  double r, double g, double b)
+{
+  this->ActivePlotDensityMapFirstDecileColor = MakeColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetDensityMapMedianColor(double r, double g, double b)
+{
+  this->ScatterPlotDensityMapMedianColor = MakeColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotDensityMapMedianColor(double r, double g, double b)
+{
+  this->ActivePlotDensityMapMedianColor = MakeColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetDensityMapLastDecileColor(double r, double g, double b)
+{
+  this->ScatterPlotDensityMapLastDecileColor = MakeColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotDensityMapLastDecileColor(
+  double r, double g, double b)
+{
+  this->ActivePlotDensityMapLastDecileColor = MakeColor(r, g, b);
   this->Modified();
 }
 
