@@ -109,7 +109,10 @@ extract_version_components("${version_txt}" "PARAVIEW")
 determine_version(${ParaView_SOURCE_DIR} ${GIT_EXECUTABLE} "PARAVIEW")
 
 # Setup some cross compiling related things.
-if (CMAKE_CROSSCOMPILING AND NOT COMPILE_TOOLS_IMPORTED)
+if (CMAKE_CROSSCOMPILING
+    AND NOT COMPILE_TOOLS_IMPORTED
+    AND NOT DEFINED CMAKE_CROSSCOMPILING_EMULATOR
+    AND CMAKE_VERSION VERSION_LESS 3.8)
   find_package (ParaViewCompileTools REQUIRED)
   # this keeps VTK sub-dir from trying to import VTKCompileTools.
   set (COMPILE_TOOLS_IMPORTED TRUE)
