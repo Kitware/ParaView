@@ -211,8 +211,9 @@ option(PARAVIEW_USE_OPENTURNS "Build ParaView with OpenTURNS filters and density
 option(PARAVIEW_ENABLE_NVPIPE
        "Build ParaView with NvPipe remoting. Requires CUDA and an NVIDIA GPU" OFF)
 
-# Xdmf3 is not ON by default since it depends on Boost.
-option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support (requires Boost)." OFF)
+option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
+mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
+option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
 
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
