@@ -31,7 +31,7 @@
 set(${vtk-module}_NO_HeaderTest 1)
 vtk_module_export("")
 
-if (NOT COMPILE_TOOLS_IMPORTED)
+if (NOT PARAVIEW_COMPILE_TOOLS_IMPORTED)
   add_executable(vtkWrapClientServer vtkWrapClientServer.c)
   target_link_libraries(vtkWrapClientServer vtkWrappingTools)
   if (PARAVIEW_USE_UNIFIED_BINDINGS)

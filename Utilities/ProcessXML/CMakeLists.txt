@@ -32,7 +32,7 @@ vtk_module_impl()
 vtk_module_export("")
 
 include(vtkForwardingExecutable)
-if (NOT COMPILE_TOOLS_IMPORTED)
+if (NOT PARAVIEW_COMPILE_TOOLS_IMPORTED)
   add_executable(kwProcessXML ProcessXML.cxx)
   target_link_libraries(kwProcessXML vtkCommonCore vtksys)
 
