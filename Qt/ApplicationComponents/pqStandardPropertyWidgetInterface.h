@@ -121,6 +121,13 @@ public:
   */
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
+
+  /**
+  * Create all default decorators for a specific widget.
+  * Created decorators are:
+  * \li \c AnimationShortcutDecorator : pqAnimationShortcutDecorator
+  */
+  virtual void createDefaultWidgetDecorators(pqPropertyWidget* widget);
 };
 
 #endif // _pqStandardPropertyWidgetInterface_h

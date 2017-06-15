@@ -33,6 +33,10 @@ set (Module_SRCS
   pqAboutDialogReaction.h
   pqAlwaysConnectedBehavior.cxx
   pqAlwaysConnectedBehavior.h
+  pqAnimationShortcutWidget.cxx
+  pqAnimationShortcutWidget.h
+  pqAnimationShortcutDecorator.cxx
+  pqAnimationShortcutDecorator.h
   pqAnimationTimeToolbar.cxx
   pqAnimationTimeToolbar.h
   pqAnimationTimeWidget.cxx
@@ -327,6 +331,8 @@ set (Module_SRCS
 set (Module_MOC_HDRS
   pqAboutDialogReaction.h
   pqAlwaysConnectedBehavior.h
+  pqAnimationShortcutDecorator.h
+  pqAnimationShortcutWidget.h
   pqAnimationTimeToolbar.h
   pqAnimationTimeWidget.h
   pqApplicationSettingsReaction.h

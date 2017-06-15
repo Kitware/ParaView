@@ -300,6 +300,18 @@
         <IntRangeDomain min="1" max="17" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ShowAnimationShortcuts"
+        number_of_elements="1"
+        default_values="0"
+        command="SetShowAnimationShortcuts"
+        panel_visibility="advanced">
+        <Documentation>
+          Set whether to show or not an animation shortcut button
+          on ranged scalar property.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -367,6 +379,7 @@
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
         <Property name="AnimationTimePrecision" />
+        <Property name="ShowAnimationShortcuts" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">

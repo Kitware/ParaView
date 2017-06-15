@@ -171,6 +171,15 @@ public:
   vtkGetMacro(AnimationTimePrecision, int);
   //@}
 
+  //@{
+  /**
+   * Set when animation shortcuts are shown.
+   */
+  vtkSetMacro(ShowAnimationShortcuts, bool);
+  vtkGetMacro(ShowAnimationShortcuts, bool);
+  vtkBooleanMacro(ShowAnimationShortcuts, bool);
+  //@}
+
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
    */
@@ -228,6 +237,7 @@ protected:
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
   int AnimationTimePrecision;
+  bool ShowAnimationShortcuts;
   int PropertiesPanelMode;
   bool LockPanels;
 
