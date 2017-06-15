@@ -51,6 +51,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , CacheGeometryForAnimation(false)
   , AnimationGeometryCacheLimit(0)
   , AnimationTimePrecision(17)
+  , ShowAnimationShortcuts(0)
   , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
   , LockPanels(false)
 {

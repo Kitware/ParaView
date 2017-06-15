@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVConfig.h"
 
+#include "pqAnimationShortcutDecorator.h"
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
 #include "pqBoxPropertyWidget.h"
@@ -193,6 +194,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   {
     return new pqViewResolutionPropertyWidget(smProxy, smProperty);
   }
+
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
 }
@@ -331,4 +333,15 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
 
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardPropertyWidgetInterface::createDefaultWidgetDecorators(pqPropertyWidget* widget)
+{
+  // *** NOTE: When adding new default decorators, please update the header documentation ***
+  if (pqAnimationShortcutDecorator::accept(widget))
+  {
+    new pqAnimationShortcutDecorator(widget);
+  }
+  // *** NOTE: When adding new default decorators, please update the header documentation ***
 }

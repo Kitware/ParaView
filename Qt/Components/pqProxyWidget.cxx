@@ -1096,6 +1096,13 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
     }
   }
 
+  // Create all default decorators
+  for (int cc = 0; cc < interfaces.size(); cc++)
+  {
+    pqPropertyWidgetInterface* interface = interfaces[cc];
+    interface->createDefaultWidgetDecorators(widget);
+  }
+
   return widget;
 }
 
