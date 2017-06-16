@@ -24,7 +24,7 @@ from vtk.web.render_window_serializer import SynchronizationContext, initializeS
 from paraview.web.decorators import *
 
 from paraview.vtk.vtkCommonDataModel          import vtkImageData
-from paraview.vtk.vtkCommonCore               import vtkUnsignedCharArray
+from paraview.vtk.vtkCommonCore               import vtkUnsignedCharArray, vtkCollection
 from paraview.vtk.vtkWebCore                  import vtkDataEncoder, vtkWebInteractionEvent
 from paraview.vtk.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
 from paraview.vtk.vtkPVServerManagerCore      import vtkSMProxyManager
@@ -1172,7 +1172,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'unspecified',     # 14
                        'signed_char' ]    # 15
 
-    def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True):
+    def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True, groupProxyEditorWidgets=True, respectPropertyGroups=True):
         """
         - basePath: specify the base directory (or directories) that we should start with, if this
          parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
@@ -1181,6 +1181,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         """
         super(ParaViewWebProxyManager, self).__init__()
         self.debugMode = False
+        self.groupProxyEditorPropertyWidget = groupProxyEditorWidgets
+        self.respectPropertyGroups = respectPropertyGroups
+        self.proxyDefinitionCache = {}
         self.domainFunctionMap = { "vtkSMBooleanDomain": booleanDomainDecorator,
                                    "vtkSMProxyListDomain": proxyListDomainDecorator,
                                    "vtkSMIntRangeDomain": numberRangeDomainDecorator,
@@ -1203,11 +1206,13 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                  'vtkSMDoubleVectorProperty': 'float',
                                  'vtkSMStringVectorProperty': 'str',
                                  'vtkSMProxyProperty': 'proxy',
-                                 'vtkSMInputProperty': 'proxy' }
+                                 'vtkSMInputProperty': 'proxy',
+                                 'vtkSMDoubleMapProperty': 'map' }
         self.allowedProxies = {}
         self.hintsMap = { 'PropertyWidgetDecorator': { 'ClipScalarsDecorator': clipScalarDecorator,
                                                        'GenericDecorator': genericDecorator },
-                          'Widget': { 'multi_line': multiLineDecorator } }
+                          'Widget': { 'multi_line': multiLineDecorator },
+                          'ProxyEditorPropertyWidget': { 'default': proxyEditorPropertyWidgetDecorator } }
 
         self.setBaseDirectory(baseDir)
         self.allowUnconfiguredReaders = allowUnconfiguredReaders
@@ -1281,8 +1286,24 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 self.readerFactoryMap[ext] = [ readerName, readerMethod ]
 
     #--------------------------------------------------------------------------
+    # Convenience method to get proxy defs, cached if available
+    #--------------------------------------------------------------------------
+    def getProxyDefinition(self, group, name):
+        cacheKey = '%s:%s' % (group, name)
+        if cacheKey in self.proxyDefinitionCache:
+            return self.proxyDefinitionCache[cacheKey]
+
+        xmlElement = servermanager.ActiveConnection.Session.GetProxyDefinitionManager().GetCollapsedProxyDefinition(group, name, None)
+        # print('\n\n\n (%s, %s): \n\n' % (group, name))
+        # xmlElement.PrintXML()
+        self.proxyDefinitionCache[cacheKey] = xmlElement
+        return xmlElement
+
+    #--------------------------------------------------------------------------
     # Look higher up in XML heirarchy for attributes on a property (useful if
-    # a property is an exposed property).
+    # a property is an exposed property).  From the documentation of vtkSMProperty,
+    # the GetParent method will access the sub-proxy to which the property
+    # actually belongs, if that is the case.
     #--------------------------------------------------------------------------
     def extractParentAttributes(self, property, attributes):
         proxy = None
@@ -1298,7 +1319,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 print ('ERROR: unable to get property parent for property ' + property.Name)
                 return {}
 
-        xmlElement = servermanager.ActiveConnection.Session.GetProxyDefinitionManager().GetCollapsedProxyDefinition(proxy.GetXMLGroup(), proxy.GetXMLName(), None)
+        xmlElement = self.getProxyDefinition(proxy.GetXMLGroup(), proxy.GetXMLName())
         attrMap = {}
 
         nbChildren = xmlElement.GetNumberOfNestedElements()
@@ -1311,35 +1332,107 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                     for attrName in attributes:
                         if xmlChild.GetAttribute(attrName):
                             attrMap[attrName] = xmlChild.GetAttribute(attrName)
+
         return attrMap
 
     #--------------------------------------------------------------------------
     # If we have a proxy property, gather up the xml information from the
     # possible proxy values it can take on.
     #--------------------------------------------------------------------------
-    def getProxyListFromProperty(self, proxy, proxyPropElement):
+    def getProxyListFromProperty(self, proxy, proxyPropElement, inPropGroup, group, parentGroup, detailsKey):
         propPropName = proxyPropElement.GetAttribute('name')
+        propVisibility = proxyPropElement.GetAttribute('panel_visibility')
         propInstance = proxy.GetProperty(propPropName)
         nbChildren = proxyPropElement.GetNumberOfNestedElements()
         foundPLDChild = False
-        proxyDefMgr = servermanager.ActiveConnection.Session.GetProxyDefinitionManager()
-        for i in range(nbChildren):
-            child = proxyPropElement.GetNestedElement(i)
-            if child.GetName() == 'ProxyListDomain':
-                domain = propInstance.GetDomain(child.GetAttribute('name'))
-                foundPLDChild = True
-                for j in range(domain.GetNumberOfProxies()):
-                    subProxy = domain.GetProxy(j)
-                    pelt = proxyDefMgr.GetCollapsedProxyDefinition(subProxy.GetXMLGroup(),
-                                                                   subProxy.GetXMLName(),
-                                                                   None)
-                    self.processXmlElement(subProxy, pelt)
+        subProxiesToProcess = []
+
+        pldChild = proxyPropElement.FindNestedElementByName('ProxyListDomain')
+
+        if pldChild:
+            domain = propInstance.GetDomain(pldChild.GetAttribute('name'))
+            foundPLDChild = True
+            for j in range(domain.GetNumberOfProxies()):
+                subProxy = domain.GetProxy(j)
+                pelt = self.getProxyDefinition(subProxy.GetXMLGroup(), subProxy.GetXMLName())
+                subProxiesToProcess.append([subProxy, pelt])
+
+        if len(subProxiesToProcess) > 0:
+            newGroup = group
+            newParentGroup = parentGroup
+            if self.groupProxyEditorPropertyWidget:
+                hintChild = proxyPropElement.FindNestedElementByName('Hints')
+                if hintChild:
+                    pepwChild = hintChild.FindNestedElementByName('ProxyEditorPropertyWidget')
+                    if pepwChild:
+                        newGroup = '%s:%s' % (proxy.GetGlobalIDAsString(), propPropName)
+                        self.groupDetailsMap[newGroup] = {
+                            'groupName': propPropName,
+                            'groupWidget': 'ProxyEditorPropertyWidget',
+                            'groupVisibility': propVisibility if propVisibility is not None else 'default',
+                            'groupType': 'ProxyEditorPropertyWidget'
+                        }
+                        newParentGroup = group
+                        self.propertyDetailsMap[detailsKey]['group'] = newGroup
+                        self.propertyDetailsMap[detailsKey]['parentGroup'] = newParentGroup
+            for sub in subProxiesToProcess:
+                self.processXmlElement(sub[0], sub[1], inPropGroup, newGroup, newParentGroup)
+
         return foundPLDChild
+
+    #--------------------------------------------------------------------------
+    # Decide whether to update our internal map of property details, or just the
+    # ordered list of properties, or both.
+    #
+    # detailsKey  => uniquely identifies a property via concatenation of proxy
+    #                id and property name, e.g. '476:Opacity'
+    # name        => property name
+    # panelVis    => value of 'panel_visibilty' attribute on element
+    # size        => number of elements to set for this property
+    # inPropGroup => whether or not this property is inside a 'PropertyGroup' element
+    # group       => name of group this property belongs to (could be other than 'root',
+    #                even if 'inPropGroup' is false, due to the grouping we impose
+    #                when we encounter a ProxyProperty with Hints: 'ProxyEditorPropertyWidget')
+    # parentGroup => name of parent group (could be None for root level property)
+    #--------------------------------------------------------------------------
+    def trackProperty(self, detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup):
+        if detailsKey not in self.propertyDetailsMap:
+            self.propertyDetailsMap[detailsKey] = {
+                'type': name,
+                'panelVis': panelVis,
+                'panelVisQualifier': panelVisQualifier,
+                'size': size,
+                'group': group,
+                'parentGroup': parentGroup
+            }
+
+        if inPropGroup:
+            self.propertyDetailsMap[detailsKey]['group'] = group
+            self.propertyDetailsMap[detailsKey]['parentGroup'] = parentGroup
+            if panelVis is not None:
+                self.propertyDetailsMap[detailsKey]['panelVis'] = panelVis
+            if panelVisQualifier is not None:
+                self.propertyDetailsMap[detailsKey]['panelVisQualifier'] = panelVisQualifier
+        else:
+            if panelVis is not None and self.propertyDetailsMap[detailsKey]['panelVis'] is None:
+                self.propertyDetailsMap[detailsKey]['panelVis'] = panelVis
+            if panelVisQualifier is not None and self.propertyDetailsMap[detailsKey]['panelVisQualifier'] is None:
+                self.propertyDetailsMap[detailsKey]['panelVisQualifier'] = panelVisQualifier
+
+        if detailsKey not in self.orderedNameList:
+            self.orderedNameList.append(detailsKey)
+        else:
+            # Do already have property in ordered list, but because we're in a
+            # PropertyGroup, we want to override the previous order
+            if inPropGroup:
+                idx = self.orderedNameList.index(detailsKey)
+                self.orderedNameList.pop(idx)
+                self.orderedNameList.append(detailsKey)
 
     #--------------------------------------------------------------------------
     # Gather information from the xml associated with a proxy and properties.
     #--------------------------------------------------------------------------
-    def processXmlElement(self, proxy, xmlElement):
+    def processXmlElement(self, proxy, xmlElement, inPropGroup, group, parentGroup):
         proxyId = proxy.GetGlobalIDAsString()
         nbChildren = xmlElement.GetNumberOfNestedElements()
         for i in range(nbChildren):
@@ -1353,28 +1446,40 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             panelVis = xmlChild.GetAttribute('panel_visibility')
             numElts = xmlChild.GetAttribute('number_of_elements')
 
+            panelVisQualifier = None
+            if self.proxyIsRepresentation:
+                panelVisQualifier = xmlChild.GetAttribute('panel_visibility_default_for_representation')
+
             size = -1
             informationOnly = 0
             internal = 0
 
             # Check for attributes that might only exist on parent xml
             parentQueryList = []
-            if not numElts:
+            if numElts is None:
                 parentQueryList.append('number_of_elements')
             else:
                 size = int(numElts)
 
-            if not infoOnly:
+            if infoOnly is None:
                 parentQueryList.append('information_only')
             else:
                 informationOnly = int(infoOnly)
 
-            if not isInternal:
+            if isInternal is None:
                 parentQueryList.append('is_internal')
             else:
                 internal = int(isInternal)
 
-            # Try to retrieve those attributes from parent xml
+            if panelVis is None:
+                parentQueryList.append('panel_visibility')
+
+            if self.proxyIsRepresentation:
+                if panelVisQualifier is None:
+                    parentQueryList.append('panel_visibility_default_for_representation')
+
+            # Try to retrieve those attributes from parent xml (implicit assumption is this is a property
+            # which actually belongs to a subproxy)
             parentAttrs = {}
             if len(parentQueryList) > 0:
                 propInstance = proxy.GetProperty(nameAttr)
@@ -1388,9 +1493,13 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 informationOnly = int(parentAttrs['information_only'])
             if 'is_internal' in parentAttrs and parentAttrs['is_internal']:
                 internal = int(parentAttrs['is_internal'])
+            if 'panel_visibility' in parentAttrs:
+                panelVis = parentAttrs['panel_visibility']
+            if 'panel_visibility_default_for_representation' in parentAttrs:
+                panelVisQualifier = parentAttrs['panel_visibility_default_for_representation']
 
             # Now decide whether we should filter out this property
-            if ((panelVis == 'never' or informationOnly == 1 or internal == 1) and nameAttr not in self.alwaysIncludeProperties) or nameAttr in self.alwaysExcludeProperties:
+            if (((name.endswith('Property') and panelVis == 'never') or informationOnly == 1 or internal == 1) and nameAttr not in self.alwaysIncludeProperties) or nameAttr in self.alwaysExcludeProperties:
                 self.debug('Filtering out property ' + str(nameAttr) + ' because panelVis is never, infoOnly is 1, isInternal is 1, or ' + str(nameAttr) + ' is an ALWAYS EXCLUDE property')
                 continue
 
@@ -1405,26 +1514,38 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                             self.debug("          Replace input value: " + str(replaceInputAttr))
             elif name == 'ProxyProperty' or name == 'InputProperty':
                 self.debug(str(nameAttr) + ' is a proxy property')
-                if detailsKey not in self.propertyDetailsMap:
-                    self.propertyDetailsMap[detailsKey] = {'type': name, 'panelVis': panelVis, 'size': size}
-                    self.orderedNameList.append(detailsKey)
-                foundProxyListDomain = self.getProxyListFromProperty(proxy, xmlChild)
+                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup)
+                foundProxyListDomain = self.getProxyListFromProperty(proxy, xmlChild, inPropGroup, group, parentGroup, detailsKey)
                 if foundProxyListDomain == True:
                     self.propertyDetailsMap[detailsKey]['size'] = 1
             elif name.endswith('Property'):
-                # Add this property to the list that will be used both to
-                # order as well as to filter the properties retrieved earlier.
-                if detailsKey not in self.propertyDetailsMap:
-                    self.propertyDetailsMap[detailsKey] = {'type': name, 'panelVis': panelVis, 'size': size}
-                    self.orderedNameList.append(detailsKey)
+                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup)
             else:
-                # Don't recurse on properties that might be within a
-                # PropertyGroup unless the PropertyGroup is itself within an
-                # ExposedProperties. Later we might want to make a note in the
-                # ui properties that the properties listed within here should be
-                # grouped
-                if name != 'PropertyGroup' or xmlChild.GetParent().GetName() == "ExposedProperties":
-                    self.processXmlElement(proxy, xmlChild)
+                # Anything else, we recursively process the element, with special handling
+                # in the case that the element is a PropertyGroup
+                if name == 'PropertyGroup':
+                    newGroup = group
+                    newParentGroup = parentGroup
+                    if self.respectPropertyGroups:
+                        typeAttr = xmlChild.GetAttribute('type')
+                        labelAttr = xmlChild.GetAttribute('label')
+                        panelWidgetAttr = None
+                        if not labelAttr:
+                            panelWidgetAttr = xmlChild.GetAttribute('panel_widget')
+                            labelAttr = panelWidgetAttr
+                            if not labelAttr:
+                                labelAttr = 'Unlabeled Property Group (%s)' % proxyId
+                        newGroup = '%s:%s' % (proxyId, labelAttr)
+                        self.groupDetailsMap[newGroup] = {
+                            'groupName': labelAttr,
+                            'groupWidget': 'PropertyGroup',
+                            'groupVisibility': panelVis,
+                            'groupType': typeAttr
+                        }
+                        newParentGroup = group
+                    self.processXmlElement(proxy, xmlChild, True, newGroup, newParentGroup)
+                else:
+                    self.processXmlElement(proxy, xmlChild, inPropGroup, group, parentGroup)
 
     #--------------------------------------------------------------------------
     # Entry point for the xml processing methods.
@@ -1432,12 +1553,14 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
     def getProxyXmlDefinitions(self, proxy):
         self.orderedNameList = []
         self.propertyDetailsMap = {}
-        self.propertyDetailsList = []
-        proxyDefMgr = servermanager.ActiveConnection.Session.GetProxyDefinitionManager()
-        xmlElement = proxyDefMgr.GetCollapsedProxyDefinition(proxy.GetXMLGroup(),
-                                                             proxy.GetXMLName(),
-                                                             None)
-        self.processXmlElement(proxy, xmlElement)
+        self.groupDetailsMap = {}
+        self.proxyIsRepresentation = proxy.GetXMLGroup() == 'representations'
+        self.groupDetailsMap['root'] = {
+            'groupName': 'root'
+        }
+
+        xmlElement = self.getProxyDefinition(proxy.GetXMLGroup(), proxy.GetXMLName())
+        self.processXmlElement(proxy, xmlElement, False, 'root', None)
 
         self.debug('Length of final ordered property list: ' + str(len(self.orderedNameList)))
         for propName in self.orderedNameList:
@@ -1452,12 +1575,12 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         proxy = self.mapIdToProxy(proxy_id)
         if proxy:
             for property in proxy.ListProperties():
-                propertyName = proxy.GetProperty(property).Name
-                displayName = proxy.GetProperty(property).GetXMLLabel()
+                prop = proxy.GetProperty(property)
+                propertyName = prop.Name
+                displayName = prop.GetXMLLabel()
                 if propertyName in ["Refresh", "Input"] or propertyName.__contains__("Info"):
                     continue
 
-                prop = proxy.GetProperty(property)
                 pythonProp = servermanager._wrap_property(proxy, prop)
 
                 propJson = { 'name': propertyName,
@@ -1469,6 +1592,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
                 if type(prop) == ProxyProperty or type(prop) == InputProperty:
                     proxyListDomain = prop.FindDomain('vtkSMProxyListDomain')
+
                     if proxyListDomain:
                         # Set the value of this ProxyProperty
                         propJson['value'] = prop.GetProxy(0).GetXMLLabel()
@@ -1489,9 +1613,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 else:
                     # For everything but ProxyProperty, we should just be able to call GetData()
                     try:
-                        propJson['value'] = proxy.GetProperty(property).GetData()
+                        propJson['value'] = prop.GetData()
                     except AttributeError as attrErr:
-                        print ('Property ' + propertyName + ' has no GetData() method, skipping')
+                        self.debug('Property ' + propertyName + ' has no GetData() method, skipping')
                         continue
 
                 self.debug('Adding a property to the pre-sorted list: ' + str(propJson))
@@ -1509,11 +1633,14 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             propMap[prop['id'] + ':' + prop['name']] = prop
 
         orderedList = []
+        groupsInfo = []
         for name in self.orderedNameList:
             if name in propMap:
                 orderedList.append(propMap[name])
+                xmlDetails = self.propertyDetailsMap[name]
+                groupsInfo.append({ 'group': xmlDetails['group'], 'parentGroup': xmlDetails['parentGroup'] })
 
-        return orderedList
+        return orderedList, groupsInfo
 
     #--------------------------------------------------------------------------
     # Convenience function to set a property value.  Can be extended with other
@@ -1746,18 +1873,24 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                }, ...
              ]
         """
+
+        if self.proxyIsRepresentation:
+            reprProxy = self.mapIdToProxy(proxyId)
+            reprProp = reprProxy.GetProperty('Representation')
+            reprValue = reprProp.GetData()
+
         uiProps = []
 
         for proxyProp in proxyProperties:
             uiElt = {}
 
-            proxyId = proxyProp['id']
+            pid = proxyProp['id']
             propertyName = proxyProp['name']
-            proxy = self.mapIdToProxy(proxyId)
+            proxy = self.mapIdToProxy(pid)
             prop = proxy.GetProperty(propertyName)
 
             # Get the xml details we already parsed out for this property
-            xmlProps = self.propertyDetailsMap[proxyId + ':' + propertyName]
+            xmlProps = self.propertyDetailsMap[pid + ':' + propertyName]
 
             # Set a few defaults for the ui elements, which may be overridden
             uiElt['size'] = xmlProps['size']
@@ -1776,6 +1909,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 proxyProp.pop('dependency', None)
             if xmlProps['panelVis'] == 'advanced':
                 uiElt['advanced'] = 1
+                if self.proxyIsRepresentation and 'panelVisQualifier' in xmlProps and xmlProps['panelVisQualifier'] and xmlProps['panelVisQualifier'].lower() == reprValue.lower():
+                    uiElt['advanced'] = 0
             else:
                 uiElt['advanced'] = 0
 
@@ -1806,14 +1941,74 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                     if hint.GetName() in self.hintsMap:
                         hmap = self.hintsMap[hint.GetName()]
                         hintType = hint.GetAttribute('type')
+                        hmapKey = None
                         if hintType and hintType in hmap:
+                            hmapKey = hintType
+                        elif 'default' in hmap:
+                            hmapKey = 'default'
+
+                        if hmapKey:
                             # We're intereseted in decorating based on this hint
-                            hintFunction = hmap[hintType]
+                            hintFunction = hmap[hmapKey]
                             hintFunction(prop, uiElt, hint)
 
             uiProps.append(uiElt)
 
         return uiProps
+
+    #--------------------------------------------------------------------------
+    # Helper function to restructure the properties so they reflect the grouping
+    # encountered when processing the xml.
+    #--------------------------------------------------------------------------
+    def restructureProperties(self, groupList, propList, uiList):
+        props = []
+        uis = [] if uiList else None
+        groupMap = { 'root': { 'proxy': props, 'ui': uis } }
+
+        for idx in range(len(groupList)):
+            groupInfo = groupList[idx]
+            group = groupInfo['group']
+            parentGroup = groupInfo['parentGroup']
+            if group is not 'root' and self.groupDetailsMap[group]['groupVisibility'] == 'never':
+                self.debug('Culling property (%s) in group (%s) because group has visibility never' % (propList[idx]['name'], group))
+                continue
+            if not group in groupMap:
+                groupMap[group] = { 'proxy': [], 'ui': [] if uiList else None }
+                groupMap[parentGroup]['proxy'].append({
+                    'id': group,
+                    'name': self.groupDetailsMap[group]['groupName'],
+                    'value': False,
+                    'children': groupMap[group]['proxy']
+                })
+                if uiList:
+                    groupMap[parentGroup]['ui'].append({
+                        'widget': self.groupDetailsMap[group]['groupWidget'],
+                        'name': self.groupDetailsMap[group]['groupName'],
+                        'type': self.groupDetailsMap[group]['groupType'],
+                        'advanced': 1 if self.groupDetailsMap[group]['groupVisibility'] == 'advanced' else 0,
+                        'children': groupMap[group]['ui']
+                    })
+                    # Make sure we can find the group ui item we just appended
+                    groupMap[group]['groupItem'] = groupMap[parentGroup]['ui'][-1]
+            groupMap[group]['proxy'].append(propList[idx])
+            if uiList:
+                groupMap[group]['ui'].append(uiList[idx])
+
+        # Before we're done we need to check for groups of properties where every
+        # property in the group has a panel_visibilty of 'advanced', in which
+        # case, the group should be marked the same.
+        for groupName in groupMap:
+            if groupName is not 'root' and 'ui' in groupMap[groupName]:
+                groupUiList = groupMap[groupName]['ui']
+                advancedGroup = True
+                for uiProp in groupUiList:
+                    if uiProp['advanced'] == 0:
+                        advancedGroup = False
+
+                if advancedGroup:
+                    groupMap[groupName]['groupItem']['advanced'] = 1
+
+        return { 'proxy': props, 'ui': uis }
 
     #--------------------------------------------------------------------------
     # Helper function validates the string we get from the client to make sure
@@ -1938,12 +2133,21 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         proxyProperties = []
         proxyId = str(proxyId)
         self.fillPropertyList(proxyId, proxyProperties)
-        proxyProperties = self.reorderProperties(proxyId, proxyProperties)
-        proxyJson = { 'id': proxyId, 'properties': proxyProperties }
+
+        proxyProperties, groupsInfo = self.reorderProperties(proxyId, proxyProperties)
+        proxyJson = { 'id': proxyId }
 
         # Perform costly request only when needed
+        uiProperties = None
         if ui:
-            proxyJson['ui'] = self.getUiProperties(proxyId, proxyProperties)
+            uiProperties = self.getUiProperties(proxyId, proxyProperties)
+
+        # Now restructure the flat, ordered lists to reflect grouping
+        restructuredProperties = self.restructureProperties(groupsInfo, proxyProperties, uiProperties)
+
+        proxyJson['properties'] = restructuredProperties['proxy']
+        if ui:
+            proxyJson['ui'] = restructuredProperties['ui']
 
         if 'specialHints' in self.propertyDetailsMap:
             proxyJson['hints'] = self.propertyDetailsMap['specialHints']
