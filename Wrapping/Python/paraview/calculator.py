@@ -65,6 +65,36 @@ def get_arrays(attribs, controller=None):
                 arrays[name] = dsa.NoneArray
     return arrays
 
+def cellContainsPoint(inputs, locations):
+    array = vtk.vtkDoubleArray()
+    array.SetNumberOfComponents(3)
+    array.SetNumberOfTuples(len(locations))
+    for i in range(len(locations)):
+        array.SetTuple(i, locations[i])
+    node = vtk.vtkSelectionNode()
+    node.SetFieldType(vtk.vtkSelectionNode.CELL)
+    node.SetContentType(vtk.vtkSelectionNode.LOCATIONS)
+    node.SetSelectionList(array)
+
+    selection = vtk.vtkSelection()
+    selection.AddNode(node)
+    from vtk.vtkFiltersExtraction import vtkExtractSelectedLocations
+    cellsNear = vtkExtractSelectedLocations()
+    cellsNear.SetInputData(0, inputs[0].VTKObject)
+    cellsNear.SetInputData(1, selection)
+    cellsNear.Update()
+
+    extractedCells = cellsNear.GetOutput()
+    numCells = inputs[0].GetNumberOfCells()
+    result = np.zeros((numCells,), dtype = np.int8)
+
+    extracted = dsa.WrapDataObject(extractedCells)
+    cellIds = extracted.CellData.GetArray('vtkOriginalCellIds')
+    result[cellIds] = 1
+
+    import vtk.util.numpy_support as np_s
+    vtkarray = np_s.numpy_to_vtk(result, deep=True)
+    return dsa.vtkDataArrayToVTKArray(vtkarray)
 
 def compute(inputs, expression, ns=None):
     #  build the locals environment used to eval the expression.
