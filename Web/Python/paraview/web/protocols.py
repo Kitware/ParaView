@@ -1369,6 +1369,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         self.groupDetailsMap[newGroup] = {
                             'groupName': propPropName,
                             'groupWidget': 'ProxyEditorPropertyWidget',
+                            'groupVisibilityProperty': pepwChild.GetAttribute('property'),
                             'groupVisibility': propVisibility if propVisibility is not None else 'default',
                             'groupType': 'ProxyEditorPropertyWidget'
                         }
@@ -1990,9 +1991,24 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                     })
                     # Make sure we can find the group ui item we just appended
                     groupMap[group]['groupItem'] = groupMap[parentGroup]['ui'][-1]
-            groupMap[group]['proxy'].append(propList[idx])
+
+            pushToFront = False
             if uiList:
-                groupMap[group]['ui'].append(uiList[idx])
+                if 'groupVisibilityProperty' in self.groupDetailsMap[group] and propList[idx]['name'] == self.groupDetailsMap[group]['groupVisibilityProperty']:
+                    # If a proxy property claimed this property as its visibilty property, we should not
+                    # allow it to remain marked as 'advanced'.
+                    uiList[idx]['advanced'] = 0
+                    pushToFront = True
+
+                if pushToFront:
+                    groupMap[group]['ui'].insert(0, uiList[idx])
+                else:
+                    groupMap[group]['ui'].append(uiList[idx])
+
+            if pushToFront:
+                groupMap[group]['proxy'].insert(0, propList[idx])
+            else:
+                groupMap[group]['proxy'].append(propList[idx])
 
         # Before we're done we need to check for groups of properties where every
         # property in the group has a panel_visibilty of 'advanced', in which
@@ -2000,13 +2016,22 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         for groupName in groupMap:
             if groupName is not 'root' and 'ui' in groupMap[groupName]:
                 groupUiList = groupMap[groupName]['ui']
+                firstUiElt = groupUiList[0]
+                groupDependency = False
+                if 'depends' in firstUiElt and firstUiElt['depends']:
+                    groupDependency = True
                 advancedGroup = True
                 for uiProp in groupUiList:
                     if uiProp['advanced'] == 0:
                         advancedGroup = False
+                    if groupDependency and ('depends' not in uiProp or uiProp['depends'] != firstUiElt['depends']):
+                        groupDependency = False
 
                 if advancedGroup:
                     groupMap[groupName]['groupItem']['advanced'] = 1
+
+                if groupDependency:
+                    groupMap[groupName]['groupItem']['depends'] = firstUiElt['depends']
 
         return { 'proxy': props, 'ui': uis }
 
