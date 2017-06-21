@@ -186,8 +186,11 @@ void pqAnimationShortcutWidget::onTriggered(QAction* action)
     animationLineEdit->setText(
       QString::number(vtkSMPropertyHelper(this->Scene->getProxy(), "Duration").GetAsInt()));
   }
-  layout->addWidget(label, 1, 0);
-  layout->addWidget(animationLineEdit, 1, 1);
+  if (label)
+  {
+    layout->addWidget(label, 1, 0);
+    layout->addWidget(animationLineEdit, 1, 1);
+  }
 
   connect(buttons, SIGNAL(accepted()), dialog, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), dialog, SLOT(reject()));
