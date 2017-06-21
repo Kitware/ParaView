@@ -32,30 +32,68 @@
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
+
+namespace
+{
+// Utility function for validating the file name suffix
+bool suffixValidation(char* fileNameSuffix)
+{
+  std::string suffix(fileNameSuffix);
+  // Only allow this format: ABC%.Xd
+  // ABC is an arbitrary string which may or may not exist
+  // % and d must exist and d must be the last char
+  // . and X may or may not exist, X must be an integer if it exists
+  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
+  {
+    return false;
+  }
+  std::string::size_type lastPercentage = suffix.find_last_of('%');
+  if (lastPercentage == std::string::npos)
+  {
+    return false;
+  }
+  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
+    suffix[lastPercentage + 1] != '.')
+  {
+    return false;
+  }
+  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
+  {
+    if (!isdigit(suffix[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+}
+
 //-----------------------------------------------------------------------------
 vtkFileSeriesWriter::vtkFileSeriesWriter()
 {
   this->SetNumberOfOutputPorts(0);
 
-  this->Writer = 0;
+  this->Writer = nullptr;
 
-  this->FileNameMethod = 0;
-  this->FileName = 0;
+  this->FileNameMethod = nullptr;
+  this->FileName = nullptr;
+  this->FileNameSuffix = nullptr;
 
   this->WriteAllTimeSteps = 0;
   this->NumberOfTimeSteps = 1;
   this->CurrentTimeIndex = 0;
-  this->Interpreter = 0;
+  this->Interpreter = nullptr;
   this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
 //-----------------------------------------------------------------------------
 vtkFileSeriesWriter::~vtkFileSeriesWriter()
 {
-  this->SetWriter(0);
-  this->SetFileNameMethod(0);
-  this->SetFileName(0);
-  this->SetInterpreter(0);
+  this->SetWriter(nullptr);
+  this->SetFileNameMethod(nullptr);
+  this->SetFileName(nullptr);
+  this->SetInterpreter(nullptr);
+  this->SetFileNameSuffix(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -150,7 +188,11 @@ int vtkFileSeriesWriter::RequestData(vtkInformation* request, vtkInformationVect
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  this->WriteATimestep(input, inInfo);
+  if (!this->WriteATimestep(input, inInfo))
+  {
+    request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
+    return 0;
+  }
 
   if (this->WriteAllTimeSteps)
   {
@@ -166,7 +208,7 @@ int vtkFileSeriesWriter::RequestData(vtkInformation* request, vtkInformationVect
   return 1;
 }
 //----------------------------------------------------------------------------
-void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* inInfo)
+bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* inInfo)
 {
   std::ostringstream fname;
   if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
@@ -174,7 +216,19 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
     std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
     std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-    fname << path << "/" << fnamenoext << "_" << this->CurrentTimeIndex << ext;
+    if (this->FileNameSuffix && suffixValidation(this->FileNameSuffix))
+    {
+      // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
+      char suffix[100];
+      snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+      fname << path << "/" << fnamenoext << suffix << ext;
+    }
+    else
+    {
+      vtkErrorMacro("Invalid file suffix:" << (this->FileNameSuffix ? this->FileNameSuffix : "null")
+                                           << ". Expected valid % format specifiers!");
+      return false;
+    }
   }
   else
   {
@@ -200,6 +254,8 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();
   this->Writer->SetInputConnection(0);
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

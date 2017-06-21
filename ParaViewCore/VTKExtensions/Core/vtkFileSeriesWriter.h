@@ -78,6 +78,8 @@ public:
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
+  vtkGetStringMacro(FileNameSuffix);
+  vtkSetStringMacro(FileNameSuffix);
   //@}
 
   /**
@@ -107,13 +109,14 @@ private:
   void operator=(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
 
   void SetWriterFileName(const char* fname);
-  void WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
+  bool WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
   void WriteInternal();
 
   vtkAlgorithm* Writer;
   char* FileNameMethod;
 
   int WriteAllTimeSteps;
+  char* FileNameSuffix;
   int NumberOfTimeSteps;
   int CurrentTimeIndex;
 
