@@ -639,7 +639,10 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
     @exportRpc("pv.time.index.get")
     def getTimeStep(self):
         anim = simple.GetAnimationScene()
-        return list(anim.TimeKeeper.TimestepValues).index(anim.TimeKeeper.Time)
+        try:
+            return list(anim.TimeKeeper.TimestepValues).index(anim.TimeKeeper.Time)
+        except:
+            return 0
 
     @exportRpc("pv.time.value.set")
     def setTimeValue(self, t):
