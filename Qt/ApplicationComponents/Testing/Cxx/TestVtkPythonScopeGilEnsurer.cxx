@@ -12,10 +12,7 @@ int main(int argc, char** argv)
   // set stdout to line buffering (aka C++ std::cout)
   setvbuf(stdout, (char*)NULL, _IOLBF, BUFSIZ);
 
-  // Initialize Python
-  Py_SetProgramName((char*)("PythonApp"));
   Py_Initialize(); // Initialize the interpreter
-  PySys_SetArgv(argc, argv);
   PyRun_SimpleString("import threading\n");
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock
   PyThreadState* pts = PyGILState_GetThisThreadState();
