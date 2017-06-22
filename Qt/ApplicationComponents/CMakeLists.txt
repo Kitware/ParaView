@@ -232,6 +232,8 @@ set (Module_SRCS
   pqPluginSettingsBehavior.h
   pqPointPickingHelper.cxx
   pqPointPickingHelper.h
+  pqPreviewMenuManager.cxx
+  pqPreviewMenuManager.h
   pqPropertyGroupButton.cxx
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.cxx
@@ -429,6 +431,7 @@ set (Module_MOC_HDRS
   pqPluginDockWidgetsBehavior.h
   pqPluginSettingsBehavior.h
   pqPointPickingHelper.h
+  pqPreviewMenuManager.h
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
   pqPythonShellReaction.h
@@ -504,6 +507,7 @@ set (Module_UI_FILES
   Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorOpacityEditorWidget.ui
   Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui

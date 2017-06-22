@@ -248,13 +248,13 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
   QAbstractButton* remember = mbox.button(QMessageBox::Save);
   QAbstractButton* yesButton = mbox.button(QMessageBox::Yes);
   QAbstractButton* okButton = mbox.button(QMessageBox::Ok);
-  if (yesButton)
+  if (yesButton && remember)
   {
     remember->setText("Yes, and don't ask again");
     remember->setObjectName("YesAndSave");
     remember->setIcon(mbox.button(QMessageBox::Yes)->icon());
   }
-  else if (okButton)
+  else if (okButton && remember)
   {
     remember->setText("OK, and don't ask again");
     remember->setObjectName("OkAndSave");
