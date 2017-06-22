@@ -658,6 +658,9 @@
      <property name="title">
       <string>Interactive View Link</string>
      </property>
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout">
       <property name="margin">
        <number>4</number>
