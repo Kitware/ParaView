@@ -639,7 +639,10 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
     @exportRpc("pv.time.index.get")
     def getTimeStep(self):
         anim = simple.GetAnimationScene()
-        return list(anim.TimeKeeper.TimestepValues).index(anim.TimeKeeper.Time)
+        try:
+            return list(anim.TimeKeeper.TimestepValues).index(anim.TimeKeeper.Time)
+        except:
+            return 0
 
     @exportRpc("pv.time.value.set")
     def setTimeValue(self, t):
@@ -1377,7 +1380,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         self.propertyDetailsMap[detailsKey]['group'] = newGroup
                         self.propertyDetailsMap[detailsKey]['parentGroup'] = newParentGroup
             for sub in subProxiesToProcess:
-                self.processXmlElement(sub[0], sub[1], inPropGroup, newGroup, newParentGroup)
+                self.processXmlElement(sub[0], sub[1], inPropGroup, newGroup, newParentGroup, detailsKey)
 
         return foundPLDChild
 
@@ -1396,7 +1399,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
     #                when we encounter a ProxyProperty with Hints: 'ProxyEditorPropertyWidget')
     # parentGroup => name of parent group (could be None for root level property)
     #--------------------------------------------------------------------------
-    def trackProperty(self, detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup):
+    def trackProperty(self, detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup, belongsToProxyProperty=None):
         if detailsKey not in self.propertyDetailsMap:
             self.propertyDetailsMap[detailsKey] = {
                 'type': name,
@@ -1406,6 +1409,17 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 'group': group,
                 'parentGroup': parentGroup
             }
+
+        if belongsToProxyProperty:
+            if belongsToProxyProperty not in self.proxyPropertyDependents:
+                self.proxyPropertyDependents[belongsToProxyProperty] = []
+            self.proxyPropertyDependents[belongsToProxyProperty].append(detailsKey)
+
+            # If this property belongs to a proxy property, and if that property is marked
+            # as advanced, then this property should be marked advanced too.
+            if self.propertyDetailsMap[belongsToProxyProperty]['panelVis'] == 'advanced':
+                self.propertyDetailsMap[detailsKey]['panelVis'] = 'advanced'
+
 
         if inPropGroup:
             self.propertyDetailsMap[detailsKey]['group'] = group
@@ -1430,10 +1444,20 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 self.orderedNameList.pop(idx)
                 self.orderedNameList.append(detailsKey)
 
+                # Additionally, if the property we are now re-ordering is a ProxyProperty, then
+                # we also need to grab any properties of the sub proxies of it's proxy list domain
+                # and move all of those down as well
+                if detailsKey in self.proxyPropertyDependents:
+                    subProxiesProps = self.proxyPropertyDependents[detailsKey]
+                    for subProxyPropKey in subProxiesProps:
+                        idx = self.orderedNameList.index(subProxyPropKey)
+                        self.orderedNameList.pop(idx)
+                        self.orderedNameList.append(subProxyPropKey)
+
     #--------------------------------------------------------------------------
     # Gather information from the xml associated with a proxy and properties.
     #--------------------------------------------------------------------------
-    def processXmlElement(self, proxy, xmlElement, inPropGroup, group, parentGroup):
+    def processXmlElement(self, proxy, xmlElement, inPropGroup, group, parentGroup, belongsToProxyProperty=None):
         proxyId = proxy.GetGlobalIDAsString()
         nbChildren = xmlElement.GetNumberOfNestedElements()
         for i in range(nbChildren):
@@ -1515,12 +1539,12 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                             self.debug("          Replace input value: " + str(replaceInputAttr))
             elif name == 'ProxyProperty' or name == 'InputProperty':
                 self.debug(str(nameAttr) + ' is a proxy property')
-                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup)
+                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup, belongsToProxyProperty)
                 foundProxyListDomain = self.getProxyListFromProperty(proxy, xmlChild, inPropGroup, group, parentGroup, detailsKey)
                 if foundProxyListDomain == True:
                     self.propertyDetailsMap[detailsKey]['size'] = 1
             elif name.endswith('Property'):
-                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup)
+                self.trackProperty(detailsKey, name, panelVis, panelVisQualifier, size, inPropGroup, group, parentGroup, belongsToProxyProperty)
             else:
                 # Anything else, we recursively process the element, with special handling
                 # in the case that the element is a PropertyGroup
@@ -1544,9 +1568,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                             'groupType': typeAttr
                         }
                         newParentGroup = group
-                    self.processXmlElement(proxy, xmlChild, True, newGroup, newParentGroup)
+                    self.processXmlElement(proxy, xmlChild, True, newGroup, newParentGroup, belongsToProxyProperty)
                 else:
-                    self.processXmlElement(proxy, xmlChild, inPropGroup, group, parentGroup)
+                    self.processXmlElement(proxy, xmlChild, inPropGroup, group, parentGroup, belongsToProxyProperty)
 
     #--------------------------------------------------------------------------
     # Entry point for the xml processing methods.
@@ -1555,6 +1579,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         self.orderedNameList = []
         self.propertyDetailsMap = {}
         self.groupDetailsMap = {}
+        self.proxyPropertyDependents = {}
         self.proxyIsRepresentation = proxy.GetXMLGroup() == 'representations'
         self.groupDetailsMap['root'] = {
             'groupName': 'root'
