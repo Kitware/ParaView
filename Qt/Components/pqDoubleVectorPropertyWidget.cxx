@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleVectorPropertyWidget.h"
 
 #include "pqCoreUtilities.h"
+#include "pqDiscreteDoubleWidget.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqHighlightableToolButton.h"
 #include "pqLabel.h"
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
+#include "vtkSMDiscreteDoubleDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -154,7 +156,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
       layoutLocal->addWidget(widget, 1);
 
-      PV_DEBUG_PANELS() << "pqDoubleRangeWidget for an DoubleVectorProperty "
+      PV_DEBUG_PANELS() << "pqDoubleRangeWidget for a DoubleVectorProperty "
                         << "with a single element and a "
                         << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                         << "with a minimum and a maximum";
@@ -270,6 +272,29 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
                           << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                           << "and more than one element";
       }
+    }
+  }
+  else if (vtkSMDiscreteDoubleDomain* discrete = vtkSMDiscreteDoubleDomain::SafeDownCast(domain))
+  {
+    if (discrete->GetValuesExists())
+    {
+      pqDiscreteDoubleWidget* widget = new pqDiscreteDoubleWidget(this);
+      widget->setObjectName("DiscreteDoubleWidget");
+      widget->setValues(discrete->GetValues());
+
+      this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
+      this->connect(widget, SIGNAL(valueEdited(double)), this, SIGNAL(changeFinished()));
+
+      layoutLocal->addWidget(widget);
+
+      PV_DEBUG_PANELS() << "pqDiscreteDoubleWidget for an DoubleVectorProperty "
+                        << "with a single element and a DiscreteDoubleDomain"
+                        << " (" << pqPropertyWidget::getXMLName(discrete) << ") "
+                        << "with a set of values";
+    }
+    else
+    {
+      vtkErrorWithObjectMacro(NULL, "vtkSMDiscreteDoubleDomain does not contain any value.");
     }
   }
 

@@ -48,6 +48,7 @@ set (Module_SRCS
   vtkSMDeserializerXMLCache.cxx
   vtkSMDeserializerXML.cxx
   vtkSMDimensionsDomain.cxx
+  vtkSMDiscreteDoubleDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx

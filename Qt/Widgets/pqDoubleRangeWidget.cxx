@@ -41,39 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 
 pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
-  : QWidget(p)
+  : Superclass(p)
 {
-  this->BlockUpdate = false;
-  this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
   this->Resolution = 100;
   this->StrictRange = false;
-  this->InteractingWithSlider = false;
-  this->DeferredValueEdited = false;
-
-  QHBoxLayout* l = new QHBoxLayout(this);
-  l->setMargin(0);
-  this->Slider = new QSlider(Qt::Horizontal, this);
-  this->Slider->setRange(0, this->Resolution);
-  l->addWidget(this->Slider);
-  this->Slider->setObjectName("Slider");
-  this->LineEdit = new pqLineEdit(this);
-  l->addWidget(this->LineEdit);
-  this->LineEdit->setObjectName("LineEdit");
-  this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
-  this->LineEdit->setTextAndResetCursor(QString().setNum(this->Value));
-
-  QObject::connect(this->Slider, SIGNAL(valueChanged(int)), this, SLOT(sliderChanged(int)));
-  QObject::connect(
-    this->LineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
-  QObject::connect(
-    this->LineEdit, SIGNAL(textChangedAndEditingFinished()), this, SLOT(editingFinished()));
-
-  // let's avoid firing `valueChanged` events until the user has released the
-  // slider.
-  this->connect(this->Slider, SIGNAL(sliderPressed()), SLOT(sliderPressed()));
-  this->connect(this->Slider, SIGNAL(sliderReleased()), SLOT(sliderReleased()));
 }
 
 //-----------------------------------------------------------------------------
@@ -91,39 +64,25 @@ int pqDoubleRangeWidget::resolution() const
 void pqDoubleRangeWidget::setResolution(int val)
 {
   this->Resolution = val;
-  this->Slider->setRange(0, this->Resolution);
-  this->updateSlider();
+  this->setSliderRange(0, this->Resolution);
 }
 
 //-----------------------------------------------------------------------------
-double pqDoubleRangeWidget::value() const
+int pqDoubleRangeWidget::valueToSliderPos(double val)
 {
-  return this->Value;
+  double range = this->Maximum - this->Minimum;
+  double fraction = range != 0 ? (val - this->Minimum) / range : 0;
+  int sliderVal = qRound(fraction * this->Resolution);
+  return sliderVal;
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::setValue(double val)
+double pqDoubleRangeWidget::sliderPosToValue(int pos)
 {
-  if (this->Value == val)
-  {
-    return;
-  }
-
-  this->Value = val;
-
-  if (!this->BlockUpdate)
-  {
-    // set the slider
-    this->updateSlider();
-
-    // set the text
-    this->BlockUpdate = true;
-    this->LineEdit->setTextAndResetCursor(
-      QString().setNum(val, 'g', DEFAULT_DOUBLE_PRECISION_VALUE));
-    this->BlockUpdate = false;
-  }
-
-  emit this->valueChanged(this->Value);
+  double fraction = this->Resolution > 0 ? pos / static_cast<double>(this->Resolution) : 0;
+  double range = this->Maximum - this->Minimum;
+  double v = (fraction * range) + this->Minimum;
+  return v;
 }
 
 //-----------------------------------------------------------------------------
@@ -159,109 +118,24 @@ void pqDoubleRangeWidget::updateValidator()
 {
   if (this->StrictRange)
   {
-    this->LineEdit->setValidator(
-      new QDoubleValidator(this->minimum(), this->maximum(), 100, this->LineEdit));
+    this->setValidator(new QDoubleValidator(this->minimum(), this->maximum(), 100));
   }
   else
   {
-    this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
+    this->setValidator(new QDoubleValidator());
   }
 }
 
 //-----------------------------------------------------------------------------
 bool pqDoubleRangeWidget::strictRange() const
 {
-  const QDoubleValidator* dv = qobject_cast<const QDoubleValidator*>(this->LineEdit->validator());
+  const QDoubleValidator* dv = validator();
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
 
+//-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::setStrictRange(bool s)
 {
   this->StrictRange = s;
   this->updateValidator();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::sliderChanged(int val)
-{
-  if (!this->BlockUpdate)
-  {
-    double fraction = val / static_cast<double>(this->Resolution);
-    double range = this->Maximum - this->Minimum;
-    double v = (fraction * range) + this->Minimum;
-    this->BlockUpdate = true;
-    this->LineEdit->setTextAndResetCursor(QString().setNum(v));
-    this->setValue(v);
-    this->emitValueEdited();
-    this->BlockUpdate = false;
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::textChanged(const QString& text)
-{
-  if (!this->BlockUpdate)
-  {
-    double val = text.toDouble();
-    this->BlockUpdate = true;
-    double range = this->Maximum - this->Minimum;
-    double fraction = (val - this->Minimum) / range;
-    int sliderVal = qRound(fraction * static_cast<double>(this->Resolution));
-    this->Slider->setValue(sliderVal);
-    this->setValue(val);
-    this->BlockUpdate = false;
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::editingFinished()
-{
-  this->emitValueEdited();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::emitValueEdited()
-{
-  if (this->InteractingWithSlider == false)
-  {
-    emit this->valueEdited(this->Value);
-  }
-  else
-  {
-    this->DeferredValueEdited = true;
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::emitIfDeferredValueEdited()
-{
-  if (this->DeferredValueEdited)
-  {
-    this->DeferredValueEdited = false;
-    this->emitValueEdited();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::updateSlider()
-{
-  this->Slider->blockSignals(true);
-  double range = this->Maximum - this->Minimum;
-  double fraction = (this->Value - this->Minimum) / range;
-  int v = qRound(fraction * static_cast<double>(this->Resolution));
-  this->Slider->setValue(v);
-  this->Slider->blockSignals(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::sliderPressed()
-{
-  this->InteractingWithSlider = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::sliderReleased()
-{
-  this->InteractingWithSlider = false;
-  this->emitIfDeferredValueEdited();
 }
