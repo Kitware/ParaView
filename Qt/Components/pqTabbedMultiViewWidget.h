@@ -126,6 +126,26 @@ public slots:
   */
   virtual void reset();
 
+  /**
+   * Enter (or exit) preview mode.
+   *
+   * Preview mode is a mode were various widget's decorations
+   * are hidden and the widget is locked to the specified size. If the widget's
+   * current size is less than the size specified, then the widget is locked to
+   * a size with similar aspect ratio as requested. Pass in invalid (or empty)
+   * size to exit preview mode.
+   *
+   * Preview mode is preferred over `toggleWidgetDecoration` and `lockViewSize`
+   * and is mutually exclusive with either. Mixing them can have unintended
+   * consequences.
+   *
+   * @returns `true` if preview mode was exited, or if preview mode was entered
+   *          at exactly the requested size. `false` is preview mode was
+   *          entered, but only respecting the aspect ratio for the size
+   *          specified.
+   */
+  virtual bool preview(const QSize& previewSize = QSize());
+
 protected slots:
   /**
   * slots connects to corresponding signals on pqServerManagerObserver.
@@ -223,9 +243,25 @@ protected:
     void setReadOnly(bool val);
     bool readOnly() const { return this->ReadOnly; }
 
+    /**
+     * Enter/exit preview mode
+     */
+    bool preview(const QSize&);
+
+    //@{
+    /**
+     * Get/Set tab bar visibility. Use this instead of directly calling
+     * `this->tabBar()->setVisible()` as that avoid interactions with preview
+     * mode.
+     */
+    void setTabBarVisibility(bool);
+    bool tabBarVisibility() const { return this->TabBarVisibility; }
+    //@}
   private:
     Q_DISABLE_COPY(pqTabWidget)
     bool ReadOnly;
+    bool InPreviewMode;
+    bool TabBarVisibility;
     friend class pqTabbedMultiViewWidget;
   };
 
