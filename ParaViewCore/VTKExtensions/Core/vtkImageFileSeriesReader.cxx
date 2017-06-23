@@ -80,6 +80,18 @@ int vtkImageFileSeriesReader::ProcessRequest(
 }
 
 //----------------------------------------------------------------------------
+void vtkImageFileSeriesReader::UpdateReaderDataExtent()
+{
+  vtkImageReader2* imageReader = vtkImageReader2::SafeDownCast(this->Reader);
+  if (!imageReader)
+  {
+    return;
+  }
+  int ext[6] = { 0, 0, 0, 0, 0, 0 };
+  imageReader->SetDataExtent(ext);
+}
+
+//----------------------------------------------------------------------------
 void vtkImageFileSeriesReader::UpdateFileNames()
 {
   vtkImageReader2* imageReader = vtkImageReader2::SafeDownCast(this->Reader);
@@ -87,16 +99,16 @@ void vtkImageFileSeriesReader::UpdateFileNames()
   {
     return;
   }
-
   this->BeforeFileNameMTime = this->GetMTime();
 
   // vtkImageReader2 reader is terrible in the way it exposes the DataExtent API.
   // I clear it here (to the defaults in the reader) to pretend that the user never set it
   // so that the class/subclass can set it up appropriately. Since ensures that
   // if we toggle ReadAsImageStack, the reader doesn't end up trying to read
-  // obsolete extents.
-  int ext[6] = { 0, 0, 0, 0, 0, 0 };
-  imageReader->SetDataExtent(ext);
+  // obsolete extents. Additionally though for RAW image files the extents aren't specified
+  // in the file so we have to manually set them. This is done when in
+  // vtkRawImageFileSeriesReader.
+  this->UpdateReaderDataExtent();
 
   // vtkImageReader2's are funky. Using SetFileNames to set a single file is
   // not same as SetFileName! This was causing BUG #15505. This fixes that
@@ -131,4 +143,5 @@ void vtkImageFileSeriesReader::UpdateFileNames()
 void vtkImageFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ReadAsImageStack: " << this->ReadAsImageStack << endl;
 }

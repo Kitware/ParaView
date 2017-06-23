@@ -51,6 +51,7 @@ set(Module_SRCS
   vtkPVPostFilterExecutive.cxx
   vtkPVTransform.cxx
   vtkPVTrivialProducer.cxx
+  vtkRawImageFileSeriesReader.cxx
   vtkReductionFilter.cxx
   vtkSelectionSerializer.cxx
   vtkUndoElement.cxx

@@ -1,5 +1,100 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_sources">
+    <SourceProxy label="Image Reader Core" name="ImageReaderCore" class="vtkPVImageReader">
+      <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
+                     short_help="Read raw regular rectilinear grid data from a file.">
+                     The Image reader reads raw, regular, rectilinear grid
+                     (image/volume) data from a file. Because no metadata is
+                     provided, the user must specify information about the
+                     size, spacing, dimensionality, etc. about the
+                     dataset.</Documentation>
+      <IntVectorProperty command="SetDataScalarType"
+                         default_values="4"
+                         name="DataScalarType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="char"
+                 value="2" />
+          <Entry text="unsigned char"
+                 value="3" />
+          <Entry text="short"
+                 value="4" />
+          <Entry text="unsigned short"
+                 value="5" />
+          <Entry text="int"
+                 value="6" />
+          <Entry text="unsigned int"
+                 value="7" />
+          <Entry text="long"
+                 value="8" />
+          <Entry text="unsigned long"
+                 value="9" />
+          <Entry text="float"
+                 value="10" />
+          <Entry text="double"
+                 value="11" />
+        </EnumerationDomain>
+        <Documentation>The value of this property indicates the scalar type of
+        the pixels/voxels in the file(s): short, int, float ...</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataByteOrder"
+                         default_values="0"
+                         name="DataByteOrder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property indicates the byte order of the binary
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDataOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="DataOrigin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The coordinate contained in this property specifies the
+        position of the point with index (0,0,0).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDataSpacing"
+                            default_values="1.0 1.0 1.0"
+                            name="DataSpacing"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the size of a voxel in each
+        dimension.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNumberOfScalarComponents"
+                         default_values="1"
+                         name="NumberOfScalarComponents"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the number of components the
+        scalar value at each pixel or voxel has (e.g., RGB - 3 scalar
+        components).</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScalarArrayName"
+                            default_values="ImageFile"
+                            name="ScalarArrayName"
+                            number_of_elements="1">
+        <Documentation>This property contains a text string listing a name to
+        assign to the point-centered data array read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileLowerLeft"
+                         default_values="1"
+                         name="FileLowerLeft"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether the data originates in
+        the lower left corner (on) or the upper left corner (off). Most
+        scientific data is written with a right-handed axes that originates in
+        the lower left corner. However, several 2D image file formats write the
+        image from the upper left corner.</Documentation>
+      </IntVectorProperty>
+      <!-- End ImageReaderCore -->
+    </SourceProxy>
     <!--  FLASH AMR Particles Reader -->
     <SourceProxy class="vtkAMRFlashParticlesReader"
                  label="FLASH Particles AMR Reader"
@@ -4950,151 +5045,6 @@
       <!-- End ensightMS -->
     </SourceProxy>
 
-    <SourceProxy label="Image Reader" name="ImageReader" class="vtkPVImageReader">
-      <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
-                     short_help="Read raw regular rectilinear grid data from a file.">
-                     The Image reader reads raw, regular, rectilinear grid
-                     (image/volume) data from a file. Because no metadata is
-                     provided, the user must specify information about the
-                     size, spacing, dimensionality, etc. about the
-                     dataset.</Documentation>
-      <!-- Unlike most readers, we need to show the "filename" so that users
-          can strip off the extension and replace it in the file pattern.
-          I'm creating this "Property" hint that has an attribute to force
-          whether the given property is shown in the GUI or not. -->
-      <Hints>
-        <Property name="FilePrefix"
-                  show="1" />
-        <ReaderFactory extensions="raw"
-                       file_description="Raw (binary) Files" />
-      </Hints>
-      <StringVectorProperty command="SetFilePrefix"
-                            name="FilePrefix"
-                            number_of_elements="1">
-        <FileListDomain name="files" />
-        <Documentation>The text string contained in this property specifies the
-        file prefix (directory plus common initial part of file name) for the
-        raw binary uniform rectilinear grid dataset.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetFilePattern"
-                            default_values="%s"
-                            name="FilePattern"
-                            number_of_elements="1">
-        <Documentation>The text string contained in the property specifies the
-        format string to determine the file names necessary for reading this
-        dataset. In creating the filenames, %s will be replaced by the prefix
-        and %d by a digit which represents the slice number in Z. The format
-        string is the same as that used by printf.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetDataScalarType"
-                         default_values="4"
-                         name="DataScalarType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="char"
-                 value="2" />
-          <Entry text="unsigned char"
-                 value="3" />
-          <Entry text="short"
-                 value="4" />
-          <Entry text="unsigned short"
-                 value="5" />
-          <Entry text="int"
-                 value="6" />
-          <Entry text="unsigned int"
-                 value="7" />
-          <Entry text="long"
-                 value="8" />
-          <Entry text="unsigned long"
-                 value="9" />
-          <Entry text="float"
-                 value="10" />
-          <Entry text="double"
-                 value="11" />
-        </EnumerationDomain>
-        <Documentation>The value of this property indicates the scalar type of
-        the pixels/voxels in the file(s): short, int, float ...</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetDataByteOrder"
-                         default_values="0"
-                         name="DataByteOrder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BigEndian"
-                 value="0" />
-          <Entry text="LittleEndian"
-                 value="1" />
-        </EnumerationDomain>
-        <Documentation>This property indicates the byte order of the binary
-        file(s).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetFileDimensionality"
-                         default_values="3"
-                         name="FileDimensionality"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="2"
-                 value="2" />
-          <Entry text="3"
-                 value="3" />
-        </EnumerationDomain>
-        <Documentation>This property indicates whether the file(s) in this
-        dataset contain slices (2D) or volumes (3D).</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetDataOrigin"
-                            default_values="0.0 0.0 0.0"
-                            name="DataOrigin"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>The coordinate contained in this property specifies the
-        position of the point with index (0,0,0).</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDataSpacing"
-                            default_values="1.0 1.0 1.0"
-                            name="DataSpacing"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the size of a voxel in each
-        dimension.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetDataExtent"
-                         default_values="0 0 0 0 0 0"
-                         name="DataExtent"
-                         number_of_elements="6">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the minimum and maximum index
-        values of the data in each dimension (xmin, xmax, ymin, ymax, zmin,
-        zmax).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetNumberOfScalarComponents"
-                         default_values="1"
-                         name="NumberOfScalarComponents"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the number of components the
-        scalar value at each pixel or voxel has (e.g., RGB - 3 scalar
-        components).</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetScalarArrayName"
-                            default_values="ImageFile"
-                            name="ScalarArrayName"
-                            number_of_elements="1">
-        <Documentation>This property contains a text string listing a name to
-        assign to the point-centered data array read.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFileLowerLeft"
-                         default_values="1"
-                         name="FileLowerLeft"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property determines whether the data originates in
-        the lower left corner (on) or the upper left corner (off). Most
-        scientific data is written with a right-handed axes that originates in
-        the lower left corner. However, several 2D image file formats write the
-        image from the upper left corner.</Documentation>
-      </IntVectorProperty>
-      <!-- End ImageReader -->
-    </SourceProxy>
     <SourceProxy class="vtkNrrdReader"
                  label="Nrrd Reader"
                  name="NrrdReader">
@@ -5396,6 +5346,87 @@
                        file_description="TIFF Image Files" />
       </Hints>
       <!-- End TIFFSeriesReader -->
+    </SourceProxy>
+    <SourceProxy class="vtkRawImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Image Reader"
+                 name="ImageReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of raw files into an time sequence of image datas."
+                     short_help="Read a series of raw files.">The raw series
+                     reader reads raw files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .raw.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ImageReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DataScalarType" />
+          <Property name="DataByteOrder" />
+          <Property name="DataOrigin" />
+          <Property name="DataSpacing" />
+          <Property name="NumberOfScalarComponents" />
+          <Property name="FileLowerLeft" />
+          <Property name="ScalarArrayName" />
+        </ExposedProperties>
+      </SubProxy>
+      <IntVectorProperty command="SetFileDimensionality"
+                         default_values="3"
+                         name="FileDimensionality"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="2"
+                 value="2" />
+          <Entry text="3"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property indicates whether the file(s) in this
+        dataset contain slices (2D) or volumes (3D).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataExtent"
+                         default_values="0 0 0 0 0 0"
+                         name="DataExtent"
+                         number_of_elements="6">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the minimum and maximum index
+        values of the data in each dimension (xmin, xmax, ymin, ymax, zmin,
+        zmax).</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="raw"
+                       file_description="Raw (binary) Files" />
+      </Hints>
+      <!-- End RAWSeriesReader -->
     </SourceProxy>
 
     <SourceProxy class="vtkExodusFileSeriesReader"
