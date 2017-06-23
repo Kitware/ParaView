@@ -1709,6 +1709,15 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         self.debug('Property ' + propertyName + ' has no GetData() method, skipping')
                         continue
 
+                    # One exception is properties which have enumeration domain, in which case we substitute
+                    # the numeric value for the enum text value.
+                    enumDomain = prop.FindDomain('vtkSMEnumerationDomain')
+                    if enumDomain:
+                        for entryNum in range(enumDomain.GetNumberOfEntries()):
+                            if enumDomain.GetEntryText(entryNum) == propJson['value']:
+                                propJson['value'] = enumDomain.GetEntryValue(entryNum)
+                                break
+
                 self.debug('Adding a property to the pre-sorted list: ' + str(propJson))
                 propertyList.append(propJson)
 
