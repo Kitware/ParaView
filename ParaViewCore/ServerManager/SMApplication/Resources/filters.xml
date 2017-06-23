@@ -6447,6 +6447,33 @@ array.
         function.</Documentation>
       </ProxyProperty>
       <IntVectorProperty animateable="0"
+                         command="SetBuildTree"
+                         default_values="1"
+                         name="BuildTree"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled and input is not an Image Data, Sphere Tree will be computed, for a faster slice computation.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildHierarchy"
+                         default_values="1"
+                         name="BuildHierarchy"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled and input is not an Image Data, Tree hierarchy will be computed, for a faster slice computation.
+       </Documentation>
+       <Hints>
+         <PropertyWidgetDecorator type="ShowWidgetDecorator">
+           <Property name="BuildTree" function="boolean" />
+         </PropertyWidgetDecorator>
+       </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
                          default_values="0"
                          name="ComputeNormals"
