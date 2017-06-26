@@ -85,14 +85,15 @@ paraview_test_load_data(""
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ArrayBoundsScaleDomain.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CustomOutputFormat.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DelimitedTextReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportFilteredColumnsSpreadsheet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FindWidget.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Preview.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SearchBox.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TableHistogram.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/CustomOutputFormat.xml
 )
 
 if (PARAVIEW_ENABLE_PYTHON)
