@@ -91,18 +91,6 @@ public:
   */
   bool togglePopout();
 
-  //@{
-  /**
-   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
-   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
-   * using it.
-   */
-  VTK_LEGACY(vtkImageData* captureImage(int width, int height));
-  VTK_LEGACY(int prepareForCapture(int width, int height));
-  VTK_LEGACY(void cleanupAfterCapture());
-  VTK_LEGACY(bool writeImage(const QString& filename, int width, int height, int quality = -1));
-  //@}
-
 signals:
   /**
   * fired when a frame in this widget becomes active.
