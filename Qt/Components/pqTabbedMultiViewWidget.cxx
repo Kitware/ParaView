@@ -193,6 +193,7 @@ bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
       this->parentWidget()->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
       if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
       {
+        widget->setForceSplitter(false);
         widget->setDecorationsVisible(true);
       }
     }
@@ -216,6 +217,7 @@ bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
 
     if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
     {
+      widget->setForceSplitter(true);
       widget->setDecorationsVisible(false);
     }
     return retval;
