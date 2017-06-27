@@ -203,6 +203,7 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , Internals(new pqInternals(this))
   , DecorationsVisible(true)
+  , ForceSplitter(false)
 {
   qApp->installEventFilter(this);
 
@@ -501,7 +502,7 @@ QWidget* pqMultiViewWidget::createWidget(
 
     case vtkSMViewLayoutProxy::VERTICAL:
     case vtkSMViewLayoutProxy::HORIZONTAL:
-      if (this->DecorationsVisible)
+      if (this->DecorationsVisible || this->ForceSplitter)
       {
         QSplitter* splitter = qobject_cast<QSplitter*>(this->Internals->Widgets[index]);
         if (!splitter)
@@ -512,7 +513,7 @@ QWidget* pqMultiViewWidget::createWidget(
 
         this->Internals->Widgets[index] = splitter;
         splitter->setParent(parentWdg);
-        splitter->setHandleWidth(this->DecorationsVisible ? 3 : 1);
+        splitter->setHandleWidth(this->DecorationsVisible ? 3 : 0);
         splitter->setObjectName(QString("Splitter.%1").arg(index));
         splitter->setProperty("FRAME_INDEX", QVariant(index));
         splitter->setOpaqueResize(false);

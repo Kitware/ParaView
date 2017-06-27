@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSaveScreenshotProxy.h"
+#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
@@ -69,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , ReadOnly(false)
+  , InPreviewMode(false)
+  , TabBarVisibility(true)
 {
 }
 
@@ -163,6 +166,61 @@ void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
   foreach (QLabel* label, labels)
   {
     label->setVisible(!val);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::pqTabWidget::setTabBarVisibility(bool val)
+{
+  this->TabBarVisibility = val;
+  if (!this->InPreviewMode)
+  {
+    this->tabBar()->setVisible(val);
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
+{
+  if (nsize.isEmpty())
+  {
+    // exit preview mode.
+    if (this->InPreviewMode)
+    {
+      this->InPreviewMode = false;
+      this->tabBar()->setVisible(this->TabBarVisibility);
+      this->setDocumentMode(false);
+      this->parentWidget()->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+      if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
+      {
+        widget->setForceSplitter(false);
+        widget->setDecorationsVisible(true);
+      }
+    }
+    return true;
+  }
+  else
+  {
+    // enter preview mode.
+    this->InPreviewMode = true;
+    this->tabBar()->setVisible(false);
+    this->setDocumentMode(true);
+    bool retval = true;
+
+    const vtkVector2i tsize(nsize.width(), nsize.height());
+    vtkVector2i csize(this->size().width(), this->size().height());
+    if (vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize) > 1)
+    {
+      retval = false; // cannot respect size. using aspect ratio only.
+    }
+    this->parentWidget()->setMaximumSize(QSize(csize[0], csize[1]));
+
+    if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
+    {
+      widget->setForceSplitter(true);
+      widget->setDecorationsVisible(false);
+    }
+    return retval;
   }
 }
 
@@ -285,13 +343,13 @@ bool pqTabbedMultiViewWidget::readOnly() const
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::setTabVisibility(bool visible)
 {
-  this->Internals->TabWidget->tabBar()->setVisible(visible);
+  this->Internals->TabWidget->setTabBarVisibility(visible);
 }
 
 //-----------------------------------------------------------------------------
 bool pqTabbedMultiViewWidget::tabVisibility() const
 {
-  return this->Internals->TabWidget->tabBar()->isVisible();
+  return this->Internals->TabWidget->tabBarVisibility();
 }
 
 //-----------------------------------------------------------------------------
@@ -610,6 +668,12 @@ void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
   }
 
   emit this->viewSizeLocked(!viewSize.isEmpty());
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::preview(const QSize& nsize)
+{
+  return this->Internals->TabWidget->preview(nsize);
 }
 
 //-----------------------------------------------------------------------------

@@ -43,7 +43,7 @@ class QMainWindow;
 * Note: For this reaction to have any effect on the dockable panels,
 * a pqLockPanelsBehavior must be instantiated.
 */
-class pqLockPanelsReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqLockPanelsReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
