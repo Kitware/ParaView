@@ -160,7 +160,7 @@ bool vtkSMSessionClient::Connect(const char* url)
   vtkPVOptions* options = pm->GetOptions();
 
   std::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION;
+  handshake << "handshake=paraview-" << PARAVIEW_VERSION;
   // Add connect-id if needed. The connect-id is added to the handshake that
   // must match on client and server processes.
   if (options->GetConnectID() != 0)
