@@ -74,7 +74,7 @@ protected:
   /**
    * Subclasses should override this method to do the actual image capture.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
+  virtual vtkImageData* CaptureWindowInternal(int magX, int magY) VTK_OVERRIDE;
 
 private:
   vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;

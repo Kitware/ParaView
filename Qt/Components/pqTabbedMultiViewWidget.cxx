@@ -209,7 +209,8 @@ bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
 
     const vtkVector2i tsize(nsize.width(), nsize.height());
     vtkVector2i csize(this->size().width(), this->size().height());
-    if (vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize) > 1)
+    int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
+    if (magnification > 1)
     {
       retval = false; // cannot respect size. using aspect ratio only.
     }

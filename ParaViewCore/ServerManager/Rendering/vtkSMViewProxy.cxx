@@ -466,7 +466,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindow(int magX, int magY)
 {
   vtkRenderWindow* window = this->GetRenderWindow();
 
@@ -492,10 +492,10 @@ vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
     }
 
     vtkRendererSaveInfo* info = this->PrepareRendererBackground(renderer, 255, 255, 255, true);
-    vtkImageData* captureWhite = this->CaptureWindowSingle(magnification);
+    vtkImageData* captureWhite = this->CaptureWindowSingle(magX, magY);
 
     this->PrepareRendererBackground(renderer, 0, 0, 0, false);
-    vtkImageData* captureBlack = this->CaptureWindowSingle(magnification);
+    vtkImageData* captureBlack = this->CaptureWindowSingle(magX, magY);
 
     vtkImageData* capture = vtkImageData::New();
     capture->CopyStructure(captureWhite);
@@ -584,7 +584,7 @@ vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
   }
 
   // Fall back to using no transparency.
-  return this->CaptureWindowSingle(magnification);
+  return this->CaptureWindowSingle(magX, magY);
 }
 
 //----------------------------------------------------------------------------
@@ -616,7 +616,7 @@ void vtkSMViewProxy::RestoreRendererBackground(vtkRenderer* renderer, vtkRendere
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magX, int magY)
 {
   if (this->ObjectsCreated)
   {
@@ -626,7 +626,7 @@ vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
     this->ExecuteStream(stream);
   }
 
-  vtkImageData* capture = this->CaptureWindowInternal(magnification);
+  vtkImageData* capture = this->CaptureWindowInternal(magX, magY);
 
   if (this->ObjectsCreated)
   {
@@ -644,17 +644,17 @@ vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
     // Update image extents based on ViewPosition
     int extents[6];
     capture->GetExtent(extents);
-    for (int cc = 0; cc < 4; cc++)
-    {
-      extents[cc] += position[cc / 2] * magnification;
-    }
+    extents[0] += position[0] * magX;
+    extents[1] += position[0] * magX;
+    extents[2] += position[1] * magY;
+    extents[3] += position[1] * magY;
     capture->SetExtent(extents);
   }
   return capture;
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magX, int magY)
 {
   vtkRenderWindow* renWin = this->GetRenderWindow();
   if (!renWin)
@@ -672,7 +672,7 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
   vtkNew<vtkSMViewProxyNS::WindowToImageFilter> w2i;
   w2i->SetInput(renWin);
   w2i->SetParent(this);
-  w2i->SetMagnification(magnification);
+  w2i->SetScale(magX, magY);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff(); // WindowToImageFilter can re-render as needed too,
                             // we just don't require the first render.
@@ -692,13 +692,19 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
 //-----------------------------------------------------------------------------
 int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int magnification)
 {
+  return this->WriteImage(filename, writerName, magnification, magnification);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int magX, int magY)
+{
   if (!filename || !writerName)
   {
     return vtkErrorCode::UnknownError;
   }
 
   vtkSmartPointer<vtkImageData> shot;
-  shot.TakeReference(this->CaptureWindow(magnification));
+  shot.TakeReference(this->CaptureWindow(magX, magY));
 
   if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
   {

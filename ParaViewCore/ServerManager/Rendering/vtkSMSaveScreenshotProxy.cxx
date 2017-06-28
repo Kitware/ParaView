@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <set>
 
 //============================================================================
 /**
@@ -104,14 +105,14 @@ private:
   }
 
 protected:
-  int Magnification;
+  vtkVector2i Magnification;
   vtkVector2i OriginalSize;
 
 public:
   vtkState(vtkSMSessionProxyManager* pxm)
     : ProxyManager(pxm)
     , TransparentBackground(false)
-    , Magnification(1)
+    , Magnification(1, 1)
     , OriginalSize(0, 0)
   {
     this->TransparentBackground = vtkSMViewProxy::GetTransparentBackground();
@@ -174,7 +175,16 @@ public:
     if (cursize != size)
     {
       this->OriginalSize = cursize;
-      this->Magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(size, cursize);
+      bool approx = false;
+      this->Magnification =
+        vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(size, cursize, &approx);
+      if (approx)
+      {
+        const vtkVector2i approxSize = cursize * this->Magnification;
+        vtkGenericWarningMacro(<< "Cannot render at '(" << size[0] << ", " << size[1]
+                               << ")'. Using "
+                               << "'(" << approxSize[0] << ", " << approxSize[1] << ")'");
+      }
       this->Resize(cursize);
     }
   }
@@ -228,7 +238,8 @@ protected:
     dpis.View = view;
     dpis.ViewPPI = vppi.GetAsInt();
     this->SavedPPIValues.push_back(dpis);
-    vppi.Set(vppi.GetAsInt() / this->Magnification);
+    // not entirely sure how to best scale ppi.
+    vppi.Set(vppi.GetAsInt() / std::max(this->Magnification[0], this->Magnification[1]));
     view->UpdateVTKObjects();
   }
 
@@ -268,7 +279,7 @@ public:
   vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
   {
     vtkSmartPointer<vtkImageData> img;
-    img.TakeReference(this->View->CaptureWindow(this->Magnification));
+    img.TakeReference(this->View->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
@@ -334,7 +345,7 @@ public:
   vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
   {
     vtkSmartPointer<vtkImageData> img;
-    img.TakeReference(this->Layout->CaptureWindow(this->Magnification));
+    img.TakeReference(this->Layout->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
@@ -445,10 +456,117 @@ int vtkSMSaveScreenshotProxy::ComputeMagnification(const vtkVector2i& targetSize
   // If fullsize > viewsize, then magnification is involved.
   int temp = std::ceil(targetSize[0] / static_cast<double>(size[0]));
   magnification = std::max(temp, magnification);
-
   temp = std::ceil(targetSize[1] / static_cast<double>(size[1]));
+
   magnification = std::max(temp, magnification);
   size = targetSize / vtkVector2i(magnification);
+  return magnification;
+}
+
+//----------------------------------------------------------------------------
+namespace
+{
+int computeGCD(int a, int b)
+{
+  return b == 0 ? a : computeGCD(b, a % b);
+}
+
+std::set<int> computeFactors(int num)
+{
+  std::set<int> result;
+  const int sroot = std::sqrt(num);
+  for (int cc = 1; cc <= sroot; ++cc)
+  {
+    if (num % cc == 0)
+    {
+      result.insert(cc);
+      if (cc * cc != num)
+      {
+        result.insert(num / cc);
+      }
+    }
+  }
+  return result;
+}
+}
+
+//----------------------------------------------------------------------------
+vtkVector2i vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(
+  const vtkVector2i& targetSize, vtkVector2i& size, bool* approximate)
+{
+  if (approximate)
+  {
+    *approximate = false;
+  }
+
+  if (targetSize[0] <= size[0] && targetSize[1] <= size[1])
+  {
+    // easy! It just fits.
+    size = targetSize;
+    return vtkVector2i(1, 1);
+  }
+
+  // First we need to see if we can find a magnification factor that preserves
+  // aspect ratio. This is the best magnification factor. Do that, we get the
+  // GCD for the target width and height and then see if factors of the GCD are
+  // a good match.
+  const int gcd = computeGCD(targetSize[0], targetSize[1]);
+  if (gcd > 1)
+  {
+    const auto factors = computeFactors(gcd);
+    for (auto fiter = factors.begin(); fiter != factors.end(); ++fiter)
+    {
+      const int magnification = *fiter;
+      vtkVector2i potentialSize = targetSize / vtkVector2i(magnification, magnification);
+      if (potentialSize[0] > 1 && potentialSize[1] > 1 && potentialSize[0] <= size[0] &&
+        potentialSize[1] <= size[1])
+      {
+        // found a good fit that's non-trivial.
+        size = potentialSize;
+        return vtkVector2i(magnification, magnification);
+      }
+    }
+  }
+
+  // Next, try to find scale factors at the cost of preserving aspect ratios
+  // since that's not possible. For this, we don't worry about GCD. Instead deal
+  // with each dimension separately, finding factors for target size and seeing
+  // if we can find a good scale factor.
+  vtkVector2i magnification;
+  for (int cc = 0; cc < 2; ++cc)
+  {
+    if (targetSize[cc] > size[cc])
+    {
+      // first, do a quick guess.
+      magnification[cc] = std::ceil(targetSize[cc] / static_cast<double>(size[cc]));
+
+      // now for a more accurate magnification; it may not be possible to find one,
+      // and hence we first do an approximate calculation.
+      const auto factors = computeFactors(targetSize[cc]);
+      for (auto fiter = factors.begin(); fiter != factors.end(); ++fiter)
+      {
+        const int potentialSize = targetSize[cc] / *fiter;
+        if (potentialSize > 1 && potentialSize <= size[cc])
+        {
+          // kaching!
+          magnification[cc] = *fiter;
+          break;
+        }
+      }
+      size[cc] = targetSize[cc] / magnification[cc];
+    }
+    else
+    {
+      size[cc] = targetSize[cc];
+      magnification[cc] = 1;
+    }
+  }
+
+  if (approximate != nullptr)
+  {
+    *approximate = (size * magnification != targetSize);
+  }
+
   return magnification;
 }
 

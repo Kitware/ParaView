@@ -198,7 +198,7 @@ void vtkParticlePipeline::SetupPipeline()
   this->syncRen->SetRootProcessId(0);
 
   this->w2i->SetInput(window);
-  // w2i->SetMagnification(magnification);
+  // w2i->SetScale(magnification);
   this->w2i->ReadFrontBufferOff();
   this->w2i->ShouldRerenderOff();
   this->w2i->FixBoundaryOn();

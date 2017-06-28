@@ -102,7 +102,7 @@ protected:
    * Overridden to do the capturing of images from each of the internal views
    * and then stitching them together.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
+  virtual vtkImageData* CaptureWindowInternal(int magX, int magY) VTK_OVERRIDE;
 
   void InvokeConfigureEvent();
 

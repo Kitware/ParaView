@@ -1027,14 +1027,14 @@ void vtkSMViewLayoutProxy::RestoreMaximizedState()
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
+vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
 {
   if (this->MaximizedCell != -1)
   {
     vtkSMViewProxy* view = this->GetView(this->MaximizedCell);
     if (view)
     {
-      return view->CaptureWindow(magnification);
+      return view->CaptureWindow(magX, magY);
     }
     vtkErrorMacro("No view present in the layout.");
     return NULL;
@@ -1048,7 +1048,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
   {
     if (iter->ViewProxy.GetPointer())
     {
-      vtkImageData* image = iter->ViewProxy->CaptureWindow(magnification);
+      vtkImageData* image = iter->ViewProxy->CaptureWindow(magX, magY);
       if (image)
       {
         images.push_back(image);
