@@ -92,6 +92,12 @@ protected:
    */
   bool Cleanup() VTK_OVERRIDE;
 
+  /**
+   * Change "ImageResolution" property as needed for the file format requested.
+   * @returns true if changed, false otherwise.
+   */
+  virtual bool EnforceSizeRestrictions(const char* filename);
+
   vtkSMViewLayoutProxy* GetLayout();
   vtkSMViewProxy* GetView();
   vtkSMSaveScreenshotProxy* GetScreenshotHelper();
