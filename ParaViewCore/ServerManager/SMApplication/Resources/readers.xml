@@ -3035,6 +3035,10 @@
           <!-- <Entry value="202" text="Vector - Momentum"/> -->
           <Entry text="Vector - Pressure gradient"
                  value="210" />
+          <Entry text="Scalar - Vorticity magnitude"
+                 value="211" />
+          <Entry text="Vector - Strain rate"
+                 value="212" />
         </EnumerationDomain>
         <Documentation>This property lists which functions (point-centered
         arrays) to compute.</Documentation>

@@ -68,12 +68,17 @@ paraview_add_test_python(
   PointPicking.py
 )
 
+paraview_add_test_python(
+  NO_VALID NO_OUTPUT NO_RT
+  Plot3DReader.py
+)
+
 # These tests could run safely in serial and parallel (and with both GL backends).
 set(PVBATCH_TESTS
   BatchAxesGrid.py
   StructuredGridVolumeRendering.py
   PLYWriter.py
-  )
+)
 
 # Tests only concerning GL2.
 if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
