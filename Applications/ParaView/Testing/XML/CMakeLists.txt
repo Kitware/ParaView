@@ -386,8 +386,8 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReactionNonConverted.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/SliceFastWithPlane.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/SliceFastWithPlaneMultiBlock.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SliceWithPlane.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SliceWithPlaneMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SortLineChartData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StockColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerSurface.xml
