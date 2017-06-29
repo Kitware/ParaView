@@ -34,6 +34,7 @@
 #include "vtkSMViewProxy.h"
 
 #include <sstream>
+#include <vtksys/SystemTools.hxx>
 
 namespace vtkSMSaveAnimationProxyNS
 {
@@ -140,6 +141,37 @@ bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
+{
+  std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename ? filename : "");
+  if (vtksys::SystemTools::LowerCase(ext) == ".avi")
+  {
+    vtkVector2i newsize;
+    vtkSMPropertyHelper(this, "ImageResolution").Get(newsize.GetData(), 2);
+
+    const vtkVector2i size(newsize);
+    if (newsize[0] % 4 != 0)
+    {
+      newsize[0] -= (newsize[0] % 4);
+    }
+    if (newsize[1] % 4 != 0)
+    {
+      newsize[1] -= (newsize[1] % 4);
+    }
+
+    if (newsize != size)
+    {
+      vtkWarningMacro("The requested resolution '("
+        << size[0] << ", " << size[1] << ")' has been changed to '(" << newsize[0] << ", "
+        << newsize[1] << ")' to match format specification.");
+      return true; // size changed.
+    }
+  }
+  // nothing  changed.
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
 {
   vtkSMViewLayoutProxy* layout = this->GetLayout();
@@ -152,6 +184,9 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
     vtkErrorMacro("Cannot WriteImage without a view or layout.");
     return false;
   }
+
+  // Enforce any restrictions on the image size based on the file format
+  this->EnforceSizeRestrictions(filename);
 
   SM_SCOPED_TRACE(SaveCameras)
     .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
