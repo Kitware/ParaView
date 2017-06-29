@@ -61,13 +61,56 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
-                         label="Write all timesteps as file-series"
-                         name="WriteAllTimeSteps"
+                         label="Write timesteps as file-series"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is OFF, the writer
+        writes only the current timestep. Otherwise it is called once
+        for each time step within the min and max range. If those are
+        not set, the writer is called for all time steps available in
+        its input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinTimeStep"
+                         default_values="0"
+                         label="First time step"
+                         name="MinTimeStep"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>Sets the lower bound for timesteps to write.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaxTimeStep"
+                         default_values="-1"
+                         label="Last time step"
+                         name="MaxTimeStep"
+                         number_of_elements="1">
+        <Documentation>Sets the upper bound for timesteps to write. If
+        less than min, the last time step is used.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTimeStepStride"
+                         default_values="1"
+                         label="Time step stride"
+                         name="TimeStepStride"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Sets the stride to go through the time steps.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
@@ -84,14 +127,17 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteAllTimeSteps" function="boolean" />
+	    <Property name="WriteTimeSteps" function="boolean" />
 	  </PropertyWidgetDecorator>
 	</Hints>
       </StringVectorProperty>
 
       <PropertyGroup label="File Series">
-        <Property name="WriteAllTimeSteps" />
+        <Property name="WriteTimeSteps" />
 	<Property name="FileNameSuffix"/>
+        <Property name="MinTimeStep" />
+        <Property name="MaxTimeStep" />
+        <Property name="TimeStepStride" />
       </PropertyGroup>
 
       <!-- End of FileSeriesWriter -->
@@ -106,12 +152,11 @@
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
                          label="Write all timesteps as file-series"
-                         name="WriteAllTimeSteps"
+                         name="WriteTimeSteps"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
-        executed once for each timestep available from the
-        reader.</Documentation>
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
       <SubProxy>
         <!-- No harm if use vtkCompleteArrays even in serial mode so, we are
@@ -121,7 +166,7 @@
       </SubProxy>
 
       <PropertyGroup label="File Series">
-        <Property name="WriteAllTimeSteps" />
+        <Property name="WriteTimeSteps" />
       </PropertyGroup>
 
       <!-- End of ParallelFileSeriesWriter -->

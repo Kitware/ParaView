@@ -31,6 +31,10 @@ if (numpy_found)
     AppendAttributes.py
     UnstructuredCellTypePythonCalculator.py
     )
+  paraview_add_test_python(
+    NO_VALID NO_RT
+    FileSeriesWriterSubTimeSteps.py
+    )
   set(PARAVIEW_PYTHON_ARGS)
 
   if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
