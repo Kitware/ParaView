@@ -112,6 +112,14 @@ public:
 
   //@{
   /**
+   * if the server supports compressing images via NVPipe
+   */
+  //@}
+  vtkSetMacro(NVPipeSupport, bool);
+  vtkGetMacro(NVPipeSupport, bool);
+
+  //@{
+  /**
    * Get/Set the time after which the server timesout.
    */
   vtkSetMacro(Timeout, int);
@@ -243,6 +251,7 @@ protected:
   bool MPIInitialized;
   int OGVSupport;
   int AVISupport;
+  bool NVPipeSupport;
   int RemoteRendering;
   int TileDimensions[2];
   int TileMullions[2];

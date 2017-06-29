@@ -66,10 +66,6 @@ public:
   virtual const char* RestoreConfiguration(const char* stream);
   //@}
 
-  /// Queries the system to see if NVIDIA cards are present to back this
-  /// implementation.
-  static bool Available();
-
   static vtkInformationIntegerKey* PIXELS_SKIPPED();
 
 protected:

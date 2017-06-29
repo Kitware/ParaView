@@ -4,6 +4,7 @@
   Module:    vtkPVClientServerSynchronizedRenderers.h
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -44,6 +45,13 @@ public:
   vtkSetMacro(LossLessCompression, bool);
   vtkGetMacro(LossLessCompression, bool);
 
+  // Description:
+  // This flag is set when NVPipe is supported.  NVPipe may not be available
+  // even when compiled in, if the system is not using an NVIDIA GPU, for
+  // example.
+  vtkSetMacro(NVPipeSupport, bool);
+  vtkGetMacro(NVPipeSupport, bool);
+
   /**
    * Set and configure a compressor from it's own configuration stream. This
    * is used by ParaView to configure the compressor from application wide
@@ -79,6 +87,7 @@ protected:
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;
+  bool NVPipeSupport;
 
 private:
   vtkPVClientServerSynchronizedRenderers(

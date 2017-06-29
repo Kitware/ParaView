@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
+#include "vtkPVConfig.h"
 
 #include <QRegExp>
 
@@ -41,6 +42,7 @@ static const int NO_COMPRESSION = 0;
 static const int LZ4_COMPRESSION = 1;
 static const int SQUIRT_COMPRESSION = 2;
 static const int ZLIB_COMPRESSION = 3;
+static const int NVPIPE_COMPRESSION = 4;
 //-----------------------------------------------------------------------------
 
 class pqImageCompressorWidget::pqInternals
@@ -76,6 +78,11 @@ pqImageCompressorWidget::pqImageCompressorWidget(
   this->connect(ui.zlibColorSpace, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
   this->connect(ui.zlibLevel, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
   this->connect(ui.zlibStripAlpha, SIGNAL(stateChanged(int)), SIGNAL(compressorConfigChanged()));
+
+#ifdef PARAVIEW_ENABLE_NVPIPE
+  ui.compressionType->addItem("NvPipe");
+  this->connect(ui.nvpLevel, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
+#endif
 
   this->addPropertyLink(this, "compressorConfig", SIGNAL(compressorConfigChanged()), smproperty);
 }
@@ -115,6 +122,12 @@ void pqImageCompressorWidget::setCompressorConfig(const QString& value)
                     "\\s+"     // space
                     "([0-9]+)" // num-of-bits.
                     "$");
+  QRegExp nvpipeRegExp("^vtkNvPipeCompressor"
+                       "\\s+"     // space
+                       "0"        // 0
+                       "\\s+"     // space
+                       "([0-9]+)" // compression level.
+                       "$");
 
   if (lz4RegExp.exactMatch(value))
   {
@@ -137,6 +150,12 @@ void pqImageCompressorWidget::setCompressorConfig(const QString& value)
     ui.zlibLevel->setValue(level);
     ui.zlibColorSpace->setValue(numBits);
     ui.zlibStripAlpha->setCheckState(stripAlpha ? Qt::Checked : Qt::Unchecked);
+  }
+  else if (nvpipeRegExp.exactMatch(value))
+  {
+    int level = nvpipeRegExp.cap(1).toInt();
+    ui.compressionType->setCurrentIndex(NVPIPE_COMPRESSION);
+    ui.nvpLevel->setValue(level);
   }
   else
   {
@@ -161,6 +180,9 @@ QString pqImageCompressorWidget::compressorConfig() const
         .arg(ui.zlibLevel->value())
         .arg(ui.zlibColorSpace->value())
         .arg(ui.zlibStripAlpha->isChecked() ? 1 : 0);
+
+    case NVPIPE_COMPRESSION: // nvpipe
+      return QString("vtkNvPipeCompressor 0 %1").arg(ui.nvpLevel->value());
   }
 
   return QString("");
@@ -170,7 +192,8 @@ QString pqImageCompressorWidget::compressorConfig() const
 void pqImageCompressorWidget::currentIndexChanged(int index)
 {
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
-  ui.squirtLabel->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
+  ui.squirtLabel->setVisible(
+    index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION || index == NVPIPE_COMPRESSION);
   ui.squirtColorSpace->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
 
   ui.zlibLabel1->setVisible(index == ZLIB_COMPRESSION);
@@ -178,6 +201,13 @@ void pqImageCompressorWidget::currentIndexChanged(int index)
   ui.zlibLevel->setVisible(index == ZLIB_COMPRESSION);
   ui.zlibColorSpace->setVisible(index == ZLIB_COMPRESSION);
   ui.zlibStripAlpha->setVisible(index == ZLIB_COMPRESSION);
+
+#ifdef PARAVIEW_ENABLE_NVPIPE
+  ui.nvpLevel->setVisible(index == NVPIPE_COMPRESSION);
+#else
+  ui.nvpLevel->setEnabled(false);
+  ui.nvpLevel->setToolTip("ParaView must be built with NVPipe enabled.");
+#endif
 }
 
 //-----------------------------------------------------------------------------

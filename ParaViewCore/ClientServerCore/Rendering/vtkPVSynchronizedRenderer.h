@@ -153,6 +153,11 @@ public:
    */
   void SetFXAAOptions(vtkFXAAOptions* opts);
 
+  /**
+   * Enable/Disable NVPipe
+   */
+  void SetNVPipeSupport(bool);
+
   //@{
   /**
    * Not for the faint hearted. This internal vtkSynchronizedRenderers instances
