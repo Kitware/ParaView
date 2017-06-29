@@ -80,9 +80,6 @@ public:
   // Dummy functions so we can use vtk macros
   void SetDebug(unsigned char i);
   unsigned char GetDebug() const;
-  const char* GetClassName() const;
-  int HasObserver(const char*) const;
-  int InvokeEvent(const char*, void*) const;
 
   void SetCoordinateSystem(const int& coordinateSystem);
 
