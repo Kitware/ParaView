@@ -343,12 +343,8 @@ bool vtkPVSessionServer::Connect(const char* url)
   {
     handshake << ".connect_id." << options->GetConnectID();
   }
-// Add rendering backend information.
-#ifdef VTKGL2
+  // Add rendering backend information.
   handshake << ".renderingbackend.opengl2";
-#else
-  handshake << ".renderingbackend.opengl";
-#endif
 
   // for forward connections, port number 0 is acceptable, while for
   // reverse-connections it's not.

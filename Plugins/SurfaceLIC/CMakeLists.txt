@@ -4,8 +4,6 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-add_definitions(-DVTKGL2)
-
 add_paraview_plugin(
   SurfaceLIC "2.0"
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"

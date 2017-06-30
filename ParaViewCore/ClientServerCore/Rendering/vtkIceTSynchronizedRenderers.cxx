@@ -412,7 +412,6 @@ void vtkIceTSynchronizedRenderers::SlaveStartRender()
 {
   this->Superclass::SlaveStartRender();
 
-#ifdef VTKGL2
   int x, y;
   this->IceTCompositePass->GetTileDimensions(x, y);
   if (!(x == 1 && y == 1))
@@ -427,5 +426,4 @@ void vtkIceTSynchronizedRenderers::SlaveStartRender()
   this->Renderer->SetBackground(0, 0, 0);
   this->Renderer->SetGradientBackground(false);
   this->Renderer->SetTexturedBackground(false);
-#endif
 }

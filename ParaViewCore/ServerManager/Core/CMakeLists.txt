@@ -156,5 +156,4 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMUncheckedPropertyHelper
   WRAP_EXCLUDE)
 
-add_definitions(-DVTKGL2)
 vtk_module_library(vtkPVServerManagerCore ${Module_SRCS})

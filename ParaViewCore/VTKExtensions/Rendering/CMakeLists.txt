@@ -91,12 +91,6 @@ set(Module_SRCS
   vtkCinemaExporter.cxx
 )
 
-
-set_source_files_properties(
-  vtkPVDefaultPass.cxx
-  vtkPVGeometryFilter.cxx
-  PROPERTIES COMPILE_FLAGS -DVTKGL2)
-
 if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS
     vtkAllToNRedistributeCompositePolyData.cxx
@@ -111,8 +105,6 @@ if (PARAVIEW_USE_MPI)
     list(APPEND Module_SRCS
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
-    set_source_files_properties(vtkIceTCompositePass.cxx
-      PROPERTIES COMPILE_FLAGS -DVTKGL2)
   endif()
 endif()
 

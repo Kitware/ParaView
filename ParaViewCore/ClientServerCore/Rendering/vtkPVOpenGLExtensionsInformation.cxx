@@ -14,12 +14,6 @@
 =========================================================================*/
 #include "vtkPVOpenGLExtensionsInformation.h"
 
-#ifdef VTKGL2
-
-#else
-#include "vtkOpenGLExtensionManager.h"
-#endif
-
 #include "vtkClientServerStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -85,14 +79,8 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
   }
   std::vector<std::string> extensions;
 
-#ifdef VTKGL2
-// FIXME: Add something to pass the equivalent string here.
-#else
-  vtkNew<vtkOpenGLExtensionManager> mgr;
-  mgr->SetRenderWindow(renWin);
-  mgr->Update();
-  vtksys::SystemTools::Split(mgr->GetExtensionsString(), extensions, ' ');
-#endif
+  // ifdef VTKGL2
+  // FIXME: Add something to pass the equivalent string here.
 
   this->Internal->Extensions.clear();
   std::vector<std::string>::iterator iter;

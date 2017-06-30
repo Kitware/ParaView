@@ -105,8 +105,6 @@ add_custom_target(
 )
 
 #------------------------------------------------------------------------------
-add_definitions(-DVTKGL2)
-
 vtk_module_library(vtkPVServerImplementationCore
   ${Module_SRCS})
 

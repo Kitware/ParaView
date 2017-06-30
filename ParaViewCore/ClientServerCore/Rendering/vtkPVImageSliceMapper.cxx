@@ -26,7 +26,6 @@
 #include "vtkScalarsToColors.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#ifdef VTKGL2
 #include "vtkCellArray.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkExtractVOI.h"
@@ -50,30 +49,6 @@ void vtkPVImageSliceMapper::SetPainter(vtkPainter*)
 {
 }
 
-#else
-
-#include "vtkTexturePainter.h"
-
-//-----------------------------------------------------------------------------
-class vtkPVImageSliceMapper::vtkObserver : public vtkCommand
-{
-public:
-  static vtkObserver* New() { return new vtkObserver; }
-
-  virtual void Execute(vtkObject* caller, unsigned long event, void*)
-  {
-    vtkPainter* p = vtkPainter::SafeDownCast(caller);
-    if (this->Target && p && event == vtkCommand::ProgressEvent)
-    {
-      this->Target->UpdateProgress(p->GetProgress());
-    }
-  }
-  vtkObserver() { this->Target = 0; }
-  vtkPVImageSliceMapper* Target;
-};
-
-#endif
-
 vtkStandardNewMacro(vtkPVImageSliceMapper);
 //----------------------------------------------------------------------------
 vtkPVImageSliceMapper::vtkPVImageSliceMapper()
@@ -87,7 +62,6 @@ vtkPVImageSliceMapper::vtkPVImageSliceMapper()
   this->SliceMode = XY_PLANE;
   this->UseXYPlane = 0;
 
-#ifdef VTKGL2
   this->Texture = vtkOpenGLTexture::New();
   this->Texture->RepeatOff();
   vtkNew<vtkPolyData> polydata;
@@ -124,37 +98,16 @@ vtkPVImageSliceMapper::vtkPVImageSliceMapper()
   this->PolyDataActor->SetTexture(this->Texture);
   this->PolyDataActor->GetProperty()->SetAmbient(1.0);
   this->PolyDataActor->GetProperty()->SetDiffuse(0.0);
-
-#else
-  this->Observer = vtkObserver::New();
-  this->Observer->Target = this;
-  this->Painter = 0;
-
-  this->PainterInformation = vtkInformation::New();
-  vtkTexturePainter* painter = vtkTexturePainter::New();
-  this->SetPainter(painter);
-  painter->Delete();
-#endif
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageSliceMapper::~vtkPVImageSliceMapper()
 {
-#ifdef VTKGL2
   this->Texture->Delete();
   this->Texture = NULL;
   this->PolyDataActor->Delete();
   this->PolyDataActor = NULL;
-#else
-  this->SetPainter(NULL);
-
-  this->Observer->Target = 0;
-  this->Observer->Delete();
-  this->PainterInformation->Delete();
-#endif
 }
-
-#ifdef VTKGL2
 
 //----------------------------------------------------------------------------
 static int vtkGetDataDimension(int inextents[6])
@@ -407,84 +360,11 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
   this->Texture->PostRender(renderer);
 }
 
-#else
-
-//-----------------------------------------------------------------------------
-void vtkPVImageSliceMapper::SetPainter(vtkPainter* p)
-{
-  if (this->Painter)
-  {
-    this->Painter->RemoveObservers(vtkCommand::ProgressEvent, this->Observer);
-    this->Painter->SetInformation(0);
-  }
-  vtkSetObjectBodyMacro(Painter, vtkPainter, p);
-  if (this->Painter)
-  {
-    this->Painter->AddObserver(vtkCommand::ProgressEvent, this->Observer);
-    this->Painter->SetInformation(this->PainterInformation);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSliceMapper::UpdatePainterInformation()
-{
-  vtkInformation* info = this->PainterInformation;
-  info->Set(vtkPainter::STATIC_DATA(), this->Static);
-
-  // tell which array to color with.
-  if (this->ScalarMode == VTK_SCALAR_MODE_USE_FIELD_DATA)
-  {
-    vtkErrorMacro("Field data coloring is not supported.");
-    this->ScalarMode = VTK_SCALAR_MODE_DEFAULT;
-  }
-
-  if (this->ArrayAccessMode == VTK_GET_ARRAY_BY_ID)
-  {
-    info->Remove(vtkTexturePainter::SCALAR_ARRAY_NAME());
-    info->Set(vtkTexturePainter::SCALAR_ARRAY_INDEX(), this->ArrayId);
-  }
-  else
-  {
-    info->Remove(vtkTexturePainter::SCALAR_ARRAY_INDEX());
-    info->Set(vtkTexturePainter::SCALAR_ARRAY_NAME(), this->ArrayName);
-  }
-  info->Set(vtkTexturePainter::SCALAR_MODE(), this->ScalarMode);
-  info->Set(vtkTexturePainter::LOOKUP_TABLE(), this->LookupTable);
-  info->Set(vtkTexturePainter::USE_XY_PLANE(), this->UseXYPlane);
-
-  // tell is we should map unsiged chars thorough LUT.
-  info->Set(
-    vtkTexturePainter::MAP_SCALARS(), (this->ColorMode == VTK_COLOR_MODE_MAP_SCALARS) ? 1 : 0);
-
-  // tell information about the slice.
-  info->Set(vtkTexturePainter::SLICE(), this->Slice);
-  switch (this->SliceMode)
-  {
-    case YZ_PLANE:
-      info->Set(vtkTexturePainter::SLICE_MODE(), vtkTexturePainter::YZ_PLANE);
-      break;
-
-    case XZ_PLANE:
-      info->Set(vtkTexturePainter::SLICE_MODE(), vtkTexturePainter::XZ_PLANE);
-      break;
-
-    case XY_PLANE:
-      info->Set(vtkTexturePainter::SLICE_MODE(), vtkTexturePainter::XY_PLANE);
-      break;
-  }
-}
-
-#endif
-
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::ReleaseGraphicsResources(vtkWindow* win)
 {
-#ifdef VTKGL2
   this->Texture->ReleaseGraphicsResources(win);
   this->PolyDataActor->ReleaseGraphicsResources(win);
-#else
-  this->Painter->ReleaseGraphicsResources(win);
-#endif
   this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -552,19 +432,6 @@ void vtkPVImageSliceMapper::Update(int port)
 
     this->Superclass::Update(port);
   }
-
-#ifndef VTKGL2
-  // Set the whole extent on the painter because it needs it internally
-  // and it has no access to the pipeline information.
-  vtkTexturePainter* ptr = vtkTexturePainter::SafeDownCast(this->GetPainter());
-
-  int* wext =
-    this->GetInputInformation(0, 0)->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
-  if (wext)
-  {
-    ptr->SetWholeExtent(wext);
-  }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -681,26 +548,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
   // make sure our window is current
   ren->GetRenderWindow()->MakeCurrent();
   this->TimeToDraw = 0.0;
-#ifdef VTKGL2
   this->RenderInternal(ren, actor);
-#else
-  if (this->Painter)
-  {
-    // Update Painter information if obsolete.
-    if (this->PainterInformationUpdateTime < this->GetMTime())
-    {
-      this->UpdatePainterInformation();
-      this->PainterInformationUpdateTime.Modified();
-    }
-    // Pass polydata if changed.
-    if (this->Painter->GetInput() != input)
-    {
-      this->Painter->SetInput(input);
-    }
-    this->Painter->Render(ren, actor, 0xff, this->ForceCompileOnly == 1);
-    this->TimeToDraw = this->Painter->GetTimeToDraw();
-  }
-#endif
 
   // If the timer is not accurate enough, set it to a small
   // time so that it is not zero

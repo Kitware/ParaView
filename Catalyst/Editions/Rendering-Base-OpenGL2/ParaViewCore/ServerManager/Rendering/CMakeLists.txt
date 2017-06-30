@@ -6,7 +6,6 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-add_definitions(-DVTKGL2)
 #-----------------------------------------------------------------------------
 # Stuff for ObjectFactory override for vtkSMParaViewPipelineControllerWithRendering.
 list(APPEND Module_SRCS

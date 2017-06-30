@@ -93,12 +93,8 @@
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#ifdef VTKGL2
 #include "vtkLightingMapPass.h"
 #include "vtkValuePass.h"
-#else
-#include "vtkValuePasses.h"
-#endif
 
 #ifdef PARAVIEW_USE_ICE_T
 #include "vtkIceTSynchronizedRenderers.h"
@@ -131,12 +127,8 @@ class vtkPVRenderView::vtkInternals
   std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
 
 public:
-#ifdef VTKGL2
   vtkNew<vtkValuePass> ValuePasses;
   vtkNew<vtkLightingMapPass> LightingMapPass;
-#else
-  vtkNew<vtkValuePasses> ValuePasses;
-#endif
 #ifdef PARAVIEW_USE_OSPRAY
   vtkNew<vtkOSPRayPass> OSPRayPass;
 #endif
@@ -277,7 +269,7 @@ private:
 };
 vtkStandardNewMacro(vtkPVRendererCuller);
 
-#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+#if defined(PARAVIEW_USE_ICE_T)
 //------------------------------------------------------------------------------
 // vtkIceTCompositePass needs to know the set RenderPass will read from its
 // internal float FBO in order to setup an adequate context.
@@ -530,13 +522,11 @@ vtkPVRenderView::vtkPVRenderView()
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-#if defined(VTKGL2)
   vtkRenderWindow* win = this->RenderView->GetRenderWindow();
   if (win)
   {
     this->Internals->ValuePasses->ReleaseGraphicsResources(win);
   }
-#endif
 
   // this ensure that the renderer releases graphics resources before the window
   // is destroyed.
@@ -2787,7 +2777,6 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 // ----------------------------------------------------------------------------
 void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 {
-#ifdef VTKGL2
   // Fixes issue with the background (black) when comming back from FLOATING_POINT
   // mode. FLOATING_POINT mode is only supported in BATCH mode and single process
   // CLIENT.
@@ -2828,19 +2817,12 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
   }
 
   this->Modified();
-#else
-  (void)mode;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVRenderView::GetValueRenderingModeCommand()
 {
-#ifdef VTKGL2
   return this->Internals->ValuePasses->GetRenderingMode();
-#else
-  return 1; // vtkValuePass::INVERTIBLE_LUT
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -2871,7 +2853,7 @@ void vtkPVRenderView::BeginValueCapture()
 {
   if (!this->Internals->IsInCapture)
   {
-#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+#if defined(PARAVIEW_USE_ICE_T)
     if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
     {
       // Let the IceTPass know FLOATING_POINT is already enabled.
@@ -2904,7 +2886,7 @@ void vtkPVRenderView::BeginValueCapture()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EndValueCapture()
 {
-#if defined(VTKGL2) && defined(PARAVIEW_USE_ICE_T)
+#if defined(PARAVIEW_USE_ICE_T)
   if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
   {
     // Let the IceTPass know vtkValuePass will be removed.
@@ -2931,9 +2913,7 @@ void vtkPVRenderView::StartCaptureLuminance()
     this->SetShowAnnotation(false);
     this->Internals->IsInCapture = true;
   }
-#ifdef VTKGL2
   this->SynchronizedRenderers->SetRenderPass(this->Internals->LightingMapPass.GetPointer());
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -2986,7 +2966,6 @@ vtkFloatArray* vtkPVRenderView::GetCapturedZBuffer()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CaptureValuesFloat()
 {
-#ifdef VTKGL2
   vtkFloatArray* values = NULL;
 #ifdef PARAVIEW_USE_ICE_T
   vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers =
@@ -3025,17 +3004,12 @@ void vtkPVRenderView::CaptureValuesFloat()
     this->Internals->ArrayHolder->SetNumberOfTuples(values->GetNumberOfTuples());
     this->Internals->ArrayHolder->CopyComponent(0, values, 0);
   }
-#endif
 }
 
 //-----------------------------------------------------------------------------
 vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 {
-#ifdef VTKGL2
   return this->Internals->ArrayHolder.GetPointer();
-#else
-  return NULL;
-#endif
 }
 
 //----------------------------------------------------------------------------

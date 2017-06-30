@@ -14,17 +14,13 @@
 =========================================================================*/
 #include "vtkGeometryRepresentation.h"
 
-#include "vtkCompositePolyDataMapper2.h"
-#ifndef VTKGL2
-#include "vtkHardwareSelectionPolyDataPainter.h"
-#include "vtkShadowMapBakerPass.h"
-#endif
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -163,20 +159,10 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
-#ifdef VTKGL2
   mapper->SetPointIdArrayName("vtkOriginalPointIds");
   mapper->SetCellIdArrayName("vtkOriginalCellIds");
   mapper->SetProcessIdArrayName("vtkProcessId");
   mapper->SetCompositeIdArrayName("vtkCompositeIndex");
-#else
-  vtkHardwareSelectionPolyDataPainter* selPainter =
-    vtkHardwareSelectionPolyDataPainter::SafeDownCast(
-      mapper->GetSelectionPainter()->GetDelegatePainter());
-  selPainter->SetPointIdArrayName("vtkOriginalPointIds");
-  selPainter->SetCellIdArrayName("vtkOriginalCellIds");
-  selPainter->SetProcessIdArrayName("vtkProcessId");
-  selPainter->SetCompositeIdArrayName("vtkCompositeIndex");
-#endif
 
   this->Mapper = mapper;
   this->LODMapper = vtkCompositePolyDataMapper2::New();
@@ -697,21 +683,6 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
       this->Property->SetEdgeVisibility(0);
       this->Property->SetRepresentation(this->Representation);
   }
-
-// Update shadow map properties, in case we are using shadow maps.
-#ifndef VTKGL2
-  if (this->Representation == SURFACE || this->Representation == SURFACE_WITH_EDGES)
-  {
-    // just add these keys, their values don't matter.
-    this->Actor->GetPropertyKeys()->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
-    this->Actor->GetPropertyKeys()->Set(vtkShadowMapBakerPass::RECEIVER(), 0);
-  }
-  else
-  {
-    this->Actor->GetPropertyKeys()->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
-    this->Actor->GetPropertyKeys()->Remove(vtkShadowMapBakerPass::RECEIVER());
-  }
-#endif
 }
 
 //----------------------------------------------------------------------------

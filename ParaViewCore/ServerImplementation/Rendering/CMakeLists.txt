@@ -34,8 +34,6 @@ set (Module_SRCS
   vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
 )
 
-add_definitions(-DVTKGL2)
-
 #------------------------------------------------------------------------------
 vtk_module_library(vtkPVServerImplementationRendering
   ${Module_SRCS})

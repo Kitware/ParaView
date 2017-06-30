@@ -106,7 +106,6 @@ set (Module_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-add_definitions(-DVTKGL2)
 list(APPEND Module_SRCS
   vtkPointGaussianRepresentation.cxx)
 

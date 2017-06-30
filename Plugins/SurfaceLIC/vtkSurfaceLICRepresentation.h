@@ -25,11 +25,7 @@
 class vtkInformation;
 class vtkInformationRequestKey;
 
-#ifndef VTKGL2
-class vtkSurfaceLICPainter;
-#else
 class vtkCompositeSurfaceLICMapper;
-#endif
 
 class VTK_EXPORT vtkSurfaceLICRepresentation : public vtkGeometryRepresentation
 {
@@ -106,13 +102,8 @@ protected:
   // Overridden method to set parameters on vtkProperty and vtkMapper.
   void UpdateColoringParameters() VTK_OVERRIDE;
 
-#ifndef VTKGL2
-  vtkSurfaceLICPainter* Painter;
-  vtkSurfaceLICPainter* LODPainter;
-#else
   vtkCompositeSurfaceLICMapper* SurfaceLICMapper;
   vtkCompositeSurfaceLICMapper* SurfaceLICLODMapper;
-#endif
 
   bool UseLICForLOD;
 

@@ -41,9 +41,6 @@
 #include "vtkThreeSliceFilter.h"
 #include "vtkVector.h"
 
-#ifndef VTKGL2
-#include "vtkHardwareSelectionPolyDataPainter.h"
-#endif
 #include <cassert>
 #include <vector>
 namespace
@@ -223,18 +220,9 @@ void vtkGeometrySliceRepresentation::SetupDefaults()
   vtkMath::UninitializeBounds(this->Internals->OriginalDataBounds);
   this->Superclass::SetupDefaults();
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-#ifdef VTKGL2
   mapper->SetPointIdArrayName("-");
   mapper->SetCellIdArrayName("vtkSliceOriginalCellIds");
   mapper->SetCompositeIdArrayName("vtkSliceCompositeIndex");
-#else
-  vtkHardwareSelectionPolyDataPainter* selPainter =
-    vtkHardwareSelectionPolyDataPainter::SafeDownCast(
-      mapper->GetSelectionPainter()->GetDelegatePainter());
-  selPainter->SetPointIdArrayName("-");
-  selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
-  selPainter->SetCompositeIdArrayName("vtkSliceCompositeIndex");
-#endif
 
   this->Internals->OutlineMapper->SetInputConnection(
     this->Internals->OutlineSource->GetOutputPort());

@@ -13,8 +13,6 @@ set_source_files_properties(
   vtkPVView
   ABSTRACT)
 
-add_definitions(-DVTKGL2)
-
 #set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
 
 # Use a custom hints file for this module.

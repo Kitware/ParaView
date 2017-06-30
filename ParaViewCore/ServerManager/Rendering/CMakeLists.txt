@@ -131,5 +131,4 @@ set_source_files_properties(
   HEADER_FILE_ONLY
   WRAP_EXCLUDE)
 #-----------------------------------------------------------------------------
-add_definitions(-DVTKGL2)
 vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})

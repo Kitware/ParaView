@@ -58,8 +58,6 @@ set (Module_SRCS
   vtkSMXYChartRepresentationInitializationHelper.cxx
 )
 
-add_definitions(-DVTKGL2)
-
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx
   ABSTRACT

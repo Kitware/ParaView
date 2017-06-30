@@ -37,8 +37,6 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 
-add_definitions(-DVTKGL2)
-
 vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
 
 #------------------------------------------------------------------------------
