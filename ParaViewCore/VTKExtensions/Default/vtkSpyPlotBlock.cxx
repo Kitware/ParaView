@@ -89,12 +89,6 @@ unsigned char vtkSpyPlotBlock::GetDebug() const
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSpyPlotBlock::GetClassName() const
-{
-  return "vtkSpyPlotBlock";
-}
-
-//-----------------------------------------------------------------------------
 // world space
 void vtkSpyPlotBlock::GetBounds(double bounds[6]) const
 {
@@ -281,12 +275,12 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
   int i, j, hasBadGhostCells = 0;
   int vectorsWereFixed = 0;
 
-  vtkDebugMacro("Vectors for block: ");
-  vtkDebugMacro("  X: " << this->XYZArrays[0]->GetNumberOfTuples());
-  vtkDebugMacro("  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
-  vtkDebugMacro("  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
-  vtkDebugMacro(<< __LINE__ << " Dims: " << coutVector3(this->Dimensions));
-  vtkDebugMacro(<< __LINE__ << " Bool: " << this->IsFixed());
+  vtkDebugWithObjectMacro(NULL, "Vectors for block: ");
+  vtkDebugWithObjectMacro(NULL, "  X: " << this->XYZArrays[0]->GetNumberOfTuples());
+  vtkDebugWithObjectMacro(NULL, "  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
+  vtkDebugWithObjectMacro(NULL, "  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
+  vtkDebugWithObjectMacro(NULL, " Dims: " << coutVector3(this->Dimensions));
+  vtkDebugWithObjectMacro(NULL, " Bool: " << this->IsFixed());
 
   double minV, maxV;
   for (i = 0, j = 0; i < 3; i++, j++)
@@ -302,7 +296,8 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
 
     minV = MinBlockBound(i);
     maxV = MaxBlockBound(i);
-    vtkDebugMacro("Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
+    vtkDebugWithObjectMacro(
+      NULL, "Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
     ca[i] = this->XYZArrays[i];
     if (minV < minP[i])
     {
@@ -377,14 +372,14 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream)
   // Read in the dimensions of the block
   if (!stream->ReadInt32s(this->Dimensions, 3))
   {
-    vtkErrorMacro("Could not read in block's dimensions");
+    vtkErrorWithObjectMacro(NULL, "Could not read in block's dimensions");
     return 0;
   }
 
   // Read in the allocation state of the block
   if (!stream->ReadInt32s(&temp, 1))
   {
-    vtkErrorMacro("Could not read in block's allocated state");
+    vtkErrorWithObjectMacro(NULL, "Could not read in block's allocated state");
     return 0;
   }
   if (temp)
@@ -399,7 +394,7 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream)
   // Read in the active state of the block
   if (!stream->ReadInt32s(&temp, 1))
   {
-    vtkErrorMacro("Could not read in block's active state");
+    vtkErrorWithObjectMacro(NULL, "Could not read in block's active state");
     return 0;
   }
   if (temp)
@@ -414,7 +409,7 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream)
   // Read in the level of the block
   if (!stream->ReadInt32s(&(this->Level), 1))
   {
-    vtkErrorMacro("Could not read in block's level");
+    vtkErrorWithObjectMacro(NULL, "Could not read in block's level");
     return 0;
   }
 
@@ -424,7 +419,7 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream)
     int buffer[6];
     if (!stream->ReadInt32s(buffer, 6))
     {
-      vtkErrorMacro("Could not read in block's bounding box");
+      vtkErrorWithObjectMacro(NULL, "Could not read in block's bounding box");
       return 0;
     }
   }
@@ -508,18 +503,6 @@ int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream* stream, unsigned char* isAllocated,
   }
 
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::HasObserver(const char*) const
-{
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::InvokeEvent(const char*, void*) const
-{
-  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -779,7 +762,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
 
   if (!this->XYZArrays[dir])
   {
-    vtkErrorMacro("Coordinate Array has not been allocated");
+    vtkErrorWithObjectMacro(NULL, "Coordinate Array has not been allocated");
     return 0;
   }
 
@@ -802,8 +785,8 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorMacro("Problem doing RLD decode. "
-            << "Too much data generated. Excpected: " << compSize);
+          vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
+              << "Too much data generated. Excpected: " << compSize);
           return 0;
         }
         comp[compIndex] = val + compIndex * delta;
@@ -818,8 +801,8 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
       {
         if (compIndex >= compSize)
         {
-          vtkErrorMacro("Problem doing RLD decode. "
-            << "Too much data generated. Excpected: " << compSize);
+          vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
+              << "Too much data generated. Excpected: " << compSize);
           return 0;
         }
         float nval;
