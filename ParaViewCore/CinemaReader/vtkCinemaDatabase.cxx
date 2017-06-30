@@ -23,7 +23,9 @@
 #include "vtkPythonUtil.h"
 #include "vtkSmartPyObject.h"
 
+#include <algorithm>
 #include <cassert>
+#include <sstream>
 #include <string>
 
 namespace
@@ -330,6 +332,23 @@ public:
     return std::vector<std::string>();
   }
 
+  std::vector<double> GetControlParameterValuesAsDouble(const std::string& name) const
+  {
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject retVal(PyObject_CallMethod(this->FileStore,
+      const_cast<char*>("get_control_values"), const_cast<char*>("s"), name.c_str()));
+    if (!retVal)
+    {
+      PyErr_Print();
+      PyErr_Clear();
+    }
+    else if (PyList_Check(retVal))
+    {
+      return PyListToVectorOfDoubles(retVal);
+    }
+    return std::vector<double>();
+  }
+
   std::vector<std::string> GetTimeSteps() const
   {
     vtkPythonScopeGilEnsurer gilEnsurer;
@@ -379,6 +398,28 @@ public:
     {
       return PyListToVectorOfVTKObjects<vtkCamera>(retVal);
     }
+  }
+
+  std::string GetSpec() const
+  {
+    vtkPythonScopeGilEnsurer gilEnsurer;
+    vtkSmartPyObject retVal(
+      PyObject_CallMethod(this->FileStore, const_cast<char*>("get_spec"), NULL));
+    if (!retVal)
+    {
+      PyErr_Print();
+      PyErr_Clear();
+    }
+    if (PyString_Check(retVal))
+    {
+      return std::string(PyString_AsString(retVal));
+    }
+    else if (PyUnicode_Check(retVal))
+    {
+      vtkSmartPyObject objLatin1(PyUnicode_AsLatin1String(retVal));
+      return std::string(PyString_AsString(objLatin1));
+    }
+    return std::string();
   }
 };
 
@@ -438,8 +479,18 @@ std::vector<std::string> vtkCinemaDatabase::GetControlParameters(const std::stri
 //----------------------------------------------------------------------------
 std::vector<std::string> vtkCinemaDatabase::GetControlParameterValues(const std::string& name) const
 {
-  return this->Internals->IsLoaded() ? this->Internals->GetControlParameterValues(name)
-                                     : std::vector<std::string>();
+  if (!this->Internals->IsLoaded())
+  {
+    return std::vector<std::string>();
+  }
+
+  std::vector<std::string> parameters = this->GetControlParameters(name);
+  if (std::find(parameters.begin(), parameters.end(), name) != parameters.end())
+  {
+    return this->Internals->GetControlParameterValues(name);
+  }
+
+  return std::vector<std::string>();
 }
 
 //----------------------------------------------------------------------------
@@ -485,6 +536,65 @@ std::vector<vtkSmartPointer<vtkCamera> > vtkCinemaDatabase::Cameras(
   return this->Internals->IsLoaded() ? this->Internals->Cameras(timestep)
                                      : std::vector<vtkSmartPointer<vtkCamera> >();
 }
+
+//----------------------------------------------------------------------------
+int vtkCinemaDatabase::GetSpec() const
+{
+  std::string spec = this->Internals->IsLoaded() ? this->Internals->GetSpec() : std::string("");
+  int res = Spec::UNKNOWN;
+  if (spec == "specA")
+  {
+    res = Spec::CINEMA_SPEC_A;
+  }
+  else if (spec == "specC")
+  {
+    res = Spec::CINEMA_SPEC_C;
+  }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkCinemaDatabase::GetNearestParameterValue(
+  const std::string& param, double value) const
+{
+  if (!this->Internals->IsLoaded())
+  {
+    return std::string();
+  }
+
+  std::vector<double> values = this->Internals->GetControlParameterValuesAsDouble(param);
+  std::vector<double>::iterator valIterator;
+  valIterator = std::lower_bound(values.begin(), values.end(), value);
+
+  double result = value;
+  if (*valIterator != value)
+  {
+    if (valIterator == values.begin())
+    {
+      // value is lower than all values, take the first
+      result = *valIterator;
+    }
+    else if (valIterator == values.end())
+    {
+      // value is higher than all, take the last
+      --valIterator;
+      result = *valIterator;
+    }
+    else
+    {
+      // take the nearest
+      double upper = *valIterator;
+      --valIterator;
+      double lower = *valIterator;
+      result = std::abs(result - lower) > std::abs(upper - result) ? upper : lower;
+    }
+  }
+
+  std::ostringstream ostr;
+  ostr << result;
+  return ostr.str();
+}
+
 //----------------------------------------------------------------------------
 void vtkCinemaDatabase::PrintSelf(ostream& os, vtkIndent indent)
 {

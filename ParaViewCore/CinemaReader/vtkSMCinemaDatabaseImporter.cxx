@@ -165,28 +165,36 @@ void vtkSMCinemaDatabaseImporter::AddPropertiesForControls(vtkSMSelfGeneratingSo
   for (vtkPVCinemaDatabaseInformation::VectorOfStrings::const_iterator iter = controlParams.begin();
        iter != controlParams.end(); ++iter)
   {
+    if (*iter == "phi" || *iter == "theta")
+    {
+      continue;
+    }
+
     // We may want to revisit this. For now, I am just putting everything in an
     // enumeration domain since that makes it easier given what we already
     // have.
     const vtkPVCinemaDatabaseInformation::VectorOfStrings& values =
       cinfo->GetControlParameterValues(*iter);
-    str << "<IntVectorProperty name='" << iter->c_str() << "'          "
+    str << "<DoubleVectorProperty name='" << iter->c_str() << "'       "
         << "                   initial_string='" << iter->c_str() << "'"
         << "                   clean_command='ClearControlParameter'   "
         << "                   command='EnableControlParameterValue'   "
-        << "                   repeat_command='1'                      "
-        << "                   number_of_elements_per_command='1' >    "
-        << " <EnumerationDomain name='enum'>                           ";
-    for (size_t cc = 0; cc < values.size(); ++cc)
+        << "                   animateable='1'                         "
+        << "                   default_values='" << values[0] << "'    "
+        << "                   number_of_elements='1' >                "
+        << " <DiscreteDoubleDomain name='enum'                         "
+        << " values = '";
+    for (unsigned int i = 0; i < values.size(); i++)
     {
-      str << "   <Entry value='" << cc << "' text='" << values[cc].c_str() << "' />";
+      str << values[i] << " ";
     }
-    str << " </EnumerationDomain>                                    "
-        << "</IntVectorProperty>";
+    str << "' />"
+        << "</DoubleVectorProperty>";
   }
   str << "</Proxy>";
   reader->ExtendDefinition(str.str().c_str());
 }
+
 //----------------------------------------------------------------------------
 void vtkSMCinemaDatabaseImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
