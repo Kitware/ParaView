@@ -4413,7 +4413,7 @@ array.
         per piece will be chosen at random; otherwise the unique value will
         match the id of the process.</Documentation>
       </IntVectorProperty>
-      <!-- End PieceScalars -->
+      <!-- End ProcessIdScalars -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointDataToCellData"
@@ -10949,6 +10949,27 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRemoveGhosts"
+                 label="Remove Ghost Information"
+                 name="RemoveGhostInformation">
+      <Documentation long_help="Removes ghost information."
+                     short_help="Removes ghost information.">Removes ghost
+      cells and point data and cell data ghost arrays.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the remove ghost
+        information filter.</Documentation>
       </InputProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
