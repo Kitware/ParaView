@@ -1,10 +1,12 @@
 <RCC>
   <qresource prefix="/pqApplicationComponents">
-    <file>Thumbnails/CanExample.png</file>
-    <file>Thumbnails/DiskOutRefExample.png</file>
-    <file>Thumbnails/WaveletExample.png</file>
     <file>ExampleVisualizations/CanExample.pvsm</file>
     <file>ExampleVisualizations/DiskOutRefExample.pvsm</file>
+    <file>ExampleVisualizations/HotGasAnalysisExample.pvsm</file>
     <file>ExampleVisualizations/WaveletExample.pvsm</file>
+    <file>Thumbnails/CanExample.png</file>
+    <file>Thumbnails/DiskOutRefExample.png</file>
+    <file>Thumbnails/HotGasAnalysisExample.png</file>
+    <file>Thumbnails/WaveletExample.png</file>
   </qresource>
 </RCC>
