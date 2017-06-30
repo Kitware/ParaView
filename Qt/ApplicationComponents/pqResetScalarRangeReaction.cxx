@@ -41,8 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -161,8 +163,10 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
   repr->renderViewEventually();
   if (vtkSMProxy* lut = lutProxy(repr))
   {
-    // See BUG #17144. We unset LockScalarRange when resetting to data range.
-    vtkSMPropertyHelper(lut, "LockScalarRange").Set(0);
+    // Set the AutomaticRescaleMode to the current global setting.
+    vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
+    tfProxy->ResetRescaleModeToGlobalSetting();
+
     lut->UpdateVTKObjects();
   }
   END_UNDO_SET();
@@ -223,7 +227,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
     // explicitly (BUG #14371).
     if (dialog.lock())
     {
-      vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
+      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Set(vtkPVGeneralSettings::NEVER);
       lut->UpdateVTKObjects();
     }
     END_UNDO_SET();
@@ -267,13 +271,13 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
 
-    // disable auto-rescale of transfer function since the user has set on
+    // disable auto-rescale of transfer function since the user has set one
     // explicitly (BUG #14371).
     if (retcode == static_cast<int>(QDialog::Accepted) + 1)
     {
       if (vtkSMProxy* lut = lutProxy(repr))
       {
-        vtkSMPropertyHelper(lut, "LockScalarRange").Set(1);
+        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Set(vtkPVGeneralSettings::NEVER);
         lut->UpdateVTKObjects();
       }
     }

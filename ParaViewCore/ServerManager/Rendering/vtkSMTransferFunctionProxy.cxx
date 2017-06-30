@@ -27,6 +27,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTrace.h"
@@ -923,6 +924,15 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
       this->ResetPropertiesToXMLDefaults();
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTransferFunctionProxy::ResetRescaleModeToGlobalSetting()
+{
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
+  int globalResetMode = vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
+  vtkSMPropertyHelper(this, "AutomaticRescaleMode").Set(globalResetMode);
 }
 
 //----------------------------------------------------------------------------

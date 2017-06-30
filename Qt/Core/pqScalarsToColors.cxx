@@ -33,8 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QList>
 #include <QPointer>
@@ -101,10 +104,20 @@ pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderViewBase* ren
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRangeLock(bool lock)
 {
-  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
+  vtkSMProperty* prop = this->getProxy()->GetProperty("AutomaticRescaleRangeMode");
   if (prop)
   {
-    pqSMAdaptor::setElementProperty(prop, (lock ? 1 : 0));
+    if (lock)
+    {
+      pqSMAdaptor::setElementProperty(prop, vtkPVGeneralSettings::NEVER);
+    }
+    else
+    {
+      // Reset the AutomaticRescaleMode to the current global setting.
+      vtkSMTransferFunctionProxy* tfProxy =
+        vtkSMTransferFunctionProxy::SafeDownCast(this->getProxy());
+      tfProxy->ResetRescaleModeToGlobalSetting();
+    }
   }
   this->getProxy()->UpdateVTKObjects();
 }
@@ -112,8 +125,8 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
 //-----------------------------------------------------------------------------
 bool pqScalarsToColors::getScalarRangeLock() const
 {
-  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
-  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() != 0)
+  vtkSMProperty* prop = this->getProxy()->GetProperty("AutomaticRescaleRangeMode");
+  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() == vtkPVGeneralSettings::NEVER)
   {
     return true;
   }
