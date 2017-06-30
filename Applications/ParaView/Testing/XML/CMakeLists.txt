@@ -436,18 +436,16 @@ if(NOT APPLE)
     )
 endif()
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  list(APPEND TESTS_WITH_BASELINES
-    # This test makes use of "Point Gaussian" representation, only available with OpenGL2
-    ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundColorCheck.xml
+list(APPEND TESTS_WITH_BASELINES
+  # This test makes use of "Point Gaussian" representation, only available with OpenGL2
+  ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundColorCheck.xml
 
-    # PlotMatrixView is bugging in OpenGL1
-    ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
+  # PlotMatrixView is bugging in OpenGL1
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotMatrixViewArraySelection.xml
 
-    # Composite Glyph Trees are only implemented in OpenGL2
-    ${CMAKE_CURRENT_SOURCE_DIR}/CompositeGlyphTree.xml
-    )
-endif()
+  # Composite Glyph Trees are only implemented in OpenGL2
+  ${CMAKE_CURRENT_SOURCE_DIR}/CompositeGlyphTree.xml
+  )
 
 if (PARAVIEW_USE_MPI)
   list(APPEND TESTS_WITH_BASELINES
@@ -554,9 +552,7 @@ if(PARAVIEW_ENABLE_PYTHON)
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
-  endif()
 
-  if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2" AND numpy_found)
     # Cinema importing capabilities are only available in Python + OpenGL2
     # add the cinema database files.
     paraview_test_load_data("" "cinema-composite.cdb/image/info.json")

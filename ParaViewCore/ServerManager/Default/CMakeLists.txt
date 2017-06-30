@@ -58,9 +58,7 @@ set (Module_SRCS
   vtkSMXYChartRepresentationInitializationHelper.cxx
 )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
+add_definitions(-DVTKGL2)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx

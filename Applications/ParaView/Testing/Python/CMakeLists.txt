@@ -75,9 +75,7 @@ set(PVBATCH_TESTS
   )
 
 # Tests only concerning GL2.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  list(APPEND PVBATCH_TESTS VolumeCellSelection.py)
-endif ()
+list(APPEND PVBATCH_TESTS VolumeCellSelection.py)
 
 foreach (tfile IN LISTS PVBATCH_TESTS)
   get_filename_component(test ${tfile} NAME_WE)

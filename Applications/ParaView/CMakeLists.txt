@@ -57,9 +57,6 @@ endif()
 set(SUPPORT_STATIC_PLUGINS TRUE)
 
 set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  set(title "${title} (Legacy Rendering Backend)")
-endif()
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview

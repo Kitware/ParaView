@@ -92,10 +92,6 @@
       { "name": "Module_vtkImagingColor",
         "type": "BOOL",
         "value": "ON"
-      },
-      { "name": "VTK_RENDERING_BACKEND",
-        "type": "STRING",
-        "value": "OpenGL2"
       }
     ]
   },

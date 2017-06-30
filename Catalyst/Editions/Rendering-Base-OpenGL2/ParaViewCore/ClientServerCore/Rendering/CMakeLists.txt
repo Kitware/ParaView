@@ -13,9 +13,7 @@ set_source_files_properties(
   vtkPVView
   ABSTRACT)
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
+add_definitions(-DVTKGL2)
 
 #set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
 

@@ -6,9 +6,7 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
+add_definitions(-DVTKGL2)
 
 vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
 vtk_mpi_link(vtkPVVTKExtensionsRendering)

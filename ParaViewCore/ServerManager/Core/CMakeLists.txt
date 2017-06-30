@@ -156,8 +156,5 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMUncheckedPropertyHelper
   WRAP_EXCLUDE)
 
-# OpenGL2 specific definitions
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
+add_definitions(-DVTKGL2)
 vtk_module_library(vtkPVServerManagerCore ${Module_SRCS})

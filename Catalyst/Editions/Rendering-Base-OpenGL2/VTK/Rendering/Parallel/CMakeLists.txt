@@ -30,9 +30,7 @@ foreach(file ${shader_files})
     )
 endforeach()
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTK_OPENGL2)
-endif()
+add_definitions(-DVTK_OPENGL2)
 
 include(vtkOpenGL)
 vtk_module_library(vtkRenderingParallel ${Module_SRCS})

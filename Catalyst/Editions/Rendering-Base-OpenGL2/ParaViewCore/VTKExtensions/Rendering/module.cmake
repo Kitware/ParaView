@@ -16,14 +16,7 @@ endif()
 if (PARAVIEW_ENABLE_QT_SUPPORT)
   list(APPEND __dependencies vtkGUISupportQt)
 endif()
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  #list(APPEND __dependencies vtkRenderingLIC)
-  if (PARAVIEW_USE_MPI)
-    #list (APPEND __dependencies vtkRenderingParallelLIC)
-  endif()
-else()
-  list(APPEND __dependencies vtkglew)
-endif()
+list(APPEND __dependencies vtkglew)
 
 if(PARAVIEW_USE_OSPRAY)
   #list(APPEND __dependencies vtkRenderingOSPRay)
@@ -40,13 +33,13 @@ if (Module_vtkRenderingCore)
     vtkFiltersParallel
     vtkFiltersParallelMPI
     vtkIOExport
-    vtkIOExport${VTK_RENDERING_BACKEND}
+    vtkIOExportOpenGL2
     vtkIOImage
     vtkIOXML
     vtkInteractionStyle
     vtkParallelMPI
     vtkRenderingAnnotation
-    vtkRendering${VTK_RENDERING_BACKEND}
+    vtkRenderingOpenGL2
     vtkRenderingParallel
     vtkicet
     vtklz4)

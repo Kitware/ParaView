@@ -12,11 +12,5 @@ else()
   # we're building from within ParaView Source.
 endif()
 
-if(VTK_RENDERING_BACKEND STREQUAL "OpenGL")
-  # process all vtk-modules defined in this plugin. This generates the necessary
-  # wrappings for all these modules as well.
-  pv_process_modules()
-endif()
-
 # Process the ParaView plugin.
 add_subdirectory(ParaViewPlugin)

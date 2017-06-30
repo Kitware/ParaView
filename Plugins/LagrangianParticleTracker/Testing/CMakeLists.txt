@@ -18,12 +18,10 @@ if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
   add_client_tests("pv"
     LOAD_PLUGIN "LagrangianParticleTracker"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelperNone.xml)
-  if(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
-    add_client_tests("pv"
-      LOAD_PLUGIN "LagrangianParticleTracker"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelperComposite.xml)
-  endif()
+  add_client_tests("pv"
+    LOAD_PLUGIN "LagrangianParticleTracker"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelperComposite.xml)
   add_client_tests("pv"
     LOAD_PLUGIN "LagrangianParticleTracker"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
