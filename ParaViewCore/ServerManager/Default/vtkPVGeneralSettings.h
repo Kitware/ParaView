@@ -119,6 +119,7 @@ public:
    */
   enum
   {
+    NEVER = -1,
     GROW_ON_APPLY = 0,
     GROW_ON_APPLY_AND_TIMESTEP = 1,
     RESET_ON_APPLY = 2,
