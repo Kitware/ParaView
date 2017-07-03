@@ -193,7 +193,7 @@ public:
    */
   void PrepareForScreenshot() {}
   void CleanupAfterScreenshot() {}
-  vtkImageData* CaptureWindow(int magnification);
+  vtkImageData* CaptureWindow(int magX, int magY);
 
 protected:
   vtkPVComparativeView();

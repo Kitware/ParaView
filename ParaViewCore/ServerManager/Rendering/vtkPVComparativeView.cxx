@@ -939,14 +939,14 @@ void vtkPVComparativeView::GetViews(vtkCollection* collection)
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
+vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
 {
   std::vector<vtkSmartPointer<vtkImageData> > images;
 
   vtkPVComparativeViewNS::vtkCloningVectorOfViews* views = this->Internal->Views.Get();
   for (size_t cc = 0, max = views->GetNumberOfItems(); cc < max; ++cc)
   {
-    vtkImageData* image = views->GetView(cc)->CaptureWindow(magnification);
+    vtkImageData* image = views->GetView(cc)->CaptureWindow(magX, magY);
     if (image)
     {
       images.push_back(image);

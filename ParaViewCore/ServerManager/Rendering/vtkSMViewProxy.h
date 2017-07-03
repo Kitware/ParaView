@@ -113,13 +113,18 @@ public:
    */
   virtual vtkSMRepresentationProxy* FindRepresentation(vtkSMSourceProxy* producer, int outputPort);
 
+  //@{
   /**
    * Captures a image from this view. Default implementation returns NULL.
    * Subclasses should override CaptureWindowInternal() to do the actual image
    * capture.
    */
-  vtkImageData* CaptureWindow(int magnification);
-
+  vtkImageData* CaptureWindow(int magnification)
+  {
+    return this->CaptureWindow(magnification, magnification);
+  }
+  vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
+  //@}
   /**
    * Returns the client-side vtkView, if any.
    */
@@ -130,6 +135,8 @@ public:
    * the vtkImageWriter subclass to use.
    */
   int WriteImage(const char* filename, const char* writerName, int magnification = 1);
+  int WriteImage(
+    const char* filename, const char* writerName, int magnificationX, int magnificationY);
 
   /**
    * Return true any internal representation is dirty. This can be usefull to
@@ -222,7 +229,8 @@ protected:
    * @returns A new vtkImageData instance or nullptr. Caller is responsible for
    *          calling `vtkImageData::Delete()` on the returned non-null value.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification);
+  virtual vtkImageData* CaptureWindowInternal(int) final { return nullptr; }
+  virtual vtkImageData* CaptureWindowInternal(int magnificationX, int magnificationY);
 
   /**
    * This method is called whenever the view wants to render to during image
@@ -278,7 +286,7 @@ private:
   void ViewTimeChanged();
 
   // Actual logic for taking a screenshot.
-  vtkImageData* CaptureWindowSingle(int magnification);
+  vtkImageData* CaptureWindowSingle(int magnificationX, int magnificationY);
   class vtkRendererSaveInfo;
   vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
   void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);

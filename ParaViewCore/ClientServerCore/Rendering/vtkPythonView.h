@@ -85,8 +85,8 @@ public:
   /**
    * Magnification is needed to inform Python of the requested size of the plot
    */
-  vtkSetMacro(Magnification, int);
-  vtkGetMacro(Magnification, int);
+  vtkSetVector2Macro(Magnification, int);
+  vtkGetVector2Macro(Magnification, int);
   //@}
 
   /**
@@ -183,7 +183,7 @@ protected:
   vtkSmartPointer<vtkRenderWindow> RenderWindow;
 
   // Needed to handle rendering at different magnifications
-  int Magnification;
+  int Magnification[2];
 
   /**
    * Is local data available?

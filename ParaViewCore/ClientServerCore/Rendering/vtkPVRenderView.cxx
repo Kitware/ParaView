@@ -2965,7 +2965,7 @@ void vtkPVRenderView::CaptureZBuffer()
     this->Internals->ZGrabber->ReadFrontBufferOff();
     this->Internals->ZGrabber->FixBoundaryOff();
     this->Internals->ZGrabber->ShouldRerenderOn();
-    this->Internals->ZGrabber->SetMagnification(1);
+    this->Internals->ZGrabber->SetScale(1, 1);
     this->Internals->ZGrabber->SetInputBufferTypeToZBuffer();
     this->Internals->ZGrabber->Modified();
     this->Internals->ZGrabber->Update();

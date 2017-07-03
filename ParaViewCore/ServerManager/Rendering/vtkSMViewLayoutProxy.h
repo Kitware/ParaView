@@ -212,10 +212,16 @@ public:
    */
   void ShowViewsOnTileDisplay();
 
+  //@{
   /**
    * Captures an image from the layout (including all the views in the layout.
    */
-  vtkImageData* CaptureWindow(int magnification);
+  vtkImageData* CaptureWindow(int magnification)
+  {
+    return this->CaptureWindow(magnification, magnification);
+  }
+  vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
+  //@}
 
   /**
    * Overridden to save custom XML state.

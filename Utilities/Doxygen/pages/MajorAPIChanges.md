@@ -4,10 +4,20 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+
+Changes in 5.5
+--------------
+
+###Changes to vtkSMViewProxy::CaptureWindowInternal###
+
+`vtkSMViewProxy::CaptureWindowInternal` now takes a 2-component magnification
+factor rather than a single component. That allows for more accurate target image
+resolution than before (see #17567).
+
 Changes in 5.4
 --------------
 
-### Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
+###Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
 
 As a result of this change, `vtkAppendArcLength` was moved from
 the `internal_filters` to the `filters` group.

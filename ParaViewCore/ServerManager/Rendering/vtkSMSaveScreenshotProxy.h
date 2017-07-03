@@ -80,7 +80,26 @@ public:
     vtkSMViewLayoutProxy* view, const vtkVector2i& size);
 
   /**
-   * Compute magnification factor and new size for target resolution.
+   * Compute scale factors and new size for target resolution. This determines
+   * integral scale factors (in X and Y) to get a box of size of \c targetSize from a
+   * box of maximum size specified by \c size. If \c approximate is non-null,
+   * then it is set to true when there no way to do that (e.g. one of the
+   * components of the \c targetSize is prime and doesn't match \c size).
+   *
+   * On success, returns the scale factors and modifies \c size such that size *
+   * scaleFactors == targetSize is possible. If not, size * scaleFactors <
+   * targetSize and approximate if non-null, is set to true.
+   *
+   */
+  static vtkVector2i GetScaleFactorsAndSize(
+    const vtkVector2i& targetSize, vtkVector2i& size, bool* approximate = nullptr);
+
+  /**
+   * Compute a single magnification factor to reach \c targetSize using a box
+   * that fits within \c size. This implementation is inaccurate and may not give
+   * target resolution correctly. Hence `GetScaleFactorsAndSize` should be preferred.
+   * This method is useful when the interest is in preserving the target aspect
+   * ratio as closely as possible than reaching the target size.
    */
   static int ComputeMagnification(const vtkVector2i& targetSize, vtkVector2i& size);
 
