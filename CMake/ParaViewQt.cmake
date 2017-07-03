@@ -77,8 +77,12 @@ macro(pv_find_package_qt out_targets_var)
 
   # Warn is Qt version is less than the official version.
   if(_qt_version VERSION_LESS _qt_official_version)
-    message(WARNING "You are using Qt ${_qt_version}. "
-      "Officially supported version is ${_qt_official_version}")
+    get_property(_warned GLOBAL PROPERTY PARAVIEW_QT_VERSION_WARNING_GENERATED SET)
+    if(NOT _warned)
+      message(WARNING "Qt '${_qt_version}' found and will be used. "
+        "Note, however, that the officially supported version is ${_qt_official_version}.")
+      set_property(GLOBAL PROPERTY PARAVIEW_QT_VERSION_WARNING_GENERATED TRUE)
+    endif()
   endif()
 
   # Add all imported components, we setup a variable that refers to the imported targets.
