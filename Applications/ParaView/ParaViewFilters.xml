@@ -171,6 +171,7 @@
   <Proxy group="filters" name="Delaunay2D" />
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="ElevationFilter" />
+  <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
