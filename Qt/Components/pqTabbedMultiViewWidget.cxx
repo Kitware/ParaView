@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 
 #include <QEvent>
+#include <QGridLayout>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMenu>
@@ -61,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QTabBar>
 #include <QTabWidget>
-#include <QVBoxLayout>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
       this->InPreviewMode = false;
       this->tabBar()->setVisible(this->TabBarVisibility);
       this->setDocumentMode(false);
-      this->parentWidget()->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+      this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
       if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
       {
         widget->setForceSplitter(false);
@@ -208,13 +208,15 @@ bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
     bool retval = true;
 
     const vtkVector2i tsize(nsize.width(), nsize.height());
-    vtkVector2i csize(this->size().width(), this->size().height());
-    int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
+    // max available size is clamped by parent widget's contentsRect.
+    const QRect crect = this->parentWidget()->contentsRect();
+    vtkVector2i csize(crect.width(), crect.height());
+    const int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
     if (magnification > 1)
     {
       retval = false; // cannot respect size. using aspect ratio only.
     }
-    this->parentWidget()->setMaximumSize(QSize(csize[0], csize[1]));
+    this->setMaximumSize(QSize(csize[0], csize[1]));
 
     if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
     {
@@ -282,11 +284,10 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   connect(this->Internals->TabWidget->tabBar(), SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(contextMenuRequested(const QPoint&)));
 
-  QVBoxLayout* vbox = new QVBoxLayout();
-  this->setLayout(vbox);
-  vbox->setMargin(0);
-  vbox->setSpacing(0);
-  vbox->addWidget(this->Internals->TabWidget);
+  QGridLayout* glayout = new QGridLayout(this);
+  glayout->setMargin(0);
+  glayout->setSpacing(0);
+  glayout->addWidget(this->Internals->TabWidget, 0, 0);
 
   pqApplicationCore* core = pqApplicationCore::instance();
 
@@ -369,11 +370,10 @@ void pqTabbedMultiViewWidget::toggleFullScreen()
     fullScreenWindow->setObjectName("FullScreenWindow");
     this->layout()->removeWidget(this->Internals->TabWidget);
 
-    QVBoxLayout* vbox = new QVBoxLayout(fullScreenWindow);
-    vbox->setSpacing(0);
-    vbox->setMargin(0);
-
-    vbox->addWidget(this->Internals->TabWidget);
+    QGridLayout* glayout = new QGridLayout(fullScreenWindow);
+    glayout->setSpacing(0);
+    glayout->setMargin(0);
+    glayout->addWidget(this->Internals->TabWidget, 0, 0);
     fullScreenWindow->showFullScreen();
     fullScreenWindow->show();
 
@@ -788,65 +788,3 @@ void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item
     }
   }
 }
-
-//=================================================================================
-// LEGACY METHODS
-//=================================================================================
-#if !defined(VTK_LEGACY_REMOVE)
-//-----------------------------------------------------------------------------
-vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
-{
-  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::captureImage, "ParaView 5.4");
-
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    vtkSmartPointer<vtkImageData> img =
-      vtkSMSaveScreenshotProxy::CaptureImage(widget->layoutManager(), vtkVector2i(dx, dy));
-    if (img)
-    {
-      img->Register(nullptr);
-      return img.GetPointer();
-    }
-    return nullptr;
-  }
-  return nullptr;
-}
-
-//-----------------------------------------------------------------------------
-int pqTabbedMultiViewWidget::prepareForCapture(int, int)
-{
-  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::prepareForCapture, "ParaView 5.4");
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::cleanupAfterCapture()
-{
-  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::cleanupAfterCapture, "ParaView 5.4");
-}
-
-//-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::writeImage(const QString& filename, int dx, int dy, int quality)
-{
-  VTK_LEGACY_BODY(pqTabbedMultiViewWidget::writeImage, "ParaView 5.4");
-
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    vtkSmartPointer<vtkImageData> img =
-      vtkSMSaveScreenshotProxy::CaptureImage(widget->layoutManager(), vtkVector2i(dx, dy));
-    if (img)
-    {
-      return vtkSMUtilities::SaveImage(img.GetPointer(), filename.toLocal8Bit().data(), quality) ==
-        vtkErrorCode::NoError;
-    }
-  }
-
-  return true;
-}
-
-#endif // !defined(VTK_LEGACY_REMOVE)
-//=================================================================================
