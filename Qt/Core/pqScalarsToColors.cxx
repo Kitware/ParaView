@@ -113,7 +113,7 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
     }
     else
     {
-      // Reset the AutomaticRescaleMode to the current global setting.
+      // Reset the AutomaticRescaleRangeMode to the current global setting.
       vtkSMTransferFunctionProxy* tfProxy =
         vtkSMTransferFunctionProxy::SafeDownCast(this->getProxy());
       tfProxy->ResetRescaleModeToGlobalSetting();

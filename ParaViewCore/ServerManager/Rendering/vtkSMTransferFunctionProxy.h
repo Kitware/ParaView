@@ -297,7 +297,7 @@ public:
   //@}
 
   /**
-   * Reset the scalar bar's AutomaticRescaleMode to the global
+   * Reset the transfer function's AutomaticRescaleResetMode to the global
    * TransferFunctionRresetMode setting.
    */
   void ResetRescaleModeToGlobalSetting();

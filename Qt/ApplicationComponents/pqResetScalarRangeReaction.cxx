@@ -163,7 +163,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToData(pqPipelineRepresentation
   repr->renderViewEventually();
   if (vtkSMProxy* lut = lutProxy(repr))
   {
-    // Set the AutomaticRescaleMode to the current global setting.
+    // Set the AutomaticRescaleRangeMode to the current global setting.
     vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
     tfProxy->ResetRescaleModeToGlobalSetting();
 
