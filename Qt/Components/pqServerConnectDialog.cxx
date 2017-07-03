@@ -828,6 +828,8 @@ void pqServerConnectDialog::importServersSelectionChanged()
 //-----------------------------------------------------------------------------
 void pqServerConnectDialog::importServers()
 {
+  // Make sure servers importer and server table widget are synchronized
+  this->updateImportableConfigurations();
   QList<QTableWidgetItem*> items = this->Internals->importServersTable->selectedItems();
   QSet<int> indexes;
   foreach (QTableWidgetItem* item, items)
