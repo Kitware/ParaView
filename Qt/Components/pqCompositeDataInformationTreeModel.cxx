@@ -43,12 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <vector>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-typedef quint32 qindexdatatype;
-#else
-typedef quintptr qindexdatatype;
-#endif
-
 namespace pqCompositeDataInformationTreeModelNS
 {
 
@@ -185,11 +179,11 @@ public:
     if (this->Parent)
     {
       return dmodel->createIndex(
-        this->Parent->childIndex(*this), col, static_cast<qindexdatatype>(this->flatIndex()));
+        this->Parent->childIndex(*this), col, static_cast<quintptr>(this->flatIndex()));
     }
     else
     {
-      return dmodel->createIndex(0, col, static_cast<qindexdatatype>(0));
+      return dmodel->createIndex(0, col, static_cast<quintptr>(0));
     }
   }
 
@@ -554,7 +548,7 @@ QModelIndex pqCompositeDataInformationTreeModel::index(
 {
   if (!parentIdx.isValid() && row == 0)
   {
-    return this->createIndex(0, column, static_cast<qindexdatatype>(0));
+    return this->createIndex(0, column, static_cast<quintptr>(0));
   }
 
   if (row < 0 || column < 0 || column >= this->columnCount())
@@ -565,7 +559,7 @@ QModelIndex pqCompositeDataInformationTreeModel::index(
   pqInternals& internals = (*this->Internals);
   const CNode& node = internals.find(parentIdx);
   const CNode& child = node.child(row);
-  return this->createIndex(row, column, static_cast<qindexdatatype>(child.flatIndex()));
+  return this->createIndex(row, column, static_cast<quintptr>(child.flatIndex()));
 }
 
 //-----------------------------------------------------------------------------
@@ -586,12 +580,12 @@ QModelIndex pqCompositeDataInformationTreeModel::parent(const QModelIndex& idx) 
 
   if (parentNode == internals.rootNode())
   {
-    return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+    return this->createIndex(0, 0, static_cast<quintptr>(0));
   }
 
   const CNode& parentsParentNode = parentNode.parent();
-  return this->createIndex(parentsParentNode.childIndex(parentNode), 0,
-    static_cast<qindexdatatype>(parentNode.flatIndex()));
+  return this->createIndex(
+    parentsParentNode.childIndex(parentNode), 0, static_cast<quintptr>(parentNode.flatIndex()));
 }
 
 //-----------------------------------------------------------------------------
@@ -701,11 +695,7 @@ bool pqCompositeDataInformationTreeModel::setData(
 
   if (idx.column() == 0 && role == Qt::CheckStateRole)
   {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    int checkState = value.value<int>();
-#else
     Qt::CheckState checkState = value.value<Qt::CheckState>();
-#endif
     if (checkState == Qt::Checked && this->exclusivity())
     {
       internals.clearCheckState(this);
@@ -918,7 +908,7 @@ QModelIndex pqCompositeDataInformationTreeModel::find(unsigned int idx) const
 //-----------------------------------------------------------------------------
 const QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
 {
-  return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+  return this->createIndex(0, 0, static_cast<quintptr>(0));
 }
 
 //-----------------------------------------------------------------------------
