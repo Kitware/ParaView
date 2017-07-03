@@ -2,7 +2,7 @@
 # ParaView ServerManager Unit Tests
 if (PARAVIEW_ENABLE_QT_SUPPORT)
   include(ParaViewQt)
-  pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtTest QT5_COMPONENTS Test)
+  pv_find_package_qt(qt_targets REQUIRED QT5_COMPONENTS Test)
   set(UNITTESTS
     SMProxy
     SMProxyLink

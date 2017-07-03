@@ -15,11 +15,7 @@ if(NOT DEFINED CMAKE_MACOSX_RPATH)
   set(CMAKE_MACOSX_RPATH 0)
 endif()
 
-IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_SRCS pqMyApplicationStarter.h)
-ELSE ()
-  QT4_WRAP_CPP(MOC_SRCS pqMyApplicationStarter.h)
-ENDIF ()
+QT5_WRAP_CPP(MOC_SRCS pqMyApplicationStarter.h)
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqMyApplicationStarter
                         STARTUP onStartup

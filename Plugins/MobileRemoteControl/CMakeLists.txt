@@ -6,7 +6,6 @@ if(PARAVIEW_BUILD_QT_GUI)
     pqRemoteControlThread.cxx)
 
   pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui QtNetwork
     QT5_COMPONENTS Widgets Network)
 
   pv_qt_wrap_cpp(MOC_SRCS pqRemoteControl.h pqRemoteControlThread.h)

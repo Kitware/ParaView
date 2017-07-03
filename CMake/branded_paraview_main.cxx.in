@@ -73,15 +73,8 @@ static bool checkenv(const char* vname)
 
 int main(int argc, char* argv[])
 {
-#if defined(Q_WS_X11) || defined(Q_OS_LINUX)
-  // Using motif style gives us test failures (and its ugly).
-  // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
-  // let's just use plastique for now
-
-  // "plastique" is only available on Qt4, but this works just fine with Qt5 too. Qt5 just uses the
-  // default style when QStyleFactory::create("plastique") return nullptr.
-  QApplication::setStyle(QStyleFactory::create("plastique"));
-#endif
+  // Here's the point to change default style, if you'd like e.g.
+  // QApplication::setStyle(QStyleFactory::create("plastique"));
 
   // When playing tests, disable all effects.
   if (checkenv("DART_TEST_FROM_DART") ||

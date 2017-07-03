@@ -1,23 +1,27 @@
 # This module makes it easier to find and import appropriate Qt modules based
 # on PARAVIEW_QT_VERSION.
+# This was more useful when we supported Qt 4 and Qt 5 together. Now it's merely here
+# to support Qt 5. We leave it around since it may make it easier when moving on to
+# future major Qt releases.
 
 #------------------------------------------------------------------------------
-# Instead of doing find_package(Qt4) or find_package(Qt5), use this macro to
-# find an appropriate version based on PARAVIEW_QT_VERSION specified.
+# Instead of doing `find_package(Qt5)`, use this macro to
+# find an appropriate version based on PARAVIEW_QT_VERSION specified (which is currently
+# forced to 5).
 # You can pass all arguments typically passed to the find_package() call with
 # following exceptions:
 # - The first argument is a variable name that gets set to the list of targets
 #   imported from the appropriate Qt package.
 # - Do not pass a version number. That will not be processed correctly. The
 #   version number is determined by this macro itself.
-# - Do not use COMPONENTS or OPTIONAL_COMPONENTS instead, use QT4_COMPONENTS,
-#   QT4_OPTIONAL_COMPONENTS and QT5_COMPONENTS, QT5_COMPONENTS to separately
-#   specify the components to use for Qt4 and Qt5.
+# - Do not use COMPONENTS or OPTIONAL_COMPONENTS instead, use
+#   QT5_COMPONENTS, QT5_COMPONENTS to specify the components to use for Qt5.
 macro(pv_find_package_qt out_targets_var)
-  if(NOT DEFINED PARAVIEW_QT_VERSION)
-    set(PARAVIEW_QT_VERSION "5")
+  if (DEFINED PARAVIEW_QT_VERSION AND PARAVIEW_QT_VERSION VERSION_LESS 5)
+    message(WARNING "ParaView no longer supports ${PARAVIEW_QT_VERSION}. Forcing Qt version to 5.*.")
   endif()
 
+  set(PARAVIEW_QT_VERSION 5)
   set(qt4_components)
   set(qt5_components)
   set(qt4_optional_components)
@@ -45,53 +49,31 @@ macro(pv_find_package_qt out_targets_var)
       list(APPEND other_args "${arg}")
     endif()
   endforeach()
-  if(NOT (qt4_components OR qt5_components OR qt4_optional_components OR qt5_optional_components))
+  if(NOT qt5_components AND NOT qt5_optional_components)
     message(FATAL_ERROR "Components must be specified to find Qt correctly.")
+  endif()
+  if (qt4_components OR qt4_optional_components)
+    message(AUTHOR_WARNING "Qt 4 components can be dropped since Qt 4 is no longer supported.")
   endif()
 
   set(_qt_targets)
-  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    set(_qt_var_prefix Qt5)
-    set(_qt_min_version "5.6")
-    set(_qt_official_version "5.6")
-
-    set(args)
-    if(qt5_components)
-      set(args ${args} COMPONENTS ${qt5_components})
-    endif()
-    if(qt5_optional_components)
-      set(args ${args} OPTIONAL_COMPONENTS ${qt5_optional_components})
-    endif()
-    find_package(Qt5 ${_qt_min_version} ${args} ${other_args})
-    set(_qt_version ${Qt5_VERSION})
-    foreach(comp IN LISTS qt5_components qt5_optional_components)
-      if(TARGET Qt5::${comp})
-        list(APPEND _qt_targets "Qt5::${comp}")
-      endif()
-    endforeach()
-  else()
-    set(_qt_var_prefix Qt4)
-    set(_qt_min_version "4.7")
-    set(_qt_official_version "4.8")
-
-    set(args)
-    if(qt4_components)
-      set(args COMPONENTS ${qt4_components})
-    endif()
-    if(qt4_optional_components)
-      set(arg OPTIONAL_COMPONENTS ${qt4_optional_components})
-    endif()
-
-    #---------------------------------------------------------
-    set(QT_USE_IMPORTED_TARGETS TRUE)
-    find_package(Qt4 ${_qt_min_version} ${args} ${other_args})
-    set(_qt_version ${QTVERSION})
-    foreach(comp IN LISTS qt4_components qt4_optional_components)
-      if(TARGET Qt4::${comp})
-        list(APPEND _qt_targets "Qt4::${comp}")
-      endif()
-    endforeach()
+  set(_qt_var_prefix Qt5)
+  set(_qt_min_version "5.6")
+  set(_qt_official_version "5.9")
+  set(args)
+  if(qt5_components)
+    set(args ${args} COMPONENTS ${qt5_components})
   endif()
+  if(qt5_optional_components)
+    set(args ${args} OPTIONAL_COMPONENTS ${qt5_optional_components})
+  endif()
+  find_package(Qt5 ${_qt_min_version} ${args} ${other_args})
+  set(_qt_version ${Qt5_VERSION})
+  foreach(comp IN LISTS qt5_components qt5_optional_components)
+    if(TARGET Qt5::${comp})
+      list(APPEND _qt_targets "Qt5::${comp}")
+    endif()
+  endforeach()
 
   # Warn is Qt version is less than the official version.
   if(_qt_version VERSION_LESS _qt_official_version)
@@ -104,25 +86,13 @@ macro(pv_find_package_qt out_targets_var)
 endmacro()
 
 macro(pv_qt_wrap_cpp)
-  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    qt5_wrap_cpp(${ARGN})
-  else()
-    qt4_wrap_cpp(${ARGN})
-  endif()
+  qt5_wrap_cpp(${ARGN})
 endmacro()
 
 macro(pv_qt_wrap_ui)
-  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    qt5_wrap_ui(${ARGN})
-  else()
-    qt4_wrap_ui(${ARGN})
-  endif()
+  qt5_wrap_ui(${ARGN})
 endmacro()
 
 macro(pv_qt_add_resources)
-  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    qt5_add_resources(${ARGN})
-  else()
-    qt4_add_resources(${ARGN})
-  endif()
+  qt5_add_resources(${ARGN})
 endmacro()
