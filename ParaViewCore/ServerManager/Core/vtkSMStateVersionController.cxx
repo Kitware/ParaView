@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMSession.h"
 
 #include <set>
 #include <sstream>
@@ -616,7 +617,7 @@ vtkSMStateVersionController::~vtkSMStateVersionController()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
+bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession* session)
 {
   vtkPVXMLElement* root = parent;
   if (parent && strcmp(parent->GetName(), "ServerManagerState") != 0)
