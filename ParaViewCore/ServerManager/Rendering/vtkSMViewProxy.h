@@ -229,7 +229,6 @@ protected:
    * @returns A new vtkImageData instance or nullptr. Caller is responsible for
    *          calling `vtkImageData::Delete()` on the returned non-null value.
    */
-  virtual vtkImageData* CaptureWindowInternal(int) final { return nullptr; }
   virtual vtkImageData* CaptureWindowInternal(int magnificationX, int magnificationY);
 
   /**
