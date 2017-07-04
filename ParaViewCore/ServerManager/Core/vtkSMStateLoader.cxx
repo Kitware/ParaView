@@ -502,7 +502,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
   }
 
   vtkSMStateVersionController* converter = vtkSMStateVersionController::New();
-  if (!converter->Process(parent))
+  if (!converter->Process(parent, this->GetSession()))
   {
     vtkWarningMacro("State converter was not able to convert the state to current "
                     "version successfully");
