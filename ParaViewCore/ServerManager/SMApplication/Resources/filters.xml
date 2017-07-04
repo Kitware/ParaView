@@ -12808,7 +12808,7 @@ source.</Documentation>
                   name="Consistency"
                   number_of_elements="1">
           <Element index="0"
-                   value="1" />
+                   value="0" />
           <Domain id="1224.Consistency.bool"
                   name="bool" />
         </Property>
