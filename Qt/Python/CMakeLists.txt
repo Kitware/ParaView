@@ -72,7 +72,6 @@ set(${vtk-module}_NO_HeaderTest 1)
 
 include(ParaViewQt)
 pv_find_package_qt(qt_private_targets REQUIRED
-                QT4_COMPONENTS QtGui
                 QT5_COMPONENTS Widgets)
 pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
@@ -80,7 +79,6 @@ pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 set(${vtk-module}_EXPORT_CODE_INSTALL
   "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
   pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)")
 set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
 

@@ -1,12 +1,7 @@
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
 include(ParaViewQt)
-set(qt5_comps Widgets)
-set(qt4_comps QtGui)
-
-pv_find_package_qt(qt_targets REQUIRED QUIET
-                QT4_COMPONENTS ${qt4_comps}
-                QT5_COMPONENTS ${qt5_comps})
+pv_find_package_qt(qt_targets REQUIRED QUIET QT5_COMPONENTS Widgets)
 pv_qt_wrap_cpp(MOC_BUILT_SOURCES ParaViewMainWindow.h)
 pv_qt_wrap_ui(UI_BUILT_SOURCES ParaViewMainWindow.ui)
 include_directories(

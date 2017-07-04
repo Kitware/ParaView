@@ -43,15 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QStyle>
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-class QMessageLogContext
-{
-public:
-  QMessageLogContext() {}
-  ~QMessageLogContext() {}
-};
-#endif
-
 namespace OutputWidgetInternals
 {
 
@@ -156,11 +147,9 @@ void MessageHandler(QtMsgType type, const QMessageLogContext&, const QString& ms
         vtkWindow->DisplayDebugText(localMsg.constData());
         break;
 
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
       case QtInfoMsg:
         vtkWindow->DisplayText(localMsg.constData());
         break;
-#endif
 
       case QtWarningMsg:
         vtkWindow->DisplayWarningText(localMsg.constData());
@@ -177,13 +166,6 @@ void MessageHandler(QtMsgType type, const QMessageLogContext&, const QString& ms
     }
   }
 }
-
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-void MsgHandler(QtMsgType type, const char* cmsg)
-{
-  MessageHandler(type, QMessageLogContext(), QString(cmsg));
-}
-#endif // endif (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 }
 
 class pqOutputWidget::pqInternals
@@ -362,11 +344,7 @@ private:
 //-----------------------------------------------------------------------------
 void pqOutputWidget::installQMessageHandler()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
   qInstallMessageHandler(OutputWidgetInternals::MessageHandler);
-#else
-  qInstallMsgHandler(OutputWidgetInternals::MsgHandler);
-#endif
 }
 
 //-----------------------------------------------------------------------------

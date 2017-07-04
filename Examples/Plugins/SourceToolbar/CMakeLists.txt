@@ -16,11 +16,7 @@ endif()
 
 IF(PARAVIEW_BUILD_QT_GUI)
   # We need to wrap for Qt stuff such as signals/slots etc. to work correctly.
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(MOC_SRCS SourceToolbarActions.h)
-  ELSE ()
-    QT4_WRAP_CPP(MOC_SRCS SourceToolbarActions.h)
-  ENDIF ()
+  QT5_WRAP_CPP(MOC_SRCS SourceToolbarActions.h)
 
   # This is a macro for adding QActionGroup subclasses automatically as toolbars.
   ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS

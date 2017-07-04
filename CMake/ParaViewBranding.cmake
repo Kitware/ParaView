@@ -237,7 +237,6 @@ FUNCTION(build_paraview_client BPC_NAME)
 
   INCLUDE(ParaViewQt)
   pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
   pv_qt_add_resources(rcs_sources ${ui_resources})
 

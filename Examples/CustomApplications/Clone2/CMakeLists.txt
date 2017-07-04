@@ -22,17 +22,8 @@ endif()
 
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
-IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_BUILT_SOURCES
-    myMainWindow.h)
-  QT5_WRAP_UI(UI_BUILT_SOURCES
-    myMainWindow.ui)
-ELSE ()
-  QT4_WRAP_CPP(MOC_BUILT_SOURCES
-    myMainWindow.h)
-  QT4_WRAP_UI(UI_BUILT_SOURCES
-    myMainWindow.ui)
-ENDIF ()
+pv_qt_wrap_cpp(MOC_BUILT_SOURCES myMainWindow.h)
+pv_qt_wrap_ui(UI_BUILT_SOURCES myMainWindow.ui)
 
 SOURCE_GROUP("Generated" FILES
   ${MOC_BUILT_SOURCES}
@@ -52,7 +43,7 @@ INCLUDE_DIRECTORIES(
 build_paraview_client(paraview_revised_2
   TITLE "ParaView (ReVisEd)"
   ORGANIZATION  "Kitware Inc."
-  VERSION_MAJOR 1 
+  VERSION_MAJOR 1
   VERSION_MINOR 1
   VERSION_PATCH 1
 #  SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/RSplash.png"

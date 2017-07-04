@@ -36,16 +36,6 @@ include (ParaViewPlugins)
 include (ParaViewBranding)
 include (ParaViewQt)
 
-if(PARAVIEW_ENABLE_QT_SUPPORT)
-  if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    # nothing to do. the module system handles it properly.
-  else()
-    set(QT_QMAKE_EXECUTABLE "${PARAVIEW_QT_QMAKE_EXECUTABLE}" CACHE FILEPATH "Qt4 qmake executable")
-    pv_find_package_qt(__tmp_qt_targets QT4_COMPONENTS QtGui)
-    unset(__tmp_qt_targets)
-  endif()
-endif()
-
 # Workaround for MPICH bug that produces error messages:
 # "SEEK_SET is #defined but must not be for the C++ binding of MPI.
 if (PARAVIEW_USE_MPI)

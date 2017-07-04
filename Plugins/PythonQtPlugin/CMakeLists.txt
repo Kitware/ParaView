@@ -8,7 +8,7 @@ else()
 endif()
 
 include(ParaViewQt)
-pv_find_package_qt(qt_targets REQUIRED QT4_COMPONENTS QtGui QT5_COMPONENTS Widgets)
+pv_find_package_qt(qt_targets REQUIRED QT5_COMPONENTS Widgets)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(PythonQt REQUIRED)

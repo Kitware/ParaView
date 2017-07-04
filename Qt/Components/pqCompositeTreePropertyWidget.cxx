@@ -41,10 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHBoxLayout>
 #include <QHeaderView>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
 #include <QSignalBlocker>
-#endif
 
 namespace
 {
@@ -178,11 +175,8 @@ void pqCompositeTreePropertyWidget::domainModified()
 {
   if (this->Model && this->Domain)
   {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     const QSignalBlocker blocker(this);
-#else
-    const bool wasBlocked = this->blockSignals(true);
-#endif
+
     // calling reset will change the check state for all node. Hence, we do
     // this.
     QList<QVariant> oldValue = this->values();
@@ -193,9 +187,6 @@ void pqCompositeTreePropertyWidget::domainModified()
     // this ensures that the widget is hidden if the data is not a composite
     // dataset.
     this->TreeView->setVisible(isComposite);
-#if QT_VERSION < QT_VERSION_CHECK(5, 3, 0)
-    this->blockSignals(wasBlocked);
-#endif
   }
 }
 

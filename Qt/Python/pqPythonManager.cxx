@@ -104,11 +104,7 @@ class pqPythonManager::pqInternal
       }
       else
       {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        vtkOutputWindow::GetInstance()->DisplayText(message);
-#else
         qInfo() << message;
-#endif
       }
     }
   }

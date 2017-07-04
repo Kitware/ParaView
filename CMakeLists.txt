@@ -465,8 +465,7 @@ endif()
 # Setup Qt state. We just do a quick top level check for Qt's exisiting here.
 # We let individual modules find_package(Qt..) as needed.
 if(PARAVIEW_ENABLE_QT_SUPPORT)
-  set(PARAVIEW_QT_VERSION "5" CACHE STRING  "Select Qt version to use 4 or 5")
-  set_property(CACHE PARAVIEW_QT_VERSION PROPERTY STRINGS 4 5)
+  set(PARAVIEW_QT_VERSION "5" CACHE INTERNAL "Select Qt version to 5")
   # Force VTK to use the same Qt version as ParaView.
   set(VTK_QT_VERSION "${PARAVIEW_QT_VERSION}" CACHE INTERNAL "")
   set(VTK_BUILD_QT_DESIGNER_PLUGIN OFF CACHE INTERNAL "")
@@ -495,12 +494,11 @@ if (PARAVIEW_BUILD_QT_GUI)
   list (APPEND pqApplicationComponents_REQUEST_BY "Option PARAVIEW_BUILD_QT_GUI")
 
   if (APPLE)
-    # Enable high resolution when using Qt5, disable it when using Qt4
-    if (${PARAVIEW_QT_VERSION} EQUAL 5)
-      set(MAC_HIGH_RESOLUTION_CAPABLE "true")
-    else()
-      set(MAC_HIGH_RESOLUTION_CAPABLE "false")
-    endif()
+    # Enable high resolution when using Qt5
+    # This configuring of MacOSXBundleInfo may no longer be needed, but I am
+    # leaving it in since in future we could build the supported extensions list
+    # more exhaustively here.
+    set(MAC_HIGH_RESOLUTION_CAPABLE "true")
     file(MAKE_DIRECTORY ${ParaView_CMAKE_BINARY_DIR})
     configure_file(
       "${ParaView_CMAKE_DIR}/MacOSXBundleInfo.plist.in.in"

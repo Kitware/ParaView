@@ -278,11 +278,7 @@ function(__add_paraview_property_widget outifaces outsrcs)
                    @ONLY)
 
     set (_moc_srcs)
-    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      qt5_wrap_cpp(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h)
-    else ()
-      qt4_wrap_cpp(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h)
-    endif ()
+    qt5_wrap_cpp(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h)
     set (${outifaces} ${name} PARENT_SCOPE)
     set (${outsrcs}
          ${_moc_srcs}
@@ -376,11 +372,7 @@ macro(add_pqproxy OUTIFACES OUTSRCS)
       ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.cxx @ONLY)
 
     set (_moc_srcs)
-    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      QT5_WRAP_CPP(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h)
-    else()
-      QT4_WRAP_CPP(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h)
-    endif()
+    QT5_WRAP_CPP(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h)
 
     set(${OUTIFACES} ${${OUTIFACES}} ${ARG_TYPE}ServerManagerModel) # don't add
                                         # the extra "Implementation" here.
@@ -448,11 +440,7 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
@@ -480,11 +468,7 @@ MACRO(ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
@@ -520,11 +504,7 @@ MACRO(ADD_PARAVIEW_DOCK_WINDOW OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
@@ -569,11 +549,7 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
@@ -629,11 +605,7 @@ MACRO(ADD_PARAVIEW_GRAPH_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   SET(LAYOUT_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx
@@ -665,11 +637,7 @@ MACRO(ADD_PARAVIEW_TREE_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   SET(LAYOUT_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
-  ENDIF ()
+  QT5_WRAP_CPP(LAYOUT_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h)
 
   SET(${OUTSRCS}
       ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx
@@ -931,17 +899,12 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   endif()
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
-    if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    else()
-      set(plugin_type_gui_qt4 TRUE)
-    endif()
     CONFIGURE_FILE(
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h @ONLY)
     CONFIGURE_FILE(
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx @ONLY)
-    unset(plugin_type_gui_qt4)
 
     SET (plugin_sources
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx
@@ -949,11 +912,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     )
     IF (plugin_type_gui)
       set (__plugin_sources_tmp)
-      IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-        QT5_WRAP_CPP(__plugin_sources_tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
-      ELSE ()
-        QT4_WRAP_CPP(__plugin_sources_tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
-      ENDIF ()
+      QT5_WRAP_CPP(__plugin_sources_tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
       SET (plugin_sources ${plugin_sources} ${__plugin_sources_tmp})
     ENDIF ()
 

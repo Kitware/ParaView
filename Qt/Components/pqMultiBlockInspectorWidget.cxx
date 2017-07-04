@@ -61,28 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPointer>
 #include <QScopedValueRollback>
-#include <QStyle>
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 3, 0)
 #include <QSignalBlocker>
-#else
-namespace
-{
-class QSignalBlocker
-{
-  QObject* Foo;
-  bool Prev;
-
-public:
-  QSignalBlocker(QObject* foo)
-    : Foo(foo)
-    , Prev(foo->blockSignals(true))
-  {
-  }
-  ~QSignalBlocker() { this->Foo->blockSignals(this->Prev); }
-};
-}
-#endif
+#include <QStyle>
 
 namespace
 {
@@ -538,12 +518,7 @@ public:
       return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QScopedValueRollback<bool> r(this->BlockSelectionPropagation);
-    this->BlockSelectionPropagation = true;
-#else
     QScopedValueRollback<bool> r(this->BlockSelectionPropagation, true);
-#endif
 
     QItemSelection aselection;
     const QAbstractProxyModel* amodel = qobject_cast<const QAbstractProxyModel*>(this->model());
@@ -569,12 +544,7 @@ private:
   void selectBlocks(const std::vector<vtkIdType>& ids)
   {
     Q_ASSERT(this->BlockSelectionPropagation == false);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QScopedValueRollback<bool> r(this->BlockSelectionPropagation);
-    this->BlockSelectionPropagation = true;
-#else
     QScopedValueRollback<bool> r(this->BlockSelectionPropagation, true);
-#endif
 
     pqOutputPort* port = this->MBWidget->outputPort();
     if (port == nullptr)

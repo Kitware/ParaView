@@ -544,7 +544,6 @@ set (Module_RESOURCE_FILES
 include(ParaViewQt)
 if (PARAVIEW_USE_QTHELP)
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
-    QT4_COMPONENTS QtHelp
     QT5_COMPONENTS Widgets Help)
   list(APPEND Module_SRCS
     pqHelpReaction.cxx
@@ -557,7 +556,6 @@ if (PARAVIEW_USE_QTHELP)
   set(${vtk-module}_EXPORT_CODE_INSTALL
     "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
     pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-      QT4_COMPONENTS QtHelp
       QT5_COMPONENTS Widgets Help)")
 else()
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
