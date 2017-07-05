@@ -81,10 +81,12 @@ public:
 
   //@{
   /**
-   * Get/Set the progress frequency in seconds. Default is 0.5 seconds.
-   */
-  vtkSetClampMacro(ProgressFrequency, double, 0.01, 30.0);
-  vtkGetMacro(ProgressFrequency, double);
+    * Get/Set the progress interval in seconds. Progress events
+    * occurring more frequently than this interval are skipped.
+    * Default is 0.1 seconds on client and 1 second on server and batch processes.
+    */
+  vtkSetClampMacro(ProgressInterval, double, 0.01, 30.0);
+  vtkGetMacro(ProgressInterval, double);
   //@}
 
   //@{
@@ -119,7 +121,7 @@ protected:
   //@}
 
   vtkPVSession* Session;
-  double ProgressFrequency;
+  double ProgressInterval;
 
 private:
   vtkPVProgressHandler(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;

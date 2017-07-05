@@ -61,11 +61,10 @@ void vtkPVSession::PrepareProgress()
     return;
   }
 
-  if (this->ProgressCount == 0)
+  if (this->ProgressCount++ == 0)
   {
     this->PrepareProgressInternal();
   }
-  this->ProgressCount++;
 }
 
 //----------------------------------------------------------------------------
@@ -77,8 +76,7 @@ void vtkPVSession::CleanupPendingProgress()
   }
 
   this->InCleanupPendingProgress = true;
-  this->ProgressCount--;
-  if (this->ProgressCount == 0)
+  if (--this->ProgressCount == 0)
   {
     this->CleanupPendingProgressInternal();
   }

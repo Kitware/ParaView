@@ -17,10 +17,6 @@ if(PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()
 
-if (PARAVIEW_ENABLE_QT_SUPPORT)
-  list(APPEND __dependencies vtkGUISupportQt)
-endif()
-
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
   list(APPEND __dependencies vtkRenderingLIC)
   if (PARAVIEW_USE_MPI)

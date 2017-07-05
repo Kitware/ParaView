@@ -810,6 +810,8 @@ bool vtkSMRenderViewProxy::SelectInternal(const vtkClientServerStream& csstream,
     return false;
   }
 
+  vtkScopedMonitorProgress monitorProgress(this);
+
   this->IsSelectionCached = true;
 
   // Call PreRender since Select making will cause multiple renders on the
@@ -932,6 +934,9 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
                   "unsupported.");
     return false;
   }
+
+  vtkScopedMonitorProgress monitorProgress(this);
+
   bool multiple_selections = true;
 
   range[0] = VTK_DOUBLE_MAX;
@@ -1021,6 +1026,8 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
   int fieldAssociation)
 {
+  vtkScopedMonitorProgress monitorProgress(this);
+
   // Simply stealing old code for now. This code have many coding style
   // violations and seems too long for what it does. At some point we'll check
   // it out.

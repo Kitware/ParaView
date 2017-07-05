@@ -86,8 +86,6 @@ set(Module_SRCS
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
-  pqProgressBar.cxx
-  pqProgressBar.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
@@ -160,7 +158,6 @@ set (QtWidgets_SRCS
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
-  pqProgressBar.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
   pqSectionVisibilityContextMenu.h

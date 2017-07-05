@@ -32,9 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 
 #include <QApplication>
-#include <QKeyEvent>
-#include <QMouseEvent>
-#include <QtDebug>
+#include <QEvent>
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -56,10 +54,7 @@ pqProgressManager::pqProgressManager(QObject* _parent)
   QApplication::instance()->installEventFilter(this);
 
   this->EnableProgress = false;
-  this->ReadyEnableProgress = false;
-  this->LastProgressTime = 0;
   this->UnblockEvents = false;
-
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerAdded(pqServer*)));
 }
@@ -85,18 +80,13 @@ void pqProgressManager::onServerAdded(pqServer* server)
 //-----------------------------------------------------------------------------
 bool pqProgressManager::eventFilter(QObject* obj, QEvent* evt)
 {
-  if (this->ProgressCount != 0 && !this->UnblockEvents)
+  bool skipEvent = false;
+  bool skippableEvent = evt->type() == QEvent::KeyPress || evt->type() == QEvent::MouseButtonPress;
+  if (this->ProgressCount > 0 && skippableEvent)
   {
-    if (dynamic_cast<QKeyEvent*>(evt) || dynamic_cast<QMouseEvent*>(evt))
-    {
-      if (!this->NonBlockableObjects.contains(obj))
-      {
-        return true;
-      }
-    }
+    skipEvent = (this->NonBlockableObjects.contains(obj) == false);
   }
-
-  return QObject::eventFilter(obj, evt);
+  return skipEvent ? true : this->QObject::eventFilter(obj, evt);
 }
 
 //-----------------------------------------------------------------------------
@@ -155,6 +145,7 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     return;
   }
   this->InUpdate = true;
+  emit this->progress(message, progress_val);
   if (progress_val > 0)
   {
     // we don't want to call a processEvents on zero progress
@@ -166,7 +157,6 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     // get tag mismatches in the release product
     // pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
   }
-  emit this->progress(message, progress_val);
   this->InUpdate = false;
 }
 
@@ -190,22 +180,22 @@ void pqProgressManager::setEnableProgress(bool enable)
     return;
   }
 
-  this->ProgressCount += (enable ? 1 : -1);
-  if (this->ProgressCount < 0)
+  if (enable)
   {
-    this->ProgressCount = 0;
+    if (this->ProgressCount++ == 0)
+    {
+      this->EnableProgress = true;
+      emit this->enableProgress(true);
+    }
   }
-
-  if (this->InUpdate)
+  else
   {
-    return;
+    if (--this->ProgressCount == 0)
+    {
+      this->EnableProgress = false;
+      emit this->enableProgress(false);
+    }
   }
-  this->InUpdate = true;
-  if (this->ProgressCount <= 1)
-  {
-    emit this->enableProgress(enable);
-  }
-  this->InUpdate = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -217,19 +207,14 @@ void pqProgressManager::triggerAbort()
 //-----------------------------------------------------------------------------
 void pqProgressManager::onStartProgress()
 {
-  this->ReadyEnableProgress = true;
   emit progressStartEvent();
+  this->setEnableProgress(true);
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressManager::onEndProgress()
 {
-  this->ReadyEnableProgress = false;
-  if (this->EnableProgress)
-  {
-    this->setEnableProgress(false);
-  }
-  this->EnableProgress = false;
+  this->setEnableProgress(false);
   emit progressEndEvent();
 }
 
@@ -240,31 +225,10 @@ void pqProgressManager::onProgress(vtkObject* caller)
   int oldProgress = handler->GetLastProgress();
   QString text = handler->GetLastProgressText();
 
-  if (this->ReadyEnableProgress == false)
+  if (!this->EnableProgress)
   {
     return;
   }
-
-  // only forward progress events to the GUI if we get at least .05 seconds
-  // since the last time we forwarded the progress event
-  double lastprog = vtkTimerLog::GetUniversalTime();
-  if (lastprog - this->LastProgressTime < .05)
-  {
-    return;
-  }
-
-  // We will show progress. Reset timer.
-  this->LastProgressTime = vtkTimerLog::GetUniversalTime();
-
-  // delayed progress starting so the progress bar doesn't flicker
-  // so much for the quick operations
-  if (this->EnableProgress == false)
-  {
-    this->EnableProgress = true;
-    this->setEnableProgress(true);
-  }
-
-  this->LastProgressTime = lastprog;
 
   // chop of "vtk" prefix
   if (text.startsWith("vtk"))
