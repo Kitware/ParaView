@@ -629,9 +629,9 @@ struct Process_5_4_to_5_5
       pugi::xml_node element = lock_scalar_range_node.child("Element");
       int lock_scalar_range = element.attribute("value").as_int();
 
-      lock_scalar_range_node.attribute("name").set_value("AutomaticRescaleMode");
+      lock_scalar_range_node.attribute("name").set_value("AutomaticRescaleRangeMode");
       lock_scalar_range_node.attribute("id").set_value(
-        (id_string + ".AutomaticRescaleMode").c_str());
+        (id_string + ".AutomaticRescaleRangeMode").c_str());
       if (lock_scalar_range)
       {
         element.attribute("value").set_value("-1");
