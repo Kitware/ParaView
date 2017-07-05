@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSelectionNode.h"
 
+#include <QDebug>
 #include <QMap>
 
 namespace
@@ -270,6 +271,16 @@ void pqQueryClauseWidget::populateSelectionCriteria(pqQueryClauseWidget::Criteri
     }
   }
 
+  if (type_flags & POINTS_NEAR && this->attributeType() == vtkDataObject::POINT)
+  {
+    this->Internals->criteria->addItem("Point", POINTS_NEAR);
+  }
+
+  if (type_flags & POINT_IN_CELL && this->attributeType() == vtkDataObject::CELL)
+  {
+    this->Internals->criteria->addItem("Cell", POINT_IN_CELL);
+  }
+
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
 
   if (type_flags & QUERY)
@@ -360,6 +371,15 @@ void pqQueryClauseWidget::populateSelectionCondition()
       this->Internals->condition->addItem("is", pqQueryClauseWidget::AMR_BLOCK_VALUE);
       break;
 
+    case POINT_IN_CELL:
+      this->Internals->condition->addItem("contains", pqQueryClauseWidget::LOCATION);
+      break;
+
+    case POINTS_NEAR:
+      this->Internals->condition->addItem(
+        "nearest to", pqQueryClauseWidget::LOCATION_AND_TOLERANCE);
+      break;
+
     case ANY:
     case INVALID:
       break;
@@ -390,6 +410,7 @@ void pqQueryClauseWidget::updateValueWidget()
       break;
 
     case TRIPLET_OF_VALUES:
+    case LOCATION:
       this->Internals->valueStackedWidget->setCurrentIndex(2);
       break;
 
@@ -402,6 +423,10 @@ void pqQueryClauseWidget::updateValueWidget()
 
     case BLOCK_NAME_VALUE:
       this->Internals->valueStackedWidget->setCurrentIndex(3);
+      break;
+
+    case LOCATION_AND_TOLERANCE:
+      this->Internals->valueStackedWidget->setCurrentIndex(5);
       break;
   }
 }
@@ -764,6 +789,39 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
           this->Internals->value_z->text());
       }
       break;
+    case LOCATION:
+      if (query.isEmpty())
+      {
+        query = "cellContainsPoint(inputs, [(%1,%2,%3),])";
+      }
+      if (!this->Internals->value_x->text().isEmpty() &&
+        !this->Internals->value_y->text().isEmpty() && !this->Internals->value_z->text().isEmpty())
+      {
+        values << this->Internals->value_x->text();
+        values << this->Internals->value_y->text();
+        values << this->Internals->value_z->text();
+        query = query.arg(this->Internals->value_x->text(), this->Internals->value_y->text(),
+          this->Internals->value_z->text());
+      }
+      break;
+    case LOCATION_AND_TOLERANCE:
+      if (query.isEmpty())
+      {
+        query = "pointIsNear([(%1,%2,%3),], %4, inputs)";
+      }
+      if (!this->Internals->location_x->text().isEmpty() &&
+        !this->Internals->location_y->text().isEmpty() &&
+        !this->Internals->location_z->text().isEmpty() &&
+        !this->Internals->location_tolerance->text().isEmpty())
+      {
+        values << this->Internals->location_x->text();
+        values << this->Internals->location_y->text();
+        values << this->Internals->location_z->text();
+        values << this->Internals->location_tolerance->text();
+        query = query.arg(this->Internals->location_x->text(), this->Internals->location_y->text(),
+          this->Internals->location_z->text(), this->Internals->location_tolerance->text());
+      }
+      break;
 
     case BLOCK_ID_VALUE:
     case LIST_OF_BLOCK_ID_VALUES:
@@ -850,6 +908,8 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     case INDEX:
     case GLOBALID:
     case THRESHOLD:
+    case POINTS_NEAR:
+    case POINT_IN_CELL:
       this->LastQuery = query;
       vtkSMPropertyHelper(selSource, "QueryString").Set(query.toLocal8Bit().constData());
       break;
