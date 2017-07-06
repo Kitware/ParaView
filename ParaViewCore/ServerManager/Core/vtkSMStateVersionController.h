@@ -24,7 +24,8 @@
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
-#include "vtkSMSession.h"
+
+class vtkSMSession;
 
 class vtkPVXMLElement;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMObject
