@@ -931,8 +931,13 @@ void vtkSMTransferFunctionProxy::ResetRescaleModeToGlobalSetting()
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
-  int globalResetMode = vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
-  vtkSMPropertyHelper(this, "AutomaticRescaleRangeMode").Set(globalResetMode);
+  // Guard against the settings proxies not being available.
+  if (settingsProxy)
+  {
+    int globalResetMode =
+      vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
+    vtkSMPropertyHelper(this, "AutomaticRescaleRangeMode").Set(globalResetMode);
+  }
 }
 
 //----------------------------------------------------------------------------
