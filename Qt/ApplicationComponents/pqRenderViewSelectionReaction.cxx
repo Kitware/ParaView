@@ -428,7 +428,6 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
       break;
 
     case ZOOM_TO_BOX:
-      this->View->resetCenterOfRotationIfNeeded();
       break;
 
     default:
