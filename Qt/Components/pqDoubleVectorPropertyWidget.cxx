@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QStyle>
+#include <QToolButton>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   vtkSMProperty* smProperty, vtkSMProxy* smProxy, QWidget* parentObject)
@@ -353,19 +354,23 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
   {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
-    QPushButton* scaleButton = new QPushButton("X", this);
+    QToolButton* scaleButton = new QToolButton(this);
+    scaleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     scaleButton->setObjectName("ScaleBy");
     scaleButton->setToolTip("Scale by ...");
-    scaleButton->setFixedWidth(32);
-    QMenu* menu = new QMenu(scaleButton);
-    menu->setObjectName("ScaleMenu");
-    QAction* actn = menu->addAction("0.5X");
+    scaleButton->setPopupMode(QToolButton::InstantPopup);
+
+    QAction* actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "0.5X", scaleButton);
     actn->setObjectName("x0.5");
     this->connect(actn, SIGNAL(triggered()), SLOT(scaleHalf()));
-    actn = menu->addAction("2X");
+    scaleButton->addAction(actn);
+    scaleButton->setDefaultAction(actn);
+
+    actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "2X", scaleButton);
     actn->setObjectName("x2.0");
     this->connect(actn, SIGNAL(triggered()), SLOT(scaleTwice()));
-    scaleButton->setMenu(menu);
+    scaleButton->addAction(actn);
+
     layoutLocal->addWidget(scaleButton, 0, Qt::AlignBottom);
 
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
