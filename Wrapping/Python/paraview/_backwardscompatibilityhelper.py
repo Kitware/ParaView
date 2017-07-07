@@ -124,6 +124,19 @@ def setattr(proxy, pname, value):
                 "'Position2' is obsolete. Use the 'ScalarBarLength' property to set the length instead")
             # we let the exception be raised as well, hence don't return here.
 
+    if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
+        if paraview.compatibility.GetVersion() <= 5.4:
+            if value:
+                from paraview.vtk.vtkPVServerManagerRendering import vtkSMTransferFunctionManager
+                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(vtkSMTransferFunctionManager.NEVER)
+            else:
+                pxm = proxy.SMProxy.GetSessionProxyManager()
+                settingsProxy = pxm.GetProxy("settings", "GeneralSettings")
+                mode = settingsProxy.GetProperty("TransferFunctionResetMode").GetElement(0)
+                proxy.GetProperty("AutomaticRescaleRangeMode").SetData(mode)
+
+            raise Continue()
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -207,6 +220,21 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                     'The Position2 property has been removed in ParaView '\
                     '5.4. Please set the ScalarBarLength property instead.')
+
+    # In 5.5, we removed the PVLookupTable.LockScalarRange boolean property and
+    # replaced it with the enumeration AutomaticRescaleRangeMode.
+    if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
+        if version <= 5.4:
+            from paraview.vtk.vtkPVServerManagerRendering import vtkSMTransferFunctionManager
+            if proxy.GetProperty("AutomaticRescaleRangeMode").GetData() == "Never":
+                return 1
+            else:
+                return 0
+        else:
+            raise NotSupportedException(
+                    'The PVLookupTable.LockScalarRange property has been removed '\
+                    'in ParaView 5.5. Please set the AutomaticRescaleRangeMode property '\
+                    'instead.')
 
     raise Continue()
 

@@ -501,13 +501,13 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     }
   }
 
-  vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
-  if (!convertor->Process(parent))
+  vtkSMStateVersionController* converter = vtkSMStateVersionController::New();
+  if (!converter->Process(parent, this->GetSession()))
   {
-    vtkWarningMacro("State convertor was not able to convert the state to current "
+    vtkWarningMacro("State converter was not able to convert the state to current "
                     "version successfully");
   }
-  convertor->Delete();
+  converter->Delete();
 
   if (!this->VerifyXMLVersion(rootElement))
   {

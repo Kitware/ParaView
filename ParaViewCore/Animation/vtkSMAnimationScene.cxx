@@ -71,25 +71,8 @@ public:
       iter->GetPointer()->Update();
     }
 
-    // To ensure that LUTs are reset using proper ranges, we need to update all
-    // views first, then reset/grow the LUTs and subsequently render all the views.
-    switch (vtkPVGeneralSettings::GetInstance()->GetTransferFunctionResetMode())
-    {
-      case vtkPVGeneralSettings::GROW_ON_APPLY_AND_TIMESTEP:
-        this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(pxm, true);
-        break;
-
-      case vtkPVGeneralSettings::RESET_ON_APPLY_AND_TIMESTEP:
-        this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(pxm, false);
-        // FIXME: Maybe we should warn the user if animation caching is ON and
-        // RESET_ON_APPLY_AND_TIMESTEP is enabled since the ranges will definitely
-        // be wrong if caching gets used.
-        break;
-
-      default:
-        // nothing to do.
-        break;
-    }
+    this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(
+      pxm, true /*animating*/);
   }
 
   void StillRenderAllViews()

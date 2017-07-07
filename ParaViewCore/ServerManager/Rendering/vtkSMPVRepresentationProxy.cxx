@@ -288,7 +288,9 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
   vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkSMProxy* sof = vtkSMPropertyHelper(sofProperty).GetAsProxy();
 
-  if (force == false && vtkSMPropertyHelper(lut, "LockScalarRange", true).GetAsInt() != 0)
+  if (force == false &&
+    vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode", true).GetAsInt() ==
+      vtkSMTransferFunctionManager::NEVER)
   {
     // nothing to change, range is locked.
     return true;

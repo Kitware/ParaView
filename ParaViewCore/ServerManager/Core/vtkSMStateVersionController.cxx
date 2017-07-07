@@ -22,6 +22,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkWeakPointer.h"
 
 #include <set>
 #include <sstream>
@@ -602,6 +606,59 @@ struct Process_5_1_to_5_4
   }
 };
 
+//===========================================================================
+struct Process_5_4_to_5_5
+{
+  bool operator()(xml_document& document) { return LockScalarRange(document); }
+
+  bool LockScalarRange(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='lookup_tables' and "
+                            "@type='PVLookupTable']");
+
+    for (pugi::xpath_node_set::const_iterator iter = proxy_nodes.begin(); iter != proxy_nodes.end();
+         ++iter)
+    {
+      pugi::xml_node proxy_node = iter->node();
+      std::string id_string(proxy_node.attribute("id").value());
+
+      pugi::xml_node lock_scalar_range_node =
+        proxy_node.find_child_by_attribute("Property", "name", "LockScalarRange");
+
+      pugi::xml_node element = lock_scalar_range_node.child("Element");
+      int lock_scalar_range = element.attribute("value").as_int();
+
+      lock_scalar_range_node.attribute("name").set_value("AutomaticRescaleRangeMode");
+      lock_scalar_range_node.attribute("id").set_value(
+        (id_string + ".AutomaticRescaleRangeMode").c_str());
+      if (lock_scalar_range)
+      {
+        element.attribute("value").set_value("-1");
+      }
+      else
+      {
+        if (this->Session)
+        {
+          vtkSMSessionProxyManager* pxm = this->Session->GetSessionProxyManager();
+          vtkSMProxy* settingsProxy = pxm->GetProxy("settings", "GeneralSettings");
+          int globalResetMode =
+            vtkSMPropertyHelper(settingsProxy, "TransferFunctionResetMode").GetAsInt();
+          element.attribute("value").set_value(toString(globalResetMode).c_str());
+        }
+        else
+        {
+          vtkGenericWarningMacro("Could not get TransferFunctionResetMode from settings.");
+        }
+      }
+    }
+
+    return true;
+  }
+
+  vtkWeakPointer<vtkSMSession> Session;
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -616,7 +673,7 @@ vtkSMStateVersionController::~vtkSMStateVersionController()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
+bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession* session)
 {
   vtkPVXMLElement* root = parent;
   if (parent && strcmp(parent->GetName(), "ServerManagerState") != 0)
@@ -686,6 +743,14 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
   {
     status = Process_5_1_to_5_4()(document);
     version = vtkSMVersion(5, 4, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 5, 0)))
+  {
+    Process_5_4_to_5_5 converter;
+    converter.Session = session;
+    status = converter(document);
+    version = vtkSMVersion(5, 5, 0);
   }
 
   if (status)

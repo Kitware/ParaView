@@ -114,17 +114,6 @@ public:
     DEFAULT_TIME_STEP_LAST
   };
 
-  /**
-   * Enum for TransferFunctionResetMode
-   */
-  enum
-  {
-    GROW_ON_APPLY = 0,
-    GROW_ON_APPLY_AND_TIMESTEP = 1,
-    RESET_ON_APPLY = 2,
-    RESET_ON_APPLY_AND_TIMESTEP = 3
-  };
-
   //@{
   /**
    * Get/Set the transfer function reset mode.
