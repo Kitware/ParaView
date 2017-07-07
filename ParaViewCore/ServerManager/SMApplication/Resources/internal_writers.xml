@@ -324,16 +324,6 @@
       <Documentation>
         Internal proxy used by XMLUniformGridAMRWriter
       </Documentation>
-      <IntVectorProperty command="SetUseSubdirectory"
-                         name="UseSubdirectory"
-                         label="Store Data in Subdirectory"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>This property controls whether the writer puts the files for each piece
-          in the same directory as the pvt* file or in a subdirectory named the same as the
-          pvt* file without its extension</Documentation>
-      </IntVectorProperty>
       <!-- End of XMLPUniformGridAMRWriter-->
     </PWriterProxy>
     <!-- ================================================================= -->
