@@ -154,7 +154,7 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAboveRangeColor"
-                            default_values="1 1 1"
+                            default_values="0.5 0.5 0.5"
                             name="AboveRangeColor"
                             number_of_elements="3"
                             panel_widget="color_selector"
