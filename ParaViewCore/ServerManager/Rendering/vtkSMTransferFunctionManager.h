@@ -87,6 +87,18 @@ public:
   };
 
   /**
+   * Enum for TransferFunctionResetMode
+   */
+  enum TransferFunctionResetMode
+  {
+    NEVER = -1,
+    GROW_ON_APPLY = 0,
+    GROW_ON_APPLY_AND_TIMESTEP = 1,
+    RESET_ON_APPLY = 2,
+    RESET_ON_APPLY_AND_TIMESTEP = 3
+  };
+
+  /**
    * Updates the scalar bar visibility in the view. Based on the specified mode,
    * scalars bars representing non-represented arrays can be automatically hidden;
    * and those corresponding to arrays used for coloring can be automatically shown.

@@ -236,15 +236,15 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
 
     bool extend = false;
 
-    if (rescaleMode == 0 /* Grow and update on Apply */ && !animating)
+    if (rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY && !animating)
     {
       extend = true;
     }
-    else if (rescaleMode == 1 /* Grow and update every timestep */ && animating)
+    else if (rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY_AND_TIMESTEP && animating)
     {
       extend = true;
     }
-    else if (rescaleMode == 3 /* Clamp and update every timestep */ && animating)
+    else if (rescaleMode == vtkSMTransferFunctionManager::RESET_ON_APPLY_AND_TIMESTEP && animating)
     {
       extend = false;
     }

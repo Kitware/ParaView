@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTimeKeeperProxy.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
@@ -227,7 +228,8 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
     // explicitly (BUG #14371).
     if (dialog.lock())
     {
-      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Set(vtkPVGeneralSettings::NEVER);
+      vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+        .Set(vtkSMTransferFunctionManager::NEVER);
       lut->UpdateVTKObjects();
     }
     END_UNDO_SET();
@@ -277,7 +279,8 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
     {
       if (vtkSMProxy* lut = lutProxy(repr))
       {
-        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode").Set(vtkPVGeneralSettings::NEVER);
+        vtkSMPropertyHelper(lut, "AutomaticRescaleRangeMode")
+          .Set(vtkSMTransferFunctionManager::NEVER);
         lut->UpdateVTKObjects();
       }
     }

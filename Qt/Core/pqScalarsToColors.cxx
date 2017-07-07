@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionManager.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 #include <QList>
 #include <QPointer>
@@ -51,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "vtkSMProperty.h"
-#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
@@ -109,7 +110,7 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
   {
     if (lock)
     {
-      pqSMAdaptor::setElementProperty(prop, vtkPVGeneralSettings::NEVER);
+      pqSMAdaptor::setElementProperty(prop, vtkSMTransferFunctionManager::NEVER);
     }
     else
     {
@@ -126,7 +127,7 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
 bool pqScalarsToColors::getScalarRangeLock() const
 {
   vtkSMProperty* prop = this->getProxy()->GetProperty("AutomaticRescaleRangeMode");
-  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() == vtkPVGeneralSettings::NEVER)
+  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() == vtkSMTransferFunctionManager::NEVER)
   {
     return true;
   }
