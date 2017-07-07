@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
-#include "pqHighlightablePushButton.h"
+#include "pqHighlightableToolButton.h"
 #include "pqLabel.h"
 #include "pqLineEdit.h"
 #include "pqPropertiesPanel.h"
@@ -376,11 +376,13 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
 
     // if this has an vtkSMArrayRangeDomain, add a "reset" button.
-    pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+    pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
     resetButton->setObjectName("Reset");
-    resetButton->setToolTip("Reset using current data values");
-    resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
-    resetButton->setFixedWidth(32);
+    QAction* resetActn = new QAction(resetButton);
+    resetActn->setToolTip("Reset using current data values");
+    resetActn->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+    resetButton->addAction(resetActn);
+    resetButton->setDefaultAction(resetActn);
 
     pqCoreUtilities::connect(
       dvp, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));

@@ -78,6 +78,8 @@ set(Module_SRCS
   pqFlatTreeView.h
   pqHighlightablePushButton.cxx
   pqHighlightablePushButton.h
+  pqHighlightableToolButton.cxx
+  pqHighlightableToolButton.h
   pqLineEdit.cxx
   pqLineEditEventPlayer.cxx
   pqLineEditEventPlayer.h
@@ -154,6 +156,7 @@ set (QtWidgets_SRCS
   pqExpanderButton.h
   pqFlatTreeView.h
   pqHighlightablePushButton.h
+  pqHighlightableToolButton.h
   pqLineEditEventPlayer.h
   pqLineEdit.h
   pqListWidgetCheckHelper.h

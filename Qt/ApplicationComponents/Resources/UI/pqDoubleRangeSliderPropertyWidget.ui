@@ -47,7 +47,7 @@
     <widget class="pqDoubleRangeWidget" name="ThresholdBetween_1" native="true"/>
    </item>
    <item row="0" column="2" rowspan="2">
-    <widget class="pqHighlightablePushButton" name="Reset">
+    <widget class="pqHighlightableToolButton" name="Reset">
      <property name="toolTip">
       <string>Reset using current data values</string>
      </property>
@@ -62,9 +62,9 @@
    <header>pqDoubleRangeWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>pqHighlightablePushButton</class>
-   <extends>QPushButton</extends>
-   <header>pqHighlightablePushButton.h</header>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

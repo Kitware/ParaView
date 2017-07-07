@@ -66,7 +66,6 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   Ui::ViewResolutionPropertyWidget& ui = internals.Ui;
   ui.setupUi(this);
   ui.reset->setIcon(ui.reset->style()->standardIcon(QStyle::SP_BrowserReload));
-  ui.reset->setFixedWidth(32);
 
   QIntValidator* iv = new QIntValidator(ui.width);
   iv->setBottom(1);
