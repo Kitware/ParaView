@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
@@ -130,6 +131,21 @@ void pqSaveScreenshotReaction::saveScreenshot()
     return;
   }
 
+  // Cache the separator width and color
+  int width = vtkSMPropertyHelper(shProxy, "SeparatorWidth").GetAsInt();
+  double color[3];
+  vtkSMPropertyHelper(shProxy, "SeparatorColor").Get(color, 3);
+  // Link the vtkSMViewLayoutProxy to vtkSMSaveScreenshotProxy to update
+  // the SeparatorWidth and SeparatorColor
+  vtkNew<vtkSMPropertyLink> widthLink, colorLink;
+  if (layout)
+  {
+    widthLink->AddLinkedProperty(shProxy, "SeparatorWidth", vtkSMLink::INPUT);
+    widthLink->AddLinkedProperty(layout, "SeparatorWidth", vtkSMLink::OUTPUT);
+    colorLink->AddLinkedProperty(shProxy, "SeparatorColor", vtkSMLink::INPUT);
+    colorLink->AddLinkedProperty(layout, "SeparatorColor", vtkSMLink::OUTPUT);
+  }
+
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
   vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
@@ -160,12 +176,19 @@ void pqSaveScreenshotReaction::saveScreenshot()
     }
   }
 
-  if (layout && showWindowDecorations != -1)
+  if (layout)
   {
-    vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    // Reset the separator width and color
+    vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
+    vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
+    if (showWindowDecorations != -1)
+    {
+      vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    }
     layout->UpdateVTKObjects();
+    widthLink->RemoveAllLinks();
+    colorLink->RemoveAllLinks();
   }
-
   // This should not be needed as image capturing code only affects back buffer,
   // however it is currently needed due to paraview/paraview#17256. Once that's
   // fixed, we should remove this.

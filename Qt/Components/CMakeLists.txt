@@ -161,6 +161,8 @@ set (Module_SRCS
   pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
+  pqSplitter.cxx
+  pqSplitter.h
   pqOrbitCreatorDialog.cxx
   pqOrbitCreatorDialog.h
   pqOutputPortComboBox.cxx
@@ -366,6 +368,7 @@ set (Module_MOC_HDRS
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorWidget.h
   pqMultiViewWidget.h
+  pqSplitter.h
   pqOrbitCreatorDialog.h
   pqOutputPortComboBox.h
   pqPipelineAnnotationFilterModel.h

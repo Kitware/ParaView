@@ -44,12 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMSaveAnimationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
-
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
@@ -146,6 +146,21 @@ void pqSaveAnimationReaction::saveAnimation()
     return;
   }
 
+  // Cache the separator width and color
+  int width = vtkSMPropertyHelper(ahProxy, "SeparatorWidth").GetAsInt();
+  double color[3];
+  vtkSMPropertyHelper(ahProxy, "SeparatorColor").Get(color, 3);
+  // Link the vtkSMViewLayoutProxy to vtkSMSaveScreenshotProxy to update
+  // the SeparatorWidth and SeparatorColor
+  vtkNew<vtkSMPropertyLink> widthLink, colorLink;
+  if (layout)
+  {
+    widthLink->AddLinkedProperty(ahProxy, "SeparatorWidth", vtkSMLink::INPUT);
+    widthLink->AddLinkedProperty(layout, "SeparatorWidth", vtkSMLink::OUTPUT);
+    colorLink->AddLinkedProperty(ahProxy, "SeparatorColor", vtkSMLink::INPUT);
+    colorLink->AddLinkedProperty(layout, "SeparatorColor", vtkSMLink::OUTPUT);
+  }
+
   controller->PreInitializeProxy(ahProxy);
   vtkSMPropertyHelper(ahProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(ahProxy, "Layout").Set(layout);
@@ -176,12 +191,18 @@ void pqSaveAnimationReaction::saveAnimation()
     dialog.setWindowTitle("Save Animation Options");
     dialog.setEnableSearchBar(true);
     dialog.setSettingsKey("SaveAnimationDialog");
+
     if (dialog.exec() != QDialog::Accepted)
     {
       if (layout)
       {
+        // Reset the separator width and color
+        vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
+        vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
         vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
         layout->UpdateVTKObjects();
+        widthLink->RemoveAllLinks();
+        colorLink->RemoveAllLinks();
       }
       return;
     }
@@ -202,10 +223,18 @@ void pqSaveAnimationReaction::saveAnimation()
     }
   }
 
-  if (layout && showWindowDecorations != -1)
+  if (layout)
   {
-    vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    // Reset the separator width and color
+    vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
+    vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
+    if (showWindowDecorations != -1)
+    {
+      vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    }
     layout->UpdateVTKObjects();
+    widthLink->RemoveAllLinks();
+    colorLink->RemoveAllLinks();
   }
 
   if (!disconnectAndSave)
