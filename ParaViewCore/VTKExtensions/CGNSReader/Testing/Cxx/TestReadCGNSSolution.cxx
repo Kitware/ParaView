@@ -20,14 +20,13 @@
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 
-#define TEST_SUCCESS 0
-#define TEST_FAILED 1
+#include <string>
 
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
   {                                                                                                \
     cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;               \
-    return TEST_FAILED;                                                                            \
+    return EXIT_FAILURE;                                                                           \
   }
 
 int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type);
@@ -59,25 +58,28 @@ int TestOutputData(vtkMultiBlockDataSet* mb, int nCells, int nArrays)
 
 int TestReadCGNSSolution(int argc, char* argv[])
 {
-  if (argc < 3)
-    return 0; // for some reason two tests are run, one without data file on cmd line
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "channelBump_solution.cgns");
+  std::string solution = fname ? fname : "";
+  delete[] fname;
 
-  const char* solution = argv[2];
   vtkNew<vtkCGNSReader> reader;
-  reader->SetFileName(solution);
+  reader->SetFileName(solution.c_str());
   reader->UpdateInformation();
   reader->EnableAllCellArrays();
   reader->EnableAllPointArrays();
   reader->Update();
 
   vtkMultiBlockDataSet* mb = reader->GetOutput();
-
   if (0 != TestOutput(mb, 19742, VTK_POLYHEDRON))
-    return 1;
+  {
+    return EXIT_FAILURE;
+  }
 
   if (0 != TestOutputData(mb, 19742, 20))
-    return 1;
+  {
+    return EXIT_FAILURE;
+  }
 
   cout << __FILE__ << " tests passed." << endl;
-  return 0;
+  return EXIT_SUCCESS;
 }
