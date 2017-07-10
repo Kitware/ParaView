@@ -4,7 +4,6 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
-
 Changes in 5.5
 --------------
 
@@ -13,6 +12,36 @@ Changes in 5.5
 `vtkSMViewProxy::CaptureWindowInternal` now takes a 2-component magnification
 factor rather than a single component. That allows for more accurate target image
 resolution than before (see #17567).
+
+###Replaced LockScalarRange property in PVLookupTable with AutomaticRescaleRangeMode###
+
+The `LockScalarRange` property in the `PVLookupTable` proxy has been removed. It
+has been replaced by the `AutomaticRescaleRangeMode` property. When
+`AutomaticRescaleRangeMode` is set to `vtkSMTransferFunctionManager::Never`,
+the transfer function minimum and maximum value is never updated, no matter what
+event occurs. This corresponds to when `LockScalarRange` was set to "on" in
+previous versions of ParaView. When `AutomaticRescaleRangeMode` is set to a
+different option, that option governs how and when the transfer function is
+reset. This option overrides whichever option is set in the `GeneralSettings`
+property `TransferFunctionResetMode`.
+
+The `TransferFunctionResetMode` property still exists, but it has been slightly
+repurposed. No longer does it control the range reset mode for ALL transfer
+functions. Instead, it serves the following functions:
+
+* determining the `AutomaticRescaleRangeMode` when a lookup table is created, and
+
+* determining what the `AutomaticRescaleRangeMode` should be when the data array
+  range is updated to the data range of the selected representation
+
+As part of this change, the enum values
+
+    GROW_ON_APPLY
+    GROW_ON_APPLY_AND_TIMESTEP
+    RESET_ON_APPLY
+    RESET_ON_APPLY_AND_TIMESTEP
+
+have been moved from `vtkPVGeneralSettings.h` to `vtkSMTransferFunctionManager.h`.
 
 Changes in 5.4
 --------------
