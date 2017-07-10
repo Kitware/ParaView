@@ -31,27 +31,6 @@ vtkStandardNewMacro(vtkNvPipeCompressor);
 vtkInformationKeyMacro(vtkNvPipeCompressor, PIXELS_SKIPPED, Integer);
 
 //-----------------------------------------------------------------------------
-static void add_ptx_paths(nvpipe* codec)
-{
-  const std::string argv0dir = vtkProcessModule::GetProcessModule()->GetSelfDir();
-  if (argv0dir.empty())
-  {
-    return;
-  }
-  const std::string dirs[] = {
-    argv0dir + "/../ThirdParty/NvPipe/vtknvpipe/", argv0dir + "/../../",
-  };
-  for (const std::string& d : dirs)
-  {
-    const nvp_err_t nverr = nvpipe_ptx_path(codec, d.c_str());
-    if (NVPIPE_SUCCESS != nverr)
-    {
-      vtkGenericWarningMacro("Error " << nverr << " adding PTX path: " << nvpipe_strerror(nverr));
-    }
-  }
-}
-
-//-----------------------------------------------------------------------------
 vtkNvPipeCompressor::vtkNvPipeCompressor()
   : Quality(1)
   , Width(1920)
@@ -90,7 +69,6 @@ int vtkNvPipeCompressor::Compress()
       vtkErrorMacro("Could not create NvPipe encoder.");
       return VTK_ERROR;
     }
-    add_ptx_paths(this->Pipe);
     this->Bitrate = brate;
   }
 
@@ -99,14 +77,15 @@ int vtkNvPipeCompressor::Compress()
   if (this->Bitrate < brate / 2 || this->Bitrate > brate * 2)
   {
     nvpipe_bitrate(this->Pipe, brate);
+    this->Bitrate = brate;
   }
 
   vtkUnsignedCharArray* input = this->GetInput();
-  const int num_pixels = input->GetNumberOfTuples();
-  assert(num_pixels == this->Width * this->Height);
   assert(input->GetNumberOfComponents() == 4); // Expecting RGBA data.
 
-  const size_t input_size = num_pixels * 4;
+  const int num_pixels = this->Width * this->Height;
+  assert(num_pixels <= input->GetNumberOfTuples());
+
   const uint8_t* rgba = (const uint8_t*)input->GetPointer(0);
 
   size_t output_size = num_pixels * 3;
@@ -162,7 +141,6 @@ int vtkNvPipeCompressor::Decompress()
       vtkErrorMacro("Could not create NvPipe decoder.");
       return VTK_ERROR;
     }
-    add_ptx_paths(this->Pipe);
   }
 
   const uint8_t* strm = this->Input->GetPointer(0);
