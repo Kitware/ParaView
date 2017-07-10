@@ -1545,6 +1545,13 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     // Disable the renderer's FXAA implementation when rendering remotely. We
     // need to run it on the composed image to avoid seam artifacts.
     this->RenderView->GetRenderer()->SetUseFXAA(false);
+
+    // Force opaque rendering for the GridAxes. Needed so that the grid axes
+    // labels are visible when not using ordered compositing (see bug #17472)
+    if (this->GridAxes3DActor)
+    {
+      this->GridAxes3DActor->SetForceOpaque(true);
+    }
   }
   else
   {

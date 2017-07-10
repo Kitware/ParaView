@@ -70,6 +70,7 @@ paraview_add_test_python(
 
 # These tests could run safely in serial and parallel (and with both GL backends).
 set(PVBATCH_TESTS
+  BatchAxesGrid.py
   StructuredGridVolumeRendering.py
   PLYWriter.py
   )
