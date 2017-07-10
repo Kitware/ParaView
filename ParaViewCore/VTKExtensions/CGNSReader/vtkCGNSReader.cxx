@@ -615,7 +615,6 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
       cgio_get_label(self->cgioNum, childId[cc], nodeLabel) == CG_OK &&
       strcmp(nodeLabel, "FlowSolution_t") == 0)
     {
-
       if (stepNumbers.size() > 0)
       {
         if (stepRe.find(nodeName) == true &&
@@ -633,24 +632,54 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
         solutionNames.push_back(nodeName);
       }
     }
-    cgio_release_id(self->cgioNum, childId[cc]);
   }
 
   if (solutionNames.empty())
   {
-    // if we still have no solution nodes discovered, then we read the 1st solution node.
+    // if we still have no solution nodes discovered, then we read the 1st solution node for
+    // each GridLocation (see paraview/paraview#17586).
     // C'est la vie!
-    double solId = 0;
-    if (CGNSRead::getFirstNodeId(self->cgioNum, self->currentId, "FlowSolution_t", &solId) == CG_OK)
+    std::set<CGNS_ENUMT(GridLocation_t)> handledCenterings;
+    for (size_t cc = 0; cc < childId.size(); ++cc)
     {
+      CGNSRead::char_33 nodeLabel;
       CGNSRead::char_33 nodeName;
-      if (cgio_get_name(self->cgioNum, solId, nodeName) == CG_OK)
+      if (cgio_get_name(self->cgioNum, childId[cc], nodeName) == CG_OK &&
+        cgio_get_label(self->cgioNum, childId[cc], nodeLabel) == CG_OK &&
+        strcmp(nodeLabel, "FlowSolution_t") == 0)
       {
-        solutionNames.push_back(nodeName);
+        CGNS_ENUMT(GridLocation_t) varCentering = CGNS_ENUMV(Vertex);
+        double gridLocationNodeId = 0.0;
+        if (CGNSRead::getFirstNodeId(
+              self->cgioNum, childId[cc], "GridLocation_t", &gridLocationNodeId) == CG_OK)
+        {
+          std::string location;
+          CGNSRead::readNodeStringData(self->cgioNum, gridLocationNodeId, location);
+          if (location == "Vertex")
+          {
+            varCentering = CGNS_ENUMV(Vertex);
+          }
+          else if (location == "CellCenter")
+          {
+            varCentering = CGNS_ENUMV(CellCenter);
+          }
+          else
+          {
+            varCentering = CGNS_ENUMV(GridLocationNull);
+          }
+          cgio_release_id(self->cgioNum, gridLocationNodeId);
+        }
+        if (handledCenterings.find(varCentering) == handledCenterings.end())
+        {
+          handledCenterings.insert(varCentering);
+          solutionNames.push_back(nodeName);
+        }
       }
-      cgio_release_id(self->cgioNum, solId);
     }
   }
+
+  CGNSRead::releaseIds(self->cgioNum, childId);
+  childId.clear();
 
   // Since we are not too careful about avoiding duplicates in solutionNames
   // array, let's clean it up here.
