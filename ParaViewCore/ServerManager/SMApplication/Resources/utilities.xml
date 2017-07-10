@@ -3699,7 +3699,7 @@
             <Group name="filters" />
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkHierarchicalBoxDataSet" />
+            <DataType value="vtkOverlappingAMR" />
           </DataTypeDomain>
           <Documentation>
             The input.
