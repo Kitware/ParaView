@@ -94,6 +94,11 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
     ui.labelOrigin->setText(origin->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
+    QString tooltip = this->getTooltip(origin);
+    ui.originX->setToolTip(tooltip);
+    ui.originY->setToolTip(tooltip);
+    ui.originZ->setToolTip(tooltip);
+    ui.labelOrigin->setToolTip(tooltip);
   }
   else
   {
@@ -106,6 +111,11 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
     this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
     this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
     ui.labelNormal->setText(normal->GetXMLLabel());
+    QString tooltip = this->getTooltip(normal);
+    ui.normalX->setToolTip(tooltip);
+    ui.normalY->setToolTip(tooltip);
+    ui.normalZ->setToolTip(tooltip);
+    ui.labelNormal->setToolTip(tooltip);
   }
   else
   {

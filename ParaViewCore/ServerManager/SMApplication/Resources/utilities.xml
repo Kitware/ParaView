@@ -591,12 +591,20 @@
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNormal"
                             default_values="1.0 0.0 0.0"
                             name="Normal"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetOffset"
