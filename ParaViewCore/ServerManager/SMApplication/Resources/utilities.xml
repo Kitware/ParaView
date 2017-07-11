@@ -660,6 +660,9 @@
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetRotation"
@@ -667,6 +670,9 @@
                             name="Rotation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetScale"
@@ -674,6 +680,9 @@
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Position" />

@@ -22,6 +22,9 @@
    </property>
    <item>
     <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Show the interactive box widget in the 3d scene.</string>
+     </property>
      <property name="text">
       <string>Show Box</string>
      </property>
@@ -92,6 +95,9 @@
     <layout class="QGridLayout">
      <item row="3" column="0">
       <widget class="QCheckBox" name="enableRotation">
+       <property name="toolTip">
+        <string>Enable rotation of the 3d box widget.</string>
+       </property>
        <property name="text">
         <string>Rotation</string>
        </property>
@@ -99,6 +105,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QCheckBox" name="enableTranslation">
+       <property name="toolTip">
+        <string>Enable translation of the 3d box widget.</string>
+       </property>
        <property name="text">
         <string>Translation</string>
        </property>
@@ -106,6 +115,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QCheckBox" name="enableScaling">
+       <property name="toolTip">
+        <string>Enable scaling of the 3d box widget.</string>
+       </property>
        <property name="text">
         <string>Scaling</string>
        </property>
@@ -113,6 +125,9 @@
      </item>
      <item row="3" column="1">
       <widget class="QCheckBox" name="enableMoveFaces">
+       <property name="toolTip">
+        <string>Enable moving faces of the 3d box widget.</string>
+       </property>
        <property name="text">
         <string>Face Movement</string>
        </property>
