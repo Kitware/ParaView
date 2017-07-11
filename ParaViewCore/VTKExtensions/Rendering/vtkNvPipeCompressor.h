@@ -38,11 +38,11 @@ public:
 
   //@{
   /**
-   * Set the quality measure. The value can be between 0 and 5. 0 means
-   * preserve input image quality while 5 emphasizes compression ratio at the
+   * Set the quality measure. The value can be between 1 and 5. 5 means
+   * preserve input image quality while 1 emphasizes compression ratio at the
    * expense of image quality.
    */
-  vtkSetClampMacro(Quality, unsigned int, 0, 5);
+  vtkSetClampMacro(Quality, unsigned int, 1, 5);
   vtkGetMacro(Quality, unsigned int);
   //@}
 

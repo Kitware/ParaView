@@ -53,10 +53,8 @@ int vtkNvPipeCompressor::Compress()
     vtkWarningMacro("Cannot compress: empty input or output detected.");
     return VTK_ERROR;
   }
-  // We use the user's quality setting as our f_m value.  But the user setting
-  // is inverted from how f_m is used, so invert it.
   assert(this->Quality <= 5);
-  const uint64_t f_m = (5u - this->Quality) + 1u;
+  const uint64_t f_m = this->Quality;
   const uint64_t fps = 30;
   const uint64_t brate = static_cast<uint64_t>(this->Width * this->Height * fps * f_m * 0.07);
   if (NULL == this->Pipe)
@@ -70,9 +68,7 @@ int vtkNvPipeCompressor::Compress()
     this->Bitrate = brate;
   }
 
-  // We choose our bitrate based on the image size.  If the window has been
-  // significantly resized, we should update the bitrate.
-  if (this->Bitrate < brate / 2 || this->Bitrate > brate * 2)
+  if (this->Bitrate != brate)
   {
     nvpipe_bitrate(this->Pipe, brate);
     this->Bitrate = brate;
