@@ -717,6 +717,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="1"
@@ -727,6 +730,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
