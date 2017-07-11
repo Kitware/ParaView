@@ -2,6 +2,7 @@
 #define COSMOLOGYTOOLSDEFINITIONS_H_
 
 // C/C++ required includes
+#include <inttypes.h>
 #include <stdint.h>
 #include <map>
 #include <string>
@@ -85,7 +86,7 @@
 #ifdef TYPE_IDS_64BITS
   typedef int64_t ID_T;
   #define MPI_ID_T MPI_INT64_T
-  #define ID_T_FMT "lld"
+  #define ID_T_FMT PRId64
 
 #ifndef MPI_INT64_T
 #define MPI_INT64_T (sizeof(long) == 8 ? MPI_LONG : MPI_LONG_LONG)
@@ -98,7 +99,7 @@
 #else
   typedef int32_t ID_T;
   #define MPI_ID_T MPI_INT32_T
-  #define ID_T_FMT "ld"
+  #define ID_T_FMT PRId32
 
 #ifdef USEDIY
   #define DIY_ID_T DIY_INT
