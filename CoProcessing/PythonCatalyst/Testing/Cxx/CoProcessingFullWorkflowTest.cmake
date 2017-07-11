@@ -27,6 +27,8 @@ file(REMOVE
   "${COPROCESSING_TEST_DIR}/image_1_0.png"
   "${COPROCESSING_TEST_DIR}/filename_0.pvtp"
   "${COPROCESSING_TEST_DIR}/filename_0_0.vtp"
+  "${COPROCESSING_TEST_DIR}/file_00.pvtp"
+  "${COPROCESSING_TEST_DIR}/file_00_0.vtp"
   "${COPROCESSING_TEST_DIR}/cinema")
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
@@ -109,6 +111,17 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflow")
     ${PVBATCH_EXECUTABLE} -dr
     ${COPROCESSING_OUTPUTCHECK_SCRIPT}
     ${COPROCESSING_TEST_DIR}/filename_0.pvtp
+    RESULT_VARIABLE rv)
+  if(rv)
+    message(FATAL_ERROR "vtkpython return value was = '${rv}' ")
+  endif()
+endif()
+
+if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowWithOnlyExtracts")
+  execute_process_with_echo(COMMAND
+    ${PVBATCH_EXECUTABLE} -dr
+    ${COPROCESSING_OUTPUTCHECK_SCRIPT}
+    ${COPROCESSING_TEST_DIR}/file_00.pvtp
     RESULT_VARIABLE rv)
   if(rv)
     message(FATAL_ERROR "vtkpython return value was = '${rv}' ")
