@@ -86,6 +86,11 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
     this->addPropertyLink(ui.centerY, "text2", SIGNAL(textChangedAndEditingFinished()), center, 1);
     this->addPropertyLink(ui.centerZ, "text2", SIGNAL(textChangedAndEditingFinished()), center, 2);
     ui.centerLabel->setText(center->GetXMLLabel());
+    QString tooltip = this->getTooltip(center);
+    ui.centerX->setToolTip(tooltip);
+    ui.centerY->setToolTip(tooltip);
+    ui.centerZ->setToolTip(tooltip);
+    ui.centerLabel->setToolTip(tooltip);
   }
   else
   {
@@ -98,6 +103,11 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
     this->addPropertyLink(ui.axisY, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 1);
     this->addPropertyLink(ui.axisZ, "text2", SIGNAL(textChangedAndEditingFinished()), axis, 2);
     ui.axisLabel->setText(axis->GetXMLLabel());
+    QString tooltip = this->getTooltip(axis);
+    ui.axisX->setToolTip(tooltip);
+    ui.axisY->setToolTip(tooltip);
+    ui.axisZ->setToolTip(tooltip);
+    ui.axisLabel->setToolTip(tooltip);
   }
   else
   {
@@ -108,6 +118,9 @@ pqCylinderPropertyWidget::pqCylinderPropertyWidget(
   {
     this->addPropertyLink(ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
     ui.radiusLabel->setText(radius->GetXMLLabel());
+    QString tooltip = this->getTooltip(radius);
+    ui.radius->setToolTip(tooltip);
+    ui.radiusLabel->setToolTip(tooltip);
   }
   else
   {

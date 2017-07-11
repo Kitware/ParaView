@@ -757,11 +757,19 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientedAxis"
                             default_values="0. 1. 0."
                             name="Axis"
                             number_of_elements="3">
+        <Documentation>
+          Set the axis of the cylinder.  This is the direction from the center of one end of
+          the cylinder to the center of the other end.  The cylinder created has infinite length
+          but this direction controls which line through the center point the cylinder is around.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="0.5"
@@ -772,6 +780,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
         <Property function="Center" name="Center" />
