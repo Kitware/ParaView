@@ -693,6 +693,8 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     case AMR_BLOCK:
     case PROCESSID:
     case QUERY:
+    case POINTS_NEAR:
+    case POINT_IN_CELL:
     case ANY:
       // Options not supported
       break;
