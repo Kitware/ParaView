@@ -28,8 +28,6 @@
 
 vtkStandardNewMacro(vtkNvPipeCompressor);
 
-vtkInformationKeyMacro(vtkNvPipeCompressor, PIXELS_SKIPPED, Integer);
-
 //-----------------------------------------------------------------------------
 vtkNvPipeCompressor::vtkNvPipeCompressor()
   : Quality(1)
@@ -96,21 +94,8 @@ int vtkNvPipeCompressor::Compress()
     return VTK_ERROR;
   }
 
-  // NvPipe input images must be even.  Just pretend one row of pixels does not
-  // exist if the image is not appropriately sized.
-  const size_t h = this->Height % 2 == 0 ? this->Height : this->Height - 1;
-  vtkInformation* info = this->Output->GetInformation();
-  if (this->Height % 2 == 0)
-  {
-    info->Set(PIXELS_SKIPPED(), 0);
-  }
-  else
-  {
-    info->Set(PIXELS_SKIPPED(), 1);
-  }
-
   const nvp_err_t encerr = nvpipe_encode(
-    this->Pipe, rgba, num_pixels * 4, obuf, &output_size, this->Width, h, NVPIPE_RGBA);
+    this->Pipe, rgba, num_pixels * 4, obuf, &output_size, this->Width, this->Height, NVPIPE_RGBA);
   if (NVPIPE_SUCCESS != encerr)
   {
     vtkErrorMacro("NvPipe encode error (" << (int)encerr << "): " << nvpipe_strerror(encerr));
@@ -146,15 +131,13 @@ int vtkNvPipeCompressor::Decompress()
   const uint8_t* strm = this->Input->GetPointer(0);
   const size_t insz = this->Input->GetNumberOfTuples() * this->Input->GetNumberOfComponents();
 
-  size_t w = this->Width;
-  size_t h = this->Height % 2 == 0 ? this->Height : this->Height - 1;
-
   vtkUnsignedCharArray* out = this->GetOutput();
   // NvPipe strips the alpha channel if it's given; output is always RGB.
   out->SetNumberOfComponents(3);
   const size_t imgsz = static_cast<size_t>(out->GetNumberOfTuples() * out->GetNumberOfComponents());
-  assert(imgsz >= w * h * 3);
-  const nvp_err_t decerr = nvpipe_decode(this->Pipe, strm, insz, out->GetPointer(0), w, h);
+  assert(imgsz >= this->Width * this->Height * 3);
+  const nvp_err_t decerr =
+    nvpipe_decode(this->Pipe, strm, insz, out->GetPointer(0), this->Width, this->Height);
 
   if (decerr != NVPIPE_SUCCESS)
   {

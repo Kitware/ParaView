@@ -27,7 +27,6 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessStream;
-class vtkInformationIntegerKey;
 typedef void nvpipe;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkNvPipeCompressor : public vtkImageCompressor
@@ -65,8 +64,6 @@ public:
   virtual const char* SaveConfiguration();
   virtual const char* RestoreConfiguration(const char* stream);
   //@}
-
-  static vtkInformationIntegerKey* PIXELS_SKIPPED();
 
 protected:
   vtkNvPipeCompressor();
