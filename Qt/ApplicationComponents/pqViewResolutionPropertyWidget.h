@@ -82,8 +82,7 @@ signals:
 
 private slots:
   void resetButtonClicked();
-  void scaleHalf();
-  void scaleTwice();
+  void scale(double factor);
   void widthTextEdited(const QString&);
   void heightTextEdited(const QString&);
   void lockAspectRatioToggled(bool);
