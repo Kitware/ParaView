@@ -92,6 +92,8 @@ set(Module_SRCS
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
   pqQuickLaunchDialog.h
+  pqScaleByButton.cxx
+  pqScaleByButton.h
   pqSectionVisibilityContextMenu.cxx
   pqSectionVisibilityContextMenu.h
   pqSetData.cxx
@@ -163,6 +165,7 @@ set (QtWidgets_SRCS
   pqListWidgetItemObject.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
+  pqScaleByButton.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h

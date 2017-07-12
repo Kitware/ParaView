@@ -29,9 +29,18 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqDoubleVectorPropertyWidget.h"
 
+#include "pqCoreUtilities.h"
+#include "pqDoubleRangeWidget.h"
+#include "pqHighlightableToolButton.h"
+#include "pqLabel.h"
+#include "pqLineEdit.h"
+#include "pqPropertiesPanel.h"
+#include "pqScalarValueListPropertyWidget.h"
+#include "pqScaleByButton.h"
+#include "pqSignalAdaptors.h"
+#include "pqWidgetRangeDomain.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
@@ -44,16 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-
-#include "pqCoreUtilities.h"
-#include "pqDoubleRangeWidget.h"
-#include "pqHighlightableToolButton.h"
-#include "pqLabel.h"
-#include "pqLineEdit.h"
-#include "pqPropertiesPanel.h"
-#include "pqScalarValueListPropertyWidget.h"
-#include "pqSignalAdaptors.h"
-#include "pqWidgetRangeDomain.h"
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
@@ -354,23 +353,9 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
   {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
-    QToolButton* scaleButton = new QToolButton(this);
-    scaleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    pqScaleByButton* scaleButton = new pqScaleByButton(this);
     scaleButton->setObjectName("ScaleBy");
-    scaleButton->setToolTip("Scale by ...");
-    scaleButton->setPopupMode(QToolButton::InstantPopup);
-
-    QAction* actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "0.5X", scaleButton);
-    actn->setObjectName("x0.5");
-    this->connect(actn, SIGNAL(triggered()), SLOT(scaleHalf()));
-    scaleButton->addAction(actn);
-    scaleButton->setDefaultAction(actn);
-
-    actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "2X", scaleButton);
-    actn->setObjectName("x2.0");
-    this->connect(actn, SIGNAL(triggered()), SLOT(scaleTwice()));
-    scaleButton->addAction(actn);
-
+    this->connect(scaleButton, SIGNAL(scale(double)), SLOT(scale(double)));
     layoutLocal->addWidget(scaleButton, 0, Qt::AlignBottom);
 
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
