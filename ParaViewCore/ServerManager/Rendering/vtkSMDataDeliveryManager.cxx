@@ -60,7 +60,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     ? view->GetUseDistributedRenderingForInteractiveRender()
     : view->GetUseDistributedRenderingForStillRender();
 
-  unsigned long update_ts = view->GetUpdateTimeStamp();
+  vtkMTimeType update_ts = view->GetUpdateTimeStamp();
   int delivery_type = LOCAL_RENDERING_AND_FULL_RES;
   if (!use_lod && use_distributed_rendering)
   {

@@ -795,7 +795,7 @@ public:
   /**
    * Provides access to the time when Update() was last called.
    */
-  unsigned long GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
+  vtkMTimeType GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
 
   /**
    * Copy internal fields that are used for rendering decision such as

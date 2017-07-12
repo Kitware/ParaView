@@ -171,7 +171,7 @@ public:
    * server-sides using Deliver().
    */
   bool NeedsDelivery(
-    unsigned long timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
+    vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
 
   /**
    * Triggers delivery for the geometries of indicated representations.
