@@ -42,6 +42,7 @@ vtkGridAxes3DActor::vtkGridAxes3DActor()
   , LabelUniqueEdgesOnly(true)
   , UseCustomLabels(false)
   , CustomLabelsMTime(0)
+  , ForceOpaque(false)
   , GetBoundsMTime(0)
 {
   this->GridBounds[0] = this->GridBounds[2] = this->GridBounds[4] = 0.0;
@@ -558,6 +559,7 @@ void vtkGridAxes3DActor::ShallowCopy(vtkProp* prop)
   this->SetGenerateEdges(other->GetGenerateEdges());
   this->SetGenerateTicks(other->GetGenerateTicks());
   this->SetProperty(other->GetProperty());
+  this->SetForceOpaque(other->GetForceOpaque());
   for (int cc = 0; cc < 3; cc++)
   {
     this->SetTitleTextProperty(cc, other->GetTitleTextProperty(cc));
