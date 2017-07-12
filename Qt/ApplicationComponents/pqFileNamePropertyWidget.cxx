@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
-#include "pqHighlightablePushButton.h"
+#include "pqHighlightableToolButton.h"
 #include "pqLineEdit.h"
 #include "pqListPropertyWidget.h"
 #include "pqPropertiesPanel.h"
@@ -94,10 +94,13 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically allocated";
 
   // add a "reset" button.
-  pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+  pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
   resetButton->setObjectName("Reset");
-  resetButton->setToolTip("Reset using current data values");
-  resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+  QAction* resetActn = new QAction(resetButton);
+  resetActn->setToolTip("Reset using current data values");
+  resetActn->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+  resetButton->addAction(resetActn);
+  resetButton->setDefaultAction(resetActn);
 
   pqCoreUtilities::connect(
     svp, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));

@@ -82,7 +82,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqHighlightablePushButton" name="reset">
+    <widget class="pqHighlightableToolButton" name="reset">
      <property name="toolTip">
       <string>Reset to default based on current values</string>
      </property>
@@ -100,9 +100,9 @@
    <header>pqLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>pqHighlightablePushButton</class>
-   <extends>QPushButton</extends>
-   <header>pqHighlightablePushButton.h</header>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

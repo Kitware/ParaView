@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqHighlightablePushButton.cxx
+   Module:  pqHighlightableToolButton.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqHighlightablePushButton.h"
+#include "pqHighlightableToolButton.h"
 
-#include <QColor>
-#include <QPalette>
-
-class pqHighlightablePushButton::pqInternals
-{
-public:
-  QPalette ResetPalette;
-};
+#include <iostream>
 
 //-----------------------------------------------------------------------------
-pqHighlightablePushButton::pqHighlightablePushButton(QWidget* parentA)
-  : Superclass(parentA)
-  , Internals(new pqHighlightablePushButton::pqInternals())
-{
-  this->Internals->ResetPalette = this->palette();
-}
-
-//-----------------------------------------------------------------------------
-pqHighlightablePushButton::pqHighlightablePushButton(const QString& textA, QWidget* parentA)
-  : Superclass(textA, parentA)
-  , Internals(new pqHighlightablePushButton::pqInternals())
-{
-  this->Internals->ResetPalette = this->palette();
-}
-
-//-----------------------------------------------------------------------------
-pqHighlightablePushButton::pqHighlightablePushButton(
-  const QIcon& iconA, const QString& textA, QWidget* parentA)
-  : Superclass(iconA, textA, parentA)
-  , Internals(new pqHighlightablePushButton::pqInternals())
-{
-  this->Internals->ResetPalette = this->palette();
-}
-
-//-----------------------------------------------------------------------------
-pqHighlightablePushButton::~pqHighlightablePushButton()
+pqHighlightableToolButton::pqHighlightableToolButton(QWidget* parentObject)
+  : Superclass(parentObject)
+  , ResetPalette(this->palette())
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqHighlightablePushButton::highlight(bool clearHighlight)
+pqHighlightableToolButton::~pqHighlightableToolButton()
 {
-  QPalette buttonPalette = this->Internals->ResetPalette;
+}
+
+//-----------------------------------------------------------------------------
+void pqHighlightableToolButton::highlight(bool clearHighlight)
+{
+  QPalette buttonPalette = this->ResetPalette;
   if (clearHighlight == false)
   {
     buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));

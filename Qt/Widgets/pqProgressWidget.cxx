@@ -90,15 +90,13 @@ protected:
   QStyle* astyle() { return this->Style ? this->Style : this->style(); }
   void paintEvent(QPaintEvent* evt)
   {
-    this->QLabel::paintEvent(evt);
-
     QStyleOptionProgressBar pbstyle;
     pbstyle.initFrom(this);
     pbstyle.minimum = 0;
     pbstyle.progress = this->ShowProgress ? this->ProgressPercentage : 0;
     pbstyle.maximum = 100;
     pbstyle.text = this->ShowProgress
-      ? QString("%1 (%2\%)").arg(this->text()).arg(this->ProgressPercentage)
+      ? QString("%1 (%2%)").arg(this->text()).arg(this->ProgressPercentage)
       : this->text();
     pbstyle.textAlignment = this->alignment();
     pbstyle.rect = this->rect();
@@ -106,12 +104,20 @@ protected:
     QPainter painter(this);
     if (this->ShowProgress && this->ProgressPercentage > 0)
     {
+      // let's print the frame border etc.
+      // note we're skipping QLabel code to avoid overlapping label text.
+      this->QFrame::paintEvent(evt);
+
       // we deliberately don't draw the progress bar groove to avoid a dramatic
       // change in the progress bar.
       pbstyle.textVisible = false;
       this->astyle()->drawControl(QStyle::CE_ProgressBarContents, &pbstyle, &painter, this);
       pbstyle.textVisible = true;
       this->astyle()->drawControl(QStyle::CE_ProgressBarLabel, &pbstyle, &painter, this);
+    }
+    else
+    {
+      this->QLabel::paintEvent(evt);
     }
   }
 

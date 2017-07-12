@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
-#include "pqHighlightablePushButton.h"
+#include "pqHighlightableToolButton.h"
 #include "pqLabel.h"
 #include "pqLineEdit.h"
 #include "pqPropertiesPanel.h"
@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QStyle>
+#include <QToolButton>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   vtkSMProperty* smProperty, vtkSMProxy* smProxy, QWidget* parentObject)
@@ -353,29 +354,35 @@ void pqDoubleVectorPropertyWidget::propertyDomainModified(vtkObject* domainObjec
     dvp->FindDomain("vtkSMBoundsDomain") != NULL)
   {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
-    QPushButton* scaleButton = new QPushButton("X", this);
+    QToolButton* scaleButton = new QToolButton(this);
+    scaleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     scaleButton->setObjectName("ScaleBy");
     scaleButton->setToolTip("Scale by ...");
-    scaleButton->setFixedWidth(32);
-    QMenu* menu = new QMenu(scaleButton);
-    menu->setObjectName("ScaleMenu");
-    QAction* actn = menu->addAction("0.5X");
+    scaleButton->setPopupMode(QToolButton::InstantPopup);
+
+    QAction* actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "0.5X", scaleButton);
     actn->setObjectName("x0.5");
     this->connect(actn, SIGNAL(triggered()), SLOT(scaleHalf()));
-    actn = menu->addAction("2X");
+    scaleButton->addAction(actn);
+    scaleButton->setDefaultAction(actn);
+
+    actn = new QAction(QIcon(":/QtWidgets/Icons/pqMultiply.png"), "2X", scaleButton);
     actn->setObjectName("x2.0");
     this->connect(actn, SIGNAL(triggered()), SLOT(scaleTwice()));
-    scaleButton->setMenu(menu);
+    scaleButton->addAction(actn);
+
     layoutLocal->addWidget(scaleButton, 0, Qt::AlignBottom);
 
     PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
 
     // if this has an vtkSMArrayRangeDomain, add a "reset" button.
-    pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+    pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
     resetButton->setObjectName("Reset");
-    resetButton->setToolTip("Reset using current data values");
-    resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
-    resetButton->setFixedWidth(32);
+    QAction* resetActn = new QAction(resetButton);
+    resetActn->setToolTip("Reset using current data values");
+    resetActn->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+    resetButton->addAction(resetActn);
+    resetButton->setDefaultAction(resetActn);
 
     pqCoreUtilities::connect(
       dvp, vtkCommand::DomainModifiedEvent, this, SIGNAL(highlightResetButton()));
