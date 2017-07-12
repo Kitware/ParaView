@@ -372,6 +372,9 @@ void pqProxyGroupMenuManager::populateMenu()
   // actions that are no longer shown in the menu. Hence we disconnect all
   // signal connections.
   QMenu* _menu = this->menu();
+  // Fix for BUG #17387
+  _menu->setStyleSheet("QMenu { menu-scrollable: 1; }");
+
   QList<QAction*> menuActions = _menu->actions();
   foreach (QAction* action, menuActions)
   {
