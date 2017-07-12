@@ -1,0 +1,209 @@
+<ServerManagerConfiguration>
+  <!--<ProxyGroup name="sources">-->
+  <ProxyGroup name="genericio_internal_sources">
+    <SourceProxy name="vtkGenIOReader" class="vtkGenIOReader" label="GenericIO Reader">
+      <Documentation
+        short_help="Read GenericIO file types."
+        long_help="Read various types of data types in the GenericIO Family">
+      </Documentation>
+
+      <StringVectorProperty
+        name="Filename:"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the GenIO reader pointing to the file.
+        </Documentation> 
+      </StringVectorProperty>
+
+
+      <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Particle Arrays" >
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          List the variables.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo" information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+
+
+      <!-- Information to show -->
+      <IntVectorProperty
+        name="Sampling Type:"
+        command="SetSampleType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="All data (sampled)"/>
+          <Entry value="3" text="Selection (AND)"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property indicates which sampling method to be used.
+        </Documentation>
+      </IntVectorProperty>
+
+
+
+      <!-- Sampling type -->
+      <IntVectorProperty name="Power cube sampling"
+        command="SetPercentageType"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+
+<!-- Data perc
+entage -->
+<DoubleVectorProperty name="Show Data %:"
+  command="SetDataPercentToShow"
+  number_of_elements="1"
+  default_values="0.1">
+  <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+</DoubleVectorProperty>
+
+
+
+<!-- Filtering -->
+<StringVectorProperty
+  name="Scalar:"
+  command="SelectScalar"
+  number_of_elements="1">
+  <Documentation>
+    Scalar value to filter on.
+  </Documentation> 
+</StringVectorProperty>
+
+<IntVectorProperty
+  name="Selection Criteria:"
+  command="SelectCriteria"
+  number_of_elements="1"
+  default_values="0">
+  <EnumerationDomain name="enum">
+    <Entry value="0" text="is"/>
+    <Entry value="1" text="greater or equal to"/>
+    <Entry value="2" text="less or equal to"/>
+    <Entry value="3" text="is between"/>
+  </EnumerationDomain>
+  <Documentation>
+    Rhe selection criteria.
+  </Documentation>
+</IntVectorProperty>
+
+<StringVectorProperty
+  name="Value:"
+  command="SelectValue1"
+  number_of_elements="1">
+  <Documentation>
+    Selected value.
+  </Documentation> 
+</StringVectorProperty>
+
+<StringVectorProperty
+  name="Value 2 (range):"
+  command="SelectValue2"
+  number_of_elements="1">
+  <Documentation>
+    Selected value (for range).
+  </Documentation> 
+</StringVectorProperty>
+
+<IntVectorProperty name="Reset Selection"
+  command="SetResetSelection"
+  number_of_elements="1"
+  default_values="0">
+  <BooleanDomain name="bool"/>
+  <Documentation>
+    Check/Uncheck to reset selection.
+  </Documentation> 
+</IntVectorProperty>
+
+</SourceProxy>
+</ProxyGroup>
+
+<ProxyGroup name="sources">
+  <SourceProxy class="vtkFileSeriesReader"
+    file_name_method="SetFileName"
+    name="vtkGenIOReader"
+    si_class="vtkSIMetaReaderProxy">
+
+    <StringVectorProperty name="FileNameInfo"
+      command="GetCurrentFileName"
+      information_only="1" >
+      <SimpleStringInformationHelper />
+    </StringVectorProperty>
+
+    <StringVectorProperty name="FileNames"
+      clean_command="RemoveAllFileNames"
+      command="AddFileName"
+      animateable="0"
+      number_of_elements="0"
+      repeat_command="1"
+      information_property="FileNameInfo">
+      <FileListDomain name="files" />
+      <Documentation>
+        The list of files to be read by the reader. If more than 1 file is
+        specified, the reader will switch to file series mode in which it will
+        pretend that it can support time and provide 1 file per time step.
+      </Documentation>
+    </StringVectorProperty>
+
+    <SubProxy>
+      <Proxy name="Reader"
+        proxygroup="genericio_internal_sources"
+        proxyname="vtkGenIOReader">
+      </Proxy>
+      <ExposedProperties>
+        <Property name="PointArrayStatus" />
+
+        <PropertyGroup panel_visibility="default"
+          label="Loading %:" >
+          <Property name="Sampling Type:" />
+          <Property name="Show Data %:" />
+          <Property name="Power cube sampling" />
+        </PropertyGroup>
+
+        <PropertyGroup panel_visibility="default"
+          label="Selection:" >
+          <Property name="Scalar:" />
+          <Property name="Selection Criteria:" />
+          <Property name="Value:" />
+          <Property name="Value 2 (range):" />
+          <Property name="Reset Selection" />
+        </PropertyGroup>
+      </ExposedProperties>
+    </SubProxy>
+
+    <DoubleVectorProperty information_only="1"
+      name="TimestepValues"
+      repeatable="1">
+      <TimeStepsInformationHelper />
+      <Documentation>
+        Available timestep values.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <Hints>
+      <ReaderFactory extensions="*" file_description="GenericIO Files" />
+      <RepresentationType view="RenderView" type="Points" />
+    </Hints>
+  </SourceProxy>
+</ProxyGroup>
+</ServerManagerConfiguration>
