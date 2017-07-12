@@ -95,8 +95,8 @@ public:
     // Data object for a streamed piece.
     vtkSmartPointer<vtkDataObject> StreamedPiece;
 
-    unsigned long TimeStamp;
-    unsigned long ActualMemorySize;
+    vtkMTimeType TimeStamp;
+    vtkMTimeType ActualMemorySize;
 
   public:
     vtkOrderedCompositingInfo OrderedCompositingInfo;
@@ -157,7 +157,7 @@ public:
     }
 
     vtkDataObject* GetDataObject() const { return this->DataObject.GetPointer(); }
-    unsigned long GetTimeStamp() const { return this->TimeStamp; }
+    vtkMTimeType GetTimeStamp() const { return this->TimeStamp; }
     void SetNextStreamedPiece(vtkDataObject* data) { this->StreamedPiece = data; }
     vtkDataObject* GetStreamedPiece() { return this->StreamedPiece; }
   };
@@ -374,7 +374,7 @@ void vtkPVDataDeliveryManager::SetPiece(vtkPVDataRepresentation* repr, vtkDataOb
     this->Internals->GetItem(repr, low_res, port, /*create_if_needed=*/true);
   if (item)
   {
-    unsigned long data_time = 0;
+    vtkMTimeType data_time = 0;
     if (data && (data->GetMTime() > data_time))
     {
       data_time = data->GetMTime();
@@ -460,7 +460,7 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(unsigned int id, bool 
 
 //----------------------------------------------------------------------------
 bool vtkPVDataDeliveryManager::NeedsDelivery(
-  unsigned long timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low)
+  vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low)
 {
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
