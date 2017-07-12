@@ -2,7 +2,7 @@
 #define COSMOLOGYTOOLSDEFINITIONS_H_
 
 // C/C++ required includes
-#include <inttypes.h>
+#include <cinttypes>
 #include <stdint.h>
 #include <map>
 #include <string>
