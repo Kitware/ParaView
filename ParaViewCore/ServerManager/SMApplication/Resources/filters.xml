@@ -15727,6 +15727,14 @@ source.</Documentation>
           <Entry text="Select Time Range"
                  value="1" />
         </EnumerationDomain>
+        <Documentation>
+          Extract time steps supports two ways to select the time steps to be extracted:
+
+          - **Select Time Steps**: Specify time steps to be extracted by their index
+
+          - **Select Time Range**: Specify the start and end time steps of a range by their index and optionally specify
+          a stride to optionally take every nth timestep in the range.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="AddTimeStepIndex"
@@ -15767,6 +15775,9 @@ source.</Documentation>
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="SelectionMode" value="1">
           </PropertyWidgetDecorator>
         </Hints>
+        <Documentation>
+          Select the beginning and end indices of the range of timesteps to extract.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetTimeStepInterval"
@@ -15778,6 +15789,9 @@ source.</Documentation>
           <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="SelectionMode" value="1">
           </PropertyWidgetDecorator>
         </Hints>
+        <Documentation>
+          Select the stride to use when extracting the range of time steps (the n in every nth timestep).
+        </Documentation>
       </IntVectorProperty>
 
       <PropertyGroup label="Time Step Indices">
@@ -15797,6 +15811,12 @@ source.</Documentation>
           <Entry text="Nearest Time Step"
                  value="2" />
         </EnumerationDomain>
+        <Documentation>
+          If the scene's time does not match the time in any of the timesteps selected (likely because something
+          else in the scene has time steps at different times) this setting controls which timestep should
+          be returned by the filter.  The options are the previous time step, the nearest time step and the next
+          time step.
+        </Documentation>
       </IntVectorProperty>
 
 
