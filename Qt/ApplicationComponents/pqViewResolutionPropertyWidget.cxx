@@ -136,9 +136,9 @@ void pqViewResolutionPropertyWidget::scale(double factor)
 {
   Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
   ui.width->setTextAndResetCursor(
-    QString::number(static_cast<int>(ui.width->text().toInt() / factor)));
+    QString::number(static_cast<int>(ui.width->text().toInt() * factor)));
   ui.height->setTextAndResetCursor(
-    QString::number(static_cast<int>(ui.height->text().toInt() / factor)));
+    QString::number(static_cast<int>(ui.height->text().toInt() * factor)));
 }
 
 //-----------------------------------------------------------------------------
