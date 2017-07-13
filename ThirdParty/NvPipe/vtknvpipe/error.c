@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, NVIDIA CORPORATION. All rights reserved.
+/* Copyright (c) 2016-2017, NVIDIA CORPORATION. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,29 +27,29 @@
 #include "nvpipe.h"
 
 struct errstr {
-	nvp_err_t code;
-	const char* msg;
+    nvp_err_t code;
+    const char* msg;
 };
-static struct errstr nvp_errors[] = {
-	{ NVPIPE_SUCCESS, "success" },
-	{ NVPIPE_EINVAL, "invalid value"},
-	{ NVPIPE_ENOMEM, "out of memory"},
-	{ NVPIPE_EMAP, "map resource"},
-	{ NVPIPE_EUNMAP, "unmap resource"},
-	{ NVPIPE_ENOENT, "file or resource not found"},
-	{ NVPIPE_EENCODE, "encode error from NvCodec"},
-	{ NVPIPE_EDECODE, "decode error from NvCodec"},
-	{ NVPIPE_EOVERFLOW, "buffer would overflow"},
-	{ NVPIPE_EAGAIN, "not ready yet"},
+static const struct errstr nvp_errors[] = {
+{ NVPIPE_SUCCESS, "success" },
+{ NVPIPE_EINVAL, "invalid value"},
+{ NVPIPE_ENOMEM, "out of memory"},
+{ NVPIPE_EMAP, "map resource"},
+{ NVPIPE_EUNMAP, "unmap resource"},
+{ NVPIPE_ENOENT, "file or resource not found"},
+{ NVPIPE_EENCODE, "encode error from NvCodec"},
+{ NVPIPE_EDECODE, "decode error from NvCodec"},
+{ NVPIPE_EOVERFLOW, "buffer would overflow"},
+{ NVPIPE_EAGAIN, "not ready yet"},
 };
 
 const char*
 nvpipe_strerror(nvp_err_t ecode) {
-	const size_t n = sizeof(nvp_errors) / sizeof(nvp_errors[0]);
-	for(size_t i=0; i < n; ++i) {
-		if(ecode == nvp_errors[i].code) {
-			return nvp_errors[i].msg;
-		}
-	}
-	return "unknown";
+    const size_t n = sizeof(nvp_errors) / sizeof(nvp_errors[0]);
+    for(size_t i=0; i < n; ++i) {
+        if(ecode == nvp_errors[i].code) {
+            return nvp_errors[i].msg;
+        }
+    }
+    return "unknown";
 }
