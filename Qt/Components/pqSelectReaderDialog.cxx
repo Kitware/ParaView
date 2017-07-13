@@ -40,12 +40,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 //-----------------------------------------------------------------------------
-class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog
+class pqSelectReaderDialog::pqInternal : public Ui::SelectReaderDialog
 {
 public:
-  pqInternal(QObject* p)
-    : QObject(p)
+  pqInternal(pqSelectReaderDialog* self)
   {
+    this->setupUi(self);
+    self->setObjectName("pqSelectReaderDialog"); // to avoid breaking old tests.
+  }
+
+  void setHeader(const QString& header) { this->FileInfo->setText(header); }
+
+  void updateList(vtkStringList* readers)
+  {
+    QListWidget* lw = this->listWidget;
+    lw->clear();
+    for (int cc = 0; (cc + 2) < readers->GetNumberOfStrings(); cc += 3)
+    {
+      QString desc = readers->GetString(cc + 2);
+      // We want the first character to always be uppercase so:
+      // 1 the list looks nicer
+      // 2 the list case sensitive sort works "better"
+      desc.replace(0, 1, desc.at(0).toUpper());
+      QListWidgetItem* item = new QListWidgetItem(desc, lw);
+      item->setData(Qt::UserRole, readers->GetString(cc + 0));
+      item->setData(Qt::UserRole + 1, readers->GetString(cc + 1));
+      if (cc == 0)
+      {
+        // ensure that the first item is selected.
+        lw->setCurrentItem(item, QItemSelectionModel::ClearAndSelect);
+      }
+    }
   }
 };
 
@@ -53,63 +78,30 @@ public:
 pqSelectReaderDialog::pqSelectReaderDialog(
   const QString& file, pqServer* s, vtkSMReaderFactory* readerFactory, QWidget* p)
   : QDialog(p)
+  , Internal(new pqSelectReaderDialog::pqInternal(this))
 {
-  this->Internal = new pqInternal(this);
-  this->Internal->setupUi(this);
-
   // set the helper/information string
-  QString info = QString("A reader for \"%1\" could not be found."
-                         "  Please choose one:")
-                   .arg(file);
-  this->Internal->FileInfo->setText(info);
+  this->Internal->setHeader(
+    QString("A reader for \"%1\" could not be found. Please choose one:").arg(file));
 
   // populate the list view with readers
-  QListWidget* lw = this->Internal->listWidget;
-
   vtkStringList* readers =
     readerFactory->GetPossibleReaders(file.toLocal8Bit().data(), s->session());
-
-  for (int cc = 0; (cc + 2) < readers->GetNumberOfStrings(); cc += 3)
-  {
-    QString desc = readers->GetString(cc + 2);
-    // We want the first character to always be uppercase so:
-    // 1 the list looks nicer
-    // 2 the list case sensitive sort works "better"
-    desc.replace(0, 1, desc.at(0).toUpper());
-    QListWidgetItem* item = new QListWidgetItem(desc, lw);
-    item->setData(Qt::UserRole, readers->GetString(cc + 0));
-    item->setData(Qt::UserRole + 1, readers->GetString(cc + 1));
-  }
+  this->Internal->updateList(readers);
 };
 
 //-----------------------------------------------------------------------------
 pqSelectReaderDialog::pqSelectReaderDialog(
   const QString& file, pqServer* vtkNotUsed(server), vtkStringList* list, QWidget* p)
   : QDialog(p)
+  , Internal(new pqSelectReaderDialog::pqInternal(this))
 {
-  this->Internal = new pqInternal(this);
-  this->Internal->setupUi(this);
-
   // set the helper/information string
-  QString info = QString("More than one reader for \"%1\" found."
-                         "  Please choose one:")
-                   .arg(file);
-  this->Internal->FileInfo->setText(info);
+  this->Internal->setHeader(
+    QString("More than one reader for \"%1\" found. Please choose one:").arg(file));
 
   // populate the list view with readers
-  QListWidget* lw = this->Internal->listWidget;
-
-  for (int cc = 0; (cc + 2) < list->GetNumberOfStrings(); cc += 3)
-  {
-    QString desc = list->GetString(cc + 2);
-    // We want the first character to always be uppercase so:
-    // 1 the list looks nicer
-    // 2 the list case sensitive sort works "better"
-    desc.replace(0, 1, desc.at(0).toUpper());
-    QListWidgetItem* item = new QListWidgetItem(desc, lw);
-    item->setData(Qt::UserRole, list->GetString(cc + 0));
-    item->setData(Qt::UserRole + 1, list->GetString(cc + 1));
-  }
+  this->Internal->updateList(list);
 };
 
 //-----------------------------------------------------------------------------
@@ -136,9 +128,7 @@ QString pqSelectReaderDialog::getGroup() const
 QString pqSelectReaderDialog::getReader() const
 {
   QListWidget* lw = this->Internal->listWidget;
-
   QList<QListWidgetItem*> selection = lw->selectedItems();
-
   if (selection.empty())
   {
     return QString();
@@ -146,6 +136,5 @@ QString pqSelectReaderDialog::getReader() const
 
   // should have only one with single selection mode
   QListWidgetItem* item = selection[0];
-
   return item->data(Qt::UserRole + 1).toString();
 }
