@@ -22,8 +22,8 @@ A sample encoding scenario:
 ```c
   const size_t width=..., height=...; // input image size.
   const uint8_t* rgba = ...; // your image data.
-  void* output = malloc(...); // place for the compressed stream.
   size_t osize = ...; // number of bytes in 'output'.
+  void* output = malloc(max_osize); // place for the compressed stream.
 
   // First create our encoder.
   const size_t f_m = 4; // "quality".  Generally in [1,5].
@@ -35,7 +35,9 @@ A sample encoding scenario:
     nvpipe_encode(enc, rgba, width*height*4, output,&osize, width, height,
                   NVPIPE_RGBA);
 
-    // Send the compressed stream to whereever.
+    // Send the frame size and compressed stream to the consuming side.
+    uint32_t size = to_network_byte_order_zu(osize);
+    send(socket, &size, sizeof(uint32_t), ...);
     send(socket, output, osize, ...);
   }
 
@@ -43,7 +45,6 @@ A sample encoding scenario:
   nvpipe_destroy(enc);
 ```
 
-A real application would probably need to also communicate `osize` out of band.
 `osize` on the encode side will become `N` in the sample decode scenario:
 
 ```c
@@ -53,10 +54,12 @@ A real application would probably need to also communicate `osize` out of band.
   size_t imgsz = width * height * 3;
   uint8_t* rgb = malloc(imgsz);
 
-  void* strm = malloc(N);
+  void* strm = malloc(max_N);
 
   while(you_have_more_frames) {
-    recv(socket, strm, N, ...);
+    uint32_t N = 0;
+    recv(socket, &N, sizeof(uin32_t), ...);
+    recv(socket, strm, from_network_byte_order(N), ...);
     nvpipe_decode(dec, strm,N, rgb, width, height);
     use_frame(rgb, width, height); // blit, save; whatever.
   }
@@ -64,22 +67,25 @@ A real application would probably need to also communicate `osize` out of band.
   nvpipe_destroy(dec); // destroy the decoder when finished
 ```
 
+Note that the underlying H.264 stream does not support alpha channels.  Such
+information would be lost in the scenario above.
+
 Build
 =====
 
-This library requires the NVIDIA video codec SDK headers available from:
+This library can optionally make use of the NVIDIA Video Codec SDK headers
+available from:
 
 	https://developer.nvidia.com/nvidia-video-codec-sdk
 
-Download and pull out the headers from the Samples/common/inc directory:
+These headers enable additional features that can improve the quality of the
+generated stream.
 
-```sh
-	cp -r Video_Codec_SDK_7.0.1/Samples/common/inc \
-		${HOME}/sw/nv-video-sdk-7.0.1/include
-```
+To utilize a custom SDK, set the `NVIDIA_VIDEO_CODEC_SDK` CMake option
+to the directory where you have unzipped the SDK.  Then build using
+this library using the standard CMake process.
 
-Then build using this library using the standard CMake process.  The only
-special CMake variable is the boolean
+The only special CMake variable is the boolean
 
   USE_FFMPEG
 
@@ -135,41 +141,22 @@ Then build FFMpeg with the 'nvenc' and 'cuvid' backends enabled, e.g.:
 		--disable-everything \
 		--enable-decoder=h264 \
 		--enable-decoder=h264_cuvid \
-		--enable-decoder=hevc \
-		--enable-decoder=hevc_cuvid \
-		--enable-decoder=mjpeg \
-		--enable-decoder=mjpegb \
-		--enable-encoder=mjpeg \
 		--enable-encoder=nvenc \
 		--enable-encoder=nvenc_h264 \
-		--enable-encoder=nvenc_hevc \
 		--enable-encoder=h264_nvenc \
-		--enable-encoder=hevc_nvenc \
 		--enable-encoder=png \
 		--enable-hwaccel=h264_cuvid \
-		--enable-hwaccel=hevc_cuvid \
 		--enable-parser=png \
 		--enable-parser=h264 \
-		--enable-parser=hevc \
-		--enable-parser=mjpeg \
-		--enable-demuxer=mjpeg \
 		--enable-demuxer=h264 \
-		--enable-demuxer=hevc \
-		--enable-demuxer=image2 \
-		--enable-muxer=image2 \
 		--enable-muxer=mjpeg \
 		--enable-muxer=h264 \
-		--enable-muxer=hevc \
-		--enable-protocol=sctp \
 		--enable-protocol=pipe \
 		--enable-protocol=file \
 		--enable-protocol=tcp \
 		--enable-protocol=udp \
-		--enable-protocol=udplite \
-		--enable-filter=blend \
-		--enable-indev=x11grab_xcb \
-		--enable-bsf=h264_mp4toannexb \
-		--enable-bsf=hevc_mp4toannexb
+		--enable-filter=scale \
+		--enable-bsf=h264_mp4toannexb
 	make -j install
 ```
 
@@ -179,8 +166,8 @@ Supported platforms
 ===================
 
 NVPipe is supported on both Linux and Windows.  Kepler-class NVIDIA
-hardware is required, and the NvEnc 5.x or NVIDIA Video Codec SDK (any
-version) is required.
+hardware is required.  The NVIDIA Video Codec SDK is an optional dependency to
+enable extra features of the generated stream.
 
 OS X support is not plausible in the short term.  NVPipe uses the
 [NVIDIA Video Codec SDK](https://developer.nvidia.com/nvidia-video-codec-sdk)

@@ -34,49 +34,49 @@ DECLARE_CHANNEL(api);
 
 NVPIPE_VISIBLE nvpipe*
 nvpipe_create_encoder(nvp_codec_t id, uint64_t bitrate) {
-	switch(id) {
-	case NVPIPE_H264_NV:
-		return nvp_create_encoder(bitrate);
-		break;
+    switch(id) {
+    case NVPIPE_H264_NV:
+        return nvp_create_encoder(bitrate);
+        break;
 #if NVPIPE_FFMPEG == 1
-	case NVPIPE_H264_NVFFMPEG:
-		return nvp_create_ffmpeg(true, bitrate);
-		break;
-	case NVPIPE_H264_FFMPEG:
-		return nvp_create_ffmpeg(false, bitrate);
-		break;
+    case NVPIPE_H264_NVFFMPEG:
+        return nvp_create_ffmpeg(true, bitrate);
+        break;
+    case NVPIPE_H264_FFMPEG:
+        return nvp_create_ffmpeg(false, bitrate);
+        break;
 #else
-	case NVPIPE_H264_NVFFMPEG: /* fallthrough */
-	case NVPIPE_H264_FFMPEG:
-		ERR(api, "nvpipe: FFMpeg support not compiled in.");
-		return NULL;
-		break;
+    case NVPIPE_H264_NVFFMPEG: /* fallthrough */
+    case NVPIPE_H264_FFMPEG:
+        ERR(api, "nvpipe: FFMpeg support not compiled in.");
+        return NULL;
+        break;
 #endif
-	}
-	return NULL;
+    }
+    return NULL;
 }
 
 NVPIPE_VISIBLE nvpipe*
 nvpipe_create_decoder(nvp_codec_t id) {
-	switch(id) {
-	case NVPIPE_H264_NV:
-		return nvp_create_decoder();
-		break;
+    switch(id) {
+    case NVPIPE_H264_NV:
+        return nvp_create_decoder();
+        break;
 #if NVPIPE_FFMPEG == 1
-	case NVPIPE_H264_NVFFMPEG:
-		return nvp_create_ffmpeg(true, 0);
-		break;
-	case NVPIPE_H264_FFMPEG:
-		return nvp_create_ffmpeg(false, 0);
-		break;
+    case NVPIPE_H264_NVFFMPEG:
+        return nvp_create_ffmpeg(true, 0);
+        break;
+    case NVPIPE_H264_FFMPEG:
+        return nvp_create_ffmpeg(false, 0);
+        break;
 #else
-	case NVPIPE_H264_NVFFMPEG: /* fallthrough */
-	case NVPIPE_H264_FFMPEG:
-		ERR(api, "nvpipe: FFMpeg support not compiled in.");
-		return NULL;
+    case NVPIPE_H264_NVFFMPEG: /* fallthrough */
+    case NVPIPE_H264_FFMPEG:
+        ERR(api, "nvpipe: FFMpeg support not compiled in.");
+        return NULL;
 #endif
-	}
-	return NULL;
+    }
+    return NULL;
 }
 
 nvp_err_t
@@ -85,10 +85,10 @@ nvpipe_encode(nvpipe* const __restrict cdc,
               const size_t ibuf_sz,
               void* const __restrict obuf,
               size_t* const __restrict obuf_sz,
-              const size_t width, const size_t height, nvp_fmt_t format) {
-	assert(cdc);
-	nvp_impl_t* enc = (nvp_impl_t*)cdc;
-	return enc->encode(enc, ibuf,ibuf_sz, obuf,obuf_sz, width,height, format);
+              const uint32_t width, const uint32_t height, nvp_fmt_t format) {
+    assert(cdc);
+    nvp_impl_t* enc = (nvp_impl_t*)cdc;
+    return enc->encode(enc, ibuf,ibuf_sz, obuf,obuf_sz, width,height, format);
 }
 
 nvp_err_t
@@ -96,38 +96,28 @@ nvpipe_decode(nvpipe* const __restrict codec,
               const void* const __restrict ibuf,
               const size_t ibuf_sz,
               void* const __restrict obuf,
-              size_t width,
-              size_t height) {
-	assert(codec);
-	nvp_impl_t* dec = (nvp_impl_t*)codec;
-	return dec->decode(dec, ibuf,ibuf_sz, obuf, width,height);
+              uint32_t width,
+              uint32_t height) {
+    assert(codec);
+    nvp_impl_t* dec = (nvp_impl_t*)codec;
+    return dec->decode(dec, ibuf,ibuf_sz, obuf, width,height);
 }
 
 void
 nvpipe_destroy(nvpipe* const __restrict codec) {
-	if(codec == NULL) {
-		return;
-	}
-	nvp_impl_t* nvp = (nvp_impl_t*)codec;
-	nvp->destroy(nvp);
+    if(codec == NULL) {
+        return;
+    }
+    nvp_impl_t* nvp = (nvp_impl_t*)codec;
+    nvp->destroy(nvp);
 }
 
 nvp_err_t
 nvpipe_bitrate(nvpipe* const __restrict codec, uint64_t br) {
-	assert(codec);
-	if(codec == NULL) {
-		return NVPIPE_EINVAL;
-	}
-	nvp_impl_t* nvp = (nvp_impl_t*)codec;
-	return nvp->bitrate(codec, br);
-}
-
-nvp_err_t
-nvpipe_ptx_path(nvpipe* __restrict codec, const char* path) {
-	assert(codec);
-	if(codec == NULL) {
-		return NVPIPE_EINVAL;
-	}
-	nvp_impl_t* nvp = (nvp_impl_t*)codec;
-	return nvp->ptx_path(codec, path);
+    assert(codec);
+    if(codec == NULL) {
+        return NVPIPE_EINVAL;
+    }
+    nvp_impl_t* nvp = (nvp_impl_t*)codec;
+    return nvp->bitrate(codec, br);
 }

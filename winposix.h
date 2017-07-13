@@ -24,29 +24,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef NVPIPE_MODULE_H_
-#define NVPIPE_MODULE_H_
+/** Wrappers for making windows work like POSIX systems. */
+#pragma once
+#include <io.h>
+#include <process.h>
 
-#include <stdlib.h>
-#include <cuda.h>
-
-typedef struct nv12_convert_metadata {
-	CUmodule mod;
-	CUfunction func;
-} ptx_fqn_t;
-
-/** Search the given paths until a named PTX module is found.
- * @param module the module (filename) to search for, e.g. "convert.ptx".
- * @param paths the directories to search
- * @param n the size of the 'paths' array. */
-ptx_fqn_t load_module(const char* module, const char* paths[], const size_t n);
-
-/** Setup initial module paths.  All paths are dynamically allocated, and the
- * array is dynamic as well; the caller should free.
- * @param[out] n the number of paths setup. */
-char** module_paths(size_t* n);
-
-/** Release internal resources for the given loaded module. */
-void module_fqn_destroy(ptx_fqn_t* cnv);
-
+#ifndef _MSC_VER
+static_assert(false);
 #endif
+
+enum dlflags_t {
+    RTLD_LAZY, RTLD_NOW, RTLD_GLOBAL, RTLD_LOCAL
+};
+
+void* dlopen(const char* handle, int flags);
+int dlclose(void* handle);
+void* dlsym(void* __restrict handle, const char* __restrict symbol);
+const char* dlerror();
+
+#define getpid _getpid
+#define isatty _isatty
+#define strncasecmp _strnicmp

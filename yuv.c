@@ -29,182 +29,138 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cuda_runtime_api.h>
 #include <nvToolsExt.h>
 #include <nvToolsExtCuda.h>
 #include "config.nvp.h"
 #include "debug.h"
-#include "module.h"
 #include "yuv.h"
-
-/* The PTX file we will look for. */
-static const char* PTXFN = "convert.ptx";
 
 DECLARE_CHANNEL(yuv);
 
-static CUresult
+static cudaError_t
 strm_sync(void* f) {
-	nv_fut_t* fut = (nv_fut_t*)f;
-	const CUresult sy = cuStreamSynchronize(fut->strm);
-	if(CUDA_SUCCESS != sy) {
-		ERR(yuv, "Error %d synchronizing stream", sy);
-	}
-	return sy;
+    nv_fut_t* fut = (nv_fut_t*)f;
+    const cudaError_t sy = cudaStreamSynchronize(fut->strm);
+    if(cudaSuccess != sy) {
+        ERR(yuv, "Error %d synchronizing stream", sy);
+    }
+    return sy;
 }
 
 static void
 strm_destroy(void* f) {
-	if(f == NULL) {
-		return;
-	}
-	nv_fut_t* fut = (nv_fut_t*)f;
-	const CUresult del = cuStreamDestroy(fut->strm);
-	if(CUDA_SUCCESS != del) {
-		WARN(yuv, "Error %d destroying stream.", del);
-	}
-	fut->strm = 0;
+    if(f == NULL) {
+        return;
+    }
+    nv_fut_t* fut = (nv_fut_t*)f;
+    const cudaError_t del = cudaStreamDestroy(fut->strm);
+    if(cudaSuccess != del) {
+        WARN(yuv, "Error %d destroying stream.", del);
+    }
+    fut->strm = 0;
 }
 
 static nv_fut_t
 strm_create() {
-	nv_fut_t rv = {0};
-	rv.sync = strm_sync;
-	rv.destroy = strm_destroy;
+    nv_fut_t rv = {0};
+    rv.sync = strm_sync;
+    rv.destroy = strm_destroy;
 
-	const CUresult cuerr = cuStreamCreate(&rv.strm, CU_STREAM_NON_BLOCKING);
-	if(cuerr != CUDA_SUCCESS) {
-		ERR(yuv, "Error %d creating stream.", cuerr);
-		return rv;
-	}
-	return rv;
+    const cudaError_t cuerr = cudaStreamCreateWithFlags(&rv.strm,
+                                                        cudaStreamNonBlocking);
+    if(cudaSuccess != cuerr) {
+        ERR(yuv, "Error %d creating stream.", cuerr);
+        return rv;
+    }
+    return rv;
 }
 
 typedef struct rgb_convert {
-	nv_fut_t fut;
-	ptx_fqn_t fqn;
-	size_t components;
+    nv_fut_t fut;
+    uint32_t components;
 } rgb2yuv_t;
 
-static CUresult
-rgb2yuv_submit(void* conv, const CUdeviceptr rgb, size_t width, size_t height,
+extern cudaError_t
+launch_rgb2yuv(CUdeviceptr rgb, uint32_t width, uint32_t height,
+               uint32_t widthUser, uint32_t heightUser, uint32_t ncomp,
+               CUdeviceptr nv12, unsigned pitch, cudaStream_t strm);
+
+static cudaError_t
+rgb2yuv_submit(void* conv, const CUdeviceptr rgb, uint32_t width, uint32_t height,
+               uint32_t widthUser, uint32_t heightUser,
                CUdeviceptr nv12, unsigned pitch) {
-	rgb2yuv_t* cnv = (rgb2yuv_t*)conv;
-	assert(cnv->fqn.mod != NULL);
-	assert(cnv->fqn.func != 0);
-
-	/* NvCodec maxes out at 8k anyway. */
-	assert(width <= 8192);
-	assert(height <= 8192);
-	/* We only support RGB and RGBA data. */
-	assert(cnv->components == 3 || cnv->components == 4);
-
-	const void* args[] = {
-		(void*)&rgb, &width, &height, &cnv->components, (void*)&nv12, &pitch, 0
-	};
-	const size_t shmem = 0;
-	/* NvCodec can't give us a height that isn't evenly divisible. */
-	assert(height%2 == 0);
-	const CUresult exec = cuLaunchKernel(cnv->fqn.func, (width/16)+1,(height/2),1,
-	                                     16,2,1, shmem, cnv->fut.strm,
-	                                     (void**)args, NULL);
-	return exec;
+    rgb2yuv_t* cnv = (rgb2yuv_t*)conv;
+    return launch_rgb2yuv(rgb, width, height, widthUser, heightUser, cnv->components, nv12, pitch,
+                          cnv->fut.strm);
 }
 
 static void
 rgb2yuv_destroy(void* r) {
-	if(r == NULL) {
-		return;
-	}
-	rgb2yuv_t* conv = (rgb2yuv_t*)r;
-	strm_destroy(&conv->fut);
-	module_fqn_destroy(&conv->fqn);
-	memset(conv, 0, sizeof(rgb2yuv_t));
-	free(conv);
+    if(r == NULL) {
+        return;
+    }
+    rgb2yuv_t* conv = (rgb2yuv_t*)r;
+    strm_destroy(&conv->fut);
+    memset(conv, 0, sizeof(rgb2yuv_t));
+    free(conv);
 }
 
 static nv_fut_t*
-rgb2yuv_create(const char* module, const char* fqnname, size_t components,
-               const char* paths[], size_t n) {
-	rgb2yuv_t* rv = calloc(1, sizeof(rgb2yuv_t));
-	rv->fut = strm_create();
-	nvtxNameCuStream(rv->fut.strm, "encode");
-	rv->fut.submit = rgb2yuv_submit;
-	/* Overwrite destructor with ours. */
-	rv->fut.destroy = rgb2yuv_destroy;
-	rv->components = components;
+rgb2yuv_create(uint32_t components) {
+    rgb2yuv_t* rv = calloc(1, sizeof(rgb2yuv_t));
+    rv->fut = strm_create();
+    nvtxNameCuStream(rv->fut.strm, "encode");
+    rv->fut.submit = rgb2yuv_submit;
+    /* Overwrite destructor with ours. */
+    rv->fut.destroy = rgb2yuv_destroy;
+    rv->components = components;
 
-	rv->fqn = load_module(module, paths, n);
-	if(NULL == rv->fqn.mod) {
-		rv->fut.destroy(rv);
-		return NULL;
-	}
-	if(cuModuleGetFunction(&rv->fqn.func, rv->fqn.mod, fqnname) != CUDA_SUCCESS) {
-		ERR(yuv, "could not load '%s' function from %s.", fqnname, PTXFN);
-		rv->fut.destroy(rv);
-		return NULL;
-	}
-	return (nv_fut_t*)rv;
+    return (nv_fut_t*)rv;
 }
 
 typedef struct yuv_convert {
-	nv_fut_t fut;
-	ptx_fqn_t fqn;
+    nv_fut_t fut;
 } yuv2rgb_t;
 
-static CUresult
-yuv2rgb_submit(void* y, const CUdeviceptr nv12, size_t width, size_t height,
-               CUdeviceptr rgb, unsigned pitch) {
-	yuv2rgb_t* conv = (yuv2rgb_t*)y;
-	assert(conv->fqn.mod);
+extern cudaError_t
+launch_yuv2rgb(CUdeviceptr nv12, uint32_t width, uint32_t height,
+               uint32_t widthUser, uint32_t heightUser, unsigned pitch,
+               CUdeviceptr rgb, cudaStream_t strm);
 
-	const void* args[] = {
-		(void*)&nv12, &width, &height, &pitch, (void*)&rgb, 0
-	};
-	assert(height%2 == 0);
-	const CUresult exec = cuLaunchKernel(conv->fqn.func, width/16+1,height/2,1,
-	                                     16,2,1, 0,
-	                                     conv->fut.strm, (void**)args, NULL);
-	return exec;
+static cudaError_t
+yuv2rgb_submit(void* y, const CUdeviceptr nv12, uint32_t width, uint32_t height,
+               uint32_t widthUser, uint32_t heightUser, CUdeviceptr rgb, unsigned pitch) {
+    yuv2rgb_t* conv = (yuv2rgb_t*)y;
+    return launch_yuv2rgb(nv12, width, height, widthUser, heightUser, pitch, rgb, conv->fut.strm);
 }
 
 static void
 yuv2rgb_destroy(void* y) {
-	if(y == NULL) {
-		return;
-	}
-	yuv2rgb_t* conv = (yuv2rgb_t*)y;
-	strm_destroy(&conv->fut);
-	module_fqn_destroy(&conv->fqn);
-	memset(conv, 0, sizeof(yuv2rgb_t));
-	free(conv);
+    if(y == NULL) {
+        return;
+    }
+    yuv2rgb_t* conv = (yuv2rgb_t*)y;
+    strm_destroy(&conv->fut);
+    memset(conv, 0, sizeof(yuv2rgb_t));
+    free(conv);
 }
 
 static nv_fut_t*
-yuv2rgb_create(const char* module, const char* fqnname, const char* paths[],
-               size_t n) {
-	yuv2rgb_t* rv = calloc(1, sizeof(yuv2rgb_t));
-	rv->fut = strm_create();
-	nvtxNameCuStream(rv->fut.strm, "decode");
-	rv->fut.submit = yuv2rgb_submit;
-	/* Overwrite destructor with ours. */
-	rv->fut.destroy = yuv2rgb_destroy;
-
-	rv->fqn = load_module(module, paths, n);
-	if(NULL == rv->fqn.mod) {
-		rv->fut.destroy(rv);
-		return NULL;
-	}
-	if(cuModuleGetFunction(&rv->fqn.func, rv->fqn.mod, fqnname) != CUDA_SUCCESS) {
-		ERR(yuv, "could not load '%s' function from %s.", fqnname, PTXFN);
-		cuModuleUnload(rv->fqn.mod);
-		rv->fut.destroy(rv);
-	}
-	return (nv_fut_t*)rv;
+yuv2rgb_create() {
+    yuv2rgb_t* rv = calloc(1, sizeof(yuv2rgb_t));
+    rv->fut = strm_create();
+    nvtxNameCuStream(rv->fut.strm, "decode");
+    rv->fut.submit = yuv2rgb_submit;
+    /* Overwrite destructor with ours. */
+    rv->fut.destroy = yuv2rgb_destroy;
+    return (nv_fut_t*)rv;
 }
 
 nv_fut_t*
-rgb2nv12(size_t components, const char* paths[], size_t n) {
-	return rgb2yuv_create(PTXFN, "rgb2yuv", components, paths, n);
+rgb2nv12(uint32_t components) {
+    return rgb2yuv_create(components);
 }
-nv_fut_t* nv122rgb(const char* paths[], size_t n) {
-	return yuv2rgb_create(PTXFN, "yuv2rgb", paths, n);
+nv_fut_t* nv122rgb() {
+    return yuv2rgb_create();
 }

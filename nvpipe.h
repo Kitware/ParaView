@@ -36,39 +36,39 @@ extern "C" {
 
 /** Codecs usable for the encoding/decoding session */
 typedef enum nvpipe_codec {
-	NVPIPE_H264_NV, /**< NVIDIA video codec SDK backend */
-	NVPIPE_H264_NVFFMPEG, /**< NVIDIA-based ffmpeg backend */
-	NVPIPE_H264_FFMPEG, /**< CPU-based ffmpeg backend */
+    NVPIPE_H264_NV, /**< NVIDIA video codec SDK backend */
+    NVPIPE_H264_NVFFMPEG, /**< NVIDIA-based ffmpeg backend */
+    NVPIPE_H264_FFMPEG, /**< CPU-based ffmpeg backend */
 } nvp_codec_t;
 
 /** Supported NvPipe image formats. */
 typedef enum nvpipe_format {
-	NVPIPE_RGB,
-	NVPIPE_RGBA,
+    NVPIPE_RGB,
+    NVPIPE_RGBA,
 } nvp_fmt_t;
 
 /* Avoid a dependency on cuda.h by copying these definitions here. */
 #define cuda_SUCCESS 0
-#define cuda_ERROR_INVALID_VALUE 1
+#define cuda_ERROR_INVALID_VALUE 11
 #define cuda_ERROR_OUT_OF_MEMORY 2
-#define cuda_ERROR_MAP_FAILED 205
-#define cuda_ERROR_UNMAP_FAILED 206
-#define cuda_ERROR_FILE_NOT_FOUND 301
-#define cuda_ERROR_UNKNOWN 999
+#define cuda_ERROR_MAP_FAILED 14
+#define cuda_ERROR_UNMAP_FAILED 15
+#define cuda_ERROR_FILE_NOT_FOUND 33
+#define cuda_ERROR_UNKNOWN 10000
 
 /** NvPipe error codes are a superset of the CUDA error codes.  See
  * nvpipe_strerror. */
 typedef enum nvpipe_error_code {
-	NVPIPE_SUCCESS = cuda_SUCCESS,
-	NVPIPE_EINVAL = cuda_ERROR_INVALID_VALUE,
-	NVPIPE_ENOMEM = cuda_ERROR_OUT_OF_MEMORY,
-	NVPIPE_EMAP = cuda_ERROR_MAP_FAILED,
-	NVPIPE_EUNMAP = cuda_ERROR_UNMAP_FAILED,
-	NVPIPE_ENOENT = cuda_ERROR_FILE_NOT_FOUND,
-	NVPIPE_EENCODE = cuda_ERROR_UNKNOWN+1,
-	NVPIPE_EDECODE = cuda_ERROR_UNKNOWN+2,
-	NVPIPE_EOVERFLOW = cuda_ERROR_UNKNOWN+3,
-	NVPIPE_EAGAIN = cuda_ERROR_UNKNOWN+4,
+    NVPIPE_SUCCESS = cuda_SUCCESS,
+    NVPIPE_EINVAL = cuda_ERROR_INVALID_VALUE,
+    NVPIPE_ENOMEM = cuda_ERROR_OUT_OF_MEMORY,
+    NVPIPE_EMAP = cuda_ERROR_MAP_FAILED,
+    NVPIPE_EUNMAP = cuda_ERROR_UNMAP_FAILED,
+    NVPIPE_ENOENT = cuda_ERROR_FILE_NOT_FOUND,
+    NVPIPE_EENCODE = cuda_ERROR_UNKNOWN+1,
+    NVPIPE_EDECODE = cuda_ERROR_UNKNOWN+2,
+    NVPIPE_EOVERFLOW = cuda_ERROR_UNKNOWN+3,
+    NVPIPE_EAGAIN = cuda_ERROR_UNKNOWN+4,
 } nvp_err_t;
 
 typedef void nvpipe;
@@ -76,7 +76,7 @@ typedef void nvpipe;
 #ifdef __GNUC__
 #	define NVPIPE_VISIBLE __attribute__((visibility("default")))
 #else
-#	define NVPIPE_VISIBLE /* no visibility attribute */
+#	define NVPIPE_VISIBLE __declspec(dllexport)
 #endif
 
 /** @fn create nvpipe instance
@@ -111,17 +111,6 @@ nvpipe_create_decoder(nvp_codec_t id);
 NVPIPE_VISIBLE void
 nvpipe_destroy(nvpipe* const __restrict codec);
 
-/** add runtime search path for PTX files.
- *
- * NvPipe needs to load ptx files that are compiled with the library.  The
- * default install includes the appropriate directory based on the install path,
- * but for situations where this is not known until runtime, this API provides a
- * additional paths to search.
- * Note that the search paths are specific to the encoder or decoder created.
- * Processes with multiple objects will want to add paths for each object. */
-NVPIPE_VISIBLE nvp_err_t
-nvpipe_ptx_path(nvpipe* __restrict codec, const char* path);
-
 /** encode/compress images
  *
  * User provides pointers for both input and output buffers.  The output buffer
@@ -132,9 +121,9 @@ nvpipe_ptx_path(nvpipe* __restrict codec, const char* path);
  * how many bytes were actually filled.
  *
  * @param[in] codec library instance to use
- * @param[in] ibuf  input buffer to compress
+ * @param[in] ibuf input buffer to compress. host or device pointer.
  * @param[in] ibuf_sz number of bytes in the input buffer
- * @param[out] obuf buffer to place compressed data into
+ * @param[out] obuf (host) buffer to place compressed data into.
  * @param[in,out] obuf_sz number of bytes available in 'obuf', output is number
  *                        of bytes that were actually filled.
  * @param[in] width number of pixels in X of the input buffer
@@ -149,7 +138,7 @@ nvpipe_encode(nvpipe * const __restrict codec,
               const size_t ibuf_sz,
               void *const __restrict obuf,
               size_t* const __restrict obuf_sz,
-              const size_t width, const size_t height,
+              const uint32_t width, const uint32_t height,
               nvp_fmt_t format);
 
 /** Adjust the bitrate used for an encoder.  The setting takes effect for
@@ -167,9 +156,10 @@ nvp_err_t nvpipe_bitrate(nvpipe* const enc, uint64_t bitrate);
 /** decode/decompress a frame
  *
  * @param[in] codec instance variable
- * @param[in] ibuf the compressed frame
+ * @param[in] ibuf the compressed frame, on the host.
  * @param[in] ibuf_sz  the size in bytes of the compressed data
- * @param[out] obuf where the output frame will be written. must be w*h*3 bytes.
+ * @param[out] obuf where the output RGB frame will be written.
+ *             must be at least width*height*3 bytes. host or device pointer.
  * @param[in] width  width of output image
  * @param[in] height height of output image
  *
@@ -180,8 +170,8 @@ nvpipe_decode(nvpipe* const __restrict codec,
               const void* const __restrict ibuf,
               const size_t ibuf_sz,
               void* const __restrict obuf,
-              size_t width,
-              size_t height);
+              uint32_t width,
+              uint32_t height);
 
 /** Retrieve human-readable error message for the given error code.  Note that
  * this is a pointer to constant memory that must NOT be freed or manipulated
