@@ -84,7 +84,6 @@ Run CMake
 
 | Variable | Value | Description |
 | -------- | ----- | ------------|
-| VTK_RENDERING_BACKEND | OpenGL2 | Use modern OpenGL |
 | PARAVIEW_ENABLE_PYTHON | ON | Add python scripting support |
 | BUILD_TESTING | ON/OFF | Build tests if you are contributing to ParaView |
 

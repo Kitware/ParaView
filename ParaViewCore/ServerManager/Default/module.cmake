@@ -4,7 +4,7 @@ vtk_module(vtkPVServerManagerDefault
   PRIVATE_DEPENDS
     vtksys
     vtkpugixml
-    vtkRenderingVolume${VTK_RENDERING_BACKEND}
+    vtkRenderingVolumeOpenGL2
     vtkTestingRendering
     vtkPVClientServerCoreDefault
   TEST_DEPENDS

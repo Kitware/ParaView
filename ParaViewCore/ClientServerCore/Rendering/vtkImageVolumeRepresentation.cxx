@@ -352,7 +352,6 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   // this is necessary since volume mappers don't like empty arrays.
   this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
 
-#ifdef VTKGL2
   if (this->Property)
   {
     // Update the mapper's vector mode
@@ -364,7 +363,6 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     this->VolumeMapper->SetVectorMode(mode);
     this->VolumeMapper->SetVectorComponent(comp);
   }
-#endif
 }
 
 //----------------------------------------------------------------------------

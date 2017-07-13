@@ -40,7 +40,7 @@
       },
       { "name":"VTK_RENDERING_BACKEND",
         "type":"STRING",
-        "value":"OpenGL"
+        "value":"OpenGL2"
       }
     ]
   },

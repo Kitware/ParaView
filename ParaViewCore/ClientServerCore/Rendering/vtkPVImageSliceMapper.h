@@ -37,10 +37,8 @@
 class vtkImageData;
 class vtkRenderer;
 
-#ifdef VTKGL2
 class vtkOpenGLTexture;
 class vtkActor;
-#endif
 class vtkPainter;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImageSliceMapper : public vtkMapper
@@ -164,25 +162,11 @@ protected:
    */
   virtual void RenderPiece(vtkRenderer* ren, vtkActor* act);
 
-#ifdef VTKGL2
   vtkOpenGLTexture* Texture;
   int SetupScalars(vtkImageData*);
   void RenderInternal(vtkRenderer* ren, vtkActor* act);
   vtkTimeStamp UpdateTime;
   vtkActor* PolyDataActor;
-#else
-  /**
-   * Called when the PainterInformation becomes obsolete. It is called before
-   * Render request is propogated to the painter.
-   */
-  void UpdatePainterInformation();
-
-  vtkInformation* PainterInformation;
-  vtkTimeStamp PainterInformationUpdateTime;
-
-  class vtkObserver;
-  vtkObserver* Observer;
-#endif
 
   vtkPainter* Painter;
 

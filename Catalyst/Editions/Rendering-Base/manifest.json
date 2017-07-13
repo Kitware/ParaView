@@ -21,7 +21,7 @@
         "type": "BOOL",
         "value": "ON"
       },
-      { "name": "Module_vtkRenderingContextOpenGL",
+      { "name": "Module_vtkRenderingContextOpenGL2",
         "type": "BOOL",
         "value": "ON"
       },
@@ -37,7 +37,7 @@
         "type": "BOOL",
         "value": "ON"
       },
-      { "name": "Module_vtkRenderingOpenGL",
+      { "name": "Module_vtkRenderingOpenGL2",
         "type": "BOOL",
         "value": "ON"
       },
@@ -61,7 +61,7 @@
         "type": "BOOL",
         "value": "ON"
       },
-      { "name": "Module_vtkRenderingGL2PS",
+      { "name": "Module_vtkRenderingGL2PSOpenGL2",
         "type": "BOOL",
         "value": "ON"
       },
@@ -69,7 +69,7 @@
         "type": "BOOL",
         "value": "ON"
       },
-      { "name": "Module_vtkIOExportOpenGL",
+      { "name": "Module_vtkIOExportOpenGL2",
         "type": "BOOL",
         "value": "ON"
       },
@@ -157,7 +157,6 @@
         { "class": "vtkSelectionConverter" },
         { "class": "vtkSortedTableStreamer" },
         { "class": "vtkSquirtCompressor" },
-        { "class": "vtkTexturePainter" },
         { "class": "vtkTileDisplayHelper" },
         { "class": "vtkTilesHelper" },
         { "class": "vtkTrackballPan" },
@@ -212,16 +211,16 @@
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkIOExportOpenGL",
-      "path": "VTK/IO/ExportOpenGL",
+    { "name": "vtkIOExportOpenGL2",
+      "path": "VTK/IO/ExportOpenGL2",
       "exclude": [
         { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkRenderingGL2PS",
-      "path": "VTK/Rendering/GL2PS",
+    { "name": "vtkRenderingGL2PSOpenGL2",
+      "path": "VTK/Rendering/GL2PSOpenGL2",
       "exclude": [
         { "path": "Testing" }
       ],
@@ -396,6 +395,7 @@
         { "class": "vtkPainterDeviceAdapter" },
         { "class": "vtkPicker" },
         { "class": "vtkPickingManager" },
+        { "class": "vtkPointGaussianMapper" },
         { "class": "vtkPolyDataMapper" },
         { "class": "vtkPolyDataMapper2D" },
         { "class": "vtkProp" },
@@ -407,15 +407,16 @@
         { "class": "vtkPropAssembly" },
         { "class": "vtkPropCollection" },
         { "class": "vtkPropPicker" },
+        { "class": "vtkRenderer" },
+        { "class": "vtkRendererCollection" },
+        { "class": "vtkRendererDelegate" },
         { "class": "vtkRenderPass" },
         { "class": "vtkRenderState" },
         { "class": "vtkRenderTimerLog" },
         { "class": "vtkRenderWindow" },
         { "class": "vtkRenderWindowInteractor" },
-        { "class": "vtkRenderer" },
-        { "class": "vtkRendererCollection" },
-        { "class": "vtkRendererDelegate" },
         { "class": "vtkShaderDeviceAdapter2" },
+        { "class": "vtkSkybox" },
         { "class": "vtkStringToImage" },
         { "class": "vtkTDxInteractorStyle" },
         { "class": "vtkTDxInteractorStyleCamera" },
@@ -463,6 +464,7 @@
       "path": "VTK/Rendering/Parallel",
       "include": [
         { "path": "module.cmake" },
+        { "path": "vtkCompositeZPassFS.glsl" },
         { "class": "vtkCompositedSynchronizedRenderers" },
         { "class": "vtkCompositer" },
         { "class": "vtkCompositeRenderManager" },
@@ -554,8 +556,8 @@
         { "class": "vtkPVCacheKeeperPipeline" },
         { "class": "vtkPVClientServerSynchronizedRenderers" },
         { "class": "vtkPVCompositeRepresentation" },
-        { "class": "vtkPVContextInteractorStyle" },
         { "class": "vtkPVContextView" },
+        { "class": "vtkPVContextInteractorStyle" },
         { "class": "vtkPVDataDeliveryManager" },
         { "class": "vtkPVDataRepresentation" },
         { "class": "vtkPVDataRepresentationPipeline" },
@@ -717,8 +719,8 @@
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkRenderingOpenGL",
-      "path": "VTK/Rendering/OpenGL",
+    { "name": "vtkRenderingOpenGL2",
+      "path": "VTK/Rendering/OpenGL2",
       "comment": [
         "Including everything because the CMake code has lots of",
         "logic in it and it isn't worth duplicating it all just to",
@@ -760,8 +762,8 @@
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkRenderingContextOpenGL",
-      "path": "VTK/Rendering/ContextOpenGL",
+    { "name": "vtkRenderingContextOpenGL2",
+      "path": "VTK/Rendering/ContextOpenGL2",
       "exclude": [
         { "path": "Testing" }
       ],
@@ -834,9 +836,15 @@
       "path": "VTK/Imaging/Core",
       "include": [
         { "path": "module.cmake" },
+        { "path": "vtkImageInterpolatorInternals.h" },
+        { "class": "vtkAbstractImageInterpolator" },
         { "class": "vtkExtractVOI" },
         { "class": "vtkImageExtractComponents" },
-        { "class": "vtkImageShiftScale" }
+        { "class": "vtkImageInterpolator" },
+        { "class": "vtkImageResize" },
+        { "class": "vtkImageResize" },
+        { "class": "vtkImageShiftScale" },
+        { "class": "vtkImageSincInterpolator" }
       ],
       "replace": [
         { "path": "VTK/Imaging/Core/CMakeLists.txt" }
@@ -925,6 +933,9 @@
     },
     { "name": "vtkParseOGLExt",
       "path": "VTK/Utilities/ParseOGLExt"
+    },
+    { "name": "vtkglew",
+      "path": "VTK/ThirdParty/glew"
     },
     { "name": "vtkjpeg",
       "path": "VTK/ThirdParty/jpeg"

@@ -82,7 +82,6 @@ void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
 {
   this->Superclass::SlaveStartRender();
 
-#ifdef VTKGL2
   // In client-server mode, we want all the server ranks to simply render using
   // a black background. That makes it easier to blend the image we obtain from
   // the server rank on top of the background rendered locally on the client.
@@ -94,7 +93,6 @@ void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
   this->Renderer->SetBackground(0, 0, 0);
   this->Renderer->SetGradientBackground(false);
   this->Renderer->SetTexturedBackground(false);
-#endif
 }
 
 //----------------------------------------------------------------------------

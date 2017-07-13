@@ -34,11 +34,6 @@ set (Module_SRCS
   vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
 )
 
-# OpenGL2 specific definitions
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
-
 #------------------------------------------------------------------------------
 vtk_module_library(vtkPVServerImplementationRendering
   ${Module_SRCS})

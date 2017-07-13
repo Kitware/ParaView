@@ -142,14 +142,6 @@ if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS vtkInSituPParticlePathFilter.cxx)
 endif()
 
-# Disabled unless using the OpenGL backend.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND Module_SRCS
-    vtkScatterPlotPainter.cxx
-    vtkScatterPlotMapper.cxx
-    )
-endif()
-
 # Add header-only files so they get installed correctly.
 set (${vtk-module}_HDRS
   vtkMaterialInterfaceIdListItem.h

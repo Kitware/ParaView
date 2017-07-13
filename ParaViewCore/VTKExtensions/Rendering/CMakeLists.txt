@@ -91,20 +91,6 @@ set(Module_SRCS
   vtkCinemaExporter.cxx
 )
 
-# Disabled unless using the OpenGL backend.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND Module_SRCS
-    vtkTexturePainter.cxx
-    )
-endif()
-
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  set_source_files_properties(
-    vtkPVDefaultPass.cxx
-    vtkPVGeometryFilter.cxx
-    PROPERTIES COMPILE_FLAGS -DVTKGL2)
-endif()
-
 if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS
     vtkAllToNRedistributeCompositePolyData.cxx
@@ -119,10 +105,6 @@ if (PARAVIEW_USE_MPI)
     list(APPEND Module_SRCS
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
-    if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-      set_source_files_properties(vtkIceTCompositePass.cxx
-        PROPERTIES COMPILE_FLAGS -DVTKGL2)
-    endif()
   endif()
 endif()
 

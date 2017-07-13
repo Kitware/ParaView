@@ -47,8 +47,8 @@ set(_vtk_modules
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
-  vtkRenderingVolume${VTK_RENDERING_BACKEND}
-  vtkRendering${VTK_RENDERING_BACKEND}
+  vtkRenderingVolumeOpenGL2
+  vtkRenderingOpenGL2
   vtkRenderingLOD
   vtkRenderingContext2D
   vtkRenderingAnnotation
@@ -363,16 +363,11 @@ set(_vtk_modules
   # needed for H5PartReader support
   )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND _vtk_modules vtkRenderingLIC vtkIOExport)
-  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
-else()
-  list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
-  list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
-  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
-  if(PARAVIEW_ENABLE_PYTHON)
-    list (APPEND _vtk_modules vtkPVCinemaReader)
-  endif()
+list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
+list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
+list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
+if(PARAVIEW_ENABLE_PYTHON)
+  list (APPEND _vtk_modules vtkPVCinemaReader)
 endif()
 
 if (PARAVIEW_ENABLE_XDMF2)

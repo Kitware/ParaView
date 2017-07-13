@@ -12,13 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifdef VTKGL2
 #include "vtk_glew.h"
-#else
-#include "vtkOpenGLExtensionManager.h"
-#include "vtkOpenGLExtensionManagerConfigure.h"
-#include "vtkgl.h"
-#endif
 
 #include "vtkPVConfig.h"
 #include "vtkPVOpenGLInformation.h"

@@ -106,11 +106,8 @@ set (Module_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-  list(APPEND Module_SRCS
-    vtkPointGaussianRepresentation.cxx)
-endif()
+list(APPEND Module_SRCS
+  vtkPointGaussianRepresentation.cxx)
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS

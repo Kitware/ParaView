@@ -587,9 +587,6 @@ SOURCE_GROUP("Generated" FILES
 )
 
 set(${vtk-module}_NO_HeaderTest 1)
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
 vtk_module_library(pqApplicationComponents
   ${Module_SRCS}
   ${__Module_RESOURCE_SRCS}

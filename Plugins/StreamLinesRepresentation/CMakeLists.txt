@@ -11,7 +11,6 @@ include_directories(
   )
 
 include(vtkOpenGL)
-add_definitions(-DVTKGL2)
 
 set(SRCS)
 

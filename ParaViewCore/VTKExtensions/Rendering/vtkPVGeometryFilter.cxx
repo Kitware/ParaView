@@ -142,15 +142,11 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UseOutline = 1;
   this->BlockColorsDistinctValues = 7;
   this->UseStrips = 0;
-#ifdef VTKGL2
   // generating cell normals by default really slows down paraview
   // it is especially noticable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
   // to be there as they use them for other purposes/etc.
   this->GenerateCellNormals = 0;
-#else
-  this->GenerateCellNormals = 1;
-#endif
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
