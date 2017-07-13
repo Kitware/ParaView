@@ -18,14 +18,11 @@
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
 
-#define TEST_SUCCESS 0
-#define TEST_FAILED 1
-
 #define vtk_assert(x)                                                                              \
   if (!(x))                                                                                        \
   {                                                                                                \
     cerr << "On line " << __LINE__ << " ERROR: Condition FAILED!! : " << #x << endl;               \
-    return TEST_FAILED;                                                                            \
+    return EXIT_FAILURE;                                                                           \
   }
 
 int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type)
@@ -52,33 +49,40 @@ int TestOutput(vtkMultiBlockDataSet* mb, int nCells, VTKCellType type)
 
 int TestCGNSReader(int argc, char* argv[])
 {
-  if (argc < 4)
-    return 0; // for some reason two tests are run, one without data data on the cmdline
 
-  const char* mixed = argv[2];
-  const char* nfacen = argv[3];
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Example_mixed.cgns");
+  std::string mixed = fname ? fname : "";
+  delete[] fname;
 
-  cout << "Opening " << mixed << endl;
-  cout << "Opening " << nfacen << endl;
+  fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Example_nface_n.cgns");
+  std::string nfacen = fname ? fname : "";
+  delete[] fname;
+
+  cout << "Opening " << mixed.c_str() << endl;
+  cout << "Opening " << nfacen.c_str() << endl;
 
   vtkNew<vtkCGNSReader> mixedReader;
 
-  mixedReader->SetFileName(mixed);
+  mixedReader->SetFileName(mixed.c_str());
   mixedReader->Update();
 
   vtkMultiBlockDataSet* mb = mixedReader->GetOutput();
 
   if (0 != TestOutput(mb, 7, VTK_HEXAHEDRON))
-    return 1;
+  {
+    return EXIT_FAILURE;
+  }
 
   vtkNew<vtkCGNSReader> nfacenReader;
-  nfacenReader->SetFileName(nfacen);
+  nfacenReader->SetFileName(nfacen.c_str());
   nfacenReader->Update();
   mb = nfacenReader->GetOutput();
 
   if (0 != TestOutput(mb, 7, VTK_POLYHEDRON))
-    return 1;
+  {
+    return EXIT_FAILURE;
+  }
 
   cout << __FILE__ << " tests passed." << endl;
-  return 0;
+  return EXIT_SUCCESS;
 }
