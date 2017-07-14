@@ -70,6 +70,16 @@ vtkStandardNewMacro(vtkCGNSReader);
 namespace
 {
 
+/**
+ * A quick function to check if vtkIdType can hold the value being
+ * saved into vtkIdType
+ */
+template <class T>
+bool IsIdTypeBigEnough(const T& val)
+{
+  return (sizeof(vtkIdType) >= sizeof(T) || static_cast<T>(vtkTypeTraits<vtkIdType>::Max()) >= val);
+}
+
 static const char* NO_FAMILY_TAG = "no-family";
 struct duo_t
 {
@@ -1504,8 +1514,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   memDims[0] = zsize[0];
 
   // Compute number of points
-  if ((sizeof(vtkIdType) < sizeof(cgsize_t)) &&
-    (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < zsize[0]))
+  if (!IsIdTypeBigEnough(zsize[0]))
   {
     // overflow! cannot open the file in current configuration.
     vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
@@ -1709,7 +1718,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     startSec.push_back(sectionInfoList[sec].range[0] - 1);
     elementCoreSize += (eDataSize);
 
-    if (static_cast<cgsize_t>(vtkTypeTraits<vtkIdType>::Max()) < (elementSize + numCoreCells))
+    if (!IsIdTypeBigEnough(elementSize + numCoreCells))
     {
       vtkErrorMacro("vtkIdType overflow. Please compile with VTK_USE_64BIT_IDS:BOOL=ON.");
       return 1;
