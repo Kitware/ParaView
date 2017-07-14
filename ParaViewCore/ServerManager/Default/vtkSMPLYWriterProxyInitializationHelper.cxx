@@ -37,7 +37,7 @@ vtkSMPLYWriterProxyInitializationHelper::~vtkSMPLYWriterProxyInitializationHelpe
 
 //----------------------------------------------------------------------------
 void vtkSMPLYWriterProxyInitializationHelper::PostInitializeProxy(
-  vtkSMProxy* proxy, vtkPVXMLElement*, unsigned long ts)
+  vtkSMProxy* proxy, vtkPVXMLElement*, vtkMTimeType ts)
 {
   assert(proxy != NULL);
   if (proxy->GetProperty("ColorArrayName")->GetMTime() > ts ||

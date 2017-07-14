@@ -61,7 +61,7 @@ public:
    * initialization.
    */
   virtual void PostInitializeProxy(
-    vtkSMProxy* proxy, vtkPVXMLElement* xml, unsigned long initializationTimeStamp) = 0;
+    vtkSMProxy* proxy, vtkPVXMLElement* xml, vtkMTimeType initializationTimeStamp) = 0;
 
 protected:
   vtkSMProxyInitializationHelper();

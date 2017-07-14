@@ -303,14 +303,14 @@ protected:
    * for subclasses to determine which properties were modified since
    * initialization.
    */
-  unsigned long GetInitializationTime(vtkSMProxy*);
+  vtkMTimeType GetInitializationTime(vtkSMProxy*);
 
   //@{
   /**
    * Proxies can specify custom initialization using XML hints. This method
    * calls those initialization helpers, if any.
    */
-  void ProcessInitializationHelper(vtkSMProxy*, unsigned long initializationTimeStamp);
+  void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
 
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
