@@ -2347,13 +2347,13 @@ type as the input.</Documentation>
         Calculator filter. The scalar and vector variables may be chosen from
         this dataset's arrays.</Documentation>
       </InputProperty>
-      <IntVectorProperty command="SetAttributeMode"
-                         default_values="1"
-                         name="AttributeMode"
+      <IntVectorProperty command="SetAttributeType"
+                         default_values="0"
+                         name="AttributeType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Point Data" value="1" />
-          <Entry text="Cell Data" value="2" />
+          <Entry text="Point Data" value="0" />
+          <Entry text="Cell Data" value="1" />
         </EnumerationDomain>
         <Documentation>This property determines whether the computation is to
         be performed on point-centered or cell-centered data.</Documentation>

@@ -7,6 +7,11 @@ started tracking these (starting after version 4.2).
 Changes in 5.5
 --------------
 
+###Changes to vtkArrayCalculator
+`vtkArrayCalculator::SetAttributeMode` is deprecated in favor of `vtkArrayCalculator::SetAttributeType`
+which takes vtkDataObject attribute modes instead of custom constants as its parameter value.
+The ParaView calculator filter's AttributeMode property's values changed as a result of this.
+
 ###Changes to vtkSMViewProxy::CaptureWindowInternal###
 
 `vtkSMViewProxy::CaptureWindowInternal` now takes a 2-component magnification
