@@ -3,14 +3,16 @@ protocols that can be combined together to provide a flexible way to define
 very specific web application.
 """
 
-import os, sys, logging, types, inspect, traceback, logging, re, json, fnmatch
+from __future__ import absolute_import, division, print_function
+
+import os, sys, types, inspect, traceback, logging, re, json, fnmatch
 from time import time
 
 # import Twisted reactor for later callback
 from twisted.internet import reactor
 
 # import RPC annotation
-from autobahn.wamp import register as exportRpc
+from wslink import register as exportRpc
 
 # import paraview modules.
 import paraview
@@ -59,7 +61,7 @@ def alphanum_key(s):
 class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
     def __init__(self):
-        self.Application = None
+        # self.Application = None
         self.coreServer = None
         self.multiRoot = False
         self.baseDirectory = ''
@@ -381,6 +383,69 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 
         return reply
 
+# =============================================================================
+#
+# Provide Image publish-based delivery mechanism
+#
+# =============================================================================
+
+class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebPublishImageDelivery):
+    def __init__(self):
+        # multiple inheritance - ParaViewWebProtocol methods take priority, i.e. stillRender()
+        # PVW init called second so Application is initialized properly.
+        vtk_protocols.vtkWebPublishImageDelivery.__init__(self)
+        ParaViewWebProtocol.__init__(self)
+
+    @exportRpc("viewport.image.push")
+    def stillRender(self, options):
+        """
+        RPC Callback to render a view and obtain the rendered image.
+        """
+        beginTime = int(round(time() * 1000))
+        view = self.getView(options["view"])
+        size = [view.ViewSize[0], view.ViewSize[1]]
+        resize = size != options.get("size", size)
+        if resize:
+            size = options["size"]
+            view.ViewSize = size
+        t = 0
+        if options and "mtime" in options:
+            t = options["mtime"]
+        quality = 100
+        if options and "quality" in options:
+            quality = options["quality"]
+        localTime = 0
+        if options and "localTime" in options:
+            localTime = options["localTime"]
+        reply = {}
+        app = self.getApplication()
+        reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+
+        # Check that we are getting image size we have set if not wait until we
+        # do.
+        tries = 10;
+        while resize and list(app.GetLastStillRenderImageSize()) != size \
+              and size != [0, 0] and tries > 0:
+            app.InvalidateCache(view.SMProxy)
+            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+            tries -= 1
+
+        if not resize and options and ("clearCache" in options) and options["clearCache"]:
+            app.InvalidateCache(view.SMProxy)
+            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+
+        reply["stale"] = app.GetHasImagesBeingProcessed(view.SMProxy)
+        reply["mtime"] = app.GetLastStillRenderToStringMTime()
+        reply["size"] = [view.ViewSize[0], view.ViewSize[1]]
+        reply["format"] = "jpeg;base64"
+        reply["global_id"] = view.GetGlobalIDAsString()
+        reply["localTime"] = localTime
+
+        endTime = int(round(time() * 1000))
+        reply["workTime"] = (endTime - beginTime)
+
+        return reply
+
 
 # =============================================================================
 #
@@ -518,7 +583,7 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
 
         if not realViewId in self.trackingViews:
             observerCallback = lambda *args, **kwargs: self.publish('viewport.geometry.view.subscription', pushGeometry())
-            tag = self.Application.AddObserver('PushRender', observerCallback)
+            tag = self.getApplication().AddObserver('PushRender', observerCallback)
             self.trackingViews[realViewId] = { 'tag': tag, 'observerCount': 1 }
         else:
             # There is an observer on this view already
@@ -546,7 +611,7 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
         observerInfo['observerCount'] -= 1
 
         if observerInfo['observerCount'] <= 0:
-            self.Application.RemoveObserver(observerInfo['tag'])
+            self.getApplication().RemoveObserver(observerInfo['tag'])
             del self.trackingViews[realViewId]
 
         return { 'result': 'success' }
@@ -2125,7 +2190,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 fileToLoad.append(validPath)
 
         if len(fileToLoad) == 0:
-            return { 'success': False, 'reason': 'No valid path name' }
+            return { 'success': False, 'reason': 'No valid path name ' + str(relativePath) }
 
         # Get file extension and look for configured reader
         idx = fileToLoad[0].rfind('.')

@@ -5,9 +5,9 @@ r"""
 import os
 
 # import paraview modules.
-from paraview.web import wamp      as pv_wamp
+from paraview.web import pv_wslink
 from paraview.web import protocols as pv_protocols
-from vtk.web import server
+from wslink import server
 
 try:
     import argparse
@@ -21,11 +21,11 @@ except ImportError:
 # Create custom Pipeline Manager class to handle clients requests
 # =============================================================================
 
-class _TestServer(pv_wamp.PVServerProtocol):
+class _TestServer(pv_wslink.PVServerProtocol):
 
     dataDir = os.getcwd()
     canFile = None
-    authKey = "vtkweb-secret"
+    authKey = "wslink-secret"
     dsHost = None
     dsPort = 11111
     rsHost = None
