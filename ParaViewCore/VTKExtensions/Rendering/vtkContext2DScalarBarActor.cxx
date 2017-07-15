@@ -760,10 +760,6 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
 {
   vtkRectf rect = this->GetColorBarRect(size);
 
-  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-  int tileScale[2];
-  renWin->GetTileScale(tileScale);
-
   // Use the length of the character "|" at the label font size for various
   // measurements.
   float bounds[4];
