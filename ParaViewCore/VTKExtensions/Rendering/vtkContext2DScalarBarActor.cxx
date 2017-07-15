@@ -1015,21 +1015,9 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   this->Axis->GetScene()->SetRenderer(vtkRenderer::SafeDownCast(this->CurrentViewport));
 
   vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-  int tileScale[2];
-  renWin->GetTileScale(tileScale);
 
   double size[2];
   this->GetSize(size, painter);
-
-  // Scale only the scalar bar length.
-  if (this->Orientation == VTK_ORIENT_VERTICAL)
-  {
-    size[1] *= tileScale[1];
-  }
-  else
-  {
-    size[0] *= tileScale[0];
-  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;
