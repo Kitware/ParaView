@@ -767,8 +767,16 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   painter->ComputeStringBounds("|", bounds);
   float pipeHeight = bounds[3];
 
-  // Compute a horizontal shift amount for tick marks when the orientation is
-  // vertical.
+  // Note that at this point the font size is already scaled by the tile
+  // scale factor. Later on, vtkAxis will scale the tick length and label offset
+  // by the tile scale factor again, so we need to divide by the tile scale
+  // factor here to take that into account.
+  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+  pipeHeight /= tileScale[1];
+
+  // Compute a shift amount for tick marks.
   float axisShift = 0.25 * pipeHeight;
 
   // Compute tick lengths and label offsets based on the label font size
