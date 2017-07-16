@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
-#include "pqDisplayPolicy.h"
 #include "pqLoadDataReaction.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"

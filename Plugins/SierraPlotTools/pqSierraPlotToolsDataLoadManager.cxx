@@ -22,22 +22,22 @@
 #include "warningState.h"
 
 #include "pqSierraPlotToolsDataLoadManager.h"
-#include "pqSierraPlotToolsManager.h"
-
-#include "vtkSMProxy.h"
+#include "ui_pqSierraPlotToolsDataLoadManager.h"
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
+#include "pqSierraPlotToolsManager.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMProxy.h"
 
 #include <QPushButton>
 #include <QtDebug>
-
-#include "ui_pqSierraPlotToolsDataLoadManager.h"
 
 // used to show line number in #pragma message
 #define STRING2(x) #x
@@ -103,7 +103,7 @@ void pqSierraPlotToolsDataLoadManager::setupPipeline()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
   pqUndoStack* stack = core->getUndoStack();
-  pqDisplayPolicy* displayPolicy = core->getDisplayPolicy();
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   pqSierraPlotToolsManager* manager = pqSierraPlotToolsManager::instance();
 
@@ -130,7 +130,7 @@ void pqSierraPlotToolsDataLoadManager::setupPipeline()
     meshReaderProxy->UpdateVTKObjects();
 
     // Make representations.
-    displayPolicy->setRepresentationVisibility(meshReader->getOutputPort(0), meshView, true);
+    controller->Show(meshReader->getSourceProxy(), 0, meshView->getViewProxy());
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.

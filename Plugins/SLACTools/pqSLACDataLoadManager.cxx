@@ -18,25 +18,25 @@
   Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
-
 #include "pqSLACDataLoadManager.h"
-
-#include "pqSLACManager.h"
+#include "ui_pqSLACDataLoadManager.h"
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqSLACManager.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QPushButton>
 #include <QtDebug>
 
-#include "ui_pqSLACDataLoadManager.h"
 class pqSLACDataLoadManager::pqUI : public Ui::pqSLACDataLoadManager
 {
 };
@@ -109,7 +109,7 @@ void pqSLACDataLoadManager::setupPipeline()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
-  pqDisplayPolicy* displayPolicy = core->getDisplayPolicy();
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   pqSLACManager* manager = pqSLACManager::instance();
 
@@ -150,11 +150,10 @@ void pqSLACDataLoadManager::setupPipeline()
       ->Copy(meshReaderProxy->GetProperty("PhaseShiftInfo"));
 
     // Make representations.
-    pqDataRepresentation* repr;
-    repr = displayPolicy->setRepresentationVisibility(meshReader->getOutputPort(0), meshView, true);
-    repr->setVisible(true);
-    repr = displayPolicy->setRepresentationVisibility(meshReader->getOutputPort(1), meshView, true);
-    repr->setVisible(false);
+    controller->Show(meshReaderProxy, 0, meshView->getViewProxy());
+    controller->Show(meshReaderProxy, 1, meshView->getViewProxy());
+    controller->Hide(
+      meshReaderProxy, 1, meshView->getViewProxy()); // keeping what old code was doing.
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.
@@ -168,9 +167,9 @@ void pqSLACDataLoadManager::setupPipeline()
       builder->createReader("sources", "SLACParticleReader", particlesFiles, this->Server);
 
     // Make representations.
-    pqDataRepresentation* repr =
-      displayPolicy->setRepresentationVisibility(particlesReader->getOutputPort(0), meshView, true);
-    repr->setVisible(manager->actionShowParticles()->isChecked());
+    controller->Show(particlesReader->getSourceProxy(), 0, meshView->getViewProxy());
+    controller->SetVisibility(particlesReader->getSourceProxy(), 0, meshView->getViewProxy(),
+      manager->actionShowParticles()->isChecked()); // keeping what old code was doing.
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.

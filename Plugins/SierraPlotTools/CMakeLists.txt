@@ -97,6 +97,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
     GUI_RESOURCES SierraPlotTools.qrc
     SOURCES  ${HEADERS}  ${MOC_SRCS} ${UI_SRCS} ${SIERRA_PLOT_TOOLS_TOOLBAR_IFACE_SRCS} ${CLIENT_SRCS}
     )
-  target_link_libraries(${PLUGIN_NAME} LINK_PRIVATE vtkPVVTKExtensionsDefault ${qt_targets})
+  target_link_libraries(${PLUGIN_NAME}
+    LINK_PRIVATE vtkPVVTKExtensionsDefault vtkPVServerManagerRendering ${qt_targets})
 ELSE ()
 ENDIF ()

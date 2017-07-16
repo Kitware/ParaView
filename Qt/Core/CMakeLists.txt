@@ -65,8 +65,6 @@ set(Module_SRCS
   pqDataRepresentation.h
   pqDebug.cxx
   pqDebug.h
-  pqDisplayPolicy.cxx
-  pqDisplayPolicy.h
   pqFileDialog.cxx
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
@@ -240,7 +238,6 @@ set (Module_MOC_HDRS
   pqCoreTestUtility.h
   pqCoreUtilities.h
   pqDataRepresentation.h
-  pqDisplayPolicy.h
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
@@ -306,6 +303,14 @@ set (Module_MOC_HDRS
   pqXYHistogramChartView.h
   pqXYChartView.h
 )
+
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS
+    pqDisplayPolicy.cxx
+    pqDisplayPolicy.h)
+  list(APPEND Module_MOC_HDRS
+    pqDisplayPolicy.h)
+endif()
 
 set (Module_UI_FILES
   Resources/UI/pqOutputWidget.ui

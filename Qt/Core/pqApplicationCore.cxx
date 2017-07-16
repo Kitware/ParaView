@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
 #include "pqCoreUtilities.h"
-#include "pqDisplayPolicy.h"
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqLinksModel.h"
@@ -91,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #if !defined(VTK_LEGACY_REMOVE)
+#include "pqDisplayPolicy.h"
 #include "pqOutputWindow.h"
 #include "pqOutputWindowAdapter.h"
 #endif
@@ -192,8 +192,10 @@ void pqApplicationCore::constructor()
 
   this->PluginManager = new pqPluginManager(this);
 
-  // * Create various factories.
+// * Create various factories.
+#if !defined(VTK_LEGACY_REMOVE)
   this->DisplayPolicy = new pqDisplayPolicy(this);
+#endif
 
   this->ProgressManager = new pqProgressManager(this);
 
@@ -266,10 +268,12 @@ pqApplicationCore::~pqApplicationCore()
   this->HelpEngine = NULL;
 #endif
 
-  // We don't call delete on these since we have already setup parent on these
-  // correctly so they will be deleted. It's possible that the user calls delete
-  // on these explicitly in which case we end up with segfaults.
+// We don't call delete on these since we have already setup parent on these
+// correctly so they will be deleted. It's possible that the user calls delete
+// on these explicitly in which case we end up with segfaults.
+#if !defined(VTK_LEGACY_REMOVE)
   this->DisplayPolicy = 0;
+#endif
   this->UndoStack = 0;
 
   // Delete all children, which clears up all managers etc. before the server
@@ -335,9 +339,11 @@ void pqApplicationCore::setUndoStack(pqUndoStack* stack)
   }
 }
 
+#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
 {
+  VTK_LEGACY_BODY(pqApplicationCore::setDisplayPolicy, "ParaView 5.5");
   delete this->DisplayPolicy;
   this->DisplayPolicy = policy;
   if (policy)
@@ -345,6 +351,14 @@ void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
     policy->setParent(this);
   }
 }
+
+//-----------------------------------------------------------------------------
+pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
+{
+  VTK_LEGACY_BODY(pqApplicationCore::getDisplayPolicy, "ParaView 5.5");
+  return this->DisplayPolicy;
+}
+#endif // VTK_LEGACY_REMOVE
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::registerManager(const QString& function, QObject* _manager)
