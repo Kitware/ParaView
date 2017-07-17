@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkSMXYChartRepresentationInitializationHelper, vtkSMProxyInitializationHelper);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, unsigned long) VTK_OVERRIDE;
+  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
 
 protected:
   vtkSMXYChartRepresentationInitializationHelper();

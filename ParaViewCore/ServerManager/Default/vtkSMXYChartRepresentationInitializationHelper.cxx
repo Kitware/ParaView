@@ -40,7 +40,7 @@ vtkSMXYChartRepresentationInitializationHelper::~vtkSMXYChartRepresentationIniti
 
 //----------------------------------------------------------------------------
 void vtkSMXYChartRepresentationInitializationHelper::PostInitializeProxy(
-  vtkSMProxy* proxy, vtkPVXMLElement*, unsigned long vtkNotUsed(ts))
+  vtkSMProxy* proxy, vtkPVXMLElement*, vtkMTimeType vtkNotUsed(ts))
 {
   assert(proxy != NULL);
 

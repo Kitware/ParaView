@@ -41,7 +41,7 @@ struct vtkPVMultiServerDataSource::vtkInternal
   vtkWeakPointer<vtkSMSourceProxy> ExternalProxy;
   int PortToExport;
   int DataTypeToUse;
-  unsigned long LastUpdatedDataTimeStamp;
+  vtkMTimeType LastUpdatedDataTimeStamp;
 
   vtkInternal()
     : DataTypeToUse(VTK_DATA_OBJECT){};
