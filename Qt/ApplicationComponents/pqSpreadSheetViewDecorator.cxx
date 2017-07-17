@@ -36,14 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 // Qt Includes.
-#include <QAction>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QPointer>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QWidgetAction>
 
 // ParaView Includes.
 #include "pqComboBoxDomain.h"
@@ -240,27 +242,36 @@ void pqSpreadSheetViewDecorator::showToggleColumnPopupMenu()
 {
   // Update toggle list
   QMap<QString, bool> userRole;
-  this->Internal->ColumnToggleMenu.clear();
+  QMenu& menu = this->Internal->ColumnToggleMenu;
+  menu.clear();
   for (int i = 0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
   {
     QString name = this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
     userRole[name] = this->Spreadsheet->getViewModel()->isVisible(i);
     if (!name.startsWith("__"))
     {
-      this->Internal->ColumnToggleMenu.addAction(name);
+      QCheckBox* cb = new QCheckBox();
+      cb->setObjectName("CheckBox");
+      cb->setText(name);
+      cb->setChecked(userRole[name]);
+      // We need a layout to set margins - there are none for Plastic theme by default
+      QHBoxLayout* layout = new QHBoxLayout();
+      layout->addWidget(cb);
+      layout->setContentsMargins(4, 2, 4, 2);
+      QWidget* widget = new QWidget(&menu);
+      widget->setObjectName(name);
+      widget->setLayout(layout);
+      QWidgetAction* action = new QWidgetAction(&menu);
+      action->setText(name);
+      action->setDefaultWidget(widget);
+      menu.addAction(action);
+      QObject::connect(cb, SIGNAL(stateChanged(int)), this, SLOT(updateColumnVisibility()));
     }
-  }
-
-  foreach (QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
-  {
-    a->setCheckable(true);
-    a->setChecked(userRole[a->text()]);
-    QObject::connect(a, SIGNAL(changed()), this, SLOT(updateColumnVisibility()));
   }
 
   if (userRole.size() > 0)
   {
-    this->Internal->ColumnToggleMenu.popup(this->Internal->ToggleColumnVisibility->mapToGlobal(
+    menu.popup(this->Internal->ToggleColumnVisibility->mapToGlobal(
       QPoint(0, this->Internal->ToggleColumnVisibility->height())));
   }
 }
@@ -275,12 +286,16 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
   }
 
   QList<QPair<QString, bool> > visibilities;
-  foreach (QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+  foreach (QWidgetAction* a, this->Internal->ColumnToggleMenu.findChildren<QWidgetAction*>())
   {
+    QWidget* widget = qobject_cast<QWidget*>(a->defaultWidget());
+    Q_ASSERT(widget && widget->layout()->count() > 0);
+    QCheckBox* cb = qobject_cast<QCheckBox*>(widget->layout()->itemAt(0)->widget());
+    Q_ASSERT(cb);
     int index = headers.indexOf(a->text());
     if (index >= 0)
     {
-      this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
+      this->Spreadsheet->getViewModel()->setVisible(index, cb->isChecked());
 
       // Recover actual name to update ColumnVisibility in vtkSpreadsheetView
       // for a potential export. This property has no effect on actual
@@ -299,7 +314,7 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
       {
         actualName = "vtkOriginalProcessIds";
       }
-      visibilities.push_back(QPair<QString, bool>(actualName, a->isChecked()));
+      visibilities.push_back(QPair<QString, bool>(actualName, cb->isChecked()));
     }
   }
 
