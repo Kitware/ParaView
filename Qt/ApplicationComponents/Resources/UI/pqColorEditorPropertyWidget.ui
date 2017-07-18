@@ -68,6 +68,26 @@
     </widget>
    </item>
    <item row="1" column="1">
+    <widget class="QPushButton" name="UseSeparateColorMap">
+     <property name="toolTip">
+      <string>Use Separate color map</string>
+     </property>
+     <property name="statusTip">
+      <string>Use Separate Color Map</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqSeparateColorMap24.png</normaloff>:/pqWidgets/Icons/pqSeparateColorMap24.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
     <widget class="QPushButton" name="Rescale">
      <property name="toolTip">
       <string>Rescale to data range</string>
@@ -87,7 +107,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
+   <item row="1" column="6">
     <widget class="QPushButton" name="ShowScalarBar">
      <property name="toolTip">
       <string>Show/hide color legend</string>
@@ -110,7 +130,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
+   <item row="1" column="7">
     <widget class="QPushButton" name="EditScalarBar">
      <property name="toolTip">
       <string>Edit color legend properties</string>
@@ -124,7 +144,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="1" column="4">
     <widget class="QPushButton" name="RescaleTemporal">
      <property name="toolTip">
       <string>Rescale to data range over all timesteps</string>
@@ -138,7 +158,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
+   <item row="1" column="5">
     <widget class="QPushButton" name="ChoosePreset">
      <property name="toolTip">
       <string>Choose preset</string>

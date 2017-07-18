@@ -18,7 +18,6 @@ Typical usage is as follows::
     # stop trace. The generated trace is returned.
     txt = smtracer.stop_trace()
 
-
 =========================
 Developer Documentation
 =========================
@@ -70,7 +69,6 @@ import paraview.simple as simple
 import sys
 from paraview.vtk import vtkTimeStamp
 
-
 if sys.version_info >= (3,):
     xrange = range
 
@@ -107,7 +105,6 @@ class TraceOutput:
   def raw_data(self): return self.__data
 
   def reset(self): self.__data = []
-
 
 class Trace(object):
     __REGISTERED_ACCESSORS = {}
@@ -286,20 +283,49 @@ class Trace(object):
         return False
 
     @classmethod
+    def rename_separate_tf_and_get_representation(cls, arrayName):
+      import re
+      representation = None
+      varname = arrayName
+      regex = re.compile(r"(^Separate_)([0-9]*)_(.*$)")
+      if re.match(regex, arrayName):
+        gid = re.sub(regex, "\g<2>", arrayName)
+        representation = next((value for key, value in simple.GetRepresentations().items() if key[1] == gid), None)
+        if representation:
+          repAccessor = Trace.get_accessor(representation)
+          arrayName = re.sub(regex, "\g<3>", arrayName)
+          varname = ("Separate_%s_%s" % (repAccessor, arrayName))
+      return arrayName, varname, representation
+
+    @classmethod
     def _create_accessor_for_tf(cls, proxy, regname):
         import re
         m = re.match("^[0-9.]*(.+)\\.%s$" % proxy.GetXMLName(), regname)
         if m:
             arrayName = m.group(1)
             if proxy.GetXMLGroup() == "lookup_tables":
-                varsuffix = "LUT"
+              arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
+              if rep:
+                repAccessor = Trace.get_accessor(rep)
+                args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
+                comment = "separate color transfer function/color map"
+              else :
+                args = ("'%s'" % arrayName)
                 comment = "color transfer function/color map"
-                method = "GetColorTransferFunction"
+              method = "GetColorTransferFunction"
+              varsuffix = "LUT"
             else:
-                varsuffix = "PWF"
+              arrayName, varname, rep = cls.rename_separate_tf_and_get_representation(arrayName)
+              if rep:
+                repAccessor = Trace.get_accessor(rep)
+                args = ("'%s', %s, separate=True" % (arrayName, repAccessor))
+                comment = "separate opacity transfer function/opacity map"
+              else :
+                args = ("'%s'" % arrayName)
                 comment = "opacity transfer function/opacity map"
-                method = "GetOpacityTransferFunction"
-            varname = cls.get_varname("%s%s" % (arrayName, varsuffix))
+              method = "GetOpacityTransferFunction"
+              varsuffix = "PWF"
+            varname = cls.get_varname("%s%s" % (varname, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
             #cls.Output.append_separated([\
             #    "# get %s for '%s'" % (comment, arrayName),
@@ -307,7 +333,7 @@ class Trace(object):
             trace = TraceOutput()
             trace.append("# get %s for '%s'" % (comment, arrayName))
             trace.append(accessor.trace_ctor(\
-                method, SupplementalProxy(TransferFunctionProxyFilter()), ctor_args="'%s'" % arrayName))
+              method, SupplementalProxy(TransferFunctionProxyFilter()), ctor_args = args))
             cls.Output.append_separated(trace.raw_data())
             return True
         return False
@@ -442,7 +468,7 @@ class RealProxyAccessor(Accessor):
         joiner = ",\n    " if in_ctor else "\n"
         return joiner.join([x.get_property_trace(in_ctor) for x in props])
 
-    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False, ctor_var=None):
         args_in_ctor = str(ctor_args) if not ctor_args is None else ""
         # trace any properties that the 'filter' tells us should be traced
         # in ctor.
@@ -889,7 +915,6 @@ class ScalarBarInteraction(NestableTraceItem):
                 self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
-
 class Show(TraceItem):
     """Traces Show"""
     def __init__(self, producer, port, view, display, comment=None):
@@ -907,6 +932,7 @@ class Show(TraceItem):
 
     def finalize(self):
         display = self.Display
+        output = TraceOutput()
         if not Trace.has_accessor(display):
             pname = "%sDisplay" % self.ProducerAccessor
             accessor = ProxyAccessor(Trace.get_varname(pname), display)
@@ -916,7 +942,6 @@ class Show(TraceItem):
             trace_ctor = False
         port = self.OutputPort
 
-        output = TraceOutput()
         if not self.Comment is None:
             output.append("# %s" % self.Comment)
         else:
@@ -927,7 +952,9 @@ class Show(TraceItem):
         else:
             output.append("%s = Show(%s, %s)" % \
                 (str(accessor), str(self.ProducerAccessor), str(self.ViewAccessor)))
+        Trace.Output.append_separated(output.raw_data())
 
+        output = TraceOutput()
         if trace_ctor:
             # Now trace default values.
             ctor_trace = accessor.trace_ctor(None, RepresentationProxyFilter())
@@ -954,7 +981,7 @@ class Hide(TraceItem):
 
 class SetScalarColoring(TraceItem):
     """Trace vtkSMPVRepresentationProxy.SetScalarColoring"""
-    def __init__(self, display, arrayname, attribute_type, component=None, lut=None):
+    def __init__(self, display, arrayname, attribute_type, component=None, separate=False, lut=None):
         TraceItem.__init__(self)
 
         self.Display = sm._getPyProxy(display)
@@ -962,25 +989,42 @@ class SetScalarColoring(TraceItem):
         self.AttributeType = attribute_type
         self.Component = component
         self.Lut = sm._getPyProxy(lut)
+        self.Separate = separate
 
     def finalize(self):
         TraceItem.finalize(self)
 
         if self.ArrayName:
             if self.Component is None:
-              Trace.Output.append_separated([\
-                  "# set scalar coloring",
-                  "ColorBy(%s, ('%s', '%s'))" % (\
-                      str(Trace.get_accessor(self.Display)),
-                      sm.GetAssociationAsString(self.AttributeType),
-                      self.ArrayName)])
+              if self.Separate:
+                Trace.Output.append_separated([\
+                    "# set scalar coloring using an separate color/opacity maps",
+                    "ColorBy(%s, ('%s', '%s'), %s)" % (\
+                        str(Trace.get_accessor(self.Display)),
+                        sm.GetAssociationAsString(self.AttributeType),
+                        self.ArrayName, self.Separate)])
+              else:
+                Trace.Output.append_separated([\
+                    "# set scalar coloring",
+                    "ColorBy(%s, ('%s', '%s'))" % (\
+                        str(Trace.get_accessor(self.Display)),
+                        sm.GetAssociationAsString(self.AttributeType),
+                        self.ArrayName)])
             else:
-              Trace.Output.append_separated([\
-                  "# set scalar coloring",
-                  "ColorBy(%s, ('%s', '%s', '%s'))" % (\
-                      str(Trace.get_accessor(self.Display)),
-                      sm.GetAssociationAsString(self.AttributeType),
-                      self.ArrayName, self.Component)])
+              if self.Separate:
+                Trace.Output.append_separated([\
+                    "# set scalar coloring using an separate color/opacity maps",
+                    "ColorBy(%s, ('%s', '%s', '%s'), %s)" % (\
+                        str(Trace.get_accessor(self.Display)),
+                        sm.GetAssociationAsString(self.AttributeType),
+                        self.ArrayName, self.Component, self.Separate)])
+              else:
+                Trace.Output.append_separated([\
+                    "# set scalar coloring",
+                    "ColorBy(%s, ('%s', '%s', '%s'))" % (\
+                        str(Trace.get_accessor(self.Display)),
+                        sm.GetAssociationAsString(self.AttributeType),
+                        self.ArrayName, self.Component)])
         else:
             Trace.Output.append_separated([\
                 "# turn off scalar coloring",
@@ -1233,7 +1277,6 @@ class CallMethod(TraceItem):
         except AttributeError:
             return "'%s'" % x if type(x) == str else x
 
-
 def _bind_on_event(ref):
     def _callback(obj, string):
         ref().on_event(obj, string)
@@ -1262,7 +1305,6 @@ class CallMethodIfPropertiesModified(CallMethod):
     def __del__(self):
         if self.proxy and self.tag:
             self.proxy.RemoveObserver(self.tag)
-
 
 class CallFunction(TraceItem):
     def __init__(self, functionname, *args, **kwargs):
@@ -1319,7 +1361,6 @@ class SaveCameras(BookkeepingItem):
         else:
             raise Untraceable("Invalid argument type %r"% proxy)
         return trace.raw_data()
-
 
 # __ActiveTraceItems is simply used to keep track of items that are currently
 # active to avoid non-nestable trace items from being created when previous
@@ -1400,7 +1441,6 @@ def get_current_trace_output_and_reset(raw=False):
     output = get_current_trace_output(raw)
     reset_trace_output()
     return output
-
 
 def reset_trace_output():
     """Resets the trace output without resetting the tracing datastructures

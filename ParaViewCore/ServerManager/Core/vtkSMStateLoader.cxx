@@ -227,7 +227,7 @@ void vtkSMStateLoader::RegisterProxyInternal(
 
 //---------------------------------------------------------------------------
 bool vtkSMStateLoader::UpdateRegistrationInfo(
-  std::string& group, std::string& vtkNotUsed(name), vtkSMProxy* vtkNotUsed(proxy))
+  std::string& group, std::string& name, vtkSMProxy* vtkNotUsed(proxy))
 {
   static const char* helper_proxies_prefix = "pq_helper_proxies.";
   static size_t len = strlen(helper_proxies_prefix);
@@ -242,6 +242,25 @@ bool vtkSMStateLoader::UpdateRegistrationInfo(
       group += helpedProxy->GetGlobalIDAsString();
     }
   }
+
+  if (group == "lookup_tables" || group == "piecewise_functions")
+  {
+    // A separated lookup table or piecewise function, must update it.
+    const std::string separatePrefix = "Separate_";
+    const size_t separateLen = separatePrefix.size();
+    if (name.substr(0, separateLen) == separatePrefix)
+    {
+      // This will change any "Separate_OLDGID_ArrayName" into "Separate_NEWGID_ArrayName"
+      size_t gidLen = name.find_first_of("_", separateLen) - separateLen;
+      std::string gidStr = name.substr(separateLen, gidLen);
+      vtkTypeUInt32 gid = static_cast<vtkTypeUInt32>(std::atoi(gidStr.c_str()));
+      if (vtkSMProxy* helpedProxy = this->ProxyLocator->LocateProxy(gid))
+      {
+        name.replace(separateLen, gidLen, helpedProxy->GetGlobalIDAsString());
+      }
+    }
+  }
+
   return true;
 }
 

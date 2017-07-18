@@ -18,7 +18,7 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleTemporalRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ResetScalarRangeToDataOverTime/RescaleAndLockButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
-  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton4" property="enabled" arguments="false" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton5" property="enabled" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionIgnoreTime" />
-  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton4" property="enabled" arguments="true" />
+  <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton5" property="enabled" arguments="true" />
 </pqevents>
