@@ -161,7 +161,7 @@ void pqCalculatorWidget::buttonPressed(const QString& buttonText)
 //-----------------------------------------------------------------------------
 void pqCalculatorWidget::updateVariableNames()
 {
-  vtkSMUncheckedPropertyHelper attributeType(this->proxy(), "AttributeMode");
+  vtkSMUncheckedPropertyHelper attributeType(this->proxy(), "AttributeType");
   this->updateVariables(attributeType.GetAsString(0));
 }
 
