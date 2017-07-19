@@ -164,6 +164,7 @@ bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
       vtkWarningMacro("The requested resolution '("
         << size[0] << ", " << size[1] << ")' has been changed to '(" << newsize[0] << ", "
         << newsize[1] << ")' to match format specification.");
+      vtkSMPropertyHelper(this, "ImageResolution").Set(newsize.GetData(), 2);
       return true; // size changed.
     }
   }
