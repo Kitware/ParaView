@@ -803,21 +803,6 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
       }
     }
   }
-
-  // Removing old definitions that don't exist anymore.
-  QSet<QPair<QString, QString> > setToRemove = this->Internal->Proxies.keys().toSet();
-  setToRemove.subtract(definitionSet);
-  QPair<QString, QString> key;
-  foreach (key, setToRemove)
-  {
-    // This extra test should be removed once the main definition has been updated
-    // with the Hints/ShowInMenu...
-    if (!pxdm->HasDefinition(key.first.toLocal8Bit().data(), key.second.toLocal8Bit().data()))
-    {
-      this->Internal->removeProxy(key.first, key.second);
-    }
-  }
-
   // Update the menu with the current definition
   this->populateMenu();
 }
