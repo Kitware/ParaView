@@ -14,33 +14,37 @@
 =========================================================================*/
 /**
  * @class   vtkPVDisplayInformation
- * @brief   provides information about the rendering
- * display and OpenGL context.
+ * @brief   provides information about the rendering display and OpenGL context.
  *
-*/
+ * @deprecated in ParaView 5.5. Please use vtkPVRenderingCapabilitiesInformation
+ * instead.
+ */
 
 #ifndef vtkPVDisplayInformation_h
 #define vtkPVDisplayInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
+
+#if !defined(VTK_LEGACY_REMOVE)
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDisplayInformation : public vtkPVInformation
 {
 public:
-  static vtkPVDisplayInformation* New();
+  VTK_LEGACY(static vtkPVDisplayInformation* New());
   vtkTypeMacro(vtkPVDisplayInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns if the display can be opened up on the current processes.
    */
-  static bool CanOpenDisplayLocally();
+  VTK_LEGACY(static bool CanOpenDisplayLocally());
 
   /**
    * Returns true if OpenGL context supports core features required for
    * rendering.
    */
-  static bool SupportsOpenGLLocally();
+  VTK_LEGACY(static bool SupportsOpenGLLocally());
 
   /**
    * Transfer information about a single object into this object.
@@ -91,4 +95,5 @@ private:
   static int GlobalSupportsOpenGL;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif

@@ -56,7 +56,6 @@
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
@@ -350,8 +349,6 @@ vtkPVRenderView::vtkPVRenderView()
   // non-reference counted, so no worries about reference loops.
   this->Internals->DeliveryManager->SetRenderView(this);
 
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-
   this->RemoteRenderingAvailable = true;
 
   this->LockBounds = false;
@@ -387,7 +384,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = NULL;
   this->UseInteractiveRenderingForScreenshots = false;
-  this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->EGLDeviceIndex = options->GetEGLDeviceIndex();
   this->Selector = vtkPVHardwareSelector::New();
   this->NeedsOrderedCompositing = false;
@@ -406,8 +402,13 @@ vtkPVRenderView::vtkPVRenderView()
 
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
-  window->SetOffScreenRendering(this->UseOffscreenRendering ? 1 : 0);
-  window->SetDeviceIndex(this->EGLDeviceIndex);
+
+  // vtkPVSynchronizedRenderWindows setups offscreen flag on the window based on
+  // the command line arguments and process type.
+  this->UseOffscreenRendering = window->GetOffScreenRendering() != 0;
+
+  // Same for device index as for offscreen flag.
+  this->EGLDeviceIndex = window->GetDeviceIndex();
 
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
@@ -597,10 +598,18 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
     return;
   }
 
+  // if command line arguments overrode the offscreen flag, then respect that.
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
+  if (options->GetForceOffscreenRendering())
+  {
+    use_offscreen = true;
+  }
+  else if (options->GetForceOnscreenRendering())
+  {
+    use_offscreen = false;
+  }
 
-  this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
+  this->UseOffscreenRendering = use_offscreen;
   this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
 }
 

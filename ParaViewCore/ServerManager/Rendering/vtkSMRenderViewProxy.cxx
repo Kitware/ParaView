@@ -32,10 +32,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVLastSelectionInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointData.h"
@@ -399,13 +399,12 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   {
     // Update whether render servers can open display i.e. remote rendering is
     // possible on all processes.
-    vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
-    this->GetSession()->GatherInformation(vtkPVSession::RENDER_SERVER, info, 0);
-    if (info->GetCanOpenDisplay() == 0 || info->GetSupportsOpenGL() == 0)
+    vtkNew<vtkPVRenderingCapabilitiesInformation> info;
+    this->GetSession()->GatherInformation(vtkPVSession::RENDER_SERVER, info.Get(), 0);
+    if (!info->Supports(vtkPVRenderingCapabilitiesInformation::OPENGL))
     {
       remote_rendering_available = false;
     }
-    info->Delete();
   }
 
   // Disable remote rendering on all processes, if not available.

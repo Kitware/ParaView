@@ -70,7 +70,7 @@ public:
   virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   //@{
-  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE { return this->RenderWindow; }
   //@}
 
   //@{
@@ -99,11 +99,8 @@ public:
   //@{
   /**
    * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion. If --use-offscreen-rendering command line option is
-   * specified, then setting this flag to 0 on that process has no effect.
-   * Setting it to true, however, will ensure that even is
-   * --use-offscreen-rendering is not specified, it will use offscreen
-   * rendering.
+   * merely a suggestion and command line options may cause the suggested value
+   * to be ignored.
    */
   virtual void SetUseOffscreenRendering(bool);
   vtkBooleanMacro(UseOffscreenRendering, bool);

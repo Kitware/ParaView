@@ -48,8 +48,6 @@ public:
   //@}
 
   vtkGetMacro(ConnectID, int);
-  vtkGetMacro(UseOffscreenRendering, int);
-  vtkGetMacro(EGLDeviceIndex, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
 
@@ -57,6 +55,16 @@ public:
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileMullions, int);
+
+  /**
+   * Returns the egl device index. -1 indicates that no value was specified.
+   */
+  vtkGetMacro(EGLDeviceIndex, int);
+
+  /**
+   * @deprecated in ParaView 5.5. Use `GetForceOnscreenRendering()` instead.
+   */
+  VTK_LEGACY(int GetUseOffscreenRendering());
 
   //@{
   /**
@@ -222,6 +230,17 @@ public:
   vtkGetMacro(DisableXDisplayTests, int);
   //@}
 
+  /**
+   * When set to true, ParaView will create headless only render windows on the
+   * current process.
+   */
+  vtkGetMacro(ForceOffscreenRendering, int);
+
+  /**
+   * When set to true, ParaView will create on-screen render windows.
+   */
+  vtkGetMacro(ForceOnscreenRendering, int);
+
   enum ProcessTypeEnum
   {
     PARAVIEW = 0x2,
@@ -314,6 +333,8 @@ private:
   int ForceMPIInitOnClient;
   int ForceNoMPIInitOnClient;
   int DummyMesaFlag;
+  int ForceOffscreenRendering;
+  int ForceOnscreenRendering;
 
   // inline setters
   vtkSetStringMacro(StereoType);
