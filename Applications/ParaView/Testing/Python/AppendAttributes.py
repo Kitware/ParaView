@@ -43,7 +43,7 @@ canex2.PointVariables = ['DISPL', 'VEL', 'ACCL']
 canex2.GlobalVariables = ['KE', 'XMOM', 'YMOM', 'ZMOM', 'NSTEPS', 'TMSTEP']
 
 calculator1 = Calculator(Input=canex2)
-calculator1.AttributeMode = 'Point Data'
+calculator1.AttributeType = 'Point Data'
 calculator1.CoordinateResults = 0
 calculator1.ResultNormals = 0
 calculator1.ResultTCoords = 0
