@@ -131,7 +131,12 @@ int GetTimeStepIndex(const double time, const double* timesteps, int num_timeste
 
   const double* lbptr = std::lower_bound(timesteps, timesteps + num_timesteps, time);
   int index = static_cast<int>(lbptr - timesteps);
-  assert(index >= 0 && index < num_timesteps);
+  assert(index >= 0 && index <= num_timesteps);
+  if (index == num_timesteps)
+  {
+    // if time > last_timestep, just give the last timestep.
+    --index;
+  }
   return index;
 }
 }
