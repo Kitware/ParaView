@@ -176,6 +176,7 @@ protected slots:
   void triggered();
   void quickLaunch();
   void switchActiveServer();
+  void updateMenuStyle();
 
 protected:
   QString ResourceTagName;
