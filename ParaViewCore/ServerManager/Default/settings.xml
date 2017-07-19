@@ -48,6 +48,21 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ForceSingleColumnMenus"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Force the sources/filters menus to be presented as a single
+          scrollable column to ensure that all the filters are selectable
+          on low resolution screens.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
       <StringVectorProperty name="DefaultViewType"
         number_of_elements="1"
         default_values="RenderView"
@@ -344,7 +359,9 @@
 
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
+        <Property name="ShowSaveStateOnExit" />
         <Property name="CrashRecovery" />
+        <Property name="ForceSingleColumnMenus" />
       </PropertyGroup>
 
       <PropertyGroup label="View Options">

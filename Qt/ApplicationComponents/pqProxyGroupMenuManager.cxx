@@ -149,6 +149,8 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(QMenu* _menu, const QString& re
   this->Internal->ProxyManagerCallBackId =
     pqCoreUtilities::connect(vtkSMProxyManager::GetProxyManager(),
       vtkSMProxyManager::ActiveSessionChanged, this, SLOT(switchActiveServer()));
+
+  QObject::connect(this->menu(), SIGNAL(aboutToShow()), this, SLOT(updateMenuStyle()));
 }
 
 //-----------------------------------------------------------------------------
@@ -372,8 +374,6 @@ void pqProxyGroupMenuManager::populateMenu()
   // actions that are no longer shown in the menu. Hence we disconnect all
   // signal connections.
   QMenu* _menu = this->menu();
-  // Fix for BUG #17387
-  _menu->setStyleSheet("QMenu { menu-scrollable: 1; }");
 
   QList<QAction*> menuActions = _menu->actions();
   foreach (QAction* action, menuActions)
@@ -451,6 +451,14 @@ void pqProxyGroupMenuManager::populateMenu()
   }
 
   emit this->menuPopulated();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::updateMenuStyle()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  bool sc = settings->value("GeneralSettings.ForceSingleColumnMenus", false).toBool();
+  this->menu()->setStyleSheet(QString("QMenu { menu-scrollable: %1; }").arg(sc ? 1 : 0));
 }
 
 //-----------------------------------------------------------------------------
