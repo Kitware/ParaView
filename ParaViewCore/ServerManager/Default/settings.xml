@@ -430,20 +430,6 @@
         Application settings for render views.
       </Documentation>
 
-      <IntVectorProperty name="UseDisplayLists"
-        command="SetUseDisplayLists"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Enable use of display lists when rendering surface meshes
-          (only applicable for builds with legacy rendering backend).
-        </Documentation>
-        <Hints>
-          <RestartRequired />
-        </Hints>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ResolveCoincidentTopology"
         command="SetResolveCoincidentTopology"
         number_of_elements="1"
@@ -796,7 +782,6 @@
       </IntVectorProperty>
 
       <PropertyGroup label="Geometry Mapper Options">
-        <Property name="UseDisplayLists" />
         <Property name="ResolveCoincidentTopology" />
         <Property name="PolygonOffsetParameters" />
         <Property name="ZShift" />
