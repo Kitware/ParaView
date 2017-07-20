@@ -64,7 +64,7 @@ public:
   /**
    * Get a handle to the render window.
    */
-  virtual vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Set the render window for this view. Note that this requires special

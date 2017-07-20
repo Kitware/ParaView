@@ -156,7 +156,7 @@ public:
   /**
    * Returns the render window.
    */
-  vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Returns the interactor.
