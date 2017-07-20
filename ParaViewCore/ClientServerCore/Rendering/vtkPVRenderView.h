@@ -403,16 +403,6 @@ public:
 
   //@{
   /**
-   * Set or get whether offscreen rendering should be used during
-   * CaptureWindow calls. On Apple machines, this flag has no effect.
-   */
-  vtkSetMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkBooleanMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkGetMacro(UseOffscreenRenderingForScreenshots, bool);
-  //@}
-
-  //@{
-  /**
    * Get/Set whether to use offscreen rendering for all rendering. This is
    * merely a suggestion. If --use-offscreen-rendering command line option is
    * specified, then setting this flag to 0 on that process has no effect.
@@ -1113,7 +1103,6 @@ protected:
 
   bool UseOffscreenRendering;
   int EGLDeviceIndex;
-  bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;

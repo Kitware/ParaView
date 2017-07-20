@@ -386,7 +386,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationWidget = vtkPVAxesWidget::New();
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = NULL;
-  this->UseOffscreenRenderingForScreenshots = false;
   this->UseInteractiveRenderingForScreenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->EGLDeviceIndex = options->GetEGLDeviceIndex();

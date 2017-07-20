@@ -283,20 +283,6 @@
                          panel_visibility="advanced">
         <IntRangeDomain min="0" name="range" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         name="UseOffscreenRenderingForScreenshots"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used during
-        CaptureWindow calls.</Documentation>
-        <Hints>
-          <PropertyLink group="settings"
-                        proxy="RenderViewSettings"
-                        property="UseOffscreenRenderingForScreenshots"/>
-        </Hints>
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"
@@ -1576,20 +1562,6 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         name="UseOffscreenRenderingForScreenshots"
-                         panel_visibility="never"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used during
-        CaptureWindow calls.</Documentation>
-        <Hints>
-          <PropertyLink group="settings"
-                        proxy="RenderViewSettings"
-                        property="UseOffscreenRenderingForScreenshots"/>
-        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
                          default_values="0"
@@ -2885,20 +2857,6 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         panel_visibility="never"
-                         name="UseOffscreenRenderingForScreenshots"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used during
-        CaptureWindow calls.</Documentation>
-        <Hints>
-          <PropertyLink group="settings"
-                        proxy="RenderViewSettings"
-                        property="UseOffscreenRenderingForScreenshots"/>
-        </Hints>
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"
@@ -2921,15 +2879,6 @@
                       skip_plotable_check="1">
       <Documentation>This is the proxy for parallel coordinates chart
       view.</Documentation>
-      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         name="UseOffscreenRenderingForScreenshots"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used during
-        CaptureWindow calls.</Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"
@@ -3419,15 +3368,6 @@
         <Property name="HistogramAxisLabelFontSize" function="Size" />
       </PropertyGroup>
 
-      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         name="UseOffscreenRenderingForScreenshots"
-                         panel_visibility="never"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used during
-        CaptureWindow calls.</Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"

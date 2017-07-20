@@ -47,7 +47,6 @@ vtkPVContextView::vtkPVContextView()
     ? vtkProcessModule::GetProcessModule()->GetOptions()
     : NULL;
 
-  this->UseOffscreenRenderingForScreenshots = false;
   this->UseOffscreenRendering = (options ? options->GetUseOffscreenRendering() != 0 : false);
 
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
