@@ -35,6 +35,7 @@
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 
 #include <cassert>
 #include <string>
@@ -327,6 +328,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
+  vtkTimerLogScope scopeTimer("ParaViewPipelineControllerWithRendering::Show");
   if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
   {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort (" << outputPort << ")");
@@ -361,6 +363,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // Since no repr exists, create a new one if possible.
   if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
   {
+    vtkTimerLogScope scopeTimer2(
+      "ParaViewPipelineControllerWithRendering::Show::CreatingRepresentation");
     SM_SCOPED_TRACE(Show)
       .arg("producer", producer)
       .arg("port", outputPort)
@@ -624,6 +628,8 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   }
 
   // Update using view time, or timekeeper time.
+  vtkTimerLogScope scopeTimer(
+    "ParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay");
   double time = view
     ? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble()
     : vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
