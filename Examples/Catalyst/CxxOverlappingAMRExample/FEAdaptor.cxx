@@ -148,19 +148,19 @@ void BuildFields(vtkOverlappingAMR* grid)
   iter->SkipEmptyNodesOn();
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
-    if (vtkDataSet* grid = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()))
+    if (vtkDataSet* gridDataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()))
     {
       vtkNew<vtkDoubleArray> data;
-      data->SetNumberOfTuples(grid->GetNumberOfPoints());
+      data->SetNumberOfTuples(gridDataset->GetNumberOfPoints());
       data->SetName("data");
       double pt[3];
-      for (vtkIdType i = 0; i < grid->GetNumberOfPoints(); i++)
+      for (vtkIdType i = 0; i < gridDataset->GetNumberOfPoints(); i++)
       {
-        grid->GetPoint(i, pt);
+        gridDataset->GetPoint(i, pt);
         pt[0] = -pt[0]; // just to make it change inversely proportional to myRank
         data->SetTypedTuple(i, pt);
       }
-      grid->GetPointData()->AddArray(data.GetPointer());
+      gridDataset->GetPointData()->AddArray(data.GetPointer());
     }
   }
   iter->Delete();
