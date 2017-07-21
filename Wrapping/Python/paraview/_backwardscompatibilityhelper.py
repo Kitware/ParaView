@@ -137,6 +137,20 @@ def setattr(proxy, pname, value):
 
             raise Continue()
 
+    # In 5.5, we changed the vtkArrayCalcualtor to use a different set of constants to control which
+    # data it operates on.  This change changed the method and property name from AttributeMode to
+    # AttributeType
+    if pname == "AttributeMode" and proxy.SMProxy.GetXMLName() == "Calculator":
+        if paraview.compatibility.GetVersion() <= 5.4:
+            # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
+            # rather than custom constants for the calculator.  For the values supported by
+            # ParaView before this change, the conversion works out to subtracting 1.
+            proxy.GetProperty("AttributeType").SetData(value - 1)
+        else:
+            paraview.print_debug_info(\
+                "'AttributeMode' is obsolete.  Use 'AttributeType' property of Calculator filter instead.")
+            # we let the AttributeError be raised
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -235,6 +249,21 @@ def getattr(proxy, pname):
                     'The PVLookupTable.LockScalarRange property has been removed '\
                     'in ParaView 5.5. Please set the AutomaticRescaleRangeMode property '\
                     'instead.')
+    # In 5.5, we changed the vtkArrayCalcualtor to use a different set of constants to control which
+    # data it operates on.  This change changed the method and property name from AttributeMode to
+    # AttributeType
+    if pname == "AttributeMode" and proxy.SMProxy.GetName() == "Calculator":
+        if paraview.compatibility.GetVersion() <= 5.4:
+            # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
+            # rather than custom constants for the calculator.  For the values supported by
+            # ParaView before this change, the conversion works out to adding 1.
+            value = proxy.GetProperty("AttributeType").GetData()
+            return value + 1
+        else:
+            raise NotSupportedException(
+                    'The Calculator.AttributeMode property has been removed in ParaView 5.5. '\
+                    'Please set the AttributeType property instead. Note that different '\
+                    'constants are needed for the two properties.')
 
     raise Continue()
 

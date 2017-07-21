@@ -89,7 +89,7 @@ int vtkCPVTKPipeline::CoProcess(vtkCPDataDescription* dataDescription)
 
   vtkNew<vtkPVArrayCalculator> calculator;
   calculator->SetInputConnection(producer->GetOutputPort());
-  calculator->SetAttributeMode(1);
+  calculator->SetAttributeType(vtkDataObject::POINT);
   calculator->SetResultArrayName("velocity magnitude");
   calculator->SetFunction("mag(velocity)");
 

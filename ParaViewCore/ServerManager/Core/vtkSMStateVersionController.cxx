@@ -609,7 +609,10 @@ struct Process_5_1_to_5_4
 //===========================================================================
 struct Process_5_4_to_5_5
 {
-  bool operator()(xml_document& document) { return LockScalarRange(document); }
+  bool operator()(xml_document& document)
+  {
+    return LockScalarRange(document) && CalculatorAttributeMode(document);
+  }
 
   bool LockScalarRange(xml_document& document)
   {
@@ -653,6 +656,27 @@ struct Process_5_4_to_5_5
       }
     }
 
+    return true;
+  }
+
+  bool CalculatorAttributeMode(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and "
+                            "@type='Calculator']/Property[@name='AttributeMode']");
+
+    for (auto iter = proxy_nodes.begin(); iter != proxy_nodes.end(); ++iter)
+    {
+      pugi::xml_node attribute_mode = iter->node();
+
+      pugi::xml_node element = attribute_mode.child("Element");
+      int attribute_mode_value = element.attribute("value").as_int();
+
+      attribute_mode.attribute("name").set_value("AttributeType");
+      element.attribute("value").set_value(attribute_mode_value - 1);
+
+      attribute_mode.remove_child("Domain");
+    }
     return true;
   }
 

@@ -53,7 +53,7 @@ int runHaloFinderTest(int argc, char* argv[])
   calc->Update();
 
   double range[2];
-  calc->GetOutput()->GetPointData()->GetArray("Result")->GetRange(range);
+  calc->GetDataSetOutput()->GetPointData()->GetArray("Result")->GetRange(range);
 
   to.maskPoints->SetInputConnection(calc->GetOutputPort());
   to.maskPoints->Update();
