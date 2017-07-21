@@ -80,14 +80,6 @@ public:
 
   //@{
   /**
-   * Variable (command line argument) to use offscreen rendering.
-   */
-  vtkSetMacro(UseOffscreenRendering, int);
-  vtkGetMacro(UseOffscreenRendering, int);
-  //@}
-
-  //@{
-  /**
    * Returns 1 if IceT is available.
    */
   vtkSetMacro(UseIceT, int);
@@ -257,7 +249,6 @@ protected:
   int TileMullions[2];
   int Timeout;
   int UseIceT;
-  int UseOffscreenRendering;
   int MultiClientsEnable;
   int ClientId;
   int IdTypeSize;
