@@ -384,7 +384,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = NULL;
   this->UseInteractiveRenderingForScreenshots = false;
-  this->EGLDeviceIndex = options->GetEGLDeviceIndex();
   this->Selector = vtkPVHardwareSelector::New();
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
@@ -402,9 +401,6 @@ vtkPVRenderView::vtkPVRenderView()
 
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
-
-  // Same for device index as for offscreen flag.
-  this->EGLDeviceIndex = window->GetDeviceIndex();
 
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
@@ -584,13 +580,6 @@ vtkPVRenderView::~vtkPVRenderView()
 vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
 {
   return this->Internals->DeliveryManager.GetPointer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetEGLDeviceIndex(int deviceIndex)
-{
-  this->EGLDeviceIndex = deviceIndex;
-  this->GetRenderWindow()->SetDeviceIndex(deviceIndex);
 }
 
 //----------------------------------------------------------------------------

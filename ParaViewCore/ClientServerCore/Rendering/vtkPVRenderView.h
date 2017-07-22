@@ -403,16 +403,6 @@ public:
 
   //@{
   /**
-   * Get/Set the EGL device index (graphics card) used for rendering. This needs to
-   * be set before rendering. The graphics card needs to have the right extensions
-   * for this to work.
-   */
-  virtual void SetEGLDeviceIndex(int);
-  vtkGetMacro(EGLDeviceIndex, int);
-  //@}
-
-  //@{
-  /**
    * Returns if remote-rendering is possible on the current group of processes.
    */
   vtkGetMacro(RemoteRenderingAvailable, bool);
@@ -1087,7 +1077,6 @@ protected:
   double LODRenderingThreshold;
   vtkBoundingBox GeometryBounds;
 
-  int EGLDeviceIndex;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;
