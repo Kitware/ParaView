@@ -45,10 +45,6 @@ vtkPVContextView::vtkPVContextView()
 {
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
 
-  // vtkPVSynchronizedRenderWindows setups offscreen flag on the window based on
-  // the command line arguments and process type.
-  this->UseOffscreenRendering = this->RenderWindow->GetOffScreenRendering() != 0;
-
   this->ContextView = vtkContextView::New();
 
   // Let the application setup the interactor.
@@ -109,29 +105,6 @@ void vtkPVContextView::SetupInteractor(vtkRenderWindowInteractor* iren)
 vtkRenderWindowInteractor* vtkPVContextView::GetInteractor()
 {
   return this->ContextView->GetInteractor();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContextView::SetUseOffscreenRendering(bool use_offscreen)
-{
-  if (this->UseOffscreenRendering == use_offscreen)
-  {
-    return;
-  }
-
-  // if command line arguments overrode the offscreen flag, then respect that.
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  if (options->GetForceOffscreenRendering())
-  {
-    use_offscreen = true;
-  }
-  else if (options->GetForceOnscreenRendering())
-  {
-    use_offscreen = false;
-  }
-
-  this->UseOffscreenRendering = use_offscreen;
-  this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
 }
 
 //----------------------------------------------------------------------------

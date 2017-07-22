@@ -7,6 +7,16 @@ started tracking these (starting after version 4.2).
 Changes in 5.5
 --------------
 
+###Changes to offscreen rendering options###
+
+ParaView executables now automatically choose to create on-screen or off-screen
+render windows for rendering based on the executable type and current
+configuration. As a result **"UseOffscreenRendering"** property on views has
+been removed to avoid conflicting with the new approach. Executables have new
+command line arguments: `--force-offscreen-rendering` and
+`--force-onscreen-rendering` that can be used to override the default behavior
+for the process.
+
 ###Changes to vtkArrayCalculator
 `vtkArrayCalculator::SetAttributeMode` is deprecated in favor of `vtkArrayCalculator::SetAttributeType`
 which takes vtkDataObject attribute modes instead of custom constants as its parameter value.

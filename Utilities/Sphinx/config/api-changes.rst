@@ -1,6 +1,27 @@
 API Changes between ParaView versions
 =====================================
 
+
+Changes in 5.5
+--------------
+
+Offscreen rendering
+~~~~~~~~~~~~~~~~~~~
+
+ParaView executables now automatically choose to use offscreen rendering, if
+appropriate. For Python executables, `pvbatch` automatically uses offscreen by
+default (even headless i.e.  using EGL or OSMesa if built with support for the
+same), and `pvpython` opts for onscreen. You can override the same by passing
+command line arguments `--force-offscreen-rendering` or
+`--force-onscreen-rendering`.
+
+As a result `view.UseOffscreenRendering` property has been removed
+to avoid conflicting with this automatic logic.
+
+Likewise, `view.UseOffscreenRenderingForScreenshots` has been removed too. That
+option is no longer needed as ParaView is no longer affected by overlapping
+windows when capturing screenshots.
+
 Changes in 5.1
 --------------
 

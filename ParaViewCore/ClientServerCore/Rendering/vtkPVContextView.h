@@ -96,17 +96,6 @@ public:
    */
   virtual void Update() VTK_OVERRIDE;
 
-  //@{
-  /**
-   * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion and command line options may cause the suggested value
-   * to be ignored.
-   */
-  virtual void SetUseOffscreenRendering(bool);
-  vtkBooleanMacro(UseOffscreenRendering, bool);
-  vtkGetMacro(UseOffscreenRendering, bool);
-  //@}
-
   /**
    * Representations can use this method to set the selection for a particular
    * representation. Subclasses override this method to pass on the selection to
@@ -166,8 +155,6 @@ protected:
 
   vtkContextView* ContextView;
   vtkRenderWindow* RenderWindow;
-
-  bool UseOffscreenRendering;
 
 private:
   vtkPVContextView(const vtkPVContextView&) VTK_DELETE_FUNCTION;

@@ -403,10 +403,6 @@ vtkPVRenderView::vtkPVRenderView()
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
 
-  // vtkPVSynchronizedRenderWindows setups offscreen flag on the window based on
-  // the command line arguments and process type.
-  this->UseOffscreenRendering = window->GetOffScreenRendering() != 0;
-
   // Same for device index as for offscreen flag.
   this->EGLDeviceIndex = window->GetDeviceIndex();
 
@@ -588,29 +584,6 @@ vtkPVRenderView::~vtkPVRenderView()
 vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
 {
   return this->Internals->DeliveryManager.GetPointer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
-{
-  if (this->UseOffscreenRendering == use_offscreen)
-  {
-    return;
-  }
-
-  // if command line arguments overrode the offscreen flag, then respect that.
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  if (options->GetForceOffscreenRendering())
-  {
-    use_offscreen = true;
-  }
-  else if (options->GetForceOnscreenRendering())
-  {
-    use_offscreen = false;
-  }
-
-  this->UseOffscreenRendering = use_offscreen;
-  this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
 }
 
 //----------------------------------------------------------------------------

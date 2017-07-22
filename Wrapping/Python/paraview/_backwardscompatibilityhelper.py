@@ -153,6 +153,13 @@ def setattr(proxy, pname, value):
     if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
         if paraview.compatibility.GetVersion() <= 5.4:
             raise Continue()
+        else:
+            paraview.print_debug_info("'UseOffscreenRenderingForScreenshots' is obsolete.")
+    if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if paraview.compatibility.GetVersion() <= 5.4:
+            raise Continue()
+        else:
+            paraview.print_debug_info("'UseOffscreenRendering' is obsolete.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -274,6 +281,14 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException('`UseOffscreenRenderingForScreenshots` '\
                     'is no longer supported. Please remove it.')
+
+    if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if version <= 5.4:
+            return 0
+        else:
+            raise NotSupportedException(\
+                    '`UseOffscreenRendering` is no longer supported. Please remove it.')
+
     raise Continue()
 
 def GetProxy(module, key):

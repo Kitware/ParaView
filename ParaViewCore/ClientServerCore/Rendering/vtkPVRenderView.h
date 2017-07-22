@@ -403,17 +403,6 @@ public:
 
   //@{
   /**
-   * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion and command line options may cause the suggested value
-   * to be ignored.
-   */
-  virtual void SetUseOffscreenRendering(bool);
-  vtkBooleanMacro(UseOffscreenRendering, bool);
-  vtkGetMacro(UseOffscreenRendering, bool);
-  //@}
-
-  //@{
-  /**
    * Get/Set the EGL device index (graphics card) used for rendering. This needs to
    * be set before rendering. The graphics card needs to have the right extensions
    * for this to work.
@@ -1098,7 +1087,6 @@ protected:
   double LODRenderingThreshold;
   vtkBoundingBox GeometryBounds;
 
-  bool UseOffscreenRendering;
   int EGLDeviceIndex;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
