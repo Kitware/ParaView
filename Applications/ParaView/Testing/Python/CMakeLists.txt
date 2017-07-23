@@ -73,15 +73,18 @@ paraview_add_test_python(
   Plot3DReader.py
 )
 
-# These tests could run safely in serial and parallel (and with both GL backends).
+# These tests could run safely in serial and parallel.
 set(PVBATCH_TESTS
   BatchAxesGrid.py
-  StructuredGridVolumeRendering.py
   PLYWriter.py
+  VolumeCellSelection.py
 )
-
-# Tests only concerning GL2.
-list(APPEND PVBATCH_TESTS VolumeCellSelection.py)
+if(NOT APPLE)
+  # temporarily disable on mac due to bugs in
+  # ProjectedTetraHedraMapper (paraview/paraview#17620).
+  list(APPEND PVBATCH_TESTS
+    StructuredGridVolumeRendering.py)
+endif()
 
 foreach (tfile IN LISTS PVBATCH_TESTS)
   get_filename_component(test ${tfile} NAME_WE)
