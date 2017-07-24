@@ -53,6 +53,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , AnimationTimePrecision(17)
   , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
   , LockPanels(false)
+  , GUIFontSize(0)
 {
   this->SetDefaultViewType("RenderView");
 }

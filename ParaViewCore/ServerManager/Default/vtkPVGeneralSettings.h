@@ -215,6 +215,15 @@ public:
   bool GetLoadNoChartVariables();
   //@}
 
+  //@{
+  /**
+   * Get/Set the GUI font size. 0 indicates system default i.e.
+   * do not override.
+   */
+  vtkSetClampMacro(GUIFontSize, int, 0, VTK_INT_MAX);
+  vtkGetMacro(GUIFontSize, int);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();
@@ -230,6 +239,7 @@ protected:
   int AnimationTimePrecision;
   int PropertiesPanelMode;
   bool LockPanels;
+  int GUIFontSize;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
