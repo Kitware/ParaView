@@ -41,10 +41,8 @@ void vtkPVInitializePythonModules();
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
-#ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
-#endif
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqOptions.h"
@@ -54,6 +52,7 @@ void vtkPVInitializePythonModules();
 #include "pqSettings.h"
 #include "pqTimer.h"
 #include "pqWelcomeDialog.h"
+#include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVPlugin.h"
 #include "vtkProcessModule.h"
@@ -61,6 +60,10 @@ void vtkPVInitializePythonModules();
 
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
+#endif
+
+#ifdef PARAVIEW_USE_QTHELP
+#include "pqHelpReaction.h"
 #endif
 
 #include <QDragEnterEvent>
@@ -86,8 +89,10 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 public:
   bool FirstShow;
+  int CurrentGUIFontSize;
   pqInternals()
     : FirstShow(true)
+    , CurrentGUIFontSize(0)
   {
   }
 };
@@ -197,6 +202,10 @@ ParaViewMainWindow::ParaViewMainWindow()
       this->Internals->displayPropertiesDock = NULL;
       break;
   }
+
+  // update UI when font size changes.
+  vtkPVGeneralSettings* gsSettings = vtkPVGeneralSettings::GetInstance();
+  pqCoreUtilities::connect(gsSettings, vtkCommand::ModifiedEvent, this, SLOT(updateFontSize()));
 
   this->Internals->propertiesDock->show();
   this->Internals->propertiesDock->raise();
@@ -322,6 +331,8 @@ void ParaViewMainWindow::showEvent(QShowEvent* evt)
       {
         pqTimer::singleShot(1000, this, SLOT(showWelcomeDialog()));
       }
+
+      this->updateFontSize();
     }
   }
 }
@@ -347,6 +358,25 @@ void ParaViewMainWindow::showWelcomeDialog()
 {
   pqWelcomeDialog dialog(this);
   dialog.exec();
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::updateFontSize()
+{
+  vtkPVGeneralSettings* gsSettings = vtkPVGeneralSettings::GetInstance();
+  const int fontSize = gsSettings->GetGUIFontSize();
+  if (this->Internals->CurrentGUIFontSize != fontSize)
+  {
+    if (fontSize > 0)
+    {
+      this->setStyleSheet(QString("* { font-size: %1pt }").arg(gsSettings->GetGUIFontSize()));
+    }
+    else
+    {
+      this->setStyleSheet(QString());
+    }
+    this->Internals->CurrentGUIFontSize = fontSize;
+  }
 }
 
 //-----------------------------------------------------------------------------
