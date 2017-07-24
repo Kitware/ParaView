@@ -55,6 +55,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , ShowAnimationShortcuts(0)
   , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
   , LockPanels(false)
+  , GUIFontSize(0)
 {
   this->SetDefaultViewType("RenderView");
 }

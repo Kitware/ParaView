@@ -78,7 +78,8 @@ build_paraview_client(paraview
     INSTALL_ARCHIVE_DIR "${VTK_INSTALL_ARCHIVE_DIR}"
     )
 
-target_link_libraries(paraview LINK_PRIVATE ${qt_targets})
+target_link_libraries(paraview
+  LINK_PRIVATE ${qt_targets} vtkPVServerManagerDefault)
 
 if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   # Link against the documentation module.

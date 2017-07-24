@@ -48,6 +48,17 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="GUIFontSize"
+        label="GUI Font Size"
+        command="SetGUIFontSize"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Override GUI font size. Set it to **0** to simply use the window system default.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="32" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="ForceSingleColumnMenus"
         number_of_elements="1"
         default_values="0"
@@ -361,6 +372,7 @@
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
         <Property name="CrashRecovery" />
+        <Property name="GUIFontSize" />
         <Property name="ForceSingleColumnMenus" />
       </PropertyGroup>
 
