@@ -1003,8 +1003,8 @@ void vtkFlashContour::ProcessSharedRegion(int regionDims[3], double* cornerPtrs[
   double* cornerPtrsX[8];
   double cornerPointsY[32];
   double cornerPointsX[32];
-  double* passPtrsY[8];
-  double* passPtrsX[8];
+  double* passPtrsY[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+  double* passPtrsX[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
   // Loop over the region.
   for (int z = 0; z < regionDims[2]; ++z)
