@@ -27,7 +27,6 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessStream;
-class vtkInformationIntegerKey;
 typedef void nvpipe;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkNvPipeCompressor : public vtkImageCompressor
@@ -39,11 +38,11 @@ public:
 
   //@{
   /**
-   * Set the quality measure. The value can be between 0 and 5. 0 means
-   * preserve input image quality while 5 emphasizes compression ratio at the
+   * Set the quality measure. The value can be between 1 and 5. 5 means
+   * preserve input image quality while 1 emphasizes compression ratio at the
    * expense of image quality.
    */
-  vtkSetClampMacro(Quality, unsigned int, 0, 5);
+  vtkSetClampMacro(Quality, unsigned int, 1, 5);
   vtkGetMacro(Quality, unsigned int);
   //@}
 
@@ -65,8 +64,6 @@ public:
   virtual const char* SaveConfiguration();
   virtual const char* RestoreConfiguration(const char* stream);
   //@}
-
-  static vtkInformationIntegerKey* PIXELS_SKIPPED();
 
 protected:
   vtkNvPipeCompressor();

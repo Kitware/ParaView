@@ -30,10 +30,10 @@ error.c
 internal-api.h
 LICENSE
 mangle_nvpipe.h
-module.c
-module.h
 nvEncodeAPI-v5.h
 nvpipe.h
+winposix.c
+winposix.h
 yuv.c
 yuv.h
 "

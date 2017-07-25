@@ -27,7 +27,7 @@ cmake_minimum_required(VERSION 3.2)
 
 set(NVPIPE "nvpipe")
 
-project(${NVPIPE} C)
+project(${NVPIPE})
 
 # Configuration
 set(config_install_dir "lib/cmake/${PROJECT_NAME}")
@@ -63,12 +63,15 @@ include_directories(BEFORE "${PROJECT_BINARY_DIR}")
 include_directories(AFTER "${PROJECT_SOURCE_DIR}")
 
 find_package(CUDA REQUIRED)
+
 cmake_policy(SET CMP0057 NEW)
 if(NOT MSVC)
   if(NOT "--std" IN_LIST CUDA_NVCC_FLAGS)
     list(APPEND CUDA_NVCC_FLAGS "--std c++11")
   endif()
 endif()
+
+list(APPEND CUDA_NVCC_FLAGS "-Wno-deprecated-gpu-targets")
 
 # CUDA + NvPipe variables that PV does not want exposed.
 mark_as_advanced(
@@ -84,22 +87,35 @@ include_directories(${PROJECT_SOURCE_DIR} ${CUDA_SDK_ROOT_DIR}/common/inc)
 link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
+
 # PV does not use ffmpeg backend.
 set(NvPipe_FFMPEG 0)
 
-cuda_compile_ptx(ptxprograms
-  convert.cu
-)
+
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  set(winsrc ${PROJECT_SOURCE_DIR}/winposix.c)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W2")
+  include_directories($ENV{NVTOOLSEXT_PATH}/include)
+  link_directories($ENV{NVTOOLSEXT_PATH}/lib/x64)
+  link_directories($ENV{CUDA_PATH}/lib/x64)
+  # "nvToolsExt" naming differs on windows.
+  set(nvpipe_libs ${nvpipe_libs} nvToolsExt64_1)
+else()
+  # "dl" and "pthread" only needed on Unix platforms.
+  set(nvpipe_libs ${nvpipe_libs} nvToolsExt dl pthread)
+endif(MSVC)
 
 cuda_add_library(${NVPIPE} SHARED
+  ${winsrc}
+  ${PROJECT_SOURCE_DIR}/convert.cu
   ${PROJECT_SOURCE_DIR}/debug.c
   ${PROJECT_SOURCE_DIR}/decode.c
   ${PROJECT_SOURCE_DIR}/encode.c
   ${PROJECT_SOURCE_DIR}/error.c
-  ${PROJECT_SOURCE_DIR}/module.c
   ${PROJECT_SOURCE_DIR}/yuv.c
   ${PROJECT_SOURCE_DIR}/api.c
-  ${ptxprograms}
   SHARED
 )
 
@@ -108,11 +124,14 @@ set_property(TARGET ${NVPIPE} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Linking with C for supercomputer-friendliness.
 set_target_properties(${NVPIPE} PROPERTIES LINKER_LANGUAGE C)
+
 # The direct nvEnc/cuvid backends use c99.
 set_property(TARGET ${NVPIPE} PROPERTY C_STANDARD 99)
+set_property(TARGET ${NVPIPE} PROPERTY CXX_STANDARD 11)
 
 target_link_libraries(${NVPIPE} PRIVATE
-  ${nvpipe_libs} cuda nvToolsExt nvcuvid dl pthread
+  ${nvpipe_libs}
+  cuda nvcuvid
 )
 
 configure_file(
@@ -131,8 +150,13 @@ export(TARGETS ${NVPIPE}
 )
 export(PACKAGE ${NVPIPE})
 
+set_target_properties(${NVPIPE} PROPERTIES
+  PUBLIC_HEADER "${PROJECT_SOURCE_DIR}/nvpipe.h;${CMAKE_BINARY_DIR}/config.nvp.h"
+)
+
 install(TARGETS ${NVPIPE}
   EXPORT nvpipeTargets
+  DESTINATION ${NvPipe_PREFIX}
   LIBRARY DESTINATION lib COMPONENT shlib
 )
 install(FILES
@@ -141,6 +165,6 @@ install(FILES
   ${PROJECT_BINARY_DIR}/config.nvp.h
   DESTINATION include
 )
-install(FILES ${PROJECT_BINARY_DIR}/convert.ptx DESTINATION share/nvpipe)
 install(FILES "${project_config}" DESTINATION lib/cmake/${NVPIPE})
 install(EXPORT nvpipeTargets DESTINATION lib/cmake/${NVPIPE} COMPONENT dev)
+install(EXPORT nvpipeTargets DESTINATION lib/cmake/${NVPIPE})

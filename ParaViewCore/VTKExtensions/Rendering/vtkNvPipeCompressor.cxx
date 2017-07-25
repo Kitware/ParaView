@@ -28,29 +28,6 @@
 
 vtkStandardNewMacro(vtkNvPipeCompressor);
 
-vtkInformationKeyMacro(vtkNvPipeCompressor, PIXELS_SKIPPED, Integer);
-
-//-----------------------------------------------------------------------------
-static void add_ptx_paths(nvpipe* codec)
-{
-  const std::string argv0dir = vtkProcessModule::GetProcessModule()->GetSelfDir();
-  if (argv0dir.empty())
-  {
-    return;
-  }
-  const std::string dirs[] = {
-    argv0dir + "/../ThirdParty/NvPipe/vtknvpipe/", argv0dir + "/../../",
-  };
-  for (const std::string& d : dirs)
-  {
-    const nvp_err_t nverr = nvpipe_ptx_path(codec, d.c_str());
-    if (NVPIPE_SUCCESS != nverr)
-    {
-      vtkGenericWarningMacro("Error " << nverr << " adding PTX path: " << nvpipe_strerror(nverr));
-    }
-  }
-}
-
 //-----------------------------------------------------------------------------
 vtkNvPipeCompressor::vtkNvPipeCompressor()
   : Quality(1)
@@ -76,10 +53,8 @@ int vtkNvPipeCompressor::Compress()
     vtkWarningMacro("Cannot compress: empty input or output detected.");
     return VTK_ERROR;
   }
-  // We use the user's quality setting as our f_m value.  But the user setting
-  // is inverted from how f_m is used, so invert it.
   assert(this->Quality <= 5);
-  const uint64_t f_m = (5u - this->Quality) + 1u;
+  const uint64_t f_m = this->Quality;
   const uint64_t fps = 30;
   const uint64_t brate = static_cast<uint64_t>(this->Width * this->Height * fps * f_m * 0.07);
   if (NULL == this->Pipe)
@@ -90,23 +65,21 @@ int vtkNvPipeCompressor::Compress()
       vtkErrorMacro("Could not create NvPipe encoder.");
       return VTK_ERROR;
     }
-    add_ptx_paths(this->Pipe);
     this->Bitrate = brate;
   }
 
-  // We choose our bitrate based on the image size.  If the window has been
-  // significantly resized, we should update the bitrate.
-  if (this->Bitrate < brate / 2 || this->Bitrate > brate * 2)
+  if (this->Bitrate != brate)
   {
     nvpipe_bitrate(this->Pipe, brate);
+    this->Bitrate = brate;
   }
 
   vtkUnsignedCharArray* input = this->GetInput();
-  const int num_pixels = input->GetNumberOfTuples();
-  assert(num_pixels == this->Width * this->Height);
   assert(input->GetNumberOfComponents() == 4); // Expecting RGBA data.
 
-  const size_t input_size = num_pixels * 4;
+  const int num_pixels = this->Width * this->Height;
+  assert(num_pixels <= input->GetNumberOfTuples());
+
   const uint8_t* rgba = (const uint8_t*)input->GetPointer(0);
 
   size_t output_size = num_pixels * 3;
@@ -117,21 +90,8 @@ int vtkNvPipeCompressor::Compress()
     return VTK_ERROR;
   }
 
-  // NvPipe input images must be even.  Just pretend one row of pixels does not
-  // exist if the image is not appropriately sized.
-  const size_t h = this->Height % 2 == 0 ? this->Height : this->Height - 1;
-  vtkInformation* info = this->Output->GetInformation();
-  if (this->Height % 2 == 0)
-  {
-    info->Set(PIXELS_SKIPPED(), 0);
-  }
-  else
-  {
-    info->Set(PIXELS_SKIPPED(), 1);
-  }
-
   const nvp_err_t encerr = nvpipe_encode(
-    this->Pipe, rgba, num_pixels * 4, obuf, &output_size, this->Width, h, NVPIPE_RGBA);
+    this->Pipe, rgba, num_pixels * 4, obuf, &output_size, this->Width, this->Height, NVPIPE_RGBA);
   if (NVPIPE_SUCCESS != encerr)
   {
     vtkErrorMacro("NvPipe encode error (" << (int)encerr << "): " << nvpipe_strerror(encerr));
@@ -162,21 +122,18 @@ int vtkNvPipeCompressor::Decompress()
       vtkErrorMacro("Could not create NvPipe decoder.");
       return VTK_ERROR;
     }
-    add_ptx_paths(this->Pipe);
   }
 
   const uint8_t* strm = this->Input->GetPointer(0);
   const size_t insz = this->Input->GetNumberOfTuples() * this->Input->GetNumberOfComponents();
 
-  size_t w = this->Width;
-  size_t h = this->Height % 2 == 0 ? this->Height : this->Height - 1;
-
   vtkUnsignedCharArray* out = this->GetOutput();
   // NvPipe strips the alpha channel if it's given; output is always RGB.
   out->SetNumberOfComponents(3);
   const size_t imgsz = static_cast<size_t>(out->GetNumberOfTuples() * out->GetNumberOfComponents());
-  assert(imgsz >= w * h * 3);
-  const nvp_err_t decerr = nvpipe_decode(this->Pipe, strm, insz, out->GetPointer(0), w, h);
+  assert(imgsz >= this->Width * this->Height * 3);
+  const nvp_err_t decerr =
+    nvpipe_decode(this->Pipe, strm, insz, out->GetPointer(0), this->Width, this->Height);
 
   if (decerr != NVPIPE_SUCCESS)
   {

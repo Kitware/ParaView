@@ -109,12 +109,20 @@ void vtkPVClientServerSynchronizedRenderers::SlaveEndRender()
   header[2] = rawImage.GetHeight();
   header[3] = rawImage.IsValid() ? rawImage.GetRawPtr()->GetNumberOfComponents() : 0;
 
-  this->Compressor->SetImageResolution(header[1], header[2]);
   // send the image to the client.
   this->ParallelController->Send(header, 4, 1, 0x023430);
+
   if (rawImage.IsValid())
   {
-    this->ParallelController->Send(this->Compress(rawImage.GetRawPtr()), 1, 0x023430);
+    if (this->Compressor)
+    {
+      this->Compressor->SetImageResolution(header[1], header[2]);
+      this->ParallelController->Send(this->Compress(rawImage.GetRawPtr()), 1, 0x023430);
+    }
+    else
+    {
+      this->ParallelController->Send(rawImage.GetRawPtr(), 1, 0x023430);
+    }
   }
 }
 

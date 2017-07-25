@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, NVIDIA CORPORATION. All rights reserved.
+/* Copyright (c) 2016-2017, NVIDIA CORPORATION. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -44,42 +44,56 @@ extern "C" {
 #endif
 
 enum _nvDbgChannelClass {
-	Err=0,
-	Warn,
-	Trace,
-	Fixme,
+    Err=0,
+    Warn,
+    Trace,
+    Fixme,
 };
 
 struct nvdbgchannel {
-	unsigned flags;
-	char name[32];
+    unsigned flags;
+    char name[32];
 };
 
 #define DEFAULT_CHFLAGS \
-	(1U << Err) | (1U << Warn) | (1U << Fixme)
+    (1U << Err) | (1U << Warn) | (1U << Fixme)
 /* creates a new debug channel.  debug channels are private to implementation,
  * and must not be declared in header files. */
+#ifdef _MSC_VER
 #define DECLARE_CHANNEL(ch) \
-	static struct nvdbgchannel nv_chn_##ch = { DEFAULT_CHFLAGS, #ch }; \
-	__attribute__((constructor(200))) static void \
-	ch_init_##ch() { \
-		const char* dbg_ = getenv("NVPIPE_VERBOSE"); \
-		nv_parse_options(&nv_chn_##ch, dbg_); \
-	}
+    static struct nvdbgchannel nv_chn_##ch = { DEFAULT_CHFLAGS, #ch }; \
+    static void \
+    ch_init_##ch() { \
+    const char* dbg_ = getenv("NVPIPE_VERBOSE"); \
+    nv_parse_options(&nv_chn_##ch, dbg_); \
+}
+#else
+#define DECLARE_CHANNEL(ch) \
+    static struct nvdbgchannel nv_chn_##ch = { DEFAULT_CHFLAGS, #ch }; \
+    __attribute__((constructor(200))) static void \
+    ch_init_##ch() { \
+    const char* dbg_ = getenv("NVPIPE_VERBOSE"); \
+    nv_parse_options(&nv_chn_##ch, dbg_); \
+}
+#endif
 
-#define TRACE(ch, args...) \
-	nv_dbg(Trace, &nv_chn_##ch, __FUNCTION__, args)
-#define ERR(ch, args...) \
-	nv_dbg(Err, &nv_chn_##ch, __FUNCTION__, args)
-#define WARN(ch, args...) \
-	nv_dbg(Warn, &nv_chn_##ch, __FUNCTION__, args)
-#define FIXME(ch, args...) \
-	nv_dbg(Fixme, &nv_chn_##ch, __FUNCTION__, args)
+#define TRACE(ch, ...) \
+    nv_dbg(Trace, &nv_chn_##ch, __FUNCTION__, __VA_ARGS__)
+#define ERR(ch, ...) \
+    nv_dbg(Err, &nv_chn_##ch, __FUNCTION__, __VA_ARGS__)
+#define WARN(ch, ...) \
+    nv_dbg(Warn, &nv_chn_##ch, __FUNCTION__, __VA_ARGS__)
+#define FIXME(ch, ...) \
+    nv_dbg(Fixme, &nv_chn_##ch, __FUNCTION__, __VA_ARGS__)
 
 /* for internal use only. */
 void nv_dbg(enum _nvDbgChannelClass, const struct nvdbgchannel*,
-              const char* func, const char* format, ...)
-              __attribute__((format(printf, 4, 5)));
+            const char* func, const char* format, ...)
+#ifdef __GNUC__
+__attribute__((format(printf, 4, 5)));
+#else
+;
+#endif
 void nv_parse_options(struct nvdbgchannel*, const char* opt);
 
 #ifdef __cplusplus
