@@ -12,41 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtk_glew.h"
-
-#include "vtkPVConfig.h"
 #include "vtkPVOpenGLInformation.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkMultiProcessController.h"
-#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDisplayInformation.h"
-#include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
+#include "vtkPVView.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-
-#include <algorithm>
-#include <iterator>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#define safes(arg) (arg ? ((const char*)arg) : "")
-
 vtkStandardNewMacro(vtkPVOpenGLInformation);
-
 //----------------------------------------------------------------------------
 vtkPVOpenGLInformation::vtkPVOpenGLInformation()
 {
   this->RootOnly = 1;
-  this->LocalDisplay = false;
-  this->Vendor = "Information Unavailable";
-  this->Version = "Information Unavailable";
-  this->Renderer = "Information Unavailable";
+  this->Vendor = this->Version = this->Renderer = this->Capabilities = "Information Unavailable";
 }
 
 //----------------------------------------------------------------------------
@@ -57,21 +39,41 @@ vtkPVOpenGLInformation::~vtkPVOpenGLInformation()
 //-----------------------------------------------------------------------------
 void vtkPVOpenGLInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkSmartPointer<vtkRenderWindow> renWin = vtkRenderWindow::SafeDownCast(obj);
-  if (!renWin)
+  this->Vendor = this->Version = this->Renderer = this->Capabilities = "Information Unavailable";
+
+  vtkPVView* view = vtkPVView::SafeDownCast(obj);
+  vtkSmartPointer<vtkRenderWindow> renWin =
+    view ? view->GetRenderWindow() : vtkRenderWindow::SafeDownCast(obj);
+  if (renWin == nullptr)
   {
-    renWin = vtkSmartPointer<vtkRenderWindow>::New();
-    renWin->SetOffScreenRendering(1);
-    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    renWin->SetDeviceIndex(options->GetEGLDeviceIndex());
+    // create new one based on current process's capabilities.
+    renWin = vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow();
+
+    // ensure context is created and OpenGL initialized.
     renWin->Render();
   }
-  this->SetLocalDisplay(vtkPVDisplayInformation::CanOpenDisplayLocally());
-  if (this->LocalDisplay)
+
+  if (const char* opengl_capabilities = renWin->ReportCapabilities())
   {
-    this->SetVendor();
-    this->SetVersion();
-    this->SetRenderer();
+    vtksys::RegularExpression reVendor("OpenGL vendor string:[ ]*([^\n\r]*)");
+    if (reVendor.find(opengl_capabilities))
+    {
+      this->Vendor = reVendor.match(1);
+    }
+
+    vtksys::RegularExpression reVersion("OpenGL version string:[ ]*([^\n\r]*)");
+    if (reVersion.find(opengl_capabilities))
+    {
+      this->Version = reVersion.match(1);
+    }
+
+    vtksys::RegularExpression reRenderer("OpenGL renderer string:[ ]*([^\n\r]*)");
+    if (reRenderer.find(opengl_capabilities))
+    {
+      this->Renderer = reRenderer.match(1);
+    }
+
+    this->Capabilities = opengl_capabilities;
   }
 }
 
@@ -92,7 +94,7 @@ void vtkPVOpenGLInformation::AddInformation(vtkPVInformation* pvinfo)
   this->Vendor = info->Vendor;
   this->Version = info->Version;
   this->Renderer = info->Renderer;
-  return;
+  this->Capabilities = info->Capabilities;
 }
 
 //-----------------------------------------------------------------------------
@@ -100,7 +102,7 @@ void vtkPVOpenGLInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply << this->Vendor << this->Version << this->Renderer
-       << vtkClientServerStream::End;
+       << this->Capabilities << vtkClientServerStream::End;
 }
 
 //-----------------------------------------------------------------------------
@@ -117,7 +119,7 @@ void vtkPVOpenGLInformation::CopyFromStream(const vtkClientServerStream* css)
   PARSE_NEXT_VALUE(Vendor);
   PARSE_NEXT_VALUE(Version);
   PARSE_NEXT_VALUE(Renderer);
-
+  PARSE_NEXT_VALUE(Capabilities);
   this->Modified();
 #undef PARSE_NEXT_VALUE
 }
@@ -127,53 +129,3 @@ void vtkPVOpenGLInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-//----------------------------------------------------------------------------
-const std::string& vtkPVOpenGLInformation::GetVendor()
-{
-  return this->Vendor;
-}
-
-//----------------------------------------------------------------------------
-const std::string& vtkPVOpenGLInformation::GetVersion()
-{
-  return this->Version;
-}
-
-//----------------------------------------------------------------------------
-const std::string& vtkPVOpenGLInformation::GetRenderer()
-{
-  return this->Renderer;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOpenGLInformation::SetVendor()
-{
-  this->Vendor = std::string(safes(glGetString(GL_VENDOR)));
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOpenGLInformation::SetVersion()
-{
-  this->Version = std::string(safes(glGetString(GL_VERSION)));
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOpenGLInformation::SetRenderer()
-{
-  this->Renderer = std::string(safes(glGetString(GL_RENDERER)));
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVOpenGLInformation::GetLocalDisplay()
-{
-  return this->LocalDisplay;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOpenGLInformation::SetLocalDisplay(bool val)
-{
-  this->LocalDisplay = val;
-}
-
-#undef safes

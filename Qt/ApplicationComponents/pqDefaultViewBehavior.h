@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
+#include <QPointer>
+
+#include "vtkType.h" // for vtkTypeUInt32.
 
 class pqServer;
 
@@ -61,15 +64,9 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqDefaultViewBehavior)
 
-  enum WarningModes
-  {
-    NONE,
-    SERVER_DISPLAY_INACCESSIBLE,
-    SERVER_OPENGL_INADEQUATE,
-    CLIENT_OPENGL_INADEQUATE
-  };
-  WarningModes WarningMode;
-  QString ExtraWarningMessage;
+  vtkTypeUInt32 ServerCapabilities;
+  vtkTypeUInt32 ClientCapabilities;
+  QPointer<pqServer> Server;
 };
 
 #endif

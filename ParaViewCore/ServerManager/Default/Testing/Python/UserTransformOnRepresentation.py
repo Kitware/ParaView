@@ -9,8 +9,6 @@ from paraview.simple import *
 
 smtesting.ProcessCommandLineArguments()
 view = CreateRenderView()
-# using offscreen avoids issues with overlapping windows and such.
-view.UseOffscreenRendering = 1
 
 # add a text source #1
 Text(Text="Hello World")

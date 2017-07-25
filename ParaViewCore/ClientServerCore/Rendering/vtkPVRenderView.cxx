@@ -56,7 +56,6 @@
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
@@ -350,8 +349,6 @@ vtkPVRenderView::vtkPVRenderView()
   // non-reference counted, so no worries about reference loops.
   this->Internals->DeliveryManager->SetRenderView(this);
 
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-
   this->RemoteRenderingAvailable = true;
 
   this->LockBounds = false;
@@ -386,10 +383,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationWidget = vtkPVAxesWidget::New();
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
   this->LastSelection = NULL;
-  this->UseOffscreenRenderingForScreenshots = false;
   this->UseInteractiveRenderingForScreenshots = false;
-  this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
-  this->EGLDeviceIndex = options->GetEGLDeviceIndex();
   this->Selector = vtkPVHardwareSelector::New();
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
@@ -407,8 +401,6 @@ vtkPVRenderView::vtkPVRenderView()
 
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   window->SetMultiSamples(0);
-  window->SetOffScreenRendering(this->UseOffscreenRendering ? 1 : 0);
-  window->SetDeviceIndex(this->EGLDeviceIndex);
 
   this->RenderView = vtkRenderViewBase::New();
   this->RenderView->SetRenderWindow(window);
@@ -588,28 +580,6 @@ vtkPVRenderView::~vtkPVRenderView()
 vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
 {
   return this->Internals->DeliveryManager.GetPointer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
-{
-  if (this->UseOffscreenRendering == use_offscreen)
-  {
-    return;
-  }
-
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
-
-  this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
-  this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetEGLDeviceIndex(int deviceIndex)
-{
-  this->EGLDeviceIndex = deviceIndex;
-  this->GetRenderWindow()->SetDeviceIndex(deviceIndex);
 }
 
 //----------------------------------------------------------------------------

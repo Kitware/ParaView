@@ -156,7 +156,7 @@ public:
   /**
    * Returns the render window.
    */
-  vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Returns the interactor.
@@ -399,40 +399,6 @@ public:
   vtkSetMacro(UseInteractiveRenderingForScreenshots, bool);
   vtkBooleanMacro(UseInteractiveRenderingForScreenshots, bool);
   vtkGetMacro(UseInteractiveRenderingForScreenshots, bool);
-  //@}
-
-  //@{
-  /**
-   * Set or get whether offscreen rendering should be used during
-   * CaptureWindow calls. On Apple machines, this flag has no effect.
-   */
-  vtkSetMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkBooleanMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkGetMacro(UseOffscreenRenderingForScreenshots, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion. If --use-offscreen-rendering command line option is
-   * specified, then setting this flag to 0 on that process has no effect.
-   * Setting it to true, however, will ensure that even is
-   * --use-offscreen-rendering is not specified, it will use offscreen
-   * rendering.
-   */
-  virtual void SetUseOffscreenRendering(bool);
-  vtkBooleanMacro(UseOffscreenRendering, bool);
-  vtkGetMacro(UseOffscreenRendering, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the EGL device index (graphics card) used for rendering. This needs to
-   * be set before rendering. The graphics card needs to have the right extensions
-   * for this to work.
-   */
-  virtual void SetEGLDeviceIndex(int);
-  vtkGetMacro(EGLDeviceIndex, int);
   //@}
 
   //@{
@@ -1111,9 +1077,6 @@ protected:
   double LODRenderingThreshold;
   vtkBoundingBox GeometryBounds;
 
-  bool UseOffscreenRendering;
-  int EGLDeviceIndex;
-  bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;

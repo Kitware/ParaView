@@ -150,6 +150,18 @@ void vtkPVView::Initialize(unsigned int id)
 }
 
 //----------------------------------------------------------------------------
+vtkRenderWindow* vtkPVView::GetRenderWindow()
+{
+  if (this->Identifier == 0)
+  {
+    vtkWarningMacro("`GetRenderWindow` has been called before the view was initialized.");
+    return nullptr;
+  }
+
+  return this->SynchronizedWindows->GetRenderWindow(this->Identifier);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVView::SetPosition(int x, int y)
 {
   if (this->Identifier != 0)

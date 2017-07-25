@@ -43,6 +43,8 @@ vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {
+  VTK_LEGACY_REPLACED_BODY(
+    vtkPVOpenGLExtensionsInformation, "ParaView 5.5", vtkPVRenderingCapabilitiesInformation);
   this->Internal = new vtkPVOpenGLExtensionsInformationInternal;
   this->RootOnly = 1;
 }

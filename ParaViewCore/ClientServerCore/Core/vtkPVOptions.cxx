@@ -66,7 +66,7 @@ vtkPVOptions::vtkPVOptions()
   this->ReverseConnection = 0;
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
-  this->EGLDeviceIndex = 0;
+  this->EGLDeviceIndex = -1;
   this->ConnectID = 0;
   this->LogFileName = 0;
   this->StereoType = 0;
@@ -77,6 +77,8 @@ vtkPVOptions::vtkPVOptions()
   this->ForceMPIInitOnClient = 0;
   this->ForceNoMPIInitOnClient = 0;
   this->DisableXDisplayTests = 0;
+  this->ForceOffscreenRendering = 0;
+  this->ForceOnscreenRendering = 0;
 
   if (this->XMLParser)
   {
@@ -176,10 +178,10 @@ void vtkPVOptions::Initialize()
     "Render offscreen on the satellite processes."
     " This option only works with software rendering or mangled Mesa on Unix.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
-#ifdef VTK_USE_OFFSCREEN_EGL
+#ifdef VTK_OPENGL_HAS_EGL
   this->AddArgument("--egl-device-index", NULL, &this->EGLDeviceIndex,
     "Render offscreen through the Native Platform Interface (EGL) on the graphics card "
-    "specificed by the device index.",
+    "specified by the device index.",
     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
 #endif
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
@@ -277,6 +279,18 @@ void vtkPVOptions::Initialize()
     "Cannot be used with --mpi.");
 #endif
 
+  this->AddBooleanArgument("--force-offscreen-rendering", nullptr, &this->ForceOffscreenRendering,
+    "If supported by the build and platform, create headless (offscreen) render windows "
+    "for rendering results.",
+    vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH | vtkPVOptions::PVCLIENT |
+      vtkPVOptions::PVRENDER_SERVER);
+
+  this->AddBooleanArgument("--force-onscreen-rendering", nullptr, &this->ForceOnscreenRendering,
+    "If supported by the build and platform, create on-screen render windows "
+    "for rendering results.",
+    vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH | vtkPVOptions::PVCLIENT |
+      vtkPVOptions::PVRENDER_SERVER);
+
 #if defined(PARAVIEW_WITH_SUPERBUILD_MESA)
   // We add these here so that "--help" on the process can print these variables
   // out. The options are actually only available when built against a suitable
@@ -349,19 +363,44 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     vtksys::SystemInformation::SetStackTraceOnError(1);
   }
 
+  if (this->ForceOffscreenRendering && this->ForceOnscreenRendering)
+  {
+    vtkWarningMacro(
+      "`--force-offscreen-rendering` and `--force-onscreen-rendering` cannot be specified "
+      "at the same time. `--force-offscreen-rendering` will be used.");
+    this->ForceOnscreenRendering = 0;
+  }
+
+  if (this->UseOffscreenRendering)
+  {
+    vtkWarningMacro("`--use-offscreen-rendering` is deprecated. Use `--force-offscreen-rendering` "
+                    "to force offscreen if needed.");
+    this->ForceOffscreenRendering = 1;
+    this->ForceOnscreenRendering = 0; // just in case.
+  }
+
+  // This is just till we update all views and client code to handle the
+  // "UseOffscreenRendering" properly.
+  this->UseOffscreenRendering = this->ForceOffscreenRendering;
+
+  // if we want to debug rendering visually, we need to see the windows.
+  if (vtksys::SystemTools::GetEnv("PV_DEBUG_REMOTE_RENDERING"))
+  {
+    if (this->ForceOffscreenRendering)
+    {
+      vtkWarningMacro("Since `PV_DEBUG_REMOTE_RENDERING` is set in the environment "
+                      "`--force-offscreen-rendering` is ignored.");
+    }
+    this->ForceOffscreenRendering = 0;
+    this->ForceOnscreenRendering = 1;
+  }
+
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVOptions::WrongArgument(const char* argument)
 {
-  if (vtksys::SystemTools::GetFilenameLastExtension(argument) == ".pvb")
-  {
-    this->SetErrorMessage(
-      "Batch file argument to ParaView executable is deprecated. Please use \"pvbatch\".");
-    return 0;
-  }
-
   if (this->Superclass::WrongArgument(argument))
   {
     return 1;
@@ -385,6 +424,16 @@ int vtkPVOptions::DeprecatedArgument(const char* argument)
 {
   return this->Superclass::DeprecatedArgument(argument);
 }
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+int vtkPVOptions::GetUseOffscreenRendering()
+{
+  VTK_LEGACY_REPLACED_BODY(vtkPVOptions::GetUseOffscreenRendering, "ParaView 5.5",
+    vtkPVOptions::GetForceOffscreenRendering);
+  return this->GetForceOffscreenRendering();
+}
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
@@ -434,8 +483,8 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Stereo Rendering: " << (this->UseStereoRendering ? "Enabled" : "Disabled")
      << endl;
 
-  os << indent << "Offscreen Rendering: " << (this->UseOffscreenRendering ? "Enabled" : "Disabled")
-     << endl;
+  os << indent << "ForceOnscreenRendering: " << this->ForceOnscreenRendering << endl;
+  os << indent << "ForceOffscreenRendering: " << this->ForceOffscreenRendering << endl;
   os << indent << "EGL Device Index: " << this->EGLDeviceIndex << endl;
 
   os << indent << "Tiled Display: " << (this->TileDimensions[0] ? "Enabled" : "Disabled") << endl;

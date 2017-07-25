@@ -42,11 +42,6 @@ public:
    */
   static vtkPVRenderViewSettings* GetInstance();
 
-  /**
-   * Get/Set use display lists.
-   */
-  void SetUseDisplayLists(bool val);
-
   enum
   {
     DO_NOTHING = 0,

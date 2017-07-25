@@ -43,15 +43,8 @@
 vtkPVContextView::vtkPVContextView()
   : InteractorStyle()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()
-    ? vtkProcessModule::GetProcessModule()->GetOptions()
-    : NULL;
-
-  this->UseOffscreenRenderingForScreenshots = false;
-  this->UseOffscreenRendering = (options ? options->GetUseOffscreenRendering() != 0 : false);
-
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
-  this->RenderWindow->SetOffScreenRendering(this->UseOffscreenRendering ? 1 : 0);
+
   this->ContextView = vtkContextView::New();
 
   // Let the application setup the interactor.
@@ -112,21 +105,6 @@ void vtkPVContextView::SetupInteractor(vtkRenderWindowInteractor* iren)
 vtkRenderWindowInteractor* vtkPVContextView::GetInteractor()
 {
   return this->ContextView->GetInteractor();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContextView::SetUseOffscreenRendering(bool use_offscreen)
-{
-  if (this->UseOffscreenRendering == use_offscreen)
-  {
-    return;
-  }
-
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
-
-  this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
-  this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
 }
 
 //----------------------------------------------------------------------------

@@ -136,11 +136,11 @@ set_source_files_properties(
   vtkSession
   ABSTRACT)
 
-if(VTK_USE_OFFSCREEN_EGL)
+if(VTK_OPENGL_HAS_EGL)
   set_source_files_properties(
     vtkPVOptions.cxx
     PROPERTIES
-    COMPILE_DEFINITIONS VTK_USE_OFFSCREEN_EGL)
+    COMPILE_DEFINITIONS VTK_OPENGL_HAS_EGL)
 endif()
 
 if(PARAVIEW_USE_MPI)

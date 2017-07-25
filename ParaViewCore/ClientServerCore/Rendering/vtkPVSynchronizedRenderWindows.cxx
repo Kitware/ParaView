@@ -21,6 +21,8 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAxesWidget.h"
+#include "vtkPVOptions.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
@@ -59,6 +61,55 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindowInternal()
   {
     return vtkGenericOpenGLRenderWindow::New();
   }
+
+  bool force_offscreen = false;
+  switch (this->Mode)
+  {
+    case BUILTIN:
+    case CLIENT:
+      force_offscreen = false;
+      break;
+
+    case RENDER_SERVER:
+      if (!this->GetIsInTileDisplay() && !this->GetIsInCave())
+      {
+        force_offscreen = true;
+      }
+      break;
+
+    case BATCH:
+      force_offscreen = true;
+      break;
+
+    case DATA_SERVER:
+    case INVALID:
+      // return a dummy render window.
+      return vtkGenericOpenGLRenderWindow::New();
+  }
+
+  if (vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions())
+  {
+    if (options->GetForceOnscreenRendering())
+    {
+      force_offscreen = false;
+    }
+    else if (options->GetForceOffscreenRendering())
+    {
+      force_offscreen = true;
+    }
+  }
+
+  if (force_offscreen)
+  {
+    // this may be a headless window if ParaView was built with headless
+    // capabilities.
+    vtkSmartPointer<vtkRenderWindow> renWindow =
+      vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow();
+    renWindow->Register(nullptr);
+    return renWindow.GetPointer();
+  }
+
+  // let vtkObjectFactory give us a native render window.
   return vtkRenderWindow::New();
 }
 

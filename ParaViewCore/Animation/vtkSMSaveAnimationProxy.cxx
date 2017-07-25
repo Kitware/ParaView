@@ -18,8 +18,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLElement.h"
@@ -97,9 +97,10 @@ bool vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(vtkSMSession* session)
   if ((vtkSMSessionClient::SafeDownCast(session) != NULL) && (!session->IsMultiClients()))
   {
     // let's also confirm that the server supports rendering.
-    vtkNew<vtkPVDisplayInformation> dinfo;
+    vtkNew<vtkPVRenderingCapabilitiesInformation> dinfo;
     session->GatherInformation(vtkPVSession::RENDER_SERVER, dinfo.Get(), 0);
-    return (dinfo->GetCanOpenDisplay() && dinfo->GetSupportsOpenGL());
+    return (dinfo->Supports(vtkPVRenderingCapabilitiesInformation::RENDERING) &&
+      dinfo->Supports(vtkPVRenderingCapabilitiesInformation::OPENGL));
   }
   return false;
 }

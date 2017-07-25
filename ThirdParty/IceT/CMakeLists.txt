@@ -47,9 +47,9 @@ set(ICET_MPI_MAX_NUMPROCS "${VTK_MPI_MAX_NUMPROCS}"  CACHE INTERNAL
 
 # Set OpenGL variables
 include(vtkOpenGL)
-set(ICET_USE_OSMESA "${VTK_USE_OSMESA}" CACHE INTERNAL
+set(ICET_USE_OSMESA "${VTK_OPENGL_HAS_OSMESA}" CACHE INTERNAL
   "Use Off-Screen Mesa")
-set(ICET_USE_OFFSCREEN_EGL "${VTK_USE_OFFSCREEN_EGL}" CACHE INTERNAL
+set(ICET_USE_OFFSCREEN_EGL "${VTK_OPENGL_HAS_EGL}" CACHE INTERNAL
   "Use Off-Screen rendering through EGL")
 
 #########################################################################

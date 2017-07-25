@@ -71,7 +71,6 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
   this->TileMullions[0] = this->TileMullions[1] = 0;
-  this->UseOffscreenRendering = 0;
   this->Timeout = 0;
 #if defined(PARAVIEW_USE_ICE_T) && defined(PARAVIEW_USE_MPI)
   this->UseIceT = 1;
@@ -113,7 +112,6 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RemoteRendering: " << this->RemoteRendering << endl;
-  os << indent << "UseOffscreenRendering: " << this->UseOffscreenRendering << endl;
   os << indent << "TileDimensions: " << this->TileDimensions[0] << ", " << this->TileDimensions[1]
      << endl;
   os << indent << "TileMullions: " << this->TileMullions[0] << ", " << this->TileMullions[1]
@@ -139,7 +137,6 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->RemoteRendering = info->GetRemoteRendering();
   info->GetTileDimensions(this->TileDimensions);
   info->GetTileMullions(this->TileMullions);
-  this->UseOffscreenRendering = info->GetUseOffscreenRendering();
   this->UseIceT = info->GetUseIceT();
   this->Timeout = info->GetTimeout();
   this->SetNumberOfMachines(info->GetNumberOfMachines());
@@ -175,11 +172,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   vtkPVOptions* options = pm->GetOptions();
   options->GetTileDimensions(this->TileDimensions);
   options->GetTileMullions(this->TileMullions);
-#if !defined(__APPLE__)
-  this->UseOffscreenRendering = options->GetUseOffscreenRendering();
-#else
-  this->UseOffscreenRendering = 0;
-#endif
+
   this->Timeout = options->GetTimeout();
 
   // Server options
@@ -239,11 +232,6 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       serverInfo->GetTileMullions(this->TileMullions);
     }
-    if (serverInfo->GetUseOffscreenRendering())
-    {
-      this->UseOffscreenRendering = 1;
-    }
-
     if (this->Timeout <= 0 ||
       (serverInfo->GetTimeout() > 0 && serverInfo->GetTimeout() < this->Timeout))
     {
@@ -307,7 +295,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->RemoteRendering;
   *css << this->TileDimensions[0] << this->TileDimensions[1];
   *css << this->TileMullions[0] << this->TileMullions[1];
-  *css << this->UseOffscreenRendering;
+  *css << 0; // we used to pass `>UseOffscreenRendering`.
   *css << this->Timeout;
   *css << this->UseIceT;
   *css << "<obsolete>"; // we used to pass RenderModuleName.
@@ -359,7 +347,8 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing TileMullions from message.");
     return;
   }
-  if (!css->GetArgument(0, 5, &this->UseOffscreenRendering))
+  int obsolete_arg;
+  if (!css->GetArgument(0, 5, &obsolete_arg))
   {
     vtkErrorMacro("Error parsing UseOffscreenRendering from message.");
     return;

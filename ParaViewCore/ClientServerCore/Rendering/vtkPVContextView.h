@@ -70,7 +70,7 @@ public:
   virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   //@{
-  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE { return this->RenderWindow; }
   //@}
 
   //@{
@@ -95,30 +95,6 @@ public:
    * representations are "dirty" on all processes to avoid race conditions.
    */
   virtual void Update() VTK_OVERRIDE;
-
-  //@{
-  /**
-   * Set or get whether offscreen rendering should be used during
-   * CaptureWindow calls. On Apple machines, this flag has no effect.
-   */
-  vtkSetMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkBooleanMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkGetMacro(UseOffscreenRenderingForScreenshots, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion. If --use-offscreen-rendering command line option is
-   * specified, then setting this flag to 0 on that process has no effect.
-   * Setting it to true, however, will ensure that even is
-   * --use-offscreen-rendering is not specified, it will use offscreen
-   * rendering.
-   */
-  virtual void SetUseOffscreenRendering(bool);
-  vtkBooleanMacro(UseOffscreenRendering, bool);
-  vtkGetMacro(UseOffscreenRendering, bool);
-  //@}
 
   /**
    * Representations can use this method to set the selection for a particular
@@ -179,9 +155,6 @@ protected:
 
   vtkContextView* ContextView;
   vtkRenderWindow* RenderWindow;
-
-  bool UseOffscreenRenderingForScreenshots;
-  bool UseOffscreenRendering;
 
 private:
   vtkPVContextView(const vtkPVContextView&) VTK_DELETE_FUNCTION;

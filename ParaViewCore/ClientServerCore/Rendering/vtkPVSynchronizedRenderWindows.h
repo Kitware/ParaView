@@ -212,6 +212,14 @@ public:
   bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
 
   /**
+   * Returns true if in tile display mode.
+   */
+  bool GetIsInTileDisplay()
+  {
+    int not_used[2];
+    return this->GetTileDisplayParameters(not_used, not_used);
+  }
+  /**
    * Returns the z-buffer value at the given location. \c id is the view id
    * used in AddRenderWindow()/AddRenderer() etc.
    * \note CallOnClientOnly
@@ -336,7 +344,7 @@ private:
   bool ReduceTemplate(T& size, StandardOperations operation);
 
   static bool UseGenericOpenGLRenderWindow;
-  static vtkRenderWindow* NewRenderWindowInternal();
+  vtkRenderWindow* NewRenderWindowInternal();
 };
 
 #endif

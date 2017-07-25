@@ -15,7 +15,6 @@ def RegressionTest(imageName, baselineName):
 
 # Create a new 'Render View'
 renderView1 = CreateView('RenderView')
-renderView1.UseOffscreenRendering = 1
 renderView1.ViewSize = [300, 300]
 # ----------------------------------------------------------------
 # setup the data processing pipelines

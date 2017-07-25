@@ -57,14 +57,6 @@ vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewSettings::SetUseDisplayLists(bool val)
-{
-  // note: this is inverted.
-  vtkMapper::SetGlobalImmediateModeRendering(val ? 0 : 1);
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderViewSettings::SetResolveCoincidentTopology(int mode)
 {
   switch (mode)

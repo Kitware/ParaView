@@ -150,6 +150,16 @@ def setattr(proxy, pname, value):
             paraview.print_debug_info(\
                 "'AttributeMode' is obsolete.  Use 'AttributeType' property of Calculator filter instead.")
             # we let the AttributeError be raised
+    if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if paraview.compatibility.GetVersion() <= 5.4:
+            raise Continue()
+        else:
+            paraview.print_debug_info("'UseOffscreenRenderingForScreenshots' is obsolete.")
+    if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if paraview.compatibility.GetVersion() <= 5.4:
+            raise Continue()
+        else:
+            paraview.print_debug_info("'UseOffscreenRendering' is obsolete.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -264,6 +274,20 @@ def getattr(proxy, pname):
                     'The Calculator.AttributeMode property has been removed in ParaView 5.5. '\
                     'Please set the AttributeType property instead. Note that different '\
                     'constants are needed for the two properties.')
+
+    if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if version <= 5.4:
+            return 0
+        else:
+            raise NotSupportedException('`UseOffscreenRenderingForScreenshots` '\
+                    'is no longer supported. Please remove it.')
+
+    if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
+        if version <= 5.4:
+            return 0
+        else:
+            raise NotSupportedException(\
+                    '`UseOffscreenRendering` is no longer supported. Please remove it.')
 
     raise Continue()
 

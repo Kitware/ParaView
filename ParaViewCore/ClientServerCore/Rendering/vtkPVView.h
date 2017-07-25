@@ -34,6 +34,7 @@ class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
 class vtkPVSynchronizedRenderWindows;
+class vtkRenderWindow;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
@@ -213,7 +214,20 @@ public:
    */
   bool GetLocalProcessSupportsInteraction();
 
+  /**
+   * Returns the unique indentifier used for this view. This gets set in
+   * `Initialize()`.
+   */
   vtkGetMacro(Identifier, unsigned int);
+
+  /**
+   * If this view needs a render window (not all views may use one),
+   * this method can be used to get the render window associated with this view
+   * on the current process. Note that this window may be shared with other
+   * views depending on the process on which this is called and the
+   * configuration ParaView is running under.
+   */
+  virtual vtkRenderWindow* GetRenderWindow();
 
 protected:
   vtkPVView();

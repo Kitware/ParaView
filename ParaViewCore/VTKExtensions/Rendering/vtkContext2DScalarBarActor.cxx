@@ -1022,8 +1022,6 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   // so that things like tile scale and DPI are correct.
   this->Axis->GetScene()->SetRenderer(vtkRenderer::SafeDownCast(this->CurrentViewport));
 
-  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-
   double size[2];
   this->GetSize(size, painter);
 

@@ -38,11 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkNew.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVOpenGLInformation.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+
+#include <QCoreApplication>
 #include <QMessageBox>
 
 namespace
@@ -51,7 +53,8 @@ QString openGLVersionInfo(vtkSMSession* session, vtkPVSession::ServerFlags serve
 {
   vtkNew<vtkPVOpenGLInformation> glinfo;
   session->GatherInformation(server_flag, glinfo.GetPointer(), 0);
-  return QString("\n\nOpenGL Vendor: %1\nOpenGL Version: %2\nOpenGL Renderer: %3")
+  return QString(QCoreApplication::translate("pqDefaultViewBehavior",
+                   ("OpenGL Vendor: %1\nOpenGL Version: %2\nOpenGL Renderer: %3")))
     .arg(glinfo->GetVendor().c_str(), glinfo->GetVersion().c_str(), glinfo->GetRenderer().c_str());
 }
 }
@@ -59,7 +62,6 @@ QString openGLVersionInfo(vtkSMSession* session, vtkPVSession::ServerFlags serve
 //-----------------------------------------------------------------------------
 pqDefaultViewBehavior::pqDefaultViewBehavior(QObject* parentObject)
   : Superclass(parentObject)
-  , WarningMode(pqDefaultViewBehavior::NONE)
 {
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerCreation(pqServer*)));
@@ -68,89 +70,77 @@ pqDefaultViewBehavior::pqDefaultViewBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 void pqDefaultViewBehavior::showWarnings()
 {
-  switch (this->WarningMode)
+  using RCInfo = vtkPVRenderingCapabilitiesInformation;
+  if (RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL) &&
+    RCInfo::Supports(this->ServerCapabilities, RCInfo::OPENGL))
   {
-    case SERVER_DISPLAY_INACCESSIBLE:
-      QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Server DISPLAY not accessible!"),
-        tr("Display is not accessible on the server side.\n"
-           "Remote rendering will be disabled."),
-        QMessageBox::Ok);
-      break;
+    // all's well!
+    return;
+  }
 
-    case SERVER_OPENGL_INADEQUATE:
-    {
-      QString msg = tr("OpenGL drivers on the server side don't support\n"
-                       "required OpenGL features for basic rendering.\n"
-                       "Remote rendering will be disabled.");
-      msg += this->ExtraWarningMessage;
-      QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Server OpenGL support inadequate!"),
-        msg, QMessageBox::Ok);
-    }
-    break;
+  if (this->Server == nullptr)
+  {
+    return;
+  }
 
-    case CLIENT_OPENGL_INADEQUATE:
-    {
-      QString msg = tr("Your OpenGL drivers don't support\n"
-                       "required OpenGL features for basic rendering.\n"
-                       "Application cannot continue. Please exit and use an older version.\n\n"
-                       "CONTINUE AT YOUR OWN RISK!");
-      msg += this->ExtraWarningMessage;
-      QMessageBox::warning(
-        pqCoreUtilities::mainWidget(), tr("OpenGL support inadequate!"), msg, QMessageBox::Ok);
-    }
-    break;
-    default:
-      // nothing to do.
-      break;
+  if (!RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))
+  {
+    QString msg = tr("Your OpenGL drivers don't support\n"
+                     "required OpenGL features for basic rendering.\n"
+                     "Application cannot continue. Please exit and use an older version.\n\n"
+                     "CONTINUE AT YOUR OWN RISK!\n\n");
+    msg += openGLVersionInfo(this->Server->session(), vtkSMSession::CLIENT);
+    QMessageBox::warning(
+      pqCoreUtilities::mainWidget(), tr("OpenGL support inadequate!"), msg, QMessageBox::Ok);
+    return;
+  }
+
+  if (!this->Server->isRemote())
+  {
+    // for non remote server, that's the only message.
+    return;
+  }
+
+  if (!RCInfo::Supports(this->ServerCapabilities, RCInfo::RENDERING))
+  {
+    QMessageBox::warning(pqCoreUtilities::mainWidget(), tr("Server DISPLAY not accessible!"),
+      tr("Display is not accessible on the server side.\n"
+         "Remote rendering will be disabled."),
+      QMessageBox::Ok);
+  }
+  else if (!RCInfo::Supports(this->ServerCapabilities, RCInfo::OPENGL))
+  {
+    QString msg = tr("OpenGL drivers on the server side don't support\n"
+                     "required OpenGL features for basic rendering.\n"
+                     "Remote rendering will be disabled.");
+    msg += openGLVersionInfo(this->Server->session(), vtkSMSession::RENDER_SERVER);
+    QMessageBox::warning(
+      pqCoreUtilities::mainWidget(), tr("Server OpenGL support inadequate!"), msg, QMessageBox::Ok);
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqDefaultViewBehavior::onServerCreation(pqServer* server)
 {
-  this->WarningMode = NONE;
-  this->ExtraWarningMessage.clear();
+  using RCInfo = vtkPVRenderingCapabilitiesInformation;
 
   pqApplicationCore* core = pqApplicationCore::instance();
 
-  // Check if it is possible to access display on the server. If not, we show a
-  // message.
-  vtkNew<vtkPVDisplayInformation> di;
-  server->session()->GatherInformation(vtkSMSession::RENDER_SERVER, di.GetPointer(), 0);
-  if (!di->GetCanOpenDisplay())
-  {
-    this->WarningMode = SERVER_DISPLAY_INACCESSIBLE;
-  }
-  else if (!di->GetSupportsOpenGL())
-  {
-    this->ExtraWarningMessage = openGLVersionInfo(server->session(), vtkSMSession::RENDER_SERVER);
-    if (server->isRemote())
-    {
-      this->WarningMode = SERVER_OPENGL_INADEQUATE;
-    }
-    else
-    {
-      this->WarningMode = CLIENT_OPENGL_INADEQUATE;
-    }
-  }
+  // Get information about rendering capabilities.
+  vtkNew<RCInfo> info;
+  server->session()->GatherInformation(vtkSMSession::RENDER_SERVER, info.GetPointer(), 0);
+
+  this->Server = server;
+  this->ServerCapabilities = this->ClientCapabilities = info->GetCapabilities();
+
+  // if server is remote, we separately get client capabilities.
   if (server->isRemote())
   {
-    // Let's also check that OpenGL version is adequate locally. This will
-    // override server OpenGL version check, but that's okay. Client version not
-    // supported is a greater issue.
-    vtkNew<vtkPVDisplayInformation> localDI;
-    server->session()->GatherInformation(vtkSMSession::CLIENT, localDI.GetPointer(), 0);
-    if (!localDI->GetSupportsOpenGL())
-    {
-      this->ExtraWarningMessage = openGLVersionInfo(server->session(), vtkSMSession::CLIENT);
-      this->WarningMode = CLIENT_OPENGL_INADEQUATE;
-    }
+    this->ClientCapabilities = RCInfo::GetLocalCapabilities();
   }
 
-  if (this->WarningMode != NONE)
-  {
-    pqTimer::singleShot(500, this, SLOT(showWarnings()));
-  }
+  // Setup a timer to show warning messages, if needed.
+  pqTimer::singleShot(500, this, SLOT(showWarnings()));
 
   // See if some view are already present and if we're in a collaborative
   // session, we are the master.
@@ -168,7 +158,8 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
     }
 
     QString curView = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
-    if (curView != "None" && !curView.isEmpty() && this->WarningMode != CLIENT_OPENGL_INADEQUATE)
+    if (curView != "None" && !curView.isEmpty() &&
+      RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))
     {
       // When a server is created, we create a new render view for it.
       builder->createView(curView, server);

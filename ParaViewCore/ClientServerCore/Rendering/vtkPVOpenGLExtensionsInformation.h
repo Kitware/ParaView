@@ -20,6 +20,9 @@
  * Information object that can be used to obtain OpenGL extension
  * information. The object from which the information is obtained
  * should be a render window.
+ *
+ * @deprecated in ParaView 5.5. The information is now indirectly available via
+ * vtkPVOpenGLInformation. See `vtkPVOpenGLInformation::GetCapabilities`.
 */
 
 #ifndef vtkPVOpenGLExtensionsInformation_h
@@ -28,8 +31,9 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class vtkPVOpenGLExtensionsInformationInternal;
+#if !defined(VTK_LEGACY_REMOVE)
 
+class vtkPVOpenGLExtensionsInformationInternal;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation
   : public vtkPVInformation
 {
@@ -74,4 +78,5 @@ private:
   vtkPVOpenGLExtensionsInformationInternal* Internal;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif
