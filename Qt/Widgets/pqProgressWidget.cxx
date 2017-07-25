@@ -101,7 +101,6 @@ protected:
     pbstyle.textAlignment = this->alignment();
     pbstyle.rect = this->rect();
 
-    QPainter painter(this);
     if (this->ShowProgress && this->ProgressPercentage > 0)
     {
       // let's print the frame border etc.
@@ -110,6 +109,7 @@ protected:
 
       // we deliberately don't draw the progress bar groove to avoid a dramatic
       // change in the progress bar.
+      QPainter painter(this);
       pbstyle.textVisible = false;
       this->astyle()->drawControl(QStyle::CE_ProgressBarContents, &pbstyle, &painter, this);
       pbstyle.textVisible = true;
