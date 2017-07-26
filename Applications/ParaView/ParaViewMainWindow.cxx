@@ -89,10 +89,13 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 public:
   bool FirstShow;
   int CurrentGUIFontSize;
+  pqTimer UpdateFontSizeTimer;
   pqInternals()
     : FirstShow(true)
     , CurrentGUIFontSize(0)
   {
+    this->UpdateFontSizeTimer.setInterval(0);
+    this->UpdateFontSizeTimer.setSingleShot(true);
   }
 };
 
@@ -210,7 +213,9 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // update UI when font size changes.
   vtkPVGeneralSettings* gsSettings = vtkPVGeneralSettings::GetInstance();
-  pqCoreUtilities::connect(gsSettings, vtkCommand::ModifiedEvent, this, SLOT(updateFontSize()));
+  pqCoreUtilities::connect(
+    gsSettings, vtkCommand::ModifiedEvent, &this->Internals->UpdateFontSizeTimer, SLOT(start()));
+  this->connect(&this->Internals->UpdateFontSizeTimer, SIGNAL(timeout()), SLOT(updateFontSize()));
 
   this->Internals->propertiesDock->show();
   this->Internals->propertiesDock->raise();
