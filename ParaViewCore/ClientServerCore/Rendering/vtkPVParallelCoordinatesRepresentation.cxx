@@ -21,17 +21,52 @@
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkStdString.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
 
-#include <map>
 #include <string>
+#include <vector>
 
 class vtkPVParallelCoordinatesRepresentation::vtkInternals
 {
 public:
-  // Refer to vtkPVPlotMatrixRepresentation when time comes to update this
-  // representation to respect the order in which the series are listed.
-  std::map<std::string, bool> SeriesVisibilities;
+  std::vector<std::pair<std::string, bool> > SeriesVisibilities;
+
+  vtkSmartPointer<vtkStringArray> GetOrderedVisibleColumnNames(vtkTable* table)
+  {
+    vtkSmartPointer<vtkStringArray> result = vtkSmartPointer<vtkStringArray>::New();
+
+    std::set<std::string> columnNames;
+
+    vtkIdType numCols = table->GetNumberOfColumns();
+    for (vtkIdType cc = 0; cc < numCols; cc++)
+    {
+      columnNames.insert(table->GetColumnName(cc));
+    }
+
+    for (size_t cc = 0; cc < this->SeriesVisibilities.size(); ++cc)
+    {
+      if (this->SeriesVisibilities[cc].second == true &&
+        columnNames.find(this->SeriesVisibilities[cc].first) != columnNames.end())
+      {
+        result->InsertNextValue(this->SeriesVisibilities[cc].first.c_str());
+      }
+    }
+
+    return result;
+  }
+
+  bool GetSeriesVisibility(const std::string& name)
+  {
+    for (size_t cc = 0; cc < this->SeriesVisibilities.size(); ++cc)
+    {
+      if (this->SeriesVisibilities[cc].first == name)
+      {
+        return this->SeriesVisibilities[cc].second;
+      }
+    }
+    return false;
+  }
 };
 
 vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
@@ -118,7 +153,7 @@ void vtkPVParallelCoordinatesRepresentation::SetSeriesVisibility(
   const char* series, bool visibility)
 {
   assert(series != NULL);
-  this->Internals->SeriesVisibilities[series] = visibility;
+  this->Internals->SeriesVisibilities.push_back(std::pair<std::string, bool>(series, visibility));
   this->Modified();
 }
 
@@ -150,17 +185,14 @@ void vtkPVParallelCoordinatesRepresentation::PrepareForRendering()
     for (vtkIdType cc = 0; cc < numCols; cc++)
     {
       std::string name = plotInput->GetColumnName(cc);
-      std::map<std::string, bool>::iterator iter = this->Internals->SeriesVisibilities.find(name);
-
-      if (iter != this->Internals->SeriesVisibilities.end() && iter->second == true)
-      {
-        chart->SetColumnVisibility(name, true);
-      }
-      else
-      {
-        chart->SetColumnVisibility(name, false);
-      }
+      chart->SetColumnVisibility(name, this->Internals->GetSeriesVisibility(name));
     }
+
+    vtkSmartPointer<vtkStringArray> orderedVisibleColumns =
+      this->Internals->GetOrderedVisibleColumnNames(plotInput);
+
+    // Set column order
+    chart->SetVisibleColumns(orderedVisibleColumns.GetPointer());
   }
 }
 
