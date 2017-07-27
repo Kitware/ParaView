@@ -192,8 +192,7 @@ QString pqImageCompressorWidget::compressorConfig() const
 void pqImageCompressorWidget::currentIndexChanged(int index)
 {
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
-  ui.squirtLabel->setVisible(
-    index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION || index == NVPIPE_COMPRESSION);
+  ui.squirtLabel->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
   ui.squirtColorSpace->setVisible(index == SQUIRT_COMPRESSION || index == LZ4_COMPRESSION);
 
   ui.zlibLabel1->setVisible(index == ZLIB_COMPRESSION);
@@ -203,10 +202,11 @@ void pqImageCompressorWidget::currentIndexChanged(int index)
   ui.zlibStripAlpha->setVisible(index == ZLIB_COMPRESSION);
 
 #ifdef PARAVIEW_ENABLE_NVPIPE
+  ui.nvpLabel->setVisible(index == NVPIPE_COMPRESSION);
   ui.nvpLevel->setVisible(index == NVPIPE_COMPRESSION);
 #else
-  ui.nvpLevel->setEnabled(false);
-  ui.nvpLevel->setToolTip("ParaView must be built with NVPipe enabled.");
+  ui.nvpLabel->setVisible(false);
+  ui.nvpLevel->setVisible(false);
 #endif
 }
 
