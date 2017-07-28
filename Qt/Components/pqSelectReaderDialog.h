@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include <QDialog>
+#include <QScopedPointer> // needed for ivar
 
 class pqServer;
 class vtkSMReaderFactory;
@@ -71,7 +72,7 @@ public:
 
 protected:
   class pqInternal;
-  pqInternal* Internal;
+  QScopedPointer<pqInternal> Internal;
 };
 
 #endif
