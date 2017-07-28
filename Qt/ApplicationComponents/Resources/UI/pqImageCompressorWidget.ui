@@ -54,7 +54,7 @@
    <item>
     <widget class="QLabel" name="squirtLabel">
      <property name="text">
-      <string>Set the Squirt/LZ4/NvPipe compression level. Move to right for better compression ratio at the cost of reduced image quality.</string>
+      <string>Set the Squirt/LZ4 compression level. Move to right for better compression ratio at the cost of reduced image quality.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -139,7 +139,7 @@
    <item>
     <widget class="QLabel" name="nvpLabel">
      <property name="text">
-      <string>Set the NvPipe compression level. 1 is low image quality; 5 is high image quality. Even at the highest setting the bandwidth cost is well below LZ4 or Squirt.
+      <string>Set the NvPipe compression level. 1 is high image quality; 5 is low image quality. Even at the highest setting the bandwidth cost is well below LZ4 or Squirt.
       </string>
      </property>
      <property name="wordWrap">
