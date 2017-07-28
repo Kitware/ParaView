@@ -39,6 +39,7 @@ set(Module_SRCS
   vtkContext2DScalarBarActor.cxx
   vtkCSVExporter.cxx
   vtkImageCompressor.cxx
+  vtkImageTransparencyFilter.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
   vtkLZ4Compressor.cxx
