@@ -15,7 +15,8 @@
 # - Do not pass a version number. That will not be processed correctly. The
 #   version number is determined by this macro itself.
 # - Do not use COMPONENTS or OPTIONAL_COMPONENTS instead, use
-#   QT5_COMPONENTS, QT5_COMPONENTS to specify the components to use for Qt5.
+#   QT5_COMPONENTS, QT5_OPTIONAL_COMPONENTS to specify the components to use
+#   for Qt5.
 macro(pv_find_package_qt out_targets_var)
   if (DEFINED PARAVIEW_QT_VERSION AND PARAVIEW_QT_VERSION VERSION_LESS 5)
     message(WARNING "ParaView no longer supports ${PARAVIEW_QT_VERSION}. Forcing Qt version to 5.*.")
