@@ -19,6 +19,7 @@
 #include "vtkErrorCode.h"
 #include "vtkGenericRenderWindowInteractor.h"
 #include "vtkImageData.h"
+#include "vtkImageTransparencyFilter.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -497,89 +498,19 @@ vtkImageData* vtkSMViewProxy::CaptureWindow(int magX, int magY)
     this->PrepareRendererBackground(renderer, 0, 0, 0, false);
     vtkImageData* captureBlack = this->CaptureWindowSingle(magX, magY);
 
+    vtkNew<vtkImageTransparencyFilter> transparencyFilter;
+    transparencyFilter->SetInputData(captureWhite);
+    transparencyFilter->AddInputData(captureBlack);
+    transparencyFilter->Update();
+
     vtkImageData* capture = vtkImageData::New();
-    capture->CopyStructure(captureWhite);
-    capture->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-
-    const unsigned char* white;
-    const unsigned char* black;
-    unsigned char* out;
-    vtkIdType whiteStep[3];
-    vtkIdType blackStep[3];
-    vtkIdType outStep[3];
-
-    white = static_cast<const unsigned char*>(
-      captureWhite->GetScalarPointerForExtent(captureWhite->GetExtent()));
-    black = static_cast<const unsigned char*>(
-      captureBlack->GetScalarPointerForExtent(captureBlack->GetExtent()));
-    out = static_cast<unsigned char*>(capture->GetScalarPointerForExtent(capture->GetExtent()));
-
-    captureWhite->GetIncrements(whiteStep[0], whiteStep[1], whiteStep[2]);
-    captureBlack->GetIncrements(blackStep[0], blackStep[1], blackStep[2]);
-    capture->GetIncrements(outStep[0], outStep[1], outStep[2]);
-
-    int* extent = capture->GetExtent();
-
-    for (int i = extent[4]; i <= extent[5]; ++i)
-    {
-      const unsigned char* whiteRow = white;
-      const unsigned char* blackRow = black;
-      unsigned char* outRow = out;
-
-      for (int j = extent[2]; j <= extent[3]; ++j)
-      {
-        const unsigned char* whitePx = whiteRow;
-        const unsigned char* blackPx = blackRow;
-        unsigned char* outPx = outRow;
-
-        for (int k = extent[0]; k <= extent[1]; ++k)
-        {
-          if (whitePx[0] == blackPx[0] && whitePx[1] == blackPx[1] && whitePx[2] == blackPx[2])
-          {
-            outPx[0] = whitePx[0];
-            outPx[1] = whitePx[1];
-            outPx[2] = whitePx[2];
-            outPx[3] = 255;
-          }
-          else
-          {
-            // Some kind of translucency; use values from the black capture.
-            // The opacity is the derived from the V difference of the HSV
-            // colors.
-            double whiteHSV[3];
-            double blackHSV[3];
-
-            vtkMath::RGBToHSV(whitePx[0] / 255., whitePx[1] / 255., whitePx[2] / 255., whiteHSV + 0,
-              whiteHSV + 1, whiteHSV + 2);
-            vtkMath::RGBToHSV(blackPx[0] / 255., blackPx[1] / 255., blackPx[2] / 255., blackHSV + 0,
-              blackHSV + 1, blackHSV + 2);
-            double alpha = 1. - (whiteHSV[2] - blackHSV[2]);
-
-            outPx[0] = static_cast<unsigned char>(blackPx[0] / alpha);
-            outPx[1] = static_cast<unsigned char>(blackPx[1] / alpha);
-            outPx[2] = static_cast<unsigned char>(blackPx[2] / alpha);
-            outPx[3] = static_cast<unsigned char>(255 * alpha);
-          }
-
-          whitePx += whiteStep[0];
-          blackPx += blackStep[0];
-          outPx += outStep[0];
-        }
-
-        whiteRow += whiteStep[1];
-        blackRow += blackStep[1];
-        outRow += outStep[1];
-      }
-
-      white += whiteStep[2];
-      black += blackStep[2];
-      out += outStep[2];
-    }
+    capture->ShallowCopy(transparencyFilter->GetOutput());
 
     this->RestoreRendererBackground(renderer, info);
 
     captureWhite->Delete();
     captureBlack->Delete();
+
     return capture;
   }
 
