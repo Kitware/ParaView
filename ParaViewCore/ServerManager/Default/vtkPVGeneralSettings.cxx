@@ -56,6 +56,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
   , LockPanels(false)
   , GUIFontSize(0)
+  , GUIOverrideFont(false)
 {
   this->SetDefaultViewType("RenderView");
 }

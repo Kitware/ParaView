@@ -215,11 +215,18 @@ public:
 
   //@{
   /**
-   * Get/Set the GUI font size. 0 indicates system default i.e.
-   * do not override.
+   * Get/Set the GUI font size. This is used only if GUIOverrideFont is true.
    */
-  vtkSetClampMacro(GUIFontSize, int, 0, VTK_INT_MAX);
+  vtkSetClampMacro(GUIFontSize, int, 8, VTK_INT_MAX);
   vtkGetMacro(GUIFontSize, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set whether the GUIFontSize should be used.
+   */
+  vtkSetMacro(GUIOverrideFont, bool);
+  vtkGetMacro(GUIOverrideFont, bool);
   //@}
 
 protected:
@@ -239,6 +246,7 @@ protected:
   int PropertiesPanelMode;
   bool LockPanels;
   int GUIFontSize;
+  bool GUIOverrideFont;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
