@@ -366,12 +366,13 @@ void ParaViewMainWindow::showWelcomeDialog()
 void ParaViewMainWindow::updateFontSize()
 {
   vtkPVGeneralSettings* gsSettings = vtkPVGeneralSettings::GetInstance();
-  const int fontSize = gsSettings->GetGUIFontSize();
+  bool overrideFontSize = gsSettings->GetGUIOverrideFont();
+  int fontSize = overrideFontSize ? gsSettings->GetGUIFontSize() : 0;
   if (this->Internals->CurrentGUIFontSize != fontSize)
   {
-    if (fontSize > 0)
+    if (fontSize > 0) // note vtkPVGeneralSettings clamps it to [8, INT_MAX)
     {
-      this->setStyleSheet(QString("* { font-size: %1pt }").arg(gsSettings->GetGUIFontSize()));
+      this->setStyleSheet(QString("* { font-size: %1pt }").arg(fontSize));
     }
     else
     {

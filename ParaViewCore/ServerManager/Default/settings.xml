@@ -48,15 +48,31 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="GUIOverrideFont"
+        label="Override Font"
+        command="SetGUIOverrideFont"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Override the GUI font size. Uncheck to use system default.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="GUIFontSize"
-        label="GUI Font Size"
+        label="Font Size"
         command="SetGUIFontSize"
         number_of_elements="1"
-        default_values="0">
+        default_values="8">
         <Documentation>
-          Override GUI font size. Set it to **0** to simply use the window system default.
+          Specify the font size in points.
         </Documentation>
-        <IntRangeDomain name="range" min="0" max="32" />
+        <IntRangeDomain name="range" min="8" max="32" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="GUIOverrideFont" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty name="DefaultViewType"
@@ -72,7 +88,8 @@
 
       <IntVectorProperty name="ScreenPixelsPerInch"
         number_of_elements="1"
-        default_values="96">
+        default_values="96"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="80" />
         <Documentation>
           Set pixels per inch on the current screen/monitor. This is used for determining
@@ -342,6 +359,11 @@
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
         <Property name="CrashRecovery" />
+        <Property name="GUIFontSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="GUI Font">
+        <Property name="GUIOverrideFont"/>
         <Property name="GUIFontSize" />
       </PropertyGroup>
 
