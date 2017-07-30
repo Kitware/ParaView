@@ -238,9 +238,13 @@ void vtkPVX3DExporter::WriteColorLegend(
   transparency->SetInputData(whiteImage);
   transparency->AddInputData(blackImage);
 
-  std::string title(actor->GetTitle());
   std::stringstream imageFileName;
-  imageFileName << this->FileName << "." << title << ".png";
+  imageFileName << this->FileName << "." << actor->GetTitle();
+  if (actor->GetComponentTitle() && actor->GetComponentTitle()[0] != '\0')
+  {
+    imageFileName << "-" << actor->GetComponentTitle();
+  }
+  imageFileName << ".png";
 
   vtkNew<vtkPNGWriter> pngWriter;
   pngWriter->SetInputConnection(transparency->GetOutputPort());
