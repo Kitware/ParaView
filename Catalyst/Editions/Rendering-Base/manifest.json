@@ -117,6 +117,7 @@
         { "class": "vtkIceTCompositePass" },
         { "class": "vtkIceTContext" },
         { "class": "vtkImageCompressor" },
+        { "class": "vtkImageTransparencyFilter" },
         { "class": "vtkKdTreeGenerator" },
         { "class": "vtkKdTreeManager" },
         { "class": "vtkLZ4Compressor" },
