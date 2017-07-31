@@ -13707,7 +13707,8 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="1" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="SpreadSheetView" />
+        <View type="SpreadSheetView" port="0" />
+        <View type="None" port="1" />
       </Hints>
     </SourceProxy>
     <!-- ContingencyStatistics -->
@@ -13866,7 +13867,8 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="1" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="SpreadSheetView" />
+        <View type="SpreadSheetView" port="0" />
+        <View type="None" port="1" />
       </Hints>
     </SourceProxy>
     <!-- DescriptiveStatistics -->
@@ -14042,7 +14044,8 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="1" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="SpreadSheetView" />
+        <View type="SpreadSheetView" port="0" />
+        <View type="None" port="1" />
       </Hints>
     </SourceProxy>
     <!-- K Means -->
@@ -14208,7 +14211,8 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="1" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="SpreadSheetView" />
+        <View type="SpreadSheetView" port="0" />
+        <View type="None" port="1" />
       </Hints>
     </SourceProxy>
     <!-- MulticorrelativeStatistics -->
@@ -14443,7 +14447,8 @@ source.</Documentation>
       <Hints>
         <Visibility replace_input="1" />
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="SpreadSheetView" />
+        <View type="SpreadSheetView" port="0" />
+        <View type="None" port="1" />
       </Hints>
     </SourceProxy>
     <!-- PCAStatistics -->
