@@ -493,7 +493,8 @@ int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
 
   if (clientVersion != serverVersion)
   {
-    vtkErrorMacro(<< "Client and server are different ParaView versions");
+    vtkErrorMacro(<< "Client and server are different ParaView versions. Client reports version: "
+                  << clientVersion << " but server is version " << serverVersion);
     return HANDSHAKE_DIFFERENT_PV_VERSIONS;
   }
 
