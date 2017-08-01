@@ -2772,7 +2772,7 @@
   </ProxyGroup>
   <ProxyGroup name="exporters">
     <!-- Proxy group for exporters used to export views.  -->
-    <RenderViewExporterProxy class="vtkX3DExporter"
+    <RenderViewExporterProxy class="vtkPVX3DExporter"
                              file_extension="x3d"
                              name="X3DExporter">
       <Documentation long_help="Export X3D Files"

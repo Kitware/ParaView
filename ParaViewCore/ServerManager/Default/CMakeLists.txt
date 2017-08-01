@@ -32,6 +32,7 @@ set (Module_SRCS
   vtkLoadStateOptions.cxx
   vtkPVGeneralSettings.cxx
   vtkPVMultiServerDataSource.cxx
+  vtkPVX3DExporter.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCSVExporterProxy.cxx
