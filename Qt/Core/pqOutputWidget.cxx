@@ -134,8 +134,35 @@ private:
   void operator=(const OutputWindow&) VTK_DELETE_FUNCTION;
 };
 vtkStandardNewMacro(OutputWindow);
+}
 
-void MessageHandler(QtMsgType type, const QMessageLogContext&, const QString& msg)
+MessageHandler::MessageHandler(QObject* parent)
+  : QObject(parent)
+{
+  qRegisterMetaType<QtMsgType>();
+  connect(this, &MessageHandler::message, this, &MessageHandler::displayMessage);
+}
+
+void MessageHandler::install()
+{
+  // Call instance() to ensure we create the MessageHandler object on the main
+  // thread.
+  MessageHandler::instance();
+  qInstallMessageHandler(MessageHandler::handler);
+}
+
+void MessageHandler::handler(QtMsgType type, const QMessageLogContext&, const QString& msg)
+{
+  emit instance()->message(type, msg);
+}
+
+MessageHandler* MessageHandler::instance()
+{
+  static MessageHandler instance;
+  return &instance;
+}
+
+void MessageHandler::displayMessage(QtMsgType type, const QString& msg)
 {
   QByteArray localMsg = msg.toLocal8Bit();
   vtkOutputWindow* vtkWindow = vtkOutputWindow::GetInstance();
@@ -165,7 +192,6 @@ void MessageHandler(QtMsgType type, const QMessageLogContext&, const QString& ms
         break;
     }
   }
-}
 }
 
 class pqOutputWidget::pqInternals
@@ -342,12 +368,6 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-void pqOutputWidget::installQMessageHandler()
-{
-  qInstallMessageHandler(OutputWidgetInternals::MessageHandler);
-}
-
-//-----------------------------------------------------------------------------
 pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , Internals(new pqOutputWidget::pqInternals(this))
@@ -360,8 +380,8 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   // Tell VTK to forward all messages.
   vtkOutputWindow::SetInstance(internals.VTKOutputWindow.Get());
 
-  // Tell Qt to forward us all messages.
-  pqOutputWidget::installQMessageHandler();
+  // Install the message handler
+  MessageHandler::install();
 
   this->setSettingsKey("pqOutputWidget");
 }
