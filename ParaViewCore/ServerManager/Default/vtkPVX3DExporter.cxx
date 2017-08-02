@@ -21,13 +21,17 @@
 #include "vtkImageTransparencyFilter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPNGWriter.h"
+#include "vtkPointData.h"
 #include "vtkRect.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkX3D.h"
+#include "vtkX3DExporterWriter.h"
 
+#include <algorithm>
 #include <set>
 #include <sstream>
 
@@ -45,15 +49,13 @@ vtkPVX3DExporter::~vtkPVX3DExporter()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVX3DExporter::WriteData()
+void vtkPVX3DExporter::WriteAdditionalNodes(vtkX3DExporterWriter* writer)
 {
-  this->Superclass::WriteData();
-
-  this->WriteColorLegends();
+  this->WriteColorLegends(writer);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVX3DExporter::WriteColorLegends()
+void vtkPVX3DExporter::WriteColorLegends(vtkX3DExporterWriter* writer)
 {
   vtkRenderer* bottomRenderer = nullptr;
   vtkRenderer* annotationRenderer = nullptr;
@@ -114,7 +116,7 @@ void vtkPVX3DExporter::WriteColorLegends()
 
     // Turn just this scalar bar actor on.
     sbActor->VisibilityOn();
-    this->WriteColorLegend(bottomRenderer, annotationRenderer, sbActor);
+    this->WriteColorLegend(bottomRenderer, annotationRenderer, sbActor, writer);
     sbActor->VisibilityOff();
   }
 
@@ -214,8 +216,8 @@ vtkImageData* CaptureScalarBarImage(vtkRenderer* bottomRenderer, vtkRenderer* an
 }
 
 //----------------------------------------------------------------------------
-void vtkPVX3DExporter::WriteColorLegend(
-  vtkRenderer* bottomRenderer, vtkRenderer* annotationRenderer, vtkContext2DScalarBarActor* actor)
+void vtkPVX3DExporter::WriteColorLegend(vtkRenderer* bottomRenderer,
+  vtkRenderer* annotationRenderer, vtkContext2DScalarBarActor* actor, vtkX3DExporterWriter* writer)
 {
   // Save renderer state
   RendererState rendererState = SaveRendererState(bottomRenderer);
@@ -237,19 +239,42 @@ void vtkPVX3DExporter::WriteColorLegend(
   vtkNew<vtkImageTransparencyFilter> transparency;
   transparency->SetInputData(whiteImage);
   transparency->AddInputData(blackImage);
+  transparency->Update();
+  vtkImageData* image = transparency->GetOutput();
+  vtkPointData* pd = image->GetPointData();
+  vtkUnsignedCharArray* pixelData = vtkUnsignedCharArray::SafeDownCast(pd->GetScalars());
+  if (!pixelData)
+  {
+    vtkErrorMacro("Pixel data not found or was not of type vtkUnsignedCharArray");
+    return;
+  }
 
-  std::stringstream imageFileName;
-  imageFileName << this->FileName << "." << actor->GetTitle();
+  std::stringstream colorLegendNameSS;
+  colorLegendNameSS << actor->GetTitle();
   if (actor->GetComponentTitle() && actor->GetComponentTitle()[0] != '\0')
   {
-    imageFileName << "-" << actor->GetComponentTitle();
+    colorLegendNameSS << "-" << actor->GetComponentTitle();
   }
-  imageFileName << ".png";
 
-  vtkNew<vtkPNGWriter> pngWriter;
-  pngWriter->SetInputConnection(transparency->GetOutputPort());
-  pngWriter->SetFileName(imageFileName.str().c_str());
-  pngWriter->Write();
+  // Replace spaces with underscores
+  std::string colorLegendName(colorLegendNameSS.str());
+  std::replace(colorLegendName.begin(), colorLegendName.end(), ' ', '_');
+
+  writer->StartNode(vtkX3D::PixelTexture);
+  writer->SetField(vtkX3D::DEF, colorLegendName.c_str());
+  std::vector<int> sfImageValues(3 + pixelData->GetNumberOfValues(), 0);
+  sfImageValues[0] = image->GetDimensions()[0];
+  sfImageValues[1] = image->GetDimensions()[1];
+  sfImageValues[2] = pixelData->GetNumberOfComponents();
+
+  for (vtkIdType i = 3; i < pixelData->GetNumberOfValues() + 3; ++i)
+  {
+    unsigned char value = pixelData->GetValue(i);
+    sfImageValues[i] = static_cast<int>(value);
+  }
+
+  writer->SetField(vtkX3D::SFIMAGE, &sfImageValues[0], sfImageValues.size(), true);
+  writer->EndNode();
 
   // Restore renderer state
   RestoreRendererState(bottomRenderer, rendererState);
