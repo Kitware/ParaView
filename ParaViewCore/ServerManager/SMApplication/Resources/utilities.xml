@@ -2788,6 +2788,17 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetExportColorLegends"
+                         name="ExportColorLegends"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the color legends are exported to PixelTexture nodes
+          under the Scene node in the exported X3D file.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of X3DExporter -->
     </RenderViewExporterProxy>
     <RenderViewExporterProxy base_proxygroup="exporters"
