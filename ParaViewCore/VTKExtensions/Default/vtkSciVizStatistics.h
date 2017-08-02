@@ -199,6 +199,13 @@ protected:
    */
   virtual vtkIdType GetNumberOfObservationsForTraining(vtkTable* observations);
 
+  /**
+   * A variant of shallow copy that calls vtkDataObject::ShallowCopy() and then
+   * for composite datasets, creates clones for each leaf node that then shallow
+   * copies the fields and geometry.
+   */
+  void ShallowCopy(vtkDataObject* out, vtkDataObject* in);
+
   int AttributeMode;
   int Task;
   double TrainingFraction;
