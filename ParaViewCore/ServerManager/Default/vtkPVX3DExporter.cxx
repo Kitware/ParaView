@@ -40,6 +40,7 @@ vtkStandardNewMacro(vtkPVX3DExporter);
 
 //----------------------------------------------------------------------------
 vtkPVX3DExporter::vtkPVX3DExporter()
+  : ExportColorLegends(false)
 {
 }
 
@@ -51,7 +52,10 @@ vtkPVX3DExporter::~vtkPVX3DExporter()
 //----------------------------------------------------------------------------
 void vtkPVX3DExporter::WriteAdditionalNodes(vtkX3DExporterWriter* writer)
 {
-  this->WriteColorLegends(writer);
+  if (this->ExportColorLegends)
+  {
+    this->WriteColorLegends(writer);
+  }
 }
 
 //----------------------------------------------------------------------------

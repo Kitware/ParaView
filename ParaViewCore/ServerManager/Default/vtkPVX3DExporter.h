@@ -37,9 +37,18 @@ public:
   vtkTypeMacro(vtkPVX3DExporter, vtkX3DExporter);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
+  /**
+   * Indicates whether color legends should be exported.
+   */
+  vtkSetMacro(ExportColorLegends, bool);
+  vtkGetMacro(ExportColorLegends, bool);
+  vtkBooleanMacro(ExportColorLegends, bool);
+
 protected:
   vtkPVX3DExporter();
   ~vtkPVX3DExporter() VTK_OVERRIDE;
+
+  bool ExportColorLegends;
 
   /**
    * Write additional data, including color legends, to the output.
