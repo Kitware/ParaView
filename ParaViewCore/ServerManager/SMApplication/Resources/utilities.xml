@@ -2792,7 +2792,7 @@
     </RenderViewExporterProxy>
     <RenderViewExporterProxy base_proxygroup="exporters"
                              base_proxyname="X3DExporter"
-                             class="vtkX3DExporter"
+                             class="vtkPVX3DExporter"
                              file_extension="x3db"
                              name="X3DExporterBinary">
       <Documentation>Binary x3d exporter</Documentation>
