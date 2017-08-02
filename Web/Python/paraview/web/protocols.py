@@ -116,17 +116,18 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
                     self.overrideDataDirKey = basePair[0]
             else:
                 self.baseDirectory = basePath
+            self.baseDirectory = os.path.normpath(self.baseDirectory)
         else:
             baseDirs = basePath.split('|')
             for baseDir in baseDirs:
                 basePair = baseDir.split('=')
                 if os.path.exists(basePair[1]):
-                    self.baseDirectoryMap[basePair[0]] = basePair[1]
+                    self.baseDirectoryMap[basePair[0]] = os.path.normpath(basePair[1])
 
             # Check if we ended up with just a single directory
             bdKeys = list(self.baseDirectoryMap)
             if len(bdKeys) == 1:
-                self.baseDirectory = self.baseDirectoryMap[bdKeys[0]]
+                self.baseDirectory = os.path.normpath(self.baseDirectoryMap[bdKeys[0]])
                 self.overrideDataDirKey = bdKeys[0]
                 self.baseDirectoryMap = {}
             elif len(bdKeys) > 1:
@@ -897,7 +898,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Scale and bias the x values, which come in between 0.0 and 1.0, to the
         # current scalar range
-        for i in range(len(pointArray) / 4):
+        for i in range(len(pointArray) // 4):
             idx = i * 4
             x = pointArray[idx]
             pointArray[idx] = (x * (cMax - cMin)) + cMin
@@ -922,7 +923,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Scale and bias the x values, which come in between 0.0 and 1.0, to the
         # current scalar range
-        for i in range(len(pointArray) / 4):
+        for i in range(len(pointArray) // 4):
             idx = i * 4
             result.append({
                 'x': (pointArray[idx] - cMin) / (cMax - cMin),
@@ -1124,6 +1125,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Use the vtk data encoder to base-64 encode the image as png, using no compression
         encoder = vtkDataEncoder()
+        # two calls in a row crash on Windows - bald timing hack to avoid the crash.
+        import time; time.sleep(0.01);
         b64Str = encoder.EncodeAsBase64Png(imgData, 0)
 
         return { 'range': dataRange, 'image': b64Str }
@@ -2234,7 +2237,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                          'reason': 'No configured reader found for ' + extension + ' files, and unconfigured readers are not enabled.' }
 
         # Rename the reader proxy
-        name = fileToLoad[0].split("/")[-1]
+        name = fileToLoad[0].split(os.path.sep)[-1]
         if len(name) > 15:
             name = name[:15] + '*'
         simple.RenameSource(name, reader)
@@ -2723,8 +2726,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         if relativeDir == '.':
             result['label'] = self.rootName
 
-        # Filter files to create groups
-        files.sort()
+        # Filter files to create groups. Dicts are not orderable in Py3 - supply a key function.
+        files.sort(key=lambda x: x["label"])
         groups = result['groups']
         groupIdx = {}
         filesToRemove = []
