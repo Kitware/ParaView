@@ -263,7 +263,7 @@ int vtkSciVizStatistics::RequestData(
   }
 
   // II. Create/update the output sci-viz data
-  dataObjOu->ShallowCopy(dataObjIn);
+  this->ShallowCopy(dataObjOu, dataObjIn);
 
   if (compDataObjIn)
   {
@@ -271,6 +271,7 @@ int vtkSciVizStatistics::RequestData(
     vtkCompositeDataSet* compModelObjIn = vtkCompositeDataSet::SafeDownCast(modelObjIn);
     vtkCompositeDataSet* compModelObjOu = vtkCompositeDataSet::SafeDownCast(modelObjOu);
     vtkCompositeDataSet* compDataObjOu = vtkCompositeDataSet::SafeDownCast(dataObjOu);
+
     // We may have a single model for all blocks or one per block
     // This is too tricky to detect automagically (because a single model may be a composite
     // dataset),
@@ -586,7 +587,8 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
   vtkIdType ncols = inTable->GetNumberOfColumns();
   if (ncols < 1)
   {
-    vtkWarningMacro("Every requested array wasn't a scalar or wasn't present.") return -1;
+    vtkWarningMacro("Every requested array wasn't a scalar or wasn't present.");
+    return -1;
   }
 
   return 1;
@@ -646,4 +648,31 @@ vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkTable* obse
   vtkIdType N = observations->GetNumberOfRows();
   vtkIdType M = static_cast<vtkIdType>(N * this->TrainingFraction);
   return M < 100 ? (N < 100 ? N : 100) : M;
+}
+
+void vtkSciVizStatistics::ShallowCopy(vtkDataObject* out, vtkDataObject* in)
+{
+  out->ShallowCopy(in);
+  vtkCompositeDataSet* cdIn = vtkCompositeDataSet::SafeDownCast(in);
+  vtkCompositeDataSet* cdOut = vtkCompositeDataSet::SafeDownCast(out);
+  if (cdIn == nullptr || cdOut == nullptr)
+  {
+    return;
+  }
+
+  // this is needed since vtkCompositeDataSet::ShallowCopy() doesn't clone
+  // leaf nodes, but simply passes them through.
+  vtkSmartPointer<vtkCompositeDataIterator> iterOut;
+  iterOut.TakeReference(cdOut->NewIterator());
+  for (iterOut->InitTraversal(); !iterOut->IsDoneWithTraversal(); iterOut->GoToNextItem())
+  {
+    vtkSmartPointer<vtkDataObject> curDO = iterOut->GetCurrentDataObject();
+    if (vtkCompositeDataSet::SafeDownCast(curDO) == nullptr && curDO != nullptr)
+    {
+      vtkDataObject* clone = curDO->NewInstance();
+      clone->ShallowCopy(curDO);
+      cdOut->SetDataSet(iterOut, clone);
+      clone->FastDelete();
+    }
+  }
 }
