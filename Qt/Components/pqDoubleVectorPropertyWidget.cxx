@@ -141,6 +141,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
+      if (range->GetResolutionExists())
+      {
+        widget->setResolution(range->GetResolution());
+      }
 
       // ensures that the widget's range is updated whenever the domain changes.
       new pqWidgetRangeDomain(widget, "minimum", "maximum", dvp, 0);
