@@ -853,10 +853,6 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 set (Molecule_DISABLE_CS TRUE)
 set (Molecule_DISABLE_CRS TRUE)
 
-# Temporarily disbale these tests till paraview/paraview#17619 is fixed.
-set(Glyph3DRepresentation_DISABLE_CS TRUE)
-set(Glyph3DRepresentation_DISABLE_CRS TRUE)
-
 ##########################################################
 # List of known incompatible tests for Collaboration
 #
