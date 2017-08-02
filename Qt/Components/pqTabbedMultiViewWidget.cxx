@@ -339,6 +339,13 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     {
       return;
     }
+    // also check with the proxy manager, since the pqApplicationCore's state
+    // loading flag won't get set if state was being loaded from Python Shell.
+    vtkSMSessionProxyManager* pxm = proxy->getServer()->proxyManager();
+    if (pxm && pxm->GetInLoadXMLState())
+    {
+      return;
+    }
 
     // check if this proxy has been assigned a frame already. This typically can
     // happen when loading states (for collaboration or otherwise).
