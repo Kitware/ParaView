@@ -22,59 +22,15 @@
 
 vtkStandardNewMacro(vtkPointGaussianRepresentation)
 
-  namespace
-{
-  std::vector<std::string> presetShaderStrings;
-
-  void InitializeShaderPresets()
-  {
-    presetShaderStrings.resize(vtkPointGaussianRepresentation::NUMBER_OF_PRESETS);
-    presetShaderStrings[vtkPointGaussianRepresentation::GAUSSIAN_BLUR] = "";
-    presetShaderStrings[vtkPointGaussianRepresentation::SPHERE] =
-      "//VTK::Color::Impl\n"
-      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
-      "if (dist > 1.0) {\n"
-      "  discard;\n"
-      "} else {\n"
-      "  float scale = (1.0 - dist);\n"
-      "  ambientColor *= scale;\n"
-      "  diffuseColor *= scale;\n"
-      "}\n";
-    presetShaderStrings[vtkPointGaussianRepresentation::BLACK_EDGED_CIRCLE] =
-      "//VTK::Color::Impl\n"
-      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
-      "if (dist > 1.0) {\n"
-      "  discard;\n"
-      "} else if (dist > 0.8) {\n"
-      "  ambientColor = vec3(0.0, 0.0, 0.0);\n"
-      "  diffuseColor = vec3(0.0, 0.0, 0.0);\n"
-      "}\n";
-    presetShaderStrings[vtkPointGaussianRepresentation::PLAIN_CIRCLE] =
-      "//VTK::Color::Impl\n"
-      "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
-      "if (dist > 1.0) {\n"
-      "  discard;\n"
-      "};\n";
-    presetShaderStrings[vtkPointGaussianRepresentation::TRIANGLE] = "//VTK::Color::Impl\n";
-    presetShaderStrings[vtkPointGaussianRepresentation::SQUARE_OUTLINE] =
-      "//VTK::Color::Impl\n"
-      "if (abs(offsetVCVSOutput.x) > 2.2 || abs(offsetVCVSOutput.y) > 2.2) {\n"
-      "  discard;\n"
-      "}\n"
-      "if (abs(offsetVCVSOutput.x) < 1.5 && abs(offsetVCVSOutput.y) < 1.5) {\n"
-      "  discard;\n"
-      "}\n";
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
+  //----------------------------------------------------------------------------
+  vtkPointGaussianRepresentation::vtkPointGaussianRepresentation()
 {
   this->Mapper = vtkSmartPointer<vtkPointGaussianMapper>::New();
   this->Actor = vtkSmartPointer<vtkActor>::New();
   this->Actor->SetMapper(this->Mapper);
   this->ScaleByArray = false;
   this->LastScaleArray = NULL;
+  this->LastScaleArrayComponent = 0;
   this->OpacityByArray = false;
   this->LastOpacityArray = NULL;
   InitializeShaderPresets();
@@ -85,6 +41,72 @@ vtkPointGaussianRepresentation::~vtkPointGaussianRepresentation()
 {
   this->SetLastScaleArray(NULL);
   this->SetLastOpacityArray(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::InitializeShaderPresets()
+{
+  this->PresetShaderStrings.resize(vtkPointGaussianRepresentation::NUMBER_OF_PRESETS);
+  this->PresetShaderScales.resize(vtkPointGaussianRepresentation::NUMBER_OF_PRESETS);
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::GAUSSIAN_BLUR] = "";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::GAUSSIAN_BLUR] = 3.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::SPHERE] =
+    "//VTK::Color::Impl\n"
+    "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+    "if (dist > 1.0) {\n"
+    "  discard;\n"
+    "} else {\n"
+    "  float scale = (1.0 - dist);\n"
+    "  ambientColor *= scale;\n"
+    "  diffuseColor *= scale;\n"
+    "}\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::SPHERE] = 1.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::BLACK_EDGED_CIRCLE] =
+    "//VTK::Color::Impl\n"
+    "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+    "if (dist > 1.0) {\n"
+    "  discard;\n"
+    "} else if (dist > 0.8) {\n"
+    "  ambientColor = vec3(0.0, 0.0, 0.0);\n"
+    "  diffuseColor = vec3(0.0, 0.0, 0.0);\n"
+    "}\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::BLACK_EDGED_CIRCLE] = 1.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::PLAIN_CIRCLE] =
+    "//VTK::Color::Impl\n"
+    "float dist = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+    "if (dist > 1.0) {\n"
+    "  discard;\n"
+    "};\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::PLAIN_CIRCLE] = 1.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::TRIANGLE] = "//VTK::Color::Impl\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::TRIANGLE] = 1.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::SQUARE_OUTLINE] =
+    "//VTK::Color::Impl\n"
+    "if (abs(offsetVCVSOutput.x) > 2.2 || abs(offsetVCVSOutput.y) > 2.2) {\n"
+    "  discard;\n"
+    "}\n"
+    "if (abs(offsetVCVSOutput.x) < 1.5 && abs(offsetVCVSOutput.y) < 1.5) {\n"
+    "  discard;\n"
+    "}\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::SQUARE_OUTLINE] = 3.0;
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::CUSTOM] =
+    "//VTK::Color::Impl\n"
+    "float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+    "if (dist2 > 9.0) {\n"
+    "  discard;\n"
+    "}\n"
+    "float gaussian = exp(-0.5*dist2);\n"
+    "opacity = opacity*gaussian;\n";
+
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::CUSTOM] = "//VTK::Color::Impl\n";
+  this->PresetShaderScales[vtkPointGaussianRepresentation::CUSTOM] = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -183,7 +205,7 @@ int vtkPointGaussianRepresentation::RequestData(
   // The mapper underneath expect only PolyData
   // Apply conversion - We do not need vertex list as we
   // use all the points in that use case
-  if (this->ProcessedData == NULL && input != NULL)
+  if (this->ProcessedData == NULL && input != NULL && input->GetNumberOfPoints() > 0)
   {
     vtkNew<vtkMaskPoints> unstructuredToPolyData;
     unstructuredToPolyData->SetInputData(input);
@@ -286,13 +308,32 @@ void vtkPointGaussianRepresentation::SetLookupTable(vtkScalarsToColors* lut)
 //----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SetCustomShader(const char* shaderString)
 {
-  this->Mapper->SetSplatShaderCode(shaderString);
+  this->PresetShaderStrings[vtkPointGaussianRepresentation::CUSTOM] = shaderString;
+  if (this->SelectedPreset == vtkPointGaussianRepresentation::CUSTOM)
+  {
+    this->Mapper->SetSplatShaderCode(this->PresetShaderStrings[this->SelectedPreset].c_str());
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SetCustomTriangleScale(double scale)
+{
+  this->PresetShaderScales[vtkPointGaussianRepresentation::CUSTOM] = scale;
+  if (this->SelectedPreset == vtkPointGaussianRepresentation::CUSTOM)
+  {
+    this->Mapper->SetTriangleScale(this->PresetShaderScales[this->SelectedPreset]);
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SelectShaderPreset(int preset)
 {
-  this->SetCustomShader(presetShaderStrings[preset].c_str());
+  if (preset != this->SelectedPreset)
+  {
+    this->SelectedPreset = preset;
+    this->Mapper->SetSplatShaderCode(this->PresetShaderStrings[preset].c_str());
+    this->Mapper->SetTriangleScale(this->PresetShaderScales[preset]);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -309,6 +350,7 @@ void vtkPointGaussianRepresentation::SetScaleByArray(bool newVal)
     this->ScaleByArray = newVal;
     this->Modified();
     this->Mapper->SetScaleArray(this->ScaleByArray ? this->LastScaleArray : NULL);
+    this->Mapper->SetScaleArrayComponent(this->ScaleByArray ? this->LastScaleArrayComponent : 0);
   }
 }
 
@@ -326,6 +368,13 @@ void vtkPointGaussianRepresentation::SelectScaleArray(int, int, int, int, const 
 }
 
 //----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SelectScaleArrayComponent(int component)
+{
+  this->LastScaleArrayComponent = component;
+  this->Mapper->SetScaleArrayComponent(this->ScaleByArray ? component : 0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SetOpacityByArray(bool newVal)
 {
   if (this->OpacityByArray != newVal)
@@ -333,6 +382,8 @@ void vtkPointGaussianRepresentation::SetOpacityByArray(bool newVal)
     this->OpacityByArray = newVal;
     this->Modified();
     this->Mapper->SetOpacityArray(this->OpacityByArray ? this->LastOpacityArray : NULL);
+    this->Mapper->SetOpacityArrayComponent(
+      this->OpacityByArray ? this->LastOpacityArrayComponent : 0);
   }
 }
 
@@ -347,6 +398,13 @@ void vtkPointGaussianRepresentation::SelectOpacityArray(int, int, int, int, cons
 {
   this->SetLastOpacityArray(name);
   this->Mapper->SetOpacityArray(this->OpacityByArray ? name : NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SelectOpacityArrayComponent(int component)
+{
+  this->LastOpacityArrayComponent = component;
+  this->Mapper->SetOpacityArrayComponent(this->OpacityByArray ? component : 0);
 }
 
 //----------------------------------------------------------------------------

@@ -248,7 +248,6 @@
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_point_array"
-                          number_of_components="1"
                           optional="1">
         </InputArrayDomain>
       </InputProperty>
@@ -291,6 +290,23 @@
           This property specifies the name of the input array to scale the splats by.
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectScaleArrayComponent"
+                         default_values="0"
+                         name="ScaleArrayComponent"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SetScaleArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for scaling.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetMapScalars"
                          default_values="1"
                          name="MapScalars"
@@ -318,13 +334,13 @@
                      panel_widget="transfer_function_editor">
         <Documentation>Set the piecewise function used to map data array to sprite size.
         ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="piecewise_functions" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="piecewise_functions"
-                 name="PiecewiseFunction" />
-        </ProxyListDomain>
+        <RangedTransferFunctionDomain name="proxy_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SetScaleArray" />
+            <Property function="ComponentSelection" name="ScaleArrayComponent" />
+          </RequiredProperties>
+        </RangedTransferFunctionDomain>
       </ProxyProperty>
       <IntVectorProperty command="SetScaleByArray"
                          default_values="0"
@@ -345,13 +361,13 @@
         <Documentation>Set the piecewise function used to map data array to sprite opacity.
         OpacityTransferFunction is only used if ScaleByArray is set and OpacityArray is
         also given.</Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="piecewise_functions" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="piecewise_functions"
-                 name="PiecewiseFunction" />
-        </ProxyListDomain>
+        <RangedTransferFunctionDomain name="proxy_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="OpacityArray" />
+            <Property function="ComponentSelection" name="OpacityArrayComponent" />
+          </RequiredProperties>
+        </RangedTransferFunctionDomain>
       </ProxyProperty>
       <IntVectorProperty command="SetOpacityByArray"
                          default_values="0"
@@ -381,6 +397,23 @@
           This property specifies the name of the input array to map to point opacity.
         </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectOpacityArrayComponent"
+                         default_values="0"
+                         name="OpacityArrayComponent"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="OpacityArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for opacity.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
                             name="Opacity"
@@ -516,23 +549,6 @@
         </Hints>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <StringVectorProperty command="SetCustomShader"
-                            defaults="
-// compute the eye position and unit direction
-//VTK::Color::Impl
-  float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);
-  if (dist2 > 9.0) { discard; }
-  float gaussian = exp(-0.5*dist2);
-  opacity = opacity*gaussian;
-"
-                            label="Custom Shader Code"
-                            name="CustomShader"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <Hints>
-          <Widget type="multi_line" />
-        </Hints>
-      </StringVectorProperty>
       <IntVectorProperty command="SelectShaderPreset"
                          default_values="1"
                          name="ShaderPreset"
@@ -550,8 +566,54 @@
                  value="4" />
           <Entry text="Square Outline"
                  value="5" />
+          <Entry text="Custom"
+                 value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetCustomTriangleScale"
+                         default_values="3"
+                         name="CustomTriangleScale"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Sets the scale of the triangle geometry drawn, automatically
+          set when using preset but needed with custom shader code
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ShaderPreset"
+                                   value="6" />
+          <!-- show this widget when using CustomShader -->
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetCustomShader"
+                            default_values="
+// This custom shader code define a gaussian blur&#xa;
+// Please take a look into vtkSMPointGaussianRepresentation.cxx&#xa;
+// for other custom shader examples&#xa;
+//VTK::Color::Impl&#xa;
+  float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);&#xa;
+  float gaussian = exp(-0.5*dist2);&#xa;
+  opacity = opacity*gaussian;&#xa;"
+                            label="Custom Shader Code"
+                            name="CustomShader"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Sets the custom shader code
+        </Documentation>
+        <Hints>
+          <Widget type="multi_line" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ShaderPreset"
+                                   value="6" />
+          <!-- show this widget when using CustomShader -->
+        </Hints>
+      </StringVectorProperty>
+
       <!-- End of PointGaussianRepresentation -->
     </RepresentationProxy>
 
@@ -575,15 +637,18 @@
           <PropertyGroup label="Point Gaussian">
             <Property name="GaussianRadius" />
             <Property name="ShaderPreset" />
+            <Property name="CustomTriangleScale" />
+            <Property name="CustomShader" />
             <Property name="Emissive" />
             <Property name="Color" />
             <Property name="ScaleByArray" />
             <Property name="SetScaleArray" />
+            <Property name="ScaleArrayComponent" />
             <Property name="ScaleTransferFunction" />
             <Property name="OpacityByArray" />
             <Property name="OpacityArray" />
+            <Property name="OpacityArrayComponent" />
             <Property name="OpacityTransferFunction" />
-            <Property name="CustomShader" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -615,15 +680,18 @@
           <PropertyGroup label="Point Gaussian">
             <Property name="GaussianRadius" />
             <Property name="ShaderPreset" />
+            <Property name="CustomTriangleScale" />
+            <Property name="CustomShader" />
             <Property name="Emissive" />
             <Property name="Color" />
             <Property name="ScaleByArray" />
             <Property name="SetScaleArray" />
+            <Property name="ScaleArrayComponent" />
             <Property name="ScaleTransferFunction" />
             <Property name="OpacityByArray" />
             <Property name="OpacityArray" />
+            <Property name="OpacityArrayComponent" />
             <Property name="OpacityTransferFunction" />
-            <Property name="CustomShader" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -635,6 +703,91 @@
       </SubProxy>
     </Extension>
 
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+          Extends standard UniformGridRepresentation by adding
+          PointGaussianRepresentation as a new type of representation.
+      </Documentation>
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointGaussianRepresentation"
+                          text="Point Gaussian" />
+      <SubProxy>
+        <Proxy name="PointGaussianRepresentation"
+               proxygroup="representations" proxyname="PointGaussianRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Point Gaussian">
+            <Property name="GaussianRadius" />
+            <Property name="ShaderPreset" />
+            <Property name="CustomTriangleScale" />
+            <Property name="CustomShader" />
+            <Property name="Emissive" />
+            <Property name="Color" />
+            <Property name="ScaleByArray" />
+            <Property name="SetScaleArray" />
+            <Property name="ScaleArrayComponent" />
+            <Property name="ScaleTransferFunction" />
+            <Property name="OpacityByArray" />
+            <Property name="OpacityArray" />
+            <Property name="OpacityArrayComponent" />
+            <Property name="OpacityTransferFunction" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Point Gaussian" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="StructuredGridRepresentation">
+      <Documentation>
+          Extends standard StructuredGridRepresentation by adding
+          PointGaussianRepresentation as a new type of representation.
+      </Documentation>
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointGaussianRepresentation"
+                          text="Point Gaussian" />
+      <SubProxy>
+        <Proxy name="PointGaussianRepresentation"
+               proxygroup="representations" proxyname="PointGaussianRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Point Gaussian">
+            <Property name="GaussianRadius" />
+            <Property name="ShaderPreset" />
+            <Property name="CustomTriangleScale" />
+            <Property name="CustomShader" />
+            <Property name="Emissive" />
+            <Property name="Color" />
+            <Property name="ScaleByArray" />
+            <Property name="SetScaleArray" />
+            <Property name="ScaleArrayComponent" />
+            <Property name="ScaleTransferFunction" />
+            <Property name="OpacityByArray" />
+            <Property name="OpacityArray" />
+            <Property name="OpacityArrayComponent" />
+            <Property name="OpacityTransferFunction" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Point Gaussian" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
 
   </ProxyGroup>
 </ServerManagerConfiguration>
