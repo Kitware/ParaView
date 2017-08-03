@@ -1,4 +1,5 @@
-#ParaView and Offscreen Rendering#        {#Offscreen}
+ParaView and Offscreen Rendering        {#Offscreen}
+================================
 
 ParaView is often used to render visualization results. While in most cases,
 the results are presented to the users on their screens or monitors, there are
