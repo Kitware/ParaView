@@ -37,7 +37,7 @@ vtkImageTransparencyFilter::~vtkImageTransparencyFilter()
 
 //-----------------------------------------------------------------------------
 int vtkImageTransparencyFilter::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // TODO - check that two inputs have been set
 
