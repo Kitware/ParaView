@@ -133,6 +133,8 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
 
   this->StateUpdateNotification = true;
   this->UpdateInputProxies = 0;
+  this->InLoadXMLState = false;
+
   this->Internals = new vtkSMSessionProxyManagerInternals;
   this->Internals->ProxyManager = this;
 
@@ -1168,8 +1170,10 @@ void vtkSMSessionProxyManager::LoadXMLState(
   {
     return;
   }
-  vtkSmartPointer<vtkSMStateLoader> spLoader;
 
+  bool prev = this->InLoadXMLState;
+  this->InLoadXMLState = true;
+  vtkSmartPointer<vtkSMStateLoader> spLoader;
   if (!loader)
   {
     spLoader = vtkSmartPointer<vtkSMStateLoader>::New();
@@ -1186,6 +1190,7 @@ void vtkSMSessionProxyManager::LoadXMLState(
     info.ProxyLocator = spLoader->GetProxyLocator();
     this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
   }
+  this->InLoadXMLState = prev;
 }
 
 //---------------------------------------------------------------------------

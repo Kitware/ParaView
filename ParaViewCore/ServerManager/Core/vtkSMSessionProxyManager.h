@@ -403,11 +403,19 @@ public:
   /**
    * Loads the state of the server manager from XML.
    * If loader is not specified, a vtkSMStateLoader instance is used.
+   * When loading XML state, `vtkSMSessionProxyManager::GetInLoadXMLState` will
+   * return true.
    */
   void LoadXMLState(const char* filename, vtkSMStateLoader* loader = NULL);
   void LoadXMLState(
     vtkPVXMLElement* rootElement, vtkSMStateLoader* loader = NULL, bool keepOriginalIds = false);
   //@}
+
+  /**
+   * Indicates if an XML state is currently being loaded. This may be used by
+   * the application to limit updates to the GUI while state is being loaded.
+   */
+  vtkGetMacro(InLoadXMLState, bool);
 
   /**
    * Save the state of the server manager in XML format in a file.
@@ -619,6 +627,7 @@ protected:
 private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
+  bool InLoadXMLState;
 
 #ifndef __WRAP__
   static vtkSMSessionProxyManager* New() { return NULL; }
