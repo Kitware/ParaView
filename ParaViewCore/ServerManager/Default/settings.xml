@@ -255,21 +255,6 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <IntVectorProperty name="DefaultTimeStep"
-        number_of_elements="1"
-        default_values="1">
-        <Documentation>
-          Any time a new dataset with timesteps is opened,
-          set the timestep the application should go to
-          by default.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Leave current time unchanged, if possible" value="0" />
-          <Entry text="Go to first timestep" value="1" />
-          <Entry text="Go to last timestep" value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
       <IntVectorProperty name="EnableAutoMPI"
         number_of_elements="1"
         default_values="0"
@@ -372,6 +357,21 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DefaultTimeStep"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Any time a new dataset with timesteps is opened,
+          set the timestep the application should go to
+          by default.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Leave current time unchanged, if possible" value="0" />
+          <Entry text="Go to first timestep" value="1" />
+          <Entry text="Go to last timestep" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="MaximumNumberOfDataRepresentationLabels"
         number_of_elements="1"
         default_values="100"
@@ -437,6 +437,8 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="InheritRepresentationProperties" />
+        <Property name="DefaultTimeStep" />
+        <Property name="MaximumNumberOfDataRepresentationLabels" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
