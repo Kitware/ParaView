@@ -57,6 +57,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 
   vtkSMProxy* wdgProxy = this->widgetProxy();
 
+  ui.translateX->setToolTip("hi");
   // Let's link some of the UI elements that only affect the interactive widget
   // properties without affecting properties on the main proxy.
   this->WidgetLinks.addPropertyLink(ui.enableTranslation, "checked", SIGNAL(toggled(bool)),
@@ -77,6 +78,11 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->addPropertyLink(
       ui.translateZ, "text2", SIGNAL(textChangedAndEditingFinished()), position, 2);
     ui.labelTranslate->setText(position->GetXMLLabel());
+    QString tooltip = this->getTooltip(position);
+    ui.translateX->setToolTip(tooltip);
+    ui.translateY->setToolTip(tooltip);
+    ui.translateZ->setToolTip(tooltip);
+    ui.labelTranslate->setToolTip(tooltip);
   }
   else
   {
@@ -99,6 +105,11 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->addPropertyLink(
       ui.rotateZ, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 2);
     ui.labelRotate->setText(rotation->GetXMLLabel());
+    QString tooltip = this->getTooltip(rotation);
+    ui.rotateX->setToolTip(tooltip);
+    ui.rotateY->setToolTip(tooltip);
+    ui.rotateZ->setToolTip(tooltip);
+    ui.labelRotate->setToolTip(tooltip);
   }
   else
   {
@@ -118,6 +129,11 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     this->addPropertyLink(ui.scaleY, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 1);
     this->addPropertyLink(ui.scaleZ, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 2);
     ui.labelScale->setText(scale->GetXMLLabel());
+    QString tooltip = this->getTooltip(scale);
+    ui.scaleX->setToolTip(tooltip);
+    ui.scaleY->setToolTip(tooltip);
+    ui.scaleZ->setToolTip(tooltip);
+    ui.labelScale->setToolTip(tooltip);
   }
   else
   {

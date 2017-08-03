@@ -591,12 +591,20 @@
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNormal"
                             default_values="1.0 0.0 0.0"
                             name="Normal"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetOffset"
@@ -660,6 +668,9 @@
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetRotation"
@@ -667,6 +678,9 @@
                             name="Rotation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetScale"
@@ -674,6 +688,9 @@
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Position" />
@@ -700,6 +717,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="1"
@@ -710,6 +730,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
@@ -734,11 +757,19 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientedAxis"
                             default_values="0. 1. 0."
                             name="Axis"
                             number_of_elements="3">
+        <Documentation>
+          Set the axis of the cylinder.  This is the direction from the center of one end of
+          the cylinder to the center of the other end.  The cylinder created has infinite length
+          but this direction controls which line through the center point the cylinder is around.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="0.5"
@@ -749,6 +780,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
         <Property function="Center" name="Center" />

@@ -22,6 +22,9 @@
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Enable/disable showing the interactive cylinder widget in the 3d render view.</string>
+     </property>
      <property name="text">
       <string>Show Cylinder</string>
      </property>
@@ -38,7 +41,7 @@
      <item row="0" column="0">
       <widget class="QCheckBox" name="outlineTranslation">
        <property name="toolTip">
-        <string>Enable/disable the ability to translate the bounding box by moving it with the mouse</string>
+        <string>Enable/disable the ability to translate the bounding box by moving it with the mouse.</string>
        </property>
        <property name="text">
         <string>Outline Translation</string>
@@ -114,6 +117,9 @@
     <layout class="QGridLayout" name="gridLayout3">
      <item row="0" column="0">
       <widget class="QPushButton" name="useXAxis">
+       <property name="toolTip">
+        <string>Use the X-axis as the cylinder's axis.</string>
+       </property>
        <property name="text">
         <string>Along X Axis</string>
        </property>
@@ -121,6 +127,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="useYAxis">
+       <property name="toolTip">
+        <string>Use the Y-axis as the cylinder's axis.</string>
+       </property>
        <property name="text">
         <string>Along Y Axis</string>
        </property>
@@ -128,6 +137,9 @@
      </item>
      <item row="2" column="0">
       <widget class="QPushButton" name="useZAxis">
+       <property name="toolTip">
+        <string>Use the Z-axis as the cylinder's axis.</string>
+       </property>
        <property name="text">
         <string>Along Z Axis</string>
        </property>
@@ -135,6 +147,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="useCameraAxis">
+       <property name="toolTip">
+        <string>Use the camera's view direction as the axis of the cylinder.</string>
+       </property>
        <property name="text">
         <string>Along Camera Axis</string>
        </property>
@@ -142,6 +157,9 @@
      </item>
      <item row="3" column="0" colspan="2">
       <widget class="QPushButton" name="resetCameraToAxis">
+       <property name="toolTip">
+        <string>Reset the camera to look along the cylinder's axis.</string>
+       </property>
        <property name="text">
         <string>Reset Camera to Axis</string>
        </property>
@@ -149,6 +167,9 @@
      </item>
      <item row="4" column="0" colspan="2">
       <widget class="QPushButton" name="resetBounds">
+       <property name="toolTip">
+        <string>Reset the cylinder's properties based on the data bounds.</string>
+       </property>
        <property name="text">
         <string>Reset to Data Bounds</string>
        </property>
