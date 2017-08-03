@@ -28,6 +28,7 @@
 // Forward declarations
 class vtkContext2DScalarBarActor;
 class vtkRenderer;
+class vtkX3DExporterWriter;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVX3DExporter : public vtkX3DExporter
 {
@@ -36,25 +37,34 @@ public:
   vtkTypeMacro(vtkPVX3DExporter, vtkX3DExporter);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
+  /**
+   * Indicates whether color legends should be exported.
+   */
+  vtkSetMacro(ExportColorLegends, bool);
+  vtkGetMacro(ExportColorLegends, bool);
+  vtkBooleanMacro(ExportColorLegends, bool);
+
 protected:
   vtkPVX3DExporter();
   ~vtkPVX3DExporter() VTK_OVERRIDE;
 
+  bool ExportColorLegends;
+
   /**
-   * Write data, including color legends, to the output.
+   * Write additional data, including color legends, to the output.
    */
-  void WriteData() VTK_OVERRIDE;
+  void WriteAdditionalNodes(vtkX3DExporterWriter* writer) VTK_OVERRIDE;
 
   /**
    * Write out color legends.
    */
-  void WriteColorLegends();
+  void WriteColorLegends(vtkX3DExporterWriter* writer);
 
   /**
    * Write out a single color legend.
    */
   void WriteColorLegend(vtkRenderer* bottomRenderer, vtkRenderer* annotationRenderer,
-    vtkContext2DScalarBarActor* actor);
+    vtkContext2DScalarBarActor* actor, vtkX3DExporterWriter* writer);
 
 private:
   vtkPVX3DExporter(const vtkPVX3DExporter&) VTK_DELETE_FUNCTION;
