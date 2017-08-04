@@ -77,6 +77,7 @@ namespace
 template <class T>
 bool IsIdTypeBigEnough(const T& val)
 {
+  (void)val;
   return (sizeof(vtkIdType) >= sizeof(T) || static_cast<T>(vtkTypeTraits<vtkIdType>::Max()) >= val);
 }
 
