@@ -186,8 +186,8 @@ int vtkPVArrayCalculator::RequestData(
     }
   }
 
-  dataAttrs = input->GetAttributes(this->AttributeType);
-  numTuples = input->GetNumberOfElements(this->AttributeType);
+  dataAttrs = input->GetAttributes(attributeType);
+  numTuples = input->GetNumberOfElements(attributeType);
 
   if (numTuples > 0)
   {
