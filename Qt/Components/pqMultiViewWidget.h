@@ -206,6 +206,12 @@ protected slots:
   */
   void viewAdded(pqView*);
 
+  /**
+  * called when the vtkSMViewLayoutProxy is changed in order to synchronize
+  * the separator width and color with the user inputs.
+  */
+  void updateSplitter();
+
 protected:
   /**
   * Called whenever a new frame needs to be created for a view. Note that view

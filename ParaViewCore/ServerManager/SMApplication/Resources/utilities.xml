@@ -2643,6 +2643,22 @@
           e.g. view frames, view toolbars etc.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="SeparatorWidth"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+	  The width of the separator (in pixels) to be displayed in preview mode.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="SeparatorColor"
+        number_of_elements="3"
+        default_values="0.937 0.922 0.906">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          The color of the separator to be displayed in preview mode.
+        </Documentation>
+      </DoubleVectorProperty>
     </ViewLayoutProxy>
     <Proxy class="vtkViewLayout"
            name="InternalViewLayoutHelper"
@@ -4068,7 +4084,7 @@
 
       <IntVectorProperty name="SeparatorWidth"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
@@ -4085,7 +4101,7 @@
 
       <DoubleVectorProperty name="SeparatorColor"
         number_of_elements="3"
-        default_values="0 0 0"
+       default_values="0.937 0.922 0.906"
         panel_widget="color_selector_with_palette"
         panel_visibility="advanced">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />

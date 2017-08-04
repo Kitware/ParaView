@@ -57,8 +57,8 @@ public:
   static void saveScreenshot();
 
   /**
-   * Save a screenshot given the filename and image properties.
-   */
+  * Save a screenshot given the filename and image properties.
+  */
   static bool saveScreenshot(
     const QString& filename, const QSize& size, int quality, bool all_views = false);
 
