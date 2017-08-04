@@ -81,6 +81,11 @@ public:
   void setTabVisibility(bool visible);
   bool tabVisibility() const;
 
+  /**
+  * Return the layout proxy.
+  */
+  vtkSMViewLayoutProxy* getLayoutProxy() const;
+
 signals:
   /**
   * fired when lockViewSize() is called.
@@ -235,6 +240,7 @@ protected:
      * Enter/exit preview mode
      */
     bool preview(const QSize&);
+    void togglePreview();
 
     //@{
     /**
@@ -247,9 +253,10 @@ protected:
     //@}
   private:
     Q_DISABLE_COPY(pqTabWidget)
-    bool ReadOnly;
     bool InPreviewMode;
+    bool ReadOnly;
     bool TabBarVisibility;
+    bool magnified;
     friend class pqTabbedMultiViewWidget;
   };
 

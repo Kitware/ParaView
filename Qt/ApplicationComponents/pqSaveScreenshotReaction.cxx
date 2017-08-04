@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
@@ -119,7 +120,6 @@ void pqSaveScreenshotReaction::saveScreenshot()
 
   vtkSMViewProxy* viewProxy = view->getViewProxy();
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
-  int showWindowDecorations = -1;
 
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
@@ -130,6 +130,8 @@ void pqSaveScreenshotReaction::saveScreenshot()
     qCritical() << "Incorrect type for `SaveScreenshot` proxy.";
     return;
   }
+
+  bool restorePreviewMode = false;
 
   // Cache the separator width and color
   int width = vtkSMPropertyHelper(shProxy, "SeparatorWidth").GetAsInt();
@@ -152,13 +154,19 @@ void pqSaveScreenshotReaction::saveScreenshot()
   vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
   controller->PostInitializeProxy(shProxy);
 
-  if (shProxy->UpdateSaveAllViewsPanelVisibility())
+  shProxy->UpdateSaveAllViewsPanelVisibility();
+  if (layout)
   {
-    Q_ASSERT(layout != NULL);
-    // let's hide window decorations.
-    vtkSMPropertyHelper helper(layout, "ShowWindowDecorations");
-    showWindowDecorations = helper.GetAsInt();
-    helper.Set(0);
+    int previewMode[2] = { -1, -1 };
+    vtkSMPropertyHelper previewHelper(layout, "PreviewMode");
+    previewHelper.Get(previewMode, 2);
+    if (previewMode[0] == 0 && previewMode[1] == 0)
+    {
+      // If we are not in the preview mode, enter it with maximum size possible
+      vtkVector2i layoutSize = layout->GetSize();
+      previewHelper.Set(layoutSize.GetData(), 2);
+      restorePreviewMode = true;
+    }
   }
 
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());
@@ -181,9 +189,11 @@ void pqSaveScreenshotReaction::saveScreenshot()
     // Reset the separator width and color
     vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
     vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
-    if (showWindowDecorations != -1)
+    // Reset to the previous preview resolution or exit preview mode
+    if (restorePreviewMode)
     {
-      vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+      int psize[2] = { 0, 0 };
+      vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
     }
     layout->UpdateVTKObjects();
     widthLink->RemoveAllLinks();

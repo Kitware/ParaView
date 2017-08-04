@@ -42,6 +42,7 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
+#include "vtkVector.h"
 #include <vector> // needed for std::vector.
 
 class vtkSMViewProxy;
@@ -252,6 +253,12 @@ public:
    * provided for the whole layout.
    */
   void SetSize(const int size[2]);
+  vtkVector2i GetSize()
+  {
+    int extent[4];
+    this->GetLayoutExtent(extent);
+    return vtkVector2i(extent[1] - extent[0] + 1, extent[3] - extent[2] + 1);
+  }
 
   /**
    * Helper method to locate a layout, if any that contains the specified view

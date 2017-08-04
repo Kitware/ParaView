@@ -205,7 +205,6 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , Internals(new pqInternals(this))
   , DecorationsVisible(true)
-  , ForceSplitter(false)
 {
   qApp->installEventFilter(this);
 
@@ -277,9 +276,6 @@ void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
       internals.ObserverIds.push_back(
         vlayout->GetProperty("SeparatorColor")
           ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiViewWidget::updateSplitter));
-      internals.Links.addPropertyLink(this, "decorationsVisibility",
-        SIGNAL(decorationsVisibilityChanged(bool)), vlayout,
-        vlayout->GetProperty("ShowWindowDecorations"));
     }
   }
   // we delay the setting of the LayoutManager to avoid the duplicate `reload`
@@ -513,89 +509,52 @@ QWidget* pqMultiViewWidget::createWidget(
 
     case vtkSMViewLayoutProxy::VERTICAL:
     case vtkSMViewLayoutProxy::HORIZONTAL:
-      if (this->DecorationsVisible || this->ForceSplitter)
+      pqSplitter* splitter = qobject_cast<pqSplitter*>(this->Internals->Widgets[index]);
+      if (!splitter)
       {
-        pqSplitter* splitter = qobject_cast<pqSplitter*>(this->Internals->Widgets[index]);
-        if (!splitter)
-        {
-          splitter = new pqSplitter(parentWdg);
-        }
-        Q_ASSERT(splitter);
+        splitter = new pqSplitter(parentWdg);
+      }
+      Q_ASSERT(splitter);
 
-        this->Internals->Widgets[index] = splitter;
-        splitter->setParent(parentWdg);
-        if (this->DecorationsVisible)
-        {
-          splitter->setHandleWidth(3);
-          splitter->setSplitterHandlePaint(false);
-        }
-        else
-        {
-          splitter->setHandleWidth(0);
-          splitter->setSplitterHandlePaint(true);
-        }
-        splitter->setObjectName(QString("Splitter.%1").arg(index));
-        splitter->setProperty("FRAME_INDEX", QVariant(index));
-        splitter->setOpaqueResize(false);
-        splitter->setOrientation(
-          direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
-        splitter->insertWidget(
-          0, this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
-        splitter->insertWidget(
-          1, this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
-
-        // set the sizes are percentage. QSplitter uses the initially specified
-        // sizes as reference.
-        QList<int> sizes;
-        sizes << static_cast<int>(vlayout->GetSplitFraction(index) * 10000);
-        sizes << static_cast<int>((1.0 - vlayout->GetSplitFraction(index)) * 10000);
-        splitter->setSizes(sizes);
-
-        // FIXME: Don't like this as this QueuedConnection may cause multiple
-        // renders.
-        QObject::disconnect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()));
-        QObject::connect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()),
-          Qt::QueuedConnection);
-        if (max_index < index)
-        {
-          max_index = index;
-        }
-        return splitter;
+      this->Internals->Widgets[index] = splitter;
+      splitter->setParent(parentWdg);
+      if (this->DecorationsVisible)
+      {
+        splitter->setHandleWidth(3);
+        splitter->setSplitterHandlePaint(false);
       }
       else
       {
-        QWidget* container = this->Internals->Widgets[index];
-        // since old widget may be a splitter, which is a QWidget too, we
-        // compare with className rather than using a `qobject_cast`.
-        if (strcmp(container->metaObject()->className(), "QWidget") != 0)
-        {
-          container = new QWidget(parentWdg);
-          new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
-              ? pqSplitterLayout::TopToBottom
-              : pqSplitterLayout::LeftToRight,
-            container);
-        }
-        Q_ASSERT(container);
-        container->setObjectName(QString("Container.%1").arg(index));
-        this->Internals->Widgets[index] = container;
-
-        pqSplitterLayout* slayout = dynamic_cast<pqSplitterLayout*>(container->layout());
-        Q_ASSERT(slayout);
-        slayout->setDirection(direction == vtkSMViewLayoutProxy::VERTICAL
-            ? pqSplitterLayout::TopToBottom
-            : pqSplitterLayout::LeftToRight);
-        slayout->setSplitFraction(vlayout->GetSplitFraction(index));
-        slayout->addWidget(
-          this->createWidget(vlayout->GetFirstChild(index), vlayout, container, max_index));
-        slayout->addWidget(
-          this->createWidget(vlayout->GetSecondChild(index), vlayout, container, max_index));
-        if (max_index < index)
-        {
-          max_index = index;
-        }
-        return container;
+        splitter->setHandleWidth(0);
+        splitter->setSplitterHandlePaint(true);
       }
-      break;
+      splitter->setObjectName(QString("Splitter.%1").arg(index));
+      splitter->setProperty("FRAME_INDEX", QVariant(index));
+      splitter->setOpaqueResize(false);
+      splitter->setOrientation(
+        direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
+      splitter->insertWidget(
+        0, this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
+      splitter->insertWidget(
+        1, this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
+
+      // set the sizes are percentage. QSplitter uses the initially specified
+      // sizes as reference.
+      QList<int> sizes;
+      sizes << static_cast<int>(vlayout->GetSplitFraction(index) * 10000);
+      sizes << static_cast<int>((1.0 - vlayout->GetSplitFraction(index)) * 10000);
+      splitter->setSizes(sizes);
+
+      // FIXME: Don't like this as this QueuedConnection may cause multiple
+      // renders.
+      QObject::disconnect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()));
+      QObject::connect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()),
+        Qt::QueuedConnection);
+      if (max_index < index)
+      {
+        max_index = index;
+      }
+      return splitter;
   }
   return NULL;
 }

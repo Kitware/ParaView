@@ -2640,12 +2640,12 @@
     <ViewLayoutProxy name="ViewLayout"
                      processes="client">
       <Documentation>Proxy used to manage layout for mutliple views.</Documentation>
-      <IntVectorProperty name="ShowWindowDecorations"
-        number_of_elements="1"
-        default_values="1">
+      <IntVectorProperty name="PreviewMode"
+        number_of_elements="2"
+        default_values="0 0">
         <Documentation>
-          Set whether the UI should show extra decorations for the layout
-          e.g. view frames, view toolbars etc.
+          Set the target resolution for the preview mode to display,
+          [0, 0] is interpreted as exiting preview.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="SeparatorWidth"

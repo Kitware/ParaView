@@ -40,8 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
@@ -72,6 +75,7 @@ pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
   , ReadOnly(false)
   , InPreviewMode(false)
   , TabBarVisibility(true)
+  , magnified(false)
 {
 }
 
@@ -180,51 +184,67 @@ void pqTabbedMultiViewWidget::pqTabWidget::setTabBarVisibility(bool val)
 }
 
 //-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
+void pqTabbedMultiViewWidget::pqTabWidget::togglePreview()
 {
-  if (nsize.isEmpty())
+  if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
   {
-    // exit preview mode.
-    if (this->InPreviewMode)
+    vtkSMViewLayoutProxy* vlayout = widget->layoutManager();
+    if (vlayout)
     {
-      this->InPreviewMode = false;
-      this->tabBar()->setVisible(this->TabBarVisibility);
-      this->setDocumentMode(false);
-      this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-      if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
+      int resolution[2] = { 0, 0 };
+      vtkSMPropertyHelper(vlayout, "PreviewMode").Get(resolution, 2);
+      if (resolution[0] == 0 || resolution[1] == 0)
       {
-        widget->setForceSplitter(false);
+        // exit preview mode
+        this->InPreviewMode = false;
+        this->tabBar()->setVisible(this->TabBarVisibility);
+        this->setDocumentMode(false);
+        this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        this->magnified = false;
         widget->setDecorationsVisible(true);
       }
+      else
+      {
+        // enter preview mode
+        this->InPreviewMode = true;
+        this->tabBar()->setVisible(false);
+        this->setDocumentMode(true);
+        widget->setDecorationsVisible(false);
+
+        vtkVector2i tsize(resolution[0], resolution[1]);
+        const QRect crect = this->parentWidget()->contentsRect();
+        vtkVector2i csize(crect.width(), crect.height());
+        this->magnified = (vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize) > 1);
+        this->setMaximumSize(QSize(csize[0], csize[1]));
+      }
     }
-    return true;
   }
-  else
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
+{
+  int resolution[2];
+  if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
   {
-    // enter preview mode.
-    this->InPreviewMode = true;
-    this->tabBar()->setVisible(false);
-    this->setDocumentMode(true);
-    bool retval = true;
-
-    const vtkVector2i tsize(nsize.width(), nsize.height());
-    // max available size is clamped by parent widget's contentsRect.
-    const QRect crect = this->parentWidget()->contentsRect();
-    vtkVector2i csize(crect.width(), crect.height());
-    const int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
-    if (magnification > 1)
+    vtkSMViewLayoutProxy* vlayout = widget->layoutManager();
+    if (vlayout)
     {
-      retval = false; // cannot respect size. using aspect ratio only.
+      if (nsize.isEmpty())
+      {
+        resolution[0] = 0;
+        resolution[1] = 0;
+      }
+      else
+      {
+        resolution[0] = nsize.width();
+        resolution[1] = nsize.height();
+      }
+      vtkSMPropertyHelper(vlayout, "PreviewMode").Set(resolution, 2);
+      return nsize.isEmpty() || !this->magnified;
     }
-    this->setMaximumSize(QSize(csize[0], csize[1]));
-
-    if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
-    {
-      widget->setForceSplitter(true);
-      widget->setDecorationsVisible(false);
-    }
-    return retval;
   }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,7 +409,11 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
 {
   if (proxy->getSMGroup() == "layouts" && proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
   {
-    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy()));
+    auto vlayout = vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy());
+    this->createTab(vlayout);
+    vlayout->GetProperty("PreviewMode")
+      ->AddObserver(vtkCommand::ModifiedEvent, this->Internals->TabWidget,
+        &pqTabbedMultiViewWidget::pqTabWidget::togglePreview);
   }
   else if (qobject_cast<pqView*>(proxy))
   {
@@ -794,4 +818,14 @@ void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item
       return;
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMViewLayoutProxy* pqTabbedMultiViewWidget::getLayoutProxy() const
+{
+  if (auto widget = qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget()))
+  {
+    return widget->layoutManager();
+  }
+  return nullptr;
 }

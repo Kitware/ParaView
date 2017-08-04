@@ -134,22 +134,6 @@ public slots:
   void hideDecorations() { this->setDecorationsVisible(false); }
 
   /**
-   * This API is added temporarily and will be removed in the future.
-   * This is added to make the pqMultiViewWidget use QSplitter even when
-   * `DecorationsVisible` is set to false. Thus allowing views to be resized
-   * even when decorations are hidden. In reality, we should be able to simply
-   * use QSplitter with 0 handle width when decorations are hidden always.
-   * However, when an empty frame is present, the QSplitter sizing doesn't work
-   * as expected when saving screenshots of specific sizes. We need to
-   * investigate entering preview mode automatically when saving screenshots
-   * (#17552). When that's fixed, this can be removed.
-   *
-   * This method should be called before calling `setDecorationsVisible(false)`.
-   * Default value is false.
-   */
-  void setForceSplitter(bool val) { this->ForceSplitter = val; }
-
-  /**
   * Locks the maximum size for each view-frame to the given size.
   * Use empty QSize() instance to indicate no limits.
   */
@@ -237,8 +221,6 @@ private:
   pqInternals* Internals;
 
   bool DecorationsVisible;
-  bool ForceSplitter;
-
   QSize LockViewSize;
 };
 

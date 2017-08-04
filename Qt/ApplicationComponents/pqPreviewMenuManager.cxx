@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMViewLayoutProxy.h"
 
 #include <QDialog>
 #include <QIntValidator>
@@ -92,6 +95,7 @@ pqPreviewMenuManager::pqPreviewMenuManager(QMenu* menu)
                << "1920 x 1080 (FHD)"
                << "3840 x 2160 (4K UHD)";
   this->init(defaultItems, menu);
+  this->connect(menu, SIGNAL(aboutToShow()), SLOT(onPreviewModeChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -326,4 +330,38 @@ void pqPreviewMenuManager::unlock()
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   Q_ASSERT(viewManager);
   viewManager->preview(QSize());
+}
+
+//-----------------------------------------------------------------------------
+void pqPreviewMenuManager::onPreviewModeChanged()
+{
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  auto layout = viewManager->getLayoutProxy();
+  if (layout)
+  {
+    int resolution[2];
+    vtkSMPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
+    if (resolution[0] == 0 && resolution[1] == 0)
+    {
+      // make sure every item in the menu is unlocked
+      this->unlock();
+    }
+    else
+    {
+      // find the corresponding item and lock it, otherwise create one
+      if (QAction* act = this->findAction(resolution[0], resolution[1]))
+      {
+        this->lockResolution(resolution[0], resolution[1]);
+      }
+      else
+      {
+        if (this->prependCustomResolution(resolution[0], resolution[0], QString()))
+        {
+          this->updateCustomActions();
+          this->lockResolution(resolution[0], resolution[1]);
+        }
+      }
+    }
+  }
 }
