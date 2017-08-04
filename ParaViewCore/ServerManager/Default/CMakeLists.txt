@@ -53,6 +53,7 @@ set (Module_SRCS
   vtkSMPSWriterProxy.cxx
   vtkSMReaderReloadHelper.cxx
   vtkSMRenderViewExporterProxy.cxx
+  vtkSMSpreadSheetRepresentationInitializationHelper.cxx
   vtkSMTesting.cxx
   vtkSMTooltipSelectionPipeline.cxx
   vtkSMViewExportHelper.cxx

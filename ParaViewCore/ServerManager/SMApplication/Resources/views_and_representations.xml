@@ -7453,6 +7453,9 @@
         <Documentation>Internal property. Please don't touch
         this.</Documentation>
       </InputProperty>
+      <Hints>
+        <InitializationHelper class="vtkSMSpreadSheetRepresentationInitializationHelper" />
+      </Hints>
       <!-- end of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
     <!-- =================================================================== -->

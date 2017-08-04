@@ -24,37 +24,30 @@ widely used and hence left out of this discussion.
 
 ##Terminology##
 
-###Desktop Qt client###
+A brief explanation of the terms:
 
-This refers to the Qt-based GUI. This is launched using the **paraview**
-executable.
+* **Desktop Qt client**: This refers to the Qt-based GUI. This is launched using
+  the **paraview** executable.
 
-###Command line executables###
+* **Command line executables**: This refers to all other ParaView executables,
+  e.g. **pvserver**, **pvdataserver**, **pvrenderserver**, **pvpython**,
+  and **pvbatch**.
 
-This refers to all other ParaView executables, e.g. **pvserver**,
-**pvdataserver**, **pvrenderserver**, **pvpython**, and **pvbatch**.
+* **Onscreen**: Onscreen refers to the case where the rendering results are
+  presented to the users in a viewable window. On Linux, this invariably requires
+  a running and accessible X server. The desktop Qt client can only operate in
+  on-screen mode and hence needs an accessible X server.
 
-###Onscreen###
+* **Offscreen**: Offscreen simply means that the rendering results are not presented
+  to the user in a window. On Linux, this does not automatically imply that an
+  accessible X server is not needed. X server may be needed, unless ParaView
+  was built with an OpenGL implementation that allows for headless operation.
+  This mode is not applicable to the desktop Qt client and is only supported
+  by the command line executables.
 
-Onscreen refers to the case where the rendering results are presented to the
-users in a viewable window. On Linux, this invariably requires a running and
-accessible X server. The desktop Qt client can only
-operate in on-screen mode and hence needs an accessible X server.
-
-###Offscreen###
-
-Offscreen simply means that the rendering results are not presented to the user
-in a window. On Linux, this does not automatically imply that an accessible X
-server is not needed. X server may be needed, unless ParaView was built with
-an OpenGL implementation that allows for headless operation. This mode is not
-applicable to the desktop Qt client and is only supported by the command line
-executables.
-
-###Headless###
-
-Headless rendering automatically implies offscreen rendering. In addition, on
-Linux, it implies that the rendering does not require an accessible X server nor
-will it make any X calls.
+* **Headless**: Headless rendering automatically implies offscreen rendering.
+  In addition, on Linux, it implies that the rendering does not require an
+  accessible X server nor will it make any X calls.
 
 **Onscreen** and **offscreen** support is built by default. Thus ParaView
 binaries available from paraview.org support these modes. **Headless** support
