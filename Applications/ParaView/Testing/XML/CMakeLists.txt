@@ -529,6 +529,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceExodus.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceExportAndSaveData.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceStatisticsFilter.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/SaveLoadStatePython.xml
   )
@@ -776,6 +777,11 @@ IF (PARAVIEW_USE_MPI)
   set(SelectionLinkMultiple_DISABLE_CS TRUE)
   set(SelectionLinkRemove_DISABLE_CS TRUE)
   set(SelectionLinkReaction_DISABLE_CS TRUE)
+
+  if (PARAVIEW_ENABLE_PYTHON)
+    set (TraceStatisticsFilter_DISABLE_CS TRUE)
+    set (TraceStatisticsFilter_DISABLE_CRS TRUE)
+  endif()
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin
