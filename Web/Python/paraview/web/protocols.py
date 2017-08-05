@@ -2210,7 +2210,6 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             simple.LoadState(fileToLoad[0])
             newView = simple.Render()
             simple.SetActiveView(newView)
-            simple.ResetCamera()
             if self.getApplication():
                 self.getApplication().InvokeEvent('ResetActiveView')
                 self.getApplication().InvokeEvent('PushRender')
