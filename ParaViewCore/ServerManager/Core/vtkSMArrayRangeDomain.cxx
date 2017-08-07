@@ -42,6 +42,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 
   vtkSMProperty* propForInput = this->GetRequiredProperty("Input");
   vtkSMProperty* propForArraySelection = this->GetRequiredProperty("ArraySelection");
+  vtkSMProperty* propForComponentSelection = this->GetRequiredProperty("ComponentSelection");
   if (!propForInput || !propForArraySelection)
   {
     return;
@@ -59,16 +60,24 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
   {
     return;
   }
+
+  int component = -1;
+  if (propForComponentSelection)
+  {
+    vtkSMUncheckedPropertyHelper componentSelectionHelper(propForComponentSelection);
+    component = componentSelectionHelper.GetAsInt();
+  }
   if (vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()) != NULL)
   {
     this->Update(arrayName, arraySelectionHelper.GetAsInt(3),
-      vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()), inputHelper.GetOutputPort());
+      vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()), inputHelper.GetOutputPort(),
+      component);
   }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(
-  const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer, int producerPort)
+void vtkSMArrayRangeDomain::Update(const char* arrayName, int fieldAssociation,
+  vtkSMSourceProxy* producer, int producerPort, int component)
 {
   assert(producer != NULL && arrayName != NULL);
 
@@ -83,7 +92,6 @@ void vtkSMArrayRangeDomain::Update(
 
   vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(arrayName, fieldAssociation);
 
-  int component_number = VTK_INT_MAX;
   if (arrayInfo == NULL &&
     (fieldAssociation == vtkDataObject::POINT || fieldAssociation == vtkDataObject::CELL))
   {
@@ -105,9 +113,10 @@ void vtkSMArrayRangeDomain::Update(
       arrayInfo = arrayInfo ? arrayInfo : info->GetArrayInformation(name.c_str(), otherField);
     }
 
-    // Now, extract component information. If name == arrayName, it means we
-    // don't have any component information in the array name itself.
-    if (arrayInfo && (name != arrayName))
+    // Now, extract static component information if no dynamic component have been specified.
+    // If name == arrayName, it means we don't have any component information in the array name
+    // itself.
+    if (component == -1 && arrayInfo && (name != arrayName))
     {
       int mangledCompNo = vtkSMArrayListDomain::ComponentIndexFromMangledName(arrayInfo, arrayName);
       // ComponentIndexFromMangledName returns -1 on error and num_of_component
@@ -117,14 +126,7 @@ void vtkSMArrayRangeDomain::Update(
       {
         return;
       }
-      if (mangledCompNo >= arrayInfo->GetNumberOfComponents())
-      {
-        component_number = -1;
-      }
-      else
-      {
-        component_number = mangledCompNo;
-      }
+      component = mangledCompNo;
     }
   }
 
@@ -133,12 +135,24 @@ void vtkSMArrayRangeDomain::Update(
     std::vector<vtkEntry> values;
     this->SetEntries(values);
   }
-  else if (component_number < arrayInfo->GetNumberOfComponents())
+
+  // component is -1 when undefined and num_of_component
+  // for magnitude. Which is not what vtkPVArrayInformation expects, this
+  // converts it.
+  else if (component >= 0)
   {
     // a particular component was chosen, add ranges for that.
     std::vector<vtkEntry> values(1);
     values[0].Valid[0] = values[0].Valid[1] = true;
-    values[0].Value = vtkTuple<double, 2>(arrayInfo->GetComponentRange(component_number));
+
+    if (component < arrayInfo->GetNumberOfComponents())
+    {
+      values[0].Value = vtkTuple<double, 2>(arrayInfo->GetComponentRange(component));
+    }
+    else
+    {
+      values[0].Value = vtkTuple<double, 2>(arrayInfo->GetComponentRange(-1));
+    }
     this->SetEntries(values);
   }
   else

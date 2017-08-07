@@ -51,8 +51,8 @@ protected:
   vtkSMArrayRangeDomain();
   ~vtkSMArrayRangeDomain();
 
-  void Update(
-    const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer, int producerPort);
+  void Update(const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer,
+    int producerPort, int component = -1);
 
   friend class vtkSMBoundsDomain;
 
