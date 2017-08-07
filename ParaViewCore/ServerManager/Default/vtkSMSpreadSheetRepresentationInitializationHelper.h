@@ -39,7 +39,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMSpreadSheetRepresentationInitializat
 public:
   static vtkSMSpreadSheetRepresentationInitializationHelper* New();
   vtkTypeMacro(vtkSMSpreadSheetRepresentationInitializationHelper, vtkSMProxyInitializationHelper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
 
