@@ -1009,3 +1009,11 @@ vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationManager()
   }
   return this->CollaborationCommunicator;
 }
+
+//-----------------------------------------------------------------------------
+int vtkSMSessionClient::GetConnectID()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* options = pm->GetOptions();
+  return options->GetConnectID();
+}

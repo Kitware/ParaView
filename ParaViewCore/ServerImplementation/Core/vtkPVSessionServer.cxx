@@ -119,6 +119,124 @@ public:
   //-----------------------------------------------------------------
   void SetClientURL(const char* client_url) { this->ClientURL = client_url; }
   //-----------------------------------------------------------------
+  void SetBaseURL(const char* url) { this->BaseURL = url; }
+  //-----------------------------------------------------------------
+  std::string ComputeURL(const char* url)
+  {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkPVOptions* options = pm->GetOptions();
+
+    vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
+    vtksys::RegularExpression pvserver_reverse("^csrc://([^:]+)(:([0-9]+))?");
+    vtksys::RegularExpression pvrenderserver("^cdsrs://([^:]+)(:([0-9]+))?/([^:]+)(:([0-9]+))?");
+    vtksys::RegularExpression pvrenderserver_reverse(
+      "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
+
+    std::ostringstream handshake;
+    handshake << "handshake=paraview-" << PARAVIEW_VERSION;
+    // Add connect-id if needed. The connect-id is added to the handshake that
+    // must match on client and server processes.
+    if (options->GetConnectID() != 0)
+    {
+      handshake << ".connect_id." << options->GetConnectID();
+    }
+    // Add rendering backend information.
+    handshake << ".renderingbackend.opengl2";
+
+    // for forward connections, port number 0 is acceptable, while for
+    // reverse-connections it's not.
+    std::string client_url;
+    if (pvserver.find(url))
+    {
+      int port = atoi(pvserver.match(3).c_str());
+      port = (port < 0) ? 11111 : port;
+
+      std::ostringstream stream;
+      stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
+      stream << ((this->Owner->MultipleConnection && !this->Owner->DisableFurtherConnections)
+          ? "&multiple=true"
+          : "");
+      client_url = stream.str();
+    }
+    else if (pvserver_reverse.find(url))
+    {
+      std::string hostname = pvserver_reverse.match(1);
+      int port = atoi(pvserver_reverse.match(3).c_str());
+      port = (port <= 0) ? 11111 : port;
+      std::ostringstream stream;
+      stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
+      client_url = stream.str();
+    }
+    else if (pvrenderserver.find(url))
+    {
+      int dsport = atoi(pvrenderserver.match(3).c_str());
+      dsport = (dsport < 0) ? 11111 : dsport;
+
+      int rsport = atoi(pvrenderserver.match(6).c_str());
+      rsport = (rsport < 0) ? 22221 : rsport;
+
+      if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
+      {
+        std::ostringstream stream;
+        stream << "tcp://localhost:" << rsport << "?listen=true&" << handshake.str();
+        client_url = stream.str();
+      }
+      else if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_DATA_SERVER)
+      {
+        std::ostringstream stream;
+        stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
+        stream << ((this->Owner->MultipleConnection && !this->Owner->DisableFurtherConnections)
+            ? "&multiple=true"
+            : "");
+        client_url = stream.str();
+      }
+    }
+    else if (pvrenderserver_reverse.find(url))
+    {
+      std::string dataserverhost = pvrenderserver_reverse.match(1);
+      int dsport = atoi(pvrenderserver_reverse.match(3).c_str());
+      dsport = (dsport <= 0) ? 11111 : dsport;
+
+      std::string renderserverhost = pvrenderserver_reverse.match(4);
+      int rsport = atoi(pvrenderserver_reverse.match(6).c_str());
+      rsport = (rsport <= 0) ? 22221 : rsport;
+
+      if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
+      {
+        std::ostringstream stream;
+        stream << "tcp://" << dataserverhost.c_str() << ":" << rsport << "?" << handshake.str();
+        client_url = stream.str();
+      }
+      else if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_DATA_SERVER)
+      {
+        std::ostringstream stream;
+        stream << "tcp://" << renderserverhost.c_str() << ":" << dsport << "?" << handshake.str();
+        client_url = stream.str();
+      }
+    }
+
+    return client_url;
+  }
+
+  //-----------------------------------------------------------------
+  void UpdateClientURL()
+  {
+    std::string url = this->ComputeURL(this->BaseURL.c_str());
+    this->SetClientURL(url.c_str());
+  }
+
+  //-----------------------------------------------------------------
+  void SetConnectID(int newConnectID)
+  {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkPVOptions* options = pm->GetOptions();
+    if (options->GetConnectID() != newConnectID)
+    {
+      options->SetConnectID(newConnectID);
+      this->UpdateClientURL();
+    }
+  }
+  //-----------------------------------------------------------------
   void NotifyOtherClients(const vtkSMMessage* msgToBroadcast)
   {
     std::string data = msgToBroadcast->SerializeAsString();
@@ -201,6 +319,7 @@ private:
   vtkNew<vtkCompositeMultiProcessController> CompositeMultiProcessController;
   vtkWeakPointer<vtkPVSessionServer> Owner;
   std::string ClientURL;
+  std::string BaseURL;
   std::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
   bool SatelliteServerSession;
 };
@@ -214,6 +333,7 @@ vtkPVSessionServer::vtkPVSessionServer()
 
   // By default we act as a server for a single client
   this->MultipleConnection = false;
+  this->DisableFurtherConnections = false;
 
   // On server side only one session is available so we just set it Active()
   // forever
@@ -326,94 +446,9 @@ bool vtkPVSessionServer::Connect(const char* url)
     return true;
   }
 
+  this->Internal->SetBaseURL(url);
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
-  vtkPVOptions* options = pm->GetOptions();
-
-  vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
-  vtksys::RegularExpression pvserver_reverse("^csrc://([^:]+)(:([0-9]+))?");
-  vtksys::RegularExpression pvrenderserver("^cdsrs://([^:]+)(:([0-9]+))?/([^:]+)(:([0-9]+))?");
-  vtksys::RegularExpression pvrenderserver_reverse(
-    "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
-
-  std::ostringstream handshake;
-  handshake << "handshake=paraview-" << PARAVIEW_VERSION;
-  // Add connect-id if needed. The connect-id is added to the handshake that
-  // must match on client and server processes.
-  if (options->GetConnectID() != 0)
-  {
-    handshake << ".connect_id." << options->GetConnectID();
-  }
-  // Add rendering backend information.
-  handshake << ".renderingbackend.opengl2";
-
-  // for forward connections, port number 0 is acceptable, while for
-  // reverse-connections it's not.
-  std::string client_url;
-  if (pvserver.find(url))
-  {
-    int port = atoi(pvserver.match(3).c_str());
-    port = (port < 0) ? 11111 : port;
-
-    std::ostringstream stream;
-    stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
-    stream << (this->MultipleConnection ? "&multiple=true" : "");
-    client_url = stream.str();
-  }
-  else if (pvserver_reverse.find(url))
-  {
-    std::string hostname = pvserver_reverse.match(1);
-    int port = atoi(pvserver_reverse.match(3).c_str());
-    port = (port <= 0) ? 11111 : port;
-    std::ostringstream stream;
-    stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
-    client_url = stream.str();
-  }
-  else if (pvrenderserver.find(url))
-  {
-    int dsport = atoi(pvrenderserver.match(3).c_str());
-    dsport = (dsport < 0) ? 11111 : dsport;
-
-    int rsport = atoi(pvrenderserver.match(6).c_str());
-    rsport = (rsport < 0) ? 22221 : rsport;
-
-    if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-    {
-      std::ostringstream stream;
-      stream << "tcp://localhost:" << rsport << "?listen=true&" << handshake.str();
-      client_url = stream.str();
-    }
-    else if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_DATA_SERVER)
-    {
-      std::ostringstream stream;
-      stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
-      stream << (this->MultipleConnection ? "&multiple=true" : "");
-      client_url = stream.str();
-    }
-  }
-  else if (pvrenderserver_reverse.find(url))
-  {
-    std::string dataserverhost = pvrenderserver_reverse.match(1);
-    int dsport = atoi(pvrenderserver_reverse.match(3).c_str());
-    dsport = (dsport <= 0) ? 11111 : dsport;
-
-    std::string renderserverhost = pvrenderserver_reverse.match(4);
-    int rsport = atoi(pvrenderserver_reverse.match(6).c_str());
-    rsport = (rsport <= 0) ? 22221 : rsport;
-
-    if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-    {
-      std::ostringstream stream;
-      stream << "tcp://" << dataserverhost.c_str() << ":" << rsport << "?" << handshake.str();
-      client_url = stream.str();
-    }
-    else if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_DATA_SERVER)
-    {
-      std::ostringstream stream;
-      stream << "tcp://" << renderserverhost.c_str() << ":" << dsport << "?" << handshake.str();
-      client_url = stream.str();
-    }
-  }
-
+  std::string client_url = this->Internal->ComputeURL(url);
   vtkMultiProcessController* ccontroller = nam->NewConnection(client_url.c_str());
   this->Internal->SetClientURL(client_url.c_str());
   if (ccontroller)
@@ -423,7 +458,8 @@ bool vtkPVSessionServer::Connect(const char* url)
     cout << "Client connected." << endl;
   }
 
-  if (this->MultipleConnection && this->Internal->GetActiveController())
+  if (this->MultipleConnection && !this->DisableFurtherConnections &&
+    this->Internal->GetActiveController())
   {
     // Listen for new client controller creation
     nam->AddObserver(
@@ -444,6 +480,48 @@ bool vtkPVSessionServer::GetIsAlive()
 
   // TODO: check for validity
   return (this->Internal->GetActiveController() != NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::SetDisableFurtherConnections(bool disable)
+{
+  if (this->DisableFurtherConnections != disable)
+  {
+    this->DisableFurtherConnections = disable;
+    this->Internal->UpdateClientURL();
+
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+    vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(pm->GetOptions());
+    int port = options->GetServerPort();
+    nam->DisableFurtherConnections(port, disable);
+
+    if (!disable)
+    {
+      nam->AddObserver(
+        vtkCommand::ConnectionCreatedEvent, this->Internal, &vtkInternals::CreateController);
+    }
+    else
+    {
+      nam->RemoveObservers(vtkCommand::ConnectionCreatedEvent);
+    }
+
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::SetConnectID(int newConnectID)
+{
+  this->Internal->SetConnectID(newConnectID);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSessionServer::GetConnectID()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* options = pm->GetOptions();
+  return options->GetConnectID();
 }
 
 //----------------------------------------------------------------------------

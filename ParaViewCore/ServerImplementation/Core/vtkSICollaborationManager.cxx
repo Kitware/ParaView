@@ -66,7 +66,7 @@ public:
     }
   }
 
-  bool UpdateUserNamesAndMaster(vtkSMMessage* msg)
+  bool UpdateFromUsers(vtkSMMessage* msg)
   {
     bool findChanges = false;
     this->DisableBroadcast = true;
@@ -81,6 +81,16 @@ public:
       {
         findChanges = findChanges || (this->MultiProcessController->GetMasterController() != id);
         this->MultiProcessController->SetMasterController(id);
+
+        if (this->ServerSession)
+        {
+          findChanges = findChanges || (this->ServerSession->GetDisableFurtherConnections() !=
+                                         user->disable_further_connections());
+          this->ServerSession->SetDisableFurtherConnections(user->disable_further_connections());
+          unsigned int serverConnectId = this->ServerSession->GetConnectID();
+          findChanges = findChanges || serverConnectId != user->connect_id();
+          this->ServerSession->SetConnectID(user->connect_id());
+        }
       }
     }
     this->DisableBroadcast = false;
@@ -110,6 +120,11 @@ public:
       if (userId == master)
       {
         user->set_is_master(true);
+      }
+      if (this->ServerSession)
+      {
+        user->set_disable_further_connections(this->ServerSession->GetDisableFurtherConnections());
+        user->set_connect_id(this->ServerSession->GetConnectID());
       }
     }
 
@@ -161,7 +176,7 @@ void vtkSICollaborationManager::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSICollaborationManager::Push(vtkSMMessage* msg)
 {
-  if (this->Internal->UpdateUserNamesAndMaster(msg) && this->Internal->CanBroadcast())
+  if (this->Internal->UpdateFromUsers(msg) && this->Internal->CanBroadcast())
   {
     this->BroadcastToClients(this->Internal->BuildServerStateMessage());
   }

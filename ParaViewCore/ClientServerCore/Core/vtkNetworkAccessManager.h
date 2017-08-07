@@ -86,6 +86,11 @@ public:
    */
   virtual bool GetPendingConnectionsPresent() = 0;
 
+  /**
+   * Enable/disable further connections for given port.
+   */
+  virtual void DisableFurtherConnections(int port, bool disable) = 0;
+
 protected:
   vtkNetworkAccessManager();
   ~vtkNetworkAccessManager() override;

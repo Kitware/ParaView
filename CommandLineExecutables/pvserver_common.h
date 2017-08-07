@@ -64,6 +64,8 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
 
   vtkPVSessionServer* session = vtkPVSessionServer::New();
   session->SetMultipleConnection(options->GetMultiClientMode() != 0);
+  session->SetDisableFurtherConnections(options->GetDisableFurtherConnections() != 0);
+
   int process_id = controller->GetLocalProcessId();
   if (process_id == 0)
   {

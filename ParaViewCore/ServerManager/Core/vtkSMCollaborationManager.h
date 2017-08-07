@@ -100,6 +100,11 @@ public:
   virtual int GetMasterId();
 
   /**
+   * Return true if further connections are disabled.
+   */
+  bool GetDisableFurtherConnections();
+
+  /**
    * Return the id of the current client
    */
   virtual int GetUserId();
@@ -136,6 +141,17 @@ public:
    */
   void UpdateUserInformations();
 
+  /**
+   * Return the server connect id if this is the master.
+   * Else return -1.
+   */
+  int GetServerConnectID();
+
+  /**
+   * Return the client connect id.
+   */
+  int GetConnectID();
+
   enum EventType
   {
     CollaborationNotification = 12345,
@@ -161,6 +177,18 @@ public:
    * informations or to forward messages across clients
    */
   void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+
+  /**
+   * Enable or disable further connections to the server.
+   * Already connected clients stay connected.
+   */
+  void DisableFurtherConnections(bool disable);
+
+  /**
+   * Change the connect-id. Already connected clients stay connected.
+   * @param connectID the new connect-id for the server.
+   */
+  void SetConnectID(int connectID);
 
 protected:
   /**

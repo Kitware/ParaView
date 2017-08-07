@@ -54,6 +54,7 @@ vtkPVOptions::vtkPVOptions()
   this->ClientMode = 0;
   this->ServerMode = 0;
   this->MultiClientMode = 0;
+  this->DisableFurtherConnections = 0;
   this->MultiClientModeWithErrorMacro = 0;
   this->MultiServerMode = 0;
   this->RenderServerMode = 0;
@@ -152,6 +153,11 @@ void vtkPVOptions::Initialize()
     "Allow server to keep listening for several clients to"
     "connect to it and share the same visualization session."
     "While keeping the error macro on the server session for debug.",
+    vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--disable-further-connections", 0, &this->DisableFurtherConnections,
+    "Disable further connections after the first client connects."
+    "Does nothing without --multi-clients enabled.",
     vtkPVOptions::PVDATA_SERVER | vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--multi-servers", 0, &this->MultiServerMode,
@@ -463,6 +469,12 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   {
     os << indent << "Allow several clients to connect to a server.\n";
   }
+
+  if (this->DisableFurtherConnections)
+  {
+    os << indent << "Disable further connections after the first client connects to a server..\n";
+  }
+
   if (this->MultiServerMode)
   {
     os << indent << "Allow a client to connect to multiple servers at the same time.\n";

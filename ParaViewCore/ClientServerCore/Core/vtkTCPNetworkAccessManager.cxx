@@ -147,6 +147,31 @@ bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
 }
 
 //----------------------------------------------------------------------------
+void vtkTCPNetworkAccessManager::DisableFurtherConnections(int port, bool disable)
+{
+  if (disable)
+  {
+    if (this->Internals->ServerSockets.find(port) != this->Internals->ServerSockets.end())
+    {
+      this->Internals->ServerSockets.at(port)->CloseSocket();
+      this->Internals->ServerSockets.erase(port);
+    }
+  }
+  else
+  {
+    vtkServerSocket* server_socket = vtkServerSocket::New();
+    if (server_socket->CreateServer(port) != 0)
+    {
+      vtkErrorMacro("Failed to set up server socket.");
+      server_socket->Delete();
+      return;
+    }
+    this->Internals->ServerSockets[port] = server_socket;
+    server_socket->FastDelete();
+  }
+}
+
+//----------------------------------------------------------------------------
 bool vtkTCPNetworkAccessManager::GetNetworkEventsAvailable()
 {
   return (this->ProcessEventsInternal(1, false) == 1);
@@ -304,11 +329,12 @@ void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode)
                     "**********************************************************************\n");
       break;
     case HANDSHAKE_DIFFERENT_CONNECTION_IDS:
-      vtkErrorMacro("\n"
-                    "**********************************************************************\n"
-                    " Connection failed during handshake.  The server has a different connection id"
-                    " than the client.\n"
-                    "**********************************************************************\n");
+      vtkWarningMacro("\n"
+                      " Wrong connect-id: \n"
+                      " The client cannot connect to the server because their connection ids\n"
+                      " are not the same. Change your connect-id and try again.\n");
+
+      this->InvokeEvent(vtkCommand::UserEvent);
       break;
     case HANDSHAKE_DIFFERENT_RENDERING_BACKENDS:
       vtkErrorMacro("\n"

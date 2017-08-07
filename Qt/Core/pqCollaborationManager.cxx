@@ -436,6 +436,25 @@ void pqCollaborationManager::enableMousePointerSharing(bool enable)
 {
   this->Internals->BroadcastMouseLocation = enable;
 }
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::disableFurtherConnections(bool disable)
+{
+  if (this->Internals->ActiveCollaborationManager)
+  {
+    this->Internals->ActiveCollaborationManager->DisableFurtherConnections(disable);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::setConnectID(int connectID)
+{
+  if (this->Internals->ActiveCollaborationManager)
+  {
+    this->Internals->ActiveCollaborationManager->SetConnectID(connectID);
+  }
+}
+
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds)
 {

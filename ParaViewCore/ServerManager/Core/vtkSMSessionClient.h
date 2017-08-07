@@ -176,6 +176,11 @@ public:
    */
   vtkSMCollaborationManager* GetCollaborationManager() VTK_OVERRIDE;
 
+  /**
+   * Return the connect id of this client.
+   */
+  int GetConnectID();
+
   //---------------------------------------------------------------------------
   // API for GlobalId management
   //---------------------------------------------------------------------------
