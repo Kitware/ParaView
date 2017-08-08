@@ -5,8 +5,7 @@ very specific web application.
 
 from __future__ import absolute_import, division, print_function
 
-import os, sys, types, inspect, traceback, logging, re, json, fnmatch
-from time import time
+import os, sys, types, inspect, traceback, logging, re, json, fnmatch, time
 
 # import Twisted reactor for later callback
 from twisted.internet import reactor
@@ -116,17 +115,18 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
                     self.overrideDataDirKey = basePair[0]
             else:
                 self.baseDirectory = basePath
+            self.baseDirectory = os.path.normpath(self.baseDirectory)
         else:
             baseDirs = basePath.split('|')
             for baseDir in baseDirs:
                 basePair = baseDir.split('=')
                 if os.path.exists(basePair[1]):
-                    self.baseDirectoryMap[basePair[0]] = basePair[1]
+                    self.baseDirectoryMap[basePair[0]] = os.path.normpath(basePair[1])
 
             # Check if we ended up with just a single directory
             bdKeys = list(self.baseDirectoryMap)
             if len(bdKeys) == 1:
-                self.baseDirectory = self.baseDirectoryMap[bdKeys[0]]
+                self.baseDirectory = os.path.normpath(self.baseDirectoryMap[bdKeys[0]])
                 self.overrideDataDirKey = bdKeys[0]
                 self.baseDirectoryMap = {}
             elif len(bdKeys) > 1:
@@ -338,9 +338,9 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
         """
         RPC Callback to render a view and obtain the rendered image.
         """
-        beginTime = int(round(time() * 1000))
+        beginTime = int(round(time.time() * 1000))
         view = self.getView(options["view"])
-        size = [view.ViewSize[0], view.ViewSize[1]]
+        size = view.ViewSize[0:2]
         resize = size != options.get("size", size)
         if resize:
             size = options["size"]
@@ -372,13 +372,13 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
             reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
 
         reply["stale"] = app.GetHasImagesBeingProcessed(view.SMProxy)
-        reply["mtime"] = app.GetLastStillRenderToStringMTime()
-        reply["size"] = [view.ViewSize[0], view.ViewSize[1]]
+        reply["mtime"] = app.GetLastStillRenderToMTime()
+        reply["size"] = view.ViewSize[0:2]
         reply["format"] = "jpeg;base64"
         reply["global_id"] = view.GetGlobalIDAsString()
         reply["localTime"] = localTime
 
-        endTime = int(round(time() * 1000))
+        endTime = int(round(time.time() * 1000))
         reply["workTime"] = (endTime - beginTime)
 
         return reply
@@ -390,10 +390,10 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 # =============================================================================
 
 class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebPublishImageDelivery):
-    def __init__(self):
+    def __init__(self, decode=True):
         # multiple inheritance - ParaViewWebProtocol methods take priority, i.e. stillRender()
         # PVW init called second so Application is initialized properly.
-        vtk_protocols.vtkWebPublishImageDelivery.__init__(self)
+        vtk_protocols.vtkWebPublishImageDelivery.__init__(self, decode)
         ParaViewWebProtocol.__init__(self)
 
     @exportRpc("viewport.image.push")
@@ -401,9 +401,9 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebP
         """
         RPC Callback to render a view and obtain the rendered image.
         """
-        beginTime = int(round(time() * 1000))
+        beginTime = int(round(time.time() * 1000))
         view = self.getView(options["view"])
-        size = [view.ViewSize[0], view.ViewSize[1]]
+        size = view.ViewSize[0:2]
         resize = size != options.get("size", size)
         if resize:
             size = options["size"]
@@ -419,7 +419,11 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebP
             localTime = options["localTime"]
         reply = {}
         app = self.getApplication()
-        reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+        if self.decode:
+            stillRender = app.StillRenderToString
+        else:
+            stillRender = app.StillRenderToBuffer
+        reply_image = stillRender(view.SMProxy, t, quality)
 
         # Check that we are getting image size we have set if not wait until we
         # do.
@@ -427,21 +431,27 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebP
         while resize and list(app.GetLastStillRenderImageSize()) != size \
               and size != [0, 0] and tries > 0:
             app.InvalidateCache(view.SMProxy)
-            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+            reply_image = stillRender(view.SMProxy, t, quality)
             tries -= 1
 
         if not resize and options and ("clearCache" in options) and options["clearCache"]:
             app.InvalidateCache(view.SMProxy)
-            reply["image"] = app.StillRenderToString(view.SMProxy, t, quality)
+            reply_image = stillRender(view.SMProxy, t, quality)
 
         reply["stale"] = app.GetHasImagesBeingProcessed(view.SMProxy)
-        reply["mtime"] = app.GetLastStillRenderToStringMTime()
-        reply["size"] = [view.ViewSize[0], view.ViewSize[1]]
-        reply["format"] = "jpeg;base64"
+        reply["mtime"] = app.GetLastStillRenderToMTime()
+        reply["size"] = view.ViewSize[0:2]
+        reply["memsize"] = reply_image.GetDataSize() if reply_image else 0
+        reply["format"] = "jpeg;base64" if self.decode else "jpeg"
         reply["global_id"] = view.GetGlobalIDAsString()
         reply["localTime"] = localTime
+        if self.decode:
+            reply["image"] = reply_image
+        else:
+            # Convert the vtkUnsignedCharArray into a bytes object, required by Autobahn websockets
+            reply["image"] = memoryview(reply_image).tobytes() if reply_image else None
 
-        endTime = int(round(time() * 1000))
+        endTime = int(round(time.time() * 1000))
         reply["workTime"] = (endTime - beginTime)
 
         return reply
@@ -897,7 +907,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Scale and bias the x values, which come in between 0.0 and 1.0, to the
         # current scalar range
-        for i in range(len(pointArray) / 4):
+        for i in range(len(pointArray) // 4):
             idx = i * 4
             x = pointArray[idx]
             pointArray[idx] = (x * (cMax - cMin)) + cMin
@@ -922,7 +932,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Scale and bias the x values, which come in between 0.0 and 1.0, to the
         # current scalar range
-        for i in range(len(pointArray) / 4):
+        for i in range(len(pointArray) // 4):
             idx = i * 4
             result.append({
                 'x': (pointArray[idx] - cMin) / (cMax - cMin),
@@ -1124,6 +1134,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Use the vtk data encoder to base-64 encode the image as png, using no compression
         encoder = vtkDataEncoder()
+        # two calls in a row crash on Windows - bald timing hack to avoid the crash.
+        time.sleep(0.01);
         b64Str = encoder.EncodeAsBase64Png(imgData, 0)
 
         return { 'range': dataRange, 'image': b64Str }
@@ -2234,7 +2246,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                          'reason': 'No configured reader found for ' + extension + ' files, and unconfigured readers are not enabled.' }
 
         # Rename the reader proxy
-        name = fileToLoad[0].split("/")[-1]
+        name = fileToLoad[0].split(os.path.sep)[-1]
         if len(name) > 15:
             name = name[:15] + '*'
         simple.RenameSource(name, reader)
@@ -2723,8 +2735,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         if relativeDir == '.':
             result['label'] = self.rootName
 
-        # Filter files to create groups
-        files.sort()
+        # Filter files to create groups. Dicts are not orderable in Py3 - supply a key function.
+        files.sort(key=lambda x: x["label"])
         groups = result['groups']
         groupIdx = {}
         filesToRemove = []

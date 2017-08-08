@@ -89,7 +89,12 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObjec
         formattersModule.TakeReference(PyImport_ImportModule("pygments.formatters"));
         htmlFormatterClass.TakeReference(PyObject_GetAttrString(formattersModule, "HtmlFormatter"));
       }
+
+#ifdef VTK_PY3K
+      vtkSmartPyObject pythonLexerClass(PyObject_GetAttrString(lexersModule, "Python3Lexer"));
+#else
       vtkSmartPyObject pythonLexerClass(PyObject_GetAttrString(lexersModule, "PythonLexer"));
+#endif
       vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
       this->Internals->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, NULL));
       this->Internals->HtmlFormatter.TakeReference(
