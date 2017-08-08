@@ -24,7 +24,7 @@
  * for that type of data set attribute. When adding new arrays, if there
  * is an existing array of the same name and attribute type, the new array
  * will have the name mangled to be the original array name plus
- * "_input_<inputid>" where <inputid> is the id/index of the input filter
+ * `_input_<inputid>` where `<inputid>` is the id/index of the input filter
  * that is providing that array.
 */
 
