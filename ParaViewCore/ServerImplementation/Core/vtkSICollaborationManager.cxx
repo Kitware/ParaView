@@ -121,8 +121,8 @@ public:
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventId),
     void* vtkNotUsed(callData)) override
   {
-    // A client has disconnect, let's notify the clients left
-    if (this->Owner)
+    // A client has (dis)connect, let's notify the other clients
+    if (this->Owner && this->CanBroadcast())
     {
       this->Owner->BroadcastToClients(this->BuildServerStateMessage());
     }
