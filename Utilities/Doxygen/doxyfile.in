@@ -51,6 +51,9 @@ INPUT                = \
 EXCLUDE              = \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
 
+# Exclude module testing directories.
+EXCLUDE_PATTERNS     = */Testing/Cxx/* */Testing/Python/*
+
 
 # TAGFILES           = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk@VTK_MAJOR_VERSION@-nightly.tag"=http://www.vtk.org/doc/nightly/html
 TAGFILES             = @TAGFILES@
@@ -79,7 +82,7 @@ RECURSIVE            = YES
 ALPHABETICAL_INDEX   = YES
 COLS_IN_ALPHA_INDEX  = 3
 IGNORE_PREFIX        = vtkPV vtkSM vtk pq vtkCP
-
+DOT_GRAPH_MAX_NODES  = 100
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES

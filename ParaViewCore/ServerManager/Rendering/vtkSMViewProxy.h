@@ -225,7 +225,8 @@ protected:
    * simply captures the image from the render window for the view. Subclasses
    * may override this for cases where that's not sufficient.
    *
-   * @param[in] magnification The magnification factor to use for generating the image.
+   * @param[in] magnificationX The X magnification factor to use for generating the image.
+   * @param[in] magnificationY The Y magnification factor to use for generating the image.
    * @returns A new vtkImageData instance or nullptr. Caller is responsible for
    *          calling `vtkImageData::Delete()` on the returned non-null value.
    */
