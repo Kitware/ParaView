@@ -547,9 +547,11 @@ class PropertyTraceHelper(object):
     def get_property_trace(self, in_ctor):
         """return trace-text for the property.
 
-        :param in_ctor: if False, the trace is generated trace will use
-        fully-scoped name when referring to the property e.g. sphere0.Radius=2,
-        else it will use just the property name e.g. Radius=2."""
+        :param in_ctor: If False, the trace is generated trace will use
+            fully-scoped name when referring to the property e.g.
+            sphere0.Radius=2, else it will use just the property name, *e.g.*,
+            Radius=2.
+        """
         varname = self.get_varname(in_ctor)
         if in_ctor: return "%s=%s" % (varname, self.get_value())
         else: return "%s = %s" % (varname, self.get_value())
@@ -557,9 +559,10 @@ class PropertyTraceHelper(object):
     def get_varname(self, not_fully_scoped=False):
         """Returns the variable name to use when referring to this property.
 
-        :param not_fully_scoped: if False, this will return
-        fully-scoped name when referring to the property e.g. sphere0.Radius,
-        else it will use just the property name e.g. Radius"""
+        :param not_fully_scoped: If False, this will return
+            fully-scoped name when referring to the property e.g. sphere0.Radius,
+            else it will use just the property name, *e.g.*, Radius.
+        """
         return self.PropertyName if not_fully_scoped else self.FullScopedName
 
     def get_value(self):
@@ -1390,8 +1393,8 @@ def get_current_trace_output(raw=False):
 def get_current_trace_output_and_reset(raw=False):
     """Equivalent to calling::
 
-            get_current_trace_output(raw)
-            reset_trace_output()
+        get_current_trace_output(raw)
+        reset_trace_output()
     """
 
     output = get_current_trace_output(raw)

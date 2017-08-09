@@ -582,22 +582,25 @@ def SetProperties(proxy=None, **params):
 
 def GetProperty(*arguments, **keywords):
     """Get one property of the given pipeline object. If keywords are used,
-       you can set the proxy and the name of the property that you want to get
-       like in the following example::
+    you can set the proxy and the name of the property that you want to get
+    as shown in the following example::
 
-            GetProperty({proxy=sphere, name="Radius"})
+        GetProperty({proxy=sphere, name="Radius"})
 
-       If it's arguments that are used, then you have two case:
-         - if only one argument is used that argument will be
-           the property name.
-         - if two arguments are used then the first one will be
-           the proxy and the second one the property name.
-       Several example are given below::
+    If arguments are used, then you have two cases:
 
-           GetProperty({name="Radius"})
-           GetProperty({proxy=sphereProxy, name="Radius"})
-           GetProperty( sphereProxy, "Radius" )
-           GetProperty( "Radius" )
+    - if only one argument is used that argument will be
+      the property name.
+
+    - if two arguments are used then the first one will be
+      the proxy and the second one the property name.
+
+    Several example are given below::
+
+        GetProperty({name="Radius"})
+        GetProperty({proxy=sphereProxy, name="Radius"})
+        GetProperty( sphereProxy, "Radius" )
+        GetProperty( "Radius" )
     """
     name = None
     proxy = None
@@ -805,29 +808,25 @@ def Delete(proxy=None):
 #==============================================================================
 
 def GetActiveView():
-    """.. _GetActiveView:
-        Returns the active view."""
+    """Returns the active view."""
     return active_objects.view
 
 # -----------------------------------------------------------------------------
 
 def SetActiveView(view):
-    """.. _SetActiveView:
-        Sets the active view."""
+    """Sets the active view."""
     active_objects.view = view
 
 # -----------------------------------------------------------------------------
 
 def GetActiveSource():
-    """.. _GetActiveSource:
-        Returns the active source."""
+    """Returns the active source."""
     return active_objects.source
 
 # -----------------------------------------------------------------------------
 
 def SetActiveSource(source):
-    """.. _SetActiveSource:
-        Sets the active source."""
+    """Sets the active source."""
     active_objects.source = source
 
 # -----------------------------------------------------------------------------
@@ -1001,58 +1000,76 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
 
     `SaveScreenshot` is used to save the rendering results to an image.
 
-    Parameters:
-    -----------
-        filename (str): name of the image file to save to. The filename extension
-            is used to determine the type of image file generated. Supported
-            extensions are `png`, `jpg`, `tif`, `bmp`, and `ppm`.
-        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
-            from, defaults to None. If None, then the active view is used, if
-            available. To save image from a single view, this must be set to a
-            view, to save an image from all views in a layout, pass the layout.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
-        ImageResolution (tuple(int, int)): a 2-tuple to specify the
-            output image resolution in pixels as `(width, height)`. If not
-            specified, the view (or layout) size is used.
-        FontScaling (str): specify whether to scale fonts
-            proportionally (`"Scale fonts proportionally"`) or
-            not (`"Do not scale fonts"`). Defaults to `"Scale fonts
-            proportionally"`.
-        SeparatorWidth (int): when saving multiple views in a
-            layout, specify the width (in approximate pixels) for a spearator
-            between views in the generated image.
-        SeparatorColor (tuple(float, float, float)): specify the
-            color for separator between views, if applicable.
-        OverrideColorPalette (:obj:str, optional): name of the color palette to
-            use, if any. If none specified, current color palette remains
-            unchanged.
-        StereoMode (str): stereo mode to use, if any. Available
-            values are `"No stereo"`,`"Red-Blue"`, `"Interlaced"`,
-            `"Left Eye Only"`, `"Right Eye Only"`, `"Dresden"`,
-            `"Anaglyph"`, `"Checkerboard"`, `"Side-by-Side Horizontal"`, and the
-            default `"No change"`.
-        TransparentBackground (int): set to 1 (or True) to save
-            an image with background set to alpha=0, if supported by the output
-            image format.
-        ImageQuality (int): set a number in the range [0, 100] to
-            specify the output image quality/compression. 0 is least
-            quality/most compressed, while 100 means best quality/least
-            compressed.
+        filename (str)
+          Name of the image file to save to. The filename extension is used to
+          determine the type of image file generated. Supported extensions are
+          `png`, `jpg`, `tif`, `bmp`, and `ppm`.
 
-    Legacy Parameters:
-    ------------------
+        viewOrLayout (``proxy``, optional):
+          The view or layout to save image from, defaults to None. If None, then
+          the active view is used, if available. To save image from a single
+          view, this must be set to a view, to save an image from all views in a
+          layout, pass the layout.
+
+    **Keyword Parameters (optional)**
+
+        ImageResolution (tuple(int, int))
+          A 2-tuple to specify the output image resolution in pixels as
+          `(width, height)`. If not specified, the view (or layout) size is
+          used.
+
+        FontScaling (str)
+          Specify whether to scale fonts proportionally (`"Scale fonts
+          proportionally"`) or not (`"Do not scale fonts"`). Defaults to
+          `"Scale fonts proportionally"`.
+
+        SeparatorWidth (int)
+          When saving multiple views in a layout, specify the width (in
+          approximate pixels) for a separator between views in the generated
+          image.
+
+        SeparatorColor (tuple(float, float, float))
+          Specify the color for separator between views, if applicable.
+
+        OverrideColorPalette (:obj:str, optional)
+          Name of the color palette to use, if any. If none specified, current
+          color palette remains unchanged.
+
+        StereoMode (str)
+          Stereo mode to use, if any. Available values are `"No stereo"`,
+          `"Red-Blue"`, `"Interlaced"`, `"Left Eye Only"`, `"Right Eye Only"`,
+          `"Dresden"`, `"Anaglyph"`, `"Checkerboard"`,
+          `"Side-by-Side Horizontal"`, and the default `"No change"`.
+
+        TransparentBackground (int)
+          Set to 1 (or True) to save an image with background set to alpha=0, if
+          supported by the output image format.
+
+        ImageQuality (int)
+          Set a number in the range [0, 100] to specify the output image
+          quality/compression. 0 is least quality/most compressed, while 100
+          means best quality/least compressed.
+
+    **Legacy Parameters**
+
         Prior to ParaView version 5.4, the following parameters were available
-        and are still supported. However, cannot be used together with other
-        keyword parameters documented earlier.
+        and are still supported. However, they cannot be used together with
+        other keyword parameters documented earlier.
 
-        view (proxy): single view to save image from.
-        layout (proxy): layout to save image from.
-        magnification (int): magnification factor to use to save the output
-            image. The current view (or layout) size is scaled by the
-            magnification factor provided.
-        quality (int): output image quality, a number in the range [0, 100].
+        view (proxy)
+          Single view to save image from.
+
+        layout (proxy)
+          Layout to save image from.
+
+        magnification (int)
+          Magnification factor to use to save the output image. The current view
+          (or layout) size is scaled by the magnification factor provided.
+
+        quality (int)
+          Output image quality, a number in the range [0, 100].
     """
     # Let's handle backwards compatibility.
     # Previous API for this method took the following arguments:
@@ -1095,36 +1112,44 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
     a series of images.
 
-    Parameters:
-    -----------
-        filename (str): name of the output file. The extension is used to
-            determine the type of the output. Supported extensions are `png`,
-            `jpg`, `tif`, `bmp`, and `ppm`. Based on platform (and build)
-            configuration, `avi` and `ogv` may be supported as well.
-        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
-            from, defaults to None. If None, then the active view is used, if
-            available. To save image from a single view, this must be set to a
-            view, to save an image from all views in a layout, pass the layout.
-        scene (:obj:`proxy`, optional): animation scene to save. If None, then
-            the active scene returned by `GetAnimationScene` is used.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
-        `SaveAnimation` supports all keyword parameters suppored by
+        filename (str)
+          Name of the output file. The extension is used to determine the type
+          of the output. Supported extensions are `png`, `jpg`, `tif`, `bmp`,
+          and `ppm`. Based on platform (and build) configuration, `avi` and
+          `ogv` may be supported as well.
+
+        viewOrLayout (``proxy``, optional)
+          The view or layout to save image from, defaults to None. If None, then
+          the active view is used, if available. To save image from a single
+          view, this must be set to a view, to save an image from all views in a
+          layout, pass the layout.
+
+        scene (``proxy``, optional)
+          Animation scene to save. If None, then the active scene returned by
+          `GetAnimationScene` is used.
+
+    **Keyword Parameters (optional)**
+
+        `SaveAnimation` supports all keyword parameters supported by
         `SaveScreenshot`. In addition, the following parameters are supported:
 
-        DisconnectAndSave (int): in client-server mode (with rendering-capable
-            server), set this to 1 to disconnect from the server and let the
-            server save the animation out before terminating. In that case, the
-            filename specifies a path on the server. Defaults to 0, in which
-            case the animation is saved on the client.
+        DisconnectAndSave (int):
+          In client-server mode (with rendering-capable server), set this to 1
+          to disconnect from the server and let the server save the animation
+          out before terminating. In that case, the filename specifies a path on
+          the server. Defaults to 0, in which case the animation is saved on the
+          client.
 
-        FrameRate (int): frame rate in frames per second for the output. This
-            only affects the output when generated movies (`avi` or `ogv`), and
-            not when saving the animation out as a series of images.
+        FrameRate (int):
+          Frame rate in frames per second for the output. This only affects the
+          output when generated movies (`avi` or `ogv`), and not when saving the
+          animation out as a series of images.
 
-        FrameWindow (tuple(int,int)):  to save a part of the animation,
-            provide the range in frames or timesteps index.
+        FrameWindow (tuple(int,int))
+          To save a part of the animation, provide the range in frames or
+          timesteps index.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1156,22 +1181,26 @@ def WriteAnimation(filename, **params):
     Use :func:`SaveAnimation` instead.
 
     This function can still be used to save an animation, but using
-    `SaveAnimation` is strongly recommended as it provides more flexibility.
+    :func: `SaveAnimation` is strongly recommended as it provides more
+    flexibility.
 
     The following parameters are currently supported.
 
-    Parameters
-    ----------
-        filename (str): name of the output file.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
+        filename (str)
+          Name of the output file.
 
-        Magnification (int): magnification factor for the saved animation.
+    **Keyword Parameters (optional)**
 
-        Quality (int): int in range [0,2].
+        Magnification (int):
+          Magnification factor for the saved animation.
 
-        FrameRate (int): frame rate.
+        Quality (int)
+          int in range [0,2].
+
+        FrameRate (int)
+          Frame rate.
 
     The following parameters are no longer supported and are ignored:
     Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
@@ -1603,9 +1632,11 @@ def GetTimeTrack():
 
 def LoadXML(xmlstring, ns=None):
     """Given a server manager XML as a string, parse and process it.
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as the second arguments:
-    LoadXML(xmlstring, globals())
+    If you loaded the simple module with ``from paraview.simple import *``,
+    make sure to pass ``globals()`` as the second arguments::
+
+        LoadXML(xmlstring, globals())
+
     Otherwise, the new functions will not appear in the global namespace."""
     if not ns:
         ns = globals()
@@ -1616,10 +1647,11 @@ def LoadXML(xmlstring, ns=None):
 
 def LoadPlugin(filename, remote=True, ns=None):
     """Loads a ParaView plugin and updates this module with new constructors
-    if any. The remote argument (default to True) is to specify whether
-    the plugin will be loaded on client (remote=False) or on server (remote=True).
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as an argument::
+    if any. The remote argument (default to ``True``) is to specify whether
+    the plugin will be loaded on client (``remote=False``) or on server
+    (``remote=True``).
+    If you loaded the simple module with ``from paraview.simple import *``,
+    make sure to pass ``globals()`` as an argument::
 
         LoadPlugin("myplugin", False, globals()) # to load on client
         LoadPlugin("myplugin", True, globals())  # to load on server
@@ -1657,9 +1689,10 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
 #==============================================================================
 def LoadCustomFilters(filename, ns=None):
     """Loads a custom filter XML file and updates this module with new
-    constructors if any.
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as an argument."""
+    constructors if any. If you loaded the simple module with
+    ``from paraview.simple import *``, make sure to pass ``globals()`` as an
+    argument.
+    """
     servermanager.ProxyManager().SMProxyManager.LoadCustomProxyDefinitions(filename)
     if not ns:
         ns = globals()

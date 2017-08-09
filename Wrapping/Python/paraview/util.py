@@ -6,10 +6,12 @@ def SetOutputWholeExtent(algorithm, extent):
     Convenience method to help set the WHOLE_EXTENT() in RequestInformation.
     Commonly used by programmable filters. The arguments are the algorithm
     and a tuple/list with 6 elements (xmin, xmax, ymin, ymax, zmin, zmax).
-    Example use:
-     import paraview.util
-     # The output will be of dimensions 10, 1, 1
-     paraview.util.SetOutputWholeExtent(algorithm, (0, 9, 0, 0, 0, 0)
+
+    Example use::
+
+        import paraview.util
+        # The output will be of dimensions 10, 1, 1
+        paraview.util.SetOutputWholeExtent(algorithm, (0, 9, 0, 0, 0, 0)
     """
     if len(extent) != 6:
         raise "Expected a sequence of length 6"
