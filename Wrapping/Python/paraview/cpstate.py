@@ -317,22 +317,36 @@ class cpstate_filter_proxies_to_serialize(object):
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     cinema_tracks, cinema_arrays):
-    """
-        Method that will dump the current pipeline and return it as a string trace
-        - export_rendering    : boolean telling if we want to export rendering
-        - simulation_input_map: string->string map with key being the proxyname
-                                while value being the simulation input name.
-        - screenshot_info     : map with information about screenshots
-                                key -> view proxy name
-                                value -> [filename, writefreq, fitToScreen,
-                                          magnification, width, height,
-                                          cinemacamera options]
-        - cinema_tracks       : map with information about cinema tracks to record
-                                key -> proxy name
-                                value -> argument ranges
-        - cinema_arrays       : map with information about value arrays to be exported
-                                key -> proxy name
-                                value -> list of array names
+    """Method that will dump the current pipeline and return it as a string trace.
+
+    export_rendering
+      boolean telling if we want to export rendering
+
+    simulation_input_map
+      string->string map with key being the proxyname while value being the
+      simulation input name.
+
+    screenshot_info
+      map with information about screenshots
+
+      * key -> view proxy name
+
+      * value -> [filename, writefreq, fitToScreen, magnification, width, height,
+        cinemacamera options]
+
+    cinema_tracks
+      map with information about cinema tracks to record
+
+      * key -> proxy name
+
+      * value -> argument ranges
+
+    cinema_arrays
+      map with information about value arrays to be exported
+
+      * key -> proxy name
+
+      * value -> list of array names
     """
 
     # reset the global variables.

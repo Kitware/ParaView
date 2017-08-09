@@ -95,6 +95,9 @@ class vtkPVLUTReader:
   number of ParaView's "ColorMap" elements define LUT entries.
 
   Usage:
+
+  ::
+
      # at the top of your script
      # create the reader and load LUT's
      lr = lookuptable.vtkPVLUTReader()
@@ -118,6 +121,9 @@ class vtkPVLUTReader:
      Render()
 
   File Format:
+
+  ::
+
       <ColorMaps>
           ...
         <ColorMap name="LUTName" space="Lab,RGB,HSV" indexedLookup="true,false">
@@ -127,7 +133,7 @@ class vtkPVLUTReader:
           <NaN r="val" g="val" b="val"/>
         </ColorMap>
           ...
-        <ColorMaps>
+        <ColorMap>
           ...
         </ColorMap>
           ...

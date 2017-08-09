@@ -178,21 +178,21 @@ class Proxy(object):
 
        proxy.Foo = (1,2)
 
-    or
+    or::
 
        proxy.Foo.SetData((1,2))
 
-    or
+    or::
 
        proxy.Foo[0:2] = (1,2)
 
     For more information, see the documentation of the property which
-    you can obtain with
-    help(proxy.Foo).
+    you can obtain with::
+
+      help(proxy.Foo).
 
     This class also provides an iterator which can be used to iterate
-    over all properties.
-    eg::
+    over all properties, e.g.::
 
         proxy = Proxy(proxy=smproxy)
         for property in proxy:
@@ -200,7 +200,7 @@ class Proxy(object):
 
 
     For advanced users:
-    This is a python class that wraps a vtkSMProxy.. Makes it easier to
+    This is a python class that wraps a vtkSMProxy. Makes it easier to
     set/get properties.
     Instead of::
 
@@ -211,11 +211,11 @@ class Proxy(object):
 
         proxy.Foo = (1,2)
 
-    or
+    or::
 
         proxy.Foo.SetData((1,2))
 
-    or
+    or::
 
         proxy.Foo[0:2] = (1,2)
 
@@ -227,22 +227,26 @@ class Proxy(object):
 
         proxy.Foo.GetData()[0]
 
-    or
+    or::
 
         proxy.Foo[0]
 
-    For proxy properties, you can use append:
-     proxy.GetProperty("Bar").AddProxy(foo)
-    you can do:
-     proxy.Bar.append(foo)
-    Properties support most of the list API. See VectorProperty and
-    ProxyProperty documentation for details.
+    For proxy properties, you can use append::
+
+        proxy.GetProperty("Bar").AddProxy(foo)
+
+    you can do::
+
+        proxy.Bar.append(foo)
+
+    Properties support most of the list API. See ``VectorProperty`` and
+    ``ProxyProperty`` documentation for details.
 
     Please note that some of the methods accessible through the Proxy
-    class are not listed by help() because the Proxy objects forward
+    class are not listed by ``help()`` because the ``Proxy`` objects forward
     unresolved attributes to the underlying object. To get the full list,
-    see also dir(proxy.SMProxy). See also the doxygen based documentation
-    of the vtkSMProxy C++ class.
+    see also ``dir(proxy.SMProxy)``. See also the doxygen based documentation
+    of the ``vtkSMProxy`` C++ class.
     """
 
     def __init__(self, **args):
@@ -2046,12 +2050,16 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     Use this function call to create a new session. On success,
     it returns a vtkSMSession object that abstracts the connection.
     Otherwise, it returns None.
+
     There are several ways in which this function can be called:
+
     * When called with no arguments, it creates a new session
       to the built-in server on the client itself.
+
     * When called with ds_host and ds_port arguments, it
       attempts to connect to a server(data and render server on the same server)
       on the indicated host:port.
+
     * When called with ds_host, ds_port, rs_host, rs_port, it
       creates a new connection to the data server on ds_host:ds_port and to the
       render server on rs_host: rs_port.
