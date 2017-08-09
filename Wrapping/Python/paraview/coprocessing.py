@@ -35,19 +35,23 @@ class CoProcessor(object):
     co-processing pipelines. Those are typically subclasses of this. The
     subclasses must provide an implementation for the CreatePipeline() method.
 
-    Cinema Tracks
-    -------------
+    **Cinema Tracks**
+
     CoProcessor maintains user-defined information for the Cinema generation in
     __CinemaTracks. This information includes track parameter values, data array
-    names, etc. __CinemaTracks holds this information in the following structure:
+    names, etc. __CinemaTracks holds this information in the following structure::
 
-        { proxy_reference : { 'ControlName' : [value_1, value_2, ..., value_n],
-                           'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
+        {
+          proxy_reference : {
+          'ControlName' : [value_1, value_2, ..., value_n],
+          'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n']
+          }
+        }
 
     __CinemaTracks is populated when defining the co-processing pipline through
     paraview.cpstate. paraview.cpstate uses accessor instances to set values and
-    array names through the RegisterCinemaTrack and AddArraysToCinemaTrack methods
-        of this class.
+    array names through the RegisterCinemaTrack and AddArraysToCinemaTrack
+    methods of this class.
     """
 
     def __init__(self):
@@ -206,26 +210,30 @@ class CoProcessor(object):
         """This method will update all views, if present and write output
         images, as needed.
 
-        Parameters:
-        -----------
-            datadescription : Catalyst data-description object
+        **Parameters**
 
-            rescale_lookuptable (bool, optional): If True, when all lookup tables
-                are rescaled using current data ranges before saving the images.
-                Defaults to False.
+            datadescription
+              Catalyst data-description object
 
-            image_quality (int, optional): If specified, should be a value in
-                the range (0, 100) that specifies the image quality. For JPEG, 0
-                is low quality i.e. max compression, 100 is best quality i.e.
-                least compression. For legacy reasons, this is inverted for PNG
-                (which uses lossless compression). For PNG, 0 is no compression
-                i.e maximum image size, while 100 is most compressed and hence
-                least image size.
+            rescale_lookuptable (bool, optional)
+              If True, when all lookup tables
+              are rescaled using current data ranges before saving the images.
+              Defaults to False.
 
-                If not specified, for saving PNGs 0 is assumed to minimize
-                preformance impact.
+            image_quality (int, optional)
+              If specified, should be a value in
+              the range (0, 100) that specifies the image quality. For JPEG, 0
+              is low quality i.e. max compression, 100 is best quality i.e.
+              least compression. For legacy reasons, this is inverted for PNG
+              (which uses lossless compression). For PNG, 0 is no compression
+              i.e maximum image size, while 100 is most compressed and hence
+              least image size.
 
-            padding_amount (int, optional): Amount to pad the time index by.
+              If not specified, for saving PNGs 0 is assumed to minimize
+              preformance impact.
+
+            padding_amount (int, optional)
+              Amount to pad the time index by.
 
         """
         timestep = datadescription.GetTimeStep()
