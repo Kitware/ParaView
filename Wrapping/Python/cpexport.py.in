@@ -84,21 +84,24 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
     cinema_tracks, array_selection, filename=None):
     """Returns a string with the generated CoProcessing script based on the
-        options specified.
+    options specified.
 
-        First three arguments are same as those expected by
-        cpstate.DumpPipeline() function.
+    First three arguments are same as those expected by
+    cpstate.DumpPipeline() function.
 
-        padding_amount     :- integer (0-10) to set image output filename padding
-        rescale_data_range :- boolean set to true if the LUTs must be scaled on
-                              each timestep
-        enable_live_viz    :- boolean set to true if the generated script should
-                              handle live-visualization.
-        live_viz_frequency :- integer specifying how often should
-                              the coprocessor send the live data
-        cinema_tracks      :- cinema offline visualizer parameters
-        array_selection    :- selected value arrays for cinema
-        filename           :- if specified, the script is written to the file.
+    :param padding_amount: integer (0-10) to set image output filename padding
+
+    :param rescale_data_range: boolean set to true if the LUTs must be scaled on each timestep
+
+    :param enable_live_viz: boolean set to true if the generated script should handle live-visualization.
+
+    :param live_viz_frequency: integer specifying how often should the coprocessor send the live data
+
+    :param cinema_tracks: cinema offline visualizer parameters
+
+    :param array_selection: selected value arrays for cinema
+
+    :param filename: if specified, the script is written to the file.
     """
     pipeline_script = cpstate.DumpPipeline(\
         export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)

@@ -23,7 +23,6 @@ Main modules
    The ParaView Python Package <paraview>
    simple <paraview.simple>
    servermanager <paraview.servermanager>
-   algorithm <paraview.vtk.algorithms>
 
    coprocessing <paraview.coprocessing>
    benchmark <paraview.benchmark>
@@ -53,13 +52,3 @@ with ParaView 4.2.0.
    :maxdepth: 2
 
    api-changes
-
-ParaViewWeb
-==================
-
-.. toctree::
-   :maxdepth: 2
-
-   Web Visualization application <paraview.web.pv_web_visualizer>
-   File loader <paraview.web.pv_web_file_loader>
-   Data Prober <paraview.web.pv_web_data_prober>

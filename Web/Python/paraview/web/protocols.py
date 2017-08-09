@@ -945,20 +945,6 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
     # RpcName: getRgbPoints => pv.color.manager.rgb.points.get
     @exportRpc("pv.color.manager.rgb.points.get")
     def getRgbPoints(self, arrayName):
-        """
-            return {
-                "mode": "categorical" | "continuous",
-                "categorical": {
-                    "scalars": [ "1", "2", "3", ... ],
-                    "annotations": [ "a1", "a2", "a3", ... ],
-                    "colors": [ [r1, g1, b1], [r2, g2, b2], [r3, g3, b3], ... ]
-                },
-                "continuous": {
-                    "scalars": [ 1.203, 17.976 ],
-                    "color": [ [r1, g1, b1], [r2, g2, b2] ]
-                }
-            }
-        """
 
         lutProxy = simple.GetColorTransferFunction(arrayName)
 
@@ -1254,10 +1240,10 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
     def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True, groupProxyEditorWidgets=True, respectPropertyGroups=True):
         """
-        - basePath: specify the base directory (or directories) that we should start with, if this
-         parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
-         case where multiple data directories are required.  In this case, each top-level directory
-         will be given the name associated with the directory in the argument.
+        basePath: specify the base directory (or directories) that we should start with, if this
+        parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
+        case where multiple data directories are required.  In this case, each top-level directory
+        will be given the name associated with the directory in the argument.
         """
         super(ParaViewWebProxyManager, self).__init__()
         self.debugMode = False
@@ -2356,20 +2342,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
     @exportRpc("pv.proxy.manager.list")
     def list(self, viewId=None):
-        """
-        Returns the current proxy list, specifying for each proxy it's
+        """Returns the current proxy list, specifying for each proxy it's
         name, id, and parent (input) proxy id.  A 'parent' of '0' means
         the proxy has no input.
-
-            { 'view': '376',
-              'sources': [
-                {'name': 'disk_out_ref', 'id': '350', 'parent': '0', 'rep': '352', 'visible': 1 },
-                {'name': 'Contour0', 'id': '455', 'parent': '350', 'rep': '319', 'visible': 0 },
-                {'name': 'Clip0', 'id': '471', 'parent': '455', 'rep': '327', 'visible': 1 },
-                {'name': 'Calc0', 'id': '221', 'multiparent': 2,
-                 'parent': '471', 'parent_1': '455', 'rep': '756', 'visible': 1 }
-              ]
-            }
         """
         proxies = servermanager.ProxyManager().GetProxiesInGroup("sources")
         viewProxy = self.getView(viewId)
@@ -2409,8 +2384,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
     @exportRpc("pv.proxy.manager.available")
     def available(self, typeOfProxy):
-        """
-        Returns a list of the available sources or filters, depending on the
+        """Returns a list of the available sources or filters, depending on the
         argument typeOfProxy, which can be either 'filters' or 'sources'.  If
         typeOfProxy is anything other than 'filter' or 'source', the empty
         list will be returned.

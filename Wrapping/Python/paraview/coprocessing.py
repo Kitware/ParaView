@@ -29,23 +29,24 @@ def IsInModulo(timestep, frequencyArray):
     return False
 
 class CoProcessor(object):
-    """Base class for co-processing Pipelines. paraview.cpstate Module can
-       be used to dump out ParaView states as co-processing pipelines. Those are
-       typically subclasses of this. The subclasses must provide an
-       implementation for the CreatePipeline() method.
+    """Base class for co-processing Pipelines.
 
-	   Cinema Tracks
-	   =============
-	   CoProcessor maintains user-defined information for the Cinema generation in
-       __CinemaTracks. This information includes track parameter values, data array
-       names, etc. __CinemaTracks holds this information in the following structure:
+    paraview.cpstate Module can be used to dump out ParaView states as
+    co-processing pipelines. Those are typically subclasses of this. The
+    subclasses must provide an implementation for the CreatePipeline() method.
+
+    Cinema Tracks
+    -------------
+    CoProcessor maintains user-defined information for the Cinema generation in
+    __CinemaTracks. This information includes track parameter values, data array
+    names, etc. __CinemaTracks holds this information in the following structure:
 
         { proxy_reference : { 'ControlName' : [value_1, value_2, ..., value_n],
-                              'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
+                           'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
 
-		__CinemaTracks is populated when defining the co-processing pipline through
-		paraview.cpstate. paraview.cpstate uses accessor instances to set values and
-		array names through the RegisterCinemaTrack and AddArraysToCinemaTrack methods
+    __CinemaTracks is populated when defining the co-processing pipline through
+    paraview.cpstate. paraview.cpstate uses accessor instances to set values and
+    array names through the RegisterCinemaTrack and AddArraysToCinemaTrack methods
         of this class.
     """
 
@@ -206,7 +207,7 @@ class CoProcessor(object):
         images, as needed.
 
         Parameters:
-        ----------
+        -----------
             datadescription : Catalyst data-description object
 
             rescale_lookuptable (bool, optional): If True, when all lookup tables
@@ -473,17 +474,19 @@ class CoProcessor(object):
         return view
 
     def CreateWriter(self, proxy_ctor, filename, freq):
-        """ **** DEPRECATED!!! Use RegisterWriter instead ****
-           Creates a writer proxy. This method is generally used in
-           CreatePipeline() to create writers. All writes created as such will
-           write the output files appropriately in WriteData() is called."""
+        """**DEPRECATED!!! Use RegisterWriter instead**
+        Creates a writer proxy. This method is generally used in
+        reatePipeline() to create writers. All writes created as such will
+        write the output files appropriately in WriteData() is called.
+        """
         writer = proxy_ctor()
         return self.RegisterWriter(writer, filename, freq)
 
     def CreateView(self, proxy_ctor, filename, freq, fittoscreen, magnification, width, height):
-        """ **** DEPRECATED!!! Use RegisterView instead ****
-           Create a CoProcessing view for image capture with extra meta-data
-           such as magnification, size and frequency."""
+        """**DEPRECATED!!! Use RegisterView instead**
+        Create a CoProcessing view for image capture with extra meta-data
+        such as magnification, size and frequency.
+        """
         view = proxy_ctor()
         return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height, None)
 
