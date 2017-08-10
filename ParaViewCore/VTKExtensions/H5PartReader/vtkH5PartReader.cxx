@@ -73,11 +73,6 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedShortArray.h"
 
-#ifdef PARAVIEW_USE_MPI
-#include "vtkMultiProcessController.h"
-vtkCxxSetObjectMacro(vtkH5PartReader, Controller, vtkMultiProcessController);
-#endif
-
 #include <algorithm>
 #include <functional>
 
@@ -158,19 +153,14 @@ vtkH5PartReader::vtkH5PartReader()
   this->Xarray = NULL;
   this->Yarray = NULL;
   this->Zarray = NULL;
-  this->UpdatePiece = 0;
-  this->UpdateNumPieces = 0;
   this->TimeOutOfRange = 0;
   this->MaskOutOfTimeRangeOutput = 0;
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->SetXarray("Coords_0");
   this->SetYarray("Coords_1");
   this->SetZarray("Coords_2");
-#ifdef PARAVIEW_USE_MPI
-  this->Controller = NULL;
-  this->SetController(vtkMultiProcessController::GetGlobalController());
-#endif
 }
+
 //----------------------------------------------------------------------------
 vtkH5PartReader::~vtkH5PartReader()
 {
@@ -189,25 +179,8 @@ vtkH5PartReader::~vtkH5PartReader()
 
   this->PointDataArraySelection->Delete();
   this->PointDataArraySelection = 0;
-
-#ifdef PARAVIEW_USE_MPI
-  this->SetController(NULL);
-#endif
 }
-//----------------------------------------------------------------------------
-bool vtkH5PartReader::HasStep(int Step)
-{
-  if (!this->OpenFile())
-  {
-    return false;
-  }
 
-  if (H5PartHasStep(this->H5FileId, Step))
-  {
-    return true;
-  }
-  return false;
-}
 //----------------------------------------------------------------------------
 void vtkH5PartReader::SetFileName(char* filename)
 {
@@ -303,16 +276,6 @@ int vtkH5PartReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
-
-#ifdef PARAVIEW_USE_MPI
-  if (this->Controller)
-  {
-    this->UpdatePiece = this->Controller->GetLocalProcessId();
-    this->UpdateNumPieces = this->Controller->GetNumberOfProcesses();
-  }
-#else
-  this->UpdatePiece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-#endif
 
   if (!this->OpenFile())
   {
@@ -570,30 +533,25 @@ public:
 int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
+  using SDDP = vtkStreamingDemandDrivenPipeline;
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  // get the ouptut
-  vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-//
-#ifdef PARAVIEW_USE_MPI
-  if (this->Controller && (this->UpdatePiece != this->Controller->GetLocalProcessId() ||
-                            this->UpdateNumPieces != this->Controller->GetNumberOfProcesses()))
-  {
-    vtkDebugMacro(<< "Parallel failure, Id's not right (ignore)");
-    this->UpdatePiece = this->Controller->GetLocalProcessId();
-    this->UpdateNumPieces = this->Controller->GetNumberOfProcesses();
-  }
-#endif
-  //
-  // Parallel read currently not implemented, just read on process zero and
-  // exit quick on the others. @TODO : Add in Slab selection code
-  if (this->UpdatePiece > 0)
-    return 1;
-  //
+  vtkPolyData* output = vtkPolyData::GetData(outInfo);
+
+  const int piece =
+    outInfo->Has(SDDP::UPDATE_PIECE_NUMBER()) ? outInfo->Get(SDDP::UPDATE_PIECE_NUMBER()) : 0;
+  const int numPieces = outInfo->Has(SDDP::UPDATE_NUMBER_OF_PIECES())
+    ? outInfo->Get(SDDP::UPDATE_NUMBER_OF_PIECES())
+    : 1;
+
   typedef std::map<std::string, std::vector<std::string> > FieldMap;
   FieldMap scalarFields;
   //
   if (this->TimeStepValues.size() == 0)
+  {
     return 0;
+  }
+
   //
   // Make sure that the user selected arrays for coordinates are represented
   //
@@ -721,6 +679,28 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
   H5PartSetStep(this->H5FileId, this->ActualTimeStep);
   // Get the number of points for this step
   vtkIdType Nt = H5PartGetNumParticles(this->H5FileId);
+  if (piece < Nt)
+  {
+    if (numPieces > 1)
+    {
+      int div = Nt / numPieces;
+      int rem = Nt % numPieces;
+
+      vtkIdType myNt = piece < rem ? div + 1 : div;
+      vtkIdType myOffset = piece < rem ? (div + 1) * piece : (div + 1) * rem + div * (piece - rem);
+      H5PartSetView(this->H5FileId, myOffset, myOffset + myNt);
+      Nt = myNt;
+    }
+    else
+    {
+      H5PartSetView(this->H5FileId, -1, -1);
+    }
+  }
+  else
+  {
+    // don't do anything.
+    return 1;
+  }
 
   // Setup arrays for reading data
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
@@ -758,6 +738,7 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
         hid_t component_datatype = H5PartGetNativeDatasetType(H5FileId, name);
         offset_mem[0] = c;
         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, NULL);
+
         if (component_datatype == datatype)
         {
           H5Dread(

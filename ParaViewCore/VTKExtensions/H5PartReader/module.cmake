@@ -3,13 +3,11 @@ vtk_module(vtkPVVTKExtensionsH5PartReader
       vtkCommonCore
       vtkCommonDataModel
       vtkCommonExecutionModel
-      vtkParallelCore
       vtkPVVTKExtensionsCore
     PRIVATE_DEPENDS
       vtkcgns
       vtkhdf5
       vtksys
-      vtkParallelCore
     TEST_DEPENDS
       vtkInteractionStyle
       vtkTestingCore
