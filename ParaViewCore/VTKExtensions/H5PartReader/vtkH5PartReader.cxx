@@ -121,11 +121,11 @@ static hid_t H5PartGetDiskShape(H5PartFile* f, hid_t dataset)
     /* now we select a subset */
     if (f->diskshape > 0)
     {
-      r = H5Sselect_hyperslab(
-        f->diskshape, H5S_SELECT_SET, range /* only using first element */, &stride, &count, NULL);
+      r = H5Sselect_hyperslab(f->diskshape, H5S_SELECT_SET, range /* only using first element */,
+        &stride, &count, nullptr);
     }
     /* now we select a subset */
-    r = H5Sselect_hyperslab(space, H5S_SELECT_SET, range, &stride, &count, NULL);
+    r = H5Sselect_hyperslab(space, H5S_SELECT_SET, range, &stride, &count, nullptr);
     if (r < 0)
     {
       fprintf(stderr, "Abort: Selection Failed!\n");
@@ -133,6 +133,28 @@ static hid_t H5PartGetDiskShape(H5PartFile* f, hid_t dataset)
     }
   }
   return space;
+}
+
+static void vtkPickArray(char*& arrayPtr, const std::initializer_list<const char*>& values,
+  vtkDataArraySelection* selection)
+{
+  if (arrayPtr != nullptr && arrayPtr[0] != '\0')
+  {
+    return;
+  }
+
+  for (int cc = 0, max = selection->GetNumberOfArrays(); cc < max; ++cc)
+  {
+    const char* aname = selection->GetArrayName(cc);
+    for (const char* value : values)
+    {
+      if (vtksys::SystemTools::Strucmp(aname, value) == 0)
+      {
+        arrayPtr = vtksys::SystemTools::DuplicateString(aname);
+        return;
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -148,17 +170,14 @@ vtkH5PartReader::vtkH5PartReader()
   this->TimeStepTolerance = 1E-6;
   this->CombineVectorComponents = 1;
   this->GenerateVertexCells = 0;
-  this->FileName = NULL;
-  this->H5FileId = NULL;
-  this->Xarray = NULL;
-  this->Yarray = NULL;
-  this->Zarray = NULL;
+  this->FileName = nullptr;
+  this->H5FileId = nullptr;
+  this->Xarray = nullptr;
+  this->Yarray = nullptr;
+  this->Zarray = nullptr;
   this->TimeOutOfRange = 0;
   this->MaskOutOfTimeRangeOutput = 0;
   this->PointDataArraySelection = vtkDataArraySelection::New();
-  this->SetXarray("Coords_0");
-  this->SetYarray("Coords_1");
-  this->SetZarray("Coords_2");
 }
 
 //----------------------------------------------------------------------------
@@ -166,16 +185,16 @@ vtkH5PartReader::~vtkH5PartReader()
 {
   this->CloseFile();
   delete[] this->FileName;
-  this->FileName = NULL;
+  this->FileName = nullptr;
 
   delete[] this->Xarray;
-  this->Xarray = NULL;
+  this->Xarray = nullptr;
 
   delete[] this->Yarray;
-  this->Yarray = NULL;
+  this->Yarray = nullptr;
 
   delete[] this->Zarray;
-  this->Zarray = NULL;
+  this->Zarray = nullptr;
 
   this->PointDataArraySelection->Delete();
   this->PointDataArraySelection = 0;
@@ -184,7 +203,7 @@ vtkH5PartReader::~vtkH5PartReader()
 //----------------------------------------------------------------------------
 void vtkH5PartReader::SetFileName(char* filename)
 {
-  if (this->FileName == NULL && filename == NULL)
+  if (this->FileName == nullptr && filename == nullptr)
   {
     return;
   }
@@ -193,7 +212,7 @@ void vtkH5PartReader::SetFileName(char* filename)
     return;
   }
   delete[] this->FileName;
-  this->FileName = NULL;
+  this->FileName = nullptr;
 
   if (filename)
   {
@@ -205,10 +224,10 @@ void vtkH5PartReader::SetFileName(char* filename)
 //----------------------------------------------------------------------------
 void vtkH5PartReader::CloseFile()
 {
-  if (this->H5FileId != NULL)
+  if (this->H5FileId != nullptr)
   {
     H5PartCloseFile(this->H5FileId);
-    this->H5FileId = NULL;
+    this->H5FileId = nullptr;
   }
 }
 //----------------------------------------------------------------------------
@@ -363,6 +382,9 @@ int vtkH5PartReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }
 
+  vtkPickArray(this->Xarray, { "x", "coords_0", "coords0" }, this->PointDataArraySelection);
+  vtkPickArray(this->Yarray, { "y", "coords_1", "coords1" }, this->PointDataArraySelection);
+  vtkPickArray(this->Zarray, { "z", "coords_2", "coords2" }, this->PointDataArraySelection);
   return 1;
 }
 
@@ -429,7 +451,7 @@ int GetVTKDataType(int datatype)
 
 //----------------------------------------------------------------------------
 // A Convenience Macro which does what we want for any dataset type
-#define H5PartReadDataArray(null, T2)                                                              \
+#define H5PartReadDataArray(nullptr, T2)                                                           \
   dataarray->SetNumberOfComponents(Nc);                                                            \
   dataarray->SetNumberOfTuples(Nt);                                                                \
   dataarray->SetName(rootname.c_str());                                                            \
@@ -443,10 +465,11 @@ int GetVTKDataType(int datatype)
     const char* name = arraylist[c].c_str();                                                       \
     hid_t dataset = H5Dopen(H5FileId->timegroup, name);                                            \
     hid_t diskshape = H5PartGetDiskShape(H5FileId, dataset);                                       \
-    hid_t memspace = H5Screate_simple(1, count1_mem, NULL);                                        \
+    hid_t memspace = H5Screate_simple(1, count1_mem, nullptr);                                     \
     offset_mem[0] = c;                                                                             \
-    r = H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, NULL);   \
-    H5Dread(dataset, null##T2, memspace, diskshape, H5P_DEFAULT, dataarray->GetVoidPointer(0));    \
+    r =                                                                                            \
+      H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, nullptr);  \
+    H5Dread(dataset, nullptr##T2, memspace, diskshape, H5P_DEFAULT, dataarray->GetVoidPointer(0)); \
     if (memspace != H5S_ALL)                                                                       \
       H5Sclose(memspace);                                                                          \
     if (diskshape != H5S_ALL)                                                                      \
@@ -704,7 +727,7 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
 
   // Setup arrays for reading data
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkDataArray> coords = NULL;
+  vtkSmartPointer<vtkDataArray> coords = nullptr;
   for (FieldMap::iterator it = scalarFields.begin(); it != scalarFields.end(); it++)
   {
     // use the type of the first array for all if it is a vector field
@@ -713,7 +736,7 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
     std::string rootname = this->NameOfVectorComponent(array_name);
     int Nc = static_cast<int>(arraylist.size());
     //
-    vtkSmartPointer<vtkDataArray> dataarray = NULL;
+    vtkSmartPointer<vtkDataArray> dataarray = nullptr;
     hid_t datatype = H5PartGetNativeDatasetType(H5FileId, array_name);
     int vtk_datatype = GetVTKDataType(datatype);
 
@@ -734,10 +757,10 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
         const char* name = arraylist[c].c_str();
         hid_t dataset = H5Dopen(H5FileId->timegroup, name);
         hid_t diskshape = H5PartGetDiskShape(H5FileId, dataset);
-        hid_t memspace = H5Screate_simple(1, count1_mem, NULL);
+        hid_t memspace = H5Screate_simple(1, count1_mem, nullptr);
         hid_t component_datatype = H5PartGetNativeDatasetType(H5FileId, name);
         offset_mem[0] = c;
-        H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, NULL);
+        H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, nullptr);
 
         if (component_datatype == datatype)
         {
@@ -754,7 +777,8 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
             vtkDataArray::CreateDataArray(GetVTKDataType(component_datatype));
           temparray->SetNumberOfComponents(Nc);
           temparray->SetNumberOfTuples(Nt);
-          H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, NULL);
+          H5Sselect_hyperslab(
+            memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, nullptr);
           H5Dread(dataset, component_datatype, memspace, diskshape, H5P_DEFAULT,
             temparray->GetVoidPointer(0));
           dataarray->CopyComponent(c, temparray, c);

@@ -15,12 +15,28 @@
      <DoubleVectorProperty name="TimestepValues"
        information_only="1">
       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+    </DoubleVectorProperty>
+
+    <StringVectorProperty name="XarrayInfo"
+      command="GetXarray"
+      information_only="1">
+    </StringVectorProperty>
+
+    <StringVectorProperty name="YarrayInfo"
+      command="GetYarray"
+      information_only="1">
+    </StringVectorProperty>
+
+    <StringVectorProperty name="ZarrayInfo"
+      command="GetZarray"
+      information_only="1">
+    </StringVectorProperty>
 
      <StringVectorProperty
         name="Xarray"
         command="SetXarray"
-        number_of_elements="1">
+        number_of_elements="1"
+        information_property="XarrayInfo">
        <Documentation>
          This property lists which point array to use for coordinates.
        </Documentation>
@@ -34,7 +50,8 @@
      <StringVectorProperty
         name="Yarray"
         command="SetYarray"
-        number_of_elements="1">
+        number_of_elements="1"
+        information_property="YarrayInfo">
        <Documentation>
          This property lists which point array to use for coordinates.
        </Documentation>
@@ -48,7 +65,8 @@
      <StringVectorProperty
         name="Zarray"
         command="SetZarray"
-        number_of_elements="1">
+        number_of_elements="1"
+        information_property="ZarrayInfo">
        <Documentation>
          This property lists which point array to use for coordinates.
        </Documentation>
