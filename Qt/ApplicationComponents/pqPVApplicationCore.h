@@ -133,9 +133,6 @@ protected:
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget> > QuickLaunchMenus;
 
-private slots:
-  void deprecatedSaveAnimationCalled();
-
 private:
   Q_DISABLE_COPY(pqPVApplicationCore)
 };

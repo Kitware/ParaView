@@ -105,13 +105,6 @@ public:
    */
   vtkPVLODVolume* GetActor() { return this->Actor; }
 
-  /**
-   * Helper method to pass input image extent information to the view to use in
-   * determining the cuts for ordered compositing.
-   */
-  VTK_LEGACY(static void PassOrderedCompositingInformation(
-    vtkPVDataRepresentation* self, vtkInformation* inInfo));
-
 protected:
   vtkImageVolumeRepresentation();
   ~vtkImageVolumeRepresentation();

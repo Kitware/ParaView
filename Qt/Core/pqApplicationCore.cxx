@@ -91,12 +91,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined(VTK_LEGACY_REMOVE)
 #include "pqDisplayPolicy.h"
-#include "pqOutputWindow.h"
-#include "pqOutputWindowAdapter.h"
 #endif
 
 // Do this after all above includes. On a VS2015 with Qt 5,
-// these includes cause build errors with pqOutputWindow, pqRenderView etc.
+// these includes cause build errors with pqRenderView etc.
 // due to some leaked through #define's (is my guess).
 #include "QVTKOpenGLWidget.h"
 #include <QSurfaceFormat>
@@ -139,20 +137,10 @@ pqApplicationCore::pqApplicationCore(
   }
   this->Options = options;
 
-// Create output window before initializing server manager.
-#if !defined(VTK_LEGACY_REMOVE)
-  this->createOutputWindow();
-#endif
-
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();
-
-#if !defined(VTK_LEGACY_REMOVE)
-  QObject::connect(this->ProgressManager, SIGNAL(progressStartEvent()), this->OutputWindow,
-    SLOT(onProgressStartEvent()));
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -284,42 +272,7 @@ pqApplicationCore::~pqApplicationCore()
   }
 
   vtkInitializationHelper::Finalize();
-#if !defined(VTK_LEGACY_REMOVE)
-  if (vtkOutputWindow::GetInstance() == this->OutputWindowAdapter)
-  {
-    vtkOutputWindow::SetInstance(NULL);
-  }
-  delete this->OutputWindow;
-  this->OutputWindow = NULL;
-  this->OutputWindowAdapter->Delete();
-  this->OutputWindowAdapter = 0;
-#endif
 }
-
-//-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqApplicationCore::createOutputWindow()
-{
-  // Set up error window.
-  pqOutputWindowAdapter* owAdapter = pqOutputWindowAdapter::New();
-  this->OutputWindow = new pqOutputWindow(0);
-  this->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
-  this->OutputWindow->connect(
-    owAdapter, SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
-  this->OutputWindow->connect(
-    owAdapter, SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
-  this->OutputWindow->connect(owAdapter, SIGNAL(displayWarningText(const QString&)),
-    SLOT(onDisplayWarningText(const QString&)));
-  this->OutputWindow->connect(owAdapter, SIGNAL(displayGenericWarningText(const QString&)),
-    SLOT(onDisplayGenericWarningText(const QString&)));
-  this->OutputWindow->connect(owAdapter, SIGNAL(displayTextInWindow(const QString&)),
-    SLOT(onDisplayTextInWindow(const QString&)));
-  this->OutputWindow->connect(owAdapter, SIGNAL(displayErrorTextInWindow(const QString&)),
-    SLOT(onDisplayErrorTextInWindow(const QString&)));
-  vtkOutputWindow::SetInstance(owAdapter);
-  this->OutputWindowAdapter = owAdapter;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
@@ -633,17 +586,6 @@ void pqApplicationCore::quit()
 {
   this->prepareForQuit();
   QCoreApplication::instance()->quit();
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::showOutputWindow()
-{
-#if !defined(VTK_LEGACY_REMOVE)
-  VTK_LEGACY_BODY(pqApplicationCore::showOutputWindow, "ParaView 5.4");
-  this->OutputWindow->show();
-  this->OutputWindow->raise();
-  this->OutputWindow->activateWindow();
-#endif
 }
 
 //-----------------------------------------------------------------------------

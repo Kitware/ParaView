@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 #include "pqComponentsModule.h" // for exports
-#include "vtkSetGet.h"          // for VTK_LEGACY
 
 class QSize;
 
@@ -76,13 +75,6 @@ public:
   */
   pqAnimationCue* getCue(
     pqAnimationScene* scene, vtkSMProxy* proxy, const char* propertyname, int index) const;
-
-  /**
-  * @deprecated in ParaView 5.4.
-  * No longer supported as of ParaView 5.4.
-  * Please use pqSaveScreenshotReaction instead.
-  */
-  VTK_LEGACY(bool saveAnimation());
 
   /**
   * Saves the animation geometry from the active scene
@@ -137,12 +129,6 @@ signals:
   * Emitted when the active animation scene finishes playing.
   */
   void endPlay();
-
-  /**
-   * private signal. do not use. will be removed once `saveAnimation` method is
-   * removed.
-   */
-  void deprecatedSaveAnimationCalled();
 
 public slots:
   // Called when the active server changes.

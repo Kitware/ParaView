@@ -196,19 +196,6 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
-  vtkPVDataRepresentation* vtkNotUsed(self), vtkInformation* vtkNotUsed(inInfo))
-{
-  vtkGenericWarningMacro(
-    "vtkImageVolumeRepresentation::PassOrderedCompositingInformation was deprecated in "
-    "ParaView 5.0 and will be removed in a future version. Change your representation "
-    "to cache information about image and then pass to "
-    "vtkPVRenderView::SetOrderedCompositingInformation() directly.");
-}
-#endif
-
-//----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

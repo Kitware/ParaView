@@ -218,23 +218,6 @@ public:
    */
   unsigned int GetNumberOfDomains();
 
-  /**
-   * Calls Update() on all domains contained by the property
-   * as well as all dependant domains. This is usually called
-   * after SetUncheckedXXX() to tell all dependant domains to
-   * update themselves according to the new value.
-   * Note that when calling Update() on domains contained by
-   * this property, a NULL is passed as the argument. This is
-   * because the domain does not really "depend" on the property.
-   * When calling Update() on dependent domains, the property
-   * passes itself as the argument.
-   * @deprecated This method is no longer needed. Dependent domains are now
-   * automatically updated when a property fires
-   * vtkCommand::UncheckedPropertyModifiedEvent. The implementation has been
-   * changed to do nothing and the method will be removed in future releases.
-   */
-  VTK_LEGACY(void UpdateDependentDomains());
-
   //@{
   /**
    * Is InformationOnly is set to true, this property is used to

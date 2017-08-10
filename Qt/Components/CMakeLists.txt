@@ -439,14 +439,6 @@ set (Module_MOC_HDRS
   pqAbstractItemSelectionModel.h
 )
 
-if (NOT VTK_LEGACY_REMOVE)
-  list(APPEND Module_SRCS
-    pqMultiBlockInspectorPanel.cxx
-    pqMultiBlockInspectorPanel.h)
-  list(APPEND Module_MOC_HDRS
-    pqMultiBlockInspectorPanel.h)
-endif()
-
 set (Module_UI_FILES
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui

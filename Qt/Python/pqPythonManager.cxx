@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
-#include "pqOutputWindowAdapter.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonScriptEditor.h"

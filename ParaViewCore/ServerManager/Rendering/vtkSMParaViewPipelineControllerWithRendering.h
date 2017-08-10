@@ -161,16 +161,6 @@ public:
   static bool GetInheritRepresentationProperties();
   //@}
 
-  //@{
-  /*
-   * @deprecated since ParaView 5.4. Use vtkSMSaveScreenshotProxy instead.
-   */
-  VTK_LEGACY(virtual bool WriteImage(
-    vtkSMViewProxy* view, const char* filename, int magnification, int quality) VTK_FINAL);
-  VTK_LEGACY(virtual bool WriteImage(
-    vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality) VTK_FINAL);
-  //@}
-
   /**
    * Overridden to handle default ColorArrayName for representations correctly.
    */

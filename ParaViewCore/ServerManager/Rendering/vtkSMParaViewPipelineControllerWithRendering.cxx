@@ -636,41 +636,6 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   producer->UpdatePipeline(time);
 }
 
-#if !defined(VTK_LEGACY_REMOVE)
-//----------------------------------------------------------------------------
-template <class T>
-bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int quality)
-{
-  if (!viewOrLayout)
-  {
-    return false;
-  }
-  vtkSmartPointer<vtkImageData> img;
-  img.TakeReference(viewOrLayout->CaptureWindow(magnification));
-  if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
-  {
-    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
-  }
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
-  vtkSMViewProxy* view, const char* filename, int magnification, int quality)
-{
-  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
-  return vtkWriteImage<vtkSMViewProxy>(view, filename, magnification, quality);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
-  vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
-{
-  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
-  return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
-}
-#endif // !defined(VTK_LEGACY_REMOVE)
-
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
   vtkSMProxy* proxy, const char* proxyname)

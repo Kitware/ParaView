@@ -880,15 +880,6 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*, vtkInformation*)
-{
-  vtkWarningMacro("REQUEST_INFORMATION pass has been deprecated and no longer used");
-  return false;
-}
-#endif
-
-//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
 {
   vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
