@@ -226,14 +226,30 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchec
     helper.SetUseUnchecked(use_unchecked_values);
     if (helper.GetNumberOfElements() == 1 && !svp->GetRepeatCommand())
     {
-      const char* defaultValue = svp->GetDefaultValue(0);
+      const char* defaultValue = nullptr;
+      // try information_property, if exists first.
+      vtkSMStringVectorProperty* infoProperty =
+        vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty());
+      if (infoProperty && infoProperty->GetNumberOfElements() == 1)
+      {
+        defaultValue = infoProperty->GetElement(0);
+      }
       unsigned int temp;
+      if (defaultValue && this->IsInDomain(defaultValue, temp))
+      {
+        helper.Set(0, defaultValue);
+        return 1;
+      }
+
+      // try xml default for the property next.
+      defaultValue = svp->GetDefaultValue(0);
       if (defaultValue && this->IsInDomain(defaultValue, temp))
       {
         helper.Set(0, defaultValue);
       }
       else
       {
+        // now just pick the first string from the domain.
         helper.Set(0, this->GetString(0));
       }
       return 1;

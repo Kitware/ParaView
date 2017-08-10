@@ -205,14 +205,9 @@ protected:
   char* Zarray;
 
   std::vector<double> TimeStepValues;
-  typedef std::vector<std::string> stringlist;
-  std::vector<stringlist> FieldArrays;
 
   // To allow paraview gui to enable/disable scalar reading
   vtkDataArraySelection* PointDataArraySelection;
-
-  // To allow paraview gui to enable/disable scalar reading
-  vtkDataArraySelection* CoordinateSelection;
 
 private:
   vtkH5PartReader(const vtkH5PartReader&) VTK_DELETE_FUNCTION;
