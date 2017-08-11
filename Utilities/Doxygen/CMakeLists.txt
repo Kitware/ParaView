@@ -44,10 +44,6 @@ foreach(module ${src})
 endforeach()
 
 set(TAGFILES "\"${CMAKE_CURRENT_BINARY_DIR}/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html\"")
-set (QT_TAG_FILE "${QT_DOC_DIR}/html/qt.tags")
-if (EXISTS "${QT_TAG_FILE}")
-  SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://qt-project.org/doc/qt-4.8/\"")
-endif()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/pages/index.md.in

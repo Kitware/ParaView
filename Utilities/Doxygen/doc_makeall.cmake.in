@@ -280,20 +280,20 @@ endif()
 # ----------------------------------------------------------------------------
 # Build the full-text index.
 
-step(3 "build full text index")
-execute_process(COMMAND ${PERL}
-  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.pl"
-  --project "${PROJECT_NAME}"
-  --stop  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.stop"
-  --store "doc_${PROJECT_NAME}_index.dox"
-  --to "${INTERMEDIATE_DOX_DIR}"
-  ${SOURCE_DIRECTORIES}
-  RESULT_VARIABLE rv
-)
-
-if (rv)
-  message(FATAL_ERROR "Step failed: ${rv}")
-endif()
+step(3 "build full text index -- skipping")
+# execute_process(COMMAND ${PERL}
+#   "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.pl"
+#   --project "${PROJECT_NAME}"
+#   --stop  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_index.stop"
+#   --store "doc_${PROJECT_NAME}_index.dox"
+#   --to "${INTERMEDIATE_DOX_DIR}"
+#   ${SOURCE_DIRECTORIES}
+#   RESULT_VARIABLE rv
+# )
+#
+# if (rv)
+#   message(FATAL_ERROR "Step failed: ${rv}")
+# endif()
 
 # ----------------------------------------------------------------------------
 # Extract the VTK version and create the main page.
@@ -410,16 +410,16 @@ endif()
 # ----------------------------------------------------------------------------
 # clean the HTML pages to remove layout problems
 
-step(10 "clean html to remove layout problems")
-execute_process(COMMAND ${PERL}
-  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_cleanhtml.pl"
-  --html "${OUTPUT_DIRECTORY}/html"
-  RESULT_VARIABLE rv
-)
-
-if (rv)
-  message(FATAL_ERROR "Step failed: ${rv}")
-endif()
+step(10 "clean html to remove layout problems - skipping")
+#execute_process(COMMAND ${PERL}
+#  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_cleanhtml.pl"
+#  --html "${OUTPUT_DIRECTORY}/html"
+#  RESULT_VARIABLE rv
+#)
+#
+#if (rv)
+#  message(FATAL_ERROR "Step failed: ${rv}")
+#endif()
 
 # ----------------------------------------------------------------------------
 # Create the *.chm file
