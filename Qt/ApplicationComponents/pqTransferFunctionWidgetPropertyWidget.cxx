@@ -66,7 +66,8 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   }
   if (proxyProperty->GetNumberOfProxies() < 1)
   {
-    qDebug() << "error, no proxies for property";
+    // To uncomment once #17658 is fixed
+    //    qDebug() << "error, no proxies for property";
     return;
   }
 
