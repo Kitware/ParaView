@@ -897,6 +897,11 @@ public:
    */
   void SetOSPRayRendererType(std::string);
 
+  /**
+   * For OSPRay, loads a set of materials.
+   */
+  virtual void SetMaterialLibrary(const char*);
+
   //@{
   /**
    * DiscreteCameras are a collection of cameras when specified,

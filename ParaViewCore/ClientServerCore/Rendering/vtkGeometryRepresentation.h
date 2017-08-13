@@ -258,6 +258,11 @@ public:
   virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
   //@}
 
+  /**
+   * For OSPRay, choose from among the materials.
+   */
+  virtual void SetMaterial(const char*);
+
   //@{
   /**
    * Specify whether or not to redistribute the data. The default is false

@@ -47,6 +47,7 @@ set (Module_SRCS
   vtkSMDataDeliveryManager.cxx
   vtkSMFunctionalBagChartSeriesSelectionDomain.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
+  vtkSMMaterialDomain.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOrthographicSliceViewProxy.cxx

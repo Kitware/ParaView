@@ -2641,7 +2641,19 @@
         remove_command="RemoveLight"
         repeatable="1">
       </ProxyProperty>
-
+      <StringVectorProperty command="SetMaterialLibrary"
+                            name="OSPRayLibrary"
+                            label="OSPRay Material Library"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="None">
+        <Documentation>Load a set of Materials that can be colored with.</Documentation>
+        <FileListDomain name="files" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <FileChooser extensions="json" file_description="material library files" />
+        </Hints>
+      </StringVectorProperty>
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>
@@ -2720,6 +2732,7 @@
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>
         <Property name="LightScale"/>
+        <Property name="OSPRayLibrary" />
       </PropertyGroup>
     </RenderViewProxy>
 
@@ -3681,12 +3694,7 @@
             <Property name="OSPRayUseScaleArray" />
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Surface" />
-            </Hints>
+            <Property name="OSPRayMaterial" />
           </PropertyGroup>
 
         </ExposedProperties>
@@ -10250,6 +10258,20 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </ProxyProperty>
+      <StringVectorProperty command="SetMaterial"
+                            name="OSPRayMaterial"
+                            label="OSPRay Material"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="None">
+        <Documentation>Set the material to paint this object with.</Documentation>
+        <MaterialDomain name="string_list">
+        </MaterialDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </StringVectorProperty>
+
       <!-- End of SurfaceRepresentationBase -->
     </RepresentationProxy>
 

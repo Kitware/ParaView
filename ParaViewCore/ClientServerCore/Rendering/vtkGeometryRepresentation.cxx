@@ -50,6 +50,7 @@
 
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayActorNode.h"
+#include "vtkOSPRayMaterialLibrary.h"
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -168,6 +169,11 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
+
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkSmartPointer<vtkOSPRayMaterialLibrary> ml = vtkOSPRayMaterialLibrary::GetInstance();
+  ml->LoadMaterials(this->Property);
+#endif
 
   // setup composite display attributes
   vtkCompositeDataDisplayAttributes* compositeAttributes = vtkCompositeDataDisplayAttributes::New();
@@ -1055,5 +1061,23 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
   this->Actor->SetScalingFunction(pwf);
 #else
   (void)pwf;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMaterial(const char* val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (!strcmp(val, "None"))
+  {
+    this->Property->SetMaterialName(nullptr);
+  }
+  else
+  {
+    this->Property->SetMaterialName(val);
+  }
+
+#else
+  (void)val;
 #endif
 }

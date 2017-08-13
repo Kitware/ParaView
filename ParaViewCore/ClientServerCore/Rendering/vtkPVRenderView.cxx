@@ -102,6 +102,7 @@
 
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayLightNode.h"
+#include "vtkOSPRayMaterialLibrary.h"
 #include "vtkOSPRayPass.h"
 #include "vtkOSPRayRendererNode.h"
 #endif
@@ -3028,6 +3029,26 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
 bool vtkPVRenderView::GetEnableOSPRay()
 {
   return this->Internals->IsInOSPRay;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetMaterialLibrary(const char* val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (!strcmp(val, "None"))
+  {
+    ;
+  }
+  else
+  {
+    // TODO: should only do this when val is changed
+    vtkSmartPointer<vtkOSPRayMaterialLibrary> ml = vtkOSPRayMaterialLibrary::GetInstance();
+    ml->ReadFile(val, this->GetRenderer());
+    vtkOSPRayMaterialLibrary::GetInstance()->Fire();
+  }
+#else
+  (void)val;
+#endif
 }
 
 //----------------------------------------------------------------------------
