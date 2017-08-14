@@ -46,7 +46,7 @@ class pqConsoleWidgetCompleter;
   console by calling printString() and receive user input by connecting to the
   executeCommand() slot.
 
-  \sa pqPythonShell, pqOutputWindow
+  \sa pqPythonShell
 */
 class PQWIDGETS_EXPORT pqConsoleWidget : public QWidget
 {

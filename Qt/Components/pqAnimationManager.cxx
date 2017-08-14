@@ -203,20 +203,6 @@ pqAnimationCue* pqAnimationManager::getCue(
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool pqAnimationManager::saveAnimation()
-{
-  VTK_LEGACY_BODY(pqAnimationManager::saveAnimation, "ParaView 5.4");
-  qDebug("`pqAnimationManager::saveAnimation` no longer supported. "
-         "Please use pqSaveAnimationReaction instead.");
-  // this is caught in pqPVApplicationCore to save animation using
-  // pqSaveAnimationReaction.
-  emit this->deprecatedSaveAnimationCalled();
-  return true;
-}
-#endif
-
-//-----------------------------------------------------------------------------
 bool pqAnimationManager::saveGeometry(const QString& filename, pqView* view)
 {
   if (!view)

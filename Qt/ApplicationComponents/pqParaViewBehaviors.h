@@ -109,10 +109,6 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
 
-#if !defined(VTK_LEGACY_REMOVE)
-  PQ_BEHAVIOR_DEFINE_METHODS_LEGACY(QtMessageHandlerBehavior);
-#endif
-
   pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
   virtual ~pqParaViewBehaviors();
 

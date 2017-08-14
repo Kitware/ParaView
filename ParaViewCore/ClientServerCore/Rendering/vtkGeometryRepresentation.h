@@ -305,11 +305,6 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
-   * Produce meta-data about this representation that the view may find useful.
-   */
-  VTK_LEGACY(virtual bool GenerateMetaData(vtkInformation*, vtkInformation*));
-
-  /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.

@@ -102,12 +102,6 @@ public:
   //@}
 
   /**
-   * Return the first acceptable number of components or 0 if any number of
-   * components are acceptable. This method is deprecated.
-   */
-  VTK_LEGACY(int GetNumberOfComponents());
-
-  /**
    * Get the AcceptableNumberOfComponents vector
    * Empty or containing a zero means no check.
    */
@@ -148,21 +142,6 @@ public:
     int required_type, int attribute_type, int* acceptable_as_type = NULL);
 
   /**
-   * Method to check if a particular array is acceptable to a domain with the
-   * specified required number of components (\c required_number_of_components).
-   * This takes into consideration the state of AutomaticePropertyConversion flag.
-   * If AutomaticePropertyConversion, required_numer_of_components == 1 and
-   * the actual number of components in the array are >= 1, then this method
-   * will return true. This method will return true if
-   * required_number_of_components == 0 (i.e. no restriction of num. of components
-   * is specified) or if required_number_of_components == num. of components
-   * in the array.
-   * This method is deprecated.
-   */
-  VTK_LEGACY(static bool IsArrayAcceptable(
-    int required_number_of_components, vtkPVArrayInformation* arrayInfo));
-
-  /**
    * This method will check if the arrayInfo contain info about an acceptable array,
    * by checking its number of components against this domain acceptable
    * numbers of components. Note that it takes into account property conversion
@@ -173,12 +152,6 @@ public:
 protected:
   vtkSMInputArrayDomain();
   ~vtkSMInputArrayDomain();
-
-  /**
-   * Set the first acceptable number of components
-   * This method is deprecated
-   */
-  VTK_LEGACY(void SetNumberOfComponents(int));
 
   vtkSetMacro(AttributeType, int);
   void SetAttributeType(const char* type);

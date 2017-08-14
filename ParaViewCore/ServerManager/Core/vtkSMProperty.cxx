@@ -280,13 +280,6 @@ void vtkSMProperty::RemoveAllDependents()
 }
 
 //---------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkSMProperty::UpdateDependentDomains()
-{
-}
-#endif
-
-//---------------------------------------------------------------------------
 void vtkSMProperty::UpdateDomains()
 {
   // I genuinely doubt when a property changes, its domain should change!!

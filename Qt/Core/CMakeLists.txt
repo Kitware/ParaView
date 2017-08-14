@@ -109,12 +109,6 @@ set(Module_SRCS
   pqOutputPort.h
   pqOutputWidget.cxx
   pqOutputWidget.h
-  pqOutputWindowAdapter.cxx
-  pqOutputWindowAdapter.h
-  pqOutputWindow.cxx
-  pqOutputWindow.h
-  pqOutputWindowModel.cxx
-  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.cxx
@@ -257,9 +251,6 @@ set (Module_MOC_HDRS
   pqObjectBuilder.h
   pqOutputPort.h
   pqOutputWidget.h
-  pqOutputWindowAdapter.h
-  pqOutputWindow.h
-  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
@@ -314,7 +305,6 @@ endif()
 
 set (Module_UI_FILES
   Resources/UI/pqOutputWidget.ui
-  Resources/UI/pqOutputWindow.ui
   Resources/UI/pqFileDialog.ui
 )
 

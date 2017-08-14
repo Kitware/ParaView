@@ -240,8 +240,6 @@ set (Module_SRCS
   pqProxyGroupMenuManager.h
   pqPythonShellReaction.cxx
   pqPythonShellReaction.h
-  pqQtMessageHandlerBehavior.cxx
-  pqQtMessageHandlerBehavior.h
   pqReaction.cxx
   pqReaction.h
   pqReloadFilesReaction.cxx
@@ -435,7 +433,6 @@ set (Module_MOC_HDRS
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
   pqPythonShellReaction.h
-  pqQtMessageHandlerBehavior.h
   pqReaction.h
   pqReloadFilesReaction.h
   pqRenameProxyReaction.h

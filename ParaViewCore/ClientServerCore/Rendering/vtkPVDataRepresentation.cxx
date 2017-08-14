@@ -276,22 +276,6 @@ bool vtkPVDataRepresentation::GetUseCache()
   return false;
 }
 
-#if !defined(VTK_LEGACY_REMOVE)
-//----------------------------------------------------------------------------
-void vtkPVDataRepresentation::SetUseCache(bool)
-{
-  VTK_LEGACY_BODY(vtkPVDataRepresentation::SetUseCache, "ParaView 5.0");
-}
-#endif
-
-#if !defined(VTK_LEGACY_REMOVE)
-//----------------------------------------------------------------------------
-void vtkPVDataRepresentation::SetCacheKey(double)
-{
-  VTK_LEGACY_BODY(vtkPVDataRepresentation::SetCacheKey, "ParaView 5.0");
-}
-#endif
-
 //----------------------------------------------------------------------------
 void vtkPVDataRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {

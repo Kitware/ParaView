@@ -63,8 +63,6 @@ class vtkSMProxyLocator;
 class vtkSMStateLoader;
 
 #if !defined(VTK_LEGACY_REMOVE)
-class pqOutputWindow;
-class pqOutputWindowAdapter;
 class pqDisplayPolicy;
 #endif
 
@@ -196,18 +194,9 @@ public:
   pqProgressManager* getProgressManager() const { return this->ProgressManager; }
 
   /**
-  * Returns the display policy instance used by the application.
-  * pqDisplayPolicy defines the policy for creating representations
-  * for sources.
+  * @deprecated ParaView 5.5.  See vtkSMParaViewPipelineControllerWithRendering.
   */
   VTK_LEGACY(pqDisplayPolicy* getDisplayPolicy() const);
-
-  /**
-  * Returns the output window.
-  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
-  */
-  VTK_LEGACY(inline pqOutputWindowAdapter* outputWindowAdapter());
-  VTK_LEGACY(inline pqOutputWindow* outputWindow());
 
   /**
   * @deprecated ParaView 5.5. See vtkSMParaViewPipelineControllerWithRendering.
@@ -314,12 +303,6 @@ public slots:
   void quit();
 
   /**
-  * Causes the output window to be shown.
-  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
-  */
-  void showOutputWindow();
-
-  /**
   * Load configuration xml. This results in firing of the loadXML() signal
   * which different components that support configuration catch and process to
   * update their behavior.
@@ -384,10 +367,6 @@ protected slots:
 protected:
   bool LoadingState;
 
-#if !defined(VTK_LEGACY_REMOVE)
-  pqOutputWindow* OutputWindow;
-  pqOutputWindowAdapter* OutputWindowAdapter;
-#endif
   pqOptions* Options;
 
 #if !defined(VTK_LEGACY_REMOVE)
@@ -416,22 +395,6 @@ private:
   pqInternals* Internal;
   static pqApplicationCore* Instance;
   void constructor();
-
-#if !defined(VTK_LEGACY_REMOVE)
-  void createOutputWindow();
-#endif
 };
-
-#if !defined(VTK_LEGACY_REMOVE)
-pqOutputWindowAdapter* pqApplicationCore::outputWindowAdapter()
-{
-  return this->OutputWindowAdapter;
-}
-
-pqOutputWindow* pqApplicationCore::outputWindow()
-{
-  return this->OutputWindow;
-}
-#endif
 
 #endif
