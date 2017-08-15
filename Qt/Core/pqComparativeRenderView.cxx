@@ -75,10 +75,12 @@ public:
   {
     this->QWidget::resizeEvent(evt);
 
-    BEGIN_UNDO_EXCLUDE();
+    QSize asize = this->size() * this->devicePixelRatio();
     int view_size[2];
-    view_size[0] = this->size().width();
-    view_size[1] = this->size().height();
+    view_size[0] = asize.width();
+    view_size[1] = asize.height();
+
+    BEGIN_UNDO_EXCLUDE();
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
     this->ViewProxy->UpdateProperty("ViewSize");
     END_UNDO_EXCLUDE();
