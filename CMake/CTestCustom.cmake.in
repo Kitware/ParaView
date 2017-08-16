@@ -15,11 +15,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "google::protobuf::Message"
 
   #ignore warnings coming from QT headers.
-  "qtcore"
-  "qthelp"
-  "QtCore"
-  "QtHelp"
-  "QtTest"
+  "[Qq][Tt][Cc][Oo][Rr][Ee]"
+  "[Qq][Tt][Gg][Uu][Ii]"
+  "[Qq][Tt][Hh][Ee][Ll][Pp]"
+  "[Qq][Tt][Tt][Ee][Ss][Tt]"
 
   # Qt header warnings on Windows with MSVC 2013 (12.0) and newer
   "qmutex"
@@ -122,9 +121,13 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "CDIReader.cdilib.c"
   "netcdf.h.* warning: shadowed declaration is here"
 
-  # ignore warnings (paraview/paraview#17282)
-  "QtCore.* warning C4127"
+  # VS2015 puts out bunch of warnings from xutility/xtree. exclude those.
+  "xtree.*warning C4800"
+  "xutility.*warning C4702"
 
+  # CTest adds "Note" to default warnings. That makes it very painful
+  # to exclude warnings on VS. Skip it.
+  "(^|[ :])[Nn][Oo][Tt][Ee]"
 )
 
 #------------------------------------------------------------------------------
