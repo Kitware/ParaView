@@ -624,8 +624,7 @@ pqProxyWidget::DocumentationType pqProxyWidget::showProxyDocumentationInPanel(vt
     : NULL;
   if (xml)
   {
-    QString type = xml->GetAttributeOrDefault("type", "description");
-    type = type.toLower();
+    const QString type = QString(xml->GetAttributeOrDefault("type", "description")).toLower();
     if (type == "long_help")
     {
       return USE_LONG_HELP;
