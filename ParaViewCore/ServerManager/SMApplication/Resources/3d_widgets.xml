@@ -467,6 +467,7 @@
             <Property name="Title" />
             <Property name="ComponentTitle" />
             <Property name="TitleJustification" />
+            <Property name="HorizontalTitle" />
           </PropertyGroup>
 
           <!-- properties for Title -->
