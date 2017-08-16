@@ -810,7 +810,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     }
 
     pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-    foreach (pqPropertyWidgetInterface* interface,
+    for (pqPropertyWidgetInterface* interface :
       interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
     {
       pqPropertyWidget* propertyWidget = interface->createWidgetForPropertyGroup(smproxy, group);
@@ -821,7 +821,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
         // Create decorators, if any.
         QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(group->GetHints());
-        foreach (const QString& type, decoratorTypes.keys())
+        for (const QString& type : decoratorTypes.keys())
         {
           if (interface->createWidgetDecorator(type, decoratorTypes[type], propertyWidget))
           {
@@ -987,12 +987,12 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     {
       // Create decorators, if any.
       pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-      foreach (pqPropertyWidgetInterface* interface,
+      for (pqPropertyWidgetInterface* interface :
         interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
       {
         QMap<QString, vtkPVXMLElement*> decoratorTypes =
           getDecorators(groupHints[property_group_tag]);
-        foreach (const QString& type, decoratorTypes.keys())
+        for (const QString& type : decoratorTypes.keys())
         {
           if (interface->createWidgetDecorator(type, decoratorTypes[type], propertyWidget))
           {
