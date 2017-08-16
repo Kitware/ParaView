@@ -231,7 +231,8 @@
                             command="AddFileName"
                             number_of_elements="0"
                             repeat_command="1"
-                            information_property="FileNameInfo">
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader. If more than 1 file is
