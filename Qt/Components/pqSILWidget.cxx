@@ -209,11 +209,41 @@ void pqSILWidget::toggleSelectedBlocks(bool checked)
   vtkSMProxy* activeSelection = port->getSelectionInput();
   vtkPVDataInformation* dataInfo = port->getDataInformation();
 
-  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
   std::vector<vtkIdType> block_ids;
-  block_ids.resize(blocksProp.GetNumberOfElements());
-  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  if (activeSelection->GetProperty("Blocks"))
+  {
+    vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+    block_ids.resize(blocksProp.GetNumberOfElements());
+    blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+    std::sort(block_ids.begin(), block_ids.end());
+  }
+  else if (activeSelection->GetXMLName() == std::string("CompositeDataIDSelectionSource") &&
+    activeSelection->GetProperty("IDs"))
+  {
+    vtkSMPropertyHelper idsProp(activeSelection, "IDs");
+
+    // Elements in the block_ids are 3-tuples (block flat-index, process number, id).
+    // Remove the process number and id elements and put the block ids into a set -
+    // we need only the unique block ids.
+    std::set<int> unique_ids;
+    for (unsigned int i = 0; i < idsProp.GetNumberOfElements(); i += 3)
+    {
+      unique_ids.insert(idsProp.GetAsInt(i));
+    }
+    block_ids.resize(unique_ids.size());
+
+    // ids will already be sorted coming out of the set.
+    block_ids.insert(block_ids.begin(), unique_ids.begin(), unique_ids.end());
+  }
+  else
+  {
+    // Exit early as we don't know what blocks have been selected.
+    return;
+  }
+
   std::sort(block_ids.begin(), block_ids.end());
+  auto new_end = std::unique(block_ids.begin(), block_ids.end());
+  block_ids.erase(new_end, block_ids.end());
 
   // if check is true then we are checking only the selected blocks,
   // if check is false, then we are un-checking the selected blocks, leaving
