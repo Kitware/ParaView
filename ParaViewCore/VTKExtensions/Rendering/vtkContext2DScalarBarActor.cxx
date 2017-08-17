@@ -113,6 +113,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->ActorDelegate = vtkContextActor::New();
 
   this->TitleJustification = VTK_TEXT_LEFT;
+  this->ForceHorizontalTitle = false;
 
   this->ScalarBarThickness = 16;
   this->ScalarBarLength = 0.33;
@@ -919,8 +920,12 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
   }
 
   // Apply the text property so that title size is up to date.
-  this->TitleTextProperty->SetOrientation(
-    this->GetOrientation() == VTK_ORIENT_HORIZONTAL ? 0.0 : 90.0);
+  double titleOrientation = 0.0;
+  if (this->GetOrientation() == VTK_ORIENT_VERTICAL && !this->GetForceHorizontalTitle())
+  {
+    titleOrientation = 90.0;
+  }
+  this->TitleTextProperty->SetOrientation(titleOrientation);
   this->TitleTextProperty->SetJustification(this->GetTitleJustification());
   painter->ApplyTextProp(this->TitleTextProperty);
 
@@ -937,7 +942,7 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
   vtkRectf rect = this->GetColorBarRect(size);
   float titleX = rect.GetX() + 0.5 * rect.GetWidth();
   float titleY = rect.GetY() + 0.5 * rect.GetHeight();
-  if (this->GetOrientation() == VTK_ORIENT_HORIZONTAL)
+  if (this->GetOrientation() == VTK_ORIENT_HORIZONTAL || this->ForceHorizontalTitle)
   {
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
@@ -958,6 +963,12 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
       {
         axisRect.SetHeight(rect.GetHeight());
       }
+      titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
+    }
+
+    // Move title to the top if the title is forced horizontal
+    if (this->ForceHorizontalTitle)
+    {
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
     }
   }

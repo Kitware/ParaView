@@ -64,6 +64,16 @@ public:
   vtkSetClampMacro(TitleJustification, int, VTK_TEXT_LEFT, VTK_TEXT_RIGHT);
   //@}
 
+  //@{
+  /**
+   * If this flag is on, the title will be drawn horizontally above the
+   * scalar bar. Off by default.
+   */
+  vtkSetMacro(ForceHorizontalTitle, bool);
+  vtkGetMacro(ForceHorizontalTitle, bool);
+  vtkBooleanMacro(ForceHorizontalTitle, bool);
+  //@}
+
   enum
   {
     PrecedeScalarBar = 0,
@@ -210,6 +220,12 @@ private:
   vtkContextActor* ActorDelegate;
 
   int TitleJustification;
+
+  /**
+   * Force the title orientation to horizontal when the scalar bar is in
+   * vertical orientation.
+   */
+  bool ForceHorizontalTitle;
 
   /**
    * Thickness of the color bar.
