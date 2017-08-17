@@ -24,6 +24,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar" command="mousePress" arguments="1,1,0,4,20" />
   <pqevent object="pqClientMainWindow/representationToolbar" command="mouseRelease" arguments="1,0,0,4,20" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionUseSeparateColorMap" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Normals" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Components" command="set_string" arguments="Y" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
@@ -32,5 +33,6 @@
   <!-- remove old state file -->
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SavePythonState-StateFile.py" />
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SavePythonState-StateFile.py" />
+  <pqevent object="StateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SkipHiddenDisplayProperties/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>

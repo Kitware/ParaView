@@ -48,6 +48,20 @@
      <string>Edit Color Map</string>
     </property>
    </action>
+   <action name="actionUseSeparateColorMap" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSeparateColorMap24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Use Separate Color Map</string>
+    </property>
+    <property name="statusTip" >
+     <string>Use Separate Color Map</string>
+    </property>
+   </action>
    <action name="actionResetRange" >
     <property name="enabled" >
      <bool>false</bool>
@@ -119,6 +133,7 @@
    </action>
    <addaction name="actionScalarBarVisibility" />
    <addaction name="actionEditColorMap" />
+   <addaction name="actionUseSeparateColorMap" />
    <addaction name="actionResetRange" />
    <addaction name="actionRescaleCustomRange" />
    <addaction name="actionRescaleTemporalRange" />

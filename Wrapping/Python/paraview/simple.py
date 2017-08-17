@@ -501,16 +501,18 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     SetProperties(rep, **params)
 
 # -----------------------------------------------------------------------------
-def ColorBy(rep=None, value=None):
+def ColorBy(rep=None, value=None, separate=False):
     """Set scalar color. This will automatically setup the color maps and others
     necessary state for the representations. 'rep' must be the display
     properties proxy i.e. the value returned by GetDisplayProperties() function.
     If none is provided the display properties for the active source will be
-    used, if possible."""
+    used, if possible. Set separate to True in order to use a separate color
+    map for this representation"""
     rep = rep if rep else GetDisplayProperties()
     if not rep:
         raise ValueError ("No display properties can be determined.")
 
+    rep.UseSeparateColorMap = separate
     association = rep.ColorArrayName.GetAssociation()
     arrayname = rep.ColorArrayName.GetArrayName()
     component = None
@@ -1311,10 +1313,15 @@ def GetScalarBar(ctf, view=None):
     return sb
 
 # -----------------------------------------------------------------------------
-def GetColorTransferFunction(arrayname, **params):
+def GetColorTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the color transfer function used to mapping a data array with the
-    given name to colors. This may create a new color transfer function
-    if none exists, or return an existing one"""
+    given name to colors. Representation is used to modify the array name
+    when using a separate color transfer function. separate can be used to recover
+    the separate color transfer function even if it is not used currently by the representation.
+    This may create a new color transfer function if none exists, or return an existing one"""
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Missing active session")
     session = servermanager.ActiveConnection.Session
@@ -1324,10 +1331,15 @@ def GetColorTransferFunction(arrayname, **params):
     SetProperties(lut, **params)
     return lut
 
-def GetOpacityTransferFunction(arrayname, **params):
+def GetOpacityTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the opacity transfer function used to mapping a data array with the
-    given name to opacity. This may create a new opacity transfer function
-    if none exists, or return an existing one"""
+    given name to opacity. Representation is used to modify the array name
+    when using a separate opacity transfer function. separate can be used to recover
+    the separate opacity transfer function even if it is not used currently by the representation.
+    This may create a new opacity transfer function if none exists, or return an existing one"""
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Missing active session")
     session = servermanager.ActiveConnection.Session

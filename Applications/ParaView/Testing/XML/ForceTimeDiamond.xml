@@ -17,6 +17,6 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="1" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="2" />
-  <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 </pqevents>

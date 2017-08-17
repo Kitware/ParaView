@@ -99,7 +99,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Color Map Editor" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,13,8,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,13,8,/0:0/0:1" />
-  <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 
   <!-- check cateogrical colors show up correctly for contours added with multiple isovalues -->

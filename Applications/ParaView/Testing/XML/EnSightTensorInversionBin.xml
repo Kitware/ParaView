@@ -6,7 +6,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Calculator" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function" command="set_string" arguments="pointTensors_XZ - pointTensors_YZ" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionRescaleCustomRange" command="activate" arguments="" />
   <pqevent object="pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="-0.1" />
   <pqevent object="pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="0.1" />
   <pqevent object="pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />

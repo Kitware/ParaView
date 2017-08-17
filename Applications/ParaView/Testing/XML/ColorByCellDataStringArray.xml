@@ -21,6 +21,6 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mousePress" arguments="1,1,0,171,44,/5:0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="mouseRelease" arguments="1,0,0,171,44,/5:0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
 </pqevents>

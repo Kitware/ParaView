@@ -310,6 +310,8 @@ set (Module_SRCS
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
   pqUndoRedoReaction.h
+  pqUseSeparateColorMapReaction.cxx
+  pqUseSeparateColorMapReaction.h
   pqVCRToolbar.cxx
   pqVCRToolbar.h
   pqVerifyRequiredPluginBehavior.cxx
@@ -468,6 +470,7 @@ set (Module_MOC_HDRS
   pqTransferFunctionWidgetPropertyWidget.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
+  pqUseSeparateColorMapReaction.h
   pqVCRToolbar.h
   pqVerifyRequiredPluginBehavior.h
   pqViewMenuManager.h

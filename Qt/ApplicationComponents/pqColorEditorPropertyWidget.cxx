@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqResetScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
+#include "pqUseSeparateColorMapReaction.h"
 #include "vtkSMPropertyHelper.h"
 
 class pqColorEditorPropertyWidget::pqInternals
@@ -48,6 +49,7 @@ class pqColorEditorPropertyWidget::pqInternals
 public:
   Ui::ColorEditorPropertyWidget Ui;
   QPointer<QAction> ScalarBarVisibilityAction;
+  QPointer<QAction> UseSeparateColorMapAction;
   QPointer<QAction> EditScalarBarAction;
 };
 
@@ -94,6 +96,17 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QW
   pqEditColorMapReaction* ecmr = new pqEditColorMapReaction(editColorMapAction, false);
   ecmr->setRepresentation(representation);
 
+  // separate color map button
+  QAction* useSeparateColorMapAction = new QAction(this);
+  this->Internals->UseSeparateColorMapAction = useSeparateColorMapAction;
+  useSeparateColorMapAction->connect(Ui.UseSeparateColorMap, SIGNAL(clicked()), SLOT(trigger()));
+  Ui.UseSeparateColorMap->connect(
+    useSeparateColorMapAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
+  pqUseSeparateColorMapReaction* uscmr =
+    new pqUseSeparateColorMapReaction(useSeparateColorMapAction, Ui.DisplayColorWidget, false);
+  uscmr->setRepresentation(representation);
+  this->connect(useSeparateColorMapAction, SIGNAL(changed()), SLOT(updateEnableState()));
+
   // reset range button
   QAction* resetRangeAction = new QAction(this);
   QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
@@ -137,6 +150,7 @@ void pqColorEditorPropertyWidget::updateEnableState()
   Ui::ColorEditorPropertyWidget& ui = this->Internals->Ui;
   const QAction* sbva = this->Internals->ScalarBarVisibilityAction;
   ui.ShowScalarBar->setEnabled(sbva->isEnabled());
+  ui.UseSeparateColorMap->setEnabled(sbva->isEnabled());
   ui.Rescale->setEnabled(sbva->isEnabled());
   ui.RescaleCustom->setEnabled(sbva->isEnabled());
   ui.RescaleTemporal->setEnabled(sbva->isEnabled());
