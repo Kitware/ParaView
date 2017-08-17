@@ -794,7 +794,10 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
           if (!resource.configuration().isNameDefault())
           {
             QString name = resource.configuration().name();
-            return QString("%1 (%2)").arg(name).arg(resource.toURI());
+            int time = server->getRemainingLifeTime();
+            QString timeLeft =
+              time > -1 ? QString(" (%1min left)").arg(QString::number(time)) : QString();
+            return QString("%1 (%2)%3").arg(name).arg(resource.toURI()).arg(timeLeft);
           }
           else
           {
@@ -815,6 +818,16 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
         }
       }
       break;
+
+    case Qt::TextColorRole:
+    {
+      if (idx.column() == 0 && server && server->getRemainingLifeTime() > -1 &&
+        server->getRemainingLifeTime() <= 5)
+      {
+        return qVariantFromValue<QColor>(QColor(Qt::red));
+      }
+      break;
+    }
 
     case Qt::DecorationRole:
       if (idx.column() == 0 && this->PixmapList)

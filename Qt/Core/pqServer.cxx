@@ -77,6 +77,10 @@ public:
   // inactivity timeouts.
   QTimer HeartbeatTimer;
 
+  QTimer ServerLifeTimeTimer;
+  // remaining time in minutes
+  int RemainingLifeTime;
+
   int IdleServerMessageCounter;
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -99,15 +103,14 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   vtkPVServerInformation* serverInfo = this->getServerInformation();
   if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
   {
-    int timeout = serverInfo->GetTimeout();
-    if (timeout > 5)
-    {
-      // 5 minute warning is shown only if timeout > 5.
-      QTimer::singleShot((timeout - 5) * 60 * 1000, this, SIGNAL(fiveMinuteTimeoutWarning()));
-    }
-
-    // 1 minute warning.
-    QTimer::singleShot((timeout - 1) * 60 * 1000, this, SIGNAL(finalTimeoutWarning()));
+    this->Internals->RemainingLifeTime = serverInfo->GetTimeout();
+    QObject::connect(&this->Internals->ServerLifeTimeTimer, SIGNAL(timeout()), this,
+      SLOT(updateRemainingLifeTime()));
+    this->Internals->ServerLifeTimeTimer.start(60000); // trigger signal every minute
+  }
+  else
+  {
+    this->Internals->RemainingLifeTime = -1;
   }
 
   QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
@@ -173,6 +176,12 @@ void pqServer::setMonitorServerNotifications(bool val)
   {
     this->IdleCollaborationTimer.stop();
   }
+}
+
+//-----------------------------------------------------------------------------
+int pqServer::getRemainingLifeTime() const
+{
+  return this->Internals->RemainingLifeTime;
 }
 
 //-----------------------------------------------------------------------------
@@ -312,6 +321,25 @@ void pqServer::heartBeat()
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke << "HeartBeat" << vtkClientServerStream::End;
     this->Session->ExecuteStream(vtkPVSession::SERVERS, stream, true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::updateRemainingLifeTime()
+{
+  if (this->isRemote() && this->Internals->RemainingLifeTime > 0)
+  {
+    this->Internals->RemainingLifeTime--;
+    if (this->Internals->RemainingLifeTime == 5)
+    {
+      emit fiveMinuteTimeoutWarning();
+    }
+    else if (this->Internals->RemainingLifeTime == 1)
+    {
+      emit finalTimeoutWarning();
+    }
+
+    emit this->nameChanged(this);
   }
 }
 
