@@ -611,7 +611,8 @@ struct Process_5_4_to_5_5
 {
   bool operator()(xml_document& document)
   {
-    return LockScalarRange(document) && CalculatorAttributeMode(document);
+    return LockScalarRange(document) && CalculatorAttributeMode(document) &&
+      CGNSReaderUpdates(document);
   }
 
   bool LockScalarRange(xml_document& document)
@@ -676,6 +677,88 @@ struct Process_5_4_to_5_5
       element.attribute("value").set_value(attribute_mode_value - 1);
 
       attribute_mode.remove_child("Domain");
+    }
+    return true;
+  }
+
+  /**
+   * Handle changes to properties on `CGNSSeriesReader`.
+   * 1. `BaseStatus`, `FamilyStatus`, `LoadMesh`, and `LoadBndPatch` properties have been removed.
+   * 2. a new `Blocks` property takes in block selection instead
+   */
+  bool CGNSReaderUpdates(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='sources' and @type='CGNSSeriesReader']");
+    for (auto xnode : proxy_nodes)
+    {
+      auto proxyNode = xnode.node();
+      if (!proxyNode.select_nodes("//Property[@name='Blocks']").empty())
+      {
+        // state is already newer.
+        continue;
+      }
+
+      bool loadMesh = true;
+      if (!proxyNode.select_nodes("//Property[@name='LoadMesh']/Element[@index='0' and value='0']")
+             .empty())
+      {
+        loadMesh = false;
+      }
+
+      bool loadBndPatch = false;
+      if (!proxyNode
+             .select_nodes("//Property[@name='LoadBndPatch']/Element[@index='0' and value='1']")
+             .empty())
+      {
+        loadBndPatch = true;
+      }
+
+      // now collect names for selected bases and families.
+      std::set<std::string> selectedPaths;
+      auto xprops_set =
+        proxyNode.select_nodes("//Property[@name='BaseStatus']/Element[@value='1']");
+      for (auto xpropnode : xprops_set)
+      {
+        std::string baseName = xpropnode.node().previous_sibling().attribute("value").value();
+        if (loadMesh)
+        {
+          std::ostringstream stream;
+          stream << "/Grids/" << baseName.c_str();
+          selectedPaths.insert(stream.str());
+        }
+        if (loadBndPatch)
+        {
+          std::ostringstream stream;
+          stream << "/Patches/" << baseName.c_str();
+          selectedPaths.insert(stream.str());
+        }
+      }
+
+      xprops_set = proxyNode.select_nodes("//Property[@name='FamilyStatus']/Element[@value='1']");
+      for (auto xpropnode : xprops_set)
+      {
+        std::string familyName = xpropnode.node().previous_sibling().attribute("value").value();
+        std::ostringstream stream;
+        stream << "/Families/" << familyName.c_str();
+        selectedPaths.insert(stream.str());
+      }
+
+      auto blocksNode = proxyNode.append_child("Property");
+      blocksNode.append_attribute("name").set_value("Blocks");
+      blocksNode.append_attribute("number_of_elements")
+        .set_value(static_cast<int>(selectedPaths.size() * 2));
+      int index = 0;
+      for (const auto spath : selectedPaths)
+      {
+        auto eNode = blocksNode.append_child("Element");
+        eNode.append_attribute("index").set_value(index++);
+        eNode.append_attribute("value").set_value(spath.c_str());
+
+        eNode = blocksNode.append_child("Element");
+        eNode.append_attribute("index").set_value(index++);
+        eNode.append_attribute("value").set_value(1);
+      }
     }
     return true;
   }

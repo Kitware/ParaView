@@ -26,6 +26,14 @@
  * similar to vtkSMArraySelectionDomain) with one notable exception. This
  * information property typically uses the vtkSMSILInformationHelper which is
  * used to access the SIL if requested by using GetSIL().
+ *
+ * @section Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, you should use
+ * vtkSMSubsetInclusionLatticeDomain instead.
 */
 
 #ifndef vtkSMSILDomain_h

@@ -42,8 +42,9 @@
 #include <string> // for std::string
 #include <vector> // for std::vector
 
-class vtkFileSeriesHelper;
 class vtkCGNSReader;
+class vtkCGNSSubsetInclusionLattice;
+class vtkFileSeriesHelper;
 class vtkMultiProcessController;
 
 class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSFileSeriesReader
@@ -106,6 +107,15 @@ public:
    */
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
+  //@{
+  /**
+   * API for support SIL and SIL based selections.
+   */
+  vtkIdType GetSILUpdateStamp() const;
+  void SetBlockStatus(const char* nodepath, bool enabled);
+  void ClearBlockStatus();
+  //@}
+
 protected:
   vtkCGNSFileSeriesReader();
   ~vtkCGNSFileSeriesReader();
@@ -142,6 +152,8 @@ private:
   unsigned long ReaderObserverId;
   bool InProcessRequest;
   std::vector<std::string> ActiveFiles;
+
+  vtkNew<vtkCGNSSubsetInclusionLattice> SIL;
 };
 
 #endif

@@ -84,12 +84,15 @@ def _wrap_property(proxy, smproperty):
     if paraview.compatibility.GetVersion() >= 3.5 and \
       smproperty.IsA("vtkSMStringVectorProperty"):
         al = smproperty.GetDomain("array_list")
-        if  al and al.IsA("vtkSMArraySelectionDomain") and \
+        if al and al.IsA("vtkSMArraySelectionDomain") and \
             smproperty.GetRepeatable():
             property = ArrayListProperty(proxy, smproperty)
-        elif  al and al.IsA("vtkSMChartSeriesSelectionDomain") and \
+        elif al and al.IsA("vtkSMChartSeriesSelectionDomain") and \
             smproperty.GetRepeatable() and al.GetDefaultMode() == 1:
             property = ArrayListProperty(proxy, smproperty)
+        elif al and al.IsA("vtkSMSubsetInclusionLatticeDomain") and \
+            smproperty.GetRepeatable():
+            property = SubsetInclusionLatticeProperty(proxy, smproperty)
         elif al and al.IsA("vtkSMArrayListDomain") and \
             smproperty.GetRepeatable():
             # if it is repeatable, then it is not a single array selection... and if it happens
@@ -1131,6 +1134,15 @@ class ArrayListProperty(VectorProperty):
             if self.GetElement(i+1) != '0':
                 self.__arrays.append(self.GetElement(i))
         return list(self.__arrays)
+
+
+class SubsetInclusionLatticeProperty(ArrayListProperty):
+    """This property provides a simpler interface for selecting blocks on a
+    property with a `vtkSMSubsetInclusionLatticeDomain`."""
+    # currently, there's nothing more here. eventually, we'll add support to
+    # forward select/deselect requests to a vtkSubsetInclusionLattice instance.
+    pass
+
 
 class ProxyProperty(Property):
     """A ProxyProperty provides access to one or more proxies. You can use

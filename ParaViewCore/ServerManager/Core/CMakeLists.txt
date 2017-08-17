@@ -121,6 +121,7 @@ set (Module_SRCS
   vtkSMStateVersionController.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMSubsetInclusionLatticeDomain.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
   vtkSMTimeStepIndexDomain.cxx

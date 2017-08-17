@@ -667,6 +667,69 @@ int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo
 }
 
 //------------------------------------------------------------------------------
+int readZoneInfo(int cgioNum, double zoneId, CGNSRead::ZoneInformation& zoneInfo)
+{
+  if (cgio_get_name(cgioNum, zoneId, zoneInfo.name) != CG_OK)
+  {
+    return 1;
+  }
+
+  std::vector<double> zoneChildren;
+  getNodeChildrenId(cgioNum, zoneId, zoneChildren);
+  for (double zoneChildId : zoneChildren)
+  {
+    CGNSRead::char_33 nodeLabel;
+    if (cgio_get_label(cgioNum, zoneChildId, nodeLabel) == CG_OK)
+    {
+      if (strcmp(nodeLabel, "FamilyName_t") == 0)
+      {
+        std::string fname;
+        CGNSRead::readNodeStringData(cgioNum, zoneChildId, fname);
+        std::copy(fname.c_str(),
+          fname.c_str() + std::min(fname.size() + 1, sizeof(zoneInfo.family)), zoneInfo.family);
+        zoneInfo.family[32] = 0;
+      }
+      else if (strcmp(nodeLabel, "ZoneBC_t") == 0)
+      {
+        std::vector<double> zoneBCChildren;
+        getNodeChildrenId(cgioNum, zoneChildId, zoneBCChildren);
+        for (double zoneBCChildId : zoneBCChildren)
+        {
+          if (cgio_get_label(cgioNum, zoneBCChildId, nodeLabel) == CG_OK &&
+            strcmp(nodeLabel, "BC_t") == 0)
+          {
+            CGNSRead::ZoneBCInformation bcinfo;
+            cgio_get_name(cgioNum, zoneBCChildId, bcinfo.name);
+
+            // now read family info for this BC_t.
+            std::vector<double> bcChildren;
+            getNodeChildrenId(cgioNum, zoneBCChildId, bcChildren);
+            for (double bcChildId : bcChildren)
+            {
+              if (cgio_get_label(cgioNum, bcChildId, nodeLabel) == CG_OK &&
+                strcmp(nodeLabel, "FamilyName_t") == 0)
+              {
+                std::string fname;
+                CGNSRead::readNodeStringData(cgioNum, bcChildId, fname);
+                std::copy(fname.c_str(),
+                  fname.c_str() + std::min(fname.size() + 1, sizeof(bcinfo.family)), bcinfo.family);
+                bcinfo.family[32] = 0;
+                break;
+              }
+            }
+            releaseIds(cgioNum, bcChildren);
+            zoneInfo.bcs.push_back(bcinfo);
+          }
+        }
+        releaseIds(cgioNum, zoneBCChildren);
+      }
+    }
+  }
+  releaseIds(cgioNum, zoneChildren);
+  return 0;
+}
+
+//------------------------------------------------------------------------------
 void releaseIds(int cgioNum, const std::vector<double>& ids)
 {
   for (auto iter = ids.begin(); iter != ids.end(); ++iter)

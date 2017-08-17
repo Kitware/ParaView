@@ -10,46 +10,6 @@
         The default file extension is .cgns. The output of this reader is
         a multi-block dataset.
       </Documentation>
-      <Hints>
-        <ReaderFactory extensions="cgns" file_description="CGNS Files" />
-      </Hints>
-
-      <StringVectorProperty name="FileName"
-                            animateable="0"
-                            command="SetFileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>
-          This property specifies the file name for the CGNS reader.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="BaseInfo"
-         information_only="1">
-         <ArraySelectionInformationHelper attribute_name="Base"/>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="BaseStatus"
-         label="Bases"
-         command="SetBaseArrayStatus"
-         number_of_elements="2"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="BaseInfo"
-         >
-        <ArraySelectionDomain name="array_list">
-           <RequiredProperties>
-              <Property name="BaseInfo" function="ArrayList"/>
-           </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>
-          Select the bases to be loaded from the dataset, if any.
-        </Documentation>
-      </StringVectorProperty>
 
       <StringVectorProperty name="PointArrayInfo"
                             information_only="1">
@@ -98,62 +58,6 @@
           This property contains a list of the cell-centered arrays to read.
         </Documentation>
       </StringVectorProperty>
-
-      <StringVectorProperty
-         name="FamilyInfo"
-         information_only="1">
-         <ArraySelectionInformationHelper attribute_name="Family"/>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="FamilyStatus"
-         label="Families"
-         command="SetFamilyArrayStatus"
-         number_of_elements="2"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="FamilyInfo"
-         panel_visibility="advanced">
-        <ArraySelectionDomain name="array_list">
-           <RequiredProperties>
-              <Property name="FamilyInfo" function="ArrayList"/>
-           </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>
-          For selected nodes, choose the node families to load.
-        </Documentation>
-      </StringVectorProperty>
-
-      <IntVectorProperty name="LoadBndPatch"
-                         command="SetLoadBndPatch"
-                         number_of_elements="1"
-                         animateable="0"
-                         default_values="0"
-                         label="Load Boundary Elements"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Toggle whether to take into account boundary elements in cgns zones
-          If unchecked, the boundary elements are ignored.
-          If checked, a "Patches" Multiblock node will appear under the zone node.
-          It stores the boundaries' geometry while the original volume cells are put
-          in a "Internal" node.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="LoadMesh"
-        command="SetLoadMesh"
-        number_of_elements="1"
-        default_values="1"
-        panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Toggle to control whether the mesh for zones enabled should be read.
-          It can be used together to **Load Boundary Elements** to only load boundary condition
-          patches and not the whole mesh.
-        </Documentation>
-      </IntVectorProperty>
 
       <IntVectorProperty name="DoublePrecisionMesh"
                          command="SetDoublePrecisionMesh"
@@ -241,22 +145,50 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IdTypeVectorProperty command="GetSILUpdateStamp"
+        number_of_elements="1"
+        default_values="0"
+        information_only="1"
+        name="SILTimeStamp">
+        <Documentation>
+          Indicates the timestamp when the SIL structured was modified.
+          Useful to determine which to rebuild the SIL on the client.
+        </Documentation>
+      </IdTypeVectorProperty>
+
+      <StringVectorProperty
+         name="Blocks"
+         label="Blocks"
+         command="SetBlockStatus"
+         clean_command="ClearBlockStatus"
+         repeat_command="1"
+         number_of_elements_per_command="2"
+         element_types="2 0">
+         <SubsetInclusionLatticeDomain name="array_list" class="vtkCGNSSubsetInclusionLattice" default_path="//Grid">
+           <RequiredProperties>
+             <Property function="TimeStamp" name="SILTimeStamp" />
+           </RequiredProperties>
+         </SubsetInclusionLatticeDomain>
+        <Documentation>
+          Select the blocks (i.e. zones, bc-patches etc)
+          to be loaded from the dataset. **Hierarchy** reflects the
+          hierarchy as present in the CGNS file. **Families** allows selecting of blocks
+          using their family names. **Grids** and **Patches** allows loading grids or
+          bc-patches for specific zones.
+        </Documentation>
+      </StringVectorProperty>
+
+
       <SubProxy command="SetReader">
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="CGNSReader">
         </Proxy>
         <ExposedProperties>
-          <Property name="BaseInfo" />
-          <Property name="BaseStatus" />
           <Property name="CellArrayInfo" />
           <Property name="CellArrayStatus" />
           <Property name="PointArrayInfo" />
           <Property name="PointArrayStatus" />
-          <Property name="FamilyInfo" />
-          <Property name="FamilyStatus" />
-          <Property name="LoadBndPatch" />
-          <Property name="LoadMesh" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CreateEachSolutionAsBlock" />
           <Property name="IgnoreFlowSolutionPointers" />

@@ -35,8 +35,10 @@
 #include <string>
 #include <vector>
 
+#include "vtkCGNSSubsetInclusionLattice.h"
 #include "vtkIdTypeArray.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkPoints.h"
 #include "vtk_cgns.h"
 
@@ -164,10 +166,30 @@ typedef struct
 } VTKVariable;
 
 //------------------------------------------------------------------------------
+class ZoneBCInformation
+{
+public:
+  char_33 name;
+  char_33 family;
+  ZoneBCInformation()
+  {
+    this->name[0] = '\0';
+    this->family[0] = '\0';
+  }
+};
+
+//------------------------------------------------------------------------------
 class ZoneInformation
 {
 public:
   char_33 name;
+  char_33 family;
+  std::vector<CGNSRead::ZoneBCInformation> bcs;
+  ZoneInformation()
+  {
+    this->name[0] = '\0';
+    this->family[0] = '\0';
+  }
 };
 
 //------------------------------------------------------------------------------
@@ -217,6 +239,8 @@ public:
   std::vector<CGNSRead::FamilyInformation> family;
   std::map<std::string, double> referenceState;
 
+  std::vector<CGNSRead::ZoneInformation> zones;
+
   int nzones;
 
   // std::vector<CGNSRead::zone> zone;
@@ -264,14 +288,34 @@ public:
   ~vtkCGNSMetaData();
   //@}
 
+  vtkCGNSSubsetInclusionLattice* GetSIL() const { return this->SIL; }
+  void SetExternalSIL(vtkCGNSSubsetInclusionLattice* sil)
+  {
+    if (sil)
+    {
+      this->SIL = sil;
+      this->SkipSILUpdates = true;
+    }
+    else
+    {
+      this->SIL = vtkSmartPointer<vtkCGNSSubsetInclusionLattice>::New();
+      this->SkipSILUpdates = false;
+    }
+  }
+
 private:
   vtkCGNSMetaData(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
   void operator=(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
+
+  void UpdateSIL();
 
   std::vector<CGNSRead::BaseInformation> baseList;
   std::string LastReadFilename;
   // Not very elegant :
   std::vector<double> GlobalTime;
+
+  vtkSmartPointer<vtkCGNSSubsetInclusionLattice> SIL;
+  bool SkipSILUpdates;
 };
 
 //------------------------------------------------------------------------------

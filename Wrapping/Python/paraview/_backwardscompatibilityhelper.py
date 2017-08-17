@@ -161,6 +161,17 @@ def setattr(proxy, pname, value):
         else:
             paraview.print_debug_info("'UseOffscreenRendering' is obsolete.")
 
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "CGNSSeriesReader":
+        # in 5.5, CGNS reader had some changes. "BaseStatus", "FamilyStatus",
+        # "LoadBndPatch", and "LoadMesh" properties were removed.
+        if pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_debug_info(\
+                  "'%s' is no longer supported and will have no effect. "\
+                  "Please use `Blocks` property to specify blocks to load." % pname)
+                raise Continue()
+            else:
+                paraview.print_debug_info("'%s' is obsolete." % pname)
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -289,6 +300,16 @@ def getattr(proxy, pname):
             raise NotSupportedException(\
                     '`UseOffscreenRendering` is no longer supported. Please remove it.')
 
+    if proxy.SMProxy.GetXMLName() == "CGNSSeriesReader" and\
+            pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
+        if version < 5.5:
+            if pname in ["LoadMesh", "LoadBndPatch"]:
+                return 0
+            else:
+                return []
+        else:
+            raise NotSupportedException(\
+              "'%s' is obsolete. Use `Blocks` to make block based selection." % pname)
     raise Continue()
 
 def GetProxy(module, key):

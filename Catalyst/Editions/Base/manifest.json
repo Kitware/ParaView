@@ -211,6 +211,9 @@
     { "name":"vtkjsoncpp",
       "path":"VTK/ThirdParty/jsoncpp"
     },
+    { "name":"vtkPVVTKExtensionsSIL",
+      "path":"ParaViewCore/VTKExtensions/SIL"
+    },
     { "name":"vtkPVVTKExtensionsCore",
       "path":"ParaViewCore/VTKExtensions/Core",
       "include": [
