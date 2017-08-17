@@ -11,10 +11,6 @@
       processes.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkDataSet" />
@@ -632,10 +628,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkDataObject" />
@@ -672,10 +664,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkPolyData" />
@@ -731,10 +719,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkUnstructuredGrid" />
@@ -803,10 +787,6 @@
       </PropertyGroup>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
@@ -863,10 +843,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
@@ -910,10 +886,6 @@
       format. </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
@@ -961,10 +933,6 @@
       headers are expected to have extension: ".mha" or ".mhd"</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkImageData" />
@@ -999,10 +967,6 @@
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkImageData" />
@@ -1033,10 +997,6 @@
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkImageData" />
@@ -1071,10 +1031,6 @@
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkImageData" />
@@ -1103,10 +1059,6 @@
       <Documentation short_help="Write image data as a JSON file."/>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkImageData" />
@@ -1153,10 +1105,6 @@
       about the Exodus II format.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkCompositeDataSet" />
@@ -1207,10 +1155,6 @@
       EnSight.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkUnstructuredGrid" />
@@ -1307,10 +1251,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable" />
         </DataTypeDomain>
@@ -1377,10 +1317,6 @@
       </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
