@@ -4184,6 +4184,86 @@ array.
       <!-- End MeshQuality -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPCellSizeFilter"
+                 label="Cell Size"
+                 name="CellSize">
+      <Documentation long_help="This filter computes sizes for 0D (1 for vertex and number of points in for polyvertex), 1D (length), 2D (area)
+        and 3D (volume) cells. ComputePoint, ComputeLength, ComputeArea and ComputeVolume options can be used to specify what dimension
+        cells to compute for. Alternatively, the ComputeHighestDimension will compute sizes for only the highest dimension cells for
+        the vtkDataSet. The values are placed in a cell data array named ArrayName. The SumSize option will give a summation of the
+        computed cell sizes for a vtkDataSet and for composite datasets will contain a sum of the underlying blocks."
+        short_help="Compute cell sizes.">This filter computes sizes for 0D (1 for vertex and number of points in for polyvertex), 1D (length), 2D (area)
+        and 3D (volume) cells. ComputePoint, ComputeLength, ComputeArea and ComputeVolume options can be used to specify what dimension
+        cells to compute for. Alternatively, the ComputeHighestDimension will compute sizes for only the highest dimension cells for
+        the vtkDataSet. The values are placed in a cell data array named ArrayName. The ComputeSum option will give a summation of the
+        computed cell sizes for a vtkDataSet and for composite datasets will contain a sum of the underlying blocks.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Cell Size filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetArrayName"
+                            default_values="size"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <Documentation>
+          Specify the name of the array to store cell data size and optionally the field data size sum.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetComputePoint"
+                         default_values="1"
+                         name="ComputePoint"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the number of points in 0D cells.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeLength"
+                         default_values="1"
+                         name="ComputeLength"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the length of 1D cells.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeArea"
+                         default_values="1"
+                         name="ComputeArea"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the area of 2D cells.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeVolume"
+                         default_values="1"
+                         name="ComputeVolume"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the volume of 3D cells .</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeHighestDimension"
+                         default_values="0"
+                         name="ComputeHighestDimension"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute only the cell sizes for cells of the highest dimension in the vtkDataSet.
+        If this is enabled then it overrides the options for ComputePoint, ComputeLength, ComputeArea and ComputeVolume.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeSum"
+                         default_values="0"
+                         name="ComputeSum"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to sum the computed sizes of cells in datasets. The result is stored in field data.</Documentation>
+      </IntVectorProperty>
+      <!-- End CellSize -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPPolyDataNormals"
                  label="Generate Surface Normals"
                  name="PolyDataNormals">

@@ -223,6 +223,11 @@ set(_vtk_modules
   vtkFiltersVerdict
   # Needed for:
   #  vtkMeshQuality
+  #  vtkCellSizeFilter
+
+  vtkFiltersParallelVerdict
+  # Needed for:
+  #  vtkPCellSizeFilter
 
   vtkImagingCore
   # Needed for:

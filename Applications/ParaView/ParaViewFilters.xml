@@ -152,6 +152,7 @@
   <Proxy group="filters" name="CellCenters" />
   <Proxy group="filters" name="CellDataToPointData" />
   <Proxy group="filters" name="CellDerivatives"/>
+  <Proxy group="filters" name="CellSize" />
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
