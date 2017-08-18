@@ -1346,10 +1346,13 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         for config in rlist:
             readerName = config['name']
             readerMethod = 'FileName'
+            useDirectory = False
             if 'method' in config:
                 readerMethod = config['method']
+            if 'useDirectory' in config:
+                useDirectory = config['useDirectory']
             for ext in config['extensions']:
-                self.readerFactoryMap[ext] = [ readerName, readerMethod ]
+                self.readerFactoryMap[ext] = [ readerName, readerMethod, useDirectory ]
 
     #--------------------------------------------------------------------------
     # Convenience method to get proxy defs, cached if available
@@ -2218,11 +2221,15 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if extension in self.readerFactoryMap:
             readerName = self.readerFactoryMap[extension][0]
             customMethod = self.readerFactoryMap[extension][1]
+            useDirectory = self.readerFactoryMap[extension][2]
 
         # Open the file(s)
         reader = None
         if readerName:
-            kw = { customMethod: fileToLoad }
+            if useDirectory:
+                kw = { customMethod: os.path.dirname(fileToLoad[0]) }
+            else:
+                kw = { customMethod: fileToLoad }
             reader = paraview.simple.__dict__[readerName](**kw)
         else:
             if self.allowUnconfiguredReaders:
