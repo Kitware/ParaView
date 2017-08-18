@@ -192,6 +192,10 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
   sim_inputs_map.chop(1);
 
   QString paddingAmount = this->Internals->fileNamePaddingAmountSpinBox->cleanText();
+  if (paddingAmount.isEmpty())
+  {
+    paddingAmount = "0";
+  }
 
   QString rescale_data_range =
     (this->Internals->rescaleDataRange->isChecked() == true ? "True" : "False");

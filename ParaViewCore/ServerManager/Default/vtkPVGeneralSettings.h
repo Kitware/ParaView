@@ -215,6 +215,22 @@ public:
   bool GetLoadNoChartVariables();
   //@}
 
+  //@{
+  /**
+   * Get/Set the GUI font size. This is used only if GUIOverrideFont is true.
+   */
+  vtkSetClampMacro(GUIFontSize, int, 8, VTK_INT_MAX);
+  vtkGetMacro(GUIFontSize, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set whether the GUIFontSize should be used.
+   */
+  vtkSetMacro(GUIOverrideFont, bool);
+  vtkGetMacro(GUIOverrideFont, bool);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings();
@@ -230,6 +246,8 @@ protected:
   int AnimationTimePrecision;
   int PropertiesPanelMode;
   bool LockPanels;
+  int GUIFontSize;
+  bool GUIOverrideFont;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;

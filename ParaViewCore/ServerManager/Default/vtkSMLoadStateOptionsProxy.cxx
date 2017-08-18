@@ -33,6 +33,7 @@
 
 using namespace vtksys;
 
+#include <algorithm>
 #include <set>
 #include <sstream>
 
@@ -210,6 +211,8 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
+  std::map<std::string, int> namesUsed;
+
   // Setup proxies for for explict file change dialog
   for (auto idIter = this->Internals->PropertiesMap.begin();
        idIter != this->Internals->PropertiesMap.end(); idIter++)
@@ -231,6 +234,26 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     std::string newProxyName = std::to_string(idIter->first);
     this->AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
 
+    std::string baseName =
+      this->Internals->CollectionsMap[idIter->first].attribute("name").as_string();
+
+    // Remove all '.'s in the name to avoid possible name collisions with the appended index
+    // If baseName is not unique for each proxy then the proxies are linked and their properties
+    // cannot
+    // be set separately if the property names are the same.
+    baseName.erase(std::remove(baseName.begin(), baseName.end(), '.'), baseName.end());
+
+    auto nameUseCount = namesUsed.find(baseName);
+    if (nameUseCount != namesUsed.end())
+    {
+      baseName.append(".").append(std::to_string(nameUseCount->second));
+      ++nameUseCount->second;
+    }
+    else
+    {
+      namesUsed[baseName] = 1;
+    }
+
     for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
     {
       vtkSmartPointer<vtkSMProperty> property = newReaderProxy->GetProperty(pIter->first.c_str());
@@ -248,14 +271,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
       property->SetHints(ConvertXML(XMLParser.Get(), hints));
 
       pugi::xml_node propertyXML = pIter->second.XMLElement;
-      std::string exposedName =
-        SystemTools::GetFilenameName(propertyXML.child("Element").attribute("value").value());
-
-      vtkNew<vtkFileSequenceParser> sequenceParser;
-      if (sequenceParser->ParseFileSequence(exposedName.c_str()))
-      {
-        exposedName = sequenceParser->GetSequenceName();
-      }
+      std::string exposedName = baseName;
 
       exposedName.append(".").append(propertyXML.attribute("name").value());
       this->ExposeSubProxyProperty(newProxyName.c_str(), propertyXML.attribute("name").value(),

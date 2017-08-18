@@ -760,10 +760,6 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
 {
   vtkRectf rect = this->GetColorBarRect(size);
 
-  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-  int tileScale[2];
-  renWin->GetTileScale(tileScale);
-
   // Use the length of the character "|" at the label font size for various
   // measurements.
   float bounds[4];
@@ -771,8 +767,16 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   painter->ComputeStringBounds("|", bounds);
   float pipeHeight = bounds[3];
 
-  // Compute a horizontal shift amount for tick marks when the orientation is
-  // vertical.
+  // Note that at this point the font size is already scaled by the tile
+  // scale factor. Later on, vtkAxis will scale the tick length and label offset
+  // by the tile scale factor again, so we need to divide by the tile scale
+  // factor here to take that into account.
+  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+  pipeHeight /= tileScale[1];
+
+  // Compute a shift amount for tick marks.
   float axisShift = 0.25 * pipeHeight;
 
   // Compute tick lengths and label offsets based on the label font size
@@ -1019,21 +1023,9 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   this->Axis->GetScene()->SetRenderer(vtkRenderer::SafeDownCast(this->CurrentViewport));
 
   vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-  int tileScale[2];
-  renWin->GetTileScale(tileScale);
 
   double size[2];
   this->GetSize(size, painter);
-
-  // Scale only the scalar bar length.
-  if (this->Orientation == VTK_ORIENT_VERTICAL)
-  {
-    size[1] *= tileScale[1];
-  }
-  else
-  {
-    size[0] *= tileScale[0];
-  }
 
   // Paint the various components
   vtkNew<vtkTransform2D> tform;

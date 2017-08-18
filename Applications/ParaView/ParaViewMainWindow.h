@@ -54,6 +54,7 @@ protected slots:
   void showHelpForProxy(const QString& groupname, const QString& proxyname);
   void showWelcomeDialog();
   void handleMessage(const QString&, int);
+  void updateFontSize();
 
 private:
   Q_DISABLE_COPY(ParaViewMainWindow)

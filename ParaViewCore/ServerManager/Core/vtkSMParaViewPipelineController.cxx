@@ -960,7 +960,7 @@ bool vtkSMParaViewPipelineController::PreInitializeProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkSMParaViewPipelineController::GetInitializationTime(vtkSMProxy* proxy)
+vtkMTimeType vtkSMParaViewPipelineController::GetInitializationTime(vtkSMProxy* proxy)
 {
   vtkInternals::TimeStampsMap::iterator titer =
     this->Internals->InitializationTimeStamps.find(proxy);
@@ -1220,7 +1220,7 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
 
 //----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::ProcessInitializationHelper(
-  vtkSMProxy* proxy, unsigned long initializationTimeStamp)
+  vtkSMProxy* proxy, vtkMTimeType initializationTimeStamp)
 {
   vtkPVXMLElement* hints = proxy->GetHints();
   for (unsigned int cc = 0, max = (hints ? hints->GetNumberOfNestedElements() : 0); cc < max; ++cc)

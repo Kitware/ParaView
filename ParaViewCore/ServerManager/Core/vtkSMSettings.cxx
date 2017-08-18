@@ -1252,7 +1252,6 @@ bool vtkSMSettings::GetPropertySetting(
   jsonPrefix.append(parent->GetXMLName());
   jsonPrefix.append(".");
   jsonPrefix.append(parent->GetPropertyName(property));
-  std::cout << maxPriority << ", " << jsonPrefix << std::endl;
 
   return this->Internal->GetPropertySetting(jsonPrefix.c_str(), property, maxPriority);
 }

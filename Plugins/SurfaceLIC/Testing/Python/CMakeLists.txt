@@ -40,7 +40,7 @@ IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
-        --threshold 25
+        --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
@@ -55,7 +55,7 @@ ELSE()
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
-        --threshold 25
+        --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
