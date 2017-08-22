@@ -85,6 +85,8 @@ if (dist > 9.0) {
   discard;
 }
 '''
+rep.CustomTriangleScale = 3
+rep.ShaderPreset = "Custom"
 
 # Now render, configure the view, and re-render
 renderView = simple.Render()

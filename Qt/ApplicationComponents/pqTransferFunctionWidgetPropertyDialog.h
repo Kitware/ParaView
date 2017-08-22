@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqTransferFunctionWidgetPropertyWidget.h
+   Module: pqTransferFunctionWidgetPropertyDialog.h
 
    Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
@@ -29,53 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqTransferFunctionWidgetPropertyWidget_h
-#define _pqTransferFunctionWidgetPropertyWidget_h
+#ifndef _pqTransferFunctionWidgetPropertyDialog_h
+#define _pqTransferFunctionWidgetPropertyDialog_h
 
 #include "pqApplicationComponentsModule.h" // for export macros
-#include "pqPropertyWidget.h"
+#include "vtkSmartPointer.h"               // For SmartPointer
+#include <QDialog>
+#include <QScopedPointer>
 
-class vtkSMTransferFunctionProxy;
-class vtkEventQtSlotConnect;
-class vtkSMRangedTransferFunctionDomain;
+class vtkPiecewiseFunction;
 
-/**
-* A property widget for editing a transfer function.
-*
-* To use this widget for a property add the
-* 'panel_widget="transfer_function_editor"' to the property's XML.
-*/
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
-  : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit pqTransferFunctionWidgetPropertyWidget(
-    vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  ~pqTransferFunctionWidgetPropertyWidget();
-
-  const double* getRange() { return this->Range; };
-  void setRange(const double& min, const double& max);
-
-signals:
-  void domainChanged();
-
-protected:
-  void UpdateProperty();
+  pqTransferFunctionWidgetPropertyDialog(const QString& label, double* xrange,
+    vtkPiecewiseFunction* transferFunction, QWidget* parentWdg = NULL);
+  ~pqTransferFunctionWidgetPropertyDialog();
 
 protected slots:
-  void buttonClicked();
-  void updateRange();
-  void propagateProxyPointsProperty();
+  void onRangeChanged();
   void onDomainChanged();
 
 private:
-  vtkEventQtSlotConnect* Connection;
-  vtkSMTransferFunctionProxy* TFProxy;
-  QDialog* Dialog;
-  vtkSMRangedTransferFunctionDomain* Domain;
-  double Range[2];
-};
+  vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
 
-#endif // _pqTransferFunctionWidgetPropertyWidget_h
+  class pqInternals;
+  const QScopedPointer<pqInternals> Internals;
+};
+#endif // _pqTransferFunctionWidgetPropertyDialog_h

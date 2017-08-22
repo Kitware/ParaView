@@ -54,6 +54,11 @@ protected:
   ~vtkSMNumberOfComponentsDomain();
 
   /**
+   * Set the appropriate ivars from the xml element.
+   */
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+
+  /**
    * Internal update method doing the actual work.
    */
   void Update(
@@ -62,6 +67,8 @@ protected:
 private:
   vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
+
+  bool EnableMagnitude;
 };
 
 #endif

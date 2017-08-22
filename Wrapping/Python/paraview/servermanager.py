@@ -1160,7 +1160,7 @@ class ProxyProperty(Property):
         # initialize ourself. (Should this go in ProxyProperty?)
         listdomain = self.GetDomain('proxy_list')
         if listdomain:
-            if listdomain.GetClassName() != 'vtkSMProxyListDomain':
+            if not listdomain.IsA('vtkSMProxyListDomain'):
                 raise ValueError ("Found a 'proxy_list' domain on an InputProperty that is not a ProxyListDomain.")
             pm = ProxyManager()
             group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()

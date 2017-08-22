@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqTransferFunctionWidgetPropertyWidget.h"
-#include "ui_pqTransferFunctionWidgetPropertyWidgetDialog.h"
 
 #include "pqPVApplicationCore.h"
 #include "pqTransferFunctionWidget.h"
+#include "pqTransferFunctionWidgetPropertyDialog.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkPiecewiseFunction.h"
@@ -42,51 +42,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRangedTransferFunctionDomain.h"
 #include "vtkSMTransferFunctionProxy.h"
-#include "vtkSmartPointer.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
 
-namespace
-{
-class pqTransferFunctionWidgetPropertyWidgetDialog : public QDialog
-{
-  vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
-  Ui::TransferFunctionWidgetPropertyWidgetDialog Ui;
-
-public:
-  pqTransferFunctionWidgetPropertyWidgetDialog(const QString& label, double* xrange,
-    vtkPiecewiseFunction* transferFunction, QWidget* parentWdg = NULL)
-    : QDialog(parentWdg)
-    , TransferFunction(transferFunction)
-  {
-    this->setWindowTitle(label);
-    this->Ui.setupUi(this);
-    this->Ui.Label->setText(this->Ui.Label->text().arg(label));
-    this->Ui.TransferFunctionEditor->initialize(
-      NULL, false, this->TransferFunction.GetPointer(), true);
-    this->Ui.minX->setValue(xrange[0]);
-    this->Ui.maxX->setValue(xrange[1]);
-
-    QObject::connect(
-      this->Ui.minX, SIGNAL(valueChanged(double)), parentWdg, SLOT(minXChanged(double)));
-    QObject::connect(
-      this->Ui.maxX, SIGNAL(valueChanged(double)), parentWdg, SLOT(maxXChanged(double)));
-  }
-  ~pqTransferFunctionWidgetPropertyWidgetDialog() {}
-};
-};
-
 pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
-  vtkSMProxy* smProxy, vtkSMProperty* proxyProperty, QWidget* pWidget)
+  vtkSMProxy* smProxy, vtkSMProperty* property, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
-  , Property(proxyProperty)
+  , Connection(nullptr)
+  , Dialog(nullptr)
+
 {
-  xRange[0] = 0.0;
-  xRange[1] = 1.0;
+  this->setProperty(property);
+  vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(property);
+  if (!proxyProperty)
+  {
+    qDebug() << "error, property is not a proxy property";
+    return;
+  }
+  if (proxyProperty->GetNumberOfProxies() < 1)
+  {
+    // To uncomment once #17658 is fixed
+    //    qDebug() << "error, no proxies for property";
+    return;
+  }
+
+  vtkSMProxy* pxy = proxyProperty->GetProxy(0);
+  if (!pxy)
+  {
+    qDebug() << "error, no proxy property";
+    return;
+  }
+  this->TFProxy = vtkSMTransferFunctionProxy::SafeDownCast(pxy);
+
+  this->Connection = vtkEventQtSlotConnect::New();
+  this->Domain =
+    vtkSMRangedTransferFunctionDomain::SafeDownCast(proxyProperty->GetDomain("proxy_list"));
+  if (this->Domain)
+  {
+    this->Connection->Connect(
+      this->Domain, vtkCommand::DomainModifiedEvent, this, SLOT(onDomainChanged()));
+  }
+  this->onDomainChanged();
 
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
@@ -103,22 +104,44 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
 
 pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget()
 {
+  if (this->Connection)
+  {
+    this->Connection->Delete();
+  }
 }
 
-void pqTransferFunctionWidgetPropertyWidget::minXChanged(double newMinX)
+void pqTransferFunctionWidgetPropertyWidget::onDomainChanged()
 {
-  xRange[0] = newMinX;
+  if (this->Domain)
+  {
+    if (this->Domain->GetRangeMinimumExists(0))
+    {
+      this->Range[0] = this->Domain->GetRangeMinimum(0);
+    }
+    if (this->Domain->GetRangeMaximumExists(0))
+    {
+      this->Range[1] = this->Domain->GetRangeMaximum(0);
+    }
+  }
+  else
+  {
+    this->Range[0] = 0.0;
+    this->Range[1] = 1.0;
+  }
+  this->updateRange();
+  emit this->domainChanged();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::maxXChanged(double newMaxX)
+void pqTransferFunctionWidgetPropertyWidget::setRange(const double& min, const double& max)
 {
-  xRange[1] = newMaxX;
+  this->Range[0] = min;
+  this->Range[1] = max;
+  this->updateRange();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty(
-  vtkSMTransferFunctionProxy* transferFunctionProxy)
+void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
 {
-  vtkSMProxy* pxy = static_cast<vtkSMProxy*>(transferFunctionProxy);
+  vtkSMProxy* pxy = static_cast<vtkSMProxy*>(this->TFProxy);
   vtkObjectBase* object = pxy->GetClientSideObject();
   vtkPiecewiseFunction* transferFunction = vtkPiecewiseFunction::SafeDownCast(object);
 
@@ -133,52 +156,33 @@ void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty(
   }
 
   vtkSMPropertyHelper(pxy, "Points").Set(pts, numPoints * 4);
-  transferFunctionProxy->UpdateVTKObjects();
+  this->TFProxy->UpdateVTKObjects();
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::updateTransferFunctionRanges(
-  vtkSMTransferFunctionProxy* transferFunctionProxy)
+void pqTransferFunctionWidgetPropertyWidget::updateRange()
 {
-  transferFunctionProxy->RescaleTransferFunction(xRange[0], xRange[1], false);
+  this->TFProxy->RescaleTransferFunction(this->Range[0], this->Range[1], false);
+  emit this->changeAvailable();
+  emit this->changeFinished();
+}
+
+void pqTransferFunctionWidgetPropertyWidget::UpdateProperty()
+{
+  this->propagateProxyPointsProperty();
+  this->updateRange();
 }
 
 void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
 {
-  vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(this->Property);
-  if (!proxyProperty)
-  {
-    qDebug() << "error, property is not a proxy property";
-    return;
-  }
-  if (proxyProperty->GetNumberOfProxies() < 1)
-  {
-    qDebug() << "error, no proxies for property";
-    return;
-  }
+  delete this->Dialog;
 
-  vtkSMProxy* pxy = proxyProperty->GetProxy(0);
-  if (!pxy)
-  {
-    qDebug() << "error, no proxy property";
-    return;
-  }
-  vtkSMTransferFunctionProxy* transferFunctionProxy = vtkSMTransferFunctionProxy::SafeDownCast(pxy);
-  vtkObjectBase* object = pxy->GetClientSideObject();
-
+  vtkObjectBase* object = this->TFProxy->GetClientSideObject();
   vtkPiecewiseFunction* transferFunction = vtkPiecewiseFunction::SafeDownCast(object);
 
-  pqTransferFunctionWidgetPropertyWidgetDialog dialog(
-    this->Property->GetXMLLabel(), &xRange[0], transferFunction, this);
-  dialog.exec();
-
-  // These next two lines constitute an attempt to work-around the BUG
-  // mentioned below.  Now the vtkPiecewiseFunction change does work in
-  // client-server mode.
-  propagateProxyPointsProperty(transferFunctionProxy);
-  updateTransferFunctionRanges(transferFunctionProxy);
-
-  // BUG: we are never propagating the vtkPiecewiseFunction change to the
-  // SMProperty on the proxy!!! This will never work in client-server mode.
-  emit this->changeAvailable();
-  emit this->changeFinished();
+  this->Dialog = new pqTransferFunctionWidgetPropertyDialog(
+    this->property()->GetXMLLabel(), &this->Range[0], transferFunction, this);
+  this->Dialog->show();
+  this->UpdateProperty();
 }

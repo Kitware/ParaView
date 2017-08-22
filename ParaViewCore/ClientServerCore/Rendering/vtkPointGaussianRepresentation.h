@@ -25,6 +25,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // needed for smart pointer
+#include <string>            // for std::string
+#include <vector>            // for std::vector
 
 class vtkActor;
 class vtkPointGaussianMapper;
@@ -102,6 +104,7 @@ public:
     PLAIN_CIRCLE,       // Same as above, but without the black edge
     TRIANGLE,           // Camera facing, flat triangle
     SQUARE_OUTLINE,     // Camera facing, flat square, with empty center
+    CUSTOM,             // Custom shader
     NUMBER_OF_PRESETS   // !!! THIS MUST ALWAYS BE THE LAST PRESET ENUM !!!
   };
 
@@ -116,11 +119,21 @@ public:
   void SetCustomShader(const char* shaderString);
 
   /**
+   * Sets the scale of the triangle geometry drawn for the custom shader
+   */
+  void SetCustomTriangleScale(double scale);
+
+  /**
    * Sets the point array to scale the guassians by.  The array should be a
    * float array.  The first four parameters are unused and only needed for
    * the ParaView GUI's signature recognition.
    */
   void SelectScaleArray(int, int, int, int, const char* name);
+
+  /**
+   * Sets the point array component to scale the gaussians by.
+   */
+  void SelectScaleArrayComponent(int component);
 
   /**
    * Sets a vtkPiecewiseFunction to use in mapping array values to sprite
@@ -143,6 +156,11 @@ public:
    * signature recognition.
    */
   void SelectOpacityArray(int, int, int, int, const char* name);
+
+  /**
+   * Sets the point array component to opacify the gaussians with.
+   */
+  void SelectOpacityArrayComponent(int component);
 
   //@{
   /**
@@ -176,21 +194,27 @@ protected:
   virtual int RequestData(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
+  void UpdateColoringParameters();
+  vtkSetStringMacro(LastScaleArray);
+  vtkSetStringMacro(LastOpacityArray);
+  void InitializeShaderPresets();
+
   vtkSmartPointer<vtkActor> Actor;
   vtkSmartPointer<vtkPointGaussianMapper> Mapper;
   vtkSmartPointer<vtkPolyData> ProcessedData;
 
-  void UpdateColoringParameters();
+  int SelectedPreset;
 
   bool ScaleByArray;
   char* LastScaleArray;
-
-  vtkSetStringMacro(LastScaleArray);
+  int LastScaleArrayComponent;
 
   bool OpacityByArray;
   char* LastOpacityArray;
+  int LastOpacityArrayComponent;
 
-  vtkSetStringMacro(LastOpacityArray);
+  std::vector<std::string> PresetShaderStrings;
+  std::vector<float> PresetShaderScales;
 
 private:
   vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&) VTK_DELETE_FUNCTION;

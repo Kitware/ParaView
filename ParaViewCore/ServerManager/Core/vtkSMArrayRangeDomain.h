@@ -51,10 +51,11 @@ protected:
   vtkSMArrayRangeDomain();
   ~vtkSMArrayRangeDomain();
 
-  void Update(
-    const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer, int producerPort);
+  void Update(const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer,
+    int producerPort, int component = -1);
 
   friend class vtkSMBoundsDomain;
+  friend class vtkSMRangedTransferFunctionDomain;
 
 private:
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
