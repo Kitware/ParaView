@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TransferFunctionWidgetPropertyWidgetDialog</class>
- <widget class="QDialog" name="TransferFunctionWidgetPropertyWidgetDialog">
+ <class>TransferFunctionWidgetPropertyDialog</class>
+ <widget class="QDialog" name="TransferFunctionWidgetPropertyDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -40,41 +40,21 @@
       </size>
      </property>
      <property name="title">
-      <string>Piece wise ranges</string>
+      <string>Transfer Function range :</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QDoubleSpinBox" name="minX">
-        <property name="minimum">
-         <double>-10000000.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10000000.000000000000000</double>
-        </property>
-       </widget>
+       <widget class="pqLineEdit" name="minX"/>
       </item>
       <item row="0" column="2">
-       <widget class="QDoubleSpinBox" name="maxX">
-        <property name="minimum">
-         <double>-10000000.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10000000.000000000000000</double>
-        </property>
-       </widget>
+       <widget class="pqLineEdit" name="maxX"/>
       </item>
       <item row="0" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>-</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -98,13 +78,18 @@
    <header>pqTransferFunctionWidget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
    <sender>ButtonBox</sender>
    <signal>accepted()</signal>
-   <receiver>TransferFunctionWidgetPropertyWidgetDialog</receiver>
+   <receiver>TransferFunctionWidgetPropertyDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -120,7 +105,7 @@
   <connection>
    <sender>ButtonBox</sender>
    <signal>rejected()</signal>
-   <receiver>TransferFunctionWidgetPropertyWidgetDialog</receiver>
+   <receiver>TransferFunctionWidgetPropertyDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

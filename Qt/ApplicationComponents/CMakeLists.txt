@@ -304,6 +304,8 @@ set (Module_SRCS
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.cxx
   pqToggleInteractionViewMode.h
+  pqTransferFunctionWidgetPropertyDialog.cxx
+  pqTransferFunctionWidgetPropertyDialog.h
   pqTransferFunctionWidgetPropertyWidget.cxx
   pqTransferFunctionWidgetPropertyWidget.h
   pqUndoRedoBehavior.cxx
@@ -467,6 +469,7 @@ set (Module_MOC_HDRS
   pqTimeInspectorWidget.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h
+  pqTransferFunctionWidgetPropertyDialog.h
   pqTransferFunctionWidgetPropertyWidget.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
@@ -530,7 +533,7 @@ set (Module_UI_FILES
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqTextLocationWidget.ui
   Resources/UI/pqTimeInspectorWidget.ui
-  Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
+  Resources/UI/pqTransferFunctionWidgetPropertyDialog.ui
   Resources/UI/pqViewResolutionPropertyWidget.ui
   Resources/UI/pqVCRToolbar.ui
   Resources/UI/pqWelcomeDialog.ui
