@@ -40,10 +40,11 @@ vtkStandardNewMacro(vtkCinemaLayerRepresentation);
 vtkCinemaLayerRepresentation::vtkCinemaLayerRepresentation()
 {
   this->Reslice->SetInputData(this->CachedImage);
-  this->MapperA->SetInputData(this->Reslice->GetOutput());
+  this->MapperA->SetInputConnection(this->Reslice->GetOutputPort());
   this->MapperA->SetColorWindow(255);
   this->MapperA->SetColorLevel(127.5);
 
+  this->Actor->SetMapper(this->MapperA.Get());
   vtkNew<vtkPolyData> pd;
   this->CacheKeeper->SetInputData(pd.Get());
   this->Actor->SetDisplayPosition(0, 0);
@@ -320,6 +321,7 @@ void vtkCinemaLayerRepresentation::UpdateMapper()
       transform->RotateWXYZ(180 + vtkMath::DegreesFromRadians(angle), 0, 0, 1);
       transform->Translate(-center[0], -center[1], -center[2]);
 
+      // scale the image to fit the view
       vtkView* view = this->GetView();
       vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
       double* rendererCenter = rview->GetRenderer()->GetCenter();
@@ -345,7 +347,6 @@ void vtkCinemaLayerRepresentation::UpdateMapper()
       this->Reslice->SetBackgroundColor(
         255 * backgroundColor[0], 255 * backgroundColor[1], 255 * backgroundColor[2], 0);
     }
-
     this->Reslice->SetOutputSpacing(image->GetSpacing());
     this->Reslice->SetOutputOrigin(image->GetOrigin());
     this->Reslice->SetOutputExtent(image->GetExtent());
