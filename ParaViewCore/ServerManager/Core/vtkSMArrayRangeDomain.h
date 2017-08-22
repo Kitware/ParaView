@@ -55,6 +55,7 @@ protected:
     int producerPort, int component = -1);
 
   friend class vtkSMBoundsDomain;
+  friend class vtkSMRangedTransferFunctionDomain;
 
 private:
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
