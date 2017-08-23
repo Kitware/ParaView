@@ -156,7 +156,7 @@ public slots:
   /**
   * Overridden to set the VisibilityChangedSinceLastUpdate flag.
   */
-  virtual void onVisibilityChanged();
+  void onVisibilityChanged() override;
 
 protected slots:
   /**
@@ -171,7 +171,7 @@ protected:
   * underlying vtkSMProxy. This needs to be done only once,
   * after the object has been created.
   */
-  virtual void initialize()
+  void initialize() override
   {
     this->Superclass::initialize();
     this->onInputChanged();

@@ -76,7 +76,7 @@ public:
   * It is essential to call this resetCamera, to ensure that the reset camera
   * action gets pushed on the interaction undo stack.
   */
-  virtual void resetCamera();
+  void resetCamera() override;
 
   /**
   * Resets the center of rotation to the focal point.
@@ -132,14 +132,14 @@ public:
   * undo/redo. Returns false by default. Subclassess must override
   * if that's not the case.
   */
-  virtual bool supportsUndo() const { return true; }
+  bool supportsUndo() const override { return true; }
 
   /**
   * Returns if the view module can undo/redo interaction
   * given the current state of the interaction undo stack.
   */
-  virtual bool canUndo() const;
-  virtual bool canRedo() const;
+  bool canUndo() const override;
+  bool canRedo() const override;
 
   /**
   * For linking of interaction undo stacks.
@@ -269,13 +269,13 @@ public slots:
   * Called to undo interaction.
   * View modules supporting interaction undo must override this method.
   */
-  virtual void undo();
+  void undo() override;
 
   /**
   * Called to redo interaction.
   * View modules supporting interaction undo must override this method.
   */
-  virtual void redo();
+  void redo() override;
 
   /**
   * Resets center of rotation if this->ResetCenterWithCamera is true.
@@ -327,12 +327,12 @@ protected:
   * Creates a new instance of the QWidget subclass to be used to show this
   * view. Default implementation creates a pqQVTKWidget
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
   /**
   * Overridden to initialize the interaction undo/redo stack.
   */
-  virtual void initialize();
+  void initialize() override;
 
 private:
   class pqInternal;
