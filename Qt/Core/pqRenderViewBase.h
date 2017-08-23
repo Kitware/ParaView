@@ -71,7 +71,7 @@ public:
   /**
   * Called to reset the view's display.  This method calls resetCamera().
   */
-  virtual void resetDisplay();
+  void resetDisplay() override;
 
 protected slots:
   virtual void initializeAfterObjectsCreated();
@@ -92,20 +92,20 @@ protected:
   * Overridden to popup the context menu, if some actions have been added
   * using addMenuAction.
   */
-  virtual bool eventFilter(QObject* caller, QEvent* e);
+  bool eventFilter(QObject* caller, QEvent* e) override;
 
   /**
   * Creates a new instance of the QWidget subclass to be used to show this
   * view. Default implementation creates a pqQVTKWidget.
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
   /**
   * Use this method to initialize the pqObject state using the
   * underlying vtkSMProxy. This needs to be done only once,
   * after the object has been created.
   */
-  virtual void initialize();
+  void initialize() override;
 
 private:
   Q_DISABLE_COPY(pqRenderViewBase)

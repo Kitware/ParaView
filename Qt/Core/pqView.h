@@ -344,7 +344,7 @@ protected:
   * after the object has been created.
   * Overridden to update the list of representations currently available.
   */
-  virtual void initialize();
+  void initialize() override;
 
   /**
   * Subclasses must override this method to create a widget for the view.
