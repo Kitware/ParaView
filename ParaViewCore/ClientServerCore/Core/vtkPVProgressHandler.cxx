@@ -374,6 +374,8 @@ void vtkPVProgressHandler::OnMessageEvent(
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::RefreshMessage(const char* message)
 {
+  SKIP_IF_DISABLED();
+
   // On server-root-nodes, send the message to the client.
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
   if (client_controller != NULL && message != NULL)

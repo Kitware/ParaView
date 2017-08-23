@@ -468,9 +468,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     {
       controller->Delete();
       controller = NULL;
-      // handshake failed, must be bogus client, continue waiting (unless
-      // this->AbortPendingConnectionFlag == true).
       this->PrintHandshakeError(errorcode);
+      break;
     }
   }
 
