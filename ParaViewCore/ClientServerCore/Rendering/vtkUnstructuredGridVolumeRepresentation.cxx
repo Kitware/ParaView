@@ -330,7 +330,15 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
     info->Has(vtkDataObject::FIELD_NAME()))
   {
     colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
-    fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    // The Resample To Image filter transforms cell data to point data.
+    if (this->Internals->ActiveVolumeMapper == "Resample To Image")
+    {
+      fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    }
+    else
+    {
+      fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    }
   }
 
   activeMapper->SelectScalarArray(colorArrayName);
