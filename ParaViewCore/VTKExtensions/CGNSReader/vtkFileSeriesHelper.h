@@ -145,6 +145,10 @@ public:
 
   /**
    * Returns the list of files to read on current rank to satisfy the request.
+   * Requested time and piece information is obtained from `outInfo`. If
+   * `outInfo` has not piece information, however, than `this->Controller`
+   * is used.
+   *
    * @param outInfo vtkInformation object with `UPDATE_*` keys that indicate the
    *                requested time and piece information.
    */

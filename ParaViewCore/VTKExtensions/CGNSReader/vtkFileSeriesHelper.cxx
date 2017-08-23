@@ -474,11 +474,19 @@ std::vector<std::string> vtkFileSeriesHelper::GetActiveFiles(vtkInformation* out
 
   // activeFiles now tells us all the files that provide the timestep of
   // interest. If this->PartitionedFiles, we distribute the files among ranks.
-  int piece =
-    outInfo->Has(SDDP::UPDATE_PIECE_NUMBER()) ? outInfo->Get(SDDP::UPDATE_PIECE_NUMBER()) : 0;
-  int numPieces = outInfo->Has(SDDP::UPDATE_NUMBER_OF_PIECES())
-    ? outInfo->Get(SDDP::UPDATE_NUMBER_OF_PIECES())
-    : 1;
+  int piece = 0, numPieces = 1;
+  if (this->Controller)
+  {
+    piece = this->Controller->GetLocalProcessId();
+    numPieces = this->Controller->GetNumberOfProcesses();
+  }
+
+  if (outInfo->Has(SDDP::UPDATE_PIECE_NUMBER()) && outInfo->Has(SDDP::UPDATE_NUMBER_OF_PIECES()))
+  {
+    piece = outInfo->Get(SDDP::UPDATE_PIECE_NUMBER());
+    numPieces = outInfo->Get(SDDP::UPDATE_NUMBER_OF_PIECES());
+  }
+
   if (this->PartitionedFiles && numPieces > 1)
   {
     int numFiles = static_cast<int>(activeFiles.size());
