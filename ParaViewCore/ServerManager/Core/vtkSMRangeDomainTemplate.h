@@ -63,14 +63,14 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate : public vtkSMDomai
 {
 public:
   typedef vtkSMDomain Superclass;
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the value of the properyy is in the domain.
    * If all vector values are in the domain, it returns 1. It returns
    * 0 otherwise. A value is in the domain if it is between (min, max).
    */
-  virtual int IsInDomain(vtkSMProperty* property);
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Returns true if the double (val) is in the domain. If value is
@@ -129,12 +129,12 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties.
    */
-  virtual void Update(vtkSMProperty*);
+  void Update(vtkSMProperty*) override;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value);
+  void SetAnimationValue(vtkSMProperty* property, int idx, double value) override;
 
   enum DefaultModes
   {
@@ -152,17 +152,17 @@ public:
    * Set the property's default value based on the domain. How the value is
    * determined using the range is controlled by DefaultMode.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMRangeDomainTemplate();
-  ~vtkSMRangeDomainTemplate();
+  ~vtkSMRangeDomainTemplate() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   struct vtkEntry
   {

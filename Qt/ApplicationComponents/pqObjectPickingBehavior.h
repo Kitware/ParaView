@@ -52,13 +52,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqObjectPickingBehavior : public QObject
 
 public:
   pqObjectPickingBehavior(QObject* parent = 0);
-  virtual ~pqObjectPickingBehavior();
+  ~pqObjectPickingBehavior() override;
 
 protected:
   /**
   * event filter to capture the left-click.
   */
-  virtual bool eventFilter(QObject* caller, QEvent* e);
+  bool eventFilter(QObject* caller, QEvent* e) override;
 
 protected slots:
   /**

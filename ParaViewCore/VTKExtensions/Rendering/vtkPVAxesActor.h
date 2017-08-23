@@ -53,15 +53,15 @@ public:
    * able to collect all the actors or volumes. These methods
    * are used in that process.
    */
-  virtual void GetActors(vtkPropCollection*) VTK_OVERRIDE;
+  void GetActors(vtkPropCollection*) VTK_OVERRIDE;
 
   //@{
   /**
    * Support the standard render methods.
    */
-  virtual int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
   //@}
 
   /**
@@ -96,7 +96,7 @@ public:
    * prop plus anything else it depends on such as properties, textures
    * etc.
    */
-  virtual vtkMTimeType GetRedrawMTime() VTK_OVERRIDE;
+  vtkMTimeType GetRedrawMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -246,7 +246,7 @@ public:
 
 protected:
   vtkPVAxesActor();
-  ~vtkPVAxesActor();
+  ~vtkPVAxesActor() override;
 
   vtkCylinderSource* CylinderSource;
   vtkLineSource* LineSource;

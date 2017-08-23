@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkSMTransferFunctionManager();
-  ~vtkSMTransferFunctionManager();
+  ~vtkSMTransferFunctionManager() override;
 
 private:
   vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;

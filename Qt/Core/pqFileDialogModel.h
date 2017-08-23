@@ -63,7 +63,7 @@ public:
   * if the server is NULL, we get file listings locally
   */
   pqFileDialogModel(pqServer* server, QObject* Parent = NULL);
-  ~pqFileDialogModel();
+  ~pqFileDialogModel() override;
 
   //@{
   /**
@@ -143,42 +143,42 @@ public:
   /**
   * sets data (used by the view when editing names of folders)
   */
-  bool setData(const QModelIndex& idx, const QVariant& value, int role);
+  bool setData(const QModelIndex& idx, const QVariant& value, int role) override;
 
   // overloads for QAbstractItemModel
 
   /**
   * return the number of columns in the model
   */
-  int columnCount(const QModelIndex&) const;
+  int columnCount(const QModelIndex&) const override;
   /**
   * return the data for an item
   */
-  QVariant data(const QModelIndex& idx, int role) const;
+  QVariant data(const QModelIndex& idx, int role) const override;
   /**
   * return an index from another index
   */
-  QModelIndex index(int row, int column, const QModelIndex&) const;
+  QModelIndex index(int row, int column, const QModelIndex&) const override;
   /**
   * return the parent index of an index
   */
-  QModelIndex parent(const QModelIndex&) const;
+  QModelIndex parent(const QModelIndex&) const override;
   /**
   * return the number of rows under a given index
   */
-  int rowCount(const QModelIndex&) const;
+  int rowCount(const QModelIndex&) const override;
   /**
   * return whether a given index has children
   */
-  bool hasChildren(const QModelIndex& p) const;
+  bool hasChildren(const QModelIndex& p) const override;
   /**
   * returns header data
   */
-  QVariant headerData(int section, Qt::Orientation, int role) const;
+  QVariant headerData(int section, Qt::Orientation, int role) const override;
   /**
   * returns flags for item
   */
-  Qt::ItemFlags flags(const QModelIndex& idx) const;
+  Qt::ItemFlags flags(const QModelIndex& idx) const override;
 
 private:
   class pqImplementation;
@@ -205,8 +205,8 @@ public:
   QIcon icon(vtkPVFileInformation::FileTypes f) const;
 
 protected:
-  QIcon icon(const QFileInfo& info) const;
-  QIcon icon(QFileIconProvider::IconType ico) const;
+  QIcon icon(const QFileInfo& info) const override;
+  QIcon icon(QFileIconProvider::IconType ico) const override;
 
   QIcon FolderLinkIcon;
   QIcon FileLinkIcon;

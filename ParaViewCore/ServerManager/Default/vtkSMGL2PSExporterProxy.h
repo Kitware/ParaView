@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkSMGL2PSExporterProxy();
-  ~vtkSMGL2PSExporterProxy();
+  ~vtkSMGL2PSExporterProxy() override;
 
   //@{
   /**

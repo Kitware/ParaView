@@ -62,7 +62,7 @@ public:
   * will be created.
   */
   pqUndoStack(vtkSMUndoStackBuilder* builder = 0, QObject* parent = NULL);
-  virtual ~pqUndoStack();
+  ~pqUndoStack() override;
 
   /**
   * returns if it's possible to undo.

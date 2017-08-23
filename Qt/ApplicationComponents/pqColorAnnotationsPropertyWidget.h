@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget : public p
 public:
   pqColorAnnotationsPropertyWidget(
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqColorAnnotationsPropertyWidget();
+  ~pqColorAnnotationsPropertyWidget() override;
 
   /**
   * Get/Set the annotations. Annotations are returns as a QList<QVariant>.

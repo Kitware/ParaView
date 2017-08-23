@@ -87,7 +87,7 @@ public:
 
 protected:
   vtkKdTreeGenerator();
-  ~vtkKdTreeGenerator();
+  ~vtkKdTreeGenerator() override;
 
   //@{
   /**

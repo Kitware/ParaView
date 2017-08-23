@@ -62,7 +62,7 @@ public:
   /**
   * destroy this dialog
   */
-  ~pqPluginDialog();
+  ~pqPluginDialog() override;
 
 public slots:
   void loadLocalPlugin();

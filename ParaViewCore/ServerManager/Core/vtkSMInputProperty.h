@@ -96,18 +96,18 @@ public:
 
 protected:
   vtkSMInputProperty();
-  ~vtkSMInputProperty();
+  ~vtkSMInputProperty() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Fill state property/proxy XML element with output port attribute
    */
-  virtual vtkPVXMLElement* AddProxyElementState(
+  vtkPVXMLElement* AddProxyElementState(
     vtkPVXMLElement* propertyElement, unsigned int idx) VTK_OVERRIDE;
 
   int MultipleInput;

@@ -34,14 +34,14 @@ public:
 
 protected:
   vtkSIArraySelectionProperty();
-  ~vtkSIArraySelectionProperty();
+  ~vtkSIArraySelectionProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIArraySelectionProperty(const vtkSIArraySelectionProperty&) VTK_DELETE_FUNCTION;

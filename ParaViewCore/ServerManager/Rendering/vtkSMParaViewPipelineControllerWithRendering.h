@@ -143,7 +143,7 @@ public:
    * overrides, we must keep such overrides to a minimal and opting for domains
    * that set appropriate defaults where as much as possible.
    */
-  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool RegisterRepresentationProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Control how scalar bar visibility is updated by the Hide call.
@@ -164,13 +164,13 @@ public:
   /**
    * Overridden to handle default ColorArrayName for representations correctly.
    */
-  virtual bool PostInitializeProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool PostInitializeProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to place the view in a layout on creation.
    */
-  virtual bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) VTK_OVERRIDE;
+  bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) VTK_OVERRIDE;
   using Superclass::RegisterViewProxy;
   //@}
 
@@ -181,7 +181,7 @@ public:
 
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
-  ~vtkSMParaViewPipelineControllerWithRendering();
+  ~vtkSMParaViewPipelineControllerWithRendering() override;
 
   virtual void UpdatePipelineBeforeDisplay(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);

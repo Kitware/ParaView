@@ -53,12 +53,12 @@ public:
   /**
   * Currently the bar chart view is not supporting selection.
   */
-  virtual bool supportsSelection() const { return true; }
+  bool supportsSelection() const override { return true; }
 
   pqXYHistogramChartView(const QString& group, const QString& name,
     vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
 
-  virtual ~pqXYHistogramChartView();
+  ~pqXYHistogramChartView() override;
 
 private:
   Q_DISABLE_COPY(pqXYHistogramChartView)

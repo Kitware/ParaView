@@ -55,7 +55,7 @@ public:
   static void managePlugins();
 
 protected:
-  virtual void onTriggered() { pqManagePluginsReaction::managePlugins(); }
+  void onTriggered() override { pqManagePluginsReaction::managePlugins(); }
 private:
   Q_DISABLE_COPY(pqManagePluginsReaction)
 };

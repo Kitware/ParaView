@@ -59,12 +59,12 @@ public:
   /**
    * Paint event for the axis, called whenever the axis needs to be drawn
    */
-  virtual bool Paint(vtkContext2D* painter) VTK_OVERRIDE;
+  bool Paint(vtkContext2D* painter) VTK_OVERRIDE;
 
   /**
    * Get the bounds for this plot as (Xmin, Xmax, Ymin, Ymax).
    */
-  virtual void GetBounds(double bounds[4]) VTK_OVERRIDE
+  void GetBounds(double bounds[4]) VTK_OVERRIDE
   {
     bounds[0] = bounds[2] = 1.0;
     bounds[1] = bounds[3] = -1.0;
@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkPVPlotTime();
-  ~vtkPVPlotTime();
+  ~vtkPVPlotTime() override;
 
   double Time;
   int TimeAxisMode;

@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkEquivalenceSet();
-  ~vtkEquivalenceSet();
+  ~vtkEquivalenceSet() override;
 
   int NumberOfResolvedSets;
 

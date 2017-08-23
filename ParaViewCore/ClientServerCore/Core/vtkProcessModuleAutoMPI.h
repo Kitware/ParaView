@@ -33,7 +33,7 @@ public:
   static void SetNumberOfCores(int val);
 
   vtkProcessModuleAutoMPI();
-  ~vtkProcessModuleAutoMPI();
+  ~vtkProcessModuleAutoMPI() override;
 
   // Description:
   // To determine if it is possible to use multi-core on the system.

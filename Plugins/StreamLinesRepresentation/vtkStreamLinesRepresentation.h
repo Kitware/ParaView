@@ -156,7 +156,7 @@ public:
 
 protected:
   vtkStreamLinesRepresentation();
-  ~vtkStreamLinesRepresentation();
+  ~vtkStreamLinesRepresentation() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 

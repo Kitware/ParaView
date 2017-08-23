@@ -61,14 +61,14 @@ public:
 
 protected:
   vtkPVClientServerSynchronizedRenderers();
-  ~vtkPVClientServerSynchronizedRenderers();
+  ~vtkPVClientServerSynchronizedRenderers() override;
 
   /**
    * Overridden to not clear the color buffer before pasting back image from
    * the server. This ensures that any annotations rendered on the back of any
    * 3D geometry will be preserved.
    */
-  virtual void PushImageToScreen() VTK_OVERRIDE;
+  void PushImageToScreen() VTK_OVERRIDE;
 
   //@{
   /**
@@ -81,9 +81,9 @@ protected:
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);
 
-  virtual void MasterEndRender() VTK_OVERRIDE;
-  virtual void SlaveStartRender() VTK_OVERRIDE;
-  virtual void SlaveEndRender() VTK_OVERRIDE;
+  void MasterEndRender() VTK_OVERRIDE;
+  void SlaveStartRender() VTK_OVERRIDE;
+  void SlaveEndRender() VTK_OVERRIDE;
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;

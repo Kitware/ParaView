@@ -58,7 +58,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqTimerLogReaction::showTimerLog(); }
+  void onTriggered() override { pqTimerLogReaction::showTimerLog(); }
 
 private:
   Q_DISABLE_COPY(pqTimerLogReaction)

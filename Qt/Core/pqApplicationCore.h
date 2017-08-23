@@ -288,7 +288,7 @@ public:
   /**
   * Destructor.
   */
-  virtual ~pqApplicationCore();
+  ~pqApplicationCore() override;
 public slots:
 
   /**

@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkPVMultiSliceView, vtkPVRenderView);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   void SetNumberOfXSlices(unsigned int count) { this->SetNumberOfSlices(0, count); }
   void SetXSlices(const double* values) { this->SetSlices(0, values); }
@@ -72,9 +72,9 @@ public:
 
 protected:
   vtkPVMultiSliceView();
-  ~vtkPVMultiSliceView();
+  ~vtkPVMultiSliceView() override;
 
-  virtual void AboutToRenderOnLocalProcess(bool interactive) VTK_OVERRIDE;
+  void AboutToRenderOnLocalProcess(bool interactive) VTK_OVERRIDE;
 
   void SetNumberOfSlices(int type, unsigned int count);
   void SetSlices(int type, const double* values);

@@ -68,7 +68,7 @@ public:
   };
 
   pqPresetDialog(QWidget* parent = 0, Modes mode = SHOW_ALL);
-  virtual ~pqPresetDialog();
+  ~pqPresetDialog() override;
 
   /**
   * Set the current preset using its name.

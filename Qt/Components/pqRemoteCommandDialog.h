@@ -37,7 +37,7 @@ class pqRemoteCommandDialog : public QDialog
 public:
   pqRemoteCommandDialog(QWidget* parent, Qt::WindowFlags f, int clientHostType, int serverHostType);
 
-  ~pqRemoteCommandDialog();
+  ~pqRemoteCommandDialog() override;
 
   // Description:
   // before running the dialog call these to set the

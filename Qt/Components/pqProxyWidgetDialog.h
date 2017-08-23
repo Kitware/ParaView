@@ -53,7 +53,7 @@ public:
   pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent = 0, Qt::WindowFlags f = 0);
   pqProxyWidgetDialog(
     vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqProxyWidgetDialog();
+  ~pqProxyWidgetDialog() override;
 
   /**
   * Returns whether that dialog has any visible widgets.
@@ -118,9 +118,9 @@ protected:
   /**
   * Overridden to resize widget before showing it the first time.
   */
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
-  virtual void done(int r);
+  void showEvent(QShowEvent* event) override;
+  void hideEvent(QHideEvent* event) override;
+  void done(int r) override;
 
 private slots:
   void filterWidgets();

@@ -76,7 +76,7 @@ class PQCOMPONENTS_EXPORT pqMultiBlockInspectorWidget : public QWidget
 public:
   pqMultiBlockInspectorWidget(
     QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
-  virtual ~pqMultiBlockInspectorWidget();
+  ~pqMultiBlockInspectorWidget() override;
 
   /**
    * Returns true if tracking of the active objects via pqActiveObjects is

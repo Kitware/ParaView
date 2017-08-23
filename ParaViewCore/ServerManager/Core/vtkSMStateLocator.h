@@ -101,7 +101,7 @@ public:
 
 protected:
   vtkSMStateLocator();
-  ~vtkSMStateLocator();
+  ~vtkSMStateLocator() override;
 
   vtkSMStateLocator* ParentLocator;
   vtkWeakPointer<vtkSMSession> Session;

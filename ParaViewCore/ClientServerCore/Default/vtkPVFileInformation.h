@@ -47,14 +47,14 @@ public:
    * Transfer information about a single object into this object.
    * The object must be a vtkPVFileInformationHelper.
    */
-  virtual void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   enum FileTypes
@@ -129,7 +129,7 @@ public:
 
 protected:
   vtkPVFileInformation();
-  ~vtkPVFileInformation();
+  ~vtkPVFileInformation() override;
 
   vtkCollection* Contents;
   vtkFileSequenceParser* SequenceParser;

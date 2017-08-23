@@ -56,17 +56,17 @@ public:
 
 protected:
   vtkIntegrateAttributes();
-  ~vtkIntegrateAttributes();
+  ~vtkIntegrateAttributes() override;
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   int CompareIntegrationDimension(vtkDataSet* output, int dim);
   int IntegrationDimension;

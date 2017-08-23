@@ -62,7 +62,7 @@ public:
   */
   pqSignalAdaptorKeyFrameType(
     pqKeyFrameTypeWidget* widget, pqPropertyLinks* links, QLabel* valueLabel = NULL);
-  virtual ~pqSignalAdaptorKeyFrameType();
+  ~pqSignalAdaptorKeyFrameType() override;
 
   /**
   * \c keyframe is the proxy for the key frame. It typically is

@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqFindDataCurrentSelectionFrame : public QWidget
 
 public:
   pqFindDataCurrentSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqFindDataCurrentSelectionFrame();
+  ~pqFindDataCurrentSelectionFrame() override;
 
   /**
   * return the port from which this frame is showing the selected data, if

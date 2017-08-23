@@ -87,7 +87,7 @@ public:
 
 protected:
   vtkPVSessionCoreInterpreterHelper();
-  ~vtkPVSessionCoreInterpreterHelper();
+  ~vtkPVSessionCoreInterpreterHelper() override;
 
   vtkWeakPointer<vtkPVSessionCore> Core;
   int LogLevel;

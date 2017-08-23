@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkNetworkAccessManager();
-  ~vtkNetworkAccessManager();
+  ~vtkNetworkAccessManager() override;
 
 private:
   vtkNetworkAccessManager(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;

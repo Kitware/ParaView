@@ -44,10 +44,10 @@ class pqOpenVRHidingDecorator : public pqPropertyWidgetDecorator
 
 public:
   pqOpenVRHidingDecorator(vtkPVXMLElement* config, pqPropertyWidget* parentObject);
-  virtual ~pqOpenVRHidingDecorator();
+  ~pqOpenVRHidingDecorator() override;
 
   /// Overridden to hide the widget when OpenVR is not compiled in
-  virtual bool canShowWidget(bool show_advanced) const;
+  bool canShowWidget(bool show_advanced) const override;
 
 private:
   Q_DISABLE_COPY(pqOpenVRHidingDecorator)

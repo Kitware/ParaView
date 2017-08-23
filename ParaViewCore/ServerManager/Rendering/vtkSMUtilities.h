@@ -100,7 +100,7 @@ public:
 
 protected:
   vtkSMUtilities() {}
-  ~vtkSMUtilities() {}
+  ~vtkSMUtilities() override {}
 
 private:
   vtkSMUtilities(const vtkSMUtilities&) VTK_DELETE_FUNCTION;

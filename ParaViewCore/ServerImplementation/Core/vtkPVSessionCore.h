@@ -190,7 +190,7 @@ public:
 
 protected:
   vtkPVSessionCore();
-  ~vtkPVSessionCore();
+  ~vtkPVSessionCore() override;
 
   /**
    * This will create a vtkSIObject and/or execute some update on the

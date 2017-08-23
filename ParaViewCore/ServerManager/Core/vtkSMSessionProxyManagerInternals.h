@@ -69,7 +69,7 @@ private:
     this->UpdateObserverTag = 0;
     this->UpdateInformationObserverTag = 0;
   }
-  ~vtkSMProxyManagerProxyInfo()
+  ~vtkSMProxyManagerProxyInfo() override
   {
     // Remove observers.
     if (this->ModifiedObserverTag && this->Proxy.GetPointer())

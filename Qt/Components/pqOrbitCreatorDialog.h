@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqOrbitCreatorDialog : public QDialog
 
 public:
   pqOrbitCreatorDialog(QWidget* parent = 0);
-  virtual ~pqOrbitCreatorDialog();
+  ~pqOrbitCreatorDialog() override;
 
   /**
   * Returns the points the orbit based on the user chosen options.

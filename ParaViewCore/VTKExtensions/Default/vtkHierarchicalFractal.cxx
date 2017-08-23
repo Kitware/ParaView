@@ -77,7 +77,7 @@ public:
     this->Boxes[index] = box;
   }
 
-  ~HierarchicalFractalOutputUtil()
+  ~HierarchicalFractalOutputUtil() override
   {
     this->DataSets.clear();
     this->Levels.clear();

@@ -41,7 +41,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultMainWindow : public QMainWindow
 
 public:
   pqDefaultMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  ~pqDefaultMainWindow();
+  ~pqDefaultMainWindow() override;
 
 private:
   Q_DISABLE_COPY(pqDefaultMainWindow)

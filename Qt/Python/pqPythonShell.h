@@ -65,7 +65,7 @@ class PQPYTHON_EXPORT pqPythonShell : public QWidget
 
 public:
   pqPythonShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  ~pqPythonShell();
+  ~pqPythonShell() override;
 
   /**
   * Returns the interactive console context (the locals() dict).

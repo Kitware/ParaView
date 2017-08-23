@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqServerConfigurationImporter : public QObject
 
 public:
   pqServerConfigurationImporter(QObject* parent = 0);
-  virtual ~pqServerConfigurationImporter();
+  ~pqServerConfigurationImporter() override;
 
   enum SourceMode
   {

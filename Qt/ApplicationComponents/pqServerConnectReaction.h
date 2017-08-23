@@ -81,13 +81,13 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqServerConnectReaction::connectToServerWithWarning(); }
+  void onTriggered() override { pqServerConnectReaction::connectToServerWithWarning(); }
 
 private slots:
   /**
   * Updates the state of this reaction.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqServerConnectReaction)

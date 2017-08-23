@@ -77,7 +77,7 @@ public:
   vtkWeakPointer<vtkSMRepresentedArrayListDomain> Domain;
   typedef vtkCommand Superclass;
   vtkSMRepresentedArrayListDomainUpdateCommand() { this->Domain = NULL; }
-  virtual const char* GetClassNameInternal() const
+  const char* GetClassNameInternal() const override
   {
     return "vtkSMRepresentedArrayListDomainUpdateCommand";
   }
@@ -85,7 +85,7 @@ public:
   {
     return new vtkSMRepresentedArrayListDomainUpdateCommand();
   }
-  virtual void Execute(vtkObject*, unsigned long, void*)
+  void Execute(vtkObject*, unsigned long, void*) override
   {
     if (this->Domain)
     {

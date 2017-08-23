@@ -75,9 +75,9 @@ public:
 
 protected:
   vtkAnnotateGlobalDataFilter();
-  ~vtkAnnotateGlobalDataFilter();
+  ~vtkAnnotateGlobalDataFilter() override;
 
-  virtual void EvaluateExpression() VTK_OVERRIDE;
+  void EvaluateExpression() VTK_OVERRIDE;
 
   char* Prefix;
   char* Postfix;

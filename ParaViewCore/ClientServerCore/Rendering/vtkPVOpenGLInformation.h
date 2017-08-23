@@ -68,7 +68,7 @@ public:
 
 protected:
   vtkPVOpenGLInformation();
-  ~vtkPVOpenGLInformation();
+  ~vtkPVOpenGLInformation() override;
 
 private:
   vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;

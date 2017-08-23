@@ -67,7 +67,7 @@ class pqComparativeWidget : public QWidget
 {
 public:
   vtkWeakPointer<vtkSMProxy> ViewProxy;
-  void resizeEvent(QResizeEvent* evt)
+  void resizeEvent(QResizeEvent* evt) override
   {
     this->QWidget::resizeEvent(evt);
 

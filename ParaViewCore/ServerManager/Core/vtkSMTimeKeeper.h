@@ -93,7 +93,7 @@ public:
 
 protected:
   vtkSMTimeKeeper();
-  ~vtkSMTimeKeeper();
+  ~vtkSMTimeKeeper() override;
 
   friend class vtkSMTimeKeeperProxy;
   void SetTimestepValuesProperty(vtkSMProperty*);

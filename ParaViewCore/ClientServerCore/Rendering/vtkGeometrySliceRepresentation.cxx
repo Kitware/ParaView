@@ -120,7 +120,7 @@ public:
   static vtkGSRGeometryFilter* New();
   vtkTypeMacro(vtkGSRGeometryFilter, vtkPVGeometryFilter);
 
-  virtual int RequestData(vtkInformation* req, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* req, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE
   {
     vtkSmartPointer<vtkDataObject> inputDO = vtkDataObject::GetData(inputVector[0]);
@@ -177,7 +177,7 @@ public:
 protected:
   vtkGSRGeometryFilter() {}
 
-  virtual ~vtkGSRGeometryFilter() {}
+  ~vtkGSRGeometryFilter() override {}
 
 private:
   vtkGSRGeometryFilter(const vtkGSRGeometryFilter&);

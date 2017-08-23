@@ -187,7 +187,7 @@ public:
 
 protected:
   vtkCDIReader();
-  ~vtkCDIReader();
+  ~vtkCDIReader() override;
   void DestroyData();
   void SetDefaults();
   bool invertedTopography;

@@ -103,7 +103,7 @@ public:
 
 protected:
   vtkSMPluginManager();
-  ~vtkSMPluginManager();
+  ~vtkSMPluginManager() override;
 
   bool InLoadPlugin;
   void OnPluginRegistered();

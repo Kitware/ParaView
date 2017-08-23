@@ -147,7 +147,7 @@ public:
 
 protected:
   vtkSMTransferFunctionPresets();
-  ~vtkSMTransferFunctionPresets();
+  ~vtkSMTransferFunctionPresets() override;
 
 private:
   vtkSMTransferFunctionPresets(const vtkSMTransferFunctionPresets&) VTK_DELETE_FUNCTION;

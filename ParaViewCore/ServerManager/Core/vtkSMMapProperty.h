@@ -40,19 +40,19 @@ public:
   /**
    * Returns true if the current value is the same as the default value.
    */
-  virtual bool IsValueDefault() VTK_OVERRIDE;
+  bool IsValueDefault() VTK_OVERRIDE;
 
   /**
    * Copy all property values.
    */
-  virtual void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
 protected:
   vtkSMMapProperty();
-  ~vtkSMMapProperty();
+  ~vtkSMMapProperty() override;
 
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
   vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;

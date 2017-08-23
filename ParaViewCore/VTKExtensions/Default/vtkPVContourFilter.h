@@ -41,21 +41,20 @@ public:
 
   static vtkPVContourFilter* New();
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkPVContourFilter();
-  ~vtkPVContourFilter();
+  ~vtkPVContourFilter() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Class superclass request data. Also handles iterating over

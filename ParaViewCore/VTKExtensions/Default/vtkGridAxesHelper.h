@@ -181,7 +181,7 @@ public:
 
 protected:
   vtkGridAxesHelper();
-  ~vtkGridAxesHelper();
+  ~vtkGridAxesHelper() override;
 
   /**
    * Get/Set label visibility overrides. This is more of a hack. We needed a

@@ -42,7 +42,7 @@ class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog
   Q_OBJECT
 public:
   pqCameraDialog(QWidget* parent = NULL, Qt::WindowFlags f = 0);
-  virtual ~pqCameraDialog();
+  ~pqCameraDialog() override;
 
   void SetCameraGroupsEnabled(bool enabled);
 

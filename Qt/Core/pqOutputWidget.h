@@ -94,7 +94,7 @@ class PQCORE_EXPORT pqOutputWidget : public QWidget
 
 public:
   pqOutputWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-  virtual ~pqOutputWidget();
+  ~pqOutputWidget() override;
 
   enum MessageTypes
   {

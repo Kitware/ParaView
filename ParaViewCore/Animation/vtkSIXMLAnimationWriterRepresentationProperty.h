@@ -36,13 +36,13 @@ public:
 
 protected:
   vtkSIXMLAnimationWriterRepresentationProperty();
-  ~vtkSIXMLAnimationWriterRepresentationProperty();
+  ~vtkSIXMLAnimationWriterRepresentationProperty() override;
 
   /**
    * Overridden to call AddRepresentation on the vtkXMLPVAnimationWriter
    * instance with correct API.
    */
-  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
 
 private:
   vtkSIXMLAnimationWriterRepresentationProperty(

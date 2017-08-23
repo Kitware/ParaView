@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkSMDeserializerProtobuf();
-  ~vtkSMDeserializerProtobuf();
+  ~vtkSMDeserializerProtobuf() override;
 
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
@@ -58,7 +58,7 @@ protected:
    * First ask the session, to find the given proxy.
    * If not found in the session then Create a new proxy with the id if possible.
    */
-  virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   vtkSMStateLocator* StateLocator;
 

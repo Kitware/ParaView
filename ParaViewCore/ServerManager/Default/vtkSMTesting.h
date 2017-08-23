@@ -60,7 +60,7 @@ public:
 
 protected:
   vtkSMTesting();
-  ~vtkSMTesting();
+  ~vtkSMTesting() override;
 
   vtkSMViewProxy* ViewProxy;
   vtkTesting* Testing;

@@ -61,7 +61,7 @@ class PQCOMPONENTS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
 
 public:
   pqCustomFilterManagerModel(QObject* parent = 0);
-  virtual ~pqCustomFilterManagerModel();
+  ~pqCustomFilterManagerModel() override;
 
   /**
   * \name QAbstractItemModel Methods
@@ -74,7 +74,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -85,7 +85,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -95,7 +95,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
   * \brief
@@ -107,7 +107,7 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
   //@}
 
   /**

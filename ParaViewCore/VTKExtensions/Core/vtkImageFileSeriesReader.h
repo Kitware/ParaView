@@ -46,13 +46,12 @@ public:
    * Overridden to directly call the internal reader after passing it the
    * correct filenames when ReadAsImageStack is true.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkImageFileSeriesReader();
-  ~vtkImageFileSeriesReader();
+  ~vtkImageFileSeriesReader() override;
 
   //@{
   /**

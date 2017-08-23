@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkRulerLineForInput();
-  ~vtkRulerLineForInput();
+  ~vtkRulerLineForInput() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inVectors,

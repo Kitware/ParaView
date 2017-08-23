@@ -69,7 +69,7 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
 #endif
 public:
   pqAnimationKeyFrame(pqAnimationTrack* p);
-  ~pqAnimationKeyFrame();
+  ~pqAnimationKeyFrame() override;
 
   double normalizedStartTime() const;
   double normalizedEndTime() const;
@@ -77,7 +77,7 @@ public:
   QVariant endValue() const;
   QIcon icon() const;
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
 
 public slots:
   void setNormalizedStartTime(double t);
@@ -99,7 +99,7 @@ protected:
   */
   pqAnimationTrack* parentTrack() const;
 
-  virtual void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget);
+  void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
   double NormalizedStartTime;

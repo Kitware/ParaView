@@ -44,7 +44,7 @@ public:
 
 protected:
   vtkPVEnvironmentInformationHelper();
-  ~vtkPVEnvironmentInformationHelper();
+  ~vtkPVEnvironmentInformationHelper() override;
 
   char* Variable;
 

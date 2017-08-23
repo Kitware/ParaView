@@ -47,22 +47,22 @@ public:
 
 protected:
   vtkPVMultiServerDataSource();
-  ~vtkPVMultiServerDataSource();
+  ~vtkPVMultiServerDataSource() override;
 
   // call 1
-  virtual int RequestDataObject(vtkInformation*, vtkInformationVector** vtkNotUsed(inputVector),
+  int RequestDataObject(vtkInformation*, vtkInformationVector** vtkNotUsed(inputVector),
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // call 2
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // call 3
-  virtual int RequestUpdateExtent(
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // call 4
-  virtual int RequestData(
+  int RequestData(
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:

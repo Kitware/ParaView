@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkPVInformation();
-  ~vtkPVInformation();
+  ~vtkPVInformation() override;
 
   int RootOnly;
   vtkSetMacro(RootOnly, int);

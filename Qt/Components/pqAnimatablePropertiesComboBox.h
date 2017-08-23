@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqAnimatablePropertiesComboBox : public QComboBox
 
 public:
   pqAnimatablePropertiesComboBox(QWidget* parent = 0);
-  ~pqAnimatablePropertiesComboBox();
+  ~pqAnimatablePropertiesComboBox() override;
 
   /**
   * Returns the source whose properties are currently being listed, if any.

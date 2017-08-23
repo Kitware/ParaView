@@ -167,7 +167,7 @@ public:
   QStringList SearchTags;
   bool Advanced;
 
-  ~pqProxyWidgetItem()
+  ~pqProxyWidgetItem() override
   {
     delete this->GroupHeader;
     delete this->GroupFooter;

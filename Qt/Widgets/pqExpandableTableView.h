@@ -53,7 +53,7 @@ class PQWIDGETS_EXPORT pqExpandableTableView : public pqTableView
 
 public:
   pqExpandableTableView(QWidget* parent = 0);
-  virtual ~pqExpandableTableView();
+  ~pqExpandableTableView() override;
 
 signals:
   /**
@@ -68,19 +68,19 @@ protected:
   * Working together with logic in closeEditor(). This methods makes it
   * possible to skip past non-editable items.
   */
-  virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+  QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;
 
   /**
   * Overridden to set MoveToNextEditableItem so that moveCursor() can skip
   * non-editable items. Also if moved past the last rows/last column, this
   * will fire the editPastLastRow() signal.
   */
-  virtual void closeEditor(QWidget* editor, QAbstractItemDelegate::EndEditHint hint);
+  void closeEditor(QWidget* editor, QAbstractItemDelegate::EndEditHint hint) override;
 
   /**
   * Overridden to capture Ctrl-V for pasting table data into the table.
   */
-  virtual void keyPressEvent(QKeyEvent* event);
+  void keyPressEvent(QKeyEvent* event) override;
 
 private:
   Q_DISABLE_COPY(pqExpandableTableView)

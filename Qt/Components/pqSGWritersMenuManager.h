@@ -56,7 +56,7 @@ class PQCOMPONENTS_EXPORT pqSGWritersMenuManager : public QObject
 public:
   pqSGWritersMenuManager(
     const char* writersMenuName, const char* objectMenuName, QObject* parent = 0);
-  ~pqSGWritersMenuManager();
+  ~pqSGWritersMenuManager() override;
 
 public slots:
   /**

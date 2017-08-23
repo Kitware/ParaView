@@ -58,7 +58,7 @@ public:
     this->setParent(_parent);
     this->setOpenLinks(false);
   }
-  ~pqTextBrowser() {}
+  ~pqTextBrowser() override {}
   static pqTextBrowser* newInstance(QHelpEngine* engine, pqHelpWindow* self)
   {
     pqTextBrowser* instance = new pqTextBrowser(engine, self);
@@ -71,7 +71,7 @@ protected:
   * Implementation reference from:
   * http://doc.qt.digia.com/qq/qq28-qthelp.html
   */
-  QVariant loadResource(int type, const QUrl& url)
+  QVariant loadResource(int type, const QUrl& url) override
   {
     if (url.scheme() == "qthelp")
     {

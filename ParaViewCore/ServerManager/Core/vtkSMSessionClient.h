@@ -42,7 +42,7 @@ public:
   /**
    * Return the url used to connect the current session to a server
    */
-  virtual const char* GetURI() VTK_OVERRIDE { return this->URI; };
+  const char* GetURI() VTK_OVERRIDE { return this->URI; };
 
   /**
    * Connects a remote server. URL can be of the following format:
@@ -62,7 +62,7 @@ public:
   /**
    * Returns true is this session is active/alive/valid.
    */
-  virtual bool GetIsAlive() VTK_OVERRIDE;
+  bool GetIsAlive() VTK_OVERRIDE;
 
   /**
    * Returns a ServerFlags indicate the nature of the current processes. e.g. if
@@ -70,13 +70,13 @@ public:
    * DATA_SERVER | RENDER_SERVER.
    * Overridden to return CLIENT since this process only acts as the client.
    */
-  virtual ServerFlags GetProcessRoles() VTK_OVERRIDE { return CLIENT; }
+  ServerFlags GetProcessRoles() VTK_OVERRIDE { return CLIENT; }
 
   /**
    * Returns the controller used to communicate with the process. Value must be
    * DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
    */
-  virtual vtkMultiProcessController* GetController(ServerFlags processType) VTK_OVERRIDE;
+  vtkMultiProcessController* GetController(ServerFlags processType) VTK_OVERRIDE;
 
   /**
    * vtkPVServerInformation is an information-object that provides information
@@ -86,27 +86,24 @@ public:
    * Overridden to provide return the information gathered from data-server and
    * render-server.
    */
-  virtual vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE
-  {
-    return this->ServerInformation;
-  }
+  vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE { return this->ServerInformation; }
 
   /**
    * Called to do any initializations after a successful session has been
    * established. Initialize the data-server-render-server connection, if
    * applicable.
    */
-  virtual void Initialize() VTK_OVERRIDE;
+  void Initialize() VTK_OVERRIDE;
 
   //@{
   /**
    * Push the state.
    */
-  virtual void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
-  virtual void PullState(vtkSMMessage* message) VTK_OVERRIDE;
-  virtual void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
+  void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
+  void PullState(vtkSMMessage* message) VTK_OVERRIDE;
+  void ExecuteStream(vtkTypeUInt32 location, const vtkClientServerStream& stream,
     bool ignore_errors = false) VTK_OVERRIDE;
-  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location) VTK_OVERRIDE;
+  const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -130,7 +127,7 @@ public:
    * Overridden to fetch the information from server if needed, otherwise it's
    * handled locally.
    */
-  virtual bool GatherInformation(
+  bool GatherInformation(
     vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid) VTK_OVERRIDE;
 
   /**
@@ -139,14 +136,14 @@ public:
    * is servers = DATA_SERVER | RENDER_SERVER and there are 3 data-server nodes
    * and 2 render-server nodes, then this method will return 3.
    */
-  virtual int GetNumberOfProcesses(vtkTypeUInt32 servers) VTK_OVERRIDE;
+  int GetNumberOfProcesses(vtkTypeUInt32 servers) VTK_OVERRIDE;
 
   /**
    * Returns whether or not MPI is initialized on the specified server/s. If
    * more than 1 server is identified it will return true only if all of the
    * servers have MPI initialized.
    */
-  virtual bool IsMPIInitialized(vtkTypeUInt32 servers) VTK_OVERRIDE;
+  bool IsMPIInitialized(vtkTypeUInt32 servers) VTK_OVERRIDE;
 
   //---------------------------------------------------------------------------
   // API for Collaboration management
@@ -154,7 +151,7 @@ public:
 
   // Called before application quit or session disconnection
   // Used to prevent quiting client to delete proxy of a running session.
-  virtual void PreDisconnection() VTK_OVERRIDE;
+  void PreDisconnection() VTK_OVERRIDE;
 
   /**
    * Flag used to know if it is a good time to handle server notification.
@@ -177,7 +174,7 @@ public:
    * Return the instance of vtkSMCollaborationManager that will be
    * lazy created at the first call.
    */
-  virtual vtkSMCollaborationManager* GetCollaborationManager() VTK_OVERRIDE;
+  vtkSMCollaborationManager* GetCollaborationManager() VTK_OVERRIDE;
 
   //---------------------------------------------------------------------------
   // API for GlobalId management
@@ -189,7 +186,7 @@ public:
    * the vtkSMSessionClient overide those method to call them on the DATA_SERVER
    * vtkPVSessionBase instance.
    */
-  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier() VTK_OVERRIDE;
+  vtkTypeUInt32 GetNextGlobalUniqueIdentifier() VTK_OVERRIDE;
 
   /**
    * Return the first Id of the requested chunk.
@@ -197,13 +194,13 @@ public:
    * 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
    * b = a + 10;
    */
-  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize) VTK_OVERRIDE;
+  vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize) VTK_OVERRIDE;
 
   void OnServerNotificationMessageRMI(void* message, int message_length);
 
 protected:
   vtkSMSessionClient();
-  ~vtkSMSessionClient();
+  ~vtkSMSessionClient() override;
 
   void SetRenderServerController(vtkMultiProcessController*);
   void SetDataServerController(vtkMultiProcessController*);
@@ -213,12 +210,12 @@ protected:
   /**
    * Delete server side object. (SIObject)
    */
-  virtual void UnRegisterSIObject(vtkSMMessage* msg) VTK_OVERRIDE;
+  void UnRegisterSIObject(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Notify server side object that it is used by one more client. (SIObject)
    */
-  virtual void RegisterSIObject(vtkSMMessage* msg) VTK_OVERRIDE;
+  void RegisterSIObject(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Translates the location to a real location based on whether a separate
@@ -253,8 +250,7 @@ protected:
    * Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
    * Return true if the event was handle locally.
    */
-  virtual bool OnWrongTagEvent(
-    vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE;
+  bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE;
 
   /**
    * Callback when any vtkMultiProcessController subclass fires a ErrorEvent.

@@ -71,7 +71,7 @@ public:
 
 protected:
   vtkCinemaDatabaseReader();
-  ~vtkCinemaDatabaseReader();
+  ~vtkCinemaDatabaseReader() override;
 
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outVector) VTK_OVERRIDE;

@@ -54,7 +54,7 @@ public:
   * constructor requires the proxy, property
   */
   pqDoubleRangeWidget(QWidget* parent = NULL);
-  ~pqDoubleRangeWidget();
+  ~pqDoubleRangeWidget() override;
 
   /**
   * get the value

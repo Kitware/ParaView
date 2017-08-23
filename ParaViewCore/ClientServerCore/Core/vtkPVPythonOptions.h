@@ -50,7 +50,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkPVPythonOptions();
+  ~vtkPVPythonOptions() override;
 
   /**
    * Synchronizes the options among root and satellites.
@@ -60,13 +60,13 @@ protected:
   /**
    * After parsing, process extra option dependencies.
    */
-  virtual int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
+  int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
 
   /**
    * This method is called when wrong argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int WrongArgument(const char* argument) VTK_OVERRIDE;
+  int WrongArgument(const char* argument) VTK_OVERRIDE;
 
   // Options:
   vtkSetStringMacro(PythonScriptName);

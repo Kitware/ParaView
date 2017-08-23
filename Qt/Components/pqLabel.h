@@ -46,9 +46,9 @@ class PQCOMPONENTS_EXPORT pqLabel : public QLabel
 
 public:
   pqLabel(const QString& text, QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~pqLabel();
+  ~pqLabel() override;
 
-  void mousePressEvent(QMouseEvent* event);
+  void mousePressEvent(QMouseEvent* event) override;
 
 signals:
   void clicked();

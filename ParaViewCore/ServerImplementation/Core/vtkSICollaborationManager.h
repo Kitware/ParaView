@@ -37,18 +37,18 @@ public:
    * The provided implementation just store the message
    * and return it at the Pull one.
    */
-  virtual void Push(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Push(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    * The provided implementation update the given message with the one
    * that has been previously pushed
    */
-  virtual void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
 
 protected:
   vtkSICollaborationManager();
-  virtual ~vtkSICollaborationManager();
+  ~vtkSICollaborationManager() override;
 
   friend class vtkInternal;
   void BroadcastToClients(vtkSMMessage* msg);

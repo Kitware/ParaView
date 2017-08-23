@@ -716,14 +716,17 @@ class vtkClientServerInterpreterCommand : public vtkCommand
 {
 public:
   static vtkClientServerInterpreterCommand* New() { return new vtkClientServerInterpreterCommand; }
-  void Execute(vtkObject*, unsigned long, void*) { this->Interpreter->ProcessStream(this->Stream); }
+  void Execute(vtkObject*, unsigned long, void*) override
+  {
+    this->Interpreter->ProcessStream(this->Stream);
+  }
 
   vtkClientServerStream Stream;
   vtkClientServerInterpreter* Interpreter;
 
 protected:
   vtkClientServerInterpreterCommand() {}
-  ~vtkClientServerInterpreterCommand() {}
+  ~vtkClientServerInterpreterCommand() override {}
 private:
   vtkClientServerInterpreterCommand(const vtkClientServerInterpreterCommand&);
   void operator=(const vtkClientServerInterpreterCommand&);

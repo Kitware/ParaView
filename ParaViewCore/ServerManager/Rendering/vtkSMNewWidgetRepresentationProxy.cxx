@@ -48,7 +48,7 @@ public:
   {
     return new vtkSMNewWidgetRepresentationObserver;
   }
-  virtual void Execute(vtkObject* caller, unsigned long event, void*)
+  void Execute(vtkObject* caller, unsigned long event, void*) override
   {
     if (this->Proxy)
     {

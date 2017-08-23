@@ -65,7 +65,7 @@ public:
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, bool use_unchecked_modified_event,
     QObject* parentObject = 0);
 
-  virtual ~pqPropertyLinksConnection();
+  ~pqPropertyLinksConnection() override;
 
   void setUseUncheckedProperties(bool useUnchecked);
 

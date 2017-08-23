@@ -167,7 +167,7 @@ public:
 
 protected:
   vtkH5PartReader();
-  ~vtkH5PartReader();
+  ~vtkH5PartReader() override;
   //
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

@@ -53,7 +53,7 @@ public:
   pqImageOutputInfo(
     QWidget* parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
 
-  ~pqImageOutputInfo();
+  ~pqImageOutputInfo() override;
 
   void setupScreenshotInfo();
 

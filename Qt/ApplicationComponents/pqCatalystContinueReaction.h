@@ -56,7 +56,7 @@ public:
   }
 
 public slots:
-  virtual void updateEnableState()
+  void updateEnableState() override
   {
     pqCatalystPauseSimulationReaction::updateEnableState(CONTINUE);
   }
@@ -65,7 +65,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { this->setPauseSimulation(false); }
+  void onTriggered() override { this->setPauseSimulation(false); }
 
 private:
   Q_DISABLE_COPY(pqCatalystContinueReaction)

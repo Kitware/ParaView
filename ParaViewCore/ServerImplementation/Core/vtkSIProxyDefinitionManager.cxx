@@ -242,9 +242,9 @@ public:
     return false;
   }
   //-------------------------------------------------------------------------
-  virtual const char* GetGroupName() VTK_OVERRIDE { return this->CurrentGroupName.c_str(); }
+  const char* GetGroupName() VTK_OVERRIDE { return this->CurrentGroupName.c_str(); }
   //-------------------------------------------------------------------------
-  virtual const char* GetProxyName() VTK_OVERRIDE
+  const char* GetProxyName() VTK_OVERRIDE
   {
     if (this->IsCustom())
     {
@@ -256,9 +256,9 @@ public:
     }
   }
   //-------------------------------------------------------------------------
-  virtual bool IsCustom() VTK_OVERRIDE { return this->IsDoneWithCoreTraversal(); }
+  bool IsCustom() VTK_OVERRIDE { return this->IsDoneWithCoreTraversal(); }
   //-------------------------------------------------------------------------
-  virtual vtkPVXMLElement* GetProxyDefinition() VTK_OVERRIDE
+  vtkPVXMLElement* GetProxyDefinition() VTK_OVERRIDE
   {
     if (this->IsCustom())
     {
@@ -270,7 +270,7 @@ public:
     }
   }
   //-------------------------------------------------------------------------
-  virtual vtkPVXMLElement* GetProxyHints() VTK_OVERRIDE
+  vtkPVXMLElement* GetProxyHints() VTK_OVERRIDE
   {
     vtkPVXMLElement* definition = this->GetProxyDefinition();
     if (definition)
@@ -309,7 +309,7 @@ protected:
     this->InvalidCoreIterator = true;
     this->InvalidCustomIterator = true;
   }
-  ~vtkInternalDefinitionIterator() {}
+  ~vtkInternalDefinitionIterator() override {}
 
   //-------------------------------------------------------------------------
   void Reset()

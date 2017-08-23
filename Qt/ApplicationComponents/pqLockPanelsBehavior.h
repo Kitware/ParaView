@@ -55,7 +55,7 @@ public:
   * ParaViewMainWindow.
   */
   pqLockPanelsBehavior(QObject* parent = 0);
-  virtual ~pqLockPanelsBehavior();
+  ~pqLockPanelsBehavior() override;
 
   /**
   * Invoked when the vtkPVGeneralSettings singleton is modified.

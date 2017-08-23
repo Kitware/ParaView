@@ -218,7 +218,7 @@ public:
 
 protected:
   vtkSMViewProxy();
-  ~vtkSMViewProxy();
+  ~vtkSMViewProxy() override;
 
   /**
    * Capture an image from the view's render window. Default implementation
@@ -255,13 +255,12 @@ protected:
   /**
    * Called at the end of CreateVTKObjects().
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(
-    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Convenience method to call

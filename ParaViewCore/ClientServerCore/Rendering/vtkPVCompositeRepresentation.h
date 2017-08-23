@@ -60,13 +60,13 @@ public:
   /**
    * Propagate the modification to all internal representations.
    */
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   /**
    * Set visibility of the representation.
    * Overridden to update the cube-axes and selection visibilities.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   /**
    * Set the selection visibility.
@@ -105,26 +105,25 @@ public:
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(
-    unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeRepresentation();
-  ~vtkPVCompositeRepresentation();
+  ~vtkPVCompositeRepresentation() override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkSelectionRepresentation* SelectionRepresentation;
   vtkPVGridAxes3DRepresentation* GridAxesRepresentation;

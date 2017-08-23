@@ -106,25 +106,23 @@ public:
   /**
    * Overridden to create output data of appropriate type.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkPVGlyphFilter();
-  ~vtkPVGlyphFilter();
+  ~vtkPVGlyphFilter() override;
   //@}
 
   // Standard Pipeline methods
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * Returns 1 if point is to be glyped, otherwise returns 0.
    */
-  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
+  int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
 
   /**
    * Returns true if input Scalars and Vectors are compatible, otherwise returns 0.

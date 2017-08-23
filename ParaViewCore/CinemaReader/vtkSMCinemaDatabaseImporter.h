@@ -62,7 +62,7 @@ public:
 
 protected:
   vtkSMCinemaDatabaseImporter();
-  ~vtkSMCinemaDatabaseImporter();
+  ~vtkSMCinemaDatabaseImporter() override;
 
   void AddPropertiesForControls(vtkSMSelfGeneratingSourceProxy* reader,
     const std::string& parametername, const vtkPVCinemaDatabaseInformation* cinfo);

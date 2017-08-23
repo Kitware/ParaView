@@ -47,13 +47,13 @@ class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
   Q_OBJECT
 public:
   pqDataInformationWidget(QWidget* parent = NULL);
-  virtual ~pqDataInformationWidget();
+  ~pqDataInformationWidget() override;
 
 protected:
   /**
   * Filters events received by the View.
   */
-  virtual bool eventFilter(QObject* object, QEvent* event);
+  bool eventFilter(QObject* object, QEvent* event) override;
 
 private slots:
   void showHeaderContextMenu(const QPoint&);

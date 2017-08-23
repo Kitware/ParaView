@@ -118,8 +118,8 @@ public:
 
   bool CanBroadcast() { return (this->ServerSession && !this->DisableBroadcast); }
 
-  void Execute(
-    vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData))
+  void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventId),
+    void* vtkNotUsed(callData)) override
   {
     // A client has disconnect, let's notify the clients left
     if (this->Owner)

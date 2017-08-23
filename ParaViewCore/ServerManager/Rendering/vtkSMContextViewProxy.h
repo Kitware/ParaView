@@ -56,7 +56,7 @@ public:
    * Return the render window from which offscreen rendering and interactor can
    * be accessed
    */
-  virtual vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * A client process need to set the interactor to enable interactivity. Use
@@ -64,12 +64,12 @@ public:
    * RenderView. This include changing the interactor style as well as
    * overriding VTK rendering to use the Proxy/ViewProxy API instead.
    */
-  virtual void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
 
   /**
    * Returns the interactor.
    */
-  virtual vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
+  vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
 
   /**
    * Resets the zoom level to 100%
@@ -83,15 +83,15 @@ public:
    * CreateDefaultRepresentation() will still work without regard for this
    * Plottable hint.
    */
-  virtual bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   vtkSelection* GetCurrentSelection();
 
 protected:
   vtkSMContextViewProxy();
-  ~vtkSMContextViewProxy();
+  ~vtkSMContextViewProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Used to update the axis range properties on each interaction event.
@@ -116,13 +116,12 @@ protected:
    * Overridden to update ChartAxes ranges on every render. This ensures that
    * the property's values are up-to-date.
    */
-  virtual void PostRender(bool interactive) VTK_OVERRIDE;
+  void PostRender(bool interactive) VTK_OVERRIDE;
 
   /**
    * Overridden to process the "skip_plotable_check" attribute.
    */
-  virtual int ReadXMLAttributes(
-    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * The context view that is used for all context derived charts.

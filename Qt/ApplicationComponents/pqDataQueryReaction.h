@@ -49,7 +49,7 @@ public:
   * Constructor. Parent cannot be NULL.
   */
   pqDataQueryReaction(QAction* parent);
-  virtual ~pqDataQueryReaction();
+  ~pqDataQueryReaction() override;
 
   /**
   * Show the query dialog for querying the data from the active source.
@@ -63,7 +63,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqDataQueryReaction::showQueryDialog(); }
+  void onTriggered() override { pqDataQueryReaction::showQueryDialog(); }
 
 private:
   Q_DISABLE_COPY(pqDataQueryReaction)

@@ -49,7 +49,7 @@ public:
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if the string is in the domain.
@@ -71,12 +71,12 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty*, int, double) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty*, int, double) VTK_OVERRIDE;
 
   //@{
   /**
@@ -89,20 +89,20 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMStringListDomain();
-  ~vtkSMStringListDomain();
+  ~vtkSMStringListDomain() override;
   //@}
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  virtual void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
+  void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
 
   //@{
   /**

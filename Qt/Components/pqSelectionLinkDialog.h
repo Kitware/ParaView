@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqSelectionLinkDialog : public QDialog
 
 public:
   pqSelectionLinkDialog(QWidget* parent, Qt::WindowFlags f = 0);
-  ~pqSelectionLinkDialog();
+  ~pqSelectionLinkDialog() override;
 
   /**
   * Specify if the convert to indices flag should be set to on

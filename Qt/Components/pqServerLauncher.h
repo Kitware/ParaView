@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqServerLauncher : public QObject
 
 public:
   pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = 0);
-  virtual ~pqServerLauncher();
+  ~pqServerLauncher() override;
 
   /**
   * Custom applications may want to extend the pqServerLauncher to customize

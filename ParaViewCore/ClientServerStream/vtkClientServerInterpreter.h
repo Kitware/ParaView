@@ -193,7 +193,7 @@ public:
 protected:
   // constructor and destructor
   vtkClientServerInterpreter();
-  ~vtkClientServerInterpreter();
+  ~vtkClientServerInterpreter() override;
 
   // A stream to which a log is written.
   ostream* LogStream;

@@ -40,14 +40,14 @@ public:
 
 protected:
   vtkPVCompositeDataPipeline();
-  ~vtkPVCompositeDataPipeline();
+  ~vtkPVCompositeDataPipeline() override;
 
   // Copy information for the given request.
-  virtual void CopyDefaultInformation(vtkInformation* request, int direction,
+  void CopyDefaultInformation(vtkInformation* request, int direction,
     vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   // Remove update/whole extent when resetting pipeline information.
-  virtual void ResetPipelineInformation(int port, vtkInformation*) VTK_OVERRIDE;
+  void ResetPipelineInformation(int port, vtkInformation*) VTK_OVERRIDE;
 
 private:
   vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&) VTK_DELETE_FUNCTION;

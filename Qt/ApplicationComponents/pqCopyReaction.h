@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCopyReaction : public pqReaction
 
 public:
   pqCopyReaction(QAction* parent, bool paste_mode = false);
-  virtual ~pqCopyReaction();
+  ~pqCopyReaction() override;
 
   /**
   * Copy all properties from source to dest. Uses the property names as the
@@ -62,13 +62,13 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
+  void onTriggered() override
   {
     if (this->Paste)
     {

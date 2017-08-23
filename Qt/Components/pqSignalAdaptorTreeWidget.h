@@ -62,7 +62,7 @@ public:
   * the user.
   */
   pqSignalAdaptorTreeWidget(QTreeWidget* treeWidget, bool editable);
-  virtual ~pqSignalAdaptorTreeWidget();
+  ~pqSignalAdaptorTreeWidget() override;
 
   /**
   * Returns a list of the values currently in the tree widget.

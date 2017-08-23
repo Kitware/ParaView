@@ -54,7 +54,7 @@ public:
 
 protected:
   vtkFileSequenceParser();
-  ~vtkFileSequenceParser();
+  ~vtkFileSequenceParser() override;
 
   vtksys::RegularExpression* reg_ex;
   vtksys::RegularExpression* reg_ex2;

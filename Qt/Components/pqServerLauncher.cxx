@@ -117,7 +117,7 @@ public:
     , ToSave(false)
   {
   }
-  virtual ~pqWidget() {}
+  ~pqWidget() override {}
 
   virtual QVariant get() const
   {
@@ -140,13 +140,13 @@ public:
   {
   }
 
-  virtual QVariant get() const
+  QVariant get() const override
   {
     QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
     return combobox->itemData(combobox->currentIndex());
   }
 
-  virtual void set(const QVariant& value)
+  void set(const QVariant& value) override
   {
     QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
     combobox->setCurrentIndex(combobox->findData(value));
@@ -169,13 +169,13 @@ public:
   {
   }
 
-  virtual QVariant get() const
+  QVariant get() const override
   {
     QCheckBox* checkbox = qobject_cast<QCheckBox*>(this->Widget);
     return checkbox->isChecked() ? this->TrueValue : this->FalseValue;
   }
 
-  virtual void set(const QVariant& value)
+  void set(const QVariant& value) override
   {
     QCheckBox* checkbox = qobject_cast<QCheckBox*>(this->Widget);
     checkbox->setChecked(value.toString() == this->TrueValue);

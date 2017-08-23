@@ -55,7 +55,7 @@ public:
    * The propery has to be a vtkSMProxyPropery or a sub-class. All
    * proxies pointed by the property have to be in the domain.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if the proxy is in the domain.
@@ -94,13 +94,13 @@ public:
 
 protected:
   vtkSMProxyGroupDomain();
-  ~vtkSMProxyGroupDomain();
+  ~vtkSMProxyGroupDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   vtkSMProxyGroupDomainInternals* PGInternals;
 

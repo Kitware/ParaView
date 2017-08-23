@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkSMIntRangeDomain();
-  ~vtkSMIntRangeDomain();
+  ~vtkSMIntRangeDomain() override;
 
 private:
   vtkSMIntRangeDomain(const vtkSMIntRangeDomain&) VTK_DELETE_FUNCTION;

@@ -65,7 +65,7 @@ public:
   /**
   * destroy this dialog
   */
-  ~pqLinksEditor();
+  ~pqLinksEditor() override;
 
   /**
   * get the name of the link

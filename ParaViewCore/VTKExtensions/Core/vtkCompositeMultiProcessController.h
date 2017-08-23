@@ -103,15 +103,15 @@ public:
   //  --------------- vtkMultiProcessController API ----------------------
   // Make sure inner vtkSocketController are initialized
   virtual void Initialize();
-  virtual void Initialize(int*, char***) VTK_OVERRIDE { this->Initialize(); };
-  virtual void Initialize(int*, char***, int) VTK_OVERRIDE { this->Initialize(); };
-  virtual void Finalize() VTK_OVERRIDE{};              // Empty: Same as vtkSocketController
-  virtual void Finalize(int) VTK_OVERRIDE{};           // Empty: Same as vtkSocketController
-  virtual void SingleMethodExecute() VTK_OVERRIDE{};   // Empty: Same as vtkSocketController
-  virtual void MultipleMethodExecute() VTK_OVERRIDE{}; // Empty: Same as vtkSocketController
-  virtual void CreateOutputWindow() VTK_OVERRIDE{};    // Empty: Same as vtkSocketController
+  void Initialize(int*, char***) VTK_OVERRIDE { this->Initialize(); };
+  void Initialize(int*, char***, int) VTK_OVERRIDE { this->Initialize(); };
+  void Finalize() VTK_OVERRIDE{};              // Empty: Same as vtkSocketController
+  void Finalize(int) VTK_OVERRIDE{};           // Empty: Same as vtkSocketController
+  void SingleMethodExecute() VTK_OVERRIDE{};   // Empty: Same as vtkSocketController
+  void MultipleMethodExecute() VTK_OVERRIDE{}; // Empty: Same as vtkSocketController
+  void CreateOutputWindow() VTK_OVERRIDE{};    // Empty: Same as vtkSocketController
 
-  virtual vtkCommunicator* GetCommunicator() VTK_OVERRIDE;
+  vtkCommunicator* GetCommunicator() VTK_OVERRIDE;
 
   //  --------------- RMIs Overloaded API -------------------
 
@@ -120,7 +120,7 @@ public:
    * When the RMI is triggered, all the callbacks are called
    * Adds a new callback for an RMI. Returns the identifier for the callback.
    */
-  virtual unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag) VTK_OVERRIDE;
+  unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag) VTK_OVERRIDE;
 
   //@{
   /**
@@ -128,14 +128,14 @@ public:
    * When the RMI is triggered, all the callbacks are called
    * Removes all callbacks for the tag.
    */
-  virtual void RemoveAllRMICallbacks(int tag) VTK_OVERRIDE;
-  virtual int RemoveFirstRMI(int tag) VTK_OVERRIDE
+  void RemoveAllRMICallbacks(int tag) VTK_OVERRIDE;
+  int RemoveFirstRMI(int tag) VTK_OVERRIDE
   {
     vtkWarningMacro("RemoveRMICallbacks will remove all...");
     this->RemoveAllRMICallbacks(tag);
     return 1;
   }
-  virtual bool RemoveRMICallback(unsigned long observerTagId) VTK_OVERRIDE;
+  bool RemoveRMICallback(unsigned long observerTagId) VTK_OVERRIDE;
   //@}
 
   enum EventId
@@ -145,7 +145,7 @@ public:
 
 protected:
   vtkCompositeMultiProcessController();
-  ~vtkCompositeMultiProcessController();
+  ~vtkCompositeMultiProcessController() override;
 
 private:
   vtkCompositeMultiProcessController(const vtkCompositeMultiProcessController&) VTK_DELETE_FUNCTION;

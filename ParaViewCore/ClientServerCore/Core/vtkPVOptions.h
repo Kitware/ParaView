@@ -261,29 +261,29 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkPVOptions();
+  ~vtkPVOptions() override;
 
   /**
    * Initialize arguments.
    */
-  virtual void Initialize() VTK_OVERRIDE;
+  void Initialize() VTK_OVERRIDE;
 
   /**
    * After parsing, process extra option dependencies.
    */
-  virtual int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
+  int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
 
   /**
    * This method is called when wrong argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int WrongArgument(const char* argument) VTK_OVERRIDE;
+  int WrongArgument(const char* argument) VTK_OVERRIDE;
 
   /**
    * This method is called when a deprecated argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int DeprecatedArgument(const char* argument) VTK_OVERRIDE;
+  int DeprecatedArgument(const char* argument) VTK_OVERRIDE;
 
   //@{
   /**

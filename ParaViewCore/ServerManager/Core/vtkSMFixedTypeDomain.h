@@ -47,7 +47,7 @@ public:
    * has the same number of parts and data types as the old
    * (checked) one, it returns 1. Returns 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if old and new source proxies have the same
@@ -57,7 +57,7 @@ public:
 
 protected:
   vtkSMFixedTypeDomain();
-  ~vtkSMFixedTypeDomain();
+  ~vtkSMFixedTypeDomain() override;
 
 private:
   vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&) VTK_DELETE_FUNCTION;

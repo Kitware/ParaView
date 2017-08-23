@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqSampleScalarAddRangeDialog : public QDialog
 public:
   pqSampleScalarAddRangeDialog(
     double from, double to, unsigned long steps, bool logarithmic, QWidget* parent = 0);
-  ~pqSampleScalarAddRangeDialog();
+  ~pqSampleScalarAddRangeDialog() override;
 
   double from() const;
   void setFrom(double value);

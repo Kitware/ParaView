@@ -36,9 +36,9 @@ public:
 
 protected:
   vtkSMImplicitPlaneRepresentationProxy();
-  ~vtkSMImplicitPlaneRepresentationProxy();
+  ~vtkSMImplicitPlaneRepresentationProxy() override;
 
-  virtual void SendRepresentation() VTK_OVERRIDE;
+  void SendRepresentation() VTK_OVERRIDE;
 
 private:
   vtkSMImplicitPlaneRepresentationProxy(

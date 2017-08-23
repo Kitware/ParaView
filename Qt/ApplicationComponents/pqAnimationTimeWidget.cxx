@@ -75,10 +75,10 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~pqAnimationTimeWidgetLinks() {}
+  ~pqAnimationTimeWidgetLinks() override {}
 
 protected:
-  virtual QVariant currentServerManagerValue(bool use_unchecked) const
+  QVariant currentServerManagerValue(bool use_unchecked) const override
   {
     Q_ASSERT(use_unchecked == false);
     Q_UNUSED(use_unchecked);

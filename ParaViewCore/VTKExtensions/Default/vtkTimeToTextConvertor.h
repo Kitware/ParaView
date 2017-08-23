@@ -63,13 +63,13 @@ public:
 
 protected:
   vtkTimeToTextConvertor();
-  ~vtkTimeToTextConvertor();
+  ~vtkTimeToTextConvertor() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   char* Format;

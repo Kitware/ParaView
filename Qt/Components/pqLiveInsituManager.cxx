@@ -75,7 +75,7 @@ public:
   }
 
   using Superclass::playEvent;
-  virtual bool playEvent(QObject*, const QString& command, const QString& arguments, bool& error)
+  bool playEvent(QObject*, const QString& command, const QString& arguments, bool& error) override
   {
     if (command == "pqLiveInsituManager" && this->Manager)
     {

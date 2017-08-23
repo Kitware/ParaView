@@ -46,7 +46,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsEditor : public QDialog
 
 public:
   pqLightsEditor(pqPropertyGroupWidget* propertyWidget, QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~pqLightsEditor();
+  ~pqLightsEditor() override;
 
 protected slots:
   void reset();

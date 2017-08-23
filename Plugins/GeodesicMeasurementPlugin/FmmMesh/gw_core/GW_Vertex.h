@@ -48,7 +48,7 @@ public:
     /*------------------------------------------------------------------------------*/
     //@{
     GW_Vertex();
-    virtual ~GW_Vertex();
+    ~GW_Vertex() override;
     virtual GW_Vertex& operator=(const GW_Vertex& v);
     //@}
 

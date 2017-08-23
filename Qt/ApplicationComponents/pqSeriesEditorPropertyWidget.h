@@ -76,7 +76,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
 
 public:
   pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqSeriesEditorPropertyWidget();
+  ~pqSeriesEditorPropertyWidget() override;
 
   /**
   * Get/Set the visibility for series.

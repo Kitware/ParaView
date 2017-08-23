@@ -54,7 +54,7 @@ public:
 public:
   pqSpreadSheetView(const QString& group, const QString& name, vtkSMViewProxy* viewModule,
     pqServer* server, QObject* parent = NULL);
-  virtual ~pqSpreadSheetView();
+  ~pqSpreadSheetView() override;
 
   /**
   * Get the internal model for the view
@@ -111,7 +111,7 @@ protected slots:
   /**
   * Create a QWidget for the view's viewport.
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
 private:
   Q_DISABLE_COPY(pqSpreadSheetView)

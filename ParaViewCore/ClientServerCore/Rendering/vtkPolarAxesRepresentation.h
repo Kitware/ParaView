@@ -97,19 +97,19 @@ public:
   // Description:
   // This needs to be called on all instances of vtkPolarAxesRepresentation when
   // the input is modified.
-  virtual void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
+  void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
   // Description:
   // Set visibility of the representation.
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   // Description:
   // Set (forward) visibility of the parent (composite) representation.
@@ -180,10 +180,10 @@ public:
 
 protected:
   vtkPolarAxesRepresentation();
-  ~vtkPolarAxesRepresentation();
+  ~vtkPolarAxesRepresentation() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(
     vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual void InitializeDataBoundsFromData(vtkDataObject* data);
@@ -193,13 +193,13 @@ protected:
   // Adds the representation to the view.  This is called from
   // vtkView::AddRepresentation().  Subclasses should override this method.
   // Returns true if the addition succeeds.
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   // Description:
   // Removes the representation to the view.  This is called from
   // vtkView::RemoveRepresentation().  Subclasses should override this method.
   // Returns true if the removal succeeds.
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkNew<vtkPolyData> OutlineGeometry;
   vtkWeakPointer<vtkPVRenderView> RenderView;

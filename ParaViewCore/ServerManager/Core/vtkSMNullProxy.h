@@ -34,9 +34,9 @@ public:
 
 protected:
   vtkSMNullProxy();
-  ~vtkSMNullProxy();
+  ~vtkSMNullProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
   vtkSMNullProxy(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;

@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
 
 public:
   pqTransferFunctionWidget(QWidget* parent = 0);
-  virtual ~pqTransferFunctionWidget();
+  ~pqTransferFunctionWidget() override;
 
   /**
   * Initialize the pqTransferFunctionWidget with the given

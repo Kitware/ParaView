@@ -172,7 +172,7 @@ private slots:
 
 protected:
   pqActiveObjects();
-  ~pqActiveObjects();
+  ~pqActiveObjects() override;
 
   /**
   * single method that fires appropriate signals based on state changes. This

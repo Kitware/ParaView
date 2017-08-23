@@ -57,7 +57,7 @@ class PQCORE_EXPORT pqDataRepresentation : public pqRepresentation
 public:
   pqDataRepresentation(const QString& group, const QString& name, vtkSMProxy* display,
     pqServer* server, QObject* parent = 0);
-  virtual ~pqDataRepresentation();
+  ~pqDataRepresentation() override;
 
   /**
   * Get the source/filter of which this is a display.

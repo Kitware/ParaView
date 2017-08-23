@@ -45,14 +45,14 @@ class PQCORE_EXPORT pqXMLEventSource : public pqEventSource
   Q_OBJECT
 public:
   pqXMLEventSource(QObject* p = 0);
-  ~pqXMLEventSource();
+  ~pqXMLEventSource() override;
 
-  virtual void setContent(const QString& path);
+  void setContent(const QString& path) override;
 
   /**
   * Get the next event from the event source
   */
-  virtual int getNextEvent(QString& object, QString& command, QString& arguments, int& eventType);
+  int getNextEvent(QString& object, QString& command, QString& arguments, int& eventType) override;
 
 private:
   class pqImplementation;

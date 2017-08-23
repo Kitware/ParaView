@@ -81,7 +81,7 @@ public:
   /**
    * This always returns true.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Add a proxy to the domain.
@@ -137,11 +137,11 @@ public:
    * application must explicitly call this method to initialize the
    * property.
    */
-  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMProxyListDomain();
-  ~vtkSMProxyListDomain();
+  ~vtkSMProxyListDomain() override;
   //@}
 
   /**
@@ -158,10 +158,10 @@ protected:
   /**
    * Save state for this domain.
    */
-  virtual void ChildSaveState(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
+  void ChildSaveState(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
 
   // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* domainElement, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  int LoadState(vtkPVXMLElement* domainElement, vtkSMProxyLocator* loader) VTK_OVERRIDE;
 
   friend class vtkSMProxyProperty;
   void SetProxies(vtkSMProxy** proxies, unsigned int count);

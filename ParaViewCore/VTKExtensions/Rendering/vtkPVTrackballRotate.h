@@ -38,12 +38,9 @@ public:
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
-  virtual void OnButtonDown(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
-  virtual void OnButtonUp(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -53,8 +50,8 @@ public:
    * perform any interactions.
    * Overridden to capture if the x,y,z key is pressed.
    */
-  virtual void OnKeyUp(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
-  virtual void OnKeyDown(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void OnKeyUp(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void OnKeyDown(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
   //@}
 
   /**
@@ -64,7 +61,7 @@ public:
 
 protected:
   vtkPVTrackballRotate();
-  ~vtkPVTrackballRotate();
+  ~vtkPVTrackballRotate() override;
 
   char KeyCode;
   vtkPVTrackballRotate(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;

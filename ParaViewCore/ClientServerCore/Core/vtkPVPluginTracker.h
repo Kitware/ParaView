@@ -120,7 +120,7 @@ public:
 
 protected:
   vtkPVPluginTracker();
-  ~vtkPVPluginTracker();
+  ~vtkPVPluginTracker() override;
 
 private:
   vtkPVPluginTracker(const vtkPVPluginTracker&) VTK_DELETE_FUNCTION;

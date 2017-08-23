@@ -34,7 +34,7 @@ public:
   static vtkSMPropertyLinkObserver* New() { return new vtkSMPropertyLinkObserver; }
 
   void SetTarget(vtkSMPropertyLink* t) { this->Target = t; }
-  virtual void Execute(vtkObject* c, unsigned long, void*)
+  void Execute(vtkObject* c, unsigned long, void*) override
   {
     vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
     if (this->Target && caller && this->Target->GetEnabled())

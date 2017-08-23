@@ -92,7 +92,7 @@ public:
   * \param parent The parent widget for the wizard.
   */
   pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel* model, QWidget* parent = 0);
-  virtual ~pqCustomFilterDefinitionWizard();
+  ~pqCustomFilterDefinitionWizard() override;
 
   /**
   * \brief

@@ -70,7 +70,7 @@ public:
 
 protected:
   vtkSMSaveAnimationProxy();
-  ~vtkSMSaveAnimationProxy();
+  ~vtkSMSaveAnimationProxy() override;
 
   /**
    * Write animation on local process.

@@ -52,7 +52,7 @@ public:
     //@}
 
     protected : vtkPVGL2PSExporter();
-  ~vtkPVGL2PSExporter();
+  ~vtkPVGL2PSExporter() override;
 
   void WriteData() VTK_OVERRIDE;
 

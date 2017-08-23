@@ -129,7 +129,7 @@ public:
    * Removes all unchecked proxies.
    */
   virtual void RemoveAllUncheckedProxies();
-  virtual void ClearUncheckedElements() VTK_OVERRIDE { this->RemoveAllUncheckedProxies(); }
+  void ClearUncheckedElements() VTK_OVERRIDE { this->RemoveAllUncheckedProxies(); }
 
   /**
    * Returns the number of proxies.
@@ -167,7 +167,7 @@ public:
    * `Copy` request, will find an equivalent proxy on the target's domain and
    * set that as the value of the target property.
    */
-  virtual void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
   //@{
   /**
@@ -179,9 +179,9 @@ public:
   /**
    * Update all proxies referred by this property (if any).
    */
-  virtual void UpdateAllInputs() VTK_OVERRIDE;
+  void UpdateAllInputs() VTK_OVERRIDE;
 
-  virtual bool IsValueDefault() VTK_OVERRIDE;
+  bool IsValueDefault() VTK_OVERRIDE;
 
   /**
    * For properties that support specifying defaults in XML configuration, this
@@ -189,21 +189,21 @@ public:
    * XML.
    * Simply clears the property.
    */
-  virtual void ResetToXMLDefaults() VTK_OVERRIDE;
+  void ResetToXMLDefaults() VTK_OVERRIDE;
 
 protected:
   vtkSMProxyProperty();
-  ~vtkSMProxyProperty();
+  ~vtkSMProxyProperty() override;
 
   /**
    * Let the property write its content into the stream
    */
-  virtual void WriteTo(vtkSMMessage* msg) VTK_OVERRIDE;
+  void WriteTo(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Let the property read and set its content from the stream
    */
-  virtual void ReadFrom(const vtkSMMessage* msg, int msg_offset, vtkSMProxyLocator*) VTK_OVERRIDE;
+  void ReadFrom(const vtkSMMessage* msg, int msg_offset, vtkSMProxyLocator*) VTK_OVERRIDE;
 
   friend class vtkSMProxy;
 
@@ -211,12 +211,12 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Generic method used to generate XML state
    */
-  virtual void SaveStateValues(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
+  void SaveStateValues(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
 
   /**
    * Fill state property/proxy XML element with proxy info.
@@ -228,7 +228,7 @@ protected:
   /**
    * Updates state from an XML element. Returns 0 on failure.
    */
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
 
   /**
    * Called when a producer fires the vtkCommand::UpdateDataEvent. We update all

@@ -60,10 +60,10 @@ public:
 
 protected:
   vtkXMLPVAnimationWriter();
-  ~vtkXMLPVAnimationWriter();
+  ~vtkXMLPVAnimationWriter() override;
 
   // Replace vtkXMLWriter's writing driver method.
-  virtual int WriteInternal() VTK_OVERRIDE;
+  int WriteInternal() VTK_OVERRIDE;
 
   // Status safety check for method call ordering.
   int StartCalled;

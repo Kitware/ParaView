@@ -110,7 +110,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkCommandOptions();
+  ~vtkCommandOptions() override;
 
   /**
    * Prototype for callbacks.

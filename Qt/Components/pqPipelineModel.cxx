@@ -72,7 +72,7 @@ public:
     , PipelineModel(pipelineModel)
   {
   }
-  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long, void* vtkNotUsed(data))
+  void Execute(vtkObject* vtkNotUsed(caller), unsigned long, void* vtkNotUsed(data)) override
   {
     this->PipelineModel->updateData(this->InsituServer);
   }
@@ -153,7 +153,7 @@ public:
     }
     this->InConstructor = false;
   }
-  ~pqPipelineModelDataItem()
+  ~pqPipelineModelDataItem() override
   {
     if (this->Type == pqPipelineModel::Link && this->Model->Internal)
     {

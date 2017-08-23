@@ -47,18 +47,18 @@ class PQCORE_EXPORT pqComparativeContextView : public pqContextView
   typedef pqContextView Superclass;
 
 public:
-  virtual ~pqComparativeContextView();
+  ~pqComparativeContextView() override;
 
   /**
   * \returns the internal vtkContextView which provides the implementation for
   * the chart rendering.
   */
-  virtual vtkContextView* getVTKContextView() const;
+  vtkContextView* getVTKContextView() const override;
 
   /**
   * Returns the context view proxy associated with this object.
   */
-  virtual vtkSMContextViewProxy* getContextViewProxy() const;
+  vtkSMContextViewProxy* getContextViewProxy() const override;
 
   /**
   * \returns the comparative view proxy.
@@ -80,7 +80,7 @@ protected:
   /**
   * Create the QWidget for this view.
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
 protected:
   /**

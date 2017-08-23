@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface
   Q_INTERFACES(pqPropertyWidgetInterface)
 public:
   pqStandardPropertyWidgetInterface(QObject* p = 0);
-  virtual ~pqStandardPropertyWidgetInterface();
+  ~pqStandardPropertyWidgetInterface() override;
 
   /**
   * Given a proxy and its property, create a widget for the same, if possible.
@@ -76,7 +76,7 @@ public:
   * \li \c filename_widget: pqFileNamePropertyWidget
   * \li \c view_resolution: pqViewResolutionPropertyWidget
   */
-  virtual pqPropertyWidget* createWidgetForProperty(vtkSMProxy* proxy, vtkSMProperty* property);
+  pqPropertyWidget* createWidgetForProperty(vtkSMProxy* proxy, vtkSMProperty* property) override;
 
   /**
   * Given a proxy and its property group, create a widget for the same, of possible.
@@ -102,8 +102,8 @@ public:
   * \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
   * \li \c cinema_export_selector : pqCinemaConfiguration
   */
-  virtual pqPropertyWidget* createWidgetForPropertyGroup(
-    vtkSMProxy* proxy, vtkSMPropertyGroup* group);
+  pqPropertyWidget* createWidgetForPropertyGroup(
+    vtkSMProxy* proxy, vtkSMPropertyGroup* group) override;
 
   /**
   * Given the type of the decorator and the pqPropertyWidget that needs to be
@@ -119,15 +119,15 @@ public:
   * \li \c OSPRayHidingDecorator: pqOSPRayHidingDecorator
   * \li \c OpenVRHidingDecorator: pqOpenVRHidingDecorator
   */
-  virtual pqPropertyWidgetDecorator* createWidgetDecorator(
-    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
+  pqPropertyWidgetDecorator* createWidgetDecorator(
+    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget) override;
 
   /**
   * Create all default decorators for a specific widget.
   * Created decorators are:
   * \li \c AnimationShortcutDecorator : pqAnimationShortcutDecorator
   */
-  virtual void createDefaultWidgetDecorators(pqPropertyWidget* widget);
+  void createDefaultWidgetDecorators(pqPropertyWidget* widget) override;
 };
 
 #endif // _pqStandardPropertyWidgetInterface_h

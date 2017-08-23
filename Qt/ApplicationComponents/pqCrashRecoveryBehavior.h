@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCrashRecoveryBehavior : public QObject
 
 public:
   pqCrashRecoveryBehavior(QObject* parent = 0);
-  ~pqCrashRecoveryBehavior();
+  ~pqCrashRecoveryBehavior() override;
 
 protected slots:
   void delayedSaveRecoveryState();

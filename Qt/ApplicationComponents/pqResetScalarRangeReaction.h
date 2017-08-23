@@ -69,7 +69,7 @@ public:
   * pqActiveObjects automatically.
   */
   pqResetScalarRangeReaction(QAction* parent, bool track_active_objects = true, Modes mode = DATA);
-  ~pqResetScalarRangeReaction();
+  ~pqResetScalarRangeReaction() override;
 
   /**
   * @deprecated Use resetScalarRangeToData().
@@ -133,7 +133,7 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
   /**
   * Set the data representation explicitly when track_active_objects is false.
@@ -144,7 +144,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 protected slots:
   virtual void onServerAdded(pqServer* server);

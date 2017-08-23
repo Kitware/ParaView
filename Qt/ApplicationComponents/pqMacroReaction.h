@@ -58,7 +58,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqMacroReaction::createMacro(); }
+  void onTriggered() override { pqMacroReaction::createMacro(); }
 
 private:
   Q_DISABLE_COPY(pqMacroReaction)

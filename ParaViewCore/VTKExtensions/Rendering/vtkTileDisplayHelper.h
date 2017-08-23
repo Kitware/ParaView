@@ -95,7 +95,7 @@ public:
 
 protected:
   vtkTileDisplayHelper();
-  ~vtkTileDisplayHelper();
+  ~vtkTileDisplayHelper() override;
 
 private:
   vtkTileDisplayHelper(const vtkTileDisplayHelper&) VTK_DELETE_FUNCTION;

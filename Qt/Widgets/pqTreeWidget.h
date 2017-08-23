@@ -53,15 +53,15 @@ class PQWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
   Q_OBJECT
 public:
   pqTreeWidget(QWidget* p = NULL);
-  ~pqTreeWidget();
+  ~pqTreeWidget() override;
 
-  bool event(QEvent* e);
+  bool event(QEvent* e) override;
 
   /**
   * give a hint on the size
   */
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
   void setMaximumRowCountBeforeScrolling(vtkSMPropertyGroup* smpropertygroup);
   void setMaximumRowCountBeforeScrolling(vtkSMProperty* smproperty);
@@ -95,7 +95,7 @@ protected:
   * Move the cursor in the way described by cursorAction,
   * using the information provided by the button modifiers.
   */
-  virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+  QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;
 
   QTimer* Timer;
 

@@ -59,7 +59,7 @@ protected:
 
 public:
   // Destructor.
-  virtual ~pqRenderViewBase();
+  ~pqRenderViewBase() override;
 
   /**
   * Resets the camera to include all visible data.

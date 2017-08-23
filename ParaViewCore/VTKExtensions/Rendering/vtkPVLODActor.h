@@ -46,7 +46,7 @@ public:
    * This causes the actor to be rendered. It, in turn, will render the actor's
    * property and then mapper.
    */
-  virtual void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
+  void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
 
   /**
    * This method is used internally by the rendering process.
@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkPVLODActor();
-  ~vtkPVLODActor();
+  ~vtkPVLODActor() override;
   vtkActor* Device;
   vtkMapper* LODMapper;
 

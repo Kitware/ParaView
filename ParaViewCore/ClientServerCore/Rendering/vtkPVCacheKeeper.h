@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkPVCacheKeeper();
-  ~vtkPVCacheKeeper();
+  ~vtkPVCacheKeeper() override;
 
   //@{
   /**
@@ -100,7 +100,7 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Called to save the data in cache. Returns true if data is saved otherwise

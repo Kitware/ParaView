@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkSMDeserializerXML();
-  ~vtkSMDeserializerXML();
+  ~vtkSMDeserializerXML() override;
 
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
@@ -48,7 +48,7 @@ protected:
   /**
    * Create a new proxy with the \c id if possible.
    */
-  virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Locate the XML for the proxy with the given id.
@@ -66,7 +66,7 @@ protected:
    * Create a new proxy of the given group and name. Default implementation
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
-  virtual vtkSMProxy* CreateProxy(
+  vtkSMProxy* CreateProxy(
     const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) VTK_OVERRIDE;
 
   /**

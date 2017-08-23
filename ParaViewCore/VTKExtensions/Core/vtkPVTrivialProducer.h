@@ -40,7 +40,7 @@ public:
    * Set the data object that is "produced" by this producer.  It is
    * never really modified.
    */
-  virtual void SetOutput(vtkDataObject* output) VTK_OVERRIDE;
+  void SetOutput(vtkDataObject* output) VTK_OVERRIDE;
 
   /**
    * Set the output data object as well as time information
@@ -53,12 +53,11 @@ public:
    * output data object is never modified, but it is queried to
    * fulfill requests.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
   vtkPVTrivialProducer();
-  ~vtkPVTrivialProducer();
+  ~vtkPVTrivialProducer() override;
 
   /**
    * Used to store any time step information. It assumes that the

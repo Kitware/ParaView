@@ -35,10 +35,10 @@ public:
   vtkGetStringMacro(CleanCommand) vtkSetStringMacro(CleanCommand)
 
     protected : vtkSIDoubleMapProperty();
-  ~vtkSIDoubleMapProperty();
+  ~vtkSIDoubleMapProperty() override;
 
-  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
-  virtual bool ReadXMLAttributes(vtkSIProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   unsigned int NumberOfComponents;
   char* CleanCommand;

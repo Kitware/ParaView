@@ -35,7 +35,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractBagPlots : public vtkMultiBlo
 public:
   static vtkPVExtractBagPlots* New();
   vtkTypeMacro(vtkPVExtractBagPlots, vtkMultiBlockDataSetAlgorithm);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -105,9 +105,9 @@ public:
 
 protected:
   vtkPVExtractBagPlots();
-  virtual ~vtkPVExtractBagPlots();
+  ~vtkPVExtractBagPlots() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 

@@ -53,7 +53,7 @@ public:
   * Parent cannot be NULL.
   */
   pqPersistentMainWindowStateBehavior(QMainWindow* parent);
-  virtual ~pqPersistentMainWindowStateBehavior();
+  ~pqPersistentMainWindowStateBehavior() override;
 
   static void restoreState(QMainWindow*);
   static void saveState(QMainWindow*);

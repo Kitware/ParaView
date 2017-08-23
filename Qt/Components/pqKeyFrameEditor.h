@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
 
 public:
   pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, const QString& label, QWidget* p);
-  ~pqKeyFrameEditor();
+  ~pqKeyFrameEditor() override;
 
   /**
   * The keyframe editor can be set in a mode where the user can only edit the
@@ -89,7 +89,7 @@ class pqKeyFrameEditorDialog : public QDialog
   Q_OBJECT
 public:
   pqKeyFrameEditorDialog(QWidget* p, QWidget* child);
-  ~pqKeyFrameEditorDialog();
+  ~pqKeyFrameEditorDialog() override;
   QWidget* Child;
 };
 

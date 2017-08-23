@@ -48,7 +48,7 @@ class PQWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
   Q_OBJECT
 public:
   pqAnimationWidget(QWidget* p = 0);
-  ~pqAnimationWidget();
+  ~pqAnimationWidget() override;
 
   pqAnimationModel* animationModel() const;
 
@@ -81,9 +81,9 @@ protected:
   void updateGeometries();
   void updateScrollBars();
   void updateWidgetPosition();
-  void scrollContentsBy(int dx, int dy);
-  bool event(QEvent* e);
-  void resizeEvent(QResizeEvent* e);
+  void scrollContentsBy(int dx, int dy) override;
+  bool event(QEvent* e) override;
+  void resizeEvent(QResizeEvent* e) override;
 
 private:
   QGraphicsView* View;

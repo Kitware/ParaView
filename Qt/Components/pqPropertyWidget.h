@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
 
 public:
   pqPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
-  virtual ~pqPropertyWidget();
+  ~pqPropertyWidget() override;
 
   virtual void apply();
   virtual void reset();

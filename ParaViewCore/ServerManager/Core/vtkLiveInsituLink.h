@@ -196,7 +196,7 @@ public:
 
 protected:
   vtkLiveInsituLink();
-  ~vtkLiveInsituLink();
+  ~vtkLiveInsituLink() override;
 
   enum RMITags
   {

@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
   Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 public:
   pqTabbedMultiViewWidget(QWidget* parent = 0);
-  virtual ~pqTabbedMultiViewWidget();
+  ~pqTabbedMultiViewWidget() override;
 
   /**
   * Returns the size for the tabs in the widget.
@@ -176,7 +176,7 @@ protected slots:
   void onLayoutNameChanged(pqServerManagerModelItem*);
 
 protected:
-  virtual bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
   /**
   * assigns a frame to the view.
@@ -192,7 +192,7 @@ protected:
 
   public:
     pqTabWidget(QWidget* parentWdg = NULL);
-    virtual ~pqTabWidget();
+    ~pqTabWidget() override;
 
     /**
     * Set a button to use on the tab bar.

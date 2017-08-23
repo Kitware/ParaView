@@ -83,7 +83,7 @@ public:
 
 protected:
   vtkSMAnimationSceneWriter();
-  ~vtkSMAnimationSceneWriter();
+  ~vtkSMAnimationSceneWriter() override;
 
   unsigned long ObserverID;
   vtkSMAnimationScene* AnimationScene;

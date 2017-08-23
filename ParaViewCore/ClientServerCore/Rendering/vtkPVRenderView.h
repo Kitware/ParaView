@@ -108,15 +108,15 @@ public:
    * must be called before calling any other methods on this class.
    * \note CallOnAllProcesses
    */
-  virtual void Initialize(unsigned int id) VTK_OVERRIDE;
+  void Initialize(unsigned int id) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
    * parameters change.
    */
-  virtual void SetSize(int, int) VTK_OVERRIDE;
-  virtual void SetPosition(int, int) VTK_OVERRIDE;
+  void SetSize(int, int) VTK_OVERRIDE;
+  void SetPosition(int, int) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -191,7 +191,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetStillRenderProcesses()`.
    */
-  virtual void StillRender() VTK_OVERRIDE;
+  void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
@@ -199,7 +199,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetInteractiveRenderProcesses()`.
    */
-  virtual void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -662,7 +662,7 @@ public:
    * their inputs. Hence it's okay to do some extra inter-process communication
    * here.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Asks representations to update their LOD geometries.
@@ -926,7 +926,7 @@ public:
   //@}
 protected:
   vtkPVRenderView();
-  ~vtkPVRenderView();
+  ~vtkPVRenderView() override;
 
   //@{
   /**
@@ -937,8 +937,8 @@ protected:
    * does any data-delivery, we don't assign IDs for these, nor affect the ID
    * uniquifier when a vtk3DWidgetRepresentation is added.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
-  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
   //@}
 
   /**

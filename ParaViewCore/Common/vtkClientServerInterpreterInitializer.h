@@ -75,7 +75,7 @@ public:
 protected:
   static vtkClientServerInterpreterInitializer* New();
   vtkClientServerInterpreterInitializer();
-  ~vtkClientServerInterpreterInitializer();
+  ~vtkClientServerInterpreterInitializer() override;
 
   /**
    * Registers an interpreter. This DOES NOT affect the reference count of the

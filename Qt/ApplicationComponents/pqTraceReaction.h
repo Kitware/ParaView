@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTraceReaction : public pqReaction
 public:
   pqTraceReaction(QAction* parent, const char* start_trace_label = "Start Trace",
     const char* stop_trace_label = "Stop Trace");
-  virtual ~pqTraceReaction();
+  ~pqTraceReaction() override;
 
   /**
   * start tracing.
@@ -67,7 +67,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 protected slots:
   virtual void updateTrace();

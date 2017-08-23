@@ -185,16 +185,16 @@ public:
 
 protected:
   vtkSMAnimationScene();
-  ~vtkSMAnimationScene();
+  ~vtkSMAnimationScene() override;
 
   //@{
   /**
    * Overridden to ensure that caching parameters are passed to the view
    * correctly.
    */
-  virtual void StartCueInternal() VTK_OVERRIDE;
-  virtual void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  virtual void EndCueInternal() VTK_OVERRIDE;
+  void StartCueInternal() VTK_OVERRIDE;
+  void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
+  void EndCueInternal() VTK_OVERRIDE;
   //@}
 
   //@{

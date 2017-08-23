@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkPVCameraCollection();
-  ~vtkPVCameraCollection();
+  ~vtkPVCameraCollection() override;
 
   int LastCameraIndex;
 

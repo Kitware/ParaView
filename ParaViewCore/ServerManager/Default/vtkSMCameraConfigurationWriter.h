@@ -50,7 +50,7 @@ public:
 
 protected:
   vtkSMCameraConfigurationWriter();
-  ~vtkSMCameraConfigurationWriter();
+  ~vtkSMCameraConfigurationWriter() override;
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy

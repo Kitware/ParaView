@@ -75,21 +75,21 @@ public:
 
 protected:
   vtk3DWidgetRepresentation();
-  ~vtk3DWidgetRepresentation();
+  ~vtk3DWidgetRepresentation() override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Updates 'Enabled' on this->Widget.

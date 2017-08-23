@@ -60,7 +60,7 @@ public:
 
 protected:
   vtkLagrangianHelperBase();
-  ~vtkLagrangianHelperBase();
+  ~vtkLagrangianHelperBase() override;
 
   /**
    * Parse string array and extract double components from it.

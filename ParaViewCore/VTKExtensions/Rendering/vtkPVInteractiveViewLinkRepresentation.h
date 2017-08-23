@@ -42,16 +42,16 @@ public:
    * going
    * over the edges of the render window
    */
-  virtual void WidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
+  void WidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
 
 protected:
   vtkPVInteractiveViewLinkRepresentation();
-  ~vtkPVInteractiveViewLinkRepresentation();
+  ~vtkPVInteractiveViewLinkRepresentation() override;
 
   /**
    * Redefining method to avoid adjustment of image
    */
-  virtual void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) VTK_OVERRIDE;
+  void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) VTK_OVERRIDE;
 
 private:
   vtkPVInteractiveViewLinkRepresentation(

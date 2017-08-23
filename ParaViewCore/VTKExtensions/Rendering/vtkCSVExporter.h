@@ -122,7 +122,7 @@ public:
 
 protected:
   vtkCSVExporter();
-  ~vtkCSVExporter();
+  ~vtkCSVExporter() override;
 
   char* FileName;
   char* FieldDelimiter;

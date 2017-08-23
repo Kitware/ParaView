@@ -102,7 +102,7 @@ public:
 
 protected:
   vtkExtractHistogram();
-  ~vtkExtractHistogram();
+  ~vtkExtractHistogram() override;
 
   /**
    * Returns the data range for the input array to process.
@@ -113,9 +113,9 @@ protected:
    */
   virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Initialize the bin_extents using the data range for the selected

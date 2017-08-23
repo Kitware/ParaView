@@ -118,7 +118,7 @@ public:
 
 protected:
   vtkCGNSFileSeriesReader();
-  ~vtkCGNSFileSeriesReader();
+  ~vtkCGNSFileSeriesReader() override;
 
   /**
    * Handles the RequestData pass.

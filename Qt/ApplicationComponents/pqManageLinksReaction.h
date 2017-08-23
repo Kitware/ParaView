@@ -55,7 +55,7 @@ public:
   static void manageLinks();
 
 protected:
-  virtual void onTriggered() { pqManageLinksReaction::manageLinks(); }
+  void onTriggered() override { pqManageLinksReaction::manageLinks(); }
 private:
   Q_DISABLE_COPY(pqManageLinksReaction)
 };

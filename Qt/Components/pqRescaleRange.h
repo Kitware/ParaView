@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
   Q_OBJECT
 public:
   pqRescaleRange(QWidget* parent = 0);
-  virtual ~pqRescaleRange();
+  ~pqRescaleRange() override;
 
   double minimum() const;
   double maximum() const;

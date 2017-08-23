@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqScalarSetModel : public QAbstractListModel
 
 public:
   pqScalarSetModel();
-  ~pqScalarSetModel();
+  ~pqScalarSetModel() override;
 
   /**
   * Clears the model contents
@@ -75,10 +75,10 @@ public:
   'e', 'E', 'f', 'F', 'g', and 'G' formats provided by printf() */
   void setFormat(char f, int precision = 3);
 
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
   /**
   * Get/Set if the order in which the values are inserted must be preserved.

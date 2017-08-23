@@ -129,7 +129,7 @@ public:
    */
 protected:
   vtkPVKeyFrameCueManipulator();
-  ~vtkPVKeyFrameCueManipulator();
+  ~vtkPVKeyFrameCueManipulator() override;
   //@}
 
   /**
@@ -146,16 +146,16 @@ protected:
    * is done only once per Animation cycle. The Initialize method is used to
    * indicate that a new animation cycle has begun.
    */
-  virtual void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
 
-  virtual void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
 
   vtkPVKeyFrameCueManipulatorInternals* Internals;
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
 
   int AddKeyFrameInternal(vtkPVKeyFrame* keyframe);
   int RemoveKeyFrameInternal(vtkPVKeyFrame* keyframe);

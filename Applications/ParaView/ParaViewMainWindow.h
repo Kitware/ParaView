@@ -42,13 +42,13 @@ class ParaViewMainWindow : public QMainWindow
 
 public:
   ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  ~ParaViewMainWindow() override;
 
 protected:
-  void dragEnterEvent(QDragEnterEvent* evt);
-  void dropEvent(QDropEvent* evt);
-  void showEvent(QShowEvent* evt);
-  void closeEvent(QCloseEvent* evt);
+  void dragEnterEvent(QDragEnterEvent* evt) override;
+  void dropEvent(QDropEvent* evt) override;
+  void showEvent(QShowEvent* evt) override;
+  void closeEvent(QCloseEvent* evt) override;
 
 protected slots:
   void showHelpForProxy(const QString& groupname, const QString& proxyname);

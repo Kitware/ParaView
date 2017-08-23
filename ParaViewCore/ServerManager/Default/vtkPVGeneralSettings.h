@@ -231,7 +231,7 @@ public:
 
 protected:
   vtkPVGeneralSettings();
-  ~vtkPVGeneralSettings();
+  ~vtkPVGeneralSettings() override;
 
   int BlockColorsDistinctValues;
   bool AutoApply;

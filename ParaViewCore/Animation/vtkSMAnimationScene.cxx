@@ -163,7 +163,7 @@ public:
 class vtkTickOnCameraCue : public vtkTickOnGenericCue
 {
 protected:
-  virtual bool IsAcceptable(vtkAnimationCue* cue) const
+  bool IsAcceptable(vtkAnimationCue* cue) const override
   {
     return (vtkPVCameraAnimationCue::SafeDownCast(cue) != NULL);
   }
@@ -178,7 +178,7 @@ public:
   {
   }
 
-  virtual void operator()(vtkAnimationCue* cue) const
+  void operator()(vtkAnimationCue* cue) const override
   {
     vtkPVCameraAnimationCue* cameraCue = vtkPVCameraAnimationCue::SafeDownCast(cue);
     if (cameraCue)
@@ -196,7 +196,7 @@ public:
 class vtkTickOnPythonCue : public vtkTickOnGenericCue
 {
 protected:
-  virtual bool IsAcceptable(vtkAnimationCue* cue) const
+  bool IsAcceptable(vtkAnimationCue* cue) const override
   {
     (void)cue;
     return (false

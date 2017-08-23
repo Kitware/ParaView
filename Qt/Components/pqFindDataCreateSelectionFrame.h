@@ -56,7 +56,7 @@ class PQCOMPONENTS_EXPORT pqFindDataCreateSelectionFrame : public QWidget
 
 public:
   pqFindDataCreateSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqFindDataCreateSelectionFrame();
+  ~pqFindDataCreateSelectionFrame() override;
 
   /**
   * Helper method used to fill up a combo-box showing allowed selection types

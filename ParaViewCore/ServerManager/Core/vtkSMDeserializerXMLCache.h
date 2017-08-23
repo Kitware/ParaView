@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkSMDeserializerXMLCache();
-  ~vtkSMDeserializerXMLCache();
+  ~vtkSMDeserializerXMLCache() override;
 
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
@@ -53,7 +53,7 @@ protected:
   /**
    * Locate the XML for the proxy with the given id.
    */
-  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
+  vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
 private:
   vtkSMDeserializerXMLCache(const vtkSMDeserializerXMLCache&) VTK_DELETE_FUNCTION;

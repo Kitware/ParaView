@@ -58,7 +58,7 @@ public:
   /**
   * destructor
   */
-  ~pqSelectReaderDialog();
+  ~pqSelectReaderDialog() override;
 
   /**
   * get the reader that was chosen to read a file

@@ -53,7 +53,7 @@ public:
   /**
    * Shallow copy from another vtkPVGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   //@{
   /**
@@ -92,13 +92,13 @@ public:
    * Overridden to ensure that the transform information is passed on the
    * superclass.
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
+  double* GetBounds() VTK_OVERRIDE;
 
 protected:
   vtkPVGridAxes3DActor();
-  ~vtkPVGridAxes3DActor();
+  ~vtkPVGridAxes3DActor() override;
 
-  virtual void Update(vtkViewport* viewport) VTK_OVERRIDE;
+  void Update(vtkViewport* viewport) VTK_OVERRIDE;
   void UpdateGridBounds();
   void UpdateGridBoundsUsingDataBounds();
   void UpdateGridBoundsUsingModelTransform();

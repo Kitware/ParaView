@@ -41,11 +41,11 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
 protected:
   vtkPVGenericAttributeInformation();
-  ~vtkPVGenericAttributeInformation();
+  ~vtkPVGenericAttributeInformation() override;
 
   vtkPVGenericAttributeInformation(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;
   void operator=(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;

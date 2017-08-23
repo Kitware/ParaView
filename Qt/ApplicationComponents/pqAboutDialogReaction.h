@@ -56,7 +56,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqAboutDialogReaction::showAboutDialog(); }
+  void onTriggered() override { pqAboutDialogReaction::showAboutDialog(); }
 
 private:
   Q_DISABLE_COPY(pqAboutDialogReaction)

@@ -48,7 +48,7 @@ public:
   /**
    * Methods overridden to propagate to the active representation.
    */
-  virtual void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) VTK_OVERRIDE;
 
   //@{
   /**
@@ -80,23 +80,23 @@ public:
    * won't need this if vtkPVDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
   //@}
 
   /**
    * Propagate the modification to all internal representations.
    */
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   /**
    * Returns the data object that is rendered from the given input port.
    */
-  virtual vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
+  vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
 
   /**
    * Returns the list of available representation types as a string array.
@@ -107,30 +107,30 @@ public:
   /**
    * Passed on to internal representations as well.
    */
-  virtual void SetUpdateTime(double time) VTK_OVERRIDE;
-  virtual void SetForceUseCache(bool val) VTK_OVERRIDE;
-  virtual void SetForcedCacheKey(double val) VTK_OVERRIDE;
+  void SetUpdateTime(double time) VTK_OVERRIDE;
+  void SetForceUseCache(bool val) VTK_OVERRIDE;
+  void SetForcedCacheKey(double val) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkCompositeRepresentation();
-  ~vtkCompositeRepresentation();
+  ~vtkCompositeRepresentation() override;
 
-  virtual int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Fires UpdateDataEvent

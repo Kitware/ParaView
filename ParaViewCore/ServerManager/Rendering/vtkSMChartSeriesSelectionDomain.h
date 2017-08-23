@@ -57,7 +57,7 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   enum DefaultModes
   {
@@ -72,7 +72,7 @@ public:
    * Set the property's default value based on the domain. How the value is
    * determined using the range is controlled by DefaultMode.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
   //@{
   /**
@@ -100,7 +100,7 @@ public:
 
 protected:
   vtkSMChartSeriesSelectionDomain();
-  ~vtkSMChartSeriesSelectionDomain();
+  ~vtkSMChartSeriesSelectionDomain() override;
 
   /**
    * Returns the datainformation from the current input, if possible.
@@ -110,7 +110,7 @@ protected:
   /**
    * Process any specific XML definition tags.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Returns the default visibility for a series given its name.

@@ -73,7 +73,7 @@ public:
 
 protected:
   vtkCinemaLayerRepresentation();
-  ~vtkCinemaLayerRepresentation();
+  ~vtkCinemaLayerRepresentation() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

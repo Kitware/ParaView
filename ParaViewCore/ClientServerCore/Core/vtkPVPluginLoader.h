@@ -146,7 +146,7 @@ public:
 
 protected:
   vtkPVPluginLoader();
-  ~vtkPVPluginLoader();
+  ~vtkPVPluginLoader() override;
 
   bool LoadPluginInternal(const char* filename, bool no_errors);
 

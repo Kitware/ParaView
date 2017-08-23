@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkSMDataSourceProxy();
-  ~vtkSMDataSourceProxy();
+  ~vtkSMDataSourceProxy() override;
 
 private:
   vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;

@@ -47,13 +47,12 @@ public:
 
 protected:
   vtkCleanUnstructuredGrid();
-  ~vtkCleanUnstructuredGrid();
+  ~vtkCleanUnstructuredGrid() override;
 
   vtkPointLocator* Locator;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
 private:
   vtkCleanUnstructuredGrid(const vtkCleanUnstructuredGrid&) VTK_DELETE_FUNCTION;

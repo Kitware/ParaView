@@ -23,7 +23,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialog : public QDia
 
 public:
   explicit pqExampleVisualizationsDialog(QWidget* parent = 0);
-  virtual ~pqExampleVisualizationsDialog();
+  ~pqExampleVisualizationsDialog() override;
 
 protected slots:
   virtual void onButtonPressed();

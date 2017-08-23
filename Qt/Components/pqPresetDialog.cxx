@@ -82,7 +82,7 @@ public:
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
   }
 
-  virtual ~pqPresetDialogTableModel() {}
+  ~pqPresetDialogTableModel() override {}
 
   void importPresets(const QString& filename)
   {
@@ -115,14 +115,14 @@ public:
     return QModelIndex();
   }
 
-  virtual int rowCount(const QModelIndex& idx) const
+  int rowCount(const QModelIndex& idx) const override
   {
     return idx.isValid() ? 0 : static_cast<int>(this->Presets->GetNumberOfPresets());
   }
 
-  virtual int columnCount(const QModelIndex& /*parent*/) const { return 1; }
+  int columnCount(const QModelIndex& /*parent*/) const override { return 1; }
 
-  virtual QVariant data(const QModelIndex& idx, int role) const
+  QVariant data(const QModelIndex& idx, int role) const override
   {
     if (!idx.isValid() || idx.model() != this)
     {
@@ -146,7 +146,7 @@ public:
     return QVariant();
   }
 
-  virtual bool setData(const QModelIndex& idx, const QVariant& value, int role)
+  bool setData(const QModelIndex& idx, const QVariant& value, int role) override
   {
     Q_UNUSED(role);
     if (!idx.isValid() || idx.model() != this)
@@ -162,7 +162,7 @@ public:
     return true;
   }
 
-  virtual Qt::ItemFlags flags(const QModelIndex& idx) const
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
     Qt::ItemFlags flgs = this->Superclass::flags(idx);
     if (!idx.isValid() || idx.model() != this)
@@ -173,7 +173,7 @@ public:
     return this->Presets->IsPresetBuiltin(idx.row()) ? flgs : (flgs | Qt::ItemIsEditable);
   }
 
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
     Q_UNUSED(section);
     if (orientation == Qt::Vertical)
@@ -203,10 +203,10 @@ public:
     , Mode(mode)
   {
   }
-  virtual ~pqPresetDialogProxyModel() {}
+  ~pqPresetDialogProxyModel() override {}
 
 protected:
-  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
   {
     if (!this->Superclass::filterAcceptsRow(sourceRow, sourceParent))
     {

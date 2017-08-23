@@ -54,12 +54,12 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   /**
    * Set the default values for the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
   /**
    * Returns the list of series that are know to this domain are are given a
@@ -70,14 +70,14 @@ public:
 
 protected:
   vtkSMChartSeriesListDomain();
-  ~vtkSMChartSeriesListDomain();
+  ~vtkSMChartSeriesListDomain() override;
 
   /**
    * Returns the datainformation from the current input, if possible.
    */
   vtkPVDataInformation* GetInputInformation();
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   virtual void PopulateArrayComponents(vtkPVArrayInformation*, std::vector<vtkStdString>&);
 

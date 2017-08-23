@@ -51,7 +51,7 @@ class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 
 public:
   pqHelpWindow(QHelpEngine* engine, QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqHelpWindow();
+  ~pqHelpWindow() override;
 
 public slots:
   /**

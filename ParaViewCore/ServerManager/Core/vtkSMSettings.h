@@ -277,7 +277,7 @@ public:
 
 protected:
   vtkSMSettings();
-  virtual ~vtkSMSettings();
+  ~vtkSMSettings() override;
 
 private:
   vtkSMSettings(const vtkSMSettings&) VTK_DELETE_FUNCTION;

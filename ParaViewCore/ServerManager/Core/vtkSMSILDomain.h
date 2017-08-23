@@ -71,20 +71,20 @@ public:
   /**
    * Overridden to leave defaults unchanged.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool) VTK_OVERRIDE { return 1; }
+  int SetDefaultValues(vtkSMProperty*, bool) VTK_OVERRIDE { return 1; }
 
 protected:
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
   // Internal method used to store the SubTree information from the XML
   vtkSetStringMacro(SubTree);
 
   vtkSMSILDomain();
-  ~vtkSMSILDomain();
+  ~vtkSMSILDomain() override;
 
   char* SubTree;
   vtkPVSILInformation* SIL;

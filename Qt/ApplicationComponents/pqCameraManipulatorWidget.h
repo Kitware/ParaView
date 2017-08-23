@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraManipulatorWidget : public pqProper
 
 public:
   pqCameraManipulatorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqCameraManipulatorWidget();
+  ~pqCameraManipulatorWidget() override;
 
   /**
   * returns a list for the selected manipulator types. This has exactly 9

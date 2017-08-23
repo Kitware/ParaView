@@ -35,7 +35,7 @@ public:
 
 protected:
   vtkPVJoystickFlyOut();
-  ~vtkPVJoystickFlyOut();
+  ~vtkPVJoystickFlyOut() override;
 
 private:
   vtkPVJoystickFlyOut(const vtkPVJoystickFlyOut&) VTK_DELETE_FUNCTION;

@@ -57,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqDialog : public QDialog
 
 public:
   pqDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqDialog();
+  ~pqDialog() override;
 
   /**
   * Set the lable used for undo command.
@@ -77,9 +77,9 @@ signals:
   void endUndo();
 
 public:
-  virtual void accept();
+  void accept() override;
 
-  virtual void done(int r);
+  void done(int r) override;
 
 protected:
   /**

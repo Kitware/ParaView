@@ -64,7 +64,7 @@ public:
     vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
   // Destructor.
-  virtual ~pqRenderView();
+  ~pqRenderView() override;
 
   /**
   * Returns the render view proxy associated with this object.

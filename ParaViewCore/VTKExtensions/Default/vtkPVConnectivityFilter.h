@@ -38,7 +38,7 @@ public:
 
 protected:
   vtkPVConnectivityFilter();
-  ~vtkPVConnectivityFilter(){};
+  ~vtkPVConnectivityFilter() override{};
 
 private:
   vtkPVConnectivityFilter(const vtkPVConnectivityFilter&) VTK_DELETE_FUNCTION;

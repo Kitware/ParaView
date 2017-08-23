@@ -194,7 +194,7 @@ public:
    * Overloaded to break the reference loop caused by the
    * internal domain iterator.
    */
-  virtual void UnRegister(vtkObjectBase* obj) VTK_OVERRIDE;
+  void UnRegister(vtkObjectBase* obj) VTK_OVERRIDE;
 
   /**
    * Creates, initializes and returns a new domain iterator. The user
@@ -450,7 +450,7 @@ public:
   /**
    * Overridden to support blocking of modified events.
    */
-  virtual void Modified() VTK_OVERRIDE
+  void Modified() VTK_OVERRIDE
   {
     if (this->BlockModifiedEvents)
     {
@@ -502,7 +502,7 @@ public:
 
 protected:
   vtkSMProperty();
-  ~vtkSMProperty();
+  ~vtkSMProperty() override;
 
   friend class vtkSMSessionProxyManager;
   friend class vtkSMProxy;

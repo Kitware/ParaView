@@ -59,7 +59,7 @@ public:
   pqMasterOnlyReaction(QAction* parentObject, Qt::ConnectionType type);
 
 protected slots:
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqMasterOnlyReaction)

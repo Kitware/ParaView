@@ -71,9 +71,9 @@ public:
 
 protected:
   vtkAnnotateAttributeDataFilter();
-  ~vtkAnnotateAttributeDataFilter();
+  ~vtkAnnotateAttributeDataFilter() override;
 
-  virtual void EvaluateExpression() VTK_OVERRIDE;
+  void EvaluateExpression() VTK_OVERRIDE;
 
   char* ArrayName;
   char* Prefix;

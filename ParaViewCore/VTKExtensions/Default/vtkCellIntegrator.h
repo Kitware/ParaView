@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkCellIntegrator(){};
-  ~vtkCellIntegrator(){};
+  ~vtkCellIntegrator() override{};
 
 private:
   static double IntegratePolyLine(vtkDataSet* input, vtkIdType cellId, vtkIdList* ptIds);

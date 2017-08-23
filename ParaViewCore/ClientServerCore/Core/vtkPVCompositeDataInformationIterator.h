@@ -82,7 +82,7 @@ public:
 
 protected:
   vtkPVCompositeDataInformationIterator();
-  ~vtkPVCompositeDataInformationIterator();
+  ~vtkPVCompositeDataInformationIterator() override;
 
   unsigned int CurrentFlatIndex;
   vtkPVDataInformation* DataInformation;

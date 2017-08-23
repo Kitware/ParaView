@@ -105,7 +105,7 @@ public:
   pqSearchBox(QWidget* parent = 0);
   pqSearchBox(bool advancedSearchEnabled, const QString& settingKey = "", QWidget* parent = 0);
 
-  virtual ~pqSearchBox();
+  ~pqSearchBox() override;
 
   /**
   * Returns whether the advanced button is activated.
@@ -195,7 +195,7 @@ public slots:
   void setAdvancedSearchEnabled(bool enable);
 
 protected:
-  virtual void keyPressEvent(QKeyEvent* e);
+  void keyPressEvent(QKeyEvent* e) override;
 
 protected slots:
   void onAdvancedButtonClicked(bool);

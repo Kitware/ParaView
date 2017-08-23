@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorMapEditor : public QWidget
 
 public:
   pqColorMapEditor(QWidget* parent = 0);
-  virtual ~pqColorMapEditor();
+  ~pqColorMapEditor() override;
 
 protected slots:
   /**

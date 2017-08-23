@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkPVTransform();
-  ~vtkPVTransform();
+  ~vtkPVTransform() override;
 
   void UpdateMatrix();
 

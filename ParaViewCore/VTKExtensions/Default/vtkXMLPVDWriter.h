@@ -39,7 +39,7 @@ public:
   /**
    * Get the default file extension for files written by this writer.
    */
-  virtual const char* GetDefaultFileExtension() VTK_OVERRIDE;
+  const char* GetDefaultFileExtension() VTK_OVERRIDE;
 
   //@{
   /**
@@ -86,15 +86,15 @@ public:
 
 protected:
   vtkXMLPVDWriter();
-  ~vtkXMLPVDWriter();
+  ~vtkXMLPVDWriter() override;
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Replace vtkXMLWriter's writing driver method.
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int WriteData() VTK_OVERRIDE;
-  virtual const char* GetDataSetName() VTK_OVERRIDE;
+  int WriteData() VTK_OVERRIDE;
+  const char* GetDataSetName() VTK_OVERRIDE;
 
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
@@ -143,7 +143,7 @@ protected:
   vtkCallbackCommand* ProgressObserver;
 
   // Garbage collection support.
-  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
 private:
   vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;

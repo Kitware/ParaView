@@ -44,11 +44,11 @@ class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : public pqSelectionAd
 
 public:
   pqPipelineModelSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel);
-  virtual ~pqPipelineModelSelectionAdaptor();
+  ~pqPipelineModelSelectionAdaptor() override;
 
 protected:
-  virtual QModelIndex mapFromItem(pqServerManagerModelItem*) const;
-  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const;
+  QModelIndex mapFromItem(pqServerManagerModelItem*) const override;
+  pqServerManagerModelItem* mapToItem(const QModelIndex& index) const override;
 
 private:
   Q_DISABLE_COPY(pqPipelineModelSelectionAdaptor)

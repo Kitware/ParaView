@@ -52,7 +52,7 @@ public:
    * ensures that the internal references to vtkSIProxyDefinitionManager are
    * updated correctly.
    */
-  virtual void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) VTK_OVERRIDE;
 
   //***************************************************************************
   // enums re-defined from vtkSIProxyDefinitionManager for convenience.
@@ -207,11 +207,11 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMProxyDefinitionManager();
-  ~vtkSMProxyDefinitionManager();
+  ~vtkSMProxyDefinitionManager() override;
 
   vtkEventForwarderCommand* Forwarder;
   vtkWeakPointer<vtkSIProxyDefinitionManager> ProxyDefinitionManager;

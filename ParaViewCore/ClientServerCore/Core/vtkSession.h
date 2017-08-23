@@ -39,7 +39,7 @@ public:
 
 protected:
   vtkSession();
-  ~vtkSession();
+  ~vtkSession() override;
 
   // Needed when TileDisplay are retreived
   friend class vtkSMRenderViewProxy;

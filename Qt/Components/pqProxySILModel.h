@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqProxySILModel : public QAbstractProxyModel
 
 public:
   pqProxySILModel(const QString& hierarchyName, QObject* parent = 0);
-  ~pqProxySILModel();
+  ~pqProxySILModel() override;
 
   /**
   * \name QAbstractItemModel Methods
@@ -68,7 +68,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex& theParent = QModelIndex()) const
+  int rowCount(const QModelIndex& theParent = QModelIndex()) const override
   {
     return this->sourceModel()->rowCount(this->mapToSource(theParent));
   }
@@ -80,7 +80,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const
+  int columnCount(const QModelIndex& theParent = QModelIndex()) const override
   {
     return this->sourceModel()->columnCount(this->mapToSource(theParent)) + 1;
   }
@@ -92,7 +92,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const
+  bool hasChildren(const QModelIndex& theParent = QModelIndex()) const override
   {
     return this->sourceModel()->hasChildren(this->mapToSource(theParent));
   }
@@ -106,7 +106,8 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column, const QModelIndex& theParent = QModelIndex()) const
+  QModelIndex index(
+    int row, int column, const QModelIndex& theParent = QModelIndex()) const override
   {
     if (column == this->columnCount(theParent) - 1)
     {
@@ -123,7 +124,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex& theIndex) const
+  QModelIndex parent(const QModelIndex& theIndex) const override
   {
     QModelIndex sourceIndex = this->sourceModel()->parent(this->mapToSource(theIndex));
     return this->mapFromSource(sourceIndex);
@@ -134,7 +135,7 @@ public:
   *  Sets the role data for the item at index to value. Returns
   *  true if successful; otherwise returns false.
   */
-  bool setData(const QModelIndex& theIndex, const QVariant& value, int role = Qt::EditRole)
+  bool setData(const QModelIndex& theIndex, const QVariant& value, int role = Qt::EditRole) override
   {
     return this->sourceModel()->setData(this->mapToSource(theIndex), value, role);
   }
@@ -143,9 +144,9 @@ public:
   /**
   * Methods from QAbstractProxyModel.
   */
-  virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const;
-  virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const;
-  virtual void setSourceModel(QAbstractItemModel* sourceModel);
+  QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
+  QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
+  void setSourceModel(QAbstractItemModel* sourceModel) override;
 
   /**
   * Overridden to return the same name as the hierarchy.
@@ -154,18 +155,18 @@ public:
   * toggleRootCheckState() to support affecting the check state using the
   * header.
   */
-  virtual QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const;
+  QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const override;
 
   /**
   * Overridden to provide a means of turning off checkboxes
   */
-  virtual QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override;
 
   /**
   * overridden to allow us to turn off checkboxes in the flags returned
   * from the model
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
 
   /**
   * Get the status values for the hierarchy.

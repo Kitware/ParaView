@@ -57,7 +57,7 @@ class PQWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
 public:
   pqAnimationTrack(QObject* p = 0);
-  ~pqAnimationTrack();
+  ~pqAnimationTrack() override;
 
   /**
   * number of keyframes
@@ -82,7 +82,7 @@ public:
 
   QVariant property() const;
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
 
 public slots:
   void setProperty(const QVariant& p);
@@ -102,7 +102,7 @@ signals:
 protected:
   void adjustKeyFrameRects();
 
-  virtual void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget);
+  void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
   bool Deletable;

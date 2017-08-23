@@ -85,7 +85,7 @@ public:
     , Hidden(false)
   {
   }
-  virtual ~pqColorOpacityEditorWidgetDecorator() {}
+  ~pqColorOpacityEditorWidgetDecorator() override {}
 
   void setHidden(bool val)
   {
@@ -95,7 +95,7 @@ public:
       emit this->visibilityChanged();
     }
   }
-  virtual bool canShowWidget(bool show_advanced) const
+  bool canShowWidget(bool show_advanced) const override
   {
     Q_UNUSED(show_advanced);
     return !this->Hidden;

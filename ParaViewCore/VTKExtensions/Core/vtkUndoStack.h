@@ -173,7 +173,7 @@ public:
 
 protected:
   vtkUndoStack();
-  ~vtkUndoStack();
+  ~vtkUndoStack() override;
   //@}
 
   vtkUndoStackInternal* Internal;

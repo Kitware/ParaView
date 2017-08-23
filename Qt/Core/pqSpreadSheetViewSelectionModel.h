@@ -60,15 +60,16 @@ class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
 
 public:
   pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
-  ~pqSpreadSheetViewSelectionModel();
+  ~pqSpreadSheetViewSelectionModel() override;
 
 public slots:
-  virtual void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command)
+  void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command) override
   {
     this->Superclass::select(index, command);
   }
 
-  virtual void select(const QItemSelection& selection, QItemSelectionModel::SelectionFlags command);
+  void select(
+    const QItemSelection& selection, QItemSelectionModel::SelectionFlags command) override;
 
 signals:
   void selection(vtkSMSourceProxy*);

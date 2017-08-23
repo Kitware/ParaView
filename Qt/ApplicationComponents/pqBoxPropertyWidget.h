@@ -61,13 +61,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractiveP
 
 public:
   pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqBoxPropertyWidget();
+  ~pqBoxPropertyWidget() override;
 
 protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
 private:
   Q_DISABLE_COPY(pqBoxPropertyWidget)

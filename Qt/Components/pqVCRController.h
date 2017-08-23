@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqVCRController : public QObject
   Q_OBJECT
 public:
   pqVCRController(QObject* parent = 0);
-  virtual ~pqVCRController();
+  ~pqVCRController() override;
 
 signals:
   void timestepChanged();

@@ -42,7 +42,7 @@ public:
 
 protected:
   vtkPVServerSideAnimationPlayer();
-  virtual ~vtkPVServerSideAnimationPlayer();
+  ~vtkPVServerSideAnimationPlayer() override;
 
   char* SessionProxyManagerState;
   char* FileName;

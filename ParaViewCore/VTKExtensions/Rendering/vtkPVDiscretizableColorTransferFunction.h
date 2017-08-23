@@ -76,11 +76,11 @@ public:
   /**
    * Override to set only the active annotations
    */
-  virtual void Build() VTK_OVERRIDE;
+  void Build() VTK_OVERRIDE;
 
 protected:
   vtkPVDiscretizableColorTransferFunction();
-  ~vtkPVDiscretizableColorTransferFunction();
+  ~vtkPVDiscretizableColorTransferFunction() override;
 
 private:
   vtkPVDiscretizableColorTransferFunction(

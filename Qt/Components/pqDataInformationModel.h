@@ -46,34 +46,34 @@ class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
 
 public:
   pqDataInformationModel(QObject* _parent = NULL);
-  virtual ~pqDataInformationModel();
+  ~pqDataInformationModel() override;
 
   /**
   * QAbstractTableModel API.
   * Returns the number of rows under the given parent.
   */
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * QAbstractTableModel API.
   * Returns the number of columns for the given parent.
   */
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * QAbstractTableModel API.
   * Returns the data stored under the given role for the item referred
   * to by the index.
   */
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
   * QAbstractTableModel API.
   * Returns the data for the given role and section in the header with the
   * specified orientation.
   */
-  virtual QVariant headerData(
-    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   /**
   * Given a pqOutputPort, get the index for it, if present in this model,
@@ -90,8 +90,8 @@ public:
   /**
   * Method needed for copy/past cell editor
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 
 public slots:
   /**

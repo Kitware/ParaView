@@ -60,7 +60,7 @@ class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 
 public:
   pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent = NULL);
-  ~pqSpreadSheetViewModel();
+  ~pqSpreadSheetViewModel() override;
 
   class vtkIndex
   {
@@ -90,24 +90,25 @@ public:
   /**
   * Returns the number of rows.
   */
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * Returns the number of columns.
   */
-  int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * Returns the data storeed under the given role for the item referred by the
   * index.
   */
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
   * Returns the data for the given role and section in the header with the
   * specified orientation.
   */
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   /**
   * Make a server request to sort based on a given column with a given order
@@ -178,8 +179,8 @@ public:
   /**
   * Method needed for copy/past cell editor
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 public slots:
   /**
   * resets the model.

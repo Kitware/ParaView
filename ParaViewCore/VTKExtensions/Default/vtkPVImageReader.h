@@ -46,13 +46,13 @@ public:
   vtkTypeMacro(vtkPVImageReader, vtkImageReader);
 #endif
 
-  virtual int CanReadFile(const char*) VTK_OVERRIDE { return 1; }
+  int CanReadFile(const char*) VTK_OVERRIDE { return 1; }
 
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkPVImageReader();
-  ~vtkPVImageReader();
+  ~vtkPVImageReader() override;
 
 private:
   vtkPVImageReader(const vtkPVImageReader&) VTK_DELETE_FUNCTION;

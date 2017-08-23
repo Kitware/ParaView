@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkPVRenderViewSettings();
-  ~vtkPVRenderViewSettings();
+  ~vtkPVRenderViewSettings() override;
 
   vtkIdType OutlineThreshold;
   int PointPickingRadius;

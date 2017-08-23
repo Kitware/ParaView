@@ -56,7 +56,7 @@ public:
   void manageCustomFilters();
 
 protected:
-  virtual void onTriggered() { this->manageCustomFilters(); }
+  void onTriggered() override { this->manageCustomFilters(); }
 
 private:
   Q_DISABLE_COPY(pqManageCustomFiltersReaction)

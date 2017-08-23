@@ -48,7 +48,7 @@ class PQCORE_EXPORT pqMultiSliceAxisWidget : public QWidget
 
 public:
   pqMultiSliceAxisWidget(QWidget* parent = NULL);
-  virtual ~pqMultiSliceAxisWidget();
+  ~pqMultiSliceAxisWidget() override;
 
   /**
   * Set the range of the Axis (Bound)

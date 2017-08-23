@@ -197,7 +197,7 @@ public:
 
 protected:
   vtkPVComparativeView();
-  ~vtkPVComparativeView();
+  ~vtkPVComparativeView() override;
 
   /**
    * Update layout for internal views.

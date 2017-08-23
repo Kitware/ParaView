@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReloadFilesReaction : public pqReaction
 
 public:
   pqReloadFilesReaction(QAction* parent = 0);
-  virtual ~pqReloadFilesReaction();
+  ~pqReloadFilesReaction() override;
 
   /**
   * reload the active proxy if it supports reload. Returns true on success.
@@ -62,8 +62,8 @@ public:
   static bool reload(vtkSMSourceProxy* proxy);
 
 protected:
-  virtual void onTriggered() { this->reload(); }
-  virtual void updateEnableState();
+  void onTriggered() override { this->reload(); }
+  void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqReloadFilesReaction)

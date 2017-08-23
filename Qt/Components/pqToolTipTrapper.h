@@ -46,9 +46,9 @@ class PQCOMPONENTS_EXPORT pqToolTipTrapper : public QObject
 
 public:
   pqToolTipTrapper();
-  ~pqToolTipTrapper();
+  ~pqToolTipTrapper() override;
 
-  bool eventFilter(QObject* watched, QEvent* event);
+  bool eventFilter(QObject* watched, QEvent* event) override;
 };
 
 #endif

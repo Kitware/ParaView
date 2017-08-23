@@ -49,7 +49,7 @@ class pqIntegrationModelSeedHelperWidget : public pqIntegrationModelHelperWidget
 public:
   pqIntegrationModelSeedHelperWidget(
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
-  virtual ~pqIntegrationModelSeedHelperWidget();
+  ~pqIntegrationModelSeedHelperWidget() override;
 
   QList<QVariant> arrayToGenerate() const;
 
@@ -61,7 +61,7 @@ signals:
 
 protected slots:
   /// Create/Reset the widget
-  virtual void resetWidget();
+  void resetWidget() override;
   void forceResetSeedWidget();
 
   /// Update the enable state of certain widgets in this widget

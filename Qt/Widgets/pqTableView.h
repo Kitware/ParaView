@@ -73,7 +73,7 @@ class PQWIDGETS_EXPORT pqTableView : public QTableView
 
 public:
   pqTableView(QWidget* parent = 0);
-  virtual ~pqTableView();
+  ~pqTableView() override;
 
   /**
   * Set the maximum number of rows beyond which this view should show a
@@ -105,19 +105,19 @@ public:
   * Overridden to ensure the view updates its size as rows are
   * added/removed.
   */
-  virtual void setModel(QAbstractItemModel* model);
-  virtual void setRootIndex(const QModelIndex& index);
+  void setModel(QAbstractItemModel* model) override;
+  void setRootIndex(const QModelIndex& index) override;
 
   /**
   * Overridden to report size as per the state of this pqTableView.
   */
-  virtual QSize sizeHint() const;
-  virtual QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
   /**
   * Overridden to handle events from QScrollBar.
   */
-  virtual bool eventFilter(QObject* watched, QEvent* evt);
+  bool eventFilter(QObject* watched, QEvent* evt) override;
 
 private slots:
   void invalidateLayout();

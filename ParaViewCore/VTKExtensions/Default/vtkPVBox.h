@@ -73,7 +73,7 @@ public:
 
 protected:
   vtkPVBox();
-  ~vtkPVBox();
+  ~vtkPVBox() override;
   void UpdateTransform();
 
   double Position[3];

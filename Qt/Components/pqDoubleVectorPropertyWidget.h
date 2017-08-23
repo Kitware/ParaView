@@ -43,11 +43,11 @@ class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
 public:
   pqDoubleVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
 
-  virtual ~pqDoubleVectorPropertyWidget();
+  ~pqDoubleVectorPropertyWidget() override;
 
   // Overridden to clear highlights from the pqHighlightablePushButton.
-  virtual void apply();
-  virtual void reset();
+  void apply() override;
+  void reset() override;
 
 signals:
   /**

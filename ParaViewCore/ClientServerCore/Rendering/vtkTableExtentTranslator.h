@@ -107,7 +107,7 @@ public:
 
 protected:
   vtkTableExtentTranslator();
-  ~vtkTableExtentTranslator();
+  ~vtkTableExtentTranslator() override;
 
   // Store the extent table in a single array.  Every 6 values form an extent.
   int* ExtentTable;

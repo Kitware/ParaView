@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkSMProxyIterator();
-  ~vtkSMProxyIterator();
+  ~vtkSMProxyIterator() override;
 
   bool SkipPrototypes;
   int Mode;

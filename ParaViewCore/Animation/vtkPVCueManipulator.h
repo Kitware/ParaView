@@ -86,7 +86,7 @@ protected:
   virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) = 0;
 
   vtkPVCueManipulator();
-  ~vtkPVCueManipulator();
+  ~vtkPVCueManipulator() override;
   friend class vtkPVAnimationCue;
 
 private:

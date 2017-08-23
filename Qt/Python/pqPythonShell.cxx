@@ -75,7 +75,7 @@ public:
     this->setParent(&p);
   }
 
-  virtual void updateCompletionModel(const QString& completion)
+  void updateCompletionModel(const QString& completion) override
   {
     // Start by clearing the model
     this->setModel(0);

@@ -64,7 +64,7 @@ class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 
 public:
   pqPropertiesPanel(QWidget* parent = 0);
-  virtual ~pqPropertiesPanel();
+  ~pqPropertiesPanel() override;
 
   /**
   * Enable/disable auto-apply.

@@ -70,8 +70,8 @@ public:
   }
   void endPaint() {}
 
-  virtual void paint(
-    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+  void paint(
+    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
   {
     const_cast<pqDelegate*>(this)->Top =
       (this->Top.isValid() && this->Top < index) ? this->Top : index;

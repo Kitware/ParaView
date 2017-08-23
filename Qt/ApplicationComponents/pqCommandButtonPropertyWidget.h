@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCommandButtonPropertyWidget : public pqPr
 public:
   explicit pqCommandButtonPropertyWidget(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  ~pqCommandButtonPropertyWidget();
+  ~pqCommandButtonPropertyWidget() override;
 
 private slots:
   void buttonClicked();

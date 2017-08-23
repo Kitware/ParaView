@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkSMDeserializer();
-  ~vtkSMDeserializer();
+  ~vtkSMDeserializer() override;
 
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;

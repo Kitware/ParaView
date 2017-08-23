@@ -63,7 +63,7 @@ public:
   pqProxyWidget(vtkSMProxy* proxy, QWidget* parent = 0, Qt::WindowFlags flags = 0);
   pqProxyWidget(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0,
     Qt::WindowFlags flags = 0);
-  virtual ~pqProxyWidget();
+  ~pqProxyWidget() override;
 
   /**
   * Returns the proxy this panel shows.
@@ -189,8 +189,8 @@ public slots:
   void saveAsDefaults();
 
 protected:
-  void showEvent(QShowEvent* event);
-  void hideEvent(QHideEvent* event);
+  void showEvent(QShowEvent* event) override;
+  void hideEvent(QHideEvent* event) override;
 
 private slots:
   /**

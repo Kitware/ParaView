@@ -67,7 +67,7 @@ public:
 
 protected:
   vtkSMLoadStateOptionsProxy();
-  ~vtkSMLoadStateOptionsProxy();
+  ~vtkSMLoadStateOptionsProxy() override;
 
   /**
    * Locates the files in the user specified directory and updates the paths

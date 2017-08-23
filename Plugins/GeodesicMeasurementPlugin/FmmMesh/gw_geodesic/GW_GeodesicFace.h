@@ -35,7 +35,7 @@ class FMMMESH_EXPORT GW_GeodesicFace:    public GW_Face
 public:
 
     GW_GeodesicFace();
-    virtual ~GW_GeodesicFace();
+    ~GW_GeodesicFace() override;
     using GW_Face::operator=;
     void SetUpTriangularInterpolation();
     void ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,

@@ -44,17 +44,17 @@ public:
    * a first pass on all SIObject with a AboutToDelete() we can simply delete the
    * remaining SIObjects.
    */
-  virtual void AboutToDelete() VTK_OVERRIDE;
+  void AboutToDelete() VTK_OVERRIDE;
 
   /**
    * Push a new state to the underneath implementation
    */
-  virtual void Push(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Push(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
 
   //@{
   /**
@@ -132,7 +132,7 @@ public:
 
 protected:
   vtkSIProxy();
-  ~vtkSIProxy();
+  ~vtkSIProxy() override;
 
   /**
    * Returns the subproxy helper for the subproxy with the given name, if any.

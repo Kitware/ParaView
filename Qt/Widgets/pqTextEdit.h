@@ -63,7 +63,7 @@ public:
   pqTextEdit(QWidget* parent = 0);
   pqTextEdit(const QString& contents, QWidget* parent = 0);
 
-  virtual ~pqTextEdit();
+  ~pqTextEdit() override;
 
 signals:
   /**
@@ -85,8 +85,8 @@ private slots:
   void onTextEdited();
 
 protected:
-  virtual void keyPressEvent(QKeyEvent* e);
-  virtual void focusOutEvent(QFocusEvent* e);
+  void keyPressEvent(QKeyEvent* e) override;
+  void focusOutEvent(QFocusEvent* e) override;
 
   QScopedPointer<pqTextEditPrivate> d_ptr;
 

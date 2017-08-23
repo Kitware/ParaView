@@ -55,12 +55,12 @@ class PQCORE_EXPORT pqSpreadSheetViewWidget : public QTableView
 
 public:
   pqSpreadSheetViewWidget(QWidget* parent = 0);
-  virtual ~pqSpreadSheetViewWidget();
+  ~pqSpreadSheetViewWidget() override;
 
   /**
   * Overridden to ensure that the model is a pqSpreadSheetViewModel.
   */
-  virtual void setModel(QAbstractItemModel* model);
+  void setModel(QAbstractItemModel* model) override;
 
   /**
   * Returns the spread sheetview model for this view.
@@ -90,7 +90,7 @@ protected:
   /**
   * Overridden to tell the pqSpreadSheetViewModel about the active viewport.
   */
-  virtual void paintEvent(QPaintEvent* event);
+  void paintEvent(QPaintEvent* event) override;
 
   bool SingleColumnMode;
 

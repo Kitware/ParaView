@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkKdTreeManager();
-  ~vtkKdTreeManager();
+  ~vtkKdTreeManager() override;
 
   void AddDataObjectToKdTree(vtkDataObject* data);
   void AddDataSetToKdTree(vtkDataSet* data);

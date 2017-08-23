@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkLoadStateOptions();
-  ~vtkLoadStateOptions();
+  ~vtkLoadStateOptions() override;
 
   std::string DataDirectory;
 

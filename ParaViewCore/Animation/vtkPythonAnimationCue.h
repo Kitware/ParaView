@@ -55,7 +55,7 @@ public:
 
 protected:
   vtkPythonAnimationCue();
-  ~vtkPythonAnimationCue();
+  ~vtkPythonAnimationCue() override;
 
   //@{
   /**

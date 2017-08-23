@@ -51,7 +51,7 @@ public:
    * Overrides the base class method to request an addition pass that moves data from the
    * server to the client.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Gets the renderer for this view.
@@ -161,9 +161,9 @@ public:
    */
   void DisableAllAttributeArrays();
 
-  virtual void StillRender() VTK_OVERRIDE;
+  void StillRender() VTK_OVERRIDE;
 
-  virtual void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -176,7 +176,7 @@ public:
 
 protected:
   vtkPythonView();
-  virtual ~vtkPythonView();
+  ~vtkPythonView() override;
 
   vtkSmartPointer<vtkTexture> RenderTexture;
   vtkSmartPointer<vtkRenderer> Renderer;

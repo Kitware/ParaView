@@ -69,7 +69,7 @@ public:
 
 protected:
   vtkSMReaderReloadHelper();
-  ~vtkSMReaderReloadHelper();
+  ~vtkSMReaderReloadHelper() override;
 
 private:
   vtkSMReaderReloadHelper(const vtkSMReaderReloadHelper&) VTK_DELETE_FUNCTION;

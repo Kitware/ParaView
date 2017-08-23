@@ -113,7 +113,7 @@ public:
 
 protected:
   vtkCinemaDatabase();
-  ~vtkCinemaDatabase();
+  ~vtkCinemaDatabase() override;
 
 private:
   vtkCinemaDatabase(const vtkCinemaDatabase&) VTK_DELETE_FUNCTION;

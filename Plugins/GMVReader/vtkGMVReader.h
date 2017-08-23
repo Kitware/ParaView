@@ -201,7 +201,7 @@ public:
 
 protected:
   vtkGMVReader();
-  ~vtkGMVReader();
+  ~vtkGMVReader() override;
   // int ProcessRequest( vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

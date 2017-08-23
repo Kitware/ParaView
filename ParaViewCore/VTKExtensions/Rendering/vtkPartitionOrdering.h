@@ -91,7 +91,7 @@ public:
 
 protected:
   vtkPartitionOrdering();
-  ~vtkPartitionOrdering();
+  ~vtkPartitionOrdering() override;
 
 private:
   vtkMultiProcessController* Controller;

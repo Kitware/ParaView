@@ -76,7 +76,7 @@ public:
    * This method will be used to fill the undo stack.
    * If not overriden this will return NULL.
    */
-  virtual const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
   /**
    * This method is used to initialize the object to the given state
@@ -85,7 +85,7 @@ public:
    * globalIDs set. This enables splitting the load process in 2 step to prevent
    * invalid state when a property refers to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Update the internal protobuf state
@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkSMLink();
-  ~vtkSMLink();
+  ~vtkSMLink() override;
 
   /**
    * When the state has changed we call that method so the state can be shared

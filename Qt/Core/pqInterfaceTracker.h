@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqInterfaceTracker : public QObject
 
 public:
   pqInterfaceTracker(QObject* parent = 0);
-  virtual ~pqInterfaceTracker();
+  ~pqInterfaceTracker() override;
 
   /**
   * Return all interfaces that have been loaded/registered.

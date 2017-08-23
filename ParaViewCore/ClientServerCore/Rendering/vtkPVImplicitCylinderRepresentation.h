@@ -36,7 +36,7 @@ public:
 
 protected:
   vtkPVImplicitCylinderRepresentation();
-  ~vtkPVImplicitCylinderRepresentation();
+  ~vtkPVImplicitCylinderRepresentation() override;
 
 private:
   vtkPVImplicitCylinderRepresentation(

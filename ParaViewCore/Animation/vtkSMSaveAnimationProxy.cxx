@@ -50,7 +50,7 @@ public:
 
 protected:
   SceneImageWriter() {}
-  ~SceneImageWriter() {}
+  ~SceneImageWriter() override {}
 
   vtkSmartPointer<vtkImageData> CaptureFrame() VTK_OVERRIDE
   {

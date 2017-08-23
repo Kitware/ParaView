@@ -60,7 +60,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqApplyBehavior : public QObject
 
 public:
   pqApplyBehavior(QObject* parent = 0);
-  virtual ~pqApplyBehavior();
+  ~pqApplyBehavior() override;
 
   /**
   * Register/unregister pqPropertiesPanel instances to monitor.

@@ -53,7 +53,7 @@ public:
 
 protected:
   vtkSMSessionObject();
-  ~vtkSMSessionObject();
+  ~vtkSMSessionObject() override;
 
   /**
    * Identifies the session id to which this object is related.

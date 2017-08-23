@@ -53,12 +53,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropert
 
 public:
   pqInputDataTypeDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqInputDataTypeDecorator();
+  ~pqInputDataTypeDecorator() override;
 
   /**
   * Overridden to enable/disable the widget based on input data type.
   */
-  virtual bool enableWidget() const;
+  bool enableWidget() const override;
 
 private:
   Q_DISABLE_COPY(pqInputDataTypeDecorator)

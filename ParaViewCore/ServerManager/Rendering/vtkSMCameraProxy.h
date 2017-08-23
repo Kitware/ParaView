@@ -38,15 +38,15 @@ public:
    * Updates all property informations by calling UpdateInformation()
    * and populating the values.
    */
-  virtual void UpdatePropertyInformation() VTK_OVERRIDE;
-  virtual void UpdatePropertyInformation(vtkSMProperty* prop) VTK_OVERRIDE
+  void UpdatePropertyInformation() VTK_OVERRIDE;
+  void UpdatePropertyInformation(vtkSMProperty* prop) VTK_OVERRIDE
   {
     this->Superclass::UpdatePropertyInformation(prop);
   }
 
 protected:
   vtkSMCameraProxy();
-  ~vtkSMCameraProxy();
+  ~vtkSMCameraProxy() override;
   //@}
 
 private:

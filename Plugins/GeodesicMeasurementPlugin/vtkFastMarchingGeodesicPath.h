@@ -123,10 +123,9 @@ public:
 
 protected:
   vtkFastMarchingGeodesicPath();
-  ~vtkFastMarchingGeodesicPath();
+  ~vtkFastMarchingGeodesicPath() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Do the fast marching and gradient backtracking
   virtual void ComputePath(vtkPolyData*);

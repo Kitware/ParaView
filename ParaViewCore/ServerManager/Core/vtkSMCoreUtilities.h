@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkSMCoreUtilities();
-  ~vtkSMCoreUtilities();
+  ~vtkSMCoreUtilities() override;
 
 private:
   vtkSMCoreUtilities(const vtkSMCoreUtilities&) VTK_DELETE_FUNCTION;

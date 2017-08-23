@@ -43,7 +43,7 @@ public:
    * PrepareForRendering.
    * Overridden to skip processing when visibility if off.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
   //@{
@@ -101,7 +101,7 @@ public:
 
 protected:
   vtkPythonRepresentation();
-  ~vtkPythonRepresentation();
+  ~vtkPythonRepresentation() override;
 
   /**
    * Overridden to make input optional.

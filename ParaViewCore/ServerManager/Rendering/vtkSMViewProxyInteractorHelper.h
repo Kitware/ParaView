@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkSMViewProxyInteractorHelper();
-  ~vtkSMViewProxyInteractorHelper();
+  ~vtkSMViewProxyInteractorHelper() override;
 
   //@{
   /**

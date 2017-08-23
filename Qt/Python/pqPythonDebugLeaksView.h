@@ -53,14 +53,14 @@ class PQPYTHON_EXPORT pqPythonDebugLeaksView : public vtkQtDebugLeaksView
 
 public:
   pqPythonDebugLeaksView(QWidget* p = 0);
-  virtual ~pqPythonDebugLeaksView();
+  ~pqPythonDebugLeaksView() override;
 
   void setShell(pqPythonShell*);
   pqPythonShell* shell() const;
 
 protected:
-  virtual void onObjectDoubleClicked(vtkObjectBase* object);
-  virtual void onClassNameDoubleClicked(const QString& className);
+  void onObjectDoubleClicked(vtkObjectBase* object) override;
+  void onClassNameDoubleClicked(const QString& className) override;
 
   virtual void addObjectToPython(vtkObjectBase* object);
   virtual void addObjectsToPython(const QList<vtkObjectBase*>& objects);

@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkSessionIterator();
-  ~vtkSessionIterator();
+  ~vtkSessionIterator() override;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -55,7 +55,7 @@ public:
    * Set visibility of the representation.
    * Overridden to update the cube-axes and selection visibilities.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -63,43 +63,42 @@ public:
    * won't need this if vtkDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, int index) VTK_OVERRIDE;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, int index) VTK_OVERRIDE;
   //@}
 
   /**
    * Propagate the modification to all internal representations.
    */
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   /**
    * Override because of internal composite representations that need to be
    * initilized as well.
    */
-  virtual unsigned int Initialize(
-    unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeOrthographicSliceRepresentation();
-  ~vtkPVCompositeOrthographicSliceRepresentation();
+  ~vtkPVCompositeOrthographicSliceRepresentation() override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   vtkSmartPointer<vtkGeometrySliceRepresentation> SliceRepresentations[3];
 

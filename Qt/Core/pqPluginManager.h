@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqPluginManager : public QObject
 
 public:
   pqPluginManager(QObject* p = 0);
-  ~pqPluginManager();
+  ~pqPluginManager() override;
 
   /**
   * Called during application initialization to load plugins from settings.

@@ -44,7 +44,7 @@ protected:
     : ArrayToSortBy(NULL)
   {
   }
-  ~SortTableFilter() {}
+  ~SortTableFilter() override {}
 public:
   static SortTableFilter* New();
   int RequestData(

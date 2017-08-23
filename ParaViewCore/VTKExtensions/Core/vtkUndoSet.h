@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkUndoSet();
-  ~vtkUndoSet();
+  ~vtkUndoSet() override;
 
   vtkCollection* Collection;
   vtkCollection* TmpWorkingCollection;

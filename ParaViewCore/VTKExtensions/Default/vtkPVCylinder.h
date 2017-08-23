@@ -43,12 +43,12 @@ public:
   //@}
 
   // Reimplemented to update transform on change:
-  virtual void SetCenter(double x, double y, double z) VTK_OVERRIDE;
-  virtual void SetCenter(double xyz[3]) VTK_OVERRIDE;
+  void SetCenter(double x, double y, double z) VTK_OVERRIDE;
+  void SetCenter(double xyz[3]) VTK_OVERRIDE;
 
 protected:
   vtkPVCylinder();
-  ~vtkPVCylinder();
+  ~vtkPVCylinder() override;
 
   void UpdateTransform();
 

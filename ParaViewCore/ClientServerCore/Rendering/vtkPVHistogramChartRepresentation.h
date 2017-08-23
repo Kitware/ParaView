@@ -108,14 +108,14 @@ public:
   /**
    * Method to be overrided to transform input data to a vtkTable.
    */
-  virtual vtkDataObject* TransformInputData(
+  vtkDataObject* TransformInputData(
     vtkInformationVector** inputVector, vtkDataObject* data) VTK_OVERRIDE;
 
   //@{
   /**
    * Overload the vtkAlgorithm method to update after the change
    */
-  virtual void SetInputArrayToProcess(
+  void SetInputArrayToProcess(
     int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
   using Superclass::SetInputArrayToProcess;
   //@}
@@ -124,18 +124,18 @@ public:
    * Overridden to transform id-based selection produced by the histogram view
    * to a threshold-based selection.
    */
-  virtual bool MapSelectionToInput(vtkSelection*) VTK_OVERRIDE;
+  bool MapSelectionToInput(vtkSelection*) VTK_OVERRIDE;
 
   /**
    * Inverse of MapSelectionToInput().
    */
-  virtual bool MapSelectionToView(vtkSelection* sel) VTK_OVERRIDE;
+  bool MapSelectionToView(vtkSelection* sel) VTK_OVERRIDE;
 
 protected:
   vtkPVHistogramChartRepresentation();
-  ~vtkPVHistogramChartRepresentation();
+  ~vtkPVHistogramChartRepresentation() override;
 
-  virtual void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() VTK_OVERRIDE;
 
   vtkPExtractHistogram* ExtractHistogram;
 

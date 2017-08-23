@@ -62,13 +62,13 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
+  void onTriggered() override { pqSaveAnimationGeometryReaction::saveAnimationGeometry(); }
 
 private:
   Q_DISABLE_COPY(pqSaveAnimationGeometryReaction)

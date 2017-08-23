@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkSIObject();
-  virtual ~vtkSIObject();
+  ~vtkSIObject() override;
 
   vtkWeakPointer<vtkClientServerInterpreter> Interpreter;
   vtkWeakPointer<vtkPVSessionCore> SessionCore;

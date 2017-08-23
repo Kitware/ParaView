@@ -53,13 +53,13 @@ class PQCOMPONENTS_EXPORT pqPipelineBrowserWidget : public pqFlatTreeView
 
 public:
   pqPipelineBrowserWidget(QWidget* parent = 0);
-  virtual ~pqPipelineBrowserWidget();
+  ~pqPipelineBrowserWidget() override;
 
   /**
   * Used to monitor the key press events in the tree view.
   * Returns True if the event should not be sent to the object.
   */
-  virtual bool eventFilter(QObject* object, QEvent* e);
+  bool eventFilter(QObject* object, QEvent* e) override;
 
   /**
   * Set the visibility of selected items.

@@ -89,7 +89,7 @@ public:
 
 protected:
   vtkSMDoubleRangeDomain();
-  ~vtkSMDoubleRangeDomain();
+  ~vtkSMDoubleRangeDomain() override;
 
 private:
   vtkSMDoubleRangeDomain(const vtkSMDoubleRangeDomain&) VTK_DELETE_FUNCTION;

@@ -76,21 +76,21 @@ public:
 
 protected:
   vtkPythonCalculator();
-  ~vtkPythonCalculator();
+  ~vtkPythonCalculator() override;
 
   /**
    * For internal use only.
    */
   void Exec(const char*);
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // DeExpressionion:
   // Creates whatever output data set type is selected.
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   char* Expression;

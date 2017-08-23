@@ -109,7 +109,7 @@ public:
     this->Visibilities.push_back(QPair<QString, bool>("Alpha", true));
     this->Visibilities.push_back(QPair<QString, bool>("Beta", false));
   }
-  virtual ~pqSeriesParametersModel() {}
+  ~pqSeriesParametersModel() override {}
   void setWidget(QWidget* wdg) { this->Widget = wdg; }
   void setVisibilityDomain(vtkSMChartSeriesSelectionDomain* domain) { this->Domain = domain; }
   void domainChanged()
@@ -128,7 +128,7 @@ public:
 
   /// Drag/drop of rows is enabled for cases were the series ordering is
   /// relevant e.g. parallel coordinates/scatter plot matrix.
-  virtual Qt::ItemFlags flags(const QModelIndex& idx) const
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
     Qt::ItemFlags value = this->Superclass::flags(idx);
     if (this->SupportsReorder)
@@ -152,18 +152,18 @@ public:
     return value;
   }
 
-  virtual int rowCount(const QModelIndex& idx = QModelIndex()) const
+  int rowCount(const QModelIndex& idx = QModelIndex()) const override
   {
     return idx.isValid() ? 0 : this->Visibilities.size();
   }
 
-  virtual int columnCount(const QModelIndex& idx = QModelIndex()) const
+  int columnCount(const QModelIndex& idx = QModelIndex()) const override
   {
     Q_UNUSED(idx);
     return 3;
   }
 
-  virtual QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const
+  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
   {
     Q_ASSERT(idx.row() < this->Visibilities.size());
 #ifndef __APPLE__
@@ -235,7 +235,7 @@ public:
     return QVariant();
   }
 
-  virtual bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole)
+  bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override
   {
     if (idx.column() == VISIBILITY && role == Qt::CheckStateRole)
     {
@@ -265,7 +265,7 @@ public:
     return false;
   }
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
     if (orientation == Qt::Horizontal && (role == Qt::DisplayRole || role == Qt::ToolTipRole))
     {
@@ -365,13 +365,13 @@ public:
   }
 
   //--------- Drag-N-Drop support when enabled --------
-  Qt::DropActions supportedDropActions() const
+  Qt::DropActions supportedDropActions() const override
   {
     return this->SupportsReorder ? (Qt::CopyAction | Qt::MoveAction)
                                  : this->Superclass::supportedDropActions();
   }
 
-  QStringList mimeTypes() const
+  QStringList mimeTypes() const override
   {
     if (this->SupportsReorder)
     {
@@ -383,7 +383,7 @@ public:
     return this->Superclass::mimeTypes();
   }
 
-  QMimeData* mimeData(const QModelIndexList& indexes) const
+  QMimeData* mimeData(const QModelIndexList& indexes) const override
   {
     if (!this->SupportsReorder)
     {
@@ -411,7 +411,7 @@ public:
   }
 
   bool dropMimeData(const QMimeData* mime_data, Qt::DropAction action, int row, int column,
-    const QModelIndex& parentIdx)
+    const QModelIndex& parentIdx) override
   {
     if (!this->SupportsReorder)
     {

@@ -35,9 +35,9 @@ public:
 
 protected:
   vtkSMTextWidgetRepresentationProxy();
-  ~vtkSMTextWidgetRepresentationProxy();
+  ~vtkSMTextWidgetRepresentationProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   vtkSMProxy* TextActorProxy;
   vtkSMProxy* TextPropertyProxy;

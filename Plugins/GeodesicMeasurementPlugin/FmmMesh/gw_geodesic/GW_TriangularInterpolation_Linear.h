@@ -32,14 +32,14 @@ class GW_TriangularInterpolation_Linear: public GW_TriangularInterpolation_ABC
 
 public:
 
-    virtual void SetUpTriangularInterpolation( GW_GeodesicFace& /*Face*/ ) {};
+    void SetUpTriangularInterpolation( GW_GeodesicFace& /*Face*/ ) override {};
     void ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
-            GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy );
+            GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy ) override;
     GW_Float ComputeValue( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
-        GW_Float x, GW_Float y );
+        GW_Float x, GW_Float y ) override;
 
 
-    T_TriangulationInterpolationType GetType()
+    T_TriangulationInterpolationType GetType() override
     { return kLinearTriangulationInterpolation; }
 
 private:

@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
 
 public:
   pqFindDataSelectionDisplayFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqFindDataSelectionDisplayFrame();
+  ~pqFindDataSelectionDisplayFrame() override;
 
   /**
   * pqFindDataSelectionDisplayFrame can be made to lay itself out in a more

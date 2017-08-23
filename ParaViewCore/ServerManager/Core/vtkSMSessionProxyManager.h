@@ -566,7 +566,7 @@ public:
 
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);
-  ~vtkSMSessionProxyManager();
+  ~vtkSMSessionProxyManager() override;
 
   friend class vtkSMProxy;
   friend class vtkPVProxyDefinitionIterator;

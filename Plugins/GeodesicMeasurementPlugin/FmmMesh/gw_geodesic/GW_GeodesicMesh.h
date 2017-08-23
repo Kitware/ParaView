@@ -45,7 +45,7 @@ public:
     /*------------------------------------------------------------------------------*/
     //@{
     GW_GeodesicMesh();
-    virtual ~GW_GeodesicMesh();
+    ~GW_GeodesicMesh() override;
     //@}
 
     using GW_Mesh::operator=;
@@ -54,8 +54,8 @@ public:
     /** \name Class factory methods. */
     //-------------------------------------------------------------------------
     //@{
-    virtual GW_Vertex& CreateNewVertex();
-    virtual GW_Face& CreateNewFace();
+    GW_Vertex& CreateNewVertex() override;
+    GW_Face& CreateNewFace() override;
     //@}
 
     //-------------------------------------------------------------------------

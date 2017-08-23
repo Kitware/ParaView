@@ -45,12 +45,12 @@ public:
 
 protected:
   vtkSMSettingsProxy();
-  ~vtkSMSettingsProxy();
+  ~vtkSMSettingsProxy() override;
 
   /**
    * Overridden from vtkSMProxy to install an observer on the VTK object
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   friend class vtkSMSettingsObserver;
 

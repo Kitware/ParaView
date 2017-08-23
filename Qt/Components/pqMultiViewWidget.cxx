@@ -168,11 +168,11 @@ public:
     this->setSpacing(0);
   };
 
-  virtual ~pqSplitterLayout() {}
+  ~pqSplitterLayout() override {}
 
   void setSplitFraction(double val) { this->SplitFraction = val; }
 
-  virtual void setGeometry(const QRect& rect)
+  void setGeometry(const QRect& rect) override
   {
     this->QLayout::setGeometry(rect);
 

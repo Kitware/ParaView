@@ -51,11 +51,11 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~PropertyLinksConnection() {}
+  ~PropertyLinksConnection() override {}
 
 protected:
   /// Called to update the ServerManager Property due to UI change.
-  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+  void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     QList<QVariant> list = value.toList();
 
@@ -76,7 +76,7 @@ protected:
   }
 
   /// called to get the current value for the ServerManager Property.
-  virtual QVariant currentServerManagerValue(bool use_unchecked) const
+  QVariant currentServerManagerValue(bool use_unchecked) const override
   {
     int values[9];
     int max = 0;

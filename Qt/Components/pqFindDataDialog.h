@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqFindDataDialog : public QDialog
 
 public:
   pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqFindDataDialog();
+  ~pqFindDataDialog() override;
 
 signals:
   /**

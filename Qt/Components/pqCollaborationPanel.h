@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqCollaborationPanel : public QWidget
 
 public:
   pqCollaborationPanel(QWidget* parent = 0);
-  ~pqCollaborationPanel();
+  ~pqCollaborationPanel() override;
 
 signals:
   /**

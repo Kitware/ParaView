@@ -110,7 +110,7 @@ protected:
   virtual void SetController(vtkMultiProcessController*);
   virtual void SetSocketCommunicator(vtkSocketCommunicator*);
   vtkMPIMToNSocketConnection();
-  ~vtkMPIMToNSocketConnection();
+  ~vtkMPIMToNSocketConnection() override;
 
 private:
   int PortNumber;

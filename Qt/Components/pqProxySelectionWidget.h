@@ -58,7 +58,7 @@ public:
   * property does not have a ProxyListDomain.
   */
   pqProxySelectionWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqProxySelectionWidget();
+  ~pqProxySelectionWidget() override;
 
   /**
   * get the selected proxy
@@ -70,13 +70,13 @@ public:
   * Overridden to forward the call to the internal pqProxyWidget maintained
   * for the chosen proxy.
   */
-  virtual void apply();
-  virtual void reset();
-  virtual void select();
-  virtual void deselect();
-  virtual void updateWidget(bool showing_advanced_properties);
-  virtual void setPanelVisibility(const char* vis);
-  virtual void setView(pqView*);
+  void apply() override;
+  void reset() override;
+  void select() override;
+  void deselect() override;
+  void updateWidget(bool showing_advanced_properties) override;
+  void setPanelVisibility(const char* vis) override;
+  void setView(pqView*) override;
 
 signals:
   /**

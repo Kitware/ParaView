@@ -66,7 +66,7 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
   /**
   * Triggered when a source became valid
   */
@@ -76,7 +76,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqSaveDataReaction::saveActiveData(); }
+  void onTriggered() override { pqSaveDataReaction::saveActiveData(); }
 
 private:
   Q_DISABLE_COPY(pqSaveDataReaction)

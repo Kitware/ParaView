@@ -71,7 +71,7 @@ public:
 
 protected:
   vtkSelectionSerializer();
-  ~vtkSelectionSerializer();
+  ~vtkSelectionSerializer() override;
 
 private:
   vtkSelectionSerializer(const vtkSelectionSerializer&) VTK_DELETE_FUNCTION;

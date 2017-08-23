@@ -92,7 +92,7 @@ public:
 
 public:
   pqQueryClauseWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqQueryClauseWidget();
+  ~pqQueryClauseWidget() override;
 
   /**
   * Set/Get the data producer.

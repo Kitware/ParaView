@@ -101,34 +101,34 @@ public:
 
   // Description:
   // Returns the name for this plugin.
-  virtual const char* GetPluginName() { return this->PluginName.c_str(); }
+  const char* GetPluginName() override { return this->PluginName.c_str(); }
 
   // Description:
   // Returns the version for this plugin.
-  virtual const char* GetPluginVersionString() { return "1.0"; }
+  const char* GetPluginVersionString() override { return "1.0"; }
 
   // Description:
   // Returns true if this plugin is required on the server.
-  virtual bool GetRequiredOnServer() { return true; }
+  bool GetRequiredOnServer() override { return true; }
 
   // Description:
   // Returns true if this plugin is required on the client.
-  virtual bool GetRequiredOnClient() { return false; }
+  bool GetRequiredOnClient() override { return false; }
 
   // Description:
   // Returns a ';' separated list of plugin names required by this plugin.
-  virtual const char* GetRequiredPlugins() { return ""; }
+  const char* GetRequiredPlugins() override { return ""; }
 
   // Description:
   // Obtain the server-manager configuration xmls, if any.
-  virtual void GetXMLs(std::vector<std::string>& xmls) { xmls.push_back(this->XML); }
+  void GetXMLs(std::vector<std::string>& xmls) override { xmls.push_back(this->XML); }
 
   // Description:
   // Returns the callback function to call to initialize the interpretor for the
   // new vtk/server-manager classes added by this plugin. Returning NULL is
   // perfectly valid.
-  virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-  GetInitializeInterpreterCallback()
+  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+  GetInitializeInterpreterCallback() override
   {
     return NULL;
   }

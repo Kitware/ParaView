@@ -44,7 +44,7 @@ class PQCORE_EXPORT pqFileDialogFilter : public QSortFilterProxyModel
 
 public:
   pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent = NULL);
-  ~pqFileDialogFilter();
+  ~pqFileDialogFilter() override;
 
 public slots:
   void setFilter(const QString& filter);
@@ -52,8 +52,8 @@ public slots:
   bool getShowHidden() { return showHidden; };
 
 protected:
-  bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const;
-  bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+  bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const override;
+  bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
   pqFileDialogModel* Model;
   QRegExp Wildcards;

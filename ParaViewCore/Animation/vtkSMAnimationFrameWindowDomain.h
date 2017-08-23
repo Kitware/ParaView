@@ -42,7 +42,7 @@ public:
 
 protected:
   vtkSMAnimationFrameWindowDomain();
-  ~vtkSMAnimationFrameWindowDomain();
+  ~vtkSMAnimationFrameWindowDomain() override;
 
 private:
   vtkSMAnimationFrameWindowDomain(const vtkSMAnimationFrameWindowDomain&) VTK_DELETE_FUNCTION;

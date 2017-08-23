@@ -106,7 +106,7 @@ public:
 
 protected:
   vtkPVProgressHandler();
-  ~vtkPVProgressHandler();
+  ~vtkPVProgressHandler() override;
 
   enum eTAGS
   {

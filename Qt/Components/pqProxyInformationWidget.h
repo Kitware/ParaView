@@ -55,7 +55,7 @@ public:
   /**
   * destructor
   */
-  ~pqProxyInformationWidget();
+  ~pqProxyInformationWidget() override;
 
   /**
   * get the proxy for which properties are displayed

@@ -37,11 +37,11 @@ public:
   /**
    * Actual rendering code.
    */
-  virtual void Render(const vtkRenderState* render_state) VTK_OVERRIDE;
+  void Render(const vtkRenderState* render_state) VTK_OVERRIDE;
 
 protected:
   vtkPVDefaultPass();
-  ~vtkPVDefaultPass();
+  ~vtkPVDefaultPass() override;
 
 private:
   vtkPVDefaultPass(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;

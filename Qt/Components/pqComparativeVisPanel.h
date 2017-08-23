@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 
 public:
   pqComparativeVisPanel(QWidget* parent = 0);
-  ~pqComparativeVisPanel();
+  ~pqComparativeVisPanel() override;
 
   /**
   * Access the current view being shown by this panel.

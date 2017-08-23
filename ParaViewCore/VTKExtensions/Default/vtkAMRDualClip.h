@@ -90,7 +90,7 @@ public:
 
 protected:
   vtkAMRDualClip();
-  ~vtkAMRDualClip();
+  ~vtkAMRDualClip() override;
 
   double IsoValue;
 
@@ -103,8 +103,7 @@ protected:
   // Needed for copying cell data to point data.
   vtkUnstructuredGrid* Mesh;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
 
@@ -114,8 +113,8 @@ protected:
    */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 

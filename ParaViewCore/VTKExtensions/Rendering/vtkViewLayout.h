@@ -44,7 +44,7 @@ public:
 
 protected:
   vtkViewLayout();
-  ~vtkViewLayout();
+  ~vtkViewLayout() override;
 
 private:
   vtkViewLayout(const vtkViewLayout&) VTK_DELETE_FUNCTION;

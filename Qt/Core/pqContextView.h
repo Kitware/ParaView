@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqContextView : public pqView
   typedef pqView Superclass;
 
 public:
-  virtual ~pqContextView();
+  ~pqContextView() override;
 
   /**
   * Returns the internal vtkContextView which provides the implementation for
@@ -79,7 +79,7 @@ public:
   /**
   * Resets the zoom level to 100%.
   */
-  virtual void resetDisplay();
+  void resetDisplay() override;
 
 protected slots:
   //@{
@@ -109,7 +109,7 @@ protected:
   * Creates a new instance of the QWidget subclass to be used to show this
   * view. This will create a pqQVTKWidget for the render window.
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
   /**
   * Listen for new selection events, and pass them back to ParaView

@@ -41,12 +41,12 @@ public:
   /**
    * Undo the operation encapsulated by this element.
    */
-  virtual int Undo() VTK_OVERRIDE;
+  int Undo() VTK_OVERRIDE;
 
   /**
    * Redo the operation encaspsulated by this element.
    */
-  virtual int Redo() VTK_OVERRIDE;
+  int Redo() VTK_OVERRIDE;
 
   /**
    * Provide the informations needed to restore the previous state
@@ -56,7 +56,7 @@ public:
 
 protected:
   vtkSMGlobalPropertiesLinkUndoElement();
-  ~vtkSMGlobalPropertiesLinkUndoElement();
+  ~vtkSMGlobalPropertiesLinkUndoElement() override;
 
   // State ivars
   char* GlobalPropertyManagerName;

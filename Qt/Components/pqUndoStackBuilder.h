@@ -91,17 +91,17 @@ public:
   * Overridden to add observers to not record changes when the
   * stack is being undone/redone.
   */
-  virtual void SetUndoStack(vtkSMUndoStack*) VTK_OVERRIDE;
+  void SetUndoStack(vtkSMUndoStack*) VTK_OVERRIDE;
 
   /**
   * Overridden to filter unwanted event and manage auto undoset creation
   */
-  virtual void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
+  void OnStateChange(vtkSMSession* session, vtkTypeUInt32 globalId,
     const vtkSMMessage* previousState, const vtkSMMessage* newState) VTK_OVERRIDE;
 
 protected:
   pqUndoStackBuilder();
-  ~pqUndoStackBuilder();
+  ~pqUndoStackBuilder() override;
 
   /**
   * Return false if this state should be escaped.

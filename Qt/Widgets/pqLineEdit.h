@@ -63,7 +63,7 @@ public:
   pqLineEdit(QWidget* parent = 0);
   pqLineEdit(const QString& contents, QWidget* parent = 0);
 
-  virtual ~pqLineEdit();
+  ~pqLineEdit() override;
 
   /**
   * To enable/disable whether the cursor position is reset to 0 after

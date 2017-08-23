@@ -47,7 +47,7 @@ public:
   typedef pqPropertyWidget Superclass;
 
   pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqColorEditorPropertyWidget();
+  ~pqColorEditorPropertyWidget() override;
 
 private slots:
   void updateEnableState();

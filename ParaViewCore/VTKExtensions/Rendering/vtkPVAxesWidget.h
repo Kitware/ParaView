@@ -118,7 +118,7 @@ public:
 
 protected:
   vtkPVAxesWidget();
-  ~vtkPVAxesWidget();
+  ~vtkPVAxesWidget() override;
 
   vtkRenderer* Renderer;
   vtkRenderer* ParentRenderer;

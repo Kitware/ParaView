@@ -61,7 +61,7 @@ class PQCORE_EXPORT pqOutputPort : public pqServerManagerModelItem
 
 public:
   pqOutputPort(pqPipelineSource* source, int portno);
-  virtual ~pqOutputPort();
+  ~pqOutputPort() override;
 
   /**
   * Returns the vtkSMOutputPort proxy for this port.

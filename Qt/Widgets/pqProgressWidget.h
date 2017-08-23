@@ -65,7 +65,7 @@ class PQWIDGETS_EXPORT pqProgressWidget : public QWidget
   Q_PROPERTY(QString busyText READ busyText WRITE setBusyText)
 public:
   pqProgressWidget(QWidget* parent = 0);
-  virtual ~pqProgressWidget();
+  ~pqProgressWidget() override;
 
   /**
    * @deprecated in ParaView 5.5. Use `abortButton` instead.

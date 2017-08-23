@@ -147,10 +147,9 @@ public:
 
 protected:
   vtkFastMarchingGeodesicDistance();
-  ~vtkFastMarchingGeodesicDistance();
+  ~vtkFastMarchingGeodesicDistance() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Create GW_GeodesicMesh given an instance of a vtkPolyData
   void SetupGeodesicMesh(vtkPolyData* in);
@@ -159,7 +158,7 @@ protected:
   void SetupCallbacks();
 
   // Do the fast marching
-  virtual int Compute() VTK_OVERRIDE;
+  int Compute() VTK_OVERRIDE;
 
   // Add the seeds
   virtual void AddSeedsInternal();

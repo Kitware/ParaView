@@ -77,7 +77,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
 
 public:
   pqTimeInspectorWidget(QWidget* parent = 0);
-  virtual ~pqTimeInspectorWidget();
+  ~pqTimeInspectorWidget() override;
 
   /**
   * access the server being reflected on the widget.

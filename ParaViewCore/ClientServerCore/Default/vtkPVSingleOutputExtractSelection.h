@@ -35,7 +35,7 @@ public:
 
 protected:
   vtkPVSingleOutputExtractSelection();
-  ~vtkPVSingleOutputExtractSelection();
+  ~vtkPVSingleOutputExtractSelection() override;
 
 private:
   vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;

@@ -113,9 +113,9 @@ public:
 
 protected:
   vtkSMTimeKeeperProxy();
-  ~vtkSMTimeKeeperProxy();
+  ~vtkSMTimeKeeperProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
   vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;

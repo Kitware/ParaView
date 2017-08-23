@@ -54,7 +54,7 @@ public:
 
 protected:
   vtkSMDirectoryProxy();
-  ~vtkSMDirectoryProxy();
+  ~vtkSMDirectoryProxy() override;
 
   bool CallDirectoryMethod(const char* method, const char* path, const char* secondaryPath = NULL);
 

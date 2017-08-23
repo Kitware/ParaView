@@ -49,18 +49,18 @@ public:
    * e.g. XArrayName property has one of the known types of arrays, otherwise it
    * must be ON.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
   /**
    * Overridden to fire DomainModified when the required property changes. This ensures
    * that SetDefaultValues() is called during proxy post-initialization after the required
    * property has been reset to default.
    */
-  virtual void Update(vtkSMProperty* requestingProperty) VTK_OVERRIDE;
+  void Update(vtkSMProperty* requestingProperty) VTK_OVERRIDE;
 
 protected:
   vtkSMChartUseIndexForAxisDomain();
-  ~vtkSMChartUseIndexForAxisDomain();
+  ~vtkSMChartUseIndexForAxisDomain() override;
 
 private:
   vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;

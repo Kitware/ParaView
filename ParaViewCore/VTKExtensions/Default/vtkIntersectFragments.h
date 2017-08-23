@@ -67,13 +67,12 @@ public:
 
 protected:
   vtkIntersectFragments();
-  ~vtkIntersectFragments();
+  ~vtkIntersectFragments() override;
 
   /// pipeline
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   ///
   // Make list of what we own
   int IdentifyLocalFragments();

@@ -61,7 +61,7 @@ public:
 
 protected:
   vtkPVTestUtilities() { this->Initialize(0, 0); }
-  ~vtkPVTestUtilities() { this->Initialize(0, 0); }
+  ~vtkPVTestUtilities() override { this->Initialize(0, 0); }
 
 private:
   vtkPVTestUtilities(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;

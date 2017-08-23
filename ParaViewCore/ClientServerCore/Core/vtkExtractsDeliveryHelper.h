@@ -73,7 +73,7 @@ public:
 
 protected:
   vtkExtractsDeliveryHelper();
-  ~vtkExtractsDeliveryHelper();
+  ~vtkExtractsDeliveryHelper() override;
 
   vtkDataObject* Collect(int nodes_to_collect_to, vtkDataObject*);
 

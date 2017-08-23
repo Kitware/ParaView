@@ -71,7 +71,7 @@ public:
 
 protected:
   vtkCameraManipulatorGUIHelper();
-  ~vtkCameraManipulatorGUIHelper();
+  ~vtkCameraManipulatorGUIHelper() override;
   //@}
 
 private:

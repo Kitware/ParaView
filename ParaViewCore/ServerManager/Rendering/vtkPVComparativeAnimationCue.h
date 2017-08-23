@@ -150,7 +150,7 @@ public:
 
 protected:
   vtkPVComparativeAnimationCue();
-  ~vtkPVComparativeAnimationCue();
+  ~vtkPVComparativeAnimationCue() override;
 
   /**
    * Get the property being animated.

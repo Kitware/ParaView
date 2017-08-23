@@ -56,7 +56,7 @@ class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
   Q_OBJECT
 public:
   pqAnimationManager(QObject* parent = 0);
-  virtual ~pqAnimationManager();
+  ~pqAnimationManager() override;
 
   /**
   * Returns the scene for the active server connection, if any.

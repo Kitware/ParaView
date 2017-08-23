@@ -47,7 +47,7 @@ public:
    * Set visibility of the representation. Overridden to ensure that internally
    * added vtkPlot instances are updated when hiding the representation.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -142,11 +142,11 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  virtual bool Export(vtkCSVExporter* exporter) VTK_OVERRIDE;
+  bool Export(vtkCSVExporter* exporter) VTK_OVERRIDE;
 
 protected:
   vtkXYChartRepresentation();
-  ~vtkXYChartRepresentation();
+  ~vtkXYChartRepresentation() override;
 
   /**
    * Overridden to remove all plots from the view.

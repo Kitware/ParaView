@@ -73,7 +73,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChooseColorPresetReaction : public pqReac
 
 public:
   pqChooseColorPresetReaction(QAction* parent, bool track_active_objects = true);
-  virtual ~pqChooseColorPresetReaction();
+  ~pqChooseColorPresetReaction() override;
 
 public slots:
   /**
@@ -99,7 +99,7 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 signals:
   /**
@@ -120,7 +120,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqChooseColorPresetReaction)

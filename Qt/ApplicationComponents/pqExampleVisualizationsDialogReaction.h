@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqExampleVisualizationsDialogReaction : pub
 
 public:
   pqExampleVisualizationsDialogReaction(QAction* parent);
-  virtual ~pqExampleVisualizationsDialogReaction();
+  ~pqExampleVisualizationsDialogReaction() override;
 
   /**
   * Shows the example visualizations dialog.
@@ -58,7 +58,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
+  void onTriggered() override
   {
     pqExampleVisualizationsDialogReaction::showExampleVisualizationsDialog();
   }

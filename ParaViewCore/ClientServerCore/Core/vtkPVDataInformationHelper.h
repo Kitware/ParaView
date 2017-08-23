@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkPVDataInformationHelper();
-  ~vtkPVDataInformationHelper();
+  ~vtkPVDataInformationHelper() override;
 
   vtkDataObject* Data; // not reference counted
 

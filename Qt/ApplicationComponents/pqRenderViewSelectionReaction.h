@@ -82,7 +82,7 @@ public:
   */
   pqRenderViewSelectionReaction(QAction* parentAction, pqRenderView* view, SelectionMode mode,
     QActionGroup* modifierGroup = NULL);
-  virtual ~pqRenderViewSelectionReaction();
+  ~pqRenderViewSelectionReaction() override;
 
 signals:
   void selectedCustomBox(int xmin, int ymin, int xmax, int ymax);
@@ -101,7 +101,7 @@ private slots:
   /**
   * Handles enable state for the "CLEAR_SELECTION" mode.
   */
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
   /**
   * Called when this object was created with NULL as the view and the active
@@ -151,7 +151,7 @@ private:
   void onWheelRotate();
 
   // Get the current state of selection modifier
-  int getSelectionModifier();
+  int getSelectionModifier() override;
 
   // Check this selection is compatible with another type of selection
   bool isCompatible(SelectionMode mode);
