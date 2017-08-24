@@ -79,6 +79,7 @@
         { "path":"module.cmake" },
         { "class":"vtkDataSetSurfaceFilter" },
         { "class":"vtkStructuredGridGeometryFilter" },
+        { "class":"vtkRectilinearGridGeometryFilter" },
         { "class":"vtkUnstructuredGridGeometryFilter" }
       ],
       "replace":[
