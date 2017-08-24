@@ -455,6 +455,7 @@ set (Module_UI_FILES
   Resources/UI/pqCollaborationPanel.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
+  Resources/UI/pqConnectIdDialog.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui

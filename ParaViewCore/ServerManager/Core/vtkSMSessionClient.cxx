@@ -250,7 +250,6 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
     else if (result == -1)
     {
-      vtkErrorMacro("Some error in socket processing.");
       break;
     }
   }

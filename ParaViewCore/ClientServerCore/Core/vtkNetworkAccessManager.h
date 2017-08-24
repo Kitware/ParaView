@@ -91,6 +91,11 @@ public:
    */
   virtual void DisableFurtherConnections(int port, bool disable) = 0;
 
+  /**
+   * Returns true if the last check of connect ids was wrong.
+   */
+  virtual bool GetWrongConnectID() = 0;
+
 protected:
   vtkNetworkAccessManager();
   ~vtkNetworkAccessManager() override;

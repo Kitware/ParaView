@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqServerLauncher.h"
+#include "ui_pqConnectIdDialog.h"
 #include "ui_pqServerLauncherDialog.h"
 
 #include "pqApplicationCore.h"
@@ -40,7 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "vtkCommand.h"
 #include "vtkMath.h"
+#include "vtkNetworkAccessManager.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
@@ -577,7 +580,25 @@ bool pqServerLauncher::connectToServer()
     }
   }
 
-  return this->connectToPrelaunchedServer();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+  vtkPVOptions* options = pm->GetOptions();
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  Ui::pqConnectIdDialog ui;
+  ui.setupUi(&dialog);
+  ui.connectId->setMaximum(VTK_INT_MAX);
+  ui.connectId->setValue(options->GetConnectID());
+
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+  bool force = builder->forceWaitingForConnection(true);
+  bool launched = false;
+  while (!(launched = this->connectToPrelaunchedServer()) && nam->GetWrongConnectID() &&
+    dialog.exec() == QDialog::Accepted)
+  {
+    options->SetConnectID(ui.connectId->value());
+  }
+  builder->forceWaitingForConnection(force);
+  return launched;
 }
 
 //-----------------------------------------------------------------------------

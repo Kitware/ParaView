@@ -101,6 +101,11 @@ public:
    */
   virtual void DisableFurtherConnections(int port, bool disable) VTK_OVERRIDE;
 
+  /**
+   * Returns true if the last check of connect ids was wrong.
+   */
+  virtual bool GetWrongConnectID() VTK_OVERRIDE;
+
 protected:
   vtkTCPNetworkAccessManager();
   ~vtkTCPNetworkAccessManager() override;
@@ -132,10 +137,11 @@ protected:
 
   int ParaViewHandshake(
     vtkMultiProcessController* controller, bool server_side, const char* handshake);
-  void PrintHandshakeError(int errorcode);
+  void PrintHandshakeError(int errorcode, bool server_side);
   int AnalyzeHandshakeAndGetErrorCode(const char* clientHS, const char* serverHS);
 
   bool AbortPendingConnectionFlag;
+  bool WrongConnectID;
 
 private:
   vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;

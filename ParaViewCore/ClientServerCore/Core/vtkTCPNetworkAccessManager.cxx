@@ -56,6 +56,7 @@ vtkTCPNetworkAccessManager::vtkTCPNetworkAccessManager()
 {
   this->Internals = new vtkInternals();
   this->AbortPendingConnectionFlag = false;
+  this->WrongConnectID = false;
 
   // It's essential to initialize the socket controller to initialize sockets on
   // Windows.
@@ -110,6 +111,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
         timeout_in_seconds = 0;
       }
     }
+
+    this->WrongConnectID = false;
 
     if (parameters["listen"] == "true" && parameters["multiple"] == "true")
     {
@@ -169,6 +172,12 @@ void vtkTCPNetworkAccessManager::DisableFurtherConnections(int port, bool disabl
     this->Internals->ServerSockets[port] = server_socket;
     server_socket->FastDelete();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetWrongConnectID()
+{
+  return this->WrongConnectID;
 }
 
 //----------------------------------------------------------------------------
@@ -241,6 +250,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 
   if (size == 0 || this->AbortPendingConnectionFlag)
   {
+    // Connection failed / aborted.
     return -1;
   }
 
@@ -286,6 +296,11 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
       return 1;
     }
 
+    if (can_quit_if_error)
+    {
+      vtkErrorMacro("Some error in socket processing.");
+    }
+
     // Close cleanly the socket in error
     vtkSocketCommunicator* comm =
       vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
@@ -299,7 +314,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode)
+void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode, bool server_side)
 {
   switch (errorcode)
   {
@@ -329,12 +344,14 @@ void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode)
                     "**********************************************************************\n");
       break;
     case HANDSHAKE_DIFFERENT_CONNECTION_IDS:
-      vtkWarningMacro("\n"
-                      " Wrong connect-id: \n"
-                      " The client cannot connect to the server because their connection ids\n"
-                      " are not the same. Change your connect-id and try again.\n");
-
-      this->InvokeEvent(vtkCommand::UserEvent);
+      if (server_side)
+      {
+        vtkWarningMacro("\n"
+                        " Connection failed during handshake. The server has a different \n"
+                        " connection id than the client.\n"
+                        "\n");
+      }
+      this->WrongConnectID = true;
       break;
     case HANDSHAKE_DIFFERENT_RENDERING_BACKENDS:
       vtkErrorMacro("\n"
@@ -396,7 +413,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     controller->Delete();
     // handshake failed, must be bogus client, continue waiting (unless
     // this->AbortPendingConnectionFlag == true).
-    this->PrintHandshakeError(errorcode);
+    this->PrintHandshakeError(errorcode, false);
     return NULL;
   }
   this->Internals->Controllers.push_back(controller);
@@ -468,8 +485,11 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     {
       controller->Delete();
       controller = NULL;
-      this->PrintHandshakeError(errorcode);
-      break;
+      this->PrintHandshakeError(errorcode, true);
+      if (!once)
+      {
+        break;
+      }
     }
   }
 
