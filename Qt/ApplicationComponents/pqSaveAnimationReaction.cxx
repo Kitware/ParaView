@@ -212,7 +212,7 @@ void pqSaveAnimationReaction::saveAnimation()
   QString filename = pqSaveAnimationReaction::promptFileName(server, disconnectAndSave);
   if (!filename.isEmpty())
   {
-    if (ahProxy->WriteAnimation(filename.toLatin1().data()) && disconnectAndSave)
+    if (ahProxy->WriteAnimation(filename.toUtf8().data()) && disconnectAndSave)
     {
       Q_ASSERT(ahProxy->GetReferenceCount() == 1);
       ahProxy = NULL;
