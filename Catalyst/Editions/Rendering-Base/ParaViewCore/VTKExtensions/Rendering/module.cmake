@@ -13,9 +13,6 @@ if(PARAVIEW_ENABLE_PYTHON)
   #list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()
 
-if (PARAVIEW_ENABLE_QT_SUPPORT)
-  list(APPEND __dependencies vtkGUISupportQt)
-endif()
 list(APPEND __dependencies vtkglew)
 
 if(PARAVIEW_USE_OSPRAY)
