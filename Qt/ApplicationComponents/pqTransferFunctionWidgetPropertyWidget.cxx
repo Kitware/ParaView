@@ -78,6 +78,8 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
     return;
   }
   this->TFProxy = vtkSMTransferFunctionProxy::SafeDownCast(pxy);
+  this->Range[0] = 0.0;
+  this->Range[1] = 1.0;
 
   this->Connection = vtkEventQtSlotConnect::New();
   this->Domain =
@@ -112,21 +114,23 @@ pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget(
 
 void pqTransferFunctionWidgetPropertyWidget::onDomainChanged()
 {
+  this->Range[0] = 0.0;
+  this->Range[1] = 1.0;
   if (this->Domain)
   {
-    if (this->Domain->GetRangeMinimumExists(0))
+    if (this->Domain->GetRangeMinimumExists(0) && this->Domain->GetRangeMaximumExists(0))
     {
       this->Range[0] = this->Domain->GetRangeMinimum(0);
-    }
-    if (this->Domain->GetRangeMaximumExists(0))
-    {
       this->Range[1] = this->Domain->GetRangeMaximum(0);
     }
-  }
-  else
-  {
-    this->Range[0] = 0.0;
-    this->Range[1] = 1.0;
+    else if (this->Domain->GetRangeMinimumExists(0))
+    {
+      this->Range[0] = this->Range[1] = this->Domain->GetRangeMinimum(0);
+    }
+    else if (this->Domain->GetRangeMaximumExists(0))
+    {
+      this->Range[0] = this->Range[1] = this->Domain->GetRangeMaximum(0);
+    }
   }
   this->updateRange();
   emit this->domainChanged();
