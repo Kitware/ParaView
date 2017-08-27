@@ -24,14 +24,14 @@ assert (len(r.ColorArrayName) == 2),\
 
 try:
     a = r.ColorAttributeType
-except AttributeError:
+except paraview.NotSupportedException:
     pass
 else:
     raise RuntimeError("Accessing 'ColorAttributeType' must have raised an exception.")
 
 try:
     v = v.CameraClippingRange
-except AttributeError:
+except paraview.NotSupportedException:
     pass
 else:
     raise RuntimeError("Accessing 'CameraClippingRange' must have raised an exception.")
@@ -63,5 +63,5 @@ paraview.compatibility.minor = 0
 try:
     a = v.CameraClippingRange
     v.CameraClippingRange = [0, 0, 0]
-except AttributeError:
+except paraview.NotSupportedException:
     raise RuntimeError("Accessing 'CameraClippingRange' must *not* have raised an exception.")

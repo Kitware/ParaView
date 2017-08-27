@@ -477,9 +477,6 @@ class Proxy(object):
 
         try:
             return _bc.getattr(self, name)
-        except _bc.NotSupportedException:
-            # we fall through and let getattr() raise the appropriate exception.
-            pass
         except _bc.Continue:
             pass
         # If not a property, see if SMProxy has the method
