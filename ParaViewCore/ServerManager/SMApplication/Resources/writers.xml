@@ -406,6 +406,52 @@
       </Hints>
       <!-- End of XMLPUnstructuredGridWriter -->
     </WriterProxy>
+ <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPTableWriter"
+                 parallel_only="1">
+      <Documentation short_help="Write table in a xml-based vtk data file.">
+      Writer to write table in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPTableCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <!-- <Property name="GhostLevel" /> -->
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="UseSubdirectory" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
+                  show="0" />
+        <WriterFactory extensions="pvtt"
+                       file_description="PVTK Table Files" />
+      </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="ParallelFileSeriesWriter"

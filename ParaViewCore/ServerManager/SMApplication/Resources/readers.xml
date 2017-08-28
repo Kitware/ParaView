@@ -1098,6 +1098,52 @@
       </StringVectorProperty>
       <!-- End XMLPUnstructuredGridReaderCore -->
     </SourceProxy>
+        <SourceProxy class="vtkXMLPTableReader"
+                 label="XML Partitioned Table Reader"
+                 name="XMLPTableReaderCore">
+      <Documentation long_help="Reads the summary file and the associated VTK XML table files."
+                     short_help="Read partitioned VTK XML table files.">
+                     The XML Partitioned Table reader reads the
+                     partitioned VTK table data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML table data files. The
+                     expected file extension is .pvtt.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        partitioned VTK XML table reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Columns"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <!-- End XMLPTableReaderCore -->
+    </SourceProxy>
     <SourceProxy class="vtkXMLPImageDataReader"
                  label="XML Partitioned Image Data Reader"
                  name="XMLPImageDataReaderCore">
@@ -4159,6 +4205,66 @@
       </Hints>
     </SourceProxy>
     <!-- XMLPUnstructuredGridReader -->
+<SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Partitioned Table Reader"
+                 name="XMLPTableReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads the summary file and the associated VTK XML table data files."
+                     short_help="Read partitioned VTK XML table data files.">
+                     The XML Partitioned Table reader reads the
+                     partitioned VTK table data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML table data files. The
+                     expected file extension is .pvtt. This reader also
+                     supports file series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPTableReaderCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Column Array Status"
+                         name="ColumnArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="ColumnArrayInfo" />
+            <Property name="ColumnArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the partitioned VTK XML table data
+        format. The standard extension is .pvtt. If more than one file is
+        specified, the reader will switch to file series mode in which it will
+        pretend that it can support time and provide one file per time
+        step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pvtt"
+                       file_description="VTK Table (partitioned)" />
+      </Hints>
+    </SourceProxy>
+    <!-- XMLPTableReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Partitioned Image Data Reader"
