@@ -47,7 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqPythonManager.h"
+#include "pqPythonScriptEditor.h"
+#else
+class pqPythonScriptEditor : public QObject
+{
+private:
+  Q_DISABLE_COPY(pqPythonScriptEditor);
+};
 #endif
 
 #include <QMainWindow>
@@ -144,17 +150,35 @@ void pqTraceReaction::stop()
     mainWindow->statusBar()->clearMessage();
   }
   QString tracetxt(vtkSMTrace::StopTrace().c_str());
-#ifdef PARAVIEW_ENABLE_PYTHON
-  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->editTrace(tracetxt);
-#endif
+  this->editTrace(tracetxt, false);
 }
 
 //-----------------------------------------------------------------------------
 void pqTraceReaction::updateTrace()
 {
+  this->editTrace(vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str(), true);
+}
+
+//-----------------------------------------------------------------------------
+void pqTraceReaction::editTrace(const QString& trace, bool incremental)
+{
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->editTrace(QString(), true);
+  bool new_editor = false;
+  if (this->Editor == nullptr)
+  {
+    this->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+    this->Editor->setPythonManager(pqPVApplicationCore::instance()->pythonManager());
+    new_editor = true;
+  }
+
+  Q_ASSERT(this->Editor);
+  this->Editor->setText(trace);
+  this->Editor->show();
+  if (new_editor ||
+    incremental == false) // don't raise the window if we are just updating the trace.
+  {
+    this->Editor->raise();
+    this->Editor->activateWindow();
+  }
 #endif
 }

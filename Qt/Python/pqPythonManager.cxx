@@ -38,17 +38,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
-#include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonScriptEditor.h"
-#include "pqPythonShell.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
+#include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSmartPointer.h"
+
+#if !defined(VTK_LEGACY_REMOVE)
+#include "pqPythonDialog.h"
+#include "pqPythonShell.h"
 #include "vtkSMTrace.h"
+#endif
 
 #include <QDebug>
 #include <QDir>
@@ -59,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSplitter>
 #include <QStatusBar>
 #include <QTextStream>
+#include <sstream>
 
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
@@ -66,29 +74,17 @@ class pqPythonManager::pqInternal
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
   void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
   {
+    // TODO: how to manage this centrally without duplicating messages shown in
+    // any pqPythonShell?
     if (eventid == vtkCommand::ErrorEvent)
     {
       const char* message = reinterpret_cast<const char*>(calldata);
-      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
-      {
-        this->PythonDialog->shell()->printString(message, pqPythonShell::ERROR);
-      }
-      else
-      {
-        qCritical() << message;
-      }
+      qCritical() << message;
     }
     else if (eventid == vtkCommand::SetOutputEvent)
     {
       const char* message = reinterpret_cast<const char*>(calldata);
-      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
-      {
-        this->PythonDialog->shell()->printString(message, pqPythonShell::OUTPUT);
-      }
-      else
-      {
-        qInfo() << message;
-      }
+      qInfo() << message;
     }
   }
 
@@ -99,12 +95,47 @@ public:
     this->DummyInterpreter->AddObserver(
       vtkCommand::AnyEvent, this, &pqPythonManager::pqInternal::interpreterEvents);
   }
-  ~pqInternal() { this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent); }
+  ~pqInternal()
+  {
+    this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent);
+#if !defined(VTK_LEGACY_REMOVE)
+    delete this->PythonDialog;
+#endif
+    delete this->Editor;
+  }
 
+#if !defined(VTK_LEGACY_REMOVE)
   QPointer<pqPythonDialog> PythonDialog;
-  QPointer<pqPythonMacroSupervisor> MacroSupervisor;
+#endif
+
   QPointer<pqPythonScriptEditor> Editor;
+  QPointer<pqPythonMacroSupervisor> MacroSupervisor;
 };
+
+//-----------------------------------------------------------------------------
+class pqPythonManagerOutputWindow : public vtkOutputWindow
+{
+  std::ostringstream TextStream;
+  std::ostringstream ErrorStream;
+
+public:
+  static pqPythonManagerOutputWindow* New();
+  vtkTypeMacro(pqPythonManagerOutputWindow, vtkOutputWindow);
+
+  void DisplayText(const char* txt) override { this->TextStream << txt; }
+
+  void DisplayErrorText(const char* txt) override { this->ErrorStream << txt; }
+
+  std::string text() const { return this->TextStream.str(); }
+  std::string errorText() const { return this->ErrorStream.str(); }
+private:
+  pqPythonManagerOutputWindow() {}
+  ~pqPythonManagerOutputWindow() override {}
+private:
+  pqPythonManagerOutputWindow(const pqPythonManagerOutputWindow&) = delete;
+  void operator=(const pqPythonManagerOutputWindow&) = delete;
+};
+vtkStandardNewMacro(pqPythonManagerOutputWindow);
 
 //-----------------------------------------------------------------------------
 pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
@@ -123,29 +154,17 @@ pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
   QObject::connect(this->Internal->MacroSupervisor, SIGNAL(onEditMacro(const QString&)), this,
     SLOT(editMacro(const QString&)));
 
+#if !defined(VTK_LEGACY_REMOVE)
   // Listen for signal when server is about to be removed
   this->connect(core->getServerManagerModel(), SIGNAL(aboutToRemoveServer(pqServer*)), this,
     SLOT(onRemovingServer(pqServer*)));
-
-  this->Internal->Editor = NULL;
+#endif
 }
 
 //-----------------------------------------------------------------------------
 pqPythonManager::~pqPythonManager()
 {
   pqApplicationCore::instance()->unRegisterManager("PYTHON_MANAGER");
-  // Make sure the python dialog is cleaned up in case it was never
-  // given a parent.
-  if (this->Internal->PythonDialog && !this->Internal->PythonDialog->parent())
-  {
-    delete this->Internal->PythonDialog;
-  }
-  // Make sure the python editor is cleaned up in case it was never
-  // given a parent.
-  if (this->Internal->Editor && !this->Internal->Editor->parent())
-  {
-    delete this->Internal->Editor;
-  }
   delete this->Internal;
 }
 
@@ -156,8 +175,11 @@ bool pqPythonManager::interpreterIsInitialized()
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 pqPythonDialog* pqPythonManager::pythonShellDialog()
 {
+  VTK_LEGACY_BODY(pqPythonManager::pythonShellDialog, "ParaView 5.5");
+
   // Create the dialog and initialize the interpreter the first time this
   // method is called.
   if (!this->Internal->PythonDialog)
@@ -167,6 +189,7 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   }
   return this->Internal->PythonDialog;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void pqPythonManager::addWidgetForRunMacros(QWidget* widget)
@@ -187,8 +210,35 @@ void pqPythonManager::addWidgetForDeleteMacros(QWidget* widget)
 //-----------------------------------------------------------------------------
 void pqPythonManager::executeScript(const QString& filename)
 {
-  pqPythonDialog* dialog = this->pythonShellDialog();
-  dialog->runScript(QStringList(filename));
+  QFile file(filename);
+  if (file.open(QIODevice::ReadOnly))
+  {
+    const QByteArray code = file.readAll();
+    vtkNew<pqPythonManagerOutputWindow> owindow;
+    vtkSmartPointer<vtkOutputWindow> old = vtkOutputWindow::GetInstance();
+    vtkOutputWindow::SetInstance(owindow);
+
+    vtkNew<vtkPythonInteractiveInterpreter> interp;
+    interp->Push("import sys");
+    interp->RunStringWithConsoleLocals(code.data());
+    vtkOutputWindow::SetInstance(old);
+
+    auto txt = owindow->text();
+    if (txt.size())
+    {
+      qInfo() << txt.c_str();
+    }
+
+    auto errorText = owindow->errorText();
+    if (errorText.size())
+    {
+      qCritical() << errorText.c_str();
+    }
+  }
+  else
+  {
+    qWarning() << "Error opening '" << filename << "'.";
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -201,22 +251,30 @@ void pqPythonManager::executeScriptAndRender(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqPythonManager::onRemovingServer(pqServer* /*server*/)
 {
+#if !defined(VTK_LEGACY_REMOVE)
   if (this->Internal->PythonDialog)
   {
     this->Internal->PythonDialog->shell()->reset();
   }
+#endif
 }
 
 //----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 QString pqPythonManager::getTraceString()
 {
+  VTK_LEGACY_BODY(pqPythonManager::getTraceString, "ParaView 5.5");
   return vtkSMTrace::GetActiveTracer() ? vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str()
                                        : "";
 }
+#endif
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void pqPythonManager::editTrace(const QString& txt, bool update)
 {
+  VTK_LEGACY_BODY(pqPythonManager::editTrace, "ParaView 5.5");
+
   // Create the editor if needed and only the first time
   bool new_editor = this->Internal->Editor == NULL;
   if (!this->Internal->Editor)
@@ -237,6 +295,7 @@ void pqPythonManager::editTrace(const QString& txt, bool update)
     this->Internal->Editor->setText(traceString);
   }
 }
+#endif
 
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()
@@ -268,6 +327,7 @@ void pqPythonManager::addMacro(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::editMacro(const QString& fileName)
 {
+  VTK_LEGACY_BODY(pqPythonManager::editMacro, "ParaView 5.5");
   // Create the editor if needed and only the first time
   if (!this->Internal->Editor)
   {

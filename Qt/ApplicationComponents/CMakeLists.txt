@@ -238,8 +238,6 @@ set (Module_SRCS
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.cxx
   pqProxyGroupMenuManager.h
-  pqPythonShellReaction.cxx
-  pqPythonShellReaction.h
   pqReaction.cxx
   pqReaction.h
   pqReloadFilesReaction.cxx
@@ -436,7 +434,6 @@ set (Module_MOC_HDRS
   pqPreviewMenuManager.h
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
-  pqPythonShellReaction.h
   pqReaction.h
   pqReloadFilesReaction.h
   pqRenameProxyReaction.h
@@ -496,6 +493,14 @@ if (PARAVIEW_ENABLE_PYTHON)
     pqTraceReaction.cxx
     pqTraceReaction.h
   )
+endif()
+
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS
+    pqPythonShellReaction.cxx
+    pqPythonShellReaction.h)
+  list(APPEND Module_MOC_HDRS
+    pqPythonShellReaction.h)
 endif()
 
 set (Module_UI_FILES
