@@ -39,7 +39,6 @@
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPointData.h"
 #include "vtkProperty.h"
-#include "vtkQuadricClustering.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionConverter.h"
@@ -48,11 +47,79 @@
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtkmConfig.h"
+
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayActorNode.h"
 #endif
 
 #include <vtksys/SystemTools.hxx>
+
+// We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
+// fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
+// serial backend.
+
+#ifdef VTKM_ENABLE_TBB
+#include "vtkmLevelOfDetail.h"
+namespace vtkGeometryRepresentation_detail
+{
+class DecimationFilterType : public vtkmLevelOfDetail
+{
+public:
+  static DecimationFilterType* New();
+  vtkTypeMacro(DecimationFilterType, vtkmLevelOfDetail)
+
+    // See note on the vtkQuadricClustering implementation below.
+    void SetLODFactor(double factor)
+  {
+    factor = vtkMath::ClampValue(factor, 0., 1.);
+
+    // This produces the following number of divisions for 'factor':
+    // 0.0 --> 64
+    // 0.5 --> 256 (default)
+    // 1.0 --> 1024
+    int divs = static_cast<int>(std::pow(2, 4. * factor + 6.));
+    this->SetNumberOfDivisions(divs, divs, divs);
+  }
+};
+vtkStandardNewMacro(DecimationFilterType)
+}
+#else
+#include "vtkQuadricClustering.h"
+namespace vtkGeometryRepresentation_detail
+{
+class DecimationFilterType : public vtkQuadricClustering
+{
+public:
+  static DecimationFilterType* New();
+  vtkTypeMacro(DecimationFilterType, vtkQuadricClustering)
+
+    // This version gets slower as the grid increases, while the VTKM version
+    // scales with number of points. This means we can get away with a much finer
+    // grid with the VTKM filter, so we'll just reduce the mesh quality a bit
+    // here.
+    void SetLODFactor(double factor)
+  {
+    factor = vtkMath::ClampValue(factor, 0., 1.);
+
+    // This is the same equation used in the old implementation:
+    // 0.0 --> 10
+    // 0.5 --> 85 (default)
+    // 1.0 --> 160
+    int divs = static_cast<int>(150 * factor) + 10;
+    this->SetNumberOfDivisions(divs, divs, divs);
+  }
+
+  DecimationFilterType()
+  {
+    this->SetUseInputPoints(1);
+    this->SetCopyCellData(1);
+    this->SetUseInternalTriangles(0);
+  }
+};
+vtkStandardNewMacro(DecimationFilterType)
+}
+#endif
 
 //*****************************************************************************
 // This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
@@ -141,7 +208,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->GeometryFilter = vtkPVGeometryFilter::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->MultiBlockMaker = vtkGeometryRepresentationMultiBlockMaker::New();
-  this->Decimator = vtkQuadricClustering::New();
+  this->Decimator = vtkGeometryRepresentation_detail::DecimationFilterType::New();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
   // connect progress bar
@@ -214,10 +281,7 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetupDefaults()
 {
-  this->Decimator->SetUseInputPoints(1);
-  this->Decimator->SetCopyCellData(1);
-  this->Decimator->SetUseInternalTriangles(0);
-  this->Decimator->SetNumberOfDivisions(10, 10, 10);
+  this->Decimator->SetLODFactor(0.5);
 
   this->LODOutlineFilter->SetUseOutline(1);
 
@@ -357,9 +421,10 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
         if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
         {
-          int division =
-            static_cast<int>(150 * inInfo->Get(vtkPVRenderView::LOD_RESOLUTION())) + 10;
-          this->Decimator->SetNumberOfDivisions(division, division, division);
+          // We handle this number differently depending on decimator
+          // implementation.
+          const double factor = inInfo->Get(vtkPVRenderView::LOD_RESOLUTION());
+          this->Decimator->SetLODFactor(factor);
         }
 
         this->Decimator->Update();

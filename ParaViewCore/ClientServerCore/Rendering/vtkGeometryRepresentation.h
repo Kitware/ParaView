@@ -42,13 +42,20 @@ class vtkPiecewiseFunction;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
-class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
+
+namespace vtkGeometryRepresentation_detail
+{
+// This is defined to either vtkQuadricClustering or vtkmLevelOfDetail in the
+// implementation file:
+class DecimationFilterType;
+}
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentation
   : public vtkPVDataRepresentation
 {
+
 public:
   static vtkGeometryRepresentation* New();
   vtkTypeMacro(vtkGeometryRepresentation, vtkPVDataRepresentation);
@@ -355,7 +362,7 @@ protected:
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
-  vtkQuadricClustering* Decimator;
+  vtkGeometryRepresentation_detail::DecimationFilterType* Decimator;
   vtkPVGeometryFilter* LODOutlineFilter;
 
   vtkMapper* Mapper;
