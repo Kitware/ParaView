@@ -660,6 +660,51 @@
       </StringVectorProperty>
       <!-- End XMLPolyDataReaderCore -->
     </SourceProxy>
+    <SourceProxy class="vtkXMLTableReader"
+                 label="XML Table Reader"
+                 name="XMLTableReaderCore">
+      <Documentation long_help="Reads serial VTK XML table files."
+                     short_help="Read VTK XML table files.">The XML table
+                     reader reads the VTK XML table file format. The
+                     standard extension is .vtt.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VTK XML
+        table reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Column Arrays"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <!-- End XMLTableReaderCore -->
+    </SourceProxy>
     <SourceProxy class="vtkXMLUnstructuredGridReader"
                  label="XML Unstructured Grid reader"
                  name="XMLUnstructuredGridReaderCore">
@@ -3702,6 +3747,63 @@
     </SourceProxy>
 
     <!-- XMLPolyDataReader -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Table Reader"
+                 name="XMLTableReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads serial VTK XML table files."
+                     short_help="Read VTK XML table files.">The XML Table
+                     reader reads the VTK XML Table file format. The
+                     standard extension is .vtt. This reader also supports file
+                     series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLTableReaderCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Column Array Status"
+                         name="ColumnArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="ColumnArrayInfo" />
+            <Property name="ColumnArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the VTK XML table format. The standard
+        extension is .vtt. If more than one file is specified, the reader will
+        switch to file series mode in which it will pretend that it can support
+        time and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vtt"
+                       file_description="VTK Table Files" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- XMLTableReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Unstructured Grid Reader"
