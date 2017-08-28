@@ -50,8 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPythonInterpreter.h"
 #include "vtkSMTrace.h"
 
-#include <QApplication>
-#include <QCursor>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -65,23 +63,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
-
-  void importParaViewModule()
-  {
-    const char* command = "try:\n"
-                          "  import paraview\n"
-                          "except: pass\n";
-    vtkPythonInterpreter::RunSimpleString(command);
-  }
-
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
   void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
   {
-    if (eventid == vtkCommand::EnterEvent)
-    {
-      importParaViewModule();
-    }
-    else if (eventid == vtkCommand::ErrorEvent)
+    if (eventid == vtkCommand::ErrorEvent)
     {
       const char* message = reinterpret_cast<const char*>(calldata);
       if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
@@ -113,13 +98,6 @@ public:
   {
     this->DummyInterpreter->AddObserver(
       vtkCommand::AnyEvent, this, &pqPythonManager::pqInternal::interpreterEvents);
-
-    // import the paraview module now if Python was already
-    // initialized (by a startup plugin, for example)
-    if (vtkPythonInterpreter::IsInitialized())
-    {
-      importParaViewModule();
-    }
   }
   ~pqInternal() { this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent); }
 
@@ -184,11 +162,8 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   // method is called.
   if (!this->Internal->PythonDialog)
   {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     vtkPythonInterpreter::Initialize();
     this->Internal->PythonDialog = new pqPythonDialog(pqCoreUtilities::mainWidget());
-    this->Internal->PythonDialog->shell()->setupInterpreter();
-    QApplication::restoreOverrideCursor();
   }
   return this->Internal->PythonDialog;
 }

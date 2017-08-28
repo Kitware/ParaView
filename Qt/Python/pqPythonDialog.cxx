@@ -74,6 +74,8 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent)
     this->Implementation->Ui.close, SLOT(setDisabled(bool)));
 
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
+
+  this->Implementation->Ui.shellWidget->setupInterpreter();
 }
 
 pqPythonDialog::~pqPythonDialog()

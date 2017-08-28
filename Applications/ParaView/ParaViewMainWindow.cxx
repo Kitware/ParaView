@@ -124,6 +124,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   this->Internals->outputWidgetDock->hide();
+  this->Internals->pythonShellDock->hide();
 
   // show output widget if we received an error message.
   this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
@@ -155,6 +156,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);

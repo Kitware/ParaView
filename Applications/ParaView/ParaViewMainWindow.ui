@@ -22,7 +22,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -36,7 +45,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -171,7 +180,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -185,7 +203,7 @@
           <x>0</x>
           <y>0</y>
           <width>78</width>
-          <height>189</height>
+          <height>196</height>
          </rect>
         </property>
        </widget>
@@ -330,6 +348,15 @@
     </property>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="pythonShellDock">
+   <property name="windowTitle">
+    <string>Python Shell</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="pqPythonShell" name="pythonShell"/>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -419,6 +446,12 @@
    <class>pqMultiBlockInspectorWidget</class>
    <extends>QWidget</extends>
    <header>pqMultiBlockInspectorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqPythonShell</class>
+   <extends>QWidget</extends>
+   <header>pqPythonShell.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

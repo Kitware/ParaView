@@ -554,3 +554,8 @@ void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 }
 
 //-----------------------------------------------------------------------------
+void pqConsoleWidget::takeFocus()
+{
+  this->Implementation->setFocus(Qt::OtherFocusReason);
+}
+//-----------------------------------------------------------------------------

@@ -104,6 +104,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(ApplyBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
 
   pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
   virtual ~pqParaViewBehaviors();
@@ -134,6 +135,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(ApplyBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DECLARE_FLAG(LockPanelsBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(PythonShellResetBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

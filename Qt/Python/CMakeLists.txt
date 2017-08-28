@@ -57,6 +57,7 @@ set (Module_MOC_HDRS
 
 set (Module_UI_FILES
   pqPythonDialog.ui
+  pqPythonShell.ui
 )
 
 find_package(PythonLibs REQUIRED)

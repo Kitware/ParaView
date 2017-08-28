@@ -34,9 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPython.h"
 
 #include "pqPythonShell.h"
+#include "ui_pqPythonShell.h"
 
 #include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
+#include "pqFileDialog.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkPVOptions.h"
@@ -47,11 +49,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
-#include <QAbstractItemView>
+#include <QApplication>
+#include <QCursor>
+#include <QFile>
 #include <QInputDialog>
 #include <QStringListModel>
 #include <QTextCharFormat>
 #include <QVBoxLayout>
+#include <QtDebug>
 
 QStringList pqPythonShell::Preamble;
 
@@ -206,13 +211,29 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+class pqPythonShell::pqInternals
+{
+public:
+  Ui::PythonShell Ui;
+
+  pqInternals(pqPythonShell* self)
+  {
+    this->Ui.setupUi(self);
+    self->connect(this->Ui.clearButton, SIGNAL(clicked()), SLOT(clear()));
+    self->connect(this->Ui.resetButton, SIGNAL(clicked()), SLOT(reset()));
+    self->connect(this->Ui.runScriptButton, SIGNAL(clicked()), SLOT(runScript()));
+  }
+};
+
+//-----------------------------------------------------------------------------
 pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags)
   : Superclass(parentObject, _flags)
-  , ConsoleWidget(new pqConsoleWidget(this))
+  , ConsoleWidget(nullptr)
   , Interpreter(vtkPythonInteractiveInterpreter::New())
   , Prompt(pqPythonShell::PS1())
   , Prompted(false)
   , Executing(false)
+  , Internals(new pqPythonShell::pqInternals(this))
 {
   // The default preamble loads paraview.simple:
   if (pqPythonShell::Preamble.empty())
@@ -222,19 +243,18 @@ pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags)
 
   QObject::connect(this, SIGNAL(executing(bool)), this, SLOT(setExecuting(bool)));
 
-  this->setObjectName("pythonShell");
+  Ui::PythonShell& ui = this->Internals->Ui;
 
-  QVBoxLayout* vbox = new QVBoxLayout(this);
-  vbox->setMargin(0);
-  vbox->addWidget(this->ConsoleWidget);
+  // install event filter to initialize Python on request.
+  ui.defaultWidget->installEventFilter(this);
 
   // Setup completer for the console widget.
   pqPythonShellCompleter* completer = new pqPythonShellCompleter(*this, this->Interpreter);
-  this->ConsoleWidget->setCompleter(completer);
+  ui.consoleWidget->setCompleter(completer);
 
   // Accept user input from the console and push it into the Python interpreter.
-  QObject::connect(this->ConsoleWidget, SIGNAL(executeCommand(const QString&)), this,
-    SLOT(pushScript(const QString&)));
+  this->connect(
+    ui.consoleWidget, SIGNAL(executeCommand(const QString&)), SLOT(pushScript(const QString&)));
 
   this->Interpreter->AddObserver(
     vtkCommand::AnyEvent, this, &pqPythonShell::HandleInterpreterEvents);
@@ -246,14 +266,37 @@ pqPythonShell::~pqPythonShell()
   this->Interpreter->RemoveObservers(vtkCommand::AnyEvent);
   this->Interpreter->Delete();
   this->Interpreter = NULL;
+}
 
-  delete this->ConsoleWidget;
-  this->ConsoleWidget = NULL;
+//-----------------------------------------------------------------------------
+bool pqPythonShell::eventFilter(QObject* obj, QEvent* evt)
+{
+  if (evt->type() == QEvent::MouseButtonDblClick)
+  {
+    this->setupInterpreter();
+    const Ui::PythonShell& ui = this->Internals->Ui;
+    ui.consoleWidget->takeFocus();
+    return true;
+  }
+  return this->Superclass::eventFilter(obj, evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::initialize()
+{
+  const Ui::PythonShell& ui = this->Internals->Ui;
+  if (ui.stackedWidget->currentWidget() != ui.consoleWidget)
+  {
+    this->setupInterpreter();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonShell::setupInterpreter()
 {
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+  vtkPythonInterpreter::Initialize();
   Q_ASSERT(vtkPythonInterpreter::IsInitialized());
 
   vtkPythonInterpreter::SetCaptureStdin(true);
@@ -271,23 +314,34 @@ void pqPythonShell::setupInterpreter()
     this->pushScript(line);
   }
   this->prompt();
+
+  const Ui::PythonShell& ui = this->Internals->Ui;
+  ui.stackedWidget->setCurrentWidget(ui.consoleWidget);
+  ui.clearButton->setEnabled(true);
+  ui.resetButton->setEnabled(true);
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonShell::reset()
 {
-  this->Interpreter->Reset();
-  this->printString("\n...resetting...\n", ERROR);
-  this->setupInterpreter();
+  const Ui::PythonShell& ui = this->Internals->Ui;
+  if (ui.stackedWidget->currentWidget() == ui.consoleWidget)
+  {
+    this->Interpreter->Reset();
+    this->printString("\n...resetting...\n", ERROR);
+    this->setupInterpreter();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mode)
 {
+  pqConsoleWidget* consoleWidget = this->Internals->Ui.consoleWidget;
   QString string = text;
   if (!string.isEmpty())
   {
-    QTextCharFormat format = this->ConsoleWidget->getFormat();
+    QTextCharFormat format = consoleWidget->getFormat();
     switch (mode)
     {
       case OUTPUT:
@@ -302,10 +356,10 @@ void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mo
       default:
         format.setForeground(QColor(0, 0, 150));
     }
-    this->ConsoleWidget->setFormat(format);
-    this->ConsoleWidget->printString(string);
+    consoleWidget->setFormat(format);
+    consoleWidget->printString(string);
     format.setForeground(QColor(0, 0, 0));
-    this->ConsoleWidget->setFormat(format);
+    consoleWidget->setFormat(format);
 
     this->Prompted = false;
 
@@ -325,14 +379,15 @@ bool pqPythonShell::prompt(const QString& indent)
   if (!this->Prompted)
   {
     this->Prompted = true;
-    QTextCharFormat format = this->ConsoleWidget->getFormat();
+
+    Ui::PythonShell& ui = this->Internals->Ui;
+    QTextCharFormat format = ui.consoleWidget->getFormat();
     format.setForeground(QColor(0, 0, 0));
-    this->ConsoleWidget->setFormat(format);
-    this->ConsoleWidget->prompt(this->Prompt);
-    this->ConsoleWidget->printCommand(indent);
+    ui.consoleWidget->setFormat(format);
+    ui.consoleWidget->prompt(this->Prompt);
+    ui.consoleWidget->printCommand(indent);
     return true;
   }
-
   return false;
 }
 
@@ -346,7 +401,7 @@ void pqPythonShell::printMessage(const QString& text)
 //-----------------------------------------------------------------------------
 void pqPythonShell::clear()
 {
-  this->ConsoleWidget->clear();
+  this->Internals->Ui.consoleWidget->clear();
   this->Prompted = false;
   this->prompt();
 }
@@ -361,7 +416,6 @@ void pqPythonShell::executeScript(const QString& script)
   this->Interpreter->RunStringWithConsoleLocals(command.toLocal8Bit().data());
   emit this->executing(false);
   CLEAR_UNDO_STACK();
-
   this->prompt();
 }
 
@@ -399,16 +453,15 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
   switch (eventid)
   {
     case vtkCommand::ErrorEvent:
-    {
-      this->repaint();
-    }
-    break;
-
     case vtkCommand::SetOutputEvent:
-    {
-      this->repaint();
-    }
-    break;
+      if (this->isExecuting())
+      {
+        const char* message = reinterpret_cast<const char*>(calldata);
+        this->printString(message,
+          eventid == vtkCommand::ErrorEvent ? pqPythonShell::ERROR : pqPythonShell::OUTPUT);
+        this->repaint();
+      }
+      break;
 
     case vtkCommand::UpdateEvent:
     {
@@ -422,5 +475,36 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
       }
     }
     break;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::runScript()
+{
+  pqFileDialog dialog(
+    nullptr, this, tr("Run Script"), QString(), QString(tr("Python Script (*.py);;All files (*)")));
+  dialog.setObjectName("PythonShellRunScriptDialog");
+  dialog.setFileMode(pqFileDialog::ExistingFile);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    for (const QString& filename : dialog.getSelectedFiles())
+    {
+      QFile file(filename);
+      if (file.open(QIODevice::ReadOnly))
+      {
+        Ui::PythonShell& ui = this->Internals->Ui;
+        if (ui.stackedWidget->currentWidget() != ui.consoleWidget)
+        {
+          // if we haven't set up the interpret, let's do it first.
+          this->setupInterpreter();
+        }
+        QByteArray code = file.readAll();
+        this->executeScript(code.data());
+      }
+      else
+      {
+        qCritical() << "Error opening '" << filename << "'";
+      }
+    }
   }
 }

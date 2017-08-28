@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonShell_h
 
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
-#include "pqTimer.h"
+#include <QScopedPointer>   // needed for QScopedPointer.
 #include <QWidget>
 
 class vtkObject;
@@ -41,14 +41,23 @@ class pqConsoleWidget;
 class vtkPythonInteractiveInterpreter;
 
 /**
+* @class pqPythonShell
+* @brief Widget for a Python shell.
+*
 * pqPythonShell is a QWidget subclass that provides an interactive Python
-* shell. It uses vtkPythonInterpreter to provide an interactive Python
-* terminal without starting a separate Python event loop.
+* shell. It uses vtkPythonInteractiveInterpreter to provide an interactive Python
+* interpreter. Note that this is still executing Python code using the
+* application wide global Python interpreter, it just keeps the context separate
+* using an instance of `core.InteractiveConsole` internally.
 *
-* Python will be initialized (if not already), when pqPythonShell is
-* instantiated.
+* @section Python initialization
 *
-* \sa pqConsoleWidget, pqPythonDialog.
+* pqPythonShell does not initialize Python on creation. By default, it waits
+* till user double-clicks on the widget to initialize the interpreter. One can
+* also call `pqPythonShell::initialize` explicitly to initialize the
+* interpreter.
+*
+* @sa pqConsoleWidget.
 */
 class PQPYTHON_EXPORT pqPythonShell : public QWidget
 {
@@ -93,7 +102,8 @@ public slots:
 
   /**
   * Resets the python interactive interpreter. This does not affect the global
-  * Python interpreter.
+  * Python interpreter. If the interactive interpreter hasn't been initialized
+  * this has no effect.
   */
   void reset();
 
@@ -118,6 +128,12 @@ public slots:
   */
   static void setPreamble(const QStringList& statements);
 
+  /**
+   * Initialize the Python interpreter in the shell, if not already.
+   * Has no effect if the interpreter has already been initialized.
+   */
+  void initialize();
+
 signals:
   /**
   * signal fired whenever the shell starts (starting=true) and finishes
@@ -129,6 +145,8 @@ signals:
 protected slots:
   void pushScript(const QString&);
   void setExecuting(bool val) { this->Executing = val; }
+  bool eventFilter(QObject* obj, QEvent* event) override;
+  void runScript();
 
 protected:
   pqConsoleWidget* ConsoleWidget;
@@ -144,7 +162,11 @@ protected:
   * environment was finalized.
   */
   void setupInterpreter();
-  friend class pqPythonManager;
+
+  /**
+   * This friendship is left around only until pqPythonDialog is removed.
+   */
+  friend class pqPythonDialog;
 
   /**
   * Show the user-input prompt, if needed. Returns true if the prompt was
@@ -156,9 +178,11 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqPythonShell)
-
   bool Prompted;
   bool Executing;
+
+  class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif // !_pqPythonShell_h
