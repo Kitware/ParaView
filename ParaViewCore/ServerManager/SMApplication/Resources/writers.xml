@@ -14,6 +14,7 @@
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the files.</Documentation>

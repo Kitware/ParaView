@@ -736,5 +736,6 @@ const vtkXMLCollectionReaderEntry vtkXMLCollectionReaderInternals::ReaderList[] 
   { "vthb", "vtkXMLHierarchicalBoxDataReader" }, { "vts", "vtkXMLStructuredGridReader" },
   { "vtt", "vtkXMLTableReader" }, { "pvtp", "vtkXMLPPolyDataReader" },
   { "pvtu", "vtkXMLPUnstructuredGridReader" }, { "pvti", "vtkXMLPImageDataReader" },
-  { "pvtr", "vtkXMLPRectilinearGridReader" }, { "pvts", "vtkXMLPStructuredGridReader" }, { 0, 0 }
+  { "pvtr", "vtkXMLPRectilinearGridReader" }, { "pvts", "vtkXMLPStructuredGridReader" },
+  { "pvtt", "vtkXMLPTableReader" }, { 0, 0 }
 };
