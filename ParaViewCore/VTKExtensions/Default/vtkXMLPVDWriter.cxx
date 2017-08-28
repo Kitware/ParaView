@@ -39,6 +39,7 @@
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkXMLStructuredGridWriter.h"
+#include "vtkXMLTableWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
 
@@ -105,7 +106,10 @@ int vtkXMLPVDWriter::ProcessRequest(
 
     for (int i = 0; i < GetNumberOfInputConnections(0); ++i)
     {
-      this->GetWriter(i)->ProcessRequest(request, inputVector, outputVector);
+      if (this->GetWriter(i))
+      {
+        this->GetWriter(i)->ProcessRequest(request, inputVector, outputVector);
+      }
     }
     return 1;
   }
@@ -458,6 +462,20 @@ void vtkXMLPVDWriter::CreateWriters()
           w->Delete();
         }
         break;
+
+      case VTK_TABLE:
+        if (!this->Internal->Writers[i].GetPointer() ||
+          (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLTableWriter") != 0))
+        {
+          vtkXMLTableWriter* w = vtkXMLTableWriter::New();
+          this->Internal->Writers[i] = w;
+          w->Delete();
+        }
+        break;
+
+      default:
+        vtkErrorMacro("Unsupported data type: " << exec->GetInputData(0, i)->GetClassName());
+        return;
     }
 
     this->Internal->Writers[i]->SetInputConnection(this->GetInputConnection(0, i));
@@ -616,6 +634,6 @@ void vtkXMLPVDWriter::ReportReferences(vtkGarbageCollector* collector)
 int vtkXMLPVDWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
