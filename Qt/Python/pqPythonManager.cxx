@@ -71,33 +71,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
-  vtkNew<vtkPythonInterpreter> DummyInterpreter;
-  void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
-  {
-    // TODO: how to manage this centrally without duplicating messages shown in
-    // any pqPythonShell?
-    if (eventid == vtkCommand::ErrorEvent)
-    {
-      const char* message = reinterpret_cast<const char*>(calldata);
-      qCritical() << message;
-    }
-    else if (eventid == vtkCommand::SetOutputEvent)
-    {
-      const char* message = reinterpret_cast<const char*>(calldata);
-      qInfo() << message;
-    }
-  }
-
 public:
   pqInternal()
     : Editor(NULL)
   {
-    this->DummyInterpreter->AddObserver(
-      vtkCommand::AnyEvent, this, &pqPythonManager::pqInternal::interpreterEvents);
   }
   ~pqInternal()
   {
-    this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent);
 #if !defined(VTK_LEGACY_REMOVE)
     delete this->PythonDialog;
 #endif

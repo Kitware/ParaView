@@ -110,7 +110,7 @@ public slots:
   /**
   * Returns true is the shell is currently executing a script/command.
   */
-  bool isExecuting() const { return this->Executing; }
+  bool isExecuting() const;
 
   /**
   * Use this method instead of calling pqConsoleWidget::printString()
@@ -144,7 +144,6 @@ signals:
 
 protected slots:
   void pushScript(const QString&);
-  void setExecuting(bool val) { this->Executing = val; }
   bool eventFilter(QObject* obj, QEvent* event) override;
   void runScript();
 
@@ -179,9 +178,9 @@ protected:
 private:
   Q_DISABLE_COPY(pqPythonShell)
   bool Prompted;
-  bool Executing;
 
   class pqInternals;
+  friend class pqInternals;
   QScopedPointer<pqInternals> Internals;
 };
 
