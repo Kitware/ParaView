@@ -57,10 +57,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 #endif
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QLayout>
 #include <QMainWindow>
 #include <QSplitter>
@@ -117,6 +119,23 @@ private:
 };
 vtkStandardNewMacro(pqPythonManagerOutputWindow);
 
+//-----------------------------------------------------------------------------
+class pqPythonManagerRawInputHelper
+{
+public:
+  void rawInput(vtkObject*, unsigned long, void* calldata)
+  {
+    vtkStdString* strData = reinterpret_cast<vtkStdString*>(calldata);
+    bool ok;
+    QString inputText = QInputDialog::getText(pqCoreUtilities::mainWidget(),
+      QCoreApplication::translate("pqPythonManager", "Enter Input requested by Python"),
+      QCoreApplication::translate("pqPythonManager", "Input: "), QLineEdit::Normal, QString(), &ok);
+    if (ok)
+    {
+      *strData = inputText.toStdString();
+    }
+  }
+};
 //-----------------------------------------------------------------------------
 pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
   : QObject(_parent)
@@ -194,14 +213,20 @@ void pqPythonManager::executeScript(const QString& filename)
   if (file.open(QIODevice::ReadOnly))
   {
     const QByteArray code = file.readAll();
+    pqPythonManagerRawInputHelper helper;
     vtkNew<pqPythonManagerOutputWindow> owindow;
     vtkSmartPointer<vtkOutputWindow> old = vtkOutputWindow::GetInstance();
     vtkOutputWindow::SetInstance(owindow);
+    const bool prevCapture = vtkPythonInterpreter::GetCaptureStdin();
+    vtkPythonInterpreter::SetCaptureStdin(true);
 
     vtkNew<vtkPythonInteractiveInterpreter> interp;
+    interp->AddObserver(vtkCommand::UpdateEvent, &helper, &pqPythonManagerRawInputHelper::rawInput);
     interp->Push("import sys");
     interp->RunStringWithConsoleLocals(code.data());
+    vtkPythonInterpreter::SetCaptureStdin(prevCapture);
     vtkOutputWindow::SetInstance(old);
+    interp->RemoveObservers(vtkCommand::UpdateEvent);
 
     auto txt = owindow->text();
     if (txt.size())
@@ -307,7 +332,6 @@ void pqPythonManager::addMacro(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::editMacro(const QString& fileName)
 {
-  VTK_LEGACY_BODY(pqPythonManager::editMacro, "ParaView 5.5");
   // Create the editor if needed and only the first time
   if (!this->Internal->Editor)
   {
