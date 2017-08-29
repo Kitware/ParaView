@@ -44,8 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqFileDialog.h>
 #include <pqImageOutputInfo.h>
 #include <pqPipelineSource.h>
-#include <pqPythonDialog.h>
-#include <pqPythonManager.h>
 #include <pqRenderView.h>
 #include <pqServerManagerModel.h>
 #include <pqView.h>
