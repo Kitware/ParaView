@@ -7,6 +7,18 @@ started tracking these (starting after version 4.2).
 Changes in 5.5
 --------------
 
+###Changes to Python shell###
+
+`pqPythonShell` now is a fairly self contained class. One no longer has to go
+through `pqPythonManager` or `pqPythonDialog` to create it. `pqPythonDialog` has
+been deprecated. `pqPythonManager` has been relegated to a helper class to
+support macros (together with `pqPythonMacroSupervisor`). The Python macro
+infrastructure may be revamped in future, but is left unchanged for now.
+
+If you want a Python shell in your application, simply create an instance of
+`pqPythonShell` and add it where ever you choose. Multiple instances are also
+supported.
+
 ###Changes to offscreen rendering options###
 
 ParaView executables now automatically choose to create on-screen or off-screen
