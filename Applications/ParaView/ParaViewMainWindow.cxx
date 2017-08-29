@@ -79,6 +79,7 @@ void vtkPVInitializePythonModules();
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonDebugLeaksView.h"
+#include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
 #else
 #include "vtkQtDebugLeaksView.h"
@@ -127,9 +128,12 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->outputWidgetDock->hide();
   this->Internals->pythonShellDock->hide();
 #ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonShell* shell = new pqPythonShell(this);
+  shell->setObjectName("pythonShell");
+  this->Internals->pythonShellDock->setWidget(shell);
   if (leaksView)
   {
-    leaksView->setShell(this->Internals->pythonShell);
+    leaksView->setShell(shell);
   }
 #endif
 
