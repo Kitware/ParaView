@@ -7,7 +7,7 @@ import paraview
 lut = GetColorTransferFunction("Normals")
 try:
     lsr = lut.LockScalarRange
-except AttributeError:
+except paraview.NotSupportedException:
     pass
 else:
     raise RuntimeError("Accessing 'LockScalarRange' must have raised an exception")

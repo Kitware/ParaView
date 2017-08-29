@@ -1,0 +1,13 @@
+vtk_module(vtkPVVTKExtensionsSIL
+  DEPENDS
+    vtkCommonCore
+  PRIVATE_DEPENDS
+    vtkpugixml
+    vtksys
+  TEST_DEPENDS
+    vtkTestingCore
+  TEST_LABELS
+    PARAVIEW
+  KIT
+    vtkPVExtensions
+)

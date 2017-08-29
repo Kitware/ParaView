@@ -161,6 +161,11 @@ int readZoneInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo
 
 //------------------------------------------------------------------------------
 /**
+ * Fills up ZoneInformation using the zoneId for the Zone_t node.
+ */
+int readZoneInfo(int cgioNum, double zoneId, CGNSRead::ZoneInformation& zoneInfo);
+//------------------------------------------------------------------------------
+/**
  * release all ids in the vector.
  */
 void releaseIds(int cgioNum, const std::vector<double>& ids);

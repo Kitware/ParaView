@@ -148,6 +148,16 @@ def print_debug_info(text):
    if options.print_debug_messages:
        print(text)
 
+class NotSupportedException(Exception):
+    """Exception that is fired when obsolete API is used in a script."""
+    def __init__(self, msg):
+        self.msg = msg
+        print_debug_info("\nDEBUG: %s\n" % msg)
+
+    def __str__(self):
+        return "%s" % (self.msg)
+
+
 """This variable is set whenever Python is initialized within a ParaView
 Qt-based application. Modules within the 'paraview' package often use this to
 taylor their behaviour based on whether the Python environment is embedded

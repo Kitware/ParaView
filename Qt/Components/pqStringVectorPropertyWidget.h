@@ -40,9 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCOMPONENTS_EXPORT pqStringVectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-
 public:
   pqStringVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  virtual ~pqStringVectorPropertyWidget();
+
+private:
+  Q_DISABLE_COPY(pqStringVectorPropertyWidget);
 };
 
 #endif // _pqStringVectorPropertyWidget_h

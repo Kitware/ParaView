@@ -43,7 +43,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkGraph;
 class vtkSMSILModel;
-
+/**
+ * @class pqSILModel
+ * @brief QAbstractItemModel for legacy SIL (vtkGraph-based SIL)
+ *
+ * pqSILModel is QAbstractItemModel implementation for legacy SIL.
+ *
+ * @section Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, you should use
+ * `pqSubsetInclusionLatticeTreeModel` instead.
+ */
 class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 {
   Q_OBJECT

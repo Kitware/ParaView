@@ -272,6 +272,10 @@ set (Module_SRCS
   pqSMSignalAdaptors.h
   pqStringVectorPropertyWidget.cxx
   pqStringVectorPropertyWidget.h
+  pqSubsetInclusionLatticeTreeModel.cxx
+  pqSubsetInclusionLatticeTreeModel.h
+  pqSubsetInclusionLatticeWidget.cxx
+  pqSubsetInclusionLatticeWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
   pqTextureComboBox.cxx
@@ -423,6 +427,8 @@ set (Module_MOC_HDRS
   pqSILWidget.h
   pqSMSignalAdaptors.h
   pqStringVectorPropertyWidget.h
+  pqSubsetInclusionLatticeTreeModel.h
+  pqSubsetInclusionLatticeWidget.h
   pqTabbedMultiViewWidget.h
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h

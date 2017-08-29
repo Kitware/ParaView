@@ -11,10 +11,7 @@ message.
 
 import paraview
 
-class NotSupportedException(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-        paraview.print_debug_info("\nDEBUG: %s\n" % msg)
+NotSupportedException = paraview.NotSupportedException
 
 class Continue(Exception):
     pass
@@ -66,9 +63,18 @@ def setattr(proxy, pname, value):
     Attempts to emulate setattr() when called using a deprecated name for a
     proxy property.
 
-    Will make a reasonable attempt to set the value of the property with the new
-    name if the property was deprecated and the paraview compatibility version
-    was set to a version older than when the property was deprecated.
+    For properties that are no longer present on a proxy, the code should do the
+    following:
+
+    1. If `paraview.compatibility.GetVersion()` is less than the version in
+       which the property was removed, attempt to handle the request and raise
+       `Continue` to indicate that the request has been handled. If it is too
+       complicated to support the old API, then it is acceptable to raise
+       a warning message, but don't raise an exception.
+
+    2. If compatibility version is >= the version in which the property was
+       removed, raise `NotSupportedException` with details including suggestions
+       to update the script.
     """
     version = paraview.compatibility.GetVersion()
 
@@ -76,14 +82,13 @@ def setattr(proxy, pname, value):
         if paraview.compatibility.GetVersion() <= 4.1:
             # set ColorAttributeType on ColorArrayName property instead.
             caProp = proxy.GetProperty("ColorArrayName")
-
             proxy.GetProperty("ColorArrayName").SetData((value, caProp[1]))
             raise Continue()
         else:
-            # if ColorAttributeType is being used, print debug information.
-            paraview.print_debug_info(\
-                "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
-            # we let the exception be raised as well, hence don't return here.
+            # if ColorAttributeType is being used, raise NotSupportedException.
+            raise NotSupportedException(
+                    "'ColorAttributeType' is obsolete as of ParaView 4.2. Simply use 'ColorArrayName' "\
+                    "instead. Refer to ParaView Python API changes documentation online.")
 
     if pname == "AspectRatio" and proxy.SMProxy.GetProperty("ScalarBarThickness"):
         if paraview.compatibility.GetVersion() <= 5.3:
@@ -103,10 +108,10 @@ def setattr(proxy, pname, value):
             proxy.GetProperty("ScalarBarThickness").SetData(int(thickness))
             raise Continue()
         else:
-            #if AspectRatio is being used, print debug info
-            paraview.print_debug_info(\
-                "'AspectRatio' is obsolete. Use the 'ScalarBarThickness' property to set the width instead")
-            # we let the exception be raised as well, hence don't return here.
+            #if AspectRatio is being used, raise NotSupportedException
+            raise NotSupportedException(\
+                "'AspectRatio' is obsolete as of ParaView 5.4. Use the "\
+                "'ScalarBarThickness' property to set the width instead.")
 
     if pname == "Position2" and proxy.SMProxy.GetProperty("ScalarBarLength"):
         if paraview.compatibility.GetVersion() <= 5.3:
@@ -119,10 +124,10 @@ def setattr(proxy, pname, value):
 
             proxy.GetProperty("ScalarBarLength").SetData(length)
         else:
-            #if Position2 is being used, print debug info
-            paraview.print_debug_info(\
-                "'Position2' is obsolete. Use the 'ScalarBarLength' property to set the length instead")
-            # we let the exception be raised as well, hence don't return here.
+            #if Position2 is being used, raise NotSupportedException
+            raise NotSupportedException(\
+                "'Position2' is obsolete as of ParaView 5.4. Use the "\
+                "'ScalarBarLength' property to set the length instead.")
 
     if pname == "LockScalarRange" and proxy.SMProxy.GetProperty("AutomaticRescaleRangeMode"):
         if paraview.compatibility.GetVersion() <= 5.4:
@@ -136,6 +141,10 @@ def setattr(proxy, pname, value):
                 proxy.GetProperty("AutomaticRescaleRangeMode").SetData(mode)
 
             raise Continue()
+        else:
+            raise NotSupportedException(
+                    "'LockScalarRange' is obsolete as of ParaView 5.5. Use "\
+                    "'AutomaticRescaleRangeMode' property instead.")
 
     # In 5.5, we changed the vtkArrayCalcualtor to use a different set of constants to control which
     # data it operates on.  This change changed the method and property name from AttributeMode to
@@ -146,20 +155,36 @@ def setattr(proxy, pname, value):
             # rather than custom constants for the calculator.  For the values supported by
             # ParaView before this change, the conversion works out to subtracting 1.
             proxy.GetProperty("AttributeType").SetData(value - 1)
+            raise Continue()
         else:
-            paraview.print_debug_info(\
+            raise NotSupportedException(\
                 "'AttributeMode' is obsolete.  Use 'AttributeType' property of Calculator filter instead.")
-            # we let the AttributeError be raised
+
     if pname == "UseOffscreenRenderingForScreenshots" and proxy.SMProxy.IsA("vtkSMViewProxy"):
         if paraview.compatibility.GetVersion() <= 5.4:
             raise Continue()
         else:
-            paraview.print_debug_info("'UseOffscreenRenderingForScreenshots' is obsolete.")
+            raise NotSupportedException(\
+                    "'UseOffscreenRenderingForScreenshots' is obsolete. Simply remove it from your script.")
     if pname == "UseOffscreenRendering" and proxy.SMProxy.IsA("vtkSMViewProxy"):
         if paraview.compatibility.GetVersion() <= 5.4:
             raise Continue()
         else:
-            paraview.print_debug_info("'UseOffscreenRendering' is obsolete.")
+            raise NotSupportedException(\
+                    "'UseOffscreenRendering' is obsolete. Simply remove it from your script.")
+
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "CGNSSeriesReader":
+        # in 5.5, CGNS reader had some changes. "BaseStatus", "FamilyStatus",
+        # "LoadBndPatch", and "LoadMesh" properties were removed.
+        if pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_warning(\
+                  "'%s' is no longer supported and will have no effect. "\
+                  "Please use `Blocks` property to specify blocks to load." % pname)
+                raise Continue()
+            else:
+                raise NotSupportedException("'%s' is obsolete. Use the `Blocks` "\
+                        "property to select blocks using SIL instead.")
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -289,6 +314,19 @@ def getattr(proxy, pname):
             raise NotSupportedException(\
                     '`UseOffscreenRendering` is no longer supported. Please remove it.')
 
+    if proxy.SMProxy.GetXMLName() == "CGNSSeriesReader" and\
+            pname in ["LoadBndPatch", "LoadMesh", "BaseStatus", "FamilyStatus"]:
+        if version < 5.5:
+            if pname in ["LoadMesh", "LoadBndPatch"]:
+                return 0
+            else:
+                paraview.print_warning(\
+                  "'%s' is no longer supported and will have no effect. "\
+                  "Please use `Blocks` property to specify blocks to load." % pname)
+                return []
+        else:
+            raise NotSupportedException(\
+              "'%s' is obsolete. Use `Blocks` to make block based selection." % pname)
     raise Continue()
 
 def GetProxy(module, key):
