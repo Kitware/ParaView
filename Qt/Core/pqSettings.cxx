@@ -92,6 +92,8 @@ void pqSettings::saveState(const QMainWindow& window, const QString& key)
   this->setValue("Position", window.pos());
   this->setValue("Size", window.size());
   this->setValue("Layout", window.saveState());
+  QDesktopWidget desktop;
+  this->setValue("Screen", desktop.screenNumber(&window));
   this->endGroup();
 }
 
@@ -120,7 +122,15 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
     QRect mwRect(windowTopLeft, window.size());
 
     QDesktopWidget desktop;
+
+    // Default to primary screen, but restore to any saved screen we may have.
     QRect desktopRect = desktop.availableGeometry(desktop.primaryScreen());
+    if (this->contains("Screen"))
+    {
+      int screen = this->value("Screen").toInt();
+      desktopRect = desktop.availableGeometry(screen);
+    }
+
     // try moving it to keep size
     if (!desktopRect.contains(mwRect))
     {
