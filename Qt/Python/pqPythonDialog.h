@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonDialog_h
 
 #include "pqPythonModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QDialog>
 
 /**
@@ -41,8 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   with an interactive Python console where they can enter Python commands
   manually and see the corresponding output.
 
-  \sa pqPythonShell, pqConsoleWidget
+  @deprecated ParaView 5.5. Please use pqPythonShell directly and house it in
+  a QDialog if needed.
 */
+#if !defined(VTK_LEGACY_REMOVE)
 class pqPythonShell;
 class QCloseEvent;
 class QSplitter;
@@ -52,8 +55,8 @@ class PQPYTHON_EXPORT pqPythonDialog : public QDialog
 
 public:
   typedef QDialog Superclass;
-  pqPythonDialog(QWidget* Parent = 0);
-  ~pqPythonDialog();
+  VTK_LEGACY(pqPythonDialog(QWidget* Parent = 0));
+  VTK_LEGACY(~pqPythonDialog());
 
 public slots:
   /**
@@ -96,4 +99,5 @@ private:
   pqImplementation* const Implementation;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif // !_pqPythonDialog_h

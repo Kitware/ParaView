@@ -33,12 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Windows debug builds.
 #include "vtkPython.h"
 
-#include "pqApplicationCore.h"
 #include "pqPythonDebugLeaksView.h"
-#include "pqPythonDialog.h"
-#include "pqPythonManager.h"
 #include "pqPythonShell.h"
-
 #include "vtkPythonUtil.h"
 #include "vtkQtDebugLeaksModel.h"
 #include "vtkSmartPyObject.h"
@@ -47,12 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 
-PyObject* consoleContext()
+PyObject* consoleContext(pqPythonShell* shell)
 {
-  pqPythonManager* pythonManager =
-    qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-  pqPythonShell* shell = pythonManager->pythonShellDialog()->shell();
-  return static_cast<PyObject*>(shell->consoleLocals());
+  return shell ? static_cast<PyObject*>(shell->consoleLocals()) : nullptr;
 }
 };
 
@@ -65,6 +58,18 @@ pqPythonDebugLeaksView::pqPythonDebugLeaksView(QWidget* p)
 //-----------------------------------------------------------------------------
 pqPythonDebugLeaksView::~pqPythonDebugLeaksView()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonDebugLeaksView::setShell(pqPythonShell* shell)
+{
+  this->Shell = shell;
+}
+
+//-----------------------------------------------------------------------------
+pqPythonShell* pqPythonDebugLeaksView::shell() const
+{
+  return this->Shell;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,21 +87,24 @@ void pqPythonDebugLeaksView::onClassNameDoubleClicked(const QString& className)
 //-----------------------------------------------------------------------------
 void pqPythonDebugLeaksView::addObjectToPython(vtkObjectBase* object)
 {
-
-  vtkSmartPyObject pyObj(vtkPythonUtil::GetObjectFromPointer(object));
-  PyDict_SetItemString(consoleContext(), "obj", pyObj);
+  if (auto context = consoleContext(this->shell()))
+  {
+    vtkSmartPyObject pyObj(vtkPythonUtil::GetObjectFromPointer(object));
+    PyDict_SetItemString(context, "obj", pyObj);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonDebugLeaksView::addObjectsToPython(const QList<vtkObjectBase*>& objects)
 {
-  vtkSmartPyObject pyListObj(PyList_New(objects.size()));
-
-  for (int i = 0; i < objects.size(); ++i)
+  if (auto context = consoleContext(this->shell()))
   {
-    PyObject* pyObj = vtkPythonUtil::GetObjectFromPointer(objects[i]);
-    PyList_SET_ITEM(pyListObj.GetPointer(), i, pyObj);
+    vtkSmartPyObject pyListObj(PyList_New(objects.size()));
+    for (int i = 0; i < objects.size(); ++i)
+    {
+      PyObject* pyObj = vtkPythonUtil::GetObjectFromPointer(objects[i]);
+      PyList_SET_ITEM(pyListObj.GetPointer(), i, pyObj);
+    }
+    PyDict_SetItemString(context, "objs", pyListObj);
   }
-
-  PyDict_SetItemString(consoleContext(), "objs", pyListObj);
 }

@@ -79,6 +79,7 @@ void vtkPVInitializePythonModules();
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonDebugLeaksView.h"
+#include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
 #else
 #include "vtkQtDebugLeaksView.h"
@@ -105,9 +106,10 @@ ParaViewMainWindow::ParaViewMainWindow()
 {
   // the debug leaks view should be constructed as early as possible
   // so that it can monitor vtk objects created at application startup.
+  DebugLeaksViewType* leaksView = nullptr;
   if (getenv("PV_DEBUG_LEAKS_VIEW"))
   {
-    vtkQtDebugLeaksView* leaksView = new DebugLeaksViewType(this);
+    leaksView = new DebugLeaksViewType(this);
     leaksView->setWindowFlags(Qt::Window);
     leaksView->show();
   }
@@ -124,6 +126,16 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   this->Internals->outputWidgetDock->hide();
+  this->Internals->pythonShellDock->hide();
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonShell* shell = new pqPythonShell(this);
+  shell->setObjectName("pythonShell");
+  this->Internals->pythonShellDock->setWidget(shell);
+  if (leaksView)
+  {
+    leaksView->setShell(shell);
+  }
+#endif
 
   // show output widget if we received an error message.
   this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
@@ -155,6 +167,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);

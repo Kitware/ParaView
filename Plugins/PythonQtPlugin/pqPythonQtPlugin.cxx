@@ -35,14 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDecorators.h"
 #include "pqPythonQtPlugin.h"
 #include "pqPythonQtWrapperFactory.h"
-
-#include <pqPVApplicationCore.h>
-#include <pqPythonDialog.h>
-#include <pqPythonManager.h>
-#include <pqPythonShell.h>
-
 #include <PythonQt.h>
 #include <PythonQt_QtBindings.h>
+#include <pqPythonShell.h>
 
 #include "vtkPythonInterpreter.h"
 
@@ -57,16 +52,6 @@ pqPythonQtPlugin::pqPythonQtPlugin(QWidget* p)
   : QObject(p)
 {
   this->Internal = new pqInternal;
-
-  /*
-    pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-    this->connect(pythonManager, SIGNAL(paraviewPythonModulesImported()), SLOT(initialize()));
-
-    if (pythonManager->interpreterIsInitialized())
-      {
-      this->initialize();
-      }
-  */
   this->initialize();
 }
 
@@ -89,12 +74,6 @@ void pqPythonQtPlugin::shutdown()
 //-----------------------------------------------------------------------------
 void pqPythonQtPlugin::initialize()
 {
-  // pqPythonManager* pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  // this->disconnect(pythonManager, SIGNAL(paraviewPythonModulesImported()), this,
-  // SLOT(initialize()));
-
-  // pqPythonShell* shell = pythonManager->pythonShellDialog()->shell();
-
   vtkPythonInterpreter::Initialize();
 
   PythonQt::init(PythonQt::PythonAlreadyInitialized);

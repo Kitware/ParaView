@@ -32,9 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonDebugLeaksView_h
 #define _pqPythonDebugLeaksView_h
 
-#include "pqPythonModule.h"
 #include "vtkQtDebugLeaksView.h"
 
+#include "pqPythonModule.h" // for exports
+#include <QPointer>         // for QPointer
+
+/**
+ * @class pqPythonDebugLeaksView
+ * @brief Widget to track VTK object references.
+ *
+ * pqPythonDebugLeaksView extends `vtkQtDebugLeaksView` to add support for
+ * double clicking on a row and adding corresponding objects to the
+ * interpreter in a Python shell. The Python shell must be provided using
+ * `pqPythonDebugLeaksView::setShell`.
+ */
+class pqPythonShell;
 class PQPYTHON_EXPORT pqPythonDebugLeaksView : public vtkQtDebugLeaksView
 {
   Q_OBJECT
@@ -43,12 +55,17 @@ public:
   pqPythonDebugLeaksView(QWidget* p = 0);
   virtual ~pqPythonDebugLeaksView();
 
+  void setShell(pqPythonShell*);
+  pqPythonShell* shell() const;
+
 protected:
   virtual void onObjectDoubleClicked(vtkObjectBase* object);
   virtual void onClassNameDoubleClicked(const QString& className);
 
   virtual void addObjectToPython(vtkObjectBase* object);
   virtual void addObjectsToPython(const QList<vtkObjectBase*>& objects);
+
+  QPointer<pqPythonShell> Shell;
 };
 
 #endif // !_pqPythonDebugLeaksView_h

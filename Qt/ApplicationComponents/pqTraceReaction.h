@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+#include <QPointer> // for QPointer.
+
+class pqPythonScriptEditor;
+
 /**
 * @ingroup Reactions
 * Reaction for application python start/stop trace. This reaction will change the
@@ -72,6 +76,9 @@ private:
   Q_DISABLE_COPY(pqTraceReaction)
   QString StartTraceLabel;
   QString StopTraceLabel;
+  QPointer<pqPythonScriptEditor> Editor;
+
+  void editTrace(const QString& txt, bool incremental);
 };
 
 #endif

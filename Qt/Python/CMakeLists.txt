@@ -31,8 +31,6 @@
 set(Module_SRCS
   pqPythonDebugLeaksView.cxx
   pqPythonDebugLeaksView.h
-  pqPythonDialog.cxx
-  pqPythonDialog.h
   pqPythonMacroSupervisor.cxx
   pqPythonMacroSupervisor.h
   pqPythonManager.cxx
@@ -47,7 +45,6 @@ set(Module_SRCS
 
 set (Module_MOC_HDRS
   pqPythonDebugLeaksView.h
-  pqPythonDialog.h
   pqPythonMacroSupervisor.h
   pqPythonManager.h
   pqPythonScriptEditor.h
@@ -56,8 +53,14 @@ set (Module_MOC_HDRS
 )
 
 set (Module_UI_FILES
-  pqPythonDialog.ui
+  pqPythonShell.ui
 )
+
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS pqPythonDialog.cxx pqPythonDialog.h)
+  list(APPEND Module_MOC_HDRS pqPythonDialog.h)
+  list(APPEND Module_UI_FILES pqPythonDialog.ui)
+endif()
 
 find_package(PythonLibs REQUIRED)
 

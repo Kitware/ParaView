@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqPersistentMainWindowStateBehavior.h"
-#include "pqPythonShellReaction.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
@@ -52,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqTimeKeeper.h"
+#include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "vtkPVConfig.h"
 #include "vtkProcessModule.h"
@@ -62,12 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
 #include <QMainWindow>
 #include <QString>
 #include <QStringList>
-#include <QTimer>
 
-#include "pqTimer.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "vtkPythonInterpreter.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqCommandLineOptionsBehavior::pqCommandLineOptionsBehavior(QObject* parentObject)
@@ -181,7 +183,16 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   if (options->GetPythonScript())
   {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    pqPythonShellReaction::executeScript(options->GetPythonScript());
+    QFile file(options->GetPythonScript());
+    if (file.open(QIODevice::ReadOnly))
+    {
+      QByteArray code = file.readAll();
+      vtkPythonInterpreter::RunSimpleString(code.data());
+    }
+    else
+    {
+      qCritical() << "Cannot open Python script specified: '" << options->GetPythonScript() << "'";
+    }
 #else
     qCritical() << "Python support not enabled. Cannot run python scripts.";
 #endif

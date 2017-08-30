@@ -33,22 +33,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonShell_h
 
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
-#include "pqTimer.h"
+#include <QScopedPointer>   // needed for QScopedPointer.
 #include <QWidget>
 
 class vtkObject;
 class pqConsoleWidget;
-class vtkPythonInteractiveInterpreter;
 
 /**
+* @class pqPythonShell
+* @brief Widget for a Python shell.
+*
 * pqPythonShell is a QWidget subclass that provides an interactive Python
-* shell. It uses vtkPythonInterpreter to provide an interactive Python
-* terminal without starting a separate Python event loop.
+* shell. It uses vtkPythonInteractiveInterpreter to provide an interactive Python
+* interpreter. Note that this is still executing Python code using the
+* application wide global Python interpreter, it just keeps the context separate
+* using an instance of `core.InteractiveConsole` internally.
 *
-* Python will be initialized (if not already), when pqPythonShell is
-* instantiated.
+* @section Python initialization
 *
-* \sa pqConsoleWidget, pqPythonDialog.
+* pqPythonShell does not initialize Python on creation. By default, it waits
+* till the pqConsoleWidget gets focus or `pqPythonShell::executeScript` is
+* called. One can also call `pqPythonShell::initialize` explicitly to
+* initialize the interpreter.
+*
+* @sa pqConsoleWidget.
 */
 class PQPYTHON_EXPORT pqPythonShell : public QWidget
 {
@@ -93,14 +101,15 @@ public slots:
 
   /**
   * Resets the python interactive interpreter. This does not affect the global
-  * Python interpreter.
+  * Python interpreter. If the interactive interpreter hasn't been initialized
+  * this has no effect.
   */
   void reset();
 
   /**
   * Returns true is the shell is currently executing a script/command.
   */
-  bool isExecuting() const { return this->Executing; }
+  bool isExecuting() const;
 
   /**
   * Use this method instead of calling pqConsoleWidget::printString()
@@ -117,6 +126,13 @@ public slots:
   * assumed not to have any multi-line statements.
   */
   static void setPreamble(const QStringList& statements);
+  static const QStringList& preamble();
+
+  /**
+   * Initialize the Python interpreter in the shell, if not already.
+   * Has no effect if the interpreter has already been initialized.
+   */
+  void initialize();
 
 signals:
   /**
@@ -128,23 +144,15 @@ signals:
 
 protected slots:
   void pushScript(const QString&);
-  void setExecuting(bool val) { this->Executing = val; }
+  void runScript();
 
 protected:
   pqConsoleWidget* ConsoleWidget;
-  vtkPythonInteractiveInterpreter* Interpreter;
   const char* Prompt;
   static QStringList Preamble;
 
   static const char* PS1() { return ">>> "; }
   static const char* PS2() { return "... "; }
-
-  /**
-  * Called to setup the Python interpreter during startup or after the Python
-  * environment was finalized.
-  */
-  void setupInterpreter();
-  friend class pqPythonManager;
 
   /**
   * Show the user-input prompt, if needed. Returns true if the prompt was
@@ -156,9 +164,11 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqPythonShell)
-
   bool Prompted;
-  bool Executing;
+
+  class pqInternals;
+  friend class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif // !_pqPythonShell_h

@@ -76,7 +76,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqProxyGroupMenuManager.h"
-#include "pqPythonShellReaction.h"
 #include "pqRecentFilesMenu.h"
 #include "pqReloadFilesReaction.h"
 #include "pqRepresentationToolbar.h"
@@ -241,8 +240,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
   menu.addSeparator(); // --------------------------------------------------
 
-  new pqPythonShellReaction(menu.addAction("Python Shell") << pqSetName("actionToolsPythonShell"));
-
 #ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
@@ -289,13 +286,9 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildMacrosMenu
-#ifdef PARAVIEW_ENABLE_PYTHON
-  (QMenu& menu)
-#else
-  (QMenu&)
-#endif
+void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
 {
+  Q_UNUSED(menu);
 #ifdef PARAVIEW_ENABLE_PYTHON
   // Give the macros menu to the pqPythonMacroSupervisor
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();

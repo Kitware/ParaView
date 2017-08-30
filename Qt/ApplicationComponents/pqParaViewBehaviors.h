@@ -63,10 +63,6 @@ class QMainWindow;
 * Since ParaView 5.1, ObjectPickingBehavior is disabled by default in
 * ParaView.
 *
-* As of ParaView 5.4, QtMessageHandlerBehavior is deprecated. It should
-* no longer be needed. Applications should consider using pqOutputWidget
-* to capture VTK and Qt messages. QtMessageHandlerBehavior is needed if using
-* deprecated pqOutputWindow.
 */
 
 #define PQ_BEHAVIOR_DEFINE_METHODS(_name)                                                          \
@@ -108,6 +104,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(ApplyBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
 
   pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
   virtual ~pqParaViewBehaviors();
@@ -138,10 +135,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(ApplyBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(QuickLaunchShortcuts);
   PQ_BEHAVIOR_DECLARE_FLAG(LockPanelsBehavior);
-
-#if !defined(VTK_LEGACY_REMOVE)
-  PQ_BEHAVIOR_DECLARE_FLAG(QtMessageHandlerBehavior);
-#endif
+  PQ_BEHAVIOR_DECLARE_FLAG(PythonShellResetBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

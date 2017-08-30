@@ -74,7 +74,7 @@ public:
     this->CommandPosition = 0;
   }
 
-  void keyPressEvent(QKeyEvent* e)
+  void keyPressEvent(QKeyEvent* e) override
   {
 
     if (this->Completer && this->Completer->popup()->isVisible())
@@ -257,7 +257,7 @@ public:
     return c.position();
   }
 
-  void focusOutEvent(QFocusEvent* e)
+  void focusOutEvent(QFocusEvent* e) override
   {
     QTextEdit::focusOutEvent(e);
 
@@ -266,8 +266,14 @@ public:
     this->setFocusPolicy(Qt::WheelFocus);
   }
 
+  void focusInEvent(QFocusEvent* e) override
+  {
+    QTextEdit::focusInEvent(e);
+    emit this->Parent.consoleFocusInEvent();
+  }
+
   /// overridden to handle middle-button click pasting in *nix
-  void mouseReleaseEvent(QMouseEvent* e)
+  void mouseReleaseEvent(QMouseEvent* e) override
   {
     if (e->button() == Qt::MidButton)
     {
@@ -553,4 +559,9 @@ void pqConsoleWidget::internalExecuteCommand(const QString& Command)
   emit this->executeCommand(Command);
 }
 
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::takeFocus()
+{
+  this->Implementation->setFocus(Qt::OtherFocusReason);
+}
 //-----------------------------------------------------------------------------
