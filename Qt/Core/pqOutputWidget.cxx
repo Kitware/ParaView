@@ -85,7 +85,18 @@ public:
     }
     if (display)
     {
-      cout << msg;
+      switch (this->CurrentMessageType)
+      {
+        case pqOutputWidget::ERROR:
+          cerr << msg;
+          cerr.flush();
+          break;
+
+        default:
+          cout << msg;
+          cout.flush();
+          break;
+      }
       // Ideally, we'd simply call superclass. However there's a bad interaction
       // between pqProgressManager, vtkPVProgressHandler and support for
       // server-side messages that leads this to be an infinite recursion. We
@@ -151,9 +162,11 @@ void MessageHandler::install()
   qInstallMessageHandler(MessageHandler::handler);
 }
 
-void MessageHandler::handler(QtMsgType type, const QMessageLogContext&, const QString& msg)
+void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, const QString& msg)
 {
-  emit instance()->message(type, msg);
+  QString formattedMsg = qFormatLogMessage(type, cntxt, msg);
+  formattedMsg += "\n";
+  emit instance()->message(type, formattedMsg);
 }
 
 MessageHandler* MessageHandler::instance()

@@ -214,6 +214,10 @@ void pqPythonManager::executeScript(const QString& filename)
   {
     const QByteArray code = file.readAll();
     pqPythonManagerRawInputHelper helper;
+
+    // we capture messages from the script so that when the end up on the
+    // terminal they are grouped as single message, otherwise they get split at
+    // each "\n" since that how Python sends those messages over to us.
     vtkNew<pqPythonManagerOutputWindow> owindow;
     vtkSmartPointer<vtkOutputWindow> old = vtkOutputWindow::GetInstance();
     vtkOutputWindow::SetInstance(owindow);
@@ -231,13 +235,13 @@ void pqPythonManager::executeScript(const QString& filename)
     auto txt = owindow->text();
     if (txt.size())
     {
-      qInfo() << txt.c_str();
+      vtkOutputWindowDisplayText(txt.c_str());
     }
 
     auto errorText = owindow->errorText();
     if (errorText.size())
     {
-      qCritical() << errorText.c_str();
+      vtkOutputWindowDisplayErrorText(errorText.c_str());
     }
   }
   else
