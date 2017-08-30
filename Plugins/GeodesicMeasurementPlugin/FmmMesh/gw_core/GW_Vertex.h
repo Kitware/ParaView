@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Vertex.h
  *  \brief  Definition of class \c GW_Vertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -23,7 +23,7 @@ class GW_VertexIterator;
 /**
  *  \class  GW_Vertex
  *  \brief  A vertex, with it's normal and position.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  *
  *  This is a simple vertex, with only position, normal, and texture
@@ -198,7 +198,7 @@ typedef T_VertexMap::const_reverse_iterator CRIT_VertexMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

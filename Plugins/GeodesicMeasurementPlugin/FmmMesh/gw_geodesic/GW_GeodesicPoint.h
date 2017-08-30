@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeodesicPoint.h
  *  \brief  Definition of class \c GW_GeodesicPoint
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -34,7 +34,7 @@ typedef T_SubPointVector::const_reverse_iterator CRIT_SubPointVector;
 /**
  *  \class  GW_GeodesicPoint
  *  \brief  A point on a geodesic path.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Must lie on a edge.
@@ -93,7 +93,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -2,14 +2,14 @@
 /**
  *  \file   GW_VertexIterator.cpp
  *  \brief  Definition of class \c GW_VertexIterator
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_VertexIterator.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_VertexIterator.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -87,7 +87,7 @@ void GW_VertexIterator::operator++()
 // Name : GW_VertexIterator::GetLeftFace
 /**
  *  \return [GW_Face*] Can be NULL.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-3-2003
  *
  *  Get the face in the left of the current edge.
@@ -114,7 +114,7 @@ GW_Face* GW_VertexIterator::GetLeftFace()
 // Name : GW_VertexIterator::GetRightFace
 /**
 *  \return [GW_Face*] Can be NULL.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-3-2003
 *
 *  Get the face in the right of the current edge.
@@ -130,7 +130,7 @@ GW_Face* GW_VertexIterator::GetRightFace()
 // Name : GW_VertexIterator::GetRightVertex
 /**
  *  \return [GW_Vertex*] Can be NULL
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-3-2003
  *
  *  Get the vertex just after.
@@ -156,7 +156,7 @@ GW_Vertex* GW_VertexIterator::GetRightVertex()
 // Name : GW_VertexIterator::GetLeftVertex
 /**
 *  \return [GW_Vertex*] Can be NULL
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-3-2003
 *
 *  Get the vertex just before.
@@ -186,7 +186,7 @@ GW_Vertex* GW_VertexIterator::GetLeftVertex()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

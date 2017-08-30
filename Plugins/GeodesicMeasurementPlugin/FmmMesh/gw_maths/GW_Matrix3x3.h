@@ -2,7 +2,7 @@
 /**
  *  \file  GW_Matrix3x3.h
  *  \brief Definition of class \c GW_Matrix3x3
- *  \author Gabriel Peyré 2001-09-18
+ *  \author Gabriel PeyrÃ© 2001-09-18
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_Matrix3x3
  *  \brief  A matrix of dimension 3.
- *  \author Gabriel Peyré 2001-09-18
+ *  \author Gabriel PeyrÃ© 2001-09-18
  *
  *    A 3x3 transformation matrix. Warning : NOT THE SAME PACKING THAN OPENGL
  *    (here we use *row* major convention)
@@ -38,7 +38,7 @@ public:
     /**
     * Name : GW_Matrix3x3 constructor
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Initialize the matrix with given coordinates.
     */
@@ -65,7 +65,7 @@ public:
     /**
     * Name : GW_Matrix3x3::SetData
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetData(    GW_Float m00, GW_Float m01, GW_Float m02,
@@ -84,7 +84,7 @@ public:
     *
     *  \param  a matrix to invert
     *  \param  r result.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Use of Cramer formula for speed up in dimension 3.
     */
@@ -142,7 +142,7 @@ public:
     * Name : GW_Matrix3x3::Invert
     *
     *  \return the inverse of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Matrix3x3 Invert() const
@@ -156,7 +156,7 @@ public:
     /**
     * Name : AutoInvert
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Invert the matrix.
     */
@@ -174,7 +174,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateX(GW_Float val)
@@ -190,7 +190,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateY(GW_Float val)
@@ -206,7 +206,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateZ(GW_Float val)
@@ -222,7 +222,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void Rotate(GW_Coord_XYZW axe, GW_Float val)
@@ -247,7 +247,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateAbsX(GW_Float val)
@@ -267,7 +267,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateAbsY(GW_Float val)
@@ -287,7 +287,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateAbsZ(GW_Float val)
@@ -307,7 +307,7 @@ public:
     * Name : GW_Matrix3x3::RotateX
     *
     *  \param val rotation angle.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void RotateAbs(GW_Coord_XYZW axe, GW_Float val)
@@ -335,7 +335,7 @@ public:
     * Name : GW_Matrix3x3::GetX
     *
     *  \return X vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Vector3D GetX() const
@@ -348,7 +348,7 @@ public:
     * Name : GW_Matrix3x3::GetY
     *
     *  \return Y vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Vector3D GetY() const
@@ -361,7 +361,7 @@ public:
     * Name : GW_Matrix3x3::GetZ
     *
     *  \return Z vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Vector3D GetZ() const
@@ -373,7 +373,7 @@ public:
     * Name : GW_Matrix3x3::SetX
     *
     *  \param  v X vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetX( const GW_Vector3D& v)
@@ -386,7 +386,7 @@ public:
     * Name : GW_Matrix3x3::SetX
     *
     *  \param  v Y vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetY( const GW_Vector3D& v)
@@ -399,7 +399,7 @@ public:
     * Name : GW_Matrix3x3::SetZ
     *
     *  \param  v Z vector of the basis defined by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetZ( const GW_Vector3D& v)

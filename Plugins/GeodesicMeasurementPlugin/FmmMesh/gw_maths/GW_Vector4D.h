@@ -3,7 +3,7 @@
 /**
  *  \file  GW_Vector4D.h
  *  \brief Definition of class \c GW_Vector4D
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  */
 /*------------------------------------------------------------------------------*/
 
@@ -20,7 +20,7 @@ namespace GW {
 /**
  *  \class  GW_Vector4D
  *  \brief  A 4D vector, with usefull operators and methods.
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    This class is used every where ...
  *    A constructor makes the conversion GW_Float[4] -> GW_Vector4D

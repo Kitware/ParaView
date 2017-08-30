@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeodesicFace.inl
  *  \brief  Inlined methods for \c GW_GeodesicFace
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -16,7 +16,7 @@ namespace GW {
 // Name : GW_GeodesicFace::SetTriangularInterpolationType
 /**
  *  \param  TriangulationInterpolationType [GW_TriangularInterpolation_ABC::T_TriangulationInterpolationType] The type
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  *
  *  Set the way interpolation is performed on triangles.
@@ -32,7 +32,7 @@ void GW_GeodesicFace::SetTriangularInterpolationType( GW_TriangularInterpolation
 // Name : GW_GeodesicFace::GetTriangularInterpolationType
 /**
  *  \return [GW_TriangularInterpolation_ABC::T_TriangulationInterpolationType] The mode.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  *
  *  Return the mode of interpolation.
@@ -48,7 +48,7 @@ GW_TriangularInterpolation_ABC::T_TriangulationInterpolationType GW_GeodesicFace
 // Name : GW_GeodesicFace::GetTriangularInterpolation
 /**
  *  \return [GW_TriangularInterpolation_ABC*] The interpolator.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-6-2003
  *
  *  Get the interpolator used.
@@ -64,7 +64,7 @@ GW_TriangularInterpolation_ABC* GW_GeodesicFace::GetTriangularInterpolation()
 // Name : GW_GeodesicFace::GetTriangularInterpolation
 /**
  *  \param  pTriangularInterpolation [GW_TriangularInterpolation_ABC*] The interpolator.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-6-2003
  *
  *  Set the interpolator used.
@@ -83,7 +83,7 @@ void GW_GeodesicFace::SetTriangularInterpolation(GW_TriangularInterpolation_ABC&
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

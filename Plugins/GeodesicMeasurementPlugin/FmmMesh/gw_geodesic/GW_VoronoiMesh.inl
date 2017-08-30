@@ -2,7 +2,7 @@
 /**
  *  \file   GW_VoronoiMesh.inl
  *  \brief  Inlined methods for \c GW_VoronoiMesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -15,7 +15,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Constructor.
@@ -32,7 +32,7 @@ GW_VoronoiMesh::GW_VoronoiMesh()
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Destructor.
@@ -56,7 +56,7 @@ GW_VoronoiMesh::~GW_VoronoiMesh()
 // Name : GW_VoronoiMesh::GetBaseVertexList
 /**
  *  \return [T_GeodesicVertexList&] The list.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Get the list of base points.
@@ -71,7 +71,7 @@ T_GeodesicVertexList& GW_VoronoiMesh::GetBaseVertexList()
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh::Reset
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Clear the list of points.
@@ -94,7 +94,7 @@ void GW_VoronoiMesh::Reset()
 // Name : GW_VoronoiMesh::GetNbrBasePoints
 /**
  *  \return [GW_U32] The number.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Get the number of base points.
@@ -110,7 +110,7 @@ GW_U32 GW_VoronoiMesh::GetNbrBasePoints()
 // Name : GW_VoronoiMesh::GetGeodesicBoundariesMap
 /**
  *  \return [T_VertexPathMap&] The map.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-23-2003
  *
  *  Get the map containing all geodesic boundaries.
@@ -133,7 +133,7 @@ T_VertexPathMap& GW_VoronoiMesh::GetGeodesicBoundariesMap()
 *  \param  p1 [GW_Float] 2nd value parameter (barycentric coord).
 *  \param  p2 [GW_Float] 3rd value parameter (barycentric coord).
 *  \param  pGuess [GW_Face*] A guess of the surrounding face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-30-2003
 *
 *  Interpolate the position for a given value of parameters
@@ -233,7 +233,7 @@ void GW_VoronoiMesh::InterpolatePosition( GW_GeodesicMesh& Mesh, GW_Vector3D& Po
  *  \param  ParamV1 [GW_VoronoiVertex&] 2nd vertex param.
  *  \param  ParamV2 [GW_VoronoiVertex&] 3rd vertex param.
  *    \return Is the result valid (e.g. it is false if the vertex doesn't belongs to the corresponding face)
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-1-2003
  *
  *  Helper method : retrieve the parameters of a vertex, taking care
@@ -319,7 +319,7 @@ GW_Bool GW_VoronoiMesh::GetParameterVertex( GW_GeodesicVertex& Vert, GW_Float& a
 /**
  *  \param  Vert [GW_GeodesicVertex&] The geodesic vertex.
  *  \return [GW_VoronoiVertex*] The voronoi vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-15-2003
  *
  *  Find the voronoi vertex corresponding to the geodesic vertex.
@@ -345,7 +345,7 @@ GW_VoronoiVertex* GW_VoronoiMesh::GetVoronoiFromGeodesic( GW_GeodesicVertex& Ver
 *  \param  p1 [GW_Float] 2nd value parameter (barycentric coord).
 *  \param  p2 [GW_Float] 3rd value parameter (barycentric coord).
 *  \param  pGuess [GW_Face*] A guess of the surrounding face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-30-2003
 *
 *  Interpolate the position for a given value of parameters.
@@ -434,7 +434,7 @@ void GW_VoronoiMesh::InterpolatePositionExhaustiveSearch( GW_GeodesicMesh& Mesh,
 *  \param  Weights [T_FloatMap&] The weights for each neighbor.
 *  \param  Mesh [GW_GeodesicMesh&] The mesh.
 *  \param  Vert [GW_GeodesicVertex&] The vertex where we want to perform the interpolation.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-30-2003
 *
 *  Compute the weights for a natural neighbors interpolation.
@@ -540,7 +540,7 @@ void GW_VoronoiMesh::GetNaturalNeighborWeights( T_FloatMap& Weights, GW_Geodesic
 *  \param  Vert [GW_GeodesicVertex&] The vertex to interpolate.
 *  \param  Weights [T_FloatMap&] The weights.
 *  \return [GW_Float] Total area that contriibute to interpolation.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-30-2003
 *
 *  Add the contribution to the weights for this face.
@@ -826,7 +826,7 @@ GW_Float GW_VoronoiMesh::DistributeContribution( GW_Face& Face, T_FloatMap& Weig
 *  \param  Weights [T_FloatMap&] The weights for each neighbor.
 *  \param  Mesh [GW_GeodesicMesh&] The mesh.
 *  \param  Vert [GW_GeodesicVertex&] The vertex where we want to perform the interpolation.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-30-2003
 *
 *  Compute the weights for a reciprocical interpolation.
@@ -899,7 +899,7 @@ void GW_VoronoiMesh::GetReciprocicalDistanceWeights( T_FloatMap& Weights, GW_Geo
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

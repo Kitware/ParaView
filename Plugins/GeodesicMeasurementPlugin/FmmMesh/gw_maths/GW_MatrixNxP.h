@@ -3,7 +3,7 @@
 /**
  *  \file   GW_MatrixNxP.h
  *  \brief  Definition of class \c GW_MatrixNxP
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-31-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ typedef TNT::Array2D<GW_Float> GW_TNTArray2D;
 /**
  *  \class  GW_MatrixNxP
  *  \brief  A matrix of arbitrary size.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-31-2003
  *
  *  Use \b TNT library.
@@ -66,7 +66,7 @@ public:
     *  \param  i row number
     *  \param  j col number
     *  \return value of the (i,j) data.
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_MatrixNxP::GetData(GW_U32 i, GW_U32 j) const
@@ -81,7 +81,7 @@ public:
     *  \param  i row number
     *  \param  j col number
     *  \param  rVal value
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::SetData(GW_U32 i, GW_U32 j, GW_Float rVal)
@@ -98,7 +98,7 @@ public:
     *
     *  \param  m right hand side
     *  \return multiplication this*m
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixNxP GW_MatrixNxP::operator*(const GW_MatrixNxP& m)
@@ -115,7 +115,7 @@ public:
     *  \param  a right side
     *  \param  b left side
     *  \param  r result
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     static void GW_MatrixNxP::Multiply(const GW_MatrixNxP& a, const GW_MatrixNxP& b, GW_MatrixNxP& r)
@@ -140,7 +140,7 @@ public:
     * Name : GW_MatrixNxP::*=
     *
     *  \param  m right side
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void  GW_MatrixNxP::operator*=(const GW_MatrixNxP & m)
@@ -154,7 +154,7 @@ public:
     // Name : GW_MatrixNxP::GW_MatrixNxP operator*
     /**
     *  \param  s [GW_Float] scalar.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Matrix times scalar operator.
@@ -172,7 +172,7 @@ public:
     *  \param  a [GW_MatrixNxP&] The matrix.
     *  \param  s [GW_Float] The scalar.
     *  \param  r [GW_MatrixNxP&] The result.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Matrix times scalar.
@@ -191,7 +191,7 @@ public:
     /**
     *  \param  s [GW_Float] scalar.
     *  \return [void operator *] DESCRIPTION
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Auto multiply.
@@ -207,7 +207,7 @@ public:
     // Name : GW_MatrixNxP::GW_MatrixNxP operator/
     /**
     *  \param  s [GW_Float] scalar.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Matrix divided by scalar operator.
@@ -225,7 +225,7 @@ public:
     *  \param  a [GW_MatrixNxP&] The matrix.
     *  \param  s [GW_Float] The scalar.
     *  \param  r [GW_MatrixNxP&] The result.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Matrix divided by scalar.
@@ -246,7 +246,7 @@ public:
     /**
     *  \param  s [GW_Float] scalar.
     *  \return [void operator *] DESCRIPTION
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Auto divide.
@@ -263,7 +263,7 @@ public:
     *
     *  \param  v right hand statement.
     *  \return the vector multiplied by the matrix.
-    *  \author Gabriel Peyré 2001-09-30
+    *  \author Gabriel PeyrÃ© 2001-09-30
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorND GW_MatrixNxP::operator*(const GW_VectorND& v)
@@ -279,7 +279,7 @@ public:
     *  \param  a left hand statement.
     *  \param  v Right hand statement.
     *  \param  r Result.
-    *  \author Gabriel Peyré 2001-09-30
+    *  \author Gabriel PeyrÃ© 2001-09-30
     *
     *    Multiply the vector by the matrix.
     */
@@ -307,7 +307,7 @@ public:
     * Name : GW_MatrixNxP::Transpose
     *
     *  \return Transposed matrix.
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixNxP GW_MatrixNxP::Transpose()
@@ -324,7 +324,7 @@ public:
     *  \param  a Right side
     *  \param  r Result
     *  \return Transposed matrix.
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::Transpose(const GW_MatrixNxP& a, GW_MatrixNxP& r)
@@ -343,7 +343,7 @@ public:
     *
     *  \param  m Right side
     *  \return this+a
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixNxP  GW_MatrixNxP::operator+(const GW_MatrixNxP & m)
@@ -359,7 +359,7 @@ public:
     *  \param  a left hand side
     *  \param  b right hand side
     *  \param  r result = a+b
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::Add(const GW_MatrixNxP& a, const GW_MatrixNxP& b, GW_MatrixNxP& r)
@@ -377,7 +377,7 @@ public:
     *
     *  \param  m Right side
     *  \return this-a
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixNxP  GW_MatrixNxP::operator-(const GW_MatrixNxP & m)
@@ -393,7 +393,7 @@ public:
     *  \param  a left hand side
     *  \param  b right hand side
     *  \param  r result = a-b
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::Minus(const GW_MatrixNxP& a, const GW_MatrixNxP& b, GW_MatrixNxP& r)
@@ -410,7 +410,7 @@ public:
     * Name : GW_MatrixNxP::operator -
     *
     *  \return -this
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixNxP  GW_MatrixNxP::operator-()
@@ -425,7 +425,7 @@ public:
     *
     *  \param  a right side
     *  \param  r result
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     *
     *    unary minus.
     */
@@ -443,7 +443,7 @@ public:
     * Name : GW_MatrixNxP::+=
     *
     *  \param  m right side
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     *
     *    unary minus.
     */
@@ -459,7 +459,7 @@ public:
     * Name : GW_MatrixNxP::-=(const
     *
     *  \param  m right side
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void  GW_MatrixNxP::operator-=(const GW_MatrixNxP & m)
@@ -475,7 +475,7 @@ public:
     * Name : GW_MatrixNxP::SetZero
     *
     *  \return set all component of the matrix to zero.
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::SetZero()
@@ -489,7 +489,7 @@ public:
     * Name : GW_MatrixNxP::SetValue
     *
     *  \param  rVal value to set.
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::SetValue(GW_Float rVal)
@@ -505,7 +505,7 @@ public:
     *
     *  \param  rMin minimum value
     *  \param  rMax maximum value
-    *  \author Gabriel Peyré 2001-09-19
+    *  \author Gabriel PeyrÃ© 2001-09-19
     */
     /*------------------------------------------------------------------------------*/
     void GW_MatrixNxP::Randomize(GW_Float rMin = 0, GW_Float rMax = 1)
@@ -525,7 +525,7 @@ public:
     *  \param  U [GW_MatrixNxP&] The \c U matrix.
     *  \param  P [GW_VectorND&] Permutations of the columns.
     *  \return [GW_Float] Determinant.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Perform an LU decomposition of the matrix.
@@ -544,7 +544,7 @@ public:
     *  \param  x [GW_VectorND&] Solution.
     *  \param  b [GW_VectorND&] RHS
     *  \return [GW_Bool] Is the system inversible ?
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Solve a linear system Ax=b with LU decomposition.
@@ -568,7 +568,7 @@ public:
     *  \param  L [GW_MatrixNxP&] The result, lower triangular matrix.
     *  \return [GW_Bool] \c true if the decomposition was a success, \c false if the matrix is not
     *    symmetric definite positive.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Perform the Cholesky decomposition of the matrix M =AA^*
@@ -588,7 +588,7 @@ public:
     *  \param  x [GW_VectorND&] Solution.
     *  \param  b [GW_VectorND&] RHS.
     *  \return [GW_Bool] Was the inversion a success ?
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Solve using Cholesky.
@@ -611,7 +611,7 @@ public:
     /**
     *  \param  Q [GW_MatrixNxP&] The Q matrix.
     *  \param  R [GW_MatrixNxP&] The R matrix.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Perform QR decomposition.
@@ -629,7 +629,7 @@ public:
     *  \param  x [GW_VectorND&] solution.
     *  \param  b [GW_VectorND&] RHS.
     *  \return [GW_Bool] Was the process sucessful ?
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Solve a linear system using QR decomposition.
@@ -654,7 +654,7 @@ public:
     *  \param  pD [GW_MatrixNxP*] A block diagonal matrix (diagonal if eigenvalues are real).
     *  \param  pRealEig [GW_VectorND*] The real part of the eigenvalues.
     *  \param  pImagEig [GW_VectorND*] The imaginary part of the eigenvalues.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Perform eigen-decomposition A = V D V^*.
@@ -678,7 +678,7 @@ public:
     *  \param  V [GW_MatrixNxP&] the right singular vectors.
     *  \param  pSingV [GW_VectorND*] The singular values.
     *  \param  pS [GW_MatrixNxP*] Diagonal matrix of singular values.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-31-2003
     *
     *  Compute SVD decomposition, ie A
@@ -699,7 +699,7 @@ public:
     /*------------------------------------------------------------------------------*/
     // Name : GW_MatrixNxP::TestClass
     /**
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   6-1-2003
     *
     *  Test the class.
@@ -772,7 +772,7 @@ std::ostream& operator<<(std::ostream &s, GW_MatrixNxP& m)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

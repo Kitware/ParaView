@@ -2,14 +2,14 @@
 /**
  *  \file   GW_GeodesicFace.cpp
  *  \brief  Definition of class \c GW_GeodesicFace
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_GeodesicFace.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_GeodesicFace.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -26,7 +26,7 @@ GW_TriangularInterpolation_ABC::T_TriangulationInterpolationType GW_GeodesicFace
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicFace constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Constructor.
@@ -42,7 +42,7 @@ GW_GeodesicFace::GW_GeodesicFace()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicFace destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Destructor.
@@ -57,7 +57,7 @@ GW_GeodesicFace::~GW_GeodesicFace()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicFace::SetUpTriangularInterpolation
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Create a triangular interpolation if necessary, and initialize
@@ -98,7 +98,7 @@ void GW_GeodesicFace::SetUpTriangularInterpolation()
 *  \param  y [GW_Float] y local coord.
 *  \param  dx [GW_Float&] x coord of the gradient in local coord.
 *  \param  dy [GW_Float&] y coord of the gradient in local coord.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-2-2003
 *
 *  Compute the gradient at given point in local frame.
@@ -113,7 +113,7 @@ void GW_GeodesicFace::ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex&
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

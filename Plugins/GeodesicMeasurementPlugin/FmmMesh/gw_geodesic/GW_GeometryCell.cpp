@@ -2,14 +2,14 @@
 /**
  *  \file   GW_GeometryCell.cpp
  *  \brief  Definition of class \c GW_GeometryCell
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_GeometryCell.cpp(c) Gabriel Peyré2004";
+    static const char* sccsid = "@(#) GW_GeometryCell.cpp(c) Gabriel PeyrÃ©2004";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -30,7 +30,7 @@ using namespace GW;
  *  \param  v4 [GW_Vector3D&] 4th corner.
  *  \param  n [GW_U32] Number of points on width.
  *  \param  n [GW_U32] Number of points on height.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Initialize the position of each point.
@@ -54,7 +54,7 @@ void GW_GeometryCell::InitSampling( GW_Vector3D& v1, GW_Vector3D& v2, GW_Vector3
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

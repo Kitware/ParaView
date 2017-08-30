@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeodesicPath.inl
  *  \brief  Inlined methods for \c GW_GeodesicPath
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicPath constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Constructor.
@@ -32,7 +32,7 @@ GW_GeodesicPath::GW_GeodesicPath()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicPath destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Destructor.
@@ -48,7 +48,7 @@ GW_GeodesicPath::~GW_GeodesicPath()
 // Name : GW_GeodesicPath::GetPointList
 /**
  *  \return [T_GeodesicPointList&] The list.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Get the list of point composing the path.
@@ -64,7 +64,7 @@ T_GeodesicPointList& GW_GeodesicPath::GetPointList()
 // Name : GW_GeodesicPath::SetStepSize
 /**
  *  \param  rStepSize [GW_Float] The new size.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Set the size of the step. This mesured in barycentric coords.
@@ -80,7 +80,7 @@ void GW_GeodesicPath::SetStepSize( GW_Float rStepSize )
 // Name : GW_GeodesicPath::GetStepSize
 /**
  *  \return [GW_Float] The size.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Get the current size of the steps.
@@ -97,7 +97,7 @@ GW_Float GW_GeodesicPath::GetStepSize()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

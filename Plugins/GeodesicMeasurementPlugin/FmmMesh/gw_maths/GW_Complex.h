@@ -3,7 +3,7 @@
 /**
  *  \file   GW_Complex.h
  *  \brief  Definition of class \c GW_Complex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-11-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_Complex
  *  \brief  A complex class.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-11-2003
  *
  *  Arithmetics on complex fields.
@@ -122,7 +122,7 @@ std::ostream& operator<<(std::ostream &s, GW_Complex<c_type>& c)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

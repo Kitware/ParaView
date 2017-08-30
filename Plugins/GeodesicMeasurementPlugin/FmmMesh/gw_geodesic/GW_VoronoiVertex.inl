@@ -2,7 +2,7 @@
 /**
  *  \file   GW_VoronoiVertex.inl
  *  \brief  Inlined methods for \c GW_VoronoiVertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-19-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -16,7 +16,7 @@ namespace GW {
 // Name : GW_VoronoiVertex::AddNeighbor
 /**
 *  \param  Node [GW_VoronoiVertex&] The son node.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-15-2003
 *
 *  Add a new son to the list.
@@ -33,7 +33,7 @@ void GW_VoronoiVertex::AddNeighbor( GW_VoronoiVertex& Node )
 // Name : GW_VoronoiVertex::RemoveNeighbor
 /**
 *  \param  Node [GW_VoronoiVertex&] The son node.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-15-2003
 *
 *  Add a son to the list of sons.
@@ -49,7 +49,7 @@ void GW_VoronoiVertex::RemoveNeighbor( GW_VoronoiVertex& Node )
 // Name : GW_VoronoiVertex::BeginNeighborIterator
 /**
 *  \return [IT_VoronoiVertexList] The iterator.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-15-2003
 *
 *  begin iterator on the son list.
@@ -65,7 +65,7 @@ IT_VoronoiVertexList GW_VoronoiVertex::BeginNeighborIterator()
 // Name : GW_VoronoiVertex::EndNeighborIterator
 /**
 *  \return [IT_VoronoiVertexList] The iterator.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-15-2003
 *
 *  end iterator on the son list.
@@ -83,7 +83,7 @@ IT_VoronoiVertexList GW_VoronoiVertex::EndNeighborIterator()
 /**
  *  \param  Node [GW_VoronoiVertex&] The vertex.
  *  \return [GW_Bool] Answer
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-15-2003
  *
  *  Is the given vertex a neighbor of us ?
@@ -107,7 +107,7 @@ GW_Bool GW_VoronoiVertex::IsNeighbor( GW_VoronoiVertex& Node )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

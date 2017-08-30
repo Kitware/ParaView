@@ -2,14 +2,14 @@
 /**
  *  \file   GW_Parameterization.cpp
  *  \brief  Definition of class \c GW_Parameterization
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_Parameterization.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_Parameterization.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -46,7 +46,7 @@ GW_Parameterization::~GW_Parameterization()
 // Name : GW_Parameterization::PerformFastMarching
 /**
 *  \param  VertList [T_GeodesicVertexList&] List of start vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-13-2003
 *
 *  Just an helper method that launch a fire from each base point.
@@ -176,7 +176,7 @@ void GW_Parameterization::PerformLloydAlgorithm( GW_GeodesicMesh& Mesh, T_Geodes
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh to segment.
  *  \param  Vert [GW_GeodesicVertex&] The seed vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  *
  *  Cut the mesh according to the voronoi diagrams.
@@ -232,7 +232,7 @@ void GW_Parameterization::SegmentRegion( GW_GeodesicMesh& Mesh, GW_GeodesicVerte
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
  *  \param  VertList [T_GeodesicVertexList&] The list of the seed points.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  *
  *  Segment all the regions of a mesh.
@@ -307,7 +307,7 @@ void ExplodeRegion_Callback2( GW_Vertex& vert )
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
  *  \param  Vert [GW_GeodesicVertex&] A seed for the region.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-2-2003
  *
  *  Explode a given region.
@@ -333,7 +333,7 @@ void GW_Parameterization::ExplodeRegion( GW_GeodesicVertex& Vert, GW_Float inten
  *  \param  VertList [T_GeodesicVertexList&] The list of seed.
  *  \param  intensity [GW_Float] intensity of the explode.
  *  \param  normal_contrib [GW_Float] DESCRIPTION
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-2-2003
  *
  *  Explode each region.
@@ -372,7 +372,7 @@ void GW_Parameterization::ExtractSubMeshes_Callback( GW_Face& face )
  *  \param  Mesh [GW_GeodesicMesh&] The original mesh.
  *  \param  VertList [T_GeodesicVertexList&] A seed for each component
  *  \param  MeshVector [T_MeshVector&] The place where new meshes are put.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-14-2004
  *
  *  Create a new mesh for each connected component.
@@ -475,7 +475,7 @@ void GW_Parameterization::ExtractSubMeshes( GW_GeodesicMesh& Mesh, T_GeodesicVer
 /**
  *  \param  Mesh [GW_GeodesicMesh&] Mesh to cut
  *  \param  NewMesh [GW_GeodesicMesh&] 1st resulting mesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-19-2004
  *
  *  Split a mesh into 2 equal parts. Work only for cylindricaly (whithout cap)
@@ -712,7 +712,7 @@ void GW_Parameterization::BuildConformalMatrix( GW_Mesh& Mesh, GW_SparseMatrix& 
                     GW_Float b = M->GetData(i,k);
                     GW_Float c = M->GetData(j,k);
                     GW_Float s = (a+b+c)*0.5;
-                    /* compute tan(A/2)² */
+                    /* compute tan(A/2)Â² */
                     GW_Float rTan = (s-b)*(s-c)/( s*(s-a) );
                     //                        GW_ASSERT( rTan>0 );
                     if( rTan>0 )
@@ -739,7 +739,7 @@ void GW_Parameterization::BuildConformalMatrix( GW_Mesh& Mesh, GW_SparseMatrix& 
                     GW_Float b = M->GetData(i,k);
                     GW_Float c = M->GetData(j,k);
                     GW_Float s = (a+b+c)*0.5;
-                    /* compute tan(A/2)² */
+                    /* compute tan(A/2)Â² */
                     GW_Float rTan = (s-b)*(s-c)/( s*(s-a) );
                     //                        GW_ASSERT( rTan>0 );
                     if( rTan>0 )
@@ -896,7 +896,7 @@ void GW_Parameterization::SolveSystem( GW_SparseMatrix& M, GW_VectorND& x, GW_Ve
  *  \param  K [GW_MatrixNxP&] The weight matrix for the flattening.
  *  \param   L [GW_MatrixNxP&] The position of the vertices.
  *  \param  M [GW_MatrixNxP&] The distance matrix.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-24-2004
  *
  *  Solve the flattening problem using boundary free formulation.
@@ -1045,7 +1045,7 @@ void GW_Parameterization::ResolutionBoundaryFree( GW_Mesh& Mesh, GW_SparseMatrix
 *  \param  K [GW_MatrixNxP&] The weight matrix for the flattening.
 *  \param   L [GW_MatrixNxP&] The position of the vertices.
 *  \param  M [GW_MatrixNxP&] The distance matrix.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   1-24-2004
 *
 *  Solve the flattening problem using boundary fixed formulation.
@@ -1217,7 +1217,7 @@ void GW_Parameterization::ResolutionBoundaryFixed( GW_Mesh& Mesh, GW_SparseMatri
 /**
 *  \param  Mesh [GW_GeodesicMesh&] The mesh to flatten.
 *  \param  BaseVertex [T_GeodesicVertexList&] The base vertex that are really flatten.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   1-13-2004
 *
 *  Parameterize a whole mesh using conformal-like flattening.
@@ -1366,7 +1366,7 @@ void GW_Parameterization::ParameterizeMesh( GW_GeodesicMesh& Mesh, GW_VoronoiMes
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh. Must have been cut in separated component.
  *  \param  VertList [T_GeodesicVertexList&] Seed points.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-3-2003
  *
  *  Parameterize each region of the mesh.
@@ -1399,7 +1399,7 @@ void GW_Parameterization::ParameterizeAllRegions( T_GeodesicVertexList& VertList
 /**
  *  \param  Seed [GW_GeodesicVertex&] Seed of the region.
  *  \param  BaseDomain [GW_GeodesicMesh&] The domain of the parameterization.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-3-2003
  *
  *  Parameterize a given part of the mesh.
@@ -1451,7 +1451,7 @@ void GW_Parameterization::PerformPseudoLloydIteration_NeswDead( GW_GeodesicVerte
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
  *  \param  VertList [T_GeodesicVertexList&] List of center of the Voronoi cells.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-14-2004
  *
  *  Perform a centering step for each Voronoi region.
@@ -1543,7 +1543,7 @@ void GW_Parameterization::PerformPseudoLloydIteration( GW_GeodesicMesh& Mesh, T_
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

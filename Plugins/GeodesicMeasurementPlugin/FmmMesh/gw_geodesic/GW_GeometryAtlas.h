@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeometryAtlas.h
  *  \brief  Definition of class \c GW_GeometryAtlas
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  */
 /*------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace GW {
 /**
  *  \class  GW_GeometryAtlas
  *  \brief  A collection of cells.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  A collection of cell with interconnections
@@ -71,7 +71,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

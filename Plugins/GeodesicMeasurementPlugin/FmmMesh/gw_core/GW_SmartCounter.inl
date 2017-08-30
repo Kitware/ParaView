@@ -2,7 +2,7 @@
 /**
  *  \file  GW_SmartCounter.inl
  *  \brief Inlined methods for \c GW_SmartCounter
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  */
 /*------------------------------------------------------------------------------*/
 #include "GW_SmartCounter.h"
@@ -14,7 +14,7 @@ namespace GW {
 /**
  * Name : GW_SmartCounter constructor
  *
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  */
 /*------------------------------------------------------------------------------*/
 GW_INLINE
@@ -64,7 +64,7 @@ GW_SmartCounter& GW_SmartCounter::operator=( const GW_SmartCounter& /*Dup*/ )
 /**
  * Name : GW_SmartCounter destructor
  *
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  *
  *    Check that nobody is still using the object.
  */
@@ -81,7 +81,7 @@ GW_SmartCounter::~GW_SmartCounter()
 /**
  * Name : GW_SmartCounter::UseIt
  *
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    Declare that we use this object. We must call \c ReleaseIt when we no longer use this object.
  */
@@ -98,7 +98,7 @@ void GW_SmartCounter::UseIt()
 /**
  * Name : GW_SmartCounter::ReleaseIt
  *
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    Declare that we no longer use this object.
  */
@@ -116,7 +116,7 @@ void GW_SmartCounter::ReleaseIt()
  * Name : GW_SmartCounter::NoLongerUsed
  *
  *  \return true if no one use this object anymore.
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    We can delete the object only if \c NoLongerUsed return true.
  */

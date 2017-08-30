@@ -2,7 +2,7 @@
 /**
  *  \file  GW_MatrixStatic.h
  *  \brief Definition of class \c GW_MatrixStatic
- *  \author Gabriel Peyré 2001-09-18
+ *  \author Gabriel PeyrÃ© 2001-09-18
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_MatrixStatic
  *  \brief  A matrix of variable dimension.
- *  \author Gabriel Peyré 2001-09-18
+ *  \author Gabriel PeyrÃ© 2001-09-18
  *
  *    Note that the matrix is \e row \e major.
  *
@@ -62,7 +62,7 @@ public:
     /**
     * Name : GW_MatrixStatic constructor
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Base constructor, load identity.
     */
@@ -77,7 +77,7 @@ public:
     * Name : GW_MatrixStatic constructor
     *
     *  \param  m original matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic(const GW_MatrixStatic& m)
@@ -89,7 +89,7 @@ public:
     * Name : copy operator
     *
     *  \param  m original matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic& operator = (const GW_MatrixStatic &m)
@@ -101,7 +101,7 @@ public:
     /**
     * Name : GW_MatrixStatic destructor
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     virtual ~GW_MatrixStatic()
@@ -120,7 +120,7 @@ public:
     *
     *  \param  a right hand matrix.
     *  \return vector transformed by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorStatic<r_size,v_type> operator*(const GW_VectorStatic<c_size,v_type>& v) const
@@ -136,7 +136,7 @@ public:
     *  \param  a right hand matrix.
     *  \param  v left hand vector.
     *  \param  r vector transformed by the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     static void Multiply(const GW_MatrixStatic& a, const GW_VectorStatic<c_size,v_type>& v, GW_VectorStatic<r_size,v_type>& r)
@@ -159,7 +159,7 @@ public:
     *  \param  rScale factor
     *  \param  a left hand matrix
     *  \param  r right hand matrix
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     static void Scale(const v_type rScale, const GW_MatrixStatic<r_size,c_size,v_type>& a, GW_MatrixStatic<r_size,c_size,v_type>& r)
@@ -171,7 +171,7 @@ public:
     * Name : GW_MatrixStatic::AutoScale
     *
     *  \param  rFactor scaling factor.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void AutoScale(v_type rFactor)
@@ -182,7 +182,7 @@ public:
     /**
     * Name : GW_MatrixStatic::operator*
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic operator*(v_type v) const
@@ -195,7 +195,7 @@ public:
     /**
     * Name : GW_MatrixStatic::Scale
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic operator/(v_type v) const
@@ -211,7 +211,7 @@ public:
     /**
     * Name : GW_MatrixStatic::Scale
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void operator*=(v_type v)
@@ -222,7 +222,7 @@ public:
     /**
     * Name : GW_MatrixStatic::Scale
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void operator/=(v_type v)
@@ -241,7 +241,7 @@ public:
     *
     *  \param  a matrix to invert
     *  \param  r result.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Use the LU factorisation to solve the system.
     */
@@ -271,7 +271,7 @@ public:
     * Name : GW_MatrixStatic::Invert
     *
     *  \return the inverse of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic Invert() const
@@ -284,7 +284,7 @@ public:
     /**
     * Name : GW_MatrixStatic::AutoInvert
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Invert the matrix.
     */
@@ -317,7 +317,7 @@ public:
     *
     *  \param  a original matrix.
     *  \param  r result.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     static void Transpose(const GW_MatrixStatic<r_size,c_size,v_type>& a, GW_MatrixStatic<c_size,r_size,v_type>& r)
@@ -330,7 +330,7 @@ public:
     /**
     * Name : GW_MatrixStatic::AutoTranspose
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Transpose the matrix. Must be square !
     */
@@ -349,7 +349,7 @@ public:
     * Name : GW_MatrixStatic::Transpose
     *
     *  \return transoped matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_MatrixStatic<c_size,r_size,v_type> Transpose() const
@@ -365,7 +365,7 @@ public:
     * Name : GW_MatrixStatic::GetData
     *
     *  \return the data of the matrix (v_type[c_size*r_size]).
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     const v_type* GetData() const
@@ -379,7 +379,7 @@ public:
     * Name : GW_MatrixStatic::GetData
     *
     *  \return the data of the matrix (v_type[c_size*r_size]).
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     v_type* GetData()
@@ -395,7 +395,7 @@ public:
     *  \param  i row number.
     *  \param  j col number.
     *  \return value of the matrix at place (i,j)
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Get an element of the matrix.
     */
@@ -414,7 +414,7 @@ public:
     *  \param  i row number.
     *  \param  j col number.
     *  \param  rVal value of the matrix at place (i,j)
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetData(GW_U32 i, GW_U32 j, v_type rVal)
@@ -431,7 +431,7 @@ public:
     *  \param  i row number.
     *  \param  j col number.
     *  \param  rVal value of the matrix at place (i,j)
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void AddData(GW_I32 i, GW_I32 j, v_type rVal)
@@ -446,7 +446,7 @@ public:
     * Name : GW_MatrixStatic::SetData
     *
     *  \param  aData a pointer on an array of c_size*r_size 'v_type'
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetData(v_type* aData)
@@ -460,7 +460,7 @@ public:
     * Name : GW_MatrixStatic::GetRow
     *
     *  \return Row vector of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorStatic<c_size,v_type> GetRow( GW_U32 i ) const
@@ -476,7 +476,7 @@ public:
     * Name : GW_MatrixStatic::GetColumn
     *
     *  \return Column vector of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorStatic<r_size,v_type> GetColumn( GW_U32 j ) const
@@ -500,7 +500,7 @@ public:
     * Name : GW_MatrixStatic::SetRow
     *
     *  \param  v A row of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetRow( const GW_VectorStatic<c_size,v_type>& v, GW_U32 i )
@@ -515,7 +515,7 @@ public:
     * Name : GW_MatrixStatic::SetColumn
     *
     *  \param  v A column of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetColumn( const GW_VectorStatic<r_size,v_type>& v, GW_U32 j )
@@ -530,7 +530,7 @@ public:
     /**
     * Name : GW_MatrixStatic::SetZero
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Set all data to zero.
     */
@@ -545,7 +545,7 @@ public:
     /**
     * Name : GW_MatrixStatic::LoadIdentity
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Set the matrix to the identity.
     */
@@ -562,7 +562,7 @@ public:
     * Name : GW_MatrixStatic::SetValue
     *
     *  \param  rVal value to set to the whole matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void SetValue(v_type rVal)
@@ -575,7 +575,7 @@ public:
     *
     *  \param  rMin minimum value
     *  \param  rMax maximum value
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     void Randomize(v_type rMin=0, v_type rMax=1)
@@ -590,7 +590,7 @@ public:
     * Name : GW_MatrixStatic::Norm1
     *
     *  \return pseuo-norm 1 of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Float Norm1()
@@ -604,7 +604,7 @@ public:
     * Name : GW_MatrixStatic::Norm2
     *
     *  \return pseuo-norm 2 of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Float Norm2()
@@ -618,7 +618,7 @@ public:
     * Name : GW_MatrixStatic::NormInf
     *
     *  \return pseudo-infinite norm of the matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     */
     /*------------------------------------------------------------------------------*/
     GW_Float NormInf()
@@ -765,7 +765,7 @@ std::ostream& operator<<(std::ostream &s, GW_MatrixStatic<r_size, c_size, v_type
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size, GW_U32 interm_size, GW_U32 c_size, class v_type>
@@ -790,7 +790,7 @@ void Multiply(const GW_MatrixStatic<r_size,interm_size,v_type>& a,
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size, GW_U32 interm_size, GW_U32 c_size, class v_type>
@@ -807,7 +807,7 @@ GW_MatrixStatic<r_size,c_size,v_type> operator*(const GW_MatrixStatic<r_size,int
 * Name : GW_MatrixStatic::operator *=
 *
 *  \param  m right hand matrix.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 *
 *    These matrix must be square of the same size.
 */
@@ -831,7 +831,7 @@ void operator *=(const GW_MatrixStatic<r_size,r_size,v_type>& a,
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -849,7 +849,7 @@ static void Add(const GW_MatrixStatic<r_size,c_size,v_type>& a,
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -865,7 +865,7 @@ GW_MatrixStatic<r_size,c_size,v_type> operator + (const GW_MatrixStatic<r_size,c
 /**
 * Name : GW_MatrixStatic::UMinus
 *
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -885,7 +885,7 @@ void operator += (const GW_MatrixStatic<r_size,c_size,v_type> & a,
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -903,7 +903,7 @@ static void Minus(    const GW_MatrixStatic<r_size,c_size,v_type>& a,
 *  \param  a left hand matrix.
 *  \param  b right hand matrix.
 *  \param  r result.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -919,7 +919,7 @@ GW_MatrixStatic<r_size,c_size,v_type> operator - (const GW_MatrixStatic<r_size,c
 /**
 * Name : GW_MatrixStatic::-=
 *
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -937,7 +937,7 @@ void operator -= (const GW_MatrixStatic<r_size,c_size,v_type> & a,
 *  \param  a left hand matrix.
 *  \param  r result.
 *  \return opposed of the matrix.
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>
@@ -951,7 +951,7 @@ void UMinus(const GW_MatrixStatic<r_size,c_size,v_type>& a, GW_MatrixStatic<r_si
 /**
 * Name : GW_MatrixStatic::unary -
 *
-*  \author Gabriel Peyré 2001-11-06
+*  \author Gabriel PeyrÃ© 2001-11-06
 */
 /*------------------------------------------------------------------------------*/
 template<GW_U32 r_size,GW_U32 c_size,class v_type>

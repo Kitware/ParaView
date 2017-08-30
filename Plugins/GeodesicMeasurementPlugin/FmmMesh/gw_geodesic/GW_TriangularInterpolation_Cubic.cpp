@@ -2,14 +2,14 @@
 /**
  *  \file   GW_TriangularInterpolation_Cubic.cpp
  *  \brief  Definition of class \c GW_TriangularInterpolation_Cubic
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_TriangularInterpolation_Cubic.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_TriangularInterpolation_Cubic.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -27,7 +27,7 @@ using namespace GW;
 // Name : GW_TriangularInterpolation_Cubic::SetLocalGradient
 /**
 *  \param  grad [GW_Vector3D] The gradient.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-6-2003
 *
 *  Set the value of the gradient in local coords.
@@ -46,7 +46,7 @@ void GW_TriangularInterpolation_Cubic::SetLocalGradient( GW_Vector3D& grad, GW_G
 /*------------------------------------------------------------------------------*/
 // Name : GW_TriangularInterpolation_Cubic constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Constructor.
@@ -62,7 +62,7 @@ GW_TriangularInterpolation_Cubic::GW_TriangularInterpolation_Cubic()
 /*------------------------------------------------------------------------------*/
 // Name : GW_TriangularInterpolation_Cubic destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Destructor.
@@ -79,7 +79,7 @@ GW_TriangularInterpolation_Cubic::~GW_TriangularInterpolation_Cubic()
 // Name : GW_TriangularInterpolation_Cubic::SetUpTriangularInterpolation
 /**
  *  \param  Face [GW_GeodesicFace&] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the coefficients of the interpolation.
@@ -212,7 +212,7 @@ void GW_TriangularInterpolation_Cubic::SetUpTriangularInterpolation( GW_Geodesic
  *  \param  y [GW_Float] y local coord.
  *  \param  dx [GW_Float&] x coord of the gradient in local coord.
  *  \param  dy [GW_Float&] y coord of the gradient in local coord.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the gradient at given point in local frame.
@@ -268,7 +268,7 @@ void GW_TriangularInterpolation_Cubic::ComputeGradient( GW_GeodesicVertex& v0, G
  *  \param  x [GW_Float] x local coord.
  *  \param  y [GW_Float] y local coord.
  *  \return  value of the distance function.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the value at a given location in the triangle.
@@ -307,7 +307,7 @@ GW_Float GW_TriangularInterpolation_Cubic::ComputeValue( GW_GeodesicVertex& v0, 
 // Name : GW_TriangularInterpolation_Cubic::ComputeLocalBasis
 /**
  *  \param  Face [GW_GeodesicFace&] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-6-2003
  *
  *  Compute the local basis of the face.
@@ -340,7 +340,7 @@ void GW_TriangularInterpolation_Cubic::ComputeLocalBasis( GW_GeodesicFace& Face 
 // Name : GW_TriangularInterpolation_Cubic::ComputeLocalGradient
 /**
  *  \param  Vert [GW_GeodesicVertex&] The vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-6-2003
  *
  *  Compute the gradient using a least square approximation on the edges around.
@@ -470,7 +470,7 @@ void GW_TriangularInterpolation_Cubic::ComputeLocalGradient(  GW_GeodesicVertex&
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

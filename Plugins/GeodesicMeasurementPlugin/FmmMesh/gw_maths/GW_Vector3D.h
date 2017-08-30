@@ -2,7 +2,7 @@
 /**
  *  \file  GW_Vector3D.h
  *  \brief Definition of class \c GW_Vector3D
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  */
 /*------------------------------------------------------------------------------*/
 
@@ -23,7 +23,7 @@ GW_Vector3D operator^( const GW_VectorStatic<3,GW_Float>& v1, const GW_VectorSta
 /**
  *  \class  GW_Vector3D
  *  \brief  A 3D vector, with usefull operators and methods.
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    This class is used every where ...
  *    A constructor makes the conversion GW_Float[3] -> GW_Vector3D
@@ -107,7 +107,7 @@ GW_END_NAMESPACE
 #endif // GW_Vector3D_h
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeodesicMesh.h
  *  \brief  Definition of class \c GW_GeodesicMesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -27,7 +27,7 @@ namespace GW {
 /**
  *  \class  GW_GeodesicMesh
  *  \brief  A mesh designed for computation of geodesic.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Overload class factory method to create \c GW_GeodesicVertex.
@@ -159,7 +159,7 @@ typedef T_GeodesicMeshVector::const_reverse_iterator CRIT_GeodesicMeshVector;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

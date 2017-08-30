@@ -3,7 +3,7 @@
 /**
  *  \file   GW_Face.h
  *  \brief  Definition of class \c GW_Face
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ namespace GW {
 /**
  *  \class  GW_Face
  *  \brief  A triangle, with its three vertex and its three neighbors.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  *
  *  We use smart counter to check wether the face should descallocate a
@@ -144,7 +144,7 @@ typedef T_FaceMap::const_reverse_iterator CRIT_FaceMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

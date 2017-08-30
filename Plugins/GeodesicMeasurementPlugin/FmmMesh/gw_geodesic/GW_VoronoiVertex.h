@@ -3,7 +3,7 @@
 /**
  *  \file   GW_VoronoiVertex.h
  *  \brief  Definition of class \c GW_VoronoiVertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-19-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -44,7 +44,7 @@ typedef T_VoronoiVertexMap::const_reverse_iterator CRIT_VoronoiVertexMap;
 /**
  *  \class  GW_VoronoiVertex
  *  \brief  A vertex involved in a voronoi mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-19-2003
  *
  *  Contains a pointer to a classical vertex.
@@ -101,7 +101,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

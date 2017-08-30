@@ -2,7 +2,7 @@
 /**
  *  \file   GW_SparseMatrix.h
  *  \brief  Definition of class \c GW_SparseMatrix
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-8-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ typedef QMatrix LSP_Matrix;
 /**
  *  \class  GW_SparseMatrix
  *  \brief  A sparse matrix.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-8-2003
  *
  *  It is a wrapper \c LASPACK library.
@@ -457,7 +457,7 @@ std::ostream& operator<<(std::ostream &s, GW_SparseMatrix &A)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

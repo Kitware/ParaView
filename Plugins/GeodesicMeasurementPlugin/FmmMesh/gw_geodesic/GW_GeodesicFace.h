@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeodesicFace.h
  *  \brief  Definition of class \c GW_GeodesicFace
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ namespace GW {
 /**
  *  \class  GW_GeodesicFace
  *  \brief  A face to make geodesic computations.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Should contains geodesic vertex.
@@ -67,7 +67,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Face.inl
  *  \brief  Inlined methods for \c GW_Face
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_Face constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Constructor.
@@ -33,7 +33,7 @@ GW_Face::GW_Face()
 /*------------------------------------------------------------------------------*/
 // Name : GW_Face::virtual ~GW_Face
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Destructor.
@@ -52,7 +52,7 @@ GW_Face::~GW_Face()
 /**
  *  \param  pFace [GW_Face*] The face. Can be NULL for border faces.
  *  \param  nEdgeNum [GW_U32] The number of the edge we are sharing with this face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set one of the neigbhoring faces.
@@ -71,7 +71,7 @@ void GW_Face::SetFaceNeighbor(GW_Face* pFace, GW_U32 nEdgeNum)
  *  \param  pFace1 [GW_Face*] face 0
  *  \param  pFace2 [GW_Face*] face 1
  *  \param  pFace3 [GW_Face*] face 2
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Assign the 3 face in one time.
@@ -90,7 +90,7 @@ void GW_Face::SetFaceNeighbor(GW_Face* pFace0, GW_Face* pFace1, GW_Face* pFace2)
 /**
  *  \param  nEdgeNum [GW_U32] number of the face.
  *  \return [GW_Face*] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get one of the face neighbor
@@ -108,7 +108,7 @@ GW_Face* GW_Face::GetFaceNeighbor(GW_U32 nEdgeNum)
 /**
 *  \param  nEdgeNum [GW_U32] number of the face.
 *  \return [GW_Face*] The face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-15-2003
 *
 *  Get one of the face neighbor
@@ -126,7 +126,7 @@ const GW_Face* GW_Face::GetFaceNeighbor(GW_U32 nEdgeNum) const
 /**
  *  \param  Vert [GW_Vertex&] The vertex.
  *  \return [GW_Face*] The face. Can be NULL if correct vertex not found.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Return the neighboring face in front of the given vertex.
@@ -150,7 +150,7 @@ GW_Face* GW_Face::GetFaceNeighbor(const GW_Vertex& Vert)
 *  \param  Vert1 [GW_Vertex&] first vertex of the edge.
 *  \param  Vert2 [GW_Vertex&] Second one.
 *  \return [GW_Face*] The face. Can be NULL if correct vertex not found.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-15-2003
 *
 *  Return the neighboring face in front of the given vertex.
@@ -171,7 +171,7 @@ GW_Face* GW_Face::GetFaceNeighbor( const GW_Vertex& Vert1, const GW_Vertex& Vert
 /**
  *  \param  Vert [GW_Vertex&] The new vertex.
  *  \param  nNum [GW_U32] Its number.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set the vertex.
@@ -197,7 +197,7 @@ void GW_Face::SetVertex(GW_Vertex& Vert, GW_U32 nNum)
  *  \param  Vert0 [GW_Vertex&] vertex 0
  *  \param  Vert1 [GW_Vertex&] vertex 1
  *  \param  Vert2 [GW_Vertex&] vertex 2
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set all vertex in once.
@@ -216,7 +216,7 @@ void GW_Face::SetVertex(GW_Vertex& Vert0, GW_Vertex& Vert1, GW_Vertex& Vert2)
 /**
  *  \param  nNum [GW_U32] The number of the vertex.
  *  \return [GW_Vertex*] the vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get one of the vertex.
@@ -267,7 +267,7 @@ GW_Vertex* GW_Face::GetVertex( const GW_Vertex& Vert1, const GW_Vertex& Vert2 )
 /**
  *  \param  Vert [GW_Vertex&] The vertex.
  *  \return [GW_Vertex*] The next one.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-1-2003
  *
  *  Get the vertex following the one given by the user.
@@ -291,7 +291,7 @@ GW_Vertex* GW_Face::GetNextVertex( const GW_Vertex& Vert )
 /**
  *  \param  Face [GW_Face&] The neighbor face.
  *  \return [GW_I32] The numer. Return -1 if not found.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get the number of the edge whose neighbor face is given.
@@ -313,7 +313,7 @@ GW_I32 GW_Face::GetEdgeNumber( const GW_Face& Face )
 /**
  *  \param  Vert [GW_Vertex&] The vertex.
  *  \return [GW_I32] The number. Return -1 if not found.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Return the number of the edge in front of the given vertex.
@@ -336,7 +336,7 @@ GW_I32 GW_Face::GetEdgeNumber( const GW_Vertex& Vert )
  *  \param  Vert1 [GW_Vertex&] vertex 1
  *  \param  Vert2 [GW_Vertex&] vertex 2
  *  \return [GW_I32] The number. Return -1 if not found.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Return the number of the edge corresponding to the two given
@@ -365,7 +365,7 @@ GW_I32 GW_Face::GetEdgeNumber( const GW_Vertex& Vert1, const GW_Vertex& Vert2 )
 /**
  *  \param  nNum [GW_U32] number of the vertex
  *  \return [GW_Bool] yes/no ?
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Return true if we are the parent of a given vertex.
@@ -385,7 +385,7 @@ GW_Bool GW_Face::IsResponsibleFor( GW_U32 nNum )
 // Name : GW_Face::SetID
 /**
 *  \param  nID [GW_U32] New ID
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   3-31-2003
 *
 *  Set the number of the face in the mesh.
@@ -402,7 +402,7 @@ void GW_Face::SetID(GW_U32 nID)
 // Name : GW_Face::GetID
 /**
 *  \return [GW_U32] The ID
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   3-31-2003
 *
 *  Get the ID of the face.
@@ -419,7 +419,7 @@ GW_U32 GW_Face::GetID() const
 // Name : GW_Face::ComputeNormal
 /**
  *  \return [GW_Vector3D] The normal.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-6-2003
  *
  *  Compute the normal of the face.
@@ -443,7 +443,7 @@ GW_Vector3D GW_Face::ComputeNormal()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

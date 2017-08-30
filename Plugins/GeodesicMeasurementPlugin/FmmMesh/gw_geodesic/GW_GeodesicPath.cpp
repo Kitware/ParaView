@@ -64,7 +64,7 @@ void GW_GeodesicPath::AddVertexToPath( GW_GeodesicVertex& Vert )
 // Name : GW_GeodesicPath::InitPath
 /**
  *  \param  StartVert [GW_GeodesicVertex&] Starting point of the path.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Compute the first face to begin the search.
@@ -80,7 +80,7 @@ void GW_GeodesicPath::InitPath( GW_GeodesicVertex& StartVert )
 // Name : GW_GeodesicPath::AddNewPoint
 /**
  *  \return [GW_I32] >0 if the path is ended.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Compute a new point and add it to the path.
@@ -317,7 +317,7 @@ GW_I32 GW_GeodesicPath::AddNewPoint()
 // Name : GW_GeodesicPath::ComputePath
 /**
  *  \param  StartVert [GW_GeodesicVertex&] The starting point.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Compute the whole path.
@@ -335,7 +335,7 @@ void GW_GeodesicPath::ComputePath( GW_GeodesicVertex& StartVert, GW_U32 nMaxLeng
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicPath::ResetPath
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Clear everything in the path.
@@ -355,7 +355,7 @@ void GW_GeodesicPath::ResetPath()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////
