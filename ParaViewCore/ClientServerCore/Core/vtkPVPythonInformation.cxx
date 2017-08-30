@@ -17,15 +17,18 @@
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPython.h"
+
+#include "vtkNew.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSmartPyObject.h"
-#endif // PARAVIEW_ENABLE_PYTHON
+#include "vtkStringOutputWindow.h"
 
-#include "vtkPVPythonInformation.h"
+#endif // PARAVIEW_ENABLE_PYTHON
 
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVPythonInformation.h"
 
 #include <sstream>
 
@@ -159,6 +162,12 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->SetPythonPath(chopFilename(getModuleAttrAsString("os", "__file__")));
   this->SetPythonVersion(getModuleAttrAsString("sys", "version"));
 
+  // while testing for modules, we don't want the error messages to be reported
+  // on to the terminal, so capture them.
+  vtkNew<vtkStringOutputWindow> captureErrors;
+  vtkSmartPointer<vtkOutputWindow> oldWindow = vtkOutputWindow::GetInstance();
+  vtkOutputWindow::SetInstance(captureErrors);
+
   this->SetNumpySupport(hasModule("numpy"));
   if (this->NumpySupport)
   {
@@ -172,6 +181,8 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     this->SetMatplotlibPath(chopFilename(getModuleAttrAsString("matplotlib", "__file__")));
     this->SetMatplotlibVersion(getModuleAttrAsString("matplotlib", "__version__"));
   }
+
+  vtkOutputWindow::SetInstance(oldWindow);
 #else
   this->PythonSupportOff();
   this->SetPythonPath("");
