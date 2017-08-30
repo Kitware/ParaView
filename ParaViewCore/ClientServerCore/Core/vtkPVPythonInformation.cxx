@@ -100,12 +100,21 @@ void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation* info)
 #ifdef PARAVIEW_ENABLE_PYTHON
 namespace
 {
+
+void flushAndClearErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print(); // print implies PyErr_Clear().
+  }
+}
+
 bool hasModule(const char* module)
 {
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
-  bool result = mod;
-  return result;
+  flushAndClearErrors();
+  return mod;
 }
 
 // Returns empty string on error.
@@ -113,6 +122,7 @@ std::string getModuleAttrAsString(const char* module, const char* attribute)
 {
   vtkPythonScopeGilEnsurer gilEnsurer;
   vtkSmartPyObject mod(PyImport_ImportModule(module));
+  flushAndClearErrors();
   if (!mod)
   {
     std::ostringstream result;
@@ -121,6 +131,7 @@ std::string getModuleAttrAsString(const char* module, const char* attribute)
   }
 
   vtkSmartPyObject attr(PyObject_GetAttrString(mod, attribute));
+  flushAndClearErrors();
   if (!attr)
   {
     std::ostringstream result;
