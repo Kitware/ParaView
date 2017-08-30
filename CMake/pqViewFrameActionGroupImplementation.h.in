@@ -9,7 +9,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,7 +48,7 @@ public:
   @ARG_CLASS_NAME@Implementation(QObject* p);
   ~@ARG_CLASS_NAME@Implementation();
 
-  /// Add/remove plugin's actions to/from the frame 
+  /// Add/remove plugin's actions to/from the frame
   /// depending on the view type. Returns true if it did.
   virtual bool connect(pqMultiViewFrame*, pqView*);
   virtual bool disconnect(pqMultiViewFrame*, pqView*);
