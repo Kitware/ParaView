@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkObject;
 class pqConsoleWidget;
-class vtkPythonInteractiveInterpreter;
 
 /**
 * @class pqPythonShell
@@ -53,9 +52,9 @@ class vtkPythonInteractiveInterpreter;
 * @section Python initialization
 *
 * pqPythonShell does not initialize Python on creation. By default, it waits
-* till user double-clicks on the widget to initialize the interpreter. One can
-* also call `pqPythonShell::initialize` explicitly to initialize the
-* interpreter.
+* till the pqConsoleWidget gets focus or `pqPythonShell::executeScript` is
+* called. One can also call `pqPythonShell::initialize` explicitly to
+* initialize the interpreter.
 *
 * @sa pqConsoleWidget.
 */
@@ -127,6 +126,7 @@ public slots:
   * assumed not to have any multi-line statements.
   */
   static void setPreamble(const QStringList& statements);
+  static const QStringList& preamble();
 
   /**
    * Initialize the Python interpreter in the shell, if not already.
@@ -144,28 +144,15 @@ signals:
 
 protected slots:
   void pushScript(const QString&);
-  bool eventFilter(QObject* obj, QEvent* event) override;
   void runScript();
 
 protected:
   pqConsoleWidget* ConsoleWidget;
-  vtkPythonInteractiveInterpreter* Interpreter;
   const char* Prompt;
   static QStringList Preamble;
 
   static const char* PS1() { return ">>> "; }
   static const char* PS2() { return "... "; }
-
-  /**
-  * Called to setup the Python interpreter during startup or after the Python
-  * environment was finalized.
-  */
-  void setupInterpreter();
-
-  /**
-   * This friendship is left around only until pqPythonDialog is removed.
-   */
-  friend class pqPythonDialog;
 
   /**
   * Show the user-input prompt, if needed. Returns true if the prompt was

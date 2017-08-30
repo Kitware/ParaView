@@ -266,6 +266,12 @@ public:
     this->setFocusPolicy(Qt::WheelFocus);
   }
 
+  void focusInEvent(QFocusEvent* e) override
+  {
+    QTextEdit::focusInEvent(e);
+    emit this->Parent.consoleFocusInEvent();
+  }
+
   /// overridden to handle middle-button click pasting in *nix
   void mouseReleaseEvent(QMouseEvent* e)
   {

@@ -78,6 +78,11 @@ signals:
   */
   void executeCommand(const QString& Command);
 
+  /**
+   * Fired to indicate to the application that the console has focus.
+   */
+  void consoleFocusInEvent();
+
 public slots:
   /**
   * Writes the supplied text to the console

@@ -59,7 +59,7 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent)
   this->setObjectName("pythonDialog");
   this->setWindowTitle(tr("Python Shell"));
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
-  this->Implementation->Ui.shellWidget->setupInterpreter();
+  this->Implementation->Ui.shellWidget->initialize();
 }
 
 pqPythonDialog::~pqPythonDialog()
