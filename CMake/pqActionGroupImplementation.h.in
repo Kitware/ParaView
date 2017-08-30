@@ -46,15 +46,15 @@ class @ARG_CLASS_NAME@Implementation : public QObject, public pqActionGroupInter
   Q_INTERFACES(pqActionGroupInterface)
 public:
   @ARG_CLASS_NAME@Implementation(QObject* p);
-  ~@ARG_CLASS_NAME@Implementation();
+  ~@ARG_CLASS_NAME@Implementation() override;
 
   /// the identifier for this action group
   ///  return "ToolBar/MyTools to put them in a toolbar called MyTools
   ///  return "MenuBar/MyMenu to put the actions under MyMenu
-  virtual QString groupName();
+  QString groupName() override;
 
   /// the instance of the QActionGroup that defines the actions
-  virtual QActionGroup* actionGroup();
+  QActionGroup* actionGroup() override;
 protected:
   QActionGroup* ActionGroup;
 };

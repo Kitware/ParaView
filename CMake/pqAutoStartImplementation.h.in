@@ -43,14 +43,14 @@ class @ARG_CLASS_NAME@Implementation : public QObject, public pqAutoStartInterfa
   Q_INTERFACES(pqAutoStartInterface)
 public:
   @ARG_CLASS_NAME@Implementation(QObject* p=0);
-  virtual ~@ARG_CLASS_NAME@Implementation();
+  ~@ARG_CLASS_NAME@Implementation() override;
 
   /// Called once after the ParaView starts. If ParaView is already running when
   /// the plugin is loaded, this method will be called when the plugin is loaded.
-  virtual void startup();
+  void startup() override;
 
   /// Called once before the program shuts down.
-  virtual void shutdown();
+  void shutdown() override;
 protected:
   @ARG_CLASS_NAME@ *UserImplementation;
 };

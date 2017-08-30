@@ -46,15 +46,15 @@ class @ARG_CLASS_NAME@Implementation : public QObject, public pqViewFrameActionG
   Q_INTERFACES(pqViewFrameActionGroupInterface)
 public:
   @ARG_CLASS_NAME@Implementation(QObject* p);
-  ~@ARG_CLASS_NAME@Implementation();
+  ~@ARG_CLASS_NAME@Implementation() override;
 
   /// Add/remove plugin's actions to/from the frame
   /// depending on the view type. Returns true if it did.
-  virtual bool connect(pqMultiViewFrame*, pqView*);
-  virtual bool disconnect(pqMultiViewFrame*, pqView*);
+  bool connect(pqMultiViewFrame*, pqView*) override;
+  bool disconnect(pqMultiViewFrame*, pqView*) override;
 
   /// the instance of the QActionGroup that defines the actions
-  virtual pqViewFrameActionGroup* actionGroup();
+  pqViewFrameActionGroup* actionGroup() override;
 protected:
   pqViewFrameActionGroup* ActionGroup;
 };

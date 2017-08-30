@@ -45,8 +45,8 @@ class @PANEL_NAME@Implementation : public QObject, public pqDisplayPanelInterfac
   Q_INTERFACES(pqDisplayPanelInterface)
 public:
   @PANEL_NAME@Implementation(QObject* p);
-  virtual pqDisplayPanel* createPanel(pqRepresentation* display, QWidget* p);
-  virtual bool canCreatePanel(pqRepresentation* display) const;
+  pqDisplayPanel* createPanel(pqRepresentation* display, QWidget* p) override;
+  bool canCreatePanel(pqRepresentation* display) const override;
 };
 
 #endif

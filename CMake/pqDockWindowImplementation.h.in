@@ -45,8 +45,8 @@ class @ARG_CLASS_NAME@Implementation : public QObject, public pqDockWindowInterf
   Q_INTERFACES(pqDockWindowInterface)
 public:
   @ARG_CLASS_NAME@Implementation(QObject* p);
-  virtual QString dockArea() const;
-  virtual QDockWidget* dockWindow(QWidget* p);
+  QString dockArea() const override;
+  QDockWidget* dockWindow(QWidget* p) override;
 
 protected:
   QDockWidget *MyDock;
